@@ -7,7 +7,6 @@ from unittest import mock
 
 from django.conf import settings
 from django.test import TestCase
-from django.test import override_settings
 from django.utils import timezone
 
 from documents import tasks
@@ -203,9 +202,7 @@ class TestRetryConsumeTask(
     FileSystemAssertsMixin,
     TestCase,
 ):
-    @override_settings(CONSUMPTION_FAILED_DIR=Path(__file__).parent / "samples")
-    def test_retry_consume_clean(self):
-        test_file = self.SAMPLE_DIR / "corrupted.pdf"
+    def do_failed_task(self, test_file: Path) -> PaperlessTask:
         temp_copy = self.dirs.scratch_dir / test_file.name
         shutil.copy(test_file, temp_copy)
 
@@ -246,14 +243,19 @@ class TestRetryConsumeTask(
         task = PaperlessTask.objects.first()
         # Ensure the file is moved to the failed dir
         self.assertIsFile(settings.CONSUMPTION_FAILED_DIR / task.task_file_name)
+        return task
 
-        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs() as cm:
-                tasks.retry_failed_file(task_id=task.task_id, clean=True)
-                # on ci, the message is different because qpdf is not installed
-                msg = (
-                    "No such file or directory: 'qpdf'"
-                    if "PAPERLESS_CI_TEST" in os.environ
-                    else "New document id 1 created"
-                )
-                self.assertIn(msg, cm.output[-1])
+    @mock.patch("documents.tasks.consume_file.delay")
+    @mock.patch("documents.tasks.run_subprocess")
+    def test_retry_consume_clean(self, m_subprocess, m_consume_file):
+        task = self.do_failed_task(self.SAMPLE_DIR / "corrupted.pdf")
+        m_subprocess.return_value.returncode = 0
+        task_id = tasks.retry_failed_file(task_id=task.task_id, clean=True)
+        self.assertIsNotNone(task_id)
+        m_consume_file.assert_called_once()
+
+    def test_cleanup(self):
+        task = self.do_failed_task(self.SAMPLE_DIR / "corrupted.pdf")
+        task.acknowledged = True
+        task.save()  # simulate the task being acknowledged
+        self.assertIsNotFile(settings.CONSUMPTION_FAILED_DIR / task.task_file_name)

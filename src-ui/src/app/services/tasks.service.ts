@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { Subject } from 'rxjs'
-import { first, takeUntil } from 'rxjs/operators'
+import { Observable, Subject } from 'rxjs'
+import { first, takeUntil, tap } from 'rxjs/operators'
 import {
   PaperlessTask,
   PaperlessTaskStatus,
@@ -71,6 +71,20 @@ export class TasksService {
       .subscribe((r) => {
         this.reload()
       })
+  }
+
+  public retryTask(task: PaperlessTask): Observable<any> {
+    return this.http
+      .post(`${this.baseUrl}tasks/${task.id}/retry/`, {
+        task_id: task.id,
+      })
+      .pipe(
+        takeUntil(this.unsubscribeNotifer),
+        first(),
+        tap(() => {
+          this.reload()
+        })
+      )
   }
 
   public cancelPending(): void {

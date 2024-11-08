@@ -81,6 +81,11 @@
           </td>
           <td scope="row">
             <div class="btn-group" role="group">
+              @if (task.status === PaperlessTaskStatus.Failed) {
+                <button class="btn btn-sm btn-outline-primary" (click)="retryTask(task); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }">
+                  <i-bs name="arrow-repeat"></i-bs>&nbsp;<ng-container i18n>Retry</ng-container>
+                </button>
+              }
               <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }">
                 <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Dismiss</ng-container>
               </button>

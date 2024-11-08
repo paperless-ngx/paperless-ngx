@@ -152,6 +152,7 @@ from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_updated
 from documents.tasks import consume_file
 from documents.tasks import empty_trash
+from documents.tasks import retry_failed_file
 from documents.templating.filepath import validate_filepath_template_and_render
 from paperless import version
 from paperless.celery import app as celery_app
@@ -1717,6 +1718,18 @@ class TasksViewSet(ReadOnlyModelViewSet):
         if task_id is not None:
             queryset = PaperlessTask.objects.filter(task_id=task_id)
         return queryset
+
+    @action(methods=["post"], detail=True)
+    def retry(self, request, pk=None):
+        task = self.get_object()
+        try:
+            new_task_id = retry_failed_file(task.task_id, True)
+            return Response({"task_id": new_task_id})
+        except Exception as e:
+            logger.warning(f"An error occurred retrying task: {e!s}")
+            return HttpResponseBadRequest(
+                "Error retrying task, check logs for more detail.",
+            )
 
 
 class AcknowledgeTasksView(GenericAPIView):

@@ -2,10 +2,11 @@ import { Component, OnInit, OnDestroy } from '@angular/core'
 import { Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { first } from 'rxjs'
-import { PaperlessTask } from 'src/app/data/paperless-task'
+import { PaperlessTask, PaperlessTaskStatus } from 'src/app/data/paperless-task'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { ToastService } from 'src/app/services/toast.service'
 
 @Component({
   selector: 'pngx-tasks',
@@ -16,6 +17,7 @@ export class TasksComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy
 {
+  public PaperlessTaskStatus = PaperlessTaskStatus
   public activeTab: string
   public selectedTasks: Set<number> = new Set()
   public togggleAll: boolean = false
@@ -35,6 +37,7 @@ export class TasksComponent
   constructor(
     public tasksService: TasksService,
     private modalService: NgbModal,
+    private toastService: ToastService,
     private readonly router: Router
   ) {
     super()
@@ -81,6 +84,17 @@ export class TasksComponent
   dismissAndGo(task: PaperlessTask) {
     this.dismissTask(task)
     this.router.navigate(['documents', task.related_document])
+  }
+
+  retryTask(task: PaperlessTask) {
+    this.tasksService.retryTask(task).subscribe({
+      next: () => {
+        this.toastService.showInfo($localize`Retrying task...`)
+      },
+      error: (e) => {
+        this.toastService.showError($localize`Failed to retry task`, e)
+      },
+    })
   }
 
   expandTask(task: PaperlessTask) {

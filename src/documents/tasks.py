@@ -180,8 +180,8 @@ def retry_failed_file(task_id: str, clean: bool = False, skip_ocr: bool = False)
     if task:
         failed_file = settings.CONSUMPTION_FAILED_DIR / task.task_file_name
         if not failed_file.exists():
-            logger.error(f"Failed file {failed_file} not found")
-            return
+            logger.error(f"File {failed_file} not found")
+            raise FileNotFoundError(f"File {failed_file} not found")
         working_copy = settings.SCRATCH_DIR / failed_file.name
         copy_file_with_basic_stats(failed_file, working_copy)
 
@@ -204,14 +204,16 @@ def retry_failed_file(task_id: str, clean: bool = False, skip_ocr: bool = False)
                     logger.debug("PDF cleaned successfully")
             except Exception as e:
                 logger.error(f"Error while cleaning PDF: {e}")
-                return
+                raise e
 
-        consume_file(
+        task = consume_file.delay(
             ConsumableDocument(
                 source=DocumentSource.ConsumeFolder,
                 original_file=working_copy,
             ),
         )
+
+        return task.id
 
 
 @shared_task

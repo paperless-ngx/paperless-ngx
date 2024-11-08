@@ -31,6 +31,8 @@ import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { FormsModule } from '@angular/forms'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { ToastService } from 'src/app/services/toast.service'
+import { of, throwError } from 'rxjs'
 
 const tasks: PaperlessTask[] = [
   {
@@ -115,6 +117,7 @@ describe('TasksComponent', () => {
   let modalService: NgbModal
   let router: Router
   let httpTestingController: HttpTestingController
+  let toastService: ToastService
   let reloadSpy
 
   beforeEach(async () => {
@@ -152,6 +155,7 @@ describe('TasksComponent', () => {
     httpTestingController = TestBed.inject(HttpTestingController)
     modalService = TestBed.inject(NgbModal)
     router = TestBed.inject(Router)
+    toastService = TestBed.inject(ToastService)
     fixture = TestBed.createComponent(TasksComponent)
     component = fixture.componentInstance
     jest.useFakeTimers()
@@ -288,5 +292,21 @@ describe('TasksComponent', () => {
     expect(component.autoRefreshInterval).toBeNull()
     jest.advanceTimersByTime(6000)
     expect(reloadSpy).toHaveBeenCalledTimes(2)
+  })
+
+  it('should retry a task, show toast on error or success', () => {
+    const retrySpy = jest.spyOn(tasksService, 'retryTask')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    retrySpy.mockReturnValueOnce(of({ task_id: '123' }))
+    component.retryTask(tasks[0])
+    expect(retrySpy).toHaveBeenCalledWith(tasks[0])
+    expect(toastInfoSpy).toHaveBeenCalledWith('Retrying task...')
+    retrySpy.mockReturnValueOnce(throwError(() => new Error('test')))
+    component.retryTask(tasks[0])
+    expect(toastErrorSpy).toHaveBeenCalledWith(
+      'Failed to retry task',
+      new Error('test')
+    )
   })
 })

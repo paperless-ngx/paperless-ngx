@@ -1,6 +1,7 @@
 import logging
 import os
 import shutil
+from pathlib import Path
 
 from celery import states
 from celery.signals import before_task_publish
@@ -518,6 +519,19 @@ def update_filename_and_move_files(
                 os.path.dirname(old_archive_path),
                 root=settings.ARCHIVE_DIR,
             )
+
+
+@receiver(models.signals.post_save, sender=PaperlessTask)
+def cleanup_failed_documents(sender, instance: PaperlessTask, **kwargs):
+    if instance.status != states.FAILURE or not instance.acknowledged:
+        return
+
+    if instance.task_file_name:
+        try:
+            Path(settings.CONSUMPTION_FAILED_DIR / instance.task_file_name).unlink()
+            logger.debug(f"Cleaned up failed file {instance.task_file_name}")
+        except FileNotFoundError:
+            logger.warning(f"Failed to clean up failed file {instance.task_file_name}")
 
 
 def set_log_entry(sender, document: Document, logging_group=None, **kwargs):
