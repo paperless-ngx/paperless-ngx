@@ -82,9 +82,7 @@
           <td scope="row">
             <div class="btn-group" role="group">
               @if (task.status === PaperlessTaskStatus.Failed) {
-                <button class="btn btn-sm btn-outline-primary" (click)="retryTask(task); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }">
-                  <i-bs name="arrow-repeat"></i-bs>&nbsp;<ng-container i18n>Retry</ng-container>
-                </button>
+                <ng-container *ngTemplateOutlet="retryDropdown; context: { task: task }"></ng-container>
               }
               <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }">
                 <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Dismiss</ng-container>
@@ -158,3 +156,25 @@
   </li>
 </ul>
 <div [ngbNavOutlet]="nav"></div>
+
+<ng-template #retryDropdown let-task="task">
+  <div ngbDropdown>
+    <button class="btn btn-sm btn-outline-primary" (click)="$event.stopImmediatePropagation()" ngbDropdownToggle>
+      <i-bs name="arrow-repeat"></i-bs>&nbsp;<ng-container i18n>Retry</ng-container>
+    </button>
+    <div ngbDropdownMenu class="shadow retry-dropdown">
+      <div class="p-2">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item small" i18n>
+              <pngx-input-check [(ngModel)]="retryClean" i18n-title title="Attempt to clean pdf"></pngx-input-check>
+            </li>
+        </ul>
+        <div class="d-flex justify-content-end">
+          <button class="btn btn-sm btn-outline-primary" (click)="retryTask(task); $event.stopPropagation();">
+            <ng-container i18n>Proceed</ng-container>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

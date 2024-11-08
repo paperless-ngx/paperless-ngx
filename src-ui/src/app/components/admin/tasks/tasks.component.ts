@@ -28,6 +28,8 @@ export class TasksComponent
 
   public autoRefreshInterval: any
 
+  public retryClean: boolean = false
+
   get dismissButtonText(): string {
     return this.selectedTasks.size > 0
       ? $localize`Dismiss selected`
@@ -87,7 +89,7 @@ export class TasksComponent
   }
 
   retryTask(task: PaperlessTask) {
-    this.tasksService.retryTask(task).subscribe({
+    this.tasksService.retryTask(task, this.retryClean).subscribe({
       next: () => {
         this.toastService.showInfo($localize`Retrying task...`)
       },

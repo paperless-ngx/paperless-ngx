@@ -1585,6 +1585,14 @@ class TasksViewSerializer(serializers.ModelSerializer):
         return result
 
 
+class RetryTaskSerializer(serializers.Serializer):
+    clean = serializers.BooleanField(
+        default=False,
+        write_only=True,
+        required=False,
+    )
+
+
 class AcknowledgeTasksViewSerializer(serializers.Serializer):
     tasks = serializers.ListField(
         required=True,

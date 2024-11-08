@@ -73,10 +73,10 @@ export class TasksService {
       })
   }
 
-  public retryTask(task: PaperlessTask): Observable<any> {
+  public retryTask(task: PaperlessTask, clean: boolean): Observable<any> {
     return this.http
       .post(`${this.baseUrl}tasks/${task.id}/retry/`, {
-        task_id: task.id,
+        clean,
       })
       .pipe(
         takeUntil(this.unsubscribeNotifer),

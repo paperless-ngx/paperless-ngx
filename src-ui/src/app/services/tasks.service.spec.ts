@@ -130,14 +130,14 @@ describe('TasksService', () => {
       date_created: new Date(),
     }
 
-    tasksService.retryTask(task).subscribe()
+    tasksService.retryTask(task, true).subscribe()
     const reloadSpy = jest.spyOn(tasksService, 'reload')
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}tasks/${task.id}/retry/`
     )
     expect(req.request.method).toEqual('POST')
     expect(req.request.body).toEqual({
-      task_id: task.id,
+      clean: true,
     })
     req.flush({ task_id: 12345 })
     expect(reloadSpy).toHaveBeenCalled()

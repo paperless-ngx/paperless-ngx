@@ -33,6 +33,7 @@ import { FormsModule } from '@angular/forms'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { ToastService } from 'src/app/services/toast.service'
 import { of, throwError } from 'rxjs'
+import { CheckComponent } from '../../common/input/check/check.component'
 
 const tasks: PaperlessTask[] = [
   {
@@ -128,6 +129,7 @@ describe('TasksComponent', () => {
         IfPermissionsDirective,
         CustomDatePipe,
         ConfirmDialogComponent,
+        CheckComponent,
       ],
       imports: [
         NgbModule,
@@ -177,8 +179,10 @@ describe('TasksComponent', () => {
       `Failed${currentTasksLength}`
     )
     expect(
-      fixture.debugElement.queryAll(By.css('table input[type="checkbox"]'))
-    ).toHaveLength(currentTasksLength + 1)
+      fixture.debugElement.queryAll(
+        By.css('table td > .form-check input[type="checkbox"]')
+      )
+    ).toHaveLength(currentTasksLength)
 
     currentTasksLength = tasks.filter(
       (t) => t.status === PaperlessTaskStatus.Complete
@@ -300,7 +304,7 @@ describe('TasksComponent', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     retrySpy.mockReturnValueOnce(of({ task_id: '123' }))
     component.retryTask(tasks[0])
-    expect(retrySpy).toHaveBeenCalledWith(tasks[0])
+    expect(retrySpy).toHaveBeenCalledWith(tasks[0], false)
     expect(toastInfoSpy).toHaveBeenCalledWith('Retrying task...')
     retrySpy.mockReturnValueOnce(throwError(() => new Error('test')))
     component.retryTask(tasks[0])
