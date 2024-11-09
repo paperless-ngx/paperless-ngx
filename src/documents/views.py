@@ -51,6 +51,7 @@ from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from langdetect import detect
 from packaging import version as packaging_version
+from pipenv.vendor.tomlkit import document
 from redis import Redis
 from rest_framework import parsers, status
 from rest_framework.decorators import action
@@ -1684,7 +1685,9 @@ class ApprovalViewSet(ModelViewSet):
         # if task_id is not None:
         #     queryset = PaperlessTask.objects.filter(task_id=task_id)
         user = self.request.user
-        document_ids = Document.objects.filter(owner=user).values_list("id")
+        document_ids = Approval.objects.all().values_list("id")
+        if user.is_superuser():
+            document_ids = Document.objects.filter(owner=user).values_list("id")
         document_ids =[x[0] for x in document_ids]
         queryset = queryset.filter(object_pk__in=document_ids)
         return queryset
@@ -2433,7 +2436,6 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             ordering = request.query_params.get('ordering', None)
-            print('ordering',ordering)
             if ordering == 'document_count':
                 sorted_data = sorted(serializer.data,
                                      key=lambda x: x['document_count'])
@@ -2444,7 +2446,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                                      reverse=True)
             else:
                 sorted_data = serializer.data
-            print(sorted_data)
+
             return self.get_paginated_response(sorted_data)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
@@ -2604,7 +2606,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         old_parent_folder = instance.parent_folder
 
         self.perform_update(serializer)
-
+        self.update_child_folder_permisisons(instance, serializer)
         if old_parent_folder != instance.parent_folder:
             if instance.parent_folder:
                 instance.path = f"{instance.parent_folder.path}/{instance.id}"
@@ -2614,6 +2616,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             instance.save()
 
             self.update_child_folder_paths(instance)
+
 
         return Response(serializer.data)
 
@@ -2663,6 +2666,51 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 child_folder.path = f"{child_folder.id}"
             child_folder.save()
             self.update_child_folder_paths(child_folder)
+    def update_child_folder_permisisons(self, folder, serializer):
+        child_folders = Folder.objects.filter(path__startswith=folder.path)
+        documents_list = Document.objects.filter(folder__in=child_folders)
+        # documents_list = []
+        # for child in child_folders:
+        #     if child.type == "file":
+        #         documents_list._append(child.o)
+
+        permissions = serializer.validated_data.get("set_permissions")
+        owner = serializer.validated_data.get("owner")
+        merge = serializer.validated_data.get("merge")
+
+        try:
+            qs = child_folders
+
+            # if merge is true, we dont want to remove the owner
+            if "owner" in serializer.validated_data and (
+                not merge or (merge and owner is not None)
+            ):
+                # if merge is true, we dont want to overwrite the owner
+                qs_owner_update = qs.filter(
+                    owner__isnull=True) if merge else qs
+                qs_owner_update.update(owner=owner)
+            if "set_permissions" in serializer.validated_data:
+                for obj in qs:
+                    set_permissions_for_object(
+                        permissions=permissions,
+                        object=obj,
+                        merge=merge,
+                    )
+                for obj in documents_list:
+                    set_permissions_for_object(
+                        permissions=permissions,
+                        object=obj,
+                        merge=merge,
+                    )
+
+
+        except Exception as e:
+            logger.warning(
+                f"An error occurred performing bulk permissions edit: {e!s}",
+            )
+            return HttpResponseBadRequest(
+                "Error performing bulk permissions edit, check logs for more detail.",
+            )
 
 
     def destroy(self, request, pk, *args, **kwargs):
