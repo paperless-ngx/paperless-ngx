@@ -51,7 +51,7 @@ from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from langdetect import detect
 from packaging import version as packaging_version
-from pipenv.vendor.tomlkit import document
+
 from redis import Redis
 from rest_framework import parsers, status
 from rest_framework.decorators import action
