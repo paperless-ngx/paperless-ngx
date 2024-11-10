@@ -710,7 +710,10 @@ export class DocumentDetailComponent
         next: (docValues) => {
           // in case data changed while saving eg removing inbox_tags
           this.documentForm.patchValue(docValues)
-          this.store.next(this.documentForm.value)
+          const newValues = Object.assign({}, this.documentForm.value)
+          newValues.tags = [...docValues.tags]
+          newValues.custom_fields = [...docValues.custom_fields]
+          this.store.next(newValues)
           this.openDocumentService.setDirty(this.document, false)
           this.openDocumentService.save()
           this.toastService.showInfo($localize`Document saved successfully.`)

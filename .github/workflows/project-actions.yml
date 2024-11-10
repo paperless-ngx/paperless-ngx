@@ -15,7 +15,7 @@ permissions:
 jobs:
   pr_opened_or_reopened:
     name: pr_opened_or_reopened
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     permissions:
       # write permission is required for autolabeler
       pull-requests: write

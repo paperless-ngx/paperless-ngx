@@ -805,6 +805,24 @@ class DocumentSerializer(
             doc["content"] = doc.get("content")[0:550]
         return doc
 
+    def validate(self, attrs):
+        if (
+            "archive_serial_number" in attrs
+            and attrs["archive_serial_number"] is not None
+            and len(str(attrs["archive_serial_number"])) > 0
+            and Document.deleted_objects.filter(
+                archive_serial_number=attrs["archive_serial_number"],
+            ).exists()
+        ):
+            raise serializers.ValidationError(
+                {
+                    "archive_serial_number": [
+                        "Document with this Archive Serial Number already exists in the trash.",
+                    ],
+                },
+            )
+        return super().validate(attrs)
+
     def update(self, instance: Document, validated_data):
         if "created_date" in validated_data and "created" not in validated_data:
             new_datetime = datetime.datetime.combine(

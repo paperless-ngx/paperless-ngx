@@ -501,7 +501,7 @@ ul.pagination {
   border-color:var(--bs-primary);
 
   .document-card-check {
-    display: block;
+    display: block !important;
   }
 
   .doc-img-container {
