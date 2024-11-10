@@ -1221,6 +1221,14 @@ describe('DocumentDetailComponent', () => {
     )
     expect(saveSpy).toHaveBeenCalled()
 
+    jest.spyOn(openDocumentsService, 'isDirty').mockReturnValue(true)
+    jest.spyOn(component, 'hasNext').mockReturnValue(true)
+    const saveNextSpy = jest.spyOn(component, 'saveEditNext')
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 's', ctrlKey: true, shiftKey: true })
+    )
+    expect(saveNextSpy).toHaveBeenCalled()
+
     const closeSpy = jest.spyOn(component, 'close')
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'escape' }))
     expect(closeSpy).toHaveBeenCalled()
