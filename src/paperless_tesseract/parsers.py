@@ -43,10 +43,15 @@ class RasterisedDocumentParser(DocumentParser):
     def get_page_count(self, document_path, mime_type):
         page_count = None
         if mime_type == "application/pdf":
-            import pikepdf
+            try:
+                import pikepdf
 
-            with pikepdf.Pdf.open(document_path) as pdf:
-                page_count = len(pdf.pages)
+                with pikepdf.Pdf.open(document_path) as pdf:
+                    page_count = len(pdf.pages)
+            except Exception as e:
+                self.log.warning(
+                    f"Unable to determine PDF page count {document_path}: {e}",
+                )
         return page_count
 
     def extract_metadata(self, document_path, mime_type):
