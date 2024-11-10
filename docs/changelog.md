@@ -1,5 +1,40 @@
 # Changelog
 
+## paperless-ngx 2.13.5
+
+### Bug Fixes
+
+-   Fix: handle page count exception for pw-protected files [@shamoon](https://github.com/shamoon) ([#8240](https://github.com/paperless-ngx/paperless-ngx/pull/8240))
+-   Fix: correctly track task id in list for change detection [@shamoon](https://github.com/shamoon) ([#8230](https://github.com/paperless-ngx/paperless-ngx/pull/8230))
+-   Fix: Admin pages should show trashed documents [@stumpylog](https://github.com/stumpylog) ([#8068](https://github.com/paperless-ngx/paperless-ngx/pull/8068))
+-   Fix: tag colors shouldn't change when selected in list [@shamoon](https://github.com/shamoon) ([#8225](https://github.com/paperless-ngx/paperless-ngx/pull/8225))
+-   Fix: fix thumbnail clipping, select inverted color in safari dark mode not system [@shamoon](https://github.com/shamoon) ([#8193](https://github.com/paperless-ngx/paperless-ngx/pull/8193))
+-   Fix: select checkbox should remain visible [@shamoon](https://github.com/shamoon) ([#8185](https://github.com/paperless-ngx/paperless-ngx/pull/8185))
+-   Fix: warn with proper error on ASN exists in trash [@shamoon](https://github.com/shamoon) ([#8176](https://github.com/paperless-ngx/paperless-ngx/pull/8176))
+
+### Maintenance
+
+-   Chore: Updates all runner images to use Ubuntu Noble [@stumpylog](https://github.com/stumpylog) ([#8213](https://github.com/paperless-ngx/paperless-ngx/pull/8213))
+-   Chore(deps): Bump stumpylog/image-cleaner-action from 0.8.0 to 0.9.0 in the actions group [@dependabot](https://github.com/dependabot) ([#8142](https://github.com/paperless-ngx/paperless-ngx/pull/8142))
+
+### Dependencies
+
+-   Chore(deps): Bump stumpylog/image-cleaner-action from 0.8.0 to 0.9.0 in the actions group [@dependabot](https://github.com/dependabot) ([#8142](https://github.com/paperless-ngx/paperless-ngx/pull/8142))
+
+### All App Changes
+
+<details>
+<summary>7 changes</summary>
+
+-   Fix: handle page count exception for pw-protected files [@shamoon](https://github.com/shamoon) ([#8240](https://github.com/paperless-ngx/paperless-ngx/pull/8240))
+-   Fix: correctly track task id in list for change detection [@shamoon](https://github.com/shamoon) ([#8230](https://github.com/paperless-ngx/paperless-ngx/pull/8230))
+-   Fix: Admin pages should show trashed documents [@stumpylog](https://github.com/stumpylog) ([#8068](https://github.com/paperless-ngx/paperless-ngx/pull/8068))
+-   Fix: tag colors shouldn't change when selected in list [@shamoon](https://github.com/shamoon) ([#8225](https://github.com/paperless-ngx/paperless-ngx/pull/8225))
+-   Fix: fix thumbnail clipping, select inverted color in safari dark mode not system [@shamoon](https://github.com/shamoon) ([#8193](https://github.com/paperless-ngx/paperless-ngx/pull/8193))
+-   Fix: select checkbox should remain visible [@shamoon](https://github.com/shamoon) ([#8185](https://github.com/paperless-ngx/paperless-ngx/pull/8185))
+-   Fix: warn with proper error on ASN exists in trash [@shamoon](https://github.com/shamoon) ([#8176](https://github.com/paperless-ngx/paperless-ngx/pull/8176))
+</details>
+
 ## paperless-ngx 2.13.4
 
 ### Bug Fixes
