@@ -365,6 +365,7 @@ class RasterisedDocumentParser(DocumentParser):
         from ocrmypdf import EncryptedPdfError
         from ocrmypdf import InputFileError
         from ocrmypdf import SubprocessOutputError
+        from ocrmypdf.exceptions import DigitalSignatureError
 
         archive_path = Path(os.path.join(self.tempdir, "archive.pdf"))
         sidecar_file = Path(os.path.join(self.tempdir, "sidecar.txt"))
@@ -387,9 +388,9 @@ class RasterisedDocumentParser(DocumentParser):
 
             if not self.text:
                 raise NoTextFoundException("No text was found in the original document")
-        except EncryptedPdfError:
+        except (DigitalSignatureError, EncryptedPdfError):
             self.log.warning(
-                "This file is encrypted, OCR is impossible. Using "
+                "This file is encrypted and/or signed, OCR is impossible. Using "
                 "any text present in the original file.",
             )
             if original_has_text:
