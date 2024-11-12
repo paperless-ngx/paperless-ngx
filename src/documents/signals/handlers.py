@@ -134,7 +134,7 @@ def set_correspondent(
 
             document.correspondent = selected
             document.save(update_fields=("correspondent",))
-            
+
 def set_folder(
     sender,
     document: Document,
@@ -696,7 +696,7 @@ def run_workflow(
 
                     if action.assign_correspondent is not None:
                         document.correspondent = action.assign_correspondent
-                    
+
                     if action.assign_document_type is not None:
                         document.document_type = action.assign_document_type
 
@@ -784,6 +784,16 @@ def run_workflow(
                             object=document,
                             merge=True,
                         )
+                        set_permissions_for_object(
+                            permissions=permissions,
+                            object=document.folder,
+                            merge=True,
+                        )
+                        set_permissions_for_object(
+                            permissions=permissions,
+                            object=document.dossier,
+                            merge=True,
+                        )
 
                     if action.assign_custom_fields is not None:
                         for field in action.assign_custom_fields.all():
@@ -862,6 +872,16 @@ def run_workflow(
                             object=document,
                             merge=False,
                         )
+                        set_permissions_for_object(
+                            permissions=permissions,
+                            object=document.folder,
+                            merge=True,
+                        )
+                        set_permissions_for_object(
+                            permissions=permissions,
+                            object=document.dossier,
+                            merge=True,
+                        )
                     elif (
                         (action.remove_view_users.all().count() > 0)
                         or (action.remove_view_groups.all().count() > 0)
@@ -886,7 +906,7 @@ def run_workflow(
                         ).delete()
 
             document.save()
-        
+
 def run_workflow_approval(
         trigger_type: WorkflowTrigger.WorkflowTriggerType,
         approval: Approval,
@@ -923,7 +943,7 @@ def run_workflow_approval(
                     extra={"group":logging_group}
                 )
                 if action.type == WorkflowAction.WorkflowActionType.ASSIGNMENT_WITH_APPROVAL:
-                    if (action.assign_content_type is not None 
+                    if (action.assign_content_type is not None
                     and action.assign_content_type == approval.ctype):
                         permissions = {}
                         match approval.access_type:
@@ -934,7 +954,7 @@ def run_workflow_approval(
                                     "users": [getattr(approval.submitted_by, 'id')] if getattr(approval.submitted_by, 'id', None) is not None else [],
                                     "groups": approval.submitted_by_group.values_list('id',)
                                     or [],
-                                    
+
                                 }
                             case "VIEW":
                                 permissions["view"] = {
@@ -942,21 +962,21 @@ def run_workflow_approval(
                                     "groups": approval.submitted_by_group.values_list('id',)
                                     or [],
                                 }
-                                
+
                             case _:
                                 pass
-                                
+
                         set_permissions_for_object(
                             permissions=permissions,
                             object=obj,
                             merge=True,
                         )
-                       
+
                 elif action.type == WorkflowAction.WorkflowActionType.REMOVAL_WITH_APPROVAL:
-                    
-                    if (action.assign_content_type is not None 
+
+                    if (action.assign_content_type is not None
                     and action.assign_content_type == approval.ctype):
-                        
+
                         if action.remove_all_permissions:
                             permissions = {
                                 "view": {
@@ -983,7 +1003,7 @@ def run_workflow_approval(
                                         remove_perm(f"change_{model_name}", approval.submitted_by, obj)
                                         remove_perm(f"add_{model_name}", approval.submitted_by, obj)
                                         remove_perm(f"delete_{model_name}", approval.submitted_by, obj)
-                                    
+
                                     if approval.submitted_by_group.values_list(flat=True):
                                         for g in groups:
                                             remove_perm(f"view_{model_name}", g, obj)
@@ -997,7 +1017,7 @@ def run_workflow_approval(
                                         for g in groups:
                                             remove_perm(f"view_{model_name}", g, obj)
             obj.save()
-                        
+
 
 
 @before_task_publish.connect

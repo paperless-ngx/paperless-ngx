@@ -2110,6 +2110,38 @@ class AdjustedNameFieldWarehouse(serializers.CharField):
                 data = generate_unique_name(data, existing_names)
         return data
 
+class AdjustedNameFieldDossier(serializers.CharField):
+    def to_internal_value(self, data):
+        model = self.parent.Meta.model
+
+        if hasattr(model, 'name'):
+            parent_dossier = self.parent.initial_data.get('parent_dossier', None)
+            type = self.parent.initial_data.get('type')
+
+            if type == 'file':
+                return data
+
+            if type and not parent_dossier:
+                existing_names = model.objects.filter(type=type).values_list('name', flat=True)
+                if getattr(self.parent,'instance') is None:
+                    pass
+                elif data == getattr(self.parent.instance,'name'):
+                    return data
+
+            elif parent_dossier:
+                existing_names = model.objects.filter(parent_dossier=parent_dossier).order_by('name').values_list('name', flat=True)
+                if getattr(self.parent,'instance') is None:
+                    pass
+                elif data == getattr(self.parent.instance,'name'):
+                    return data
+
+            else:
+                existing_names = model.objects.filter(name__startswith=data,parent_dossier=None).order_by('name').values_list('name', flat=True)
+
+            if data in existing_names:
+                data = generate_unique_name(data, existing_names)
+        return data
+
 
 
 
@@ -2257,7 +2289,9 @@ class DossierSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             'type',
             'dossier_form_name',
             'document_matching',
-            'custom_fields'
+            'custom_fields',
+            'set_permissions',
+            'permissions'
         ]
     def create(self, validated_data):
         custom_fields_data = validated_data.pop('custom_fields', [])
@@ -2355,7 +2389,9 @@ class DossierFormSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             'owner',
             'type',
             'form_rule',
-            'custom_fields'
+            'custom_fields',
+            'set_permissions',
+            'permissions'
         ]
     def create(self, validated_data):
         custom_fields_data = validated_data.pop('custom_fields', [])

@@ -803,6 +803,44 @@ class Consumer(LoggingMixin):
             with transaction.atomic():
                 # store the document.
                 document = self._store(text=text, date=date, mime_type=mime_type)
+                new_file = None
+                self.log.debug("Comsumer", document.folder)
+                if document.folder==None:
+                    new_file = Folder.objects.create(name=document.title,
+                                                 parent_folder=document.folder,
+                                                 type=Folder.FILE,
+                                                 owner=document.owner,
+                                                 created=document.created,
+                                                 updated=document.modified)
+                new_file.checksum = hashlib.md5(
+                    f'{new_file.id}.{new_file.name}'.encode()).hexdigest()
+                if document.folder:
+                    new_file.path = f"{document.folder.path}/{new_file.id}"
+                else:
+                    new_file.path = f"{new_file.id}"
+                new_file.save()
+                document.folder = new_file
+
+                dossier = None
+                if document.dossier:
+                    dossier = Dossier.objects.filter(
+                        id=document.dossier.pk).first()
+                    # update custom field by document_id
+                dossier_form = None
+                if dossier:
+                    dossier_form = dossier.dossier_form
+                new_dossier_document = Dossier.objects.create(
+                    name=document.title,
+                    parent_dossier=document.dossier,
+                    type="FILE",
+                    dossier_form=dossier_form)
+                if document.dossier:
+                    new_dossier_document.path = f"{document.dossier.path}/{new_file.id}"
+                else:
+                    new_dossier_document.path = f"{new_file.id}"
+                new_dossier_document.save()
+                self.log.debug("dossier log",new_dossier_document)
+                document.dossier = new_dossier_document
 
                 # If we get here, it was successful. Proceed with post-consume
                 # hooks. If they fail, nothing will get changed.
@@ -814,31 +852,8 @@ class Consumer(LoggingMixin):
                 )
                  # create file from document
                 # self.log.info('gia tri documentt', document.folder)
-                new_file = Folder.objects.create(name=document.title, parent_folder = document.folder,type = Folder.FILE, owner = document.owner, created = document.created, updated = document.modified)
-                new_file.checksum=hashlib.md5(f'{new_file.id}.{new_file.name}'.encode()).hexdigest()
-                if document.folder :
-                    new_file.path = f"{document.folder.path}/{new_file.id}"
-                else:
-                    new_file.path = f"{new_file.id}"
-                new_file.save()
-                document.folder=new_file
 
-                dossier = None
-                if document.dossier:
-                    dossier = Dossier.objects.filter(id=document.dossier.pk).first()
-                    # update custom field by document_id
-                dossier_form = None
-                if dossier:
-                    dossier_form = dossier.dossier_form
-                new_dossier_document = Dossier.objects.create(name=document.title,
-                                                                parent_dossier=document.dossier,
-                                                                type="FILE",
-                                                                dossier_form=dossier_form)
-                if document.dossier :
-                    new_dossier_document.path = f"{document.dossier.path}/{new_file.id}"
-                else:
-                    new_dossier_document.path = f"{new_file.id}"
-                new_dossier_document.save()
+
 
 
                 if data_ocr_fields[1] == '' and isinstance(data_ocr_fields[0], list):
