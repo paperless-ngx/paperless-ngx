@@ -647,7 +647,7 @@ def run_workflow_updated(sender, document: Document, logging_group=None, **kwarg
 
 def run_workflow_approval_updated(sender, approval: Approval, logging_group=None, **kwargs):
     run_workflow_approval(
-        WorkflowTrigger.WorkflowTriggerType.APPROVAL_ADDED,
+        WorkflowTrigger.WorkflowTriggerType.APPROVAL_UPDATED,
         approval,
         logging_group,
     )
