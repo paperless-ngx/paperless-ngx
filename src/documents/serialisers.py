@@ -2243,6 +2243,8 @@ class ParentDossierTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer
         model = Dossier
         fields = '__all__'
 class DossierSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+    name = AdjustedNameFieldDossier()
+
     custom_fields = CustomFieldInstanceSerializer(
         many=True,
         allow_null=True,
@@ -2295,8 +2297,11 @@ class DossierSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         ]
     def create(self, validated_data):
         custom_fields_data = validated_data.pop('custom_fields', [])
-
-        dossier = Dossier.objects.create(**validated_data)
+        dossier_name = validated_data.pop('name', None)
+        dossier_type = validated_data.pop('type', None)
+        parent_dossier = validated_data.pop('parent_dossier', None)
+        dossier_form = validated_data.pop('dossier_form', None)
+        dossier = Dossier.objects.create(name = dossier_name, type = dossier_type, parent_dossier = parent_dossier, dossier_form= dossier_form)
         type_to_data_store_name_map = {
             CustomField.FieldDataType.STRING: "value_text",
             CustomField.FieldDataType.URL: "value_url",
@@ -2323,8 +2328,8 @@ class DossierSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             custom_field_instance.save()
             lst_dossier_custom_field.append(custom_field_instance.pk)
         return dossier
-
-        records_to_delete = CustomFieldInstance.objects.exclude(id__in=lst_dossier_custom_field).filter(dossier=dossier.pk)
+        #
+        # records_to_delete = CustomFieldInstance.objects.exclude(id__in=lst_dossier_custom_field).filter(dossier=dossier.pk)
     def update(self, instance, validated_data):
         custom_fields_data = validated_data.pop('custom_fields', [])
         # validated_data['parent_dossier_type']
