@@ -509,6 +509,16 @@ export class DocumentDetailComponent
       .subscribe(() => {
         if (this.openDocumentService.isDirty(this.document)) this.save()
       })
+
+    this.hotKeyService
+      .addShortcut({
+        keys: 'control.shift.s',
+        description: $localize`Save and close / next`,
+      })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        if (this.openDocumentService.isDirty(this.document)) this.saveEditNext()
+      })
   }
 
   ngOnDestroy(): void {
