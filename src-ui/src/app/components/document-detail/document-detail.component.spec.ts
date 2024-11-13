@@ -774,6 +774,15 @@ describe('DocumentDetailComponent', () => {
     expect(component.previewNumPages).toEqual(1000)
   })
 
+  it('should include delay of 300ms after previewloaded before showing pdf', fakeAsync(() => {
+    initNormally()
+    expect(component.previewLoaded).toBeFalsy()
+    component.pdfPreviewLoaded({ numPages: 1000 } as any)
+    expect(component.previewNumPages).toEqual(1000)
+    tick(300)
+    expect(component.previewLoaded).toBeTruthy()
+  }))
+
   it('should support zoom controls', () => {
     initNormally()
     component.onZoomSelect({ target: { value: '1' } } as any) // from select
@@ -921,7 +930,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should display built-in pdf viewer if not disabled', () => {
     initNormally()
-    component.metadata = { has_archive_version: true }
+    component.document.archived_file_name = 'file.pdf'
     jest.spyOn(settingsService, 'get').mockReturnValue(false)
     expect(component.useNativePdfViewer).toBeFalsy()
     fixture.detectChanges()
@@ -930,7 +939,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should display native pdf viewer if enabled', () => {
     initNormally()
-    component.metadata = { has_archive_version: true }
+    component.document.archived_file_name = 'file.pdf'
     jest.spyOn(settingsService, 'get').mockReturnValue(true)
     expect(component.useNativePdfViewer).toBeTruthy()
     fixture.detectChanges()
@@ -1072,8 +1081,8 @@ describe('DocumentDetailComponent', () => {
   })
 
   it('should change preview element by render type', () => {
-    component.metadata = { has_archive_version: true }
     initNormally()
+    component.document.archived_file_name = 'file.pdf'
     fixture.detectChanges()
     expect(component.archiveContentRenderType).toEqual(
       component.ContentRenderType.PDF
@@ -1082,10 +1091,8 @@ describe('DocumentDetailComponent', () => {
       fixture.debugElement.query(By.css('pdf-viewer-container'))
     ).not.toBeUndefined()
 
-    component.metadata = {
-      has_archive_version: false,
-      original_mime_type: 'text/plain',
-    }
+    component.document.archived_file_name = undefined
+    component.document.mime_type = 'text/plain'
     fixture.detectChanges()
     expect(component.archiveContentRenderType).toEqual(
       component.ContentRenderType.Text
@@ -1094,10 +1101,7 @@ describe('DocumentDetailComponent', () => {
       fixture.debugElement.query(By.css('div.preview-sticky'))
     ).not.toBeUndefined()
 
-    component.metadata = {
-      has_archive_version: false,
-      original_mime_type: 'image/jpg',
-    }
+    component.document.mime_type = 'image/jpeg'
     fixture.detectChanges()
     expect(component.archiveContentRenderType).toEqual(
       component.ContentRenderType.Image
@@ -1105,13 +1109,9 @@ describe('DocumentDetailComponent', () => {
     expect(
       fixture.debugElement.query(By.css('.preview-sticky img'))
     ).not.toBeUndefined()
-
-    component.metadata = {
-      has_archive_version: false,
-      original_mime_type:
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    }
-    fixture.detectChanges()
+    ;(component.document.mime_type =
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
+      fixture.detectChanges()
     expect(component.archiveContentRenderType).toEqual(
       component.ContentRenderType.Other
     )

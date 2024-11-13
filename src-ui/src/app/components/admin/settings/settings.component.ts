@@ -88,7 +88,6 @@ export class SettingsComponent
     darkModeEnabled: new FormControl(null),
     darkModeInvertThumbs: new FormControl(null),
     themeColor: new FormControl(null),
-    useNativePdfViewer: new FormControl(null),
     displayLanguage: new FormControl(null),
     dateLocale: new FormControl(null),
     dateFormat: new FormControl(null),
@@ -99,7 +98,9 @@ export class SettingsComponent
     defaultPermsViewGroups: new FormControl(null),
     defaultPermsEditUsers: new FormControl(null),
     defaultPermsEditGroups: new FormControl(null),
+    useNativePdfViewer: new FormControl(null),
     documentEditingRemoveInboxTags: new FormControl(null),
+    documentEditingOverlayThumbnail: new FormControl(null),
     searchDbOnly: new FormControl(null),
     searchLink: new FormControl(null),
 
@@ -307,6 +308,9 @@ export class SettingsComponent
       ),
       documentEditingRemoveInboxTags: this.settings.get(
         SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS
+      ),
+      documentEditingOverlayThumbnail: this.settings.get(
+        SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL
       ),
       searchDbOnly: this.settings.get(SETTINGS_KEYS.SEARCH_DB_ONLY),
       searchLink: this.settings.get(SETTINGS_KEYS.SEARCH_FULL_TYPE),
@@ -538,6 +542,10 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS,
       this.settingsForm.value.documentEditingRemoveInboxTags
+    )
+    this.settings.set(
+      SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL,
+      this.settingsForm.value.documentEditingOverlayThumbnail
     )
     this.settings.set(
       SETTINGS_KEYS.SEARCH_DB_ONLY,

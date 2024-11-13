@@ -120,17 +120,6 @@
 
         <div class="row mb-3">
           <div class="col-md-3 col-form-label pt-0">
-            <span i18n>Document editor</span>
-          </div>
-          <div class="col">
-
-            <pngx-input-check i18n-title title="Use PDF viewer provided by the browser" i18n-hint hint="This is usually faster for displaying large PDF documents, but it might not work on some browsers." formControlName="useNativePdfViewer"></pngx-input-check>
-
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="col-md-3 col-form-label pt-0">
             <span i18n>Sidebar</span>
           </div>
           <div class="col">
@@ -168,15 +157,19 @@
         <h4 class="mt-4" id="update-checking" i18n>Update checking</h4>
 
         <div class="row mb-3">
-          <div class="offset-md-3 col">
-            <p i18n>
-            Update checking works by pinging the public <a href="https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest" target="_blank" rel="noopener noreferrer">GitHub API</a> for the latest release to determine whether a new version is available.<br/>
-            Actual updating of the app must still be performed manually.
-          </p>
-            <p i18n>
-            <em>No tracking data is collected by the app in any way.</em>
-          </p>
+          <div class="offset-md-3 col d-flex flex-row align-items-start">
             <pngx-input-check i18n-title title="Enable update checking" formControlName="updateCheckingEnabled"></pngx-input-check>
+            <button class="btn btn-sm btn-link text-muted me-auto p-0 ms-2" title="What's this?" i18n-title type="button" triggers="mouseenter:mouseleave" [ngbPopover]="updatesPopover" [autoClose]="true">
+              <i-bs name="question-circle"></i-bs>
+            </button>
+            <ng-template #updatesPopover>
+              <p i18n>
+                Update checking works by pinging the public GitHub API for the latest release to determine whether a new version is available. Actual updating of the app must still be performed manually.
+              </p>
+              <p>
+                <em i18n>No tracking data is collected by the app in any way.</em>
+              </p>
+            </ng-template>
           </div>
         </div>
 
@@ -184,7 +177,19 @@
 
         <div class="row mb-3">
           <div class="offset-md-3 col">
+            <pngx-input-check i18n-title title="Use PDF viewer provided by the browser" i18n-hint hint="This is usually faster for displaying large PDF documents, but it might not work on some browsers." formControlName="useNativePdfViewer"></pngx-input-check>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
             <pngx-input-check i18n-title title="Automatically remove inbox tag(s) on save" formControlName="documentEditingRemoveInboxTags"></pngx-input-check>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="offset-md-3 col">
+            <pngx-input-check i18n-title title="Show document thumbnail during loading" formControlName="documentEditingOverlayThumbnail"></pngx-input-check>
           </div>
         </div>
 
