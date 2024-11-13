@@ -17,7 +17,11 @@ const customFields: CustomField[] = [
     name: 'Field 4',
     data_type: CustomFieldDataType.Select,
     extra_data: {
-      select_options: ['Option 1', 'Option 2', 'Option 3'],
+      select_options: [
+        { label: 'Option 1', id: 'abc-123' },
+        { label: 'Option 2', id: 'def-456' },
+        { label: 'Option 3', id: 'ghi-789' },
+      ],
     },
   },
   {
@@ -131,6 +135,8 @@ describe('CustomFieldDisplayComponent', () => {
   })
 
   it('should show select value', () => {
-    expect(component.getSelectValue(customFields[3], 2)).toEqual('Option 3')
+    expect(component.getSelectValue(customFields[3], 'ghi-789')).toEqual(
+      'Option 3'
+    )
   })
 })

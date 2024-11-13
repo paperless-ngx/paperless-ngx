@@ -61,7 +61,10 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
                     "data_type": "select",
                     "name": "Select Field",
                     "extra_data": {
-                        "select_options": ["Option 1", "Option 2"],
+                        "select_options": [
+                            {"label": "Option 1", "id": "abc-123"},
+                            {"label": "Option 2", "id": "def-456"},
+                        ],
                     },
                 },
             ),
@@ -73,7 +76,10 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
 
         self.assertCountEqual(
             data["extra_data"]["select_options"],
-            ["Option 1", "Option 2"],
+            [
+                {"label": "Option 1", "id": "abc-123"},
+                {"label": "Option 2", "id": "def-456"},
+            ],
         )
 
     def test_create_custom_field_nonunique_name(self):
@@ -261,7 +267,10 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             name="Test Custom Field Select",
             data_type=CustomField.FieldDataType.SELECT,
             extra_data={
-                "select_options": ["Option 1", "Option 2"],
+                "select_options": [
+                    {"label": "Option 1", "id": "abc-123"},
+                    {"label": "Option 2", "id": "def-456"},
+                ],
             },
         )
 
@@ -309,7 +318,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
                     },
                     {
                         "field": custom_field_select.id,
-                        "value": 0,
+                        "value": "abc-123",
                     },
                 ],
             },
@@ -332,7 +341,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
                 {"field": custom_field_monetary.id, "value": "EUR11.10"},
                 {"field": custom_field_monetary2.id, "value": "11.1"},
                 {"field": custom_field_documentlink.id, "value": [doc2.id]},
-                {"field": custom_field_select.id, "value": 0},
+                {"field": custom_field_select.id, "value": "abc-123"},
             ],
         )
 
@@ -722,7 +731,10 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             name="Test Custom Field SELECT",
             data_type=CustomField.FieldDataType.SELECT,
             extra_data={
-                "select_options": ["Option 1", "Option 2"],
+                "select_options": [
+                    {"label": "Option 1", "id": "abc-123"},
+                    {"label": "Option 2", "id": "def-456"},
+                ],
             },
         )
 
@@ -730,7 +742,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             f"/api/documents/{doc.id}/",
             data={
                 "custom_fields": [
-                    {"field": custom_field_select.id, "value": 3},
+                    {"field": custom_field_select.id, "value": "not an option"},
                 ],
             },
             format="json",

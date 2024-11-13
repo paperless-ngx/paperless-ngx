@@ -311,7 +311,9 @@ export class CustomFieldsQueryDropdownComponent implements OnDestroy {
     }))
   }
 
-  getSelectOptionsForField(fieldID: number): string[] {
+  getSelectOptionsForField(
+    fieldID: number
+  ): Array<{ label: string; id: string }> {
     const field = this.customFields.find((field) => field.id === fieldID)
     if (field) {
       return field.extra_data['select_options']

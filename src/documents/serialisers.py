@@ -539,7 +539,7 @@ class CustomFieldSerializer(serializers.ModelSerializer):
                 or not isinstance(attrs["extra_data"]["select_options"], list)
                 or len(attrs["extra_data"]["select_options"]) == 0
                 or not all(
-                    isinstance(option, str) and len(option) > 0
+                    len(option.get("label", "")) > 0
                     for option in attrs["extra_data"]["select_options"]
                 )
             )
@@ -646,10 +646,14 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
             elif field.data_type == CustomField.FieldDataType.SELECT:
                 select_options = field.extra_data["select_options"]
                 try:
-                    select_options[data["value"]]
+                    next(
+                        option
+                        for option in select_options
+                        if option["id"] == data["value"]
+                    )
                 except Exception:
                     raise serializers.ValidationError(
-                        f"Value must be index of an element in {select_options}",
+                        f"Value must be an id of an element in {select_options}",
                     )
             elif field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
                 doc_ids = data["value"]
