@@ -22,8 +22,8 @@
           <div formArrayName="select_options">
             @for (option of objectForm.controls.extra_data.controls.select_options.controls; track option; let i = $index) {
               <div class="input-group input-group-sm my-2" [formGroup]="objectForm.controls.extra_data.controls.select_options.controls[i]">
-                <input type="hidden" formControlName="id">
                 <input #selectOption type="text" class="form-control" formControlName="label" autocomplete="off">
+                <input type="hidden" formControlName="id">
                 <button type="button" class="btn btn-outline-danger" (click)="removeSelectOption(i)" i18n>Delete</button>
               </div>
             }

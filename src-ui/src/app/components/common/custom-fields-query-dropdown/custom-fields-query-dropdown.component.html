@@ -44,6 +44,8 @@
     <ng-select #fieldSelects
       class="paperless-input-select rounded-end"
       [items]="getSelectOptionsForField(atom.field)"
+      bindLabel="label"
+      bindValue="id"
       [(ngModel)]="atom.value"
       [disabled]="disabled"
       (mousedown)="$event.stopImmediatePropagation()"
@@ -99,6 +101,8 @@
         <ng-select
           class="paperless-input-select rounded-end"
           [items]="getSelectOptionsForField(atom.field)"
+          bindLabel="label"
+          bindValue="id"
           [(ngModel)]="atom.value"
           [disabled]="disabled"
           [multiple]="true"

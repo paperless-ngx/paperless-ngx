@@ -176,9 +176,9 @@ class CustomFieldsFilter(Filter):
             if fields_with_matching_selects.count() > 0:
                 for field in fields_with_matching_selects:
                     options = field.extra_data.get("select_options", [])
-                    for index, option in enumerate(options):
-                        if option.lower().find(value.lower()) != -1:
-                            option_ids.extend([index])
+                    for _, option in enumerate(options):
+                        if option.get("label").lower().find(value.lower()) != -1:
+                            option_ids.extend([option.get("id")])
             return (
                 qs.filter(custom_fields__field__name__icontains=value)
                 | qs.filter(custom_fields__value_text__icontains=value)
@@ -195,19 +195,21 @@ class CustomFieldsFilter(Filter):
             return qs
 
 
-class SelectField(serializers.IntegerField):
+class SelectField(serializers.CharField):
     def __init__(self, custom_field: CustomField):
         self._options = custom_field.extra_data["select_options"]
-        super().__init__(min_value=0, max_value=len(self._options))
+        super().__init__(max_length=128)
 
     def to_internal_value(self, data):
-        if not isinstance(data, int):
-            # If the supplied value is not an integer,
-            # we will try to map it to an option index.
-            try:
-                data = self._options.index(data)
-            except ValueError:
-                pass
+        # Test if the supplied value is not an id
+        try:
+            data = next(
+                option.get("id")
+                for option in self._options
+                if option.get("label") == data
+            )
+        except StopIteration:
+            pass
         return super().to_internal_value(data)
 
 
