@@ -63,6 +63,27 @@ textarea.rtl {
   object-fit: contain;
 }
 
-.whitespace-preserve {
-  white-space: preserve;
+.thumb-preview {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 160px);
+
+  @media screen and (min-width: 768px) {
+    left: calc(.5 * var(--bs-gutter-x));
+    width: calc(100% - var(--bs-gutter-x));
+  }
+
+  overflow: hidden;
+  background-color: gray;
+  padding: 10px 8px; // border
+  z-index: 1000;
+
+  > div {
+    mix-blend-mode: difference;
+  }
+
+  > img {
+    filter: blur(1px);
+  }
 }
