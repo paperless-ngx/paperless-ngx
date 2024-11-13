@@ -886,6 +886,7 @@ def run_workflows(
             "triggers",
         )
         .order_by("order")
+        .distinct()
     )
 
     for workflow in workflows:
