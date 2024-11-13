@@ -65,7 +65,7 @@ services:
 # to your UID and GID on the host so that you have write access to the
 # consumption directory.
       USERMAP_UID: 1000
-      USERMAP_GID: 100
+      USERMAP_GID: 1000
 # Additional languages to install for text recognition, separated by a
 # whitespace. Note that this is
 # different from PAPERLESS_OCR_LANGUAGE (default=eng), which defines the
