@@ -53,7 +53,7 @@ tika-client = "*"
 tqdm = "*"
 uvicorn = {extras = ["standard"], version = "==0.25.0"}
 watchdog = "~=4.0"
-whitenoise = "~=6.6"
+whitenoise = "~=6.8"
 whoosh="~=2.7"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
 PyPDF2 = "2.11.2"
