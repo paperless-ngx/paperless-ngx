@@ -947,7 +947,7 @@ class CustomFieldInstance(SoftDeleteModel):
 
     value_document_ids = models.JSONField(null=True)
 
-    value_select = models.CharField(null=True, max_length=128)
+    value_select = models.CharField(null=True, max_length=16)
 
     class Meta:
         ordering = ("created",)

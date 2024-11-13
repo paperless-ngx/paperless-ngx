@@ -198,7 +198,7 @@ class CustomFieldsFilter(Filter):
 class SelectField(serializers.CharField):
     def __init__(self, custom_field: CustomField):
         self._options = custom_field.extra_data["select_options"]
-        super().__init__(max_length=128)
+        super().__init__(max_length=16)
 
     def to_internal_value(self, data):
         # Test if the supplied value is not an id

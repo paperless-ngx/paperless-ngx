@@ -533,7 +533,8 @@ class CustomFieldSerializer(serializers.ModelSerializer):
         if (
             "data_type" in attrs
             and attrs["data_type"] == CustomField.FieldDataType.SELECT
-            and (
+        ):
+            if (
                 "extra_data" not in attrs
                 or "select_options" not in attrs["extra_data"]
                 or not isinstance(attrs["extra_data"]["select_options"], list)
@@ -542,11 +543,14 @@ class CustomFieldSerializer(serializers.ModelSerializer):
                     len(option.get("label", "")) > 0
                     for option in attrs["extra_data"]["select_options"]
                 )
-            )
-        ):
-            raise serializers.ValidationError(
-                {"error": "extra_data.select_options must be a valid list"},
-            )
+            ):
+                raise serializers.ValidationError(
+                    {"error": "extra_data.select_options must be a valid list"},
+                )
+            # labels are valid, generate ids if not present
+            for option in attrs["extra_data"]["select_options"]:
+                if "id" not in option or option["id"] is None:
+                    option["id"] = get_random_string(length=16)
         elif (
             "data_type" in attrs
             and attrs["data_type"] == CustomField.FieldDataType.MONETARY
