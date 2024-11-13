@@ -528,9 +528,9 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
 
     def test_invalid_value(self):
         self._assert_validation_error(
-            json.dumps(["select_field", "exact", "not an option"]),
+            json.dumps(["select_field", "exact", []]),
             ["custom_field_query", "2"],
-            "integer",
+            "string",
         )
 
     def test_invalid_logical_operator(self):

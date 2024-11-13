@@ -544,7 +544,11 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             name="test",
             data_type=CustomField.FieldDataType.SELECT,
             extra_data={
-                "select_options": ["apple", "banana", "cherry"],
+                "select_options": [
+                    {"label": "apple", "id": "abc123"},
+                    {"label": "banana", "id": "def456"},
+                    {"label": "cherry", "id": "ghi789"},
+                ],
             },
         )
         doc = Document.objects.create(
@@ -555,14 +559,22 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             archive_checksum="B",
             mime_type="application/pdf",
         )
-        CustomFieldInstance.objects.create(field=cf, document=doc, value_select=0)
+        CustomFieldInstance.objects.create(
+            field=cf,
+            document=doc,
+            value_select="abc123",
+        )
 
         self.assertEqual(generate_filename(doc), "document_apple.pdf")
 
         # handler should not have been called
         self.assertEqual(m.call_count, 0)
         cf.extra_data = {
-            "select_options": ["aubergine", "banana", "cherry"],
+            "select_options": [
+                {"label": "aubergine", "id": "abc123"},
+                {"label": "banana", "id": "def456"},
+                {"label": "cherry", "id": "ghi789"},
+            ],
         }
         cf.save()
         self.assertEqual(generate_filename(doc), "document_aubergine.pdf")
