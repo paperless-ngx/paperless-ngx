@@ -50,8 +50,10 @@ from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
+from guardian.shortcuts import get_objects_for_user, get_perms
 from langdetect import detect
 from packaging import version as packaging_version
+from pipenv.vendor.tomlkit import document
 
 from redis import Redis
 from rest_framework import parsers, status
@@ -1741,28 +1743,53 @@ class ApprovalViewSet(ModelViewSet):
 
     serializer_class = ApprovalSerializer
     # pagination_class = StandardPagination
-
+    queryset = Approval.objects.all()
     def get_queryset(self):
-        queryset = (
-            Approval.objects.filter(
-            )
-            .order_by("created")
-            .reverse()
-        )
-        # task_id = self.request.query_params.get("")
-        # if task_id is not None:
-        #     queryset = PaperlessTask.objects.filter(task_id=task_id)
+        # TODO: get user -> group -> document ->
+        approvals = Approval.objects.all().order_by("created").reverse()
+        approvals_object_pk = [int(x.object_pk) for x in approvals]
+        # approvals_object_pk = list(map(int, Approval.objects.all().order_by("created").reverse().values_list("object_pk", flat=True)))
+
         user = self.request.user
-        document_ids = Approval.objects.all().values_list("id")
-        if user.is_superuser():
-            document_ids = Document.objects.filter(owner=user).values_list("id")
-        document_ids =[x[0] for x in document_ids]
-        queryset = queryset.filter(object_pk__in=document_ids)
-        return queryset
+        user_groups = set(user.groups.all())
+        documents = Document.objects.filter(id__in=approvals_object_pk)
+        # editable_objects = get_objects_for_user(user, 'change_document',
+        #                                         klass=Document,
+        #                                         accept_global_perms=False)
+        documents.count()
+        editable_objects = set()
+
+        for obj in documents:
+            if 'change_document' in get_perms(user,obj):
+                editable_objects.add(obj)
+                continue
+            if hasattr(obj,'owner') and obj.owner == user:
+                editable_objects.add(obj)
+                continue
+            object_groups = set(obj.groups.all())
+            if user_groups.intersection(
+                object_groups): editable_objects.add(obj)
+
+        for obj in approvals:
+            if int(obj.object_pk) in editable_objects:
+                del obj
+        return approvals
+
+
+
+        # logger.info("noi dung test", qs)
+        # document_ids = Document.objects.filter(owner=user).values_list("id")
+        # if user.is_superuser:
+        #     document_ids = Approval.objects.all().values_list("id")
+        # # document_ids =[str(x[0]) for x in document_ids]
+        # logger.info("noi dung", document_ids)
+        # qs = qs.filter(object_pk__in=document_ids)
+        # logger.info("noi dung test1", qs)
+        # return qs
 
     model = Approval
 
-    queryset = Approval.objects.all()
+
 
     def create(self, request, *args, **kwargs):
         serializer = ApprovalSerializer(data=request.data)
@@ -2839,13 +2866,7 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             dossier.path = str(dossier.id)
             dossier.save()
         elif parent_dossier:
-            dossier = serializer.save(owner=request.user)
-            # if parent_dossier.is_form == True and dossier.is_form == False:
-            #     dossier.path = str(dossier.id)
-            # elif parent_dossier.is_form == True and dossier.is_form == True:
-            #     dossier = serializer.save(parent_dossier=None,owner=request.user)
-            #     dossier.path = f"{parent_dossier.path}/{dossier.id}"
-            # else:
+            # dossier = serializer.save(owner=request.user)
             dossier = serializer.save(parent_dossier=parent_dossier,owner=request.user)
             dossier.path = f"{parent_dossier.path}/{dossier.id}"
             dossier.save()
@@ -3019,7 +3040,23 @@ class DossierFormViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = DossierFormFilterSet
-    ordering_fields = ("name", "type",)
+    ordering_fields = ("name", "type")
+
+    def create(self, request, *args, **kwargs):
+        serializer = DossierFormSerializer(data=request.data)
+
+        if serializer.is_valid(raise_exception=True):
+            permissions = serializer.validated_data.get("set_permissions")
+            # owner = serializer.validated_data.get("owner")
+            # merge = serializer.validated_data.get("merge")
+            dossier_form = serializer.save(owner=request.user)
+            set_permissions_for_object(
+                permissions=permissions,
+                object=dossier_form,
+                merge=True,
+            )
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
     # def create(self, request, *args, **kwargs):
     #     # try:

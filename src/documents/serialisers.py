@@ -2378,26 +2378,6 @@ class DossierFormSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         required=False,
     )
 
-    class Meta:
-        model = DossierForm
-        fields = [
-            'id',
-            'document_count',
-            'slug',
-            'user_can_change',
-            'is_shared_by_requester',
-            'name',
-            'match',
-            'matching_algorithm',
-            'is_insensitive',
-            'created',
-            'owner',
-            'type',
-            'form_rule',
-            'custom_fields',
-            'set_permissions',
-            'permissions'
-        ]
     def create(self, validated_data):
         custom_fields_data = validated_data.pop('custom_fields', [])
 
@@ -2469,3 +2449,23 @@ class DossierFormSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         records_to_delete.delete()
 
         return dossier_form
+    class Meta:
+        model = DossierForm
+        fields = [
+            'id',
+            'document_count',
+            'slug',
+            'user_can_change',
+            'is_shared_by_requester',
+            'name',
+            'match',
+            'matching_algorithm',
+            'is_insensitive',
+            'created',
+            'owner',
+            'type',
+            'form_rule',
+            'custom_fields',
+            'set_permissions',
+            'permissions'
+        ]
