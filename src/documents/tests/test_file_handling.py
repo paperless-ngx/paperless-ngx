@@ -1373,13 +1373,18 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         cf2 = CustomField.objects.create(
             name="Select Field",
             data_type=CustomField.FieldDataType.SELECT,
-            extra_data={"select_options": ["ChoiceOne", "ChoiceTwo"]},
+            extra_data={
+                "select_options": [
+                    {"label": "ChoiceOne", "id": "abc=123"},
+                    {"label": "ChoiceTwo", "id": "def-456"},
+                ],
+            },
         )
 
         cfi1 = CustomFieldInstance.objects.create(
             document=doc_a,
             field=cf2,
-            value_select=0,
+            value_select="abc=123",
         )
 
         cfi = CustomFieldInstance.objects.create(
