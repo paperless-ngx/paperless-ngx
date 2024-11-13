@@ -225,10 +225,6 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
     && python3 -m pip install --no-cache-dir --upgrade wheel \
   && echo "Installing Python requirements" \
     && python3 -m pip install --default-timeout=1000 --requirement requirements.txt \
-  && echo "Patching whitenoise for compression speedup" \
-    && curl --fail --silent --show-error --location --output 484.patch https://github.com/evansd/whitenoise/pull/484.patch \
-    && patch -d /usr/local/lib/python3.11/site-packages --verbose -p2 < 484.patch \
-    && rm 484.patch \
   && echo "Installing NLTK data" \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" snowball_data \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" stopwords \
