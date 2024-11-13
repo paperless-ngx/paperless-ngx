@@ -637,7 +637,7 @@ class TestApiUser(DirectoriesMixin, APITestCase):
         response = self.client.post(
             f"{self.ENDPOINT}{user1.pk}/deactivate_totp/",
         )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         regular_user = User.objects.create_user(username="regular_user")
         regular_user.user_permissions.add(

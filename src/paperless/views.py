@@ -15,6 +15,7 @@ from django.db.models.functions import Lower
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
+from django.http import HttpResponseNotFound
 from django.views.generic import View
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.authtoken.models import Token
@@ -124,7 +125,7 @@ class UserViewSet(ModelViewSet):
             delete_and_cleanup(request, authenticator)
             return Response(True)
         else:
-            return HttpResponseBadRequest("TOTP not found")
+            return HttpResponseNotFound("TOTP not found")
 
 
 class GroupViewSet(ModelViewSet):
@@ -238,7 +239,7 @@ class TOTPView(GenericAPIView):
             delete_and_cleanup(request, authenticator)
             return Response(True)
         else:
-            return HttpResponseBadRequest("TOTP not found")
+            return HttpResponseNotFound("TOTP not found")
 
 
 class GenerateAuthTokenView(GenericAPIView):
