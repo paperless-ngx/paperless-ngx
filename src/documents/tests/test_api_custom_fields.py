@@ -1,5 +1,6 @@
 import json
 from datetime import date
+from unittest.mock import ANY
 
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -143,6 +144,70 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_custom_field_select_unique_ids(self):
+        """
+        GIVEN:
+            - Nothing
+            - Existing custom field
+        WHEN:
+            - API request to create custom field with select options without id
+        THEN:
+            - Unique ids are generated for each option
+        """
+        resp = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "data_type": "select",
+                    "name": "Select Field",
+                    "extra_data": {
+                        "select_options": [
+                            {"label": "Option 1"},
+                            {"label": "Option 2"},
+                        ],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        data = resp.json()
+
+        self.assertCountEqual(
+            data["extra_data"]["select_options"],
+            [
+                {"label": "Option 1", "id": ANY},
+                {"label": "Option 2", "id": ANY},
+            ],
+        )
+
+        # Add a new option
+        resp = self.client.patch(
+            f"{self.ENDPOINT}{data['id']}/",
+            json.dumps(
+                {
+                    "extra_data": {
+                        "select_options": data["extra_data"]["select_options"]
+                        + [{"label": "Option 3"}],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.json()
+
+        self.assertCountEqual(
+            data["extra_data"]["select_options"],
+            [
+                {"label": "Option 1", "id": ANY},
+                {"label": "Option 2", "id": ANY},
+                {"label": "Option 3", "id": ANY},
+            ],
+        )
 
     def test_create_custom_field_monetary_validation(self):
         """
