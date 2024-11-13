@@ -150,6 +150,8 @@ export interface Document extends ObjectWithPermissions {
 
   added?: Date
 
+  mime_type?: string
+
   deleted_at?: Date
 
   original_file_name?: string
