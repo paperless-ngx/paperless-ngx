@@ -55,7 +55,7 @@ def reverse_migrate_customfield_selects(apps, schema_editor):
                     instance.value_select = next(
                         index
                         for index, option in enumerate(old_select_options)
-                        if option.id == instance.value_select
+                        if option.get("id") == instance.value_select
                     )
                     instance.save()
 
