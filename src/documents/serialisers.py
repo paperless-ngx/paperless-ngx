@@ -533,7 +533,10 @@ class CustomFieldSerializer(serializers.ModelSerializer):
         if (
             "data_type" in attrs
             and attrs["data_type"] == CustomField.FieldDataType.SELECT
-        ) or self.instance.data_type == CustomField.FieldDataType.SELECT:
+        ) or (
+            self.instance
+            and self.instance.data_type == CustomField.FieldDataType.SELECT
+        ):
             if (
                 "extra_data" not in attrs
                 or "select_options" not in attrs["extra_data"]
