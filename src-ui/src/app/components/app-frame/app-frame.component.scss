@@ -48,6 +48,13 @@
 
 main {
   transition: all .2s ease;
+  padding-top: 110px;
+}
+
+@media (min-width: 768px) {
+  main {
+    padding-top: 56px;
+  }
 }
 
 .sidebar-slim-toggler {
