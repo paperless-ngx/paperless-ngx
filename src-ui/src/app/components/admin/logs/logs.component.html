@@ -36,9 +36,7 @@
       <ng-container i18n>Loading...</ng-container>
     </div>
   }
-  @for (log of logs; track log) {
-    <p
-      class="m-0 p-0 log-entry-{{getLogLevel(log)}}"
-    >{{log}}</p>
+  @for (log of logs; track $index) {
+    <p class="m-0 p-0 log-entry-{{getLogLevel(log)}}">{{log}}</p>
   }
 </div>
