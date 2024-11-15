@@ -60,6 +60,7 @@ PyPDF2 = "2.11.2"
 requests = "2.32.2"
 pandas = "2.2.2"
 openpyxl = "3.1.5"
+python-decouple= "3.8"
 
 [dev-packages]
 # Linting
