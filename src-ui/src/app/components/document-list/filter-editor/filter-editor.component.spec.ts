@@ -1204,7 +1204,7 @@ describe('FilterEditorComponent', () => {
     const tagButton = tagsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]
-    tagButton.triggerEventHandler('toggle')
+    tagButton.triggerEventHandler('toggled')
     fixture.detectChanges()
     expect(component.filterRules).toEqual([
       {
@@ -1222,8 +1222,8 @@ describe('FilterEditorComponent', () => {
     const tagButtons = tagsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
-    tagButtons[1].triggerEventHandler('toggle')
-    tagButtons[2].triggerEventHandler('toggle')
+    tagButtons[1].triggerEventHandler('toggled')
+    tagButtons[2].triggerEventHandler('toggled')
     fixture.detectChanges()
     expect(component.filterRules).toEqual([
       {
@@ -1273,8 +1273,8 @@ describe('FilterEditorComponent', () => {
     const correspondentButtons = correspondentsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
-    correspondentButtons[1].triggerEventHandler('toggle')
-    correspondentButtons[2].triggerEventHandler('toggle')
+    correspondentButtons[1].triggerEventHandler('toggled')
+    correspondentButtons[2].triggerEventHandler('toggled')
     fixture.detectChanges()
     expect(component.filterRules).toEqual([
       {
@@ -1312,7 +1312,7 @@ describe('FilterEditorComponent', () => {
     const notAssignedButton = correspondentsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]
-    notAssignedButton.triggerEventHandler('toggle')
+    notAssignedButton.triggerEventHandler('toggled')
     fixture.detectChanges()
     expect(component.filterRules).toEqual([
       {
@@ -1330,8 +1330,8 @@ describe('FilterEditorComponent', () => {
     const documentTypeButtons = documentTypesFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
-    documentTypeButtons[1].triggerEventHandler('toggle')
-    documentTypeButtons[2].triggerEventHandler('toggle')
+    documentTypeButtons[1].triggerEventHandler('toggled')
+    documentTypeButtons[2].triggerEventHandler('toggled')
     fixture.detectChanges()
     expect(component.filterRules).toEqual([
       {
@@ -1369,7 +1369,7 @@ describe('FilterEditorComponent', () => {
     const notAssignedButton = docTypesFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]
-    notAssignedButton.triggerEventHandler('toggle')
+    notAssignedButton.triggerEventHandler('toggled')
     fixture.detectChanges()
     expect(component.filterRules).toEqual([
       {
@@ -1387,8 +1387,8 @@ describe('FilterEditorComponent', () => {
     const storagePathButtons = storagePathFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
-    storagePathButtons[1].triggerEventHandler('toggle')
-    storagePathButtons[2].triggerEventHandler('toggle')
+    storagePathButtons[1].triggerEventHandler('toggled')
+    storagePathButtons[2].triggerEventHandler('toggled')
     fixture.detectChanges()
     expect(component.filterRules).toEqual([
       {
@@ -1426,7 +1426,7 @@ describe('FilterEditorComponent', () => {
     const notAssignedButton = storagePathsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]
-    notAssignedButton.triggerEventHandler('toggle')
+    notAssignedButton.triggerEventHandler('toggled')
     fixture.detectChanges()
     expect(component.filterRules).toEqual([
       {

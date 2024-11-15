@@ -58,7 +58,7 @@ describe('ToggleableDropdownButtonComponent', () => {
     let toggleResult
     component.state = ToggleableItemState.Selected
     component.exclude.subscribe(() => (excludeResult = true))
-    component.toggle.subscribe(() => (toggleResult = true))
+    component.toggled.subscribe(() => (toggleResult = true))
     const button = fixture.nativeElement.querySelector('button')
     button.dispatchEvent(new MouseEvent('click'))
     expect(excludeResult).toBeTruthy()
@@ -70,7 +70,7 @@ describe('ToggleableDropdownButtonComponent', () => {
     let toggleResult
     component.state = ToggleableItemState.Excluded
     component.exclude.subscribe(() => (excludeResult = true))
-    component.toggle.subscribe(() => (toggleResult = true))
+    component.toggled.subscribe(() => (toggleResult = true))
     const button = fixture.nativeElement.querySelector('button')
     button.dispatchEvent(new MouseEvent('click'))
     expect(excludeResult).toBeFalsy()

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-19 22:56-0700\n"
-"PO-Revision-Date: 2024-10-20 05:58\n"
+"PO-Revision-Date: 2024-10-31 12:12\n"
 "Last-Translator: \n"
 "Language-Team: Thai\n"
 "Language: th_TH\n"
@@ -23,35 +23,35 @@ msgstr "เอกสาร"
 
 #: documents/filters.py:334
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "ค่า ต้องอยู่ในรูปแบบ JSON ที่ถูกต้อง"
 
 #: documents/filters.py:353
 msgid "Invalid custom field query expression"
-msgstr ""
+msgstr "รูปแบบการค้นหาฟิลด์ที่กำหนดเองไม่ถูกต้อง"
 
 #: documents/filters.py:363
 msgid "Invalid expression list. Must be nonempty."
-msgstr ""
+msgstr "รายการคำสั่งไม่ถูกต้อง ต้องไม่เว้นว่าง"
 
 #: documents/filters.py:384
 msgid "Invalid logical operator {op!r}"
-msgstr ""
+msgstr "ตัวดำเนินการเชิงตรรกะ {op!r} ไม่ถูกต้อง"
 
 #: documents/filters.py:398
 msgid "Maximum number of query conditions exceeded."
-msgstr ""
+msgstr "จำนวนเงื่อนไขในการค้นหาเกินกำหนด"
 
 #: documents/filters.py:455
 msgid "{name!r} is not a valid custom field."
-msgstr ""
+msgstr "{name!r} ไม่ใช่ฟิลด์ที่กำหนดเองที่ถูกต้อง"
 
 #: documents/filters.py:492
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr ""
+msgstr "{data_type} ไม่รองรับรูปแบบการค้นหา {expr!r}"
 
 #: documents/filters.py:600
 msgid "Maximum nesting depth exceeded."
-msgstr ""
+msgstr "จำนวนการซ้อนเงื่อนไขสูงสุดเกินขีดจำกัด"
 
 #: documents/models.py:41 documents/models.py:802
 msgid "owner"
@@ -192,11 +192,11 @@ msgstr "ค่า checksum ของเอกสารประเภทเก�
 
 #: documents/models.py:211
 msgid "page count"
-msgstr ""
+msgstr "จำนวนหน้า"
 
 #: documents/models.py:218
 msgid "The number of pages of the document."
-msgstr ""
+msgstr "จำนวนหน้าทั้งหมดของเอกสาร"
 
 #: documents/models.py:222 documents/models.py:402 documents/models.py:722
 #: documents/models.py:760 documents/models.py:831 documents/models.py:889
@@ -301,11 +301,11 @@ msgstr "ตาราง"
 
 #: documents/models.py:416
 msgid "Small Cards"
-msgstr ""
+msgstr "การ์ดขนาดเล็ก"
 
 #: documents/models.py:417
 msgid "Large Cards"
-msgstr ""
+msgstr "การ์ดขนาดใหญ่"
 
 #: documents/models.py:420
 msgid "Title"
@@ -313,11 +313,11 @@ msgstr ""
 
 #: documents/models.py:421
 msgid "Created"
-msgstr ""
+msgstr "วันที่สร้าง"
 
 #: documents/models.py:422
 msgid "Added"
-msgstr ""
+msgstr "วันที่เพิ่ม"
 
 #: documents/models.py:423
 msgid "Tags"
@@ -333,7 +333,7 @@ msgstr "ประเภทเอกสาร"
 
 #: documents/models.py:426
 msgid "Storage Path"
-msgstr ""
+msgstr "ตำแหน่งจัดเก็บ"
 
 #: documents/models.py:427
 msgid "Note"
@@ -345,7 +345,7 @@ msgstr "เจ้าของ"
 
 #: documents/models.py:429
 msgid "Shared"
-msgstr ""
+msgstr "แชร์แล้ว"
 
 #: documents/models.py:430
 msgid "ASN"
@@ -353,7 +353,7 @@ msgstr ""
 
 #: documents/models.py:431
 msgid "Pages"
-msgstr ""
+msgstr "หน้า"
 
 #: documents/models.py:437
 msgid "show on dashboard"
@@ -373,15 +373,15 @@ msgstr "เรียงย้อนกลับ"
 
 #: documents/models.py:452
 msgid "View page size"
-msgstr ""
+msgstr "ขนาดการแสดงผลหน้า"
 
 #: documents/models.py:460
 msgid "View display mode"
-msgstr ""
+msgstr "โหมดการแสดงผล"
 
 #: documents/models.py:467
 msgid "Document display fields"
-msgstr ""
+msgstr "ฟิลด์การแสดงผลของเอกสาร"
 
 #: documents/models.py:474 documents/models.py:532
 msgid "saved view"
@@ -537,31 +537,31 @@ msgstr "ไม่มีเจ้าของเป็น"
 
 #: documents/models.py:519
 msgid "has custom field value"
-msgstr ""
+msgstr "มีค่าฟิลด์ที่กำหนดเอง"
 
 #: documents/models.py:520
 msgid "is shared by me"
-msgstr ""
+msgstr "แชร์โดยฉัน"
 
 #: documents/models.py:521
 msgid "has custom fields"
-msgstr ""
+msgstr "มีฟิลด์ที่กำหนดเอง"
 
 #: documents/models.py:522
 msgid "has custom field in"
-msgstr ""
+msgstr "มีฟิลด์ที่กำหนดเองใน"
 
 #: documents/models.py:523
 msgid "does not have custom field in"
-msgstr ""
+msgstr "ไม่มีฟิลด์ที่กำหนดเอง"
 
 #: documents/models.py:524
 msgid "does not have custom field"
-msgstr ""
+msgstr "ไม่มีฟิลด์ที่กำหนดเองใน"
 
 #: documents/models.py:525
 msgid "custom fields query"
-msgstr ""
+msgstr "การค้นหาฟิลด์ที่กำหนดเอง"
 
 #: documents/models.py:535
 msgid "rule type"
@@ -717,11 +717,11 @@ msgstr "Float"
 
 #: documents/models.py:826
 msgid "Monetary"
-msgstr ""
+msgstr "จำนวนเงิน"
 
 #: documents/models.py:827
 msgid "Document Link"
-msgstr ""
+msgstr "ลิงก์ของเอกสาร"
 
 #: documents/models.py:828
 msgid "Select"
@@ -733,23 +733,23 @@ msgstr "ชนิดข้อมูล"
 
 #: documents/models.py:847
 msgid "extra data"
-msgstr ""
+msgstr "ข้อมูลเพิ่มเติม"
 
 #: documents/models.py:851
 msgid "Extra data for the custom field, such as select options"
-msgstr ""
+msgstr "ข้อมูลเพิ่มเติมสำหรับฟิลด์ที่กำหนดเอง เช่น ตัวเลือก"
 
 #: documents/models.py:857
 msgid "custom field"
-msgstr ""
+msgstr "ฟิลด์ที่กำหนดเอง"
 
 #: documents/models.py:858
 msgid "custom fields"
-msgstr ""
+msgstr "ฟิลด์ที่กำหนดเอง"
 
 #: documents/models.py:955
 msgid "custom field instance"
-msgstr ""
+msgstr "ชุดข้อมูลฟิลด์ที่กำหนดเอง"
 
 #: documents/models.py:956
 msgid "custom field instances"
@@ -757,7 +757,7 @@ msgstr ""
 
 #: documents/models.py:1017
 msgid "Consumption Started"
-msgstr ""
+msgstr "เริ่มใช้งาน"
 
 #: documents/models.py:1018
 msgid "Document Added"
@@ -769,7 +769,7 @@ msgstr "ปรับปรุงเอกสารแล้ว"
 
 #: documents/models.py:1022
 msgid "Consume Folder"
-msgstr ""
+msgstr "โฟลเดอร์ใช้งาน"
 
 #: documents/models.py:1023
 msgid "Api Upload"

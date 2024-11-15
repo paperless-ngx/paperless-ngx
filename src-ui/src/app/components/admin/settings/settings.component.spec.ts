@@ -315,7 +315,7 @@ describe('SettingsComponent', () => {
     expect(toastErrorSpy).toHaveBeenCalled()
     expect(storeSpy).toHaveBeenCalled()
     expect(appearanceSettingsSpy).not.toHaveBeenCalled()
-    expect(setSpy).toHaveBeenCalledTimes(27)
+    expect(setSpy).toHaveBeenCalledTimes(28)
 
     // succeed
     storeSpy.mockReturnValueOnce(of(true))

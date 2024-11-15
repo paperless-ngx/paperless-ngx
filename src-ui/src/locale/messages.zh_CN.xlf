@@ -1743,7 +1743,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">385</context>
         </context-group>
-        <target state="needs-translation">Table</target>
+        <target state="translated">表格</target>
       </trans-unit>
       <trans-unit id="4236040382842528005" datatype="html">
         <source>Small Cards</source>
@@ -2371,7 +2371,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {One document in trash} other {<x id="INTERPOLATION"/> total documents in trash}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {垃圾桶中有一份文件} other {垃圾桶中共有 <x id="INTERPOLATION"/> 份文件}}</target>
       </trans-unit>
       <trans-unit id="9021887951960049161" datatype="html">
         <source>Confirm delete</source>
@@ -3619,7 +3619,7 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
           <context context-type="linenumber">79</context>
         </context-group>
-        <target state="needs-translation">True</target>
+        <target state="translated">真</target>
       </trans-unit>
       <trans-unit id="3800326155195149498" datatype="html">
         <source>False</source>
@@ -3635,7 +3635,7 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="needs-translation">False</target>
+        <target state="translated">假</target>
       </trans-unit>
       <trans-unit id="7551700625201096185" datatype="html">
         <source>Search docs...</source>
@@ -3643,7 +3643,7 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="needs-translation">Search docs...</target>
+        <target state="translated">搜索文档...</target>
       </trans-unit>
       <trans-unit id="3184700926171002527" datatype="html">
         <source>Any</source>
@@ -3691,7 +3691,7 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
           <context context-type="linenumber">131</context>
         </context-group>
-        <target state="needs-translation">Not</target>
+        <target state="translated">否</target>
       </trans-unit>
       <trans-unit id="6548676277933116532" datatype="html">
         <source>Add query</source>
@@ -3699,7 +3699,7 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
           <context context-type="linenumber">150</context>
         </context-group>
-        <target state="needs-translation">Add query</target>
+        <target state="translated">添加查询</target>
       </trans-unit>
       <trans-unit id="5599577087865387184" datatype="html">
         <source>Add expression</source>
@@ -3707,7 +3707,7 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
           <context context-type="linenumber">153</context>
         </context-group>
-        <target state="needs-translation">Add expression</target>
+        <target state="translated">添加表达式</target>
       </trans-unit>
       <trans-unit id="6052766076365105714" datatype="html">
         <source>now</source>
@@ -4135,7 +4135,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Order</target>
+        <target state="translated">顺序</target>
       </trans-unit>
       <trans-unit id="4816216590591222133" datatype="html">
         <source>Enabled</source>
@@ -4519,7 +4519,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">See &lt;a target='_blank' href='https://docs.paperless-ngx.com/advanced_usage/#file-name-handling'&gt;the documentation&lt;/a&gt;.</target>
+        <target state="translated">请参阅 &lt;a target='_blank' href='https://docs.paperless-ngx.com/advanced_usage/#file-name-handling'&gt;文档&lt;/a&gt;。</target>
       </trans-unit>
       <trans-unit id="1295614462098694869" datatype="html">
         <source>Preview</source>
@@ -4539,7 +4539,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Path test failed</target>
+        <target state="translated">路径测试失败</target>
       </trans-unit>
       <trans-unit id="9116034231465034307" datatype="html">
         <source>No document selected</source>
@@ -4547,7 +4547,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">No document selected</target>
+        <target state="translated">没有选择文档</target>
       </trans-unit>
       <trans-unit id="2083498114116917092" datatype="html">
         <source>Search for a document</source>
@@ -4555,7 +4555,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="needs-translation">Search for a document</target>
+        <target state="translated">搜索文档</target>
       </trans-unit>
       <trans-unit id="6423278459497515329" datatype="html">
         <source>No documents found</source>
@@ -4759,7 +4759,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Add Trigger</target>
+        <target state="translated">添加触发器</target>
       </trans-unit>
       <trans-unit id="6882912390704300247" datatype="html">
         <source>Apply Actions:</source>
@@ -4767,7 +4767,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">73</context>
         </context-group>
-        <target state="needs-translation">Apply Actions:</target>
+        <target state="translated">应用操作：</target>
       </trans-unit>
       <trans-unit id="51883444329775670" datatype="html">
         <source>Add Action</source>
@@ -4775,7 +4775,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">75</context>
         </context-group>
-        <target state="needs-translation">Add Action</target>
+        <target state="translated">添加动作</target>
       </trans-unit>
       <trans-unit id="3288318211116868972" datatype="html">
         <source>Trigger type</source>
@@ -4783,7 +4783,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">121</context>
         </context-group>
-        <target state="needs-translation">Trigger type</target>
+        <target state="translated">触发类型</target>
       </trans-unit>
       <trans-unit id="8727727835543352574" datatype="html">
         <source>Trigger for documents that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> filters specified below.</source>
@@ -4791,7 +4791,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="needs-translation">Trigger for documents that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> filters specified below.</target>
+        <target state="translated">触发匹配下面指定的 <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>所有<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> 过滤器的文档。</target>
       </trans-unit>
       <trans-unit id="7467799586957602479" datatype="html">
         <source>Filter filename</source>
@@ -4831,7 +4831,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">128</context>
         </context-group>
-        <target state="needs-translation">Apply to documents that match this path. Wildcards specified as * are allowed. Case-normalized.&lt;/a&gt;</target>
+        <target state="translated">应用于匹配此路径的文档。允许指定为*的通配符。不区分大小写。&lt;/a&gt;</target>
       </trans-unit>
       <trans-unit id="7468453896129193641" datatype="html">
         <source>Filter mail rule</source>
@@ -4847,7 +4847,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">129</context>
         </context-group>
-        <target state="needs-translation">Apply to documents consumed via this mail rule.</target>
+        <target state="translated">应用于通过此邮件规则消费的文档。</target>
       </trans-unit>
       <trans-unit id="6840369584127435743" datatype="html">
         <source>Content matching algorithm</source>
@@ -4855,7 +4855,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">132</context>
         </context-group>
-        <target state="needs-translation">Content matching algorithm</target>
+        <target state="translated">内容匹配算法</target>
       </trans-unit>
       <trans-unit id="510635115034690805" datatype="html">
         <source>Content matching pattern</source>
@@ -4863,7 +4863,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">134</context>
         </context-group>
-        <target state="needs-translation">Content matching pattern</target>
+        <target state="translated">内容匹配模式</target>
       </trans-unit>
       <trans-unit id="3484236514968690689" datatype="html">
         <source>Has any of tags</source>
@@ -4871,7 +4871,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">143</context>
         </context-group>
-        <target state="needs-translation">Has any of tags</target>
+        <target state="translated">有任何标签</target>
       </trans-unit>
       <trans-unit id="5281365940563983618" datatype="html">
         <source>Has correspondent</source>
@@ -4879,7 +4879,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">144</context>
         </context-group>
-        <target state="needs-translation">Has correspondent</target>
+        <target state="translated">已有联系人</target>
       </trans-unit>
       <trans-unit id="4806713133917046341" datatype="html">
         <source>Has document type</source>
@@ -4887,7 +4887,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">145</context>
         </context-group>
-        <target state="needs-translation">Has document type</target>
+        <target state="translated">有文档类型</target>
       </trans-unit>
       <trans-unit id="6417103744331194518" datatype="html">
         <source>Action type</source>
@@ -4895,7 +4895,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="needs-translation">Action type</target>
+        <target state="translated">操作类型</target>
       </trans-unit>
       <trans-unit id="6019822389883736115" datatype="html">
         <source>Assign title</source>
@@ -4911,7 +4911,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">160</context>
         </context-group>
-        <target state="needs-translation">Can include some placeholders, see &lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'&gt;documentation&lt;/a&gt;.</target>
+        <target state="translated">可以包含一些占位符，请参阅 &lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'&gt;文档&lt;/a&gt;。</target>
       </trans-unit>
       <trans-unit id="6528897010417701530" datatype="html">
         <source>Assign tags</source>
@@ -4967,7 +4967,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">216</context>
         </context-group>
-        <target state="needs-translation">Remove tags</target>
+        <target state="translated">移除标签</target>
       </trans-unit>
       <trans-unit id="7890599006071681081" datatype="html">
         <source>Remove all</source>
@@ -4999,7 +4999,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">254</context>
         </context-group>
-        <target state="needs-translation">Remove all</target>
+        <target state="translated">移除全部</target>
       </trans-unit>
       <trans-unit id="8636414563726517994" datatype="html">
         <source>Remove correspondents</source>
@@ -5007,7 +5007,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">222</context>
         </context-group>
-        <target state="needs-translation">Remove correspondents</target>
+        <target state="translated">移除所有通讯员</target>
       </trans-unit>
       <trans-unit id="5305293055593064952" datatype="html">
         <source>Remove document types</source>
@@ -5015,7 +5015,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">228</context>
         </context-group>
-        <target state="needs-translation">Remove document types</target>
+        <target state="translated">移除所有文档类型</target>
       </trans-unit>
       <trans-unit id="2400388879708187" datatype="html">
         <source>Remove storage paths</source>
@@ -5473,7 +5473,7 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Filter documents with these Tags</target>
+        <target state="translated">按标签过滤</target>
       </trans-unit>
       <trans-unit id="5752465522295465624" datatype="html">
         <source>What&apos;s this?</source>
@@ -5537,7 +5537,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">75</context>
         </context-group>
-        <target state="needs-translation">Any and all existing owner, user and group permissions will be replaced.</target>
+        <target state="translated"/>
       </trans-unit>
       <trans-unit id="5947558132119506443" datatype="html">
         <source>My documents</source>
