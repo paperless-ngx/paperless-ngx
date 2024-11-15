@@ -97,3 +97,4 @@ scripts/nuke
 
 # celery schedule file
 celerybeat-schedule*
+/src/data_dump.json
