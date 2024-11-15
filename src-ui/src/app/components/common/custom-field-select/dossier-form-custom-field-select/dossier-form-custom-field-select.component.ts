@@ -36,11 +36,11 @@ export class DossierFormCustomFieldSelectComponent
 
   @Input()
   title: string = ''
-  
+
   @Input()
   error: string
 
-  
+
   private arrayCustomFields: CustomField[]=[]
   private unsubscribeNotifier: Subject<any> = new Subject()
   public unusedFields: CustomField[]
@@ -60,19 +60,19 @@ export class DossierFormCustomFieldSelectComponent
   _inheritedCustomFields: CustomFieldInstance[] = []
   dossierFormReference: any[] = []
 
-  
+
   @Input()
   set inheritedCustomFields(inherited: CustomFieldInstance[]) {
     this.dictCustomFields={}
     this.dictCustomFieldsEnable={}
     this._inheritedCustomFields = inherited?.length? inherited: []
     // console.log("gia tri inherited",this._inheritedCustomFields)
-    
+
   }
 
-  @Input() inputDossier: Dossier 
-  @Input() inputDossierForm: DossierForm 
-  @Input() dataDossierForm: FormGroup 
+  @Input() inputDossier: Dossier
+  @Input() inputDossierForm: DossierForm
+  @Input() dataDossierForm: FormGroup
   @Output() dataChange = new EventEmitter<any[]>();
 
   inheritedWarning: string = $localize`Inherited from dossier form`
@@ -87,20 +87,20 @@ export class DossierFormCustomFieldSelectComponent
     this.form = this.fb.group({
       customFields: this.fb.array([])
     });
-    
+
     this.customFields.valueChanges.subscribe(data => {
       const filteredData = data.filter(item => this.dictCustomFieldsEnable[item.field]);
         this.dataChange.emit(filteredData);
     });
-    console.log("gia trii inputDossierForm",this.inputDossierForm);
-    
+    // console.log("gia trii inputDossierForm",this.inputDossierForm);
+
   }
-  
+
 
   get customFields(): FormArray {
     return this.form.get('customFields') as FormArray;
   }
-  
+
 
   private getFields(newInheritedCustomFields) {
     this.customFieldsService.clearCache()
@@ -110,8 +110,8 @@ export class DossierFormCustomFieldSelectComponent
     .subscribe((result) => {
       this.arrayCustomFields = result.results
       this.writeValue(newInheritedCustomFields)
-     
-    })    
+
+    })
   }
 
 
@@ -125,7 +125,7 @@ export class DossierFormCustomFieldSelectComponent
         this.dossierForm = c.results
         this.getFields(this._inheritedCustomFields);
       })
-    
+
   }
 
   writeValue(newInheritedCustomFields): void {
@@ -144,7 +144,7 @@ export class DossierFormCustomFieldSelectComponent
           "dossier_document": null,
           "field_name": c.name,
           "reference": null,
-          
+
         };
         this.dictCustomFieldsEnable[c.id] = false
       }
@@ -156,7 +156,7 @@ export class DossierFormCustomFieldSelectComponent
           "dossier_document":  this.dictCustomFields[c.id].dossier_document,
           "field_name": c.name,
           "reference":  this.dictCustomFields[c.id].reference,
-          
+
         };
         this.dictCustomFieldsEnable[c.id] = true
       }
@@ -171,13 +171,13 @@ export class DossierFormCustomFieldSelectComponent
           reference: new FormControl(value?.reference),
           dossier_document: new FormControl(value?.dossier_document),
         }));
-        
+
       }
     }
-    
+
   }
 
-  
+
   onChange = (newValue: string[]) => {}
 
   onTouched = () => {}
@@ -197,7 +197,7 @@ export class DossierFormCustomFieldSelectComponent
   ngOnInit(): void {
     if(this.inputDossierForm!=undefined){
       this.dataDossier()
-    } 
+    }
   }
 
   toggleAll(event, field) {
@@ -216,7 +216,7 @@ export class DossierFormCustomFieldSelectComponent
     }
     this.dataChange.emit(result);
     // this.customFields.clear()
-    
+
     // for (const [key, value] of Object.entries(this.dictCustomFields)) {
     //   if (this.dictCustomFieldsEnable[key]==true){
     //     this.customFields.push(this.fb.group({
@@ -227,15 +227,15 @@ export class DossierFormCustomFieldSelectComponent
     //         reference: new FormControl(value?.reference),
 
     //     }));
-       
+
     //   }
     // }
 
   }
- 
+
   onMatchValueChange(event, field: any) {
     field.value.match_value=event.target.value
-   
+
   }
 
   enableClick(event, field) {
@@ -268,7 +268,7 @@ export class DossierFormCustomFieldSelectComponent
   handleRemove(index): void {
     // console.log("GIA TRI",index,this.customFields.at(index).get("dossier_document").value)
     if (this.customFields.at(index).get("dossier_document").value == null){
-      this.customFields.at(index).patchValue({reference: null}) 
+      this.customFields.at(index).patchValue({reference: null})
     }
   }
   getCustomFieldOfForm(formId){
@@ -282,7 +282,7 @@ export class DossierFormCustomFieldSelectComponent
   modelChangeField(event,index) {
     if (event!=null){
       const d = this.dossierFormReference.find(obj => obj.id === event);
-      this.customFields.at(index).patchValue({value_reference: d?.value})      
+      this.customFields.at(index).patchValue({value_reference: d?.value})
     }
 
   }

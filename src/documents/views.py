@@ -54,7 +54,6 @@ from guardian.shortcuts import get_objects_for_user, get_perms
 from langdetect import detect
 from packaging import version as packaging_version
 
-
 from redis import Redis
 from rest_framework import parsers, status
 from rest_framework.decorators import action

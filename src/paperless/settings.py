@@ -338,6 +338,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.locale.LocaleMiddleware",
+    "paperless.middleware.LoginLanguageMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "paperless.middleware.ApiVersionMiddleware",
@@ -358,7 +359,7 @@ def _parse_base_paths() -> tuple[str, str, str, str, str]:
     script_name = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
     base_url = (script_name or "") + "/"
     login_url = base_url + "accounts/login/"
-    login_redirect_url = base_url + "dashboard"
+    login_redirect_url = base_url + "folders/roots"
     logout_redirect_url = os.getenv("PAPERLESS_LOGOUT_REDIRECT_URL", base_url)
     return script_name, base_url, login_url, login_redirect_url, logout_redirect_url
 

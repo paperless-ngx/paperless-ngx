@@ -231,6 +231,7 @@ import {
   threeDots,
   threeDotsVertical,
   trash,
+  upload,
   uiRadios,
   upcScan,
   x,
@@ -337,6 +338,7 @@ const icons = {
   threeDots,
   threeDotsVertical,
   trash,
+  upload,
   uiRadios,
   upcScan,
   bookshelf,
@@ -384,6 +386,7 @@ import { CustomFieldSelectComponent } from './components/common/custom-field-sel
 import { DossierCustomFieldSelectComponent } from './components/common/custom-field-select/dossier-custom-field-select/dossier-custom-field-select.component'
 import { DossierFormCustomFieldSelectComponent } from './components/common/custom-field-select/dossier-form-custom-field-select/dossier-form-custom-field-select.component'
 import { NodeFileWidgetComponent } from './components/dashboard/widgets/folder-node-widget/node-tree-widget.component'
+import { UploadFileButtonComponent } from './components/dashboard/widgets/upload-file-button/upload-file-btn.component'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -483,6 +486,7 @@ function initializeApp(settings: SettingsService) {
     SavedViewWidgetComponent,
     StatisticsWidgetComponent,
     UploadFileWidgetComponent,
+    UploadFileButtonComponent,
     WidgetFrameComponent,
     FileTreeWidgetComponent,
     WarehouseTreeWidgetComponent,

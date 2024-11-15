@@ -42,7 +42,7 @@ import { DossiersFormComponent } from './components/manage/dossier-form-list/dos
 
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: '', redirectTo: 'folders/root', pathMatch: 'full' },
   {
     path: '',
     component: AppFrameComponent,
@@ -298,7 +298,7 @@ export const routes: Routes = [
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
-            action: PermissionAction.Change,
+            action: PermissionAction.View,
             type: PermissionType.DossierForm,
           },
         },
@@ -309,7 +309,7 @@ export const routes: Routes = [
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
-            action: PermissionAction.Change,
+            action: PermissionAction.View,
             type: PermissionType.DossierForm,
           },
         },

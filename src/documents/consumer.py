@@ -805,8 +805,8 @@ class Consumer(LoggingMixin):
                 document = self._store(text=text, date=date, mime_type=mime_type)
                 new_file = None
                 self.log.debug("Comsumer", document.folder)
-                if document.folder==None:
-                    new_file = Folder.objects.create(name=document.title,
+
+                new_file = Folder.objects.create(name=document.title,
                                                  parent_folder=document.folder,
                                                  type=Folder.FILE,
                                                  owner=document.owner,
