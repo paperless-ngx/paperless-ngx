@@ -548,6 +548,9 @@ export class DocumentDetailComponent
     this.document = doc
     this.requiresPassword = false
     this.updateFormForCustomFields()
+    if (this.archiveContentRenderType === ContentRenderType.TIFF) {
+      this.tryRenderTiff()
+    }
     this.documentsService
       .getMetadata(doc.id)
       .pipe(
@@ -560,9 +563,6 @@ export class DocumentDetailComponent
           this.metadata = result
           if (this.archiveContentRenderType !== ContentRenderType.PDF) {
             this.previewLoaded = true
-          }
-          if (this.archiveContentRenderType === ContentRenderType.TIFF) {
-            this.tryRenderTiff()
           }
         },
         error: (error) => {
