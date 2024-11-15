@@ -31,17 +31,61 @@ extend-select = [
   "PLE",   # https://docs.astral.sh/ruff/rules/#pylint-pl
   "RUF",   # https://docs.astral.sh/ruff/rules/#ruff-specific-rules-ruf
   "FLY",   # https://docs.astral.sh/ruff/rules/#flynt-fly
+  "PTH",   # https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
 ]
-# TODO PTH https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
 ignore = ["DJ001", "SIM105", "RUF012"]
 
 [lint.per-file-ignores]
 ".github/scripts/*.py" = ["E501", "INP001", "SIM117"]
 "docker/wait-for-redis.py" = ["INP001", "T201"]
+"src/documents/barcodes.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/classifier.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/consumer.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/file_handling.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/index.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/management/commands/decrypt_documents.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/management/commands/document_consumer.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/management/commands/document_exporter.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/management/commands/document_importer.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/migrations/0012_auto_20160305_0040.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/migrations/0014_document_checksum.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/migrations/1003_mime_types.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/migrations/1012_fix_archive_files.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/migrations/1037_webp_encrypted_thumbnail_conversion.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/models.py" = ["SIM115", "PTH"]  # TODO PTH Enable & remove
+"src/documents/parsers.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/signals/handlers.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/tasks.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/tests/test_api_app_config.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/tests/test_api_bulk_download.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/tests/test_api_documents.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/tests/test_classifier.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/tests/test_consumer.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/tests/test_file_handling.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/tests/test_management.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/tests/test_management_consumer.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/tests/test_management_exporter.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/tests/test_management_thumbnails.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/tests/test_migration_archive_files.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/tests/test_migration_document_pages_count.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/tests/test_migration_mime_type.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/tests/test_sanity_check.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/tests/test_tasks.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/tests/test_views.py" = ["PTH"]  # TODO Enable & remove
+"src/documents/views.py" = ["PTH"]  # TODO Enable & remove
+"src/paperless/checks.py" = ["PTH"]  # TODO Enable & remove
+"src/paperless/settings.py" = ["PTH"]  # TODO Enable & remove
+"src/paperless/tests/test_checks.py" = ["PTH"]  # TODO Enable & remove
+"src/paperless/urls.py" = ["PTH"]  # TODO Enable & remove
+"src/paperless/views.py" = ["PTH"]  # TODO Enable & remove
+"src/paperless_mail/mail.py" = ["PTH"]  # TODO Enable & remove
+"src/paperless_mail/preprocessor.py" = ["PTH"]  # TODO Enable & remove
+"src/paperless_tesseract/parsers.py" = ["PTH"]  # TODO Enable & remove
+"src/paperless_tesseract/tests/test_parser.py" = ["RUF001", "PTH"]  # TODO PTH Enable & remove
+"src/paperless_tika/tests/test_live_tika.py" = ["PTH"]  # TODO Enable & remove
+"src/paperless_tika/tests/test_tika_parser.py" = ["PTH"]  # TODO Enable & remove
 "*/tests/*.py" = ["E501", "SIM117"]
 "*/migrations/*.py" = ["E501", "SIM", "T201"]
-"src/paperless_tesseract/tests/test_parser.py" = ["RUF001"]
-"src/documents/models.py" = ["SIM115"]
 
 [lint.isort]
 force-single-line = true

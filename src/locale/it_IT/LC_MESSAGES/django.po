@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-19 22:56-0700\n"
-"PO-Revision-Date: 2024-10-20 05:58\n"
+"PO-Revision-Date: 2024-11-03 00:33\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -23,11 +23,11 @@ msgstr "Documenti"
 
 #: documents/filters.py:334
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "Il valore deve essere un JSON valido."
 
 #: documents/filters.py:353
 msgid "Invalid custom field query expression"
-msgstr ""
+msgstr "Espressione della query del campo personalizzato non valida"
 
 #: documents/filters.py:363
 msgid "Invalid expression list. Must be nonempty."
@@ -35,7 +35,7 @@ msgstr ""
 
 #: documents/filters.py:384
 msgid "Invalid logical operator {op!r}"
-msgstr ""
+msgstr "Operatore logico non valido {op!r}"
 
 #: documents/filters.py:398
 msgid "Maximum number of query conditions exceeded."
@@ -43,7 +43,7 @@ msgstr ""
 
 #: documents/filters.py:455
 msgid "{name!r} is not a valid custom field."
-msgstr ""
+msgstr "{name!r} non è un campo personalizzato valido."
 
 #: documents/filters.py:492
 msgid "{data_type} does not support query expr {expr!r}."

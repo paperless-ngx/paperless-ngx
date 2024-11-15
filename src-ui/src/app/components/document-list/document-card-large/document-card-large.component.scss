@@ -2,7 +2,7 @@
   overflow-wrap: anywhere;
 }
 
-.doc-img-background {
+.doc-img-container {
   position: relative;
 }
 
@@ -11,7 +11,6 @@
   object-position: top left;
   height: 100%;
   position: absolute;
-  mix-blend-mode: multiply;
 }
 
 .card-title {
@@ -47,18 +46,6 @@
 
 .document-card:hover .document-card-check {
   display: block;
-}
-
-.card-selected {
-  border-color: var(--bs-primary);
-
-  .document-card-check {
-    display: block;
-  }
-}
-
-.doc-img-background-selected {
-  background-color: var(--pngx-primary-faded);
 }
 
 .card-info {

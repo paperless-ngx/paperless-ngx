@@ -133,9 +133,11 @@ export class DocumentDetailComponent
   title: string
   titleSubject: Subject<string> = new Subject()
   previewUrl: string
+  thumbUrl: string
   previewText: string
   downloadUrl: string
   downloadOriginalUrl: string
+  previewLoaded: boolean = false
   tiffURL: string
   tiffError: string
 
@@ -225,15 +227,17 @@ export class DocumentDetailComponent
   }
 
   get archiveContentRenderType(): ContentRenderType {
-    return this.getRenderType(
-      this.metadata?.has_archive_version
-        ? 'application/pdf'
-        : this.metadata?.original_mime_type
-    )
+    return this.document?.archived_file_name
+      ? this.getRenderType('application/pdf')
+      : this.getRenderType(this.document?.mime_type)
   }
 
   get originalContentRenderType(): ContentRenderType {
-    return this.getRenderType(this.metadata?.original_mime_type)
+    return this.getRenderType(this.document?.mime_type)
+  }
+
+  get showThumbnailOverlay(): boolean {
+    return this.settings.get(SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL)
   }
 
   private getRenderType(mimeType: string): ContentRenderType {
@@ -345,6 +349,7 @@ export class DocumentDetailComponent
               }`
             },
           })
+          this.thumbUrl = this.documentsService.getThumbUrl(documentId)
           return this.documentsService.get(documentId)
         })
       )
@@ -510,6 +515,16 @@ export class DocumentDetailComponent
       .subscribe(() => {
         if (this.openDocumentService.isDirty(this.document)) this.save()
       })
+
+    this.hotKeyService
+      .addShortcut({
+        keys: 'control.shift.s',
+        description: $localize`Save and close / next`,
+      })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        if (this.openDocumentService.isDirty(this.document)) this.saveEditNext()
+      })
   }
 
   ngOnDestroy(): void {
@@ -543,6 +558,9 @@ export class DocumentDetailComponent
       .subscribe({
         next: (result) => {
           this.metadata = result
+          if (this.archiveContentRenderType !== ContentRenderType.PDF) {
+            this.previewLoaded = true
+          }
           if (this.archiveContentRenderType === ContentRenderType.TIFF) {
             this.tryRenderTiff()
           }
@@ -719,7 +737,10 @@ export class DocumentDetailComponent
         next: (docValues) => {
           // in case data changed while saving eg removing inbox_tags
           this.documentForm.patchValue(docValues)
-          this.store.next(this.documentForm.value)
+          const newValues = Object.assign({}, this.documentForm.value)
+          newValues.tags = [...docValues.tags]
+          newValues.custom_fields = [...docValues.custom_fields]
+          this.store.next(newValues)
           this.openDocumentService.setDirty(this.document, false)
           this.openDocumentService.save()
           this.toastService.showInfo($localize`Document saved successfully.`)
@@ -909,11 +930,15 @@ export class DocumentDetailComponent
   pdfPreviewLoaded(pdf: PDFDocumentProxy) {
     this.previewNumPages = pdf.numPages
     if (this.password) this.requiresPassword = false
+    setTimeout(() => {
+      this.previewLoaded = true
+    }, 300)
   }
 
   onError(event) {
     if (event.name == 'PasswordException') {
       this.requiresPassword = true
+      this.previewLoaded = true
     }
   }
 

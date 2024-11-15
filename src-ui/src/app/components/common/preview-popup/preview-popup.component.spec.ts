@@ -9,13 +9,20 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { PdfViewerModule } from 'ng2-pdf-viewer'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import {
+  HttpClient,
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http'
+import { of, throwError } from 'rxjs'
 
 const doc = {
   id: 10,
   title: 'Document 10',
   content: 'Cupcake ipsum dolor sit amet ice cream.',
   original_file_name: 'sample.pdf',
+  archived_file_name: 'sample.pdf',
+  mime_type: 'application/pdf',
 }
 
 describe('PreviewPopupComponent', () => {
@@ -23,6 +30,7 @@ describe('PreviewPopupComponent', () => {
   let fixture: ComponentFixture<PreviewPopupComponent>
   let settingsService: SettingsService
   let documentService: DocumentService
+  let http: HttpClient
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -35,23 +43,22 @@ describe('PreviewPopupComponent', () => {
     })
     settingsService = TestBed.inject(SettingsService)
     documentService = TestBed.inject(DocumentService)
+    http = TestBed.inject(HttpClient)
     jest
       .spyOn(documentService, 'getPreviewUrl')
       .mockImplementation((id) => doc.original_file_name)
     fixture = TestBed.createComponent(PreviewPopupComponent)
     component = fixture.componentInstance
-    component.document = doc
+    component.document = { ...doc }
     fixture.detectChanges()
   })
 
-  it('should guess if file is pdf by file name', () => {
+  it('should correctly report if document is pdf', () => {
     expect(component.isPdf).toBeTruthy()
-    component.document.archived_file_name = 'sample.pdf'
-    expect(component.isPdf).toBeTruthy()
+    component.document.mime_type = 'application/msword'
+    expect(component.isPdf).toBeTruthy() // still has archive file
     component.document.archived_file_name = undefined
-    component.document.original_file_name = 'sample.txt'
     expect(component.isPdf).toBeFalsy()
-    component.document.original_file_name = 'sample.pdf'
   })
 
   it('should return settings for native PDF viewer', () => {
@@ -84,6 +91,8 @@ describe('PreviewPopupComponent', () => {
 
   it('should fall back to object for non-pdf', () => {
     component.document.original_file_name = 'sample.png'
+    component.document.mime_type = 'image/png'
+    component.document.archived_file_name = undefined
     fixture.detectChanges()
     expect(fixture.debugElement.query(By.css('object'))).not.toBeNull()
   })
@@ -94,5 +103,23 @@ describe('PreviewPopupComponent', () => {
     expect(fixture.debugElement.nativeElement.textContent).toContain(
       'Error loading preview'
     )
+  })
+
+  it('should get text content from http if appropriate', () => {
+    component.document = {
+      ...doc,
+      original_file_name: 'sample.txt',
+      mime_type: 'text/plain',
+    }
+    const httpSpy = jest.spyOn(http, 'get')
+    httpSpy.mockReturnValueOnce(
+      throwError(() => new Error('Error getting preview'))
+    )
+    component.init()
+    expect(httpSpy).toHaveBeenCalled()
+    expect(component.error).toBeTruthy()
+    httpSpy.mockReturnValueOnce(of('Preview text'))
+    component.init()
+    expect(component.previewText).toEqual('Preview text')
   })
 })

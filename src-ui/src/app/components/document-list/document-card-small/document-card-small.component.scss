@@ -6,7 +6,6 @@
   object-fit: cover;
   object-position: top left;
   height: 180px;
-  mix-blend-mode: multiply;
 }
 
 .document-card-check {
@@ -38,18 +37,6 @@
   position: absolute;
   right: 0;
   top: 142px;
-}
-
-.card-selected {
-  border-color:var(--bs-primary);
-
-  .document-card-check {
-    display: block;
-  }
-}
-
-.doc-img-background-selected {
-  background-color: var(--pngx-primary-faded);
 }
 
 .card-info {

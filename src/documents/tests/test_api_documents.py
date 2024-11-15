@@ -2540,6 +2540,50 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.content, b"1")
 
+    def test_asn_not_unique_with_trashed_doc(self):
+        """
+        GIVEN:
+            - Existing document with ASN that is trashed
+        WHEN:
+            - API request to update document with same ASN
+        THEN:
+            - Explicit error is returned
+        """
+        user1 = User.objects.create_superuser(username="test1")
+
+        self.client.force_authenticate(user1)
+
+        doc1 = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document 1",
+            checksum="1",
+            archive_serial_number=1,
+        )
+        doc1.delete()
+
+        doc2 = Document.objects.create(
+            title="test2",
+            mime_type="application/pdf",
+            content="this is a document 2",
+            checksum="2",
+        )
+        result = self.client.patch(
+            f"/api/documents/{doc2.pk}/",
+            {
+                "archive_serial_number": 1,
+            },
+        )
+        self.assertEqual(result.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            result.json(),
+            {
+                "archive_serial_number": [
+                    "Document with this Archive Serial Number already exists in the trash.",
+                ],
+            },
+        )
+
     def test_remove_inbox_tags(self):
         """
         GIVEN:

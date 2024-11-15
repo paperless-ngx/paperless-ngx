@@ -350,14 +350,16 @@
 </ng-template>
 
 <ng-template #previewContent>
-  @if (!metadata) {
-    <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+  <div class="thumb-preview position-absolute pe-none" [class.fade]="previewLoaded">
+    <img *ngIf="showThumbnailOverlay" [src]="thumbUrl | safeUrl" class="" width="100%" height="auto" alt="Document loading..." i18n-alt />
+    <div class="position-absolute top-0 start-0 m-2 p-2 d-flex align-items-center justify-content-center">
       <div>
         <div class="spinner-border spinner-border-sm me-2" role="status"></div>
         <ng-container i18n>Loading...</ng-container>
       </div>
     </div>
-  } @else {
+  </div>
+  @if (document) {
     @switch (archiveContentRenderType) {
       @case (ContentRenderType.PDF) {
         @if (!useNativePdfViewer) {

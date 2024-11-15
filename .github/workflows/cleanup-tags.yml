@@ -21,7 +21,7 @@ jobs:
   cleanup-images:
     name: Cleanup Image Tags for ${{ matrix.primary-name }}
     if: github.repository_owner == 'paperless-ngx'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -33,7 +33,7 @@ jobs:
       -
         name: Clean temporary images
         if: "${{ env.TOKEN != '' }}"
-        uses: stumpylog/image-cleaner-action/ephemeral@v0.8.0
+        uses: stumpylog/image-cleaner-action/ephemeral@v0.9.0
         with:
           token: "${{ env.TOKEN }}"
           owner: "${{ github.repository_owner }}"
@@ -47,7 +47,7 @@ jobs:
   cleanup-untagged-images:
     name: Cleanup Untagged Images Tags for ${{ matrix.primary-name }}
     if: github.repository_owner == 'paperless-ngx'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs:
       - cleanup-images
     strategy:
@@ -61,7 +61,7 @@ jobs:
       -
         name: Clean untagged images
         if: "${{ env.TOKEN != '' }}"
-        uses: stumpylog/image-cleaner-action/untagged@v0.8.0
+        uses: stumpylog/image-cleaner-action/untagged@v0.9.0
         with:
           token: "${{ env.TOKEN }}"
           owner: "${{ github.repository_owner }}"

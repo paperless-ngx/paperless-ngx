@@ -777,7 +777,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/document-link/document-link.component.html</context>
-          <context context-type="linenumber">51</context>
+          <context context-type="linenumber">57</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.html</context>
@@ -3605,7 +3605,7 @@
         </context-group>
         <target state="final">Fehler beim Speichern des Feldes.</target>
       </trans-unit>
-      <trans-unit id="4465085913683915434" datatype="html">
+      <trans-unit id="4465085913683915434" datatype="html" approved="yes">
         <source>True</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
@@ -3619,9 +3619,9 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
           <context context-type="linenumber">79</context>
         </context-group>
-        <target state="translated">Wahr</target>
+        <target state="final">Wahr</target>
       </trans-unit>
-      <trans-unit id="3800326155195149498" datatype="html">
+      <trans-unit id="3800326155195149498" datatype="html" approved="yes">
         <source>False</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
@@ -3635,15 +3635,15 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="translated">Falsch</target>
+        <target state="final">Falsch</target>
       </trans-unit>
-      <trans-unit id="7551700625201096185" datatype="html">
+      <trans-unit id="7551700625201096185" datatype="html" approved="yes">
         <source>Search docs...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="translated">Suche Dokumente...</target>
+        <target state="final">Suche Dokumente...</target>
       </trans-unit>
       <trans-unit id="3184700926171002527" datatype="html" approved="yes">
         <source>Any</source>
@@ -3685,29 +3685,29 @@
         </context-group>
         <target state="final">Alle</target>
       </trans-unit>
-      <trans-unit id="1496549861742963591" datatype="html">
+      <trans-unit id="1496549861742963591" datatype="html" approved="yes">
         <source>Not</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
           <context context-type="linenumber">131</context>
         </context-group>
-        <target state="translated">Nicht</target>
+        <target state="final">Nicht</target>
       </trans-unit>
-      <trans-unit id="6548676277933116532" datatype="html">
+      <trans-unit id="6548676277933116532" datatype="html" approved="yes">
         <source>Add query</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
           <context context-type="linenumber">150</context>
         </context-group>
-        <target state="translated">Abfrage hinzufügen</target>
+        <target state="final">Abfrage hinzufügen</target>
       </trans-unit>
-      <trans-unit id="5599577087865387184" datatype="html">
+      <trans-unit id="5599577087865387184" datatype="html" approved="yes">
         <source>Add expression</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
           <context context-type="linenumber">153</context>
         </context-group>
-        <target state="translated">Ausdruck hinzufügen</target>
+        <target state="final">Ausdruck hinzufügen</target>
       </trans-unit>
       <trans-unit id="6052766076365105714" datatype="html" approved="yes">
         <source>now</source>
@@ -4513,13 +4513,13 @@
         </context-group>
         <target state="final">Pfad</target>
       </trans-unit>
-      <trans-unit id="2816147949408898105" datatype="html">
+      <trans-unit id="2816147949408898105" datatype="html" approved="yes">
         <source>See &lt;a target=&apos;_blank&apos; href=&apos;https://docs.paperless-ngx.com/advanced_usage/#file-name-handling&apos;&gt;the documentation&lt;/a&gt;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Siehe &lt;a target='_blank' href='https://docs.paperless-ngx.com/advanced_usage/#file-name-handling'&gt;Dokumentation&lt;/a&gt;.</target>
+        <target state="final">Siehe &lt;a target='_blank' href='https://docs.paperless-ngx.com/advanced_usage/#file-name-handling'&gt;Dokumentation&lt;/a&gt;.</target>
       </trans-unit>
       <trans-unit id="1295614462098694869" datatype="html" approved="yes">
         <source>Preview</source>
@@ -4533,29 +4533,29 @@
         </context-group>
         <target state="final">Vorschau</target>
       </trans-unit>
-      <trans-unit id="8057014866157903311" datatype="html">
+      <trans-unit id="8057014866157903311" datatype="html" approved="yes">
         <source>Path test failed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="translated">Pfadüberprüfung fehlgeschlagen</target>
+        <target state="final">Pfadüberprüfung fehlgeschlagen</target>
       </trans-unit>
-      <trans-unit id="9116034231465034307" datatype="html">
+      <trans-unit id="9116034231465034307" datatype="html" approved="yes">
         <source>No document selected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="translated">Kein Dokument ausgewählt</target>
+        <target state="final">Kein Dokument ausgewählt</target>
       </trans-unit>
-      <trans-unit id="2083498114116917092" datatype="html">
+      <trans-unit id="2083498114116917092" datatype="html" approved="yes">
         <source>Search for a document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="translated">Ein Dokument suchen</target>
+        <target state="final">Ein Dokument suchen</target>
       </trans-unit>
       <trans-unit id="6423278459497515329" datatype="html" approved="yes">
         <source>No documents found</source>
@@ -5324,13 +5324,17 @@
           <context context-type="sourcefile">src/app/components/common/input/document-link/document-link.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/document-link/document-link.component.html</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
         <target state="final">Verknüpfung entfernen</target>
       </trans-unit>
       <trans-unit id="1388712764439031120" datatype="html" approved="yes">
         <source>Open link</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/document-link/document-link.component.html</context>
-          <context context-type="linenumber">44</context>
+          <context context-type="linenumber">45</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/url/url.component.html</context>
@@ -5338,13 +5342,21 @@
         </context-group>
         <target state="final">Link öffnen</target>
       </trans-unit>
-      <trans-unit id="5676637575587497817" datatype="html">
+      <trans-unit id="6595008830732269870" datatype="html" approved="yes">
+        <source>Not found</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/document-link/document-link.component.html</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+        <target state="final">Nicht gefunden</target>
+      </trans-unit>
+      <trans-unit id="5676637575587497817" datatype="html" approved="yes">
         <source>Search for documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/document-link/document-link.component.ts</context>
           <context context-type="linenumber">53</context>
         </context-group>
-        <target state="translated">Nach Dokumenten suchen</target>
+        <target state="final">Nach Dokumenten suchen</target>
       </trans-unit>
       <trans-unit id="8627133593113147800" datatype="html" approved="yes">
         <source>Selected items</source>
@@ -8088,13 +8100,13 @@
         </context-group>
         <target state="final">Ohne Tag</target>
       </trans-unit>
-      <trans-unit id="8644099678903817943" datatype="html">
+      <trans-unit id="8644099678903817943" datatype="html" approved="yes">
         <source>Custom fields query</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">238</context>
         </context-group>
-        <target state="translated">Benutzerdefinierte Feldabfrage</target>
+        <target state="final">Benutzerdefinierte Feldabfrage</target>
       </trans-unit>
       <trans-unit id="6523384805359286307" datatype="html" approved="yes">
         <source>Title: <x id="PH" equiv-text="rule.value"/></source>
@@ -8284,7 +8296,7 @@
         </context-group>
         <target state="final">Datentyp</target>
       </trans-unit>
-      <trans-unit id="6209318295562170730" datatype="html">
+      <trans-unit id="6209318295562170730" datatype="html" approved="yes">
         <source>Filter Documents (<x id="INTERPOLATION" equiv-text="{{ field.document_count }}"/>)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.html</context>
@@ -8306,7 +8318,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">85</context>
         </context-group>
-        <target state="translated">Dokumente filtern (<x id="INTERPOLATION" equiv-text="{{ field.document_count }}"/>)</target>
+        <target state="final">Dokumente filtern (<x id="INTERPOLATION" equiv-text="{{ field.document_count }}"/>)</target>
       </trans-unit>
       <trans-unit id="651372623796033489" datatype="html" approved="yes">
         <source>No fields defined.</source>
@@ -8396,21 +8408,21 @@
         </context-group>
         <target state="final">Konto hinzufügen</target>
       </trans-unit>
-      <trans-unit id="5088684330574277786" datatype="html">
+      <trans-unit id="5088684330574277786" datatype="html" approved="yes">
         <source>Connect Gmail Account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="translated">Gmail-Konto verbinden</target>
+        <target state="final">Gmail-Konto verbinden</target>
       </trans-unit>
-      <trans-unit id="6630732552154686829" datatype="html">
+      <trans-unit id="6630732552154686829" datatype="html" approved="yes">
         <source>Connect Outlook Account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="translated">Outlook-Konto verbinden</target>
+        <target state="final">Outlook-Konto verbinden</target>
       </trans-unit>
       <trans-unit id="2188854519574316630" datatype="html" approved="yes">
         <source>Server</source>
@@ -8488,21 +8500,21 @@
         </context-group>
         <target state="final">Fehler beim Abrufen der E-Mail-Regeln</target>
       </trans-unit>
-      <trans-unit id="763945516325093575" datatype="html">
+      <trans-unit id="763945516325093575" datatype="html" approved="yes">
         <source>OAuth2 authentication success</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">101</context>
         </context-group>
-        <target state="translated">OAuth2-Authentifizierung erfolgreich</target>
+        <target state="final">OAuth2-Authentifizierung erfolgreich</target>
       </trans-unit>
-      <trans-unit id="9022978370268070156" datatype="html">
+      <trans-unit id="9022978370268070156" datatype="html" approved="yes">
         <source>OAuth2 authentication failed, see logs for details</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">112</context>
         </context-group>
-        <target state="translated">OAuth2-Authentifizierung fehlgeschlagen, siehe Protokolle für Details</target>
+        <target state="final">OAuth2-Authentifizierung fehlgeschlagen, siehe Protokolle für Details</target>
       </trans-unit>
       <trans-unit id="6327501535846658797" datatype="html" approved="yes">
         <source>Saved account &quot;<x id="PH" equiv-text="newMailAccount.name"/>&quot;.</source>
@@ -8988,93 +9000,93 @@
         </context-group>
         <target state="final">Zur Startseite</target>
       </trans-unit>
-      <trans-unit id="7088714514100361567" datatype="html">
+      <trans-unit id="7088714514100361567" datatype="html" approved="yes">
         <source>Equal to</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field-query.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="translated">Ist gleich</target>
+        <target state="final">Ist gleich</target>
       </trans-unit>
-      <trans-unit id="2841739558138901231" datatype="html">
+      <trans-unit id="2841739558138901231" datatype="html" approved="yes">
         <source>In</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field-query.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="translated">In</target>
+        <target state="final">In</target>
       </trans-unit>
-      <trans-unit id="6504828068656625171" datatype="html">
+      <trans-unit id="6504828068656625171" datatype="html" approved="yes">
         <source>Is null</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field-query.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="translated">Ist null</target>
+        <target state="final">Ist null</target>
       </trans-unit>
-      <trans-unit id="4112599358351148632" datatype="html">
+      <trans-unit id="4112599358351148632" datatype="html" approved="yes">
         <source>Exists</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field-query.ts</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="translated">Existiert</target>
+        <target state="final">Existiert</target>
       </trans-unit>
-      <trans-unit id="6238291467288576076" datatype="html">
+      <trans-unit id="6238291467288576076" datatype="html" approved="yes">
         <source>Contains</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field-query.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="translated">Enthält</target>
+        <target state="final">Enthält</target>
       </trans-unit>
-      <trans-unit id="870133374397538941" datatype="html">
+      <trans-unit id="870133374397538941" datatype="html" approved="yes">
         <source>Contains (case-insensitive)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field-query.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="translated">Enthält (beachte Groß- und Kleinschreibung)</target>
+        <target state="final">Enthält (beachte Groß- und Kleinschreibung)</target>
       </trans-unit>
-      <trans-unit id="7732309408488818531" datatype="html">
+      <trans-unit id="7732309408488818531" datatype="html" approved="yes">
         <source>Greater than</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field-query.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="translated">Größer als</target>
+        <target state="final">Größer als</target>
       </trans-unit>
-      <trans-unit id="9087788064443057357" datatype="html">
+      <trans-unit id="9087788064443057357" datatype="html" approved="yes">
         <source>Greater than or equal to</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field-query.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="translated">Größer oder gleich</target>
+        <target state="final">Größer oder gleich</target>
       </trans-unit>
-      <trans-unit id="5995604223909447366" datatype="html">
+      <trans-unit id="5995604223909447366" datatype="html" approved="yes">
         <source>Less than</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field-query.ts</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="translated">Kleiner als</target>
+        <target state="final">Kleiner als</target>
       </trans-unit>
-      <trans-unit id="6989379963430864867" datatype="html">
+      <trans-unit id="6989379963430864867" datatype="html" approved="yes">
         <source>Less than or equal to</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field-query.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="translated">Kleiner oder gleich</target>
+        <target state="final">Kleiner oder gleich</target>
       </trans-unit>
-      <trans-unit id="2348971518300945764" datatype="html">
+      <trans-unit id="2348971518300945764" datatype="html" approved="yes">
         <source>Range</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/custom-field-query.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="translated">Bereich</target>
+        <target state="final">Bereich</target>
       </trans-unit>
       <trans-unit id="969459137986754249" datatype="html" approved="yes">
         <source>Boolean</source>

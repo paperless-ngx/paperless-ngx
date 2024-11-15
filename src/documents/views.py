@@ -1499,7 +1499,7 @@ class BulkDownloadView(GenericAPIView):
         follow_filename_format = serializer.validated_data.get("follow_formatting")
 
         settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
-        temp = tempfile.NamedTemporaryFile(
+        temp = tempfile.NamedTemporaryFile(  # noqa: SIM115
             dir=settings.SCRATCH_DIR,
             suffix="-compressed-archive",
             delete=False,
@@ -1517,6 +1517,7 @@ class BulkDownloadView(GenericAPIView):
             for document in Document.objects.filter(pk__in=ids):
                 strategy.add_document(document)
 
+        # TODO(stumpylog): Investigate using FileResponse here
         with open(temp.name, "rb") as f:
             response = HttpResponse(f, content_type="application/zip")
             response["Content-Disposition"] = '{}; filename="{}"'.format(

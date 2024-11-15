@@ -490,9 +490,23 @@ ul.pagination {
 
 .doc-img-container {
   border: none !important;
-  border-top-left-radius: .25rem;
-  border-top-right-radius: .25rem;
   overflow: hidden;
+
+  .doc-img {
+    overflow: visible;
+  }
+}
+
+.card-selected {
+  border-color:var(--bs-primary);
+
+  .document-card-check {
+    display: block !important;
+  }
+
+  .doc-img-container {
+    background-color: var(--pngx-primary-faded);
+  }
 }
 
 table.table {
@@ -666,6 +680,10 @@ code {
   opacity: .5;
 }
 
+.whitespace-preserve {
+  white-space: preserve;
+}
+
 /* Animate items as they're being sorted. */
 .cdk-drop-list-dragging .cdk-drag {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
@@ -705,6 +723,8 @@ i-bs svg {
   vertical-align: text-bottom;
 }
 
-.document-card .card-footer i-bs svg {
-  vertical-align: middle;
+.document-card {
+  .card-footer i-bs svg {
+    vertical-align: middle;
+  }
 }

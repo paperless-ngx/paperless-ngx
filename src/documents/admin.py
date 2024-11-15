@@ -51,6 +51,7 @@ class DocumentAdmin(GuardedModelAdmin):
         "archive_filename",
         "archive_checksum",
         "original_filename",
+        "deleted_at",
     )
 
     list_display_links = ("title",)
@@ -76,6 +77,12 @@ class DocumentAdmin(GuardedModelAdmin):
         return obj.created.date().strftime("%Y-%m-%d")
 
     created_.short_description = "Created"
+
+    def get_queryset(self, request):  # pragma: no cover
+        """
+        Include trashed documents
+        """
+        return Document.global_objects.all()
 
     def delete_queryset(self, request, queryset):
         from documents import index
