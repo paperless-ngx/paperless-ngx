@@ -53,7 +53,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from guardian.shortcuts import get_objects_for_user, get_perms
 from langdetect import detect
 from packaging import version as packaging_version
-from pipenv.vendor.tomlkit import document
+
 
 from redis import Redis
 from rest_framework import parsers, status
