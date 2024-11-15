@@ -1277,6 +1277,9 @@ describe('DocumentDetailComponent', () => {
       DocumentDetailComponent.prototype as any,
       'tryRenderTiff'
     )
+    const doc = Object.assign({}, component.document)
+    doc.archived_file_name = null
+    doc.mime_type = 'image/tiff'
     jest
       .spyOn(documentService, 'getMetadata')
       .mockReturnValue(
