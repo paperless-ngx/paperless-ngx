@@ -209,6 +209,69 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             ],
         )
 
+    def test_custom_field_select_options_pruned(self):
+        """
+        GIVEN:
+            - Select custom field exists and document instance with one of the options
+        WHEN:
+            - API request to remove an option from the select field
+        THEN:
+            - The option is removed from the field
+            - The option is removed from the document instance
+        """
+        custom_field_select = CustomField.objects.create(
+            name="Select Field",
+            data_type=CustomField.FieldDataType.SELECT,
+            extra_data={
+                "select_options": [
+                    {"label": "Option 1", "id": "abc-123"},
+                    {"label": "Option 2", "id": "def-456"},
+                    {"label": "Option 3", "id": "ghi-789"},
+                ],
+            },
+        )
+
+        doc = Document.objects.create(
+            title="WOW",
+            content="the content",
+            checksum="123",
+            mime_type="application/pdf",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=custom_field_select,
+            value_text="abc-123",
+        )
+
+        resp = self.client.patch(
+            f"{self.ENDPOINT}{custom_field_select.id}/",
+            json.dumps(
+                {
+                    "extra_data": {
+                        "select_options": [
+                            {"label": "Option 1", "id": "abc-123"},
+                            {"label": "Option 3", "id": "ghi-789"},
+                        ],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.json()
+
+        self.assertCountEqual(
+            data["extra_data"]["select_options"],
+            [
+                {"label": "Option 1", "id": "abc-123"},
+                {"label": "Option 3", "id": "ghi-789"},
+            ],
+        )
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.custom_fields.first().value, None)
+
     def test_create_custom_field_monetary_validation(self):
         """
         GIVEN:
