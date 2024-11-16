@@ -201,7 +201,7 @@ class SelectField(serializers.CharField):
         super().__init__(max_length=16)
 
     def to_internal_value(self, data):
-        # Test if the supplied value is not an id
+        # If the supplied value is the option label instead of the ID
         try:
             data = next(
                 option.get("id")
