@@ -698,5 +698,31 @@ describe('DocumentListComponent', () => {
     fixture.detectChanges()
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'o' }))
     expect(detailSpy).toHaveBeenCalledWith(docs[1].id)
+
+    const lotsOfDocs: Document[] = Array.from({ length: 100 }, (_, i) => ({
+      id: i + 1,
+      title: `Doc${i + 1}`,
+      notes: [],
+      tags$: new Subject(),
+      content: `document content ${i + 1}`,
+    }))
+    jest
+      .spyOn(documentListService, 'documents', 'get')
+      .mockReturnValue(lotsOfDocs)
+    jest
+      .spyOn(documentService, 'listAllFilteredIds')
+      .mockReturnValue(of(lotsOfDocs.map((d) => d.id)))
+    jest.spyOn(documentListService, 'getLastPage').mockReturnValue(4)
+    fixture.detectChanges()
+
+    expect(component.list.currentPage).toEqual(1)
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowRight', ctrlKey: true })
+    )
+    expect(component.list.currentPage).toEqual(2)
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowLeft', ctrlKey: true })
+    )
+    expect(component.list.currentPage).toEqual(1)
   })
 })
