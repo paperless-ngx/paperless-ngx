@@ -127,7 +127,7 @@
       <div class="d-flex justify-content-between align-items-center">
         <div class="btn-group w-100">
           <a routerLink="/documents/{{document.id}}" class="btn btn-sm btn-outline-secondary" title="Open" i18n-title *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }" i18n-title>
-            <i-bs name="box-arrow-in-right"></i-bs>
+            <i-bs name="file-earmark-richtext"></i-bs>
           </a>
           <a [href]="previewUrl" target="_blank" class="btn btn-sm btn-outline-secondary"
             [ngbPopover]="previewContent" [popoverTitle]="document.title | documentTitle"

@@ -54,7 +54,7 @@
               <i-bs name="diagram-3"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>More like this</span>
             </a>
             <a routerLink="/documents/{{document.id}}" class="btn btn-sm btn-outline-secondary" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-              <i-bs name="box-arrow-in-right"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Open</span>
+              <i-bs name="file-earmark-richtext"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Open</span>
             </a>
             <a class="btn btn-sm btn-outline-secondary" target="_blank" [href]="previewUrl"
               [ngbPopover]="previewContent" [popoverTitle]="document.title | documentTitle"
