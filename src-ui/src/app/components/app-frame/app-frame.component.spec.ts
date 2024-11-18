@@ -343,6 +343,7 @@ describe('AppFrameComponent', () => {
     component.editProfile()
     expect(modalSpy).toHaveBeenCalledWith(ProfileEditDialogComponent, {
       backdrop: 'static',
+      size: 'xl',
     })
   })
 
