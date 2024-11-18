@@ -49,7 +49,7 @@
                 [disabled]="disablePrimaryButton(type, item)"
                 (mouseenter)="onButtonHover($event)">
                     @if (type === DataType.Document) {
-                        <i-bs width="1em" height="1em" name="box-arrow-in-right"></i-bs>
+                        <i-bs width="1em" height="1em" name="file-earmark-richtext"></i-bs>
                         <span>&nbsp;<ng-container i18n>Open</ng-container></span>
                     } @else if (type === DataType.SavedView) {
                         <i-bs width="1em" height="1em" name="eye"></i-bs>
@@ -72,7 +72,7 @@
                             <i-bs width="1em" height="1em" name="download"></i-bs>
                             <span>&nbsp;<ng-container i18n>Download</ng-container></span>
                         } @else {
-                            <i-bs width="1em" height="1em" name="box-arrow-in-right"></i-bs>
+                            <i-bs width="1em" height="1em" name="file-earmark-richtext"></i-bs>
                             <span>&nbsp;<ng-container i18n>Open</ng-container></span>
                         }
                     </button>
