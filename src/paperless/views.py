@@ -1,6 +1,12 @@
 import os
 from collections import OrderedDict
 
+from allauth.mfa import signals
+from allauth.mfa.adapter import get_adapter as get_mfa_adapter
+from allauth.mfa.base.internal.flows import delete_and_cleanup
+from allauth.mfa.models import Authenticator
+from allauth.mfa.recovery_codes.internal.flows import auto_generate_recovery_codes
+from allauth.mfa.totp.internal import auth as totp_auth
 from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth.models import Group
@@ -8,9 +14,12 @@ from django.contrib.auth.models import User
 from django.db.models.functions import Lower
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
+from django.http import HttpResponseForbidden
+from django.http import HttpResponseNotFound
 from django.views.generic import View
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.authtoken.models import Token
+from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import GenericAPIView
 from rest_framework.pagination import PageNumberPagination
@@ -100,6 +109,24 @@ class UserViewSet(ModelViewSet):
     filterset_class = UserFilterSet
     ordering_fields = ("username",)
 
+    @action(detail=True, methods=["post"])
+    def deactivate_totp(self, request, pk=None):
+        request_user = request.user
+        user = User.objects.get(pk=pk)
+        if not request_user.is_superuser and request_user != user:
+            return HttpResponseForbidden(
+                "You do not have permission to deactivate TOTP for this user",
+            )
+        authenticator = Authenticator.objects.filter(
+            user=user,
+            type=Authenticator.Type.TOTP,
+        ).first()
+        if authenticator is not None:
+            delete_and_cleanup(request, authenticator)
+            return Response(True)
+        else:
+            return HttpResponseNotFound("TOTP not found")
+
 
 class GroupViewSet(ModelViewSet):
     model = Group
@@ -143,6 +170,76 @@ class ProfileView(GenericAPIView):
         user.save()
 
         return Response(serializer.to_representation(user))
+
+
+class TOTPView(GenericAPIView):
+    """
+    TOTP views
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        """
+        Generates a new TOTP secret and returns the URL and SVG
+        """
+        user = self.request.user
+        mfa_adapter = get_mfa_adapter()
+        secret = totp_auth.get_totp_secret(regenerate=True)
+        url = mfa_adapter.build_totp_url(user, secret)
+        svg = mfa_adapter.build_totp_svg(url)
+        return Response(
+            {
+                "url": url,
+                "qr_svg": svg,
+                "secret": secret,
+            },
+        )
+
+    def post(self, request, *args, **kwargs):
+        """
+        Validates a TOTP code and activates the TOTP authenticator
+        """
+        valid = totp_auth.validate_totp_code(
+            request.data["secret"],
+            request.data["code"],
+        )
+        recovery_codes = None
+        if valid:
+            auth = totp_auth.TOTP.activate(
+                request.user,
+                request.data["secret"],
+            ).instance
+            signals.authenticator_added.send(
+                sender=Authenticator,
+                request=request,
+                user=request.user,
+                authenticator=auth,
+            )
+            rc_auth: Authenticator = auto_generate_recovery_codes(request)
+            if rc_auth:
+                recovery_codes = rc_auth.wrap().get_unused_codes()
+        return Response(
+            {
+                "success": valid,
+                "recovery_codes": recovery_codes,
+            },
+        )
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Deactivates the TOTP authenticator
+        """
+        user = self.request.user
+        authenticator = Authenticator.objects.filter(
+            user=user,
+            type=Authenticator.Type.TOTP,
+        ).first()
+        if authenticator is not None:
+            delete_and_cleanup(request, authenticator)
+            return Response(True)
+        else:
+            return HttpResponseNotFound("TOTP not found")
 
 
 class GenerateAuthTokenView(GenericAPIView):

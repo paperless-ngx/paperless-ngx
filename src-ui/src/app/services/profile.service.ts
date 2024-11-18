@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
 import {
+  TotpSettings,
   PaperlessUserProfile,
   SocialAccountProvider,
 } from '../data/user-profile'
@@ -45,6 +46,32 @@ export class ProfileService {
   getSocialAccountProviders(): Observable<SocialAccountProvider[]> {
     return this.http.get<SocialAccountProvider[]>(
       `${environment.apiBaseUrl}${this.endpoint}/social_account_providers/`
+    )
+  }
+
+  getTotpSettings(): Observable<TotpSettings> {
+    return this.http.get<TotpSettings>(
+      `${environment.apiBaseUrl}${this.endpoint}/totp/`
+    )
+  }
+
+  activateTotp(
+    totpSecret: string,
+    totpCode: string
+  ): Observable<{ success: boolean; recovery_codes: string[] }> {
+    return this.http.post<{ success: boolean; recovery_codes: string[] }>(
+      `${environment.apiBaseUrl}${this.endpoint}/totp/`,
+      {
+        secret: totpSecret,
+        code: totpCode,
+      }
+    )
+  }
+
+  deactivateTotp(): Observable<boolean> {
+    return this.http.delete<boolean>(
+      `${environment.apiBaseUrl}${this.endpoint}/totp/`,
+      {}
     )
   }
 }
