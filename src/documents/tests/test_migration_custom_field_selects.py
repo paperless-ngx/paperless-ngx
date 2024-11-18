@@ -23,7 +23,7 @@ class TestMigrateCustomFieldSelects(TestMigrations):
             document=doc,
         )
 
-    def test_migrate_old_to_new_storage_path(self):
+    def test_migrate_old_to_new_select_fields(self):
         self.old_format.refresh_from_db()
         self.old_instance.refresh_from_db()
 
@@ -68,7 +68,7 @@ class TestMigrationCustomFieldSelectsReverse(TestMigrations):
             document=doc,
         )
 
-    def test_migrate_new_to_old_storage_path(self):
+    def test_migrate_new_to_old_select_fields(self):
         self.new_format.refresh_from_db()
         self.new_instance.refresh_from_db()
 
