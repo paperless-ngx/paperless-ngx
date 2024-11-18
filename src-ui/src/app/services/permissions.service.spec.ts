@@ -439,4 +439,25 @@ describe('PermissionsService', () => {
 
     expect(permissionsService.isAdmin()).toBeFalsy()
   })
+
+  it('correctly checks superuser status', () => {
+    permissionsService.initialize([], {
+      username: 'testuser',
+      last_name: 'User',
+      first_name: 'Test',
+      id: 1,
+      is_superuser: true,
+    })
+
+    expect(permissionsService.isSuperUser()).toBeTruthy()
+
+    permissionsService.initialize([], {
+      username: 'testuser',
+      last_name: 'User',
+      first_name: 'Test',
+      id: 1,
+    })
+
+    expect(permissionsService.isSuperUser()).toBeFalsy()
+  })
 })

@@ -32,6 +32,20 @@
           </div>
 
           <pngx-input-select i18n-title title="Groups" [items]="groups" multiple="true" formControlName="groups"></pngx-input-select>
+
+          @if (object?.is_mfa_enabled && currentUserIsSuperUser) {
+            <label class="form-label" i18n>Two-factor Authentication</label>
+            <pngx-confirm-button
+              label="Disable Two-factor Authentication"
+              i18n-label
+              title="Disable Two-factor Authentication"
+              i18n-title
+              buttonClasses="btn-outline-danger btn-sm"
+              iconName="trash"
+              [disabled]="totpLoading"
+              (confirm)="deactivateTotp()">
+            </pngx-confirm-button>
+          }
         </div>
         <div class="col">
           <pngx-permissions-select i18n-title title="Permissions" formControlName="user_permissions" [error]="error?.user_permissions" [inheritedPermissions]="inheritedPermissions"></pngx-permissions-select>

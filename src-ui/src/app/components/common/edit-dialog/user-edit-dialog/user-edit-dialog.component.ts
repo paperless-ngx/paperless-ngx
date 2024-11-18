@@ -5,9 +5,11 @@ import { first } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Group } from 'src/app/data/group'
 import { User } from 'src/app/data/user'
+import { PermissionsService } from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 
 @Component({
   selector: 'pngx-user-edit-dialog',
@@ -20,12 +22,15 @@ export class UserEditDialogComponent
 {
   groups: Group[]
   passwordIsSet: boolean = false
+  public totpLoading: boolean = false
 
   constructor(
     service: UserService,
     activeModal: NgbActiveModal,
     groupsService: GroupService,
-    settingsService: SettingsService
+    settingsService: SettingsService,
+    private toastService: ToastService,
+    private permissionsService: PermissionsService
   ) {
     super(service, activeModal, service, settingsService)
 
@@ -86,5 +91,31 @@ export class UserEditDialogComponent
       this.objectForm.get('password').value?.toString().replaceAll('*', '')
         .length > 0
     super.save()
+  }
+
+  get currentUserIsSuperUser(): boolean {
+    return this.permissionsService.isSuperUser()
+  }
+
+  deactivateTotp() {
+    this.totpLoading = true
+    ;(this.service as UserService)
+      .deactivateTotp(this.object)
+      .pipe(first())
+      .subscribe({
+        next: (result) => {
+          this.totpLoading = false
+          if (result) {
+            this.toastService.showInfo($localize`Totp deactivated`)
+            this.object.is_mfa_enabled = false
+          } else {
+            this.toastService.showError($localize`Totp deactivation failed`)
+          }
+        },
+        error: (e) => {
+          this.totpLoading = false
+          this.toastService.showError($localize`Totp deactivation failed`, e)
+        },
+      })
   }
 }

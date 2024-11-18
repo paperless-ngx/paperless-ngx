@@ -1,0 +1,35 @@
+{% extends "paperless-ngx/base.html" %}
+{% load i18n %}
+{% load allauth %}
+{% load allauth static %}
+
+{% block head_title %}
+    {% trans "Paperless-ngx Two-Factor Authentication" %}
+{% endblock head_title %}
+
+{% block form_top_content %}
+	<p>
+		{% blocktranslate %}Your account is protected by two-factor authentication. Please enter an authenticator code:{% endblocktranslate %}
+	</p>
+{% endblock form_top_content %}
+
+{% block form_content %}
+{% translate "Code" as i18n_code %}
+<div class="form-floating">
+		<input type="code" name="code" id="inputCode" autocomplete="one-time-code" placeholder="{{ i18n_code }}" class="form-control" required>
+		<label for="inputCode">{{ i18n_code }}</label>
+</div>
+<div class="d-grid mt-3">
+		<button class="btn btn-lg btn-primary" type="submit">{% translate "Sign in" %}</button>
+		<button class="btn btn-lg btn-secondary mt-2" type="submit" form="logout-from-stage">{% translate "Cancel" %}</button>
+</div>
+{% endblock form_content %}
+
+{% block after_form_content %}
+<form id="logout-from-stage"
+method="post"
+action="{% url 'account_logout' %}">
+<input type="hidden" name="next" value="{% url 'account_login' %}">
+{% csrf_token %}
+</form>
+{% endblock after_form_content %}
