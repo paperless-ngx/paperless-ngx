@@ -43,7 +43,7 @@ from documents.parsers import DocumentParser, custom_get_parser_class_for_mime_t
 from documents.parsers import ParseError
 from documents.parsers import get_parser_class_for_mime_type
 from documents.parsers import parse_date
-from documents.permissions import set_permissions_for_object
+from documents.permissions import set_permissions_for_object, check_user_can_change_folder
 from documents.plugins.base import AlwaysRunPluginMixin
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import NoCleanupPluginMixin
@@ -250,6 +250,7 @@ class ConsumerStatusShortMessage(str, Enum):
     SAVE_DOCUMENT = "save_document"
     FINISHED = "finished"
     FAILED = "failed"
+    NO_UPLOAD_PERMISSION_TO_FOLDER="no_upload_permission_to_folder"
 
 
 class ConsumerFilePhase(str, Enum):
@@ -314,6 +315,17 @@ class Consumer(LoggingMixin):
         self.override_custom_field_ids = None
 
         self.channel_layer = get_channel_layer()
+    def pre_change_folder(self,folder_id, user_id, doc_name):
+        # check folder when uploading documents
+        folder = Folder.objects.filter(id=folder_id).first()
+        user = User.objects.get(id=user_id)
+        if folder:
+            user_can_change = check_user_can_change_folder(user, folder)
+            if not user_can_change:
+                self._fail(
+                    ConsumerStatusShortMessage.NO_UPLOAD_PERMISSION_TO_FOLDER,
+                    f"Cannot consume {doc_name}: no upload permission to folder",
+                )
 
     def pre_check_file_exists(self):
         """
@@ -657,7 +669,7 @@ class Consumer(LoggingMixin):
         )
 
         # Make sure that preconditions for consuming the file are met.
-
+        self.pre_change_folder(self.override_folder_id,self.override_owner_id, self.override_title)
         self.pre_check_file_exists()
         self.pre_check_directories()
         self.pre_check_duplicate()
