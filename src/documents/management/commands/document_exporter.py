@@ -83,6 +83,18 @@ class Command(CryptMixin, BaseCommand):
         )
 
         parser.add_argument(
+            "-cj",
+            "--compare-json",
+            default=False,
+            action="store_true",
+            help=(
+                "Compare json file checksums when determining whether to "
+                "export a json file or not (manifest or metadata). "
+                "If not specified, the file is always exported."
+            ),
+        )
+
+        parser.add_argument(
             "-d",
             "--delete",
             default=False,
@@ -178,6 +190,7 @@ class Command(CryptMixin, BaseCommand):
         self.target = Path(options["target"]).resolve()
         self.split_manifest: bool = options["split_manifest"]
         self.compare_checksums: bool = options["compare_checksums"]
+        self.compare_json: bool = options["compare_json"]
         self.use_filename_format: bool = options["use_filename_format"]
         self.use_folder_prefix: bool = options["use_folder_prefix"]
         self.delete: bool = options["delete"]
@@ -343,12 +356,11 @@ class Command(CryptMixin, BaseCommand):
                         manifest_dict["custom_field_instances"],
                     ),
                 )
-                manifest_name.write_text(
-                    json.dumps(content, indent=2, ensure_ascii=False),
-                    encoding="utf-8",
+
+                self.check_and_write_json(
+                    content,
+                    manifest_name,
                 )
-                if manifest_name in self.files_in_export_dir:
-                    self.files_in_export_dir.remove(manifest_name)
 
         # These were exported already
         if self.split_manifest:
@@ -361,12 +373,10 @@ class Command(CryptMixin, BaseCommand):
         for key in manifest_dict:
             manifest.extend(manifest_dict[key])
         manifest_path = (self.target / "manifest.json").resolve()
-        manifest_path.write_text(
-            json.dumps(manifest, indent=2, ensure_ascii=False),
-            encoding="utf-8",
+        self.check_and_write_json(
+            manifest,
+            manifest_path,
         )
-        if manifest_path in self.files_in_export_dir:
-            self.files_in_export_dir.remove(manifest_path)
 
         # 4.2 write version information to target folder
         extra_metadata_path = (self.target / "metadata.json").resolve()
@@ -378,16 +388,11 @@ class Command(CryptMixin, BaseCommand):
         # Django stores most of these in the field itself, we store them once here
         if self.passphrase:
             metadata.update(self.get_crypt_params())
-        extra_metadata_path.write_text(
-            json.dumps(
-                metadata,
-                indent=2,
-                ensure_ascii=False,
-            ),
-            encoding="utf-8",
+
+        self.check_and_write_json(
+            metadata,
+            extra_metadata_path,
         )
-        if extra_metadata_path in self.files_in_export_dir:
-            self.files_in_export_dir.remove(extra_metadata_path)
 
         if self.delete:
             # 5. Remove files which we did not explicitly export in this run
@@ -515,6 +520,35 @@ class Command(CryptMixin, BaseCommand):
                     document.archive_checksum,
                     archive_target,
                 )
+
+    def check_and_write_json(
+        self,
+        content: list[dict] | dict,
+        target: Path,
+    ):
+        """
+        Writes the source content to the target json file.
+        If --compare-json arg was used, don't write to target file if
+        the file exists and checksum is identical to content checksum.
+        This preserves the file timestamps when no changes are made.
+        """
+
+        target = target.resolve()
+        perform_write = True
+        if target in self.files_in_export_dir:
+            self.files_in_export_dir.remove(target)
+            if self.compare_json:
+                target_checksum = hashlib.md5(target.read_bytes()).hexdigest()
+                src_str = json.dumps(content, indent=2, ensure_ascii=False)
+                src_checksum = hashlib.md5(src_str.encode("utf-8")).hexdigest()
+                if src_checksum == target_checksum:
+                    perform_write = False
+
+        if perform_write:
+            target.write_text(
+                json.dumps(content, indent=2, ensure_ascii=False),
+                encoding="utf-8",
+            )
 
     def check_and_copy(
         self,
