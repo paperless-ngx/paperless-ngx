@@ -133,7 +133,6 @@ export class PermissionsService {
     action: PermissionAction,
     type: PermissionType
   ): string {
-    if (type in DevelopPermissionType)
     return type.replace('%s', action)
   }
 
