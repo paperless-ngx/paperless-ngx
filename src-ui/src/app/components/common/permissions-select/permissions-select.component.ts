@@ -9,7 +9,7 @@ import {
 import {
   PermissionAction,
   PermissionsService,
-  PermissionType,
+  DevelopPermissionType,
 } from 'src/app/services/permissions.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
@@ -62,7 +62,7 @@ export class PermissionsSelectComponent
 
   constructor(private readonly permissionsService: PermissionsService) {
     super()
-    for (const type in PermissionType) {
+    for (const type in DevelopPermissionType) {
       const control = new FormGroup({})
       for (const action in PermissionAction) {
         control.addControl(action, new FormControl(null))
@@ -92,7 +92,7 @@ export class PermissionsSelectComponent
         }
       }
     })
-    Object.keys(PermissionType).forEach((type) => {
+    Object.keys(DevelopPermissionType).forEach((type) => {
       if (
         Object.values(this.form.get(type).value).every((val) => val == true)
       ) {
@@ -134,7 +134,7 @@ export class PermissionsSelectComponent
 
         selectedActions.forEach(([actionKey, actionValue]) => {
           permissions.push(
-            (PermissionType[typeKey] as string).replace(
+            (DevelopPermissionType[typeKey] as string).replace(
               '%s',
               PermissionAction[actionKey]
             )
@@ -175,7 +175,7 @@ export class PermissionsSelectComponent
       return this._inheritedPermissions.includes(
         this.permissionsService.getPermissionCode(
           PermissionAction[actionKey],
-          PermissionType[typeKey]
+          DevelopPermissionType[typeKey]
         )
       )
     } else {
@@ -183,7 +183,7 @@ export class PermissionsSelectComponent
         return this._inheritedPermissions.includes(
           this.permissionsService.getPermissionCode(
             action as PermissionAction,
-            PermissionType[typeKey]
+            DevelopPermissionType[typeKey]
           )
         )
       })
@@ -191,7 +191,7 @@ export class PermissionsSelectComponent
   }
 
   updateDisabledStates() {
-    for (const type in PermissionType) {
+    for (const type in DevelopPermissionType) {
       const control = this.form.get(type)
       let actionControl: AbstractControl
       for (const action in PermissionAction) {
@@ -202,4 +202,6 @@ export class PermissionsSelectComponent
       }
     }
   }
+
+  protected readonly DevelopPermissionType = DevelopPermissionType
 }
