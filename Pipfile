@@ -55,7 +55,7 @@ tika-client = "*"
 tqdm = "*"
 # See https://github.com/paperless-ngx/paperless-ngx/issues/5494
 uvicorn = {extras = ["standard"], version = "==0.25.0"}
-watchdog = "~=5.0"
+watchdog = "~=6.0"
 whitenoise = "~=6.8"
 whoosh = "~=2.7"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
