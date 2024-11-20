@@ -556,3 +556,11 @@ Initial API version.
 
 -   Consumption templates were refactored to workflows and API endpoints
     changed as such.
+
+#### Version 5
+
+-   Added bulk deletion methods for documents and objects.
+
+#### Version 6
+
+-   Moved acknowledge tasks endpoint to be under `/api/tasks/acknowledge/`.
