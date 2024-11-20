@@ -1,6 +1,6 @@
 <a [href]="previewUrl" target="_blank" class="{{btn_classes}}"
   [ngbPopover]="previewContent" [popoverTitle]="document.title | documentTitle"
-  autoClose="true" popoverClass="shadow popover-preview" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
+  autoClose="true" [popoverClass]="popoverClass" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
   <ng-content></ng-content>
 </a>
 <ng-template #previewContent>

@@ -38,7 +38,8 @@ export class PreviewPopupComponent implements OnDestroy {
   @ViewChild('popover') popover: NgbPopover
 
   mouseOnPreview: boolean
-  popoverHidden: boolean
+
+  popoverClass: string = 'shadow popover-preview'
 
   get renderAsObject(): boolean {
     return (this.isPdf && this.useNativePdfViewer) || !this.isPdf
@@ -102,11 +103,11 @@ export class PreviewPopupComponent implements OnDestroy {
     if (!this.popover.isOpen()) {
       // we're going to open but hide to pre-load content during hover delay
       this.popover.open()
-      this.popoverHidden = true
+      this.popoverClass = 'shadow popover-preview pe-none opacity-0'
       setTimeout(() => {
         if (this.mouseOnPreview) {
           // show popover
-          this.popoverHidden = false
+          this.popoverClass = this.popoverClass.replace('pe-none opacity-0', '')
         } else {
           this.popover.close()
         }
@@ -119,6 +120,6 @@ export class PreviewPopupComponent implements OnDestroy {
   }
 
   public close() {
-    this.popover.close()
+    this.popover.close(false)
   }
 }

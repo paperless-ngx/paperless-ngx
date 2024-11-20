@@ -131,9 +131,7 @@ describe('PreviewPopupComponent', () => {
   it('should show preview on mouseover after delay to preload content', fakeAsync(() => {
     component.mouseEnterPreview()
     expect(component.popover.isOpen()).toBeTruthy()
-    expect(component.popoverHidden).toBeTruthy()
     tick(600)
-    expect(component.popoverHidden).toBeFalsy()
     component.close()
 
     component.mouseEnterPreview()
