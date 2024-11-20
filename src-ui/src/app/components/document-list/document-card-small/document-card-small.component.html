@@ -1,5 +1,5 @@
 <div class="col p-2 h-100">
-  <div class="card h-100 shadow-sm document-card" [class.card-selected]="selected" [class.popover-hidden]="popoverHidden" (mouseleave)="mouseLeaveCard()">
+  <div class="card h-100 shadow-sm document-card" [class.card-selected]="selected" (mouseleave)="mouseLeaveCard()">
     <div class="border-bottom doc-img-container rounded-top" (click)="this.toggleSelected.emit($event)" (dblclick)="dblClickDocument.emit(this)">
       <img class="card-img doc-img" [class.inverted]="getIsThumbInverted()" [src]="getThumbUrl()">
 
@@ -129,14 +129,9 @@
           <a routerLink="/documents/{{document.id}}" class="btn btn-sm btn-outline-secondary" title="Open" i18n-title *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }" i18n-title>
             <i-bs name="file-earmark-richtext"></i-bs>
           </a>
-          <a [href]="previewUrl" target="_blank" class="btn btn-sm btn-outline-secondary"
-            [ngbPopover]="previewContent" [popoverTitle]="document.title | documentTitle"
-            autoClose="true" popoverClass="shadow popover-preview" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
+          <pngx-preview-popup [document]="document" #popupPreview>
             <i-bs name="eye"></i-bs>
-          </a>
-          <ng-template #previewContent>
-            <pngx-preview-popup [document]="document"></pngx-preview-popup>
-          </ng-template>
+          </pngx-preview-popup>
           <a [href]="getDownloadUrl()" class="btn btn-sm btn-outline-secondary" title="Download" i18n-title (click)="$event.stopPropagation()">
             <i-bs name="download"></i-bs>
           </a>

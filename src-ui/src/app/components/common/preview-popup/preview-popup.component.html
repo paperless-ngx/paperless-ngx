@@ -1,30 +1,37 @@
-<div class="preview-popup-container">
-  @if (error) {
-    <div class="w-100 h-100 position-relative">
-      <p class="fst-italic position-absolute top-50 start-50 translate-middle" i18n>Error loading preview</p>
-    </div>
-  } @else {
-    @if (renderAsObject) {
-      @if (previewText) {
-        <div class="bg-light p-3 overflow-auto whitespace-preserve" width="100%">{{previewText}}</div>
-      } @else {
-        <object [data]="previewURL | safeUrl" width="100%" class="bg-light" [class.p-2]="!isPdf"></object>
-      }
+<a [href]="previewUrl" target="_blank" class="{{btn_classes}}"
+  [ngbPopover]="previewContent" [popoverTitle]="document.title | documentTitle"
+  autoClose="true" popoverClass="shadow popover-preview" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
+  <ng-content></ng-content>
+</a>
+<ng-template #previewContent>
+  <div class="preview-popup-container">
+    @if (error) {
+      <div class="w-100 h-100 position-relative">
+        <p class="fst-italic position-absolute top-50 start-50 translate-middle" i18n>Error loading preview</p>
+      </div>
     } @else {
-      @if (requiresPassword) {
-        <div class="w-100 h-100 position-relative">
-          <i-bs width="2em" height="2em" class="position-absolute top-50 start-50 translate-middle" name="file-earmark-lock"></i-bs>
-        </div>
-      }
-      @if (!requiresPassword) {
-        <pdf-viewer
-          [src]="previewURL"
-          [original-size]="false"
-          [show-borders]="false"
-          [show-all]="true"
-          (error)="onError($event)">
-        </pdf-viewer>
+      @if (renderAsObject) {
+        @if (previewText) {
+          <div class="bg-light p-3 overflow-auto whitespace-preserve" width="100%">{{previewText}}</div>
+        } @else {
+          <object [data]="previewURL | safeUrl" width="100%" class="bg-light" [class.p-2]="!isPdf"></object>
+        }
+      } @else {
+        @if (requiresPassword) {
+          <div class="w-100 h-100 position-relative">
+            <i-bs width="2em" height="2em" class="position-absolute top-50 start-50 translate-middle" name="file-earmark-lock"></i-bs>
+          </div>
+        }
+        @if (!requiresPassword) {
+          <pdf-viewer
+            [src]="previewURL"
+            [original-size]="false"
+            [show-borders]="false"
+            [show-all]="true"
+            (error)="onError($event)">
+          </pdf-viewer>
+        }
       }
     }
-  }
-</div>
+  </div>
+</ng-template>

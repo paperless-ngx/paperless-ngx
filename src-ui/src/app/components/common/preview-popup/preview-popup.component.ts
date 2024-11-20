@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http'
-import { Component, Input, OnDestroy } from '@angular/core'
+import { Component, Input, OnDestroy, ViewChild } from '@angular/core'
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { first, Subject, takeUntil } from 'rxjs'
 import { Document } from 'src/app/data/document'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
@@ -23,6 +24,9 @@ export class PreviewPopupComponent implements OnDestroy {
     return this._document
   }
 
+  @Input()
+  btn_classes: string = 'btn btn-sm btn-outline-secondary'
+
   unsubscribeNotifier: Subject<any> = new Subject()
 
   error = false
@@ -30,6 +34,11 @@ export class PreviewPopupComponent implements OnDestroy {
   requiresPassword: boolean = false
 
   previewText: string
+
+  @ViewChild('popover') popover: NgbPopover
+
+  mouseOnPreview: boolean
+  popoverHidden: boolean
 
   get renderAsObject(): boolean {
     return (this.isPdf && this.useNativePdfViewer) || !this.isPdf
@@ -82,5 +91,34 @@ export class PreviewPopupComponent implements OnDestroy {
     } else {
       this.error = true
     }
+  }
+
+  get previewUrl() {
+    return this.documentService.getPreviewUrl(this.document.id)
+  }
+
+  mouseEnterPreview() {
+    this.mouseOnPreview = true
+    if (!this.popover.isOpen()) {
+      // we're going to open but hide to pre-load content during hover delay
+      this.popover.open()
+      this.popoverHidden = true
+      setTimeout(() => {
+        if (this.mouseOnPreview) {
+          // show popover
+          this.popoverHidden = false
+        } else {
+          this.popover.close()
+        }
+      }, 600)
+    }
+  }
+
+  mouseLeavePreview() {
+    this.mouseOnPreview = false
+  }
+
+  public close() {
+    this.popover.close()
   }
 }

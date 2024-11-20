@@ -1,4 +1,9 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing'
 
 import { PreviewPopupComponent } from './preview-popup.component'
 import { By } from '@angular/platform-browser'
@@ -122,4 +127,19 @@ describe('PreviewPopupComponent', () => {
     component.init()
     expect(component.previewText).toEqual('Preview text')
   })
+
+  it('should show preview on mouseover after delay to preload content', fakeAsync(() => {
+    component.mouseEnterPreview()
+    expect(component.popover.isOpen()).toBeTruthy()
+    expect(component.popoverHidden).toBeTruthy()
+    tick(600)
+    expect(component.popoverHidden).toBeFalsy()
+    component.close()
+
+    component.mouseEnterPreview()
+    tick(100)
+    component.mouseLeavePreview()
+    tick(600)
+    expect(component.popover.isOpen()).toBeFalsy()
+  }))
 })
