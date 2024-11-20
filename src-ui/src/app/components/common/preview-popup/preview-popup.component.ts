@@ -27,6 +27,9 @@ export class PreviewPopupComponent implements OnDestroy {
   @Input()
   btn_classes: string = 'btn btn-sm btn-outline-secondary'
 
+  @Input()
+  link: string
+
   unsubscribeNotifier: Subject<any> = new Subject()
 
   error = false
