@@ -50,7 +50,7 @@ from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
-from guardian.shortcuts import get_objects_for_user, get_perms
+from guardian.shortcuts import  get_perms
 from langdetect import detect
 from packaging import version as packaging_version
 
@@ -95,6 +95,7 @@ from documents.conditionals import preview_last_modified
 from documents.conditionals import suggestions_etag
 from documents.conditionals import suggestions_last_modified
 from documents.conditionals import thumbnail_last_modified
+from documents.consumer import Consumer, ConsumerStatusShortMessage
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
@@ -134,7 +135,7 @@ from documents.models import Folder
 
 from documents.parsers import custom_get_parser_class_for_mime_type
 from documents.parsers import parse_date_generator
-from documents.permissions import PaperlessAdminPermissions
+from documents.permissions import PaperlessAdminPermissions, check_user_can_change_folder
 from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
@@ -2667,6 +2668,9 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             folder.checksum = hashlib.md5(f'{folder.id}.{folder.name}'.encode()).hexdigest()
             folder.save()
         elif parent_folder:
+            user_can_change = check_user_can_change_folder(request.user, parent_folder)
+            if not user_can_change:
+                return Response(data={"detail":"You do not have permission to perform this action."},status=status.HTTP_403_FORBIDDEN)
             folder = serializer.save(parent_folder=parent_folder,owner=request.user)
             folder.path = f"{parent_folder.path}/{folder.id}"
             folder.checksum = hashlib.md5(f'{folder.id}.{folder.name}'.encode()).hexdigest()

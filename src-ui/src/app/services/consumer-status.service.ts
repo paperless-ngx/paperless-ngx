@@ -28,6 +28,7 @@ export const FILE_STATUS_MESSAGES = {
   parse_date: $localize`Retrieving date from document...`,
   save_document: $localize`Saving document...`,
   finished: $localize`Finished.`,
+  no_upload_permission_to_folder: $localize`No upload permission to folder.`,
 }
 
 export class FileStatus {

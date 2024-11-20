@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { ObjectWithPermissions } from '../data/object-with-permissions'
 import { User } from '../data/user'
+import { isString } from '@ng-bootstrap/ng-bootstrap/util/util'
 
 export enum PermissionAction {
   Add = 'add',
@@ -13,7 +14,7 @@ export enum PermissionType {
   Document = '%s_document',
   Tag = '%s_tag',
   Warehouse = '%s_warehouse',
-  Correspondent = '%s_correspondent',
+  Correspondent = '%',
   DocumentType = '%s_documenttype',
   StoragePath = '%s_storagepath',
   SavedView = '%s_savedview',
@@ -36,6 +37,31 @@ export enum PermissionType {
   DossierForm = '%s_dossierform'
 }
 
+export enum DevelopPermissionType {
+  Document = '%s_document',
+  Tag = '%s_tag',
+  Warehouse = '%s_warehouse',
+  // Correspondent = '%s_correspondent',
+  DocumentType = '%s_documenttype',
+  // StoragePath = '%s_storagepath',
+  SavedView = '%s_savedview',
+  PaperlessTask = '%s_paperlesstask',
+  AppConfig = '%s_applicationconfiguration',
+  UISettings = '%s_uisettings',
+  Note = '%s_note',
+  // MailAccount = '%s_mailaccount',
+  // MailRule = '%s_mailrule',
+  User = '%s_user',
+  Group = '%s_group',
+  ShareLink = '%s_sharelink',
+  CustomField = '%s_customfield',
+  Workflow = '%s_workflow',
+  Approval = '%s_approval',
+  Folder = '%s_folder',
+
+}
+
+
 @Injectable({
   providedIn: 'root',
 })
@@ -48,10 +74,18 @@ export class PermissionsService {
     this.currentUser = currentUser
   }
 
+  private isStringInEnum(v,enumPermissionType): boolean {
+    return Object.values(enumPermissionType).includes(v);
+  }
+
   public currentUserCan(
     action: PermissionAction,
     type: PermissionType
   ): boolean {
+    if (!this.isStringInEnum(type,DevelopPermissionType))
+    {
+      return false;
+    }
     return (
       this.currentUser?.is_superuser ||
       this.permissions?.includes(this.getPermissionCode(action, type))

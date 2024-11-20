@@ -180,12 +180,12 @@
               @if (object.type == 'folder') {
                 <td scope="row" class="d-md-table-cell">
                   <button class="btn btn-link ms-0 ps-0 text-start"
-                          (click)="userCanEdit(object) ? goToFolder(object) : null; $event.stopPropagation()">
+                          (click)=" goToFolder(object) ; $event.stopPropagation()">
 
                     <i-bs class="me-1" name="folder-fill" width="2rem" height="2rem"></i-bs>
                   </button>
                   <span class="custom-cursor"
-                        (click)="userCanEdit(object) ? goToFolder(object) : null; $event.stopPropagation()">{{ object.name }}</span>
+                        (click)="goToFolder(object); $event.stopPropagation()">{{ object.name }}</span>
                 </td>
               } @else {
                 <td scope="row" class="d-md-table-cell">
