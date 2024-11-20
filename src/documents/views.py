@@ -426,7 +426,7 @@ class DocumentViewSet(
         )
 
     def file_response(self, pk, request, disposition):
-        doc = Document.objects.select_related("owner").get(id=pk)
+        doc = Document.global_objects.select_related("owner").get(id=pk)
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "view_document",
