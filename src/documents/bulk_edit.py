@@ -24,7 +24,7 @@ from documents.models import StoragePath
 from documents.permissions import set_permissions_for_object
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
-from documents.tasks import update_document_archive_file
+from documents.tasks import update_document_content_maybe_archive_file
 
 logger: logging.Logger = logging.getLogger("paperless.bulk_edit")
 
@@ -191,7 +191,7 @@ def delete(doc_ids: list[int]) -> Literal["OK"]:
 
 def reprocess(doc_ids: list[int]) -> Literal["OK"]:
     for document_id in doc_ids:
-        update_document_archive_file.delay(
+        update_document_content_maybe_archive_file.delay(
             document_id=document_id,
         )
 
@@ -245,7 +245,7 @@ def rotate(doc_ids: list[int], degrees: int) -> Literal["OK"]:
                 doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
                 doc.save()
                 rotate_tasks.append(
-                    update_document_archive_file.s(
+                    update_document_content_maybe_archive_file.s(
                         document_id=doc.id,
                     ),
                 )
@@ -423,7 +423,7 @@ def delete_pages(doc_ids: list[int], pages: list[int]) -> Literal["OK"]:
             if doc.page_count is not None:
                 doc.page_count = doc.page_count - len(pages)
             doc.save()
-            update_document_archive_file.delay(document_id=doc.id)
+            update_document_content_maybe_archive_file.delay(document_id=doc.id)
             logger.info(f"Deleted pages {pages} from document {doc.id}")
     except Exception as e:
         logger.exception(f"Error deleting pages from document {doc.id}: {e}")
