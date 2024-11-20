@@ -72,4 +72,32 @@ describe('ProfileService', () => {
     )
     expect(req.request.method).toEqual('GET')
   })
+
+  it('calls get totp settings endpoint', () => {
+    service.getTotpSettings().subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}profile/totp/`
+    )
+    expect(req.request.method).toEqual('GET')
+  })
+
+  it('calls activate totp endpoint', () => {
+    service.activateTotp('secret', 'code').subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}profile/totp/`
+    )
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body).toEqual({
+      secret: 'secret',
+      code: 'code',
+    })
+  })
+
+  it('calls deactivate totp endpoint', () => {
+    service.deactivateTotp().subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}profile/totp/`
+    )
+    expect(req.request.method).toEqual('DELETE')
+  })
 })

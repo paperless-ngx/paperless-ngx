@@ -316,6 +316,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "allauth.mfa",
     *env_apps,
 ]
 
@@ -332,7 +333,7 @@ REST_FRAMEWORK = {
     "DEFAULT_VERSION": "1",
     # Make sure these are ordered and that the most recent version appears
     # last
-    "ALLOWED_VERSIONS": ["1", "2", "3", "4", "5"],
+    "ALLOWED_VERSIONS": ["1", "2", "3", "4", "5", "6"],
 }
 
 if DEBUG:
@@ -457,6 +458,8 @@ SOCIALACCOUNT_AUTO_SIGNUP = __get_boolean("PAPERLESS_SOCIAL_AUTO_SIGNUP")
 SOCIALACCOUNT_PROVIDERS = json.loads(
     os.getenv("PAPERLESS_SOCIALACCOUNT_PROVIDERS", "{}"),
 )
+
+MFA_TOTP_ISSUER = "Paperless-ngx"
 
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Paperless-ngx] "
 

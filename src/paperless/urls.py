@@ -1,6 +1,7 @@
 import os
 
 from allauth.account import views as allauth_account_views
+from allauth.mfa.base import views as allauth_mfa_views
 from allauth.socialaccount import views as allauth_social_account_views
 from allauth.urls import build_provider_urlpatterns
 from django.conf import settings
@@ -17,7 +18,6 @@ from django.views.static import serve
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
-from documents.views import AcknowledgeTasksView
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
@@ -54,6 +54,7 @@ from paperless.views import GenerateAuthTokenView
 from paperless.views import GroupViewSet
 from paperless.views import ProfileView
 from paperless.views import SocialAccountProvidersView
+from paperless.views import TOTPView
 from paperless.views import UserViewSet
 from paperless_mail.views import MailAccountTestView
 from paperless_mail.views import MailAccountViewSet
@@ -131,11 +132,6 @@ urlpatterns = [
                 ),
                 re_path("^ui_settings/", UiSettingsView.as_view(), name="ui_settings"),
                 re_path(
-                    "^acknowledge_tasks/",
-                    AcknowledgeTasksView.as_view(),
-                    name="acknowledge_tasks",
-                ),
-                re_path(
                     "^mail_accounts/test/",
                     MailAccountTestView.as_view(),
                     name="mail_accounts_test",
@@ -146,19 +142,34 @@ urlpatterns = [
                     BulkEditObjectsView.as_view(),
                     name="bulk_edit_objects",
                 ),
-                path("profile/generate_auth_token/", GenerateAuthTokenView.as_view()),
-                path(
-                    "profile/disconnect_social_account/",
-                    DisconnectSocialAccountView.as_view(),
-                ),
-                path(
-                    "profile/social_account_providers/",
-                    SocialAccountProvidersView.as_view(),
-                ),
                 re_path(
                     "^profile/",
-                    ProfileView.as_view(),
-                    name="profile_view",
+                    include(
+                        [
+                            path(
+                                "generate_auth_token/",
+                                GenerateAuthTokenView.as_view(),
+                            ),
+                            path(
+                                "disconnect_social_account/",
+                                DisconnectSocialAccountView.as_view(),
+                            ),
+                            path(
+                                "social_account_providers/",
+                                SocialAccountProvidersView.as_view(),
+                            ),
+                            re_path(
+                                "^$",
+                                ProfileView.as_view(),
+                                name="profile_view",
+                            ),
+                            path(
+                                "totp/",
+                                TOTPView.as_view(),
+                                name="totp_view",
+                            ),
+                        ],
+                    ),
                 ),
                 re_path(
                     "^status/",
@@ -296,6 +307,12 @@ urlpatterns = [
                     ),
                 ),
                 *build_provider_urlpatterns(),
+                # mfa, see allauth/mfa/base/urls.py
+                path(
+                    "2fa/authenticate/",
+                    allauth_mfa_views.authenticate,
+                    name="mfa_authenticate",
+                ),
             ],
         ),
     ),

@@ -1,5 +1,6 @@
 from unittest import mock
 
+from allauth.mfa.models import Authenticator
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.models import SocialApp
 from django.contrib.auth.models import User
@@ -299,3 +300,82 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
             len(self.user.socialaccount_set.filter(pk=social_account_id)),
             0,
         )
+
+
+class TestApiTOTPViews(APITestCase):
+    ENDPOINT = "/api/profile/totp/"
+
+    def setUp(self):
+        super().setUp()
+
+        self.user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=self.user)
+
+    def test_get_totp(self):
+        """
+        GIVEN:
+            - Existing user account
+        WHEN:
+            - API request is made to TOTP endpoint
+        THEN:
+            - TOTP is generated
+        """
+        response = self.client.get(
+            self.ENDPOINT,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("qr_svg", response.data)
+        self.assertIn("secret", response.data)
+
+    @mock.patch("allauth.mfa.totp.internal.auth.validate_totp_code")
+    def test_activate_totp(self, mock_validate_totp_code):
+        """
+        GIVEN:
+            - Existing user account
+        WHEN:
+            - API request is made to activate TOTP
+        THEN:
+            - TOTP is activated, recovery codes are returned
+        """
+        mock_validate_totp_code.return_value = True
+
+        response = self.client.post(
+            self.ENDPOINT,
+            data={
+                "secret": "123",
+                "code": "456",
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(Authenticator.objects.filter(user=self.user).exists())
+        self.assertIn("recovery_codes", response.data)
+
+    def test_deactivate_totp(self):
+        """
+        GIVEN:
+            - Existing user account with TOTP enabled
+        WHEN:
+            - API request is made to deactivate TOTP
+        THEN:
+            - TOTP is deactivated
+        """
+        Authenticator.objects.create(
+            user=self.user,
+            type=Authenticator.Type.TOTP,
+            data={},
+        )
+
+        response = self.client.delete(
+            self.ENDPOINT,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Authenticator.objects.filter(user=self.user).count(), 0)
+
+        # test fails
+        response = self.client.delete(
+            self.ENDPOINT,
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
