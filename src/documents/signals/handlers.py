@@ -615,6 +615,7 @@ def run_workflows(
                         document.owner.username if document.owner else "",
                         timezone.localtime(document.added),
                         document.original_filename or "",
+                        document.filename or "",
                         timezone.localtime(document.created),
                     )
                 except Exception:

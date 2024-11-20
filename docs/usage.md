@@ -411,6 +411,7 @@ applied. You can use the following placeholders with any trigger type:
 -   `{added_day}`: added day
 -   `{added_time}`: added time in HH:MM format
 -   `{original_filename}`: original file name without extension
+-   `{filename}`: current file name without extension
 
 The following placeholders are only available for "added" or "updated" triggers
 

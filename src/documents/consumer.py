@@ -673,6 +673,7 @@ class ConsumerPlugin(
             owner_username,
             local_added,
             self.filename,
+            self.filename,
         )
 
     def _store(

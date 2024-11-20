@@ -9,6 +9,7 @@ def parse_doc_title_w_placeholders(
     owner_username: str,
     local_added: datetime,
     original_filename: str,
+    filename: str,
     created: datetime | None = None,
 ) -> str:
     """
@@ -29,6 +30,7 @@ def parse_doc_title_w_placeholders(
         "added_time": local_added.strftime("%H:%M"),
         "owner_username": owner_username,
         "original_filename": Path(original_filename).stem,
+        "filename": Path(filename).stem,
     }
     if created is not None:
         formatting.update(
