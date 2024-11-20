@@ -7181,10 +7181,10 @@
                <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-button/upload-file-btn.component.html</context>
                <context context-type="linenumber">4</context>
             </context-group>
-            <target state="needs-translation">
+            <target state="translated">
                <x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&amp;lt;i-bs name=&amp;quot;upload&amp;quot;&gt;" />
                <x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&amp;lt;/i-bs&gt;" />
-                 Tải tài liệu
+               Tải tài liệu
             </target>
          </trans-unit>
          <trans-unit id="1749180330008942007" datatype="html">
@@ -11473,7 +11473,7 @@
                <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
                <context context-type="linenumber">19</context>
             </context-group>
-            <target state="translated">File not found.</target>
+            <target state="translated">Không tìm thấy tập tin.</target>
          </trans-unit>
          <trans-unit id="1520671543092565667" datatype="html">
             <source>Pre-consume script does not exist.</source>
@@ -11509,7 +11509,7 @@
                <context context-type="linenumber">23</context>
             </context-group>
             <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-            <target state="translated">Error while executing post-consume script.</target>
+            <target state="translated">Có lỗi khi thực thi tập lệnh sau khi tiêu thụ.</target>
          </trans-unit>
          <trans-unit id="6252258095055634191" datatype="html">
             <source>Received new file.</source>
@@ -11566,6 +11566,14 @@
                <context context-type="linenumber">30</context>
             </context-group>
             <target state="translated">Đã hoàn thành</target>
+         </trans-unit>
+         <trans-unit id="6195823662903852369" datatype="html">
+            <source>No upload permission to folder.</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+               <context context-type="linenumber">31</context>
+            </context-group>
+            <target state="needs-translation">Không có quyền tải lên thư mục.</target>
          </trans-unit>
          <trans-unit id="5523607037798226031" datatype="html">
             <source>You have unsaved changes to the document</source>
