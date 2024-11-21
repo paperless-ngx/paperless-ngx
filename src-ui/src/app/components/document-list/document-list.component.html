@@ -293,7 +293,7 @@
                   <td width="30%">
                     @if (activeDisplayFields.includes(DisplayField.TITLE)) {
                       <div class="d-inline-block" (mouseleave)="popupPreview.close()">
-                        <pngx-preview-popup [document]="d" link="/documents/{{d.id}}/" btn_classes="btn btn-sm btn-link" #popupPreview>
+                        <pngx-preview-popup [document]="d" link="/documents/{{d.id}}/" linkClasses="btn btn-sm btn-link" linkTarget="_self" linkTitle="Open document" i18n-linkTitle #popupPreview>
                           {{d.title | documentTitle}}
                         </pngx-preview-popup>
                       </div>

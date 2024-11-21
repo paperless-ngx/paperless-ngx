@@ -1,4 +1,4 @@
-<a [href]="link ?? previewUrl" target="_blank" class="{{btn_classes}}"
+<a [href]="link ?? previewUrl" class="{{linkClasses}}" [target]="linkTarget" [title]="linkTitle"
   [ngbPopover]="previewContent" [popoverTitle]="document.title | documentTitle" container="body"
   autoClose="true" [popoverClass]="popoverClass" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
   <ng-content></ng-content>

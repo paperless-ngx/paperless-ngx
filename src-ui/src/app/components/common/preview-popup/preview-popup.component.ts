@@ -25,10 +25,16 @@ export class PreviewPopupComponent implements OnDestroy {
   }
 
   @Input()
-  btn_classes: string = 'btn btn-sm btn-outline-secondary'
+  link: string
 
   @Input()
-  link: string
+  linkClasses: string = 'btn btn-sm btn-outline-secondary'
+
+  @Input()
+  linkTarget: string = '_blank'
+
+  @Input()
+  linkTitle: string = $localize`Open preview`
 
   unsubscribeNotifier: Subject<any> = new Subject()
 
