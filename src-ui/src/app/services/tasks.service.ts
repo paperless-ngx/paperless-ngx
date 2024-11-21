@@ -64,7 +64,7 @@ export class TasksService {
 
   public dismissTasks(task_ids: Set<number>) {
     this.http
-      .post(`${this.baseUrl}acknowledge_tasks/`, {
+      .post(`${this.baseUrl}tasks/acknowledge/`, {
         tasks: [...task_ids],
       })
       .pipe(first())
