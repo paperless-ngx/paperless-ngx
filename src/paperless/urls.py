@@ -18,7 +18,6 @@ from django.views.static import serve
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
-from documents.views import AcknowledgeTasksView
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
@@ -132,11 +131,6 @@ urlpatterns = [
                     name="remoteversion",
                 ),
                 re_path("^ui_settings/", UiSettingsView.as_view(), name="ui_settings"),
-                re_path(
-                    "^acknowledge_tasks/",
-                    AcknowledgeTasksView.as_view(),
-                    name="acknowledge_tasks",
-                ),
                 re_path(
                     "^mail_accounts/test/",
                     MailAccountTestView.as_view(),

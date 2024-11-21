@@ -16,6 +16,7 @@ import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dial
 import { By } from '@angular/platform-browser'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { ToastService } from 'src/app/services/toast.service'
+import { Router } from '@angular/router'
 
 const documentsInTrash = [
   {
@@ -38,6 +39,7 @@ describe('TrashComponent', () => {
   let trashService: TrashService
   let modalService: NgbModal
   let toastService: ToastService
+  let router: Router
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -61,6 +63,7 @@ describe('TrashComponent', () => {
     trashService = TestBed.inject(TrashService)
     modalService = TestBed.inject(NgbModal)
     toastService = TestBed.inject(ToastService)
+    router = TestBed.inject(Router)
     component = fixture.componentInstance
     fixture.detectChanges()
   })
@@ -159,6 +162,22 @@ describe('TrashComponent', () => {
     expect(reloadSpy).toHaveBeenCalled()
     component.restoreAll(new Set([1, 2]))
     expect(restoreSpy).toHaveBeenCalledWith([1, 2])
+  })
+
+  it('should offer link to restored document', () => {
+    let toasts
+    const navigateSpy = jest.spyOn(router, 'navigate')
+    toastService.getToasts().subscribe((allToasts) => {
+      toasts = [...allToasts]
+    })
+    jest.spyOn(trashService, 'restoreDocuments').mockReturnValue(of('OK'))
+    component.restore(documentsInTrash[0])
+    expect(toasts.length).toEqual(1)
+    toasts[0].action()
+    expect(navigateSpy).toHaveBeenCalledWith([
+      'documents',
+      documentsInTrash[0].id,
+    ])
   })
 
   it('should support toggle all items in view', () => {

@@ -607,7 +607,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_consume_file.assert_not_called()
 
     @mock.patch("documents.tasks.bulk_update_documents.si")
-    @mock.patch("documents.tasks.update_document_archive_file.s")
+    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.s")
     @mock.patch("celery.chord.delay")
     def test_rotate(self, mock_chord, mock_update_document, mock_update_documents):
         """
@@ -626,7 +626,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertEqual(result, "OK")
 
     @mock.patch("documents.tasks.bulk_update_documents.si")
-    @mock.patch("documents.tasks.update_document_archive_file.s")
+    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.s")
     @mock.patch("pikepdf.Pdf.save")
     def test_rotate_with_error(
         self,
@@ -654,7 +654,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             mock_update_archive_file.assert_not_called()
 
     @mock.patch("documents.tasks.bulk_update_documents.si")
-    @mock.patch("documents.tasks.update_document_archive_file.s")
+    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.s")
     @mock.patch("celery.chord.delay")
     def test_rotate_non_pdf(
         self,
@@ -680,7 +680,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             mock_chord.assert_called_once()
             self.assertEqual(result, "OK")
 
-    @mock.patch("documents.tasks.update_document_archive_file.delay")
+    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.delay")
     @mock.patch("pikepdf.Pdf.save")
     def test_delete_pages(self, mock_pdf_save, mock_update_archive_file):
         """
@@ -705,7 +705,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.doc2.refresh_from_db()
         self.assertEqual(self.doc2.page_count, expected_page_count)
 
-    @mock.patch("documents.tasks.update_document_archive_file.delay")
+    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.delay")
     @mock.patch("pikepdf.Pdf.save")
     def test_delete_pages_with_error(self, mock_pdf_save, mock_update_archive_file):
         """
