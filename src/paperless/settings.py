@@ -317,6 +317,7 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.mfa",
+    "drf_spectacular",
     *env_apps,
 ]
 
@@ -334,6 +335,7 @@ REST_FRAMEWORK = {
     # Make sure these are ordered and that the most recent version appears
     # last
     "ALLOWED_VERSIONS": ["1", "2", "3", "4", "5"],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 if DEBUG:
@@ -355,8 +357,13 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
 ]
-
-# Optional to enable compression
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Paperless API",
+    "DESCRIPTION": "Generated with drf-spectacular (unmodified) python manage.py spectacular --color --file schema.yml",
+    "VERSION": "5.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    # OTHER SETTINGS
+}# Optional to enable compression
 if __get_boolean("PAPERLESS_ENABLE_COMPRESSION", "yes"):  # pragma: no cover
     MIDDLEWARE.insert(0, "compression_middleware.middleware.CompressionMiddleware")
 

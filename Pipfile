@@ -59,7 +59,7 @@ watchdog = "~=6.0"
 whitenoise = "~=6.8"
 whoosh = "~=2.7"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
-
+drf-spectacular = "*"
 
 [dev-packages]
 # Linting
