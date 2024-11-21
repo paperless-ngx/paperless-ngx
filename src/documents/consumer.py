@@ -10,6 +10,7 @@ from typing import Optional
 
 import magic
 from asgiref.sync import async_to_sync
+from celery import shared_task
 from channels.layers import get_channel_layer
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -259,6 +260,21 @@ class ConsumerFilePhase(str, Enum):
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
 
+@shared_task(name='tasks.parse_and_update_data_document')
+def parse_and_update_data_document(working_copy, mime_type,
+                                   dossier_document, document,
+                                   document_parser):
+    """"Parse and update"""
+    document_parser_copy = document_parser.copy()
+    data_ocr_fields = Consumer.parse_document(working_copy, mime_type,
+                                          document_parser_copy)
+
+    Consumer.update_data_document(document, document_parser_copy)
+    if data_ocr_fields:
+        Consumer.update_data_dossier(ocr_fields=data_ocr_fields,
+                                 document=document,
+                                 dossier_document=dossier_document)
+
 
 class Consumer(LoggingMixin):
     logging_name = "paperless.consumer"
@@ -505,6 +521,31 @@ class Consumer(LoggingMixin):
                 exc_info=True,
                 exception=e,
             )
+
+    def parse_document(self, working_copy, mime_type, document_parser_copy):
+        if isinstance(document_parser_copy, RasterisedDocumentCustomParser):
+            return  document_parser_copy.parse(working_copy, mime_type,
+                                                    self.filename,
+                                                    self.get_config_dossier_form())
+        document_parser_copy.parse(working_copy, mime_type, self.filename)
+        return None
+
+    def update_data_dossier(self,ocr_fields, document, dossier_document):
+        if ocr_fields[1] == '' and isinstance(ocr_fields[0], list):
+            self.fill_custom_field(document, ocr_fields,
+                                   dossier_document)
+
+        elif ocr_fields[1] is not None and isinstance(ocr_fields[0],
+                                                           list):
+            self.fill_custom_field_default(document, ocr_fields)
+
+    def update_data_document(self,document, document_parser, working_copy):
+        document.content = document_parser.get_text()
+        # ghi file
+        # document.archive_path
+        pass
+
+
     def fill_custom_field_default(self,document:Document, data_ocr_fields):
         fields = CustomFieldInstance.objects.filter(
                                     document=document,
@@ -744,13 +785,13 @@ class Consumer(LoggingMixin):
                 ConsumerStatusShortMessage.PARSING_DOCUMENT,
             )
             enable_ocr = ApplicationConfiguration.objects.filter().first().enable_ocr
-            if enable_ocr:
-                self.log.debug(f"Parsing {self.filename}...")
-
-                if isinstance(document_parser,RasterisedDocumentCustomParser):
-                    data_ocr_fields = document_parser.parse(self.working_copy, mime_type, self.filename, self.get_config_dossier_form())
-                else:
-                    document_parser.parse(self.working_copy, mime_type, self.filename)
+            # if enable_ocr:
+            #     self.log.debug(f"Parsing {self.filename}...")
+            #
+            #     if isinstance(document_parser,RasterisedDocumentCustomParser):
+            #         data_ocr_fields = document_parser.parse(self.working_copy, mime_type, self.filename, self.get_config_dossier_form())
+            #     else:
+            #         document_parser.parse(self.working_copy, mime_type, self.filename)
 
             self.log.debug(f"Generating thumbnail for {self.filename}...")
             self._send_progress(
@@ -766,8 +807,10 @@ class Consumer(LoggingMixin):
             )
             text = document_parser.get_text()
             date = document_parser.get_date()
-            if enable_ocr!=True:
-                text=''
+            # if enable_ocr!=True:
+            #     text=''
+            if text == None:
+                text = ""
             if date is None:
                 self._send_progress(
                     90,
@@ -776,7 +819,7 @@ class Consumer(LoggingMixin):
                     ConsumerStatusShortMessage.PARSE_DATE,
                 )
                 date = parse_date(self.filename, text)
-            archive_path = document_parser.get_archive_path()
+            archive_path = self.working_copy
 
         except ParseError as e:
             self._fail(
@@ -865,14 +908,6 @@ class Consumer(LoggingMixin):
                  # create file from document
                 # self.log.info('gia tri documentt', document.folder)
 
-
-
-
-                if data_ocr_fields[1] == '' and isinstance(data_ocr_fields[0], list):
-                    self.fill_custom_field(document, data_ocr_fields, new_dossier_document)
-
-                elif data_ocr_fields[1] is not None and isinstance(data_ocr_fields[0], list):
-                    self.fill_custom_field_default(document, data_ocr_fields)
                 document.dossier=new_dossier_document
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.
@@ -913,6 +948,9 @@ class Consumer(LoggingMixin):
                 # renaming logic to acquire the lock as well.
                 # This triggers things like file renaming
                 document.save()
+
+                self.log.debug("document.path", document.archive_file, document.archive_path, archive_path)
+                parse_and_update_data_document.apply_async(args=[document.archive_path, mime_type, new_dossier_document, document, document_parser])
 
                 # Delete the file only if it was successfully consumed
                 self.log.debug(f"Deleting file {self.working_copy}")

@@ -73,7 +73,7 @@ def revoke_permission():
     # approvals_reject = Approval.objects.filter(
     #     status__in=["REJECT", "REVOKED"],
     #     expiration__lte=thirty_days_ago
-        
+
     # ).delete()
 
 
@@ -373,7 +373,7 @@ def update_document_field(document_id):
     try:
         data_ocr_fields = parser.parse(document.source_path, mime_type, document.get_public_filename())
 
-        
+
         if parser.get_archive_path():
             with transaction.atomic():
                 oldDocument = Document.objects.get(pk=document.pk)
@@ -393,7 +393,7 @@ def update_document_field(document_id):
                                 if f.get("name") == data_ocr_fields[1]:
                                     mapping_field_user_args = f.get("mapping",[])
                             map_fields = {}
-                  
+
                             for key,value in mapping_field_user_args[0].items():
                                 map_fields[key]=dict_data.get(value)
                             for f in fields:
