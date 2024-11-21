@@ -7,6 +7,7 @@ import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dial
 import { Subject, takeUntil } from 'rxjs'
 import { SettingsService } from 'src/app/services/settings.service'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { Router } from '@angular/router'
 
 @Component({
   selector: 'pngx-trash',
@@ -26,7 +27,8 @@ export class TrashComponent implements OnDestroy {
     private trashService: TrashService,
     private toastService: ToastService,
     private modalService: NgbModal,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private router: Router
   ) {
     this.reload()
   }
@@ -110,7 +112,14 @@ export class TrashComponent implements OnDestroy {
   restore(document: Document) {
     this.trashService.restoreDocuments([document.id]).subscribe({
       next: () => {
-        this.toastService.showInfo($localize`Document restored`)
+        this.toastService.show({
+          content: $localize`Document restored`,
+          delay: 5000,
+          actionName: $localize`Open document`,
+          action: () => {
+            this.router.navigate(['documents', document.id])
+          },
+        })
         this.reload()
       },
       error: (err) => {
