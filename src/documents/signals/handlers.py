@@ -1041,7 +1041,7 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
         kwargs_dict = json.loads(kwargsrepr.replace("'", "\""))
         document_id = kwargs_dict.get('document_id')
         document = Document.objects.get(id=document_id)
-        logger.debug("Waiting for 1", document, body[0], headers["task"], headers, "task" not in headers or headers["task"] != "documents.tasks.consume_file")
+        # logger.debug("Waiting for 1", document, body[0], headers["task"], headers, "task" not in headers or headers["task"] != "documents.tasks.consume_file")
         # task_file_name = input_doc.original_file.name
         task_file_name = document.original_filename
 
@@ -1101,7 +1101,6 @@ def task_postrun_handler(
     try:
         close_old_connections()
         task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
-        print("noi dung  retval", retval)
         if task_instance is not None:
             task_instance.status = state
             task_instance.result = retval
