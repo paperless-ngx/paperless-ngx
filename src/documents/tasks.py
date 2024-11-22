@@ -345,38 +345,27 @@ def check_scheduled_workflows():
                 logger.debug(
                     f"Checking trigger {trigger} with offset {offset_td} against field: {trigger.schedule_date_field}",
                 )
-                if (
-                    trigger.schedule_date_field
-                    == WorkflowTrigger.ScheduleDateField.ADDED
-                ):
-                    documents = Document.objects.filter(
-                        added__lt=timezone.now() - offset_td,
-                    )
-                elif (
-                    trigger.schedule_date_field
-                    == WorkflowTrigger.ScheduleDateField.CREATED
-                ):
-                    documents = Document.objects.filter(
-                        created__lt=timezone.now() - offset_td,
-                    )
-                elif (
-                    trigger.schedule_date_field
-                    == WorkflowTrigger.ScheduleDateField.MODIFIED
-                ):
-                    documents = Document.objects.filter(
-                        modified__lt=timezone.now() - offset_td,
-                    )
-                elif (
-                    trigger.schedule_date_field
-                    == WorkflowTrigger.ScheduleDateField.CUSTOM_FIELD
-                ):
-                    cf_instances = CustomFieldInstance.objects.filter(
-                        field=trigger.schedule_date_custom_field,
-                        value_date__lt=timezone.now() - offset_td,
-                    )
-                    documents = Document.objects.filter(
-                        id__in=cf_instances.values_list("document", flat=True),
-                    )
+                match trigger.schedule_date_field:
+                    case WorkflowTrigger.ScheduleDateField.ADDED:
+                        documents = Document.objects.filter(
+                            added__lt=timezone.now() - offset_td,
+                        )
+                    case WorkflowTrigger.ScheduleDateField.CREATED:
+                        documents = Document.objects.filter(
+                            created__lt=timezone.now() - offset_td,
+                        )
+                    case WorkflowTrigger.ScheduleDateField.MODIFIED:
+                        documents = Document.objects.filter(
+                            modified__lt=timezone.now() - offset_td,
+                        )
+                    case WorkflowTrigger.ScheduleDateField.CUSTOM_FIELD:
+                        cf_instances = CustomFieldInstance.objects.filter(
+                            field=trigger.schedule_date_custom_field,
+                            value_date__lt=timezone.now() - offset_td,
+                        )
+                        documents = Document.objects.filter(
+                            id__in=cf_instances.values_list("document", flat=True),
+                        )
                 if documents.count() > 0:
                     logger.debug(
                         f"Found {documents.count()} documents for trigger {trigger}",
