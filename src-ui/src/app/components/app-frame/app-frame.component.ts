@@ -136,6 +136,7 @@ export class AppFrameComponent
   editProfile() {
     this.modalService.open(ProfileEditDialogComponent, {
       backdrop: 'static',
+      size: 'xl',
     })
     this.closeMenu()
   }

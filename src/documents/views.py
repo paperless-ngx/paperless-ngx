@@ -1705,6 +1705,7 @@ class RemoteVersionView(GenericAPIView):
 class TasksViewSet(ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     serializer_class = TasksViewSerializer
+    filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
 
     def get_queryset(self):
         queryset = (
@@ -1719,19 +1720,17 @@ class TasksViewSet(ReadOnlyModelViewSet):
             queryset = PaperlessTask.objects.filter(task_id=task_id)
         return queryset
 
-
-class AcknowledgeTasksView(GenericAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = AcknowledgeTasksViewSerializer
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+    @action(methods=["post"], detail=False)
+    def acknowledge(self, request):
+        serializer = AcknowledgeTasksViewSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        tasks = serializer.validated_data.get("tasks")
+        task_ids = serializer.validated_data.get("tasks")
 
         try:
-            result = PaperlessTask.objects.filter(id__in=tasks).update(
+            tasks = PaperlessTask.objects.filter(id__in=task_ids)
+            if request.user is not None and not request.user.is_superuser:
+                tasks = tasks.filter(owner=request.user) | tasks.filter(owner=None)
+            result = tasks.update(
                 acknowledged=True,
             )
             return Response({"result": result})

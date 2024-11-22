@@ -8,7 +8,7 @@ dateparser = "~=1.2"
 # WARNING: django does not use semver.
 #          Only patch versions are guaranteed to not introduce breaking changes.
 django = "~=5.1.3"
-django-allauth = {extras = ["socialaccount"], version = "*"}
+django-allauth = {extras = ["mfa", "socialaccount"], version = "*"}
 django-auditlog = "*"
 django-celery-results = "*"
 django-compression-middleware = "*"
@@ -55,7 +55,7 @@ tika-client = "*"
 tqdm = "*"
 # See https://github.com/paperless-ngx/paperless-ngx/issues/5494
 uvicorn = {extras = ["standard"], version = "==0.25.0"}
-watchdog = "~=5.0"
+watchdog = "~=6.0"
 whitenoise = "~=6.8"
 whoosh = "~=2.7"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}

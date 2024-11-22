@@ -1567,7 +1567,7 @@ class UiSettingsViewSerializer(serializers.ModelSerializer):
         return ui_settings
 
 
-class TasksViewSerializer(serializers.ModelSerializer):
+class TasksViewSerializer(OwnedObjectSerializer):
     class Meta:
         model = PaperlessTask
         depth = 1
@@ -1582,6 +1582,7 @@ class TasksViewSerializer(serializers.ModelSerializer):
             "result",
             "acknowledged",
             "related_document",
+            "owner",
         )
 
     type = serializers.SerializerMethodField()

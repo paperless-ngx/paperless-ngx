@@ -5,6 +5,7 @@ import { User } from 'src/app/data/user'
 import { PermissionsService } from '../permissions.service'
 import { AbstractNameFilterService } from './abstract-name-filter-service'
 
+const endpoint = 'users'
 @Injectable({
   providedIn: 'root',
 })
@@ -13,7 +14,7 @@ export class UserService extends AbstractNameFilterService<User> {
     http: HttpClient,
     private permissionService: PermissionsService
   ) {
-    super(http, 'users')
+    super(http, endpoint)
   }
 
   update(o: User): Observable<User> {
@@ -29,6 +30,13 @@ export class UserService extends AbstractNameFilterService<User> {
         })
         return super.update(o)
       })
+    )
+  }
+
+  deactivateTotp(u: User): Observable<boolean> {
+    return this.http.post<boolean>(
+      `${this.getResourceUrl(u.id, 'deactivate_totp')}`,
+      null
     )
   }
 }

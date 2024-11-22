@@ -211,9 +211,10 @@ def bulk_update_documents(document_ids):
 
 
 @shared_task
-def update_document_archive_file(document_id):
+def update_document_content_maybe_archive_file(document_id):
     """
-    Re-creates the archive file of a document, including new OCR content and thumbnail
+    Re-creates OCR content and thumbnail for a document, and archive file if
+    it exists.
     """
     document = Document.objects.get(id=document_id)
 
@@ -239,8 +240,9 @@ def update_document_archive_file(document_id):
             document.get_public_filename(),
         )
 
-        if parser.get_archive_path():
-            with transaction.atomic():
+        with transaction.atomic():
+            oldDocument = Document.objects.get(pk=document.pk)
+            if parser.get_archive_path():
                 with open(parser.get_archive_path(), "rb") as f:
                     checksum = hashlib.md5(f.read()).hexdigest()
                 # I'm going to save first so that in case the file move
@@ -251,7 +253,6 @@ def update_document_archive_file(document_id):
                     document,
                     archive_filename=True,
                 )
-                oldDocument = Document.objects.get(pk=document.pk)
                 Document.objects.filter(pk=document.pk).update(
                     archive_checksum=checksum,
                     content=parser.get_text(),
@@ -273,24 +274,41 @@ def update_document_archive_file(document_id):
                             ],
                         },
                         additional_data={
-                            "reason": "Update document archive file",
+                            "reason": "Update document content",
+                        },
+                        action=LogEntry.Action.UPDATE,
+                    )
+            else:
+                Document.objects.filter(pk=document.pk).update(
+                    content=parser.get_text(),
+                )
+
+                if settings.AUDIT_LOG_ENABLED:
+                    LogEntry.objects.log_create(
+                        instance=oldDocument,
+                        changes={
+                            "content": [oldDocument.content, parser.get_text()],
+                        },
+                        additional_data={
+                            "reason": "Update document content",
                         },
                         action=LogEntry.Action.UPDATE,
                     )
 
-                with FileLock(settings.MEDIA_LOCK):
+            with FileLock(settings.MEDIA_LOCK):
+                if parser.get_archive_path():
                     create_source_path_directory(document.archive_path)
                     shutil.move(parser.get_archive_path(), document.archive_path)
-                    shutil.move(thumbnail, document.thumbnail_path)
+                shutil.move(thumbnail, document.thumbnail_path)
 
-            document.refresh_from_db()
-            logger.info(
-                f"Updating index for document {document_id} ({document.archive_checksum})",
-            )
-            with index.open_index_writer() as writer:
-                index.update_document(writer, document)
+        document.refresh_from_db()
+        logger.info(
+            f"Updating index for document {document_id} ({document.archive_checksum})",
+        )
+        with index.open_index_writer() as writer:
+            index.update_document(writer, document)
 
-            clear_document_caches(document.pk)
+        clear_document_caches(document.pk)
 
     except Exception:
         logger.exception(
