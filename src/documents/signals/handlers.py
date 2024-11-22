@@ -2,7 +2,6 @@ import json
 import logging
 import os
 import shutil
-import time
 from typing import Optional
 
 from celery import states
@@ -16,7 +15,6 @@ from django.contrib.admin.models import ADDITION
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth.models import Permission
 from django.db import DatabaseError
 from django.db import close_old_connections
 from django.db import models
@@ -25,7 +23,6 @@ from django.dispatch import receiver
 from django.utils import timezone
 from filelock import FileLock
 from guardian.shortcuts import remove_perm
-import requests
 
 from documents import matching
 from documents.caching import clear_document_caches
@@ -1031,17 +1028,22 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
     https://docs.celeryq.dev/en/stable/internals/protocol.html#version-2
 
     """
-    if "task" not in headers or headers["task"] != "documents.tasks.consume_file":
+    if "task" not in headers or headers["task"] != "documents.tasks.update_document_archive_file":
         # Assumption: this is only ever a v2 message
         return
 
     try:
         close_old_connections()
 
-        task_args = body[0]
-        input_doc, _ = task_args
-
-        task_file_name = input_doc.original_file.name
+        # task_args = body[0]
+        # input_doc, _ = task_args
+        kwargsrepr = headers.get('kwargsrepr', '{}')
+        kwargs_dict = json.loads(kwargsrepr.replace("'", "\""))
+        document_id = kwargs_dict.get('document_id')
+        document = Document.objects.get(id=document_id)
+        logger.debug("Waiting for 1", document, body[0], headers["task"], headers, "task" not in headers or headers["task"] != "documents.tasks.consume_file")
+        # task_file_name = input_doc.original_file.name
+        task_file_name = document.original_filename
 
         PaperlessTask.objects.create(
             task_id=headers["id"],
@@ -1053,10 +1055,10 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
             date_started=None,
             date_done=None,
         )
-    except Exception:  # pragma: no cover
+    except Exception as e:  # pragma: no cover
         # Don't let an exception in the signal handlers prevent
         # a document from being consumed.
-        logger.exception("Creating PaperlessTask failed")
+        logger.exception("Creating PaperlessTask failed", e)
 
 
 @task_prerun.connect
@@ -1099,7 +1101,7 @@ def task_postrun_handler(
     try:
         close_old_connections()
         task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
-
+        print("noi dung  retval", retval)
         if task_instance is not None:
             task_instance.status = state
             task_instance.result = retval

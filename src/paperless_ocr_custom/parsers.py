@@ -1,27 +1,26 @@
 import io
 import json
-import logging
 import math
 import os
 import re
 import shutil
 import tempfile
-from pathlib import Path
 import time
-from typing import TYPE_CHECKING
+from pathlib import Path
 from typing import Optional
+from typing import TYPE_CHECKING
 
-from django.conf import settings
 import requests
-from PyPDF2 import PdfReader, PdfWriter
-from PyPDF2.errors import PdfReadError
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
 from PIL import Image
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfbase import pdfmetrics
+from PyPDF2 import PdfReader
+from PyPDF2.errors import PdfReadError
+from django.conf import settings
 from pdf2image import convert_from_path
+from reportlab.lib.pagesizes import letter
 from reportlab.lib.utils import ImageReader
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
 
 from documents.models import DossierForm
 from documents.parsers import DocumentParser
@@ -169,7 +168,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                 response_ocr = requests.request(method, url, headers=headers,
                                                 params=params, data=payload,
                                                 timeout=timeout, )
-                self.log.info("Got response", response_ocr.status_code)
+                self.log.info("Got response", url , response_ocr.status_code)
                 if response_ocr.status_code in status_code_success:
                     flag = False
                     for key, value in data_compare.items():
@@ -865,7 +864,6 @@ class RasterisedDocumentCustomParser(DocumentParser):
         # file created, so OCR the file and create an archive with any
         # text located via OCR
 
-        import ocrmypdf
         from ocrmypdf import EncryptedPdfError
         from ocrmypdf import InputFileError
         from ocrmypdf import SubprocessOutputError

@@ -5,8 +5,8 @@ import tempfile
 import uuid
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING
 from typing import Optional
+from typing import TYPE_CHECKING
 
 import magic
 from asgiref.sync import async_to_sync
@@ -26,25 +26,25 @@ from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.loggers import LoggingMixin
 from documents.matching import document_matches_workflow
-from documents.matching import approval_matches_workflow
-from documents.models import Correspondent, Dossier, DossierForm
+from documents.models import Correspondent, Dossier
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import FileInfo
-from documents.models import StoragePath
-from documents.models import Warehouse
 from documents.models import Folder
+from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Warehouse
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
-from documents.parsers import DocumentParser, custom_get_parser_class_for_mime_type
+from documents.parsers import DocumentParser, \
+    custom_get_parser_class_for_mime_type
 from documents.parsers import ParseError
-from documents.parsers import get_parser_class_for_mime_type
 from documents.parsers import parse_date
-from documents.permissions import set_permissions_for_object, check_user_can_change_folder
+from documents.permissions import set_permissions_for_object, \
+    check_user_can_change_folder
 from documents.plugins.base import AlwaysRunPluginMixin
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import NoCleanupPluginMixin
@@ -275,6 +275,11 @@ def parse_and_update_data_document(working_copy, mime_type,
                                  document=document,
                                  dossier_document=dossier_document)
 
+def get_config_dossier_form(override_dossier_id):
+    if override_dossier_id is None:
+        return None
+    dossier = Dossier.objects.filter(id=override_dossier_id).select_related('dossier_form').first()
+    return dossier.dossier_form
 
 class Consumer(LoggingMixin):
     logging_name = "paperless.consumer"
@@ -526,7 +531,7 @@ class Consumer(LoggingMixin):
         if isinstance(document_parser_copy, RasterisedDocumentCustomParser):
             return  document_parser_copy.parse(working_copy, mime_type,
                                                     self.filename,
-                                                    self.get_config_dossier_form())
+                                                    get_config_dossier_form(self.override_dossier_id))
         document_parser_copy.parse(working_copy, mime_type, self.filename)
         return None
 
@@ -651,11 +656,7 @@ class Consumer(LoggingMixin):
 
 
 
-    def get_config_dossier_form(self):
-        if self.override_dossier_id is None:
-            return None
-        dossier = Dossier.objects.filter(id=self.override_dossier_id).select_related('dossier_form').first()
-        return dossier.dossier_form
+
     def try_consume_file(
         self,
         path: Path,
@@ -949,8 +950,9 @@ class Consumer(LoggingMixin):
                 # This triggers things like file renaming
                 document.save()
 
-                self.log.debug("document.path", document.archive_file, document.archive_path, archive_path)
-                parse_and_update_data_document.apply_async(args=[document.archive_path, mime_type, new_dossier_document, document, document_parser])
+                # self.log.debug("document.path", document.archive_file, document.archive_path, archive_path)
+                # parse_and_update_data_document.apply_async(args=[document.archive_path, mime_type, new_dossier_document, document, document_parser])
+
 
                 # Delete the file only if it was successfully consumed
                 self.log.debug(f"Deleting file {self.working_copy}")
@@ -989,6 +991,11 @@ class Consumer(LoggingMixin):
             ConsumerFilePhase.SUCCESS,
             ConsumerStatusShortMessage.FINISHED,
             document.id,
+        )
+
+        from documents.tasks import update_document_archive_file
+        update_document_archive_file.delay(
+            document_id=document.id
         )
 
         # Return the most up to date fields
