@@ -43,11 +43,18 @@ export class FilterableDropdownSelectionModel {
   private _intersection: Intersection = Intersection.Include
   temporaryIntersection: Intersection = this._intersection
 
-  items: MatchingModel[] = []
+  private _items: MatchingModel[] = []
+  get items(): MatchingModel[] {
+    return this._items
+  }
 
-  get itemsSorted(): MatchingModel[] {
-    // TODO: this is getting called very often
-    return this.items.sort((a, b) => {
+  set items(items: MatchingModel[]) {
+    this._items = items
+    this.sortItems()
+  }
+
+  private sortItems() {
+    this._items.sort((a, b) => {
       if (a.id == null && b.id != null) {
         return -1
       } else if (a.id != null && b.id == null) {
@@ -291,6 +298,7 @@ export class FilterableDropdownSelectionModel {
     })
     this._logicalOperator = this.temporaryLogicalOperator
     this._intersection = this.temporaryIntersection
+    this.sortItems()
   }
 
   reset(complete: boolean = false) {
