@@ -279,11 +279,11 @@
                <context context-type="linenumber">13</context>
             </context-group>
          </trans-unit>
-         <trans-unit id="3527354815023530656" datatype="html">
+         <trans-unit id="4397637601647171461" datatype="html">
             <source>
                Document
                <x id="PH" equiv-text="status.filename" />
-               was added to Paperless-ngx.
+               was added to Edocs.
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/app.component.ts</context>
@@ -296,7 +296,7 @@
             <target state="translated">
                Tài liệu
                <x id="PH" equiv-text="status.filename" />
-               đã được thêm.
+               đã được thêmm vào Edocs.
             </target>
          </trans-unit>
          <trans-unit id="1931214133925051574" datatype="html">
@@ -333,11 +333,11 @@
                <x id="PH_1" equiv-text="status.message" />
             </target>
          </trans-unit>
-         <trans-unit id="1218124467712564468" datatype="html">
+         <trans-unit id="3360769330673660282" datatype="html">
             <source>
                Document
                <x id="PH" equiv-text="status.filename" />
-               is being processed by Paperless-ngx.
+               is being processed by Edocs.
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/app.component.ts</context>
@@ -346,7 +346,7 @@
             <target state="translated">
                Tài liệu
                <x id="PH" equiv-text="status.filename" />
-               đang được xử lý.
+               đang được xử lý bởi Edocs.
             </target>
          </trans-unit>
          <trans-unit id="2501522447884928778" datatype="html">
@@ -385,13 +385,13 @@
             </context-group>
             <target state="translated">Trang dashboard có thể được sử dụng để hiển thị các chế độ xem đã lưu, chẳng hạn như 'Hộp thư đến'. Những cài đặt đó được tìm thấy trong Cài đặt &amp;&gt; Đã lưu Chế độ xem sau khi bạn đã tạo.</target>
          </trans-unit>
-         <trans-unit id="9075755296812854717" datatype="html">
-            <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
+         <trans-unit id="4176459502716818443" datatype="html">
+            <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Edocs will start training its machine learning algorithms.</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/app.component.ts</context>
                <context context-type="linenumber">141</context>
             </context-group>
-            <target state="translated">Kéo và thả tài liệu vào đây để bắt đầu tải lên hoặc đặt chúng vào thư mục . Bạn cũng có thể kéo và thả tài liệu ở bất kỳ đâu trên tất cả các trang khác của ứng dụng web. Sau khi bạn làm như vậy, hệ thống sẽ bắt đầu huấn luyện các thuật toán học máy.</target>
+            <target state="translated">Kéo và thả tài liệu vào đây để bắt đầu tải lên hoặc đặt chúng vào thư mục consumer. Bạn cũng có thể kéo và thả tài liệu ở bất kỳ đâu trên tất cả các trang khác của ứng dụng web. Sau khi thực hiện, Edocs sẽ bắt đầu đào tạo các thuật toán học máy của mình.</target>
          </trans-unit>
          <trans-unit id="7495498057594070122" datatype="html">
             <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
@@ -481,13 +481,13 @@
             </context-group>
             <target state="translated">Xem tài liệu hoặc truy cập dự án trên GitHub để tìm hiểu thêm hoặc báo cáo sự cố.</target>
          </trans-unit>
-         <trans-unit id="4270528545616947218" datatype="html">
-            <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</source>
+         <trans-unit id="7421249122519786700" datatype="html">
+            <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Edocs!</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/app.component.ts</context>
                <context context-type="linenumber">208</context>
             </context-group>
-            <target state="translated">Cảm ơn bạn đã sử dụng hệ thống</target>
+            <target state="translated">Xin cảm ơn bạn đã sử dụng Edocs!</target>
          </trans-unit>
          <trans-unit id="5558547280081275233" datatype="html">
             <source>Approvals</source>
@@ -5777,7 +5777,7 @@
                <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
                <context context-type="linenumber">177</context>
             </context-group>
-            <target state="translated">Gán người phụ trách</target>
+            <target state="translated">Gán chủ sở hữu</target>
          </trans-unit>
          <trans-unit id="1749184201773078639" datatype="html">
             <source>Assign view permissions</source>
@@ -6298,7 +6298,7 @@
                <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
                <context context-type="linenumber">26</context>
             </context-group>
-            <target state="translated">Owner:</target>
+            <target state="translated">Chủ sở hữu:</target>
          </trans-unit>
          <trans-unit id="2722549756198502062" datatype="html">
             <source>Add item</source>
@@ -6423,7 +6423,7 @@
                <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
                <context context-type="linenumber">75</context>
             </context-group>
-            <target state="translated">Any and all existing owner, user and group permissions will be replaced.</target>
+            <target state="translated">Mọi quyền của chủ sở hữu, người dùng và nhóm hiện có sẽ được thay thế.</target>
          </trans-unit>
          <trans-unit id="5947558132119506443" datatype="html">
             <source>My documents</source>
@@ -9134,7 +9134,7 @@
                <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
                <context context-type="linenumber">163</context>
             </context-group>
-            <target state="translated">Sắp xếp bằng chủ sở hữu</target>
+            <target state="translated">Sắp xếp theo chủ sở hữu</target>
          </trans-unit>
          <trans-unit id="3557446856808034218" datatype="html">
             <source>Sort by notes</source>
@@ -11573,7 +11573,7 @@
                <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
                <context context-type="linenumber">31</context>
             </context-group>
-            <target state="needs-translation">Không có quyền tải lên thư mục.</target>
+            <target state="translated">Không có quyền tải lên thư mục.</target>
          </trans-unit>
          <trans-unit id="5523607037798226031" datatype="html">
             <source>You have unsaved changes to the document</source>
