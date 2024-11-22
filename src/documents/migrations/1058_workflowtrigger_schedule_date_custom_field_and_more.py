@@ -9,7 +9,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "1056_customfieldinstance_deleted_at_and_more"),
+        ("documents", "1057_paperlesstask_owner"),
     ]
 
     operations = [
