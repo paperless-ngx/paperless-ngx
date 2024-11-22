@@ -73,10 +73,11 @@ extends CustomFolderListComponent<Folder> {
   goToFolder(object: Folder) {
     let folderId = this.route.snapshot.queryParams['folderIds'];
     let getQueryParams: { folderIds?: string };
+
     if (this.isFolderCutClicked) {
-      getQueryParams = {
-        folderIds: Array.from(this.folderCut).join(',')
-      };
+        getQueryParams = {
+          folderIds: Array.from(this.folderCut).join(',')
+        }
     } else if (folderId) {
       getQueryParams = {
         folderIds: Array.from(folderId).join('')

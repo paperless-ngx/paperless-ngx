@@ -16,8 +16,8 @@
 
 
   <button class="btn btn-sm btn-outline-secondary" (click)="cutFolder()"
-          [disabled]="selectedObjects.size === 0 || isFolderCutClicked === true">
-    <i-bs name="arrow-90deg-right"></i-bs>&nbsp;<ng-container i18n>Cut</ng-container>
+          [hidden]="selectedObjects.size === 0 || isFolderCutClicked === true">
+          <ng-container i18n>Cut</ng-container>
   </button>
 
   <button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()" [hidden]="selectedObjects.size === 0">
@@ -44,9 +44,9 @@
       <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanEditAll || list.selected.size < 2">
         <i-bs name="journals"></i-bs>&nbsp;<ng-container i18n>Merge</ng-container>
       </button> -->
-      <button ngbDropdownItem (click)="exportToExcelSelected()" [disabled]="!userCanEditAll">
-        <i-bs name="arrow-down"></i-bs>&nbsp;<ng-container i18n>Export to Excel</ng-container>
-      </button>
+<!--      <button ngbDropdownItem (click)="exportToExcelSelected()" [disabled]="!userCanEditAll">-->
+<!--        <i-bs name="arrow-down"></i-bs>&nbsp;<ng-container i18n>Export to Excel</ng-container>-->
+<!--      </button>-->
     </div>
   </div>
 <!--  <button type="button" class="btn btn-sm btn-outline-primary" (click)="setPermissions()"-->
@@ -63,7 +63,7 @@
     <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Paste</ng-container>
   </button>
   <button type="button" class="btn btn-sm btn-outline-danger" (click)="cancelFolder()" [hidden]="getFolderSelect()===0">
-    <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Cancel</ng-container>
+    <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Cancel cut</ng-container>
   </button>
   <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="openCreateDialog()"
           *pngxIfPermissions="{ action: PermissionAction.Add, type: permissionType }">

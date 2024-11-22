@@ -10,6 +10,7 @@ import {
 } from 'src/app/services/consumer-status.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
+import { folder } from 'ngx-bootstrap-icons'
 
 const MAX_ALERTS = 5
 
@@ -125,12 +126,11 @@ export class UploadFileButtonComponent extends ComponentWithPermissions {
   public onFileSelected(event: Event) {
     let getUrl = this.router.url.split('/')
     let payload = { folder: '' ,dossiers:''};
-    if (getUrl[1] === 'folders') {
-      payload.folder = getUrl[2];
-    }
-    if (getUrl[1] === 'dossiers') {
-      payload.dossiers = getUrl[2];
-    }
+    const folderMatch = this.router.url.match(/folders\/(\d+)/);
+    const dossierMatch = this.router.url.match(/dossiers\/(\d+)/);
+    if (folderMatch) { payload.folder = folderMatch[1]}
+    if (dossierMatch) { payload.dossiers = dossierMatch[1]}
+
     this.uploadDocumentsService.uploadFiles(
       (event.target as HTMLInputElement).files,
       payload

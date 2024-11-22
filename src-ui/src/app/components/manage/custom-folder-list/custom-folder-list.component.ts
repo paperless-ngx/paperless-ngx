@@ -440,7 +440,13 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
 
   cancelFolder() {
     this.reloadData()
-
+    this.folderCut=[]
+    // const currentUrl = this.router.url;
+    //
+    //
+    // const newUrl = currentUrl.split('?')[0]; // Lấy phần trước dấu hỏi
+    // this.router.navigateByUrl(newUrl);
+    this.isFolderCutClicked=false
     if (this.router.url.includes('/folders/')) {
       this.id = this.route.snapshot.params['id'];
       this.router.navigate(['/folders/', this.id], {
@@ -449,12 +455,12 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
     }
 
     else {
-      this.router.navigate(['/folders/'], {
+      this.router.navigate(['/folders/root'], {
         queryParams: {}
       });
     }
   }
-  setCutFolder(){
+  getCutFolder(){
     let folderIds
     this.route.queryParams.subscribe(params => {
       folderIds = params['folderIds'];
@@ -476,11 +482,13 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
     modal.componentInstance.message = $localize`This operation cannot be undone.`
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
+    this.folderCut=[];
+    this.isFolderCutClicked=false
     modal.componentInstance.confirmClicked.subscribe(() => {
       modal.componentInstance.buttonsEnabled = false
       this.service
         .bulk_edit_folders(
-          Array.from(this.setCutFolder()),
+          Array.from(this.getCutFolder()),
           Number(this.id),
           BulkEditObjectOperation.Update
         )
@@ -496,7 +504,7 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
               });
             }
             else {
-              this.router.navigate(['/folders/'], {
+              this.router.navigate(['/folders/root'], {
                 queryParams: {}
               });
             }
