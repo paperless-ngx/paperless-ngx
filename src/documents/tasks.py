@@ -375,7 +375,7 @@ def check_scheduled_workflows():
                             document=document,
                             type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
                             workflow=workflow,
-                        )
+                        ).order_by("-run_at")
                         if not trigger.schedule_is_recurring and workflow_runs.exists():
                             # schedule is non-recurring and the workflow has already been run
                             logger.debug(
