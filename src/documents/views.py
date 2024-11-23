@@ -386,12 +386,20 @@ class DocumentViewSet(
         return super().get_serializer(*args, **kwargs)
 
     def update(self, request, *args, **kwargs):
-        response = super().update(request, *args, **kwargs)
-        from documents import index
-        serializer = self.get_serializer(data=request.data)
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        data = request.data.copy()  # Tạo một bản sao của dữ liệu
+        # Loại bỏ trường archive_serial_number khỏi quá trình xác thực
+        if 'archive_serial_number' in data:
+            data.pop('archive_serial_number')
+
+        serializer = self.get_serializer(instance, data=data, partial=partial)
         serializer.is_valid(raise_exception=True)
+        response = super().update(request, *args, **kwargs)
+        logger.debug(response)
         self.update_folder_permisisons(self.get_object(), serializer)
         self.update_dossier_permisisons(self.get_object(), serializer)
+        from documents import index
         index.add_or_update_document(self.get_object())
 
         document_updated.send(
