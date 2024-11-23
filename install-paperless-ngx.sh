@@ -330,8 +330,13 @@ SECRET_KEY=$(LC_ALL=C tr -dc 'a-zA-Z0-9!#$%&()*+,-./:;<=>?@[\]^_`{|}~' < /dev/ur
 
 DEFAULT_LANGUAGES=("deu eng fra ita spa")
 
-_split_langs="${OCR_LANGUAGE//+/ }"
-read -r -a OCR_LANGUAGES_ARRAY <<< "${_split_langs}"
+# OCR_LANG requires underscores, replace dashes if the user gave them with underscores
+readonly ocr_langs=${OCR_LANGUAGE//-/_}
+# OCR_LANGS (the install version) uses dashes, not underscores, so convert underscore to dash and plus to space
+install_langs=${OCR_LANGUAGE//_/-}    # First convert any underscores to dashes
+install_langs=${install_langs//+/ }    # Then convert plus signs to spaces
+
+read -r -a install_langs_array <<< "${install_langs}"
 
 {
 	if [[ ! $URL == "" ]] ; then
@@ -344,10 +349,10 @@ read -r -a OCR_LANGUAGES_ARRAY <<< "${_split_langs}"
 		echo "USERMAP_GID=$USERMAP_GID"
 	fi
 	echo "PAPERLESS_TIME_ZONE=$TIME_ZONE"
-	echo "PAPERLESS_OCR_LANGUAGE=$OCR_LANGUAGE"
+	echo "PAPERLESS_OCR_LANGUAGE=$ocr_langs"
 	echo "PAPERLESS_SECRET_KEY='$SECRET_KEY'"
-	if [[ ! ${DEFAULT_LANGUAGES[*]} =~ ${OCR_LANGUAGES_ARRAY[*]} ]] ; then
-		echo "PAPERLESS_OCR_LANGUAGES=${OCR_LANGUAGES_ARRAY[*]}"
+	if [[ ! ${DEFAULT_LANGUAGES[*]} =~ ${install_langs_array[*]} ]] ; then
+		echo "PAPERLESS_OCR_LANGUAGES=${install_langs_array[*]}"
 	fi
 } > docker-compose.env
 
