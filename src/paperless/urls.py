@@ -14,6 +14,8 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import RedirectView
 from django.views.static import serve
+from drf_spectacular.views import SpectacularAPIView
+from drf_spectacular.views import SpectacularSwaggerView
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
@@ -202,6 +204,23 @@ urlpatterns = [
                     r"^oauth/callback/",
                     OauthCallbackView.as_view(),
                     name="oauth_callback",
+                ),
+                re_path(
+                    "^schema/",
+                    include(
+                        [
+                            re_path(
+                                "^$",
+                                SpectacularAPIView.as_view(),
+                                name="schema",
+                            ),
+                            re_path(
+                                "^swagger-ui/",
+                                SpectacularSwaggerView.as_view(),
+                                name="swagger-ui",
+                            ),
+                        ],
+                    ),
                 ),
                 *api_router.urls,
             ],

@@ -328,6 +328,8 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.mfa",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
     *env_apps,
 ]
 
@@ -345,6 +347,17 @@ REST_FRAMEWORK = {
     # Make sure these are ordered and that the most recent version appears
     # last
     "ALLOWED_VERSIONS": ["1", "2", "3", "4", "5", "6"],
+    # DRF Spectacular default schema
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+# DRF Spectacular settings
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Paperless-ngx API",
+    "DESCRIPTION": "OpenAPI Spec for Paperless-ngx",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_DIST": "SIDECAR",
 }
 
 if DEBUG:
