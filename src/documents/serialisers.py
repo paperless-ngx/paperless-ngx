@@ -1772,6 +1772,11 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             "filter_has_tags",
             "filter_has_correspondent",
             "filter_has_document_type",
+            "schedule_offset_days",
+            "schedule_is_recurring",
+            "schedule_recurring_interval_days",
+            "schedule_date_field",
+            "schedule_date_custom_field",
         ]
 
     def validate(self, attrs):
