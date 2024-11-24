@@ -1546,6 +1546,12 @@ class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     filterset_class = StoragePathFilterSet
     ordering_fields = ("name", "path", "matching_algorithm", "match", "document_count")
 
+    def get_permissions(self):
+        if self.action == "test":
+            # Test action does not require object level permissions
+            self.permission_classes = (IsAuthenticated,)
+        return super().get_permissions()
+
     def destroy(self, request, *args, **kwargs):
         """
         When a storage path is deleted, see if documents
@@ -1562,17 +1568,12 @@ class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
         return response
 
-
-class StoragePathTestView(GenericAPIView):
-    """
-    Test storage path against a document
-    """
-
-    permission_classes = [IsAuthenticated]
-    serializer_class = StoragePathTestSerializer
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+    @action(methods=["post"], detail=False)
+    def test(self, request):
+        """
+        Test storage path against a document
+        """
+        serializer = StoragePathTestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         document = serializer.validated_data.get("document")
