@@ -346,10 +346,14 @@ def empty_trash(doc_ids=None):
 
 @shared_task
 def check_scheduled_workflows():
-    scheduled_workflows: list[Workflow] = Workflow.objects.filter(
-        triggers__type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
-        enabled=True,
-    ).prefetch_related("triggers")
+    scheduled_workflows: list[Workflow] = (
+        Workflow.objects.filter(
+            triggers__type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            enabled=True,
+        )
+        .distinct()
+        .prefetch_related("triggers")
+    )
     if scheduled_workflows.count() > 0:
         logger.debug(f"Checking {len(scheduled_workflows)} scheduled workflows")
         for workflow in scheduled_workflows:
