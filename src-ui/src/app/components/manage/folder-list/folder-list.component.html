@@ -1,6 +1,6 @@
 <pngx-page-header title="{{ typeNamePlural | titlecase }}">
 
-  <div class="btn-group flex-fill z-0" role="group" >
+  <div class="btn-group flex-fill z-0" role="group">
     <input type="radio" class="btn-check" [(ngModel)]="displayMode" value="details" (ngModelChange)="saveDisplayMode()"
            id="displayModeDetails" name="displayModeDetails">
     <label for="displayModeDetails" class="btn btn-outline-primary btn-sm">
@@ -17,7 +17,7 @@
 
   <button class="btn btn-sm btn-outline-secondary" (click)="cutFolder()"
           [hidden]="selectedObjects.size === 0 || isFolderCutClicked === true">
-          <ng-container i18n>Cut</ng-container>
+    <ng-container i18n>Cut</ng-container>
   </button>
 
   <button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()" [hidden]="selectedObjects.size === 0">
@@ -44,15 +44,15 @@
       <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanEditAll || list.selected.size < 2">
         <i-bs name="journals"></i-bs>&nbsp;<ng-container i18n>Merge</ng-container>
       </button> -->
-<!--      <button ngbDropdownItem (click)="exportToExcelSelected()" [disabled]="!userCanEditAll">-->
-<!--        <i-bs name="arrow-down"></i-bs>&nbsp;<ng-container i18n>Export to Excel</ng-container>-->
-<!--      </button>-->
+      <!--      <button ngbDropdownItem (click)="exportToExcelSelected()" [disabled]="!userCanEditAll">-->
+      <!--        <i-bs name="arrow-down"></i-bs>&nbsp;<ng-container i18n>Export to Excel</ng-container>-->
+      <!--      </button>-->
     </div>
   </div>
-<!--  <button type="button" class="btn btn-sm btn-outline-primary" (click)="setPermissions()"-->
-<!--          [disabled]="!userCanBulkEdit(PermissionAction.Change) || selectedObjects.size === 0">-->
-<!--    <i-bs name="person-fill-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>-->
-<!--  </button>-->
+  <!--  <button type="button" class="btn btn-sm btn-outline-primary" (click)="setPermissions()"-->
+  <!--          [disabled]="!userCanBulkEdit(PermissionAction.Change) || selectedObjects.size === 0">-->
+  <!--    <i-bs name="person-fill-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>-->
+  <!--  </button>-->
   <button type="button" class="btn btn-sm btn-outline-danger" (click)="delete()"
           [disabled]="!userCanBulkEdit(PermissionAction.Delete) || selectedObjects.size === 0">
     <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
@@ -70,10 +70,10 @@
     <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Create</ng-container>
   </button>
   <pngx-upload-file-btn></pngx-upload-file-btn>
-<!--  <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="openCreateDialog()"-->
-<!--          *pngxIfPermissions="{ action: PermissionAction.Add, type: permissionType }">-->
-<!--    <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Create</ng-container>-->
-<!--  </button>-->
+  <!--  <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="openCreateDialog()"-->
+  <!--          *pngxIfPermissions="{ action: PermissionAction.Add, type: permissionType }">-->
+  <!--    <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Create</ng-container>-->
+  <!--  </button>-->
 
 </pngx-page-header>
 
@@ -98,7 +98,7 @@
     </a>
     </ng-container>
     <ng-container *ngIf="i === 2&&folderPath.length>i+1 ">
-      <i-bs class="" name="chevron-right"></i-bs>&nbsp;<a class="me custom-cursor" >
+      <i-bs class="" name="chevron-right"></i-bs>&nbsp;<a class="me custom-cursor">
       ...
     </a>
     </ng-container>
@@ -115,7 +115,7 @@
   </div>
 
   <ngb-pagination class="col-auto z-0" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5"
-                  (pageChange)="reloadData()" size="sm" aria-label="Pagination" ></ngb-pagination>
+                  (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
 </div>
 <div class="row row-cols-1 g-4 mb-4 sticky-lg-top z-0" style="position:relative">
   <div class="col-md-4 folder-tree" [ngClass]="{'collapse': !isSidebarVisible}">
@@ -189,18 +189,21 @@
                 </td>
               } @else {
                 <td scope="row" class="d-md-table-cell">
-<!--                  <button-->
-<!--                    class="btn btn-link ms-0 ps-0 text-start"-->
-<!--                    [routerLink]="userCanEdit(object) ? ['/documents', object.document_matching] : null"-->
-<!--                    (click)="$event.stopPropagation()">-->
+                  <!--                  <button-->
+                  <!--                    class="btn btn-link ms-0 ps-0 text-start"-->
+                  <!--                    [routerLink]="userCanEdit(object) ? ['/documents', object.document_matching] : null"-->
+                  <!--                    (click)="$event.stopPropagation()">-->
 
-<!--                    <i-bs class="me-1 " name="file-earmark-pdf" width="2rem"-->
-<!--                          height="2rem"></i-bs>-->
-<!--                  </button>-->
+                  <!--                    <i-bs class="me-1 " name="file-earmark-pdf" width="2rem"-->
+                  <!--                          height="2rem"></i-bs>-->
+                  <!--                  </button>-->
 
-                  <a [href]="getPreviewUrl(object.document)" title="View Preview" i18n-title target="_blank" class="text-primary ms-0 ps-0 text-start"
-                    [ngbPopover]="previewContent" [popoverTitle]="object.document.title | documentTitle"
-                    autoClose="true" popoverClass="shadow popover-preview" container="body" (mouseenter)="mouseEnterPreviewButton(object.document)" (mouseleave)="mouseLeavePreviewButton()" #popover="ngbPopover">
+                  <a [href]="getPreviewUrl(object.document)" title="View Preview" i18n-title target="_blank"
+                     class="text-primary ms-0 ps-0 text-start"
+                     [ngbPopover]="previewContent" [popoverTitle]="object.document.title | documentTitle"
+                     autoClose="true" popoverClass="shadow popover-preview" container="body"
+                     (mouseenter)="mouseEnterPreviewButton(object.document)" (mouseleave)="mouseLeavePreviewButton()"
+                     #popover="ngbPopover">
                     <i-bs class="me-1 " name="file-earmark-pdf" width="2rem"
                           height="2rem"></i-bs>
                   </a>
@@ -209,7 +212,8 @@
                         (click)="$event.stopPropagation()">   {{ object.name }}
                   </span>
                   <ng-template #previewContent>
-                    <pngx-preview-popup [document]="object.document" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()"></pngx-preview-popup>
+                    <pngx-preview-popup [document]="object.document" (mouseenter)="mouseEnterPreview()"
+                                        (mouseleave)="mouseLeavePreview()"></pngx-preview-popup>
                   </ng-template>
                 </td>
 
@@ -258,33 +262,34 @@
                   </div>
                 </div>
                 <div class="btn-group d-none d-xxl-inline-flex">
-  <button class="btn btn-sm btn-outline-secondary"
-          (click)="filterDocuments(object); $event.stopPropagation();"
-          *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
-    <i-bs width="1em" height="1em" name="filter"></i-bs>&nbsp;<ng-container i18n>Documents</ng-container>
-  </button>
-  <button class="btn btn-sm btn-outline-secondary"
-          (click)="openEditDialog(object); $event.stopPropagation();"
-          *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }"
-          [disabled]="!userCanEdit(object)">
-    <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
-  </button>
-  <button class="btn btn-sm btn-outline-danger"
-          (click)="openDeleteDialog(object); $event.stopPropagation();"
-          *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }"
-          [disabled]="!userCanDelete(object)">
-    <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
-  </button>
-</div>
+                  <button class="btn btn-sm btn-outline-secondary"
+                          (click)="filterDocuments(object); $event.stopPropagation();"
+                          *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+                    <i-bs width="1em" height="1em" name="filter"></i-bs>&nbsp;<ng-container i18n>Documents
+                  </ng-container>
+                  </button>
+                  <button class="btn btn-sm btn-outline-secondary"
+                          (click)="openEditDialog(object); $event.stopPropagation();"
+                          *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }"
+                          [disabled]="!userCanEdit(object)">
+                    <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger"
+                          (click)="openDeleteDialog(object); $event.stopPropagation();"
+                          *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }"
+                          [disabled]="!userCanDelete(object)">
+                    <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+                  </button>
+                </div>
 
               </td>
             </tr>
           }
-          @if (data.length==0){
+          @if (data.length == 0) {
             <tr>
               <td colspan="5">
-                <div class=" me-2" ></div>
-                <ng-container i18n>No folders defined.</ng-container>
+                <div class=" me-2"></div>
+                <ng-container i18n>No files defined.</ng-container>
               </td>
             </tr>
           }
