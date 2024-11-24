@@ -37,14 +37,11 @@ import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dial
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
-import { ShareLink } from 'src/app/data/share-link'
-import { environment } from 'src/environments/environment'
-import { Router } from '@angular/router'
 import { Folder } from 'src/app/data/folder'
 import { FolderService } from 'src/app/services/rest/folder.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { saveAs } from 'file-saver'
-import { NgxBootstrapIconsModule, ColorTheme } from 'ngx-bootstrap-icons';
+import { Document } from '../../../data/document'
 export interface ManagementListColumn {
   key: string
 
@@ -83,6 +80,7 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
   public id: number
   public data: T[] = []
+  documents: Document[] = []
   displayMode = 'details'
   public page = 1
   private permissionService: PermissionsService
@@ -183,6 +181,8 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
     this.reloadData()
   }
 
+  extractDocuments(){}
+
   reloadData() {
     if (this.id!=this.preFolder)
       this.page=1
@@ -211,9 +211,11 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((c) => {
         this.data = c.results
+        this.extractDocuments()
         this.collectionSize = c.count
         this.isLoading = false
       })
+
     this.preFolder=this.id
   }
 
@@ -470,6 +472,8 @@ export abstract class CustomFolderListComponent<T extends ObjectWithId>
     this.folderCut = parts.map(part => parseInt(part, 10));
     return this.folderCut
   }
+
+
 
 
   update() {

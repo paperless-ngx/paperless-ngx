@@ -1,5 +1,5 @@
-import { Component, Renderer2 } from '@angular/core'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { Component, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core'
+import { NgbModal, NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { Subject } from 'rxjs'
 import { FolderService } from 'src/app/services/rest/folder.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -14,6 +14,8 @@ import {
   PermissionType,
 } from 'src/app/services/permissions.service'
 import { CustomFolderListComponent } from '../custom-folder-list/custom-folder-list.component'
+import { DocumentService } from '../../../services/rest/document.service'
+import { Document } from '../../../data/document'
 
 
 @Component({
@@ -23,13 +25,9 @@ import { CustomFolderListComponent } from '../custom-folder-list/custom-folder-l
 })
 export class FoldersComponent
 extends CustomFolderListComponent<Folder> {
-  // id: number;
-  folderUnsubscribeNotifier: Subject<any> = new Subject();
-  folder_nameFilter: string;
-  MyunsubscribeNotifier: Subject<any> = new Subject()
+
 
   public selectedObjects: Set<number> = new Set()
-
 
   constructor(
     private route: ActivatedRoute,
@@ -40,7 +38,20 @@ extends CustomFolderListComponent<Folder> {
     documentListViewService: DocumentListViewService,
     permissionsService: PermissionsService,
     private renderer: Renderer2,
+    public documentService: DocumentService
   ) {
+    function formatBytes(bytes, decimals = 2) {
+        if (!+bytes) return '0 Bytes'
+
+        const k = 1024
+        const dm = decimals < 0 ? 0 : decimals
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+
+        const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+        return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
+    }
+
     super(
       folderService,
       modalService,
@@ -52,17 +63,68 @@ extends CustomFolderListComponent<Folder> {
       $localize`folder`,
       $localize`folders`,
       PermissionType.Folder,
-      [],
+      [{key: 'filesize', name: 'Size', valueFn: (item) => (item.type == 'file')?formatBytes(item.filesize):"", rendersHtml: true}],
       folderService
     )
   }
+  @ViewChildren('popover') popovers: QueryList<NgbPopover>
+  popover: NgbPopover
+  mouseOnPreview = false
+  popoverHidden = true
 
 
 
+  extractDocuments(): void {
+    console.log("dax goi")
+    this.documents = this.data
+      .filter(item => item.document)  // Lọc các phần tử có `document`
+      .map(item => item.document);    // Chỉ lấy phần `document` của các phần tử
+  }
   reloadData() {
     this.id = this.route.snapshot.params['id'] !== 'root' ? this.route.snapshot.params['id'] :  null;
-
     super.reloadData()
+  }
+
+  getPreviewUrl(document: Document): string {
+    return this.documentService.getPreviewUrl(document.id)
+  }
+
+  mouseEnterPreviewButton(doc: Document) {
+    const newPopover = this.popovers.get(this.documents.indexOf(doc))
+    if (this.popover !== newPopover && this.popover?.isOpen())
+      this.popover.close()
+    this.popover = newPopover
+    this.mouseOnPreview = true
+    if (!this.popover.isOpen()) {
+
+      this.popoverHidden = true
+      setTimeout(() => {
+        if (this.mouseOnPreview) {
+          // show popover
+          this.popover.open()
+          this.popoverHidden = false
+        } else {
+          this.popover.close()
+        }
+      }, 600)
+    }
+  }
+
+  mouseLeavePreviewButton() {
+    this.mouseOnPreview = false
+    this.maybeClosePopover()
+  }
+  maybeClosePopover() {
+    setTimeout(() => {
+      if (!this.mouseOnPreview) this.popover?.close()
+    }, 600)
+  }
+  mouseLeavePreview() {
+    this.mouseOnPreview = false
+    this.maybeClosePopover()
+  }
+  mouseEnterPreview() {
+      this.mouseOnPreview = true
   }
 
   getFolderSelect(){

@@ -143,7 +143,7 @@
               <label class="form-check-label" for="all-objects"></label>
             </div>
           </th>
-          <th scope="col" class="w-40" pngxSortable="name" [currentSortField]="sortField"
+          <th scope="col" class="w-30" pngxSortable="name" [currentSortField]="sortField"
               [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name
           </th>
           <!-- <th scope="col" class="fw-normal d-none d-sm-table-cell" pngxSortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th> -->
@@ -189,19 +189,30 @@
                 </td>
               } @else {
                 <td scope="row" class="d-md-table-cell">
-                  <button
-                    class="btn btn-link ms-0 ps-0 text-start"
-                    [routerLink]="userCanEdit(object) ? ['/documents', object.document_matching] : null"
-                    (click)="$event.stopPropagation()">
+<!--                  <button-->
+<!--                    class="btn btn-link ms-0 ps-0 text-start"-->
+<!--                    [routerLink]="userCanEdit(object) ? ['/documents', object.document_matching] : null"-->
+<!--                    (click)="$event.stopPropagation()">-->
 
+<!--                    <i-bs class="me-1 " name="file-earmark-pdf" width="2rem"-->
+<!--                          height="2rem"></i-bs>-->
+<!--                  </button>-->
+
+                  <a [href]="getPreviewUrl(object.document)" title="View Preview" i18n-title target="_blank" class="text-primary ms-0 ps-0 text-start"
+                    [ngbPopover]="previewContent" [popoverTitle]="object.document.title | documentTitle"
+                    autoClose="true" popoverClass="shadow popover-preview" container="body" (mouseenter)="mouseEnterPreviewButton(object.document)" (mouseleave)="mouseLeavePreviewButton()" #popover="ngbPopover">
                     <i-bs class="me-1 " name="file-earmark-pdf" width="2rem"
                           height="2rem"></i-bs>
-                  </button>
+                  </a>
                   <span class="custom-cursor"
-                        [routerLink]="userCanEdit(object) ? ['/documents', object.document_matching] : null"
-                        (click)="$event.stopPropagation()">   {{ object.name }}</span>
-
+                        [routerLink]="userCanEdit(object) ? ['/documents', object.document.id] : null"
+                        (click)="$event.stopPropagation()">   {{ object.name }}
+                  </span>
+                  <ng-template #previewContent>
+                    <pngx-preview-popup [document]="object.document" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()"></pngx-preview-popup>
+                  </ng-template>
                 </td>
+
               }
               <!-- <td scope="row" class="d-none d-sm-table-cell">{{ getMatching(object) }}</td> -->
 
@@ -222,8 +233,8 @@
                   }
                 </td>
               }
-              <td scope="row" class="d-md-table-cell">
-                <div class="btn-group d-block d-sm-none">
+              <td scope="row" class="d-lg-table-cell">
+                <div class="btn-group d-block d-xxl-none">
                   <div ngbDropdown class="d-inline-block">
                     <button type="button" class="btn btn-link" id="actionsMenuMobile"
                             (click)="$event.stopPropagation()"
@@ -246,26 +257,26 @@
                     </div>
                   </div>
                 </div>
-                <div class="btn-group d-none d-sm-block">
-                  <button class="btn btn-sm btn-outline-secondary"
-                          (click)="filterDocuments(object); $event.stopPropagation();"
-                          *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
-                    <i-bs width="1em" height="1em" name="filter"></i-bs>&nbsp;<ng-container i18n>Documents
-                  </ng-container>
-                  </button>
-                  <button class="btn btn-sm btn-outline-secondary"
-                          (click)="openEditDialog(object); $event.stopPropagation();"
-                          *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }"
-                          [disabled]="!userCanEdit(object)">
-                    <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
-                  </button>
-                  <button class="btn btn-sm btn-outline-danger"
-                          (click)="openDeleteDialog(object); $event.stopPropagation();"
-                          *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }"
-                          [disabled]="!userCanDelete(object)">
-                    <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
-                  </button>
-                </div>
+                <div class="btn-group d-none d-xxl-inline-flex">
+  <button class="btn btn-sm btn-outline-secondary"
+          (click)="filterDocuments(object); $event.stopPropagation();"
+          *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+    <i-bs width="1em" height="1em" name="filter"></i-bs>&nbsp;<ng-container i18n>Documents</ng-container>
+  </button>
+  <button class="btn btn-sm btn-outline-secondary"
+          (click)="openEditDialog(object); $event.stopPropagation();"
+          *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }"
+          [disabled]="!userCanEdit(object)">
+    <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
+  </button>
+  <button class="btn btn-sm btn-outline-danger"
+          (click)="openDeleteDialog(object); $event.stopPropagation();"
+          *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }"
+          [disabled]="!userCanDelete(object)">
+    <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+  </button>
+</div>
+
               </td>
             </tr>
           }
@@ -318,6 +329,4 @@
 
   </div>
 
-
-  <!--  </div>-->
 </div>

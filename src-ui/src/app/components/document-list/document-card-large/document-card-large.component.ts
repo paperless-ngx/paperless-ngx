@@ -119,7 +119,6 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
   mouseEnterPreview() {
     this.mouseOnPreview = true
     if (!this.popover.isOpen()) {
-      // we're going to open but hide to pre-load content during hover delay
       this.popover.open()
       this.popoverHidden = true
       setTimeout(() => {

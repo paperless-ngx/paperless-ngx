@@ -903,6 +903,58 @@ class DocumentSerializer(
 
         )
 
+class DocumentFolderSerializer(
+    OwnedObjectSerializer,
+):
+
+    original_file_name = SerializerMethodField()
+    archived_file_name = SerializerMethodField()
+
+    def to_representation(self, instance):
+        value = instance.created
+        return value.astimezone(timezone.get_default_timezone()).isoformat()
+
+    owner = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        required=False,
+        allow_null=True,
+    )
+    def get_original_file_name(self, obj):
+        return obj.original_filename
+
+    def get_archived_file_name(self, obj):
+        if obj.has_archive_version:
+            return obj.get_public_filename(archive=True)
+        else:
+            return None
+
+    def to_representation(self, instance):
+        doc = super().to_representation(instance)
+        return doc
+    def __init__(self, *args, **kwargs):
+
+
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        model = Document
+        depth = 1
+        fields = (
+            "id",
+            "title",
+            "created",
+            "created_date",
+            "modified",
+            "added",
+            "original_file_name",
+            "archived_file_name",
+            "owner",
+            "permissions",
+            "user_can_change",
+            "is_shared_by_requester",
+            "set_permissions",
+        )
+
 
 class SavedViewFilterRuleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -2184,19 +2236,13 @@ class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     name = AdjustedNameFieldFolder()
     document_count = serializers.SerializerMethodField()
-    document_matching = serializers.SerializerMethodField()
-    child_folder_count = serializers.SerializerMethodField()
     filesize = serializers.SerializerMethodField()
+    document = serializers.SerializerMethodField()
 
     def get_filesize(self, obj):
-        folder = Folder.objects.get(id=int(obj.id))
-        return self.get_folder_filesize(folder)
-
-    def get_folder_filesize(self, folder):
-        folders = Folder.objects.filter(path__startswith=folder.path)
-        documents = Document.objects.filter(folder__in=folders)
-        total_size_bytes = sum(os.path.getsize(doc.source_path) for doc in documents)
-        return total_size_bytes
+        if obj.type != Folder.FILE:
+            return 0
+        return os.path.getsize(obj.documents.first().archive_path)
 
     def get_document_count(self, obj):
         folders = Folder.objects.filter(path__startswith=obj.path)
@@ -2204,15 +2250,12 @@ class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 
         return documents.count()
 
-    def get_document_matching(self, obj):
+    def get_document(self, obj):
         if obj.type == Folder.FILE:
-            document = Document.objects.filter(folder=obj).first()
+            document = obj.documents.first()
             if document:
-                return document.id
+                return DocumentFolderSerializer(document).data
         return None
-
-    def get_child_folder_count(self, obj):
-        return Folder.objects.filter(parent_folder=obj).count()
 
     def validate(self, data):
         return data
@@ -2232,11 +2275,6 @@ class ExportDocumentFromFolderSerializer(serializers.Serializer):
             return Folder.objects.all().values_list('id', flat=True)
         return value
 
-
-# class CustomFieldInstanceDossierSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = CustomFieldInstance
-#         fields = '__all__'
 
 class ParentDossierTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     class Meta:

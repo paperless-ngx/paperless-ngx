@@ -50,17 +50,17 @@ export class FolderCardSmallComponent extends ComponentWithPermissions {
 
   @Output()
   toggleSelected = new EventEmitter()
-  @Output() 
+  @Output()
   filterDocuments = new EventEmitter<any>();
-  @Output() 
+  @Output()
   goToFolder = new EventEmitter<any>();
-  @Output() 
+  @Output()
   openEditDialog = new EventEmitter<any>();
-  @Output() 
+  @Output()
   openDeleteDialog = new EventEmitter<any>();
-  @Output() 
+  @Output()
   userCanEdit=new EventEmitter<any>();
-  @Output() 
+  @Output()
   userCanDelete=new EventEmitter<any>();
   // @Input() permissionType: PermissionType;
   @Input()
@@ -75,24 +75,24 @@ export class FolderCardSmallComponent extends ComponentWithPermissions {
 
   moreTags: number = null
 
-  
+
 
 
   mouseOnPreview = false
   popoverHidden = true
-  
+
   // getIsThumbInverted() {
   //   return this.settingsService.get(SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED)
   // }
 
-  
+
 
   get privateName() {
     return $localize`Private`
   }
 
   getThumbUrl(object: Folder) {
-    return this.documentService.getThumbUrl(object.document_matching)
+    return this.documentService.getThumbUrl(object.document.id)
   }
   // get notesEnabled(): boolean {
   //   return this.settingsService.get(SETTINGS_KEYS.NOTES_ENABLED)

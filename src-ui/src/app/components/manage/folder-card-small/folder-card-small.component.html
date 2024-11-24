@@ -3,7 +3,7 @@
     [class.popover-hidden]="popoverHidden" >
     <div class="border-bottom doc-img-container" [class.doc-img-background-selected]="selected"
       (click)="this.toggleSelected.emit($event)" (dblclick)="dblClickDocument.emit(this)">
-      
+
       <!-- @if ( folder.document_matching == null ){ -->
         <a class="me">
 
@@ -13,13 +13,13 @@
             <!-- <i-bs class="me-1" name="files"></i-bs> -->
             <i-bs class="me-1 d-flex justify-content-center align-items-center p-2" name="file-earmark-pdf" width="2rem" height="2rem"></i-bs>
           }
-         
+
         </a>
       <!-- }@else {
         <img class="card-img doc-img rounded-top"  [src]="getThumbUrl(folder)">
       } -->
-      
-       
+
+
       <div class="border-end border-bottom bg-light py-1 px-2 document-card-check">
         <div class="form-check">
           <!-- <input type="checkbox" class="form-check-input" id="smallCardCheck{{folder.id}}" [checked]="selected"
@@ -62,7 +62,7 @@
           {{folder.name | documentTitle}}
         </span>
       } @else {
-        <span class="card-text"  routerLink="/documents/{{this.folder.document_matching}}">
+        <span class="card-text"  routerLink="/documents/{{this.folder.document.id}}">
           <!-- @if (document.correspondent) {
           <a title="Toggle correspondent filter" i18n-title
             (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()"
@@ -162,14 +162,14 @@
             </button>
           }
 
-          
+
         </div>
       </div> -->
       <div class="d-flex justify-content-between align-items-center">
         <div class="btn-group w-100">
-          
-            
-            <!-- <button class="btn btn-sm btn-outline-secondary" (click)="filterDocuments(object); $event.stopPropagation();" title="Document" i18n-title 
+
+
+            <!-- <button class="btn btn-sm btn-outline-secondary" (click)="filterDocuments(object); $event.stopPropagation();" title="Document" i18n-title
               *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }" i18n-title>
               <i-bs name="filter"></i-bs>
             </button>
@@ -177,11 +177,11 @@
               *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType }" autoClose="true" [disabled]="!userCanEdit(folder)" >
               <i-bs name="pencil"></i-bs>
             </button>
-            <button class="btn btn-sm btn-outline-secondary" (click)="openDeleteDialog(folder); $event.stopPropagation();" title="Delete" i18n-title 
+            <button class="btn btn-sm btn-outline-secondary" (click)="openDeleteDialog(folder); $event.stopPropagation();" title="Delete" i18n-title
             *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType }" [disabled]="!userCanDelete(folder)">
               <i-bs name="trash"></i-bs>
             </button> -->
-            <button class="btn btn-sm btn-outline-secondary" (click)="this.filterDocuments.emit(this.foler); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+            <button class="btn btn-sm btn-outline-secondary" (click)="this.filterDocuments.emit(this.folder); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
               <i-bs name="filter"></i-bs>
             </button>
             <button class="btn btn-sm btn-outline-secondary" (click)="this.openEditDialog.emit(this.folder); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType }" [disabled]="userCanEdit.emit(this.folder)">
@@ -191,9 +191,9 @@
               <i-bs name="trash"></i-bs>
             </button>
 
-          
+
         </div>
-      </div> 
+      </div>
     </div>
   </div>
 </div>

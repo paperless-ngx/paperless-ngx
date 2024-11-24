@@ -2522,7 +2522,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             When(type='file', then=1),  # Gán giá trị 1 cho file
             output_field=IntegerField(),
         )
-    ).order_by('type_order', Lower('name'))
+    ).order_by('type_order', Lower('name')).prefetch_related('documents')
 
     serializer_class = FolderSerializer
     pagination_class = StandardPagination
