@@ -536,7 +536,7 @@
                <context context-type="linenumber">19</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
                <context context-type="linenumber">24</context>
             </context-group>
             <context-group purpose="location">
@@ -664,7 +664,7 @@
                <context context-type="linenumber">108</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
                <context context-type="linenumber">166</context>
             </context-group>
             <context-group purpose="location">
@@ -808,7 +808,7 @@
                <context context-type="linenumber">17</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
                <context context-type="linenumber">113</context>
             </context-group>
             <context-group purpose="location">
@@ -1060,11 +1060,11 @@
                <context context-type="linenumber">19</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
                <context context-type="linenumber">34</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
                <context context-type="linenumber">158</context>
             </context-group>
             <context-group purpose="location">
@@ -1206,8 +1206,8 @@
                <context context-type="linenumber">255</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">307</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
+               <context context-type="linenumber">323</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -2512,16 +2512,12 @@
                <context context-type="linenumber">34</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
                <context context-type="linenumber">58</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">266</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">285</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
+               <context context-type="linenumber">281</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
@@ -3062,8 +3058,8 @@
                <context context-type="linenumber">31</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">260</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
+               <context context-type="linenumber">275</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
@@ -3226,12 +3222,8 @@
                <context context-type="linenumber">72</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">407</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">482</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
+               <context context-type="linenumber">337</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
@@ -3302,12 +3294,8 @@
                <context context-type="linenumber">74</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">409</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">484</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
+               <context context-type="linenumber">339</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
@@ -4361,7 +4349,7 @@
                <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.ts</context>
                <context context-type="linenumber">19</context>
             </context-group>
-            <target state="translated">Không bao giờ</target>
+            <target state="translated">Không giới hạn</target>
          </trans-unit>
          <trans-unit id="3804284037932638327" datatype="html">
             <source>Create exploitation request</source>
@@ -6106,7 +6094,7 @@
                <context context-type="linenumber">52</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
                <context context-type="linenumber">70</context>
             </context-group>
             <context-group purpose="location">
@@ -6483,7 +6471,7 @@
                <context context-type="sourcefile">src/app/components/common/preview-popup/preview-popup.component.html</context>
                <context context-type="linenumber">4</context>
             </context-group>
-            <target state="translated">Error loading preview</target>
+            <target state="translated">Lỗi khi tải bản xem trước</target>
          </trans-unit>
          <trans-unit id="2984628903434675339" datatype="html">
             <source>Edit Profile</source>
@@ -7076,6 +7064,10 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
                <context context-type="linenumber">47</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
+               <context context-type="linenumber">201</context>
             </context-group>
             <target state="translated">Xem bản xem trước</target>
          </trans-unit>
@@ -7703,7 +7695,7 @@
                <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
                <context context-type="linenumber">282</context>
             </context-group>
-            <target state="translated">Preview</target>
+            <target state="translated">Xem trước</target>
          </trans-unit>
          <trans-unit id="7206723502037428235" datatype="html">
             <source>
@@ -7833,7 +7825,7 @@
                <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
                <context context-type="linenumber">587</context>
             </context-group>
-            <target state="translated">Error retrieving suggestions.</target>
+            <target state="translated">Có lỗi khi tìm kiếm gợi ý.</target>
          </trans-unit>
          <trans-unit id="8348337312757497317" datatype="html">
             <source>Document saved successfully.</source>
@@ -7845,7 +7837,7 @@
                <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
                <context context-type="linenumber">740</context>
             </context-group>
-            <target state="translated">Document saved successfully.</target>
+            <target state="translated">Tài liệu đã được lưu thành công.</target>
          </trans-unit>
          <trans-unit id="448882439049417053" datatype="html">
             <source>Error saving document</source>
@@ -7857,7 +7849,7 @@
                <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
                <context context-type="linenumber">785</context>
             </context-group>
-            <target state="translated">Error saving document</target>
+            <target state="translated">Lỗi khi lưu tài liệu</target>
          </trans-unit>
          <trans-unit id="9021887951960049161" datatype="html">
             <source>Confirm delete</source>
@@ -7880,14 +7872,6 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.ts</context>
                <context context-type="linenumber">427</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">281</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">405</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -7937,7 +7921,7 @@
                <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
                <context context-type="linenumber">835</context>
             </context-group>
-            <target state="translated">Error deleting document</target>
+            <target state="translated">Lỗi khi xóa tài liệu</target>
          </trans-unit>
          <trans-unit id="8575807054036244251" datatype="html">
             <source>Auto OCR Field confirm</source>
@@ -8017,7 +8001,7 @@
                <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
                <context context-type="linenumber">1196</context>
             </context-group>
-            <target state="translated">Split confirm</target>
+            <target state="translated">Xác nhận chia tách</target>
          </trans-unit>
          <trans-unit id="2805304563009985503" datatype="html">
             <source>This operation will split the selected document(s) into new documents.</source>
@@ -8025,7 +8009,7 @@
                <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
                <context context-type="linenumber">1197</context>
             </context-group>
-            <target state="translated">This operation will split the selected document(s) into new documents.</target>
+            <target state="translated">Hoạt động này sẽ chia tài liệu đã chọn thành các tài liệu mới.</target>
          </trans-unit>
          <trans-unit id="4158171846914923744" datatype="html">
             <source>Split operation will begin in the background.</source>
@@ -8033,7 +8017,7 @@
                <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
                <context context-type="linenumber">1212</context>
             </context-group>
-            <target state="translated">Split operation will begin in the background.</target>
+            <target state="translated">Hoạt động chia tách sẽ bắt đầu ở chế độ nền.</target>
          </trans-unit>
          <trans-unit id="3235014591864339926" datatype="html">
             <source>Error executing split operation</source>
@@ -8041,7 +8025,7 @@
                <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
                <context context-type="linenumber">1221</context>
             </context-group>
-            <target state="translated">Error executing split operation</target>
+            <target state="translated">Lỗi khi thực hiện thao tác chia tách</target>
          </trans-unit>
          <trans-unit id="6555329262222566158" datatype="html">
             <source>Rotate confirm</source>
@@ -8073,7 +8057,7 @@
                <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
                <context context-type="linenumber">840</context>
             </context-group>
-            <target state="translated">This will alter the original copy.</target>
+            <target state="translated">Điều này sẽ làm thay đổi bản gốc.</target>
          </trans-unit>
          <trans-unit id="4069543875319587651" datatype="html">
             <source>Rotation will begin in the background. Close and re-open the document after the operation has completed to see the changes.</source>
@@ -8303,7 +8287,7 @@
                <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
                <context context-type="linenumber">401</context>
             </context-group>
-            <target state="translated">Confirm tags assignment</target>
+            <target state="translated">Xác nhận gán thẻ</target>
          </trans-unit>
          <trans-unit id="6619516195038467207" datatype="html">
             <source>
@@ -8518,7 +8502,7 @@
                <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
                <context context-type="linenumber">548</context>
             </context-group>
-            <target state="translated">This operation will assign the storage path "</target>
+            <target state="translated">Hoạt động này sẽ chỉ định đường dẫn lưu trữ"</target>
          </trans-unit>
          <trans-unit id="60728365335056946" datatype="html">
             <source>
@@ -8864,7 +8848,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.ts</context>
-               <context context-type="linenumber">175</context>
+               <context context-type="linenumber">174</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.ts</context>
@@ -8880,7 +8864,7 @@
             <source>Error saving fieldSubmitted mining request failed.</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.ts</context>
-               <context context-type="linenumber">182</context>
+               <context context-type="linenumber">181</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.ts</context>
@@ -8959,7 +8943,7 @@
                <context context-type="linenumber">22</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
                <context context-type="linenumber">28</context>
             </context-group>
             <target state="translated">Chọn tất cả</target>
@@ -9627,7 +9611,7 @@
                <context context-type="linenumber">73</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
                <context context-type="linenumber">111</context>
             </context-group>
             <context-group purpose="location">
@@ -9663,7 +9647,7 @@
                <context context-type="linenumber">78,79</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
                <context context-type="linenumber">147,148</context>
             </context-group>
             <context-group purpose="location">
@@ -9683,7 +9667,7 @@
                <context context-type="linenumber">82,83</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
                <context context-type="linenumber">151,152</context>
             </context-group>
             <context-group purpose="location">
@@ -9703,8 +9687,8 @@
                <context context-type="linenumber">135,136</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">236,237</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
+               <context context-type="linenumber">251,252</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/shelf/shelf.component.html</context>
@@ -9723,8 +9707,8 @@
                <context context-type="linenumber">139,140</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">240,241</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
+               <context context-type="linenumber">255,256</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/shelf/shelf.component.html</context>
@@ -9743,8 +9727,8 @@
                <context context-type="linenumber">143,144</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">244,245</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
+               <context context-type="linenumber">259,260</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/shelf/shelf.component.html</context>
@@ -9763,8 +9747,8 @@
                <context context-type="linenumber">152,153</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">253,254</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
+               <context context-type="linenumber">268,269</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/shelf/shelf.component.html</context>
@@ -9799,8 +9783,8 @@
                <context context-type="linenumber">252</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">304</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
+               <context context-type="linenumber">320</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -9871,10 +9855,6 @@
                <context context-type="linenumber">252</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">230</context>
-            </context-group>
-            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
                <context context-type="linenumber">166</context>
             </context-group>
@@ -9909,10 +9889,6 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.ts</context>
                <context context-type="linenumber">257</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">235</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -10007,10 +9983,6 @@
                <context context-type="linenumber">141</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">137</context>
-            </context-group>
-            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
                <context context-type="linenumber">122</context>
             </context-group>
@@ -10029,10 +10001,6 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.ts</context>
                <context context-type="linenumber">143</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">139</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -10059,10 +10027,6 @@
                <context context-type="linenumber">274</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">251</context>
-            </context-group>
-            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
                <context context-type="linenumber">186</context>
             </context-group>
@@ -10085,10 +10049,6 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.ts</context>
                <context context-type="linenumber">279</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">256</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -10135,10 +10095,6 @@
                <context context-type="linenumber">306</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">283</context>
-            </context-group>
-            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
                <context context-type="linenumber">211</context>
             </context-group>
@@ -10153,10 +10109,6 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.ts</context>
                <context context-type="linenumber">322</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">299</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -10175,10 +10127,6 @@
                <context context-type="linenumber">407</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">385</context>
-            </context-group>
-            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
                <context context-type="linenumber">327</context>
             </context-group>
@@ -10193,10 +10141,6 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.ts</context>
                <context context-type="linenumber">414</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">392</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
@@ -10219,10 +10163,6 @@
                <context context-type="linenumber">428</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">406</context>
-            </context-group>
-            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
                <context context-type="linenumber">348</context>
             </context-group>
@@ -10239,10 +10179,6 @@
                <context context-type="linenumber">442</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">421</context>
-            </context-group>
-            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
                <context context-type="linenumber">362</context>
             </context-group>
@@ -10257,10 +10193,6 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.ts</context>
                <context context-type="linenumber">448</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">427</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -10380,78 +10312,6 @@
             </context-group>
             <target state="translated">Lỗi xóa trường</target>
          </trans-unit>
-         <trans-unit id="3804037606764273869" datatype="html">
-            <source>Cut</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">20</context>
-            </context-group>
-            <target state="translated">Di chuyển</target>
-         </trans-unit>
-         <trans-unit id="8890504809170904482" datatype="html">
-            <source>Paste</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">63</context>
-            </context-group>
-            <target state="translated">Dán</target>
-         </trans-unit>
-         <trans-unit id="9211071915988621328" datatype="html">
-            <source>Cancel cut</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">66</context>
-            </context-group>
-            <target state="needs-translation">Cancel cut</target>
-         </trans-unit>
-         <trans-unit id="342662241267492860" datatype="html">
-            <source>Folder Tree</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">122</context>
-            </context-group>
-            <target state="translated">Cây thư mục</target>
-         </trans-unit>
-         <trans-unit id="5068765454253428187" datatype="html">
-            <source>No folders defined.</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.html</context>
-               <context context-type="linenumber">276</context>
-            </context-group>
-            <target state="translated">Không có tài liệu xác định.</target>
-         </trans-unit>
-         <trans-unit id="2636341142529824389" datatype="html">
-            <source>Confirm update</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">480</context>
-            </context-group>
-            <target state="translated">Xác nhận cập nhật</target>
-         </trans-unit>
-         <trans-unit id="1743564456946375306" datatype="html">
-            <source>This operation will permanently update all objects.</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">481</context>
-            </context-group>
-            <target state="translated">Hành động này sẽ cập nhật vĩnh viễn tất cả các đối tượng.</target>
-         </trans-unit>
-         <trans-unit id="331020237076232956" datatype="html">
-            <source>Objects update successfully</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">498</context>
-            </context-group>
-            <target state="translated">Đối tượng cập nhật thành công</target>
-         </trans-unit>
-         <trans-unit id="5120718024775031361" datatype="html">
-            <source>Error updating objects</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-folder-list/custom-folder-list.component.ts</context>
-               <context context-type="linenumber">516</context>
-            </context-group>
-            <target state="translated">Lỗi khi cập nhật đối tượng</target>
-         </trans-unit>
          <trans-unit id="8084492669582894778" datatype="html">
             <source>document type</source>
             <context-group purpose="location">
@@ -10548,21 +10408,101 @@
                "?
             </target>
          </trans-unit>
-         <trans-unit id="1433656264377559703" datatype="html">
-            <source>folder</source>
+         <trans-unit id="3804037606764273869" datatype="html">
+            <source>Cut</source>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-               <context context-type="linenumber">52</context>
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
+               <context context-type="linenumber">20</context>
             </context-group>
-            <target state="translated">thư mục</target>
+            <target state="translated">Di chuyển</target>
          </trans-unit>
-         <trans-unit id="3037543638839191476" datatype="html">
-            <source>folders</source>
+         <trans-unit id="8890504809170904482" datatype="html">
+            <source>Paste</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
+               <context context-type="linenumber">63</context>
+            </context-group>
+            <target state="translated">Dán</target>
+         </trans-unit>
+         <trans-unit id="9211071915988621328" datatype="html">
+            <source>Cancel cut</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
+               <context context-type="linenumber">66</context>
+            </context-group>
+            <target state="translated">Cancel cut</target>
+         </trans-unit>
+         <trans-unit id="342662241267492860" datatype="html">
+            <source>Folder Tree</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
+               <context context-type="linenumber">122</context>
+            </context-group>
+            <target state="translated">Cây thư mục</target>
+         </trans-unit>
+         <trans-unit id="6770855997254078774" datatype="html">
+            <source>No files defined.</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
+               <context context-type="linenumber">292</context>
+            </context-group>
+            <target state="needs-translation">Không có file được xác định.</target>
+         </trans-unit>
+         <trans-unit id="3346091623266062200" datatype="html">
+            <source>file</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-               <context context-type="linenumber">53</context>
+               <context context-type="linenumber">65</context>
             </context-group>
-            <target state="translated">thư mục</target>
+            <target state="needs-translation">file</target>
+         </trans-unit>
+         <trans-unit id="6889473896134264260" datatype="html">
+            <source>files</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
+               <context context-type="linenumber">66</context>
+            </context-group>
+            <target state="needs-translation">files</target>
+         </trans-unit>
+         <trans-unit id="45739481977493163" datatype="html">
+            <source>Size</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
+               <context context-type="linenumber">70</context>
+            </context-group>
+            <target state="needs-translation">Dung lượng</target>
+         </trans-unit>
+         <trans-unit id="2636341142529824389" datatype="html">
+            <source>Confirm update</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
+               <context context-type="linenumber">335</context>
+            </context-group>
+            <target state="translated">Xác nhận cập nhật</target>
+         </trans-unit>
+         <trans-unit id="1743564456946375306" datatype="html">
+            <source>This operation will permanently update all objects.</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
+               <context context-type="linenumber">336</context>
+            </context-group>
+            <target state="translated">Hành động này sẽ cập nhật vĩnh viễn tất cả các đối tượng.</target>
+         </trans-unit>
+         <trans-unit id="331020237076232956" datatype="html">
+            <source>Objects update successfully</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
+               <context context-type="linenumber">353</context>
+            </context-group>
+            <target state="translated">Đối tượng cập nhật thành công</target>
+         </trans-unit>
+         <trans-unit id="5120718024775031361" datatype="html">
+            <source>Error updating objects</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
+               <context context-type="linenumber">370</context>
+            </context-group>
+            <target state="translated">Lỗi khi cập nhật đối tượng</target>
          </trans-unit>
          <trans-unit id="6970443300968731345" datatype="html">
             <source>
@@ -10572,7 +10512,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-               <context context-type="linenumber">147</context>
+               <context context-type="linenumber">379</context>
             </context-group>
             <target state="translated">
                Bạn có thực sự muốn xóa file "
@@ -10710,7 +10650,7 @@
                <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
                <context context-type="linenumber">132</context>
             </context-group>
-            <target state="translated">Error deleting mail account.</target>
+            <target state="translated">Có lỗi khi xóa tài khoản email.</target>
          </trans-unit>
          <trans-unit id="123368655395433699" datatype="html">
             <source>
