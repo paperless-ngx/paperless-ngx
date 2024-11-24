@@ -49,10 +49,13 @@ from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema_view
 from langdetect import detect
 from packaging import version as packaging_version
 from redis import Redis
 from rest_framework import parsers
+from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 from rest_framework.filters import OrderingFilter
@@ -916,6 +919,25 @@ class UnifiedSearchViewSet(DocumentViewSet):
         return Response(max_asn + 1)
 
 
+@extend_schema_view(
+    list=extend_schema(
+        description="Logs view",
+        responses={
+            (200, "application/json"): serializers.ListSerializer(
+                child=serializers.CharField(),
+            ),
+        },
+    ),
+    retrieve=extend_schema(
+        description="Single log view",
+        responses={
+            (200, "application/json"): serializers.ListSerializer(
+                child=serializers.CharField(),
+            ),
+            (404, "application/json"): None,
+        },
+    ),
+)
 class LogViewSet(ViewSet):
     permission_classes = (IsAuthenticated, PaperlessAdminPermissions)
 
