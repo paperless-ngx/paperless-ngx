@@ -29,11 +29,11 @@
   </button>
   <div ngbDropdown>
 
-    <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
-      <i-bs name="three-dots"></i-bs>
-      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container>
-      </div>
-    </button>
+<!--    <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>-->
+<!--      <i-bs name="three-dots"></i-bs>-->
+<!--      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container>-->
+<!--      </div>-->
+<!--    </button>-->
     <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
       <!-- <button ngbDropdownItem (click)="redoOcrSelected()" [disabled]="!userCanEditAll">
         <i-bs name="body-text"></i-bs>&nbsp;<ng-container i18n>Redo OCR</ng-container>
@@ -143,7 +143,7 @@
               <label class="form-check-label" for="all-objects"></label>
             </div>
           </th>
-          <th scope="col" class="w-30" pngxSortable="name" [currentSortField]="sortField"
+          <th scope="col" class="d-xl-table-cell" pngxSortable="name" [currentSortField]="sortField"
               [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name
           </th>
           <!-- <th scope="col" class="fw-normal d-none d-sm-table-cell" pngxSortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th> -->
