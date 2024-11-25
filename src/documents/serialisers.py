@@ -2235,9 +2235,9 @@ class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 
 class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     name = AdjustedNameFieldFolder()
-    document_count = serializers.SerializerMethodField()
-    filesize = serializers.SerializerMethodField()
-    document = serializers.SerializerMethodField()
+    document_count = serializers.SerializerMethodField(read_only=True)
+    filesize = serializers.SerializerMethodField(read_only=True)
+    document = serializers.SerializerMethodField(read_only=True)
 
     def get_filesize(self, obj):
         if obj.type == Folder.FOLDER:

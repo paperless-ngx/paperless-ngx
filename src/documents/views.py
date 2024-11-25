@@ -50,7 +50,7 @@ from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
-from guardian.shortcuts import  get_perms
+from guardian.shortcuts import get_perms, get_users_with_perms
 from langdetect import detect
 from packaging import version as packaging_version
 
@@ -135,7 +135,9 @@ from documents.models import Folder
 
 from documents.parsers import custom_get_parser_class_for_mime_type
 from documents.parsers import parse_date_generator
-from documents.permissions import PaperlessAdminPermissions, check_user_can_change_folder
+from documents.permissions import PaperlessAdminPermissions, \
+    check_user_can_change_folder, update_view_folder_parent_permissions, \
+    get_groups_with_only_permission
 from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
@@ -2054,6 +2056,22 @@ class BulkEditObjectsView(PassUserMixin):
 
                     else:
                         folder.path = f"{folder.id}"
+
+                    groups = get_groups_with_only_permission(folder,"view_folder")
+                    users = get_users_with_perms(folder, attach_perms=False, with_group_users = False)
+                    # logger.debug("users", users, groups, folder)
+                    permissions = {
+                        "view": {
+                            "users": users,
+                            "groups": groups,
+                        },
+                        "change": {
+                            "users": [],
+                            "groups": [],
+                        },
+                    }
+
+                    update_view_folder_parent_permissions(folder, permissions)
                     folder.save()
                     self.update_child_folder_paths(folder)
 
@@ -2778,20 +2796,8 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             child_folder.save()
             self.update_child_folder_paths(child_folder)
 
-    def update_view_folder_parent_permissions(self, folder, permissions):
-        list_folder_ids = folder.path.split("/")
-        folders_list = Folder.objects.filter(id__in = list_folder_ids)
-        permissions["change"] = {
-            "users": [],
-            "groups": [],
-        }
-        for obj in folders_list:
-            set_permissions_for_object(
-                permissions=permissions,
-                object=obj.dossier,
-                merge=True,
-            )
-        logger.debug("noi dung test", folders_list)
+
+
     def update_child_folder_permisisons(self, folder, serializer):
         child_folders = Folder.objects.filter(path__startswith=folder.path)
         documents_list = Document.objects.select_related("dossier").filter(folder__in=child_folders)
@@ -2801,7 +2807,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         #         documents_list._append(child.o)
 
         permissions = serializer.validated_data.get("set_permissions")
-        self.update_view_folder_parent_permissions(folder, serializer)
+        update_view_folder_parent_permissions(folder, permissions)
         owner = serializer.validated_data.get("owner")
         merge = serializer.validated_data.get("merge")
 
