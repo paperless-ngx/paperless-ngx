@@ -15,6 +15,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import RedirectView
 from django.views.static import serve
+from drf_spectacular.views import SpectacularAPIView
+from drf_spectacular.views import SpectacularRedocView
+from drf_spectacular.views import SpectacularSwaggerView
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
@@ -316,6 +319,12 @@ urlpatterns = [
             ],
         ),
     ),
+    # drf spectacular
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    # Optional UI:
+    path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path("api/schema/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
+
     # Root of the Frontend
     re_path(
         r".*",
@@ -323,7 +332,6 @@ urlpatterns = [
         name="base",
     ),
 ]
-
 
 websocket_urlpatterns = [
     path(settings.BASE_URL.lstrip("/") + "ws/status/", StatusConsumer.as_asgi()),

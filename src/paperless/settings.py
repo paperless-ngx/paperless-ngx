@@ -359,11 +359,27 @@ MIDDLEWARE = [
 ]
 SPECTACULAR_SETTINGS = {
     "TITLE": "Paperless API",
-    "DESCRIPTION": "Generated with drf-spectacular (unmodified) python manage.py spectacular --color --file schema.yml",
-    "VERSION": "5.0.0",
-    "SERVE_INCLUDE_SCHEMA": False,
-    # OTHER SETTINGS
-}# Optional to enable compression
+    "DESCRIPTION": """
+        WARNING: Not yet complete due to errors in the processing of the API Information
+        """,
+    "VERSION": "6.0.0",
+    "SERVE_INCLUDE_SCHEMA": True,
+    "SERVER_PUBLIC": True,
+    "COMPONENT_SPLIT_REQUEST": True,
+    # swagger ui
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "persistAuthorization": True,
+        "displayOperationId": True,
+    },
+    # available SwaggerUI versions: https://github.com/swagger-api/swagger-ui/releases
+    "SWAGGER_UI_DIST": "https://cdn.jsdelivr.net/npm/swagger-ui-dist@latest", # default
+    # redoc
+    "REDOC_UI_SETTINGS": {},
+    "REDOC_DIST": "https://cdn.jsdelivr.net/npm/redoc@latest",
+}
+
+# Optional to enable compression
 if __get_boolean("PAPERLESS_ENABLE_COMPRESSION", "yes"):  # pragma: no cover
     MIDDLEWARE.insert(0, "compression_middleware.middleware.CompressionMiddleware")
 

@@ -1,0 +1,7439 @@
+openapi: 3.0.3
+info:
+  title: Paperless API
+  version: 6.0.0
+  description: Generated with drf-spectacular (unmodified) python manage.py spectacular
+    --color --file schema.yml
+paths:
+  /api/acknowledge_tasks/:
+    post:
+      operationId: acknowledge_tasks_create
+      tags:
+      - acknowledge_tasks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcknowledgeTasksView'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AcknowledgeTasksView'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AcknowledgeTasksView'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcknowledgeTasksView'
+          description: ''
+  /api/bulk_edit_objects/:
+    post:
+      operationId: bulk_edit_objects_create
+      description: Pass a user object to serializer
+      tags:
+      - bulk_edit_objects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkEditObjects'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkEditObjects'
+          description: ''
+  /api/config/:
+    get:
+      operationId: config_list
+      tags:
+      - config
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApplicationConfiguration'
+          description: ''
+    post:
+      operationId: config_create
+      tags:
+      - config
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationConfiguration'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ApplicationConfiguration'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ApplicationConfiguration'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationConfiguration'
+          description: ''
+  /api/config/{id}/:
+    get:
+      operationId: config_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this paperless application
+          settings.
+        required: true
+      tags:
+      - config
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationConfiguration'
+          description: ''
+    put:
+      operationId: config_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this paperless application
+          settings.
+        required: true
+      tags:
+      - config
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationConfiguration'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ApplicationConfiguration'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ApplicationConfiguration'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationConfiguration'
+          description: ''
+    patch:
+      operationId: config_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this paperless application
+          settings.
+        required: true
+      tags:
+      - config
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedApplicationConfiguration'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedApplicationConfiguration'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedApplicationConfiguration'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationConfiguration'
+          description: ''
+    delete:
+      operationId: config_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this paperless application
+          settings.
+        required: true
+      tags:
+      - config
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/correspondents/:
+    get:
+      operationId: correspondents_list
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: integer
+      - in: query
+        name: id__in
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: name__icontains
+        schema:
+          type: string
+      - in: query
+        name: name__iendswith
+        schema:
+          type: string
+      - in: query
+        name: name__iexact
+        schema:
+          type: string
+      - in: query
+        name: name__istartswith
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - correspondents
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCorrespondentList'
+          description: ''
+    post:
+      operationId: correspondents_create
+      tags:
+      - correspondents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Correspondent'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Correspondent'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Correspondent'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Correspondent'
+          description: ''
+  /api/correspondents/{id}/:
+    get:
+      operationId: correspondents_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this correspondent.
+        required: true
+      tags:
+      - correspondents
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Correspondent'
+          description: ''
+    put:
+      operationId: correspondents_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this correspondent.
+        required: true
+      tags:
+      - correspondents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Correspondent'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Correspondent'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Correspondent'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Correspondent'
+          description: ''
+    patch:
+      operationId: correspondents_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this correspondent.
+        required: true
+      tags:
+      - correspondents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCorrespondent'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCorrespondent'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCorrespondent'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Correspondent'
+          description: ''
+    delete:
+      operationId: correspondents_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this correspondent.
+        required: true
+      tags:
+      - correspondents
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/custom_fields/:
+    get:
+      operationId: custom_fields_list
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: integer
+      - in: query
+        name: id__in
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: name__icontains
+        schema:
+          type: string
+      - in: query
+        name: name__iendswith
+        schema:
+          type: string
+      - in: query
+        name: name__iexact
+        schema:
+          type: string
+      - in: query
+        name: name__istartswith
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - custom_fields
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCustomFieldList'
+          description: ''
+    post:
+      operationId: custom_fields_create
+      tags:
+      - custom_fields
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomField'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomField'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomField'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomField'
+          description: ''
+  /api/custom_fields/{id}/:
+    get:
+      operationId: custom_fields_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this custom field.
+        required: true
+      tags:
+      - custom_fields
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomField'
+          description: ''
+    put:
+      operationId: custom_fields_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this custom field.
+        required: true
+      tags:
+      - custom_fields
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomField'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomField'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomField'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomField'
+          description: ''
+    patch:
+      operationId: custom_fields_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this custom field.
+        required: true
+      tags:
+      - custom_fields
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomField'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomField'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomField'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomField'
+          description: ''
+    delete:
+      operationId: custom_fields_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this custom field.
+        required: true
+      tags:
+      - custom_fields
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/document_types/:
+    get:
+      operationId: document_types_list
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: integer
+      - in: query
+        name: id__in
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: name__icontains
+        schema:
+          type: string
+      - in: query
+        name: name__iendswith
+        schema:
+          type: string
+      - in: query
+        name: name__iexact
+        schema:
+          type: string
+      - in: query
+        name: name__istartswith
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - document_types
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDocumentTypeList'
+          description: ''
+    post:
+      operationId: document_types_create
+      tags:
+      - document_types
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentType'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DocumentType'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DocumentType'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentType'
+          description: ''
+  /api/document_types/{id}/:
+    get:
+      operationId: document_types_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this document type.
+        required: true
+      tags:
+      - document_types
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentType'
+          description: ''
+    put:
+      operationId: document_types_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this document type.
+        required: true
+      tags:
+      - document_types
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentType'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DocumentType'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DocumentType'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentType'
+          description: ''
+    patch:
+      operationId: document_types_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this document type.
+        required: true
+      tags:
+      - document_types
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDocumentType'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDocumentType'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDocumentType'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentType'
+          description: ''
+    delete:
+      operationId: document_types_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this document type.
+        required: true
+      tags:
+      - document_types
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/documents/:
+    get:
+      operationId: documents_list
+      description: Pass a user object to serializer
+      parameters:
+      - in: query
+        name: added__date__gt
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: added__date__lt
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: added__day
+        schema:
+          type: number
+      - in: query
+        name: added__gt
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: added__lt
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: added__month
+        schema:
+          type: number
+      - in: query
+        name: added__year
+        schema:
+          type: number
+      - in: query
+        name: archive_serial_number
+        schema:
+          type: integer
+      - in: query
+        name: archive_serial_number__gt
+        schema:
+          type: integer
+      - in: query
+        name: archive_serial_number__gte
+        schema:
+          type: integer
+      - in: query
+        name: archive_serial_number__isnull
+        schema:
+          type: boolean
+      - in: query
+        name: archive_serial_number__lt
+        schema:
+          type: integer
+      - in: query
+        name: archive_serial_number__lte
+        schema:
+          type: integer
+      - in: query
+        name: checksum__icontains
+        schema:
+          type: string
+      - in: query
+        name: checksum__iendswith
+        schema:
+          type: string
+      - in: query
+        name: checksum__iexact
+        schema:
+          type: string
+      - in: query
+        name: checksum__istartswith
+        schema:
+          type: string
+      - in: query
+        name: content__icontains
+        schema:
+          type: string
+      - in: query
+        name: content__iendswith
+        schema:
+          type: string
+      - in: query
+        name: content__iexact
+        schema:
+          type: string
+      - in: query
+        name: content__istartswith
+        schema:
+          type: string
+      - in: query
+        name: correspondent__id
+        schema:
+          type: integer
+      - in: query
+        name: correspondent__id__in
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: correspondent__id__none
+        schema:
+          type: integer
+      - in: query
+        name: correspondent__isnull
+        schema:
+          type: boolean
+      - in: query
+        name: correspondent__name__icontains
+        schema:
+          type: string
+      - in: query
+        name: correspondent__name__iendswith
+        schema:
+          type: string
+      - in: query
+        name: correspondent__name__iexact
+        schema:
+          type: string
+      - in: query
+        name: correspondent__name__istartswith
+        schema:
+          type: string
+      - in: query
+        name: created__date__gt
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: created__date__lt
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: created__day
+        schema:
+          type: number
+      - in: query
+        name: created__gt
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: created__lt
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: created__month
+        schema:
+          type: number
+      - in: query
+        name: created__year
+        schema:
+          type: number
+      - in: query
+        name: custom_field_query
+        schema:
+          type: string
+      - in: query
+        name: custom_fields__icontains
+        schema:
+          type: string
+      - in: query
+        name: custom_fields__id__all
+        schema:
+          type: integer
+      - in: query
+        name: custom_fields__id__in
+        schema:
+          type: integer
+      - in: query
+        name: custom_fields__id__none
+        schema:
+          type: integer
+      - in: query
+        name: document_type__id
+        schema:
+          type: integer
+      - in: query
+        name: document_type__id__in
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: document_type__id__none
+        schema:
+          type: integer
+      - in: query
+        name: document_type__isnull
+        schema:
+          type: boolean
+      - in: query
+        name: document_type__name__icontains
+        schema:
+          type: string
+      - in: query
+        name: document_type__name__iendswith
+        schema:
+          type: string
+      - in: query
+        name: document_type__name__iexact
+        schema:
+          type: string
+      - in: query
+        name: document_type__name__istartswith
+        schema:
+          type: string
+      - in: query
+        name: has_custom_fields
+        schema:
+          type: boolean
+        description: Has custom field
+      - in: query
+        name: id
+        schema:
+          type: integer
+      - in: query
+        name: id__in
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: is_in_inbox
+        schema:
+          type: string
+      - in: query
+        name: is_tagged
+        schema:
+          type: boolean
+        description: Is tagged
+      - in: query
+        name: modified__date__gt
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: modified__date__lt
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: modified__day
+        schema:
+          type: number
+      - in: query
+        name: modified__gt
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: modified__lt
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: modified__month
+        schema:
+          type: number
+      - in: query
+        name: modified__year
+        schema:
+          type: number
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - in: query
+        name: original_filename__icontains
+        schema:
+          type: string
+      - in: query
+        name: original_filename__iendswith
+        schema:
+          type: string
+      - in: query
+        name: original_filename__iexact
+        schema:
+          type: string
+      - in: query
+        name: original_filename__istartswith
+        schema:
+          type: string
+      - in: query
+        name: owner__id
+        schema:
+          type: integer
+      - in: query
+        name: owner__id__in
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: owner__id__none
+        schema:
+          type: integer
+      - in: query
+        name: owner__isnull
+        schema:
+          type: boolean
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: shared_by__id
+        schema:
+          type: string
+      - in: query
+        name: storage_path__id
+        schema:
+          type: integer
+      - in: query
+        name: storage_path__id__in
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: storage_path__id__none
+        schema:
+          type: integer
+      - in: query
+        name: storage_path__isnull
+        schema:
+          type: boolean
+      - in: query
+        name: storage_path__name__icontains
+        schema:
+          type: string
+      - in: query
+        name: storage_path__name__iendswith
+        schema:
+          type: string
+      - in: query
+        name: storage_path__name__iexact
+        schema:
+          type: string
+      - in: query
+        name: storage_path__name__istartswith
+        schema:
+          type: string
+      - in: query
+        name: tags__id
+        schema:
+          type: integer
+      - in: query
+        name: tags__id__all
+        schema:
+          type: integer
+      - in: query
+        name: tags__id__in
+        schema:
+          type: integer
+      - in: query
+        name: tags__id__none
+        schema:
+          type: integer
+      - in: query
+        name: tags__name__icontains
+        schema:
+          type: string
+      - in: query
+        name: tags__name__iendswith
+        schema:
+          type: string
+      - in: query
+        name: tags__name__iexact
+        schema:
+          type: string
+      - in: query
+        name: tags__name__istartswith
+        schema:
+          type: string
+      - in: query
+        name: title__icontains
+        schema:
+          type: string
+      - in: query
+        name: title__iendswith
+        schema:
+          type: string
+      - in: query
+        name: title__iexact
+        schema:
+          type: string
+      - in: query
+        name: title__istartswith
+        schema:
+          type: string
+      - in: query
+        name: title_content
+        schema:
+          type: string
+      tags:
+      - documents
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDocumentList'
+          description: ''
+  /api/documents/{id}/:
+    get:
+      operationId: documents_retrieve
+      description: Pass a user object to serializer
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this document.
+        required: true
+      tags:
+      - documents
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+    put:
+      operationId: documents_update
+      description: Pass a user object to serializer
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this document.
+        required: true
+      tags:
+      - documents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Document'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Document'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Document'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+    patch:
+      operationId: documents_partial_update
+      description: Pass a user object to serializer
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this document.
+        required: true
+      tags:
+      - documents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDocument'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDocument'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDocument'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+    delete:
+      operationId: documents_destroy
+      description: Pass a user object to serializer
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this document.
+        required: true
+      tags:
+      - documents
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/documents/{id}/download/:
+    get:
+      operationId: documents_download_retrieve
+      description: Pass a user object to serializer
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this document.
+        required: true
+      tags:
+      - documents
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+  /api/documents/{id}/history/:
+    get:
+      operationId: documents_history_retrieve
+      description: Pass a user object to serializer
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this document.
+        required: true
+      tags:
+      - documents
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+  /api/documents/{id}/metadata/:
+    get:
+      operationId: documents_metadata_retrieve
+      description: Pass a user object to serializer
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this document.
+        required: true
+      tags:
+      - documents
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+  /api/documents/{id}/notes/:
+    get:
+      operationId: documents_notes_retrieve
+      description: Pass a user object to serializer
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this document.
+        required: true
+      tags:
+      - documents
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+    post:
+      operationId: documents_notes_create
+      description: Pass a user object to serializer
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this document.
+        required: true
+      tags:
+      - documents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Document'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Document'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Document'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+    delete:
+      operationId: documents_notes_destroy
+      description: Pass a user object to serializer
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this document.
+        required: true
+      tags:
+      - documents
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/documents/{id}/preview/:
+    get:
+      operationId: documents_preview_retrieve
+      description: Pass a user object to serializer
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this document.
+        required: true
+      tags:
+      - documents
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+  /api/documents/{id}/share_links/:
+    get:
+      operationId: documents_share_links_retrieve
+      description: Pass a user object to serializer
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this document.
+        required: true
+      tags:
+      - documents
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+  /api/documents/{id}/suggestions/:
+    get:
+      operationId: documents_suggestions_retrieve
+      description: Pass a user object to serializer
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this document.
+        required: true
+      tags:
+      - documents
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+  /api/documents/{id}/thumb/:
+    get:
+      operationId: documents_thumb_retrieve
+      description: Pass a user object to serializer
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this document.
+        required: true
+      tags:
+      - documents
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+  /api/documents/bulk_download/:
+    post:
+      operationId: documents_bulk_download_create
+      tags:
+      - documents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkDownload'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkDownload'
+          description: ''
+  /api/documents/bulk_edit/:
+    post:
+      operationId: documents_bulk_edit_create
+      description: Pass a user object to serializer
+      tags:
+      - documents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkEdit'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkEdit'
+          description: ''
+  /api/documents/next_asn/:
+    get:
+      operationId: documents_next_asn_retrieve
+      description: Pass a user object to serializer
+      tags:
+      - documents
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: ''
+  /api/documents/post_document/:
+    post:
+      operationId: documents_post_document_create
+      tags:
+      - documents
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PostDocument'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostDocument'
+          description: ''
+  /api/documents/selection_data/:
+    post:
+      operationId: documents_selection_data_create
+      tags:
+      - documents
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DocumentList'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentList'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentList'
+          description: ''
+  /api/groups/:
+    get:
+      operationId: groups_list
+      parameters:
+      - in: query
+        name: name__icontains
+        schema:
+          type: string
+      - in: query
+        name: name__iendswith
+        schema:
+          type: string
+      - in: query
+        name: name__iexact
+        schema:
+          type: string
+      - in: query
+        name: name__istartswith
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - groups
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedGroupList'
+          description: ''
+    post:
+      operationId: groups_create
+      tags:
+      - groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Group'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Group'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+          description: ''
+  /api/groups/{id}/:
+    get:
+      operationId: groups_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this group.
+        required: true
+      tags:
+      - groups
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+          description: ''
+    put:
+      operationId: groups_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this group.
+        required: true
+      tags:
+      - groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Group'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Group'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+          description: ''
+    patch:
+      operationId: groups_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this group.
+        required: true
+      tags:
+      - groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedGroup'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedGroup'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedGroup'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+          description: ''
+    delete:
+      operationId: groups_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this group.
+        required: true
+      tags:
+      - groups
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/logs/:
+    get:
+      operationId: logs_retrieve
+      tags:
+      - logs
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/logs/{id}/:
+    get:
+      operationId: logs_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - logs
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/mail_accounts/:
+    get:
+      operationId: mail_accounts_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - mail_accounts
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMailAccountList'
+          description: ''
+    post:
+      operationId: mail_accounts_create
+      tags:
+      - mail_accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MailAccount'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MailAccount'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MailAccount'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailAccount'
+          description: ''
+  /api/mail_accounts/{id}/:
+    get:
+      operationId: mail_accounts_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this mail account.
+        required: true
+      tags:
+      - mail_accounts
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailAccount'
+          description: ''
+    put:
+      operationId: mail_accounts_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this mail account.
+        required: true
+      tags:
+      - mail_accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MailAccount'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MailAccount'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MailAccount'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailAccount'
+          description: ''
+    patch:
+      operationId: mail_accounts_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this mail account.
+        required: true
+      tags:
+      - mail_accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMailAccount'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMailAccount'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMailAccount'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailAccount'
+          description: ''
+    delete:
+      operationId: mail_accounts_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this mail account.
+        required: true
+      tags:
+      - mail_accounts
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/mail_accounts/test/:
+    post:
+      operationId: mail_accounts_test_create
+      tags:
+      - mail_accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MailAccount'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MailAccount'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MailAccount'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailAccount'
+          description: ''
+  /api/mail_rules/:
+    get:
+      operationId: mail_rules_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - mail_rules
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMailRuleList'
+          description: ''
+    post:
+      operationId: mail_rules_create
+      tags:
+      - mail_rules
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MailRule'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MailRule'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MailRule'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailRule'
+          description: ''
+  /api/mail_rules/{id}/:
+    get:
+      operationId: mail_rules_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this mail rule.
+        required: true
+      tags:
+      - mail_rules
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailRule'
+          description: ''
+    put:
+      operationId: mail_rules_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this mail rule.
+        required: true
+      tags:
+      - mail_rules
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MailRule'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MailRule'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MailRule'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailRule'
+          description: ''
+    patch:
+      operationId: mail_rules_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this mail rule.
+        required: true
+      tags:
+      - mail_rules
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMailRule'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMailRule'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMailRule'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailRule'
+          description: ''
+    delete:
+      operationId: mail_rules_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this mail rule.
+        required: true
+      tags:
+      - mail_rules
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/oauth/callback/:
+    get:
+      operationId: oauth_callback_retrieve
+      tags:
+      - oauth
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/profile/:
+    get:
+      operationId: profile_retrieve
+      description: User profile view, only available when logged in
+      tags:
+      - profile
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+    patch:
+      operationId: profile_partial_update
+      description: User profile view, only available when logged in
+      tags:
+      - profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProfile'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+  /api/profile/disconnect_social_account/:
+    post:
+      operationId: profile_disconnect_social_account_create
+      description: Disconnects a social account provider from the user account
+      tags:
+      - profile
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/profile/generate_auth_token/:
+    post:
+      operationId: profile_generate_auth_token_create
+      description: |-
+        Generates (or re-generates) an auth token, requires a logged in user
+        unlike the default DRF endpoint
+      tags:
+      - profile
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/profile/social_account_providers/:
+    get:
+      operationId: profile_social_account_providers_retrieve
+      description: List of social account providers
+      tags:
+      - profile
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/profile/totp/:
+    get:
+      operationId: profile_totp_retrieve
+      description: Generates a new TOTP secret and returns the URL and SVG
+      tags:
+      - profile
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: profile_totp_create
+      description: Validates a TOTP code and activates the TOTP authenticator
+      tags:
+      - profile
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: profile_totp_destroy
+      description: Deactivates the TOTP authenticator
+      tags:
+      - profile
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/remote_version/:
+    get:
+      operationId: remote_version_retrieve
+      tags:
+      - remote_version
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/saved_views/:
+    get:
+      operationId: saved_views_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - saved_views
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSavedViewList'
+          description: ''
+    post:
+      operationId: saved_views_create
+      tags:
+      - saved_views
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavedView'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SavedView'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SavedView'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedView'
+          description: ''
+  /api/saved_views/{id}/:
+    get:
+      operationId: saved_views_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this saved view.
+        required: true
+      tags:
+      - saved_views
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedView'
+          description: ''
+    put:
+      operationId: saved_views_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this saved view.
+        required: true
+      tags:
+      - saved_views
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavedView'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SavedView'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SavedView'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedView'
+          description: ''
+    patch:
+      operationId: saved_views_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this saved view.
+        required: true
+      tags:
+      - saved_views
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSavedView'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSavedView'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSavedView'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedView'
+          description: ''
+    delete:
+      operationId: saved_views_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this saved view.
+        required: true
+      tags:
+      - saved_views
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/search/:
+    get:
+      operationId: search_retrieve
+      description: Pass a user object to serializer
+      tags:
+      - search
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResult'
+          description: ''
+  /api/search/autocomplete/:
+    get:
+      operationId: search_autocomplete_retrieve
+      tags:
+      - search
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/share_links/:
+    get:
+      operationId: share_links_list
+      parameters:
+      - in: query
+        name: created__date__gt
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: created__date__lt
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: created__day
+        schema:
+          type: number
+      - in: query
+        name: created__gt
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: created__lt
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: created__month
+        schema:
+          type: number
+      - in: query
+        name: created__year
+        schema:
+          type: number
+      - in: query
+        name: expiration__date__gt
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: expiration__date__lt
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: expiration__day
+        schema:
+          type: number
+      - in: query
+        name: expiration__gt
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: expiration__lt
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: expiration__month
+        schema:
+          type: number
+      - in: query
+        name: expiration__year
+        schema:
+          type: number
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - share_links
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedShareLinkList'
+          description: ''
+    post:
+      operationId: share_links_create
+      tags:
+      - share_links
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShareLink'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ShareLink'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ShareLink'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShareLink'
+          description: ''
+  /api/share_links/{id}/:
+    get:
+      operationId: share_links_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this share link.
+        required: true
+      tags:
+      - share_links
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShareLink'
+          description: ''
+    put:
+      operationId: share_links_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this share link.
+        required: true
+      tags:
+      - share_links
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShareLink'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ShareLink'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ShareLink'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShareLink'
+          description: ''
+    patch:
+      operationId: share_links_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this share link.
+        required: true
+      tags:
+      - share_links
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedShareLink'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedShareLink'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedShareLink'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShareLink'
+          description: ''
+    delete:
+      operationId: share_links_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this share link.
+        required: true
+      tags:
+      - share_links
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/statistics/:
+    get:
+      operationId: statistics_retrieve
+      tags:
+      - statistics
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/status/:
+    get:
+      operationId: status_retrieve
+      description: Pass a user object to serializer
+      tags:
+      - status
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/storage_paths/:
+    get:
+      operationId: storage_paths_list
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: integer
+      - in: query
+        name: id__in
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: name__icontains
+        schema:
+          type: string
+      - in: query
+        name: name__iendswith
+        schema:
+          type: string
+      - in: query
+        name: name__iexact
+        schema:
+          type: string
+      - in: query
+        name: name__istartswith
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: path__icontains
+        schema:
+          type: string
+      - in: query
+        name: path__iendswith
+        schema:
+          type: string
+      - in: query
+        name: path__iexact
+        schema:
+          type: string
+      - in: query
+        name: path__istartswith
+        schema:
+          type: string
+      tags:
+      - storage_paths
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStoragePathList'
+          description: ''
+    post:
+      operationId: storage_paths_create
+      tags:
+      - storage_paths
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoragePath'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StoragePath'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StoragePath'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoragePath'
+          description: ''
+  /api/storage_paths/{id}/:
+    get:
+      operationId: storage_paths_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this storage path.
+        required: true
+      tags:
+      - storage_paths
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoragePath'
+          description: ''
+    put:
+      operationId: storage_paths_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this storage path.
+        required: true
+      tags:
+      - storage_paths
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoragePath'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StoragePath'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StoragePath'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoragePath'
+          description: ''
+    patch:
+      operationId: storage_paths_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this storage path.
+        required: true
+      tags:
+      - storage_paths
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedStoragePath'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedStoragePath'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedStoragePath'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoragePath'
+          description: ''
+    delete:
+      operationId: storage_paths_destroy
+      description: |-
+        When a storage path is deleted, see if documents
+        using it require a rename/move
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this storage path.
+        required: true
+      tags:
+      - storage_paths
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/storage_paths/test/:
+    post:
+      operationId: storage_paths_test_create
+      description: Test storage path against a document
+      tags:
+      - storage_paths
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoragePathTest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StoragePathTest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StoragePathTest'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoragePathTest'
+          description: ''
+  /api/tags/:
+    get:
+      operationId: tags_list
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: integer
+      - in: query
+        name: id__in
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: name__icontains
+        schema:
+          type: string
+      - in: query
+        name: name__iendswith
+        schema:
+          type: string
+      - in: query
+        name: name__iexact
+        schema:
+          type: string
+      - in: query
+        name: name__istartswith
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - tags
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTagSerializerVersion1List'
+          description: ''
+    post:
+      operationId: tags_create
+      tags:
+      - tags
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagSerializerVersion1'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TagSerializerVersion1'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TagSerializerVersion1'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagSerializerVersion1'
+          description: ''
+  /api/tags/{id}/:
+    get:
+      operationId: tags_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tag.
+        required: true
+      tags:
+      - tags
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagSerializerVersion1'
+          description: ''
+    put:
+      operationId: tags_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tag.
+        required: true
+      tags:
+      - tags
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagSerializerVersion1'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TagSerializerVersion1'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TagSerializerVersion1'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagSerializerVersion1'
+          description: ''
+    patch:
+      operationId: tags_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tag.
+        required: true
+      tags:
+      - tags
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTagSerializerVersion1'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTagSerializerVersion1'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTagSerializerVersion1'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagSerializerVersion1'
+          description: ''
+    delete:
+      operationId: tags_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this tag.
+        required: true
+      tags:
+      - tags
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/tasks/:
+    get:
+      operationId: tasks_list
+      tags:
+      - tasks
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TasksView'
+          description: ''
+  /api/tasks/{id}/:
+    get:
+      operationId: tasks_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this paperless task.
+        required: true
+      tags:
+      - tasks
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TasksView'
+          description: ''
+  /api/token/:
+    post:
+      operationId: token_create
+      tags:
+      - token
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+          description: ''
+  /api/trash/:
+    get:
+      operationId: trash_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - trash
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTrashList'
+          description: ''
+    post:
+      operationId: trash_create
+      tags:
+      - trash
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Trash'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Trash'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Trash'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trash'
+          description: ''
+  /api/ui_settings/:
+    get:
+      operationId: ui_settings_retrieve
+      tags:
+      - ui_settings
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UiSettingsView'
+          description: ''
+    post:
+      operationId: ui_settings_create
+      tags:
+      - ui_settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UiSettingsView'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UiSettingsView'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UiSettingsView'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UiSettingsView'
+          description: ''
+  /api/users/:
+    get:
+      operationId: users_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: username__icontains
+        schema:
+          type: string
+      - in: query
+        name: username__iendswith
+        schema:
+          type: string
+      - in: query
+        name: username__iexact
+        schema:
+          type: string
+      - in: query
+        name: username__istartswith
+        schema:
+          type: string
+      tags:
+      - users
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserList'
+          description: ''
+    post:
+      operationId: users_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/{id}/:
+    get:
+      operationId: users_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: users_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: users_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: users_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/users/{id}/deactivate_totp/:
+    post:
+      operationId: users_deactivate_totp_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/workflow_actions/:
+    get:
+      operationId: workflow_actions_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - workflow_actions
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedWorkflowActionList'
+          description: ''
+    post:
+      operationId: workflow_actions_create
+      tags:
+      - workflow_actions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WorkflowAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WorkflowAction'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowAction'
+          description: ''
+  /api/workflow_actions/{id}/:
+    get:
+      operationId: workflow_actions_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this workflow action.
+        required: true
+      tags:
+      - workflow_actions
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowAction'
+          description: ''
+    put:
+      operationId: workflow_actions_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this workflow action.
+        required: true
+      tags:
+      - workflow_actions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WorkflowAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WorkflowAction'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowAction'
+          description: ''
+    patch:
+      operationId: workflow_actions_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this workflow action.
+        required: true
+      tags:
+      - workflow_actions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedWorkflowAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedWorkflowAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedWorkflowAction'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowAction'
+          description: ''
+    delete:
+      operationId: workflow_actions_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this workflow action.
+        required: true
+      tags:
+      - workflow_actions
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/workflow_triggers/:
+    get:
+      operationId: workflow_triggers_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - workflow_triggers
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedWorkflowTriggerList'
+          description: ''
+    post:
+      operationId: workflow_triggers_create
+      tags:
+      - workflow_triggers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowTrigger'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WorkflowTrigger'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WorkflowTrigger'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowTrigger'
+          description: ''
+  /api/workflow_triggers/{id}/:
+    get:
+      operationId: workflow_triggers_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this workflow trigger.
+        required: true
+      tags:
+      - workflow_triggers
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowTrigger'
+          description: ''
+    put:
+      operationId: workflow_triggers_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this workflow trigger.
+        required: true
+      tags:
+      - workflow_triggers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowTrigger'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WorkflowTrigger'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WorkflowTrigger'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowTrigger'
+          description: ''
+    patch:
+      operationId: workflow_triggers_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this workflow trigger.
+        required: true
+      tags:
+      - workflow_triggers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedWorkflowTrigger'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedWorkflowTrigger'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedWorkflowTrigger'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowTrigger'
+          description: ''
+    delete:
+      operationId: workflow_triggers_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this workflow trigger.
+        required: true
+      tags:
+      - workflow_triggers
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/workflows/:
+    get:
+      operationId: workflows_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - workflows
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedWorkflowList'
+          description: ''
+    post:
+      operationId: workflows_create
+      tags:
+      - workflows
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Workflow'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Workflow'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Workflow'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+          description: ''
+  /api/workflows/{id}/:
+    get:
+      operationId: workflows_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this workflow.
+        required: true
+      tags:
+      - workflows
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+          description: ''
+    put:
+      operationId: workflows_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this workflow.
+        required: true
+      tags:
+      - workflows
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Workflow'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Workflow'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Workflow'
+        required: true
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+          description: ''
+    patch:
+      operationId: workflows_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this workflow.
+        required: true
+      tags:
+      - workflows
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedWorkflow'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedWorkflow'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedWorkflow'
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+          description: ''
+    delete:
+      operationId: workflows_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this workflow.
+        required: true
+      tags:
+      - workflows
+      security:
+      - basicAuth: []
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    AccountTypeEnum:
+      enum:
+      - 1
+      - 2
+      - 3
+      type: integer
+      description: |-
+        * `1` - IMAP
+        * `2` - Gmail OAuth
+        * `3` - Outlook OAuth
+    AcknowledgeTasksView:
+      type: object
+      properties:
+        tasks:
+          type: array
+          items:
+            type: integer
+          writeOnly: true
+      required:
+      - tasks
+    ApplicationConfiguration:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_args:
+          nullable: true
+        output_type:
+          nullable: true
+          title: Sets the output PDF type
+          oneOf:
+          - $ref: '#/components/schemas/OutputTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        pages:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 1
+          format: int64
+          nullable: true
+          title: Do OCR from page 1 to this value
+        language:
+          type: string
+          nullable: true
+          title: Do OCR using these languages
+          maxLength: 32
+        mode:
+          nullable: true
+          title: Sets the OCR mode
+          oneOf:
+          - $ref: '#/components/schemas/ModeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        skip_archive_file:
+          nullable: true
+          title: Controls the generation of an archive file
+          oneOf:
+          - $ref: '#/components/schemas/SkipArchiveFileEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        image_dpi:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 1
+          format: int64
+          nullable: true
+          title: Sets image DPI fallback value
+        unpaper_clean:
+          nullable: true
+          title: Controls the unpaper cleaning
+          oneOf:
+          - $ref: '#/components/schemas/UnpaperCleanEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        deskew:
+          type: boolean
+          nullable: true
+          title: Enables deskew
+        rotate_pages:
+          type: boolean
+          nullable: true
+          title: Enables page rotation
+        rotate_pages_threshold:
+          type: number
+          format: double
+          minimum: 0.0
+          nullable: true
+          title: Sets the threshold for rotation of pages
+        max_image_pixels:
+          type: number
+          format: double
+          minimum: 0.0
+          nullable: true
+          title: Sets the maximum image size for decompression
+        color_conversion_strategy:
+          nullable: true
+          title: Sets the Ghostscript color conversion strategy
+          oneOf:
+          - $ref: '#/components/schemas/ColorConversionStrategyEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        app_title:
+          type: string
+          nullable: true
+          title: Application title
+          maxLength: 48
+        app_logo:
+          type: string
+          format: uri
+          nullable: true
+          title: Application logo
+          pattern: (?:jpg|png|gif|svg)$
+      required:
+      - id
+      - user_args
+    AssignCorrespondentFromEnum:
+      enum:
+      - 1
+      - 2
+      - 3
+      - 4
+      type: integer
+      description: |-
+        * `1` - Do not assign a correspondent
+        * `2` - Use mail address
+        * `3` - Use name (or mail address if not available)
+        * `4` - Use correspondent selected below
+    AssignTitleFromEnum:
+      enum:
+      - 1
+      - 2
+      - 3
+      type: integer
+      description: |-
+        * `1` - Use subject as title
+        * `2` - Use attachment filename as title
+        * `3` - Do not assign title from rule
+    AttachmentTypeEnum:
+      enum:
+      - 1
+      - 2
+      type: integer
+      description: |-
+        * `1` - Only process attachments.
+        * `2` - Process all files, including 'inline' attachments.
+    AuthToken:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        token:
+          type: string
+          readOnly: true
+      required:
+      - password
+      - token
+      - username
+    BlankEnum:
+      enum:
+      - ''
+    BulkDownload:
+      type: object
+      properties:
+        documents:
+          type: array
+          items:
+            type: integer
+          writeOnly: true
+        content:
+          allOf:
+          - $ref: '#/components/schemas/ContentEnum'
+          default: archive
+        compression:
+          allOf:
+          - $ref: '#/components/schemas/CompressionEnum'
+          default: none
+        follow_formatting:
+          type: boolean
+          default: false
+      required:
+      - documents
+    BulkEdit:
+      type: object
+      properties:
+        documents:
+          type: array
+          items:
+            type: integer
+          writeOnly: true
+        method:
+          allOf:
+          - $ref: '#/components/schemas/MethodEnum'
+          writeOnly: true
+        parameters:
+          type: object
+          additionalProperties: {}
+          writeOnly: true
+          default: {}
+      required:
+      - documents
+      - method
+    BulkEditObjects:
+      type: object
+      properties:
+        objects:
+          type: array
+          items:
+            type: integer
+          writeOnly: true
+        object_type:
+          allOf:
+          - $ref: '#/components/schemas/ObjectTypeEnum'
+          writeOnly: true
+        operation:
+          allOf:
+          - $ref: '#/components/schemas/OperationEnum'
+          writeOnly: true
+        owner:
+          type: integer
+          nullable: true
+        permissions:
+          type: object
+          additionalProperties: {}
+          writeOnly: true
+          title: Set permissions
+        merge:
+          type: boolean
+          writeOnly: true
+          default: false
+      required:
+      - object_type
+      - objects
+      - operation
+    ColorConversionStrategyEnum:
+      enum:
+      - LeaveColorUnchanged
+      - RGB
+      - UseDeviceIndependentColor
+      - Gray
+      - CMYK
+      type: string
+      description: |-
+        * `LeaveColorUnchanged` - LeaveColorUnchanged
+        * `RGB` - RGB
+        * `UseDeviceIndependentColor` - UseDeviceIndependentColor
+        * `Gray` - Gray
+        * `CMYK` - CMYK
+    CompressionEnum:
+      enum:
+      - none
+      - deflated
+      - bzip2
+      - lzma
+      type: string
+      description: |-
+        * `none` - none
+        * `deflated` - deflated
+        * `bzip2` - bzip2
+        * `lzma` - lzma
+    ConsumptionScopeEnum:
+      enum:
+      - 1
+      - 2
+      - 3
+      type: integer
+      description: |-
+        * `1` - Only process attachments.
+        * `2` - Process full Mail (with embedded attachments in file) as .eml
+        * `3` - Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents
+    ContentEnum:
+      enum:
+      - archive
+      - originals
+      - both
+      type: string
+      description: |-
+        * `archive` - archive
+        * `originals` - originals
+        * `both` - both
+    Correspondent:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        slug:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        match:
+          type: string
+          maxLength: 256
+        matching_algorithm:
+          allOf:
+          - $ref: '#/components/schemas/MatchingAlgorithm27bEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        is_insensitive:
+          type: boolean
+        document_count:
+          type: integer
+          readOnly: true
+        last_correspondence:
+          type: string
+          format: date-time
+          readOnly: true
+        owner:
+          type: integer
+          nullable: true
+        user_can_change:
+          type: string
+          readOnly: true
+        set_permissions:
+          type: object
+          additionalProperties: {}
+          writeOnly: true
+      required:
+      - document_count
+      - id
+      - last_correspondence
+      - name
+      - slug
+      - user_can_change
+    CustomField:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        data_type:
+          $ref: '#/components/schemas/DataTypeEnum'
+        extra_data:
+          nullable: true
+          description: Extra data for the custom field, such as select options
+        document_count:
+          type: integer
+          readOnly: true
+      required:
+      - data_type
+      - document_count
+      - id
+      - name
+    CustomFieldInstance:
+      type: object
+      properties:
+        value:
+          type: string
+          nullable: true
+        field:
+          type: integer
+      required:
+      - field
+      - value
+    DataTypeEnum:
+      enum:
+      - string
+      - url
+      - date
+      - boolean
+      - integer
+      - float
+      - monetary
+      - documentlink
+      - select
+      type: string
+      description: |-
+        * `string` - string
+        * `url` - url
+        * `date` - date
+        * `boolean` - boolean
+        * `integer` - integer
+        * `float` - float
+        * `monetary` - monetary
+        * `documentlink` - documentlink
+        * `select` - select
+    DisplayModeEnum:
+      enum:
+      - table
+      - smallCards
+      - largeCards
+      type: string
+      description: |-
+        * `table` - Table
+        * `smallCards` - Small Cards
+        * `largeCards` - Large Cards
+    Document:
+      type: object
+      description: Adds update nested feature
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        correspondent:
+          type: integer
+          nullable: true
+        document_type:
+          type: integer
+          nullable: true
+        storage_path:
+          type: integer
+          nullable: true
+        title:
+          type: string
+          maxLength: 128
+        content:
+          type: string
+          description: The raw, text-only data of the document. This field is primarily
+            used for searching.
+        tags:
+          type: array
+          items:
+            type: integer
+        created:
+          type: string
+          format: date-time
+        created_date:
+          type: string
+          format: date
+        modified:
+          type: string
+          format: date-time
+          readOnly: true
+        added:
+          type: string
+          format: date-time
+          readOnly: true
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+        archive_serial_number:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+          nullable: true
+          description: The position of this document in your physical document archive.
+        original_file_name:
+          type: string
+          readOnly: true
+        archived_file_name:
+          type: string
+          readOnly: true
+        owner:
+          type: integer
+          nullable: true
+        user_can_change:
+          type: string
+          readOnly: true
+        is_shared_by_requester:
+          type: string
+          readOnly: true
+        set_permissions:
+          type: object
+          additionalProperties: {}
+          writeOnly: true
+        notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Nested'
+          readOnly: true
+        custom_fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldInstance'
+        remove_inbox_tags:
+          type: boolean
+          writeOnly: true
+          nullable: true
+          default: false
+        page_count:
+          type: string
+          readOnly: true
+        mime_type:
+          type: string
+          readOnly: true
+      required:
+      - added
+      - archived_file_name
+      - correspondent
+      - document_type
+      - id
+      - is_shared_by_requester
+      - mime_type
+      - modified
+      - notes
+      - original_file_name
+      - page_count
+      - storage_path
+      - tags
+      - user_can_change
+    DocumentList:
+      type: object
+      properties:
+        documents:
+          type: array
+          items:
+            type: integer
+          writeOnly: true
+      required:
+      - documents
+    DocumentType:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        slug:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        match:
+          type: string
+          maxLength: 256
+        matching_algorithm:
+          allOf:
+          - $ref: '#/components/schemas/MatchingAlgorithm27bEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        is_insensitive:
+          type: boolean
+        document_count:
+          type: integer
+          readOnly: true
+        owner:
+          type: integer
+          nullable: true
+        user_can_change:
+          type: string
+          readOnly: true
+        set_permissions:
+          type: object
+          additionalProperties: {}
+          writeOnly: true
+      required:
+      - document_count
+      - id
+      - name
+      - slug
+      - user_can_change
+    FileVersionEnum:
+      enum:
+      - archive
+      - original
+      type: string
+      description: |-
+        * `archive` - Archive
+        * `original` - Original
+    Group:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        permissions:
+          type: array
+          items:
+            type: string
+      required:
+      - id
+      - name
+      - permissions
+    ImapSecurityEnum:
+      enum:
+      - 1
+      - 2
+      - 3
+      type: integer
+      description: |-
+        * `1` - No encryption
+        * `2` - Use SSL
+        * `3` - Use STARTTLS
+    MailAccount:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 256
+        imap_server:
+          type: string
+          maxLength: 256
+        imap_port:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+          description: This is usually 143 for unencrypted and STARTTLS connections,
+            and 993 for SSL connections.
+        imap_security:
+          allOf:
+          - $ref: '#/components/schemas/ImapSecurityEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        username:
+          type: string
+          maxLength: 256
+        password:
+          type: string
+        character_set:
+          type: string
+          description: The character set to use when communicating with the mail server,
+            such as 'UTF-8' or 'US-ASCII'.
+          maxLength: 256
+        is_token:
+          type: boolean
+          title: Is token authentication
+        owner:
+          type: integer
+          nullable: true
+        user_can_change:
+          type: string
+          readOnly: true
+        set_permissions:
+          type: object
+          additionalProperties: {}
+          writeOnly: true
+        account_type:
+          allOf:
+          - $ref: '#/components/schemas/AccountTypeEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        expiration:
+          type: string
+          format: date-time
+          nullable: true
+          description: 'The expiration date of the refresh token. '
+      required:
+      - id
+      - imap_server
+      - name
+      - password
+      - user_can_change
+      - username
+    MailRule:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 256
+        account:
+          type: integer
+        enabled:
+          type: boolean
+        folder:
+          type: string
+          description: Subfolders must be separated by a delimiter, often a dot ('.')
+            or slash ('/'), but it varies by mail server.
+          maxLength: 256
+        filter_from:
+          type: string
+          nullable: true
+          maxLength: 256
+        filter_to:
+          type: string
+          nullable: true
+          maxLength: 256
+        filter_subject:
+          type: string
+          nullable: true
+          maxLength: 256
+        filter_body:
+          type: string
+          nullable: true
+          maxLength: 256
+        filter_attachment_filename_include:
+          type: string
+          nullable: true
+          title: Filter attachment filename inclusive
+          description: Only consume documents which entirely match this filename if
+            specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.
+          maxLength: 256
+        filter_attachment_filename_exclude:
+          type: string
+          nullable: true
+          title: Filter attachment filename exclusive
+          description: Do not consume documents which entirely match this filename
+            if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.
+          maxLength: 256
+        maximum_age:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          description: Specified in days.
+        action:
+          allOf:
+          - $ref: '#/components/schemas/MailRuleActionEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        action_parameter:
+          type: string
+          nullable: true
+          default: ''
+        assign_title_from:
+          allOf:
+          - $ref: '#/components/schemas/AssignTitleFromEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        assign_tags:
+          type: array
+          items:
+            type: integer
+            nullable: true
+        assign_correspondent_from:
+          allOf:
+          - $ref: '#/components/schemas/AssignCorrespondentFromEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        assign_correspondent:
+          type: integer
+          nullable: true
+        assign_document_type:
+          type: integer
+          nullable: true
+        assign_owner_from_rule:
+          type: boolean
+          title: Assign the rule owner to documents
+        order:
+          type: integer
+        attachment_type:
+          allOf:
+          - $ref: '#/components/schemas/AttachmentTypeEnum'
+          description: |-
+            Inline attachments include embedded images, so it's best to combine this option with a filename filter.
+
+            * `1` - Only process attachments.
+            * `2` - Process all files, including 'inline' attachments.
+          minimum: 0
+          maximum: 9223372036854775807
+        consumption_scope:
+          allOf:
+          - $ref: '#/components/schemas/ConsumptionScopeEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        owner:
+          type: integer
+          nullable: true
+        user_can_change:
+          type: string
+          readOnly: true
+        set_permissions:
+          type: object
+          additionalProperties: {}
+          writeOnly: true
+      required:
+      - account
+      - id
+      - name
+      - user_can_change
+    MailRuleActionEnum:
+      enum:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      type: integer
+      description: |-
+        * `1` - Delete
+        * `2` - Move to specified folder
+        * `3` - Mark as read, don't process read mails
+        * `4` - Flag the mail, don't process flagged mails
+        * `5` - Tag the mail with specified tag, don't process tagged mails
+    MatchingAlgorithm27bEnum:
+      enum:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      type: integer
+      description: |-
+        * `0` - None
+        * `1` - Any word
+        * `2` - All words
+        * `3` - Exact match
+        * `4` - Regular expression
+        * `5` - Fuzzy word
+        * `6` - Automatic
+    MethodEnum:
+      enum:
+      - set_correspondent
+      - set_document_type
+      - set_storage_path
+      - add_tag
+      - remove_tag
+      - modify_tags
+      - modify_custom_fields
+      - delete
+      - reprocess
+      - set_permissions
+      - rotate
+      - merge
+      - split
+      - delete_pages
+      type: string
+      description: |-
+        * `set_correspondent` - set_correspondent
+        * `set_document_type` - set_document_type
+        * `set_storage_path` - set_storage_path
+        * `add_tag` - add_tag
+        * `remove_tag` - remove_tag
+        * `modify_tags` - modify_tags
+        * `modify_custom_fields` - modify_custom_fields
+        * `delete` - delete
+        * `reprocess` - reprocess
+        * `set_permissions` - set_permissions
+        * `rotate` - rotate
+        * `merge` - merge
+        * `split` - split
+        * `delete_pages` - delete_pages
+    ModeEnum:
+      enum:
+      - skip
+      - redo
+      - force
+      - skip_noarchive
+      type: string
+      description: |-
+        * `skip` - skip
+        * `redo` - redo
+        * `force` - force
+        * `skip_noarchive` - skip_noarchive
+    Nested:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+        restored_at:
+          type: string
+          format: date-time
+          nullable: true
+        transaction_id:
+          type: string
+          format: uuid
+          nullable: true
+        note:
+          type: string
+          title: Content
+          description: Note for the document
+        created:
+          type: string
+          format: date-time
+        document:
+          type: integer
+          nullable: true
+        user:
+          type: integer
+          nullable: true
+      required:
+      - id
+    NullEnum:
+      enum:
+      - null
+    ObjectTypeEnum:
+      enum:
+      - tags
+      - correspondents
+      - document_types
+      - storage_paths
+      type: string
+      description: |-
+        * `tags` - tags
+        * `correspondents` - correspondents
+        * `document_types` - document_types
+        * `storage_paths` - storage_paths
+    OperationEnum:
+      enum:
+      - set_permissions
+      - delete
+      type: string
+      description: |-
+        * `set_permissions` - set_permissions
+        * `delete` - delete
+    OutputTypeEnum:
+      enum:
+      - pdf
+      - pdfa
+      - pdfa-1
+      - pdfa-2
+      - pdfa-3
+      type: string
+      description: |-
+        * `pdf` - pdf
+        * `pdfa` - pdfa
+        * `pdfa-1` - pdfa-1
+        * `pdfa-2` - pdfa-2
+        * `pdfa-3` - pdfa-3
+    PaginatedCorrespondentList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Correspondent'
+        all:
+          type: array
+          example: '[1, 2, 3]'
+    PaginatedCustomFieldList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomField'
+        all:
+          type: array
+          example: '[1, 2, 3]'
+    PaginatedDocumentList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+        all:
+          type: array
+          example: '[1, 2, 3]'
+    PaginatedDocumentTypeList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentType'
+        all:
+          type: array
+          example: '[1, 2, 3]'
+    PaginatedGroupList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
+        all:
+          type: array
+          example: '[1, 2, 3]'
+    PaginatedMailAccountList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/MailAccount'
+        all:
+          type: array
+          example: '[1, 2, 3]'
+    PaginatedMailRuleList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/MailRule'
+        all:
+          type: array
+          example: '[1, 2, 3]'
+    PaginatedSavedViewList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SavedView'
+        all:
+          type: array
+          example: '[1, 2, 3]'
+    PaginatedShareLinkList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShareLink'
+        all:
+          type: array
+          example: '[1, 2, 3]'
+    PaginatedStoragePathList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/StoragePath'
+        all:
+          type: array
+          example: '[1, 2, 3]'
+    PaginatedTagSerializerVersion1List:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/TagSerializerVersion1'
+        all:
+          type: array
+          example: '[1, 2, 3]'
+    PaginatedTrashList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trash'
+        all:
+          type: array
+          example: '[1, 2, 3]'
+    PaginatedUserList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        all:
+          type: array
+          example: '[1, 2, 3]'
+    PaginatedWorkflowActionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowAction'
+        all:
+          type: array
+          example: '[1, 2, 3]'
+    PaginatedWorkflowList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Workflow'
+        all:
+          type: array
+          example: '[1, 2, 3]'
+    PaginatedWorkflowTriggerList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowTrigger'
+        all:
+          type: array
+          example: '[1, 2, 3]'
+    PatchedApplicationConfiguration:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_args:
+          nullable: true
+        output_type:
+          nullable: true
+          title: Sets the output PDF type
+          oneOf:
+          - $ref: '#/components/schemas/OutputTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        pages:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 1
+          format: int64
+          nullable: true
+          title: Do OCR from page 1 to this value
+        language:
+          type: string
+          nullable: true
+          title: Do OCR using these languages
+          maxLength: 32
+        mode:
+          nullable: true
+          title: Sets the OCR mode
+          oneOf:
+          - $ref: '#/components/schemas/ModeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        skip_archive_file:
+          nullable: true
+          title: Controls the generation of an archive file
+          oneOf:
+          - $ref: '#/components/schemas/SkipArchiveFileEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        image_dpi:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 1
+          format: int64
+          nullable: true
+          title: Sets image DPI fallback value
+        unpaper_clean:
+          nullable: true
+          title: Controls the unpaper cleaning
+          oneOf:
+          - $ref: '#/components/schemas/UnpaperCleanEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        deskew:
+          type: boolean
+          nullable: true
+          title: Enables deskew
+        rotate_pages:
+          type: boolean
+          nullable: true
+          title: Enables page rotation
+        rotate_pages_threshold:
+          type: number
+          format: double
+          minimum: 0.0
+          nullable: true
+          title: Sets the threshold for rotation of pages
+        max_image_pixels:
+          type: number
+          format: double
+          minimum: 0.0
+          nullable: true
+          title: Sets the maximum image size for decompression
+        color_conversion_strategy:
+          nullable: true
+          title: Sets the Ghostscript color conversion strategy
+          oneOf:
+          - $ref: '#/components/schemas/ColorConversionStrategyEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        app_title:
+          type: string
+          nullable: true
+          title: Application title
+          maxLength: 48
+        app_logo:
+          type: string
+          format: uri
+          nullable: true
+          title: Application logo
+          pattern: (?:jpg|png|gif|svg)$
+    PatchedCorrespondent:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        slug:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        match:
+          type: string
+          maxLength: 256
+        matching_algorithm:
+          allOf:
+          - $ref: '#/components/schemas/MatchingAlgorithm27bEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        is_insensitive:
+          type: boolean
+        document_count:
+          type: integer
+          readOnly: true
+        last_correspondence:
+          type: string
+          format: date-time
+          readOnly: true
+        owner:
+          type: integer
+          nullable: true
+        user_can_change:
+          type: string
+          readOnly: true
+        set_permissions:
+          type: object
+          additionalProperties: {}
+          writeOnly: true
+    PatchedCustomField:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        data_type:
+          $ref: '#/components/schemas/DataTypeEnum'
+        extra_data:
+          nullable: true
+          description: Extra data for the custom field, such as select options
+        document_count:
+          type: integer
+          readOnly: true
+    PatchedDocument:
+      type: object
+      description: Adds update nested feature
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        correspondent:
+          type: integer
+          nullable: true
+        document_type:
+          type: integer
+          nullable: true
+        storage_path:
+          type: integer
+          nullable: true
+        title:
+          type: string
+          maxLength: 128
+        content:
+          type: string
+          description: The raw, text-only data of the document. This field is primarily
+            used for searching.
+        tags:
+          type: array
+          items:
+            type: integer
+        created:
+          type: string
+          format: date-time
+        created_date:
+          type: string
+          format: date
+        modified:
+          type: string
+          format: date-time
+          readOnly: true
+        added:
+          type: string
+          format: date-time
+          readOnly: true
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+        archive_serial_number:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+          nullable: true
+          description: The position of this document in your physical document archive.
+        original_file_name:
+          type: string
+          readOnly: true
+        archived_file_name:
+          type: string
+          readOnly: true
+        owner:
+          type: integer
+          nullable: true
+        permissions:
+          type: string
+          readOnly: true
+        set_permissions:
+          type: object
+          additionalProperties: {}
+          writeOnly: true
+        notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Nested'
+          readOnly: true
+        custom_fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldInstance'
+        remove_inbox_tags:
+          type: boolean
+          writeOnly: true
+          nullable: true
+          default: false
+        page_count:
+          type: string
+          readOnly: true
+        mime_type:
+          type: string
+          readOnly: true
+    PatchedDocumentType:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        slug:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        match:
+          type: string
+          maxLength: 256
+        matching_algorithm:
+          allOf:
+          - $ref: '#/components/schemas/MatchingAlgorithm27bEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        is_insensitive:
+          type: boolean
+        document_count:
+          type: integer
+          readOnly: true
+        owner:
+          type: integer
+          nullable: true
+        user_can_change:
+          type: string
+          readOnly: true
+        set_permissions:
+          type: object
+          additionalProperties: {}
+          writeOnly: true
+    PatchedGroup:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        permissions:
+          type: array
+          items:
+            type: string
+    PatchedMailAccount:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 256
+        imap_server:
+          type: string
+          maxLength: 256
+        imap_port:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+          description: This is usually 143 for unencrypted and STARTTLS connections,
+            and 993 for SSL connections.
+        imap_security:
+          allOf:
+          - $ref: '#/components/schemas/ImapSecurityEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        username:
+          type: string
+          maxLength: 256
+        password:
+          type: string
+        character_set:
+          type: string
+          description: The character set to use when communicating with the mail server,
+            such as 'UTF-8' or 'US-ASCII'.
+          maxLength: 256
+        is_token:
+          type: boolean
+          title: Is token authentication
+        owner:
+          type: integer
+          nullable: true
+        user_can_change:
+          type: string
+          readOnly: true
+        set_permissions:
+          type: object
+          additionalProperties: {}
+          writeOnly: true
+        account_type:
+          allOf:
+          - $ref: '#/components/schemas/AccountTypeEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        expiration:
+          type: string
+          format: date-time
+          nullable: true
+          description: 'The expiration date of the refresh token. '
+    PatchedMailRule:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 256
+        account:
+          type: integer
+        enabled:
+          type: boolean
+        folder:
+          type: string
+          description: Subfolders must be separated by a delimiter, often a dot ('.')
+            or slash ('/'), but it varies by mail server.
+          maxLength: 256
+        filter_from:
+          type: string
+          nullable: true
+          maxLength: 256
+        filter_to:
+          type: string
+          nullable: true
+          maxLength: 256
+        filter_subject:
+          type: string
+          nullable: true
+          maxLength: 256
+        filter_body:
+          type: string
+          nullable: true
+          maxLength: 256
+        filter_attachment_filename_include:
+          type: string
+          nullable: true
+          title: Filter attachment filename inclusive
+          description: Only consume documents which entirely match this filename if
+            specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.
+          maxLength: 256
+        filter_attachment_filename_exclude:
+          type: string
+          nullable: true
+          title: Filter attachment filename exclusive
+          description: Do not consume documents which entirely match this filename
+            if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.
+          maxLength: 256
+        maximum_age:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          description: Specified in days.
+        action:
+          allOf:
+          - $ref: '#/components/schemas/MailRuleActionEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        action_parameter:
+          type: string
+          nullable: true
+          default: ''
+        assign_title_from:
+          allOf:
+          - $ref: '#/components/schemas/AssignTitleFromEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        assign_tags:
+          type: array
+          items:
+            type: integer
+            nullable: true
+        assign_correspondent_from:
+          allOf:
+          - $ref: '#/components/schemas/AssignCorrespondentFromEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        assign_correspondent:
+          type: integer
+          nullable: true
+        assign_document_type:
+          type: integer
+          nullable: true
+        assign_owner_from_rule:
+          type: boolean
+          title: Assign the rule owner to documents
+        order:
+          type: integer
+        attachment_type:
+          allOf:
+          - $ref: '#/components/schemas/AttachmentTypeEnum'
+          description: |-
+            Inline attachments include embedded images, so it's best to combine this option with a filename filter.
+
+            * `1` - Only process attachments.
+            * `2` - Process all files, including 'inline' attachments.
+          minimum: 0
+          maximum: 9223372036854775807
+        consumption_scope:
+          allOf:
+          - $ref: '#/components/schemas/ConsumptionScopeEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        owner:
+          type: integer
+          nullable: true
+        user_can_change:
+          type: string
+          readOnly: true
+        set_permissions:
+          type: object
+          additionalProperties: {}
+          writeOnly: true
+    PatchedProfile:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        auth_token:
+          type: string
+          readOnly: true
+        social_accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/SocialAccount'
+          readOnly: true
+        has_usable_password:
+          type: string
+          readOnly: true
+        is_mfa_enabled:
+          type: string
+          readOnly: true
+    PatchedSavedView:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        show_on_dashboard:
+          type: boolean
+        show_in_sidebar:
+          type: boolean
+        sort_field:
+          type: string
+          nullable: true
+          maxLength: 128
+        sort_reverse:
+          type: boolean
+        filter_rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/SavedViewFilterRule'
+        page_size:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 1
+          format: int64
+          nullable: true
+          title: View page size
+        display_mode:
+          nullable: true
+          title: View display mode
+          oneOf:
+          - $ref: '#/components/schemas/DisplayModeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        display_fields:
+          nullable: true
+          title: Document display fields
+        owner:
+          type: integer
+          nullable: true
+        user_can_change:
+          type: string
+          readOnly: true
+        set_permissions:
+          type: object
+          additionalProperties: {}
+          writeOnly: true
+    PatchedShareLink:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        expiration:
+          type: string
+          format: date-time
+          nullable: true
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        document:
+          type: integer
+        file_version:
+          $ref: '#/components/schemas/FileVersionEnum'
+    PatchedStoragePath:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        slug:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        path:
+          type: string
+        match:
+          type: string
+          maxLength: 256
+        matching_algorithm:
+          allOf:
+          - $ref: '#/components/schemas/MatchingAlgorithm27bEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        is_insensitive:
+          type: boolean
+        document_count:
+          type: integer
+          readOnly: true
+        owner:
+          type: integer
+          nullable: true
+        user_can_change:
+          type: string
+          readOnly: true
+        set_permissions:
+          type: object
+          additionalProperties: {}
+          writeOnly: true
+    PatchedTagSerializerVersion1:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        slug:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        colour:
+          type: string
+          default: 1
+        match:
+          type: string
+          maxLength: 256
+        matching_algorithm:
+          allOf:
+          - $ref: '#/components/schemas/MatchingAlgorithm27bEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        is_insensitive:
+          type: boolean
+        is_inbox_tag:
+          type: boolean
+          description: 'Marks this tag as an inbox tag: All newly consumed documents
+            will be tagged with inbox tags.'
+        document_count:
+          type: integer
+          readOnly: true
+        owner:
+          type: integer
+          nullable: true
+        user_can_change:
+          type: string
+          readOnly: true
+        set_permissions:
+          type: object
+          additionalProperties: {}
+          writeOnly: true
+    PatchedUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        password:
+          type: string
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        date_joined:
+          type: string
+          format: date-time
+        is_staff:
+          type: boolean
+          title: Staff status
+          description: Designates whether the user can log into this admin site.
+        is_active:
+          type: boolean
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        is_superuser:
+          type: boolean
+          title: Superuser status
+          description: Designates that this user has all permissions without explicitly
+            assigning them.
+        groups:
+          type: array
+          items:
+            type: integer
+          description: The groups this user belongs to. A user will get all permissions
+            granted to each of their groups.
+        user_permissions:
+          type: array
+          items:
+            type: string
+        inherited_permissions:
+          type: string
+          readOnly: true
+        is_mfa_enabled:
+          type: string
+          readOnly: true
+    PatchedWorkflow:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 256
+        order:
+          type: integer
+        enabled:
+          type: boolean
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowTrigger'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowAction'
+    PatchedWorkflowAction:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        type:
+          allOf:
+          - $ref: '#/components/schemas/WorkflowActionTypeEnum'
+          title: Workflow Action Type
+          minimum: 0
+          maximum: 9223372036854775807
+        assign_title:
+          type: string
+          nullable: true
+          description: Assign a document title, can include some placeholders, see
+            documentation.
+          maxLength: 256
+        assign_tags:
+          type: array
+          items:
+            type: integer
+            nullable: true
+        assign_correspondent:
+          type: integer
+          nullable: true
+        assign_document_type:
+          type: integer
+          nullable: true
+        assign_storage_path:
+          type: integer
+          nullable: true
+        assign_owner:
+          type: integer
+          nullable: true
+          title: Assign this owner
+        assign_view_users:
+          type: array
+          items:
+            type: integer
+            title: Grant view permissions to these users
+          title: Grant view permissions to these users
+        assign_view_groups:
+          type: array
+          items:
+            type: integer
+            title: Grant view permissions to these groups
+          title: Grant view permissions to these groups
+        assign_change_users:
+          type: array
+          items:
+            type: integer
+            title: Grant change permissions to these users
+          title: Grant change permissions to these users
+        assign_change_groups:
+          type: array
+          items:
+            type: integer
+            title: Grant change permissions to these groups
+          title: Grant change permissions to these groups
+        assign_custom_fields:
+          type: array
+          items:
+            type: integer
+            title: Assign these custom fields
+          title: Assign these custom fields
+        remove_all_tags:
+          type: boolean
+        remove_tags:
+          type: array
+          items:
+            type: integer
+            title: Remove these tag(s)
+          title: Remove these tag(s)
+        remove_all_correspondents:
+          type: boolean
+        remove_correspondents:
+          type: array
+          items:
+            type: integer
+            title: Remove these correspondent(s)
+          title: Remove these correspondent(s)
+        remove_all_document_types:
+          type: boolean
+        remove_document_types:
+          type: array
+          items:
+            type: integer
+            title: Remove these document type(s)
+          title: Remove these document type(s)
+        remove_all_storage_paths:
+          type: boolean
+        remove_storage_paths:
+          type: array
+          items:
+            type: integer
+            title: Remove these storage path(s)
+          title: Remove these storage path(s)
+        remove_custom_fields:
+          type: array
+          items:
+            type: integer
+            title: Remove these custom fields
+          title: Remove these custom fields
+        remove_all_custom_fields:
+          type: boolean
+        remove_all_owners:
+          type: boolean
+        remove_owners:
+          type: array
+          items:
+            type: integer
+            title: Remove these owner(s)
+          title: Remove these owner(s)
+        remove_all_permissions:
+          type: boolean
+        remove_view_users:
+          type: array
+          items:
+            type: integer
+            title: Remove view permissions for these users
+          title: Remove view permissions for these users
+        remove_view_groups:
+          type: array
+          items:
+            type: integer
+            title: Remove view permissions for these groups
+          title: Remove view permissions for these groups
+        remove_change_users:
+          type: array
+          items:
+            type: integer
+            title: Remove change permissions for these users
+          title: Remove change permissions for these users
+        remove_change_groups:
+          type: array
+          items:
+            type: integer
+            title: Remove change permissions for these groups
+          title: Remove change permissions for these groups
+    PatchedWorkflowTrigger:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourcesEnum'
+          default:
+          - 1
+          - 2
+          - 3
+        type:
+          allOf:
+          - $ref: '#/components/schemas/WorkflowTriggerTypeEnum'
+          title: Trigger Type
+        filter_path:
+          type: string
+          nullable: true
+          description: Only consume documents with a path that matches this if specified.
+            Wildcards specified as * are allowed. Case insensitive.
+          maxLength: 256
+        filter_filename:
+          type: string
+          nullable: true
+          description: Only consume documents which entirely match this filename if
+            specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.
+          maxLength: 256
+        filter_mailrule:
+          type: integer
+          nullable: true
+          title: Filter documents from this mail rule
+        matching_algorithm:
+          allOf:
+          - $ref: '#/components/schemas/WorkflowTriggerMatchingAlgorithmEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        match:
+          type: string
+          maxLength: 256
+        is_insensitive:
+          type: boolean
+        filter_has_tags:
+          type: array
+          items:
+            type: integer
+            title: Has these tag(s)
+          title: Has these tag(s)
+        filter_has_correspondent:
+          type: integer
+          nullable: true
+          title: Has this correspondent
+        filter_has_document_type:
+          type: integer
+          nullable: true
+          title: Has this document type
+    PostDocument:
+      type: object
+      properties:
+        created:
+          type: string
+          format: date-time
+          writeOnly: true
+          nullable: true
+        document:
+          type: string
+          format: uri
+          writeOnly: true
+        title:
+          type: string
+          writeOnly: true
+        correspondent:
+          type: integer
+          writeOnly: true
+          nullable: true
+        document_type:
+          type: integer
+          writeOnly: true
+          nullable: true
+        storage_path:
+          type: integer
+          writeOnly: true
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: integer
+            writeOnly: true
+            title: Tags
+          writeOnly: true
+        archive_serial_number:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+          writeOnly: true
+          title: ASN
+        custom_fields:
+          type: array
+          items:
+            type: integer
+            writeOnly: true
+            title: Custom fields
+          writeOnly: true
+      required:
+      - document
+    Profile:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        auth_token:
+          type: string
+          readOnly: true
+        social_accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/SocialAccount'
+          readOnly: true
+        has_usable_password:
+          type: string
+          readOnly: true
+        is_mfa_enabled:
+          type: string
+          readOnly: true
+      required:
+      - auth_token
+      - email
+      - has_usable_password
+      - is_mfa_enabled
+      - social_accounts
+    RuleTypeEnum:
+      enum:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 11
+      - 12
+      - 13
+      - 14
+      - 15
+      - 16
+      - 17
+      - 18
+      - 19
+      - 20
+      - 21
+      - 22
+      - 23
+      - 24
+      - 25
+      - 26
+      - 27
+      - 28
+      - 29
+      - 30
+      - 31
+      - 32
+      - 33
+      - 34
+      - 35
+      - 36
+      - 37
+      - 38
+      - 39
+      - 40
+      - 41
+      - 42
+      type: integer
+      description: |-
+        * `0` - title contains
+        * `1` - content contains
+        * `2` - ASN is
+        * `3` - correspondent is
+        * `4` - document type is
+        * `5` - is in inbox
+        * `6` - has tag
+        * `7` - has any tag
+        * `8` - created before
+        * `9` - created after
+        * `10` - created year is
+        * `11` - created month is
+        * `12` - created day is
+        * `13` - added before
+        * `14` - added after
+        * `15` - modified before
+        * `16` - modified after
+        * `17` - does not have tag
+        * `18` - does not have ASN
+        * `19` - title or content contains
+        * `20` - fulltext query
+        * `21` - more like this
+        * `22` - has tags in
+        * `23` - ASN greater than
+        * `24` - ASN less than
+        * `25` - storage path is
+        * `26` - has correspondent in
+        * `27` - does not have correspondent in
+        * `28` - has document type in
+        * `29` - does not have document type in
+        * `30` - has storage path in
+        * `31` - does not have storage path in
+        * `32` - owner is
+        * `33` - has owner in
+        * `34` - does not have owner
+        * `35` - does not have owner in
+        * `36` - has custom field value
+        * `37` - is shared by me
+        * `38` - has custom fields
+        * `39` - has custom field in
+        * `40` - does not have custom field in
+        * `41` - does not have custom field
+        * `42` - custom fields query
+    SavedView:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        show_on_dashboard:
+          type: boolean
+        show_in_sidebar:
+          type: boolean
+        sort_field:
+          type: string
+          nullable: true
+          maxLength: 128
+        sort_reverse:
+          type: boolean
+        filter_rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/SavedViewFilterRule'
+        page_size:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 1
+          format: int64
+          nullable: true
+          title: View page size
+        display_mode:
+          nullable: true
+          title: View display mode
+          oneOf:
+          - $ref: '#/components/schemas/DisplayModeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        display_fields:
+          nullable: true
+          title: Document display fields
+        owner:
+          type: integer
+          nullable: true
+        user_can_change:
+          type: string
+          readOnly: true
+        set_permissions:
+          type: object
+          additionalProperties: {}
+          writeOnly: true
+      required:
+      - filter_rules
+      - id
+      - name
+      - show_in_sidebar
+      - show_on_dashboard
+      - user_can_change
+    SavedViewFilterRule:
+      type: object
+      properties:
+        rule_type:
+          allOf:
+          - $ref: '#/components/schemas/RuleTypeEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        value:
+          type: string
+          nullable: true
+          maxLength: 255
+      required:
+      - rule_type
+    SearchResult:
+      type: object
+      description: Adds update nested feature
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        correspondent:
+          type: integer
+          nullable: true
+        document_type:
+          type: integer
+          nullable: true
+        storage_path:
+          type: integer
+          nullable: true
+        title:
+          type: string
+          maxLength: 128
+        content:
+          type: string
+          description: The raw, text-only data of the document. This field is primarily
+            used for searching.
+        tags:
+          type: array
+          items:
+            type: integer
+        created:
+          type: string
+          format: date-time
+        created_date:
+          type: string
+          format: date
+        modified:
+          type: string
+          format: date-time
+          readOnly: true
+        added:
+          type: string
+          format: date-time
+          readOnly: true
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+        archive_serial_number:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+          nullable: true
+          description: The position of this document in your physical document archive.
+        original_file_name:
+          type: string
+          readOnly: true
+        archived_file_name:
+          type: string
+          readOnly: true
+        owner:
+          type: integer
+          nullable: true
+        user_can_change:
+          type: string
+          readOnly: true
+        is_shared_by_requester:
+          type: string
+          readOnly: true
+        set_permissions:
+          type: object
+          additionalProperties: {}
+          writeOnly: true
+        notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Nested'
+          readOnly: true
+        custom_fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldInstance'
+        remove_inbox_tags:
+          type: boolean
+          writeOnly: true
+          nullable: true
+          default: false
+        page_count:
+          type: string
+          readOnly: true
+        mime_type:
+          type: string
+          readOnly: true
+      required:
+      - added
+      - archived_file_name
+      - correspondent
+      - document_type
+      - id
+      - is_shared_by_requester
+      - mime_type
+      - modified
+      - notes
+      - original_file_name
+      - page_count
+      - storage_path
+      - tags
+      - user_can_change
+    ShareLink:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        expiration:
+          type: string
+          format: date-time
+          nullable: true
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        document:
+          type: integer
+        file_version:
+          $ref: '#/components/schemas/FileVersionEnum'
+      required:
+      - created
+      - id
+      - slug
+    SkipArchiveFileEnum:
+      enum:
+      - never
+      - with_text
+      - always
+      type: string
+      description: |-
+        * `never` - never
+        * `with_text` - with_text
+        * `always` - always
+    SocialAccount:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        provider:
+          type: string
+          maxLength: 200
+        name:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - name
+      - provider
+    SourcesEnum:
+      enum:
+      - 1
+      - 2
+      - 3
+      type: integer
+      description: |-
+        * `1` - Consume Folder
+        * `2` - Api Upload
+        * `3` - Mail Fetch
+    StatusEnum:
+      enum:
+      - FAILURE
+      - PENDING
+      - RECEIVED
+      - RETRY
+      - REVOKED
+      - STARTED
+      - SUCCESS
+      type: string
+      description: |-
+        * `FAILURE` - FAILURE
+        * `PENDING` - PENDING
+        * `RECEIVED` - RECEIVED
+        * `RETRY` - RETRY
+        * `REVOKED` - REVOKED
+        * `STARTED` - STARTED
+        * `SUCCESS` - SUCCESS
+    StoragePath:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        slug:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        path:
+          type: string
+        match:
+          type: string
+          maxLength: 256
+        matching_algorithm:
+          allOf:
+          - $ref: '#/components/schemas/MatchingAlgorithm27bEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        is_insensitive:
+          type: boolean
+        document_count:
+          type: integer
+          readOnly: true
+        owner:
+          type: integer
+          nullable: true
+        user_can_change:
+          type: string
+          readOnly: true
+        set_permissions:
+          type: object
+          additionalProperties: {}
+          writeOnly: true
+      required:
+      - document_count
+      - id
+      - name
+      - path
+      - slug
+      - user_can_change
+    StoragePathTest:
+      type: object
+      properties:
+        path:
+          type: string
+          writeOnly: true
+        document:
+          type: integer
+          writeOnly: true
+      required:
+      - document
+      - path
+    TagSerializerVersion1:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        slug:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        colour:
+          type: string
+          default: 1
+        match:
+          type: string
+          maxLength: 256
+        matching_algorithm:
+          allOf:
+          - $ref: '#/components/schemas/MatchingAlgorithm27bEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        is_insensitive:
+          type: boolean
+        is_inbox_tag:
+          type: boolean
+          description: 'Marks this tag as an inbox tag: All newly consumed documents
+            will be tagged with inbox tags.'
+        document_count:
+          type: integer
+          readOnly: true
+        owner:
+          type: integer
+          nullable: true
+        user_can_change:
+          type: string
+          readOnly: true
+        set_permissions:
+          type: object
+          additionalProperties: {}
+          writeOnly: true
+      required:
+      - document_count
+      - id
+      - name
+      - slug
+      - user_can_change
+    TasksView:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        task_id:
+          type: string
+          description: Celery ID for the Task that was run
+          maxLength: 255
+        task_file_name:
+          type: string
+          nullable: true
+          title: Task Filename
+          description: Name of the file which the Task was run for
+          maxLength: 255
+        date_created:
+          type: string
+          format: date-time
+          nullable: true
+          title: Created DateTime
+          description: Datetime field when the task result was created in UTC
+        date_done:
+          type: string
+          format: date-time
+          nullable: true
+          title: Completed DateTime
+          description: Datetime field when the task was completed in UTC
+        type:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          title: Task State
+          description: |-
+            Current state of the task being run
+
+            * `FAILURE` - FAILURE
+            * `PENDING` - PENDING
+            * `RECEIVED` - RECEIVED
+            * `RETRY` - RETRY
+            * `REVOKED` - REVOKED
+            * `STARTED` - STARTED
+            * `SUCCESS` - SUCCESS
+        result:
+          type: string
+          nullable: true
+          title: Result Data
+          description: The data returned by the task
+        acknowledged:
+          type: boolean
+          description: If the task is acknowledged via the frontend or API
+        related_document:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - related_document
+      - task_id
+      - type
+    Trash:
+      type: object
+      properties:
+        documents:
+          type: array
+          items:
+            type: integer
+          writeOnly: true
+        action:
+          allOf:
+          - $ref: '#/components/schemas/TrashActionEnum'
+          writeOnly: true
+      required:
+      - action
+    TrashActionEnum:
+      enum:
+      - restore
+      - empty
+      type: string
+      description: |-
+        * `restore` - restore
+        * `empty` - empty
+    UiSettingsView:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        settings:
+          nullable: true
+      required:
+      - id
+    UnpaperCleanEnum:
+      enum:
+      - clean
+      - clean-final
+      - none
+      type: string
+      description: |-
+        * `clean` - clean
+        * `clean-final` - clean-final
+        * `none` - none
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        password:
+          type: string
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        date_joined:
+          type: string
+          format: date-time
+        is_staff:
+          type: boolean
+          title: Staff status
+          description: Designates whether the user can log into this admin site.
+        is_active:
+          type: boolean
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        is_superuser:
+          type: boolean
+          title: Superuser status
+          description: Designates that this user has all permissions without explicitly
+            assigning them.
+        groups:
+          type: array
+          items:
+            type: integer
+          description: The groups this user belongs to. A user will get all permissions
+            granted to each of their groups.
+        user_permissions:
+          type: array
+          items:
+            type: string
+        inherited_permissions:
+          type: string
+          readOnly: true
+        is_mfa_enabled:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - inherited_permissions
+      - is_mfa_enabled
+      - username
+    Workflow:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 256
+        order:
+          type: integer
+        enabled:
+          type: boolean
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowTrigger'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowAction'
+      required:
+      - actions
+      - id
+      - name
+      - triggers
+    WorkflowAction:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        type:
+          allOf:
+          - $ref: '#/components/schemas/WorkflowActionTypeEnum'
+          title: Workflow Action Type
+          minimum: 0
+          maximum: 9223372036854775807
+        assign_title:
+          type: string
+          nullable: true
+          description: Assign a document title, can include some placeholders, see
+            documentation.
+          maxLength: 256
+        assign_tags:
+          type: array
+          items:
+            type: integer
+            nullable: true
+        assign_correspondent:
+          type: integer
+          nullable: true
+        assign_document_type:
+          type: integer
+          nullable: true
+        assign_storage_path:
+          type: integer
+          nullable: true
+        assign_owner:
+          type: integer
+          nullable: true
+          title: Assign this owner
+        assign_view_users:
+          type: array
+          items:
+            type: integer
+            title: Grant view permissions to these users
+          title: Grant view permissions to these users
+        assign_view_groups:
+          type: array
+          items:
+            type: integer
+            title: Grant view permissions to these groups
+          title: Grant view permissions to these groups
+        assign_change_users:
+          type: array
+          items:
+            type: integer
+            title: Grant change permissions to these users
+          title: Grant change permissions to these users
+        assign_change_groups:
+          type: array
+          items:
+            type: integer
+            title: Grant change permissions to these groups
+          title: Grant change permissions to these groups
+        assign_custom_fields:
+          type: array
+          items:
+            type: integer
+            title: Assign these custom fields
+          title: Assign these custom fields
+        remove_all_tags:
+          type: boolean
+        remove_tags:
+          type: array
+          items:
+            type: integer
+            title: Remove these tag(s)
+          title: Remove these tag(s)
+        remove_all_correspondents:
+          type: boolean
+        remove_correspondents:
+          type: array
+          items:
+            type: integer
+            title: Remove these correspondent(s)
+          title: Remove these correspondent(s)
+        remove_all_document_types:
+          type: boolean
+        remove_document_types:
+          type: array
+          items:
+            type: integer
+            title: Remove these document type(s)
+          title: Remove these document type(s)
+        remove_all_storage_paths:
+          type: boolean
+        remove_storage_paths:
+          type: array
+          items:
+            type: integer
+            title: Remove these storage path(s)
+          title: Remove these storage path(s)
+        remove_custom_fields:
+          type: array
+          items:
+            type: integer
+            title: Remove these custom fields
+          title: Remove these custom fields
+        remove_all_custom_fields:
+          type: boolean
+        remove_all_owners:
+          type: boolean
+        remove_owners:
+          type: array
+          items:
+            type: integer
+            title: Remove these owner(s)
+          title: Remove these owner(s)
+        remove_all_permissions:
+          type: boolean
+        remove_view_users:
+          type: array
+          items:
+            type: integer
+            title: Remove view permissions for these users
+          title: Remove view permissions for these users
+        remove_view_groups:
+          type: array
+          items:
+            type: integer
+            title: Remove view permissions for these groups
+          title: Remove view permissions for these groups
+        remove_change_users:
+          type: array
+          items:
+            type: integer
+            title: Remove change permissions for these users
+          title: Remove change permissions for these users
+        remove_change_groups:
+          type: array
+          items:
+            type: integer
+            title: Remove change permissions for these groups
+          title: Remove change permissions for these groups
+    WorkflowActionTypeEnum:
+      enum:
+      - 1
+      - 2
+      type: integer
+      description: |-
+        * `1` - Assignment
+        * `2` - Removal
+    WorkflowTrigger:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourcesEnum'
+          default:
+          - 1
+          - 2
+          - 3
+        type:
+          allOf:
+          - $ref: '#/components/schemas/WorkflowTriggerTypeEnum'
+          title: Trigger Type
+        filter_path:
+          type: string
+          nullable: true
+          description: Only consume documents with a path that matches this if specified.
+            Wildcards specified as * are allowed. Case insensitive.
+          maxLength: 256
+        filter_filename:
+          type: string
+          nullable: true
+          description: Only consume documents which entirely match this filename if
+            specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.
+          maxLength: 256
+        filter_mailrule:
+          type: integer
+          nullable: true
+          title: Filter documents from this mail rule
+        matching_algorithm:
+          allOf:
+          - $ref: '#/components/schemas/WorkflowTriggerMatchingAlgorithmEnum'
+          minimum: 0
+          maximum: 9223372036854775807
+        match:
+          type: string
+          maxLength: 256
+        is_insensitive:
+          type: boolean
+        filter_has_tags:
+          type: array
+          items:
+            type: integer
+            title: Has these tag(s)
+          title: Has these tag(s)
+        filter_has_correspondent:
+          type: integer
+          nullable: true
+          title: Has this correspondent
+        filter_has_document_type:
+          type: integer
+          nullable: true
+          title: Has this document type
+      required:
+      - type
+    WorkflowTriggerMatchingAlgorithmEnum:
+      enum:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      type: integer
+      description: |-
+        * `0` - None
+        * `1` - Any word
+        * `2` - All words
+        * `3` - Exact match
+        * `4` - Regular expression
+        * `5` - Fuzzy word
+    WorkflowTriggerTypeEnum:
+      enum:
+      - 1
+      - 2
+      - 3
+      type: integer
+      description: |-
+        * `1` - Consumption Started
+        * `2` - Document Added
+        * `3` - Document Updated
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
