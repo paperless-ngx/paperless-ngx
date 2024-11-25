@@ -4,8 +4,7 @@ import { FolderService } from 'src/app/services/rest/folder.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { FolderEditDialogComponent } from '../../common/edit-dialog/folder-edit-dialog/folder-edit-dialog.component'
 import { Folder } from 'src/app/data/folder'
-import { Router } from '@angular/router'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { FILTER_HAS_FOLDER_ANY } from 'src/app/data/filter-rule-type'
 import {
@@ -19,6 +18,7 @@ import { ManagementListComponent } from '../management-list/management-list.comp
 import { takeUntil } from 'rxjs/operators'
 import { BulkEditObjectOperation } from '../../../services/rest/abstract-name-filter-service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 
 
 @Component({
@@ -375,6 +375,25 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
     })
   }
 
+  openCreateDialog() {
+    var activeModal = this.getModalService().open(this.getEditDialogComponent(), {
+      backdrop: 'static',
+    })
+    activeModal.componentInstance.object = { parent_folder: this.id }
+    activeModal.componentInstance.dialogMode = EditDialogMode.CREATE
+    activeModal.componentInstance.succeeded.subscribe(() => {
+      this.reloadData()
+      this.getToastService().showInfo(
+        $localize`Successfully created ${this.typeName}.`
+      )
+    })
+    activeModal.componentInstance.failed.subscribe((e) => {
+      this.getToastService().showError(
+        $localize`Error occurred while creating ${this.typeName}.`,
+        e
+      )
+    })
+  }
   getDeleteMessage(object: Folder) {
     return $localize`Do you really want to delete the folder "${object.name}"?`
   }
