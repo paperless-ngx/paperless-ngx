@@ -2107,28 +2107,28 @@ class AdjustedNameFieldFolder(serializers.CharField):
             type = self.parent.initial_data.get('type')
 
             if type == 'file':
-                return data
+                return data.strip()
 
             if type and not parent_folder:
                 existing_names = model.objects.filter(type=type).values_list('name', flat=True)
                 if getattr(self.parent,'instance') is None:
                     pass
                 elif data == getattr(self.parent.instance,'name'):
-                    return data
+                    return data.strip()
 
             elif parent_folder:
                 existing_names = model.objects.filter(parent_folder=parent_folder).order_by('name').values_list('name', flat=True)
                 if getattr(self.parent,'instance') is None:
                     pass
                 elif data == getattr(self.parent.instance,'name'):
-                    return data
+                    return data.strip()
 
             else:
-                existing_names = model.objects.filter(name__startswith=data,parent_folder=None).order_by('name').values_list('name', flat=True)
+                existing_names = model.objects.filter(name__startswith=data.strip(),parent_folder=None).order_by('name').values_list('name', flat=True)
 
-            if data in existing_names:
-                data = generate_unique_name(data, existing_names)
-        return data
+            if data.strip() in existing_names:
+                data = generate_unique_name(data.strip(), existing_names)
+        return data.strip()
 
 class AdjustedNameFieldWarehouse(serializers.CharField):
     def to_internal_value(self, data):
@@ -2139,28 +2139,28 @@ class AdjustedNameFieldWarehouse(serializers.CharField):
             type = self.parent.initial_data.get('type')
 
             if type == 'file':
-                return data
+                return data.strip()
 
             if type and not parent_warehouse:
                 existing_names = model.objects.filter(type=type).values_list('name', flat=True)
                 if getattr(self.parent,'instance') is None:
                     pass
                 elif data == getattr(self.parent.instance,'name'):
-                    return data
+                    return data.strip()
 
             elif parent_warehouse:
                 existing_names = model.objects.filter(parent_warehouse=parent_warehouse).order_by('name').values_list('name', flat=True)
                 if getattr(self.parent,'instance') is None:
                     pass
                 elif data == getattr(self.parent.instance,'name'):
-                    return data
+                    return data.strip()
 
             else:
-                existing_names = model.objects.filter(name__startswith=data,parent_warehouse=None).order_by('name').values_list('name', flat=True)
+                existing_names = model.objects.filter(name__startswith=data.strip(),parent_warehouse=None).order_by('name').values_list('name', flat=True)
 
-            if data in existing_names:
-                data = generate_unique_name(data, existing_names)
-        return data
+            if data.strip() in existing_names:
+                data = generate_unique_name(data.strip(), existing_names)
+        return data.strip()
 
 class AdjustedNameFieldDossier(serializers.CharField):
     def to_internal_value(self, data):
