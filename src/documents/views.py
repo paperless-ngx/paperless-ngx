@@ -2777,6 +2777,21 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 child_folder.path = f"{child_folder.id}"
             child_folder.save()
             self.update_child_folder_paths(child_folder)
+
+    def update_view_folder_parent_permissions(self, folder, permissions):
+        list_folder_ids = folder.path.split("/")
+        folders_list = Folder.objects.filter(id__in = list_folder_ids)
+        permissions["change"] = {
+            "users": [],
+            "groups": [],
+        }
+        for obj in folders_list:
+            set_permissions_for_object(
+                permissions=permissions,
+                object=obj.dossier,
+                merge=True,
+            )
+        logger.debug("noi dung test", folders_list)
     def update_child_folder_permisisons(self, folder, serializer):
         child_folders = Folder.objects.filter(path__startswith=folder.path)
         documents_list = Document.objects.select_related("dossier").filter(folder__in=child_folders)
@@ -2786,6 +2801,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         #         documents_list._append(child.o)
 
         permissions = serializer.validated_data.get("set_permissions")
+        self.update_view_folder_parent_permissions(folder, serializer)
         owner = serializer.validated_data.get("owner")
         merge = serializer.validated_data.get("merge")
 
