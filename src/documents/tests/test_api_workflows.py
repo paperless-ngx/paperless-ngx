@@ -484,8 +484,10 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     "actions": [
                         {
                             "type": WorkflowAction.WorkflowActionType.EMAIL,
-                            "email_subject": "Subject",
-                            "email_body": "Body",
+                            "email": {
+                                "subject": "Subject",
+                                "body": "Body",
+                            },
                         },
                     ],
                 },
@@ -511,9 +513,12 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     "actions": [
                         {
                             "type": WorkflowAction.WorkflowActionType.EMAIL,
-                            "email_subject": "Subject",
-                            "email_body": "Body",
-                            "email_to": "me@example.com",
+                            "email": {
+                                "subject": "Subject",
+                                "body": "Body",
+                                "to": "me@example.com",
+                                "include_document": False,
+                            },
                         },
                     ],
                 },
@@ -572,7 +577,10 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     "actions": [
                         {
                             "type": WorkflowAction.WorkflowActionType.WEBHOOK,
-                            "webhook_url": "https://example.com",
+                            "webhook": {
+                                "url": "https://example.com",
+                                "include_document": False,
+                            },
                         },
                     ],
                 },

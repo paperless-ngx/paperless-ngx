@@ -31,6 +31,8 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
+from documents.models import WorkflowActionEmail
+from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.signals import document_consumption_finished
@@ -2109,12 +2111,15 @@ class TestWorkflows(
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
         )
+        email_action = WorkflowActionEmail.objects.create(
+            subject="Test Notification: {doc_title}",
+            body="Test message: {doc_url}",
+            to="user@example.com",
+            include_document=False,
+        )
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.EMAIL,
-            email_subject="Test Notification: {doc_title}",
-            email_body="Test message: {doc_url}",
-            email_to="user@example.com",
-            email_include_document=False,
+            email=email_action,
         )
         w = Workflow.objects.create(
             name="Workflow 1",
@@ -2161,12 +2166,15 @@ class TestWorkflows(
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
         )
+        email_action = WorkflowActionEmail.objects.create(
+            subject="Test Notification: {doc_title}",
+            body="Test message: {doc_url}",
+            to="me@example.com",
+            include_document=True,
+        )
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.EMAIL,
-            email_subject="Test Notification: {doc_title}",
-            email_body="Test message: {doc_url}",
-            email_to="me@example.com",
-            email_include_document=True,
+            email=email_action,
         )
         w = Workflow.objects.create(
             name="Workflow 1",
@@ -2202,11 +2210,14 @@ class TestWorkflows(
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
         )
+        email_action = WorkflowActionEmail.objects.create(
+            subject="Test Notification: {doc_title}",
+            body="Test message: {doc_url}",
+            to="me@example.com",
+        )
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.EMAIL,
-            email_subject="Test Notification: {doc_title}",
-            email_body="Test message: {doc_url}",
-            email_to="me@example.com",
+            email=email_action,
         )
         w = Workflow.objects.create(
             name="Workflow 1",
@@ -2247,11 +2258,14 @@ class TestWorkflows(
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
         )
+        email_action = WorkflowActionEmail.objects.create(
+            subject="Test Notification: {doc_title}",
+            body="Test message: {doc_url}",
+            to="me@example.com",
+        )
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.EMAIL,
-            email_subject="Test Notification: {doc_title}",
-            email_body="Test message: {doc_url}",
-            email_to="me@example.com",
+            email=email_action,
         )
         w = Workflow.objects.create(
             name="Workflow 1",
@@ -2296,12 +2310,15 @@ class TestWorkflows(
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
         )
+        webhook_action = WorkflowActionWebhook.objects.create(
+            use_params=False,
+            body="Test message: {doc_url}",
+            url="http://paperless-ngx.com",
+            include_document=False,
+        )
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.WEBHOOK,
-            webhook_use_params=False,
-            webhook_body="Test message: {doc_url}",
-            webhook_url="http://paperless-ngx.com",
-            webhook_include_document=False,
+            webhook=webhook_action,
         )
         w = Workflow.objects.create(
             name="Workflow 1",
@@ -2348,12 +2365,15 @@ class TestWorkflows(
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
         )
+        webhook_action = WorkflowActionWebhook.objects.create(
+            use_params=False,
+            body="Test message: {doc_url}",
+            url="http://paperless-ngx.com",
+            include_document=True,
+        )
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.WEBHOOK,
-            webhook_use_params=False,
-            webhook_body="Test message: {doc_url}",
-            webhook_url="http://paperless-ngx.com",
-            webhook_include_document=True,
+            webhook=webhook_action,
         )
         w = Workflow.objects.create(
             name="Workflow 1",
@@ -2373,6 +2393,7 @@ class TestWorkflows(
             correspondent=self.c,
             original_filename="simple.pdf",
             filename=test_file,
+            mime_type="application/pdf",
         )
 
         run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
@@ -2380,7 +2401,7 @@ class TestWorkflows(
         mock_post.assert_called_once_with(
             "http://paperless-ngx.com",
             data=f"Test message: http://localhost:8000/documents/{doc.id}/",
-            files={"file": ("simple.pdf", mock.ANY)},
+            files={"file": ("simple.pdf", mock.ANY, "application/pdf")},
             headers={},
         )
 
@@ -2402,15 +2423,18 @@ class TestWorkflows(
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
         )
-        action = WorkflowAction.objects.create(
-            type=WorkflowAction.WorkflowActionType.WEBHOOK,
-            webhook_use_params=True,
-            webhook_params={
+        webhook_action = WorkflowActionWebhook.objects.create(
+            use_params=True,
+            params={
                 "title": "Test webhook: {doc_title}",
                 "body": "Test message: {doc_url}",
             },
-            webhook_url="http://paperless-ngx.com",
-            webhook_include_document=True,
+            url="http://paperless-ngx.com",
+            include_document=True,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.WEBHOOK,
+            webhook=webhook_action,
         )
         w = Workflow.objects.create(
             name="Workflow 1",
@@ -2447,12 +2471,15 @@ class TestWorkflows(
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
         )
+        webhook_action = WorkflowActionWebhook.objects.create(
+            url="http://paperless-ngx.com",
+            use_params=True,
+            params="invalid",
+            headers="invalid",
+        )
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.WEBHOOK,
-            webhook_url="http://paperless-ngx.com",
-            webhook_use_params=True,
-            webhook_params="invalid",
-            webhook_headers="invalid",
+            webhook=webhook_action,
         )
         w = Workflow.objects.create(
             name="Workflow 1",

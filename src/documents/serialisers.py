@@ -49,6 +49,8 @@ from documents.models import Tag
 from documents.models import UiSettings
 from documents.models import Workflow
 from documents.models import WorkflowAction
+from documents.models import WorkflowActionEmail
+from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
 from documents.permissions import get_groups_with_only_permission
@@ -1807,12 +1809,44 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
         return attrs
 
 
+class WorkflowActionEmailSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(allow_null=True, required=False)
+
+    class Meta:
+        model = WorkflowActionEmail
+        fields = [
+            "id",
+            "subject",
+            "body",
+            "to",
+            "include_document",
+        ]
+
+
+class WorkflowActionWebhookSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(allow_null=True, required=False)
+
+    class Meta:
+        model = WorkflowActionWebhook
+        fields = [
+            "id",
+            "url",
+            "use_params",
+            "params",
+            "body",
+            "headers",
+            "include_document",
+        ]
+
+
 class WorkflowActionSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False, allow_null=True)
     assign_correspondent = CorrespondentField(allow_null=True, required=False)
     assign_tags = TagsField(many=True, allow_null=True, required=False)
     assign_document_type = DocumentTypeField(allow_null=True, required=False)
     assign_storage_path = StoragePathField(allow_null=True, required=False)
+    email = WorkflowActionEmailSerializer(allow_null=True, required=False)
+    webhook = WorkflowActionWebhookSerializer(allow_null=True, required=False)
 
     class Meta:
         model = WorkflowAction
@@ -1847,15 +1881,8 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
             "remove_view_groups",
             "remove_change_users",
             "remove_change_groups",
-            "email_to",
-            "email_subject",
-            "email_body",
-            "email_include_document",
-            "webhook_url",
-            "webhook_use_params",
-            "webhook_params",
-            "webhook_body",
-            "webhook_headers",
+            "email",
+            "webhook",
         ]
 
     def validate(self, attrs):
@@ -1893,37 +1920,22 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
                         {"assign_title": f'Invalid f-string detected: "{e.args[0]}"'},
                     )
 
-        if "type" in attrs and attrs["type"] == WorkflowAction.WorkflowActionType.EMAIL:
-            if (
-                "email_subject" not in attrs
-                or attrs["email_subject"] is None
-                or len(attrs["email_subject"]) == 0
-                or "email_body" not in attrs
-                or attrs["email_body"] is None
-                or len(attrs["email_body"]) == 0
-            ):
-                raise serializers.ValidationError(
-                    "Email subject and body required",
-                )
-            elif (
-                "email_to" not in attrs
-                or attrs["email_to"] is None
-                or len(attrs["email_to"]) == 0
-            ):
-                raise serializers.ValidationError(
-                    "Email recipient required",
-                )
+        if (
+            "type" in attrs
+            and attrs["type"] == WorkflowAction.WorkflowActionType.EMAIL
+            and "email" not in attrs
+        ):
+            raise serializers.ValidationError(
+                "Email data is required for email actions",
+            )
 
         if (
             "type" in attrs
             and attrs["type"] == WorkflowAction.WorkflowActionType.WEBHOOK
-        ) and (
-            "webhook_url" not in attrs
-            or attrs["webhook_url"] is None
-            or len(attrs["webhook_url"]) == 0
+            and "webhook" not in attrs
         ):
             raise serializers.ValidationError(
-                "Webhook URL required",
+                "Webhook data is required for webhook actions",
             )
 
         return attrs
@@ -1980,10 +1992,33 @@ class WorkflowSerializer(serializers.ModelSerializer):
                 remove_change_users = action.pop("remove_change_users", None)
                 remove_change_groups = action.pop("remove_change_groups", None)
 
+                email_data = action.pop("email", None)
+                webhook_data = action.pop("webhook", None)
+
                 action_instance, _ = WorkflowAction.objects.update_or_create(
                     id=action.get("id"),
                     defaults=action,
                 )
+
+                if email_data is not None:
+                    serializer = WorkflowActionEmailSerializer(data=email_data)
+                    serializer.is_valid(raise_exception=True)
+                    email, _ = WorkflowActionEmail.objects.update_or_create(
+                        id=email_data.get("id"),
+                        defaults=serializer.validated_data,
+                    )
+                    action_instance.email = email
+                    action_instance.save()
+
+                if webhook_data is not None:
+                    serializer = WorkflowActionWebhookSerializer(data=webhook_data)
+                    serializer.is_valid(raise_exception=True)
+                    webhook, _ = WorkflowActionWebhook.objects.update_or_create(
+                        id=webhook_data.get("id"),
+                        defaults=serializer.validated_data,
+                    )
+                    action_instance.webhook = webhook
+                    action_instance.save()
 
                 if assign_tags is not None:
                     action_instance.assign_tags.set(assign_tags)
@@ -2036,6 +2071,9 @@ class WorkflowSerializer(serializers.ModelSerializer):
         for action in WorkflowAction.objects.all():
             if action.workflows.all().count() == 0:
                 action.delete()
+
+        WorkflowActionEmail.objects.filter(action=None).delete()
+        WorkflowActionWebhook.objects.filter(action=None).delete()
 
     def create(self, validated_data) -> Workflow:
         if "triggers" in validated_data:

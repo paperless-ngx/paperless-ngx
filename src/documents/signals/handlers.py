@@ -891,7 +891,7 @@ def run_workflows(
         added = timezone.localtime(document.added)
         created = timezone.localtime(document.created)
         subject = parse_w_workflow_placeholders(
-            action.email_subject,
+            action.email.subject,
             correspondent,
             document_type,
             owner_username,
@@ -902,7 +902,7 @@ def run_workflows(
             doc_url,
         )
         body = parse_w_workflow_placeholders(
-            action.email_body,
+            action.email.body,
             correspondent,
             document_type,
             owner_username,
@@ -916,13 +916,13 @@ def run_workflows(
             email = EmailMessage(
                 subject=subject,
                 body=body,
-                to=action.email_to.split(","),
+                to=action.email.to.split(","),
             )
-            if action.email_include_document:
+            if action.email.include_document:
                 email.attach_file(document.source_path)
             n_messages = email.send()
             logger.debug(
-                f"Sent {n_messages} notification email(s) to {action.email_to}",
+                f"Sent {n_messages} notification email(s) to {action.email.to}",
                 extra={"group": logging_group},
             )
         except Exception as e:
@@ -949,9 +949,9 @@ def run_workflows(
 
         try:
             data = {}
-            if action.webhook_use_params:
+            if action.webhook.use_params:
                 try:
-                    for key, value in action.webhook_params.items():
+                    for key, value in action.webhook.params.items():
                         data[key] = parse_w_workflow_placeholders(
                             value,
                             correspondent,
@@ -970,7 +970,7 @@ def run_workflows(
                     )
             else:
                 data = parse_w_workflow_placeholders(
-                    action.webhook_body,
+                    action.webhook.body,
                     correspondent,
                     document_type,
                     owner_username,
@@ -981,30 +981,30 @@ def run_workflows(
                     doc_url,
                 )
             headers = {}
-            if action.webhook_headers:
+            if action.webhook.headers:
                 try:
                     headers = {
-                        str(k): str(v) for k, v in action.webhook_headers.items()
+                        str(k): str(v) for k, v in action.webhook.headers.items()
                     }
                 except Exception as e:
                     logger.error(
                         f"Error occurred parsing webhook headers: {e}",
                         extra={"group": logging_group},
                     )
-            if action.webhook_include_document:
+            if action.webhook.include_document:
                 with open(document.source_path, "rb") as f:
                     files = {
                         "file": (document.original_filename, f, document.mime_type),
                     }
                     httpx.post(
-                        action.webhook_url,
+                        action.webhook.url,
                         data=data,
                         files=files,
                         headers=headers,
                     )
             else:
                 httpx.post(
-                    action.webhook_url,
+                    action.webhook.url,
                     data=data,
                     headers=headers,
                 )

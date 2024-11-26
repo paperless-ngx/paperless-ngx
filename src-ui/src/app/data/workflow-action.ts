@@ -6,6 +6,31 @@ export enum WorkflowActionType {
   Email = 3,
   Webhook = 4,
 }
+
+export interface WorkflowActionEmail extends ObjectWithId {
+  subject?: string
+
+  body?: string
+
+  to?: string
+
+  include_document?: boolean
+}
+
+export interface WorkflowActionWebhook extends ObjectWithId {
+  url?: string
+
+  use_params?: boolean
+
+  params?: object
+
+  body?: string
+
+  headers?: object
+
+  include_document?: boolean
+}
+
 export interface WorkflowAction extends ObjectWithId {
   type: WorkflowActionType
 
@@ -65,23 +90,7 @@ export interface WorkflowAction extends ObjectWithId {
 
   remove_all_custom_fields?: boolean
 
-  email_subject?: string
+  email?: WorkflowActionEmail
 
-  email_body?: string
-
-  email_to?: string
-
-  email_include_document?: boolean
-
-  webhook_url?: string
-
-  webhook_use_params?: boolean
-
-  webhook_params?: object
-
-  webhook_body?: string
-
-  webhook_headers?: object
-
-  webhook_include_document?: boolean
+  webhook?: WorkflowActionWebhook
 }

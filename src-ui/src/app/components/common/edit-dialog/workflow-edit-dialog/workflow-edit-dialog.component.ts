@@ -410,18 +410,22 @@ export class WorkflowEditDialogComponent
         remove_all_custom_fields: new FormControl(
           action.remove_all_custom_fields
         ),
-        email_subject: new FormControl(action.email_subject),
-        email_body: new FormControl(action.email_body),
-        email_to: new FormControl(action.email_to),
-        email_include_document: new FormControl(action.email_include_document),
-        webhook_url: new FormControl(action.webhook_url),
-        webhook_use_params: new FormControl(action.webhook_use_params),
-        webhook_params: new FormControl(action.webhook_params),
-        webhook_body: new FormControl(action.webhook_body),
-        webhook_headers: new FormControl(action.webhook_headers),
-        webhook_include_document: new FormControl(
-          action.webhook_include_document
-        ),
+        email: new FormGroup({
+          id: new FormControl(action.email?.id),
+          subject: new FormControl(action.email?.subject),
+          body: new FormControl(action.email?.body),
+          to: new FormControl(action.email?.to),
+          include_document: new FormControl(!!action.email?.include_document),
+        }),
+        webhook: new FormGroup({
+          id: new FormControl(action.webhook?.id),
+          url: new FormControl(action.webhook?.url),
+          use_params: new FormControl(action.webhook?.use_params),
+          params: new FormControl(action.webhook?.params),
+          body: new FormControl(action.webhook?.body),
+          headers: new FormControl(action.webhook?.headers),
+          include_document: new FormControl(!!action.webhook?.include_document),
+        }),
       }),
       { emitEvent }
     )
@@ -523,16 +527,22 @@ export class WorkflowEditDialogComponent
       remove_all_permissions: false,
       remove_custom_fields: [],
       remove_all_custom_fields: false,
-      email_subject: null,
-      email_body: null,
-      email_to: null,
-      email_include_document: false,
-      webhook_url: null,
-      webhook_use_params: true,
-      webhook_params: null,
-      webhook_body: null,
-      webhook_headers: null,
-      webhook_include_document: false,
+      email: {
+        id: null,
+        subject: null,
+        body: null,
+        to: null,
+        include_document: false,
+      },
+      webhook: {
+        id: null,
+        url: null,
+        use_params: true,
+        params: null,
+        body: null,
+        headers: null,
+        include_document: false,
+      },
     }
     this.object.actions.push(action)
     this.createActionField(action)
@@ -562,5 +572,19 @@ export class WorkflowEditDialogComponent
     this.actionFields.controls.forEach((c) =>
       c.get('id').setValue(null, { emitEvent: false })
     )
+  }
+
+  save(): void {
+    this.objectForm
+      .get('actions')
+      .value.forEach((action: WorkflowAction, i) => {
+        if (action.type !== WorkflowActionType.Webhook) {
+          action.webhook = null
+        }
+        if (action.type !== WorkflowActionType.Email) {
+          action.email = null
+        }
+      })
+    super.save()
   }
 }
