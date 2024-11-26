@@ -884,25 +884,31 @@ def run_workflows(
         doc_url = None
         if isinstance(document, Document):
             doc_url = f"{settings.PAPERLESS_URL}/documents/{document.pk}/"
+        correspondent = document.correspondent.name if document.correspondent else ""
+        document_type = document.document_type.name if document.document_type else ""
+        owner_username = document.owner.username if document.owner else ""
+        filename = document.original_filename or ""
+        added = timezone.localtime(document.added)
+        created = timezone.localtime(document.created)
         subject = parse_w_workflow_placeholders(
             action.email_subject,
-            document.correspondent.name if document.correspondent else "",
-            document.document_type.name if document.document_type else "",
-            document.owner.username if document.owner else "",
-            timezone.localtime(document.added),
-            document.original_filename or "",
-            timezone.localtime(document.created),
+            correspondent,
+            document_type,
+            owner_username,
+            added,
+            filename,
+            created,
             title,
             doc_url,
         )
         body = parse_w_workflow_placeholders(
             action.email_body,
-            document.correspondent.name if document.correspondent else "",
-            document.document_type.name if document.document_type else "",
-            document.owner.username if document.owner else "",
-            timezone.localtime(document.added),
-            document.original_filename or "",
-            timezone.localtime(document.created),
+            correspondent,
+            document_type,
+            owner_username,
+            added,
+            filename,
+            created,
             title,
             doc_url,
         )
@@ -934,6 +940,12 @@ def run_workflows(
         doc_url = None
         if isinstance(document, Document):
             doc_url = f"{settings.PAPERLESS_URL}/documents/{document.pk}/"
+        correspondent = document.correspondent.name if document.correspondent else ""
+        document_type = document.document_type.name if document.document_type else ""
+        owner_username = document.owner.username if document.owner else ""
+        filename = document.original_filename or ""
+        added = timezone.localtime(document.added)
+        created = timezone.localtime(document.created)
 
         try:
             data = {}
@@ -942,16 +954,12 @@ def run_workflows(
                     for key, value in action.webhook_params.items():
                         data[key] = parse_w_workflow_placeholders(
                             value,
-                            document.correspondent.name
-                            if document.correspondent
-                            else "",
-                            document.document_type.name
-                            if document.document_type
-                            else "",
-                            document.owner.username if document.owner else "",
-                            timezone.localtime(document.added),
-                            document.original_filename or "",
-                            timezone.localtime(document.created),
+                            correspondent,
+                            document_type,
+                            owner_username,
+                            added,
+                            filename,
+                            created,
                             title,
                             doc_url,
                         )
@@ -963,12 +971,12 @@ def run_workflows(
             else:
                 data = parse_w_workflow_placeholders(
                     action.webhook_body,
-                    document.correspondent.name if document.correspondent else "",
-                    document.document_type.name if document.document_type else "",
-                    document.owner.username if document.owner else "",
-                    timezone.localtime(document.added),
-                    document.original_filename or "",
-                    timezone.localtime(document.created),
+                    correspondent,
+                    document_type,
+                    owner_username,
+                    added,
+                    filename,
+                    created,
                     title,
                     doc_url,
                 )
