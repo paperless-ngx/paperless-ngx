@@ -251,10 +251,12 @@
                               ngbDropdownItem i18n>Filter Documents
                       </button>
                       <button (click)="openEditDialog(object)"
+                              [disabled]="!userCanEdit(object)"
                               *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }"
                               ngbDropdownItem i18n>Edit
                       </button>
                       <button class="text-danger" (click)="openDeleteDialog(object)"
+                              [disabled]="!userCanDelete(object)"
                               *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }"
                               ngbDropdownItem i18n>Delete
                       </button>
