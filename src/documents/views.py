@@ -2113,7 +2113,11 @@ class BulkEditObjectsView(PassUserMixin):
 
         elif operation == "update" and object_type == "folders":
             parent_folder_id = serializer.validated_data.get("parent_folder")
+
+            new_parent_folder = Folder.objects.filter(id=parent_folder_id).first() if parent_folder_id else None
             parent_folder_obj = Folder.objects.get(pk=parent_folder_id) if parent_folder_id else None
+            folder_list = Folder.objects.filter(id__in = object_ids)
+            for folder in folder_list:
 
                 # folder.parent_folder = parent_folder_obj
                 # folder.path = f"{folder.parent_folder.path}/{folder.id}"
@@ -2126,7 +2130,9 @@ class BulkEditObjectsView(PassUserMixin):
                 elif int(request.data['parent_folder']) == folder.id:
                     return Response(status=status.HTTP_400_BAD_REQUEST)
                 elif 'parent_folder' in request.data:
-                    new_parent_folder = Folder.objects.get(id=int(request.data['parent_folder']))
+                    if parent_folder_obj.owner != user:
+                        return HttpResponseForbidden(
+                            "Insufficient permissions")
                     if new_parent_folder.path.startswith(folder.path):
                         return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a folder into one of its child folders.'})
                     elif new_parent_folder.type == "file":
