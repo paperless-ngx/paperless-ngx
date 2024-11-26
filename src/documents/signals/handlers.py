@@ -985,7 +985,9 @@ def run_workflows(
                     )
             if action.webhook_include_document:
                 with open(document.source_path, "rb") as f:
-                    files = {"file": (document.original_filename, f)}
+                    files = {
+                        "file": (document.original_filename, f, document.mime_type),
+                    }
                     httpx.post(
                         action.webhook_url,
                         data=data,
