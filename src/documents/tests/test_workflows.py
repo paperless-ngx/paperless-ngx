@@ -2117,6 +2117,7 @@ class TestWorkflows(
             to="user@example.com",
             include_document=False,
         )
+        self.assertEqual(str(email_action), f"Workflow Email Action {email_action.id}")
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.EMAIL,
             email=email_action,
@@ -2315,6 +2316,10 @@ class TestWorkflows(
             body="Test message: {doc_url}",
             url="http://paperless-ngx.com",
             include_document=False,
+        )
+        self.assertEqual(
+            str(webhook_action),
+            f"Workflow Webhook Action {webhook_action.id}",
         )
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.WEBHOOK,
