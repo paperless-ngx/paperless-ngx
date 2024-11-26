@@ -294,7 +294,7 @@ class Command(CryptMixin, BaseCommand):
             manifest_dict = {}
 
             # Build an overall manifest
-            for key in manifest_key_to_object_query:
+            for key in manifest_key_to_object_query.items():
                 manifest_dict[key] = json.loads(
                     serializers.serialize("json", manifest_key_to_object_query[key]),
                 )
@@ -370,7 +370,7 @@ class Command(CryptMixin, BaseCommand):
 
         # 4.1 write primary manifest to target folder
         manifest = []
-        for key in manifest_dict:
+        for key in manifest_dict.items():
             manifest.extend(manifest_dict[key])
         manifest_path = (self.target / "manifest.json").resolve()
         self.check_and_write_json(

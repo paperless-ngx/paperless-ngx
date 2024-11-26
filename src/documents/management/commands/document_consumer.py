@@ -317,7 +317,7 @@ class Command(BaseCommand):
 
                 # Check the files against the timeout
                 still_waiting = {}
-                for filepath in notified_files:
+                for filepath in notified_files.items():
                     # Time of the last inotify event for this file
                     last_event_time = notified_files[filepath]
 
