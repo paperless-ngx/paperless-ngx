@@ -194,6 +194,23 @@ urlpatterns = [
                     OauthCallbackView.as_view(),
                     name="oauth_callback",
                 ),
+                re_path(
+                    "^schema/",
+                    include(
+                        [
+                            re_path(
+                                "^$",
+                                SpectacularAPIView.as_view(),
+                                name="schema",
+                            ),
+                            re_path(
+                                "^swagger-ui/",
+                                SpectacularSwaggerView.as_view(),
+                                name="swagger-ui",
+                            ),
+                        ],
+                    ),
+                ),
                 *api_router.urls,
             ],
         ),
