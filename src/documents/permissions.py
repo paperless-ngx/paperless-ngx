@@ -11,6 +11,8 @@ from guardian.shortcuts import remove_perm
 from rest_framework.permissions import BasePermission
 from rest_framework.permissions import DjangoObjectPermissions
 
+from documents.models import Folder
+
 
 class PaperlessObjectPermissions(DjangoObjectPermissions):
     """
@@ -137,3 +139,31 @@ def get_objects_for_user_owner_aware(user, perms, Model):
 def has_perms_owner_aware(user, perms, obj):
     checker = ObjectPermissionChecker(user)
     return obj.owner is None or obj.owner == user or checker.has_perm(perms, obj)
+
+
+def check_user_can_change_folder(user, obj):
+    checker = ObjectPermissionChecker(
+        user) if user is not None else None
+    return (
+        obj.owner is None
+        or obj.owner == user
+        or (
+            user is not None
+            and checker.has_perm(
+            f"change_{obj.__class__.__name__.lower()}", obj)
+        )
+    )
+
+def update_view_folder_parent_permissions(folder, permissions):
+    list_folder_ids = folder.path.split("/")
+    folders_list = Folder.objects.filter(id__in = list_folder_ids)
+    permissions["change"] = {
+        "users": [],
+        "groups": [],
+    }
+    for obj in folders_list:
+        set_permissions_for_object(
+            permissions=permissions,
+            object=obj,
+            merge=True,
+        )

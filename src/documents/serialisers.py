@@ -903,6 +903,58 @@ class DocumentSerializer(
 
         )
 
+class DocumentFolderSerializer(
+    OwnedObjectSerializer,
+):
+
+    original_file_name = SerializerMethodField()
+    archived_file_name = SerializerMethodField()
+
+    def to_representation(self, instance):
+        value = instance.created
+        return value.astimezone(timezone.get_default_timezone()).isoformat()
+
+    owner = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        required=False,
+        allow_null=True,
+    )
+    def get_original_file_name(self, obj):
+        return obj.original_filename
+
+    def get_archived_file_name(self, obj):
+        if obj.has_archive_version:
+            return obj.get_public_filename(archive=True)
+        else:
+            return None
+
+    def to_representation(self, instance):
+        doc = super().to_representation(instance)
+        return doc
+    def __init__(self, *args, **kwargs):
+
+
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        model = Document
+        depth = 1
+        fields = (
+            "id",
+            "title",
+            "created",
+            "created_date",
+            "modified",
+            "added",
+            "original_file_name",
+            "archived_file_name",
+            "owner",
+            "permissions",
+            "user_can_change",
+            "is_shared_by_requester",
+            "set_permissions",
+        )
+
 
 class SavedViewFilterRuleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -2055,28 +2107,28 @@ class AdjustedNameFieldFolder(serializers.CharField):
             type = self.parent.initial_data.get('type')
 
             if type == 'file':
-                return data
+                return data.strip()
 
             if type and not parent_folder:
                 existing_names = model.objects.filter(type=type).values_list('name', flat=True)
                 if getattr(self.parent,'instance') is None:
                     pass
                 elif data == getattr(self.parent.instance,'name'):
-                    return data
+                    return data.strip()
 
             elif parent_folder:
                 existing_names = model.objects.filter(parent_folder=parent_folder).order_by('name').values_list('name', flat=True)
                 if getattr(self.parent,'instance') is None:
                     pass
                 elif data == getattr(self.parent.instance,'name'):
-                    return data
+                    return data.strip()
 
             else:
-                existing_names = model.objects.filter(name__startswith=data,parent_folder=None).order_by('name').values_list('name', flat=True)
+                existing_names = model.objects.filter(name__startswith=data.strip(),parent_folder=None).order_by('name').values_list('name', flat=True)
 
-            if data in existing_names:
-                data = generate_unique_name(data, existing_names)
-        return data
+            if data.strip() in existing_names:
+                data = generate_unique_name(data.strip(), existing_names)
+        return data.strip()
 
 class AdjustedNameFieldWarehouse(serializers.CharField):
     def to_internal_value(self, data):
@@ -2087,24 +2139,56 @@ class AdjustedNameFieldWarehouse(serializers.CharField):
             type = self.parent.initial_data.get('type')
 
             if type == 'file':
-                return data
+                return data.strip()
 
             if type and not parent_warehouse:
                 existing_names = model.objects.filter(type=type).values_list('name', flat=True)
                 if getattr(self.parent,'instance') is None:
                     pass
                 elif data == getattr(self.parent.instance,'name'):
-                    return data
+                    return data.strip()
 
             elif parent_warehouse:
                 existing_names = model.objects.filter(parent_warehouse=parent_warehouse).order_by('name').values_list('name', flat=True)
                 if getattr(self.parent,'instance') is None:
                     pass
                 elif data == getattr(self.parent.instance,'name'):
+                    return data.strip()
+
+            else:
+                existing_names = model.objects.filter(name__startswith=data.strip(),parent_warehouse=None).order_by('name').values_list('name', flat=True)
+
+            if data.strip() in existing_names:
+                data = generate_unique_name(data.strip(), existing_names)
+        return data.strip()
+
+class AdjustedNameFieldDossier(serializers.CharField):
+    def to_internal_value(self, data):
+        model = self.parent.Meta.model
+
+        if hasattr(model, 'name'):
+            parent_dossier = self.parent.initial_data.get('parent_dossier', None)
+            type = self.parent.initial_data.get('type')
+
+            if type == 'file':
+                return data
+
+            if type and not parent_dossier:
+                existing_names = model.objects.filter(type=type).values_list('name', flat=True)
+                if getattr(self.parent,'instance') is None:
+                    pass
+                elif data == getattr(self.parent.instance,'name'):
+                    return data
+
+            elif parent_dossier:
+                existing_names = model.objects.filter(parent_dossier=parent_dossier).order_by('name').values_list('name', flat=True)
+                if getattr(self.parent,'instance') is None:
+                    pass
+                elif data == getattr(self.parent.instance,'name'):
                     return data
 
             else:
-                existing_names = model.objects.filter(name__startswith=data,parent_warehouse=None).order_by('name').values_list('name', flat=True)
+                existing_names = model.objects.filter(name__startswith=data,parent_dossier=None).order_by('name').values_list('name', flat=True)
 
             if data in existing_names:
                 data = generate_unique_name(data, existing_names)
@@ -2151,20 +2235,14 @@ class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 
 class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     name = AdjustedNameFieldFolder()
-    document_count = serializers.SerializerMethodField()
-    document_matching = serializers.SerializerMethodField()
-    child_folder_count = serializers.SerializerMethodField()
-    filesize = serializers.SerializerMethodField()
+    document_count = serializers.SerializerMethodField(read_only=True)
+    filesize = serializers.SerializerMethodField(read_only=True)
+    document = serializers.SerializerMethodField(read_only=True)
 
     def get_filesize(self, obj):
-        folder = Folder.objects.get(id=int(obj.id))
-        return self.get_folder_filesize(folder)
-
-    def get_folder_filesize(self, folder):
-        folders = Folder.objects.filter(path__startswith=folder.path)
-        documents = Document.objects.filter(folder__in=folders)
-        total_size_bytes = sum(os.path.getsize(doc.source_path) for doc in documents)
-        return total_size_bytes
+        if obj.type == Folder.FOLDER:
+            return 0
+        return os.path.getsize(getattr(obj.documents.first(),'archive_path',0))
 
     def get_document_count(self, obj):
         folders = Folder.objects.filter(path__startswith=obj.path)
@@ -2172,15 +2250,12 @@ class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 
         return documents.count()
 
-    def get_document_matching(self, obj):
+    def get_document(self, obj):
         if obj.type == Folder.FILE:
-            document = Document.objects.filter(folder=obj).first()
+            document = obj.documents.first()
             if document:
-                return document.id
+                return DocumentFolderSerializer(document).data
         return None
-
-    def get_child_folder_count(self, obj):
-        return Folder.objects.filter(parent_folder=obj).count()
 
     def validate(self, data):
         return data
@@ -2201,16 +2276,13 @@ class ExportDocumentFromFolderSerializer(serializers.Serializer):
         return value
 
 
-# class CustomFieldInstanceDossierSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = CustomFieldInstance
-#         fields = '__all__'
-
 class ParentDossierTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     class Meta:
         model = Dossier
         fields = '__all__'
 class DossierSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+    name = AdjustedNameFieldDossier()
+
     custom_fields = CustomFieldInstanceSerializer(
         many=True,
         allow_null=True,
@@ -2257,12 +2329,17 @@ class DossierSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             'type',
             'dossier_form_name',
             'document_matching',
-            'custom_fields'
+            'custom_fields',
+            'set_permissions',
+            'permissions'
         ]
     def create(self, validated_data):
         custom_fields_data = validated_data.pop('custom_fields', [])
-
-        dossier = Dossier.objects.create(**validated_data)
+        dossier_name = validated_data.pop('name', None)
+        dossier_type = validated_data.pop('type', None)
+        parent_dossier = validated_data.pop('parent_dossier', None)
+        dossier_form = validated_data.pop('dossier_form', None)
+        dossier = Dossier.objects.create(name = dossier_name, type = dossier_type, parent_dossier = parent_dossier, dossier_form= dossier_form)
         type_to_data_store_name_map = {
             CustomField.FieldDataType.STRING: "value_text",
             CustomField.FieldDataType.URL: "value_url",
@@ -2289,8 +2366,8 @@ class DossierSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             custom_field_instance.save()
             lst_dossier_custom_field.append(custom_field_instance.pk)
         return dossier
-
-        records_to_delete = CustomFieldInstance.objects.exclude(id__in=lst_dossier_custom_field).filter(dossier=dossier.pk)
+        #
+        # records_to_delete = CustomFieldInstance.objects.exclude(id__in=lst_dossier_custom_field).filter(dossier=dossier.pk)
     def update(self, instance, validated_data):
         custom_fields_data = validated_data.pop('custom_fields', [])
         # validated_data['parent_dossier_type']
@@ -2339,24 +2416,6 @@ class DossierFormSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         required=False,
     )
 
-    class Meta:
-        model = DossierForm
-        fields = [
-            'id',
-            'document_count',
-            'slug',
-            'user_can_change',
-            'is_shared_by_requester',
-            'name',
-            'match',
-            'matching_algorithm',
-            'is_insensitive',
-            'created',
-            'owner',
-            'type',
-            'form_rule',
-            'custom_fields'
-        ]
     def create(self, validated_data):
         custom_fields_data = validated_data.pop('custom_fields', [])
 
@@ -2428,3 +2487,23 @@ class DossierFormSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         records_to_delete.delete()
 
         return dossier_form
+    class Meta:
+        model = DossierForm
+        fields = [
+            'id',
+            'document_count',
+            'slug',
+            'user_can_change',
+            'is_shared_by_requester',
+            'name',
+            'match',
+            'matching_algorithm',
+            'is_insensitive',
+            'created',
+            'owner',
+            'type',
+            'form_rule',
+            'custom_fields',
+            'set_permissions',
+            'permissions'
+        ]

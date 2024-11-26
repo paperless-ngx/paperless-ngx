@@ -229,7 +229,7 @@ export class DocumentListComponent
       backdrop: 'static',
     })
     modal.componentInstance.defaultName = this.filterEditor.generateFilterName()
-    modal.componentInstance.saveClicked.pipe(first()).subscribe((formValue) => {
+    modal.componentInstance.saveClicked.pipe().subscribe((formValue) => {
       modal.componentInstance.buttonsEnabled = false
       let savedView: SavedView = {
         name: formValue.name,
@@ -239,7 +239,6 @@ export class DocumentListComponent
         sort_reverse: this.list.sortReverse,
         sort_field: this.list.sortField,
       }
-
       this.savedViewService
         .create(savedView)
         .pipe(first())

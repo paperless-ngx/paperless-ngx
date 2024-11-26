@@ -26,7 +26,7 @@ export abstract class AbstractNameFilterService<T extends ObjectWithId,> extends
     if (fullPerms) {
       params['full_perms'] = true
     }
-    params['type__iexact'] = 'Warehouse'
+    // params['type__iexact'] = 'Warehouse'
 
     return this.list(page, pageSize, sortField, sortReverse, params)
   }

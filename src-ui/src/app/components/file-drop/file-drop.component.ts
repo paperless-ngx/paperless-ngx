@@ -88,7 +88,7 @@ export class FileDropComponent {
 
     let getUrl = this.router.url.split('/')
     let payload = { folder: '',dossiers: '' };
-    if (getUrl[1] === 'subfolders') {
+    if (getUrl[1] === 'folders') {
       payload.folder = getUrl[2];
     }
     if (getUrl[1] === 'dossiers') {

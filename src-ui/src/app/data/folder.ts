@@ -1,4 +1,5 @@
 import { MatchingModel } from './matching-model'
+import { Document } from './document'
 
 export interface Folder extends MatchingModel {
     documentCount?: number;
@@ -9,6 +10,6 @@ export interface Folder extends MatchingModel {
     parentFolder: number | null;
     owner: number;
     type: string;
-    document_matching: number | null;
-     
+    document?: Document;
+
 }

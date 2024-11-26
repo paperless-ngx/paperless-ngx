@@ -2,7 +2,6 @@ import json
 import logging
 import os
 import shutil
-import time
 from typing import Optional
 
 from celery import states
@@ -16,7 +15,6 @@ from django.contrib.admin.models import ADDITION
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth.models import Permission
 from django.db import DatabaseError
 from django.db import close_old_connections
 from django.db import models
@@ -25,7 +23,6 @@ from django.dispatch import receiver
 from django.utils import timezone
 from filelock import FileLock
 from guardian.shortcuts import remove_perm
-import requests
 
 from documents import matching
 from documents.caching import clear_document_caches
@@ -134,7 +131,7 @@ def set_correspondent(
 
             document.correspondent = selected
             document.save(update_fields=("correspondent",))
-            
+
 def set_folder(
     sender,
     document: Document,
@@ -647,7 +644,7 @@ def run_workflow_updated(sender, document: Document, logging_group=None, **kwarg
 
 def run_workflow_approval_updated(sender, approval: Approval, logging_group=None, **kwargs):
     run_workflow_approval(
-        WorkflowTrigger.WorkflowTriggerType.APPROVAL_ADDED,
+        WorkflowTrigger.WorkflowTriggerType.APPROVAL_UPDATED,
         approval,
         logging_group,
     )
@@ -696,7 +693,7 @@ def run_workflow(
 
                     if action.assign_correspondent is not None:
                         document.correspondent = action.assign_correspondent
-                    
+
                     if action.assign_document_type is not None:
                         document.document_type = action.assign_document_type
 
@@ -784,6 +781,16 @@ def run_workflow(
                             object=document,
                             merge=True,
                         )
+                        set_permissions_for_object(
+                            permissions=permissions,
+                            object=document.folder,
+                            merge=True,
+                        )
+                        set_permissions_for_object(
+                            permissions=permissions,
+                            object=document.dossier,
+                            merge=True,
+                        )
 
                     if action.assign_custom_fields is not None:
                         for field in action.assign_custom_fields.all():
@@ -862,6 +869,16 @@ def run_workflow(
                             object=document,
                             merge=False,
                         )
+                        set_permissions_for_object(
+                            permissions=permissions,
+                            object=document.folder,
+                            merge=True,
+                        )
+                        set_permissions_for_object(
+                            permissions=permissions,
+                            object=document.dossier,
+                            merge=True,
+                        )
                     elif (
                         (action.remove_view_users.all().count() > 0)
                         or (action.remove_view_groups.all().count() > 0)
@@ -886,7 +903,7 @@ def run_workflow(
                         ).delete()
 
             document.save()
-        
+
 def run_workflow_approval(
         trigger_type: WorkflowTrigger.WorkflowTriggerType,
         approval: Approval,
@@ -923,7 +940,7 @@ def run_workflow_approval(
                     extra={"group":logging_group}
                 )
                 if action.type == WorkflowAction.WorkflowActionType.ASSIGNMENT_WITH_APPROVAL:
-                    if (action.assign_content_type is not None 
+                    if (action.assign_content_type is not None
                     and action.assign_content_type == approval.ctype):
                         permissions = {}
                         match approval.access_type:
@@ -934,7 +951,7 @@ def run_workflow_approval(
                                     "users": [getattr(approval.submitted_by, 'id')] if getattr(approval.submitted_by, 'id', None) is not None else [],
                                     "groups": approval.submitted_by_group.values_list('id',)
                                     or [],
-                                    
+
                                 }
                             case "VIEW":
                                 permissions["view"] = {
@@ -942,21 +959,21 @@ def run_workflow_approval(
                                     "groups": approval.submitted_by_group.values_list('id',)
                                     or [],
                                 }
-                                
+
                             case _:
                                 pass
-                                
+
                         set_permissions_for_object(
                             permissions=permissions,
                             object=obj,
                             merge=True,
                         )
-                       
+
                 elif action.type == WorkflowAction.WorkflowActionType.REMOVAL_WITH_APPROVAL:
-                    
-                    if (action.assign_content_type is not None 
+
+                    if (action.assign_content_type is not None
                     and action.assign_content_type == approval.ctype):
-                        
+
                         if action.remove_all_permissions:
                             permissions = {
                                 "view": {
@@ -983,7 +1000,7 @@ def run_workflow_approval(
                                         remove_perm(f"change_{model_name}", approval.submitted_by, obj)
                                         remove_perm(f"add_{model_name}", approval.submitted_by, obj)
                                         remove_perm(f"delete_{model_name}", approval.submitted_by, obj)
-                                    
+
                                     if approval.submitted_by_group.values_list(flat=True):
                                         for g in groups:
                                             remove_perm(f"view_{model_name}", g, obj)
@@ -997,7 +1014,7 @@ def run_workflow_approval(
                                         for g in groups:
                                             remove_perm(f"view_{model_name}", g, obj)
             obj.save()
-                        
+
 
 
 @before_task_publish.connect
@@ -1011,17 +1028,22 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
     https://docs.celeryq.dev/en/stable/internals/protocol.html#version-2
 
     """
-    if "task" not in headers or headers["task"] != "documents.tasks.consume_file":
+    if "task" not in headers or headers["task"] != "documents.tasks.update_document_archive_file":
         # Assumption: this is only ever a v2 message
         return
 
     try:
         close_old_connections()
 
-        task_args = body[0]
-        input_doc, _ = task_args
-
-        task_file_name = input_doc.original_file.name
+        # task_args = body[0]
+        # input_doc, _ = task_args
+        kwargsrepr = headers.get('kwargsrepr', '{}')
+        kwargs_dict = json.loads(kwargsrepr.replace("'", "\""))
+        document_id = kwargs_dict.get('document_id')
+        document = Document.objects.get(id=document_id)
+        # logger.debug("Waiting for 1", document, body[0], headers["task"], headers, "task" not in headers or headers["task"] != "documents.tasks.consume_file")
+        # task_file_name = input_doc.original_file.name
+        task_file_name = document.original_filename
 
         PaperlessTask.objects.create(
             task_id=headers["id"],
@@ -1033,10 +1055,10 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
             date_started=None,
             date_done=None,
         )
-    except Exception:  # pragma: no cover
+    except Exception as e:  # pragma: no cover
         # Don't let an exception in the signal handlers prevent
         # a document from being consumed.
-        logger.exception("Creating PaperlessTask failed")
+        logger.exception("Creating PaperlessTask failed", e)
 
 
 @task_prerun.connect
@@ -1079,7 +1101,6 @@ def task_postrun_handler(
     try:
         close_old_connections()
         task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
-
         if task_instance is not None:
             task_instance.status = state
             task_instance.result = retval

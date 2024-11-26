@@ -5,11 +5,12 @@ import tempfile
 import uuid
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING
 from typing import Optional
+from typing import TYPE_CHECKING
 
 import magic
 from asgiref.sync import async_to_sync
+from celery import shared_task
 from channels.layers import get_channel_layer
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -25,25 +26,25 @@ from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.loggers import LoggingMixin
 from documents.matching import document_matches_workflow
-from documents.matching import approval_matches_workflow
-from documents.models import Correspondent, Dossier, DossierForm
+from documents.models import Correspondent, Dossier
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import FileInfo
-from documents.models import StoragePath
-from documents.models import Warehouse
 from documents.models import Folder
+from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Warehouse
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
-from documents.parsers import DocumentParser, custom_get_parser_class_for_mime_type
+from documents.parsers import DocumentParser, \
+    custom_get_parser_class_for_mime_type
 from documents.parsers import ParseError
-from documents.parsers import get_parser_class_for_mime_type
 from documents.parsers import parse_date
-from documents.permissions import set_permissions_for_object
+from documents.permissions import set_permissions_for_object, \
+    check_user_can_change_folder
 from documents.plugins.base import AlwaysRunPluginMixin
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import NoCleanupPluginMixin
@@ -250,6 +251,7 @@ class ConsumerStatusShortMessage(str, Enum):
     SAVE_DOCUMENT = "save_document"
     FINISHED = "finished"
     FAILED = "failed"
+    NO_UPLOAD_PERMISSION_TO_FOLDER="no_upload_permission_to_folder"
 
 
 class ConsumerFilePhase(str, Enum):
@@ -258,6 +260,26 @@ class ConsumerFilePhase(str, Enum):
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
 
+@shared_task(name='tasks.parse_and_update_data_document')
+def parse_and_update_data_document(working_copy, mime_type,
+                                   dossier_document, document,
+                                   document_parser):
+    """"Parse and update"""
+    document_parser_copy = document_parser.copy()
+    data_ocr_fields = Consumer.parse_document(working_copy, mime_type,
+                                          document_parser_copy)
+
+    Consumer.update_data_document(document, document_parser_copy)
+    if data_ocr_fields:
+        Consumer.update_data_dossier(ocr_fields=data_ocr_fields,
+                                 document=document,
+                                 dossier_document=dossier_document)
+
+def get_config_dossier_form(override_dossier_id):
+    if override_dossier_id is None:
+        return None
+    dossier = Dossier.objects.filter(id=override_dossier_id).select_related('dossier_form').first()
+    return dossier.dossier_form
 
 class Consumer(LoggingMixin):
     logging_name = "paperless.consumer"
@@ -314,6 +336,17 @@ class Consumer(LoggingMixin):
         self.override_custom_field_ids = None
 
         self.channel_layer = get_channel_layer()
+    def pre_change_folder(self,folder_id, user_id, doc_name):
+        # check folder when uploading documents
+        folder = Folder.objects.filter(id=folder_id).first()
+        user = User.objects.get(id=user_id)
+        if folder:
+            user_can_change = check_user_can_change_folder(user, folder)
+            if not user_can_change:
+                self._fail(
+                    ConsumerStatusShortMessage.NO_UPLOAD_PERMISSION_TO_FOLDER,
+                    f"Cannot consume {doc_name}: no upload permission to folder",
+                )
 
     def pre_check_file_exists(self):
         """
@@ -493,6 +526,31 @@ class Consumer(LoggingMixin):
                 exc_info=True,
                 exception=e,
             )
+
+    def parse_document(self, working_copy, mime_type, document_parser_copy):
+        if isinstance(document_parser_copy, RasterisedDocumentCustomParser):
+            return  document_parser_copy.parse(working_copy, mime_type,
+                                                    self.filename,
+                                                    get_config_dossier_form(self.override_dossier_id))
+        document_parser_copy.parse(working_copy, mime_type, self.filename)
+        return None
+
+    def update_data_dossier(self,ocr_fields, document, dossier_document):
+        if ocr_fields[1] == '' and isinstance(ocr_fields[0], list):
+            self.fill_custom_field(document, ocr_fields,
+                                   dossier_document)
+
+        elif ocr_fields[1] is not None and isinstance(ocr_fields[0],
+                                                           list):
+            self.fill_custom_field_default(document, ocr_fields)
+
+    def update_data_document(self,document, document_parser, working_copy):
+        document.content = document_parser.get_text()
+        # ghi file
+        # document.archive_path
+        pass
+
+
     def fill_custom_field_default(self,document:Document, data_ocr_fields):
         fields = CustomFieldInstance.objects.filter(
                                     document=document,
@@ -598,11 +656,7 @@ class Consumer(LoggingMixin):
 
 
 
-    def get_config_dossier_form(self):
-        if self.override_dossier_id is None:
-            return None
-        dossier = Dossier.objects.filter(id=self.override_dossier_id).select_related('dossier_form').first()
-        return dossier.dossier_form
+
     def try_consume_file(
         self,
         path: Path,
@@ -657,7 +711,7 @@ class Consumer(LoggingMixin):
         )
 
         # Make sure that preconditions for consuming the file are met.
-
+        self.pre_change_folder(self.override_folder_id,self.override_owner_id, self.override_title)
         self.pre_check_file_exists()
         self.pre_check_directories()
         self.pre_check_duplicate()
@@ -732,13 +786,13 @@ class Consumer(LoggingMixin):
                 ConsumerStatusShortMessage.PARSING_DOCUMENT,
             )
             enable_ocr = ApplicationConfiguration.objects.filter().first().enable_ocr
-            if enable_ocr:
-                self.log.debug(f"Parsing {self.filename}...")
-
-                if isinstance(document_parser,RasterisedDocumentCustomParser):
-                    data_ocr_fields = document_parser.parse(self.working_copy, mime_type, self.filename, self.get_config_dossier_form())
-                else:
-                    document_parser.parse(self.working_copy, mime_type, self.filename)
+            # if enable_ocr:
+            #     self.log.debug(f"Parsing {self.filename}...")
+            #
+            #     if isinstance(document_parser,RasterisedDocumentCustomParser):
+            #         data_ocr_fields = document_parser.parse(self.working_copy, mime_type, self.filename, self.get_config_dossier_form())
+            #     else:
+            #         document_parser.parse(self.working_copy, mime_type, self.filename)
 
             self.log.debug(f"Generating thumbnail for {self.filename}...")
             self._send_progress(
@@ -754,8 +808,10 @@ class Consumer(LoggingMixin):
             )
             text = document_parser.get_text()
             date = document_parser.get_date()
-            if enable_ocr!=True:
-                text=''
+            # if enable_ocr!=True:
+            #     text=''
+            if text == None:
+                text = ""
             if date is None:
                 self._send_progress(
                     90,
@@ -764,7 +820,7 @@ class Consumer(LoggingMixin):
                     ConsumerStatusShortMessage.PARSE_DATE,
                 )
                 date = parse_date(self.filename, text)
-            archive_path = document_parser.get_archive_path()
+            archive_path = self.working_copy
 
         except ParseError as e:
             self._fail(
@@ -803,6 +859,44 @@ class Consumer(LoggingMixin):
             with transaction.atomic():
                 # store the document.
                 document = self._store(text=text, date=date, mime_type=mime_type)
+                new_file = None
+                self.log.debug("Comsumer", document.folder)
+
+                new_file = Folder.objects.create(name=document.title,
+                                                 parent_folder=document.folder,
+                                                 type=Folder.FILE,
+                                                 owner=document.owner,
+                                                 created=document.created,
+                                                 updated=document.modified)
+                new_file.checksum = hashlib.md5(
+                    f'{new_file.id}.{new_file.name}'.encode()).hexdigest()
+                if document.folder:
+                    new_file.path = f"{document.folder.path}/{new_file.id}"
+                else:
+                    new_file.path = f"{new_file.id}"
+                new_file.save()
+                document.folder = new_file
+
+                dossier = None
+                if document.dossier:
+                    dossier = Dossier.objects.filter(
+                        id=document.dossier.pk).first()
+                    # update custom field by document_id
+                dossier_form = None
+                if dossier:
+                    dossier_form = dossier.dossier_form
+                new_dossier_document = Dossier.objects.create(
+                    name=document.title,
+                    parent_dossier=document.dossier,
+                    type="FILE",
+                    dossier_form=dossier_form)
+                if document.dossier:
+                    new_dossier_document.path = f"{document.dossier.path}/{new_file.id}"
+                else:
+                    new_dossier_document.path = f"{new_file.id}"
+                new_dossier_document.save()
+                self.log.debug("dossier log",new_dossier_document)
+                document.dossier = new_dossier_document
 
                 # If we get here, it was successful. Proceed with post-consume
                 # hooks. If they fail, nothing will get changed.
@@ -814,38 +908,7 @@ class Consumer(LoggingMixin):
                 )
                  # create file from document
                 # self.log.info('gia tri documentt', document.folder)
-                new_file = Folder.objects.create(name=document.title, parent_folder = document.folder,type = Folder.FILE, owner = document.owner, created = document.created, updated = document.modified)
-                new_file.checksum=hashlib.md5(f'{new_file.id}.{new_file.name}'.encode()).hexdigest()
-                if document.folder :
-                    new_file.path = f"{document.folder.path}/{new_file.id}"
-                else:
-                    new_file.path = f"{new_file.id}"
-                new_file.save()
-                document.folder=new_file
 
-                dossier = None
-                if document.dossier:
-                    dossier = Dossier.objects.filter(id=document.dossier.pk).first()
-                    # update custom field by document_id
-                dossier_form = None
-                if dossier:
-                    dossier_form = dossier.dossier_form
-                new_dossier_document = Dossier.objects.create(name=document.title,
-                                                                parent_dossier=document.dossier,
-                                                                type="FILE",
-                                                                dossier_form=dossier_form)
-                if document.dossier :
-                    new_dossier_document.path = f"{document.dossier.path}/{new_file.id}"
-                else:
-                    new_dossier_document.path = f"{new_file.id}"
-                new_dossier_document.save()
-
-
-                if data_ocr_fields[1] == '' and isinstance(data_ocr_fields[0], list):
-                    self.fill_custom_field(document, data_ocr_fields, new_dossier_document)
-
-                elif data_ocr_fields[1] is not None and isinstance(data_ocr_fields[0], list):
-                    self.fill_custom_field_default(document, data_ocr_fields)
                 document.dossier=new_dossier_document
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.
@@ -887,6 +950,10 @@ class Consumer(LoggingMixin):
                 # This triggers things like file renaming
                 document.save()
 
+                # self.log.debug("document.path", document.archive_file, document.archive_path, archive_path)
+                # parse_and_update_data_document.apply_async(args=[document.archive_path, mime_type, new_dossier_document, document, document_parser])
+
+
                 # Delete the file only if it was successfully consumed
                 self.log.debug(f"Deleting file {self.working_copy}")
                 self.original_path.unlink()
@@ -924,6 +991,11 @@ class Consumer(LoggingMixin):
             ConsumerFilePhase.SUCCESS,
             ConsumerStatusShortMessage.FINISHED,
             document.id,
+        )
+
+        from documents.tasks import update_document_archive_file
+        update_document_archive_file.delay(
+            document_id=document.id
         )
 
         # Return the most up to date fields

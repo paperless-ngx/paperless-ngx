@@ -18,9 +18,9 @@
                 <td class="custom-space"></td>
                 @if (object.type == 'folder') {
                   <td scope="row" class="d-md-table-cell custom-width-content">
-                 <span class="text-primary">
                     <i-bs class="me-1 custom-cursor" (click)="getNode(object,$event);" name="chevronRight" width="1.5rem" height="1.5rem"></i-bs>
-                    <i-bs class="me-1 custom-cursor" (click)="this.goToNode.emit(object); $event.stopPropagation()" name="folder-fill" width="1.5rem" height="1.5rem"></i-bs>
+                 <span class="text-primary custom-cursor" (click)="this.goToNode.emit(object); $event.stopPropagation()">
+                    <i-bs class="me-1 "  name="folder-fill" width="1.5rem" height="1.5rem"></i-bs>
                    {{ object.name }}
                   </span>
 
@@ -28,11 +28,11 @@
                 } @else {
                   <td scope="row" class="d-md-table-cell custom-width-content">
                   <span
-                    class="text-primary"
-                    [routerLink]="['/documents', object.document_matching]"
+                    class="text-primary custom-cursor"
+                    [routerLink]="['/documents', object.document.id]"
                     (click)="$event.stopPropagation()">
 
-                    <i-bs class="me-1 " name="file-earmark-pdf" width="1.5rem"
+                    <i-bs class="me-1 ms-4 ps-1"  name="file-earmark-pdf" width="1.5rem"
                           height="1.5rem"></i-bs>
                     {{ object.name }}
                   </span>
@@ -47,7 +47,7 @@
                 <td class="custom-space"></td>
                 <td scope="row" class="d-md-table-cell custom-width-content">
                    <span class="text-primary" i18n (click)="viewMore()">
-                     More...
+                     <i-bs class="me-1 custom-cursor" name="chevron-double-down" width="1.5rem" height="1.5rem"></i-bs>
                     </span>
                 </td>
               </tr>

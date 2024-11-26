@@ -289,6 +289,7 @@ export class SettingsService {
         // to update lang cookie
         if (this.settings['language']?.length)
           this.setLanguage(this.settings['language'])
+        else this.setLanguage('vi-vn')
         this.currentUser = uisettings.user
         this.permissionsService.initialize(
           uisettings.permissions,

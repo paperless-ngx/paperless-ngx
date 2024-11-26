@@ -1,12 +1,10 @@
 import hashlib
 import logging
-import os
 import shutil
 import uuid
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Optional
-from datetime import datetime, timedelta
 
 import tqdm
 from celery import Task
@@ -23,7 +21,7 @@ from documents.barcodes import BarcodePlugin
 from documents.caching import clear_document_caches
 from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
-from documents.consumer import Consumer
+from documents.consumer import Consumer, get_config_dossier_form
 from documents.consumer import ConsumerError
 from documents.consumer import WorkflowTriggerPlugin
 from documents.data_models import ConsumableDocument
@@ -31,13 +29,13 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
-from documents.models import Approval, Correspondent, CustomFieldInstance
+from documents.models import Correspondent, CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
-from documents.models import StoragePath
-from documents.models import Warehouse
 from documents.models import Folder
+from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Warehouse
 from documents.parsers import DocumentParser
 from documents.parsers import custom_get_parser_class_for_mime_type
 from documents.plugins.base import ConsumeTaskPlugin
@@ -47,6 +45,7 @@ from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
 from paperless.models import ApplicationConfiguration
+from paperless_ocr_custom.parsers import RasterisedDocumentCustomParser
 
 if settings.AUDIT_LOG_ENABLED:
     import json
@@ -73,7 +72,7 @@ def revoke_permission():
     # approvals_reject = Approval.objects.filter(
     #     status__in=["REJECT", "REVOKED"],
     #     expiration__lte=thirty_days_ago
-        
+
     # ).delete()
 
 
@@ -261,7 +260,7 @@ def bulk_update_documents(document_ids):
 
 
 @shared_task
-def update_document_archive_file(document_id):
+def update_document_archive_file(document_id=None):
     """
     Re-creates the archive file of a document, including new OCR content and thumbnail
     """
@@ -281,7 +280,15 @@ def update_document_archive_file(document_id):
     parser: DocumentParser = parser_class(logging_group=uuid.uuid4())
 
     try:
-        parser.parse(document.source_path, mime_type, document.get_public_filename())
+        enable_ocr = ApplicationConfiguration.objects.filter().first().enable_ocr
+        if enable_ocr:
+            # self.log.debug(f"Parsing {self.filename}...")
+
+            if isinstance(parser,RasterisedDocumentCustomParser):
+                data_ocr_fields = parser.parse(document.source_path, mime_type, document.get_public_filename(), get_config_dossier_form(document.dossier.parent_dossier))
+            else:
+                parser.parse(document.source_path, mime_type, document.get_public_filename())
+        # parser.parse(document.source_path, mime_type, document.get_public_filename())
 
         thumbnail = parser.get_thumbnail(
             document.source_path,
@@ -342,12 +349,14 @@ def update_document_archive_file(document_id):
 
             clear_document_caches(document.pk)
 
-    except Exception:
+    except Exception as ex:
         logger.exception(
-            f"Error while parsing document {document} (ID: {document_id})",
+            f"Error while parsing document {document} (ID: {document_id} ex: {ex}) ",
         )
+        return  f"Error while parsing document {document} (ID: {document_id} ex: {ex}) "
     finally:
         parser.cleanup()
+    return f"Success. New document id {document.pk} created"
 
 
 @shared_task
@@ -373,7 +382,7 @@ def update_document_field(document_id):
     try:
         data_ocr_fields = parser.parse(document.source_path, mime_type, document.get_public_filename())
 
-        
+
         if parser.get_archive_path():
             with transaction.atomic():
                 oldDocument = Document.objects.get(pk=document.pk)
@@ -393,7 +402,7 @@ def update_document_field(document_id):
                                 if f.get("name") == data_ocr_fields[1]:
                                     mapping_field_user_args = f.get("mapping",[])
                             map_fields = {}
-                  
+
                             for key,value in mapping_field_user_args[0].items():
                                 map_fields[key]=dict_data.get(value)
                             for f in fields:

@@ -63,7 +63,7 @@ export const SETTINGS: UiSetting[] = [
   {
     key: SETTINGS_KEYS.LANGUAGE,
     type: 'string',
-    default: '',
+    default: 'vi-vn',
   },
   {
     key: SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS,
@@ -88,7 +88,7 @@ export const SETTINGS: UiSetting[] = [
   {
     key: SETTINGS_KEYS.DARK_MODE_USE_SYSTEM,
     type: 'boolean',
-    default: true,
+    default: false,
   },
   {
     key: SETTINGS_KEYS.DARK_MODE_ENABLED,
@@ -113,7 +113,7 @@ export const SETTINGS: UiSetting[] = [
   {
     key: SETTINGS_KEYS.DATE_LOCALE,
     type: 'string',
-    default: '',
+    default: 'vi-vn',
   },
   {
     key: SETTINGS_KEYS.DATE_FORMAT,

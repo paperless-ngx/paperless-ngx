@@ -49,10 +49,10 @@ export class FileTreeWidgetComponent extends ComponentWithPermissions
   subscription: Subscription
 
   renderNode(c, object, event) {
-    const spanElement = (event.target as HTMLElement).closest('span')
-    const tdElement = spanElement.closest('td')
+    const spanElement = (event.target as HTMLElement).closest('td')
+    // const tdElement = spanElement.closest('')
     const svgElement = spanElement?.querySelector('svg')
-    const tableElement = tdElement?.querySelector('table')
+    const tableElement = spanElement?.querySelector('table')
     if (svgElement.style.transform != '') {
       this.renderer.removeStyle(svgElement, 'transform')
     } else {
@@ -65,7 +65,7 @@ export class FileTreeWidgetComponent extends ComponentWithPermissions
     }
     if (c.count > 0) {
 
-      const tdElement = (event.target as HTMLElement).closest('td')
+      const spanElement = (event.target as HTMLElement).closest('td')
       const node = this.viewContainer.createComponent(FileTreeWidgetComponent)
       node.instance.data = c.results
       node.instance.nodeId = object.id
@@ -74,7 +74,7 @@ export class FileTreeWidgetComponent extends ComponentWithPermissions
         this.goToNode.emit(object)
       })
       const componentElement = node.location.nativeElement
-      this.renderer.appendChild(tdElement, componentElement)
+      this.renderer.appendChild(spanElement, componentElement)
       return
     }
 

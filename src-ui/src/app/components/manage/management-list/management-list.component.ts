@@ -259,19 +259,19 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     return this.modalService
   }
 
-  getEditDialogComponent(): EditDialogComponent<any>{
+  getEditDialogComponent(): EditDialogComponent<any> {
     return this.editDialogComponent
   }
 
-  getToastService(): ToastService{
+  getToastService(): ToastService {
     return this.toastService
   }
 
-  getService(){
+  getService() {
     return this.service
   }
 
-  getUnsubscribeNotifier(){
+  getUnsubscribeNotifier() {
     return this.unsubscribeNotifier
   }
 
@@ -287,7 +287,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     return ownsAll
   }
 
-  toggleAll(event: PointerEvent) {
+  toggleAll(event) {
     if ((event.target as HTMLInputElement).checked) {
       this.selectedObjects = new Set(this.data.map((o) => o.id))
     } else {

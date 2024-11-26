@@ -217,9 +217,19 @@ def set_permissions(doc_ids, set_permissions, owner=None, merge=False):
         qs.filter(owner__isnull=True).update(owner=owner)
     else:
         qs.update(owner=owner)
-
+    # set permissions for foders and dossier
     for doc in qs:
         set_permissions_for_object(permissions=set_permissions, object=doc, merge=merge)
+        set_permissions_for_object(
+            permissions=set_permissions,
+            object=doc.folder,
+            merge=True,
+        )
+        set_permissions_for_object(
+            permissions=set_permissions,
+            object=doc.dossier,
+            merge=True,
+        )
 
     affected_docs = [doc.id for doc in qs]
 

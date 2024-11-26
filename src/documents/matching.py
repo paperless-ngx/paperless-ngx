@@ -60,7 +60,7 @@ def match_correspondents(document: Document, classifier: DocumentClassifier, use
             correspondents,
         ),
     )
-    
+
 def match_folders(document: Document, classifier: DocumentClassifier, user=None):
     pred_id = classifier.predict_folder(document.content) if classifier else None
 
@@ -423,8 +423,8 @@ def existing_document_matches_workflow(
             f"Document correspondent {document.correspondent} does not match {trigger.filter_has_correspondent}",
         )
         trigger_matched = False
-        
-    
+
+
     # Document document_type vs trigger has_document_type
     if (
         trigger.filter_has_document_type is not None
@@ -516,12 +516,13 @@ def approval_matches_workflow(
         logger.debug(f"No matching triggers with type {trigger_type} found")
     else:
         for trigger in workflow.triggers.filter(type=trigger_type):
+
             if (
                 trigger_type == WorkflowTrigger.WorkflowTriggerType.APPROVAL_ADDED
                 or trigger_type == WorkflowTrigger.WorkflowTriggerType.APPROVAL_UPDATED
             ):
                 trigger_matched, reason = existing_approval_matches_workflow(
-                    approval,   
+                    approval,
                     trigger,
                 )
             else:
@@ -547,11 +548,11 @@ def existing_approval_matches_workflow(
     Returns True if the Approval matches all filters from the workflow trigger,
     False otherwise. Includes a reason if doesn't match
     """
-# 
+#
     trigger_matched = True
     reason = ""
 
-    # Approval ctype vs trigger has_content_type 
+    # Approval ctype vs trigger has_content_type
     if(
         trigger.filter_has_content_type is not None
         and approval.ctype != trigger.filter_has_content_type
