@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, HttpParams } from '@angular/common/http'
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { Observable, Subscription } from 'rxjs'
 import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
@@ -7,19 +7,13 @@ import { DocumentListViewService } from 'src/app/services/document-list-view.ser
 import { environment } from 'src/environments/environment'
 import * as mimeTypeNames from 'mime-names'
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
-import Chart from 'chart.js/auto';
+import Chart from 'chart.js/auto'
 
 export interface Statistics {
-  documents_total?: number
-  documents_inbox?: number
-  inbox_tag?: number
-  document_file_type_counts?: DocumentFileType[]
-  character_count?: number
-  tag_count?: number
-  correspondent_count?: number
-  document_type_count?: number
-  storage_path_count?: number
-  warehouse_count?: number
+  labels_graph?: []
+  data_graph?: []
+  data_document_type_pie_graph?: []
+  labels_document_type_pie_graph?: []
 }
 
 interface DocumentFileType {
@@ -34,8 +28,7 @@ interface DocumentFileType {
 })
 export class StatisticsCustomWidgetComponent
   extends ComponentWithPermissions
-  implements OnInit, OnDestroy
-{
+  implements OnInit, OnDestroy {
   loading: boolean = true
 
   constructor(
@@ -45,79 +38,118 @@ export class StatisticsCustomWidgetComponent
   ) {
     super()
   }
+
   public chart: any
+  public pieChart: any
   statistics: Statistics = {}
+  data_graph: []
+  labels_graph: []
+  data_document_type_pie_graph: []
+  labels_document_type_pie_graph: []
 
   subscription: Subscription
 
-  createChart(){
-
-    this.chart = new Chart("MyChart", {
+  createChart() {
+    if (this.chart) {
+      this.chart.destroy()
+    }
+    this.chart = new Chart('DocumentChart', {
       type: 'line', //this denotes tha type of chart
 
       data: {// values on X-Axis
-        labels: ['2022-05-10', '2022-05-11', '2022-05-12','2022-05-13',
-                                 '2022-05-14', '2022-05-15', '2022-05-16','2022-05-17', ],
-           datasets: [
+        labels: this.labels_graph,
+        datasets: [
           {
-            label: "Documents",
-            data: ['467','576', '572', '79', '92',
-                                 '574', '573', '576'],
+            label: 'Documents',
+            data: this.data_graph,
             backgroundColor: 'rgb(75, 192, 192)',
             fill: false,
-          }
-        ]
+          },
+        ],
       },
       options: {
-        aspectRatio:2.5
-      }
+        responsive: true,
+        maintainAspectRatio: false,
+        aspectRatio: 2.5,
+      },
 
-    });
+    })
   }
 
-  private getStatistics(): Observable<Statistics> {
-    return this.http.get(`${environment.apiBaseUrl}statistics/`)
+  createPieChart() {
+    if (this.pieChart) {
+      this.pieChart.destroy()
+    }
+    this.pieChart = new Chart('DocumentTypePieChart', {
+      type: 'doughnut', //this denotes tha type of chart
+
+      data: {
+        labels: this.labels_document_type_pie_graph,
+        datasets: [{
+          label: 'Document Type',
+          data: this.data_document_type_pie_graph,
+          backgroundColor: [
+            'rgb(255, 99, 132)',  // Red
+            'rgb(54, 162, 235)',  // Blue
+            'rgb(255, 205, 86)',  // Yellow
+            'rgb(75, 192, 192)',  // Teal
+            'rgb(153, 102, 255)', // Purple
+            'rgb(255, 159, 64)',  // Orange
+            'rgb(199, 199, 199)', // Grey
+            'rgb(255, 99, 71)',   // Tomato
+            'rgb(144, 238, 144)', // Light Green
+            'rgb(135, 206, 235)'  // Sky Blue
+          ],
+
+          hoverOffset: 4,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        aspectRatio: 2.5,
+      },
+
+    })
+  }
+
+  private getStatistics(httpParams): Observable<Statistics> {
+    return this.http.get(`${environment.apiBaseUrl}statistics_custom/`, { params: httpParams })
+  }
+
+  fromDate: any
+  toDate: any
+  dateRangePicker: boolean = false
+
+  onDateRangeChange(event: { fromDate: any, toDate: any }) {
+    this.fromDate = event.fromDate
+    this.toDate = event.toDate
+    if (!this.dateRangePicker) {
+      this.dateRangePicker = true
+      this.reload()
+    }
   }
 
   reload() {
     this.loading = true
-    this.getStatistics().subscribe((statistics) => {
+    let httpParams = new HttpParams()
+    if (this.fromDate && this.toDate) {
+      httpParams = httpParams.set('from_date', this.fromDate)
+      httpParams = httpParams.set('to_date', this.toDate)
+    }
+    console.log('noi dung trong reload', this.fromDate, this.toDate)
+    this.getStatistics(httpParams).subscribe((statistics) => {
       this.loading = false
       const fileTypeMax = 5
-      if (statistics.document_file_type_counts?.length > fileTypeMax) {
-        const others = statistics.document_file_type_counts.slice(fileTypeMax)
-        statistics.document_file_type_counts =
-          statistics.document_file_type_counts.slice(0, fileTypeMax)
-        statistics.document_file_type_counts.push({
-          mime_type: $localize`Other`,
-          mime_type_count: others.reduce(
-            (currentValue, documentFileType) =>
-              documentFileType.mime_type_count + currentValue,
-            0
-          ),
-        })
-      }
+
       this.statistics = statistics
+      this.data_graph = statistics.data_graph
+      this.labels_graph = statistics.labels_graph
+      this.data_document_type_pie_graph = statistics.data_document_type_pie_graph
+      this.labels_document_type_pie_graph = statistics.labels_document_type_pie_graph
+      this.createChart()
+      this.createPieChart()
     })
-  }
-
-  getFileTypeExtension(filetype: DocumentFileType): string {
-    return (
-      mimeTypeNames[filetype.mime_type]?.extensions[0]?.toUpperCase() ??
-      filetype.mime_type
-    )
-  }
-
-  getFileTypeName(filetype: DocumentFileType): string {
-    return mimeTypeNames[filetype.mime_type]?.name ?? filetype.mime_type
-  }
-
-  getFileTypePercent(filetype: DocumentFileType): number {
-    return (filetype.mime_type_count / this.statistics?.documents_total) * 100
-  }
-
-  getItemOpacity(i: number): number {
-    return 1 - i / this.statistics?.document_file_type_counts.length
   }
 
   ngOnInit(): void {
@@ -127,19 +159,15 @@ export class StatisticsCustomWidgetComponent
       .subscribe(() => {
         this.reload()
       })
-    this.createChart();
+    this.createChart()
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe()
   }
 
-  goToInbox() {
-    this.documentListViewService.quickFilter([
-      {
-        rule_type: FILTER_HAS_TAGS_ALL,
-        value: this.statistics.inbox_tag.toString(),
-      },
-    ])
+  confirmButton() {
+    console.log("da goi ")
+    this.reload()
   }
 }

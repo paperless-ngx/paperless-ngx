@@ -1,59 +1,74 @@
 <form class="row row-cols-sm-auto">
-	<div class="col-12">
-		<div class="dp-hidden position-absolute">
-			<div class="input-group">
-				<input
-					name="datepicker"
-					class="form-control"
-					ngbDatepicker
-					#datepicker="ngbDatepicker"
-					[autoClose]="'outside'"
-					(dateSelect)="onDateSelection($event)"
-					[displayMonths]="2"
-					[dayTemplate]="t"
-					outsideDays="hidden"
-					[startDate]="fromDate!"
-					tabindex="-1"
-				/>
-				<ng-template #t let-date let-focused="focused">
+  <div class="col-12">
+    <div class="dp-hidden position-absolute">
+      <div class="input-group">
+        <input
+          name="datepicker"
+          class="form-control"
+          ngbDatepicker
+          #datepicker="ngbDatepicker"
+          [autoClose]="'outside'"
+          (dateSelect)="onDateSelection($event)"
+          [displayMonths]="2"
+          [dayTemplate]="t"
+          outsideDays="hidden"
+          [startDate]="fromDate!"
+          tabindex="-1"
+        />
+        <ng-template #t let-date let-focused="focused">
 					<span
-						class="custom-day"
-						[class.focused]="focused"
-						[class.range]="isRange(date)"
-						[class.faded]="isHovered(date) || isInside(date)"
-						(mouseenter)="hoveredDate = date"
-						(mouseleave)="hoveredDate = null"
-					>
+            class="custom-day"
+            [class.focused]="focused"
+            [class.range]="isRange(date)"
+            [class.faded]="isHovered(date) || isInside(date)"
+            (mouseenter)="hoveredDate = date"
+            (mouseleave)="hoveredDate = null"
+          >
 						{{ date.day }}
 					</span>
-				</ng-template>
-			</div>
-		</div>
-		<div class="input-group">
-			<input
-				#dpFromDate
-				class="form-control"
-				placeholder="yyyy-mm-dd"
-				name="dpFromDate"
-				[value]="formatter.format(fromDate)"
-				(input)="fromDate = validateInput(fromDate, dpFromDate.value)"
-			/>
-			<button class="btn btn-outline-secondary" (click)="datepicker.toggle()" type="button"><i-bs width="1.2em" height="1.2em" name="calendar3"></i-bs></button>
-		</div>
-	</div>
-	<div class="col-12">
-		<div class="input-group">
-			<input
-				#dpToDate
-				class="form-control"
-				placeholder="yyyy-mm-dd"
-				name="dpToDate"
-				[value]="formatter.format(toDate)"
-				(input)="toDate = validateInput(toDate, dpToDate.value)"
-			/>
-			<button class="btn btn-outline-secondary" (click)="datepicker.toggle()" type="button"> <i-bs width="1.2em" height="1.2em" name="calendar3"></i-bs></button>
-		</div>
-	</div>
+        </ng-template>
+      </div>
+    </div>
+    <div class="input-group">
+      <input
+        #dpFromDate
+        class="form-control"
+        placeholder="yyyy-mm-dd"
+        name="dpFromDate"
+        [value]="formatter.format(fromDate)"
+        (input)="fromDate = validateInput(fromDate, dpFromDate.value)"
+      />
+      <button class="btn btn-outline-secondary" (click)="datepicker.toggle()" type="button">
+        <i-bs width="1.2em" height="1.2em" name="calendar3"></i-bs>
+      </button>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="input-group">
+      <input
+        #dpToDate
+        class="form-control"
+        placeholder="yyyy-mm-dd"
+        name="dpToDate"
+        [value]="formatter.format(toDate)"
+        (input)="toDate = validateInput(toDate, dpToDate.value)"
+      />
+      <button class="btn btn-outline-secondary" (click)="datepicker.toggle()" type="button">
+        <i-bs width="1.2em" height="1.2em" name="calendar3"></i-bs>
+      </button>
+    </div>
+  </div>
+  <div class="col-12">
+    <select class="form-select" (change)="setDateRange($event)">
+      <option value="today">Today</option>
+      <option value="week">Week</option>
+      <option value="month">Month</option>
+    </select>
+  </div>
+  <div class="col-12">
+    <button type="button" class="btn btn-outline-primary" (click)="this.confirmButton.emit()" i18n>Confirm
+    </button>
+  </div>
 </form>
 
 <!--<hr />-->

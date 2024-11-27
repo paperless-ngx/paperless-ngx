@@ -18,6 +18,7 @@ from urllib.parse import urlparse
 import pandas as pd
 
 import pathvalidate
+import pytz
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -32,7 +33,7 @@ from django.db.models import Max
 from django.db.models import Q
 from django.db.models import Sum
 from django.db.models import When
-from django.db.models.functions import Length
+from django.db.models.functions import Length, TruncDate
 from django.db.models.functions import Lower
 from django.http import Http404
 from django.http import HttpResponse
@@ -51,6 +52,7 @@ from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from guardian.shortcuts import get_perms, get_users_with_perms
+from django.utils.translation import gettext_lazy as _
 from langdetect import detect
 from packaging import version as packaging_version
 
@@ -73,6 +75,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.viewsets import ViewSet
+
 
 from documents import bulk_edit
 from documents import index
@@ -1454,125 +1457,56 @@ class StatisticsView(APIView):
             },
         )
 
-    class StatisticsCustomView(APIView):
-        permission_classes = (IsAuthenticated,)
+class StatisticsCustomView(APIView):
+    permission_classes = (IsAuthenticated,)
 
-        def get(self, request, format=None):
-            user = request.user if request.user is not None else None
+    def get(self, request, format=None):
+        to_date = request.query_params.get('to_date')
+        from_date = request.query_params.get('from_date')
+        label_graph = []
+        data_graph = []
+        data_document_type_graph = []
+        label_document_type_graph = []
+        user = request.user if request.user is not None else None
 
-            documents = (
-                Document.objects.all()
-                if user is None
-                else get_objects_for_user_owner_aware(
-                    user,
-                    "documents.view_document",
-                    Document,
-                )
+        documents = (
+            Document.objects.all()
+            if user is None
+            else get_objects_for_user_owner_aware(
+                user,
+                "documents.view_document",
+                Document,
             )
-            tags = (
-                Tag.objects.all()
-                if user is None
-                else get_objects_for_user_owner_aware(user, "documents.view_tag", Tag)
-            )
-            correspondent_count = (
-                Correspondent.objects.count()
-                if user is None
-                else len(
-                    get_objects_for_user_owner_aware(
-                        user,
-                        "documents.view_correspondent",
-                        Correspondent,
-                    ),
-                )
-            )
-            document_type_count = (
-                DocumentType.objects.count()
-                if user is None
-                else len(
-                    get_objects_for_user_owner_aware(
-                        user,
-                        "documents.view_documenttype",
-                        DocumentType,
-                    ),
-                )
-            )
-            warehouse_count = (
-                Warehouse.objects.count()
-                if user is None
-                else len(
-                    get_objects_for_user_owner_aware(
-                        user,
-                        "documents.view_warehouse",
-                        Warehouse,
-                    ),
-                )
-            )
+        )
+        if from_date and to_date:
+            from datetime import datetime
+            timezone = pytz.UTC
+            from_date = timezone.localize(datetime.strptime(from_date, '%Y-%m-%d'))
+            to_date = timezone.localize(datetime.strptime(to_date, '%Y-%m-%d'))
+            documents_count_by_day = documents.filter(
+                created__range=(from_date, to_date)).annotate(
+                created_date=TruncDate('created')).values(
+                'created_date').annotate(document_count=Count('id')).order_by(
+                'created_date')
+            for entry in documents_count_by_day:
+                label_graph.append(entry['created_date'])
+                data_graph.append(entry['document_count'])
 
-            folder_count = (
-                Folder.objects.count()
-                if user is None
-                else len(
-                    get_objects_for_user_owner_aware(
-                        user,
-                        "documents.view_folder",
-                        Folder,
-                    ),
-                )
-            )
+        top_document_types = (documents.values('document_type__name').annotate(document_count=Count('id')) .order_by('-document_count')[:10])
+        for entry in top_document_types:
+            data_document_type_graph.append(entry['document_count'])
+            if entry['document_type__name'] is None:
+                entry['document_type__name'] = _('Other')
+            label_document_type_graph.append(entry['document_type__name'])
 
-            storage_path_count = (
-                StoragePath.objects.count()
-                if user is None
-                else len(
-                    get_objects_for_user_owner_aware(
-                        user,
-                        "documents.view_storagepath",
-                        StoragePath,
-                    ),
-                )
-            )
-
-            documents_total = documents.count()
-
-            inbox_tag = tags.filter(is_inbox_tag=True)
-
-            documents_inbox = (
-                documents.filter(tags__is_inbox_tag=True).distinct().count()
-                if inbox_tag.exists()
-                else None
-            )
-
-            document_file_type_counts = (
-                documents.values("mime_type")
-                .annotate(mime_type_count=Count("mime_type"))
-                .order_by("-mime_type_count")
-                if documents_total > 0
-                else []
-            )
-
-            character_count = (
-                documents.annotate(
-                    characters=Length("content"),
-                )
-                .aggregate(Sum("characters"))
-                .get("characters__sum")
-            )
-
-            return Response(
-                {
-                    "documents_total": documents_total,
-                    "documents_inbox": documents_inbox,
-                    "inbox_tag": inbox_tag.first().pk if inbox_tag.exists() else None,
-                    "document_file_type_counts": document_file_type_counts,
-                    "character_count": character_count,
-                    "tag_count": len(tags),
-                    "correspondent_count": correspondent_count,
-                    "document_type_count": document_type_count,
-                    "storage_path_count": storage_path_count,
-                    "warehouse_count": warehouse_count,
-                    "folder_count": folder_count,
-                },
-            )
+        return Response(
+            {
+                "labels_graph": label_graph,
+                "data_graph": data_graph,
+                "labels_document_type_pie_graph": label_document_type_graph,
+                "data_document_type_pie_graph": data_document_type_graph,
+            },
+        )
 
 
 class BulkDownloadView(GenericAPIView):

@@ -4,14 +4,14 @@
 
 <div class="row">
   <div class="col-12 col-lg-8 col-xl-9 mb-4">
-     <div class="col">
-        <pngx-statistics-custom-widget></pngx-statistics-custom-widget>
-      </div>
     <div class="row row-cols-1 g-4" tourAnchor="tour.dashboard"
          cdkDropList
          [cdkDropListDisabled]="settingsService.globalDropzoneActive"
          (cdkDropListDropped)="onDrop($event)"
     >
+     <div class="col">
+        <pngx-statistics-custom-widget></pngx-statistics-custom-widget>
+     </div>
       @if (savedViewService.loading) {
         <div class="col">
           <div class="spinner-border spinner-border-sm me-2" role="status"></div>

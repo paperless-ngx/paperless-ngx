@@ -14,7 +14,9 @@ from django.views.static import serve
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
-from documents.views import AcknowledgeTasksView, ApprovalUpdateMutipleView, ApprovalViewSet, BulkExportExcelFromFolderView, BulkExportExcelView, DossierFormViewSet, DossierViewSet
+from documents.views import AcknowledgeTasksView, ApprovalUpdateMutipleView, \
+    ApprovalViewSet, BulkExportExcelFromFolderView, BulkExportExcelView, \
+    DossierFormViewSet, DossierViewSet, StatisticsCustomView
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
@@ -86,7 +88,7 @@ api_router.register(r"dossier_forms", DossierFormViewSet)
 api_router.register(r"content_types", ContentTypeViewSet, basename="content_types")
 
 urlpatterns = [
-    
+
     re_path(
         r"^api/",
         include(
@@ -104,6 +106,7 @@ urlpatterns = [
                     name="autocomplete",
                 ),
                 re_path("^statistics/", StatisticsView.as_view(), name="statistics"),
+                re_path("^statistics_custom/", StatisticsCustomView.as_view(), name="statistics_custom"),
                 re_path(
                     "^documents/post_document/",
                     PostDocumentView.as_view(),
