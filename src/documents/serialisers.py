@@ -3,6 +3,7 @@ import logging
 import math
 import os
 import re
+import time
 import zoneinfo
 from decimal import Decimal
 
@@ -1595,13 +1596,17 @@ class ApprovalSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
 
     def get_name(self, obj):
-        if obj.ctype:
-            model_name = obj.ctype.name
-            model_class = apps.get_model(obj.ctype.app_label, model_name)
-            if model_class == Document:
-                return model_class.objects.get(id=int(obj.object_pk)).title
+        start = time.time()
+        if not obj.ctype:
+            return ''
+        model_name = obj.ctype.name
 
-        return None
+        model_class = apps.get_model(obj.ctype.app_label, model_name)
+        if model_class != Document:
+            return ''
+        document = model_class.objects.filter(id=int(obj.object_pk)).first()
+        return getattr(document,'title','')
+
     class Meta:
         model = Approval
         fields = "__all__"

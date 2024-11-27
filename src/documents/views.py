@@ -6,6 +6,7 @@ import os
 import platform
 import re
 import tempfile
+import time
 import urllib
 import zipfile
 from datetime import datetime
@@ -75,7 +76,6 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.viewsets import ViewSet
-
 
 from documents import bulk_edit
 from documents import index
@@ -831,13 +831,13 @@ class DocumentViewSet(
                         object_pk=serializer.validated_data.get("object_pk"),
                         access_type=serializer.validated_data.get("access_type"),
                         ctype=serializer.validated_data.get("ctype"),
-                        submitted_by=serializer.validated_data.get("submitted_by"),
+                        submitted_by=serializer.validated_data.get("submitted_by")
                     )
 
                     submitted_by_groups = serializer.validated_data.get("submitted_by_group", None)
                     if submitted_by_groups:
                         existing_approval = existing_approval.filter(
-                            Q(submitted_by_group__in=submitted_by_groups),
+                            Q(submitted_by_group__in=submitted_by_groups)
                         ).exists()
 
                 if existing_approval:
@@ -851,7 +851,7 @@ class DocumentViewSet(
                     ctype_id=content_type_id,
                     access_type="VIEW",
                     expiration=serializer.validated_data.get("expiration"),
-                    submitted_by_group=serializer.validated_data.get("submitted_by_group", None),
+                    submitted_by_group=serializer.validated_data.get("submitted_by_group", None)
                 )
                 a.save()
                 # If audit log is enabled make an entry in the log
@@ -1809,20 +1809,51 @@ class ApprovalViewSet(ModelViewSet):
     # pagination_class = StandardPagination
     queryset = Approval.objects.all()
     def get_queryset(self):
-        queryset = (
-            Approval.objects.filter(
-            )
-            .order_by("created")
-            .reverse()
-        )
-        # task_id = self.request.query_params.get("")
-        # if task_id is not None:
-        #     queryset = PaperlessTask.objects.filter(task_id=task_id)
+        # TODO: get user -> group -> document ->
+
+        approvals = Approval.objects.all().order_by("created").reverse()
+        approvals_object_pk = [int(x.object_pk) for x in approvals]
+        # approvals_object_pk = list(map(int, Approval.objects.all().order_by("created").reverse().values_list("object_pk", flat=True)))
+
         user = self.request.user
-        document_ids = Document.objects.filter(owner=user).values_list("id")
-        document_ids =[x[0] for x in document_ids]
-        queryset = queryset.filter(object_pk__in=document_ids)
-        return queryset
+        user_groups = set(user.groups.all())
+        documents = Document.objects.filter(id__in=approvals_object_pk)
+        # editable_objects = get_objects_for_user(user, 'change_document',
+        #                                         klass=Document,
+        #                                         accept_global_perms=False)
+
+        editable_objects = set()
+
+
+
+        for obj in documents:
+            if 'change_document' in get_perms(user,obj):
+                editable_objects.add(obj)
+                continue
+            if hasattr(obj,'owner') and obj.owner == user:
+                editable_objects.add(obj)
+                continue
+            object_groups = set(obj.groups.all())
+            if user_groups.intersection(object_groups):
+                editable_objects.add(obj)
+
+        for obj in approvals:
+            if int(obj.object_pk) in editable_objects:
+                del obj
+
+        return approvals
+
+
+
+        # logger.info("noi dung test", qs)
+        # document_ids = Document.objects.filter(owner=user).values_list("id")
+        # if user.is_superuser:
+        #     document_ids = Approval.objects.all().values_list("id")
+        # # document_ids =[str(x[0]) for x in document_ids]
+        # logger.info("noi dung", document_ids)
+        # qs = qs.filter(object_pk__in=document_ids)
+        # logger.info("noi dung test1", qs)
+        # return qs
 
     model = Approval
 
@@ -1839,14 +1870,14 @@ class ApprovalViewSet(ModelViewSet):
                 access_type=serializer.validated_data.get("access_type"),
                 ctype=serializer.validated_data.get("ctype"),
                 submitted_by=serializer.validated_data.get("submitted_by"),
-                status__in=["SUCCESS", "PENDING"],
+                status__in=["SUCCESS", "PENDING"]
             )
 
             submitted_by_groups = serializer.validated_data.get("submitted_by_group", None)
             group_names = ''
             if submitted_by_groups:
                 existing_approval = existing_approval.filter(
-                    Q(submitted_by_group__in=submitted_by_groups),
+                    Q(submitted_by_group__in=submitted_by_groups)
                 ).prefetch_related('submitted_by_group').values_list('submitted_by_group__name',flat=True)
                 group_names = ', '.join(group for group in existing_approval)
 
@@ -2417,14 +2448,14 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             ordering = request.query_params.get('ordering', None)
-            print('ordering',ordering)
+            # print('ordering',ordering)
             if ordering == 'document_count':
-                print('-document_count')
+                # print('-document_count')
                 sorted_data = sorted(serializer.data,
                                      key=lambda x: x['document_count'])
 
             elif ordering == '-document_count':
-                print('+document_count')
+                # print('+document_count')
                 sorted_data = sorted(serializer.data,
                                      key=lambda x: x['document_count'],
                                      reverse=True)
@@ -2443,7 +2474,7 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             parent_warehouse = serializer.validated_data.get('parent_warehouse',None)
 
         parent_warehouse = Warehouse.objects.filter(id=parent_warehouse.id if parent_warehouse else None).first()
-        print(parent_warehouse, serializer.validated_data.get("type"))
+        # print(parent_warehouse, serializer.validated_data.get("type"))
         if serializer.validated_data.get("type") == Warehouse.WAREHOUSE and not parent_warehouse:
             warehouse = serializer.save(owner=request.user)
             warehouse.path = str(warehouse.id)
@@ -2567,8 +2598,8 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             When(type='folder', then=0),  # Gán giá trị 0 cho folder
             When(type='file', then=1),  # Gán giá trị 1 cho file
             output_field=IntegerField(),
-        ),
-    ).order_by('type_order', Lower('name'))
+        )
+    ).order_by('type_order', Lower('name')).prefetch_related('documents')
 
     serializer_class = FolderSerializer
     pagination_class = StandardPagination
@@ -2588,7 +2619,6 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             ordering = request.query_params.get('ordering', None)
-            print('ordering',ordering)
             if ordering == 'document_count':
                 sorted_data = sorted(serializer.data,
                                      key=lambda x: x['document_count'])
@@ -2726,6 +2756,9 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             folder.checksum = hashlib.md5(f'{folder.id}.{folder.name}'.encode()).hexdigest()
             folder.save()
         elif parent_folder:
+            user_can_change = check_user_can_change_folder(request.user, parent_folder)
+            if not user_can_change:
+                return Response(data={"detail":"You do not have permission to perform this action."},status=status.HTTP_403_FORBIDDEN)
             folder = serializer.save(parent_folder=parent_folder,owner=request.user)
             folder.path = f"{parent_folder.path}/{folder.id}"
             folder.checksum = hashlib.md5(f'{folder.id}.{folder.name}'.encode()).hexdigest()
@@ -2760,7 +2793,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
         self.perform_update(serializer)
         # update permission document
-        # update permission folder child
+        # update permisson folder child
         self.update_child_folder_permisisons(instance, serializer)
         if old_parent_folder != instance.parent_folder:
             if instance.parent_folder:
@@ -2823,6 +2856,61 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             self.update_child_folder_paths(child_folder)
 
 
+
+    def update_child_folder_permisisons(self, folder, serializer):
+        child_folders = Folder.objects.filter(path__startswith=folder.path)
+        documents_list = Document.objects.select_related("dossier").filter(folder__in=child_folders)
+        # documents_list = []
+        # for child in child_folders:
+        #     if child.type == "file":
+        #         documents_list._append(child.o)
+
+        permissions = serializer.validated_data.get("set_permissions")
+        update_view_folder_parent_permissions(folder, permissions)
+        owner = serializer.validated_data.get("owner")
+        merge = serializer.validated_data.get("merge")
+
+        try:
+            qs = child_folders
+
+            # if merge is true, we dont want to remove the owner
+            if "owner" in serializer.validated_data and (
+                not merge or (merge and owner is not None)
+            ):
+                # if merge is true, we dont want to overwrite the owner
+                qs_owner_update = qs.filter(
+                    owner__isnull=True) if merge else qs
+                qs_owner_update.update(owner=owner)
+            if "set_permissions" in serializer.validated_data:
+                for obj in qs:
+                    set_permissions_for_object(
+                        permissions=permissions,
+                        object=obj,
+                        merge=merge,
+                    )
+                for obj in documents_list:
+                    set_permissions_for_object(
+                        permissions=permissions,
+                        object=obj,
+                        merge=merge,
+                    )
+                    set_permissions_for_object(
+                        permissions=permissions,
+                        object=obj.dossier,
+                        merge=merge,
+                    )
+
+
+
+        except Exception as e:
+            logger.warning(
+                f"An error occurred performing bulk permissions edit: {e!s}",
+            )
+            return HttpResponseBadRequest(
+                "Error performing bulk permissions edit, check logs for more detail.",
+            )
+
+
     def destroy(self, request, pk, *args, **kwargs):
         folder = Folder.objects.get(id=pk)
         folders = Folder.objects.filter(path__startswith=folder.path)
@@ -2863,6 +2951,7 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         set_permissions = None
         if serializer.is_valid(raise_exception=True):
             parent_dossier = serializer.validated_data.get('parent_dossier',None)
+            set_permissions = serializer.validated_data.get('set_permissions',None)
 
         parent_dossier = Dossier.objects.filter(id=parent_dossier.id if parent_dossier else 0).first()
 
@@ -2872,13 +2961,7 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             dossier.path = str(dossier.id)
             dossier.save()
         elif parent_dossier:
-            dossier = serializer.save(owner=request.user)
-            # if parent_dossier.is_form == True and dossier.is_form == False:
-            #     dossier.path = str(dossier.id)
-            # elif parent_dossier.is_form == True and dossier.is_form == True:
-            #     dossier = serializer.save(parent_dossier=None,owner=request.user)
-            #     dossier.path = f"{parent_dossier.path}/{dossier.id}"
-            # else:
+            # dossier = serializer.save(owner=request.user)
             dossier = serializer.save(parent_dossier=parent_dossier,owner=request.user)
             dossier.path = f"{parent_dossier.path}/{dossier.id}"
             dossier.save()
@@ -3054,6 +3137,22 @@ class DossierFormViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     filterset_class = DossierFormFilterSet
     ordering_fields = ("name", "type")
 
+    def create(self, request, *args, **kwargs):
+        serializer = DossierFormSerializer(data=request.data)
+
+        if serializer.is_valid(raise_exception=True):
+            permissions = serializer.validated_data.get("set_permissions")
+            # owner = serializer.validated_data.get("owner")
+            # merge = serializer.validated_data.get("merge")
+            dossier_form = serializer.save(owner=request.user)
+            set_permissions_for_object(
+                permissions=permissions,
+                object=dossier_form,
+                merge=True,
+            )
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
     # def create(self, request, *args, **kwargs):
     #     # try:
     #     serializer = DossierFormSerializer(data=request.data)
@@ -3150,3 +3249,4 @@ class DossierFormViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     #             return Response(
     #                 {"error": "Error retrieving dossiers, check logs for more detail."},
     #             )
+
