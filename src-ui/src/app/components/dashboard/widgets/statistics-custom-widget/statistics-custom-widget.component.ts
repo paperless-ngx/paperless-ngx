@@ -60,7 +60,7 @@ export class StatisticsCustomWidgetComponent
         labels: this.labels_graph,
         datasets: [
           {
-            label: 'Documents',
+            label: $localize `Documents`,
             data: this.data_graph,
             backgroundColor: 'rgb(75, 192, 192)',
             fill: false,
@@ -86,7 +86,7 @@ export class StatisticsCustomWidgetComponent
       data: {
         labels: this.labels_document_type_pie_graph,
         datasets: [{
-          label: 'Document Type',
+          label: $localize `Document Type`,
           data: this.data_document_type_pie_graph,
           backgroundColor: [
             'rgb(255, 99, 132)',  // Red

@@ -540,7 +540,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.html</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">18</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/folder-node-widget/node-tree-widget.component.html</context>
@@ -2960,6 +2960,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">111</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
+          <context context-type="linenumber">63</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
@@ -5456,6 +5460,46 @@
           <context context-type="linenumber">155</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="4893021289045823170" datatype="html">
+        <source><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;col-12&quot;&gt;"/><x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div class=&quot;dp-hidden position-absolute&quot;&gt;"/><x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;input-group&quot;&gt;"/><x id="TAG_INPUT" ctype="x-input" equiv-text="&lt;input
+          name=&quot;datepicker&quot;
+          class=&quot;form-control&quot;
+          ngbDatepicker
+          #datepicker=&quot;ngbDatepicker&quot;
+          [autoClose]=&quot;&apos;outside&apos;&quot;
+          (dateSelect)=&quot;onDateSelection($event)&quot;
+          [displayMonths]=&quot;2&quot;
+          [dayTemplate]=&quot;t&quot;
+          outsideDays=&quot;hidden&quot;
+          [startDate]=&quot;fromDate!&quot;
+          tabindex=&quot;-1&quot;
+        /&gt;"/><x id="START_TAG_NG_TEMPLATE" ctype="x-ng_template" equiv-text="&lt;ng-template #t let-date let-focused=&quot;focused&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span
+            class=&quot;custom-day&quot;
+            [class.focused]=&quot;focused&quot;
+            [class.range]=&quot;isRange(date)&quot;
+            [class.faded]=&quot;isHovered(date) || isInside(date)&quot;
+            (mouseenter)=&quot;hoveredDate = date&quot;
+            (mouseleave)=&quot;hoveredDate = null&quot;
+          &gt;"/> <x id="INTERPOLATION" equiv-text="{{ date.day }}"/> <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_NG_TEMPLATE" ctype="x-ng_template" equiv-text="&lt;/ng-template&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;input-group&quot;&gt;"/><x id="TAG_INPUT_1" ctype="x-input_1" equiv-text="&lt;input
+        #dpFromDate
+        class=&quot;form-control&quot;
+        placeholder=&quot;yyyy-mm-dd&quot;
+        name=&quot;dpFromDate&quot;
+        [value]=&quot;formatter.format(fromDate)&quot;
+        (input)=&quot;fromDate = validateInput(fromDate, dpFromDate.value)&quot;
+      /&gt;"/><x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&lt;button class=&quot;btn btn-outline-secondary&quot; (click)=&quot;datepicker.toggle()&quot; type=&quot;button&quot;&gt;"/><x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;i-bs width=&quot;1.2em&quot; height=&quot;1.2em&quot; name=&quot;calendar3&quot;&gt;"/><x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;/i-bs&gt;"/><x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;col-12&quot;&gt;"/><x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;input-group&quot;&gt;"/><x id="TAG_INPUT_2" ctype="x-input_2" equiv-text="&lt;input
+        #dpToDate
+        class=&quot;form-control&quot;
+        placeholder=&quot;yyyy-mm-dd&quot;
+        name=&quot;dpToDate&quot;
+        [value]=&quot;formatter.format(toDate)&quot;
+        (input)=&quot;toDate = validateInput(toDate, dpToDate.value)&quot;
+      /&gt;"/><x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&lt;button class=&quot;btn btn-outline-secondary&quot; (click)=&quot;datepicker.toggle()&quot; type=&quot;button&quot;&gt;"/><x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;i-bs width=&quot;1.2em&quot; height=&quot;1.2em&quot; name=&quot;calendar3&quot;&gt;"/><x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;/i-bs&gt;"/><x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;col-12&quot;&gt;"/><x id="START_TAG_SELECT" ctype="x-select" equiv-text="&lt;select class=&quot;form-select&quot; (change)=&quot;setDateRange($event)&quot;&gt;"/><x id="START_TAG_OPTION" ctype="x-option" equiv-text="&lt;option value=&quot;today&quot;&gt;"/>Today<x id="CLOSE_TAG_OPTION" ctype="x-option" equiv-text="&lt;/option&gt;"/><x id="START_TAG_OPTION_1" ctype="x-option_1" equiv-text="&lt;option value=&quot;week&quot;&gt;"/>Week<x id="CLOSE_TAG_OPTION" ctype="x-option" equiv-text="&lt;/option&gt;"/><x id="START_TAG_OPTION_2" ctype="x-option_2" equiv-text="&lt;option value=&quot;month&quot;&gt;"/>Month<x id="CLOSE_TAG_OPTION" ctype="x-option" equiv-text="&lt;/option&gt;"/><x id="CLOSE_TAG_SELECT" ctype="x-select" equiv-text="&lt;/select&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;col-12&quot;&gt;"/><x id="START_TAG_BUTTON_1" ctype="x-button_1" equiv-text="&lt;button type=&quot;button&quot; class=&quot;btn btn-outline-primary&quot; (click)=&quot;this.confirmButton.emit()&quot; &gt;"/>Confirm <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/datepicker-range/datepicker-range.component.html</context>
+          <context context-type="linenumber">2,71</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="6423278459497515329" datatype="html">
         <source>No documents found</source>
         <context-group purpose="location">
@@ -6204,8 +6248,27 @@
       <trans-unit id="1069523139277190436" datatype="html">
         <source>Statistics</source>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9094662485818616570" datatype="html">
+        <source><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;list-group border-light&quot; &gt;"/><x id="START_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;h5 class=&quot;mt-2 mb-2&quot;&gt;"/>Uploaded Document Statistics<x id="CLOSE_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;/h5&gt;"/><x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;m-2&quot;&gt;"/><x id="START_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&lt;pngx-input-datepicker-range class=&quot;mb-2 mb-sm-0 &quot;
+                                     (dateRangeChange)=&quot;onDateRangeChange($event)&quot; (confirmButton)=&quot;confirmButton()&quot;&gt;"/><x id="CLOSE_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&lt;/pngx-input-datepicker-range&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div class=&quot;&quot;&gt;"/><x id="START_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;canvas id=&quot;DocumentChart&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{ chart }}"/><x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;/canvas&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="HORIZONTAL_RULE" ctype="x-hr" equiv-text="&lt;hr /&gt;"/><x id="START_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;h5 class=&quot;mt-2 mb-2&quot;&gt;"/>Top Document Types with the Largest Number of Documents<x id="CLOSE_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;/h5&gt;"/><x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div class=&quot;&quot;&gt;"/><x id="START_TAG_CANVAS_1" ctype="x-canvas_1" equiv-text="&lt;canvas id=&quot;DocumentTypePieChart&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{ chart }}"/><x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;/canvas&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="HORIZONTAL_RULE" ctype="x-hr" equiv-text="&lt;hr /&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.html</context>
+          <context context-type="linenumber">3,82</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3264001515130844663" datatype="html">
+        <source>Document Type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
+          <context context-type="linenumber">89</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2028517964701399614" datatype="html">
@@ -7755,7 +7818,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">250</context>
+          <context context-type="linenumber">249</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6904053157270858713" datatype="html">
