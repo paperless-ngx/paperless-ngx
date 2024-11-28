@@ -113,4 +113,8 @@ class GeneralConfig(BaseConfig):
         app_config = self._get_config_instance()
 
         self.app_title = app_config.app_title or None
-        self.app_logo = app_config.app_logo.url if app_config.app_logo else None
+        self.app_logo = (
+            settings.BASE_URL + app_config.app_logo.url.lstrip("/")
+            if app_config.app_logo
+            else None
+        )
