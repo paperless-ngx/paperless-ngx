@@ -721,6 +721,7 @@ export class DocumentDetailComponent
 
   save(close: boolean = false) {
     this.networkActive = true
+    ;(document.activeElement as HTMLElement)?.dispatchEvent(new Event('change'))
     this.documentsService
       .update(this.document)
       .pipe(first())
