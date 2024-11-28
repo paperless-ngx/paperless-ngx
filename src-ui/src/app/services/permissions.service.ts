@@ -105,6 +105,10 @@ export class PermissionsService {
     )
   }
 
+  getCurrentUser(){
+    return this.currentUser
+  }
+
   public currentUserHasObjectPermissions(
     action: string,
     object: ObjectWithPermissions

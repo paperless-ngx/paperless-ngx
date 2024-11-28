@@ -8,7 +8,7 @@
     <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedApprovals.size === 0">
       <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
     </button>
-    
+
     <!-- <button class="btn btn-sm btn-outline-primary me-4" (click)="updateApprovals()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }" [disabled]="approvalsService.total === 0">
       <i-bs name="check2-all"></i-bs>&nbsp;{{rejectButtonText}}
     </button>
@@ -18,7 +18,7 @@
     <button class="btn btn-sm btn-outline-primary me-4" (click)="updateApprovals()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }" [disabled]="approvalsService.total === 0">
       <i-bs name="check2-all"></i-bs>&nbsp;{{revokeButtonText}}
     </button> -->
-    
+
     <div class="form-check form-switch mb-0">
       <input class="form-check-input" type="checkbox" role="switch" id="autoRefreshSwitch" (click)="toggleAutoRefresh()" [attr.checked]="autoRefreshInterval">
       <label class="form-check-label" for="autoRefreshSwitch" i18n>Auto refresh</label>
@@ -45,7 +45,7 @@
         <th scope="col" class="d-table-cell d-lg-none" i18n>Info</th>
         <th scope="col" class="d-none d-lg-table-cell" i18n>Content type</th>
         <th scope="col" class="d-none d-lg-table-cell" i18n>Submmit by</th>
-        <th scope="col" class="d-none d-lg-table-cell" i18n>Submmit by group</th>
+<!--        <th scope="col" class="d-none d-lg-table-cell" i18n>Submmit by group</th>-->
         <th scope="col" class="d-none d-lg-table-cell" i18n>Created</th>
         <th scope="col" class="d-none d-lg-table-cell" i18n>Expires</th>
         @if (activeTab == 'success') {
@@ -63,28 +63,30 @@
     </thead>
     <tbody>
       @for (approval of approvals | slice: (page-1) * pageSize : page * pageSize; track approval) {
-        <tr (click)="toggleSelected(approval, $event); $event.stopPropagation();">
+        <tr (click)="toggleSelected(approval); $event.stopPropagation();">
           <td>
             <div class="form-check">
-              <input type="checkbox" class="form-check-input" id="approval{{approval.id}}" [checked]="selectedApprovals.has(approval.id)" (click)="toggleSelected(approval, $event); $event.stopPropagation();">
+              <input type="checkbox" class="form-check-input" id="approval{{approval.id}}" [checked]="selectedApprovals.has(approval.id)" (click)="toggleSelected(approval); $event.stopPropagation();">
               <label class="form-check-label" for="approval{{approval.id}}"></label>
             </div>
           </td>
           <td class="overflow-auto name-col">{{ approval.name }}</td>
           <td class="d-none d-lg-table-cell">{{ approval.ctype }}</td>
           <td class="d-none d-lg-table-cell">{{ displayName(approval) }}</td>
-          <td class="d-none d-lg-table-cell">{{ displayGroup(approval) }}</td>
+<!--          <td class="d-none d-lg-table-cell">{{ displayGroup(approval) }}</td>-->
           <td class="d-none d-lg-table-cell">{{ approval.created | customDate:'short' }}</td>
           @if (approval.expiration==null){
             <td class="d-none d-lg-table-cell">Unlimited</td>
-          }
-          @if (approval.expiration!=null){
+          } @else if (approval.expiration!=null){
             <td class="d-none d-lg-table-cell">{{ approval.expiration | customDate:'short' }}</td>
           }
-          <td class="d-none d-lg-table-cell">{{ approval.modified | customDate:'short' }}</td>
+          @if (approval.status != PaperlessApprovalStatus.Pending){
+              <td class="d-none d-lg-table-cell">{{ approval.modified | customDate:'short' }} </td>
+          }
+
           <td class="d-none d-lg-table-cell">{{ approval.access_type }}</td>
 
-          
+
           <td class="d-lg-none">
             <button class="btn btn-link" (click)="expandApproval(approval); $event.stopPropagation();">
               <i-bs width="1.2em" height="1.2em" name="info-circle"></i-bs>
@@ -93,15 +95,15 @@
           <td scope="row">
             <div class="btn-group" role="group">
               @if (approval.status == 'PENDING'){
-                <button class="btn btn-sm btn-outline-success" (click)="updateApproval(approval,'SUCCESS'); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }">
+                <button class="btn btn-sm btn-outline-success" (click)="updateApproval(approval,'SUCCESS'); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }" [hidden]="check_submit(approval)">
                   <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Approve</ng-container>
                 </button>
-                <button class="btn btn-sm btn-outline-danger" (click)="updateApproval(approval,'FAILURE'); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }">
+                <button class="btn btn-sm btn-outline-danger" (click)="updateApproval(approval,'FAILURE'); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }" [hidden]="check_submit(approval)">
                   <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Reject</ng-container>
                 </button>
               }
               @if (approval.status == 'SUCCESS'){
-                <button class="btn btn-sm btn-outline-danger" (click)="updateApproval(approval,'REVOKED'); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }">
+                <button class="btn btn-sm btn-outline-danger" (click)="updateApproval(approval,'REVOKED'); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }" [hidden]="check_submit(approval)">
                   <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Revoked</ng-container>
                 </button>
               }
@@ -131,10 +133,10 @@
                 <td>Submmit by</td>
                 <td>{{ displayName(approval) }}</td>
               </tr>
-              <tr>
-                <td>Submmit by group</td>
-                <td>{{ displayGroup(approval) }}</td>
-              </tr>
+<!--              <tr>-->
+<!--                <td>Submmit by group</td>-->
+<!--                <td>{{ displayGroup(approval) }}</td>-->
+<!--              </tr>-->
               <tr>
                 <td>Created</td>
                 <td>{{ approval.created | customDate:'short' }}</td>

@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core'
 import { Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { first } from 'rxjs'
-import { PaperlessApproval } from 'src/app/data/paperless-approval'
+import { PaperlessApproval, PaperlessApprovalStatus } from 'src/app/data/paperless-approval'
 import { ApprovalsService } from 'src/app/services/approvals.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
@@ -10,6 +10,8 @@ import { User } from 'src/app/data/user'
 import { Group } from 'src/app/data/group'
 import { UserService } from 'src/app/services/rest/user.service'
 import { GroupService } from 'src/app/services/rest/group.service'
+import { PermissionsService } from '../../../services/permissions.service'
+import { app } from 'ngx-bootstrap-icons'
 
 @Component({
   selector: 'pngx-approvals',
@@ -42,7 +44,7 @@ export class ApprovalsComponent
       ? $localize`Approve selected`
       : $localize`Approval all`
   }
-  
+
   get rejectButtonText(): string {
     return this.selectedApprovals.size > 0
       ? $localize`Reject selected`
@@ -58,7 +60,8 @@ export class ApprovalsComponent
     private modalService: NgbModal,
     private readonly router: Router,
     private userService: UserService,
-    private groupService: GroupService
+    private groupService: GroupService,
+    private permissionsService: PermissionsService,
   ) {
     super()
     this.groupService.listAll().subscribe({
@@ -78,7 +81,7 @@ export class ApprovalsComponent
     this.toggleAutoRefresh()
     // console.log(approvals)
   }
-  
+
   displayName(approval: PaperlessApproval): string {
     if (!approval.submitted_by) return '';
       if (!approval.submitted_by) return ''
@@ -87,7 +90,12 @@ export class ApprovalsComponent
       if (!user) return ''
       return user.username
   }
-  
+
+  check_submit(object){
+    // console.log(object.submitted_by)
+    return this.permissionsService.getCurrentUser().id === object.submitted_by
+  }
+
   displayGroup(approval: PaperlessApproval): string {
     if (!approval.submitted_by_group) return ''
     const nameArray = this.groups?.filter(obj => approval.submitted_by_group.includes(obj.id)).map(obj => obj.name);
@@ -226,4 +234,7 @@ export class ApprovalsComponent
       }, 5000)
     }
   }
+
+  protected readonly PaperlessApprovalStatus = PaperlessApprovalStatus
+  protected readonly app = app
 }

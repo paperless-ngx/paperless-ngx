@@ -52,7 +52,8 @@ from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
-from guardian.shortcuts import get_perms, get_users_with_perms
+from guardian.shortcuts import get_perms, get_users_with_perms, \
+    get_objects_for_user
 from django.utils.translation import gettext_lazy as _
 from langdetect import detect
 from packaging import version as packaging_version
@@ -1810,50 +1811,25 @@ class ApprovalViewSet(ModelViewSet):
     queryset = Approval.objects.all()
     def get_queryset(self):
         # TODO: get user -> group -> document ->
+        if self.request.user.is_superuser:
+            documents_can_change = Document.objects.all()
+        else:
+            documents_can_change = get_objects_for_user(self.request.user, 'documents.change_document', with_superuser=False, any_perm=True)
+        document_ids = [x.id for x in documents_can_change]
+        # print(document_ids)
+        approvals = Approval.objects.filter(Q(object_pk__in=document_ids) | Q(submitted_by=self.request.user)).order_by("created").reverse()
 
-        approvals = Approval.objects.all().order_by("created").reverse()
-        approvals_object_pk = [int(x.object_pk) for x in approvals]
-        # approvals_object_pk = list(map(int, Approval.objects.all().order_by("created").reverse().values_list("object_pk", flat=True)))
+        approvals_ids = []
+        for x in approvals:
+            approvals_ids.append(x.object_pk)
+        document_ids_queryset = Document.objects.filter(id__in=approvals_ids).values_list('id', flat=True)
+        document_ids_set = set(document_ids_queryset)
+        approval_new = []
+        for approval in approvals:
+            if int(approval.object_pk) in document_ids_set:
+                approval_new.append(approval)
 
-        user = self.request.user
-        user_groups = set(user.groups.all())
-        documents = Document.objects.filter(id__in=approvals_object_pk)
-        # editable_objects = get_objects_for_user(user, 'change_document',
-        #                                         klass=Document,
-        #                                         accept_global_perms=False)
-
-        editable_objects = set()
-
-
-
-        for obj in documents:
-            if 'change_document' in get_perms(user,obj):
-                editable_objects.add(obj)
-                continue
-            if hasattr(obj,'owner') and obj.owner == user:
-                editable_objects.add(obj)
-                continue
-            object_groups = set(obj.groups.all())
-            if user_groups.intersection(object_groups):
-                editable_objects.add(obj)
-
-        for obj in approvals:
-            if int(obj.object_pk) in editable_objects:
-                del obj
-
-        return approvals
-
-
-
-        # logger.info("noi dung test", qs)
-        # document_ids = Document.objects.filter(owner=user).values_list("id")
-        # if user.is_superuser:
-        #     document_ids = Approval.objects.all().values_list("id")
-        # # document_ids =[str(x[0]) for x in document_ids]
-        # logger.info("noi dung", document_ids)
-        # qs = qs.filter(object_pk__in=document_ids)
-        # logger.info("noi dung test1", qs)
-        # return qs
+        return approval_new
 
     model = Approval
 
@@ -1904,14 +1880,25 @@ class ApprovalUpdateMutipleView(GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         approvals = serializer.validated_data.get("approvals")
         status = serializer.validated_data.get("status")
 
         try:
             approvals_match = Approval.objects.filter(id__in=approvals).prefetch_related('submitted_by_group')
+            document_ids = []
+            for approval in approvals_match:
+                if self.request.user == approval.submitted_by:
+                    return HttpResponseForbidden("Insufficient permissions")
+                document_ids.append(int(approval.object_pk))
+            documents =  Document.objects.filter(id__in=document_ids)
+            for document in documents:
+                if not self.request.user.has_perm('change_document', document):
+                    return HttpResponseForbidden("Insufficient permissions")
+
+
             result = approvals_match.update(
                 status=status,
+                modified=timezone.now()
             )
             for approval in approvals_match:
                 approval_updated.send(
