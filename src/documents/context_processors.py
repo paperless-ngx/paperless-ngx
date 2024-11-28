@@ -14,7 +14,7 @@ def settings(request):
     app_logo = (
         django_settings.APP_LOGO
         if general_config.app_logo is None or len(general_config.app_logo) == 0
-        else general_config.app_logo
+        else django_settings.BASE_URL + general_config.app_logo.lstrip("/")
     )
 
     return {
