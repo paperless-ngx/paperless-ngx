@@ -10,6 +10,7 @@ import tqdm
 from celery import Task
 from celery import shared_task
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db import transaction
 from django.db.models.signals import post_save
@@ -332,9 +333,17 @@ def empty_trash(doc_ids=None):
     )
 
     try:
+        deleted_document_ids = documents.values_list("id", flat=True)
         # Temporarily connect the cleanup handler
         models.signals.post_delete.connect(cleanup_document_deletion, sender=Document)
         documents.delete()  # this is effectively a hard delete
+
+        if settings.AUDIT_LOG_ENABLED:
+            # Delete the audit log entries for documents that dont exist anymore
+            LogEntry.objects.filter(
+                content_type=ContentType.objects.get_for_model(Document),
+                object_id__in=deleted_document_ids,
+            ).delete()
     except Exception as e:  # pragma: no cover
         logger.exception(f"Error while emptying trash: {e}")
     finally:
