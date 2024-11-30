@@ -64,7 +64,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_account1["username"], account1.username)
         self.assertEqual(
             returned_account1["password"],
-            "*" * len(account1.password),
+            "**********",
         )
         self.assertEqual(returned_account1["imap_server"], account1.imap_server)
         self.assertEqual(returned_account1["imap_port"], account1.imap_port)

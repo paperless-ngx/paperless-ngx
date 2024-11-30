@@ -11,20 +11,9 @@ from rest_framework import serializers
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 from paperless.models import ApplicationConfiguration
+from paperless_mail.serialisers import ObfuscatedPasswordField
 
 logger = logging.getLogger("paperless.settings")
-
-
-class ObfuscatedUserPasswordField(serializers.Field):
-    """
-    Sends *** string instead of password in the clear
-    """
-
-    def to_representation(self, value):
-        return "**********" if len(value) > 0 else ""
-
-    def to_internal_value(self, data):
-        return data
 
 
 class PaperlessAuthTokenSerializer(AuthTokenSerializer):
@@ -58,7 +47,7 @@ class PaperlessAuthTokenSerializer(AuthTokenSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password = ObfuscatedUserPasswordField(required=False)
+    password = ObfuscatedPasswordField(required=False)
     user_permissions = serializers.SlugRelatedField(
         many=True,
         queryset=Permission.objects.exclude(content_type__app_label="admin"),
@@ -163,7 +152,7 @@ class SocialAccountSerializer(serializers.ModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(allow_null=False)
-    password = ObfuscatedUserPasswordField(required=False, allow_null=False)
+    password = ObfuscatedPasswordField(required=False, allow_null=False)
     auth_token = serializers.SlugRelatedField(read_only=True, slug_field="key")
     social_accounts = SocialAccountSerializer(
         many=True,
