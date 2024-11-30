@@ -26,7 +26,6 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from documents.permissions import PaperlessObjectPermissions
@@ -290,7 +289,7 @@ class DisconnectSocialAccountView(GenericAPIView):
             return HttpResponseBadRequest("Social account not found")
 
 
-class SocialAccountProvidersView(APIView):
+class SocialAccountProvidersView(GenericAPIView):
     """
     List of social account providers
     """
