@@ -18,6 +18,9 @@ from django.http import HttpResponseForbidden
 from django.http import HttpResponseNotFound
 from django.views.generic import View
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema_view
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
@@ -171,6 +174,34 @@ class ProfileView(GenericAPIView):
         return Response(serializer.to_representation(user))
 
 
+@extend_schema_view(
+    get=extend_schema(
+        responses={
+            (200, "application/json"): OpenApiTypes.OBJECT,
+        },
+    ),
+    post=extend_schema(
+        request={
+            "application/json": {
+                "type": "object",
+                "properties": {
+                    "secret": {"type": "string"},
+                    "code": {"type": "string"},
+                },
+                "required": ["secret", "code"],
+            },
+        },
+        responses={
+            (200, "application/json"): OpenApiTypes.OBJECT,
+        },
+    ),
+    delete=extend_schema(
+        responses={
+            (200, "application/json"): OpenApiTypes.BOOL,
+            404: OpenApiTypes.STR,
+        },
+    ),
+)
 class TOTPView(GenericAPIView):
     """
     TOTP views
