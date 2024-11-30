@@ -929,6 +929,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
     ),
     retrieve=extend_schema(
         description="Single log view",
+        operation_id="retrieve_log",
         responses={
             (200, "application/json"): serializers.ListSerializer(
                 child=serializers.CharField(),
@@ -945,11 +946,12 @@ class LogViewSet(ViewSet):
     def get_log_filename(self, log):
         return os.path.join(settings.LOGGING_DIR, f"{log}.log")
 
-    def retrieve(self, request, pk=None, *args, **kwargs):
-        if pk not in self.log_files:
+    def retrieve(self, request, *args, **kwargs):
+        log_file = kwargs.get("pk")
+        if log_file not in self.log_files:
             raise Http404
 
-        filename = self.get_log_filename(pk)
+        filename = self.get_log_filename(log_file)
 
         if not os.path.isfile(filename):
             raise Http404
