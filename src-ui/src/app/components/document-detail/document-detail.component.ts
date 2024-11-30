@@ -1164,6 +1164,7 @@ export class DocumentDetailComponent
   splitDocument() {
     let modal = this.modalService.open(SplitConfirmDialogComponent, {
       backdrop: 'static',
+      size: 'lg',
     })
     modal.componentInstance.title = $localize`Split confirm`
     modal.componentInstance.messageBold = $localize`This operation will split the selected document(s) into new documents.`
@@ -1202,6 +1203,7 @@ export class DocumentDetailComponent
   rotateDocument() {
     let modal = this.modalService.open(RotateConfirmDialogComponent, {
       backdrop: 'static',
+      size: 'lg',
     })
     modal.componentInstance.title = $localize`Rotate confirm`
     modal.componentInstance.messageBold = $localize`This operation will permanently rotate the original version of the current document.`
