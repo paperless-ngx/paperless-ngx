@@ -113,7 +113,7 @@ class SocialAccountSerializer(serializers.ModelSerializer):
             "name",
         )
 
-    def get_name(self, obj):
+    def get_name(self, obj) -> str:
         return obj.get_provider_account().to_str()
 
 
@@ -131,6 +131,9 @@ class ProfileSerializer(serializers.ModelSerializer):
     def get_is_mfa_enabled(self, user: User) -> bool:
         mfa_adapter = get_mfa_adapter()
         return mfa_adapter.is_mfa_enabled(user)
+
+    def get_has_usable_password(self, user: User) -> bool:
+        return user.has_usable_password()
 
     class Meta:
         model = User
