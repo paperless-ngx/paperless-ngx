@@ -87,7 +87,7 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 class MatchingModelSerializer(serializers.ModelSerializer):
     document_count = serializers.IntegerField(read_only=True)
 
-    def get_slug(self, obj):
+    def get_slug(self, obj) -> str:
         return slugify(obj.name)
 
     slug = SerializerMethodField()
@@ -200,7 +200,7 @@ class OwnedObjectSerializer(
         except KeyError:
             pass
 
-    def get_permissions(self, obj):
+    def get_permissions(self, obj) -> dict:
         view_codename = f"view_{obj.__class__.__name__.lower()}"
         change_codename = f"change_{obj.__class__.__name__.lower()}"
 
@@ -229,7 +229,7 @@ class OwnedObjectSerializer(
             },
         }
 
-    def get_user_can_change(self, obj):
+    def get_user_can_change(self, obj) -> bool:
         checker = ObjectPermissionChecker(self.user) if self.user is not None else None
         return (
             obj.owner is None
@@ -272,7 +272,7 @@ class OwnedObjectSerializer(
 
         return set(user_permission_pks) | set(group_permission_pks)
 
-    def get_is_shared_by_requester(self, obj: Document):
+    def get_is_shared_by_requester(self, obj: Document) -> bool:
         # First check the context to see if `shared_object_pks` is set by the parent.
         shared_object_pks = self.context.get("shared_object_pks")
         # If not just check if the current object is shared.
@@ -658,7 +658,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         )
         return instance
 
-    def get_value(self, obj: CustomFieldInstance):
+    def get_value(self, obj: CustomFieldInstance) -> str | int | float | dict | None:
         return obj.value
 
     def validate(self, data):
@@ -892,13 +892,13 @@ class DocumentSerializer(
         required=False,
     )
 
-    def get_page_count(self, obj):
+    def get_page_count(self, obj) -> int | None:
         return obj.page_count
 
-    def get_original_file_name(self, obj):
+    def get_original_file_name(self, obj) -> str | None:
         return obj.original_filename
 
-    def get_archived_file_name(self, obj):
+    def get_archived_file_name(self, obj) -> str | None:
         if obj.has_archive_version:
             return obj.get_public_filename(archive=True)
         else:
@@ -1707,7 +1707,7 @@ class TasksViewSerializer(OwnedObjectSerializer):
 
     type = serializers.SerializerMethodField()
 
-    def get_type(self, obj):
+    def get_type(self, obj) -> str:
         # just file tasks, for now
         return "file"
 
@@ -1715,7 +1715,7 @@ class TasksViewSerializer(OwnedObjectSerializer):
     created_doc_re = re.compile(r"New document id (\d+) created")
     duplicate_doc_re = re.compile(r"It is a duplicate of .* \(#(\d+)\)")
 
-    def get_related_document(self, obj):
+    def get_related_document(self, obj) -> str | None:
         result = None
         re = None
         match obj.status:
