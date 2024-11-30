@@ -209,35 +209,16 @@ lint.per-file-ignores."src/documents/management/commands/document_consumer.py" =
 lint.per-file-ignores."src/documents/management/commands/document_exporter.py" = [
   "PTH",
 ] # TODO Enable & remove
-lint.per-file-ignores."src/documents/migrations/0012_auto_20160305_0040.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/documents/migrations/0014_document_checksum.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/documents/migrations/1003_mime_types.py" = [
-  "PTH",
-] # TODO Enable & remove
 lint.per-file-ignores."src/documents/migrations/1012_fix_archive_files.py" = [
   "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/models.py" = [
-  "PTH",
   "SIM115",
-] # TODO PTH Enable & remove
+]
 lint.per-file-ignores."src/documents/parsers.py" = [
   "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/signals/handlers.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/documents/tasks.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/documents/tests/test_api_app_config.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/documents/tests/test_classifier.py" = [
   "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/tests/test_consumer.py" = [
@@ -255,9 +236,6 @@ lint.per-file-ignores."src/documents/tests/test_management_consumer.py" = [
 lint.per-file-ignores."src/documents/tests/test_management_exporter.py" = [
   "PTH",
 ] # TODO Enable & remove
-lint.per-file-ignores."src/documents/tests/test_management_thumbnails.py" = [
-  "PTH",
-] # TODO Enable & remove
 lint.per-file-ignores."src/documents/tests/test_migration_archive_files.py" = [
   "PTH",
 ] # TODO Enable & remove
@@ -270,12 +248,6 @@ lint.per-file-ignores."src/documents/tests/test_migration_mime_type.py" = [
 lint.per-file-ignores."src/documents/tests/test_sanity_check.py" = [
   "PTH",
 ] # TODO Enable & remove
-lint.per-file-ignores."src/documents/tests/test_tasks.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/documents/tests/test_views.py" = [
-  "PTH",
-] # TODO Enable & remove
 lint.per-file-ignores."src/documents/views.py" = [
   "PTH",
 ] # TODO Enable & remove
@@ -285,34 +257,16 @@ lint.per-file-ignores."src/paperless/checks.py" = [
 lint.per-file-ignores."src/paperless/settings.py" = [
   "PTH",
 ] # TODO Enable & remove
-lint.per-file-ignores."src/paperless/tests/test_checks.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/paperless/urls.py" = [
-  "PTH",
-] # TODO Enable & remove
 lint.per-file-ignores."src/paperless/views.py" = [
   "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/paperless_mail/mail.py" = [
   "PTH",
 ] # TODO Enable & remove
-lint.per-file-ignores."src/paperless_mail/preprocessor.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/paperless_tesseract/parsers.py" = [
-  "PTH",
-] # TODO Enable & remove
 lint.per-file-ignores."src/paperless_tesseract/tests/test_parser.py" = [
   "PTH",
   "RUF001",
 ] # TODO PTH Enable & remove
-lint.per-file-ignores."src/paperless_tika/tests/test_live_tika.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/paperless_tika/tests/test_tika_parser.py" = [
-  "PTH",
-] # TODO Enable & remove
 lint.isort.force-single-line = true
 
 [tool.pytest.ini_options]
