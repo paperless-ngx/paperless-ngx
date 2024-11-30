@@ -12,9 +12,9 @@ import {
 } from 'src/app/data/document'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
 
 @Component({
   selector: 'pngx-document-card-large',
@@ -65,7 +65,7 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
   @Output()
   clickMoreLike = new EventEmitter()
 
-  @ViewChild('popover') popover: NgbPopover
+  @ViewChild('popupPreview') popupPreview: PreviewPopupComponent
 
   mouseOnPreview = false
   popoverHidden = true
@@ -112,29 +112,8 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
     return this.documentService.getPreviewUrl(this.document.id)
   }
 
-  mouseEnterPreview() {
-    this.mouseOnPreview = true
-    if (!this.popover.isOpen()) {
-      // we're going to open but hide to pre-load content during hover delay
-      this.popover.open()
-      this.popoverHidden = true
-      setTimeout(() => {
-        if (this.mouseOnPreview) {
-          // show popover
-          this.popoverHidden = false
-        } else {
-          this.popover.close()
-        }
-      }, 600)
-    }
-  }
-
-  mouseLeavePreview() {
-    this.mouseOnPreview = false
-  }
-
   mouseLeaveCard() {
-    this.popover.close()
+    this.popupPreview.close()
   }
 
   get contentTrimmed() {

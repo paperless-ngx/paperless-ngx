@@ -564,11 +564,6 @@ table.table {
   }
 }
 
-.popover-hidden .popover {
-    opacity: 0;
-    pointer-events: none;
-}
-
 // Tour
 .tour-active .popover {
   min-width: 360px;
@@ -726,5 +721,29 @@ i-bs svg {
 .document-card {
   .card-footer i-bs svg {
     vertical-align: middle;
+  }
+}
+
+// fixes for buttons in preview popup
+.btn-group pngx-preview-popup:not(:last-child) {
+  // Prevent double borders when buttons are next to each other
+  > .btn {
+    margin-left: calc(#{$btn-border-width} * -1);
+  }
+  > .btn {
+    @include border-end-radius(0);
+  }
+}
+.btn-group pngx-preview-popup:not(:first-child) {
+  > .btn {
+    @include border-start-radius(0);
+  }
+}
+.btn-group pngx-preview-popup {
+  position: relative;
+  flex: 1 1 auto;
+
+  > .btn {
+    display: block;
   }
 }

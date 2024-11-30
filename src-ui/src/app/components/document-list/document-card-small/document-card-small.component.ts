@@ -13,9 +13,9 @@ import {
 } from 'src/app/data/document'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
 
 @Component({
   selector: 'pngx-document-card-small',
@@ -61,10 +61,7 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
 
   moreTags: number = null
 
-  @ViewChild('popover') popover: NgbPopover
-
-  mouseOnPreview = false
-  popoverHidden = true
+  @ViewChild('popupPreview') popupPreview: PreviewPopupComponent
 
   getIsThumbInverted() {
     return this.settingsService.get(SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED)
@@ -76,10 +73,6 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
 
   getDownloadUrl() {
     return this.documentService.getDownloadUrl(this.document.id)
-  }
-
-  get previewUrl() {
-    return this.documentService.getPreviewUrl(this.document.id)
   }
 
   get privateName() {
@@ -100,29 +93,8 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
     )
   }
 
-  mouseEnterPreview() {
-    this.mouseOnPreview = true
-    if (!this.popover.isOpen()) {
-      // we're going to open but hide to pre-load content during hover delay
-      this.popover.open()
-      this.popoverHidden = true
-      setTimeout(() => {
-        if (this.mouseOnPreview) {
-          // show popover
-          this.popoverHidden = false
-        } else {
-          this.popover.close()
-        }
-      }, 600)
-    }
-  }
-
-  mouseLeavePreview() {
-    this.mouseOnPreview = false
-  }
-
   mouseLeaveCard() {
-    this.popover.close()
+    this.popupPreview.close()
   }
 
   get notesEnabled(): boolean {
