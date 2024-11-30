@@ -35,7 +35,7 @@ class UserSerializer(serializers.ModelSerializer):
     inherited_permissions = serializers.SerializerMethodField()
     is_mfa_enabled = serializers.SerializerMethodField()
 
-    def get_is_mfa_enabled(self, user: User):
+    def get_is_mfa_enabled(self, user: User) -> bool:
         mfa_adapter = get_mfa_adapter()
         return mfa_adapter.is_mfa_enabled(user)
 
@@ -58,7 +58,7 @@ class UserSerializer(serializers.ModelSerializer):
             "is_mfa_enabled",
         )
 
-    def get_inherited_permissions(self, obj):
+    def get_inherited_permissions(self, obj) -> list[str]:
         return obj.get_group_permissions()
 
     def update(self, instance, validated_data):
@@ -139,7 +139,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     )
     is_mfa_enabled = serializers.SerializerMethodField()
 
-    def get_is_mfa_enabled(self, user: User):
+    def get_is_mfa_enabled(self, user: User) -> bool:
         mfa_adapter = get_mfa_adapter()
         return mfa_adapter.is_mfa_enabled(user)
 
