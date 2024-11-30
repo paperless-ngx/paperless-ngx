@@ -67,7 +67,6 @@ from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.mixins import UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ReadOnlyModelViewSet
@@ -1265,7 +1264,7 @@ class SelectionDataView(GenericAPIView):
         return r
 
 
-class SearchAutoCompleteView(APIView):
+class SearchAutoCompleteView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
@@ -1492,7 +1491,7 @@ class GlobalSearchView(PassUserMixin):
         )
 
 
-class StatisticsView(APIView):
+class StatisticsView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
