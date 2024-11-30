@@ -1033,8 +1033,9 @@ class BulkEditView(PassUserMixin):
         try:
             modified_field = self.MODIFIED_FIELD_BY_METHOD[method.__name__]
             if settings.AUDIT_LOG_ENABLED and modified_field:
-                old_documents = list(
-                    Document.objects.filter(pk__in=documents).values(
+                old_documents = {
+                    obj["pk"]: obj
+                    for obj in Document.objects.filter(pk__in=documents).values(
                         "pk",
                         "correspondent",
                         "document_type",
@@ -1043,8 +1044,8 @@ class BulkEditView(PassUserMixin):
                         "custom_fields",
                         "deleted_at",
                         "checksum",
-                    ),
-                )
+                    )
+                }
 
             # TODO: parameter validation
             result = method(documents, **parameters)
@@ -1052,9 +1053,7 @@ class BulkEditView(PassUserMixin):
             if settings.AUDIT_LOG_ENABLED and modified_field:
                 new_documents = Document.objects.filter(pk__in=documents)
                 for doc in new_documents:
-                    old_value = next(
-                        item for item in old_documents if item["pk"] == doc.pk
-                    )[modified_field]
+                    old_value = old_documents[doc.pk][modified_field]
                     new_value = getattr(doc, modified_field)
 
                     if isinstance(new_value, Model):
