@@ -127,6 +127,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         source="socialaccount_set",
     )
     is_mfa_enabled = serializers.SerializerMethodField()
+    has_usable_password = serializers.SerializerMethodField()
 
     def get_is_mfa_enabled(self, user: User) -> bool:
         mfa_adapter = get_mfa_adapter()
