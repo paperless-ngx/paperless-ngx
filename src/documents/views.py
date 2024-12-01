@@ -1381,7 +1381,7 @@ class PostDocumentView(GenericAPIView):
                 fields={
                     "selected_correspondents": serializers.ListSerializer(
                         child=inline_serializer(
-                            name="Correspondent Counts",
+                            name="CorrespondentCounts",
                             fields={
                                 "id": serializers.IntegerField(),
                                 "document_count": serializers.IntegerField(),
@@ -1390,7 +1390,7 @@ class PostDocumentView(GenericAPIView):
                     ),
                     "selected_tags": serializers.ListSerializer(
                         child=inline_serializer(
-                            name="Tag Counts",
+                            name="TagCounts",
                             fields={
                                 "id": serializers.IntegerField(),
                                 "document_count": serializers.IntegerField(),
@@ -1399,7 +1399,7 @@ class PostDocumentView(GenericAPIView):
                     ),
                     "selected_document_types": serializers.ListSerializer(
                         child=inline_serializer(
-                            name="DocumentType Counts",
+                            name="DocumentTypeCounts",
                             fields={
                                 "id": serializers.IntegerField(),
                                 "document_count": serializers.IntegerField(),
@@ -1408,7 +1408,7 @@ class PostDocumentView(GenericAPIView):
                     ),
                     "selected_storage_paths": serializers.ListSerializer(
                         child=inline_serializer(
-                            name="StoragePath Counts",
+                            name="StoragePathCounts",
                             fields={
                                 "id": serializers.IntegerField(),
                                 "document_count": serializers.IntegerField(),
@@ -1417,7 +1417,7 @@ class PostDocumentView(GenericAPIView):
                     ),
                     "selected_custom_fields": serializers.ListSerializer(
                         child=inline_serializer(
-                            name="CustomField Counts",
+                            name="CustomFieldCounts",
                             fields={
                                 "id": serializers.IntegerField(),
                                 "document_count": serializers.IntegerField(),
@@ -1558,6 +1558,45 @@ class SearchAutoCompleteView(GenericAPIView):
         )
 
 
+@extend_schema_view(
+    get=extend_schema(
+        description="Global search",
+        parameters=[
+            OpenApiParameter(
+                name="query",
+                required=True,
+                type=str,
+                description="Query to search for",
+            ),
+            OpenApiParameter(
+                name="db_only",
+                required=False,
+                type=bool,
+                description="Search only the database",
+            ),
+        ],
+        responses={
+            (200, "application/json"): inline_serializer(
+                name="SearchResult",
+                fields={
+                    "total": serializers.IntegerField(),
+                    "documents": DocumentSerializer(many=True),
+                    "saved_views": SavedViewSerializer(many=True),
+                    "tags": TagSerializer(many=True),
+                    "correspondents": CorrespondentSerializer(many=True),
+                    "document_types": DocumentTypeSerializer(many=True),
+                    "storage_paths": StoragePathSerializer(many=True),
+                    "users": UserSerializer(many=True),
+                    "groups": GroupSerializer(many=True),
+                    "mail_rules": MailRuleSerializer(many=True),
+                    "mail_accounts": MailAccountSerializer(many=True),
+                    "workflows": WorkflowSerializer(many=True),
+                    "custom_fields": CustomFieldSerializer(many=True),
+                },
+            ),
+        },
+    ),
+)
 class GlobalSearchView(PassUserMixin):
     permission_classes = (IsAuthenticated,)
     serializer_class = SearchResultSerializer

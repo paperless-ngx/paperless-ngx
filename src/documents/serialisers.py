@@ -442,7 +442,7 @@ class TagSerializerVersion1(MatchingModelSerializer, OwnedObjectSerializer):
 
 
 class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
-    def get_text_color(self, obj):
+    def get_text_color(self, obj) -> str:
         try:
             h = obj.color.lstrip("#")
             rgb = tuple(int(h[i : i + 2], 16) / 256 for i in (0, 2, 4))
@@ -1003,7 +1003,7 @@ class DocumentSerializer(
 
         # return full permissions if we're doing a PATCH or PUT
         context = kwargs.get("context")
-        if (
+        if context is not None and (
             context.get("request").method == "PATCH"
             or context.get("request").method == "PUT"
         ):
