@@ -428,16 +428,26 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     notes=extend_schema(
         description="View, add, or delete notes for the document",
         responses={
-            200: inline_serializer(
-                name="Note",
-                many=True,
-                fields={
-                    "id": serializers.IntegerField(),
-                    "note": serializers.CharField(),
-                    "created": serializers.DateTimeField(),
-                    "user": UserSerializer(),
+            200: {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "id": {"type": "integer"},
+                        "note": {"type": "string"},
+                        "created": {"type": "string", "format": "date-time"},
+                        "user": {
+                            "type": "object",
+                            "properties": {
+                                "id": {"type": "integer"},
+                                "username": {"type": "string"},
+                                "first_name": {"type": "string"},
+                                "last_name": {"type": "string"},
+                            },
+                        },
+                    },
                 },
-            ),
+            },
             400: None,
             403: None,
             404: None,
@@ -476,6 +486,7 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         responses={200: OpenApiTypes.BINARY},
     ),
     share_links=extend_schema(
+        operation_id="document_share_links",
         description="View share links for the document",
         parameters=[
             OpenApiParameter(
@@ -485,7 +496,18 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             ),
         ],
         responses={
-            200: ShareLinkSerializer(many=True),
+            200: {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "id": {"type": "integer"},
+                        "created": {"type": "string", "format": "date-time"},
+                        "expiration": {"type": "string", "format": "date-time"},
+                        "slug": {"type": "string"},
+                    },
+                },
+            },
             400: None,
             403: None,
             404: None,
