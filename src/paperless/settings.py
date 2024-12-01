@@ -359,6 +359,10 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
     "SWAGGER_UI_DIST": "SIDECAR",
     "COMPONENT_SPLIT_REQUEST": True,
+    "EXTERNAL_DOCS": {
+        "description": "Paperless-ngx API Documentation",
+        "url": "https://docs.paperless-ngx.com/api/",
+    },
     "ENUM_NAME_OVERRIDES": {
         "MatchingAlgorithm": "documents.models.MatchingModel.MATCHING_ALGORITHMS",
     },
