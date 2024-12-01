@@ -1358,6 +1358,8 @@ class StatisticsView(APIView):
             if user is None
             else get_objects_for_user_owner_aware(user, "documents.view_tag", Tag)
         )
+        untagged_tags_count = tags.annotate(
+            num_docs=Count('documents')).filter(num_docs=0).count()
         correspondent_count = (
             Correspondent.objects.count()
             if user is None
@@ -1369,17 +1371,11 @@ class StatisticsView(APIView):
                 ),
             )
         )
-        document_type_count = (
-            DocumentType.objects.count()
-            if user is None
-            else len(
-                get_objects_for_user_owner_aware(
-                    user,
-                    "documents.view_documenttype",
-                    DocumentType,
-                ),
-            )
-        )
+
+        document_types = ( DocumentType.objects.all() if user is None else get_objects_for_user_owner_aware(user, "documents.view_documenttype", DocumentType) )
+
+        unassigned_document_types_count = document_types.annotate(num_docs=Count('documents')).filter(num_docs=0).count()
+
         warehouse_count = (
             Warehouse.objects.count()
             if user is None
@@ -1450,8 +1446,10 @@ class StatisticsView(APIView):
                 "document_file_type_counts": document_file_type_counts,
                 "character_count": character_count,
                 "tag_count": len(tags),
+                "untagged_tags_count": untagged_tags_count,
                 "correspondent_count": correspondent_count,
-                "document_type_count": document_type_count,
+                "document_type_count": document_types.count(),
+                "unassigned_document_types_count": unassigned_document_types_count,
                 "storage_path_count": storage_path_count,
                 "warehouse_count": warehouse_count,
                 "folder_count": folder_count,
@@ -1468,6 +1466,8 @@ class StatisticsCustomView(APIView):
         data_graph = []
         data_document_type_graph = []
         label_document_type_graph = []
+        data_tag_graph = []
+        label_tag_graph = []
         user = request.user if request.user is not None else None
 
         documents = (
@@ -1500,12 +1500,21 @@ class StatisticsCustomView(APIView):
                 entry['document_type__name'] = _('Other')
             label_document_type_graph.append(entry['document_type__name'])
 
+        top_tags = (documents.values('tags__name').annotate(
+            document_count=Count('id')).order_by('-document_count')[:10])
+        for entry in top_tags:
+            data_tag_graph.append(entry['document_count'])
+            if entry['tags__name'] is None:
+                entry['tags__name'] = _('Other')
+            label_tag_graph.append(entry['tags__name'])
         return Response(
             {
                 "labels_graph": label_graph,
                 "data_graph": data_graph,
                 "labels_document_type_pie_graph": label_document_type_graph,
                 "data_document_type_pie_graph": data_document_type_graph,
+                "labels_tags_pie_graph": label_tag_graph,
+                "data_tags_pie_graph": data_tag_graph,
             },
         )
 

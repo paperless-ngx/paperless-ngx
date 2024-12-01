@@ -1,15 +1,28 @@
 <pngx-widget-frame title="Statistics" [loading]="loading" i18n-title>
   <ng-container content i18n>
-    <div class="list-group border-light" >
+    <div class="list-group border-light">
       <!--      <div class="d-flex align-items-center ">-->
       <!--        <pngx-input-datepicker-range (dateRangeChange)="onDateRangeChange($event)"></pngx-input-datepicker-range>-->
       <!--        <button type="button" class="btn btn-sm btn-outline-secondary ms-lg-3" (click)="getDocumentGraph()"  i18n>Confirm-->
       <!--                        </button>-->
       <!--      </div>-->
-      <h5 class="mt-2 mb-2">Uploaded Document Statistics</h5>
-      <div class="m-2">
-        <pngx-input-datepicker-range class="mb-2 mb-sm-0 "
-                                     (dateRangeChange)="onDateRangeChange($event)" (confirmButton)="confirmButton()"></pngx-input-datepicker-range>
+      <div class="d-flex flex-wrap gap-2 mt-1 mb-1">
+        <h5 class="mt-2 mb-2 ">Uploaded Document Statistics </h5>
+        <div class="">
+          <select class="form-select " (change)="customDateEnable=!customDateEnable">
+            <option value="day">Day</option>
+            <option value="week">Custom day</option>
+          </select>
+        </div>
+
+      </div>
+      <div class="mt-2 mb-2">
+        <pngx-input-date-custom i18n-title title="" [model]="innitDate" [hidden]="!customDateEnable"
+                                (dateSelection)="onDateSelection($event)"></pngx-input-date-custom>
+        <pngx-input-datepicker-range [hidden]="customDateEnable" class="mb-2 mb-sm-0 "
+                                     (dateRangeChange)="onDateRangeChange($event)"
+                                     (confirmButton)="confirmButton()"></pngx-input-datepicker-range>
+
 
       </div>
 
@@ -17,10 +30,18 @@
         <canvas id="DocumentChart">{{ chart }}</canvas>
       </div>
       <hr />
-      <h5 class="mt-2 mb-2">Top Document Types with the Largest Number of Documents</h5>
       <div class="">
-        <canvas id="DocumentTypePieChart">{{ chart }}</canvas>
+        <h5 class="mt-2 mb-2 text-center">Top Document Types/Tags with the Largest Number of Documents</h5>
+        <div class="row">
+          <div class="col-md-6">
+            <canvas id="DocumentTypePieChart"></canvas>
+          </div>
+          <div class="col-md-6">
+            <canvas id="TagsPieChart"></canvas>
+          </div>
+        </div>
       </div>
+
       <hr />
       <!--      @if (statistics?.documents_inbox !== null) {-->
       <!--        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"-->
