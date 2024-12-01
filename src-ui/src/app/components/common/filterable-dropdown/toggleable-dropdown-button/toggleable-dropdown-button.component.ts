@@ -29,6 +29,9 @@ export class ToggleableDropdownButtonComponent {
   @Input()
   hideCount: boolean = false
 
+  @Input()
+  opacifyCount: boolean = true
+
   @Output()
   toggled = new EventEmitter()
 
@@ -37,6 +40,10 @@ export class ToggleableDropdownButtonComponent {
 
   get isTag(): boolean {
     return 'is_inbox_tag' in this.item
+  }
+
+  get currentCount(): number {
+    return this.count ?? this.item.document_count
   }
 
   toggleItem(event: MouseEvent): void {
