@@ -129,7 +129,7 @@ account. The script essentially automatically performs the steps described in [D
 
 5.  Run `docker compose pull`. This will pull the image from the GitHub container registry
     by default but you can change the image to pull from Docker Hub by changing the `image`
-    line to `image: paperless-ngx/paperless-ngx:latest`.
+    line to `image: paperlessngx/paperless-ngx:latest`.
 
 6.  To be able to login, you will need a "superuser". To create it,
     execute the following command:
