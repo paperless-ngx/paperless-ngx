@@ -5,9 +5,12 @@ from datetime import timedelta
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseRedirect
 from django.utils import timezone
+from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import extend_schema_view
+from drf_spectacular.utils import inline_serializer
 from httpx_oauth.oauth2 import GetAccessTokenError
+from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -29,6 +32,19 @@ from paperless_mail.serialisers import MailRuleSerializer
 from paperless_mail.tasks import process_mail_accounts
 
 
+@extend_schema_view(
+    test=extend_schema(
+        operation_id="mail_account_test",
+        description="Test a mail account",
+        responses={
+            200: inline_serializer(
+                name="MailAccountTestResponse",
+                fields={"success": serializers.BooleanField()},
+            ),
+            400: OpenApiTypes.STR,
+        },
+    ),
+)
 class MailAccountViewSet(ModelViewSet, PassUserMixin):
     model = MailAccount
 
