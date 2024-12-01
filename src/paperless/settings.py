@@ -358,6 +358,9 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "SWAGGER_UI_DIST": "SIDECAR",
+    "ENUM_NAME_OVERRIDES": {
+        "MatchingAlgorithm": "documents.models.MatchingModel.MATCHING_ALGORITHMS",
+    },
 }
 
 if DEBUG:
