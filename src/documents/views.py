@@ -53,6 +53,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import extend_schema_view
+from drf_spectacular.utils import inline_serializer
 from langdetect import detect
 from packaging import version as packaging_version
 from redis import Redis
@@ -338,6 +339,167 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
 
+@extend_schema_view(
+    download=extend_schema(
+        description="Download the document",
+        parameters=[
+            OpenApiParameter(
+                name="original",
+                type=OpenApiTypes.BOOL,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
+        responses={200: OpenApiTypes.BINARY},
+    ),
+    history=extend_schema(
+        description="View the document history",
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+            ),
+        ],
+        responses={
+            200: inline_serializer(
+                name="LogEntry",
+                fields={
+                    "id": serializers.IntegerField(),
+                    "timestamp": serializers.DateTimeField(),
+                    "action": serializers.CharField(),
+                    "changes": serializers.DictField(),
+                    "actor": inline_serializer(
+                        name="Actor",
+                        fields={
+                            "id": serializers.IntegerField(),
+                            "username": serializers.CharField(),
+                        },
+                    ),
+                },
+            ),
+            400: None,
+            403: None,
+            404: None,
+        },
+    ),
+    metadata=extend_schema(
+        description="View the document metadata",
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+            ),
+        ],
+        responses={
+            200: inline_serializer(
+                name="Metadata",
+                fields={
+                    "original_checksum": serializers.CharField(),
+                    "original_size": serializers.IntegerField(),
+                    "original_mime_type": serializers.CharField(),
+                    "media_filename": serializers.CharField(),
+                    "has_archive_version": serializers.BooleanField(),
+                    "original_metadata": serializers.DictField(),
+                    "archive_checksum": serializers.CharField(),
+                    "archive_media_filename": serializers.CharField(),
+                    "original_filename": serializers.CharField(),
+                    "archive_size": serializers.IntegerField(),
+                    "archive_metadata": serializers.DictField(),
+                    "lang": serializers.CharField(),
+                },
+            ),
+            400: None,
+            403: None,
+            404: None,
+        },
+    ),
+    notes=extend_schema(
+        description="View, add, or delete notes for the document",
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
+        responses={
+            200: inline_serializer(
+                name="Note",
+                fields={
+                    "id": serializers.IntegerField(),
+                    "note": serializers.CharField(),
+                    "created": serializers.DateTimeField(),
+                    "user": inline_serializer(
+                        name="User",
+                        fields={
+                            "id": serializers.IntegerField(),
+                            "username": serializers.CharField(),
+                            "first_name": serializers.CharField(),
+                            "last_name": serializers.CharField(),
+                        },
+                    ),
+                },
+            ),
+            400: None,
+            403: None,
+            404: None,
+        },
+    ),
+    suggestions=extend_schema(
+        description="View suggestions for the document",
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+            ),
+        ],
+        responses={
+            200: inline_serializer(
+                name="Suggestions",
+                fields={
+                    "correspondents": serializers.ListField(
+                        child=serializers.IntegerField(),
+                    ),
+                    "tags": serializers.ListField(child=serializers.IntegerField()),
+                    "document_types": serializers.ListField(
+                        child=serializers.IntegerField(),
+                    ),
+                    "storage_paths": serializers.ListField(
+                        child=serializers.IntegerField(),
+                    ),
+                    "dates": serializers.ListField(child=serializers.CharField()),
+                },
+            ),
+            400: None,
+            403: None,
+            404: None,
+        },
+    ),
+    thumb=extend_schema(
+        description="View the document thumbnail",
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+            ),
+        ],
+        responses={200: OpenApiTypes.BINARY},
+    ),
+    preview=extend_schema(
+        description="View the document preview",
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+            ),
+        ],
+        responses={200: OpenApiTypes.BINARY},
+    ),
+)
 class DocumentViewSet(
     PassUserMixin,
     RetrieveModelMixin,
@@ -1146,6 +1308,14 @@ class BulkEditView(PassUserMixin):
             )
 
 
+@extend_schema_view(
+    get=extend_schema(
+        description="Upload a document via the API",
+        responses={
+            (200, "application/json"): serializers.CharField(),
+        },
+    ),
+)
 class PostDocumentView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = PostDocumentSerializer
@@ -1202,6 +1372,63 @@ class PostDocumentView(GenericAPIView):
         return Response(async_task.id)
 
 
+@extend_schema_view(
+    post=extend_schema(
+        description="Get selection data for the selected documents",
+        responses={
+            (200, "application/json"): inline_serializer(
+                name="SelectionData",
+                fields={
+                    "selected_correspondents": serializers.ListSerializer(
+                        child=inline_serializer(
+                            name="Correspondent Counts",
+                            fields={
+                                "id": serializers.IntegerField(),
+                                "document_count": serializers.IntegerField(),
+                            },
+                        ),
+                    ),
+                    "selected_tags": serializers.ListSerializer(
+                        child=inline_serializer(
+                            name="Tag Counts",
+                            fields={
+                                "id": serializers.IntegerField(),
+                                "document_count": serializers.IntegerField(),
+                            },
+                        ),
+                    ),
+                    "selected_document_types": serializers.ListSerializer(
+                        child=inline_serializer(
+                            name="DocumentType Counts",
+                            fields={
+                                "id": serializers.IntegerField(),
+                                "document_count": serializers.IntegerField(),
+                            },
+                        ),
+                    ),
+                    "selected_storage_paths": serializers.ListSerializer(
+                        child=inline_serializer(
+                            name="StoragePath Counts",
+                            fields={
+                                "id": serializers.IntegerField(),
+                                "document_count": serializers.IntegerField(),
+                            },
+                        ),
+                    ),
+                    "selected_custom_fields": serializers.ListSerializer(
+                        child=inline_serializer(
+                            name="CustomField Counts",
+                            fields={
+                                "id": serializers.IntegerField(),
+                                "document_count": serializers.IntegerField(),
+                            },
+                        ),
+                    ),
+                },
+            ),
+        },
+    ),
+)
 class SelectionDataView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = DocumentListSerializer
