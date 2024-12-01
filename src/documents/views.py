@@ -1214,6 +1214,15 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin):
         serializer.save(owner=self.request.user)
 
 
+@extend_schema_view(
+    post=extend_schema(
+        description="Perform a bulk edit operation on a list of documents",
+        external_docs={
+            "description": "Further documentation",
+            "url": "https://docs.paperless-ngx.com/api/#bulk-editing",
+        },
+    ),
+)
 class BulkEditView(PassUserMixin):
     MODIFIED_FIELD_BY_METHOD = {
         "set_correspondent": "correspondent",
@@ -2306,6 +2315,15 @@ def serve_file(doc: Document, use_archive: bool, disposition: str):
     return response
 
 
+@extend_schema_view(
+    post=extend_schema(
+        description="Perform a bulk edit operation on a list of objects",
+        external_docs={
+            "description": "Further documentation",
+            "url": "https://docs.paperless-ngx.com/api/#objects",
+        },
+    ),
+)
 class BulkEditObjectsView(PassUserMixin):
     permission_classes = (IsAuthenticated,)
     serializer_class = BulkEditObjectsSerializer
