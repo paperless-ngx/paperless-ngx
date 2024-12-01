@@ -1216,6 +1216,7 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin):
 
 @extend_schema_view(
     post=extend_schema(
+        operation_id="bulk_edit",
         description="Perform a bulk edit operation on a list of documents",
         external_docs={
             "description": "Further documentation",
@@ -2210,6 +2211,33 @@ class RemoteVersionView(GenericAPIView):
         )
 
 
+@extend_schema_view(
+    acknowledge=extend_schema(
+        operation_id="acknowledge_tasks",
+        description="Acknowledge a list of tasks",
+        request={
+            "application/json": {
+                "type": "object",
+                "properties": {
+                    "tasks": {
+                        "type": "array",
+                        "items": {"type": "integer"},
+                    },
+                },
+                "required": ["tasks"],
+            },
+        },
+        responses={
+            (200, "application/json"): inline_serializer(
+                name="AcknowledgeTasks",
+                fields={
+                    "result": serializers.IntegerField(),
+                },
+            ),
+            (400, "application/json"): None,
+        },
+    ),
+)
 class TasksViewSet(ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     serializer_class = TasksViewSerializer
@@ -2317,6 +2345,7 @@ def serve_file(doc: Document, use_archive: bool, disposition: str):
 
 @extend_schema_view(
     post=extend_schema(
+        operation_id="bulk_edit_objects",
         description="Perform a bulk edit operation on a list of objects",
         external_docs={
             "description": "Further documentation",
@@ -2486,7 +2515,64 @@ class CustomFieldViewSet(ModelViewSet):
     get=extend_schema(
         description="Get the current system status of the Paperless-NGX server",
         responses={
-            (200, "application/json"): OpenApiTypes.OBJECT,
+            (200, "application/json"): inline_serializer(
+                name="SystemStatus",
+                fields={
+                    "pngx_version": serializers.CharField(),
+                    "server_os": serializers.CharField(),
+                    "install_type": serializers.CharField(),
+                    "storage": inline_serializer(
+                        name="Storage",
+                        fields={
+                            "total": serializers.IntegerField(),
+                            "available": serializers.IntegerField(),
+                        },
+                    ),
+                    "database": inline_serializer(
+                        name="Database",
+                        fields={
+                            "type": serializers.CharField(),
+                            "url": serializers.CharField(),
+                            "status": serializers.CharField(),
+                            "error": serializers.CharField(),
+                            "migration_status": inline_serializer(
+                                name="MigrationStatus",
+                                fields={
+                                    "latest_migration": serializers.CharField(),
+                                    "unapplied_migrations": serializers.ListSerializer(
+                                        child=serializers.CharField(),
+                                    ),
+                                },
+                            ),
+                        },
+                    ),
+                    "tasks": inline_serializer(
+                        name="Tasks",
+                        fields={
+                            "redis_url": serializers.CharField(),
+                            "redis_status": serializers.CharField(),
+                            "redis_error": serializers.CharField(),
+                            "celery_status": serializers.CharField(),
+                        },
+                    ),
+                    "index": inline_serializer(
+                        name="Index",
+                        fields={
+                            "status": serializers.CharField(),
+                            "error": serializers.CharField(),
+                            "last_modified": serializers.DateTimeField(),
+                        },
+                    ),
+                    "classifier": inline_serializer(
+                        name="Classifier",
+                        fields={
+                            "status": serializers.CharField(),
+                            "error": serializers.CharField(),
+                            "last_trained": serializers.DateTimeField(),
+                        },
+                    ),
+                },
+            ),
         },
     ),
 )
