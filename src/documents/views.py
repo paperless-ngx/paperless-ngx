@@ -133,6 +133,7 @@ from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
+from documents.schema import generate_object_with_permissions_schema
 from documents.serialisers import AcknowledgeTasksViewSerializer
 from documents.serialisers import BulkDownloadSerializer
 from documents.serialisers import BulkEditObjectsSerializer
@@ -262,29 +263,7 @@ class PermissionsAwareDocumentCountMixin(PassUserMixin):
         )
 
 
-full_perms_schema = {
-    "list": extend_schema(
-        parameters=[
-            OpenApiParameter(
-                name="full_perms",
-                type=OpenApiTypes.BOOL,
-                location=OpenApiParameter.QUERY,
-            ),
-        ],
-    ),
-    "retrieve": extend_schema(
-        parameters=[
-            OpenApiParameter(
-                name="full_perms",
-                type=OpenApiTypes.BOOL,
-                location=OpenApiParameter.QUERY,
-            ),
-        ],
-    ),
-}
-
-
-@extend_schema_view(**full_perms_schema)
+@extend_schema_view(**generate_object_with_permissions_schema(CorrespondentSerializer))
 class CorrespondentViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = Correspondent
 
@@ -321,7 +300,7 @@ class CorrespondentViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         return super().retrieve(request, *args, **kwargs)
 
 
-@extend_schema_view(**full_perms_schema)
+@extend_schema_view(**generate_object_with_permissions_schema(TagSerializer))
 class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = Tag
 
@@ -346,7 +325,7 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
 
 
-@extend_schema_view(**full_perms_schema)
+@extend_schema_view(**generate_object_with_permissions_schema(DocumentTypeSerializer))
 class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = DocumentType
 
@@ -2023,7 +2002,7 @@ class BulkDownloadView(GenericAPIView):
             return response
 
 
-@extend_schema_view(**full_perms_schema)
+@extend_schema_view(**generate_object_with_permissions_schema(StoragePathSerializer))
 class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = StoragePath
 
