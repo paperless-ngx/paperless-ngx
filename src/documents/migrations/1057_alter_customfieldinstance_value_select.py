@@ -15,21 +15,22 @@ def migrate_customfield_selects(apps, schema_editor):
     CustomField = apps.get_model("documents", "CustomField")
 
     with transaction.atomic():
-        for custom_field in CustomField.objects.all():
-            if custom_field.data_type == "select":  # CustomField.FieldDataType.SELECT
-                old_select_options = custom_field.extra_data["select_options"]
-                custom_field.extra_data["select_options"] = [
-                    {"id": get_random_string(16), "label": value}
-                    for value in old_select_options
-                ]
-                custom_field.save()
+        for custom_field in CustomField.objects.filter(
+            data_type="select",
+        ):  # CustomField.FieldDataType.SELECT
+            old_select_options = custom_field.extra_data["select_options"]
+            custom_field.extra_data["select_options"] = [
+                {"id": get_random_string(16), "label": value}
+                for value in old_select_options
+            ]
+            custom_field.save()
 
-                for instance in CustomFieldInstance.objects.filter(field=custom_field):
-                    if instance.value_select:
-                        instance.value_select = custom_field.extra_data[
-                            "select_options"
-                        ][int(instance.value_select)]["id"]
-                        instance.save()
+            for instance in CustomFieldInstance.objects.filter(field=custom_field):
+                if instance.value_select:
+                    instance.value_select = custom_field.extra_data["select_options"][
+                        int(instance.value_select)
+                    ]["id"]
+                    instance.save()
 
 
 def reverse_migrate_customfield_selects(apps, schema_editor):

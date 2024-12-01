@@ -552,7 +552,7 @@ class CustomFieldSerializer(serializers.ModelSerializer):
                 )
             # labels are valid, generate ids if not present
             for option in attrs["extra_data"]["select_options"]:
-                if "id" not in option or option["id"] is None:
+                if option.get("id") is None:
                     option["id"] = get_random_string(length=16)
         elif (
             "data_type" in attrs
