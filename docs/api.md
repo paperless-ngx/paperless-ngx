@@ -2,7 +2,7 @@
 
 Paperless-ngx now ships with a fully-documented REST API and a browsable
 web interface to explore it. The API browsable interface is available at
-`/api/api/schema/swagger-ui/`.
+`/api/api/schema/view/`.
 
 Further documentation is provided here for some endpoints and features.
 
@@ -194,10 +194,6 @@ The endpoint supports the following optional form fields:
 -   `archive_serial_number`: An optional archive serial number to set.
 -   `custom_fields`: An array of custom field ids to assign (with an empty
     value) to the document.
-
-!!! note
-
-    Sending a `Content-Length` header with correct size is mandatory.
 
 The endpoint will immediately return HTTP 200 if the document consumption
 process was started successfully, with the UUID of the consumption task

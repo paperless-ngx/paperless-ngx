@@ -215,7 +215,7 @@ urlpatterns = [
                                 name="schema",
                             ),
                             re_path(
-                                "^swagger-ui/",
+                                "^view/",
                                 SpectacularSwaggerView.as_view(),
                                 name="swagger-ui",
                             ),
