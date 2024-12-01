@@ -20,6 +20,7 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
+from drf_spectacular.utils import extend_schema_field
 from drf_writable_nested.serializers import NestedUpdateMixin
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import get_users_with_perms
@@ -381,7 +382,7 @@ class DocumentTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         )
 
 
-class ColorField(serializers.Field):
+class DeprecatedColors:
     COLOURS = (
         (1, "#a6cee3"),
         (2, "#1f78b4"),
@@ -398,14 +399,21 @@ class ColorField(serializers.Field):
         (13, "#cccccc"),
     )
 
+
+@extend_schema_field(
+    serializers.ChoiceField(
+        choices=DeprecatedColors.COLOURS,
+    ),
+)
+class ColorField(serializers.Field):
     def to_internal_value(self, data):
-        for id, color in self.COLOURS:
+        for id, color in DeprecatedColors.COLOURS:
             if id == data:
                 return color
         raise serializers.ValidationError
 
     def to_representation(self, value):
-        for id, color in self.COLOURS:
+        for id, color in DeprecatedColors.COLOURS:
             if color == value:
                 return id
         return 1
