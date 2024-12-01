@@ -5,6 +5,8 @@ from datetime import timedelta
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseRedirect
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema_view
 from httpx_oauth.oauth2 import GetAccessTokenError
 from rest_framework.decorators import action
 from rest_framework.generics import GenericAPIView
@@ -106,6 +108,12 @@ class MailRuleViewSet(ModelViewSet, PassUserMixin):
     filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
 
 
+@extend_schema_view(
+    get=extend_schema(
+        description="Callback view for OAuth2 authentication",
+        responses={200: None},
+    ),
+)
 class OauthCallbackView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
