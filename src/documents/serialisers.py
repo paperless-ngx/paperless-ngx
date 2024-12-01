@@ -181,6 +181,7 @@ class SerializerWithPerms(serializers.Serializer):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
         self.full_perms = kwargs.pop("full_perms", False)
+        self.all_fields = kwargs.pop("all_fields", False)
         super().__init__(*args, **kwargs)
 
 
@@ -229,14 +230,15 @@ class OwnedObjectSerializer(
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        try:
-            if self.full_perms:
-                self.fields.pop("user_can_change")
-                self.fields.pop("is_shared_by_requester")
-            else:
-                self.fields.pop("permissions")
-        except KeyError:
-            pass
+        if not self.all_fields:
+            try:
+                if self.full_perms:
+                    self.fields.pop("user_can_change")
+                    self.fields.pop("is_shared_by_requester")
+                else:
+                    self.fields.pop("permissions")
+            except KeyError:
+                pass
 
     @extend_schema_field(
         field={
