@@ -344,22 +344,12 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
 
 @extend_schema_view(
-    list=extend_schema(
-        parameters=[
-            OpenApiParameter(
-                name="full_perms",
-                type=OpenApiTypes.BOOL,
-                location=OpenApiParameter.QUERY,
-            ),
-            OpenApiParameter(
-                name="fields",
-                type=OpenApiTypes.STR,
-                many=True,
-                location=OpenApiParameter.QUERY,
-            ),
-        ],
-    ),
     retrieve=extend_schema(
+        description="Retrieve a single document",
+        responses={
+            200: DocumentSerializer(all_fields=True),
+            400: None,
+        },
         parameters=[
             OpenApiParameter(
                 name="full_perms",
@@ -1049,6 +1039,26 @@ class DocumentViewSet(
         return Response(sorted(entries, key=lambda x: x["timestamp"], reverse=True))
 
 
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="full_perms",
+                type=OpenApiTypes.BOOL,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
+                name="fields",
+                type=OpenApiTypes.STR,
+                many=True,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
+        responses={
+            200: DocumentSerializer(many=True, all_fields=True),
+        },
+    ),
+)
 class UnifiedSearchViewSet(DocumentViewSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
