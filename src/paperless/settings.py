@@ -355,9 +355,10 @@ REST_FRAMEWORK = {
 SPECTACULAR_SETTINGS = {
     "TITLE": "Paperless-ngx API",
     "DESCRIPTION": "OpenAPI Spec for Paperless-ngx",
-    "VERSION": "1.0.0",
+    "VERSION": "6.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "SWAGGER_UI_DIST": "SIDECAR",
+    "COMPONENT_SPLIT_REQUEST": True,
     "ENUM_NAME_OVERRIDES": {
         "MatchingAlgorithm": "documents.models.MatchingModel.MATCHING_ALGORITHMS",
     },
