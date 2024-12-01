@@ -23,7 +23,7 @@ djangorestframework-guardian = "*"
 drf-writable-nested = "*"
 bleach = "*"
 celery = {extras = ["redis"], version = "*"}
-channels = "~=4.1"
+channels = "~=4.2"
 channels-redis = "*"
 concurrent-log-handler = "*"
 filelock = "*"
