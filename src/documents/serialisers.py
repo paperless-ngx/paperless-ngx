@@ -238,6 +238,39 @@ class OwnedObjectSerializer(
         except KeyError:
             pass
 
+    @extend_schema_field(
+        field={
+            "type": "object",
+            "properties": {
+                "view": {
+                    "type": "object",
+                    "properties": {
+                        "users": {
+                            "type": "array",
+                            "items": {"type": "integer"},
+                        },
+                        "groups": {
+                            "type": "array",
+                            "items": {"type": "integer"},
+                        },
+                    },
+                },
+                "change": {
+                    "type": "object",
+                    "properties": {
+                        "users": {
+                            "type": "array",
+                            "items": {"type": "integer"},
+                        },
+                        "groups": {
+                            "type": "array",
+                            "items": {"type": "integer"},
+                        },
+                    },
+                },
+            },
+        },
+    )
     def get_permissions(self, obj) -> dict:
         view_codename = f"view_{obj.__class__.__name__.lower()}"
         change_codename = f"change_{obj.__class__.__name__.lower()}"
