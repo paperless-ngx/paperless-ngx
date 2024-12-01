@@ -22,6 +22,7 @@ from django.utils.translation import gettext_lazy as _
 from django_filters.rest_framework import BooleanFilter
 from django_filters.rest_framework import Filter
 from django_filters.rest_framework import FilterSet
+from drf_spectacular.utils import extend_schema_field
 from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
 from rest_framework import serializers
@@ -112,6 +113,7 @@ class ObjectFilter(Filter):
         return qs
 
 
+@extend_schema_field(serializers.BooleanField)
 class InboxFilter(Filter):
     def filter(self, qs, value):
         if value == "true":
@@ -122,6 +124,7 @@ class InboxFilter(Filter):
             return qs
 
 
+@extend_schema_field(serializers.CharField)
 class TitleContentFilter(Filter):
     def filter(self, qs, value):
         if value:
@@ -130,6 +133,7 @@ class TitleContentFilter(Filter):
             return qs
 
 
+@extend_schema_field(serializers.BooleanField)
 class SharedByUser(Filter):
     def filter(self, qs, value):
         ctype = ContentType.objects.get_for_model(self.model)
@@ -174,6 +178,7 @@ class CustomFieldFilterSet(FilterSet):
         }
 
 
+@extend_schema_field(serializers.CharField)
 class CustomFieldsFilter(Filter):
     def filter(self, qs, value):
         if value:
@@ -622,6 +627,7 @@ class CustomFieldQueryParser:
             self._current_depth -= 1
 
 
+@extend_schema_field(serializers.CharField)
 class CustomFieldQueryFilter(Filter):
     def __init__(self, validation_prefix):
         """
