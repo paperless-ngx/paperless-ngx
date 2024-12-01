@@ -932,6 +932,13 @@ class UnifiedSearchViewSet(DocumentViewSet):
     retrieve=extend_schema(
         description="Single log view",
         operation_id="retrieve_log",
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+            ),
+        ],
         responses={
             (200, "application/json"): serializers.ListSerializer(
                 child=serializers.CharField(),
