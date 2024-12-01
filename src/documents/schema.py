@@ -17,7 +17,7 @@ class AngularApiAuthenticationOverrideScheme(OpenApiAuthenticationExtension):
 
 def generate_object_with_permissions_schema(serializer_class):
     return {
-        "list": extend_schema(
+        operation: extend_schema(
             parameters=[
                 OpenApiParameter(
                     name="full_perms",
@@ -25,16 +25,9 @@ def generate_object_with_permissions_schema(serializer_class):
                     location=OpenApiParameter.QUERY,
                 ),
             ],
-            responses={200: serializer_class(many=True, all_fields=True)},
-        ),
-        "retrieve": extend_schema(
-            parameters=[
-                OpenApiParameter(
-                    name="full_perms",
-                    type=OpenApiTypes.BOOL,
-                    location=OpenApiParameter.QUERY,
-                ),
-            ],
-            responses={200: serializer_class(many=True, all_fields=True)},
-        ),
+            responses={
+                200: serializer_class(many=operation == "list", all_fields=True),
+            },
+        )
+        for operation in ["list", "retrieve"]
     }
