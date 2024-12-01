@@ -2,7 +2,7 @@
 
 Paperless-ngx now ships with a fully-documented REST API and a browsable
 web interface to explore it. The API browsable interface is available at
-`/api/api/schema/swagger-ui/`.
+`/api/api/schema/view/`.
 
 Further documentation is provided here for some endpoints and features.
 

@@ -353,7 +353,7 @@ REST_FRAMEWORK = {
 
 # DRF Spectacular settings
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Paperless-ngx API",
+    "TITLE": "Paperless-ngx REST API",
     "DESCRIPTION": "OpenAPI Spec for Paperless-ngx",
     "VERSION": "6.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
