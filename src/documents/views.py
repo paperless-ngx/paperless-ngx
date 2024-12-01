@@ -1309,10 +1309,14 @@ class BulkEditView(PassUserMixin):
 
 
 @extend_schema_view(
-    get=extend_schema(
+    post=extend_schema(
         description="Upload a document via the API",
+        external_docs={
+            "description": "Further documentation",
+            "url": "https://docs.paperless-ngx.com/api/#file-uploads",
+        },
         responses={
-            (200, "application/json"): serializers.CharField(),
+            (200, "application/json"): OpenApiTypes.STR,
         },
     ),
 )

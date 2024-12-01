@@ -184,6 +184,43 @@ class SerializerWithPerms(serializers.Serializer):
         super().__init__(*args, **kwargs)
 
 
+@extend_schema_field(
+    field={
+        "type": "object",
+        "properties": {
+            "view": {
+                "type": "object",
+                "properties": {
+                    "users": {
+                        "type": "array",
+                        "items": {"type": "integer"},
+                    },
+                    "groups": {
+                        "type": "array",
+                        "items": {"type": "integer"},
+                    },
+                },
+            },
+            "change": {
+                "type": "object",
+                "properties": {
+                    "users": {
+                        "type": "array",
+                        "items": {"type": "integer"},
+                    },
+                    "groups": {
+                        "type": "array",
+                        "items": {"type": "integer"},
+                    },
+                },
+            },
+        },
+    },
+)
+class SetPermissionsSerializer(serializers.DictField):
+    pass
+
+
 class OwnedObjectSerializer(
     SerializerWithPerms,
     serializers.ModelSerializer,
@@ -285,7 +322,7 @@ class OwnedObjectSerializer(
     user_can_change = SerializerMethodField(read_only=True)
     is_shared_by_requester = SerializerMethodField(read_only=True)
 
-    set_permissions = serializers.DictField(
+    set_permissions = SetPermissionsSerializer(
         label="Set permissions",
         allow_empty=True,
         required=False,
