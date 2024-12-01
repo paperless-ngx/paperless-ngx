@@ -49,6 +49,8 @@ from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import extend_schema_view
 from langdetect import detect
@@ -1266,6 +1268,30 @@ class SelectionDataView(GenericAPIView):
         return r
 
 
+@extend_schema_view(
+    get=extend_schema(
+        description="Get a list of all available tags",
+        parameters=[
+            OpenApiParameter(
+                name="term",
+                required=False,
+                type=str,
+                description="Term to search for",
+            ),
+            OpenApiParameter(
+                name="limit",
+                required=False,
+                type=int,
+                description="Number of completions to return",
+            ),
+        ],
+        responses={
+            (200, "application/json"): serializers.ListSerializer(
+                child=serializers.CharField(),
+            ),
+        },
+    ),
+)
 class SearchAutoCompleteView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
@@ -1493,6 +1519,14 @@ class GlobalSearchView(PassUserMixin):
         )
 
 
+@extend_schema_view(
+    get=extend_schema(
+        description="Get statistics for the current user",
+        responses={
+            (200, "application/json"): OpenApiTypes.OBJECT,
+        },
+    ),
+)
 class StatisticsView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
@@ -1786,6 +1820,14 @@ class UiSettingsView(GenericAPIView):
         )
 
 
+@extend_schema_view(
+    get=extend_schema(
+        description="Get the current version of the Paperless-NGX server",
+        responses={
+            (200, "application/json"): OpenApiTypes.OBJECT,
+        },
+    ),
+)
 class RemoteVersionView(GenericAPIView):
     def get(self, request, format=None):
         remote_version = "0.0.0"
@@ -2089,6 +2131,14 @@ class CustomFieldViewSet(ModelViewSet):
         )
 
 
+@extend_schema_view(
+    get=extend_schema(
+        description="Get the current system status of the Paperless-NGX server",
+        responses={
+            (200, "application/json"): OpenApiTypes.OBJECT,
+        },
+    ),
+)
 class SystemStatusView(PassUserMixin):
     permission_classes = (IsAuthenticated,)
 

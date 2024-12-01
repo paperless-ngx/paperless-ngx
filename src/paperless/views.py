@@ -297,6 +297,16 @@ class TOTPView(GenericAPIView):
             return HttpResponseNotFound("TOTP not found")
 
 
+@extend_schema_view(
+    post=extend_schema(
+        request={
+            "application/json": None,
+        },
+        responses={
+            (200, "application/json"): OpenApiTypes.STR,
+        },
+    ),
+)
 class GenerateAuthTokenView(GenericAPIView):
     """
     Generates (or re-generates) an auth token, requires a logged in user
@@ -326,6 +336,23 @@ class ApplicationConfigurationViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated, DjangoModelPermissions)
 
 
+@extend_schema_view(
+    post=extend_schema(
+        request={
+            "application/json": {
+                "type": "object",
+                "properties": {
+                    "id": {"type": "integer"},
+                },
+                "required": ["id"],
+            },
+        },
+        responses={
+            (200, "application/json"): OpenApiTypes.INT,
+            400: OpenApiTypes.STR,
+        },
+    ),
+)
 class DisconnectSocialAccountView(GenericAPIView):
     """
     Disconnects a social account provider from the user account
@@ -345,6 +372,13 @@ class DisconnectSocialAccountView(GenericAPIView):
             return HttpResponseBadRequest("Social account not found")
 
 
+@extend_schema_view(
+    get=extend_schema(
+        responses={
+            (200, "application/json"): OpenApiTypes.OBJECT,
+        },
+    ),
+)
 class SocialAccountProvidersView(GenericAPIView):
     """
     List of social account providers
