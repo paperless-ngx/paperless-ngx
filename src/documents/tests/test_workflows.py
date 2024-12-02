@@ -10,6 +10,7 @@ from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
+from httpx import HTTPStatusError
 from rest_framework.test import APITestCase
 
 from documents.signals.handlers import run_workflows
@@ -17,6 +18,8 @@ from documents.signals.handlers import send_webhook
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
+
+from celery.exceptions import MaxRetriesExceededError
 
 from documents import tasks
 from documents.data_models import ConsumableDocument
@@ -2534,3 +2537,30 @@ class TestWorkflows(
 
             expected_str = "Webhook sent to http://paperless-ngx.com"
             self.assertIn(expected_str, cm.output[0])
+
+    @mock.patch("httpx.post")
+    @mock.patch("documents.signals.handlers.send_webhook.retry")
+    def test_workflow_webhook_send_webhook_retry(self, mock_retry, mock_http):
+        mock_http.return_value.raise_for_status = mock.Mock(
+            side_effect=HTTPStatusError(
+                "Error",
+                request=mock.Mock(),
+                response=mock.Mock(),
+            ),
+        )
+        mock_retry.side_effect = MaxRetriesExceededError("Max retries exceeded")
+
+        with self.assertLogs("paperless.handlers") as cm:
+            send_webhook(
+                url="http://paperless-ngx.com",
+                data="Test message",
+                headers={},
+                files=None,
+            )
+
+            self.assertEqual(mock_retry.call_count, 1)
+
+            expected_str = "Failed sending webhook to http://paperless-ngx.com"
+            expected_str2 = "Max retries exceeded"
+            self.assertIn(expected_str, cm.output[0])
+            self.assertIn(expected_str2, cm.output[1])
