@@ -657,13 +657,16 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             name="Test Custom Field Select",
             data_type=CustomField.FieldDataType.SELECT,
             extra_data={
-                "select_options": ["Option 1", "Choice 2"],
+                "select_options": [
+                    {"label": "Option 1", "id": "abc123"},
+                    {"label": "Choice 2", "id": "def456"},
+                ],
             },
         )
         CustomFieldInstance.objects.create(
             document=doc1,
             field=custom_field_select,
-            value_select=1,
+            value_select="def456",
         )
 
         r = self.client.get("/api/documents/?custom_fields__icontains=choice")
