@@ -160,7 +160,7 @@ class SetPermissionsMixin:
             },
         }
         if set_permissions is not None:
-            for action in permissions_dict:
+            for action, _ in permissions_dict.items():
                 if action in set_permissions:
                     users = set_permissions[action]["users"]
                     permissions_dict[action]["users"] = self._validate_user_ids(users)
