@@ -43,6 +43,11 @@ export class FilterableDropdownSelectionModel {
   private _intersection: Intersection = Intersection.Include
   temporaryIntersection: Intersection = this._intersection
 
+  private _documentCounts: SelectionDataItem[] = []
+  public set documentCounts(counts: SelectionDataItem[]) {
+    this._documentCounts = counts
+  }
+
   private _items: MatchingModel[] = []
   get items(): MatchingModel[] {
     return this._items
@@ -69,6 +74,16 @@ export class FilterableDropdownSelectionModel {
         this.getNonTemporary(b.id) == ToggleableItemState.NotSelected
       ) {
         return -1
+      } else if (
+        this._documentCounts.length &&
+        this.getDocumentCount(a.id) > this.getDocumentCount(b.id)
+      ) {
+        return -1
+      } else if (
+        this._documentCounts.length &&
+        this.getDocumentCount(a.id) < this.getDocumentCount(b.id)
+      ) {
+        return 1
       } else {
         return a.name.localeCompare(b.name)
       }
@@ -286,6 +301,10 @@ export class FilterableDropdownSelectionModel {
     )
   }
 
+  getDocumentCount(id: number) {
+    return this._documentCounts.find((c) => c.id === id)?.document_count
+  }
+
   init(map: Map<number, ToggleableItemState>) {
     this.temporarySelectionStates = map
     this.apply()
@@ -431,7 +450,11 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
   }
 
   @Input()
-  documentCounts: SelectionDataItem[]
+  set documentCounts(counts: SelectionDataItem[]) {
+    if (counts) {
+      this.selectionModel.documentCounts = counts
+    }
+  }
 
   @Input()
   shortcutKey: string
@@ -544,9 +567,7 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
   }
 
   getUpdatedDocumentCount(id: number) {
-    if (this.documentCounts) {
-      return this.documentCounts.find((c) => c.id === id)?.document_count
-    }
+    return this.selectionModel.getDocumentCount(id)
   }
 
   listKeyDown(event: KeyboardEvent) {

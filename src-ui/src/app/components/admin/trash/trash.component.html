@@ -47,14 +47,19 @@
                 </tr>
             }
             @for (document of documentsInTrash; track document.id) {
-                <tr (click)="toggleSelected(document); $event.stopPropagation();">
+                <tr (click)="toggleSelected(document); $event.stopPropagation();" (mouseleave)="popupPreview.close()">
                     <td>
                     <div class="form-check m-0 ms-2 me-n2">
                         <input type="checkbox" class="form-check-input" id="{{document.id}}" [checked]="selectedDocuments.has(document.id)" (click)="toggleSelected(document); $event.stopPropagation();">
                         <label class="form-check-label" for="{{document.id}}"></label>
                     </div>
                     </td>
-                    <td scope="row">{{ document.title }}</td>
+                    <td scope="row">
+                      {{ document.title }}
+                      <pngx-preview-popup [document]="document" linkClasses="btn btn-sm btn-link" #popupPreview>
+                        <i-bs name="eye"></i-bs>
+                      </pngx-preview-popup>
+                    </td>
                     <td scope="row" i18n>{{ getDaysRemaining(document) }} days</td>
                     <td scope="row">
                     <div class="btn-group d-block d-sm-none">
