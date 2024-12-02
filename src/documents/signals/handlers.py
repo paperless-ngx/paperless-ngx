@@ -5,7 +5,6 @@ import shutil
 import httpx
 from celery import shared_task
 from celery import states
-from celery.exceptions import MaxRetriesExceededError
 from celery.signals import before_task_publish
 from celery.signals import task_failure
 from celery.signals import task_postrun
@@ -576,6 +575,8 @@ def run_workflows_updated(sender, document: Document, logging_group=None, **kwar
 
 @shared_task(
     retry_backoff=True,
+    autoretry_for=(httpx.HTTPStatusError,),
+    retry_kwargs={"max_retries": 3},
 )
 def send_webhook(url, data, headers, files):
     try:
@@ -588,16 +589,11 @@ def send_webhook(url, data, headers, files):
         logger.info(
             f"Webhook sent to {url}",
         )
-    except httpx.HTTPStatusError as e:
+    except Exception as e:
         logger.error(
-            f"Failed sending webhook to {url}: {e}",
+            f"Failed attempt sending webhook to {url}: {e}",
         )
-        try:
-            send_webhook.retry(exc=e, max_retries=3)
-        except MaxRetriesExceededError:
-            logger.error(
-                f"Max retries exceeded for webhook to {url}",
-            )
+        raise e
 
 
 def run_workflows(
