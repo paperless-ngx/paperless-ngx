@@ -4,8 +4,8 @@ from documents.tests.utils import TestMigrations
 
 
 class TestMigrateCustomFieldSelects(TestMigrations):
-    migrate_from = "1056_customfieldinstance_deleted_at_and_more"
-    migrate_to = "1057_alter_customfieldinstance_value_select"
+    migrate_from = "1058_workflowtrigger_schedule_date_custom_field_and_more"
+    migrate_to = "1059_alter_customfieldinstance_value_select"
 
     def setUpBeforeMigration(self, apps):
         CustomField = apps.get_model("documents.CustomField")
@@ -43,8 +43,8 @@ class TestMigrateCustomFieldSelects(TestMigrations):
 
 
 class TestMigrationCustomFieldSelectsReverse(TestMigrations):
-    migrate_from = "1057_alter_customfieldinstance_value_select"
-    migrate_to = "1056_customfieldinstance_deleted_at_and_more"
+    migrate_from = "1059_alter_customfieldinstance_value_select"
+    migrate_to = "1058_workflowtrigger_schedule_date_custom_field_and_more"
 
     def setUpBeforeMigration(self, apps):
         CustomField = apps.get_model("documents.CustomField")
