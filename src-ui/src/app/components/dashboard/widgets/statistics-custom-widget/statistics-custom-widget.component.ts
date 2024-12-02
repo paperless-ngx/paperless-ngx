@@ -65,27 +65,68 @@ export class StatisticsCustomWidgetComponent
     if (this.chart) {
       this.chart.destroy()
     }
-    this.chart = new Chart('DocumentChart', {
-      type: 'line', //this denotes tha type of chart
-
-      data: {// values on X-Axis
-        labels: this.labels_graph,
-        datasets: [
-          {
-            label: $localize`Documents`,
-            data: this.data_graph,
-            backgroundColor: 'rgb(75, 192, 192)',
-            fill: false,
-          },
-        ],
+    this.chart = new Chart('DocumentChart',
+      //   {
+      //   type: 'line', //this denotes tha type of chart
+      //
+      //   data: {// values on X-Axis
+      //     labels: this.labels_graph,
+      //     datasets: [
+      //       {
+      //         label: $localize`Documents`,
+      //         data: this.data_graph,
+      //         backgroundColor: 'rgb(75, 192, 192)',
+      //         fill: false,
+      //       },
+      //     ],
+      //   },
+      //   options: {
+      //     responsive: true,
+      //     maintainAspectRatio: false,
+      //     aspectRatio: 2.5,
+      //   },
+      //
+      // }
+      {
+  type: 'bar',
+  data: {
+    labels: this.labels_graph,
+    datasets: [{
+      label: $localize`Documents`,
+      data: this.data_graph,
+      backgroundColor: [
+        'rgba(75, 192, 192, 0.2)',
+      ],
+      borderColor: [
+        'rgb(75, 192, 192)',
+      ],
+      borderWidth: 1,
+      // Sử dụng maxBarThickness để kiểm soát kích thước cột
+      // maxBarThickness: this.data_graph.length === 1 ? this.chart.width / 10 : undefined
+    }],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    aspectRatio: 2.5,
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          // Tùy chỉnh định dạng nhãn để hiển thị số nguyên
+          callback: function(value, index, values) {
+            if (Number.isInteger(value)) {
+              return value;
+            }
+            return null;
+          }
+        }
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        aspectRatio: 2.5,
-      },
+    },
+  },
+}
 
-    })
+    )
   }
 
   createDocumentTypePieChart() {

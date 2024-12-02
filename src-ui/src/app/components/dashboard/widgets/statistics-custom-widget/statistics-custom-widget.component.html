@@ -8,12 +8,18 @@
       <!--      </div>-->
       <div class="d-flex flex-wrap gap-2 mt-1 mb-1">
         <h5 class="mt-2 mb-2 ">Uploaded Document Statistics </h5>
-        <div class="">
-          <select class="form-select " (change)="customDateEnable=!customDateEnable">
-            <option value="day">Day</option>
-            <option value="week">Custom day</option>
-          </select>
-        </div>
+<!--        <div class="d-flex flex-wrap gap-2 mt-1 mb-1">-->
+<!--        </div>-->
+          <button class="btn btn-sm btn-outline-primary mt-1" [hidden]="!customDateEnable" (click)="customDateEnable=!customDateEnable">Custom day</button>
+          <button class="btn btn-sm btn-outline-primary mt-1" [hidden]="customDateEnable"  (click)="customDateEnable=!customDateEnable">Specific date</button>
+<!--        <div class=" mt-1 mb-1">-->
+<!--        </div>-->
+<!--        <div class="">-->
+<!--          <select class="form-select " (change)="customDateEnable=!customDateEnable">-->
+<!--            <option value="day">Day</option>-->
+<!--            <option value="week">Custom day</option>-->
+<!--          </select>-->
+<!--        </div>-->
 
       </div>
       <div class="mt-2 mb-2">
@@ -33,13 +39,20 @@
       <div class="">
         <h5 class="mt-2 mb-2 text-center">Top Document Types/Tags with the Largest Number of Documents</h5>
         <div class="row">
-          <div class="col-md-6">
-            <canvas id="DocumentTypePieChart"></canvas>
+          <div class="col-md-6 d-flex flex-column align-items-center">
+            <div>
+              <canvas id="DocumentTypePieChart"></canvas>
+            </div>
+            <span>Document types</span>
           </div>
-          <div class="col-md-6">
-            <canvas id="TagsPieChart"></canvas>
+          <div class="col-md-6 d-flex flex-column align-items-center">
+            <div>
+              <canvas id="TagsPieChart"></canvas>
+            </div>
+            <span>Tags</span>
           </div>
         </div>
+
       </div>
 
       <hr />
