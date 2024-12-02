@@ -2247,13 +2247,15 @@ class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     def get_filesize(self, obj):
         if obj.type == Folder.FOLDER:
             return 0
-        return os.path.getsize(getattr(obj.documents.first(),'archive_path',0))
+        path = getattr(obj.documents.first(),'archive_path','')
+        return os.path.getsize(path) if path !='' and os.path.exists(path) else 0
 
     def get_document_count(self, obj):
-        folders = Folder.objects.filter(path__startswith=obj.path)
-        documents = Document.objects.filter(folder__in=folders)
+        folders = Folder.objects.filter(path__startswith=obj.path, type = Folder.FILE)
 
-        return documents.count()
+        # documents = Document.objects.filter(folder__in=folders)
+
+        return folders.count()
 
     def get_document(self, obj):
         if obj.type == Folder.FILE:
