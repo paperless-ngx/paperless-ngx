@@ -639,12 +639,12 @@
         },
         "drf-spectacular": {
             "hashes": [
-                "sha256:a199492f2163c4101055075ebdbb037d59c6e0030692fc83a1a8c0fc65929981",
-                "sha256:b1c04bf8b2fbbeaf6f59414b4ea448c8787aba4d32f76055c3b13335cf7ec37b"
+                "sha256:2c778a47a40ab2f5078a7c42e82baba07397bb35b074ae4680721b2805943061",
+                "sha256:856e7edf1056e49a4245e87a61e8da4baff46c83dbc25be1da2df77f354c7cb4"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.7'",
-            "version": "==0.27.2"
+            "version": "==0.28.0"
         },
         "drf-spectacular-sidecar": {
             "hashes": [
