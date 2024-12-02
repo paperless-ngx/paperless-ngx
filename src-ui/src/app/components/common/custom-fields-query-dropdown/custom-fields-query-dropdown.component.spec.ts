@@ -39,7 +39,12 @@ const customFields = [
     id: 2,
     name: 'Test Select Field',
     data_type: CustomFieldDataType.Select,
-    extra_data: { select_options: ['Option 1', 'Option 2'] },
+    extra_data: {
+      select_options: [
+        { label: 'Option 1', id: 'abc-123' },
+        { label: 'Option 2', id: 'def-456' },
+      ],
+    },
   },
 ]
 
@@ -128,11 +133,19 @@ describe('CustomFieldsQueryDropdownComponent', () => {
       id: 1,
       name: 'Test Field',
       data_type: CustomFieldDataType.Select,
-      extra_data: { select_options: ['Option 1', 'Option 2'] },
+      extra_data: {
+        select_options: [
+          { label: 'Option 1', id: 'abc-123' },
+          { label: 'Option 2', id: 'def-456' },
+        ],
+      },
     }
     component.customFields = [field]
     const options = component.getSelectOptionsForField(1)
-    expect(options).toEqual(['Option 1', 'Option 2'])
+    expect(options).toEqual([
+      { label: 'Option 1', id: 'abc-123' },
+      { label: 'Option 2', id: 'def-456' },
+    ])
 
     // Fallback to empty array if field is not found
     const options2 = component.getSelectOptionsForField(2)
