@@ -80,7 +80,11 @@ describe('CustomFieldEditDialogComponent', () => {
       name: 'Field 1',
       data_type: CustomFieldDataType.Select,
       extra_data: {
-        select_options: ['Option 1', 'Option 2', 'Option 3'],
+        select_options: [
+          { label: 'Option 1', id: '123-xyz' },
+          { label: 'Option 2', id: '456-abc' },
+          { label: 'Option 3', id: '789-123' },
+        ],
       },
     }
     fixture.detectChanges()
@@ -96,19 +100,19 @@ describe('CustomFieldEditDialogComponent', () => {
     component.ngOnInit()
     expect(
       component.objectForm.get('extra_data').get('select_options').value.length
+    ).toBe(0)
+    component.addSelectOption()
+    expect(
+      component.objectForm.get('extra_data').get('select_options').value.length
     ).toBe(1)
     component.addSelectOption()
     expect(
       component.objectForm.get('extra_data').get('select_options').value.length
     ).toBe(2)
-    component.addSelectOption()
-    expect(
-      component.objectForm.get('extra_data').get('select_options').value.length
-    ).toBe(3)
     component.removeSelectOption(0)
     expect(
       component.objectForm.get('extra_data').get('select_options').value.length
-    ).toBe(2)
+    ).toBe(1)
   })
 
   it('should focus on last select option input', () => {
