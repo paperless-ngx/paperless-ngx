@@ -1663,7 +1663,6 @@ class UiSettingsViewSerializer(serializers.ModelSerializer):
 class TasksViewSerializer(OwnedObjectSerializer):
     class Meta:
         model = PaperlessTask
-        depth = 1
         fields = (
             "id",
             "task_id",
