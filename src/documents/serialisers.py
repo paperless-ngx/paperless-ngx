@@ -1603,13 +1603,20 @@ class TasksViewSerializer(OwnedObjectSerializer):
         return "file"
 
     related_document = serializers.SerializerMethodField()
-    related_doc_re = re.compile(r"New document id (\d+) created")
+    created_doc_re = re.compile(r"New document id (\d+) created")
+    duplicate_doc_re = re.compile(r"It is a duplicate of .* \(#(\d+)\)")
 
     def get_related_document(self, obj):
         result = None
-        if obj.status is not None and obj.status == states.SUCCESS:
+        re = None
+        match obj.status:
+            case states.SUCCESS:
+                re = self.created_doc_re
+            case states.FAILURE:
+                re = self.duplicate_doc_re
+        if re is not None:
             try:
-                result = self.related_doc_re.search(obj.result).group(1)
+                result = re.search(obj.result).group(1)
             except Exception:
                 pass
 

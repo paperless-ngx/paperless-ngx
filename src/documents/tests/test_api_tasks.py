@@ -284,3 +284,28 @@ class TestTasks(DirectoriesMixin, APITestCase):
         returned_data = response.data[0]
 
         self.assertEqual(returned_data["task_file_name"], "anothertest.pdf")
+
+    def test_task_result_failed_duplicate_includes_related_doc(self):
+        """
+        GIVEN:
+            - A celery task failed with a duplicate error
+        WHEN:
+            - API call is made to get tasks
+        THEN:
+            - The returned data includes a related document link
+        """
+        PaperlessTask.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_file_name="task_one.pdf",
+            status=celery.states.FAILURE,
+            result="Not consuming task_one.pdf: It is a duplicate of task_one_existing.pdf (#1234).",
+        )
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+        returned_data = response.data[0]
+
+        self.assertEqual(returned_data["related_document"], "1234")
