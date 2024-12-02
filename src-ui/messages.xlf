@@ -6329,7 +6329,7 @@
                   [ngbPopover]=&quot;translateText(&apos;Tagged tags&apos;)&quot;
                   i18n-ngbPopover
                   triggers=&quot;mouseenter:mouseleave&quot;
-                  [attr.aria-label]=&quot;translateText(&apos;Tagged tags count&apos;)&quot;
+                  [attr.aria-label]=&quot;translateText(&apos;Tagged tags&apos;)&quot;
                   [class.me-1px]=&quot;!0&quot;
                   [style.width]=&quot;100-(statistics.untagged_tags_count/statistics.tag_count)*100 + &apos;%&apos;&quot;
                   [style.opacity]=&quot;getItemOpacity(0)&quot;
@@ -8312,10 +8312,6 @@
           <context context-type="linenumber">135,136</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
-          <context context-type="linenumber">251,252</context>
-        </context-group>
-        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/shelf/shelf.component.html</context>
           <context context-type="linenumber">136,137</context>
         </context-group>
@@ -8367,6 +8363,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/boxcase/boxcase.component.html</context>
           <context context-type="linenumber">152,153</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
+          <context context-type="linenumber">251,252</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>

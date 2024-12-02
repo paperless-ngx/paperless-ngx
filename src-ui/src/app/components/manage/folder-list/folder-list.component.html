@@ -248,7 +248,7 @@
                     <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
                       <button (click)="filterDocuments(object)"
                               *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }"
-                              ngbDropdownItem i18n>Filter Documents
+                              ngbDropdownItem i18n>Documents
                       </button>
                       <button (click)="openEditDialog(object)"
                               [disabled]="!userCanEdit(object)"

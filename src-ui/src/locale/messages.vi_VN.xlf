@@ -6223,7 +6223,7 @@
                <context context-type="sourcefile">src/app/components/common/input/date-custom/date-custom.component.html</context>
                <context context-type="linenumber">2,21</context>
             </context-group>
-            <target state="needs-translation">
+            <target state="translated">
                <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&amp;lt;div class=&amp;quot;col-12 mt-1 mb-1&amp;quot;&gt;" />
                <x id="START_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;div class=&amp;quot;input-group&amp;quot;&gt;" />
                <x id="TAG_INPUT" ctype="x-input" equiv-text="&amp;lt;input     class=&amp;quot;form-control&amp;quot;     [placeholder]=&amp;quot;placeholder&amp;quot;     name=&amp;quot;dp&amp;quot;     [(ngModel)]=&amp;quot;model&amp;quot;         (dateSelect)=&amp;quot;onDateSelection($event)&amp;quot;     ngbDatepicker     #d=&amp;quot;ngbDatepicker&amp;quot;    /&gt;" />
@@ -7392,7 +7392,7 @@
          <trans-unit id="2470690291316891440" datatype="html">
             <source>
                <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;progress flex-grow-1&quot;&gt;" />
-               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div                   class=&quot;progress-bar bg-primary&quot;                   role=&quot;progressbar&quot;                   [ngbPopover]=&quot;translateText('Tagged tags')&quot;                   i18n-ngbPopover                   triggers=&quot;mouseenter:mouseleave&quot;                   [attr.aria-label]=&quot;translateText('Tagged tags count')&quot;                   [class.me-1px]=&quot;!0&quot;                   [style.width]=&quot;100-(statistics.untagged_tags_count/statistics.tag_count)*100 + '%'&quot;                   [style.opacity]=&quot;getItemOpacity(0)&quot;                   [attr.aria-valuenow]=&quot;statistics.tag_count-statistics.untagged_tags_count&quot;                   aria-valuemin=&quot;0&quot;                   aria-valuemax=&quot;100&quot;&gt;" />
+               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div                   class=&quot;progress-bar bg-primary&quot;                   role=&quot;progressbar&quot;                   [ngbPopover]=&quot;translateText('Tagged tags')&quot;                   i18n-ngbPopover                   triggers=&quot;mouseenter:mouseleave&quot;                   [attr.aria-label]=&quot;translateText('Tagged tags')&quot;                   [class.me-1px]=&quot;!0&quot;                   [style.width]=&quot;100-(statistics.untagged_tags_count/statistics.tag_count)*100 + '%'&quot;                   [style.opacity]=&quot;getItemOpacity(0)&quot;                   [attr.aria-valuenow]=&quot;statistics.tag_count-statistics.untagged_tags_count&quot;                   aria-valuemin=&quot;0&quot;                   aria-valuemax=&quot;100&quot;&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
                <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div                   class=&quot;progress-bar bg-primary&quot;                   role=&quot;progressbar&quot;                   [ngbPopover]=&quot;translateText('Untagged tags')&quot;                   i18n-ngbPopover                   triggers=&quot;mouseenter:mouseleave&quot;                   [attr.aria-label]=&quot;translateText('Untagged tags')&quot;                   [class.me-1px]=&quot;!1&quot;                   [style.width]=&quot;(statistics.untagged_tags_count/statistics.tag_count)*100+ '%'&quot;                   [style.opacity]=&quot;getItemOpacity(1)&quot;                   [attr.aria-valuenow]=&quot;statistics.untagged_tags_count&quot;                   aria-valuemin=&quot;0&quot;                   aria-valuemax=&quot;100&quot;&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
@@ -7402,7 +7402,7 @@
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
                <context context-type="linenumber">63,93</context>
             </context-group>
-            <target state="needs-translation">
+            <target state="translated">
                <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&amp;lt;div class=&amp;quot;progress flex-grow-1&amp;quot;&gt;" />
                <x id="START_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;div                   class=&amp;quot;progress-bar bg-primary&amp;quot;                   role=&amp;quot;progressbar&amp;quot;                   [ngbPopover]=&amp;quot;translateText('Thẻ đã gán')&amp;quot;                   i18n-ngbPopover                   triggers=&amp;quot;mouseenter:mouseleave&amp;quot;                   [attr.aria-label]=&amp;quot;translateText('Thẻ đã gán')&amp;quot;                   [class.me-1px]=&amp;quot;!0&amp;quot;                   [style.width]=&amp;quot;100-(statistics.untagged_tags_count/statistics.tag_count)*100 + '%'&amp;quot;                   [style.opacity]=&amp;quot;getItemOpacity(0)&amp;quot;                   [attr.aria-valuenow]=&amp;quot;statistics.tag_count-statistics.untagged_tags_count&amp;quot;                   aria-valuemin=&amp;quot;0&amp;quot;                   aria-valuemax=&amp;quot;100&amp;quot;&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
@@ -7417,7 +7417,7 @@
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
                <context context-type="linenumber">100</context>
             </context-group>
-            <target state="needs-translation">Thẻ đã gán</target>
+            <target state="translated">Thẻ đã gán</target>
          </trans-unit>
          <trans-unit id="6571816214672638255" datatype="html">
             <source>Untagged tags</source>
@@ -7425,7 +7425,7 @@
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
                <context context-type="linenumber">106</context>
             </context-group>
-            <target state="needs-translation">Thẻ chưa gán</target>
+            <target state="translated">Thẻ chưa gán</target>
          </trans-unit>
          <trans-unit id="6887606175573586232" datatype="html">
             <source>
@@ -7478,7 +7478,7 @@
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
                <context context-type="linenumber">129,176</context>
             </context-group>
-            <target state="needs-translation">
+            <target state="translated">
                <x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&amp;lt;div class=&amp;quot;d-flex justify-content-between align-items-center my-2&amp;quot;&gt;" />
                <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&amp;lt;div class=&amp;quot;progress flex-grow-1&amp;quot;&gt;" />
                <x id="START_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;div                   class=&amp;quot;progress-bar bg-primary&amp;quot;                   role=&amp;quot;progressbar&amp;quot;                   [ngbPopover]=&amp;quot;translateText('Loại tài liệu đã gán')&amp;quot;                   i18n-ngbPopover                   triggers=&amp;quot;mouseenter:mouseleave&amp;quot;                   [attr.aria-label]=&amp;quot;translateText('Loại tài liệu đã gán')&amp;quot;                   [class.me-1px]=&amp;quot;!0&amp;quot;                   [style.width]=&amp;quot;100-(statistics?.unassigned_document_types_count/statistics?.document_type_count)*100 + '%'&amp;quot;                   [style.opacity]=&amp;quot;getItemOpacity(0)&amp;quot;                   [attr.aria-valuenow]=&amp;quot;statistics?.document_type_count-statistics?.unassigned_document_types_count&amp;quot;                   aria-valuemin=&amp;quot;0&amp;quot;                   aria-valuemax=&amp;quot;100&amp;quot;&gt;" />
@@ -7496,7 +7496,6 @@
                <x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&amp;lt;span class=&amp;quot;fw-bold&amp;quot; &gt;" />
                Loại tài liệu đã gán
                <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;/span&gt;" />
-
                <x id="START_TAG_SPAN_2" ctype="x-span_2" equiv-text="&amp;lt;span class=&amp;quot;text-muted&amp;quot;&gt;" />
                (
                <x id="INTERPOLATION" equiv-text="{{100-(statistics.unassigned_document_types_count/statistics.document_type_count)*100 | number: '1.0-1'}}" />
@@ -7513,7 +7512,6 @@
                <x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&amp;lt;span class=&amp;quot;fw-bold&amp;quot; &gt;" />
                Loại tài liệu chưa gán
                <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;/span&gt;" />
-
                <x id="START_TAG_SPAN_2" ctype="x-span_2" equiv-text="&amp;lt;span class=&amp;quot;text-muted&amp;quot;&gt;" />
                (
                <x id="INTERPOLATION_1" equiv-text="{{(statistics.unassigned_document_types_count/statistics.document_type_count)*100 | number: '1.0-1'}}" />
@@ -7539,7 +7537,7 @@
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
                <context context-type="linenumber">96</context>
             </context-group>
-            <target state="needs-translation">
+            <target state="translated">
                <source />
             </target>
          </trans-unit>
@@ -10063,10 +10061,6 @@
                <context context-type="linenumber">135,136</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
-               <context context-type="linenumber">251,252</context>
-            </context-group>
-            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/shelf/shelf.component.html</context>
                <context context-type="linenumber">136,137</context>
             </context-group>
@@ -10074,7 +10068,7 @@
                <context context-type="sourcefile">src/app/components/manage/warehouse/warehouse.component.html</context>
                <context context-type="linenumber">136,137</context>
             </context-group>
-            <target state="translated">Lọc tài liệu</target>
+            <target state="translated">Tài liệu</target>
          </trans-unit>
          <trans-unit id="7565155156017938502" datatype="html">
             <source>Edit</source>
@@ -10121,6 +10115,10 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/boxcase/boxcase.component.html</context>
                <context context-type="linenumber">152,153</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
+               <context context-type="linenumber">251,252</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
@@ -10630,7 +10628,7 @@
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
                <context context-type="linenumber">82</context>
             </context-group>
-            <target state="translated">Lọc tài liệu</target>
+            <target state="translated">Tài liệu</target>
          </trans-unit>
          <trans-unit id="8384138406252790442" datatype="html">
             <source>Customize the data fields that can be attached to documents.</source>
