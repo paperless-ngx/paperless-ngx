@@ -15,8 +15,10 @@ export interface Statistics {
   document_file_type_counts?: DocumentFileType[]
   character_count?: number
   tag_count?: number
+  untagged_tags_count?: number
   correspondent_count?: number
   document_type_count?: number
+  unassigned_document_types_count?: number
   storage_path_count?: number
   warehouse_count?: number
 }
@@ -88,6 +90,14 @@ export class StatisticsWidgetComponent
 
   getFileTypePercent(filetype: DocumentFileType): number {
     return (filetype.mime_type_count / this.statistics?.documents_total) * 100
+  }
+
+  translateText(value: string){
+    return $localize ``+ value;
+  }
+
+  getTagPercent(): number {
+    return (this.statistics?.untagged_tags_count / this.statistics?.tag_count) * 100
   }
 
   getItemOpacity(i: number): number {

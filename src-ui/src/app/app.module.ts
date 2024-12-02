@@ -67,6 +67,7 @@ import { SafeUrlPipe } from './pipes/safeurl.pipe'
 import { SafeHtmlPipe } from './pipes/safehtml.pipe'
 import { CustomDatePipe } from './pipes/custom-date.pipe'
 import { DateComponent } from './components/common/input/date/date.component'
+import { DateCustomComponent } from './components/common/input/date-custom/date-custom.component'
 import { DatepickerRangeComponent } from './components/common/input/datepicker-range/datepicker-range.component'
 import { ISODateAdapter } from './utils/ngb-iso-date-adapter'
 import { LocalizedDateParserFormatter } from './utils/ngb-date-parser-formatter'
@@ -508,6 +509,7 @@ function initializeApp(settings: SettingsService) {
     SafeHtmlPipe,
     CustomDatePipe,
     DateComponent,
+    DateCustomComponent,
     DatepickerRangeComponent,
     ColorComponent,
     DocumentAsnComponent,
@@ -569,7 +571,7 @@ function initializeApp(settings: SettingsService) {
     ColorSliderModule,
     TourNgBootstrapModule,
     DragDropModule,
-    NgxBootstrapIconsModule.pick(icons ),
+    NgxBootstrapIconsModule.pick(icons),
     NgxFilesizeModule,
   ],
   providers: [

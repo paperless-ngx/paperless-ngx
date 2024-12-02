@@ -1,5 +1,8 @@
 <form class="row row-cols-sm-auto" i18n>
-  <div class="col-12" >
+<!--  <div class="col-12" [hidden]="customDateEnable" >-->
+<!--    <pngx-input-date-custom i18n-title title=""  (dateSelection)="onDateSelection($event)"  ></pngx-input-date-custom>-->
+<!--  </div>-->
+  <div class="col-12 mt-1 mb-1" >
     <div class="dp-hidden position-absolute">
       <div class="input-group">
         <input
@@ -8,15 +11,17 @@
           ngbDatepicker
           #datepicker="ngbDatepicker"
           [autoClose]="'outside'"
-          (dateSelect)="onDateSelection($event)"
+          (dateSelect)="onDateRangeSelection($event)"
           [displayMonths]="2"
           [dayTemplate]="t"
+          [minDate]="minDate"
+          [maxDate]="maxDate"
           outsideDays="hidden"
           [startDate]="fromDate!"
           tabindex="-1"
         />
         <ng-template #t let-date let-focused="focused">
-					<span
+          <span
             class="custom-day"
             [class.focused]="focused"
             [class.range]="isRange(date)"
@@ -24,8 +29,8 @@
             (mouseenter)="hoveredDate = date"
             (mouseleave)="hoveredDate = null"
           >
-						{{ date.day }}
-					</span>
+              {{ date.day }}
+          </span>
         </ng-template>
       </div>
     </div>
@@ -33,7 +38,7 @@
       <input
         #dpFromDate
         class="form-control"
-        placeholder="yyyy-mm-dd"
+        [placeholder]="placeholder"
         name="dpFromDate"
         [value]="formatter.format(fromDate)"
         (input)="fromDate = validateInput(fromDate, dpFromDate.value)"
@@ -43,12 +48,12 @@
       </button>
     </div>
   </div>
-  <div class="col-12">
+  <div class="col-12 mt-1 mb-1" >
     <div class="input-group">
       <input
         #dpToDate
         class="form-control"
-        placeholder="yyyy-mm-dd"
+        [placeholder]="placeholder"
         name="dpToDate"
         [value]="formatter.format(toDate)"
         (input)="toDate = validateInput(toDate, dpToDate.value)"
@@ -58,19 +63,12 @@
       </button>
     </div>
   </div>
-  <div class="col-12">
-    <select class="form-select" (change)="setDateRange($event)">
-      <option value="today">Today</option>
-      <option value="week">Week</option>
-      <option value="month">Month</option>
-    </select>
-  </div>
-  <div class="col-12">
-    <button type="button" class="btn btn-outline-primary" (click)="this.confirmButton.emit()" >Confirm
-    </button>
-  </div>
-</form>
 
-<!--<hr />-->
-<!--<pre>From date model: {{ fromDate | json }}</pre>-->
-<!--<pre>To date model: {{ toDate | json }}</pre>-->
+  <div class="col-12 d-flex flex-wrap gap-2 mt-1 mb-1">
+    <button class="btn btn-sm btn-outline-primary mt-1" (click)="getThisWeek()">This week</button>
+    <button class="btn btn-sm btn-outline-primary mt-1" (click)="getThisMonth()">This month</button>
+    <button class="btn btn-sm btn-outline-primary mt-1" (click)="getThisYear()">This year</button>
+  </div>
+<!--  <div class="col-12" >-->
+<!--  </div>-->
+</form>

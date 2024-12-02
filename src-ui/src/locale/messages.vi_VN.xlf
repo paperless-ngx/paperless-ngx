@@ -893,14 +893,6 @@
             </context-group>
             <target state="translated">Đệ trình bởi</target>
          </trans-unit>
-         <trans-unit id="8752028648713536143" datatype="html">
-            <source>Submmit by group</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">48</context>
-            </context-group>
-            <target state="translated">Đệ trình bởi nhóm</target>
-         </trans-unit>
          <trans-unit id="4207916966377787111" datatype="html">
             <source>Created</source>
             <context-group purpose="location">
@@ -957,7 +949,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">157</context>
+               <context context-type="linenumber">159</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-approvals/document-approvals.component.html</context>
@@ -973,7 +965,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">160</context>
+               <context context-type="linenumber">162</context>
             </context-group>
             <target state="translated">Từ chối lúc</target>
          </trans-unit>
@@ -985,7 +977,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">163</context>
+               <context context-type="linenumber">165</context>
             </context-group>
             <target state="translated">Đã thu hồi lúc</target>
          </trans-unit>
@@ -997,7 +989,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">168</context>
+               <context context-type="linenumber">170</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-approvals/document-approvals.component.html</context>
@@ -1105,11 +1097,11 @@
             <source>Approve</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">97</context>
+               <context context-type="linenumber">99</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">118</context>
+               <context context-type="linenumber">126</context>
             </context-group>
             <target state="translated">xét duyệt</target>
          </trans-unit>
@@ -1117,11 +1109,11 @@
             <source>Reject</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">100</context>
+               <context context-type="linenumber">102</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">129</context>
+               <context context-type="linenumber">137</context>
             </context-group>
             <target state="translated">Từ chối</target>
          </trans-unit>
@@ -1129,7 +1121,7 @@
             <source>Revoked</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">105</context>
+               <context context-type="linenumber">107</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
@@ -1141,7 +1133,7 @@
             <source>Open Document</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">112</context>
+               <context context-type="linenumber">114</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
@@ -1161,7 +1153,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">182</context>
+               <context context-type="linenumber">184</context>
             </context-group>
             <target state="translated">
                {VAR_PLURAL, plural, =1 {1
@@ -1183,7 +1175,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">184</context>
+               <context context-type="linenumber">186</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
@@ -1247,7 +1239,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">196,198</context>
+               <context context-type="linenumber">198,200</context>
             </context-group>
             <target state="translated">
                Từ chối
@@ -1269,7 +1261,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">204,206</context>
+               <context context-type="linenumber">206,208</context>
             </context-group>
             <target state="translated">
                Thành công
@@ -1291,7 +1283,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">212,214</context>
+               <context context-type="linenumber">214,216</context>
             </context-group>
             <target state="translated">
                Đang chờ
@@ -1313,7 +1305,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">220,222</context>
+               <context context-type="linenumber">222,224</context>
             </context-group>
             <target state="translated">
                Đã thu hồi
@@ -1328,7 +1320,7 @@
             <source>Dismiss selected</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">37</context>
+               <context context-type="linenumber">39</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
@@ -1340,7 +1332,7 @@
             <source>Dismiss all</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">38</context>
+               <context context-type="linenumber">40</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
@@ -1352,7 +1344,7 @@
             <source>Approve selected</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">42</context>
+               <context context-type="linenumber">44</context>
             </context-group>
             <target state="translated">Xét duyệt đã chọn</target>
          </trans-unit>
@@ -1360,7 +1352,7 @@
             <source>Approval all</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">43</context>
+               <context context-type="linenumber">45</context>
             </context-group>
             <target state="translated">Xét duyệt tất cả</target>
          </trans-unit>
@@ -1368,7 +1360,7 @@
             <source>Reject selected</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">48</context>
+               <context context-type="linenumber">50</context>
             </context-group>
             <target state="translated">Từ chối đã chọn</target>
          </trans-unit>
@@ -1376,7 +1368,7 @@
             <source>Reject all</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">49</context>
+               <context context-type="linenumber">51</context>
             </context-group>
             <target state="translated">Từ chối tất cả</target>
          </trans-unit>
@@ -1384,7 +1376,7 @@
             <source>Revoke selected</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">53</context>
+               <context context-type="linenumber">55</context>
             </context-group>
             <target state="translated">Thu hồi đã chọn</target>
          </trans-unit>
@@ -1392,7 +1384,7 @@
             <source>Revoke all</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">54</context>
+               <context context-type="linenumber">56</context>
             </context-group>
             <target state="translated">Huỷ tất cả</target>
          </trans-unit>
@@ -1400,7 +1392,7 @@
             <source>Confirm Approve All</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">115</context>
+               <context context-type="linenumber">123</context>
             </context-group>
             <target state="translated">Xác nhận xét duyệt tất cả</target>
          </trans-unit>
@@ -1412,14 +1404,14 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">116</context>
+               <context context-type="linenumber">124</context>
             </context-group>
          </trans-unit>
          <trans-unit id="8149316136396574153" datatype="html">
             <source>Confirm Reject All</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">126</context>
+               <context context-type="linenumber">134</context>
             </context-group>
             <target state="translated">Xác nhận từ chối tất cả</target>
          </trans-unit>
@@ -1431,14 +1423,14 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">127</context>
+               <context context-type="linenumber">135</context>
             </context-group>
          </trans-unit>
          <trans-unit id="1968812985483407517" datatype="html">
             <source>Confirm Revoke All</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">137</context>
+               <context context-type="linenumber">145</context>
             </context-group>
             <target state="translated">Xác nhận huỷ tất cả</target>
          </trans-unit>
@@ -1450,14 +1442,14 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">138</context>
+               <context context-type="linenumber">146</context>
             </context-group>
          </trans-unit>
          <trans-unit id="135077277733987408" datatype="html">
             <source>Revoke</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">140</context>
+               <context context-type="linenumber">148</context>
             </context-group>
             <target state="translated">Thu hồi</target>
          </trans-unit>
@@ -1465,7 +1457,7 @@
             <source>pending</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">209</context>
+               <context context-type="linenumber">217</context>
             </context-group>
             <target state="translated">Đang chờ</target>
          </trans-unit>
@@ -1473,7 +1465,7 @@
             <source>success</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">211</context>
+               <context context-type="linenumber">219</context>
             </context-group>
             <target state="translated">thành công</target>
          </trans-unit>
@@ -1481,7 +1473,7 @@
             <source>failure</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">213</context>
+               <context context-type="linenumber">221</context>
             </context-group>
             <target state="translated">Thất bại</target>
          </trans-unit>
@@ -1489,7 +1481,7 @@
             <source>revoked</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">215</context>
+               <context context-type="linenumber">223</context>
             </context-group>
             <target state="translated">Đã thu hồi</target>
          </trans-unit>
@@ -2969,7 +2961,7 @@
                <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
                <context context-type="linenumber">13</context>
             </context-group>
-            <target state="translated">tên tài khoản</target>
+            <target state="translated">Tên tài khoản</target>
          </trans-unit>
          <trans-unit id="5944812089887969249" datatype="html">
             <source>Groups</source>
@@ -3453,7 +3445,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
-               <context context-type="linenumber">63</context>
+               <context context-type="linenumber">75</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
@@ -3557,7 +3549,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
-               <context context-type="linenumber">66</context>
+               <context context-type="linenumber">116</context>
             </context-group>
             <target state="translated">Người biên tập</target>
          </trans-unit>
@@ -3578,6 +3570,10 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
                <context context-type="linenumber">19</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
+               <context context-type="linenumber">138</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -3605,7 +3601,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
-               <context context-type="linenumber">74</context>
+               <context context-type="linenumber">124</context>
             </context-group>
             <target state="translated">Loại Tài liệu</target>
          </trans-unit>
@@ -3621,7 +3617,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
-               <context context-type="linenumber">82</context>
+               <context context-type="linenumber">182</context>
             </context-group>
             <target state="translated">Đường dẫn lưu dữ liệu</target>
          </trans-unit>
@@ -3637,7 +3633,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
-               <context context-type="linenumber">90</context>
+               <context context-type="linenumber">190</context>
             </context-group>
             <target state="translated">Kho</target>
          </trans-unit>
@@ -5521,7 +5517,7 @@
                <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
                <context context-type="linenumber">20</context>
             </context-group>
-            <target state="translated">kích hoạt</target>
+            <target state="translated">Kích hoạt</target>
          </trans-unit>
          <trans-unit id="2033923486957762916" datatype="html">
             <source>Trigger Workflow On:</source>
@@ -6206,6 +6202,44 @@
             </context-group>
             <target state="translated">Xóa</target>
          </trans-unit>
+         <trans-unit id="2960342086890185317" datatype="html">
+            <source>
+               <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div class=&quot;col-12 mt-1 mb-1&quot;&gt;" />
+               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;input-group&quot;&gt;" />
+               <x id="TAG_INPUT" ctype="x-input" equiv-text="&lt;input     class=&quot;form-control&quot;     [placeholder]=&quot;placeholder&quot;     name=&quot;dp&quot;     [(ngModel)]=&quot;model&quot;         (dateSelect)=&quot;onDateSelection($event)&quot;     ngbDatepicker     #d=&quot;ngbDatepicker&quot;    /&gt;" />
+               <x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&lt;button class=&quot;btn btn-outline-secondary&quot; (click)=&quot;d.toggle()&quot; type=&quot;button&quot;&gt;" />
+               <x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;i-bs width=&quot;1.2em&quot; height=&quot;1.2em&quot; name=&quot;calendar3&quot;&gt;" />
+               <x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;/i-bs&gt;" />
+               <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+               <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div class=&quot;col-12 mt-1 mb-1&quot;&gt;" />
+               <x id="START_TAG_BUTTON_1" ctype="x-button_1" equiv-text="&lt;button class=&quot;btn btn-sm btn-outline-primary mt-1&quot; (click)=&quot;setToday()&quot;&gt;" />
+               Select Today
+               <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+            </source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/common/input/date-custom/date-custom.component.html</context>
+               <context context-type="linenumber">2,21</context>
+            </context-group>
+            <target state="translated">
+               <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&amp;lt;div class=&amp;quot;col-12 mt-1 mb-1&amp;quot;&gt;" />
+               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;div class=&amp;quot;input-group&amp;quot;&gt;" />
+               <x id="TAG_INPUT" ctype="x-input" equiv-text="&amp;lt;input     class=&amp;quot;form-control&amp;quot;     [placeholder]=&amp;quot;placeholder&amp;quot;     name=&amp;quot;dp&amp;quot;     [(ngModel)]=&amp;quot;model&amp;quot;         (dateSelect)=&amp;quot;onDateSelection($event)&amp;quot;     ngbDatepicker     #d=&amp;quot;ngbDatepicker&amp;quot;    /&gt;" />
+               <x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;button class=&amp;quot;btn btn-outline-secondary&amp;quot; (click)=&amp;quot;d.toggle()&amp;quot; type=&amp;quot;button&amp;quot;&gt;" />
+               <x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&amp;lt;i-bs width=&amp;quot;1.2em&amp;quot; height=&amp;quot;1.2em&amp;quot; name=&amp;quot;calendar3&amp;quot;&gt;" />
+               <x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&amp;lt;/i-bs&gt;" />
+               <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;/button&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+               <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&amp;lt;div class=&amp;quot;col-12 mt-1 mb-1&amp;quot;&gt;" />
+               <x id="START_TAG_BUTTON_1" ctype="x-button_1" equiv-text="&amp;lt;button class=&amp;quot;btn btn-sm btn-outline-primary mt-1&amp;quot; (click)=&amp;quot;setToday()&amp;quot;&gt;" />
+               Hôm nay
+               <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;/button&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+            </target>
+         </trans-unit>
          <trans-unit id="445302259125375799" datatype="html">
             <source>Invalid date.</source>
             <context-group purpose="location">
@@ -6248,12 +6282,12 @@
                <x id="PH" equiv-text="this.title" />
             </target>
          </trans-unit>
-         <trans-unit id="4893021289045823170" datatype="html">
+         <trans-unit id="5559248076190743961" datatype="html">
             <source>
-               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;col-12&quot;&gt;" />
+               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;col-12 mt-1 mb-1&quot; &gt;" />
                <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div class=&quot;dp-hidden position-absolute&quot;&gt;" />
                <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;input-group&quot;&gt;" />
-               <x id="TAG_INPUT" ctype="x-input" equiv-text="&lt;input           name=&quot;datepicker&quot;           class=&quot;form-control&quot;           ngbDatepicker           #datepicker=&quot;ngbDatepicker&quot;           [autoClose]=&quot;'outside'&quot;           (dateSelect)=&quot;onDateSelection($event)&quot;           [displayMonths]=&quot;2&quot;           [dayTemplate]=&quot;t&quot;           outsideDays=&quot;hidden&quot;           [startDate]=&quot;fromDate!&quot;           tabindex=&quot;-1&quot;         /&gt;" />
+               <x id="TAG_INPUT" ctype="x-input" equiv-text="&lt;input           name=&quot;datepicker&quot;           class=&quot;form-control&quot;           ngbDatepicker           #datepicker=&quot;ngbDatepicker&quot;           [autoClose]=&quot;'outside'&quot;           (dateSelect)=&quot;onDateRangeSelection($event)&quot;           [displayMonths]=&quot;2&quot;           [dayTemplate]=&quot;t&quot;           [minDate]=&quot;minDate&quot;           [maxDate]=&quot;maxDate&quot;           outsideDays=&quot;hidden&quot;           [startDate]=&quot;fromDate!&quot;           tabindex=&quot;-1&quot;         /&gt;" />
                <x id="START_TAG_NG_TEMPLATE" ctype="x-ng_template" equiv-text="&lt;ng-template #t let-date let-focused=&quot;focused&quot;&gt;" />
                <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span             class=&quot;custom-day&quot;             [class.focused]=&quot;focused&quot;             [class.range]=&quot;isRange(date)&quot;             [class.faded]=&quot;isHovered(date) || isInside(date)&quot;             (mouseenter)=&quot;hoveredDate = date&quot;             (mouseleave)=&quot;hoveredDate = null&quot;           &gt;" />
                <x id="INTERPOLATION" equiv-text="{{ date.day }}" />
@@ -6262,50 +6296,43 @@
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
                <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;input-group&quot;&gt;" />
-               <x id="TAG_INPUT_1" ctype="x-input_1" equiv-text="&lt;input         #dpFromDate         class=&quot;form-control&quot;         placeholder=&quot;yyyy-mm-dd&quot;         name=&quot;dpFromDate&quot;         [value]=&quot;formatter.format(fromDate)&quot;         (input)=&quot;fromDate = validateInput(fromDate, dpFromDate.value)&quot;       /&gt;" />
+               <x id="TAG_INPUT_1" ctype="x-input_1" equiv-text="&lt;input         #dpFromDate         class=&quot;form-control&quot;         [placeholder]=&quot;placeholder&quot;         name=&quot;dpFromDate&quot;         [value]=&quot;formatter.format(fromDate)&quot;         (input)=&quot;fromDate = validateInput(fromDate, dpFromDate.value)&quot;       /&gt;" />
                <x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&lt;button class=&quot;btn btn-outline-secondary&quot; (click)=&quot;datepicker.toggle()&quot; type=&quot;button&quot;&gt;" />
                <x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;i-bs width=&quot;1.2em&quot; height=&quot;1.2em&quot; name=&quot;calendar3&quot;&gt;" />
                <x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;/i-bs&gt;" />
                <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
-               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;col-12&quot;&gt;" />
+               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;col-12 mt-1 mb-1&quot; &gt;" />
                <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;input-group&quot;&gt;" />
-               <x id="TAG_INPUT_2" ctype="x-input_2" equiv-text="&lt;input         #dpToDate         class=&quot;form-control&quot;         placeholder=&quot;yyyy-mm-dd&quot;         name=&quot;dpToDate&quot;         [value]=&quot;formatter.format(toDate)&quot;         (input)=&quot;toDate = validateInput(toDate, dpToDate.value)&quot;       /&gt;" />
+               <x id="TAG_INPUT_2" ctype="x-input_2" equiv-text="&lt;input         #dpToDate         class=&quot;form-control&quot;         [placeholder]=&quot;placeholder&quot;         name=&quot;dpToDate&quot;         [value]=&quot;formatter.format(toDate)&quot;         (input)=&quot;toDate = validateInput(toDate, dpToDate.value)&quot;       /&gt;" />
                <x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&lt;button class=&quot;btn btn-outline-secondary&quot; (click)=&quot;datepicker.toggle()&quot; type=&quot;button&quot;&gt;" />
                <x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;i-bs width=&quot;1.2em&quot; height=&quot;1.2em&quot; name=&quot;calendar3&quot;&gt;" />
                <x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;/i-bs&gt;" />
                <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
-               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;col-12&quot;&gt;" />
-               <x id="START_TAG_SELECT" ctype="x-select" equiv-text="&lt;select class=&quot;form-select&quot; (change)=&quot;setDateRange($event)&quot;&gt;" />
-               <x id="START_TAG_OPTION" ctype="x-option" equiv-text="&lt;option value=&quot;today&quot;&gt;" />
-               Today
-               <x id="CLOSE_TAG_OPTION" ctype="x-option" equiv-text="&lt;/option&gt;" />
-               <x id="START_TAG_OPTION_1" ctype="x-option_1" equiv-text="&lt;option value=&quot;week&quot;&gt;" />
-               Week
-               <x id="CLOSE_TAG_OPTION" ctype="x-option" equiv-text="&lt;/option&gt;" />
-               <x id="START_TAG_OPTION_2" ctype="x-option_2" equiv-text="&lt;option value=&quot;month&quot;&gt;" />
-               Month
-               <x id="CLOSE_TAG_OPTION" ctype="x-option" equiv-text="&lt;/option&gt;" />
-               <x id="CLOSE_TAG_SELECT" ctype="x-select" equiv-text="&lt;/select&gt;" />
-               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
-               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;col-12&quot;&gt;" />
-               <x id="START_TAG_BUTTON_1" ctype="x-button_1" equiv-text="&lt;button type=&quot;button&quot; class=&quot;btn btn-outline-primary&quot; (click)=&quot;this.confirmButton.emit()&quot; &gt;" />
-               Confirm
+               <x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&lt;div class=&quot;col-12 d-flex flex-wrap gap-2 mt-1 mb-1&quot;&gt;" />
+               <x id="START_TAG_BUTTON_1" ctype="x-button_1" equiv-text="&lt;button class=&quot;btn btn-sm btn-outline-primary mt-1&quot; (click)=&quot;getThisWeek()&quot;&gt;" />
+               This week
+               <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;" />
+               <x id="START_TAG_BUTTON_2" ctype="x-button_2" equiv-text="&lt;button class=&quot;btn btn-sm btn-outline-primary mt-1&quot; (click)=&quot;getThisMonth()&quot;&gt;" />
+               This month
+               <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;" />
+               <x id="START_TAG_BUTTON_3" ctype="x-button_3" equiv-text="&lt;button class=&quot;btn btn-sm btn-outline-primary mt-1&quot; (click)=&quot;getThisYear()&quot;&gt;" />
+               This year
                <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/input/datepicker-range/datepicker-range.component.html</context>
-               <context context-type="linenumber">2,71</context>
+               <context context-type="linenumber">5,71</context>
             </context-group>
             <target state="translated">
-               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&amp;lt;div class=&amp;quot;col-12&amp;quot;&gt;" />
+               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&amp;lt;div class=&amp;quot;col-12 mt-1 mb-1&amp;quot; &gt;" />
                <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&amp;lt;div class=&amp;quot;dp-hidden position-absolute&amp;quot;&gt;" />
                <x id="START_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;div class=&amp;quot;input-group&amp;quot;&gt;" />
-               <x id="TAG_INPUT" ctype="x-input" equiv-text="&amp;lt;input           name=&amp;quot;datepicker&amp;quot;           class=&amp;quot;form-control&amp;quot;           ngbDatepicker           #datepicker=&amp;quot;ngbDatepicker&amp;quot;           [autoClose]=&amp;quot;'outside'&amp;quot;           (dateSelect)=&amp;quot;onDateSelection($event)&amp;quot;           [displayMonths]=&amp;quot;2&amp;quot;           [dayTemplate]=&amp;quot;t&amp;quot;           outsideDays=&amp;quot;hidden&amp;quot;           [startDate]=&amp;quot;fromDate!&amp;quot;           tabindex=&amp;quot;-1&amp;quot;         /&gt;" />
+               <x id="TAG_INPUT" ctype="x-input" equiv-text="&amp;lt;input           name=&amp;quot;datepicker&amp;quot;           class=&amp;quot;form-control&amp;quot;           ngbDatepicker           #datepicker=&amp;quot;ngbDatepicker&amp;quot;           [autoClose]=&amp;quot;'outside'&amp;quot;           (dateSelect)=&amp;quot;onDateRangeSelection($event)&amp;quot;           [displayMonths]=&amp;quot;2&amp;quot;           [dayTemplate]=&amp;quot;t&amp;quot;           [minDate]=&amp;quot;minDate&amp;quot;           [maxDate]=&amp;quot;maxDate&amp;quot;           outsideDays=&amp;quot;hidden&amp;quot;           [startDate]=&amp;quot;fromDate!&amp;quot;           tabindex=&amp;quot;-1&amp;quot;         /&gt;" />
                <x id="START_TAG_NG_TEMPLATE" ctype="x-ng_template" equiv-text="&amp;lt;ng-template #t let-date let-focused=&amp;quot;focused&amp;quot;&gt;" />
                <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;span             class=&amp;quot;custom-day&amp;quot;             [class.focused]=&amp;quot;focused&amp;quot;             [class.range]=&amp;quot;isRange(date)&amp;quot;             [class.faded]=&amp;quot;isHovered(date) || isInside(date)&amp;quot;             (mouseenter)=&amp;quot;hoveredDate = date&amp;quot;             (mouseleave)=&amp;quot;hoveredDate = null&amp;quot;           &gt;" />
                <x id="INTERPOLATION" equiv-text="{{ date.day }}" />
@@ -6314,38 +6341,31 @@
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
                <x id="START_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;div class=&amp;quot;input-group&amp;quot;&gt;" />
-               <x id="TAG_INPUT_1" ctype="x-input_1" equiv-text="&amp;lt;input         #dpFromDate         class=&amp;quot;form-control&amp;quot;         placeholder=&amp;quot;yyyy-mm-dd&amp;quot;         name=&amp;quot;dpFromDate&amp;quot;         [value]=&amp;quot;formatter.format(fromDate)&amp;quot;         (input)=&amp;quot;fromDate = validateInput(fromDate, dpFromDate.value)&amp;quot;       /&gt;" />
+               <x id="TAG_INPUT_1" ctype="x-input_1" equiv-text="&amp;lt;input         #dpFromDate         class=&amp;quot;form-control&amp;quot;         [placeholder]=&amp;quot;placeholder&amp;quot;         name=&amp;quot;dpFromDate&amp;quot;         [value]=&amp;quot;formatter.format(fromDate)&amp;quot;         (input)=&amp;quot;fromDate = validateInput(fromDate, dpFromDate.value)&amp;quot;       /&gt;" />
                <x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;button class=&amp;quot;btn btn-outline-secondary&amp;quot; (click)=&amp;quot;datepicker.toggle()&amp;quot; type=&amp;quot;button&amp;quot;&gt;" />
                <x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&amp;lt;i-bs width=&amp;quot;1.2em&amp;quot; height=&amp;quot;1.2em&amp;quot; name=&amp;quot;calendar3&amp;quot;&gt;" />
                <x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&amp;lt;/i-bs&gt;" />
                <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;/button&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
-               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&amp;lt;div class=&amp;quot;col-12&amp;quot;&gt;" />
+               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&amp;lt;div class=&amp;quot;col-12 mt-1 mb-1&amp;quot; &gt;" />
                <x id="START_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;div class=&amp;quot;input-group&amp;quot;&gt;" />
-               <x id="TAG_INPUT_2" ctype="x-input_2" equiv-text="&amp;lt;input         #dpToDate         class=&amp;quot;form-control&amp;quot;         placeholder=&amp;quot;yyyy-mm-dd&amp;quot;         name=&amp;quot;dpToDate&amp;quot;         [value]=&amp;quot;formatter.format(toDate)&amp;quot;         (input)=&amp;quot;toDate = validateInput(toDate, dpToDate.value)&amp;quot;       /&gt;" />
+               <x id="TAG_INPUT_2" ctype="x-input_2" equiv-text="&amp;lt;input         #dpToDate         class=&amp;quot;form-control&amp;quot;         [placeholder]=&amp;quot;placeholder&amp;quot;         name=&amp;quot;dpToDate&amp;quot;         [value]=&amp;quot;formatter.format(toDate)&amp;quot;         (input)=&amp;quot;toDate = validateInput(toDate, dpToDate.value)&amp;quot;       /&gt;" />
                <x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;button class=&amp;quot;btn btn-outline-secondary&amp;quot; (click)=&amp;quot;datepicker.toggle()&amp;quot; type=&amp;quot;button&amp;quot;&gt;" />
                <x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&amp;lt;i-bs width=&amp;quot;1.2em&amp;quot; height=&amp;quot;1.2em&amp;quot; name=&amp;quot;calendar3&amp;quot;&gt;" />
                <x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&amp;lt;/i-bs&gt;" />
                <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;/button&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
-               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&amp;lt;div class=&amp;quot;col-12&amp;quot;&gt;" />
-               <x id="START_TAG_SELECT" ctype="x-select" equiv-text="&amp;lt;select class=&amp;quot;form-select&amp;quot; (change)=&amp;quot;setDateRange($event)&amp;quot;&gt;" />
-               <x id="START_TAG_OPTION" ctype="x-option" equiv-text="&amp;lt;option value=&amp;quot;today&amp;quot;&gt;" />
-               Hôm nay
-               <x id="CLOSE_TAG_OPTION" ctype="x-option" equiv-text="&amp;lt;/option&gt;" />
-               <x id="START_TAG_OPTION_1" ctype="x-option_1" equiv-text="&amp;lt;option value=&amp;quot;week&amp;quot;&gt;" />
+               <x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&amp;lt;div class=&amp;quot;col-12 d-flex flex-wrap gap-2 mt-1 mb-1&amp;quot;&gt;" />
+               <x id="START_TAG_BUTTON_1" ctype="x-button_1" equiv-text="&amp;lt;button class=&amp;quot;btn btn-sm btn-outline-primary mt-1&amp;quot; (click)=&amp;quot;getThisWeek()&amp;quot;&gt;" />
                Tuần này
-               <x id="CLOSE_TAG_OPTION" ctype="x-option" equiv-text="&amp;lt;/option&gt;" />
-               <x id="START_TAG_OPTION_2" ctype="x-option_2" equiv-text="&amp;lt;option value=&amp;quot;month&amp;quot;&gt;" />
+               <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;/button&gt;" />
+               <x id="START_TAG_BUTTON_2" ctype="x-button_2" equiv-text="&amp;lt;button class=&amp;quot;btn btn-sm btn-outline-primary mt-1&amp;quot; (click)=&amp;quot;getThisMonth()&amp;quot;&gt;" />
                Tháng này
-               <x id="CLOSE_TAG_OPTION" ctype="x-option" equiv-text="&amp;lt;/option&gt;" />
-               <x id="CLOSE_TAG_SELECT" ctype="x-select" equiv-text="&amp;lt;/select&gt;" />
-               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
-               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&amp;lt;div class=&amp;quot;col-12&amp;quot;&gt;" />
-               <x id="START_TAG_BUTTON_1" ctype="x-button_1" equiv-text="&amp;lt;button type=&amp;quot;button&amp;quot; class=&amp;quot;btn btn-outline-primary&amp;quot; (click)=&amp;quot;this.confirmButton.emit()&amp;quot; &gt;" />
-               Xác nhận
+               <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;/button&gt;" />
+               <x id="START_TAG_BUTTON_3" ctype="x-button_3" equiv-text="&amp;lt;button class=&amp;quot;btn btn-sm btn-outline-primary mt-1&amp;quot; (click)=&amp;quot;getThisYear()&amp;quot;&gt;" />
+               Năm này
                <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;/button&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
             </target>
@@ -7221,59 +7241,101 @@
             </context-group>
             <target state="translated">Thống kê</target>
          </trans-unit>
-         <trans-unit id="9094662485818616570" datatype="html">
+         <trans-unit id="1644841792033076611" datatype="html">
             <source>
-               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;list-group border-light&quot; &gt;" />
-               <x id="START_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;h5 class=&quot;mt-2 mb-2&quot;&gt;" />
+               <x id="START_TAG_DIV_5" ctype="x-div_5" equiv-text="&lt;div class=&quot;list-group border-light&quot;&gt;" />
+               <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div class=&quot;d-flex flex-wrap gap-2 mt-1 mb-1&quot;&gt;" />
+               <x id="START_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;h5 class=&quot;mt-2 mb-2 &quot;&gt;" />
                Uploaded Document Statistics
                <x id="CLOSE_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;/h5&gt;" />
-               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;m-2&quot;&gt;" />
-               <x id="START_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&lt;pngx-input-datepicker-range class=&quot;mb-2 mb-sm-0 &quot;                                      (dateRangeChange)=&quot;onDateRangeChange($event)&quot; (confirmButton)=&quot;confirmButton()&quot;&gt;" />
+               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;&quot;&gt;" />
+               <x id="START_TAG_SELECT" ctype="x-select" equiv-text="&lt;select class=&quot;form-select &quot; (change)=&quot;customDateEnable=!customDateEnable&quot;&gt;" />
+               <x id="START_TAG_OPTION" ctype="x-option" equiv-text="&lt;option value=&quot;day&quot;&gt;" />
+               Day
+               <x id="CLOSE_TAG_OPTION" ctype="x-option" equiv-text="&lt;/option&gt;" />
+               <x id="START_TAG_OPTION_1" ctype="x-option_1" equiv-text="&lt;option value=&quot;week&quot;&gt;" />
+               Custom day
+               <x id="CLOSE_TAG_OPTION" ctype="x-option" equiv-text="&lt;/option&gt;" />
+               <x id="CLOSE_TAG_SELECT" ctype="x-select" equiv-text="&lt;/select&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;mt-2 mb-2&quot;&gt;" />
+               <x id="START_TAG_PNGX_INPUT_DATE_CUSTOM" ctype="x-pngx_input_date_custom" equiv-text="&lt;pngx-input-date-custom i18n-title title=&quot;&quot; [model]=&quot;innitDate&quot; [hidden]=&quot;!customDateEnable&quot;                                 (dateSelection)=&quot;onDateSelection($event)&quot;&gt;" />
+               <x id="CLOSE_TAG_PNGX_INPUT_DATE_CUSTOM" ctype="x-pngx_input_date_custom" equiv-text="&lt;/pngx-input-date-custom&gt;" />
+               <x id="START_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&lt;pngx-input-datepicker-range [hidden]=&quot;customDateEnable&quot; class=&quot;mb-2 mb-sm-0 &quot;                                      (dateRangeChange)=&quot;onDateRangeChange($event)&quot;                                      (confirmButton)=&quot;confirmButton()&quot;&gt;" />
                <x id="CLOSE_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&lt;/pngx-input-datepicker-range&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
-               <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div class=&quot;&quot;&gt;" />
+               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;&quot;&gt;" />
                <x id="START_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;canvas id=&quot;DocumentChart&quot;&gt;" />
                <x id="INTERPOLATION" equiv-text="{{ chart }}" />
                <x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;/canvas&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
                <x id="HORIZONTAL_RULE" ctype="x-hr" equiv-text="&lt;hr /&gt;" />
-               <x id="START_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;h5 class=&quot;mt-2 mb-2&quot;&gt;" />
-               Top Document Types with the Largest Number of Documents
+               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;&quot;&gt;" />
+               <x id="START_HEADING_LEVEL5_1" equiv-text="&lt;h5 class=&quot;mt-2 mb-2 text-center&quot;&gt;" />
+               Top Document Types/Tags with the Largest Number of Documents
                <x id="CLOSE_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;/h5&gt;" />
-               <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div class=&quot;&quot;&gt;" />
+               <x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&lt;div class=&quot;row&quot;&gt;" />
+               <x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&lt;div class=&quot;col-md-6&quot;&gt;" />
                <x id="START_TAG_CANVAS_1" ctype="x-canvas_1" equiv-text="&lt;canvas id=&quot;DocumentTypePieChart&quot;&gt;" />
-               <x id="INTERPOLATION" equiv-text="{{ chart }}" />
                <x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;/canvas&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+               <x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&lt;div class=&quot;col-md-6&quot;&gt;" />
+               <x id="START_TAG_CANVAS_2" ctype="x-canvas_2" equiv-text="&lt;canvas id=&quot;TagsPieChart&quot;&gt;" />
+               <x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;/canvas&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
                <x id="HORIZONTAL_RULE" ctype="x-hr" equiv-text="&lt;hr /&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.html</context>
-               <context context-type="linenumber">3,82</context>
+               <context context-type="linenumber">3,103</context>
             </context-group>
             <target state="translated">
-               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&amp;lt;div class=&amp;quot;list-group border-light&amp;quot; &gt;" />
-               <x id="START_HEADING_LEVEL5" ctype="x-h5" equiv-text="&amp;lt;h5 class=&amp;quot;mt-2 mb-2&amp;quot;&gt;" />
+               <x id="START_TAG_DIV_5" ctype="x-div_5" equiv-text="&amp;lt;div class=&amp;quot;list-group border-light&amp;quot;&gt;" />
+               <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&amp;lt;div class=&amp;quot;d-flex flex-wrap gap-2 mt-1 mb-1&amp;quot;&gt;" />
+               <x id="START_HEADING_LEVEL5" ctype="x-h5" equiv-text="&amp;lt;h5 class=&amp;quot;mt-2 mb-2 &amp;quot;&gt;" />
                Thống kê tài liệu đã tải lên
                <x id="CLOSE_HEADING_LEVEL5" ctype="x-h5" equiv-text="&amp;lt;/h5&gt;" />
-               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;div class=&amp;quot;m-2&amp;quot;&gt;" />
-               <x id="START_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&amp;lt;pngx-input-datepicker-range class=&amp;quot;mb-2 mb-sm-0 &amp;quot;                                      (dateRangeChange)=&amp;quot;onDateRangeChange($event)&amp;quot; (confirmButton)=&amp;quot;confirmButton()&amp;quot;&gt;" />
+               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;div class=&amp;quot;&amp;quot;&gt;" />
+               <x id="START_TAG_SELECT" ctype="x-select" equiv-text="&amp;lt;select class=&amp;quot;form-select &amp;quot; (change)=&amp;quot;customDateEnable=!customDateEnable&amp;quot;&gt;" />
+               <x id="START_TAG_OPTION" ctype="x-option" equiv-text="&amp;lt;option value=&amp;quot;day&amp;quot;&gt;" />
+               Ngày
+               <x id="CLOSE_TAG_OPTION" ctype="x-option" equiv-text="&amp;lt;/option&gt;" />
+               <x id="START_TAG_OPTION_1" ctype="x-option_1" equiv-text="&amp;lt;option value=&amp;quot;week&amp;quot;&gt;" />
+               Ngày tùy chỉnh
+               <x id="CLOSE_TAG_OPTION" ctype="x-option" equiv-text="&amp;lt;/option&gt;" />
+               <x id="CLOSE_TAG_SELECT" ctype="x-select" equiv-text="&amp;lt;/select&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&amp;lt;div class=&amp;quot;mt-2 mb-2&amp;quot;&gt;" />
+               <x id="START_TAG_PNGX_INPUT_DATE_CUSTOM" ctype="x-pngx_input_date_custom" equiv-text="&amp;lt;pngx-input-date-custom i18n-title title=&amp;quot;&amp;quot; [model]=&amp;quot;innitDate&amp;quot; [hidden]=&amp;quot;!customDateEnable&amp;quot;                                 (dateSelection)=&amp;quot;onDateSelection($event)&amp;quot;&gt;" />
+               <x id="CLOSE_TAG_PNGX_INPUT_DATE_CUSTOM" ctype="x-pngx_input_date_custom" equiv-text="&amp;lt;/pngx-input-date-custom&gt;" />
+               <x id="START_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&amp;lt;pngx-input-datepicker-range [hidden]=&amp;quot;customDateEnable&amp;quot; class=&amp;quot;mb-2 mb-sm-0 &amp;quot;                                      (dateRangeChange)=&amp;quot;onDateRangeChange($event)&amp;quot;                                      (confirmButton)=&amp;quot;confirmButton()&amp;quot;&gt;" />
                <x id="CLOSE_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&amp;lt;/pngx-input-datepicker-range&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
-               <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&amp;lt;div class=&amp;quot;&amp;quot;&gt;" />
+               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;div class=&amp;quot;&amp;quot;&gt;" />
                <x id="START_TAG_CANVAS" ctype="x-canvas" equiv-text="&amp;lt;canvas id=&amp;quot;DocumentChart&amp;quot;&gt;" />
                <x id="INTERPOLATION" equiv-text="{{ chart }}" />
                <x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&amp;lt;/canvas&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
                <x id="HORIZONTAL_RULE" ctype="x-hr" equiv-text="&amp;lt;hr /&gt;" />
-               <x id="START_HEADING_LEVEL5" ctype="x-h5" equiv-text="&amp;lt;h5 class=&amp;quot;mt-2 mb-2&amp;quot;&gt;" />
-               Loại tài liệu có lượng tài liệu nhiều nhất
+               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;div class=&amp;quot;&amp;quot;&gt;" />
+               <x id="START_HEADING_LEVEL5_1" equiv-text="&amp;lt;h5 class=&amp;quot;mt-2 mb-2 text-center&amp;quot;&gt;" />
+               Loại tài liệu và Thẻ hàng đầu có số lượng tài liệu lớn nhất
                <x id="CLOSE_HEADING_LEVEL5" ctype="x-h5" equiv-text="&amp;lt;/h5&gt;" />
-               <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&amp;lt;div class=&amp;quot;&amp;quot;&gt;" />
+               <x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&amp;lt;div class=&amp;quot;row&amp;quot;&gt;" />
+               <x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&amp;lt;div class=&amp;quot;col-md-6&amp;quot;&gt;" />
                <x id="START_TAG_CANVAS_1" ctype="x-canvas_1" equiv-text="&amp;lt;canvas id=&amp;quot;DocumentTypePieChart&amp;quot;&gt;" />
-               <x id="INTERPOLATION" equiv-text="{{ chart }}" />
                <x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&amp;lt;/canvas&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+               <x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&amp;lt;div class=&amp;quot;col-md-6&amp;quot;&gt;" />
+               <x id="START_TAG_CANVAS_2" ctype="x-canvas_2" equiv-text="&amp;lt;canvas id=&amp;quot;TagsPieChart&amp;quot;&gt;" />
+               <x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&amp;lt;/canvas&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
                <x id="HORIZONTAL_RULE" ctype="x-hr" equiv-text="&amp;lt;hr /&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
@@ -7283,9 +7345,9 @@
             <source>Document Type</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
-               <context context-type="linenumber">89</context>
+               <context context-type="linenumber">101</context>
             </context-group>
-            <target state="needs-translation">Loại tài liệu</target>
+            <target state="translated">Loại tài liệu</target>
          </trans-unit>
          <trans-unit id="2028517964701399614" datatype="html">
             <source>Go to inbox</source>
@@ -7327,13 +7389,157 @@
             </context-group>
             <target state="translated">Tổng kí tự</target>
          </trans-unit>
+         <trans-unit id="2470690291316891440" datatype="html">
+            <source>
+               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;progress flex-grow-1&quot;&gt;" />
+               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div                   class=&quot;progress-bar bg-primary&quot;                   role=&quot;progressbar&quot;                   [ngbPopover]=&quot;translateText('Tagged tags')&quot;                   i18n-ngbPopover                   triggers=&quot;mouseenter:mouseleave&quot;                   [attr.aria-label]=&quot;translateText('Tagged tags')&quot;                   [class.me-1px]=&quot;!0&quot;                   [style.width]=&quot;100-(statistics.untagged_tags_count/statistics.tag_count)*100 + '%'&quot;                   [style.opacity]=&quot;getItemOpacity(0)&quot;                   [attr.aria-valuenow]=&quot;statistics.tag_count-statistics.untagged_tags_count&quot;                   aria-valuemin=&quot;0&quot;                   aria-valuemax=&quot;100&quot;&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+               <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div                   class=&quot;progress-bar bg-primary&quot;                   role=&quot;progressbar&quot;                   [ngbPopover]=&quot;translateText('Untagged tags')&quot;                   i18n-ngbPopover                   triggers=&quot;mouseenter:mouseleave&quot;                   [attr.aria-label]=&quot;translateText('Untagged tags')&quot;                   [class.me-1px]=&quot;!1&quot;                   [style.width]=&quot;(statistics.untagged_tags_count/statistics.tag_count)*100+ '%'&quot;                   [style.opacity]=&quot;getItemOpacity(1)&quot;                   [attr.aria-valuenow]=&quot;statistics.untagged_tags_count&quot;                   aria-valuemin=&quot;0&quot;                   aria-valuemax=&quot;100&quot;&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+            </source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+               <context context-type="linenumber">63,93</context>
+            </context-group>
+            <target state="translated">
+               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&amp;lt;div class=&amp;quot;progress flex-grow-1&amp;quot;&gt;" />
+               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;div                   class=&amp;quot;progress-bar bg-primary&amp;quot;                   role=&amp;quot;progressbar&amp;quot;                   [ngbPopover]=&amp;quot;translateText('Thẻ đã gán')&amp;quot;                   i18n-ngbPopover                   triggers=&amp;quot;mouseenter:mouseleave&amp;quot;                   [attr.aria-label]=&amp;quot;translateText('Thẻ đã gán')&amp;quot;                   [class.me-1px]=&amp;quot;!0&amp;quot;                   [style.width]=&amp;quot;100-(statistics.untagged_tags_count/statistics.tag_count)*100 + '%'&amp;quot;                   [style.opacity]=&amp;quot;getItemOpacity(0)&amp;quot;                   [attr.aria-valuenow]=&amp;quot;statistics.tag_count-statistics.untagged_tags_count&amp;quot;                   aria-valuemin=&amp;quot;0&amp;quot;                   aria-valuemax=&amp;quot;100&amp;quot;&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+               <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&amp;lt;div                   class=&amp;quot;progress-bar bg-primary&amp;quot;                   role=&amp;quot;progressbar&amp;quot;                   [ngbPopover]=&amp;quot;translateText('Thẻ chưa gán')&amp;quot;                   i18n-ngbPopover                   triggers=&amp;quot;mouseenter:mouseleave&amp;quot;                   [attr.aria-label]=&amp;quot;translateText('Thẻ chưa gán')&amp;quot;                   [class.me-1px]=&amp;quot;!1&amp;quot;                   [style.width]=&amp;quot;(statistics.untagged_tags_count/statistics.tag_count)*100+ '%'&amp;quot;                   [style.opacity]=&amp;quot;getItemOpacity(1)&amp;quot;                   [attr.aria-valuenow]=&amp;quot;statistics.untagged_tags_count&amp;quot;                   aria-valuemin=&amp;quot;0&amp;quot;                   aria-valuemax=&amp;quot;100&amp;quot;&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+            </target>
+         </trans-unit>
+         <trans-unit id="2158696772202789736" datatype="html">
+            <source>Tagged tags</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+               <context context-type="linenumber">100</context>
+            </context-group>
+            <target state="translated">Thẻ đã gán</target>
+         </trans-unit>
+         <trans-unit id="6571816214672638255" datatype="html">
+            <source>Untagged tags</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+               <context context-type="linenumber">106</context>
+            </context-group>
+            <target state="translated">Thẻ chưa gán</target>
+         </trans-unit>
+         <trans-unit id="6887606175573586232" datatype="html">
+            <source>
+               <x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&lt;div class=&quot;d-flex justify-content-between align-items-center my-2&quot;&gt;" />
+               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;progress flex-grow-1&quot;&gt;" />
+               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div                   class=&quot;progress-bar bg-primary&quot;                   role=&quot;progressbar&quot;                   [ngbPopover]=&quot;translateText('Assigned document type')&quot;                   i18n-ngbPopover                   triggers=&quot;mouseenter:mouseleave&quot;                   [attr.aria-label]=&quot;translateText('Assigned document type')&quot;                   [class.me-1px]=&quot;!0&quot;                   [style.width]=&quot;100-(statistics?.unassigned_document_types_count/statistics?.document_type_count)*100 + '%'&quot;                   [style.opacity]=&quot;getItemOpacity(0)&quot;                   [attr.aria-valuenow]=&quot;statistics?.document_type_count-statistics?.unassigned_document_types_count&quot;                   aria-valuemin=&quot;0&quot;                   aria-valuemax=&quot;100&quot;&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+               <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div                   class=&quot;progress-bar bg-primary&quot;                   role=&quot;progressbar&quot;                   [ngbPopover]=&quot;translateText('Unassigned document type')&quot;                   i18n-ngbPopover                   triggers=&quot;mouseenter:mouseleave&quot;                   [attr.aria-label]=&quot;translateText('Unassigned document type')&quot;                   [class.me-1px]=&quot;!1&quot;                   [style.width]=&quot;(statistics.unassigned_document_types_count/statistics.document_type_count)*100+ '%'&quot;                   [style.opacity]=&quot;getItemOpacity(1)&quot;                   [attr.aria-valuenow]=&quot;statistics.unassigned_document_types_count&quot;                   aria-valuemin=&quot;0&quot;                   aria-valuemax=&quot;100&quot;&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+               <x id="START_TAG_DIV_6" ctype="x-div_6" equiv-text="&lt;div class=&quot;d-flex flex-wrap align-items-start&quot; &gt;" />
+               <x id="START_TAG_DIV_5" ctype="x-div_5" equiv-text="&lt;div class=&quot;d-flex&quot;&gt;" />
+               <x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&lt;div class=&quot;text-nowrap me-2&quot;&gt;" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge rounded-pill bg-primary d-inline-block p-0 me-1&quot; [style.opacity]=&quot;getItemOpacity(0)&quot;&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
+               <x id="START_SMALL_TEXT" ctype="x-small" equiv-text="&lt;small class=&quot;text-nowrap&quot;&gt;" />
+               <x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span class=&quot;fw-bold&quot; &gt;" />
+               Assigned document type
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
+
+               <x id="START_TAG_SPAN_2" ctype="x-span_2" equiv-text="&lt;span class=&quot;text-muted&quot;&gt;" />
+               (
+               <x id="INTERPOLATION" equiv-text="{{100-(statistics.unassigned_document_types_count/statistics.document_type_count)*100 | number: '1.0-1'}}" />
+               %)
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
+               <x id="CLOSE_SMALL_TEXT" ctype="x-small" equiv-text="&lt;/small&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+               <x id="START_TAG_DIV_5" ctype="x-div_5" equiv-text="&lt;div class=&quot;d-flex&quot;&gt;" />
+               <x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&lt;div class=&quot;text-nowrap me-2&quot;&gt;" />
+               <x id="START_TAG_SPAN_3" ctype="x-span_3" equiv-text="&lt;span class=&quot;badge rounded-pill bg-primary d-inline-block p-0 me-1&quot; [style.opacity]=&quot;getItemOpacity(1)&quot;&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
+               <x id="START_SMALL_TEXT" ctype="x-small" equiv-text="&lt;small class=&quot;text-nowrap&quot;&gt;" />
+               <x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span class=&quot;fw-bold&quot; &gt;" />
+               Unassigned document type
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
+
+               <x id="START_TAG_SPAN_2" ctype="x-span_2" equiv-text="&lt;span class=&quot;text-muted&quot;&gt;" />
+               (
+               <x id="INTERPOLATION_1" equiv-text="{{(statistics.unassigned_document_types_count/statistics.document_type_count)*100 | number: '1.0-1'}}" />
+               %)
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
+               <x id="CLOSE_SMALL_TEXT" ctype="x-small" equiv-text="&lt;/small&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+            </source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+               <context context-type="linenumber">129,176</context>
+            </context-group>
+            <target state="translated">
+               <x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&amp;lt;div class=&amp;quot;d-flex justify-content-between align-items-center my-2&amp;quot;&gt;" />
+               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&amp;lt;div class=&amp;quot;progress flex-grow-1&amp;quot;&gt;" />
+               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;div                   class=&amp;quot;progress-bar bg-primary&amp;quot;                   role=&amp;quot;progressbar&amp;quot;                   [ngbPopover]=&amp;quot;translateText('Loại tài liệu đã gán')&amp;quot;                   i18n-ngbPopover                   triggers=&amp;quot;mouseenter:mouseleave&amp;quot;                   [attr.aria-label]=&amp;quot;translateText('Loại tài liệu đã gán')&amp;quot;                   [class.me-1px]=&amp;quot;!0&amp;quot;                   [style.width]=&amp;quot;100-(statistics?.unassigned_document_types_count/statistics?.document_type_count)*100 + '%'&amp;quot;                   [style.opacity]=&amp;quot;getItemOpacity(0)&amp;quot;                   [attr.aria-valuenow]=&amp;quot;statistics?.document_type_count-statistics?.unassigned_document_types_count&amp;quot;                   aria-valuemin=&amp;quot;0&amp;quot;                   aria-valuemax=&amp;quot;100&amp;quot;&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+               <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&amp;lt;div                   class=&amp;quot;progress-bar bg-primary&amp;quot;                   role=&amp;quot;progressbar&amp;quot;                   [ngbPopover]=&amp;quot;translateText('Loại tài liệu chưa gán')&amp;quot;                   i18n-ngbPopover                   triggers=&amp;quot;mouseenter:mouseleave&amp;quot;                   [attr.aria-label]=&amp;quot;translateText('Loại tài liệu chưa gán')&amp;quot;                   [class.me-1px]=&amp;quot;!1&amp;quot;                   [style.width]=&amp;quot;(statistics.unassigned_document_types_count/statistics.document_type_count)*100+ '%'&amp;quot;                   [style.opacity]=&amp;quot;getItemOpacity(1)&amp;quot;                   [attr.aria-valuenow]=&amp;quot;statistics.unassigned_document_types_count&amp;quot;                   aria-valuemin=&amp;quot;0&amp;quot;                   aria-valuemax=&amp;quot;100&amp;quot;&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+               <x id="START_TAG_DIV_6" ctype="x-div_6" equiv-text="&amp;lt;div class=&amp;quot;d-flex flex-wrap align-items-start&amp;quot; &gt;" />
+               <x id="START_TAG_DIV_5" ctype="x-div_5" equiv-text="&amp;lt;div class=&amp;quot;d-flex&amp;quot;&gt;" />
+               <x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&amp;lt;div class=&amp;quot;text-nowrap me-2&amp;quot;&gt;" />
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;span class=&amp;quot;badge rounded-pill bg-primary d-inline-block p-0 me-1&amp;quot; [style.opacity]=&amp;quot;getItemOpacity(0)&amp;quot;&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;/span&gt;" />
+               <x id="START_SMALL_TEXT" ctype="x-small" equiv-text="&amp;lt;small class=&amp;quot;text-nowrap&amp;quot;&gt;" />
+               <x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&amp;lt;span class=&amp;quot;fw-bold&amp;quot; &gt;" />
+               Loại tài liệu đã gán
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;/span&gt;" />
+               <x id="START_TAG_SPAN_2" ctype="x-span_2" equiv-text="&amp;lt;span class=&amp;quot;text-muted&amp;quot;&gt;" />
+               (
+               <x id="INTERPOLATION" equiv-text="{{100-(statistics.unassigned_document_types_count/statistics.document_type_count)*100 | number: '1.0-1'}}" />
+               %)
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;/span&gt;" />
+               <x id="CLOSE_SMALL_TEXT" ctype="x-small" equiv-text="&amp;lt;/small&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+               <x id="START_TAG_DIV_5" ctype="x-div_5" equiv-text="&amp;lt;div class=&amp;quot;d-flex&amp;quot;&gt;" />
+               <x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&amp;lt;div class=&amp;quot;text-nowrap me-2&amp;quot;&gt;" />
+               <x id="START_TAG_SPAN_3" ctype="x-span_3" equiv-text="&amp;lt;span class=&amp;quot;badge rounded-pill bg-primary d-inline-block p-0 me-1&amp;quot; [style.opacity]=&amp;quot;getItemOpacity(1)&amp;quot;&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;/span&gt;" />
+               <x id="START_SMALL_TEXT" ctype="x-small" equiv-text="&amp;lt;small class=&amp;quot;text-nowrap&amp;quot;&gt;" />
+               <x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&amp;lt;span class=&amp;quot;fw-bold&amp;quot; &gt;" />
+               Loại tài liệu chưa gán
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;/span&gt;" />
+               <x id="START_TAG_SPAN_2" ctype="x-span_2" equiv-text="&amp;lt;span class=&amp;quot;text-muted&amp;quot;&gt;" />
+               (
+               <x id="INTERPOLATION_1" equiv-text="{{(statistics.unassigned_document_types_count/statistics.document_type_count)*100 | number: '1.0-1'}}" />
+               %)
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;/span&gt;" />
+               <x id="CLOSE_SMALL_TEXT" ctype="x-small" equiv-text="&amp;lt;/small&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+            </target>
+         </trans-unit>
          <trans-unit id="8693603235657020323" datatype="html">
             <source>Other</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
-               <context context-type="linenumber">66</context>
+               <context context-type="linenumber">68</context>
             </context-group>
             <target state="translated">Khác</target>
+         </trans-unit>
+         <trans-unit id="4416290763660062288" datatype="html">
+            <source />
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
+               <context context-type="linenumber">96</context>
+            </context-group>
+            <target state="translated">
+               <source />
+            </target>
          </trans-unit>
          <trans-unit id="5321728948071221061" datatype="html">
             <source>
@@ -9078,7 +9284,7 @@
                <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
                <context context-type="linenumber">67</context>
             </context-group>
-            <target state="translated">Bật/tắt bộ lọc kho</target>
+            <target state="translated">Bật/Tắt bộ lọc kho</target>
          </trans-unit>
          <trans-unit id="5145213156408463657" datatype="html">
             <source>Select none</source>
@@ -9855,10 +10061,6 @@
                <context context-type="linenumber">135,136</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
-               <context context-type="linenumber">251,252</context>
-            </context-group>
-            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/shelf/shelf.component.html</context>
                <context context-type="linenumber">136,137</context>
             </context-group>
@@ -9866,7 +10068,7 @@
                <context context-type="sourcefile">src/app/components/manage/warehouse/warehouse.component.html</context>
                <context context-type="linenumber">136,137</context>
             </context-group>
-            <target state="translated">Lọc tài liệu</target>
+            <target state="translated">Tài liệu</target>
          </trans-unit>
          <trans-unit id="7565155156017938502" datatype="html">
             <source>Edit</source>
@@ -9913,6 +10115,10 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/boxcase/boxcase.component.html</context>
                <context context-type="linenumber">152,153</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
+               <context context-type="linenumber">251,252</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
@@ -10422,7 +10628,7 @@
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
                <context context-type="linenumber">82</context>
             </context-group>
-            <target state="translated">Lọc tài liệu</target>
+            <target state="translated">Tài liệu</target>
          </trans-unit>
          <trans-unit id="8384138406252790442" datatype="html">
             <source>Customize the data fields that can be attached to documents.</source>
@@ -11318,7 +11524,7 @@
                <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
                <context context-type="linenumber">75</context>
             </context-group>
-            <target state="translated">Bật/tắt Ocr</target>
+            <target state="translated">Bật/Tắt Ocr</target>
          </trans-unit>
          <trans-unit id="1313137480169642057" datatype="html">
             <source>Output Type</source>
@@ -11811,4 +12017,3 @@
       </body>
    </file>
 </xliff>
-1

@@ -1,9 +1,11 @@
 import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core'
-import { NgbCalendar, NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
+import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap'
 import { FormsModule } from '@angular/forms'
 import { JsonPipe } from '@angular/common'
 import { AbstractInputComponent } from '../abstract-input'
 import { end } from '@popperjs/core'
+import { SettingsService } from '../../../../services/settings.service'
+
 
 @Component({
   selector: 'pngx-input-datepicker-range',
@@ -14,57 +16,38 @@ export class DatepickerRangeComponent extends AbstractInputComponent<string>
   implements OnInit {
   calendar = inject(NgbCalendar)
   formatter = inject(NgbDateParserFormatter)
+  today = new Date()
+  tomorrow = new Date()
   @Output() dateRangeChange = new EventEmitter<{ fromDate: string | null, toDate: string | null }>()
   @Output() confirmButton = new EventEmitter()
 
-  selectDateRange: number = 1
-  hoveredDate: NgbDate | null = null
-  fromDate: NgbDate | null = this.calendar.getToday()
-  toDate: NgbDate | null = this.calendar.getNext(this.calendar.getToday(), 'd', 10)
+  protected hoveredDate: NgbDate | null = null
+  protected fromDate: NgbDate | null = this.calendar.getToday()
+  protected toDate: NgbDate | null = this.calendar.getNext(this.calendar.getToday(), 'd', 10)
+  protected minDate: NgbDateStruct
+  protected maxDate: NgbDateStruct
+  protected placeholder: string
 
-  ngOnInit() {
-    const today = new Date()
-    const tomorrow = new Date()
-    tomorrow.setDate(today.getDate() + 1)
-    this.fromDate = this.convertDateToNgbDate(today)
-    this.toDate = this.convertDateToNgbDate(today)
-    this.emitDateRangeChange()
+  constructor(private settings: SettingsService,) {
+    super()
   }
-
-  function
+  ngOnInit() {
+    this.minDate = { year: 1900, month: 1, day: 1 }
+    this.maxDate = { year: 2100, month: 12, day: 31 }
+    this.tomorrow.setDate(this.today.getDate() + 1)
+    this.fromDate = this.convertDateToNgbDate(this.today)
+    this.toDate = this.convertDateToNgbDate(this.today)
+    // this.emitDateRangeChange()
+    this.placeholder = this.settings.getLocalizedDateInputFormat()
+    super.ngOnInit()
+  }
 
   convertDateToNgbDate(date: Date): NgbDate {
     return new NgbDate(date.getFullYear(), date.getMonth() + 1, date.getDate())
   }
 
-  convertSelectToDate(value) {
-    const today = new Date()
-    const tomorrow = new Date()
-    tomorrow.setDate(today.getDate() + 1)
 
-    if (value == 'today') {
-      this.fromDate = this.convertDateToNgbDate(today)
-      this.toDate = this.convertDateToNgbDate(today)
-    } else if (value == 'week') {
-      const startOfWeek = new Date(today)
-      startOfWeek.setDate(today.getDate() - today.getDay() + 1)
-      this.fromDate = this.convertDateToNgbDate(startOfWeek)
-      const endOfWeek = new Date(startOfWeek)
-      endOfWeek.setDate(startOfWeek.getDate() + 6)
-      this.toDate = this.convertDateToNgbDate(endOfWeek)
-    } else if (value == 'month') {
-      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-      const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1)
-      const endOfMonth = new Date(startOfNextMonth)
-      endOfMonth.setDate(startOfNextMonth.getDate() - 1)
-      this.fromDate = this.convertDateToNgbDate(startOfMonth)
-      this.toDate = this.convertDateToNgbDate(endOfMonth)
-    }
-    this.emitDateRangeChange()
-  }
-
-
-  onDateSelection(date: NgbDate) {
+  onDateRangeSelection(date: NgbDate) {
     if (!this.fromDate && !this.toDate) {
       this.fromDate = date
     } else if (this.fromDate && !this.toDate && date && date.after(this.fromDate)) {
@@ -73,7 +56,6 @@ export class DatepickerRangeComponent extends AbstractInputComponent<string>
       this.toDate = null
       this.fromDate = date
     }
-    this.convertSelectToDate(this.selectDateRange)
     this.emitDateRangeChange()
   }
 
@@ -111,8 +93,36 @@ export class DatepickerRangeComponent extends AbstractInputComponent<string>
     return parsed && this.calendar.isValid(NgbDate.from(parsed)) ? NgbDate.from(parsed) : currentValue
   }
 
-  setDateRange(event: any) {
-    const value = event.target.value
-    this.convertSelectToDate(value)
+
+  getThisWeek() {
+    const startOfWeek = new Date(this.today)
+    startOfWeek.setDate(this.today.getDate() - this.today.getDay() + 1)
+    this.fromDate = this.convertDateToNgbDate(startOfWeek)
+    const endOfWeek = new Date(startOfWeek)
+    endOfWeek.setDate(startOfWeek.getDate() + 6)
+    this.toDate = this.convertDateToNgbDate(endOfWeek)
+    this.emitDateRangeChange()
   }
+
+  getThisMonth() {
+    const startOfMonth = new Date(this.today.getFullYear(), this.today.getMonth(), 1)
+    const startOfNextMonth = new Date(this.today.getFullYear(), this.today.getMonth() + 1, 1)
+    const endOfMonth = new Date(startOfNextMonth)
+    endOfMonth.setDate(startOfNextMonth.getDate() - 1)
+    this.fromDate = this.convertDateToNgbDate(startOfMonth)
+    this.toDate = this.convertDateToNgbDate(endOfMonth)
+    this.emitDateRangeChange()
+  }
+
+  getThisYear() {
+    const startOfYear = new Date(this.today.getFullYear(), 0, 1) // Ngày 1 tháng 1 của năm hiện tại
+    const startOfNextYear = new Date(this.today.getFullYear() + 1, 0, 1) // Ngày 1 tháng 1 của năm tiếp theo
+    const endOfYear = new Date(startOfNextYear)
+    endOfYear.setDate(startOfNextYear.getDate() - 1) // Ngày cuối cùng của năm hiện tại
+
+    this.fromDate = this.convertDateToNgbDate(startOfYear)
+    this.toDate = this.convertDateToNgbDate(endOfYear)
+    this.emitDateRangeChange()
+  }
+
 }
