@@ -991,23 +991,18 @@ def run_workflows(
                         f"Error occurred parsing webhook headers: {e}",
                         extra={"group": logging_group},
                     )
+            files = None
             if action.webhook.include_document:
                 with open(document.source_path, "rb") as f:
                     files = {
                         "file": (document.original_filename, f, document.mime_type),
                     }
-                    httpx.post(
-                        action.webhook.url,
-                        data=data,
-                        files=files,
-                        headers=headers,
-                    )
-            else:
-                httpx.post(
-                    action.webhook.url,
-                    data=data,
-                    headers=headers,
-                )
+            httpx.post(
+                action.webhook.url,
+                data=data,
+                files=files,
+                headers=headers,
+            ).raise_for_status()
         except Exception as e:
             logger.exception(
                 f"Error occurred sending webhook: {e}",
