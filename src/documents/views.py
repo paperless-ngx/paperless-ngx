@@ -9,7 +9,7 @@ import tempfile
 import time
 import urllib
 import zipfile
-from datetime import datetime
+from datetime import datetime, timedelta
 from logging import Logger
 from pathlib import Path
 from time import mktime
@@ -77,6 +77,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.viewsets import ViewSet
+from torch.onnx.symbolic_opset9 import to
 
 from documents import bulk_edit
 from documents import index
@@ -1484,6 +1485,8 @@ class StatisticsCustomView(APIView):
             timezone = pytz.UTC
             from_date = timezone.localize(datetime.strptime(from_date, '%Y-%m-%d'))
             to_date = timezone.localize(datetime.strptime(to_date, '%Y-%m-%d'))
+            to_date = to_date + timedelta(hours=23, minutes=59, seconds=59,
+                                          microseconds=999999)
             documents_count_by_day = documents.filter(
                 created__range=(from_date, to_date)).annotate(
                 created_date=TruncDate('created')).values(
