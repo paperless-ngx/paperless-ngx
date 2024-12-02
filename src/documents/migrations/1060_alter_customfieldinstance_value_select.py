@@ -63,7 +63,7 @@ def reverse_migrate_customfield_selects(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "1058_workflowtrigger_schedule_date_custom_field_and_more"),
+        ("documents", "1059_workflowactionemail_workflowactionwebhook_and_more"),
     ]
 
     operations = [
