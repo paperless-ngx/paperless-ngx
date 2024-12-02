@@ -1,4 +1,4 @@
-<div class="card mb-3 shadow-sm bg-light" [class.card-selected]="selected" [class.document-card]="selectable" [class.popover-hidden]="popoverHidden" (mouseleave)="mouseLeaveCard()">
+<div class="card mb-3 shadow-sm bg-light" [class.card-selected]="selected" [class.document-card]="selectable" (mouseleave)="mouseLeaveCard()">
   <div class="row g-0">
     <div class="col-md-2 doc-img-container rounded-start" (click)="this.toggleSelected.emit($event)" (dblclick)="dblClickDocument.emit()">
       <img [src]="getThumbUrl()" class="card-img doc-img border-end rounded-start" [class.inverted]="getIsThumbInverted()">
@@ -54,16 +54,11 @@
               <i-bs name="diagram-3"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>More like this</span>
             </a>
             <a routerLink="/documents/{{document.id}}" class="btn btn-sm btn-outline-secondary" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-              <i-bs name="box-arrow-in-right"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Open</span>
+              <i-bs name="file-earmark-richtext"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Open</span>
             </a>
-            <a class="btn btn-sm btn-outline-secondary" target="_blank" [href]="previewUrl"
-              [ngbPopover]="previewContent" [popoverTitle]="document.title | documentTitle"
-              autoClose="true" popoverClass="shadow popover-preview" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
+            <pngx-preview-popup [document]="document" #popupPreview>
               <i-bs name="eye"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>View</span>
-            </a>
-            <ng-template #previewContent>
-              <pngx-preview-popup [document]="document"></pngx-preview-popup>
-            </ng-template>
+            </pngx-preview-popup>
             <a class="btn btn-sm btn-outline-secondary" [href]="getDownloadUrl()">
               <i-bs name="download"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Download</span>
               </a>

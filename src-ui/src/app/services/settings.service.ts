@@ -17,7 +17,12 @@ import {
   hexToHsl,
 } from 'src/app/utils/color'
 import { environment } from 'src/environments/environment'
-import { UiSettings, SETTINGS, SETTINGS_KEYS } from '../data/ui-settings'
+import {
+  UiSettings,
+  SETTINGS,
+  SETTINGS_KEYS,
+  PAPERLESS_GREEN_HEX,
+} from '../data/ui-settings'
 import { User } from '../data/user'
 import {
   PermissionAction,
@@ -420,7 +425,7 @@ export class SettingsService {
       )
     }
 
-    if (themeColor) {
+    if (themeColor?.length) {
       const hsl = hexToHsl(themeColor)
       const bgBrightnessEstimate = estimateBrightnessForColor(themeColor)
 
@@ -445,6 +450,11 @@ export class SettingsService {
       document.documentElement.style.removeProperty('--pngx-primary')
       document.documentElement.style.removeProperty('--pngx-primary-lightness')
     }
+
+    this.meta.updateTag({
+      name: 'theme-color',
+      content: themeColor?.length ? themeColor : PAPERLESS_GREEN_HEX,
+    })
   }
 
   getLanguageOptions(): LanguageOption[] {

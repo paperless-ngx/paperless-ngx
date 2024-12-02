@@ -5,6 +5,7 @@ import celery
 from django.test import TestCase
 
 from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.models import PaperlessTask
 from documents.signals.handlers import before_task_publish_handler
@@ -48,7 +49,10 @@ class TestTaskSignalHandler(DirectoriesMixin, TestCase):
                     source=DocumentSource.ConsumeFolder,
                     original_file="/consume/hello-999.pdf",
                 ),
-                None,
+                DocumentMetadataOverrides(
+                    title="Hello world",
+                    owner_id=1,
+                ),
             ),
             # kwargs
             {},
@@ -65,6 +69,7 @@ class TestTaskSignalHandler(DirectoriesMixin, TestCase):
         self.assertEqual(headers["id"], task.task_id)
         self.assertEqual("hello-999.pdf", task.task_file_name)
         self.assertEqual("documents.tasks.consume_file", task.task_name)
+        self.assertEqual(1, task.owner_id)
         self.assertEqual(celery.states.PENDING, task.status)
 
     def test_task_prerun_handler(self):

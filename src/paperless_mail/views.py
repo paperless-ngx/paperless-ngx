@@ -6,6 +6,7 @@ from django.http import HttpResponseBadRequest
 from django.http import HttpResponseRedirect
 from django.utils import timezone
 from httpx_oauth.oauth2 import GetAccessTokenError
+from rest_framework.decorators import action
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -34,22 +35,14 @@ class MailAccountViewSet(ModelViewSet, PassUserMixin):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
 
+    def get_permissions(self):
+        if self.action == "test":
+            # Test action does not require object level permissions
+            self.permission_classes = (IsAuthenticated,)
+        return super().get_permissions()
 
-class MailRuleViewSet(ModelViewSet, PassUserMixin):
-    model = MailRule
-
-    queryset = MailRule.objects.all().order_by("order")
-    serializer_class = MailRuleSerializer
-    pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
-    filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
-
-
-class MailAccountTestView(GenericAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = MailAccountSerializer
-
-    def post(self, request, *args, **kwargs):
+    @action(methods=["post"], detail=False)
+    def test(self, request):
         logger = logging.getLogger("paperless_mail")
         request.data["name"] = datetime.datetime.now().isoformat()
         serializer = self.get_serializer(data=request.data)
@@ -93,6 +86,16 @@ class MailAccountTestView(GenericAPIView):
                     f"Mail account {account} test failed: {e}",
                 )
                 return HttpResponseBadRequest("Unable to connect to server")
+
+
+class MailRuleViewSet(ModelViewSet, PassUserMixin):
+    model = MailRule
+
+    queryset = MailRule.objects.all().order_by("order")
+    serializer_class = MailRuleSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
 
 
 class OauthCallbackView(GenericAPIView):

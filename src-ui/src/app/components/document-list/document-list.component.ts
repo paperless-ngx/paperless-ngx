@@ -273,6 +273,30 @@ export class DocumentListComponent
           }
         }
       })
+
+    this.hotKeyService
+      .addShortcut({
+        keys: 'control.arrowleft',
+        description: $localize`Previous page`,
+      })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        if (this.list.currentPage > 1) {
+          this.list.currentPage--
+        }
+      })
+
+    this.hotKeyService
+      .addShortcut({
+        keys: 'control.arrowright',
+        description: $localize`Next page`,
+      })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        if (this.list.currentPage < this.list.getLastPage()) {
+          this.list.currentPage++
+        }
+      })
   }
 
   ngOnDestroy() {

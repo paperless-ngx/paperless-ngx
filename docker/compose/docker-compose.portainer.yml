@@ -19,6 +19,8 @@
 #
 # - Open portainer Stacks list and click 'Add stack'
 # - Paste the contents of this file and assign a name, e.g. 'paperless'
+# - Upload 'docker-compose.env' by clicking on 'Load variables from .env file'
+# - Modify the environment variables as needed
 # - Click 'Deploy the stack' and wait for it to be deployed
 # - Open the list of containers, select paperless_webserver_1
 # - Click 'Console' and then 'Connect' to open the command line inside the container
@@ -61,28 +63,8 @@ services:
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBHOST: db
-# The UID and GID of the user used to run paperless in the container. Set this
-# to your UID and GID on the host so that you have write access to the
-# consumption directory.
-      USERMAP_UID: 1000
-      USERMAP_GID: 100
-# Additional languages to install for text recognition, separated by a
-# whitespace. Note that this is
-# different from PAPERLESS_OCR_LANGUAGE (default=eng), which defines the
-# language used for OCR.
-# The container installs English, German, Italian, Spanish and French by
-# default.
-# See https://packages.debian.org/search?keywords=tesseract-ocr-&searchon=names&suite=buster
-# for available languages.
-      #PAPERLESS_OCR_LANGUAGES: tur ces
-# Adjust this key if you plan to make paperless available publicly. It should
-# be a very long sequence of random characters. You don't need to remember it.
-      #PAPERLESS_SECRET_KEY: change-me
-# Use this variable to set a timezone for the Paperless Docker containers. If not specified, defaults to UTC.
-      #PAPERLESS_TIME_ZONE: America/Los_Angeles
-# The default language to use for OCR. Set this to the language most of your
-# documents are written in.
-      #PAPERLESS_OCR_LANGUAGE: eng
+    env_file:
+      - stack.env
 
 volumes:
   data:

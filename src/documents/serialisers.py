@@ -160,7 +160,7 @@ class SetPermissionsMixin:
             },
         }
         if set_permissions is not None:
-            for action in permissions_dict:
+            for action, _ in permissions_dict.items():
                 if action in set_permissions:
                     users = set_permissions[action]["users"]
                     permissions_dict[action]["users"] = self._validate_user_ids(users)
@@ -1578,7 +1578,7 @@ class UiSettingsViewSerializer(serializers.ModelSerializer):
         return ui_settings
 
 
-class TasksViewSerializer(serializers.ModelSerializer):
+class TasksViewSerializer(OwnedObjectSerializer):
     class Meta:
         model = PaperlessTask
         depth = 1
@@ -1593,6 +1593,7 @@ class TasksViewSerializer(serializers.ModelSerializer):
             "result",
             "acknowledged",
             "related_document",
+            "owner",
         )
 
     type = serializers.SerializerMethodField()
@@ -1782,6 +1783,11 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             "filter_has_tags",
             "filter_has_correspondent",
             "filter_has_document_type",
+            "schedule_offset_days",
+            "schedule_is_recurring",
+            "schedule_recurring_interval_days",
+            "schedule_date_field",
+            "schedule_date_custom_field",
         ]
 
     def validate(self, attrs):

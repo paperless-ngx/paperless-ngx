@@ -5,94 +5,179 @@
     </button>
   </div>
   <div class="modal-body">
-    <pngx-input-text i18n-title title="Email" formControlName="email" (keyup)="onEmailKeyUp($event)" [error]="error?.email"></pngx-input-text>
-    <div ngbAccordion>
-      <div ngbAccordionItem="first" [collapsed]="!showEmailConfirm" class="border-0 bg-transparent">
-        <div ngbAccordionCollapse>
-          <div ngbAccordionBody class="p-0 pb-3">
-            <pngx-input-text i18n-title title="Confirm Email" formControlName="email_confirm" (keyup)="onEmailConfirmKeyUp($event)" autocomplete="email" [error]="error?.email_confirm"></pngx-input-text>
+    <div class="row">
+      <div class="col-12 col-md-6">
+        <pngx-input-text i18n-title title="Email" formControlName="email" (keyup)="onEmailKeyUp($event)" [error]="error?.email"></pngx-input-text>
+        <div ngbAccordion>
+          <div ngbAccordionItem="first" [collapsed]="!showEmailConfirm" class="border-0 bg-transparent">
+            <div ngbAccordionCollapse>
+              <div ngbAccordionBody class="p-0 pb-3">
+                <pngx-input-text i18n-title title="Confirm Email" formControlName="email_confirm" (keyup)="onEmailConfirmKeyUp($event)" autocomplete="email" [error]="error?.email_confirm"></pngx-input-text>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-    <pngx-input-password i18n-title title="Password" formControlName="password" (keyup)="onPasswordKeyUp($event)" [showReveal]="true" autocomplete="current-password" [error]="error?.password"></pngx-input-password>
-    <div ngbAccordion>
-      <div ngbAccordionItem="first" [collapsed]="!showPasswordConfirm" class="border-0 bg-transparent">
-        <div ngbAccordionCollapse>
-          <div ngbAccordionBody class="p-0 pb-3">
-            <pngx-input-password i18n-title title="Confirm Password" formControlName="password_confirm" (keyup)="onPasswordConfirmKeyUp($event)" autocomplete="new-password" [error]="error?.password_confirm"></pngx-input-password>
+        <pngx-input-password i18n-title title="Password" formControlName="password" (keyup)="onPasswordKeyUp($event)" [showReveal]="true" autocomplete="current-password" [error]="error?.password"></pngx-input-password>
+        <div ngbAccordion>
+          <div ngbAccordionItem="first" [collapsed]="!showPasswordConfirm" class="border-0 bg-transparent">
+            <div ngbAccordionCollapse>
+              <div ngbAccordionBody class="p-0 pb-3">
+                <pngx-input-password i18n-title title="Confirm Password" formControlName="password_confirm" (keyup)="onPasswordConfirmKeyUp($event)" autocomplete="new-password" [error]="error?.password_confirm"></pngx-input-password>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-    <pngx-input-text i18n-title title="First name" formControlName="first_name" [error]="error?.first_name"></pngx-input-text>
-    <pngx-input-text i18n-title title="Last name" formControlName="last_name" [error]="error?.first_name"></pngx-input-text>
-    <div class="mb-3">
-      <label class="form-label" i18n>API Auth Token</label>
-      <div class="position-relative">
-        <div class="input-group">
-          <input type="text" class="form-control" formControlName="auth_token" readonly>
-          <button type="button" class="btn btn-outline-secondary" (click)="copyAuthToken()" i18n-title title="Copy">
-              @if (!copied) {
-                <i-bs width="1em" height="1em" name="clipboard-fill"></i-bs>
-              }
-              @if (copied) {
-                <i-bs width="1em" height="1em" name="clipboard-check-fill"></i-bs>
-              }
-              <span class="visually-hidden" i18n>Copy</span>
-            </button>
-            <pngx-confirm-button
-              title="Regenerate auth token"
-              i18n-title
-              buttonClasses=" btn-outline-secondary"
-              iconName="arrow-repeat"
-              [disabled]="!hasUsablePassword"
-              (confirm)="generateAuthToken()">
-            </pngx-confirm-button>
-          </div>
-          <span class="badge copied-badge bg-primary small fade ms-4 position-absolute top-50 translate-middle-y pe-none z-3" [class.show]="copied" i18n>Copied!</span>
-        </div>
-        <div class="form-text text-muted text-end fst-italic" i18n>Warning: changing the token cannot be undone</div>
-      </div>
-      @if (socialAccounts?.length > 0) {
+        <pngx-input-text i18n-title title="First name" formControlName="first_name" [error]="error?.first_name"></pngx-input-text>
+        <pngx-input-text i18n-title title="Last name" formControlName="last_name" [error]="error?.first_name"></pngx-input-text>
         <div class="mb-3">
-          <p i18n>Connected social accounts</p>
-          <ul class="list-group">
-            @for (account of socialAccounts; track account.id) {
-              <li class="list-group-item"
-                ngbPopover="Set a password before disconnecting social account."
-                i18n-ngbPopover
-                [disablePopover]="hasUsablePassword"
-                triggers="mouseenter:mouseleave">
-                {{account.name}} ({{account.provider}})
+          <label class="form-label" i18n>API Auth Token</label>
+          <div class="position-relative">
+            <div class="input-group">
+              <input type="text" class="form-control" formControlName="auth_token" readonly>
+              <button type="button" class="btn btn-outline-secondary" (click)="copyAuthToken()" i18n-title title="Copy">
+                  @if (!copied) {
+                    <i-bs width="1em" height="1em" name="clipboard-fill"></i-bs>
+                  }
+                  @if (copied) {
+                    <i-bs width="1em" height="1em" name="clipboard-check-fill"></i-bs>
+                  }
+                  <span class="visually-hidden" i18n>Copy</span>
+                </button>
                 <pngx-confirm-button
-                  label="Disconnect"
-                  i18n-label
-                  title="Disconnect {{ account.name }} social account"
+                  title="Regenerate auth token"
                   i18n-title
-                  buttonClasses="btn-outline-danger btn-sm ms-2 align-baseline"
-                  iconName="trash"
+                  buttonClasses=" btn-outline-secondary"
+                  iconName="arrow-repeat"
                   [disabled]="!hasUsablePassword"
-                  (confirm)="disconnectSocialAccount(account.id)">
+                  (confirm)="generateAuthToken()">
                 </pngx-confirm-button>
-              </li>
-            }
-          </ul>
-          <div class="form-text text-muted text-end fst-italic" i18n>Warning: disconnecting social accounts cannot be undone</div>
-        </div>
-      }
-      @if (socialAccountProviders?.length > 0) {
-        <div class="mb-3">
-          <p i18n>Connect new social account</p>
-          <div class="list-group">
-            @for (provider of socialAccountProviders; track provider.name) {
-              <a class="list-group-item list-group-item-action text-primary d-flex align-items-center" href="{{ provider.login_url }}" rel="noopener noreferrer">
-                {{provider.name}}&nbsp;<i-bs class="pb-1 ps-1" name="box-arrow-up-right"></i-bs>
-              </a>
-            }
+              </div>
+              <span class="badge copied-badge bg-primary small fade ms-4 position-absolute top-50 translate-middle-y pe-none z-3" [class.show]="copied" i18n>Copied!</span>
+            </div>
+            <div class="form-text text-muted text-end fst-italic" i18n>Warning: changing the token cannot be undone</div>
           </div>
-        </div>
-      }
+      </div>
+      <div class="col-12 col-md-6">
+        @if (socialAccounts?.length > 0) {
+          <div class="mb-3">
+            <p i18n>Connected social accounts</p>
+            <ul class="list-group">
+              @for (account of socialAccounts; track account.id) {
+                <li class="list-group-item"
+                  ngbPopover="Set a password before disconnecting social account."
+                  i18n-ngbPopover
+                  [disablePopover]="hasUsablePassword"
+                  triggers="mouseenter:mouseleave">
+                  {{account.name}} ({{account.provider}})
+                  <pngx-confirm-button
+                    label="Disconnect"
+                    i18n-label
+                    title="Disconnect {{ account.name }} social account"
+                    i18n-title
+                    buttonClasses="btn-outline-danger btn-sm ms-2 align-baseline"
+                    iconName="trash"
+                    [disabled]="!hasUsablePassword"
+                    (confirm)="disconnectSocialAccount(account.id)">
+                  </pngx-confirm-button>
+                </li>
+              }
+            </ul>
+            <div class="form-text text-muted text-end fst-italic" i18n>Warning: disconnecting social accounts cannot be undone</div>
+          </div>
+        }
+        @if (socialAccountProviders?.length > 0) {
+          <div class="mb-3">
+            <p i18n>Connect new social account</p>
+            <div class="list-group">
+              @for (provider of socialAccountProviders; track provider.name) {
+                <a class="list-group-item list-group-item-action text-primary d-flex align-items-center" href="{{ provider.login_url }}" rel="noopener noreferrer">
+                  {{provider.name}}&nbsp;<i-bs class="pb-1 ps-1" name="box-arrow-up-right"></i-bs>
+                </a>
+              }
+            </div>
+          </div>
+        }
+        @if (!isTotpEnabled) {
+          <div ngbAccordion>
+            <div ngbAccordionItem>
+              <h2 ngbAccordionHeader>
+                <button ngbAccordionButton (click)="gettotpSettings()" i18n>Two-factor Authentication</button>
+              </h2>
+              <div ngbAccordionCollapse>
+                <div ngbAccordionBody>
+                  <ng-template>
+                    @if (totpSettingsLoading) {
+                      <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
+                      <div class="visually-hidden" i18n>Loading...</div>
+                    } @else if (totpSettings) {
+                      <figure class="figure">
+                        <div class="bg-white d-inline-block" [innerHTML]="totpSettings.qr_svg | safeHtml"></div>
+                        <figcaption class="figure-caption text-end mt-2" i18n>Scan the QR code with your authenticator app and then enter the code below</figcaption>
+                      </figure>
+                      <p>
+                        <ng-container i18n>Authenticator secret</ng-container>: <code>{{totpSettings.secret}}</code>.
+                        <ng-container i18n>You can store this secret and use it to reinstall your authenticator app at a later time.</ng-container>
+                      </p>
+                      <div class="input-group mb-3">
+                        <input type="text" class="form-control" formControlName="totp_code" placeholder="Code" i18n-placeholder>
+                        <button type="button" class="btn btn-primary ml-auto" (click)="activateTotp()" [disabled]="totpLoading">
+                          <ng-container i18n>Enable</ng-container>
+                          @if (totpLoading) {
+                            <div class="spinner-border spinner-border-sm fw-normal ms-2" role="status"></div>
+                            <div class="visually-hidden" i18n>Loading...</div>
+                          }
+                        </button>
+                      </div>
+                    }
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <label class="d-block mb-2" i18n>Two-factor Authentication</label>
+          @if (recoveryCodes) {
+            <div class="alert alert-warning" role="alert">
+              <i-bs name="exclamation-triangle"></i-bs>&nbsp;<ng-container i18n>Recovery codes will not be shown again, make sure to save them.</ng-container>
+            </div>
+            <div class="d-flex flex-row align-items-start mb-3">
+              <ul class="list-group w-50">
+                  @for (code of recoveryCodes; track code; let i = $index) {
+                    @if (i % 2 === 0) {
+                      <li class="list-group-item d-flex justify-content-around align-items-center">
+                        <code>{{code}}</code>
+                        @if (recoveryCodes[i + 1]) {
+                          <code>{{recoveryCodes[i + 1]}}</code>
+                        }
+                      </li>
+                    }
+                  }
+              </ul>
+              <button type="button" class="btn btn-sm btn-outline-secondary ms-2" (click)="copyRecoveryCodes()" i18n-title title="Copy">
+                @if (!codesCopied) {
+                  <i-bs width="1em" height="1em" name="clipboard-fill"></i-bs>
+                  &nbsp;<span i18n>Copy codes</span>
+                }
+                @if (codesCopied) {
+                  <i-bs width="1em" height="1em" name="clipboard-check-fill" class="text-primary"></i-bs>
+                  &nbsp;<span class="text-primary" i18n>Copied!</span>
+                }
+              </button>
+            </div>
+          }
+          <pngx-confirm-button
+            label="Disable Two-factor Authentication"
+            i18n-label
+            title="Disable Two-factor Authentication"
+            i18n-title
+            buttonClasses="btn-outline-danger btn-sm"
+            iconName="trash"
+            [disabled]="totpLoading"
+            (confirm)="deactivateTotp()">
+          </pngx-confirm-button>
+        }
+      </div>
+    </div>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>

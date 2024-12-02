@@ -37,6 +37,7 @@ from documents.models import PaperlessTask
 from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
+from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import set_permissions_for_object
@@ -899,6 +900,7 @@ def run_workflows(
             "triggers",
         )
         .order_by("order")
+        .distinct()
     )
 
     for workflow in workflows:
@@ -928,6 +930,12 @@ def run_workflows(
                 document.save()
                 document.tags.set(doc_tag_ids)
 
+            WorkflowRun.objects.create(
+                workflow=workflow,
+                type=trigger_type,
+                document=document if not use_overrides else None,
+            )
+
     if use_overrides:
         return overrides, "\n".join(messages)
 
@@ -951,9 +959,10 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
         close_old_connections()
 
         task_args = body[0]
-        input_doc, _ = task_args
+        input_doc, overrides = task_args
 
         task_file_name = input_doc.original_file.name
+        user_id = overrides.owner_id if overrides else None
 
         PaperlessTask.objects.create(
             task_id=headers["id"],
@@ -964,6 +973,7 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
             date_created=timezone.now(),
             date_started=None,
             date_done=None,
+            owner_id=user_id,
         )
     except Exception:  # pragma: no cover
         # Don't let an exception in the signal handlers prevent
