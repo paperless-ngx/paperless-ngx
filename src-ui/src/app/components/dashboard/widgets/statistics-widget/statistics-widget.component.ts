@@ -92,8 +92,8 @@ export class StatisticsWidgetComponent
     return (filetype.mime_type_count / this.statistics?.documents_total) * 100
   }
 
-  getTagName(): string {
-    return 'Tag'
+  translateText(value: string){
+    return $localize ``+ value;
   }
 
   getTagPercent(): number {

@@ -1,5 +1,5 @@
 <pngx-widget-frame title="Statistics" [loading]="loading" i18n-title>
-  <ng-container content>
+  <ng-container content >
     <div class="list-group border-light">
       @if (statistics?.documents_inbox !== null) {
         <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" title="Go to inbox" i18n-title href="javascript:void(0)" (click)="goToInbox()">
@@ -59,15 +59,15 @@
             <span class="badge bg-secondary text-light rounded-pill">{{statistics?.tag_count | number}}</span>
           </a>
           <div class="list-group-item filetypes">
-          <div class="d-flex justify-content-between align-items-center my-2">
+          <div class="d-flex justify-content-between align-items-center my-2" i18n>
             <div class="progress flex-grow-1">
                 <div
                   class="progress-bar bg-primary"
                   role="progressbar"
-                  [ngbPopover]="'Tagged tags'"
+                  [ngbPopover]="translateText('Tagged tags')"
                   i18n-ngbPopover
                   triggers="mouseenter:mouseleave"
-                  [attr.aria-label]="'Tagged tags count'"
+                  [attr.aria-label]="translateText('Tagged tags')"
                   [class.me-1px]="!0"
                   [style.width]="100-(statistics.untagged_tags_count/statistics.tag_count)*100 + '%'"
                   [style.opacity]="getItemOpacity(0)"
@@ -78,10 +78,10 @@
                 <div
                   class="progress-bar bg-primary"
                   role="progressbar"
-                  [ngbPopover]="'Untagged tags'"
+                  [ngbPopover]="translateText('Untagged tags')"
                   i18n-ngbPopover
                   triggers="mouseenter:mouseleave"
-                  [attr.aria-label]="'Untagged tags count'"
+                  [attr.aria-label]="translateText('Untagged tags')"
                   [class.me-1px]="!1"
                   [style.width]="(statistics.untagged_tags_count/statistics.tag_count)*100+ '%'"
                   [style.opacity]="getItemOpacity(1)"
@@ -97,13 +97,13 @@
               <div class="d-flex">
                 <div class="text-nowrap me-2">
                   <span class="badge rounded-pill bg-primary d-inline-block p-0 me-1" [style.opacity]="getItemOpacity(0)"></span>
-                  <small class="text-nowrap"><span class="fw-bold">{{ 'Tagged tags count'}}</span>&nbsp;<span class="text-muted">({{100-(statistics.untagged_tags_count/statistics.tag_count)*100 | number: '1.0-1'}}%)</span></small>
+                  <small class="text-nowrap"><span class="fw-bold" i18n>Tagged tags</span>&nbsp;<span class="text-muted">({{100-(statistics.untagged_tags_count/statistics.tag_count)*100 | number: '1.0-1'}}%)</span></small>
                 </div>
               </div>
               <div class="d-flex">
                 <div class="text-nowrap me-2">
                   <span class="badge rounded-pill bg-primary d-inline-block p-0 me-1" [style.opacity]="getItemOpacity(1)"></span>
-                  <small class="text-nowrap"><span class="fw-bold">{{ 'Untagged tags count' }}</span>&nbsp;<span class="text-muted">({{(statistics.untagged_tags_count/statistics.tag_count)*100 | number: '1.0-1'}}%)</span></small>
+                  <small class="text-nowrap"><span class="fw-bold" i18n>Untagged tags</span>&nbsp;<span class="text-muted">({{(statistics.untagged_tags_count/statistics.tag_count)*100 | number: '1.0-1'}}%)</span></small>
                 </div>
               </div>
           </div>
@@ -125,16 +125,16 @@
             <span class="badge bg-secondary text-light rounded-pill">{{statistics?.document_type_count | number}}</span>
           </a>
         }
-        <div class="list-group-item filetypes">
+        <div class="list-group-item filetypes" i18n>
           <div class="d-flex justify-content-between align-items-center my-2">
             <div class="progress flex-grow-1">
                 <div
                   class="progress-bar bg-primary"
                   role="progressbar"
-                  [ngbPopover]="'Assigned document type'"
+                  [ngbPopover]="translateText('Assigned document type')"
                   i18n-ngbPopover
                   triggers="mouseenter:mouseleave"
-                  [attr.aria-label]="'Assigned document type count'"
+                  [attr.aria-label]="translateText('Assigned document type')"
                   [class.me-1px]="!0"
                   [style.width]="100-(statistics?.unassigned_document_types_count/statistics?.document_type_count)*100 + '%'"
                   [style.opacity]="getItemOpacity(0)"
@@ -145,10 +145,10 @@
                 <div
                   class="progress-bar bg-primary"
                   role="progressbar"
-                  [ngbPopover]="'Unassigned document type'"
+                  [ngbPopover]="translateText('Unassigned document type')"
                   i18n-ngbPopover
                   triggers="mouseenter:mouseleave"
-                  [attr.aria-label]="'Unassigned document type count'"
+                  [attr.aria-label]="translateText('Unassigned document type')"
                   [class.me-1px]="!1"
                   [style.width]="(statistics.unassigned_document_types_count/statistics.document_type_count)*100+ '%'"
                   [style.opacity]="getItemOpacity(1)"
@@ -159,18 +159,18 @@
 
             </div>
           </div>
-          <div class="d-flex flex-wrap align-items-start">
+          <div class="d-flex flex-wrap align-items-start" >
 
               <div class="d-flex">
                 <div class="text-nowrap me-2">
                   <span class="badge rounded-pill bg-primary d-inline-block p-0 me-1" [style.opacity]="getItemOpacity(0)"></span>
-                  <small class="text-nowrap"><span class="fw-bold">{{ 'Assigned document type'}}</span>&nbsp;<span class="text-muted">({{100-(statistics.unassigned_document_types_count/statistics.document_type_count)*100 | number: '1.0-1'}}%)</span></small>
+                  <small class="text-nowrap"><span class="fw-bold">Assigned document type</span>&nbsp;<span class="text-muted">({{100-(statistics.unassigned_document_types_count/statistics.document_type_count)*100 | number: '1.0-1'}}%)</span></small>
                 </div>
               </div>
               <div class="d-flex">
                 <div class="text-nowrap me-2">
                   <span class="badge rounded-pill bg-primary d-inline-block p-0 me-1" [style.opacity]="getItemOpacity(1)"></span>
-                  <small class="text-nowrap"><span class="fw-bold">{{ 'Unassigned document type' }}</span>&nbsp;<span class="text-muted">({{(statistics.unassigned_document_types_count/statistics.document_type_count)*100 | number: '1.0-1'}}%)</span></small>
+                  <small class="text-nowrap"><span class="fw-bold" >Unassigned document type</span>&nbsp;<span class="text-muted">({{(statistics.unassigned_document_types_count/statistics.document_type_count)*100 | number: '1.0-1'}}%)</span></small>
                 </div>
               </div>
           </div>

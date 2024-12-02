@@ -5424,6 +5424,21 @@
           <context context-type="linenumber">7</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="2960342086890185317" datatype="html">
+        <source><x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div class=&quot;col-12 mt-1 mb-1&quot;&gt;"/><x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;input-group&quot;&gt;"/><x id="TAG_INPUT" ctype="x-input" equiv-text="&lt;input
+				class=&quot;form-control&quot;
+				[placeholder]=&quot;placeholder&quot;
+				name=&quot;dp&quot;
+				[(ngModel)]=&quot;model&quot;
+        (dateSelect)=&quot;onDateSelection($event)&quot;
+				ngbDatepicker
+				#d=&quot;ngbDatepicker&quot;
+			/&gt;"/><x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&lt;button class=&quot;btn btn-outline-secondary&quot; (click)=&quot;d.toggle()&quot; type=&quot;button&quot;&gt;"/><x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;i-bs width=&quot;1.2em&quot; height=&quot;1.2em&quot; name=&quot;calendar3&quot;&gt;"/><x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;/i-bs&gt;"/><x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div class=&quot;col-12 mt-1 mb-1&quot;&gt;"/><x id="START_TAG_BUTTON_1" ctype="x-button_1" equiv-text="&lt;button class=&quot;btn btn-sm btn-outline-primary mt-1&quot; (click)=&quot;setToday()&quot;&gt;"/> Select Today <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/date-custom/date-custom.component.html</context>
+          <context context-type="linenumber">2,21</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="445302259125375799" datatype="html">
         <source>Invalid date.</source>
         <context-group purpose="location">
@@ -6307,11 +6322,94 @@
           <context context-type="linenumber">15</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="2470690291316891440" datatype="html">
+        <source><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;progress flex-grow-1&quot;&gt;"/><x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div
+                  class=&quot;progress-bar bg-primary&quot;
+                  role=&quot;progressbar&quot;
+                  [ngbPopover]=&quot;translateText(&apos;Tagged tags&apos;)&quot;
+                  i18n-ngbPopover
+                  triggers=&quot;mouseenter:mouseleave&quot;
+                  [attr.aria-label]=&quot;translateText(&apos;Tagged tags count&apos;)&quot;
+                  [class.me-1px]=&quot;!0&quot;
+                  [style.width]=&quot;100-(statistics.untagged_tags_count/statistics.tag_count)*100 + &apos;%&apos;&quot;
+                  [style.opacity]=&quot;getItemOpacity(0)&quot;
+                  [attr.aria-valuenow]=&quot;statistics.tag_count-statistics.untagged_tags_count&quot;
+                  aria-valuemin=&quot;0&quot;
+                  aria-valuemax=&quot;100&quot;&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div
+                  class=&quot;progress-bar bg-primary&quot;
+                  role=&quot;progressbar&quot;
+                  [ngbPopover]=&quot;translateText(&apos;Untagged tags&apos;)&quot;
+                  i18n-ngbPopover
+                  triggers=&quot;mouseenter:mouseleave&quot;
+                  [attr.aria-label]=&quot;translateText(&apos;Untagged tags&apos;)&quot;
+                  [class.me-1px]=&quot;!1&quot;
+                  [style.width]=&quot;(statistics.untagged_tags_count/statistics.tag_count)*100+ &apos;%&apos;&quot;
+                  [style.opacity]=&quot;getItemOpacity(1)&quot;
+                  [attr.aria-valuenow]=&quot;statistics.untagged_tags_count&quot;
+                  aria-valuemin=&quot;0&quot;
+                  aria-valuemax=&quot;100&quot;&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+          <context context-type="linenumber">63,93</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2158696772202789736" datatype="html">
+        <source>Tagged tags</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6571816214672638255" datatype="html">
+        <source>Untagged tags</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+          <context context-type="linenumber">106</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6887606175573586232" datatype="html">
+        <source><x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&lt;div class=&quot;d-flex justify-content-between align-items-center my-2&quot;&gt;"/><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;progress flex-grow-1&quot;&gt;"/><x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div
+                  class=&quot;progress-bar bg-primary&quot;
+                  role=&quot;progressbar&quot;
+                  [ngbPopover]=&quot;translateText(&apos;Assigned document type&apos;)&quot;
+                  i18n-ngbPopover
+                  triggers=&quot;mouseenter:mouseleave&quot;
+                  [attr.aria-label]=&quot;translateText(&apos;Assigned document type&apos;)&quot;
+                  [class.me-1px]=&quot;!0&quot;
+                  [style.width]=&quot;100-(statistics?.unassigned_document_types_count/statistics?.document_type_count)*100 + &apos;%&apos;&quot;
+                  [style.opacity]=&quot;getItemOpacity(0)&quot;
+                  [attr.aria-valuenow]=&quot;statistics?.document_type_count-statistics?.unassigned_document_types_count&quot;
+                  aria-valuemin=&quot;0&quot;
+                  aria-valuemax=&quot;100&quot;&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div
+                  class=&quot;progress-bar bg-primary&quot;
+                  role=&quot;progressbar&quot;
+                  [ngbPopover]=&quot;translateText(&apos;Unassigned document type&apos;)&quot;
+                  i18n-ngbPopover
+                  triggers=&quot;mouseenter:mouseleave&quot;
+                  [attr.aria-label]=&quot;translateText(&apos;Unassigned document type&apos;)&quot;
+                  [class.me-1px]=&quot;!1&quot;
+                  [style.width]=&quot;(statistics.unassigned_document_types_count/statistics.document_type_count)*100+ &apos;%&apos;&quot;
+                  [style.opacity]=&quot;getItemOpacity(1)&quot;
+                  [attr.aria-valuenow]=&quot;statistics.unassigned_document_types_count&quot;
+                  aria-valuemin=&quot;0&quot;
+                  aria-valuemax=&quot;100&quot;&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_6" ctype="x-div_6" equiv-text="&lt;div class=&quot;d-flex flex-wrap align-items-start&quot; &gt;"/><x id="START_TAG_DIV_5" ctype="x-div_5" equiv-text="&lt;div class=&quot;d-flex&quot;&gt;"/><x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&lt;div class=&quot;text-nowrap me-2&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge rounded-pill bg-primary d-inline-block p-0 me-1&quot; [style.opacity]=&quot;getItemOpacity(0)&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="START_SMALL_TEXT" ctype="x-small" equiv-text="&lt;small class=&quot;text-nowrap&quot;&gt;"/><x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span class=&quot;fw-bold&quot; &gt;"/>Assigned document type<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> <x id="START_TAG_SPAN_2" ctype="x-span_2" equiv-text="&lt;span class=&quot;text-muted&quot;&gt;"/>(<x id="INTERPOLATION" equiv-text="{{100-(statistics.unassigned_document_types_count/statistics.document_type_count)*100 | number: &apos;1.0-1&apos;}}"/>%)<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_SMALL_TEXT" ctype="x-small" equiv-text="&lt;/small&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_5" ctype="x-div_5" equiv-text="&lt;div class=&quot;d-flex&quot;&gt;"/><x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&lt;div class=&quot;text-nowrap me-2&quot;&gt;"/><x id="START_TAG_SPAN_3" ctype="x-span_3" equiv-text="&lt;span class=&quot;badge rounded-pill bg-primary d-inline-block p-0 me-1&quot; [style.opacity]=&quot;getItemOpacity(1)&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="START_SMALL_TEXT" ctype="x-small" equiv-text="&lt;small class=&quot;text-nowrap&quot;&gt;"/><x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span class=&quot;fw-bold&quot; &gt;"/>Unassigned document type<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> <x id="START_TAG_SPAN_2" ctype="x-span_2" equiv-text="&lt;span class=&quot;text-muted&quot;&gt;"/>(<x id="INTERPOLATION_1" equiv-text="{{(statistics.unassigned_document_types_count/statistics.document_type_count)*100 | number: &apos;1.0-1&apos;}}"/>%)<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_SMALL_TEXT" ctype="x-small" equiv-text="&lt;/small&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+          <context context-type="linenumber">129,176</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="8693603235657020323" datatype="html">
         <source>Other</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
           <context context-type="linenumber">68</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4416290763660062288" datatype="html">
+        <source></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
+          <context context-type="linenumber">96</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5321728948071221061" datatype="html">
