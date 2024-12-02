@@ -77,7 +77,6 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.viewsets import ViewSet
-from torch.onnx.symbolic_opset9 import to
 
 from documents import bulk_edit
 from documents import index
