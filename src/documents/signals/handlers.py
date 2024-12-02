@@ -576,7 +576,7 @@ def run_workflows_updated(sender, document: Document, logging_group=None, **kwar
 @shared_task(
     retry_backoff=True,
     autoretry_for=(httpx.HTTPStatusError,),
-    retry_kwargs={"max_retries": 3},
+    max_retries=3,
 )
 def send_webhook(url, data, headers, files):
     try:
