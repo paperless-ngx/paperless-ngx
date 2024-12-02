@@ -947,7 +947,7 @@ class CustomFieldInstance(SoftDeleteModel):
 
     value_document_ids = models.JSONField(null=True)
 
-    value_select = models.PositiveSmallIntegerField(null=True)
+    value_select = models.CharField(null=True, max_length=16)
 
     class Meta:
         ordering = ("created",)
@@ -962,7 +962,11 @@ class CustomFieldInstance(SoftDeleteModel):
 
     def __str__(self) -> str:
         value = (
-            self.field.extra_data["select_options"][self.value_select]
+            next(
+                option.get("label")
+                for option in self.field.extra_data["select_options"]
+                if option.get("id") == self.value_select
+            )
             if (
                 self.field.data_type == CustomField.FieldDataType.SELECT
                 and self.value_select is not None

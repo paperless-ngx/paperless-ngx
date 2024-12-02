@@ -34,7 +34,7 @@ from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_CRYPTO_SETTINGS_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
-from documents.signals.handlers import update_cf_instance_documents
+from documents.signals.handlers import check_paths_and_prune_custom_fields
 from documents.signals.handlers import update_filename_and_move_files
 from documents.utils import copy_file_with_basic_stats
 from paperless import version
@@ -262,7 +262,7 @@ class Command(CryptMixin, BaseCommand):
             ),
             disable_signal(
                 post_save,
-                receiver=update_cf_instance_documents,
+                receiver=check_paths_and_prune_custom_fields,
                 sender=CustomField,
             ),
         ):

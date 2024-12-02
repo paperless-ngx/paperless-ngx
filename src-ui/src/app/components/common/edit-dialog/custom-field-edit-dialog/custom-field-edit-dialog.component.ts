@@ -57,9 +57,16 @@ export class CustomFieldEditDialogComponent
     }
     if (this.object?.data_type === CustomFieldDataType.Select) {
       this.selectOptions.clear()
-      this.object.extra_data.select_options.forEach((option) =>
-        this.selectOptions.push(new FormControl(option))
-      )
+      this.object.extra_data.select_options
+        .filter((option) => option)
+        .forEach((option) =>
+          this.selectOptions.push(
+            new FormGroup({
+              label: new FormControl(option.label),
+              id: new FormControl(option.id),
+            })
+          )
+        )
     }
   }
 
@@ -89,7 +96,7 @@ export class CustomFieldEditDialogComponent
       name: new FormControl(null),
       data_type: new FormControl(null),
       extra_data: new FormGroup({
-        select_options: new FormArray([new FormControl(null)]),
+        select_options: new FormArray([]),
         default_currency: new FormControl(null),
       }),
     })
@@ -104,7 +111,9 @@ export class CustomFieldEditDialogComponent
   }
 
   public addSelectOption() {
-    this.selectOptions.push(new FormControl(''))
+    this.selectOptions.push(
+      new FormGroup({ label: new FormControl(null), id: new FormControl(null) })
+    )
   }
 
   public removeSelectOption(index: number) {

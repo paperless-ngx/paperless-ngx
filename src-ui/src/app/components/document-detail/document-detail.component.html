@@ -190,7 +190,8 @@
                     @case (CustomFieldDataType.Select) {
                       <pngx-input-select formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [itemsArray]="getCustomFieldFromInstance(fieldInstance)?.extra_data.select_options"
+                      [items]="getCustomFieldFromInstance(fieldInstance)?.extra_data.select_options"
+                      bindLabel="label"
                       [allowNull]="true"
                       [horizontal]="true"
                       [removable]="userIsOwner"
