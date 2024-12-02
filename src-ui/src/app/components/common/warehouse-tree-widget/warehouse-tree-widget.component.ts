@@ -155,14 +155,17 @@ export class WarehouseTreeWidgetComponent extends ComponentWithPermissions
   }
 
   reload() {
+    let params = {}
+    params['type__iexact'] = 'Warehouse'
     if (this.nodeId == 0) {
-      this.warehouseService.listFiltered(
+      this.warehouseService.listFilteredCustom(
         1,
         null,
         null,
-        null,
-        null,
+        params,
         true,
+        null,
+        true
       ).subscribe((c) => {
         if (this.pageNumber > 1) {
           this.data = this.data.concat(c.results)
