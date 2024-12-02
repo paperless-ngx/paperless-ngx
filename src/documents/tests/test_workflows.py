@@ -13,6 +13,7 @@ from guardian.shortcuts import get_users_with_perms
 from rest_framework.test import APITestCase
 
 from documents.signals.handlers import run_workflows
+from documents.signals.handlers import send_webhook
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -2463,8 +2464,7 @@ class TestWorkflows(
             expected_str = "Error occurred sending webhook"
             self.assertIn(expected_str, cm.output[0])
 
-    @mock.patch("httpx.post")
-    def test_workflow_webhook_action_url_invalid_params_headers(self, mock_post):
+    def test_workflow_webhook_action_url_invalid_params_headers(self):
         """
         GIVEN:
             - Document updated workflow with webhook action
@@ -2508,3 +2508,29 @@ class TestWorkflows(
             self.assertIn(expected_str, cm.output[0])
             expected_str = "Error occurred parsing webhook headers"
             self.assertIn(expected_str, cm.output[1])
+
+    @mock.patch("httpx.post")
+    def test_workflow_webhook_send_webhook_task(self, mock_post):
+        mock_post.return_value = mock.Mock(
+            status_code=200,
+            json=mock.Mock(return_value={"status": "ok"}),
+            raise_for_status=mock.Mock(),
+        )
+
+        with self.assertLogs("paperless.handlers") as cm:
+            send_webhook(
+                url="http://paperless-ngx.com",
+                data="Test message",
+                headers={},
+                files=None,
+            )
+
+            mock_post.assert_called_once_with(
+                "http://paperless-ngx.com",
+                data="Test message",
+                headers={},
+                files=None,
+            )
+
+            expected_str = "Webhook sent to http://paperless-ngx.com"
+            self.assertIn(expected_str, cm.output[0])

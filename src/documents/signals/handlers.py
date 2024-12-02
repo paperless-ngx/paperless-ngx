@@ -580,7 +580,7 @@ def send_webhook(url, data, headers, files):
             f"Failed sending webhook to {url}: {e}",
         )
         try:
-            send_webhook.retry(exc=e)
+            send_webhook.retry(exc=e, max_retries=3)
         except MaxRetriesExceededError:
             logger.error(
                 f"Max retries exceeded for webhook to {url}",
