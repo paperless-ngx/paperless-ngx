@@ -3,7 +3,9 @@ import os
 import shutil
 
 import httpx
+from celery import shared_task
 from celery import states
+from celery.exceptions import MaxRetriesExceededError
 from celery.signals import before_task_publish
 from celery.signals import task_failure
 from celery.signals import task_postrun
@@ -559,6 +561,32 @@ def run_workflows_updated(sender, document: Document, logging_group=None, **kwar
     )
 
 
+@shared_task(
+    retry_backoff=True,
+)
+def send_webhook(url, data, headers, files):
+    try:
+        httpx.post(
+            url,
+            data=data,
+            files=files,
+            headers=headers,
+        ).raise_for_status()
+        logger.info(
+            f"Webhook sent to {url}",
+        )
+    except httpx.HTTPStatusError as e:
+        logger.error(
+            f"Failed sending webhook to {url}: {e}",
+        )
+        try:
+            send_webhook.retry(exc=e)
+        except MaxRetriesExceededError:
+            logger.error(
+                f"Max retries exceeded for webhook to {url}",
+            )
+
+
 def run_workflows(
     trigger_type: WorkflowTrigger.WorkflowTriggerType,
     document: Document | ConsumableDocument,
@@ -997,12 +1025,16 @@ def run_workflows(
                     files = {
                         "file": (document.original_filename, f, document.mime_type),
                     }
-            httpx.post(
-                action.webhook.url,
+            send_webhook.delay(
+                url=action.webhook.url,
                 data=data,
-                files=files,
                 headers=headers,
-            ).raise_for_status()
+                files=files,
+            )
+            logger.debug(
+                f"Webhook to {action.webhook.url} queued",
+                extra={"group": logging_group},
+            )
         except Exception as e:
             logger.exception(
                 f"Error occurred sending webhook: {e}",

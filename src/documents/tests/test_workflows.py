@@ -2293,7 +2293,7 @@ class TestWorkflows(
         EMAIL_ENABLED=True,
         PAPERLESS_URL="http://localhost:8000",
     )
-    @mock.patch("httpx.post")
+    @mock.patch("documents.signals.handlers.send_webhook.delay")
     def test_workflow_webhook_action_body(self, mock_post):
         """
         GIVEN:
@@ -2342,9 +2342,10 @@ class TestWorkflows(
         run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
         mock_post.assert_called_once_with(
-            "http://paperless-ngx.com",
+            url="http://paperless-ngx.com",
             data=f"Test message: http://localhost:8000/documents/{doc.id}/",
             headers={},
+            files=None,
         )
 
     @override_settings(
@@ -2352,7 +2353,7 @@ class TestWorkflows(
         EMAIL_ENABLED=True,
         PAPERLESS_URL="http://localhost:8000",
     )
-    @mock.patch("httpx.post")
+    @mock.patch("documents.signals.handlers.send_webhook.delay")
     def test_workflow_webhook_action_w_files(self, mock_post):
         """
         GIVEN:
@@ -2404,10 +2405,10 @@ class TestWorkflows(
         run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
         mock_post.assert_called_once_with(
-            "http://paperless-ngx.com",
+            url="http://paperless-ngx.com",
             data=f"Test message: http://localhost:8000/documents/{doc.id}/",
-            files={"file": ("simple.pdf", mock.ANY, "application/pdf")},
             headers={},
+            files={"file": ("simple.pdf", mock.ANY, "application/pdf")},
         )
 
     @override_settings(
