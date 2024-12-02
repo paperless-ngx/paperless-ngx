@@ -90,7 +90,7 @@ export class StatisticsCustomWidgetComponent
 
   createDocumentTypePieChart() {
     if (this.documentTypePieChart) {
-      this.documentTypePieChart.destroy()
+      return
     }
     this.documentTypePieChart = new Chart('DocumentTypePieChart', {
       type: 'doughnut', //this denotes tha type of chart
@@ -127,7 +127,7 @@ export class StatisticsCustomWidgetComponent
 
   createTagsPieChart() {
     if (this.tagsPieChart) {
-      this.tagsPieChart.destroy()
+      return
     }
     this.tagsPieChart = new Chart('TagsPieChart', {
       type: 'doughnut', //this denotes tha type of chart
