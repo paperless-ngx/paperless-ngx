@@ -15,7 +15,6 @@ import {
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
-import { SavedView } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
@@ -52,10 +51,6 @@ import { DragDropSelectComponent } from '../../common/input/drag-drop-select/dra
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
-const savedViews = [
-  { id: 1, name: 'view1', show_in_sidebar: true, show_on_dashboard: true },
-  { id: 2, name: 'view2', show_in_sidebar: false, show_on_dashboard: false },
-]
 const users = [
   { id: 1, username: 'user1', is_superuser: false },
   { id: 2, username: 'user2', is_superuser: false },
@@ -70,7 +65,6 @@ describe('SettingsComponent', () => {
   let fixture: ComponentFixture<SettingsComponent>
   let router: Router
   let settingsService: SettingsService
-  let savedViewService: SavedViewService
   let activatedRoute: ActivatedRoute
   let viewportScroller: ViewportScroller
   let toastService: ToastService
@@ -139,7 +133,6 @@ describe('SettingsComponent', () => {
       .spyOn(permissionsService, 'currentUserOwnsObject')
       .mockReturnValue(true)
     groupService = TestBed.inject(GroupService)
-    savedViewService = TestBed.inject(SavedViewService)
   })
 
   function completeSetup(excludeService = null) {
@@ -161,15 +154,6 @@ describe('SettingsComponent', () => {
         })
       )
     }
-    if (excludeService !== savedViewService) {
-      jest.spyOn(savedViewService, 'listAll').mockReturnValue(
-        of({
-          all: savedViews.map((v) => v.id),
-          count: savedViews.length,
-          results: (savedViews as SavedView[]).concat([]),
-        })
-      )
-    }
 
     fixture = TestBed.createComponent(SettingsComponent)
     component = fixture.componentInstance
@@ -184,8 +168,6 @@ describe('SettingsComponent', () => {
     expect(navigateSpy).toHaveBeenCalledWith(['settings', 'permissions'])
     tabButtons[2].nativeElement.dispatchEvent(new MouseEvent('click'))
     expect(navigateSpy).toHaveBeenCalledWith(['settings', 'notifications'])
-    tabButtons[3].nativeElement.dispatchEvent(new MouseEvent('click'))
-    expect(navigateSpy).toHaveBeenCalledWith(['settings', 'savedviews'])
 
     const initSpy = jest.spyOn(component, 'initialize')
     component.isDirty = true // mock dirty
@@ -213,90 +195,8 @@ describe('SettingsComponent', () => {
     expect(scrollSpy).toHaveBeenCalledWith('#notifications')
   })
 
-  it('should enable organizing of sidebar saved views even on direct navigation', () => {
-    completeSetup()
-    jest
-      .spyOn(activatedRoute, 'paramMap', 'get')
-      .mockReturnValue(of(convertToParamMap({ section: 'savedviews' })))
-    activatedRoute.snapshot.fragment = '#savedviews'
-    component.ngOnInit()
-    expect(component.activeNavID).toEqual(4) // Saved Views
-    component.ngAfterViewInit()
-    expect(settingsService.organizingSidebarSavedViews).toBeTruthy()
-  })
-
-  it('should support save saved views, show error', () => {
-    completeSetup()
-
-    const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
-    tabButtons[3].nativeElement.dispatchEvent(new MouseEvent('click'))
-    fixture.detectChanges()
-
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastSpy = jest.spyOn(toastService, 'show')
-    const savedViewPatchSpy = jest.spyOn(savedViewService, 'patchMany')
-
-    const toggle = fixture.debugElement.query(
-      By.css('.form-check.form-switch input')
-    )
-    toggle.nativeElement.checked = true
-    toggle.nativeElement.dispatchEvent(new Event('change'))
-
-    // saved views error first
-    savedViewPatchSpy.mockReturnValueOnce(
-      throwError(() => new Error('unable to save saved views'))
-    )
-    component.saveSettings()
-    expect(toastErrorSpy).toHaveBeenCalled()
-    expect(savedViewPatchSpy).toHaveBeenCalled()
-    toastSpy.mockClear()
-    toastErrorSpy.mockClear()
-    savedViewPatchSpy.mockClear()
-
-    // succeed saved views
-    savedViewPatchSpy.mockReturnValueOnce(of(savedViews as SavedView[]))
-    component.saveSettings()
-    expect(toastErrorSpy).not.toHaveBeenCalled()
-    expect(savedViewPatchSpy).toHaveBeenCalled()
-  })
-
-  it('should update only patch saved views that have changed', () => {
-    completeSetup()
-
-    const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
-    tabButtons[3].nativeElement.dispatchEvent(new MouseEvent('click'))
-    fixture.detectChanges()
-
-    const patchSpy = jest.spyOn(savedViewService, 'patchMany')
-    component.saveSettings()
-    expect(patchSpy).not.toHaveBeenCalled()
-
-    const view = savedViews[0]
-    const toggle = fixture.debugElement.query(
-      By.css('.form-check.form-switch input')
-    )
-    toggle.nativeElement.checked = true
-    toggle.nativeElement.dispatchEvent(new Event('change'))
-    // register change
-    component.savedViewGroup.get(view.id.toString()).value[
-      'show_on_dashboard'
-    ] = !view.show_on_dashboard
-    fixture.detectChanges()
-
-    component.saveSettings()
-    expect(patchSpy).toHaveBeenCalledWith([
-      {
-        id: view.id,
-        name: view.name,
-        show_in_sidebar: view.show_in_sidebar,
-        show_on_dashboard: !view.show_on_dashboard,
-      },
-    ])
-  })
-
   it('should support save local settings updating appearance settings and calling API, show error', () => {
     completeSetup()
-    jest.spyOn(savedViewService, 'patchMany').mockReturnValue(of([]))
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastSpy = jest.spyOn(toastService, 'show')
     const storeSpy = jest.spyOn(settingsService, 'storeSettings')
@@ -326,7 +226,6 @@ describe('SettingsComponent', () => {
 
   it('should offer reload if settings changes require', () => {
     completeSetup()
-    jest.spyOn(savedViewService, 'patchMany').mockReturnValue(of([]))
     let toast: Toast
     toastService.getToasts().subscribe((t) => (toast = t[0]))
     component.initialize(true) // reset
@@ -359,18 +258,6 @@ describe('SettingsComponent', () => {
     expect(appearanceSpy).toHaveBeenCalled()
     expect(settingsService.get(SETTINGS_KEYS.THEME_COLOR)).toEqual('')
     component.clearThemeColor()
-  })
-
-  it('should support delete saved view', () => {
-    completeSetup()
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
-    const deleteSpy = jest.spyOn(savedViewService, 'delete')
-    deleteSpy.mockReturnValue(of(true))
-    component.deleteSavedView(savedViews[0] as SavedView)
-    expect(deleteSpy).toHaveBeenCalled()
-    expect(toastSpy).toHaveBeenCalledWith(
-      `Saved view "${savedViews[0].name}" deleted.`
-    )
   })
 
   it('should show errors on load if load users failure', () => {

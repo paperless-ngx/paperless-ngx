@@ -26,7 +26,6 @@ import {
   tap,
 } from 'rxjs'
 import { Group } from 'src/app/data/group'
-import { SavedView } from 'src/app/data/saved-view'
 import { GlobalSearchType, SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { User } from 'src/app/data/user'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
@@ -36,7 +35,6 @@ import {
   PermissionType,
 } from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
-import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import {
   SettingsService,
@@ -50,7 +48,6 @@ import {
   SystemStatusItemStatus,
   SystemStatus,
 } from 'src/app/data/system-status'
-import { DisplayMode } from 'src/app/data/document'
 
 enum SettingsNavIDs {
   General = 1,
@@ -75,9 +72,6 @@ export class SettingsComponent
   implements OnInit, AfterViewInit, OnDestroy, DirtyComponent
 {
   activeNavID: number
-  DisplayMode = DisplayMode
-
-  savedViewGroup = new FormGroup({})
 
   settingsForm = new FormGroup({
     bulkEditConfirmationDialogs: new FormControl(null),
@@ -110,14 +104,9 @@ export class SettingsComponent
     notificationsConsumerSuppressOnDashboard: new FormControl(null),
 
     savedViewsWarnOnUnsavedChange: new FormControl(null),
-    savedViews: this.savedViewGroup,
   })
 
-  savedViews: SavedView[]
   SettingsNavIDs = SettingsNavIDs
-  get displayFields() {
-    return this.settings.allDisplayFields
-  }
 
   store: BehaviorSubject<any>
   storeSub: Subscription
@@ -152,7 +141,6 @@ export class SettingsComponent
   }
 
   constructor(
-    public savedViewService: SavedViewService,
     private documentListViewService: DocumentListViewService,
     private toastService: ToastService,
     private settings: SettingsService,
@@ -214,18 +202,6 @@ export class SettingsComponent
         })
     }
 
-    if (
-      this.permissionsService.currentUserCan(
-        PermissionAction.View,
-        PermissionType.SavedView
-      )
-    ) {
-      this.savedViewService.listAll().subscribe((r) => {
-        this.savedViews = r.results
-        this.initialize(false)
-      })
-    }
-
     this.activatedRoute.paramMap.subscribe((paramMap) => {
       const section = paramMap.get('section')
       if (section) {
@@ -234,9 +210,6 @@ export class SettingsComponent
         )
         if (navIDKey) {
           this.activeNavID = SettingsNavIDs[navIDKey]
-        }
-        if (this.activeNavID === SettingsNavIDs.SavedViews) {
-          this.settings.organizingSidebarSavedViews = true
         }
       }
     })
@@ -314,7 +287,6 @@ export class SettingsComponent
       ),
       searchDbOnly: this.settings.get(SETTINGS_KEYS.SEARCH_DB_ONLY),
       searchLink: this.settings.get(SETTINGS_KEYS.SEARCH_FULL_TYPE),
-      savedViews: {},
     }
   }
 
@@ -327,14 +299,10 @@ export class SettingsComponent
       this.router
         .navigate(['settings', foundNavIDkey.toLowerCase()])
         .then((navigated) => {
-          this.settings.organizingSidebarSavedViews = false
           if (!navigated && this.isDirty) {
             this.activeNavID = navChangeEvent.activeId
           } else if (navigated && this.isDirty) {
             this.initialize()
-          }
-          if (this.activeNavID === SettingsNavIDs.SavedViews) {
-            this.settings.organizingSidebarSavedViews = true
           }
         })
   }
@@ -345,34 +313,6 @@ export class SettingsComponent
     const currentFormValue = this.settingsForm.value
 
     let storeData = this.getCurrentSettings()
-
-    if (this.savedViews) {
-      this.emptyGroup(this.savedViewGroup)
-
-      for (let view of this.savedViews) {
-        storeData.savedViews[view.id.toString()] = {
-          id: view.id,
-          name: view.name,
-          show_on_dashboard: view.show_on_dashboard,
-          show_in_sidebar: view.show_in_sidebar,
-          page_size: view.page_size,
-          display_mode: view.display_mode,
-          display_fields: view.display_fields,
-        }
-        this.savedViewGroup.addControl(
-          view.id.toString(),
-          new FormGroup({
-            id: new FormControl(null),
-            name: new FormControl(null),
-            show_on_dashboard: new FormControl(null),
-            show_in_sidebar: new FormControl(null),
-            page_size: new FormControl(null),
-            display_mode: new FormControl(null),
-            display_fields: new FormControl([]),
-          })
-        )
-      }
-    }
 
     this.store = new BehaviorSubject(storeData)
 
@@ -413,32 +353,12 @@ export class SettingsComponent
     }
   }
 
-  private emptyGroup(group: FormGroup) {
-    Object.keys(group.controls).forEach((key) => group.removeControl(key))
-  }
-
   ngOnDestroy() {
     if (this.isDirty) this.settings.updateAppearanceSettings() // in case user changed appearance but didn't save
     this.storeSub && this.storeSub.unsubscribe()
-    this.settings.organizingSidebarSavedViews = false
   }
 
-  deleteSavedView(savedView: SavedView) {
-    this.savedViewService.delete(savedView).subscribe(() => {
-      this.savedViewGroup.removeControl(savedView.id.toString())
-      this.savedViews.splice(this.savedViews.indexOf(savedView), 1)
-      this.toastService.showInfo(
-        $localize`Saved view "${savedView.name}" deleted.`
-      )
-      this.savedViewService.clearCache()
-      this.savedViewService.listAll().subscribe((r) => {
-        this.savedViews = r.results
-        this.initialize(true)
-      })
-    })
-  }
-
-  private saveLocalSettings() {
+  public saveSettings() {
     this.savePending = true
     const reloadRequired =
       this.settingsForm.value.displayLanguage !=
@@ -598,31 +518,6 @@ export class SettingsComponent
 
   get today() {
     return new Date()
-  }
-
-  saveSettings() {
-    // only patch views that have actually changed
-    const changed: SavedView[] = []
-    Object.values(this.savedViewGroup.controls)
-      .filter((g: FormGroup) => !g.pristine)
-      .forEach((group: FormGroup) => {
-        changed.push(group.value)
-      })
-    if (changed.length > 0) {
-      this.savedViewService.patchMany(changed).subscribe({
-        next: () => {
-          this.saveLocalSettings()
-        },
-        error: (error) => {
-          this.toastService.showError(
-            $localize`Error while storing settings on server.`,
-            error
-          )
-        },
-      })
-    } else {
-      this.saveLocalSettings()
-    }
   }
 
   reset() {

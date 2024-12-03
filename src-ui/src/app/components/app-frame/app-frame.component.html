@@ -199,6 +199,13 @@
                 <i-bs class="me-1" name="ui-radios"></i-bs><span>&nbsp;<ng-container i18n>Custom Fields</ng-container></span>
               </a>
             </li>
+            <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
+              <a class="nav-link" routerLink="savedviews" routerLinkActive="active" (click)="closeMenu()"
+                ngbPopover="Custom Fields" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
+                container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+                <i-bs class="me-1" name="window-stack"></i-bs><span>&nbsp;<ng-container i18n>Saved Views</ng-container></span>
+              </a>
+            </li>
             <li class="nav-item app-link"
               *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Workflow }"
               tourAnchor="tour.workflows">

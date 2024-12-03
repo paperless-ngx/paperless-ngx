@@ -27,6 +27,7 @@ import { UsersAndGroupsComponent } from './components/admin/users-groups/users-g
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 import { ConfigComponent } from './components/admin/config/config.component'
 import { TrashComponent } from './components/admin/trash/trash.component'
+import { SavedViewsComponent } from './components/manage/saved-views/saved-views.component'
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -166,6 +167,10 @@ export const routes: Routes = [
         redirectTo: '/usersgroups',
       },
       {
+        path: 'settings/savedviews',
+        redirectTo: '/savedviews',
+      },
+      {
         path: 'settings',
         component: SettingsComponent,
         canDeactivate: [DirtyFormGuard],
@@ -252,6 +257,17 @@ export const routes: Routes = [
           requiredPermission: {
             action: PermissionAction.View,
             type: PermissionType.User,
+          },
+        },
+      },
+      {
+        path: 'savedviews',
+        component: SavedViewsComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.SavedView,
           },
         },
       },
