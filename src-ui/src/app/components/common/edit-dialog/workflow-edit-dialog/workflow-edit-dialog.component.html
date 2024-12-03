@@ -322,6 +322,33 @@
           </div>
         </div>
       }
+      @case (WorkflowActionType.Email) {
+        <div class="row" [formGroup]="formGroup.get('email')">
+          <input type="hidden" formControlName="id" />
+          <div class="col">
+            <pngx-input-text i18n-title title="Email subject" formControlName="subject" [error]="error?.actions?.[i]?.email?.subject"></pngx-input-text>
+            <pngx-input-textarea i18n-title title="Email body" formControlName="body" [error]="error?.actions?.[i]?.email?.body"></pngx-input-textarea>
+            <pngx-input-text i18n-title title="Email recipients" formControlName="to" [error]="error?.actions?.[i]?.email?.to"></pngx-input-text>
+            <pngx-input-switch i18n-title title="Attach document" formControlName="include_document"></pngx-input-switch>
+          </div>
+        </div>
+      }
+      @case (WorkflowActionType.Webhook) {
+        <div class="row" [formGroup]="formGroup.get('webhook')">
+          <input type="hidden" formControlName="id" />
+          <div class="col">
+            <pngx-input-text i18n-title title="Webhook url" formControlName="url" [error]="error?.actions?.[i]?.url"></pngx-input-text>
+            <pngx-input-switch i18n-title title="Use parameters for webhook body" formControlName="use_params"></pngx-input-switch>
+            @if (formGroup.get('webhook').value['use_params']) {
+              <pngx-input-entries i18n-title title="Webhook params" formControlName="params" [error]="error?.actions?.[i]?.params"></pngx-input-entries>
+            } @else {
+              <pngx-input-textarea i18n-title title="Webhook body" formControlName="body" [error]="error?.actions?.[i]?.body"></pngx-input-textarea>
+            }
+            <pngx-input-entries i18n-title title="Webhook headers" formControlName="headers" [error]="error?.actions?.[i]?.headers"></pngx-input-entries>
+            <pngx-input-switch i18n-title title="Include document" formControlName="include_document"></pngx-input-switch>
+          </div>
+        </div>
+      }
     }
   </div>
 </ng-template>

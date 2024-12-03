@@ -322,6 +322,8 @@ fields and permissions, which will be merged.
 
 ### Workflow Triggers
 
+#### Types
+
 Currently, there are three events that correspond to workflow trigger 'types':
 
 1. **Consumption Started**: _before_ a document is consumed, so events can include filters by source (mail, consumption
@@ -380,25 +382,49 @@ Workflows allow you to filter by:
 
 ### Workflow Actions
 
-There are currently two types of workflow actions, "Assignment", which can assign:
+#### Types
 
--   Title, see [title placeholders](usage.md#title-placeholders) below
+The following workflow action types are available:
+
+##### Assignment
+
+"Assignment" actions can assign:
+
+-   Title, see [workflow placeholders](usage.md#workflow-placeholders) below
 -   Tags, correspondent, document type and storage path
 -   Document owner
 -   View and / or edit permissions to users or groups
 -   Custom fields. Note that no value for the field will be set
 
-and "Removal" actions, which can remove either all of or specific sets of the following:
+##### Removal
+
+"Removal" actions can remove either all of or specific sets of the following:
 
 -   Tags, correspondents, document types or storage paths
 -   Document owner
 -   View and / or edit permissions
 -   Custom fields
 
-#### Title placeholders
+##### Email
 
-Workflow titles can include placeholders but the available options differ depending on the type of
-workflow trigger. This is because at the time of consumption (when the title is to be set), no automatic tags etc. have been
+"Email" actions can send documents via email. This action requires a mail server to be [configured](configuration.md#email-sending). You can specify:
+
+-   The recipient email address(es) separated by commas
+-   The subject and body of the email, which can include placeholders, see [placeholders](usage.md#workflow-placeholders) below
+-   Whether to include the document as an attachment
+
+##### Webhook
+
+"Webhook" actions send a POST request to a specified URL. You can specify:
+
+-   The URL to send the request to
+-   The request body as text or as key-value pairs, which can include placeholders, see [placeholders](usage.md#workflow-placeholders) below.
+-   The request headers as key-value pairs
+
+#### Workflow placeholders
+
+Some workflow text can include placeholders but the available options differ depending on the type of
+workflow trigger. This is because at the time of consumption (when the text is to be set), no automatic tags etc. have been
 applied. You can use the following placeholders with any trigger type:
 
 -   `{correspondent}`: assigned correspondent name
@@ -425,6 +451,7 @@ The following placeholders are only available for "added" or "updated" triggers
 -   `{created_month_name_short}`: created month short name
 -   `{created_day}`: created day
 -   `{created_time}`: created time in HH:MM format
+-   `{doc_url}`: URL to the document in the web UI. Requires the `PAPERLESS_URL` setting to be set.
 
 ### Workflow permissions
 
