@@ -118,13 +118,13 @@
   </div>
 </ng-template>
 
-<ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs" (hidden)="duringTabChange($event)">
+<ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs" (hidden)="duringTabChange()" (navChange)="beforeTabChange()">
   <li ngbNavItem="failed">
     <a ngbNavLink i18n>Failed@if (tasksService.failedFileTasks.length > 0) {
       <span class="badge bg-danger ms-2">{{tasksService.failedFileTasks.length}}</span>
     }</a>
     <ng-template ngbNavContent>
-      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.failedFileTasks}"></ng-container>
+      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:currentTasks}"></ng-container>
     </ng-template>
   </li>
   <li ngbNavItem="completed">
@@ -132,7 +132,7 @@
       <span class="badge bg-secondary ms-2">{{tasksService.completedFileTasks.length}}</span>
     }</a>
     <ng-template ngbNavContent>
-      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.completedFileTasks}"></ng-container>
+      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:currentTasks}"></ng-container>
     </ng-template>
   </li>
   <li ngbNavItem="started">
@@ -140,7 +140,7 @@
       <span class="badge bg-secondary ms-2">{{tasksService.startedFileTasks.length}}</span>
     }</a>
     <ng-template ngbNavContent>
-      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.startedFileTasks}"></ng-container>
+      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:currentTasks}"></ng-container>
     </ng-template>
   </li>
   <li ngbNavItem="queued">
@@ -148,8 +148,35 @@
       <span class="badge bg-secondary ms-2">{{tasksService.queuedFileTasks.length}}</span>
     }</a>
     <ng-template ngbNavContent>
-      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:tasksService.queuedFileTasks}"></ng-container>
+      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:currentTasks}"></ng-container>
     </ng-template>
+  </li>
+  <li class="ms-auto">
+    <div class="form-inline d-flex align-items-center">
+      <div class="input-group input-group-sm flex-fill w-auto flex-nowrap">
+        <span class="input-group-text text-muted" i18n>Filter by</span>
+        @if (filterTargets.length > 1) {
+          <div ngbDropdown>
+            <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>{{filterTargetName}}</button>
+            <div class="dropdown-menu shadow" ngbDropdownMenu>
+              @for (t of filterTargets; track t.id) {
+                <button ngbDropdownItem [class.active]="filterTargetID === t.id" (click)="filterTargetID = t.id">{{t.name}}</button>
+              }
+            </div>
+          </div>
+        } @else {
+          <span class="input-group-text">{{filterTargetName}}</span>
+        }
+        @if (filterText?.length) {
+          <button class="btn btn-link btn-sm px-2 position-absolute top-0 end-0 z-10" (click)="resetFilter()">
+            <i-bs width="1em" height="1em" name="x"></i-bs>
+          </button>
+        }
+        <input #filterInput class="form-control form-control-sm" type="text"
+          (keyup)="filterInputKeyup($event)"
+          [(ngModel)]="filterText">
+      </div>
+    </div>
   </li>
 </ul>
 <div [ngbNavOutlet]="nav"></div>
