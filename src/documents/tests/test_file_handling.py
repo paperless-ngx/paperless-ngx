@@ -544,7 +544,11 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             name="test",
             data_type=CustomField.FieldDataType.SELECT,
             extra_data={
-                "select_options": ["apple", "banana", "cherry"],
+                "select_options": [
+                    {"label": "apple", "id": "abc123"},
+                    {"label": "banana", "id": "def456"},
+                    {"label": "cherry", "id": "ghi789"},
+                ],
             },
         )
         doc = Document.objects.create(
@@ -555,14 +559,22 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             archive_checksum="B",
             mime_type="application/pdf",
         )
-        CustomFieldInstance.objects.create(field=cf, document=doc, value_select=0)
+        CustomFieldInstance.objects.create(
+            field=cf,
+            document=doc,
+            value_select="abc123",
+        )
 
         self.assertEqual(generate_filename(doc), "document_apple.pdf")
 
         # handler should not have been called
         self.assertEqual(m.call_count, 0)
         cf.extra_data = {
-            "select_options": ["aubergine", "banana", "cherry"],
+            "select_options": [
+                {"label": "aubergine", "id": "abc123"},
+                {"label": "banana", "id": "def456"},
+                {"label": "cherry", "id": "ghi789"},
+            ],
         }
         cf.save()
         self.assertEqual(generate_filename(doc), "document_aubergine.pdf")
@@ -1373,13 +1385,18 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         cf2 = CustomField.objects.create(
             name="Select Field",
             data_type=CustomField.FieldDataType.SELECT,
-            extra_data={"select_options": ["ChoiceOne", "ChoiceTwo"]},
+            extra_data={
+                "select_options": [
+                    {"label": "ChoiceOne", "id": "abc=123"},
+                    {"label": "ChoiceTwo", "id": "def-456"},
+                ],
+            },
         )
 
         cfi1 = CustomFieldInstance.objects.create(
             document=doc_a,
             field=cf2,
-            value_select=0,
+            value_select="abc=123",
         )
 
         cfi = CustomFieldInstance.objects.create(

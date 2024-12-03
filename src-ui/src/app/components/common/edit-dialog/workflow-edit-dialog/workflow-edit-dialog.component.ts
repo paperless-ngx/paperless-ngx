@@ -16,9 +16,10 @@ import { EditDialogComponent } from '../edit-dialog.component'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { MailRule } from 'src/app/data/mail-rule'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { CustomField } from 'src/app/data/custom-field'
+import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
   DocumentSource,
+  ScheduleDateField,
   WorkflowTrigger,
   WorkflowTriggerType,
 } from 'src/app/data/workflow-trigger'
@@ -48,6 +49,25 @@ export const DOCUMENT_SOURCE_OPTIONS = [
   },
 ]
 
+export const SCHEDULE_DATE_FIELD_OPTIONS = [
+  {
+    id: ScheduleDateField.Added,
+    name: $localize`Added`,
+  },
+  {
+    id: ScheduleDateField.Created,
+    name: $localize`Created`,
+  },
+  {
+    id: ScheduleDateField.Modified,
+    name: $localize`Modified`,
+  },
+  {
+    id: ScheduleDateField.CustomField,
+    name: $localize`Custom Field`,
+  },
+]
+
 export const WORKFLOW_TYPE_OPTIONS = [
   {
     id: WorkflowTriggerType.Consumption,
@@ -60,6 +80,10 @@ export const WORKFLOW_TYPE_OPTIONS = [
   {
     id: WorkflowTriggerType.DocumentUpdated,
     name: $localize`Document Updated`,
+  },
+  {
+    id: WorkflowTriggerType.Scheduled,
+    name: $localize`Scheduled`,
   },
 ]
 
@@ -96,6 +120,7 @@ export class WorkflowEditDialogComponent
   storagePaths: StoragePath[]
   mailRules: MailRule[]
   customFields: CustomField[]
+  dateCustomFields: CustomField[]
 
   expandedItem: number = null
 
@@ -135,7 +160,12 @@ export class WorkflowEditDialogComponent
     customFieldsService
       .listAll()
       .pipe(first())
-      .subscribe((result) => (this.customFields = result.results))
+      .subscribe((result) => {
+        this.customFields = result.results
+        this.dateCustomFields = this.customFields?.filter(
+          (f) => f.data_type === CustomFieldDataType.Date
+        )
+      })
   }
 
   getCreateTitle() {
@@ -314,6 +344,15 @@ export class WorkflowEditDialogComponent
         filter_has_document_type: new FormControl(
           trigger.filter_has_document_type
         ),
+        schedule_offset_days: new FormControl(trigger.schedule_offset_days),
+        schedule_is_recurring: new FormControl(trigger.schedule_is_recurring),
+        schedule_recurring_interval_days: new FormControl(
+          trigger.schedule_recurring_interval_days
+        ),
+        schedule_date_field: new FormControl(trigger.schedule_date_field),
+        schedule_date_custom_field: new FormControl(
+          trigger.schedule_date_custom_field
+        ),
       }),
       { emitEvent }
     )
@@ -388,6 +427,10 @@ export class WorkflowEditDialogComponent
     return WORKFLOW_TYPE_OPTIONS
   }
 
+  get scheduleDateFieldOptions() {
+    return SCHEDULE_DATE_FIELD_OPTIONS
+  }
+
   getTriggerTypeOptionName(type: WorkflowTriggerType): string {
     return this.triggerTypeOptions.find((t) => t.id === type)?.name ?? ''
   }
@@ -408,6 +451,11 @@ export class WorkflowEditDialogComponent
       matching_algorithm: MATCH_NONE,
       match: '',
       is_insensitive: true,
+      schedule_offset_days: 0,
+      schedule_is_recurring: false,
+      schedule_recurring_interval_days: 1,
+      schedule_date_field: ScheduleDateField.Added,
+      schedule_date_custom_field: null,
     }
     this.object.triggers.push(trigger)
     this.createTriggerField(trigger)

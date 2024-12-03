@@ -26,11 +26,13 @@ from django.db.models import Case
 from django.db.models import Count
 from django.db.models import IntegerField
 from django.db.models import Max
+from django.db.models import Model
 from django.db.models import Q
 from django.db.models import Sum
 from django.db.models import When
 from django.db.models.functions import Length
 from django.db.models.functions import Lower
+from django.db.models.manager import Manager
 from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
@@ -426,7 +428,7 @@ class DocumentViewSet(
         )
 
     def file_response(self, pk, request, disposition):
-        doc = Document.objects.select_related("owner").get(id=pk)
+        doc = Document.global_objects.select_related("owner").get(id=pk)
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "view_document",
@@ -961,6 +963,22 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin):
 
 
 class BulkEditView(PassUserMixin):
+    MODIFIED_FIELD_BY_METHOD = {
+        "set_correspondent": "correspondent",
+        "set_document_type": "document_type",
+        "set_storage_path": "storage_path",
+        "add_tag": "tags",
+        "remove_tag": "tags",
+        "modify_tags": "tags",
+        "modify_custom_fields": "custom_fields",
+        "set_permissions": None,
+        "delete": "deleted_at",
+        "rotate": "checksum",
+        "delete_pages": "checksum",
+        "split": None,
+        "merge": None,
+    }
+
     permission_classes = (IsAuthenticated,)
     serializer_class = BulkEditSerializer
     parser_classes = (parsers.JSONParser,)
@@ -1013,8 +1031,53 @@ class BulkEditView(PassUserMixin):
                 return HttpResponseForbidden("Insufficient permissions")
 
         try:
+            modified_field = self.MODIFIED_FIELD_BY_METHOD[method.__name__]
+            if settings.AUDIT_LOG_ENABLED and modified_field:
+                old_documents = {
+                    obj["pk"]: obj
+                    for obj in Document.objects.filter(pk__in=documents).values(
+                        "pk",
+                        "correspondent",
+                        "document_type",
+                        "storage_path",
+                        "tags",
+                        "custom_fields",
+                        "deleted_at",
+                        "checksum",
+                    )
+                }
+
             # TODO: parameter validation
             result = method(documents, **parameters)
+
+            if settings.AUDIT_LOG_ENABLED and modified_field:
+                new_documents = Document.objects.filter(pk__in=documents)
+                for doc in new_documents:
+                    old_value = old_documents[doc.pk][modified_field]
+                    new_value = getattr(doc, modified_field)
+
+                    if isinstance(new_value, Model):
+                        # correspondent, document type, etc.
+                        new_value = new_value.pk
+                    elif isinstance(new_value, Manager):
+                        # tags, custom fields
+                        new_value = list(new_value.values_list("pk", flat=True))
+
+                    LogEntry.objects.log_create(
+                        instance=doc,
+                        changes={
+                            modified_field: [
+                                old_value,
+                                new_value,
+                            ],
+                        },
+                        action=LogEntry.Action.UPDATE,
+                        actor=user,
+                        additional_data={
+                            "reason": f"Bulk edit: {method.__name__}",
+                        },
+                    )
+
             return Response({"result": result})
         except Exception as e:
             logger.warning(f"An error occurred performing bulk edit: {e!s}")
@@ -1546,6 +1609,12 @@ class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     filterset_class = StoragePathFilterSet
     ordering_fields = ("name", "path", "matching_algorithm", "match", "document_count")
 
+    def get_permissions(self):
+        if self.action == "test":
+            # Test action does not require object level permissions
+            self.permission_classes = (IsAuthenticated,)
+        return super().get_permissions()
+
     def destroy(self, request, *args, **kwargs):
         """
         When a storage path is deleted, see if documents
@@ -1562,17 +1631,12 @@ class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
         return response
 
-
-class StoragePathTestView(GenericAPIView):
-    """
-    Test storage path against a document
-    """
-
-    permission_classes = [IsAuthenticated]
-    serializer_class = StoragePathTestSerializer
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+    @action(methods=["post"], detail=False)
+    def test(self, request):
+        """
+        Test storage path against a document
+        """
+        serializer = StoragePathTestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         document = serializer.validated_data.get("document")

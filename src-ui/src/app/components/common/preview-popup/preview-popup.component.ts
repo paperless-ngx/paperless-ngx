@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http'
-import { Component, Input, OnDestroy } from '@angular/core'
+import { Component, Input, OnDestroy, ViewChild } from '@angular/core'
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { first, Subject, takeUntil } from 'rxjs'
 import { Document } from 'src/app/data/document'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
@@ -23,6 +24,18 @@ export class PreviewPopupComponent implements OnDestroy {
     return this._document
   }
 
+  @Input()
+  link: string
+
+  @Input()
+  linkClasses: string = 'btn btn-sm btn-outline-secondary'
+
+  @Input()
+  linkTarget: string = '_blank'
+
+  @Input()
+  linkTitle: string = $localize`Open preview`
+
   unsubscribeNotifier: Subject<any> = new Subject()
 
   error = false
@@ -30,6 +43,12 @@ export class PreviewPopupComponent implements OnDestroy {
   requiresPassword: boolean = false
 
   previewText: string
+
+  @ViewChild('popover') popover: NgbPopover
+
+  mouseOnPreview: boolean
+
+  popoverClass: string = 'shadow popover-preview'
 
   get renderAsObject(): boolean {
     return (this.isPdf && this.useNativePdfViewer) || !this.isPdf
@@ -82,5 +101,34 @@ export class PreviewPopupComponent implements OnDestroy {
     } else {
       this.error = true
     }
+  }
+
+  get previewUrl() {
+    return this.documentService.getPreviewUrl(this.document.id)
+  }
+
+  mouseEnterPreview() {
+    this.mouseOnPreview = true
+    if (!this.popover.isOpen()) {
+      // we're going to open but hide to pre-load content during hover delay
+      this.popover.open()
+      this.popoverClass = 'shadow popover-preview pe-none opacity-0'
+      setTimeout(() => {
+        if (this.mouseOnPreview) {
+          // show popover
+          this.popoverClass = this.popoverClass.replace('pe-none opacity-0', '')
+        } else {
+          this.popover.close()
+        }
+      }, 600)
+    }
+  }
+
+  mouseLeavePreview() {
+    this.mouseOnPreview = false
+  }
+
+  public close() {
+    this.popover.close(false)
   }
 }

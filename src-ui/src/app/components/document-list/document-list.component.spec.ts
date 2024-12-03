@@ -72,6 +72,7 @@ import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { NgSelectModule } from '@ng-select/ng-select'
+import { PreviewPopupComponent } from '../common/preview-popup/preview-popup.component'
 
 const docs: Document[] = [
   {
@@ -137,6 +138,7 @@ describe('DocumentListComponent', () => {
         UsernamePipe,
         SafeHtmlPipe,
         IsNumberPipe,
+        PreviewPopupComponent,
       ],
       imports: [
         RouterTestingModule.withRoutes(routes),

@@ -190,7 +190,8 @@
                     @case (CustomFieldDataType.Select) {
                       <pngx-input-select formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [itemsArray]="getCustomFieldFromInstance(fieldInstance)?.extra_data.select_options"
+                      [items]="getCustomFieldFromInstance(fieldInstance)?.extra_data.select_options"
+                      bindLabel="label"
                       [allowNull]="true"
                       [horizontal]="true"
                       [removable]="userIsOwner"
@@ -387,6 +388,15 @@
         <div class="preview-sticky">
           <img [src]="previewUrl | safeUrl" width="100%" height="100%" alt="{{title}}" />
         </div>
+      }
+      @case (ContentRenderType.TIFF) {
+        @if (!tiffError) {
+          <div class="preview-sticky">
+            <img [src]="tiffURL" width="100%" height="100%" alt="{{title}}" />
+          </div>
+        } @else {
+          <div class="preview-sticky bg-light p-3 overflow-auto whitespace-preserve" width="100%">{{tiffError}}</div>
+        }
       }
       @case (ContentRenderType.Other) {
         <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>

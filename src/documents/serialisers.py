@@ -160,7 +160,7 @@ class SetPermissionsMixin:
             },
         }
         if set_permissions is not None:
-            for action in permissions_dict:
+            for action, _ in permissions_dict.items():
                 if action in set_permissions:
                     users = set_permissions[action]["users"]
                     permissions_dict[action]["users"] = self._validate_user_ids(users)
@@ -533,20 +533,27 @@ class CustomFieldSerializer(serializers.ModelSerializer):
         if (
             "data_type" in attrs
             and attrs["data_type"] == CustomField.FieldDataType.SELECT
-            and (
+        ) or (
+            self.instance
+            and self.instance.data_type == CustomField.FieldDataType.SELECT
+        ):
+            if (
                 "extra_data" not in attrs
                 or "select_options" not in attrs["extra_data"]
                 or not isinstance(attrs["extra_data"]["select_options"], list)
                 or len(attrs["extra_data"]["select_options"]) == 0
                 or not all(
-                    isinstance(option, str) and len(option) > 0
+                    len(option.get("label", "")) > 0
                     for option in attrs["extra_data"]["select_options"]
                 )
-            )
-        ):
-            raise serializers.ValidationError(
-                {"error": "extra_data.select_options must be a valid list"},
-            )
+            ):
+                raise serializers.ValidationError(
+                    {"error": "extra_data.select_options must be a valid list"},
+                )
+            # labels are valid, generate ids if not present
+            for option in attrs["extra_data"]["select_options"]:
+                if option.get("id") is None:
+                    option["id"] = get_random_string(length=16)
         elif (
             "data_type" in attrs
             and attrs["data_type"] == CustomField.FieldDataType.MONETARY
@@ -646,10 +653,14 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
             elif field.data_type == CustomField.FieldDataType.SELECT:
                 select_options = field.extra_data["select_options"]
                 try:
-                    select_options[data["value"]]
+                    next(
+                        option
+                        for option in select_options
+                        if option["id"] == data["value"]
+                    )
                 except Exception:
                     raise serializers.ValidationError(
-                        f"Value must be index of an element in {select_options}",
+                        f"Value must be an id of an element in {select_options}",
                     )
             elif field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
                 doc_ids = data["value"]
@@ -1772,6 +1783,11 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             "filter_has_tags",
             "filter_has_correspondent",
             "filter_has_document_type",
+            "schedule_offset_days",
+            "schedule_is_recurring",
+            "schedule_recurring_interval_days",
+            "schedule_date_field",
+            "schedule_date_custom_field",
         ]
 
     def validate(self, attrs):

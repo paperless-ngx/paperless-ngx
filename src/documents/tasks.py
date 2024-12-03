@@ -31,10 +31,14 @@ from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.models import Correspondent
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Workflow
+from documents.models import WorkflowRun
+from documents.models import WorkflowTrigger
 from documents.parsers import DocumentParser
 from documents.parsers import get_parser_class_for_mime_type
 from documents.plugins.base import ConsumeTaskPlugin
@@ -44,6 +48,7 @@ from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
+from documents.signals.handlers import run_workflows
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -337,3 +342,85 @@ def empty_trash(doc_ids=None):
             cleanup_document_deletion,
             sender=Document,
         )
+
+
+@shared_task
+def check_scheduled_workflows():
+    scheduled_workflows: list[Workflow] = (
+        Workflow.objects.filter(
+            triggers__type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            enabled=True,
+        )
+        .distinct()
+        .prefetch_related("triggers")
+    )
+    if scheduled_workflows.count() > 0:
+        logger.debug(f"Checking {len(scheduled_workflows)} scheduled workflows")
+        for workflow in scheduled_workflows:
+            schedule_triggers = workflow.triggers.filter(
+                type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            )
+            trigger: WorkflowTrigger
+            for trigger in schedule_triggers:
+                documents = Document.objects.none()
+                offset_td = timedelta(days=trigger.schedule_offset_days)
+                logger.debug(
+                    f"Checking trigger {trigger} with offset {offset_td} against field: {trigger.schedule_date_field}",
+                )
+                match trigger.schedule_date_field:
+                    case WorkflowTrigger.ScheduleDateField.ADDED:
+                        documents = Document.objects.filter(
+                            added__lt=timezone.now() - offset_td,
+                        )
+                    case WorkflowTrigger.ScheduleDateField.CREATED:
+                        documents = Document.objects.filter(
+                            created__lt=timezone.now() - offset_td,
+                        )
+                    case WorkflowTrigger.ScheduleDateField.MODIFIED:
+                        documents = Document.objects.filter(
+                            modified__lt=timezone.now() - offset_td,
+                        )
+                    case WorkflowTrigger.ScheduleDateField.CUSTOM_FIELD:
+                        cf_instances = CustomFieldInstance.objects.filter(
+                            field=trigger.schedule_date_custom_field,
+                            value_date__lt=timezone.now() - offset_td,
+                        )
+                        documents = Document.objects.filter(
+                            id__in=cf_instances.values_list("document", flat=True),
+                        )
+                if documents.count() > 0:
+                    logger.debug(
+                        f"Found {documents.count()} documents for trigger {trigger}",
+                    )
+                    for document in documents:
+                        workflow_runs = WorkflowRun.objects.filter(
+                            document=document,
+                            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+                            workflow=workflow,
+                        ).order_by("-run_at")
+                        if not trigger.schedule_is_recurring and workflow_runs.exists():
+                            # schedule is non-recurring and the workflow has already been run
+                            logger.debug(
+                                f"Skipping document {document} for non-recurring workflow {workflow} as it has already been run",
+                            )
+                            continue
+                        elif (
+                            trigger.schedule_is_recurring
+                            and workflow_runs.exists()
+                            and (
+                                workflow_runs.last().run_at
+                                > timezone.now()
+                                - timedelta(
+                                    days=trigger.schedule_recurring_interval_days,
+                                )
+                            )
+                        ):
+                            # schedule is recurring but the last run was within the number of recurring interval days
+                            logger.debug(
+                                f"Skipping document {document} for recurring workflow {workflow} as the last run was within the recurring interval",
+                            )
+                            continue
+                        run_workflows(
+                            WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+                            document,
+                        )

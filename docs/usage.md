@@ -331,8 +331,10 @@ Currently, there are three events that correspond to workflow trigger 'types':
    be used for filtering.
 3. **Document Updated**: when a document is updated. Similar to 'added' events, triggers can include filtering by content matching,
    tags, doc type, or correspondent.
+4. **Scheduled**: a scheduled trigger that can be used to run workflows at a specific time. The date used can be either the document
+   added, created, updated date or you can specify a (date) custom field. You can also specify a day offset from the date.
 
-The following flow diagram illustrates the three trigger types:
+The following flow diagram illustrates the three document trigger types:
 
 ```mermaid
 flowchart TD

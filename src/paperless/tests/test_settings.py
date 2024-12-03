@@ -157,6 +157,7 @@ class TestCeleryScheduleParsing(TestCase):
     INDEX_EXPIRE_TIME = 23.0 * 60.0 * 60.0
     SANITY_EXPIRE_TIME = ((7.0 * 24.0) - 1.0) * 60.0 * 60.0
     EMPTY_TRASH_EXPIRE_TIME = 23.0 * 60.0 * 60.0
+    RUN_SCHEDULED_WORKFLOWS_EXPIRE_TIME = 59.0 * 60.0
 
     def test_schedule_configuration_default(self):
         """
@@ -195,6 +196,11 @@ class TestCeleryScheduleParsing(TestCase):
                     "task": "documents.tasks.empty_trash",
                     "schedule": crontab(minute=0, hour="1"),
                     "options": {"expires": self.EMPTY_TRASH_EXPIRE_TIME},
+                },
+                "Check and run scheduled workflows": {
+                    "task": "documents.tasks.check_scheduled_workflows",
+                    "schedule": crontab(minute="5", hour="*/1"),
+                    "options": {"expires": self.RUN_SCHEDULED_WORKFLOWS_EXPIRE_TIME},
                 },
             },
             schedule,
@@ -243,6 +249,11 @@ class TestCeleryScheduleParsing(TestCase):
                     "schedule": crontab(minute=0, hour="1"),
                     "options": {"expires": self.EMPTY_TRASH_EXPIRE_TIME},
                 },
+                "Check and run scheduled workflows": {
+                    "task": "documents.tasks.check_scheduled_workflows",
+                    "schedule": crontab(minute="5", hour="*/1"),
+                    "options": {"expires": self.RUN_SCHEDULED_WORKFLOWS_EXPIRE_TIME},
+                },
             },
             schedule,
         )
@@ -282,6 +293,11 @@ class TestCeleryScheduleParsing(TestCase):
                     "schedule": crontab(minute=0, hour="1"),
                     "options": {"expires": self.EMPTY_TRASH_EXPIRE_TIME},
                 },
+                "Check and run scheduled workflows": {
+                    "task": "documents.tasks.check_scheduled_workflows",
+                    "schedule": crontab(minute="5", hour="*/1"),
+                    "options": {"expires": self.RUN_SCHEDULED_WORKFLOWS_EXPIRE_TIME},
+                },
             },
             schedule,
         )
@@ -303,6 +319,7 @@ class TestCeleryScheduleParsing(TestCase):
                 "PAPERLESS_SANITY_TASK_CRON": "disable",
                 "PAPERLESS_INDEX_TASK_CRON": "disable",
                 "PAPERLESS_EMPTY_TRASH_TASK_CRON": "disable",
+                "PAPERLESS_WORKFLOW_SCHEDULED_TASK_CRON": "disable",
             },
         ):
             schedule = _parse_beat_schedule()

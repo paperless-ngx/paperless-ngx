@@ -52,7 +52,7 @@ export class CorrespondentListComponent extends ManagementListComponent<Correspo
                 date = new Date(
                   c.last_correspondence
                     ?.toString()
-                    .replace(/-(\d\d):\d\d:\d\d/gm, `-$1:00`)
+                    .replace(/([-+])(\d\d):\d\d:\d\d/gm, `$1$2:00`)
                 )
               }
               return this.datePipe.transform(date)

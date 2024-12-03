@@ -29,6 +29,7 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
+from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.signals import document_consumption_finished
 from documents.tests.utils import DirectoriesMixin
@@ -1306,6 +1307,275 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         # group2 should have been added
         self.assertIn(self.group2, group_perms)
 
+    def test_workflow_scheduled_trigger_created(self):
+        """
+        GIVEN:
+            - Existing workflow with SCHEDULED trigger against the created field and action that assigns owner
+            - Existing doc that matches the trigger
+        WHEN:
+            - Scheduled workflows are checked
+        THEN:
+            - Workflow runs, document owner is updated
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_offset_days=1,
+            schedule_date_field="created",
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        now = timezone.localtime(timezone.now())
+        created = now - timedelta(weeks=520)
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+            created=created,
+        )
+
+        tasks.check_scheduled_workflows()
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.owner, self.user2)
+
+    def test_workflow_scheduled_trigger_added(self):
+        """
+        GIVEN:
+            - Existing workflow with SCHEDULED trigger against the added field and action that assigns owner
+            - Existing doc that matches the trigger
+        WHEN:
+            - Scheduled workflows are checked
+        THEN:
+            - Workflow runs, document owner is updated
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_offset_days=1,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.ADDED,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        added = timezone.now() - timedelta(days=365)
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+            added=added,
+        )
+
+        tasks.check_scheduled_workflows()
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.owner, self.user2)
+
+    @mock.patch("documents.models.Document.objects.filter", autospec=True)
+    def test_workflow_scheduled_trigger_modified(self, mock_filter):
+        """
+        GIVEN:
+            - Existing workflow with SCHEDULED trigger against the modified field and action that assigns owner
+            - Existing doc that matches the trigger
+        WHEN:
+            - Scheduled workflows are checked
+        THEN:
+            - Workflow runs, document owner is updated
+        """
+        # we have to mock because modified field is auto_now
+        mock_filter.return_value = Document.objects.all()
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_offset_days=1,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.MODIFIED,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        tasks.check_scheduled_workflows()
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.owner, self.user2)
+
+    def test_workflow_scheduled_trigger_custom_field(self):
+        """
+        GIVEN:
+            - Existing workflow with SCHEDULED trigger against a custom field and action that assigns owner
+            - Existing doc that matches the trigger
+        WHEN:
+            - Scheduled workflows are checked
+        THEN:
+            - Workflow runs, document owner is updated
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_offset_days=1,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.CUSTOM_FIELD,
+            schedule_date_custom_field=self.cf1,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=self.cf1,
+            value_date=timezone.now() - timedelta(days=2),
+        )
+
+        tasks.check_scheduled_workflows()
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.owner, self.user2)
+
+    def test_workflow_scheduled_already_run(self):
+        """
+        GIVEN:
+            - Existing workflow with SCHEDULED trigger
+            - Existing doc that has already had the workflow run
+        WHEN:
+            - Scheduled workflows are checked
+        THEN:
+            - Workflow does not run again
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_offset_days=1,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.CREATED,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+            created=timezone.now() - timedelta(days=2),
+        )
+
+        wr = WorkflowRun.objects.create(
+            workflow=w,
+            document=doc,
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            run_at=timezone.now(),
+        )
+        self.assertEqual(
+            str(wr),
+            f"WorkflowRun of {w} at {wr.run_at} on {doc}",
+        )  # coverage
+
+        tasks.check_scheduled_workflows()
+
+        doc.refresh_from_db()
+        self.assertIsNone(doc.owner)
+
+    def test_workflow_scheduled_trigger_too_early(self):
+        """
+        GIVEN:
+            - Existing workflow with SCHEDULED trigger and recurring interval of 7 days
+            - Workflow run date is 6 days ago
+        WHEN:
+            - Scheduled workflows are checked
+        THEN:
+            - Workflow does not run as the offset is not met
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_offset_days=30,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.CREATED,
+            schedule_is_recurring=True,
+            schedule_recurring_interval_days=7,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+            created=timezone.now() - timedelta(days=40),
+        )
+
+        WorkflowRun.objects.create(
+            workflow=w,
+            document=doc,
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            run_at=timezone.now() - timedelta(days=6),
+        )
+
+        with self.assertLogs(level="DEBUG") as cm:
+            tasks.check_scheduled_workflows()
+            self.assertIn(
+                "last run was within the recurring interval",
+                " ".join(cm.output),
+            )
+
+            doc.refresh_from_db()
+            self.assertIsNone(doc.owner)
+
     def test_workflow_enabled_disabled(self):
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
@@ -1354,7 +1624,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
 
     def test_new_trigger_type_raises_exception(self):
         trigger = WorkflowTrigger.objects.create(
-            type=4,
+            type=99,
         )
         action = WorkflowAction.objects.create(
             assign_title="Doc assign owner",
@@ -1370,7 +1640,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         doc = Document.objects.create(
             title="test",
         )
-        self.assertRaises(Exception, document_matches_workflow, doc, w, 4)
+        self.assertRaises(Exception, document_matches_workflow, doc, w, 99)
 
     def test_removal_action_document_updated_workflow(self):
         """

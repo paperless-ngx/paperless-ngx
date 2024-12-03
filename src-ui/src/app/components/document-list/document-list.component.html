@@ -292,7 +292,12 @@
                 @if (activeDisplayFields.includes(DisplayField.TITLE) || activeDisplayFields.includes(DisplayField.TAGS)) {
                   <td width="30%">
                     @if (activeDisplayFields.includes(DisplayField.TITLE)) {
-                      <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
+                      <div class="d-inline-block" (mouseleave)="popupPreview.close()">
+                        <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
+                        <pngx-preview-popup [document]="d" linkClasses="btn btn-sm btn-link text-secondary" linkTitle="Preview document" (click)="$event.stopPropagation()" i18n-linkTitle #popupPreview>
+                          <i-bs name="eye"></i-bs>
+                        </pngx-preview-popup>
+                      </div>
                     }
                     @if (activeDisplayFields.includes(DisplayField.TAGS)) {
                       @for (t of d.tags$ | async; track t) {

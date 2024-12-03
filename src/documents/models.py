@@ -947,7 +947,7 @@ class CustomFieldInstance(SoftDeleteModel):
 
     value_document_ids = models.JSONField(null=True)
 
-    value_select = models.PositiveSmallIntegerField(null=True)
+    value_select = models.CharField(null=True, max_length=16)
 
     class Meta:
         ordering = ("created",)
@@ -962,7 +962,11 @@ class CustomFieldInstance(SoftDeleteModel):
 
     def __str__(self) -> str:
         value = (
-            self.field.extra_data["select_options"][self.value_select]
+            next(
+                option.get("label")
+                for option in self.field.extra_data["select_options"]
+                if option.get("id") == self.value_select
+            )
             if (
                 self.field.data_type == CustomField.FieldDataType.SELECT
                 and self.value_select is not None
@@ -1016,11 +1020,18 @@ class WorkflowTrigger(models.Model):
         CONSUMPTION = 1, _("Consumption Started")
         DOCUMENT_ADDED = 2, _("Document Added")
         DOCUMENT_UPDATED = 3, _("Document Updated")
+        SCHEDULED = 4, _("Scheduled")
 
     class DocumentSourceChoices(models.IntegerChoices):
         CONSUME_FOLDER = DocumentSource.ConsumeFolder.value, _("Consume Folder")
         API_UPLOAD = DocumentSource.ApiUpload.value, _("Api Upload")
         MAIL_FETCH = DocumentSource.MailFetch.value, _("Mail Fetch")
+
+    class ScheduleDateField(models.TextChoices):
+        ADDED = "added", _("Added")
+        CREATED = "created", _("Created")
+        MODIFIED = "modified", _("Modified")
+        CUSTOM_FIELD = "custom_field", _("Custom Field")
 
     type = models.PositiveIntegerField(
         _("Workflow Trigger Type"),
@@ -1096,6 +1107,49 @@ class WorkflowTrigger(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
         verbose_name=_("has this correspondent"),
+    )
+
+    schedule_offset_days = models.PositiveIntegerField(
+        _("schedule offset days"),
+        default=0,
+        help_text=_(
+            "The number of days to offset the schedule trigger by.",
+        ),
+    )
+
+    schedule_is_recurring = models.BooleanField(
+        _("schedule is recurring"),
+        default=False,
+        help_text=_(
+            "If the schedule should be recurring.",
+        ),
+    )
+
+    schedule_recurring_interval_days = models.PositiveIntegerField(
+        _("schedule recurring delay in days"),
+        default=1,
+        validators=[MinValueValidator(1)],
+        help_text=_(
+            "The number of days between recurring schedule triggers.",
+        ),
+    )
+
+    schedule_date_field = models.CharField(
+        _("schedule date field"),
+        max_length=20,
+        choices=ScheduleDateField.choices,
+        default=ScheduleDateField.ADDED,
+        help_text=_(
+            "The field to check for a schedule trigger.",
+        ),
+    )
+
+    schedule_date_custom_field = models.ForeignKey(
+        CustomField,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("schedule date custom field"),
     )
 
     class Meta:
@@ -1348,3 +1402,39 @@ class Workflow(models.Model):
 
     def __str__(self):
         return f"Workflow: {self.name}"
+
+
+class WorkflowRun(models.Model):
+    workflow = models.ForeignKey(
+        Workflow,
+        on_delete=models.CASCADE,
+        related_name="runs",
+        verbose_name=_("workflow"),
+    )
+
+    type = models.PositiveIntegerField(
+        _("workflow trigger type"),
+        choices=WorkflowTrigger.WorkflowTriggerType.choices,
+        null=True,
+    )
+
+    document = models.ForeignKey(
+        Document,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="workflow_runs",
+        verbose_name=_("document"),
+    )
+
+    run_at = models.DateTimeField(
+        _("date run"),
+        default=timezone.now,
+        db_index=True,
+    )
+
+    class Meta:
+        verbose_name = _("workflow run")
+        verbose_name_plural = _("workflow runs")
+
+    def __str__(self):
+        return f"WorkflowRun of {self.workflow} at {self.run_at} on {self.document}"

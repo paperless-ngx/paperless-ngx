@@ -77,13 +77,18 @@ describe('CorrespondentListComponent', () => {
   it('should support very old date strings', () => {
     jest.spyOn(correspondentsService, 'listFiltered').mockReturnValue(
       of({
-        count: 1,
-        all: [1],
+        count: 2,
+        all: [1, 2],
         results: [
           {
             id: 1,
             name: 'Correspondent1',
             last_correspondence: '1832-12-31T15:32:54-07:52:58',
+          },
+          {
+            id: 2,
+            name: 'Correspondent2',
+            last_correspondence: '1901-07-01T00:00:00+00:09:21',
           },
         ],
       })

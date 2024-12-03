@@ -501,11 +501,42 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     component.selectionModel = selectionModel
     selectionModel.toggle(items[1].id)
     selectionModel.apply()
-    expect(selectionModel.itemsSorted).toEqual([
+    expect(selectionModel.items).toEqual([
       nullItem,
       { id: null, name: 'Null B' },
       items[1],
       items[0],
+    ])
+  })
+
+  it('selection model should sort items by state and document counts, if set', () => {
+    component.items = items.concat([{ id: 4, name: 'Item D' }])
+    component.selectionModel = selectionModel
+    component.documentCounts = [
+      { id: 1, document_count: 0 }, // Tag1
+      { id: 2, document_count: 1 }, // Tag2
+      { id: 4, document_count: 2 },
+    ]
+    component.selectionModel.apply()
+    expect(selectionModel.items).toEqual([
+      nullItem,
+      { id: 4, name: 'Item D' },
+      items[1], // Tag2
+      items[0], // Tag1
+    ])
+
+    selectionModel.toggle(items[1].id)
+    component.documentCounts = [
+      { id: 1, document_count: 0 },
+      { id: 2, document_count: 1 },
+      { id: 4, document_count: 0 },
+    ]
+    selectionModel.apply()
+    expect(selectionModel.items).toEqual([
+      nullItem,
+      items[1], // Tag2
+      { id: 4, name: 'Item D' },
+      items[0], // Tag1
     ])
   })
 

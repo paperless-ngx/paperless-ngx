@@ -283,7 +283,7 @@ jobs:
           merge-multiple: true
       -
         name: Upload frontend coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           # not required for public repos, but intermittently fails otherwise
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -299,7 +299,7 @@ jobs:
           path: src/
       -
         name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           # not required for public repos, but intermittently fails otherwise
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -406,7 +406,7 @@ jobs:
       -
         name: Login to Docker Hub
         uses: docker/login-action@v3
-        # Don't attempt to login is not pushing to Docker Hub
+        # Don't attempt to login if not pushing to Docker Hub
         if: steps.push-other-places.outputs.enable == 'true'
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -414,7 +414,7 @@ jobs:
       -
         name: Login to Quay.io
         uses: docker/login-action@v3
-        # Don't attempt to login is not pushing to Quay.io
+        # Don't attempt to login if not pushing to Quay.io
         if: steps.push-other-places.outputs.enable == 'true'
         with:
           registry: quay.io
