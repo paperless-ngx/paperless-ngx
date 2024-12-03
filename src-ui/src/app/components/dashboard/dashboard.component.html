@@ -9,9 +9,6 @@
          [cdkDropListDisabled]="settingsService.globalDropzoneActive"
          (cdkDropListDropped)="onDrop($event)"
     >
-     <div class="col">
-        <pngx-statistics-custom-widget></pngx-statistics-custom-widget>
-     </div>
       @if (savedViewService.loading) {
         <div class="col">
           <div class="spinner-border spinner-border-sm me-2" role="status"></div>
@@ -19,11 +16,16 @@
         </div>
       }
 
+
       @if (settingsService.offerTour()) {
         <div class="col">
           <pngx-welcome-widget (dismiss)="completeTour()"></pngx-welcome-widget>
         </div>
       }
+
+      <div class="col">
+        <pngx-statistics-custom-widget></pngx-statistics-custom-widget>
+     </div>
 
       <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
         @for (v of dashboardViews; track v) {

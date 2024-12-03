@@ -10,8 +10,8 @@
         <h5 class="mt-2 mb-2 ">Uploaded Document Statistics </h5>
 <!--        <div class="d-flex flex-wrap gap-2 mt-1 mb-1">-->
 <!--        </div>-->
-          <button class="btn btn-sm btn-outline-primary mt-1" [hidden]="!customDateEnable" (click)="customDateEnable=!customDateEnable">Custom day</button>
-          <button class="btn btn-sm btn-outline-primary mt-1" [hidden]="customDateEnable"  (click)="customDateEnable=!customDateEnable">Specific date</button>
+<!--          <button class="btn btn-sm btn-outline-primary mt-1" [hidden]="!customDateEnable" (click)="customDateEnable=!customDateEnable">Custom day</button>-->
+<!--          <button class="btn btn-sm btn-outline-primary mt-1" [hidden]="customDateEnable"  (click)="customDateEnable=!customDateEnable">Specific date</button>-->
 <!--        <div class=" mt-1 mb-1">-->
 <!--        </div>-->
 <!--        <div class="">-->
@@ -23,11 +23,10 @@
 
       </div>
       <div class="mt-2 mb-2">
-        <pngx-input-date-custom i18n-title title="" [model]="innitDate" [hidden]="!customDateEnable"
-                                (dateSelection)="onDateSelection($event)"></pngx-input-date-custom>
-        <pngx-input-datepicker-range [hidden]="customDateEnable" class="mb-2 mb-sm-0 "
-                                     (dateRangeChange)="onDateRangeChange($event)"
-                                     (confirmButton)="confirmButton()"></pngx-input-datepicker-range>
+<!--        <pngx-input-date-custom i18n-title title="" [model]="innitDate" [hidden]="!customDateEnable"-->
+<!--                                (dateSelection)="onDateSelection($event)"></pngx-input-date-custom>-->
+        <pngx-input-datepicker-range  class="mb-2 mb-sm-0 "
+                                     (dateRangeChange)="onDateRangeChange($event)"></pngx-input-datepicker-range>
 
 
       </div>

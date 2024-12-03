@@ -633,7 +633,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.html</context>
-               <context context-type="linenumber">18</context>
+               <context context-type="linenumber">15</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/folder-node-widget/node-tree-widget.component.html</context>
@@ -2974,10 +2974,6 @@
                <context context-type="linenumber">50</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/common/edit-dialog/approval-edit-dialog/approval-edit-dialog.component.html</context>
-               <context context-type="linenumber">11</context>
-            </context-group>
-            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
                <context context-type="linenumber">34</context>
             </context-group>
@@ -3445,7 +3441,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
-               <context context-type="linenumber">95</context>
+               <context context-type="linenumber">74</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
@@ -3573,7 +3569,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
-               <context context-type="linenumber">179</context>
+               <context context-type="linenumber">155</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -6282,12 +6278,12 @@
                <x id="PH" equiv-text="this.title" />
             </target>
          </trans-unit>
-         <trans-unit id="5559248076190743961" datatype="html">
+         <trans-unit id="2977882815372821294" datatype="html">
             <source>
-               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;col-12 mt-1 mb-1&quot; &gt;" />
+               <x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&lt;div class=&quot;col-12&quot;&gt;" />
                <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div class=&quot;dp-hidden position-absolute&quot;&gt;" />
                <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;input-group&quot;&gt;" />
-               <x id="TAG_INPUT" ctype="x-input" equiv-text="&lt;input           name=&quot;datepicker&quot;           class=&quot;form-control&quot;           ngbDatepicker           #datepicker=&quot;ngbDatepicker&quot;           [autoClose]=&quot;'outside'&quot;           (dateSelect)=&quot;onDateRangeSelection($event)&quot;           [displayMonths]=&quot;2&quot;           [dayTemplate]=&quot;t&quot;           [minDate]=&quot;minDate&quot;           [maxDate]=&quot;maxDate&quot;           outsideDays=&quot;hidden&quot;           [startDate]=&quot;fromDate!&quot;           tabindex=&quot;-1&quot;         /&gt;" />
+               <x id="TAG_INPUT" ctype="x-input" equiv-text="&lt;input           name=&quot;datepicker&quot;           class=&quot;form-control&quot;           ngbDatepicker           #datepicker=&quot;ngbDatepicker&quot;           [autoClose]=&quot;'outside'&quot;           (dateSelect)=&quot;onDateSelection($event)&quot;           [displayMonths]=&quot;2&quot;           [dayTemplate]=&quot;t&quot;           outsideDays=&quot;hidden&quot;           tabindex=&quot;-1&quot;         /&gt;" />
                <x id="START_TAG_NG_TEMPLATE" ctype="x-ng_template" equiv-text="&lt;ng-template #t let-date let-focused=&quot;focused&quot;&gt;" />
                <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span             class=&quot;custom-day&quot;             [class.focused]=&quot;focused&quot;             [class.range]=&quot;isRange(date)&quot;             [class.faded]=&quot;isHovered(date) || isInside(date)&quot;             (mouseenter)=&quot;hoveredDate = date&quot;             (mouseleave)=&quot;hoveredDate = null&quot;           &gt;" />
                <x id="INTERPOLATION" equiv-text="{{ date.day }}" />
@@ -6296,43 +6292,48 @@
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
                <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;input-group&quot;&gt;" />
-               <x id="TAG_INPUT_1" ctype="x-input_1" equiv-text="&lt;input         #dpFromDate         class=&quot;form-control&quot;         [placeholder]=&quot;placeholder&quot;         name=&quot;dpFromDate&quot;         [value]=&quot;formatter.format(fromDate)&quot;         (input)=&quot;fromDate = validateInput(fromDate, dpFromDate.value)&quot;       /&gt;" />
-               <x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&lt;button class=&quot;btn btn-outline-secondary&quot; (click)=&quot;datepicker.toggle()&quot; type=&quot;button&quot;&gt;" />
+               <x id="TAG_INPUT_1" ctype="x-input_1" equiv-text="&lt;input         #dpDateRange         class=&quot;form-control custom-input&quot;         placeholder=&quot;yyyy-mm-dd to yyyy-mm-dd&quot;         name=&quot;dpDateRange&quot;         [value]=&quot;formatter.format(fromDate) + ' - ' + (toDate!=null?formatter.format(toDate):'')&quot;         (input)=&quot;updateDateRange(dpDateRange.value)&quot;         readonly        /&gt;" />
+               <x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&lt;div ngbDropdown class=&quot;&quot;&gt;" />
+               <x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&lt;button class=&quot;btn btn-outline-secondary&quot; id=&quot;dropdownBasic1&quot; ngbDropdownToggle&gt;" />
                <x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;i-bs width=&quot;1.2em&quot; height=&quot;1.2em&quot; name=&quot;calendar3&quot;&gt;" />
                <x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;/i-bs&gt;" />
                <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;" />
-               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
-               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
-               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;col-12 mt-1 mb-1&quot; &gt;" />
-               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;input-group&quot;&gt;" />
-               <x id="TAG_INPUT_2" ctype="x-input_2" equiv-text="&lt;input         #dpToDate         class=&quot;form-control&quot;         [placeholder]=&quot;placeholder&quot;         name=&quot;dpToDate&quot;         [value]=&quot;formatter.format(toDate)&quot;         (input)=&quot;toDate = validateInput(toDate, dpToDate.value)&quot;       /&gt;" />
-               <x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&lt;button class=&quot;btn btn-outline-secondary&quot; (click)=&quot;datepicker.toggle()&quot; type=&quot;button&quot;&gt;" />
-               <x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;i-bs width=&quot;1.2em&quot; height=&quot;1.2em&quot; name=&quot;calendar3&quot;&gt;" />
-               <x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;/i-bs&gt;" />
+               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div ngbDropdownMenu aria-labelledby=&quot;dropdownBasic1&quot;&gt;" />
+               <x id="START_TAG_BUTTON_1" ctype="x-button_1" equiv-text="&lt;button ngbDropdownItem (click)=&quot;setRange('today')&quot;&gt;" />
+               Today
                <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;" />
-               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
-               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
-               <x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&lt;div class=&quot;col-12 d-flex flex-wrap gap-2 mt-1 mb-1&quot;&gt;" />
-               <x id="START_TAG_BUTTON_1" ctype="x-button_1" equiv-text="&lt;button class=&quot;btn btn-sm btn-outline-primary mt-1&quot; (click)=&quot;getThisWeek()&quot;&gt;" />
-               This week
+               <x id="START_TAG_BUTTON_2" ctype="x-button_2" equiv-text="&lt;button ngbDropdownItem (click)=&quot;setRange('yesterday')&quot;&gt;" />
+               Yesterday
                <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;" />
-               <x id="START_TAG_BUTTON_2" ctype="x-button_2" equiv-text="&lt;button class=&quot;btn btn-sm btn-outline-primary mt-1&quot; (click)=&quot;getThisMonth()&quot;&gt;" />
+               <x id="START_TAG_BUTTON_3" ctype="x-button_3" equiv-text="&lt;button ngbDropdownItem (click)=&quot;setRange('last7days')&quot;&gt;" />
+               Last 7 days
+               <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;" />
+               <x id="START_TAG_BUTTON_4" ctype="x-button_4" equiv-text="&lt;button ngbDropdownItem (click)=&quot;setRange('last30days')&quot;&gt;" />
+               Last 30 days
+               <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;" />
+               <x id="START_TAG_BUTTON_5" ctype="x-button_5" equiv-text="&lt;button ngbDropdownItem (click)=&quot;setRange('thisMonth')&quot;&gt;" />
                This month
                <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;" />
-               <x id="START_TAG_BUTTON_3" ctype="x-button_3" equiv-text="&lt;button class=&quot;btn btn-sm btn-outline-primary mt-1&quot; (click)=&quot;getThisYear()&quot;&gt;" />
-               This year
+               <x id="START_TAG_BUTTON_6" ctype="x-button_6" equiv-text="&lt;button ngbDropdownItem (click)=&quot;setRange('lastMonth')&quot;&gt;" />
+               Last month
                <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;" />
+               <x id="START_TAG_BUTTON_7" ctype="x-button_7" equiv-text="&lt;button ngbDropdownItem (click)=&quot;datepicker.toggle()&quot;&gt;" />
+               Custom
+               <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/input/datepicker-range/datepicker-range.component.html</context>
-               <context context-type="linenumber">5,71</context>
+               <context context-type="linenumber">2,61</context>
             </context-group>
             <target state="translated">
-               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&amp;lt;div class=&amp;quot;col-12 mt-1 mb-1&amp;quot; &gt;" />
+               <x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&amp;lt;div class=&amp;quot;col-12&amp;quot;&gt;" />
                <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&amp;lt;div class=&amp;quot;dp-hidden position-absolute&amp;quot;&gt;" />
                <x id="START_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;div class=&amp;quot;input-group&amp;quot;&gt;" />
-               <x id="TAG_INPUT" ctype="x-input" equiv-text="&amp;lt;input           name=&amp;quot;datepicker&amp;quot;           class=&amp;quot;form-control&amp;quot;           ngbDatepicker           #datepicker=&amp;quot;ngbDatepicker&amp;quot;           [autoClose]=&amp;quot;'outside'&amp;quot;           (dateSelect)=&amp;quot;onDateRangeSelection($event)&amp;quot;           [displayMonths]=&amp;quot;2&amp;quot;           [dayTemplate]=&amp;quot;t&amp;quot;           [minDate]=&amp;quot;minDate&amp;quot;           [maxDate]=&amp;quot;maxDate&amp;quot;           outsideDays=&amp;quot;hidden&amp;quot;           [startDate]=&amp;quot;fromDate!&amp;quot;           tabindex=&amp;quot;-1&amp;quot;         /&gt;" />
+               <x id="TAG_INPUT" ctype="x-input" equiv-text="&amp;lt;input           name=&amp;quot;datepicker&amp;quot;           class=&amp;quot;form-control&amp;quot;           ngbDatepicker           #datepicker=&amp;quot;ngbDatepicker&amp;quot;           [autoClose]=&amp;quot;'outside'&amp;quot;           (dateSelect)=&amp;quot;onDateSelection($event)&amp;quot;           [displayMonths]=&amp;quot;2&amp;quot;           [dayTemplate]=&amp;quot;t&amp;quot;           outsideDays=&amp;quot;hidden&amp;quot;           tabindex=&amp;quot;-1&amp;quot;         /&gt;" />
                <x id="START_TAG_NG_TEMPLATE" ctype="x-ng_template" equiv-text="&amp;lt;ng-template #t let-date let-focused=&amp;quot;focused&amp;quot;&gt;" />
                <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;span             class=&amp;quot;custom-day&amp;quot;             [class.focused]=&amp;quot;focused&amp;quot;             [class.range]=&amp;quot;isRange(date)&amp;quot;             [class.faded]=&amp;quot;isHovered(date) || isInside(date)&amp;quot;             (mouseenter)=&amp;quot;hoveredDate = date&amp;quot;             (mouseleave)=&amp;quot;hoveredDate = null&amp;quot;           &gt;" />
                <x id="INTERPOLATION" equiv-text="{{ date.day }}" />
@@ -6341,32 +6342,37 @@
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
                <x id="START_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;div class=&amp;quot;input-group&amp;quot;&gt;" />
-               <x id="TAG_INPUT_1" ctype="x-input_1" equiv-text="&amp;lt;input         #dpFromDate         class=&amp;quot;form-control&amp;quot;         [placeholder]=&amp;quot;placeholder&amp;quot;         name=&amp;quot;dpFromDate&amp;quot;         [value]=&amp;quot;formatter.format(fromDate)&amp;quot;         (input)=&amp;quot;fromDate = validateInput(fromDate, dpFromDate.value)&amp;quot;       /&gt;" />
-               <x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;button class=&amp;quot;btn btn-outline-secondary&amp;quot; (click)=&amp;quot;datepicker.toggle()&amp;quot; type=&amp;quot;button&amp;quot;&gt;" />
+               <x id="TAG_INPUT_1" ctype="x-input_1" equiv-text="&amp;lt;input         #dpDateRange         class=&amp;quot;form-control custom-input&amp;quot;         placeholder=&amp;quot;yyyy-mm-dd to yyyy-mm-dd&amp;quot;         name=&amp;quot;dpDateRange&amp;quot;         [value]=&amp;quot;formatter.format(fromDate) + ' - ' + (toDate!=null?formatter.format(toDate):'')&amp;quot;         (input)=&amp;quot;updateDateRange(dpDateRange.value)&amp;quot;         readonly        /&gt;" />
+               <x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&amp;lt;div ngbDropdown class=&amp;quot;&amp;quot;&gt;" />
+               <x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;button class=&amp;quot;btn btn-outline-secondary&amp;quot; id=&amp;quot;dropdownBasic1&amp;quot; ngbDropdownToggle&gt;" />
                <x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&amp;lt;i-bs width=&amp;quot;1.2em&amp;quot; height=&amp;quot;1.2em&amp;quot; name=&amp;quot;calendar3&amp;quot;&gt;" />
                <x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&amp;lt;/i-bs&gt;" />
                <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;/button&gt;" />
-               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
-               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
-               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&amp;lt;div class=&amp;quot;col-12 mt-1 mb-1&amp;quot; &gt;" />
-               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;div class=&amp;quot;input-group&amp;quot;&gt;" />
-               <x id="TAG_INPUT_2" ctype="x-input_2" equiv-text="&amp;lt;input         #dpToDate         class=&amp;quot;form-control&amp;quot;         [placeholder]=&amp;quot;placeholder&amp;quot;         name=&amp;quot;dpToDate&amp;quot;         [value]=&amp;quot;formatter.format(toDate)&amp;quot;         (input)=&amp;quot;toDate = validateInput(toDate, dpToDate.value)&amp;quot;       /&gt;" />
-               <x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;button class=&amp;quot;btn btn-outline-secondary&amp;quot; (click)=&amp;quot;datepicker.toggle()&amp;quot; type=&amp;quot;button&amp;quot;&gt;" />
-               <x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&amp;lt;i-bs width=&amp;quot;1.2em&amp;quot; height=&amp;quot;1.2em&amp;quot; name=&amp;quot;calendar3&amp;quot;&gt;" />
-               <x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&amp;lt;/i-bs&gt;" />
+               <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&amp;lt;div ngbDropdownMenu aria-labelledby=&amp;quot;dropdownBasic1&amp;quot;&gt;" />
+               <x id="START_TAG_BUTTON_1" ctype="x-button_1" equiv-text="&amp;lt;button ngbDropdownItem (click)=&amp;quot;setRange('today')&amp;quot;&gt;" />
+               Hôm nay
                <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;/button&gt;" />
-               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
-               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
-               <x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&amp;lt;div class=&amp;quot;col-12 d-flex flex-wrap gap-2 mt-1 mb-1&amp;quot;&gt;" />
-               <x id="START_TAG_BUTTON_1" ctype="x-button_1" equiv-text="&amp;lt;button class=&amp;quot;btn btn-sm btn-outline-primary mt-1&amp;quot; (click)=&amp;quot;getThisWeek()&amp;quot;&gt;" />
-               Tuần này
+               <x id="START_TAG_BUTTON_2" ctype="x-button_2" equiv-text="&amp;lt;button ngbDropdownItem (click)=&amp;quot;setRange('yesterday')&amp;quot;&gt;" />
+               Hôm qua
                <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;/button&gt;" />
-               <x id="START_TAG_BUTTON_2" ctype="x-button_2" equiv-text="&amp;lt;button class=&amp;quot;btn btn-sm btn-outline-primary mt-1&amp;quot; (click)=&amp;quot;getThisMonth()&amp;quot;&gt;" />
+               <x id="START_TAG_BUTTON_3" ctype="x-button_3" equiv-text="&amp;lt;button ngbDropdownItem (click)=&amp;quot;setRange('last7days')&amp;quot;&gt;" />
+               7 ngày trước
+               <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;/button&gt;" />
+               <x id="START_TAG_BUTTON_4" ctype="x-button_4" equiv-text="&amp;lt;button ngbDropdownItem (click)=&amp;quot;setRange('last30days')&amp;quot;&gt;" />
+               30 ngày trước
+               <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;/button&gt;" />
+               <x id="START_TAG_BUTTON_5" ctype="x-button_5" equiv-text="&amp;lt;button ngbDropdownItem (click)=&amp;quot;setRange('thisMonth')&amp;quot;&gt;" />
                Tháng này
                <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;/button&gt;" />
-               <x id="START_TAG_BUTTON_3" ctype="x-button_3" equiv-text="&amp;lt;button class=&amp;quot;btn btn-sm btn-outline-primary mt-1&amp;quot; (click)=&amp;quot;getThisYear()&amp;quot;&gt;" />
-               Năm này
+               <x id="START_TAG_BUTTON_6" ctype="x-button_6" equiv-text="&amp;lt;button ngbDropdownItem (click)=&amp;quot;setRange('lastMonth')&amp;quot;&gt;" />
+               Tháng sau
                <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;/button&gt;" />
+               <x id="START_TAG_BUTTON_7" ctype="x-button_7" equiv-text="&amp;lt;button ngbDropdownItem (click)=&amp;quot;datepicker.toggle()&amp;quot;&gt;" />
+               Ngày tùy chỉnh
+               <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;/button&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
+               <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
             </target>
          </trans-unit>
@@ -6376,7 +6382,7 @@
                <context context-type="sourcefile">src/app/components/common/input/document-link/document-link.component.ts</context>
                <context context-type="linenumber">44</context>
             </context-group>
-            <target state="translated">No documents found</target>
+            <target state="translated">Không tìm thấy tài liệu nào</target>
          </trans-unit>
          <trans-unit id="6932865105766151309" datatype="html">
             <source>Upload</source>
@@ -6392,7 +6398,7 @@
                <context context-type="sourcefile">src/app/components/common/input/password/password.component.html</context>
                <context context-type="linenumber">6</context>
             </context-group>
-            <target state="translated">Show password</target>
+            <target state="translated">Hiển thị mật khẩu</target>
          </trans-unit>
          <trans-unit id="594042705136125260" datatype="html">
             <source>Edit Permissions</source>
@@ -6417,7 +6423,7 @@
                <context context-type="linenumber">23</context>
             </context-group>
             <note priority="1" from="description">Used for both types, correspondents, storage paths</note>
-            <target state="translated">Add item</target>
+            <target state="translated">Thêm mục</target>
          </trans-unit>
          <trans-unit id="3686284950598311784" datatype="html">
             <source>Private</source>
@@ -6445,7 +6451,7 @@
                <context context-type="sourcefile">src/app/components/manage/folder-card-small/folder-card-small.component.ts</context>
                <context context-type="linenumber">91</context>
             </context-group>
-            <target state="translated">Private</target>
+            <target state="translated">Riêng tư</target>
          </trans-unit>
          <trans-unit id="2504502765849142619" datatype="html">
             <source>No items found</source>
@@ -6469,7 +6475,7 @@
                <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
                <context context-type="linenumber">15</context>
             </context-group>
-            <target state="translated">Add tag</target>
+            <target state="translated">Thêm thẻ</target>
          </trans-unit>
          <trans-unit id="2561408369057364131" datatype="html">
             <source>Filter documents with these Tags</source>
@@ -6477,7 +6483,7 @@
                <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
                <context context-type="linenumber">41</context>
             </context-group>
-            <target state="translated">Filter documents with these Tags</target>
+            <target state="translated">Lọc tài liệu có các thẻ này</target>
          </trans-unit>
          <trans-unit id="1388712764439031120" datatype="html">
             <source>Open link</source>
@@ -6485,7 +6491,7 @@
                <context context-type="sourcefile">src/app/components/common/input/url/url.component.html</context>
                <context context-type="linenumber">14</context>
             </context-group>
-            <target state="translated">Open link</target>
+            <target state="translated">Mở đường dẫn</target>
          </trans-unit>
          <trans-unit id="5752465522295465624" datatype="html">
             <source>What's this?</source>
@@ -7241,24 +7247,16 @@
             </context-group>
             <target state="translated">Thống kê</target>
          </trans-unit>
-         <trans-unit id="5385781902662155761" datatype="html">
+         <trans-unit id="538061070560610647" datatype="html">
             <source>
                <x id="START_TAG_DIV_6" ctype="x-div_6" equiv-text="&lt;div class=&quot;list-group border-light&quot;&gt;" />
                <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;d-flex flex-wrap gap-2 mt-1 mb-1&quot;&gt;" />
                <x id="START_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;h5 class=&quot;mt-2 mb-2 &quot;&gt;" />
                Uploaded Document Statistics
                <x id="CLOSE_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;/h5&gt;" />
-               <x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&lt;button class=&quot;btn btn-sm btn-outline-primary mt-1&quot; [hidden]=&quot;!customDateEnable&quot; (click)=&quot;customDateEnable=!customDateEnable&quot;&gt;" />
-               Custom day
-               <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;" />
-               <x id="START_TAG_BUTTON_1" ctype="x-button_1" equiv-text="&lt;button class=&quot;btn btn-sm btn-outline-primary mt-1&quot; [hidden]=&quot;customDateEnable&quot;  (click)=&quot;customDateEnable=!customDateEnable&quot;&gt;" />
-               Specific date
-               <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
                <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div class=&quot;mt-2 mb-2&quot;&gt;" />
-               <x id="START_TAG_PNGX_INPUT_DATE_CUSTOM" ctype="x-pngx_input_date_custom" equiv-text="&lt;pngx-input-date-custom i18n-title title=&quot;&quot; [model]=&quot;innitDate&quot; [hidden]=&quot;!customDateEnable&quot;                                 (dateSelection)=&quot;onDateSelection($event)&quot;&gt;" />
-               <x id="CLOSE_TAG_PNGX_INPUT_DATE_CUSTOM" ctype="x-pngx_input_date_custom" equiv-text="&lt;/pngx-input-date-custom&gt;" />
-               <x id="START_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&lt;pngx-input-datepicker-range [hidden]=&quot;customDateEnable&quot; class=&quot;mb-2 mb-sm-0 &quot;                                      (dateRangeChange)=&quot;onDateRangeChange($event)&quot;                                      (confirmButton)=&quot;confirmButton()&quot;&gt;" />
+               <x id="START_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&lt;pngx-input-datepicker-range  class=&quot;mb-2 mb-sm-0 &quot;                                      (dateRangeChange)=&quot;onDateRangeChange($event)&quot;&gt;" />
                <x id="CLOSE_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&lt;/pngx-input-datepicker-range&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
                <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;&quot;&gt;" />
@@ -7297,7 +7295,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.html</context>
-               <context context-type="linenumber">3,116</context>
+               <context context-type="linenumber">3,115</context>
             </context-group>
             <target state="translated">
                <x id="START_TAG_DIV_6" ctype="x-div_6" equiv-text="&amp;lt;div class=&amp;quot;list-group border-light&amp;quot;&gt;" />
@@ -7305,17 +7303,9 @@
                <x id="START_HEADING_LEVEL5" ctype="x-h5" equiv-text="&amp;lt;h5 class=&amp;quot;mt-2 mb-2 &amp;quot;&gt;" />
                Thống kê tài liệu đã tải lên
                <x id="CLOSE_HEADING_LEVEL5" ctype="x-h5" equiv-text="&amp;lt;/h5&gt;" />
-               <x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;button class=&amp;quot;btn btn-sm btn-outline-primary mt-1&amp;quot; [hidden]=&amp;quot;!customDateEnable&amp;quot; (click)=&amp;quot;customDateEnable=!customDateEnable&amp;quot;&gt;" />
-               Ngày tùy chỉnh
-               <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;/button&gt;" />
-               <x id="START_TAG_BUTTON_1" ctype="x-button_1" equiv-text="&amp;lt;button class=&amp;quot;btn btn-sm btn-outline-primary mt-1&amp;quot; [hidden]=&amp;quot;customDateEnable&amp;quot;  (click)=&amp;quot;customDateEnable=!customDateEnable&amp;quot;&gt;" />
-               ngày xác định
-               <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;/button&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
                <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&amp;lt;div class=&amp;quot;mt-2 mb-2&amp;quot;&gt;" />
-               <x id="START_TAG_PNGX_INPUT_DATE_CUSTOM" ctype="x-pngx_input_date_custom" equiv-text="&amp;lt;pngx-input-date-custom i18n-title title=&amp;quot;&amp;quot; [model]=&amp;quot;innitDate&amp;quot; [hidden]=&amp;quot;!customDateEnable&amp;quot;                                 (dateSelection)=&amp;quot;onDateSelection($event)&amp;quot;&gt;" />
-               <x id="CLOSE_TAG_PNGX_INPUT_DATE_CUSTOM" ctype="x-pngx_input_date_custom" equiv-text="&amp;lt;/pngx-input-date-custom&gt;" />
-               <x id="START_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&amp;lt;pngx-input-datepicker-range [hidden]=&amp;quot;customDateEnable&amp;quot; class=&amp;quot;mb-2 mb-sm-0 &amp;quot;                                      (dateRangeChange)=&amp;quot;onDateRangeChange($event)&amp;quot;                                      (confirmButton)=&amp;quot;confirmButton()&amp;quot;&gt;" />
+               <x id="START_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&amp;lt;pngx-input-datepicker-range  class=&amp;quot;mb-2 mb-sm-0 &amp;quot;                                      (dateRangeChange)=&amp;quot;onDateRangeChange($event)&amp;quot;&gt;" />
                <x id="CLOSE_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&amp;lt;/pngx-input-datepicker-range&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
                <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&amp;lt;div class=&amp;quot;&amp;quot;&gt;" />
@@ -7326,7 +7316,7 @@
                <x id="HORIZONTAL_RULE" ctype="x-hr" equiv-text="&amp;lt;hr /&gt;" />
                <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&amp;lt;div class=&amp;quot;&amp;quot;&gt;" />
                <x id="START_HEADING_LEVEL5_1" equiv-text="&amp;lt;h5 class=&amp;quot;mt-2 mb-2 text-center&amp;quot;&gt;" />
-               Loại tài liệu/thẻ hàng đầu có số lượng tài liệu lớn nhất
+               Các loại tài liệu/thẻ hàng đầu có số lượng tài liệu lớn nhất
                <x id="CLOSE_HEADING_LEVEL5" ctype="x-h5" equiv-text="&amp;lt;/h5&gt;" />
                <x id="START_TAG_DIV_5" ctype="x-div_5" equiv-text="&amp;lt;div class=&amp;quot;row&amp;quot;&gt;" />
                <x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&amp;lt;div class=&amp;quot;col-md-6 d-flex flex-column align-items-center&amp;quot;&gt;" />
@@ -7357,7 +7347,7 @@
             <source>Document Type</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
-               <context context-type="linenumber">142</context>
+               <context context-type="linenumber">118</context>
             </context-group>
             <target state="translated">Loại tài liệu</target>
          </trans-unit>

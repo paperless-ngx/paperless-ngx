@@ -1,8 +1,5 @@
 <form class="row row-cols-sm-auto" i18n>
-<!--  <div class="col-12" [hidden]="customDateEnable" >-->
-<!--    <pngx-input-date-custom i18n-title title=""  (dateSelection)="onDateSelection($event)"  ></pngx-input-date-custom>-->
-<!--  </div>-->
-  <div class="col-12 mt-1 mb-1" >
+  <div class="col-12">
     <div class="dp-hidden position-absolute">
       <div class="input-group">
         <input
@@ -11,15 +8,13 @@
           ngbDatepicker
           #datepicker="ngbDatepicker"
           [autoClose]="'outside'"
-          (dateSelect)="onDateRangeSelection($event)"
+          (dateSelect)="onDateSelection($event)"
           [displayMonths]="2"
           [dayTemplate]="t"
-          [minDate]="minDate"
-          [maxDate]="maxDate"
           outsideDays="hidden"
-          [startDate]="fromDate!"
           tabindex="-1"
         />
+
         <ng-template #t let-date let-focused="focused">
           <span
             class="custom-day"
@@ -29,46 +24,39 @@
             (mouseenter)="hoveredDate = date"
             (mouseleave)="hoveredDate = null"
           >
-              {{ date.day }}
+            {{ date.day }}
           </span>
         </ng-template>
+
+      </div>
+
+    </div>
+    <div class="input-group">
+      <input
+        #dpDateRange
+        class="form-control custom-input"
+        placeholder="yyyy-mm-dd to yyyy-mm-dd"
+        name="dpDateRange"
+        [value]="formatter.format(fromDate) + ' - ' + (toDate!=null?formatter.format(toDate):'')"
+        (input)="updateDateRange(dpDateRange.value)"
+        readonly
+
+      />
+      <div ngbDropdown class="">
+      <button class="btn btn-outline-secondary" id="dropdownBasic1" ngbDropdownToggle>
+        <i-bs width="1.2em" height="1.2em" name="calendar3"></i-bs>
+      </button>
+      <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+        <button ngbDropdownItem (click)="setRange('today')">Today</button>
+        <button ngbDropdownItem (click)="setRange('yesterday')">Yesterday</button>
+        <button ngbDropdownItem (click)="setRange('last7days')">Last 7 days</button>
+        <button ngbDropdownItem (click)="setRange('last30days')">Last 30 days</button>
+        <button ngbDropdownItem (click)="setRange('thisMonth')">This month</button>
+        <button ngbDropdownItem (click)="setRange('lastMonth')">Last month</button>
+        <button ngbDropdownItem (click)="datepicker.toggle()">Custom</button>
       </div>
     </div>
-    <div class="input-group">
-      <input
-        #dpFromDate
-        class="form-control"
-        [placeholder]="placeholder"
-        name="dpFromDate"
-        [value]="formatter.format(fromDate)"
-        (input)="fromDate = validateInput(fromDate, dpFromDate.value)"
-      />
-      <button class="btn btn-outline-secondary" (click)="datepicker.toggle()" type="button">
-        <i-bs width="1.2em" height="1.2em" name="calendar3"></i-bs>
-      </button>
     </div>
-  </div>
-  <div class="col-12 mt-1 mb-1" >
-    <div class="input-group">
-      <input
-        #dpToDate
-        class="form-control"
-        [placeholder]="placeholder"
-        name="dpToDate"
-        [value]="formatter.format(toDate)"
-        (input)="toDate = validateInput(toDate, dpToDate.value)"
-      />
-      <button class="btn btn-outline-secondary" (click)="datepicker.toggle()" type="button">
-        <i-bs width="1.2em" height="1.2em" name="calendar3"></i-bs>
-      </button>
-    </div>
-  </div>
 
-  <div class="col-12 d-flex flex-wrap gap-2 mt-1 mb-1">
-    <button class="btn btn-sm btn-outline-primary mt-1" (click)="getThisWeek()">This week</button>
-    <button class="btn btn-sm btn-outline-primary mt-1" (click)="getThisMonth()">This month</button>
-    <button class="btn btn-sm btn-outline-primary mt-1" (click)="getThisYear()">This year</button>
   </div>
-<!--  <div class="col-12" >-->
-<!--  </div>-->
 </form>

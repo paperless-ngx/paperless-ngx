@@ -540,7 +540,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.html</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">15</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/folder-node-widget/node-tree-widget.component.html</context>
@@ -2532,10 +2532,6 @@
           <context context-type="linenumber">50</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/edit-dialog/approval-edit-dialog/approval-edit-dialog.component.html</context>
-          <context context-type="linenumber">11</context>
-        </context-group>
-        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
@@ -2956,7 +2952,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
-          <context context-type="linenumber">95</context>
+          <context context-type="linenumber">74</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
@@ -3077,7 +3073,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
-          <context context-type="linenumber">179</context>
+          <context context-type="linenumber">155</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -5472,20 +5468,17 @@
           <context context-type="linenumber">155</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="5559248076190743961" datatype="html">
-        <source><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;col-12 mt-1 mb-1&quot; &gt;"/><x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div class=&quot;dp-hidden position-absolute&quot;&gt;"/><x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;input-group&quot;&gt;"/><x id="TAG_INPUT" ctype="x-input" equiv-text="&lt;input
+      <trans-unit id="2977882815372821294" datatype="html">
+        <source><x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&lt;div class=&quot;col-12&quot;&gt;"/><x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div class=&quot;dp-hidden position-absolute&quot;&gt;"/><x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;input-group&quot;&gt;"/><x id="TAG_INPUT" ctype="x-input" equiv-text="&lt;input
           name=&quot;datepicker&quot;
           class=&quot;form-control&quot;
           ngbDatepicker
           #datepicker=&quot;ngbDatepicker&quot;
           [autoClose]=&quot;&apos;outside&apos;&quot;
-          (dateSelect)=&quot;onDateRangeSelection($event)&quot;
+          (dateSelect)=&quot;onDateSelection($event)&quot;
           [displayMonths]=&quot;2&quot;
           [dayTemplate]=&quot;t&quot;
-          [minDate]=&quot;minDate&quot;
-          [maxDate]=&quot;maxDate&quot;
           outsideDays=&quot;hidden&quot;
-          [startDate]=&quot;fromDate!&quot;
           tabindex=&quot;-1&quot;
         /&gt;"/><x id="START_TAG_NG_TEMPLATE" ctype="x-ng_template" equiv-text="&lt;ng-template #t let-date let-focused=&quot;focused&quot;&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span
             class=&quot;custom-day&quot;
@@ -5495,23 +5488,18 @@
             (mouseenter)=&quot;hoveredDate = date&quot;
             (mouseleave)=&quot;hoveredDate = null&quot;
           &gt;"/> <x id="INTERPOLATION" equiv-text="{{ date.day }}"/> <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_NG_TEMPLATE" ctype="x-ng_template" equiv-text="&lt;/ng-template&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;input-group&quot;&gt;"/><x id="TAG_INPUT_1" ctype="x-input_1" equiv-text="&lt;input
-        #dpFromDate
-        class=&quot;form-control&quot;
-        [placeholder]=&quot;placeholder&quot;
-        name=&quot;dpFromDate&quot;
-        [value]=&quot;formatter.format(fromDate)&quot;
-        (input)=&quot;fromDate = validateInput(fromDate, dpFromDate.value)&quot;
-      /&gt;"/><x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&lt;button class=&quot;btn btn-outline-secondary&quot; (click)=&quot;datepicker.toggle()&quot; type=&quot;button&quot;&gt;"/><x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;i-bs width=&quot;1.2em&quot; height=&quot;1.2em&quot; name=&quot;calendar3&quot;&gt;"/><x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;/i-bs&gt;"/><x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;col-12 mt-1 mb-1&quot; &gt;"/><x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;input-group&quot;&gt;"/><x id="TAG_INPUT_2" ctype="x-input_2" equiv-text="&lt;input
-        #dpToDate
-        class=&quot;form-control&quot;
-        [placeholder]=&quot;placeholder&quot;
-        name=&quot;dpToDate&quot;
-        [value]=&quot;formatter.format(toDate)&quot;
-        (input)=&quot;toDate = validateInput(toDate, dpToDate.value)&quot;
-      /&gt;"/><x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&lt;button class=&quot;btn btn-outline-secondary&quot; (click)=&quot;datepicker.toggle()&quot; type=&quot;button&quot;&gt;"/><x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;i-bs width=&quot;1.2em&quot; height=&quot;1.2em&quot; name=&quot;calendar3&quot;&gt;"/><x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;/i-bs&gt;"/><x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&lt;div class=&quot;col-12 d-flex flex-wrap gap-2 mt-1 mb-1&quot;&gt;"/><x id="START_TAG_BUTTON_1" ctype="x-button_1" equiv-text="&lt;button class=&quot;btn btn-sm btn-outline-primary mt-1&quot; (click)=&quot;getThisWeek()&quot;&gt;"/>This week<x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="START_TAG_BUTTON_2" ctype="x-button_2" equiv-text="&lt;button class=&quot;btn btn-sm btn-outline-primary mt-1&quot; (click)=&quot;getThisMonth()&quot;&gt;"/>This month<x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="START_TAG_BUTTON_3" ctype="x-button_3" equiv-text="&lt;button class=&quot;btn btn-sm btn-outline-primary mt-1&quot; (click)=&quot;getThisYear()&quot;&gt;"/>This year<x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></source>
+        #dpDateRange
+        class=&quot;form-control custom-input&quot;
+        placeholder=&quot;yyyy-mm-dd to yyyy-mm-dd&quot;
+        name=&quot;dpDateRange&quot;
+        [value]=&quot;formatter.format(fromDate) + &apos; - &apos; + (toDate!=null?formatter.format(toDate):&apos;&apos;)&quot;
+        (input)=&quot;updateDateRange(dpDateRange.value)&quot;
+        readonly
+
+      /&gt;"/><x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&lt;div ngbDropdown class=&quot;&quot;&gt;"/><x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&lt;button class=&quot;btn btn-outline-secondary&quot; id=&quot;dropdownBasic1&quot; ngbDropdownToggle&gt;"/><x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;i-bs width=&quot;1.2em&quot; height=&quot;1.2em&quot; name=&quot;calendar3&quot;&gt;"/><x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;/i-bs&gt;"/><x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div ngbDropdownMenu aria-labelledby=&quot;dropdownBasic1&quot;&gt;"/><x id="START_TAG_BUTTON_1" ctype="x-button_1" equiv-text="&lt;button ngbDropdownItem (click)=&quot;setRange(&apos;today&apos;)&quot;&gt;"/>Today<x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="START_TAG_BUTTON_2" ctype="x-button_2" equiv-text="&lt;button ngbDropdownItem (click)=&quot;setRange(&apos;yesterday&apos;)&quot;&gt;"/>Yesterday<x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="START_TAG_BUTTON_3" ctype="x-button_3" equiv-text="&lt;button ngbDropdownItem (click)=&quot;setRange(&apos;last7days&apos;)&quot;&gt;"/>Last 7 days<x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="START_TAG_BUTTON_4" ctype="x-button_4" equiv-text="&lt;button ngbDropdownItem (click)=&quot;setRange(&apos;last30days&apos;)&quot;&gt;"/>Last 30 days<x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="START_TAG_BUTTON_5" ctype="x-button_5" equiv-text="&lt;button ngbDropdownItem (click)=&quot;setRange(&apos;thisMonth&apos;)&quot;&gt;"/>This month<x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="START_TAG_BUTTON_6" ctype="x-button_6" equiv-text="&lt;button ngbDropdownItem (click)=&quot;setRange(&apos;lastMonth&apos;)&quot;&gt;"/>Last month<x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="START_TAG_BUTTON_7" ctype="x-button_7" equiv-text="&lt;button ngbDropdownItem (click)=&quot;datepicker.toggle()&quot;&gt;"/>Custom<x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/datepicker-range/datepicker-range.component.html</context>
-          <context context-type="linenumber">5,71</context>
+          <context context-type="linenumber">2,61</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6423278459497515329" datatype="html">
@@ -6270,21 +6258,19 @@
           <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="5385781902662155761" datatype="html">
-        <source><x id="START_TAG_DIV_6" ctype="x-div_6" equiv-text="&lt;div class=&quot;list-group border-light&quot;&gt;"/><x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;d-flex flex-wrap gap-2 mt-1 mb-1&quot;&gt;"/><x id="START_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;h5 class=&quot;mt-2 mb-2 &quot;&gt;"/>Uploaded Document Statistics <x id="CLOSE_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;/h5&gt;"/><x id="START_TAG_BUTTON" ctype="x-button" equiv-text="&lt;button class=&quot;btn btn-sm btn-outline-primary mt-1&quot; [hidden]=&quot;!customDateEnable&quot; (click)=&quot;customDateEnable=!customDateEnable&quot;&gt;"/>Custom day<x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="START_TAG_BUTTON_1" ctype="x-button_1" equiv-text="&lt;button class=&quot;btn btn-sm btn-outline-primary mt-1&quot; [hidden]=&quot;customDateEnable&quot;  (click)=&quot;customDateEnable=!customDateEnable&quot;&gt;"/>Specific date<x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&lt;/button&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div class=&quot;mt-2 mb-2&quot;&gt;"/><x id="START_TAG_PNGX_INPUT_DATE_CUSTOM" ctype="x-pngx_input_date_custom" equiv-text="&lt;pngx-input-date-custom i18n-title title=&quot;&quot; [model]=&quot;innitDate&quot; [hidden]=&quot;!customDateEnable&quot;
-                                (dateSelection)=&quot;onDateSelection($event)&quot;&gt;"/><x id="CLOSE_TAG_PNGX_INPUT_DATE_CUSTOM" ctype="x-pngx_input_date_custom" equiv-text="&lt;/pngx-input-date-custom&gt;"/><x id="START_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&lt;pngx-input-datepicker-range [hidden]=&quot;customDateEnable&quot; class=&quot;mb-2 mb-sm-0 &quot;
-                                     (dateRangeChange)=&quot;onDateRangeChange($event)&quot;
-                                     (confirmButton)=&quot;confirmButton()&quot;&gt;"/><x id="CLOSE_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&lt;/pngx-input-datepicker-range&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;&quot;&gt;"/><x id="START_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;canvas id=&quot;DocumentChart&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{ chart }}"/><x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;/canvas&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="HORIZONTAL_RULE" ctype="x-hr" equiv-text="&lt;hr /&gt;"/><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;&quot;&gt;"/><x id="START_HEADING_LEVEL5_1" equiv-text="&lt;h5 class=&quot;mt-2 mb-2 text-center&quot;&gt;"/>Top Document Types/Tags with the Largest Number of Documents<x id="CLOSE_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;/h5&gt;"/><x id="START_TAG_DIV_5" ctype="x-div_5" equiv-text="&lt;div class=&quot;row&quot;&gt;"/><x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&lt;div class=&quot;col-md-6 d-flex flex-column align-items-center&quot;&gt;"/><x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&lt;div&gt;"/><x id="START_TAG_CANVAS_1" ctype="x-canvas_1" equiv-text="&lt;canvas id=&quot;DocumentTypePieChart&quot;&gt;"/><x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;/canvas&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>Document types<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&lt;div class=&quot;col-md-6 d-flex flex-column align-items-center&quot;&gt;"/><x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&lt;div&gt;"/><x id="START_TAG_CANVAS_2" ctype="x-canvas_2" equiv-text="&lt;canvas id=&quot;TagsPieChart&quot;&gt;"/><x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;/canvas&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>Tags<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="HORIZONTAL_RULE" ctype="x-hr" equiv-text="&lt;hr /&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></source>
+      <trans-unit id="538061070560610647" datatype="html">
+        <source><x id="START_TAG_DIV_6" ctype="x-div_6" equiv-text="&lt;div class=&quot;list-group border-light&quot;&gt;"/><x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;d-flex flex-wrap gap-2 mt-1 mb-1&quot;&gt;"/><x id="START_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;h5 class=&quot;mt-2 mb-2 &quot;&gt;"/>Uploaded Document Statistics <x id="CLOSE_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;/h5&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div class=&quot;mt-2 mb-2&quot;&gt;"/><x id="START_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&lt;pngx-input-datepicker-range  class=&quot;mb-2 mb-sm-0 &quot;
+                                     (dateRangeChange)=&quot;onDateRangeChange($event)&quot;&gt;"/><x id="CLOSE_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&lt;/pngx-input-datepicker-range&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;&quot;&gt;"/><x id="START_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;canvas id=&quot;DocumentChart&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{ chart }}"/><x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;/canvas&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="HORIZONTAL_RULE" ctype="x-hr" equiv-text="&lt;hr /&gt;"/><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;&quot;&gt;"/><x id="START_HEADING_LEVEL5_1" equiv-text="&lt;h5 class=&quot;mt-2 mb-2 text-center&quot;&gt;"/>Top Document Types/Tags with the Largest Number of Documents<x id="CLOSE_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;/h5&gt;"/><x id="START_TAG_DIV_5" ctype="x-div_5" equiv-text="&lt;div class=&quot;row&quot;&gt;"/><x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&lt;div class=&quot;col-md-6 d-flex flex-column align-items-center&quot;&gt;"/><x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&lt;div&gt;"/><x id="START_TAG_CANVAS_1" ctype="x-canvas_1" equiv-text="&lt;canvas id=&quot;DocumentTypePieChart&quot;&gt;"/><x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;/canvas&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>Document types<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&lt;div class=&quot;col-md-6 d-flex flex-column align-items-center&quot;&gt;"/><x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&lt;div&gt;"/><x id="START_TAG_CANVAS_2" ctype="x-canvas_2" equiv-text="&lt;canvas id=&quot;TagsPieChart&quot;&gt;"/><x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;/canvas&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>Tags<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="HORIZONTAL_RULE" ctype="x-hr" equiv-text="&lt;hr /&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.html</context>
-          <context context-type="linenumber">3,116</context>
+          <context context-type="linenumber">3,115</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3264001515130844663" datatype="html">
         <source>Document Type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
-          <context context-type="linenumber">142</context>
+          <context context-type="linenumber">118</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2028517964701399614" datatype="html">
