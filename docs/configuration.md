@@ -60,7 +60,7 @@ database engine. Available options are `postgresql` and
 
     !!! warning
 
-        Using MariaDB comes with some caveats and is generally not recommended. See [MySQL Caveats](advanced_usage.md#mysql-caveats).
+        Using MariaDB comes with some caveats. See [MySQL Caveats](advanced_usage.md#mysql-caveats).
 
 #### [`PAPERLESS_DBHOST=<hostname>`](#PAPERLESS_DBHOST) {#PAPERLESS_DBHOST}
 
