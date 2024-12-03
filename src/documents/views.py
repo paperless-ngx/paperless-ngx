@@ -2785,6 +2785,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
+        print(serializer.validated_data.get("set_permissions"))
         serializer.validated_data['updated'] = timezone.now()
 
         old_parent_folder = instance.parent_folder
@@ -2864,7 +2865,8 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         #         documents_list._append(child.o)
 
         permissions = serializer.validated_data.get("set_permissions")
-        update_view_folder_parent_permissions(folder, permissions)
+        permissions_copy = permissions.copy()
+        update_view_folder_parent_permissions(folder, permissions_copy)
         owner = serializer.validated_data.get("owner")
         merge = serializer.validated_data.get("merge")
 

@@ -208,7 +208,7 @@
                           height="2rem"></i-bs>
                   </a>
                   <span class="custom-cursor"
-                        [routerLink]="userCanEdit(object) ? ['/documents', object.document.id] : null"
+                        [routerLink]="['/documents', object.document.id]"
                         (click)="$event.stopPropagation()">   {{ object.name }}
                   </span>
                   <ng-template #previewContent>

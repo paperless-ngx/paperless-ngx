@@ -157,13 +157,14 @@ def check_user_can_change_folder(user, obj):
 def update_view_folder_parent_permissions(folder, permissions):
     list_folder_ids = folder.path.split("/")
     folders_list = Folder.objects.filter(id__in = list_folder_ids)
-    permissions["change"] = {
+    permission_copy = permissions
+    permission_copy["change"] = {
         "users": [],
         "groups": [],
     }
     for obj in folders_list:
         set_permissions_for_object(
-            permissions=permissions,
+            permissions=permission_copy,
             object=obj,
             merge=True,
         )
