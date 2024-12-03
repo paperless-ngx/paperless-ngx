@@ -7,6 +7,8 @@ from io import StringIO
 from pathlib import Path
 from unittest import mock
 
+from auditlog.models import LogEntry
+from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.test import TestCase
 from django.test import override_settings
@@ -252,3 +254,15 @@ class TestConvertMariaDBUUID(TestCase):
         m.assert_called_once()
 
         self.assertIn("Successfully converted", stdout.getvalue())
+
+
+class TestPruneAuditLogs(TestCase):
+    def test_prune_audit_logs(self):
+        LogEntry.objects.create(
+            content_type=ContentType.objects.get_for_model(Document),
+            object_id=1,
+            action=LogEntry.Action.CREATE,
+        )
+        call_command("prune_audit_logs")
+
+        self.assertEqual(LogEntry.objects.count(), 0)
