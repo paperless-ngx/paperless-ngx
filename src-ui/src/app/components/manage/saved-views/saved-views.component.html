@@ -1,0 +1,75 @@
+<pngx-page-header
+  title="Saved Views"
+  i18n-title
+  info="Customize the views of your documents."
+  i18n-info
+  >
+</pngx-page-header>
+<form [formGroup]="savedViewsForm" (ngSubmit)="save()">
+  <ul class="list-group mb-3" formGroupName="savedViews">
+    @for (view of savedViews; track view) {
+      <li class="list-group-item py-3">
+      <div [formGroupName]="view.id">
+        <div class="row">
+          <div class="col">
+            <pngx-input-text title="Name" formControlName="name"></pngx-input-text>
+          </div>
+          <div class="col">
+            <div class="form-check form-switch mt-3">
+              <input type="checkbox" class="form-check-input" id="show_on_dashboard_{{view.id}}" formControlName="show_on_dashboard">
+              <label class="form-check-label" for="show_on_dashboard_{{view.id}}" i18n>Show on dashboard</label>
+            </div>
+            <div class="form-check form-switch">
+              <input type="checkbox" class="form-check-input" id="show_in_sidebar_{{view.id}}" formControlName="show_in_sidebar">
+              <label class="form-check-label" for="show_in_sidebar_{{view.id}}" i18n>Show in sidebar</label>
+            </div>
+          </div>
+          <div class="col-auto">
+            <label class="form-label" for="name_{{view.id}}" i18n>Actions</label>
+            <pngx-confirm-button
+              label="Delete"
+              i18n-label
+              (confirm)="deleteSavedView(view)"
+              *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.SavedView }"
+              buttonClasses="btn-sm btn-outline-danger form-control"
+              iconName="trash">
+            </pngx-confirm-button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <pngx-input-number i18n-title title="Documents page size" [showAdd]="false" formControlName="page_size"></pngx-input-number>
+          </div>
+          <div class="col">
+            <label class="form-label" for="display_mode_{{view.id}}" i18n>Display as</label>
+            <select class="form-select" formControlName="display_mode">
+              <option [ngValue]="DisplayMode.TABLE" i18n>Table</option>
+              <option [ngValue]="DisplayMode.SMALL_CARDS" i18n>Small Cards</option>
+              <option [ngValue]="DisplayMode.LARGE_CARDS" i18n>Large Cards</option>
+            </select>
+          </div>
+            @if (displayFields) {
+              <pngx-input-drag-drop-select i18n-title title="Show" i18n-emptyText emptyText="Default" [items]="displayFields" formControlName="display_fields"></pngx-input-drag-drop-select>
+            }
+          </div>
+      </div>
+      </li>
+    }
+
+    @if (savedViews && savedViews.length === 0) {
+      <li class="list-group-item">
+        <div i18n>No saved views defined.</div>
+      </li>
+    }
+
+    @if (!savedViews) {
+      <li class="list-group-item">
+        <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
+        <div class="visually-hidden" i18n>Loading...</div>
+      </li>
+    }
+  </ul>
+
+  <button type="submit" class="btn btn-primary mb-2" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
+  <button type="button" (click)="reset()" class="btn btn-secondary ms-2 mb-2" [disabled]="(isDirty$ | async) === false" i18n>Cancel</button>
+</form>

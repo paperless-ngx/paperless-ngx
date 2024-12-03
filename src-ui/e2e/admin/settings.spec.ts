@@ -33,24 +33,3 @@ test('should apply appearance changes when set', async ({ page }) => {
   await page.getByLabel('Enable dark mode').click()
   await expect(page.locator('html')).toHaveAttribute('data-bs-theme', /dark/)
 })
-
-test('should toggle saved view options when set & saved', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
-  await page.goto('/settings/savedviews')
-  await page.getByLabel('Show on dashboard').first().click()
-  await page.getByLabel('Show in sidebar').first().click()
-  const updatePromise = page.waitForRequest((request) => {
-    if (!request.url().includes('8')) return true // skip other saved views
-    const data = request.postDataJSON()
-    const isValid =
-      data['show_on_dashboard'] === true && data['show_in_sidebar'] === true
-    return (
-      isValid &&
-      request.method() === 'PATCH' &&
-      request.url().includes('/api/saved_views/')
-    )
-  })
-  await page.getByRole('button', { name: 'Save' }).scrollIntoViewIfNeeded()
-  await page.getByRole('button', { name: 'Save' }).click()
-  await updatePromise
-})
