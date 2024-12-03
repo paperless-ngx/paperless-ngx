@@ -165,7 +165,7 @@ export class AppComponent implements OnInit, OnDestroy {
       [
         {
           anchorId: 'tour.dashboard',
-          content: $localize`The dashboard can be used to show saved views, such as an 'Inbox'. Those settings are found under Settings > Saved Views once you have created some.`,
+          content: $localize`The dashboard can be used to show saved views, such as an 'Inbox'. Views are found under Manage > Saved Views once you have created some.`,
           route: '/dashboard',
           delayAfterNavigation: 500,
           isOptional: false,
@@ -227,7 +227,7 @@ export class AppComponent implements OnInit, OnDestroy {
         },
         {
           anchorId: 'tour.settings',
-          content: $localize`Check out the settings for various tweaks to the web app and toggle settings for saved views.`,
+          content: $localize`Check out the settings for various tweaks to the web app.`,
           route: '/settings',
           backdropConfig: {
             offset: 0,
