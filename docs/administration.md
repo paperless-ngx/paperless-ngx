@@ -624,3 +624,12 @@ document_fuzzy_match [--ratio] [--processes N]
     If providing the `--delete` option, it is highly recommended to have a backup.
     While every effort has been taken to ensure proper operation, there is always the
     chance of deletion of a file you want to keep.
+
+### Prune history (audit log) entries {#prune-history}
+
+If the audit log is enabled Paperless-ngx keeps an audit log of all changes made to documents. Functionality to automatically remove entries for deleted documents was added but
+entries created prior to this are not removed. This command allows you to prune the audit log of entries that are no longer needed.
+
+```shell
+prune_audit_logs
+```
