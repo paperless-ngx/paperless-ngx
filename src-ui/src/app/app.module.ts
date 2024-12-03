@@ -132,6 +132,7 @@ import { HotkeyDialogComponent } from './components/common/hotkey-dialog/hotkey-
 import { DeletePagesConfirmDialogComponent } from './components/common/confirm-dialog/delete-pages-confirm-dialog/delete-pages-confirm-dialog.component'
 import { TrashComponent } from './components/admin/trash/trash.component'
 import { EntriesComponent } from './components/common/input/entries/entries.component'
+import { SavedViewsComponent } from './components/manage/saved-views/saved-views.component'
 import {
   airplane,
   archive,
@@ -235,6 +236,7 @@ import {
   trash,
   uiRadios,
   upcScan,
+  windowStack,
   x,
   xCircle,
   xLg,
@@ -343,6 +345,7 @@ const icons = {
   trash,
   uiRadios,
   upcScan,
+  windowStack,
   x,
   xCircle,
   xLg,
@@ -524,6 +527,7 @@ function initializeApp(settings: SettingsService) {
     DeletePagesConfirmDialogComponent,
     TrashComponent,
     EntriesComponent,
+    SavedViewsComponent,
   ],
   bootstrap: [AppComponent],
   imports: [
