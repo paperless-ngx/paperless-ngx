@@ -588,7 +588,10 @@ The database interface does not provide a method to configure a MySQL
 database to be case sensitive. A case **in**sensitive database prevents a user from creating a
 tag `Name` and `NAME` as they are considered the same.
 
-Per Django documentation, mitigating this requires manual intervention.
+However, there is a downside to turning on case sensitivity, as it also makes searches case sensitive.   
+This means that a document with the title `Invoice` won't be found when searching for `invoice`.
+
+Per Django documentation, making a database case-sensitive requires manual intervention.
 To enable case sensitive tables, you can execute the following command
 against each table:
 
