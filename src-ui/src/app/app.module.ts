@@ -131,6 +131,7 @@ import { GlobalSearchComponent } from './components/app-frame/global-search/glob
 import { HotkeyDialogComponent } from './components/common/hotkey-dialog/hotkey-dialog.component'
 import { DeletePagesConfirmDialogComponent } from './components/common/confirm-dialog/delete-pages-confirm-dialog/delete-pages-confirm-dialog.component'
 import { TrashComponent } from './components/admin/trash/trash.component'
+import { EntriesComponent } from './components/common/input/entries/entries.component'
 import {
   airplane,
   archive,
@@ -522,6 +523,7 @@ function initializeApp(settings: SettingsService) {
     HotkeyDialogComponent,
     DeletePagesConfirmDialogComponent,
     TrashComponent,
+    EntriesComponent,
   ],
   bootstrap: [AppComponent],
   imports: [
