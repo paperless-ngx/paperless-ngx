@@ -15,7 +15,8 @@ for command in decrypt_documents \
 	document_sanity_checker \
 	document_fuzzy_match \
 	manage_superuser \
-	convert_mariadb_uuid;
+	convert_mariadb_uuid \
+	prune_audit_logs;
 do
 	echo "installing $command..."
 	sed "s/management_command/$command/g" management_script.sh > /usr/local/bin/$command
