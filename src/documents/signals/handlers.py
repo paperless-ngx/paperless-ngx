@@ -2,6 +2,8 @@ import logging
 import os
 import shutil
 
+import httpx
+from celery import shared_task
 from celery import states
 from celery.signals import before_task_publish
 from celery.signals import task_failure
@@ -12,6 +14,7 @@ from django.contrib.admin.models import ADDITION
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.core.mail import EmailMessage
 from django.db import DatabaseError
 from django.db import close_old_connections
 from django.db import models
@@ -41,7 +44,7 @@ from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import set_permissions_for_object
-from documents.templating.title import parse_doc_title_w_placeholders
+from documents.templating.workflows import parse_w_workflow_placeholders
 
 logger = logging.getLogger("paperless.handlers")
 
@@ -570,6 +573,30 @@ def run_workflows_updated(sender, document: Document, logging_group=None, **kwar
     )
 
 
+@shared_task(
+    retry_backoff=True,
+    autoretry_for=(httpx.HTTPStatusError,),
+    max_retries=3,
+    throws=(httpx.HTTPError,),
+)
+def send_webhook(url, data, headers, files):
+    try:
+        httpx.post(
+            url,
+            data=data,
+            files=files,
+            headers=headers,
+        ).raise_for_status()
+        logger.info(
+            f"Webhook sent to {url}",
+        )
+    except Exception as e:
+        logger.error(
+            f"Failed attempt sending webhook to {url}: {e}",
+        )
+        raise e
+
+
 def run_workflows(
     trigger_type: WorkflowTrigger.WorkflowTriggerType,
     document: Document | ConsumableDocument,
@@ -622,7 +649,7 @@ def run_workflows(
         if action.assign_title:
             if not use_overrides:
                 try:
-                    document.title = parse_doc_title_w_placeholders(
+                    document.title = parse_w_workflow_placeholders(
                         action.assign_title,
                         document.correspondent.name if document.correspondent else "",
                         document.document_type.name if document.document_type else "",
@@ -879,6 +906,151 @@ def run_workflows(
                 ):
                     overrides.custom_field_ids.remove(field.pk)
 
+    def email_action():
+        if not settings.EMAIL_ENABLED:
+            logger.error(
+                "Email backend has not been configured, cannot send email notifications",
+                extra={"group": logging_group},
+            )
+            return
+
+        title = (
+            document.title
+            if isinstance(document, Document)
+            else str(document.original_file)
+        )
+        doc_url = None
+        if isinstance(document, Document):
+            doc_url = f"{settings.PAPERLESS_URL}/documents/{document.pk}/"
+        correspondent = document.correspondent.name if document.correspondent else ""
+        document_type = document.document_type.name if document.document_type else ""
+        owner_username = document.owner.username if document.owner else ""
+        filename = document.original_filename or ""
+        added = timezone.localtime(document.added)
+        created = timezone.localtime(document.created)
+        subject = parse_w_workflow_placeholders(
+            action.email.subject,
+            correspondent,
+            document_type,
+            owner_username,
+            added,
+            filename,
+            created,
+            title,
+            doc_url,
+        )
+        body = parse_w_workflow_placeholders(
+            action.email.body,
+            correspondent,
+            document_type,
+            owner_username,
+            added,
+            filename,
+            created,
+            title,
+            doc_url,
+        )
+        try:
+            email = EmailMessage(
+                subject=subject,
+                body=body,
+                to=action.email.to.split(","),
+            )
+            if action.email.include_document:
+                email.attach_file(document.source_path)
+            n_messages = email.send()
+            logger.debug(
+                f"Sent {n_messages} notification email(s) to {action.email.to}",
+                extra={"group": logging_group},
+            )
+        except Exception as e:
+            logger.exception(
+                f"Error occurred sending notification email: {e}",
+                extra={"group": logging_group},
+            )
+
+    def webhook_action():
+        title = (
+            document.title
+            if isinstance(document, Document)
+            else str(document.original_file)
+        )
+        doc_url = None
+        if isinstance(document, Document):
+            doc_url = f"{settings.PAPERLESS_URL}/documents/{document.pk}/"
+        correspondent = document.correspondent.name if document.correspondent else ""
+        document_type = document.document_type.name if document.document_type else ""
+        owner_username = document.owner.username if document.owner else ""
+        filename = document.original_filename or ""
+        added = timezone.localtime(document.added)
+        created = timezone.localtime(document.created)
+
+        try:
+            data = {}
+            if action.webhook.use_params:
+                try:
+                    for key, value in action.webhook.params.items():
+                        data[key] = parse_w_workflow_placeholders(
+                            value,
+                            correspondent,
+                            document_type,
+                            owner_username,
+                            added,
+                            filename,
+                            created,
+                            title,
+                            doc_url,
+                        )
+                except Exception as e:
+                    logger.error(
+                        f"Error occurred parsing webhook params: {e}",
+                        extra={"group": logging_group},
+                    )
+            else:
+                data = parse_w_workflow_placeholders(
+                    action.webhook.body,
+                    correspondent,
+                    document_type,
+                    owner_username,
+                    added,
+                    filename,
+                    created,
+                    title,
+                    doc_url,
+                )
+            headers = {}
+            if action.webhook.headers:
+                try:
+                    headers = {
+                        str(k): str(v) for k, v in action.webhook.headers.items()
+                    }
+                except Exception as e:
+                    logger.error(
+                        f"Error occurred parsing webhook headers: {e}",
+                        extra={"group": logging_group},
+                    )
+            files = None
+            if action.webhook.include_document:
+                with open(document.source_path, "rb") as f:
+                    files = {
+                        "file": (document.original_filename, f, document.mime_type),
+                    }
+            send_webhook.delay(
+                url=action.webhook.url,
+                data=data,
+                headers=headers,
+                files=files,
+            )
+            logger.debug(
+                f"Webhook to {action.webhook.url} queued",
+                extra={"group": logging_group},
+            )
+        except Exception as e:
+            logger.exception(
+                f"Error occurred sending webhook: {e}",
+                extra={"group": logging_group},
+            )
+
     use_overrides = overrides is not None
     messages = []
 
@@ -924,6 +1096,10 @@ def run_workflows(
                     assignment_action()
                 elif action.type == WorkflowAction.WorkflowActionType.REMOVAL:
                     removal_action()
+                elif action.type == WorkflowAction.WorkflowActionType.EMAIL:
+                    email_action()
+                elif action.type == WorkflowAction.WorkflowActionType.WEBHOOK:
+                    webhook_action()
 
             if not use_overrides:
                 # save first before setting tags

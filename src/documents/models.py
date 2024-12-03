@@ -1160,6 +1160,85 @@ class WorkflowTrigger(models.Model):
         return f"WorkflowTrigger {self.pk}"
 
 
+class WorkflowActionEmail(models.Model):
+    subject = models.CharField(
+        _("email subject"),
+        max_length=256,
+        null=False,
+        help_text=_(
+            "The subject of the email, can include some placeholders, "
+            "see documentation.",
+        ),
+    )
+
+    body = models.TextField(
+        _("email body"),
+        null=False,
+        help_text=_(
+            "The body (message) of the email, can include some placeholders, "
+            "see documentation.",
+        ),
+    )
+
+    to = models.TextField(
+        _("emails to"),
+        null=False,
+        help_text=_(
+            "The destination email addresses, comma separated.",
+        ),
+    )
+
+    include_document = models.BooleanField(
+        default=False,
+        verbose_name=_("include document in email"),
+    )
+
+    def __str__(self):
+        return f"Workflow Email Action {self.pk}"
+
+
+class WorkflowActionWebhook(models.Model):
+    url = models.URLField(
+        _("webhook url"),
+        null=False,
+        help_text=_("The destination URL for the notification."),
+    )
+
+    use_params = models.BooleanField(
+        default=True,
+        verbose_name=_("use parameters"),
+    )
+
+    params = models.JSONField(
+        _("webhook parameters"),
+        null=True,
+        blank=True,
+        help_text=_("The parameters to send with the webhook URL if body not used."),
+    )
+
+    body = models.TextField(
+        _("webhook body"),
+        null=True,
+        blank=True,
+        help_text=_("The body to send with the webhook URL if parameters not used."),
+    )
+
+    headers = models.JSONField(
+        _("webhook headers"),
+        null=True,
+        blank=True,
+        help_text=_("The headers to send with the webhook URL."),
+    )
+
+    include_document = models.BooleanField(
+        default=False,
+        verbose_name=_("include document in webhook"),
+    )
+
+    def __str__(self):
+        return f"Workflow Webhook Action {self.pk}"
+
+
 class WorkflowAction(models.Model):
     class WorkflowActionType(models.IntegerChoices):
         ASSIGNMENT = (
@@ -1169,6 +1248,14 @@ class WorkflowAction(models.Model):
         REMOVAL = (
             2,
             _("Removal"),
+        )
+        EMAIL = (
+            3,
+            _("Email"),
+        )
+        WEBHOOK = (
+            4,
+            _("Webhook"),
         )
 
     type = models.PositiveIntegerField(
@@ -1369,6 +1456,24 @@ class WorkflowAction(models.Model):
     remove_all_custom_fields = models.BooleanField(
         default=False,
         verbose_name=_("remove all custom fields"),
+    )
+
+    email = models.ForeignKey(
+        WorkflowActionEmail,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="action",
+        verbose_name=_("email"),
+    )
+
+    webhook = models.ForeignKey(
+        WorkflowActionWebhook,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="action",
+        verbose_name=_("webhook"),
     )
 
     class Meta:

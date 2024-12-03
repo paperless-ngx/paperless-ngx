@@ -1,0 +1,29 @@
+<div class="mb-3" [class.pb-3]="error">
+  <div class="row">
+    <div class="d-flex align-items-center mb-2">
+      @if (title) {
+        <label class="form-label mb-0" [class.mb-md-0]="horizontal" [for]="inputId">{{title}}</label>
+      }
+      <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="addEntry()">
+        <i-bs name="plus-circle"></i-bs>&nbsp;<ng-container i18n>Add</ng-container>
+      </button>
+    </div>
+    <div class="position-relative">
+      @for (entry of entries; let i = $index; track entry[0]) {
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" [(ngModel)]="entry[0]" (change)="inputChange()" [disabled]="disabled" autocomplete="off">
+          <input type="text" class="form-control" [(ngModel)]="entry[1]" (change)="inputChange()" [disabled]="disabled" autocomplete="off">
+          <button type="button" class="btn btn-outline-secondary" (click)="removeEntry(i)">
+            <i-bs class="text-danger" name="trash"></i-bs>
+          </button>
+        </div>
+      }
+      @if (hint) {
+        <small class="form-text text-muted" [innerHTML]="hint | safeHtml"></small>
+      }
+      <div class="invalid-feedback position-absolute top-100">
+        {{error}}
+      </div>
+    </div>
+  </div>
+</div>
