@@ -39,204 +39,204 @@
     <li [ngbNavItem]="SettingsNavIDs.General">
       <a ngbNavLink i18n>General</a>
       <ng-template ngbNavContent>
-
-        <h4 i18n>Appearance</h4>
-
-        <div class="row mb-3">
-          <div class="col-md-3 col-form-label pt-0">
-            <span i18n>Display language</span>
-          </div>
-          <div class="col">
-
-            <select class="form-select" formControlName="displayLanguage">
-              @for (lang of displayLanguageOptions; track lang) {
-                <option [ngValue]="lang.code">{{lang.name}}@if (lang.code && currentLocale !== 'en-US') {
-                  <span> - {{lang.englishName}}</span>
-                }</option>
-              }
-            </select>
-
-            @if (displayLanguageIsDirty) {
-              <small class="form-text text-primary" i18n>You need to reload the page after applying a new language.</small>
-            }
-
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="col-md-3 col-form-label pt-0">
-            <span i18n>Date display</span>
-          </div>
-          <div class="col">
-
-            <select class="form-select" formControlName="dateLocale">
-              @for (lang of dateLocaleOptions; track lang) {
-                <option [ngValue]="lang.code">{{lang.name}}@if (lang.code) {
-                  <span> - {{today | customDate:'shortDate':null:lang.code}}</span>
-                }</option>
-              }
-            </select>
-
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="col-md-3 col-form-label pt-0">
-            <span i18n>Date format</span>
-          </div>
-          <div class="col">
-
-            <div class="form-check">
-              <input type="radio" id="dateFormatShort" name="dateFormat" class="form-check-input" formControlName="dateFormat" value="shortDate">
-              <label class="form-check-label" for="dateFormatShort" i18n>Short: {{today | customDate:'shortDate':null:computedDateLocale}}</label>
-            </div>
-            <div class="form-check">
-              <input type="radio" id="dateFormatMedium" name="dateFormat" class="form-check-input" formControlName="dateFormat" value="mediumDate">
-              <label class="form-check-label" for="dateFormatMedium" i18n>Medium: {{today | customDate:'mediumDate':null:computedDateLocale}}</label>
-            </div>
-            <div class="form-check">
-              <input type="radio" id="dateFormatLong" name="dateFormat" class="form-check-input" formControlName="dateFormat" value="longDate">
-              <label class="form-check-label" for="dateFormatLong" i18n>Long: {{today | customDate:'longDate':null:computedDateLocale}}</label>
-            </div>
-
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="col-md-3 col-form-label pt-0">
-            <span i18n>Items per page</span>
-          </div>
-          <div class="col">
-
-            <select class="form-select" formControlName="documentListItemPerPage">
-              <option [ngValue]="10">10</option>
-              <option [ngValue]="25">25</option>
-              <option [ngValue]="50">50</option>
-              <option [ngValue]="100">100</option>
-            </select>
-
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="col-md-3 col-form-label pt-0">
-            <span i18n>Sidebar</span>
-          </div>
-          <div class="col">
-
-            <pngx-input-check i18n-title title="Use 'slim' sidebar (icons only)" formControlName="slimSidebarEnabled"></pngx-input-check>
-
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="col-md-3 col-form-label pt-0">
-            <span i18n>Dark mode</span>
-          </div>
-          <div class="col">
-            <pngx-input-check i18n-title title="Use system settings" formControlName="darkModeUseSystem"></pngx-input-check>
-            <pngx-input-check [hidden]="settingsForm.value.darkModeUseSystem" i18n-title title="Enable dark mode" formControlName="darkModeEnabled"></pngx-input-check>
-            <pngx-input-check i18n-title title="Invert thumbnails in dark mode" formControlName="darkModeInvertThumbs"></pngx-input-check>
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="col-md-3 col-form-label pt-0">
-            <span i18n>Theme Color</span>
-          </div>
-          <div class="col col-md-3">
-            <pngx-input-color i18n-title formControlName="themeColor" [error]="error?.color"></pngx-input-color>
-          </div>
-          <div class="col-2">
-            <button class="btn btn-link btn-sm pt-2 ps-0" [disabled]="!this.settingsForm.get('themeColor').value" (click)="clearThemeColor()">
-              <i-bs width="1em" height="1em" name="x"></i-bs><ng-container i18n>Reset</ng-container>
-            </button>
-          </div>
-        </div>
-
-        <h4 class="mt-4" id="update-checking" i18n>Update checking</h4>
-
-        <div class="row mb-3">
-          <div class="offset-md-3 col d-flex flex-row align-items-start">
-            <pngx-input-check i18n-title title="Enable update checking" formControlName="updateCheckingEnabled"></pngx-input-check>
-            <button class="btn btn-sm btn-link text-muted me-auto p-0 ms-2" title="What's this?" i18n-title type="button" triggers="mouseenter:mouseleave" [ngbPopover]="updatesPopover" [autoClose]="true">
-              <i-bs name="question-circle"></i-bs>
-            </button>
-            <ng-template #updatesPopover>
-              <p i18n>
-                Update checking works by pinging the public GitHub API for the latest release to determine whether a new version is available. Actual updating of the app must still be performed manually.
-              </p>
-              <p>
-                <em i18n>No tracking data is collected by the app in any way.</em>
-              </p>
-            </ng-template>
-          </div>
-        </div>
-
-        <h4 class="mt-4" i18n>Document editing</h4>
-
-        <div class="row mb-3">
-          <div class="offset-md-3 col">
-            <pngx-input-check i18n-title title="Use PDF viewer provided by the browser" i18n-hint hint="This is usually faster for displaying large PDF documents, but it might not work on some browsers." formControlName="useNativePdfViewer"></pngx-input-check>
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="offset-md-3 col">
-            <pngx-input-check i18n-title title="Automatically remove inbox tag(s) on save" formControlName="documentEditingRemoveInboxTags"></pngx-input-check>
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="offset-md-3 col">
-            <pngx-input-check i18n-title title="Show document thumbnail during loading" formControlName="documentEditingOverlayThumbnail"></pngx-input-check>
-          </div>
-        </div>
-
-        <h4 class="mt-4" i18n>Bulk editing</h4>
-
-        <div class="row mb-3">
-          <div class="offset-md-3 col">
-            <pngx-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs"></pngx-input-check>
-            <pngx-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></pngx-input-check>
-          </div>
-        </div>
-
-        <h4 class="mt-4" i18n>Global search</h4>
-
-        <div class="row mb-3">
-          <div class="offset-md-3 col">
-            <pngx-input-check i18n-title title="Do not include advanced search results" formControlName="searchDbOnly"></pngx-input-check>
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="offset-md-3 col">
-            <div class="row">
-              <div class="col-md-2 col-form-label pt-0">
-                <span i18n>Full search links to</span>
+        <div class="row">
+          <div class="col-xl-6">
+            <h4 i18n>Appearance</h4>
+            <div class="row mb-3">
+              <div class="col-md-3 col-form-label pt-0">
+                <span i18n>Display language</span>
               </div>
               <div class="col">
-                <select class="form-select" formControlName="searchLink">
-                  <option [ngValue]="GlobalSearchType.TITLE_CONTENT" i18n>Title and content search</option>
-                  <option [ngValue]="GlobalSearchType.ADVANCED" i18n>Advanced search</option>
+
+                <select class="form-select" formControlName="displayLanguage">
+                  @for (lang of displayLanguageOptions; track lang) {
+                    <option [ngValue]="lang.code">{{lang.name}}@if (lang.code && currentLocale !== 'en-US') {
+                      <span> - {{lang.englishName}}</span>
+                    }</option>
+                  }
                 </select>
+
+                @if (displayLanguageIsDirty) {
+                  <small class="form-text text-primary" i18n>You need to reload the page after applying a new language.</small>
+                }
+
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-3 col-form-label pt-0">
+                <span i18n>Date display</span>
+              </div>
+              <div class="col">
+
+                <select class="form-select" formControlName="dateLocale">
+                  @for (lang of dateLocaleOptions; track lang) {
+                    <option [ngValue]="lang.code">{{lang.name}}@if (lang.code) {
+                      <span> - {{today | customDate:'shortDate':null:lang.code}}</span>
+                    }</option>
+                  }
+                </select>
+
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-3 col-form-label pt-0">
+                <span i18n>Date format</span>
+              </div>
+              <div class="col">
+
+                <div class="form-check">
+                  <input type="radio" id="dateFormatShort" name="dateFormat" class="form-check-input" formControlName="dateFormat" value="shortDate">
+                  <label class="form-check-label" for="dateFormatShort" i18n>Short: {{today | customDate:'shortDate':null:computedDateLocale}}</label>
+                </div>
+                <div class="form-check">
+                  <input type="radio" id="dateFormatMedium" name="dateFormat" class="form-check-input" formControlName="dateFormat" value="mediumDate">
+                  <label class="form-check-label" for="dateFormatMedium" i18n>Medium: {{today | customDate:'mediumDate':null:computedDateLocale}}</label>
+                </div>
+                <div class="form-check">
+                  <input type="radio" id="dateFormatLong" name="dateFormat" class="form-check-input" formControlName="dateFormat" value="longDate">
+                  <label class="form-check-label" for="dateFormatLong" i18n>Long: {{today | customDate:'longDate':null:computedDateLocale}}</label>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-3 col-form-label pt-0">
+                <span i18n>Items per page</span>
+              </div>
+              <div class="col">
+
+                <select class="form-select" formControlName="documentListItemPerPage">
+                  <option [ngValue]="10">10</option>
+                  <option [ngValue]="25">25</option>
+                  <option [ngValue]="50">50</option>
+                  <option [ngValue]="100">100</option>
+                </select>
+
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-3 col-form-label pt-0">
+                <span i18n>Sidebar</span>
+              </div>
+              <div class="col">
+
+                <pngx-input-check i18n-title title="Use 'slim' sidebar (icons only)" formControlName="slimSidebarEnabled"></pngx-input-check>
+
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-3 col-form-label pt-0">
+                <span i18n>Dark mode</span>
+              </div>
+              <div class="col">
+                <pngx-input-check i18n-title title="Use system settings" formControlName="darkModeUseSystem"></pngx-input-check>
+                <pngx-input-check [hidden]="settingsForm.value.darkModeUseSystem" i18n-title title="Enable dark mode" formControlName="darkModeEnabled"></pngx-input-check>
+                <pngx-input-check i18n-title title="Invert thumbnails in dark mode" formControlName="darkModeInvertThumbs"></pngx-input-check>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-3 col-form-label pt-0">
+                <span i18n>Theme Color</span>
+              </div>
+              <div class="col col-md-3">
+                <pngx-input-color i18n-title formControlName="themeColor" [error]="error?.color"></pngx-input-color>
+              </div>
+              <div class="col-2">
+                <button class="btn btn-link btn-sm pt-2 ps-0" [disabled]="!this.settingsForm.get('themeColor').value" (click)="clearThemeColor()">
+                  <i-bs width="1em" height="1em" name="x"></i-bs><ng-container i18n>Reset</ng-container>
+                </button>
+              </div>
+            </div>
+
+            <h4 class="mt-4" i18n>Document editing</h4>
+
+            <div class="row mb-3">
+              <div class="offset-md-3 col">
+                <pngx-input-check i18n-title title="Use PDF viewer provided by the browser" i18n-hint hint="This is usually faster for displaying large PDF documents, but it might not work on some browsers." formControlName="useNativePdfViewer"></pngx-input-check>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="offset-md-3 col">
+                <pngx-input-check i18n-title title="Automatically remove inbox tag(s) on save" formControlName="documentEditingRemoveInboxTags"></pngx-input-check>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="offset-md-3 col">
+                <pngx-input-check i18n-title title="Show document thumbnail during loading" formControlName="documentEditingOverlayThumbnail"></pngx-input-check>
               </div>
             </div>
           </div>
-        </div>
+          <div class="col-xl-6">
+            <h4 class="mt-4" id="update-checking" i18n>Update checking</h4>
+            <div class="row mb-3">
+              <div class="offset-md-3 col d-flex flex-row align-items-start">
+                <pngx-input-check i18n-title title="Enable update checking" formControlName="updateCheckingEnabled"></pngx-input-check>
+                <button class="btn btn-sm btn-link text-muted me-auto p-0 ms-2" title="What's this?" i18n-title type="button" triggers="mouseenter:mouseleave" [ngbPopover]="updatesPopover" [autoClose]="true">
+                  <i-bs name="question-circle"></i-bs>
+                </button>
+                <ng-template #updatesPopover>
+                  <p i18n>
+                    Update checking works by pinging the public GitHub API for the latest release to determine whether a new version is available. Actual updating of the app must still be performed manually.
+                  </p>
+                  <p>
+                    <em i18n>No tracking data is collected by the app in any way.</em>
+                  </p>
+                </ng-template>
+              </div>
+            </div>
 
-        <h4 class="mt-4" i18n>Saved Views</h4>
-        <div class="row mb-3">
-          <div class="offset-md-3 col">
-            <pngx-input-check i18n-title title="Show warning when closing saved views with unsaved changes" formControlName="savedViewsWarnOnUnsavedChange"></pngx-input-check>
-          </div>
-        </div>
+            <h4 class="mt-4" i18n>Bulk editing</h4>
+            <div class="row mb-3">
+              <div class="offset-md-3 col">
+                <pngx-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs"></pngx-input-check>
+                <pngx-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></pngx-input-check>
+              </div>
+            </div>
 
-        <h4 class="mt-4" i18n>Notes</h4>
-        <div class="row mb-3">
-          <div class="offset-md-3 col">
-            <pngx-input-check i18n-title title="Enable notes" formControlName="notesEnabled"></pngx-input-check>
+            <h4 class="mt-4" i18n>Global search</h4>
+            <div class="row mb-3">
+              <div class="offset-md-3 col">
+                <pngx-input-check i18n-title title="Do not include advanced search results" formControlName="searchDbOnly"></pngx-input-check>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="offset-md-3 col">
+                <div class="row">
+                  <div class="col-md-2 col-form-label pt-0">
+                    <span i18n>Full search links to</span>
+                  </div>
+                  <div class="col">
+                    <select class="form-select" formControlName="searchLink">
+                      <option [ngValue]="GlobalSearchType.TITLE_CONTENT" i18n>Title and content search</option>
+                      <option [ngValue]="GlobalSearchType.ADVANCED" i18n>Advanced search</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <h4 class="mt-4" i18n>Saved Views</h4>
+            <div class="row mb-3">
+              <div class="offset-md-3 col">
+                <pngx-input-check i18n-title title="Show warning when closing saved views with unsaved changes" formControlName="savedViewsWarnOnUnsavedChange"></pngx-input-check>
+              </div>
+            </div>
+
+            <h4 class="mt-4" i18n>Notes</h4>
+            <div class="row mb-3">
+              <div class="offset-md-3 col">
+                <pngx-input-check i18n-title title="Enable notes" formControlName="notesEnabled"></pngx-input-check>
+              </div>
+            </div>
           </div>
         </div>
 
