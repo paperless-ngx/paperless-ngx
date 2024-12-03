@@ -1615,7 +1615,11 @@ class TasksViewSerializer(OwnedObjectSerializer):
             case states.SUCCESS:
                 re = self.created_doc_re
             case states.FAILURE:
-                re = self.duplicate_doc_re
+                re = (
+                    self.duplicate_doc_re
+                    if "existing document is in the trash" not in obj.result
+                    else None
+                )
         if re is not None:
             try:
                 result = re.search(obj.result).group(1)
