@@ -10,8 +10,8 @@ class AngularApiAuthenticationOverrideScheme(OpenApiAuthenticationExtension):
 
     def get_security_definition(self, auto_schema):
         return {
-            "name": "Angular Authorization",
-            "description": "Automatic Angular authentication for the dev server",
+            "type": "http",
+            "scheme": "basic",
         }
 
 
