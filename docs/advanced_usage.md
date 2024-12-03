@@ -585,10 +585,13 @@ services:
 ### Case Sensitivity
 
 The database interface does not provide a method to configure a MySQL
-database to be case sensitive. This would prevent a user from creating a
+database to be case sensitive. This causes a number of caveats when using MySQL.
+
+#### Tags
+A case **in**sensitive database prevents a user from creating a
 tag `Name` and `NAME` as they are considered the same.
 
-Per Django documentation, to enable this requires manual intervention.
+Per Django documentation, mitigating this requires manual intervention.
 To enable case sensitive tables, you can execute the following command
 against each table:
 
@@ -604,6 +607,12 @@ existing tables) with:
     Using mariadb version 10.4+ is recommended. Using the `utf8mb3` character set on
     an older system may fix issues that can arise while setting up Paperless-ngx but
     `utf8mb3` can cause issues with consumption (where `utf8mb4` does not).
+    
+#### Search
+However, there is a downside to turning on case sensitivity, as it also makes searches case sensitive.   
+This means: A document called `Invoice` won't be found when searching for `invoice`.
+
+For more information on this topic, you can refer to [this](https://code.djangoproject.com/ticket/9682) Django issue.
 
 ### Missing timezones
 
