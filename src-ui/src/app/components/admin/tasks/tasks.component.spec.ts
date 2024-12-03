@@ -26,7 +26,7 @@ import { TasksService } from 'src/app/services/tasks.service'
 import { environment } from 'src/environments/environment'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-import { TasksComponent } from './tasks.component'
+import { TasksComponent, TaskTab } from './tasks.component'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { FormsModule } from '@angular/forms'
@@ -167,7 +167,7 @@ describe('TasksComponent', () => {
     let currentTasksLength = tasks.filter(
       (t) => t.status === PaperlessTaskStatus.Failed
     ).length
-    component.activeTab = 'failed'
+    component.activeTab = TaskTab.Failed
     fixture.detectChanges()
     expect(tabButtons[0].nativeElement.textContent).toEqual(
       `Failed${currentTasksLength}`
@@ -179,7 +179,7 @@ describe('TasksComponent', () => {
     currentTasksLength = tasks.filter(
       (t) => t.status === PaperlessTaskStatus.Complete
     ).length
-    component.activeTab = 'completed'
+    component.activeTab = TaskTab.Completed
     fixture.detectChanges()
     expect(tabButtons[1].nativeElement.textContent).toEqual(
       `Complete${currentTasksLength}`
@@ -188,7 +188,7 @@ describe('TasksComponent', () => {
     currentTasksLength = tasks.filter(
       (t) => t.status === PaperlessTaskStatus.Started
     ).length
-    component.activeTab = 'started'
+    component.activeTab = TaskTab.Started
     fixture.detectChanges()
     expect(tabButtons[2].nativeElement.textContent).toEqual(
       `Started${currentTasksLength}`
@@ -197,7 +197,7 @@ describe('TasksComponent', () => {
     currentTasksLength = tasks.filter(
       (t) => t.status === PaperlessTaskStatus.Pending
     ).length
-    component.activeTab = 'queued'
+    component.activeTab = TaskTab.Queued
     fixture.detectChanges()
     expect(tabButtons[3].nativeElement.textContent).toEqual(
       `Queued${currentTasksLength}`
@@ -206,7 +206,7 @@ describe('TasksComponent', () => {
 
   it('should to go page 1 between tab switch', () => {
     component.page = 10
-    component.duringTabChange(2)
+    component.duringTabChange()
     expect(component.page).toEqual(1)
   })
 
@@ -288,5 +288,54 @@ describe('TasksComponent', () => {
     expect(component.autoRefreshInterval).toBeNull()
     jest.advanceTimersByTime(6000)
     expect(reloadSpy).toHaveBeenCalledTimes(2)
+  })
+
+  it('should filter tasks by file name', () => {
+    const input = fixture.debugElement.query(By.css('ul input[type=text]'))
+    input.nativeElement.value = '191092'
+    input.nativeElement.dispatchEvent(new Event('input'))
+    jest.advanceTimersByTime(150) // debounce time
+    fixture.detectChanges()
+    expect(component.filterText).toEqual('191092')
+    expect(
+      fixture.debugElement.queryAll(By.css('table tbody tr')).length
+    ).toEqual(2) // 1 task x 2 lines
+  })
+
+  it('should filter tasks by result', () => {
+    component.activeTab = TaskTab.Failed
+    fixture.detectChanges()
+    component.filterTargetID = 1
+    const input = fixture.debugElement.query(By.css('ul input[type=text]'))
+    input.nativeElement.value = 'duplicate'
+    input.nativeElement.dispatchEvent(new Event('input'))
+    jest.advanceTimersByTime(150) // debounce time
+    fixture.detectChanges()
+    expect(component.filterText).toEqual('duplicate')
+    expect(
+      fixture.debugElement.queryAll(By.css('table tbody tr')).length
+    ).toEqual(4) // 2 tasks x 2 lines
+  })
+
+  it('should support keyboard events for filtering', () => {
+    const input = fixture.debugElement.query(By.css('ul input[type=text]'))
+    input.nativeElement.value = '191092'
+    input.nativeElement.dispatchEvent(
+      new KeyboardEvent('keyup', { key: 'Enter' })
+    )
+    expect(component.filterText).toEqual('191092') // no debounce needed
+    input.nativeElement.dispatchEvent(
+      new KeyboardEvent('keyup', { key: 'Escape' })
+    )
+    expect(component.filterText).toEqual('')
+  })
+
+  it('should reset filter and target on tab switch', () => {
+    component.filterText = '191092'
+    component.filterTargetID = 1
+    component.activeTab = TaskTab.Completed
+    component.beforeTabChange()
+    expect(component.filterText).toEqual('')
+    expect(component.filterTargetID).toEqual(0)
   })
 })
