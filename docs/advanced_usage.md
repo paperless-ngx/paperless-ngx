@@ -607,10 +607,6 @@ existing tables) with:
     Using mariadb version 10.4+ is recommended. Using the `utf8mb3` character set on
     an older system may fix issues that can arise while setting up Paperless-ngx but
     `utf8mb3` can cause issues with consumption (where `utf8mb4` does not).
-    
-#### Search
-However, there is a downside to turning on case sensitivity, as it also makes searches case sensitive.   
-This means: A document called `Invoice` won't be found when searching for `invoice`.
 
 For more information on this topic, you can refer to [this](https://code.djangoproject.com/ticket/9682) Django issue.
 
