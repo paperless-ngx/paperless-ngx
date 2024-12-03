@@ -347,4 +347,15 @@ describe('WorkflowEditDialogComponent', () => {
       component.actionFields.at(0).get('remove_change_groups').disabled
     ).toBeFalsy()
   })
+
+  it('should prune empty nested objects on save', () => {
+    component.object = workflow
+    component.addTrigger()
+    component.addAction()
+    expect(component.objectForm.get('actions').value[0].email).not.toBeNull()
+    expect(component.objectForm.get('actions').value[0].webhook).not.toBeNull()
+    component.save()
+    expect(component.objectForm.get('actions').value[0].email).toBeNull()
+    expect(component.objectForm.get('actions').value[0].webhook).toBeNull()
+  })
 })

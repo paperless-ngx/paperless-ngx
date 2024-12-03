@@ -18,8 +18,7 @@ def settings(request):
     )
 
     return {
-        "EMAIL_ENABLED": django_settings.EMAIL_HOST != "localhost"
-        or django_settings.EMAIL_HOST_USER != "",
+        "EMAIL_ENABLED": django_settings.EMAIL_ENABLED,
         "DISABLE_REGULAR_LOGIN": django_settings.DISABLE_REGULAR_LOGIN,
         "REDIRECT_LOGIN_TO_SSO": django_settings.REDIRECT_LOGIN_TO_SSO,
         "ACCOUNT_ALLOW_SIGNUPS": django_settings.ACCOUNT_ALLOW_SIGNUPS,
