@@ -1917,6 +1917,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
                         added_time="",
                         owner_username="",
                         original_filename="",
+                        filename="",
                         created="",
                         created_year="",
                         created_year_short="",

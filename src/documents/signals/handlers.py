@@ -656,6 +656,7 @@ def run_workflows(
                         document.owner.username if document.owner else "",
                         timezone.localtime(document.added),
                         document.original_filename or "",
+                        document.filename or "",
                         timezone.localtime(document.created),
                     )
                 except Exception:
@@ -926,6 +927,7 @@ def run_workflows(
         document_type = document.document_type.name if document.document_type else ""
         owner_username = document.owner.username if document.owner else ""
         filename = document.original_filename or ""
+        current_filename = document.filename or ""
         added = timezone.localtime(document.added)
         created = timezone.localtime(document.created)
         subject = parse_w_workflow_placeholders(
@@ -935,6 +937,7 @@ def run_workflows(
             owner_username,
             added,
             filename,
+            current_filename,
             created,
             title,
             doc_url,
@@ -946,6 +949,7 @@ def run_workflows(
             owner_username,
             added,
             filename,
+            current_filename,
             created,
             title,
             doc_url,
@@ -982,6 +986,7 @@ def run_workflows(
         document_type = document.document_type.name if document.document_type else ""
         owner_username = document.owner.username if document.owner else ""
         filename = document.original_filename or ""
+        current_filename = document.filename or ""
         added = timezone.localtime(document.added)
         created = timezone.localtime(document.created)
 
@@ -997,6 +1002,7 @@ def run_workflows(
                             owner_username,
                             added,
                             filename,
+                            current_filename,
                             created,
                             title,
                             doc_url,
@@ -1014,6 +1020,7 @@ def run_workflows(
                     owner_username,
                     added,
                     filename,
+                    current_filename,
                     created,
                     title,
                     doc_url,

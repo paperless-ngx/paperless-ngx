@@ -9,6 +9,7 @@ def parse_w_workflow_placeholders(
     owner_username: str,
     local_added: datetime,
     original_filename: str,
+    filename: str,
     created: datetime | None = None,
     doc_title: str | None = None,
     doc_url: str | None = None,
@@ -31,6 +32,7 @@ def parse_w_workflow_placeholders(
         "added_time": local_added.strftime("%H:%M"),
         "owner_username": owner_username,
         "original_filename": Path(original_filename).stem,
+        "filename": Path(filename).stem,
     }
     if created is not None:
         formatting.update(
