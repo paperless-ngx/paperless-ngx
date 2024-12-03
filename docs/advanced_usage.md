@@ -585,7 +585,7 @@ services:
 ### Case Sensitivity
 
 The database interface does not provide a method to configure a MySQL
-database to be case sensitive. A case **in**sensitive database prevents a user from creating a
+database to be case-sensitive. A case-**in**sensitive database prevents a user from creating a
 tag `Name` and `NAME` as they are considered the same.
 
 However, there is a downside to turning on case sensitivity, as it also makes searches case sensitive.   
