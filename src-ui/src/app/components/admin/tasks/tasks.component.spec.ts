@@ -291,7 +291,9 @@ describe('TasksComponent', () => {
   })
 
   it('should filter tasks by file name', () => {
-    const input = fixture.debugElement.query(By.css('ul input[type=text]'))
+    const input = fixture.debugElement.query(
+      By.css('pngx-page-header input[type=text]')
+    )
     input.nativeElement.value = '191092'
     input.nativeElement.dispatchEvent(new Event('input'))
     jest.advanceTimersByTime(150) // debounce time
@@ -306,7 +308,9 @@ describe('TasksComponent', () => {
     component.activeTab = TaskTab.Failed
     fixture.detectChanges()
     component.filterTargetID = 1
-    const input = fixture.debugElement.query(By.css('ul input[type=text]'))
+    const input = fixture.debugElement.query(
+      By.css('pngx-page-header input[type=text]')
+    )
     input.nativeElement.value = 'duplicate'
     input.nativeElement.dispatchEvent(new Event('input'))
     jest.advanceTimersByTime(150) // debounce time
@@ -318,7 +322,9 @@ describe('TasksComponent', () => {
   })
 
   it('should support keyboard events for filtering', () => {
-    const input = fixture.debugElement.query(By.css('ul input[type=text]'))
+    const input = fixture.debugElement.query(
+      By.css('pngx-page-header input[type=text]')
+    )
     input.nativeElement.value = '191092'
     input.nativeElement.dispatchEvent(
       new KeyboardEvent('keyup', { key: 'Enter' })
