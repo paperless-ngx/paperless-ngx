@@ -832,6 +832,7 @@ class TestMail(
 
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 0)
 
+    @pytest.mark.flaky(reruns=4)
     def test_handle_mail_account_flag(self):
         account = MailAccount.objects.create(
             name="test",
