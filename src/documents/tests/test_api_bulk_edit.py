@@ -348,7 +348,23 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         m.assert_not_called()
 
-        # Not a list of integers
+        # Invalid dict
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id, self.doc3.id],
+                    "method": "modify_custom_fields",
+                    "parameters": {
+                        "add_custom_fields": {"foo": 99},
+                        "remove_custom_fields": [self.cf2.id],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        m.assert_not_called()
 
         # Missing remove_custom_fields
         response = self.client.post(
