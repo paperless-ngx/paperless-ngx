@@ -52,7 +52,11 @@ export class CustomFieldsBulkEditDialogComponent {
   ) {}
 
   initForm() {
-    this.form = new FormGroup({})
+    Object.keys(this.form.controls).forEach((key) => {
+      if (!this._fieldsToAddIds.includes(parseInt(key))) {
+        this.form.removeControl(key)
+      }
+    })
     this._fieldsToAddIds.forEach((field_id) => {
       this.form.addControl(field_id.toString(), new FormControl(null))
     })
