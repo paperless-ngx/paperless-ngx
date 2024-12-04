@@ -91,6 +91,6 @@
             <p class="mb-0 small" i18n>This operation will also remove {{fieldsToRemoveIds.length}} custom field(s) from the selected documents.</p>
         }
         <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
-        <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
+        <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive || fieldsToRemoveIds.length + fieldsToAddIds.length === 0">Save</button>
     </div>
   </form>
