@@ -1150,8 +1150,9 @@ class BulkEditSerializer(
             try:
                 ids = [int(i[0]) for i in custom_fields.items()]
             except Exception as e:
+                logger.exception(f"Error validating custom fields: {e}")
                 raise serializers.ValidationError(
-                    f"{name} must be a list of integers or a dict of key-value pairs: {e}",
+                    f"{name} must be a list of integers or a dict of key-value pairs, see the log for details",
                 )
         elif not isinstance(custom_fields, list) or not all(
             isinstance(i, int) for i in ids
