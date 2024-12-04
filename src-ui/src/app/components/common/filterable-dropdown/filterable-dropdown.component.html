@@ -67,8 +67,9 @@
         }
       }
       @if (extraButtonTitle) {
-        <button class="list-group-item list-group-item-action bg-light text-primary" (click)="extraButtonClicked($event)" [disabled]="disabled">
-          <small class="ms-2 fw-bold"><ng-container i18n>{{extraButtonTitle}}</ng-container></small>
+        <button class="list-group-item list-group-item-action bg-light" (click)="extraButtonClicked($event)" [disabled]="disabled">
+          <small class="ms-2 fw-bold">{{extraButtonTitle}}</small>
+          <i-bs width="1.5em" height="1em" name="arrow-right"></i-bs>
         </button>
       }
       @if (!editing && manyToOne) {
