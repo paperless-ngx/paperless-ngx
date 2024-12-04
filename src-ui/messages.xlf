@@ -596,7 +596,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component.html</context>
-          <context context-type="linenumber">94</context>
+          <context context-type="linenumber">102</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
@@ -1444,7 +1444,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component.html</context>
-          <context context-type="linenumber">93</context>
+          <context context-type="linenumber">101</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
@@ -6932,7 +6932,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">860</context>
+          <context context-type="linenumber">859</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7894972847287473517" datatype="html">
@@ -7178,21 +7178,28 @@
         <source>Bulk operation executed successfully</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">850</context>
+          <context context-type="linenumber">849</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6307402210351946694" datatype="html">
+        <source>{VAR_PLURAL, plural, =1 {Set custom fields for 1 document} other {Set custom fields for <x id="INTERPOLATION"/> documents}}</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component.html</context>
+          <context context-type="linenumber">3,7</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8100177157764133131" datatype="html">
         <source>Select custom fields</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component.html</context>
-          <context context-type="linenumber">12</context>
+          <context context-type="linenumber">16</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="7267500828215901463" datatype="html">
-        <source>This operation will also remove <x id="INTERPOLATION" equiv-text="{{fieldsToRemoveIds.length}}"/> custom field(s) from the selected documents.</source>
+      <trans-unit id="5468792870683258164" datatype="html">
+        <source>{VAR_PLURAL, plural, =1 {This operation will also remove 1 custom field from the selected documents.} other {This operation will also remove <x id="INTERPOLATION"/> custom fields from the selected documents.}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component.html</context>
-          <context context-type="linenumber">91</context>
+          <context context-type="linenumber">95,99</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2784168796433474565" datatype="html">

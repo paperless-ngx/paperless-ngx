@@ -44,7 +44,7 @@ export class CustomFieldsBulkEditDialogComponent {
 
   public form: FormGroup = new FormGroup({})
 
-  public documents: number[]
+  public documents: number[] = []
 
   constructor(
     private activeModal: NgbActiveModal,
