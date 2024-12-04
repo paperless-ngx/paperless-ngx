@@ -264,7 +264,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         )
         cf2 = CustomField.objects.create(
             name="cf2",
-            data_type=CustomField.FieldDataType.INT,
+            data_type=CustomField.FieldDataType.MONETARY,
         )
         cf3 = CustomField.objects.create(
             name="cf3",
