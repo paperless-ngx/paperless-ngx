@@ -133,6 +133,7 @@ import { DeletePagesConfirmDialogComponent } from './components/common/confirm-d
 import { TrashComponent } from './components/admin/trash/trash.component'
 import { EntriesComponent } from './components/common/input/entries/entries.component'
 import { SavedViewsComponent } from './components/manage/saved-views/saved-views.component'
+import { CustomFieldsBulkEditDialogComponent } from './components/document-list/bulk-editor/custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component'
 import {
   airplane,
   archive,
@@ -528,6 +529,7 @@ function initializeApp(settings: SettingsService) {
     TrashComponent,
     EntriesComponent,
     SavedViewsComponent,
+    CustomFieldsBulkEditDialogComponent,
   ],
   bootstrap: [AppComponent],
   imports: [

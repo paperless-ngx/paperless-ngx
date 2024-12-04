@@ -66,6 +66,11 @@
           </button>
         }
       }
+      @if (extraButtonTitle) {
+        <button class="list-group-item list-group-item-action bg-light text-primary" (click)="extraButton.next($event)" [disabled]="disabled">
+          <small class="ms-2 fw-bold"><ng-container i18n>{{extraButtonTitle}}</ng-container></small>
+        </button>
+      }
       @if (!editing && manyToOne) {
         <div class="list-group-item list-group-item-note pt-1 pb-2">
           <small i18n>Click again to exclude items.</small>

@@ -1,0 +1,32 @@
+<form [formGroup]="form" (ngSubmit)="save()" autocomplete="off">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Set custom fields for {{documents?.length}} document(s)</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="cancel()">
+      </button>
+    </div>
+    <div class="modal-body">
+        <pngx-input-select i18n-title title=""
+        multiple="true"
+        [items]="customFields"
+        [(ngModel)]="selectedFieldsIds"
+        placeholder="Select custom fields"
+        i18n-placeholder
+        [ngModelOptions]="{standalone: true}">
+    </pngx-input-select>
+        <div class="d-flex flex-column gap-2">
+            @for (field of selectedFields; track field.id) {
+                <div class="input-group">
+                    <span class="input-group-text">{{field.name}}</span>
+                    <input type="text" class="form-control" id="field_{{field.id}}" formControlName="{{field.id}}">
+                    <button type="button" class="btn btn-outline-danger" (click)="removeField(field.id)">
+                        <i-bs name="x"></i-bs>
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
+      <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
+    </div>
+  </form>

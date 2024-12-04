@@ -434,21 +434,6 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
   @Input()
   createRef: (name) => void
 
-  creating: boolean = false
-
-  @Output()
-  apply = new EventEmitter<ChangedItems>()
-
-  @Output()
-  opened = new EventEmitter()
-
-  get modifierToggleEnabled(): boolean {
-    return this.manyToOne
-      ? this.selectionModel.selectionSize() > 1 &&
-          this.selectionModel.getExcludedItems().length == 0
-      : !this.selectionModel.isNoneSelected()
-  }
-
   @Input()
   set documentCounts(counts: SelectionDataItem[]) {
     if (counts) {
@@ -458,6 +443,27 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
 
   @Input()
   shortcutKey: string
+
+  @Input()
+  extraButtonTitle: string
+
+  creating: boolean = false
+
+  @Output()
+  apply = new EventEmitter<ChangedItems>()
+
+  @Output()
+  opened = new EventEmitter()
+
+  @Output()
+  extraButton = new EventEmitter()
+
+  get modifierToggleEnabled(): boolean {
+    return this.manyToOne
+      ? this.selectionModel.selectionSize() > 1 &&
+          this.selectionModel.getExcludedItems().length == 0
+      : !this.selectionModel.isNoneSelected()
+  }
 
   get name(): string {
     return this.title ? this.title.replace(/\s/g, '_').toLowerCase() : null

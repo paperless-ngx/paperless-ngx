@@ -90,6 +90,9 @@
               (opened)="openCustomFieldsDropdown()"
               [(selectionModel)]="customFieldsSelectionModel"
               [documentCounts]="customFieldDocumentCounts"
+              extraButtonTitle="Set values"
+              i18n-extraButtonTitle
+              (extraButton)="setCustomFieldValues()"
               (apply)="setCustomFields($event)">
             </pngx-filterable-dropdown>
           }
