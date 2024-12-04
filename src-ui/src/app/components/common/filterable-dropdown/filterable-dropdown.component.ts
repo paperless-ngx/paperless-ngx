@@ -650,4 +650,13 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
       this.selectionModel.get(item.id) !== ToggleableItemState.Selected
     )
   }
+
+  extraButtonClicked() {
+    // don't apply changes when clicking the extra button
+    const applyOnClose = this.applyOnClose
+    this.applyOnClose = false
+    this.dropdown.close()
+    this.extraButton.emit()
+    this.applyOnClose = applyOnClose
+  }
 }
