@@ -1446,7 +1446,7 @@ describe('BulkEditorComponent', () => {
 
     component.setCustomFieldValues({
       itemsToAdd: [{ id: 1 }, { id: 2 }],
-      itemsToRemove: [],
+      itemsToRemove: [1],
     } as any)
 
     expect(modal.componentInstance.customFields).toEqual(component.customFields)
