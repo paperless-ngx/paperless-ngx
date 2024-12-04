@@ -57,6 +57,7 @@ from guardian.shortcuts import get_perms, get_users_with_perms, \
 from django.utils.translation import gettext_lazy as _
 from langdetect import detect
 from packaging import version as packaging_version
+from pytz import country_timezones
 
 from redis import Redis
 from rest_framework import parsers, status
@@ -1486,29 +1487,44 @@ class StatisticsCustomView(APIView):
             to_date = timezone.localize(datetime.strptime(to_date, '%Y-%m-%d'))
             to_date = to_date + timedelta(hours=23, minutes=59, seconds=59,
                                           microseconds=999999)
+            date_dict = {}
+            current_date = from_date
+
+            while current_date <= to_date:
+                date_key = current_date.strftime('%Y-%m-%d')  # Định dạng ngày
+                date_dict[date_key] = 0  # Thêm vào dict
+                current_date += timedelta(days=1)
+
             documents_count_by_day = documents.filter(
                 created__range=(from_date, to_date)).annotate(
                 created_date=TruncDate('created')).values(
                 'created_date').annotate(document_count=Count('id')).order_by(
                 'created_date')
             for entry in documents_count_by_day:
-                label_graph.append(entry['created_date'])
-                data_graph.append(entry['document_count'])
+                target_date_str = entry['created_date'].strftime('%Y-%m-%d')
+                if target_date_str  in date_dict:
+                    date_dict[target_date_str]=entry['document_count']
+            for key,value in date_dict.items():
+                label_graph.append(key)
+                data_graph.append(value)
+
 
         top_document_types = (documents.values('document_type__name').annotate(document_count=Count('id')) .order_by('-document_count')[:10])
         for entry in top_document_types:
-            data_document_type_graph.append(entry['document_count'])
             if entry['document_type__name'] is None:
-                entry['document_type__name'] = _('Other')
+                continue
+            data_document_type_graph.append(entry['document_count'])
             label_document_type_graph.append(entry['document_type__name'])
 
         top_tags = (documents.values('tags__name').annotate(
             document_count=Count('id')).order_by('-document_count')[:10])
         for entry in top_tags:
-            data_tag_graph.append(entry['document_count'])
             if entry['tags__name'] is None:
-                entry['tags__name'] = _('Other')
+                # entry['tags__name'] = _('Other')
+                continue
+            data_tag_graph.append(entry['document_count'])
             label_tag_graph.append(entry['tags__name'])
+
         return Response(
             {
                 "labels_graph": label_graph,
