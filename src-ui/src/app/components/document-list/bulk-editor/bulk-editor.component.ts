@@ -842,7 +842,6 @@ export class BulkEditorComponent
     dialog.fieldsToRemoveIds = changedCustomFields.itemsToRemove.map(
       (item) => item.id
     )
-    console.log(dialog.fieldsToRemoveIds, this.customFieldsSelectionModel)
 
     dialog.documents = Array.from(this.list.selected)
     dialog.succeeded.subscribe((result) => {
