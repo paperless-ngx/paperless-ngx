@@ -8,13 +8,13 @@
         <pngx-input-select i18n-title title=""
             multiple="true"
             [items]="customFields"
-            [(ngModel)]="selectedFieldsIds"
+            [(ngModel)]="fieldsToAddIds"
             placeholder="Select custom fields"
             i18n-placeholder
             [ngModelOptions]="{standalone: true}">
         </pngx-input-select>
         <div class="d-flex flex-column gap-2">
-            @for (field of selectedFields; track field.id) {
+            @for (field of fieldsToAdd; track field.id) {
                 <div class="d-flex gap-2">
                     @switch (field.data_type) {
                         @case (CustomFieldDataType.String) {
@@ -87,6 +87,9 @@
         </div>
     </div>
     <div class="modal-footer">
+        @if (fieldsToRemoveIds.length) {
+            <p class="mb-0 small" i18n>This operation will also remove {{fieldsToRemoveIds.length}} custom field(s) from the selected documents.</p>
+        }
         <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
         <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
     </div>

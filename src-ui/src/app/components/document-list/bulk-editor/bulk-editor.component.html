@@ -92,7 +92,7 @@
               [documentCounts]="customFieldDocumentCounts"
               extraButtonTitle="Set values"
               i18n-extraButtonTitle
-              (extraButton)="setCustomFieldValues()"
+              (extraButton)="setCustomFieldValues($event)"
               (apply)="setCustomFields($event)">
             </pngx-filterable-dropdown>
           }

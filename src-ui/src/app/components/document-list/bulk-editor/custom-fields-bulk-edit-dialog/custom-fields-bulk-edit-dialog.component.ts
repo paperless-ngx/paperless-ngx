@@ -23,22 +23,24 @@ export class CustomFieldsBulkEditDialogComponent {
 
   public customFields: CustomField[] = []
 
-  private _selectedFields: CustomField[] = [] // static object for change detection
-  public get selectedFields() {
-    return this._selectedFields
+  private _fieldsToAdd: CustomField[] = [] // static object for change detection
+  public get fieldsToAdd() {
+    return this._fieldsToAdd
   }
 
-  private _selectedFieldsIds: number[] = []
-  public get selectedFieldsIds() {
-    return this._selectedFieldsIds
+  private _fieldsToAddIds: number[] = []
+  public get fieldsToAddIds() {
+    return this._fieldsToAddIds
   }
-  public set selectedFieldsIds(ids: number[]) {
-    this._selectedFieldsIds = ids
-    this._selectedFields = this.customFields.filter((field) =>
-      this._selectedFieldsIds.includes(field.id)
+  public set fieldsToAddIds(ids: number[]) {
+    this._fieldsToAddIds = ids
+    this._fieldsToAdd = this.customFields.filter((field) =>
+      this._fieldsToAddIds.includes(field.id)
     )
     this.initForm()
   }
+
+  public fieldsToRemoveIds: number[] = []
 
   public form: FormGroup = new FormGroup({})
 
@@ -51,7 +53,7 @@ export class CustomFieldsBulkEditDialogComponent {
 
   initForm() {
     this.form = new FormGroup({})
-    this._selectedFieldsIds.forEach((field_id) => {
+    this._fieldsToAddIds.forEach((field_id) => {
       this.form.addControl(field_id.toString(), new FormControl(null))
     })
   }
@@ -60,7 +62,7 @@ export class CustomFieldsBulkEditDialogComponent {
     this.documentService
       .bulkEdit(this.documents, 'modify_custom_fields', {
         add_custom_fields: this.form.value,
-        remove_custom_fields: [],
+        remove_custom_fields: this.fieldsToRemoveIds,
       })
       .pipe(first())
       .subscribe({
@@ -79,8 +81,6 @@ export class CustomFieldsBulkEditDialogComponent {
   }
 
   public removeField(fieldId: number) {
-    this.selectedFieldsIds = this._selectedFieldsIds.filter(
-      (id) => id !== fieldId
-    )
+    this.fieldsToAddIds = this._fieldsToAddIds.filter((id) => id !== fieldId)
   }
 }

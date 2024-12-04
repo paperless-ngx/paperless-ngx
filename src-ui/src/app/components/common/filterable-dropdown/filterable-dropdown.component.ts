@@ -456,7 +456,7 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
   opened = new EventEmitter()
 
   @Output()
-  extraButton = new EventEmitter()
+  extraButton = new EventEmitter<ChangedItems>()
 
   get modifierToggleEnabled(): boolean {
     return this.manyToOne
@@ -656,7 +656,7 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
     const applyOnClose = this.applyOnClose
     this.applyOnClose = false
     this.dropdown.close()
-    this.extraButton.emit()
+    this.extraButton.emit(this.selectionModel.diff())
     this.applyOnClose = applyOnClose
   }
 }

@@ -828,7 +828,7 @@ export class BulkEditorComponent
       })
   }
 
-  public setCustomFieldValues() {
+  public setCustomFieldValues(changedCustomFields: ChangedItems) {
     const modal = this.modalService.open(CustomFieldsBulkEditDialogComponent, {
       backdrop: 'static',
       size: 'lg',
@@ -836,9 +836,14 @@ export class BulkEditorComponent
     const dialog =
       modal.componentInstance as CustomFieldsBulkEditDialogComponent
     dialog.customFields = this.customFields
-    dialog.selectedFieldsIds = this.customFieldsSelectionModel
-      .getSelectedItems()
-      .map((item) => item.id)
+    dialog.fieldsToAddIds = changedCustomFields.itemsToAdd.map(
+      (item) => item.id
+    )
+    dialog.fieldsToRemoveIds = changedCustomFields.itemsToRemove.map(
+      (item) => item.id
+    )
+    console.log(dialog.fieldsToRemoveIds, this.customFieldsSelectionModel)
+
     dialog.documents = Array.from(this.list.selected)
     dialog.succeeded.subscribe((result) => {
       this.toastService.showInfo(

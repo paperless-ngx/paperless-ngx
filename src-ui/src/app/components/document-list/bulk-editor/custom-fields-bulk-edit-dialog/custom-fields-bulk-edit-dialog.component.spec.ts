@@ -40,7 +40,7 @@ describe('CustomFieldsBulkEditDialogComponent', () => {
       { id: 1, name: 'Field 1', data_type: CustomFieldDataType.String },
       { id: 2, name: 'Field 2', data_type: CustomFieldDataType.Integer },
     ]
-    component.selectedFieldsIds = [1, 2]
+    component.fieldsToAddIds = [1, 2]
     expect(component.form.contains('1')).toBeTruthy()
     expect(component.form.contains('2')).toBeTruthy()
   })
@@ -52,7 +52,7 @@ describe('CustomFieldsBulkEditDialogComponent', () => {
     const successSpy = jest.spyOn(component.succeeded, 'emit')
 
     component.documents = [1, 2]
-    component.selectedFieldsIds = [1]
+    component.fieldsToAddIds = [1]
     component.form.controls['1'].setValue('Value 1')
     component.save()
 
@@ -67,7 +67,7 @@ describe('CustomFieldsBulkEditDialogComponent', () => {
     const failSpy = jest.spyOn(component.failed, 'emit')
 
     component.documents = [1, 2]
-    component.selectedFieldsIds = [1]
+    component.fieldsToAddIds = [1]
     component.form.controls['1'].setValue('Value 1')
     component.save()
 
@@ -82,8 +82,8 @@ describe('CustomFieldsBulkEditDialogComponent', () => {
   })
 
   it('should remove field from selected fields', () => {
-    component.selectedFieldsIds = [1, 2]
+    component.fieldsToAddIds = [1, 2]
     component.removeField(1)
-    expect(component.selectedFieldsIds).toEqual([2])
+    expect(component.fieldsToAddIds).toEqual([2])
   })
 })

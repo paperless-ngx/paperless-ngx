@@ -1443,14 +1443,14 @@ describe('BulkEditorComponent', () => {
       { id: 1, name: 'Custom Field 1', data_type: CustomFieldDataType.String },
       { id: 2, name: 'Custom Field 2', data_type: CustomFieldDataType.String },
     ]
-    jest
-      .spyOn(component.customFieldsSelectionModel, 'getSelectedItems')
-      .mockReturnValue([{ id: 1 }, { id: 2 }])
 
-    component.setCustomFieldValues()
+    component.setCustomFieldValues({
+      itemsToAdd: [{ id: 1 }, { id: 2 }],
+      itemsToRemove: [],
+    } as any)
 
     expect(modal.componentInstance.customFields).toEqual(component.customFields)
-    expect(modal.componentInstance.selectedFieldsIds).toEqual([1, 2])
+    expect(modal.componentInstance.fieldsToAddIds).toEqual([1, 2])
     expect(modal.componentInstance.documents).toEqual([3, 4])
 
     modal.componentInstance.failed.emit()
