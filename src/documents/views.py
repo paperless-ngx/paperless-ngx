@@ -2135,11 +2135,10 @@ class BulkEditObjectsView(PassUserMixin):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         elif operation == "delete" and object_type == "warehouses":
-            for warehouse_id in object_ids:
-                warehouse = Warehouse.objects.get(id=int(warehouse_id))
+            warehouses_list = Warehouse.objects.filter(id__in=object_ids)
+
+            for warehouse in warehouses_list:
                 warehouses = Warehouse.objects.filter(path__startswith=warehouse.path)
-                documents = Document.objects.filter(warehouse__in=warehouses)
-                documents.delete()
                 warehouses.delete()
 
 
@@ -2555,8 +2554,8 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     def destroy(self, request, pk, *args, **kwargs):
         warehouse = Warehouse.objects.get(id=pk)
         warehouses = Warehouse.objects.filter(path__startswith=warehouse.path)
-        documents = Document.objects.filter(warehouse__in=warehouses)
-        documents.delete()
+        # documents = Document.objects.filter(warex1house__in=warehouses)
+        # documents.delete()
         warehouses.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)

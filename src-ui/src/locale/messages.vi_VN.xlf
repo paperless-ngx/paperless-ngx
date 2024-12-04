@@ -4481,7 +4481,7 @@
                <context context-type="sourcefile">src/app/components/common/edit-dialog/box-edit-dialog/box-edit-dialog.component.ts</context>
                <context context-type="linenumber">72</context>
             </context-group>
-            <target state="translated">Create new Boxcase</target>
+            <target state="translated">Tạo hộp cặp mới</target>
          </trans-unit>
          <trans-unit id="3852279067551495091" datatype="html">
             <source>Edit Boxcase</source>
