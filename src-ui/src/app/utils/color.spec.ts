@@ -1,8 +1,10 @@
 import {
   BRIGHTNESS,
+  componentToHex,
   computeLuminance,
   estimateBrightnessForColor,
   hexToHsl,
+  hslToRgb,
   randomColor,
   rgbToHsl,
 } from './color'
@@ -44,7 +46,21 @@ describe('Color Utils', () => {
     expect(hsl).toEqual([0, 0, 0.5019607843137255])
   })
 
+  it('should convert hsl to rgb', () => {
+    let rgb = hslToRgb(0, 0, 0.5)
+    expect(rgb).toEqual([127.5, 127.5, 127.5])
+    expect(hslToRgb(0, 0, 0)).toEqual([0, 0, 0])
+    expect(hslToRgb(0, 0, 1)).toEqual([255, 255, 255])
+  })
+
   it('should return a random color', () => {
     expect(randomColor()).not.toBeNull()
+  })
+
+  it('should convert component to hex', () => {
+    expect(componentToHex(0)).toEqual('00')
+    expect(componentToHex(255)).toEqual('ff')
+    expect(componentToHex(128)).toEqual('80')
+    expect(componentToHex(15)).toEqual('0f')
   })
 })
