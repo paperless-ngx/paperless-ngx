@@ -47,6 +47,15 @@ export class StatisticsWidgetComponent
     super()
   }
 
+  labelProcess = {
+    'tagged_tags' : $localize`Tagged tags`,
+    'untagged_tags': $localize`Untagged tags`,
+    'assigned_document_type': $localize`Assigned document type`,
+    'unassigned_document_type': $localize`Unassigned document type`,
+
+
+}
+
   statistics: Statistics = {}
 
   subscription: Subscription
@@ -93,7 +102,7 @@ export class StatisticsWidgetComponent
   }
 
   translateText(value: string){
-    return $localize ``+ value;
+    return $localize `${value}`;
   }
 
   getTagPercent(): number {

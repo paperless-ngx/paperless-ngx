@@ -18,11 +18,7 @@ export class DatepickerRangeComponent extends AbstractInputComponent<string>
 
   hoveredDate: NgbDate | null = null
   fromDate: NgbDate | null = this.calendar.getToday()
-  toDate: NgbDate | null = this.calendar.getNext(
-    this.calendar.getToday(),
-    'd',
-    10,
-  )
+  toDate: NgbDate | null = this.calendar.getToday()
 
   constructor(private settings: SettingsService) {
     super()

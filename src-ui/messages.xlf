@@ -2952,7 +2952,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">78</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
@@ -3073,7 +3073,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
-          <context context-type="linenumber">155</context>
+          <context context-type="linenumber">177</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -6270,7 +6270,7 @@
         <source>Document Type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
-          <context context-type="linenumber">118</context>
+          <context context-type="linenumber">128</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2028517964701399614" datatype="html">
@@ -6312,10 +6312,10 @@
         <source><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;progress flex-grow-1&quot;&gt;"/><x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div
                   class=&quot;progress-bar bg-primary&quot;
                   role=&quot;progressbar&quot;
-                  [ngbPopover]=&quot;translateText(&apos;Tagged tags&apos;)&quot;
+                  [ngbPopover]=&quot;labelProcess[&apos;tagged_tags&apos;]&quot;
                   i18n-ngbPopover
                   triggers=&quot;mouseenter:mouseleave&quot;
-                  [attr.aria-label]=&quot;translateText(&apos;Tagged tags&apos;)&quot;
+                  [attr.aria-label]=&quot;labelProcess[&apos;tagged_tags&apos;]&quot;
                   [class.me-1px]=&quot;!0&quot;
                   [style.width]=&quot;100-(statistics.untagged_tags_count/statistics.tag_count)*100 + &apos;%&apos;&quot;
                   [style.opacity]=&quot;1&quot;
@@ -6324,10 +6324,10 @@
                   aria-valuemax=&quot;100&quot;&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div
                   class=&quot;progress-bar bg-primary&quot;
                   role=&quot;progressbar&quot;
-                  [ngbPopover]=&quot;translateText(&apos;Untagged tags&apos;)&quot;
+                  [ngbPopover]=&quot;labelProcess[&apos;untagged_tags&apos;]&quot;
                   i18n-ngbPopover
                   triggers=&quot;mouseenter:mouseleave&quot;
-                  [attr.aria-label]=&quot;translateText(&apos;Untagged tags&apos;)&quot;
+                  [attr.aria-label]=&quot;labelProcess[&apos;untagged_tags&apos;]&quot;
                   [class.me-1px]=&quot;!1&quot;
                   [style.width]=&quot;(statistics.untagged_tags_count/statistics.tag_count)*100+ &apos;%&apos;&quot;
                   [style.opacity]=&quot;0.5&quot;
@@ -6345,6 +6345,10 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">100</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="6571816214672638255" datatype="html">
         <source>Untagged tags</source>
@@ -6352,15 +6356,19 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">106</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="6887606175573586232" datatype="html">
         <source><x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&lt;div class=&quot;d-flex justify-content-between align-items-center my-2&quot;&gt;"/><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;progress flex-grow-1&quot;&gt;"/><x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div
                   class=&quot;progress-bar bg-primary&quot;
                   role=&quot;progressbar&quot;
-                  [ngbPopover]=&quot;translateText(&apos;Assigned document type&apos;)&quot;
+                  [ngbPopover]=&quot;labelProcess[&apos;assigned_document_type&apos;]&quot;
                   i18n-ngbPopover
                   triggers=&quot;mouseenter:mouseleave&quot;
-                  [attr.aria-label]=&quot;translateText(&apos;Assigned document type&apos;)&quot;
+                  [attr.aria-label]=&quot;labelProcess[&apos;assigned_document_type&apos;]&quot;
                   [class.me-1px]=&quot;!0&quot;
                   [style.width]=&quot;100-(statistics?.unassigned_document_types_count/statistics?.document_type_count)*100 + &apos;%&apos;&quot;
                   [style.opacity]=&quot;1&quot;
@@ -6369,10 +6377,10 @@
                   aria-valuemax=&quot;100&quot;&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div
                   class=&quot;progress-bar bg-primary&quot;
                   role=&quot;progressbar&quot;
-                  [ngbPopover]=&quot;translateText(&apos;Unassigned document type&apos;)&quot;
+                  [ngbPopover]=&quot;labelProcess[&apos;unassigned_document_type&apos;]&quot;
                   i18n-ngbPopover
                   triggers=&quot;mouseenter:mouseleave&quot;
-                  [attr.aria-label]=&quot;translateText(&apos;Unassigned document type&apos;)&quot;
+                  [attr.aria-label]=&quot;labelProcess[&apos;unassigned_document_type&apos;]&quot;
                   [class.me-1px]=&quot;!1&quot;
                   [style.width]=&quot;(statistics.unassigned_document_types_count/statistics.document_type_count)*100+ &apos;%&apos;&quot;
                   [style.opacity]=&quot;0.5&quot;
@@ -6384,18 +6392,32 @@
           <context context-type="linenumber">129,176</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="2690125102590347742" datatype="html">
+        <source>Assigned document type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9109954431544796886" datatype="html">
+        <source>Unassigned document type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="8693603235657020323" datatype="html">
         <source>Other</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
-          <context context-type="linenumber">68</context>
+          <context context-type="linenumber">77</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="4416290763660062288" datatype="html">
-        <source></source>
+      <trans-unit id="1737753151350322492" datatype="html">
+        <source><x id="PH" equiv-text="value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
-          <context context-type="linenumber">96</context>
+          <context context-type="linenumber">105</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5321728948071221061" datatype="html">

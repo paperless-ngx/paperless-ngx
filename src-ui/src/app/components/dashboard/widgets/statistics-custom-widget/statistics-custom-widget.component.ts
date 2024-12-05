@@ -7,8 +7,12 @@ import { DocumentListViewService } from 'src/app/services/document-list-view.ser
 import { environment } from 'src/environments/environment'
 
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
-import Chart from 'chart.js/auto'
+import Chart from 'chart.js/auto';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+
 import { NgbCalendar, NgbDate } from '@ng-bootstrap/ng-bootstrap'
+
+Chart.register(ChartDataLabels)
 
 export interface Statistics {
   labels_graph?: []
@@ -100,6 +104,12 @@ export class StatisticsCustomWidgetComponent
               },
             },
           },
+          plugins: {
+          datalabels: {
+            display: false,
+            // color: 'white',
+          },
+        },
         },
       },
     )
@@ -137,6 +147,18 @@ export class StatisticsCustomWidgetComponent
         responsive: true,
         maintainAspectRatio: false,
         aspectRatio: 2.5,
+        cutout: '50%',
+        plugins: {
+          datalabels: {
+            display: true,
+            formatter: (value, ctx) => {
+              const sum = ctx.dataset.data.reduce((a, b) => Number(a) + Number(b), 0)
+              const percentage = ((value / Number(sum)) * 100).toFixed(2) + '%'
+              return percentage
+            },
+            color: 'white',
+          },
+        },
       },
 
     })
@@ -174,6 +196,18 @@ export class StatisticsCustomWidgetComponent
         responsive: true,
         maintainAspectRatio: false,
         aspectRatio: 2.5,
+        cutout: '50%',
+        plugins: {
+          datalabels: {
+            display: true,
+            formatter: (value, ctx) => {
+              const sum = ctx.dataset.data.reduce((a, b) => Number(a) + Number(b), 0)
+              const percentage = ((value / Number(sum)) * 100).toFixed(2) + '%'
+              return percentage
+            },
+            color: 'white',
+          },
+        },
       },
 
     })

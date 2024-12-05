@@ -3441,7 +3441,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
-               <context context-type="linenumber">74</context>
+               <context context-type="linenumber">78</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
@@ -3569,7 +3569,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
-               <context context-type="linenumber">155</context>
+               <context context-type="linenumber">177</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -4481,7 +4481,7 @@
                <context context-type="sourcefile">src/app/components/common/edit-dialog/box-edit-dialog/box-edit-dialog.component.ts</context>
                <context context-type="linenumber">72</context>
             </context-group>
-            <target state="translated">Tạo hộp cặp mới</target>
+            <target state="translated">Tạo hộp/cặp mới</target>
          </trans-unit>
          <trans-unit id="3852279067551495091" datatype="html">
             <source>Edit Boxcase</source>
@@ -6365,7 +6365,7 @@
                Tháng này
                <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;/button&gt;" />
                <x id="START_TAG_BUTTON_6" ctype="x-button_6" equiv-text="&amp;lt;button ngbDropdownItem (click)=&amp;quot;setRange('lastMonth')&amp;quot;&gt;" />
-               Tháng sau
+               Tháng trước
                <x id="CLOSE_TAG_BUTTON" ctype="x-button" equiv-text="&amp;lt;/button&gt;" />
                <x id="START_TAG_BUTTON_7" ctype="x-button_7" equiv-text="&amp;lt;button ngbDropdownItem (click)=&amp;quot;datepicker.toggle()&amp;quot;&gt;" />
                Ngày tùy chỉnh
@@ -7347,7 +7347,7 @@
             <source>Document Type</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
-               <context context-type="linenumber">118</context>
+               <context context-type="linenumber">128</context>
             </context-group>
             <target state="translated">Loại tài liệu</target>
          </trans-unit>
@@ -7394,9 +7394,9 @@
          <trans-unit id="2470690291316891440" datatype="html">
             <source>
                <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;progress flex-grow-1&quot;&gt;" />
-               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div                   class=&quot;progress-bar bg-primary&quot;                   role=&quot;progressbar&quot;                   [ngbPopover]=&quot;translateText('Tagged tags')&quot;                   i18n-ngbPopover                   triggers=&quot;mouseenter:mouseleave&quot;                   [attr.aria-label]=&quot;translateText('Tagged tags')&quot;                   [class.me-1px]=&quot;!0&quot;                   [style.width]=&quot;100-(statistics.untagged_tags_count/statistics.tag_count)*100 + '%'&quot;                   [style.opacity]=&quot;1&quot;                   [attr.aria-valuenow]=&quot;statistics.tag_count-statistics.untagged_tags_count&quot;                   aria-valuemin=&quot;0&quot;                   aria-valuemax=&quot;100&quot;&gt;" />
+               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div                   class=&quot;progress-bar bg-primary&quot;                   role=&quot;progressbar&quot;                   [ngbPopover]=&quot;labelProcess['tagged_tags']&quot;                   i18n-ngbPopover                   triggers=&quot;mouseenter:mouseleave&quot;                   [attr.aria-label]=&quot;labelProcess['tagged_tags']&quot;                   [class.me-1px]=&quot;!0&quot;                   [style.width]=&quot;100-(statistics.untagged_tags_count/statistics.tag_count)*100 + '%'&quot;                   [style.opacity]=&quot;1&quot;                   [attr.aria-valuenow]=&quot;statistics.tag_count-statistics.untagged_tags_count&quot;                   aria-valuemin=&quot;0&quot;                   aria-valuemax=&quot;100&quot;&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
-               <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div                   class=&quot;progress-bar bg-primary&quot;                   role=&quot;progressbar&quot;                   [ngbPopover]=&quot;translateText('Untagged tags')&quot;                   i18n-ngbPopover                   triggers=&quot;mouseenter:mouseleave&quot;                   [attr.aria-label]=&quot;translateText('Untagged tags')&quot;                   [class.me-1px]=&quot;!1&quot;                   [style.width]=&quot;(statistics.untagged_tags_count/statistics.tag_count)*100+ '%'&quot;                   [style.opacity]=&quot;0.5&quot;                   [attr.aria-valuenow]=&quot;statistics.untagged_tags_count&quot;                   aria-valuemin=&quot;0&quot;                   aria-valuemax=&quot;100&quot;&gt;" />
+               <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div                   class=&quot;progress-bar bg-primary&quot;                   role=&quot;progressbar&quot;                   [ngbPopover]=&quot;labelProcess['untagged_tags']&quot;                   i18n-ngbPopover                   triggers=&quot;mouseenter:mouseleave&quot;                   [attr.aria-label]=&quot;labelProcess['untagged_tags']&quot;                   [class.me-1px]=&quot;!1&quot;                   [style.width]=&quot;(statistics.untagged_tags_count/statistics.tag_count)*100+ '%'&quot;                   [style.opacity]=&quot;0.5&quot;                   [attr.aria-valuenow]=&quot;statistics.untagged_tags_count&quot;                   aria-valuemin=&quot;0&quot;                   aria-valuemax=&quot;100&quot;&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
             </source>
@@ -7419,6 +7419,10 @@
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
                <context context-type="linenumber">100</context>
             </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
+               <context context-type="linenumber">51</context>
+            </context-group>
             <target state="translated">Thẻ đã gán</target>
          </trans-unit>
          <trans-unit id="6571816214672638255" datatype="html">
@@ -7427,15 +7431,19 @@
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
                <context context-type="linenumber">106</context>
             </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
+               <context context-type="linenumber">52</context>
+            </context-group>
             <target state="translated">Thẻ chưa gán</target>
          </trans-unit>
          <trans-unit id="6887606175573586232" datatype="html">
             <source>
                <x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&lt;div class=&quot;d-flex justify-content-between align-items-center my-2&quot;&gt;" />
                <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;progress flex-grow-1&quot;&gt;" />
-               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div                   class=&quot;progress-bar bg-primary&quot;                   role=&quot;progressbar&quot;                   [ngbPopover]=&quot;translateText('Assigned document type')&quot;                   i18n-ngbPopover                   triggers=&quot;mouseenter:mouseleave&quot;                   [attr.aria-label]=&quot;translateText('Assigned document type')&quot;                   [class.me-1px]=&quot;!0&quot;                   [style.width]=&quot;100-(statistics?.unassigned_document_types_count/statistics?.document_type_count)*100 + '%'&quot;                   [style.opacity]=&quot;1&quot;                   [attr.aria-valuenow]=&quot;statistics?.document_type_count-statistics?.unassigned_document_types_count&quot;                   aria-valuemin=&quot;0&quot;                   aria-valuemax=&quot;100&quot;&gt;" />
+               <x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div                   class=&quot;progress-bar bg-primary&quot;                   role=&quot;progressbar&quot;                   [ngbPopover]=&quot;labelProcess['assigned_document_type']&quot;                   i18n-ngbPopover                   triggers=&quot;mouseenter:mouseleave&quot;                   [attr.aria-label]=&quot;labelProcess['assigned_document_type']&quot;                   [class.me-1px]=&quot;!0&quot;                   [style.width]=&quot;100-(statistics?.unassigned_document_types_count/statistics?.document_type_count)*100 + '%'&quot;                   [style.opacity]=&quot;1&quot;                   [attr.aria-valuenow]=&quot;statistics?.document_type_count-statistics?.unassigned_document_types_count&quot;                   aria-valuemin=&quot;0&quot;                   aria-valuemax=&quot;100&quot;&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
-               <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div                   class=&quot;progress-bar bg-primary&quot;                   role=&quot;progressbar&quot;                   [ngbPopover]=&quot;translateText('Unassigned document type')&quot;                   i18n-ngbPopover                   triggers=&quot;mouseenter:mouseleave&quot;                   [attr.aria-label]=&quot;translateText('Unassigned document type')&quot;                   [class.me-1px]=&quot;!1&quot;                   [style.width]=&quot;(statistics.unassigned_document_types_count/statistics.document_type_count)*100+ '%'&quot;                   [style.opacity]=&quot;0.5&quot;                   [attr.aria-valuenow]=&quot;statistics.unassigned_document_types_count&quot;                   aria-valuemin=&quot;0&quot;                   aria-valuemax=&quot;100&quot;&gt;" />
+               <x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div                   class=&quot;progress-bar bg-primary&quot;                   role=&quot;progressbar&quot;                   [ngbPopover]=&quot;labelProcess['unassigned_document_type']&quot;                   i18n-ngbPopover                   triggers=&quot;mouseenter:mouseleave&quot;                   [attr.aria-label]=&quot;labelProcess['unassigned_document_type']&quot;                   [class.me-1px]=&quot;!1&quot;                   [style.width]=&quot;(statistics.unassigned_document_types_count/statistics.document_type_count)*100+ '%'&quot;                   [style.opacity]=&quot;0.5&quot;                   [attr.aria-valuenow]=&quot;statistics.unassigned_document_types_count&quot;                   aria-valuemin=&quot;0&quot;                   aria-valuemax=&quot;100&quot;&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;" />
@@ -7525,22 +7533,40 @@
                <x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&amp;lt;/div&gt;" />
             </target>
          </trans-unit>
+         <trans-unit id="2690125102590347742" datatype="html">
+            <source>Assigned document type</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
+               <context context-type="linenumber">53</context>
+            </context-group>
+            <target state="needs-translation">Loại tài liệu đã gán</target>
+         </trans-unit>
+         <trans-unit id="9109954431544796886" datatype="html">
+            <source>Unassigned document type</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
+               <context context-type="linenumber">54</context>
+            </context-group>
+            <target state="needs-translation">Loại tài liệu chưa gán</target>
+         </trans-unit>
          <trans-unit id="8693603235657020323" datatype="html">
             <source>Other</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
-               <context context-type="linenumber">68</context>
+               <context context-type="linenumber">77</context>
             </context-group>
             <target state="translated">Khác</target>
          </trans-unit>
-         <trans-unit id="4416290763660062288" datatype="html">
-            <source />
+         <trans-unit id="1737753151350322492" datatype="html">
+            <source>
+               <x id="PH" equiv-text="value" />
+            </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
-               <context context-type="linenumber">96</context>
+               <context context-type="linenumber">105</context>
             </context-group>
             <target state="translated">
-               <source />
+               <x id="PH" equiv-text="value" />
             </target>
          </trans-unit>
          <trans-unit id="5321728948071221061" datatype="html">

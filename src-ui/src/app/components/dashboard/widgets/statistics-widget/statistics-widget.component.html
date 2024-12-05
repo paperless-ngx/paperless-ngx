@@ -64,10 +64,10 @@
                 <div
                   class="progress-bar bg-primary"
                   role="progressbar"
-                  [ngbPopover]="translateText('Tagged tags')"
+                  [ngbPopover]="labelProcess['tagged_tags']"
                   i18n-ngbPopover
                   triggers="mouseenter:mouseleave"
-                  [attr.aria-label]="translateText('Tagged tags')"
+                  [attr.aria-label]="labelProcess['tagged_tags']"
                   [class.me-1px]="!0"
                   [style.width]="100-(statistics.untagged_tags_count/statistics.tag_count)*100 + '%'"
                   [style.opacity]="1"
@@ -78,10 +78,10 @@
                 <div
                   class="progress-bar bg-primary"
                   role="progressbar"
-                  [ngbPopover]="translateText('Untagged tags')"
+                  [ngbPopover]="labelProcess['untagged_tags']"
                   i18n-ngbPopover
                   triggers="mouseenter:mouseleave"
-                  [attr.aria-label]="translateText('Untagged tags')"
+                  [attr.aria-label]="labelProcess['untagged_tags']"
                   [class.me-1px]="!1"
                   [style.width]="(statistics.untagged_tags_count/statistics.tag_count)*100+ '%'"
                   [style.opacity]="0.5"
@@ -131,10 +131,10 @@
                 <div
                   class="progress-bar bg-primary"
                   role="progressbar"
-                  [ngbPopover]="translateText('Assigned document type')"
+                  [ngbPopover]="labelProcess['assigned_document_type']"
                   i18n-ngbPopover
                   triggers="mouseenter:mouseleave"
-                  [attr.aria-label]="translateText('Assigned document type')"
+                  [attr.aria-label]="labelProcess['assigned_document_type']"
                   [class.me-1px]="!0"
                   [style.width]="100-(statistics?.unassigned_document_types_count/statistics?.document_type_count)*100 + '%'"
                   [style.opacity]="1"
@@ -145,10 +145,10 @@
                 <div
                   class="progress-bar bg-primary"
                   role="progressbar"
-                  [ngbPopover]="translateText('Unassigned document type')"
+                  [ngbPopover]="labelProcess['unassigned_document_type']"
                   i18n-ngbPopover
                   triggers="mouseenter:mouseleave"
-                  [attr.aria-label]="translateText('Unassigned document type')"
+                  [attr.aria-label]="labelProcess['unassigned_document_type']"
                   [class.me-1px]="!1"
                   [style.width]="(statistics.unassigned_document_types_count/statistics.document_type_count)*100+ '%'"
                   [style.opacity]="0.5"
