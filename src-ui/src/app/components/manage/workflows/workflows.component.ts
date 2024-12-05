@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
-import { Subject, takeUntil } from 'rxjs'
+import { delay, Subject, takeUntil, tap } from 'rxjs'
 import { Workflow } from 'src/app/data/workflow'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ToastService } from 'src/app/services/toast.service'
@@ -26,6 +26,9 @@ export class WorkflowsComponent
 
   private unsubscribeNotifier: Subject<any> = new Subject()
 
+  public loading: boolean = false
+  public reveal: boolean = false
+
   constructor(
     private workflowService: WorkflowService,
     public permissionsService: PermissionsService,
@@ -40,11 +43,17 @@ export class WorkflowsComponent
   }
 
   reload() {
+    this.loading = true
     this.workflowService
       .listAll()
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((r) => {
-        this.workflows = r.results
+      .pipe(
+        takeUntil(this.unsubscribeNotifier),
+        tap((r) => (this.workflows = r.results)),
+        delay(100)
+      )
+      .subscribe(() => {
+        this.reveal = true
+        this.loading = false
       })
   }
 

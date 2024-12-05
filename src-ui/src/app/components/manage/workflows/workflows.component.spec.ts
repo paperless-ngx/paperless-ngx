@@ -119,10 +119,11 @@ describe('WorkflowsComponent', () => {
     )
     modalService = TestBed.inject(NgbModal)
     toastService = TestBed.inject(ToastService)
-
+    jest.useFakeTimers()
     fixture = TestBed.createComponent(WorkflowsComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
+    jest.advanceTimersByTime(100)
   })
 
   it('should support create, show notification on error / success', () => {

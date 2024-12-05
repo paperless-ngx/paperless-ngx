@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { Subject, takeUntil } from 'rxjs'
+import { delay, Subject, takeUntil, tap } from 'rxjs'
 import { DATA_TYPE_LABELS, CustomField } from 'src/app/data/custom-field'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
@@ -28,6 +28,9 @@ export class CustomFieldsComponent
 {
   public fields: CustomField[] = []
 
+  public loading: boolean = true
+  public reveal: boolean = false
+
   private unsubscribeNotifier: Subject<any> = new Subject()
   constructor(
     private customFieldsService: CustomFieldsService,
@@ -47,9 +50,16 @@ export class CustomFieldsComponent
   reload() {
     this.customFieldsService
       .listAll()
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((r) => {
-        this.fields = r.results
+      .pipe(
+        takeUntil(this.unsubscribeNotifier),
+        tap((r) => {
+          this.fields = r.results
+        }),
+        delay(100)
+      )
+      .subscribe(() => {
+        this.reveal = true
+        this.loading = false
       })
   }
 
