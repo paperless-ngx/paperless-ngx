@@ -38,8 +38,10 @@ describe('SwitchComponent', () => {
     expect(component.value).toBeFalsy()
   })
 
-  it('should show note if unset', () => {
+  it('should correctly report unset', () => {
     component.value = null
+    expect(component.isUnset).toBeTruthy()
+    component.value = undefined
     expect(component.isUnset).toBeTruthy()
   })
 })
