@@ -202,38 +202,11 @@ describe('SavedViewWidgetComponent', () => {
     // preview + download buttons
     expect(
       fixture.debugElement.queryAll(By.css('td a.btn'))[0].attributes['href']
-    ).toEqual(component.getPreviewUrl(documentResults[0]))
+    ).toEqual(documentService.getPreviewUrl(documentResults[0].id))
     expect(
       fixture.debugElement.queryAll(By.css('td a.btn'))[1].attributes['href']
     ).toEqual(component.getDownloadUrl(documentResults[0]))
   })
-
-  it('should show preview on mouseover after delay to preload content', fakeAsync(() => {
-    jest.spyOn(documentService, 'listFiltered').mockReturnValue(
-      of({
-        all: [2, 3],
-        count: 2,
-        results: documentResults,
-      })
-    )
-    component.ngOnInit()
-    fixture.detectChanges()
-    component.mouseEnterPreviewButton(documentResults[0])
-    expect(component.popover.isOpen()).toBeTruthy()
-    expect(component.popoverHidden).toBeTruthy()
-    tick(600)
-    expect(component.popoverHidden).toBeFalsy()
-    component.maybeClosePopover()
-
-    component.mouseEnterPreviewButton(documentResults[1])
-    tick(100)
-    component.mouseLeavePreviewButton()
-    component.mouseEnterPreview()
-    expect(component.popover.isOpen()).toBeTruthy()
-    component.mouseLeavePreview()
-    tick(600)
-    expect(component.popover.isOpen()).toBeFalsy()
-  }))
 
   it('should call api endpoint and load results', () => {
     const listAllSpy = jest.spyOn(documentService, 'listFiltered')
