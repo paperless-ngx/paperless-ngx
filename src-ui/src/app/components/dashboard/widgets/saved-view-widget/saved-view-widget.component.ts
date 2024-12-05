@@ -202,53 +202,8 @@ export class SavedViewWidgetComponent
     this.router.navigate(['documents', document.id])
   }
 
-  getPreviewUrl(document: Document): string {
-    return this.documentService.getPreviewUrl(document.id)
-  }
-
   getDownloadUrl(document: Document): string {
     return this.documentService.getDownloadUrl(document.id)
-  }
-
-  mouseEnterPreviewButton(doc: Document) {
-    const newPopover = this.popovers.get(this.documents.indexOf(doc))
-    if (this.popover !== newPopover && this.popover?.isOpen())
-      this.popover.close()
-    this.popover = newPopover
-    this.mouseOnPreview = true
-    if (!this.popover.isOpen()) {
-      // we're going to open but hide to pre-load content during hover delay
-      this.popover.open()
-      this.popoverHidden = true
-      setTimeout(() => {
-        if (this.mouseOnPreview) {
-          // show popover
-          this.popoverHidden = false
-        } else {
-          this.popover.close()
-        }
-      }, 600)
-    }
-  }
-
-  mouseEnterPreview() {
-    this.mouseOnPreview = true
-  }
-
-  mouseLeavePreview() {
-    this.mouseOnPreview = false
-    this.maybeClosePopover()
-  }
-
-  mouseLeavePreviewButton() {
-    this.mouseOnPreview = false
-    this.maybeClosePopover()
-  }
-
-  maybeClosePopover() {
-    setTimeout(() => {
-      if (!this.mouseOnPreview) this.popover?.close()
-    }, 300)
   }
 
   public getColumnTitle(field: DisplayField): string {
