@@ -11,8 +11,19 @@
       >
       @if (savedViewService.loading) {
         <div class="col">
-          <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-          <ng-container i18n>Loading...</ng-container>
+          <div class="card shadow-sm bg-light">
+            <div class="card-header">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex">
+                  <div class="ms-n2 me-1">
+                    <i-bs name="grip-vertical"></i-bs>
+                  </div>
+                  <h6 class="card-title mb-0" i18n>Loading...</h6>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">&nbsp;</div>
+          </div>
         </div>
       }
 
