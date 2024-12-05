@@ -120,4 +120,12 @@ describe('DocumentCardLargeComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('bananas')
     expect(component.searchNoteHighlights).toContain('<span>bananas</span>')
   })
+
+  it('should try to close the preview on mouse leave', () => {
+    component.popupPreview = {
+      close: jest.fn(),
+    } as any
+    component.mouseLeaveCard()
+    expect(component.popupPreview.close).toHaveBeenCalled()
+  })
 })

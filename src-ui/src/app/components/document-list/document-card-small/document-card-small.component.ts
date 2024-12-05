@@ -94,7 +94,7 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
   }
 
   mouseLeaveCard() {
-    this.popupPreview.close()
+    this.popupPreview?.close()
   }
 
   get notesEnabled(): boolean {
