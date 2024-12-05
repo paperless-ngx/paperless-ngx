@@ -27,7 +27,7 @@ import { WarehouseService } from './warehouse.service'
 
 export const DOCUMENT_SORT_FIELDS = [
   { field: 'archive_serial_number', name: $localize`ASN` },
-  { field: 'correspondent__name', name: $localize`Correspondent` },
+  // { field: 'correspondent__name', name: $localize`Correspondent` },
   { field: 'title', name: $localize`Title` },
   { field: 'document_type__name', name: $localize`Document type` },
   { field: 'warehouse__name', name: $localize`Warehouse` },
@@ -59,7 +59,7 @@ export interface SelectionData {
   selected_warehouses: SelectionDataItem[]
   selected_shelfs: SelectionDataItem[]
   selected_boxcases: SelectionDataItem[]
-  
+
 
 }
 
@@ -245,7 +245,7 @@ export class DocumentService extends AbstractPaperlessService<Document> {
       this.getResourceUrl(id, 'suggestions')
     )
   }
-  
+
   bulkExportExcels(
     ids: number[]
   ) {
@@ -258,7 +258,7 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     )
   }
 
- 
+
 
 
   bulkDownload(
@@ -276,7 +276,7 @@ export class DocumentService extends AbstractPaperlessService<Document> {
       { responseType: 'blob' }
     )
   }
-  
+
 
   public set searchQuery(query: string) {
     this._searchQuery = query
