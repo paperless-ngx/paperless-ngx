@@ -1,70 +1,92 @@
-<div class="card mb-3 shadow-sm bg-light" [class.card-selected]="selected" [class.document-card]="selectable" (mouseleave)="mouseLeaveCard()">
+<div class="card document-card-large mb-3 shadow-sm bg-light placeholder-glow" [class.card-selected]="selected" [class.document-card]="selectable" (mouseleave)="mouseLeaveCard()">
   <div class="row g-0">
     <div class="col-md-2 doc-img-container rounded-start" (click)="this.toggleSelected.emit($event)" (dblclick)="dblClickDocument.emit()">
-      <img [src]="getThumbUrl()" class="card-img doc-img border-end rounded-start" [class.inverted]="getIsThumbInverted()">
+      @if (document) {
+        <img [src]="getThumbUrl()" class="card-img doc-img border-end rounded-start" [class.inverted]="getIsThumbInverted()">
 
-      <div class="border-end border-bottom bg-light document-card-check">
-        <div class="form-check">
-          <input type="checkbox" class="form-check-input" id="smallCardCheck{{document.id}}" [checked]="selected" (click)="this.toggleSelected.emit($event)">
-          <label class="form-check-label" for="smallCardCheck{{document.id}}"></label>
+        <div class="border-end border-bottom bg-light document-card-check">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="smallCardCheck{{document.id}}" [checked]="selected" (click)="this.toggleSelected.emit($event)">
+            <label class="form-check-label" for="smallCardCheck{{document.id}}"></label>
+          </div>
         </div>
-      </div>
+      } @else {
+        <div class="placeholder bg-secondary w-100 card-img doc-img border-end rounded-start"></div>
+      }
 
     </div>
     <div class="col">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
-          <h5 class="card-title">
-            @if (displayFields.includes(DisplayField.CORRESPONDENT) && document.correspondent) {
-              @if (clickCorrespondent.observers.length ) {
-                <a title="Filter by correspondent" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold btn-link">{{(document.correspondent$ | async)?.name}}</a>
-              } @else {
-                {{(document.correspondent$ | async)?.name}}
+          <h5 class="card-title w-100">
+            @if (document) {
+              @if (displayFields.includes(DisplayField.CORRESPONDENT) && document.correspondent) {
+                @if (clickCorrespondent.observers.length ) {
+                  <a title="Filter by correspondent" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold btn-link">{{(document.correspondent$ | async)?.name}}</a>
+                } @else {
+                  {{(document.correspondent$ | async)?.name}}
+                }
+                @if (displayFields.includes(DisplayField.TITLE)) {:}
               }
-              @if (displayFields.includes(DisplayField.TITLE)) {:}
-            }
-            @if (displayFields.includes(DisplayField.TITLE)) {
-              {{document.title | documentTitle}}
-            }
-            @if (displayFields.includes(DisplayField.TAGS)) {
-              @for (t of document.tags$ | async; track t) {
-                <pngx-tag [tag]="t" linkTitle="Filter by tag" i18n-linkTitle class="ms-1" (click)="clickTag.emit(t.id);$event.stopPropagation()" [clickable]="clickTag.observers.length"></pngx-tag>
+              @if (displayFields.includes(DisplayField.TITLE)) {
+                {{document.title | documentTitle}}
               }
+              @if (displayFields.includes(DisplayField.TAGS)) {
+                @for (t of document.tags$ | async; track t) {
+                  <pngx-tag [tag]="t" linkTitle="Filter by tag" i18n-linkTitle class="ms-1" (click)="clickTag.emit(t.id);$event.stopPropagation()" [clickable]="clickTag.observers.length"></pngx-tag>
+                }
+              }
+            } @else {
+              <div class="placeholder bg-secondary w-75 mb-3">&nbsp;</div>
             }
           </h5>
         </div>
         <p class="card-text">
-          @if (document.__search_hit__ && document.__search_hit__.highlights) {
-            <span [innerHtml]="document.__search_hit__.highlights"></span>
-          }
-          @for (highlight of searchNoteHighlights; track highlight) {
-            <span class="d-block">
-              <i-bs name="chat-left-text"></i-bs>
-              <span [innerHtml]="highlight"></span>
-            </span>
-          }
-          @if (!document.__search_hit__?.score) {
-            <span class="result-content">{{contentTrimmed}}</span>
+          @if (document) {
+            @if (document.__search_hit__ && document.__search_hit__.highlights) {
+              <span [innerHtml]="document.__search_hit__.highlights"></span>
+            }
+            @for (highlight of searchNoteHighlights; track highlight) {
+              <span class="d-block">
+                <i-bs name="chat-left-text"></i-bs>
+                <span [innerHtml]="highlight"></span>
+              </span>
+            }
+            @if (!document.__search_hit__?.score) {
+              <span class="result-content">{{contentTrimmed}}</span>
+            }
+          } @else {
+            <div class="placeholder bg-secondary w-100 d-block mb-2"></div>
+            <div class="placeholder bg-secondary w-75 d-block mb-2"></div>
+            <div class="placeholder bg-secondary w-25 d-block"></div>
           }
         </p>
 
         <div class="d-flex flex-column flex-md-row align-items-md-center">
           <div class="btn-group">
-            <a class="btn btn-sm btn-outline-secondary" (click)="clickMoreLike.emit()">
-              <i-bs name="diagram-3"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>More like this</span>
-            </a>
-            <a routerLink="/documents/{{document.id}}" class="btn btn-sm btn-outline-secondary" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-              <i-bs name="file-earmark-richtext"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Open</span>
-            </a>
-            <pngx-preview-popup [document]="document" #popupPreview>
-              <i-bs name="eye"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>View</span>
-            </pngx-preview-popup>
-            <a class="btn btn-sm btn-outline-secondary" [href]="getDownloadUrl()">
-              <i-bs name="download"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Download</span>
+            @if (document) {
+              <a class="btn btn-sm btn-outline-secondary" (click)="clickMoreLike.emit()">
+                <i-bs name="diagram-3"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>More like this</span>
               </a>
-            </div>
+              <a routerLink="/documents/{{document.id}}" class="btn btn-sm btn-outline-secondary" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
+                <i-bs name="file-earmark-richtext"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Open</span>
+              </a>
+              <pngx-preview-popup [document]="document" #popupPreview>
+                <i-bs name="eye"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>View</span>
+              </pngx-preview-popup>
+              <a class="btn btn-sm btn-outline-secondary" [href]="getDownloadUrl()">
+                <i-bs name="download"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Download</span>
+              </a>
+            } @else {
+              <div class="placeholder btn btn-sm btn-outline-secondary bg-secondary" style="width: 60px;">&nbsp;</div>
+              <div class="placeholder btn btn-sm btn-outline-secondary bg-secondary" style="width: 60px;">&nbsp;</div>
+              <div class="placeholder btn btn-sm btn-outline-secondary bg-secondary" style="width: 60px;">&nbsp;</div>
+              <div class="placeholder btn btn-sm btn-outline-secondary bg-secondary" style="width: 60px;">&nbsp;</div>
+            }
+          </div>
 
-            <div class="list-group list-group-horizontal border-0 card-info ms-md-auto mt-2 mt-md-0">
+          <div class="list-group list-group-horizontal border-0 card-info ms-md-auto mt-2 mt-md-0">
+            @if (document) {
               @if (displayFields.includes(DisplayField.NOTES) && notesEnabled && document.notes.length) {
                 <button routerLink="/documents/{{document.id}}/notes" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 me-2 d-flex align-items-center" title="View notes" i18n-title>
                   <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="chat-left-text"></i-bs><small>{{document.notes.length}} Notes</small>
@@ -138,9 +160,16 @@
                   </div>
                 }
               }
-            </div>
+            } @else {
+              <div class="placeholder list-group-item bg-secondary w-25">&nbsp;</div>
+              <div class="placeholder list-group-item bg-secondary w-25">&nbsp;</div>
+              <div class="placeholder list-group-item bg-secondary w-25">&nbsp;</div>
+              <div class="placeholder list-group-item bg-secondary w-25">&nbsp;</div>
+              <div class="placeholder list-group-item bg-secondary w-25">&nbsp;</div>
+            }
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>

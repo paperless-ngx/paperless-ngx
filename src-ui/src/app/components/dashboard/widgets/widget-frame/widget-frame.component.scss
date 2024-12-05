@@ -1,3 +1,12 @@
 i-bs {
     cursor: move;
 }
+
+.card {
+    opacity: 0;
+    transition: opacity .2s;
+}
+
+.reveal {
+    opacity: 1;
+}
