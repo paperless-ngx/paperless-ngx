@@ -41,8 +41,6 @@ export class StoragePathEditDialogComponent
   public loading = false
   public testLoading = false
 
-  private unsubscribeNotifier: Subject<any> = new Subject()
-
   constructor(
     service: StoragePathService,
     activeModal: NgbActiveModal,
@@ -52,11 +50,6 @@ export class StoragePathEditDialogComponent
   ) {
     super(service, activeModal, userService, settingsService)
     this.initPathObservables()
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribeNotifier.next(this)
-    this.unsubscribeNotifier.complete()
   }
 
   getCreateTitle() {

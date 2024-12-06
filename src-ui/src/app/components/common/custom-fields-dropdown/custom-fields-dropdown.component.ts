@@ -10,7 +10,7 @@ import {
   ViewChildren,
 } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { Subject, first, takeUntil } from 'rxjs'
+import { first, takeUntil } from 'rxjs'
 import { CustomField, DATA_TYPE_LABELS } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
@@ -21,13 +21,14 @@ import {
   PermissionType,
   PermissionsService,
 } from 'src/app/services/permissions.service'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
   selector: 'pngx-custom-fields-dropdown',
   templateUrl: './custom-fields-dropdown.component.html',
   styleUrls: ['./custom-fields-dropdown.component.scss'],
 })
-export class CustomFieldsDropdownComponent implements OnDestroy {
+export class CustomFieldsDropdownComponent extends LoadingComponentWithPermissions {
   @Input()
   documentId: number
 
@@ -60,8 +61,6 @@ export class CustomFieldsDropdownComponent implements OnDestroy {
 
   public filterText: string
 
-  private unsubscribeNotifier: Subject<any> = new Subject()
-
   get canCreateFields(): boolean {
     return this.permissionsService.currentUserCan(
       PermissionAction.Add,
@@ -75,12 +74,8 @@ export class CustomFieldsDropdownComponent implements OnDestroy {
     private toastService: ToastService,
     private permissionsService: PermissionsService
   ) {
+    super()
     this.getFields()
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribeNotifier.next(this)
-    this.unsubscribeNotifier.complete()
   }
 
   private getFields() {

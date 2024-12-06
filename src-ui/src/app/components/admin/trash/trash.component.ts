@@ -4,25 +4,26 @@ import { Document } from 'src/app/data/document'
 import { ToastService } from 'src/app/services/toast.service'
 import { TrashService } from 'src/app/services/trash.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import { delay, Subject, takeUntil, tap } from 'rxjs'
+import { delay, takeUntil, tap } from 'rxjs'
 import { SettingsService } from 'src/app/services/settings.service'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { Router } from '@angular/router'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
   selector: 'pngx-trash',
   templateUrl: './trash.component.html',
   styleUrl: './trash.component.scss',
 })
-export class TrashComponent implements OnDestroy {
+export class TrashComponent
+  extends LoadingComponentWithPermissions
+  implements OnDestroy
+{
   public documentsInTrash: Document[] = []
   public selectedDocuments: Set<number> = new Set()
   public allToggled: boolean = false
   public page: number = 1
   public totalDocuments: number
-  public isLoading: boolean = false
-  public reveal: boolean = false
-  unsubscribeNotifier: Subject<void> = new Subject()
 
   constructor(
     private trashService: TrashService,
@@ -31,16 +32,12 @@ export class TrashComponent implements OnDestroy {
     private settingsService: SettingsService,
     private router: Router
   ) {
+    super()
     this.reload()
   }
 
-  ngOnDestroy() {
-    this.unsubscribeNotifier.next()
-    this.unsubscribeNotifier.complete()
-  }
-
   reload() {
-    this.isLoading = true
+    this.loading = true
     this.trashService
       .getTrash(this.page)
       .pipe(
@@ -48,12 +45,12 @@ export class TrashComponent implements OnDestroy {
           this.documentsInTrash = r.results
           this.totalDocuments = r.count
           this.selectedDocuments.clear()
+          this.loading = false
         }),
         delay(100)
       )
       .subscribe(() => {
         this.reveal = true
-        this.isLoading = false
       })
   }
 

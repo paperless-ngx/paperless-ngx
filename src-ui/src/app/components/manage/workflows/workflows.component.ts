@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core'
 import { WorkflowService } from 'src/app/services/rest/workflow.service'
-import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
-import { delay, Subject, takeUntil, tap } from 'rxjs'
+import { delay, takeUntil, tap } from 'rxjs'
 import { Workflow } from 'src/app/data/workflow'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ToastService } from 'src/app/services/toast.service'
@@ -12,6 +11,7 @@ import {
 } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
   selector: 'pngx-workflows',
@@ -19,15 +19,10 @@ import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
   styleUrls: ['./workflows.component.scss'],
 })
 export class WorkflowsComponent
-  extends ComponentWithPermissions
+  extends LoadingComponentWithPermissions
   implements OnInit
 {
   public workflows: Workflow[] = []
-
-  private unsubscribeNotifier: Subject<any> = new Subject()
-
-  public loading: boolean = false
-  public reveal: boolean = false
 
   constructor(
     private workflowService: WorkflowService,

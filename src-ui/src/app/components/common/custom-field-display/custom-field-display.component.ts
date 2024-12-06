@@ -1,25 +1,22 @@
 import { getLocaleCurrencyCode } from '@angular/common'
-import {
-  Component,
-  Inject,
-  Input,
-  LOCALE_ID,
-  OnDestroy,
-  OnInit,
-} from '@angular/core'
-import { Subject, takeUntil } from 'rxjs'
+import { Component, Inject, Input, LOCALE_ID, OnInit } from '@angular/core'
+import { takeUntil } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DisplayField, Document } from 'src/app/data/document'
 import { Results } from 'src/app/data/results'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
   selector: 'pngx-custom-field-display',
   templateUrl: './custom-field-display.component.html',
   styleUrl: './custom-field-display.component.scss',
 })
-export class CustomFieldDisplayComponent implements OnInit, OnDestroy {
+export class CustomFieldDisplayComponent
+  extends LoadingComponentWithPermissions
+  implements OnInit
+{
   CustomFieldDataType = CustomFieldDataType
 
   private _document: Document
@@ -61,7 +58,6 @@ export class CustomFieldDisplayComponent implements OnInit, OnDestroy {
 
   private docLinkDocuments: Document[] = []
 
-  private unsubscribeNotifier: Subject<any> = new Subject()
   private defaultCurrencyCode: any
 
   constructor(
@@ -69,6 +65,7 @@ export class CustomFieldDisplayComponent implements OnInit, OnDestroy {
     private documentService: DocumentService,
     @Inject(LOCALE_ID) currentLocale: string
   ) {
+    super()
     this.defaultCurrencyCode = getLocaleCurrencyCode(currentLocale)
     this.customFieldService.listAll().subscribe((r) => {
       this.customFields = r.results
@@ -119,10 +116,5 @@ export class CustomFieldDisplayComponent implements OnInit, OnDestroy {
 
   public getSelectValue(field: CustomField, id: string): string {
     return field.extra_data.select_options?.find((o) => o.id === id)?.label
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribeNotifier.next(true)
-    this.unsubscribeNotifier.complete()
   }
 }

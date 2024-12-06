@@ -2,7 +2,6 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
-  OnDestroy,
   OnInit,
   QueryList,
   ViewChildren,
@@ -18,7 +17,7 @@ import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { EditDialogComponent, EditDialogMode } from '../edit-dialog.component'
-import { Subject, takeUntil } from 'rxjs'
+import { takeUntil } from 'rxjs'
 
 @Component({
   selector: 'pngx-custom-field-edit-dialog',
@@ -27,14 +26,12 @@ import { Subject, takeUntil } from 'rxjs'
 })
 export class CustomFieldEditDialogComponent
   extends EditDialogComponent<CustomField>
-  implements OnInit, AfterViewInit, OnDestroy
+  implements OnInit, AfterViewInit
 {
   CustomFieldDataType = CustomFieldDataType
 
   @ViewChildren('selectOption')
   private selectOptionInputs: QueryList<ElementRef>
-
-  private unsubscribeNotifier: Subject<any> = new Subject()
 
   private get selectOptions(): FormArray {
     return (this.objectForm.controls.extra_data as FormGroup).controls
@@ -76,11 +73,6 @@ export class CustomFieldEditDialogComponent
       .subscribe(() => {
         this.selectOptionInputs.last?.nativeElement.focus()
       })
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribeNotifier.next(true)
-    this.unsubscribeNotifier.complete()
   }
 
   getCreateTitle() {
