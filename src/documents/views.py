@@ -2074,6 +2074,12 @@ class BulkEditObjectsView(PassUserMixin):
                     # if merge is true, we dont want to overwrite the owner
                     qs_owner_update = qs.filter(owner__isnull=True) if merge else qs
                     qs_owner_update.update(owner=owner)
+                #  check owner each object
+                for obj in qs:
+                    if obj.owner == None or user.is_superuser or user.owner == obj.owner :
+                        continue
+                    elif obj.owner != self.request.user :
+                        return HttpResponseForbidden("Insufficient permissions")
 
                 if "permissions" in serializer.validated_data:
                     for obj in qs:
@@ -2098,21 +2104,13 @@ class BulkEditObjectsView(PassUserMixin):
             parent_folder_obj = Folder.objects.get(pk=parent_folder_id) if parent_folder_id else None
             folder_list = Folder.objects.filter(id__in = object_ids)
             for folder in folder_list:
-
-                # folder.parent_folder = parent_folder_obj
-                # folder.path = f"{folder.parent_folder.path}/{folder.id}"
-                # folder.save()
-
-                # print(folder.id)
-                # print(int(request.data['parent_folder'][0]))
                 if request.data.get('parent_folder') is None:
                     pass
                 elif int(request.data['parent_folder']) == folder.id:
                     return Response(status=status.HTTP_400_BAD_REQUEST)
                 elif 'parent_folder' in request.data:
                     if parent_folder_obj.owner != user:
-                        return HttpResponseForbidden(
-                            "Insufficient permissions")
+                        return HttpResponseForbidden("Insufficient permissions")
                     if new_parent_folder.path.startswith(folder.path):
                         return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a folder into one of its child folders.'})
                     elif new_parent_folder.type == "file":
@@ -2120,6 +2118,13 @@ class BulkEditObjectsView(PassUserMixin):
                 else:
                     request.data['parent_folder'] = None
 
+            for folder in folder_list:
+                # folder.parent_folder = parent_folder_obj
+                # folder.path = f"{folder.parent_folder.path}/{folder.id}"
+                # folder.save()
+
+                # print(folder.id)
+                # print(int(request.data['parent_folder'][0]))
                 old_parent_folder = folder.parent_folder
                 folder.parent_folder = parent_folder_obj
 
@@ -2153,6 +2158,12 @@ class BulkEditObjectsView(PassUserMixin):
 
         elif operation == "delete" and object_type == "warehouses":
             warehouses_list = Warehouse.objects.filter(id__in=object_ids)
+            for warehouse in warehouses_list:
+                if warehouse.owner == self.request.user or warehouse.owner == self.request.user.is_superuser or warehouse.owner == None:
+                    continue
+                elif warehouse.owner != self.request.user:
+                    return HttpResponseForbidden(
+                        "Insufficient permissions")
 
             for warehouse in warehouses_list:
                 warehouses = Warehouse.objects.filter(path__startswith=warehouse.path)
@@ -2162,6 +2173,12 @@ class BulkEditObjectsView(PassUserMixin):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         elif operation == "delete" and object_type == "folders":
+            for folder in object_ids:
+                if object_ids.owner == user or folder.owner == user.is_superuser or folder.owner == None:
+                    continue
+                elif folder.owner != user:
+                    return HttpResponseForbidden(
+                        "Insufficient permissions")
             for folder_id in object_ids:
                 folder = Folder.objects.get(id=int(folder_id))
                 folders = Folder.objects.filter(path__startswith=folder.path)
