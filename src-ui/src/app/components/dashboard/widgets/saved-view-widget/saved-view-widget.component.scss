@@ -1,3 +1,17 @@
+.wrapper {
+  transition: all .3s ease-out;
+  overflow: hidden;
+  max-height: 0;
+  opacity: .1;
+  width: 100%;
+}
+
+.reveal {
+  max-height: 1000px;
+  opacity: 1;
+  overflow: visible;
+}
+
 table {
   overflow-wrap: anywhere;
   table-layout: fixed;

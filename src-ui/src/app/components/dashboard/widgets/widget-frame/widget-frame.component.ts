@@ -1,11 +1,11 @@
-import { Component, Input } from '@angular/core'
+import { AfterViewInit, Component, Input } from '@angular/core'
 
 @Component({
   selector: 'pngx-widget-frame',
   templateUrl: './widget-frame.component.html',
   styleUrls: ['./widget-frame.component.scss'],
 })
-export class WidgetFrameComponent {
+export class WidgetFrameComponent implements AfterViewInit {
   constructor() {}
 
   @Input()
@@ -16,4 +16,12 @@ export class WidgetFrameComponent {
 
   @Input()
   draggable: any
+
+  public reveal: boolean = false
+
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      this.reveal = true
+    }, 100)
+  }
 }

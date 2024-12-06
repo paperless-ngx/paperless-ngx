@@ -7,7 +7,7 @@ import {
   ViewChildren,
 } from '@angular/core'
 import { Router } from '@angular/router'
-import { Subject, takeUntil } from 'rxjs'
+import { delay, Subject, takeUntil, tap } from 'rxjs'
 import {
   DEFAULT_DASHBOARD_DISPLAY_FIELDS,
   DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
@@ -52,7 +52,8 @@ export class SavedViewWidgetComponent
   public DisplayField = DisplayField
   public CustomFieldDataType = CustomFieldDataType
 
-  loading: boolean = true
+  public loading: boolean = true
+  public reveal: boolean = false
 
   private customFields: CustomField[] = []
 
@@ -133,16 +134,22 @@ export class SavedViewWidgetComponent
     this.documentService
       .listFiltered(
         1,
-        this.savedView.page_size ?? DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
+        this.savedView?.page_size ?? DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
         this.savedView.sort_field,
         this.savedView.sort_reverse,
         this.savedView.filter_rules,
         { truncate_content: true }
       )
-      .pipe(takeUntil(this.unsubscribeNotifier))
+      .pipe(
+        takeUntil(this.unsubscribeNotifier),
+        tap((result) => {
+          this.reveal = true
+          this.documents = result.results
+        }),
+        delay(500)
+      )
       .subscribe((result) => {
         this.loading = false
-        this.documents = result.results
       })
   }
 

@@ -26,7 +26,7 @@
   </h4>
   <ul class="list-group">
     <li class="list-group-item">
-      <div class="row">
+      <div class="row reveal">
         <div class="col" i18n>Name</div>
         <div class="col" i18n>Server</div>
         <div class="col d-none d-sm-block" i18n>Username</div>
@@ -34,9 +34,16 @@
       </div>
     </li>
 
+    @if (loadingAccounts) {
+      <li class="list-group-item">
+        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+        <ng-container i18n>Loading...</ng-container>
+      </li>
+    }
+
     @for (account of mailAccounts; track account) {
       <li class="list-group-item">
-        <div class="row">
+        <div class="row" [class.reveal]="revealAccounts">
           <div class="col d-flex align-items-center">
             <button class="btn btn-link p-0 text-start" type="button" (click)="editMailAccount(account)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailAccount)">
               {{account.name}}@switch (account.account_type) {
@@ -76,7 +83,7 @@
         </div>
       </li>
     }
-    @if (mailAccounts.length === 0) {
+    @if (!loadingAccounts && mailAccounts.length === 0) {
       <li class="list-group-item" i18n>No mail accounts defined.</li>
     }
   </ul>
@@ -92,7 +99,7 @@
   </h4>
   <ul class="list-group">
     <li class="list-group-item">
-      <div class="row">
+      <div class="row reveal">
         <div class="col" i18n>Name</div>
         <div class="col d-none d-sm-block" i18n>Sort Order</div>
         <div class="col" i18n>Account</div>
@@ -101,9 +108,16 @@
       </div>
     </li>
 
+    @if (loadingRules) {
+      <li class="list-group-item">
+        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+        <ng-container i18n>Loading...</ng-container>
+      </li>
+    }
+
     @for (rule of mailRules; track rule) {
       <li class="list-group-item">
-        <div class="row">
+        <div class="row" [class.reveal]="revealRules">
           <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editMailRule(rule)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailRule)">{{rule.name}}</button></div>
           <div class="col d-flex align-items-center d-none d-sm-flex">{{rule.order}}</div>
           <div class="col d-flex align-items-center">{{(mailAccountService.getCached(rule.account) | async)?.name}}</div>
@@ -151,7 +165,7 @@
         </div>
       </li>
     }
-    @if (mailRules.length === 0) {
+    @if (!loadingRules && mailRules.length === 0) {
       <li class="list-group-item" i18n>No mail rules defined.</li>
     }
   </ul>
