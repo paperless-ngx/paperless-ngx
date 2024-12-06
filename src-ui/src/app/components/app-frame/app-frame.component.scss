@@ -1,6 +1,3 @@
-@import "node_modules/bootstrap/scss/functions";
-@import "node_modules/bootstrap/scss/variables";
-
 /*
  * Sidebar
  */
@@ -15,6 +12,7 @@
   overflow-y: auto;
   --pngx-sidebar-width: 100%;
   max-width: var(--pngx-sidebar-width);
+  transition: all .2s ease;
 
   .sidebar-heading .spinner-border {
     width: 0.8em;
@@ -37,8 +35,6 @@
   @media (min-width: 2400px) {
     --pngx-sidebar-width: 8.33333333%;
   }
-
-  transition: all .2s ease;
 }
 @media (max-width: 767.98px) {
   .sidebar {
