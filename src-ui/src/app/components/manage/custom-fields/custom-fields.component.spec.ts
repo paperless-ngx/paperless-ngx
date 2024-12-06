@@ -95,6 +95,8 @@ describe('CustomFieldsComponent', () => {
     fixture = TestBed.createComponent(CustomFieldsComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
+    jest.useFakeTimers()
+    jest.advanceTimersByTime(100)
   })
 
   it('should support create, show notification on error / success', () => {
@@ -119,6 +121,7 @@ describe('CustomFieldsComponent', () => {
     editDialog.succeeded.emit(fields[0])
     expect(toastInfoSpy).toHaveBeenCalled()
     expect(reloadSpy).toHaveBeenCalled()
+    jest.advanceTimersByTime(100)
   })
 
   it('should support edit, show notification on error / success', () => {
