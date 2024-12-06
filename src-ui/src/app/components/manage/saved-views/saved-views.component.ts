@@ -3,11 +3,11 @@ import { FormControl, FormGroup } from '@angular/forms'
 import { SavedView } from 'src/app/data/saved-view'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { DisplayMode } from 'src/app/data/document'
-import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs'
+import { BehaviorSubject, Observable, takeUntil } from 'rxjs'
 import { dirtyCheck } from '@ngneat/dirty-check-forms'
 import { ToastService } from 'src/app/services/toast.service'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
   selector: 'pngx-saved-views',
@@ -15,7 +15,7 @@ import { ToastService } from 'src/app/services/toast.service'
   styleUrl: './saved-views.component.scss',
 })
 export class SavedViewsComponent
-  extends ComponentWithPermissions
+  extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy
 {
   DisplayMode = DisplayMode
@@ -27,11 +27,7 @@ export class SavedViewsComponent
   })
 
   private store: BehaviorSubject<any>
-  private storeSub: Subscription
   public isDirty$: Observable<boolean>
-  private isDirty: boolean = false
-  private unsubscribeNotifier: Subject<any> = new Subject()
-  private savePending: boolean = false
 
   get displayFields() {
     return this.settings.allDisplayFields
@@ -56,9 +52,7 @@ export class SavedViewsComponent
 
   ngOnDestroy(): void {
     this.settings.organizingSidebarSavedViews = false
-    this.unsubscribeNotifier.next(this)
-    this.unsubscribeNotifier.complete()
-    this.storeSub.unsubscribe()
+    super.ngOnDestroy()
   }
 
   private initialize() {
@@ -93,9 +87,12 @@ export class SavedViewsComponent
     }
 
     this.store = new BehaviorSubject(storeData)
-    this.storeSub = this.store.asObservable().subscribe((state) => {
-      this.savedViewsForm.patchValue(state, { emitEvent: false })
-    })
+    this.store
+      .asObservable()
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((state) => {
+        this.savedViewsForm.patchValue(state, { emitEvent: false })
+      })
 
     // Initialize dirtyCheck
     this.isDirty$ = dirtyCheck(this.savedViewsForm, this.store.asObservable())

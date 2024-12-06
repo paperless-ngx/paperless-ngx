@@ -2,7 +2,6 @@ import {
   Component,
   EventEmitter,
   Input,
-  OnDestroy,
   Output,
   QueryList,
   ViewChild,
@@ -29,6 +28,7 @@ import {
   CustomFieldQueryAtom,
 } from 'src/app/utils/custom-field-query-element'
 import { popperOptionsReenablePreventOverflow } from 'src/app/utils/popper-options'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 export class CustomFieldQueriesModel {
   public queries: CustomFieldQueryElement[] = []
@@ -157,7 +157,7 @@ export class CustomFieldQueriesModel {
   templateUrl: './custom-fields-query-dropdown.component.html',
   styleUrls: ['./custom-fields-query-dropdown.component.scss'],
 })
-export class CustomFieldsQueryDropdownComponent implements OnDestroy {
+export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPermissions {
   public CustomFieldQueryComponentType = CustomFieldQueryElementType
   public CustomFieldQueryOperator = CustomFieldQueryOperator
   public CustomFieldDataType = CustomFieldDataType
@@ -223,17 +223,11 @@ export class CustomFieldsQueryDropdownComponent implements OnDestroy {
 
   customFields: CustomField[] = []
 
-  private unsubscribeNotifier: Subject<any> = new Subject()
-
   constructor(protected customFieldsService: CustomFieldsService) {
+    super()
     this.selectionModel = new CustomFieldQueriesModel()
     this.getFields()
     this.reset()
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribeNotifier.next(this)
-    this.unsubscribeNotifier.complete()
   }
 
   public onOpenChange(open: boolean) {

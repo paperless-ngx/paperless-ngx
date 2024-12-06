@@ -39,8 +39,8 @@ import {
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
-import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 export interface ManagementListColumn {
   key: string
@@ -56,7 +56,7 @@ export interface ManagementListColumn {
 
 @Directive()
 export abstract class ManagementListComponent<T extends ObjectWithId>
-  extends ComponentWithPermissions
+  extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy
 {
   constructor(
@@ -86,16 +86,12 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
   public sortField: string
   public sortReverse: boolean
 
-  public isLoading: boolean = false
-
   private nameFilterDebounce: Subject<string>
   protected unsubscribeNotifier: Subject<any> = new Subject()
   protected _nameFilter: string
 
   public selectedObjects: Set<number> = new Set()
   public togggleAll: boolean = false
-
-  public reveal: boolean = false
 
   ngOnInit(): void {
     this.reloadData()
@@ -113,11 +109,6 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
         this.page = 1
         this.reloadData()
       })
-  }
-
-  ngOnDestroy() {
-    this.unsubscribeNotifier.next(true)
-    this.unsubscribeNotifier.complete()
   }
 
   getMatching(o: MatchingModel) {
@@ -141,7 +132,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
   }
 
   reloadData(extraParams: { [key: string]: any } = null) {
-    this.isLoading = true
+    this.loading = true
     this.clearSelection()
     this.service
       .listFiltered(
@@ -163,7 +154,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
       )
       .subscribe(() => {
         this.reveal = true
-        this.isLoading = false
+        this.loading = false
       })
   }
 

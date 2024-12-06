@@ -44,7 +44,7 @@
       </tr>
     </thead>
     <tbody>
-      @if (isLoading) {
+      @if (loading) {
         <tr>
           <td colspan="5">
             <div class="spinner-border spinner-border-sm me-2" role="status"></div>
@@ -109,7 +109,7 @@
   </table>
 </div>
 
-@if (!isLoading) {
+@if (!loading) {
   <div class="d-flex mb-2">
     @if (collectionSize > 0) {
       <div>
