@@ -6,7 +6,6 @@ import {
   ElementRef,
   ViewChild,
   OnInit,
-  OnDestroy,
 } from '@angular/core'
 import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
@@ -17,6 +16,7 @@ import { SelectionDataItem } from 'src/app/services/rest/document.service'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { HotKeyService } from 'src/app/services/hot-key.service'
 import { popperOptionsReenablePreventOverflow } from 'src/app/utils/popper-options'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 export interface ChangedItems {
   itemsToAdd: MatchingModel[]
@@ -353,7 +353,10 @@ export class FilterableDropdownSelectionModel {
   templateUrl: './filterable-dropdown.component.html',
   styleUrls: ['./filterable-dropdown.component.scss'],
 })
-export class FilterableDropdownComponent implements OnDestroy, OnInit {
+export class FilterableDropdownComponent
+  extends LoadingComponentWithPermissions
+  implements OnInit
+{
   @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
   @ViewChild('dropdown') dropdown: NgbDropdown
   @ViewChild('buttonItems') buttonItems: ElementRef
@@ -467,12 +470,11 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
 
   private keyboardIndex: number
 
-  private unsubscribeNotifier: Subject<any> = new Subject()
-
   constructor(
     private filterPipe: FilterPipe,
     private hotkeyService: HotKeyService
   ) {
+    super()
     this.selectionModelChange.subscribe((updatedModel) => {
       this.modelIsDirty = updatedModel.isDirty()
     })
@@ -493,11 +495,6 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
           this.dropdown.open()
         })
     }
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribeNotifier.next(true)
-    this.unsubscribeNotifier.complete()
   }
 
   applyClicked() {

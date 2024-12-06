@@ -12,7 +12,7 @@ import {
 import { PaperlessTask } from 'src/app/data/paperless-task'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 export enum TaskTab {
   Queued = 'queued',
@@ -37,7 +37,7 @@ const FILTER_TARGETS = [
   styleUrls: ['./tasks.component.scss'],
 })
 export class TasksComponent
-  extends ComponentWithPermissions
+  extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy
 {
   public activeTab: TaskTab
@@ -70,8 +70,6 @@ export class TasksComponent
       : FILTER_TARGETS.slice(0, 1)
   }
 
-  private unsubscribeNotifier: Subject<any> = new Subject()
-
   get dismissButtonText(): string {
     return this.selectedTasks.size > 0
       ? $localize`Dismiss selected`
@@ -101,9 +99,9 @@ export class TasksComponent
   }
 
   ngOnDestroy() {
+    super.ngOnDestroy()
     this.tasksService.cancelPending()
     clearInterval(this.autoRefreshInterval)
-    this.unsubscribeNotifier.next(this)
   }
 
   dismissTask(task: PaperlessTask) {

@@ -25,8 +25,6 @@ export class MergeConfirmDialogComponent
 
   public metadataDocumentID: number = -1
 
-  private unsubscribeNotifier: Subject<any> = new Subject()
-
   constructor(
     activeModal: NgbActiveModal,
     private documentService: DocumentService,

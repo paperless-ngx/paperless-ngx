@@ -15,6 +15,7 @@ import { UserService } from 'src/app/services/rest/user.service'
 import { PermissionsFormObject } from '../input/permissions/permissions-form/permissions-form.component'
 import { SettingsService } from 'src/app/services/settings.service'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 export enum EditDialogMode {
   CREATE = 0,
@@ -23,15 +24,19 @@ export enum EditDialogMode {
 
 @Directive()
 export abstract class EditDialogComponent<
-  T extends ObjectWithPermissions | ObjectWithId,
-> implements OnInit
+    T extends ObjectWithPermissions | ObjectWithId,
+  >
+  extends LoadingComponentWithPermissions
+  implements OnInit
 {
   constructor(
     protected service: AbstractPaperlessService<T>,
     private activeModal: NgbActiveModal,
     private userService: UserService,
     private settingsService: SettingsService
-  ) {}
+  ) {
+    super()
+  }
 
   users: User[]
 

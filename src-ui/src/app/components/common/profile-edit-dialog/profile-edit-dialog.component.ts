@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { ProfileService } from 'src/app/services/profile.service'
@@ -8,18 +8,21 @@ import {
   SocialAccountProvider,
 } from 'src/app/data/user-profile'
 import { ToastService } from 'src/app/services/toast.service'
-import { Subject, takeUntil } from 'rxjs'
+import { takeUntil } from 'rxjs'
 import { Clipboard } from '@angular/cdk/clipboard'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
   selector: 'pngx-profile-edit-dialog',
   templateUrl: './profile-edit-dialog.component.html',
   styleUrls: ['./profile-edit-dialog.component.scss'],
 })
-export class ProfileEditDialogComponent implements OnInit, OnDestroy {
+export class ProfileEditDialogComponent
+  extends LoadingComponentWithPermissions
+  implements OnInit
+{
   public networkActive: boolean = false
   public error: any
-  private unsubscribeNotifier: Subject<any> = new Subject()
 
   public form = new FormGroup({
     email: new FormControl(''),
@@ -60,7 +63,9 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
     public activeModal: NgbActiveModal,
     private toastService: ToastService,
     private clipboard: Clipboard
-  ) {}
+  ) {
+    super()
+  }
 
   ngOnInit(): void {
     this.networkActive = true
@@ -91,11 +96,6 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
       .subscribe((providers) => {
         this.socialAccountProviders = providers
       })
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribeNotifier.next(true)
-    this.unsubscribeNotifier.complete()
   }
 
   get saveDisabled(): boolean {

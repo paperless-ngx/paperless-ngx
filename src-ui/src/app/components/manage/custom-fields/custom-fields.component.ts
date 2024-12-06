@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { delay, Subject, takeUntil, tap } from 'rxjs'
+import { delay, takeUntil, tap } from 'rxjs'
 import { DATA_TYPE_LABELS, CustomField } from 'src/app/data/custom-field'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
@@ -8,7 +8,6 @@ import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
-import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { FILTER_CUSTOM_FIELDS_QUERY } from 'src/app/data/filter-rule-type'
 import {
@@ -16,6 +15,7 @@ import {
   CustomFieldQueryOperator,
 } from 'src/app/data/custom-field-query'
 import { SettingsService } from 'src/app/services/settings.service'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
   selector: 'pngx-custom-fields',
@@ -23,15 +23,11 @@ import { SettingsService } from 'src/app/services/settings.service'
   styleUrls: ['./custom-fields.component.scss'],
 })
 export class CustomFieldsComponent
-  extends ComponentWithPermissions
+  extends LoadingComponentWithPermissions
   implements OnInit
 {
   public fields: CustomField[] = []
 
-  public loading: boolean = true
-  public reveal: boolean = false
-
-  private unsubscribeNotifier: Subject<any> = new Subject()
   constructor(
     private customFieldsService: CustomFieldsService,
     public permissionsService: PermissionsService,

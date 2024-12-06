@@ -28,6 +28,7 @@ import {
   CustomFieldQueryLogicalOperator,
   CustomFieldQueryOperator,
 } from 'src/app/data/custom-field-query'
+import { SettingsService } from 'src/app/services/settings.service'
 
 const fields: CustomField[] = [
   {
@@ -49,6 +50,7 @@ describe('CustomFieldsComponent', () => {
   let modalService: NgbModal
   let toastService: ToastService
   let listViewService: DocumentListViewService
+  let settingsService: SettingsService
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -91,6 +93,8 @@ describe('CustomFieldsComponent', () => {
     modalService = TestBed.inject(NgbModal)
     toastService = TestBed.inject(ToastService)
     listViewService = TestBed.inject(DocumentListViewService)
+    settingsService = TestBed.inject(SettingsService)
+    settingsService.currentUser = { id: 0, username: 'test' }
 
     fixture = TestBed.createComponent(CustomFieldsComponent)
     component = fixture.componentInstance
