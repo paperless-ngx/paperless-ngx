@@ -2,3 +2,12 @@
 .d-block.d-sm-none .dropdown-toggle::after {
     display: none;
 }
+
+.list-group-item .row {
+    opacity: 0;
+    transition: opacity .2s;
+}
+
+.list-group-item .reveal {
+    opacity: 1;
+}

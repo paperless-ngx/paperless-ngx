@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { Subject, first, takeUntil } from 'rxjs'
+import { Subject, delay, first, takeUntil, tap } from 'rxjs'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { MailAccount, MailAccountType } from 'src/app/data/mail-account'
 import { MailRule } from 'src/app/data/mail-rule'
@@ -47,6 +47,11 @@ export class MailComponent
     return this.settingsService.get(SETTINGS_KEYS.OUTLOOK_OAUTH_URL)
   }
 
+  public loadingRules: boolean = true
+  public revealRules: boolean = false
+  public loadingAccounts: boolean = true
+  public revealAccounts: boolean = false
+
   constructor(
     public mailAccountService: MailAccountService,
     public mailRuleService: MailRuleService,
@@ -62,9 +67,10 @@ export class MailComponent
   ngOnInit(): void {
     this.mailAccountService
       .listAll(null, null, { full_perms: true })
-      .pipe(first(), takeUntil(this.unsubscribeNotifier))
-      .subscribe({
-        next: (r) => {
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        tap((r) => {
           this.mailAccounts = r.results
           if (this.oAuthAccountId) {
             this.editMailAccount(
@@ -73,6 +79,13 @@ export class MailComponent
               )
             )
           }
+        }),
+        delay(100)
+      )
+      .subscribe({
+        next: () => {
+          this.loadingAccounts = false
+          this.revealAccounts = true
         },
         error: (e) => {
           this.toastService.showError(
@@ -84,10 +97,18 @@ export class MailComponent
 
     this.mailRuleService
       .listAll(null, null, { full_perms: true })
-      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        tap((r) => {
+          this.mailRules = r.results
+        }),
+        delay(100)
+      )
       .subscribe({
         next: (r) => {
-          this.mailRules = r.results
+          this.loadingRules = false
+          this.revealRules = true
         },
         error: (e) => {
           this.toastService.showError($localize`Error retrieving mail rules`, e)

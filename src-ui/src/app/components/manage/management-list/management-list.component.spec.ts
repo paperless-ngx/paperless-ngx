@@ -150,6 +150,7 @@ describe('ManagementListComponent', () => {
     fixture.detectChanges()
     expect(component.nameFilter).toBeNull()
     expect(component.data).toEqual(tags)
+    tick(100) // load
   }))
 
   it('should support create, show notification on error / success', () => {

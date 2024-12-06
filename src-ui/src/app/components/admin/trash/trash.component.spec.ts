@@ -69,6 +69,7 @@ describe('TrashComponent', () => {
   })
 
   it('should call correct service method on reload', () => {
+    jest.useFakeTimers()
     const trashSpy = jest.spyOn(trashService, 'getTrash')
     trashSpy.mockReturnValue(
       of({
@@ -78,6 +79,7 @@ describe('TrashComponent', () => {
       })
     )
     component.reload()
+    jest.advanceTimersByTime(100)
     expect(trashSpy).toHaveBeenCalled()
     expect(component.documentsInTrash).toEqual(documentsInTrash)
   })

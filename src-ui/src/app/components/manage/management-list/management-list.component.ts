@@ -7,7 +7,13 @@ import {
 } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject } from 'rxjs'
-import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators'
+import {
+  debounceTime,
+  delay,
+  distinctUntilChanged,
+  takeUntil,
+  tap,
+} from 'rxjs/operators'
 import {
   MatchingModel,
   MATCHING_ALGORITHMS,
@@ -89,6 +95,8 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
   public selectedObjects: Set<number> = new Set()
   public togggleAll: boolean = false
 
+  public reveal: boolean = false
+
   ngOnInit(): void {
     this.reloadData()
 
@@ -132,7 +140,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     this.reloadData()
   }
 
-  reloadData() {
+  reloadData(extraParams: { [key: string]: any } = null) {
     this.isLoading = true
     this.clearSelection()
     this.service
@@ -142,12 +150,19 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
         this.sortField,
         this.sortReverse,
         this._nameFilter,
-        true
+        true,
+        extraParams
       )
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((c) => {
-        this.data = c.results
-        this.collectionSize = c.count
+      .pipe(
+        takeUntil(this.unsubscribeNotifier),
+        tap((c) => {
+          this.data = c.results
+          this.collectionSize = c.count
+        }),
+        delay(100)
+      )
+      .subscribe(() => {
+        this.reveal = true
         this.isLoading = false
       })
   }

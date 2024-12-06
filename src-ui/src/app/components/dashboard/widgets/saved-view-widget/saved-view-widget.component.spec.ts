@@ -187,7 +187,7 @@ describe('SavedViewWidgetComponent', () => {
     fixture.detectChanges()
   })
 
-  it('should show a list of documents', () => {
+  it('should show a list of documents', fakeAsync(() => {
     jest.spyOn(documentService, 'listFiltered').mockReturnValue(
       of({
         all: [2, 3],
@@ -196,6 +196,7 @@ describe('SavedViewWidgetComponent', () => {
       })
     )
     component.ngOnInit()
+    tick(500)
     fixture.detectChanges()
     expect(fixture.debugElement.nativeElement.textContent).toContain('doc2')
     expect(fixture.debugElement.nativeElement.textContent).toContain('doc3')
@@ -206,7 +207,7 @@ describe('SavedViewWidgetComponent', () => {
     expect(
       fixture.debugElement.queryAll(By.css('td a.btn'))[1].attributes['href']
     ).toEqual(component.getDownloadUrl(documentResults[0]))
-  })
+  }))
 
   it('should call api endpoint and load results', () => {
     const listAllSpy = jest.spyOn(documentService, 'listFiltered')
