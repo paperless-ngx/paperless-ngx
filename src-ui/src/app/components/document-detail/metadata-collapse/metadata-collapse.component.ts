@@ -4,6 +4,7 @@ import { Component, Input } from '@angular/core'
   selector: 'pngx-metadata-collapse',
   templateUrl: './metadata-collapse.component.html',
   styleUrls: ['./metadata-collapse.component.scss'],
+  standalone: false,
 })
 export class MetadataCollapseComponent {
   constructor() {}

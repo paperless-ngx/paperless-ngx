@@ -13,6 +13,7 @@ import { randomColor } from 'src/app/utils/color'
   selector: 'pngx-tag-edit-dialog',
   templateUrl: './tag-edit-dialog.component.html',
   styleUrls: ['./tag-edit-dialog.component.scss'],
+  standalone: false,
 })
 export class TagEditDialogComponent extends EditDialogComponent<Tag> {
   constructor(

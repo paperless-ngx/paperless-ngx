@@ -26,6 +26,7 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
   selector: 'pngx-permissions-select',
   templateUrl: './permissions-select.component.html',
   styleUrls: ['./permissions-select.component.scss'],
+  standalone: false,
 })
 export class PermissionsSelectComponent
   extends ComponentWithPermissions

@@ -13,6 +13,7 @@ import { UploadDocumentsService } from 'src/app/services/upload-documents.servic
   selector: 'pngx-file-drop',
   templateUrl: './file-drop.component.html',
   styleUrls: ['./file-drop.component.scss'],
+  standalone: false,
 })
 export class FileDropComponent {
   private fileLeaveTimeoutID: any

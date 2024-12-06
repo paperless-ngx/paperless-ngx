@@ -19,6 +19,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-select',
   templateUrl: './select.component.html',
   styleUrls: ['./select.component.scss'],
+  standalone: false,
 })
 export class SelectComponent extends AbstractInputComponent<number> {
   constructor() {

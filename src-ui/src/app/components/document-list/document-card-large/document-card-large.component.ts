@@ -21,6 +21,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
   selector: 'pngx-document-card-large',
   templateUrl: './document-card-large.component.html',
   styleUrls: ['./document-card-large.component.scss'],
+  standalone: false,
 })
 export class DocumentCardLargeComponent
   extends LoadingComponentWithPermissions

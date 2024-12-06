@@ -11,6 +11,7 @@ import { IfPermissionsDirective } from './if-permissions.directive'
       </button>
     </div>
   `,
+  standalone: false,
 })
 class TestComponent {}
 

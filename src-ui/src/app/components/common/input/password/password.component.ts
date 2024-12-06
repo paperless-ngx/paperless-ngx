@@ -13,6 +13,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-password',
   templateUrl: './password.component.html',
   styleUrls: ['./password.component.scss'],
+  standalone: false,
 })
 export class PasswordComponent extends AbstractInputComponent<string> {
   @Input()

@@ -16,6 +16,7 @@ import { AbstractInputComponent } from '../../abstract-input'
   selector: 'pngx-permissions-group',
   templateUrl: './permissions-group.component.html',
   styleUrls: ['./permissions-group.component.scss'],
+  standalone: false,
 })
 export class PermissionsGroupComponent extends AbstractInputComponent<Group> {
   groups: Group[]

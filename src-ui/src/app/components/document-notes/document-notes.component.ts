@@ -11,6 +11,7 @@ import { ComponentWithPermissions } from '../with-permissions/with-permissions.c
   selector: 'pngx-document-notes',
   templateUrl: './document-notes.component.html',
   styleUrls: ['./document-notes.component.scss'],
+  standalone: false,
 })
 export class DocumentNotesComponent extends ComponentWithPermissions {
   noteForm: FormGroup = new FormGroup({

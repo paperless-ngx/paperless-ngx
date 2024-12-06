@@ -21,6 +21,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
   selector: 'pngx-custom-fields',
   templateUrl: './custom-fields.component.html',
   styleUrls: ['./custom-fields.component.scss'],
+  standalone: false,
 })
 export class CustomFieldsComponent
   extends LoadingComponentWithPermissions

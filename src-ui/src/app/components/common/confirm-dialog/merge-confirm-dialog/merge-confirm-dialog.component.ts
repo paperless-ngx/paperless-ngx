@@ -11,6 +11,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog.component'
   selector: 'pngx-merge-confirm-dialog',
   templateUrl: './merge-confirm-dialog.component.html',
   styleUrl: './merge-confirm-dialog.component.scss',
+  standalone: false,
 })
 export class MergeConfirmDialogComponent
   extends ConfirmDialogComponent

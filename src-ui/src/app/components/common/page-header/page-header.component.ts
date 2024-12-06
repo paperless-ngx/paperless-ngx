@@ -6,6 +6,7 @@ import { environment } from 'src/environments/environment'
   selector: 'pngx-page-header',
   templateUrl: './page-header.component.html',
   styleUrls: ['./page-header.component.scss'],
+  standalone: false,
 })
 export class PageHeaderComponent {
   constructor(private titleService: Title) {}

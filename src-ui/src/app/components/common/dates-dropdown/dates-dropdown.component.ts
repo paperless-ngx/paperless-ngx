@@ -34,6 +34,7 @@ export enum RelativeDate {
   templateUrl: './dates-dropdown.component.html',
   styleUrls: ['./dates-dropdown.component.scss'],
   providers: [{ provide: NgbDateAdapter, useClass: ISODateAdapter }],
+  standalone: false,
 })
 export class DatesDropdownComponent implements OnInit, OnDestroy {
   public popperOptions = popperOptionsReenablePreventOverflow

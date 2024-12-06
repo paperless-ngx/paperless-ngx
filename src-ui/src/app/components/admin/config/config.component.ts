@@ -24,6 +24,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
   selector: 'pngx-config',
   templateUrl: './config.component.html',
   styleUrl: './config.component.scss',
+  standalone: false,
 })
 export class ConfigComponent
   extends LoadingComponentWithPermissions

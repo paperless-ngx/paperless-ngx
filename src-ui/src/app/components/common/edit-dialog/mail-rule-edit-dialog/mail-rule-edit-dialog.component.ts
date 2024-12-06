@@ -108,6 +108,7 @@ const METADATA_CORRESPONDENT_OPTIONS = [
   selector: 'pngx-mail-rule-edit-dialog',
   templateUrl: './mail-rule-edit-dialog.component.html',
   styleUrls: ['./mail-rule-edit-dialog.component.scss'],
+  standalone: false,
 })
 export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
   accounts: MailAccount[]

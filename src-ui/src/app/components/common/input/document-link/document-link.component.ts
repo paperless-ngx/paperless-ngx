@@ -28,6 +28,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-document-link',
   templateUrl: './document-link.component.html',
   styleUrls: ['./document-link.component.scss'],
+  standalone: false,
 })
 export class DocumentLinkComponent
   extends AbstractInputComponent<any[]>

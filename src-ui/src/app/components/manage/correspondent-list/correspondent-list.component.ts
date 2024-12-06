@@ -18,6 +18,7 @@ import { ManagementListComponent } from '../management-list/management-list.comp
   templateUrl: './../management-list/management-list.component.html',
   styleUrls: ['./../management-list/management-list.component.scss'],
   providers: [{ provide: CustomDatePipe }],
+  standalone: false,
 })
 export class CorrespondentListComponent extends ManagementListComponent<Correspondent> {
   constructor(

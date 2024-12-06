@@ -50,6 +50,7 @@ import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-e
   selector: 'pngx-global-search',
   templateUrl: './global-search.component.html',
   styleUrl: './global-search.component.scss',
+  standalone: false,
 })
 export class GlobalSearchComponent implements OnInit {
   public DataType = DataType

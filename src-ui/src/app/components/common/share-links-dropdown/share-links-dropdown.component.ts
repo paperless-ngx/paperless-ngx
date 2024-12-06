@@ -10,6 +10,7 @@ import { environment } from 'src/environments/environment'
   selector: 'pngx-share-links-dropdown',
   templateUrl: './share-links-dropdown.component.html',
   styleUrls: ['./share-links-dropdown.component.scss'],
+  standalone: false,
 })
 export class ShareLinksDropdownComponent implements OnInit {
   EXPIRATION_OPTIONS = [

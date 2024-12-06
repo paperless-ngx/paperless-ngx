@@ -17,6 +17,7 @@ import { ComponentWithPermissions } from '../with-permissions/with-permissions.c
   selector: 'pngx-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
+  standalone: false,
 })
 export class DashboardComponent extends ComponentWithPermissions {
   public dashboardViews: SavedView[] = []

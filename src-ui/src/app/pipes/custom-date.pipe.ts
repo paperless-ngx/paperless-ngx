@@ -44,6 +44,7 @@ const INTERVALS = {
 
 @Pipe({
   name: 'customDate',
+  standalone: false,
 })
 export class CustomDatePipe implements PipeTransform {
   private defaultLocale: string

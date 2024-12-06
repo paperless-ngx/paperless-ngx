@@ -109,6 +109,7 @@ enum ZoomSetting {
   selector: 'pngx-document-detail',
   templateUrl: './document-detail.component.html',
   styleUrls: ['./document-detail.component.scss'],
+  standalone: false,
 })
 export class DocumentDetailComponent
   extends ComponentWithPermissions

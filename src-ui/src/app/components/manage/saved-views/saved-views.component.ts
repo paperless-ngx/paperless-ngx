@@ -13,6 +13,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
   selector: 'pngx-saved-views',
   templateUrl: './saved-views.component.html',
   styleUrl: './saved-views.component.scss',
+  standalone: false,
 })
 export class SavedViewsComponent
   extends LoadingComponentWithPermissions

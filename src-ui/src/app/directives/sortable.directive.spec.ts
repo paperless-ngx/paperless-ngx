@@ -24,6 +24,7 @@ import { SortEvent, SortableDirective } from './sortable.directive'
       </tbody>
     </table>
   `,
+  standalone: false,
 })
 class TestComponent {}
 

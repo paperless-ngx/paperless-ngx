@@ -11,6 +11,7 @@ import { SettingsService } from 'src/app/services/settings.service'
   selector: 'pngx-group-edit-dialog',
   templateUrl: './group-edit-dialog.component.html',
   styleUrls: ['./group-edit-dialog.component.scss'],
+  standalone: false,
 })
 export class GroupEditDialogComponent extends EditDialogComponent<Group> {
   constructor(

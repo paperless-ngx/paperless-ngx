@@ -16,6 +16,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
   selector: 'pngx-profile-edit-dialog',
   templateUrl: './profile-edit-dialog.component.html',
   styleUrls: ['./profile-edit-dialog.component.scss'],
+  standalone: false,
 })
 export class ProfileEditDialogComponent
   extends LoadingComponentWithPermissions

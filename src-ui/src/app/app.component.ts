@@ -18,6 +18,7 @@ import { ToastService } from './services/toast.service'
   selector: 'pngx-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  standalone: false,
 })
 export class AppComponent implements OnInit, OnDestroy {
   newDocumentSubscription: Subscription

@@ -5,7 +5,9 @@ import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { routes } from '../app-routing.module'
 import { ComponentCanDeactivate, DirtyDocGuard } from './dirty-doc.guard'
 
-@Component({})
+@Component({
+  standalone: false,
+})
 class GenericDirtyDocComponent implements ComponentCanDeactivate {
   canDeactivate: () => boolean
 }

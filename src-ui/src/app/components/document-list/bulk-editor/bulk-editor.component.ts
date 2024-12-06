@@ -50,6 +50,7 @@ import { CustomFieldsBulkEditDialogComponent } from './custom-fields-bulk-edit-d
   selector: 'pngx-bulk-editor',
   templateUrl: './bulk-editor.component.html',
   styleUrls: ['./bulk-editor.component.scss'],
+  standalone: false,
 })
 export class BulkEditorComponent
   extends ComponentWithPermissions

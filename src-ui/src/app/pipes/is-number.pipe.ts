@@ -2,6 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core'
 
 @Pipe({
   name: 'isNumber',
+  standalone: false,
 })
 export class IsNumberPipe implements PipeTransform {
   transform(value: any): boolean {

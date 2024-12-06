@@ -28,6 +28,7 @@ export interface PermissionsFormObject {
   selector: 'pngx-permissions-form',
   templateUrl: './permissions-form.component.html',
   styleUrls: ['./permissions-form.component.scss'],
+  standalone: false,
 })
 export class PermissionsFormComponent
   extends AbstractInputComponent<PermissionsFormObject>

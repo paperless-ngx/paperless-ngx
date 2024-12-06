@@ -13,6 +13,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-url',
   templateUrl: './url.component.html',
   styleUrls: ['./url.component.scss'],
+  standalone: false,
 })
 export class UrlComponent extends AbstractInputComponent<string> {
   constructor() {

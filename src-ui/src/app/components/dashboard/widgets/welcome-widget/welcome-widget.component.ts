@@ -5,6 +5,7 @@ import { TourService } from 'ngx-ui-tour-ng-bootstrap'
   selector: 'pngx-welcome-widget',
   templateUrl: './welcome-widget.component.html',
   styleUrls: ['./welcome-widget.component.scss'],
+  standalone: false,
 })
 export class WelcomeWidgetComponent {
   constructor(public readonly tourService: TourService) {}

@@ -17,6 +17,7 @@ import { AbstractInputComponent } from '../../abstract-input'
   selector: 'pngx-permissions-user',
   templateUrl: './permissions-user.component.html',
   styleUrls: ['./permissions-user.component.scss'],
+  standalone: false,
 })
 export class PermissionsUserComponent extends AbstractInputComponent<User[]> {
   users: User[]

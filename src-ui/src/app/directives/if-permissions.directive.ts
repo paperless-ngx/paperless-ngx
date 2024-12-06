@@ -13,6 +13,7 @@ import {
 
 @Directive({
   selector: '[pngxIfPermissions]',
+  standalone: false,
 })
 export class IfPermissionsDirective implements OnInit {
   @Input()

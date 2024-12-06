@@ -11,6 +11,7 @@ import { SettingsService } from 'src/app/services/settings.service'
   selector: 'pngx-preview-popup',
   templateUrl: './preview-popup.component.html',
   styleUrls: ['./preview-popup.component.scss'],
+  standalone: false,
 })
 export class PreviewPopupComponent implements OnDestroy {
   private _document: Document

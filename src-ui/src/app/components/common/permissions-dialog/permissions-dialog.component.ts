@@ -9,6 +9,7 @@ import { UserService } from 'src/app/services/rest/user.service'
   selector: 'pngx-permissions-dialog',
   templateUrl: './permissions-dialog.component.html',
   styleUrls: ['./permissions-dialog.component.scss'],
+  standalone: false,
 })
 export class PermissionsDialogComponent {
   users: User[]

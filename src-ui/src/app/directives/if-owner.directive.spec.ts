@@ -9,6 +9,7 @@ import { IfOwnerDirective } from './if-owner.directive'
       <button *pngxIfOwner="{ id: 2, owner: user1 }">Some Text</button>
     </div>
   `,
+  standalone: false,
 })
 class TestComponent {}
 

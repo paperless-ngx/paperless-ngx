@@ -16,6 +16,7 @@ const MAX_ALERTS = 5
   selector: 'pngx-upload-file-widget',
   templateUrl: './upload-file-widget.component.html',
   styleUrls: ['./upload-file-widget.component.scss'],
+  standalone: false,
 })
 export class UploadFileWidgetComponent extends ComponentWithPermissions {
   alertsExpanded = false

@@ -12,6 +12,7 @@ import { UserService } from 'src/app/services/rest/user.service'
   selector: 'pngx-document-history',
   templateUrl: './document-history.component.html',
   styleUrl: './document-history.component.scss',
+  standalone: false,
 })
 export class DocumentHistoryComponent implements OnInit {
   public AuditLogAction = AuditLogAction

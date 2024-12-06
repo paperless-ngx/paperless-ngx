@@ -23,6 +23,7 @@ import { EditDialogComponent, EditDialogMode } from '../edit-dialog.component'
   selector: 'pngx-custom-field-edit-dialog',
   templateUrl: './custom-field-edit-dialog.component.html',
   styleUrls: ['./custom-field-edit-dialog.component.scss'],
+  standalone: false,
 })
 export class CustomFieldEditDialogComponent
   extends EditDialogComponent<CustomField>

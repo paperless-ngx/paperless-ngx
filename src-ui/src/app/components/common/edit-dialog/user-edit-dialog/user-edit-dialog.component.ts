@@ -15,6 +15,7 @@ import { ToastService } from 'src/app/services/toast.service'
   selector: 'pngx-user-edit-dialog',
   templateUrl: './user-edit-dialog.component.html',
   styleUrls: ['./user-edit-dialog.component.scss'],
+  standalone: false,
 })
 export class UserEditDialogComponent
   extends EditDialogComponent<User>

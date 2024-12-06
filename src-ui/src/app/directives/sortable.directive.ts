@@ -14,6 +14,7 @@ export interface SortEvent {
 
 @Directive({
   selector: 'th[pngxSortable]',
+  standalone: false,
 })
 export class SortableDirective {
   constructor() {}

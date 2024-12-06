@@ -184,6 +184,7 @@ const DEFAULT_TEXT_FILTER_MODIFIER_OPTIONS = [
   selector: 'pngx-filter-editor',
   templateUrl: './filter-editor.component.html',
   styleUrls: ['./filter-editor.component.scss'],
+  standalone: false,
 })
 export class FilterEditorComponent
   extends LoadingComponentWithPermissions

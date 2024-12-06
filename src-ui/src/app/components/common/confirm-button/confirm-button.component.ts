@@ -11,6 +11,7 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
   selector: 'pngx-confirm-button',
   templateUrl: './confirm-button.component.html',
   styleUrl: './confirm-button.component.scss',
+  standalone: false,
 })
 export class ConfirmButtonComponent {
   @Input()

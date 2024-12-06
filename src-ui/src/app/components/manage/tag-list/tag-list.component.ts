@@ -16,6 +16,7 @@ import { ManagementListComponent } from '../management-list/management-list.comp
   selector: 'pngx-tag-list',
   templateUrl: './../management-list/management-list.component.html',
   styleUrls: ['./../management-list/management-list.component.scss'],
+  standalone: false,
 })
 export class TagListComponent extends ManagementListComponent<Tag> {
   constructor(

@@ -13,6 +13,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-check',
   templateUrl: './check.component.html',
   styleUrls: ['./check.component.scss'],
+  standalone: false,
 })
 export class CheckComponent extends AbstractInputComponent<boolean> {
   constructor() {

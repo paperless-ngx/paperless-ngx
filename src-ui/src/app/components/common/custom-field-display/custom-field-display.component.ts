@@ -12,6 +12,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
   selector: 'pngx-custom-field-display',
   templateUrl: './custom-field-display.component.html',
   styleUrl: './custom-field-display.component.scss',
+  standalone: false,
 })
 export class CustomFieldDisplayComponent
   extends LoadingComponentWithPermissions

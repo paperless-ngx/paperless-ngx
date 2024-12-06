@@ -43,6 +43,7 @@ import { SettingsService } from 'src/app/services/settings.service'
   selector: 'pngx-saved-view-widget',
   templateUrl: './saved-view-widget.component.html',
   styleUrls: ['./saved-view-widget.component.scss'],
+  standalone: false,
 })
 export class SavedViewWidgetComponent
   extends LoadingComponentWithPermissions

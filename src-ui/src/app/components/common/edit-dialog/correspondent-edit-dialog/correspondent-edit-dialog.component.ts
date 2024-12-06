@@ -12,6 +12,7 @@ import { SettingsService } from 'src/app/services/settings.service'
   selector: 'pngx-correspondent-edit-dialog',
   templateUrl: './correspondent-edit-dialog.component.html',
   styleUrls: ['./correspondent-edit-dialog.component.scss'],
+  standalone: false,
 })
 export class CorrespondentEditDialogComponent extends EditDialogComponent<Correspondent> {
   constructor(

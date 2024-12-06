@@ -12,6 +12,7 @@ export enum ToggleableItemState {
   selector: 'pngx-toggleable-dropdown-button',
   templateUrl: './toggleable-dropdown-button.component.html',
   styleUrls: ['./toggleable-dropdown-button.component.scss'],
+  standalone: false,
 })
 export class ToggleableDropdownButtonComponent {
   @Input()

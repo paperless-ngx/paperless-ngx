@@ -7,6 +7,7 @@ import { environment } from 'src/environments/environment'
   selector: 'pngx-logo',
   templateUrl: './logo.component.html',
   styleUrls: ['./logo.component.scss'],
+  standalone: false,
 })
 export class LogoComponent {
   @Input()

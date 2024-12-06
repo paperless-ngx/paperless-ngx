@@ -12,6 +12,7 @@ import { SettingsService } from 'src/app/services/settings.service'
   selector: 'pngx-document-type-edit-dialog',
   templateUrl: './document-type-edit-dialog.component.html',
   styleUrls: ['./document-type-edit-dialog.component.scss'],
+  standalone: false,
 })
 export class DocumentTypeEditDialogComponent extends EditDialogComponent<DocumentType> {
   constructor(

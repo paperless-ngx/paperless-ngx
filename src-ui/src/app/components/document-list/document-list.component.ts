@@ -43,6 +43,7 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
   selector: 'pngx-document-list',
   templateUrl: './document-list.component.html',
   styleUrls: ['./document-list.component.scss'],
+  standalone: false,
 })
 export class DocumentListComponent
   extends ComponentWithPermissions

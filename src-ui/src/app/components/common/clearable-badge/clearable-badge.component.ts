@@ -4,6 +4,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core'
   selector: 'pngx-clearable-badge',
   templateUrl: './clearable-badge.component.html',
   styleUrls: ['./clearable-badge.component.scss'],
+  standalone: false,
 })
 export class ClearableBadgeComponent {
   constructor() {}

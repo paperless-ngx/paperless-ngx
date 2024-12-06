@@ -7,6 +7,7 @@ import { DocumentService } from '../../services/rest/document.service'
   selector: 'pngx-document-asncomponent',
   templateUrl: './document-asn.component.html',
   styleUrls: ['./document-asn.component.scss'],
+  standalone: false,
 })
 export class DocumentAsnComponent implements OnInit {
   asn: string

@@ -28,6 +28,7 @@ import { SettingsService } from 'src/app/services/settings.service'
   selector: 'pngx-storage-path-edit-dialog',
   templateUrl: './storage-path-edit-dialog.component.html',
   styleUrls: ['./storage-path-edit-dialog.component.scss'],
+  standalone: false,
 })
 export class StoragePathEditDialogComponent
   extends EditDialogComponent<StoragePath>

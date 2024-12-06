@@ -66,6 +66,7 @@ const systemDateFormat = {
   selector: 'pngx-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
+  standalone: false,
 })
 export class SettingsComponent
   extends ComponentWithPermissions

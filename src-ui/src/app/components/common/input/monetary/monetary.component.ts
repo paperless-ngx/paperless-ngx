@@ -14,6 +14,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-monetary',
   templateUrl: './monetary.component.html',
   styleUrls: ['./monetary.component.scss'],
+  standalone: false,
 })
 export class MonetaryComponent extends AbstractInputComponent<string> {
   public currency: string = ''

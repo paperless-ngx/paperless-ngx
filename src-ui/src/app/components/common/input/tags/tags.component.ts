@@ -27,6 +27,7 @@ import { TagEditDialogComponent } from '../../edit-dialog/tag-edit-dialog/tag-ed
   selector: 'pngx-input-tags',
   templateUrl: './tags.component.html',
   styleUrls: ['./tags.component.scss'],
+  standalone: false,
 })
 export class TagsComponent implements OnInit, ControlValueAccessor {
   constructor(

@@ -14,6 +14,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
   selector: 'pngx-trash',
   templateUrl: './trash.component.html',
   styleUrl: './trash.component.scss',
+  standalone: false,
 })
 export class TrashComponent
   extends LoadingComponentWithPermissions

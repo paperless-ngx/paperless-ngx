@@ -14,6 +14,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
   selector: 'pngx-logs',
   templateUrl: './logs.component.html',
   styleUrls: ['./logs.component.scss'],
+  standalone: false,
 })
 export class LogsComponent
   extends LoadingComponentWithPermissions

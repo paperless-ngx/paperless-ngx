@@ -3,6 +3,7 @@ import { MatchingModel } from '../data/matching-model'
 
 @Pipe({
   name: 'filter',
+  standalone: false,
 })
 export class FilterPipe implements PipeTransform {
   transform(

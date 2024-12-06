@@ -13,6 +13,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-switch',
   templateUrl: './switch.component.html',
   styleUrls: ['./switch.component.scss'],
+  standalone: false,
 })
 export class SwitchComponent extends AbstractInputComponent<boolean> {
   @Input()

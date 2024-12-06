@@ -19,6 +19,7 @@ import { WidgetFrameComponent } from './widget-frame.component'
       </button>
     </div>
   `,
+  standalone: false,
 })
 class TestComponent extends WidgetFrameComponent {}
 

@@ -7,6 +7,7 @@ import { Toast, ToastService } from 'src/app/services/toast.service'
   selector: 'pngx-toasts',
   templateUrl: './toasts.component.html',
   styleUrls: ['./toasts.component.scss'],
+  standalone: false,
 })
 export class ToastsComponent implements OnInit, OnDestroy {
   constructor(

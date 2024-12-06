@@ -16,6 +16,7 @@ import { ManagementListComponent } from '../management-list/management-list.comp
   selector: 'pngx-document-type-list',
   templateUrl: './../management-list/management-list.component.html',
   styleUrls: ['./../management-list/management-list.component.scss'],
+  standalone: false,
 })
 export class DocumentTypeListComponent extends ManagementListComponent<DocumentType> {
   constructor(

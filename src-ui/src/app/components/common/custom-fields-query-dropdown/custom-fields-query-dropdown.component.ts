@@ -156,6 +156,7 @@ export class CustomFieldQueriesModel {
   selector: 'pngx-custom-fields-query-dropdown',
   templateUrl: './custom-fields-query-dropdown.component.html',
   styleUrls: ['./custom-fields-query-dropdown.component.scss'],
+  standalone: false,
 })
 export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPermissions {
   public CustomFieldQueryComponentType = CustomFieldQueryElementType

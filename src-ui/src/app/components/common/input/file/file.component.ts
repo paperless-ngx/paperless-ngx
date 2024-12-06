@@ -20,6 +20,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-file',
   templateUrl: './file.component.html',
   styleUrl: './file.component.scss',
+  standalone: false,
 })
 export class FileComponent extends AbstractInputComponent<string> {
   @Output()

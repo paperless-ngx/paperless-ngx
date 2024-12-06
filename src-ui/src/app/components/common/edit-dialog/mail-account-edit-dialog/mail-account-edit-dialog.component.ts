@@ -17,6 +17,7 @@ const IMAP_SECURITY_OPTIONS = [
   selector: 'pngx-mail-account-edit-dialog',
   templateUrl: './mail-account-edit-dialog.component.html',
   styleUrls: ['./mail-account-edit-dialog.component.scss'],
+  standalone: false,
 })
 export class MailAccountEditDialogComponent extends EditDialogComponent<MailAccount> {
   testActive: boolean = false

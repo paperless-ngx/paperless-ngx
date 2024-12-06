@@ -5,6 +5,7 @@ import { LoadingComponentWithPermissions } from 'src/app/components/loading-comp
   selector: 'pngx-widget-frame',
   templateUrl: './widget-frame.component.html',
   styleUrls: ['./widget-frame.component.scss'],
+  standalone: false,
 })
 export class WidgetFrameComponent
   extends LoadingComponentWithPermissions

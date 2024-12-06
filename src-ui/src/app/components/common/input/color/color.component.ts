@@ -14,6 +14,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-color',
   templateUrl: './color.component.html',
   styleUrls: ['./color.component.scss'],
+  standalone: false,
 })
 export class ColorComponent extends AbstractInputComponent<string> {
   constructor() {

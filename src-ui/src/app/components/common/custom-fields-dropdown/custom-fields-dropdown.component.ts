@@ -26,6 +26,7 @@ import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit
   selector: 'pngx-custom-fields-dropdown',
   templateUrl: './custom-fields-dropdown.component.html',
   styleUrls: ['./custom-fields-dropdown.component.scss'],
+  standalone: false,
 })
 export class CustomFieldsDropdownComponent extends LoadingComponentWithPermissions {
   @Input()

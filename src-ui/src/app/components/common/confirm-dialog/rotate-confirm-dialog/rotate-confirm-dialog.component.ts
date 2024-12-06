@@ -7,6 +7,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog.component'
   selector: 'pngx-rotate-confirm-dialog',
   templateUrl: './rotate-confirm-dialog.component.html',
   styleUrl: './rotate-confirm-dialog.component.scss',
+  standalone: false,
 })
 export class RotateConfirmDialogComponent extends ConfirmDialogComponent {
   public documentID: number

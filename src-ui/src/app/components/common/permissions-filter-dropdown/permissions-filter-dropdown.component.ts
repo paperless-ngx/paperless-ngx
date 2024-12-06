@@ -39,6 +39,7 @@ export enum OwnerFilterType {
   selector: 'pngx-permissions-filter-dropdown',
   templateUrl: './permissions-filter-dropdown.component.html',
   styleUrls: ['./permissions-filter-dropdown.component.scss'],
+  standalone: false,
 })
 export class PermissionsFilterDropdownComponent extends ComponentWithPermissions {
   public OwnerFilterType = OwnerFilterType

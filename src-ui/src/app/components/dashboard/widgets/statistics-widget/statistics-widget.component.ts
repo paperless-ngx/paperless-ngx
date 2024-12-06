@@ -30,6 +30,7 @@ interface DocumentFileType {
   selector: 'pngx-statistics-widget',
   templateUrl: './statistics-widget.component.html',
   styleUrls: ['./statistics-widget.component.scss'],
+  standalone: false,
 })
 export class StatisticsWidgetComponent
   extends ComponentWithPermissions

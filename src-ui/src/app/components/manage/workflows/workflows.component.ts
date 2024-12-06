@@ -17,6 +17,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
   selector: 'pngx-workflows',
   templateUrl: './workflows.component.html',
   styleUrls: ['./workflows.component.scss'],
+  standalone: false,
 })
 export class WorkflowsComponent
   extends LoadingComponentWithPermissions

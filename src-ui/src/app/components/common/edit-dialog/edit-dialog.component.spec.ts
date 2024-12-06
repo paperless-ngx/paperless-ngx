@@ -38,6 +38,7 @@ import { EditDialogComponent, EditDialogMode } from './edit-dialog.component'
       <h4 class="modal-title" id="modal-basic-title">{{ getTitle() }}</h4>
     </div>
   `,
+  standalone: false,
 })
 class TestComponent extends EditDialogComponent<Tag> {
   constructor(

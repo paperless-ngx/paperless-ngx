@@ -26,6 +26,7 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
   selector: 'pngx-mail',
   templateUrl: './mail.component.html',
   styleUrls: ['./mail.component.scss'],
+  standalone: false,
 })
 export class MailComponent
   extends ComponentWithPermissions

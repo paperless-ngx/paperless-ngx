@@ -6,6 +6,7 @@ import { ObjectWithId } from 'src/app/data/object-with-id'
   selector: 'pngx-select-dialog',
   templateUrl: './select-dialog.component.html',
   styleUrls: ['./select-dialog.component.scss'],
+  standalone: false,
 })
 export class SelectDialogComponent {
   constructor(public activeModal: NgbActiveModal) {}

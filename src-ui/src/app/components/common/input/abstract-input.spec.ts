@@ -18,6 +18,7 @@ import { AbstractInputComponent } from './abstract-input'
       />
     </div>
   `,
+  standalone: false,
 })
 class TestComponent extends AbstractInputComponent<string> {
   constructor() {

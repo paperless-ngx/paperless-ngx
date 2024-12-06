@@ -18,6 +18,7 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
   selector: 'pngx-users-groups',
   templateUrl: './users-groups.component.html',
   styleUrls: ['./users-groups.component.scss'],
+  standalone: false,
 })
 export class UsersAndGroupsComponent
   extends ComponentWithPermissions

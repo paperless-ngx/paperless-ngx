@@ -17,6 +17,7 @@ const SYMBOLS = {
   selector: 'pngx-hotkey-dialog',
   templateUrl: './hotkey-dialog.component.html',
   styleUrl: './hotkey-dialog.component.scss',
+  standalone: false,
 })
 export class HotkeyDialogComponent {
   public title: string = $localize`Keyboard shortcuts`

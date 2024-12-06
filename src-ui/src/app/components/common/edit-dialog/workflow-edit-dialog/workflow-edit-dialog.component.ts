@@ -115,6 +115,7 @@ const TRIGGER_MATCHING_ALGORITHMS = MATCHING_ALGORITHMS.filter(
   selector: 'pngx-workflow-edit-dialog',
   templateUrl: './workflow-edit-dialog.component.html',
   styleUrls: ['./workflow-edit-dialog.component.scss'],
+  standalone: false,
 })
 export class WorkflowEditDialogComponent
   extends EditDialogComponent<Workflow>

@@ -14,6 +14,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-number',
   templateUrl: './number.component.html',
   styleUrls: ['./number.component.scss'],
+  standalone: false,
 })
 export class NumberComponent extends AbstractInputComponent<number> {
   @Input()

@@ -13,6 +13,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-textarea',
   templateUrl: './textarea.component.html',
   styleUrls: ['./textarea.component.scss'],
+  standalone: false,
 })
 export class TextAreaComponent extends AbstractInputComponent<string> {
   @Input()

@@ -8,7 +8,9 @@ import { routes } from '../app-routing.module'
 import { ConfirmDialogComponent } from '../components/common/confirm-dialog/confirm-dialog.component'
 import { DirtyFormGuard } from './dirty-form.guard'
 
-@Component({})
+@Component({
+  standalone: false,
+})
 class GenericDirtyComponent implements DirtyComponent {
   isDirty$: boolean
 }

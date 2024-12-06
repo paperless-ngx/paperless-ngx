@@ -7,6 +7,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
   selector: 'pngx-confirm-dialog',
   templateUrl: './confirm-dialog.component.html',
   styleUrls: ['./confirm-dialog.component.scss'],
+  standalone: false,
 })
 export class ConfirmDialogComponent extends LoadingComponentWithPermissions {
   constructor(public activeModal: NgbActiveModal) {

@@ -6,6 +6,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
   selector: 'pngx-save-view-config-dialog',
   templateUrl: './save-view-config-dialog.component.html',
   styleUrls: ['./save-view-config-dialog.component.scss'],
+  standalone: false,
 })
 export class SaveViewConfigDialogComponent implements OnInit {
   constructor(private modal: NgbActiveModal) {}
