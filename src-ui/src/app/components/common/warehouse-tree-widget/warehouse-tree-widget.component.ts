@@ -52,9 +52,9 @@ export class WarehouseTreeWidgetComponent extends ComponentWithPermissions
 
   renderNode(c, object, event) {
     this.type_warehouse = object.type
-    const spanElement = (event.target as HTMLElement).closest('span')
-    const tdElement = spanElement.closest('td')
-    const svgElement = spanElement?.querySelector('svg')
+    // const spanElement = (event.target as HTMLElement).closest('span')
+    const tdElement = (event.target as HTMLElement).closest('td')
+    const svgElement = tdElement?.querySelector('svg')
     const tableElement = tdElement?.querySelector('table')
     if (svgElement.style.transform != '') {
       this.renderer.removeStyle(svgElement, 'transform')

@@ -18,27 +18,27 @@
                 <td class="custom-space"></td>
                 @if (object.type == 'Warehouse') {
                   <td scope="row" class="d-md-table-cell custom-width-content">
-                 <span class="text-primary">
                     <i-bs class="me-1 custom-cursor" (click)="getNode(object,$event);" name="chevronRight" width="1.5rem" height="1.5rem"></i-bs>
-                    <i-bs class="me-1 custom-cursor" (click)="this.goToNode.emit(object); $event.stopPropagation()" name="house-door-fill" width="1.5rem" height="1.5rem"></i-bs>
+                 <span class="text-primary custom-cursor" (click)="this.goToNode.emit(object); $event.stopPropagation()">
+                    <i-bs class="me-1 "  name="house-door-fill" width="1.5rem" height="1.5rem"></i-bs>
                    {{ object.name }}
                   </span>
 
                   </td>
                 } @else if  (object.type == 'Shelf') {
                   <td scope="row" class="d-md-table-cell custom-width-content p-2">
-                 <span class="text-primary">
-                    <i-bs class="me-1 custom-cursor" (click)="getNode(object,$event);" name="chevronRight" width="1.5rem" height="1.5rem"></i-bs>
-                    <i-bs class="me-1 custom-cursor" (click)="this.goToNode.emit(object); $event.stopPropagation()" name="bookshelf" width="1.5rem" height="1.5rem"></i-bs>
+                <i-bs class="me-1 custom-cursor" (click)="getNode(object,$event);" name="chevronRight" width="1.5rem" height="1.5rem"></i-bs>
+                 <span class="text-primary custom-cursor" (click)="this.goToNode.emit(object); $event.stopPropagation()">
+                    <i-bs class="me-1 "  name="bookshelf" width="1.5rem" height="1.5rem"></i-bs>
                    {{ object.name }}
                   </span>
 
                   </td>
                 } @else if  (object.type == 'Boxcase') {
-                  <td scope="row" class="d-md-table-cell custom-width-content p-1">
-                 <span class="text-primary">
+                  <td scope="row" class="d-md-table-cell custom-width-content p-2">
+                 <span class="text-primary custom-cursor">
 <!--                    <i-bs class="me-1 custom-cursor" (click)="getNode(object,$event);" name="chevronRight" width="1.5rem" height="1.5rem"></i-bs>-->
-                    <i-bs class="me-1 custom-cursor" (click)="this.goToNode.emit(object); $event.stopPropagation()" name="inboxes-fill" width="1.5rem" height="1.5rem"></i-bs>
+                    <i-bs class="me-1 " (click)="this.goToNode.emit(object); $event.stopPropagation()" name="inboxes-fill" width="1.5rem" height="1.5rem"></i-bs>
                    {{ object.name }}
                   </span>
 

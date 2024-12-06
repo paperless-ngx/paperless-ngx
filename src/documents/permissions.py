@@ -1,3 +1,5 @@
+from itertools import chain
+
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -11,7 +13,7 @@ from guardian.shortcuts import remove_perm
 from rest_framework.permissions import BasePermission
 from rest_framework.permissions import DjangoObjectPermissions
 
-from documents.models import Folder
+from documents.models import Folder, Warehouse
 
 
 class PaperlessObjectPermissions(DjangoObjectPermissions):
@@ -168,3 +170,62 @@ def update_view_folder_parent_permissions(folder, permissions):
             object=obj,
             merge=True,
         )
+
+def update_view_warehouse_shelf_boxcase_permissions(warehouse, permission_copy):
+    list_warehouse_ids = warehouse.path.split("/")
+    warehouses_list = Warehouse.objects.filter(id__in = list_warehouse_ids)
+    print(f'permission ----{permission_copy}')
+
+    # Lấy QuerySet từ cả hai quyền
+    view_users = permission_copy['view']['users']
+    change_users = permission_copy['change']['users']
+
+    # Kết hợp người dùng từ cả hai QuerySet
+    # Chuyển đổi thành danh sách và sử dụng chain
+    combined_users_list = list(chain(view_users, change_users))
+
+    # Tạo một QuerySet mới từ danh sách đã kết hợp
+    combined_users_queryset = User.objects.filter(
+        id__in=[user.id for user in combined_users_list])
+    permission_copy["view"]["users"]=combined_users_queryset
+    view_users = permission_copy['view']['users']
+    change_users = permission_copy['change']['users']
+
+    # Kết hợp người dùng từ cả hai QuerySet
+    # Chuyển đổi thành danh sách và sử dụng chain
+    combined_users_list = list(chain(view_users, change_users))
+
+    # Tạo một QuerySet mới từ danh sách đã kết hợp
+    combined_users_queryset = User.objects.filter(
+        id__in=[user.id for user in combined_users_list])
+    permission_copy["view"]["users"] = combined_users_queryset
+
+    # -----------------------------------------
+    view_groups = permission_copy['view']['groups']
+    change_groups = permission_copy['change']['groups']
+
+    # Kết hợp nhóm từ cả hai QuerySet
+    # Chuyển đổi thành danh sách và sử dụng chain
+    combined_groups_list = list(chain(view_groups, change_groups))
+
+    # Tạo một QuerySet mới từ danh sách đã kết hợp
+    combined_groups_queryset = Group.objects.filter(
+        id__in=[group.id for group in combined_groups_list])
+
+    # Cập nhật lại permission_copy
+    permission_copy['view']['groups'] = combined_groups_queryset
+
+    permission_copy["change"] = {
+        "users": [],
+        "groups": [],
+    }
+
+
+    for obj in warehouses_list:
+        print('trong for',permission_copy)
+        set_permissions_for_object(
+            permissions=permission_copy,
+            object=obj,
+            merge=True,
+        )
+

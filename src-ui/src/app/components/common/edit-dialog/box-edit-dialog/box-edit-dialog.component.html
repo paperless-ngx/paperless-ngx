@@ -10,21 +10,21 @@
   <div class="modal-body">
 
     <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
-   
+
    <div *ngIf="getCheckCreate()">
-      <label i18n>Warehouse</label>
-      <select id="parentWarehouse" class="form-select" formControlName="parent_shefl" (change)="onWarehouseChange($event)">
-        <option *ngFor="let warehouse of warehouses" [value]="warehouse.id">{{ warehouse.name }}</option>
-      </select>
-      <br>
-      <label i18n>Shelf</label>
-      <select id="parentShelf" class="form-select" formControlName="parent_warehouse" (change)="onShelfChange($event)">
-        <option *ngFor="let shelf of shelfs" [value]="shelf.id">{{ shelf.name }}</option>
-      </select>
+<!--      <label i18n>Warehouse</label>-->
+<!--      <select id="parentWarehouse" class="form-select" formControlName="parent_shefl" (change)="onWarehouseChange($event)">-->
+<!--        <option *ngFor="let warehouse of warehouses" [value]="warehouse.id">{{ warehouse.name }}</option>-->
+<!--      </select>-->
+<!--      <br>-->
+<!--      <label i18n>Shelf</label>-->
+<!--      <select id="parentShelf" class="form-select" formControlName="parent_warehouse" (change)="onShelfChange($event)">-->
+<!--        <option *ngFor="let shelf of shelfs" [value]="shelf.id">{{ shelf.name }}</option>-->
+<!--      </select>-->
     </div>
   <br>
 
-   
+
 
     <!-- <pngx-input-text i18n-title title="parent_warehouse" formControlName="parent_warehouse" [error]="error?.parent_warehouse" autocomplete="off"></pngx-input-text> -->
     <!-- <pngx-input-text i18n-title title="Path" formControlName="path" [error]="error?.path" [hint]="pathHint"></pngx-input-text> -->

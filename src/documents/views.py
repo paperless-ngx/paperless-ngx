@@ -142,7 +142,8 @@ from documents.parsers import custom_get_parser_class_for_mime_type
 from documents.parsers import parse_date_generator
 from documents.permissions import PaperlessAdminPermissions, \
     check_user_can_change_folder, update_view_folder_parent_permissions, \
-    get_groups_with_only_permission
+fi    get_groups_with_only_permission, \
+    update_view_warehouse_shelf_boxcase_permissions
 from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
@@ -2515,7 +2516,7 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         old_parent_warehouse = instance.parent_warehouse
 
         self.perform_update(serializer)
-
+        self.update_shelf_boxcase_permisisons(instance, serializer)
         if old_parent_warehouse != instance.parent_warehouse:
 
             if instance.type == Warehouse.SHELF and getattr(instance.parent_warehouse, 'type', "") == Warehouse.WAREHOUSE :
@@ -2535,6 +2536,60 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
 
         return Response(serializer.data)
+
+    def update_shelf_boxcase_permisisons(self, warehouse, serializer):
+        child_shelf_boxcase = Warehouse.objects.filter(path__startswith=warehouse.path)
+        documents_list = Document.objects.select_related("dossier").filter(warehouse__in=child_shelf_boxcase)
+        # documents_list = []
+        # for child in child_folders:
+        #     if child.type == "file":
+        #         documents_list._append(child.o)
+
+        permissions = serializer.validated_data.get("set_permissions")
+        permissions_copy = permissions.copy()
+        update_view_warehouse_shelf_boxcase_permissions(warehouse, permissions_copy)
+        owner = serializer.validated_data.get("owner")
+        merge = False
+
+        try:
+            qs = child_shelf_boxcase
+
+            # if merge is true, we dont want to remove the owner
+            if "owner" in serializer.validated_data and (
+                not merge or (merge and owner is not None)
+            ):
+                # if merge is true, we dont want to overwrite the owner
+                qs_owner_update = qs.filter(
+                    owner__isnull=True) if merge else qs
+                qs_owner_update.update(owner=owner)
+            if "set_permissions" in serializer.validated_data:
+                for obj in qs:
+                    set_permissions_for_object(
+                        permissions=permissions,
+                        object=obj,
+                        merge=merge,
+                    )
+                for obj in documents_list:
+                    set_permissions_for_object(
+                        permissions=permissions,
+                        object=obj,
+                        merge=merge,
+                    )
+                    set_permissions_for_object(
+                        permissions=permissions,
+                        object=obj.dossier,
+                        merge=merge,
+                    )
+
+
+
+        except Exception as e:
+            logger.warning(
+                f"An error occurred performing bulk permissions edit: {e!s}",
+            )
+            return HttpResponseBadRequest(
+                "Error performing bulk permissions edit, check logs for more detail.",
+            )
 
     def partial_update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', True)
@@ -2800,7 +2855,6 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        print(serializer.validated_data.get("set_permissions"))
         serializer.validated_data['updated'] = timezone.now()
 
         old_parent_folder = instance.parent_folder
