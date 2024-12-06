@@ -38,7 +38,7 @@
             </tr>
         </thead>
         <tbody>
-            @if (isLoading) {
+            @if (loading) {
                 <tr>
                     <td colspan="5">
                     <div class="spinner-border spinner-border-sm me-2" role="status"></div>
@@ -88,7 +88,7 @@
     </table>
 </div>
 
-@if (!isLoading) {
+@if (!loading) {
     <div class="d-flex mb-2">
         <div>
             <ng-container i18n>{totalDocuments, plural, =1 {One document in trash} other {{{totalDocuments || 0}} total documents in trash}}</ng-container>

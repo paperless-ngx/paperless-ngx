@@ -28,7 +28,6 @@ import {
 } from 'src/app/data/filter-rule-type'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import {
   PermissionAction,
@@ -38,6 +37,7 @@ import {
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { SettingsService } from 'src/app/services/settings.service'
+import { LoadingComponentWithPermissions } from 'src/app/components/loading-component/loading.component'
 
 @Component({
   selector: 'pngx-saved-view-widget',
@@ -45,15 +45,12 @@ import { SettingsService } from 'src/app/services/settings.service'
   styleUrls: ['./saved-view-widget.component.scss'],
 })
 export class SavedViewWidgetComponent
-  extends ComponentWithPermissions
+  extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy
 {
   public DisplayMode = DisplayMode
   public DisplayField = DisplayField
   public CustomFieldDataType = CustomFieldDataType
-
-  public loading: boolean = true
-  public reveal: boolean = false
 
   private customFields: CustomField[] = []
 

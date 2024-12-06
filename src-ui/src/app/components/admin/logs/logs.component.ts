@@ -3,22 +3,28 @@ import {
   ElementRef,
   OnInit,
   ViewChild,
-  OnDestroy,
   ChangeDetectorRef,
+  OnDestroy,
 } from '@angular/core'
-import { Subject, takeUntil } from 'rxjs'
+import { takeUntil } from 'rxjs'
 import { LogService } from 'src/app/services/rest/log.service'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
   selector: 'pngx-logs',
   templateUrl: './logs.component.html',
   styleUrls: ['./logs.component.scss'],
 })
-export class LogsComponent implements OnInit, OnDestroy {
+export class LogsComponent
+  extends LoadingComponentWithPermissions
+  implements OnInit, OnDestroy
+{
   constructor(
     private logService: LogService,
     private changedetectorRef: ChangeDetectorRef
-  ) {}
+  ) {
+    super()
+  }
 
   public logs: string[] = []
 
@@ -26,22 +32,17 @@ export class LogsComponent implements OnInit, OnDestroy {
 
   public activeLog: string
 
-  private unsubscribeNotifier: Subject<any> = new Subject()
-
-  public isLoading: boolean = false
-
   public autoRefreshInterval: any
 
   @ViewChild('logContainer') logContainer: ElementRef
 
   ngOnInit(): void {
-    this.isLoading = true
     this.logService
       .list()
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((result) => {
         this.logFiles = result
-        this.isLoading = false
+        this.loading = false
         if (this.logFiles.length > 0) {
           this.activeLog = this.logFiles[0]
           this.reloadLogs()
@@ -51,25 +52,24 @@ export class LogsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.unsubscribeNotifier.next(true)
-    this.unsubscribeNotifier.complete()
+    super.ngOnDestroy()
     clearInterval(this.autoRefreshInterval)
   }
 
   reloadLogs() {
-    this.isLoading = true
+    this.loading = true
     this.logService
       .get(this.activeLog)
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
           this.logs = result
-          this.isLoading = false
+          this.loading = false
           this.scrollToBottom()
         },
         error: () => {
           this.logs = []
-          this.isLoading = false
+          this.loading = false
         },
       })
   }
