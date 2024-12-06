@@ -638,7 +638,10 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
                 uri_validator(data["value"])
             elif field.data_type == CustomField.FieldDataType.INT:
                 integer_validator(data["value"])
-            elif field.data_type == CustomField.FieldDataType.MONETARY:
+            elif (
+                field.data_type == CustomField.FieldDataType.MONETARY
+                and data["value"] != ""
+            ):
                 try:
                     # First try to validate as a number from legacy format
                     DecimalValidator(max_digits=12, decimal_places=2)(
