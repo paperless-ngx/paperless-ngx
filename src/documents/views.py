@@ -142,7 +142,7 @@ from documents.parsers import custom_get_parser_class_for_mime_type
 from documents.parsers import parse_date_generator
 from documents.permissions import PaperlessAdminPermissions, \
     check_user_can_change_folder, update_view_folder_parent_permissions, \
-fi    get_groups_with_only_permission, \
+    get_groups_with_only_permission, \
     update_view_warehouse_shelf_boxcase_permissions
 from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import get_objects_for_user_owner_aware
