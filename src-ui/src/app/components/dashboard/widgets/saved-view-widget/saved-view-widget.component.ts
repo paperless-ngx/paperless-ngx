@@ -7,7 +7,7 @@ import {
   ViewChildren,
 } from '@angular/core'
 import { Router } from '@angular/router'
-import { Subject, takeUntil } from 'rxjs'
+import { delay, Subject, takeUntil, tap } from 'rxjs'
 import {
   DEFAULT_DASHBOARD_DISPLAY_FIELDS,
   DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
@@ -52,7 +52,8 @@ export class SavedViewWidgetComponent
   public DisplayField = DisplayField
   public CustomFieldDataType = CustomFieldDataType
 
-  loading: boolean = true
+  public loading: boolean = true
+  public reveal: boolean = false
 
   private customFields: CustomField[] = []
 
@@ -137,16 +138,22 @@ export class SavedViewWidgetComponent
     this.documentService
       .listFiltered(
         1,
-        this.pageSize,
+        this.savedView?.page_size ?? DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
         this.savedView.sort_field,
         this.savedView.sort_reverse,
         this.savedView.filter_rules,
         { truncate_content: true }
       )
-      .pipe(takeUntil(this.unsubscribeNotifier))
+      .pipe(
+        takeUntil(this.unsubscribeNotifier),
+        tap((result) => {
+          this.reveal = true
+          this.documents = result.results
+        }),
+        delay(500)
+      )
       .subscribe((result) => {
         this.loading = false
-        this.documents = result.results
       })
   }
 
@@ -206,53 +213,8 @@ export class SavedViewWidgetComponent
     this.router.navigate(['documents', document.id])
   }
 
-  getPreviewUrl(document: Document): string {
-    return this.documentService.getPreviewUrl(document.id)
-  }
-
   getDownloadUrl(document: Document): string {
     return this.documentService.getDownloadUrl(document.id)
-  }
-
-  mouseEnterPreviewButton(doc: Document) {
-    const newPopover = this.popovers.get(this.documents.indexOf(doc))
-    if (this.popover !== newPopover && this.popover?.isOpen())
-      this.popover.close()
-    this.popover = newPopover
-    this.mouseOnPreview = true
-    if (!this.popover.isOpen()) {
-      // we're going to open but hide to pre-load content during hover delay
-      this.popover.open()
-      this.popoverHidden = true
-      setTimeout(() => {
-        if (this.mouseOnPreview) {
-          // show popover
-          this.popoverHidden = false
-        } else {
-          this.popover.close()
-        }
-      }, 600)
-    }
-  }
-
-  mouseEnterPreview() {
-    this.mouseOnPreview = true
-  }
-
-  mouseLeavePreview() {
-    this.mouseOnPreview = false
-    this.maybeClosePopover()
-  }
-
-  mouseLeavePreviewButton() {
-    this.mouseOnPreview = false
-    this.maybeClosePopover()
-  }
-
-  maybeClosePopover() {
-    setTimeout(() => {
-      if (!this.mouseOnPreview) this.popover?.close()
-    }, 300)
   }
 
   public getColumnTitle(field: DisplayField): string {

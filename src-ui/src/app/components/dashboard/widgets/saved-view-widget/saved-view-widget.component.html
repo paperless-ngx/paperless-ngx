@@ -9,8 +9,9 @@
     <a class="btn-link text-decoration-none" header-buttons [routerLink]="[]" (click)="showAll()" i18n>Show all</a>
   }
 
+  <div content class="wrapper" [class.reveal]="reveal">
   @if (displayMode === DisplayMode.TABLE) {
-    <table content class="table table-hover mb-0 mt-n2 align-middle">
+    <table class="table table-hover mb-0 mt-n2 align-middle">
       <thead>
         <tr>
           @for (field of displayFields; track field; let i = $index) {
@@ -28,71 +29,59 @@
         </tr>
       </thead>
       <tbody>
-        @if (loading) {
-          @for (i of [].constructor(pageSize); track i) {
-            <tr>
-              @for (field of displayFields; track field; let j = $index) {
-                <td class="py-2 py-md" [ngClass]="{ 'd-none d-md-table-cell': j > 1 }">
-                  <div class="placeholder-glow text-start py-2">
-                    <span class="placeholder bg-secondary w-50"></span>
-                  </div>
-                </td>
-              }
-            </tr>
-          }
-        }
-        @for (doc of documents; track doc.id) {
+        @for (doc of documents; track doc.id; let i = $index) {
           <tr>
-            @for (field of displayFields; track field; let i = $index) {
-              <td class="py-2 py-md-3 position-relative" [ngClass]="{ 'd-none d-md-table-cell': i > 1 }">
-                @switch (field) {
-                  @case (DisplayField.ADDED) {
-                    <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3" title="Open document" i18n-title>{{doc.added | customDate}}</a>
-                  }
-                  @case (DisplayField.CREATED) {
-                    <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3" title="Open document" i18n-title>{{doc.created_date | customDate}}</a>
-                  }
-                  @case (DisplayField.TITLE) {
-                    <a routerLink="/documents/{{doc.id}}" title="Open document" i18n-title class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.title | documentTitle}}</a>
-                  }
-                  @case (DisplayField.CORRESPONDENT) {
-                    @if (doc.correspondent) {
-                      <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickCorrespondent(doc.correspondent, $event)" title="Filter by correspondent" i18n-title>{{(doc.correspondent$ | async)?.name}}</a>
-                    }
-                  }
-                  @case (DisplayField.TAGS) {
-                    @for (t of doc.tags$ | async; track t) {
-                      <pngx-tag [tag]="t" class="ms-1" (click)="clickTag(t.id, $event)" [clickable]="true" linkTitle="Filter by tag" i18n-title></pngx-tag>
-                    }
-                  }
-                  @case (DisplayField.DOCUMENT_TYPE) {
-                    @if (doc.document_type) {
-                      <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickDocType(doc.document_type, $event)" title="Filter by document type" i18n-title>{{(doc.document_type$ | async)?.name}}</a>
-                    }
-                  }
-                  @case (DisplayField.STORAGE_PATH) {
-                    @if (doc.storage_path) {
-                      <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickStoragePath(doc.storage_path, $event)" title="Filter by storage path" i18n-title>{{(doc.storage_path$ | async)?.name}}</a>
-                    }
-                  }
-                }
-                @if (field.startsWith(DisplayField.CUSTOM_FIELD)) {
-                  <pngx-custom-field-display [document]="doc" [fieldDisplayKey]="field"></pngx-custom-field-display>
-                }
-                @if (i === displayFields.length - 1) {
-                  <div class="btn-group position-absolute top-50 end-0 translate-middle-y">
-                    <a [href]="getPreviewUrl(doc)" title="View Preview" i18n-title target="_blank" class="btn px-4 btn-dark border-dark-subtle"
-                      [ngbPopover]="previewContent" [popoverTitle]="doc.title | documentTitle"
-                      autoClose="true" popoverClass="shadow popover-preview" container="body" (mouseenter)="mouseEnterPreviewButton(doc)" (mouseleave)="mouseLeavePreviewButton()" #popover="ngbPopover">
-                      <i-bs width="0.8em" height="0.8em" name="eye"></i-bs>
-                    </a>
-                    <ng-template #previewContent>
-                      <pngx-preview-popup [document]="doc" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()"></pngx-preview-popup>
-                    </ng-template>
-                    <a [href]="getDownloadUrl(doc)" class="btn px-4 btn-dark border-dark-subtle" title="Download" i18n-title (click)="$event.stopPropagation()">
-                      <i-bs width="0.8em" height="0.8em" name="download"></i-bs>
-                    </a>
+            @for (field of displayFields; track field; let j = $index) {
+              <td class="py-2 py-md-3 position-relative" [ngClass]="{ 'd-none d-md-table-cell': j > 1 }">
+                @if (loading && reveal) {
+                  <div class="placeholder-glow text-start">
+                    <span class="placeholder bg-secondary w-50" [ngStyle]="{ opacity: 1 - (i * 1/documents.length) }"></span>
                   </div>
+                } @else {
+                  @switch (field) {
+                    @case (DisplayField.ADDED) {
+                      <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3" title="Open document" i18n-title>{{doc.added | customDate}}</a>
+                    }
+                    @case (DisplayField.CREATED) {
+                      <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3" title="Open document" i18n-title>{{doc.created_date | customDate}}</a>
+                    }
+                    @case (DisplayField.TITLE) {
+                      <a routerLink="/documents/{{doc.id}}" title="Open document" i18n-title class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.title | documentTitle}}</a>
+                    }
+                    @case (DisplayField.CORRESPONDENT) {
+                      @if (doc.correspondent) {
+                        <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickCorrespondent(doc.correspondent, $event)" title="Filter by correspondent" i18n-title>{{(doc.correspondent$ | async)?.name}}</a>
+                      }
+                    }
+                    @case (DisplayField.TAGS) {
+                      @for (t of doc.tags$ | async; track t) {
+                        <pngx-tag [tag]="t" class="ms-1" (click)="clickTag(t.id, $event)" [clickable]="true" linkTitle="Filter by tag" i18n-title></pngx-tag>
+                      }
+                    }
+                    @case (DisplayField.DOCUMENT_TYPE) {
+                      @if (doc.document_type) {
+                        <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickDocType(doc.document_type, $event)" title="Filter by document type" i18n-title>{{(doc.document_type$ | async)?.name}}</a>
+                      }
+                    }
+                    @case (DisplayField.STORAGE_PATH) {
+                      @if (doc.storage_path) {
+                        <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickStoragePath(doc.storage_path, $event)" title="Filter by storage path" i18n-title>{{(doc.storage_path$ | async)?.name}}</a>
+                      }
+                    }
+                  }
+                  @if (field.startsWith(DisplayField.CUSTOM_FIELD)) {
+                    <pngx-custom-field-display [document]="doc" [fieldDisplayKey]="field"></pngx-custom-field-display>
+                  }
+                  @if (j === displayFields.length - 1) {
+                    <div class="btn-group position-absolute top-50 end-0 translate-middle-y" (mouseleave)="popupPreview.close()">
+                      <pngx-preview-popup [document]="doc" linkClasses="btn px-4 btn-dark border-dark-subtle" #popupPreview>
+                        <i-bs width="0.8em" height="0.8em" name="eye"></i-bs>
+                      </pngx-preview-popup>
+                      <a [href]="getDownloadUrl(doc)" class="btn px-4 btn-dark border-dark-subtle" title="Download" i18n-title (click)="$event.stopPropagation()">
+                        <i-bs width="0.8em" height="0.8em" name="download"></i-bs>
+                      </a>
+                    </div>
+                  }
                 }
               </td>
             }
@@ -101,17 +90,13 @@
       </tbody>
     </table>
   } @else if (displayMode === DisplayMode.SMALL_CARDS) {
-    <div content class="row row-cols-paperless-cards my-n2">
-      @if (loading) {
-        @for (i of [].constructor(pageSize); track i) {
-          <pngx-document-card-small class="p-0"></pngx-document-card-small>
-        }
-      }
-      @for (d of documents; track d.id) {
+    <div class="row row-cols-paperless-cards my-n2">
+      @for (d of documents; track d.id; let i = $index) {
         <pngx-document-card-small
           class="p-0"
+          [ngStyle]="{ opacity: !loading && reveal ? 1 : 1 - (i * 1/documents.length) }"
           (dblClickDocument)="openDocumentDetail(d)"
-          [document]="d"
+          [document]="!loading && reveal ? d : null"
           [displayFields]="displayFields"
           (clickTag)="clickTag($event)"
           (clickCorrespondent)="clickCorrespondent($event)"
@@ -121,16 +106,12 @@
       }
     </div>
   } @else if (displayMode === DisplayMode.LARGE_CARDS) {
-    <div content class="row my-n2">
-      @if (loading) {
-        @for (i of [].constructor(pageSize); track i) {
-          <pngx-document-card-large></pngx-document-card-large>
-        }
-      }
-      @for (d of documents; track d.id) {
+    <div class="row my-n2">
+      @for (d of documents; track d.id; let i = $index) {
         <pngx-document-card-large
           (dblClickDocument)="openDocumentDetail(d)"
-          [document]="d"
+          [document]="!loading && reveal ? d : null"
+          [ngStyle]="{ opacity: !loading && reveal ? 1 : 1 - (i * 1/documents.length) }"
           [displayFields]="displayFields"
           (clickTag)="clickTag($event)"
           (clickCorrespondent)="clickCorrespondent($event)"
@@ -141,8 +122,8 @@
       }
     </div>
   } @else {
-    <p content i18n class="text-center text-muted mb-0 fst-italic">No documents</p>
+    <p i18n class="text-center text-muted mb-0 fst-italic">No documents</p>
   }
 
-
+  </div>
 </pngx-widget-frame>

@@ -1,5 +1,5 @@
-<div class="col p-2 h-100 placeholder-glow">
-  <div class="card h-100 shadow-sm document-card" [class.card-selected]="selected" (mouseleave)="mouseLeaveCard()">
+<div class="col p-2 h-100">
+  <div class="card h-100 shadow-sm document-card" [class.placeholder-glow]="!document" [class.card-selected]="selected" (mouseleave)="mouseLeaveCard()">
     <div class="border-bottom doc-img-container rounded-top" (click)="this.toggleSelected.emit($event)" (dblclick)="dblClickDocument.emit(this)">
       @if (document) {
         <img class="card-img doc-img" [class.inverted]="getIsThumbInverted()" [src]="getThumbUrl()">
@@ -14,7 +14,7 @@
         <div class="placeholder bg-secondary w-100 card-img doc-img"></div>
       }
 
-      @if (displayFields?.includes(DisplayField.TAGS) && document) {
+      @if (document && displayFields?.includes(DisplayField.TAGS)) {
         <div class="tags d-flex flex-column text-end position-absolute me-1 fs-6">
           @for (t of getTagsLimited$() | async; track t) {
             <pngx-tag [tag]="t" (click)="clickTag.emit(t.id);$event.stopPropagation()" [clickable]="true" linkTitle="Toggle tag filter" i18n-linkTitle></pngx-tag>
@@ -38,12 +38,17 @@
 
     <div class="card-body bg-light p-2">
       <p class="card-text">
-        @if (document && displayFields.includes(DisplayField.CORRESPONDENT) && document.correspondent) {
-          <a title="Toggle correspondent filter" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold btn-link">{{(document.correspondent$ | async)?.name ?? privateName}}</a>
-          @if (displayFields.includes(DisplayField.TITLE)) {:}
-        }
-        @if (document && displayFields.includes(DisplayField.TITLE)) {
-          {{document.title | documentTitle}}
+        @if (document) {
+          @if (displayFields.includes(DisplayField.CORRESPONDENT) && document.correspondent) {
+            <a title="Toggle correspondent filter" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold btn-link">{{(document.correspondent$ | async)?.name ?? privateName}}</a>
+            @if (displayFields.includes(DisplayField.TITLE)) {:}
+          }
+          @if (displayFields.includes(DisplayField.TITLE)) {
+            {{document.title | documentTitle}}
+          }
+        } @else {
+          <div class="placeholder bg-secondary w-100"></div>
+          <div class="placeholder bg-secondary w-50"></div>
         }
         @if (!document) {
           <div class="placeholder bg-secondary w-100"></div>

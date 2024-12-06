@@ -108,12 +108,8 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
     return this.documentService.getDownloadUrl(this.document.id)
   }
 
-  get previewUrl() {
-    return this.documentService.getPreviewUrl(this.document.id)
-  }
-
   mouseLeaveCard() {
-    this.popupPreview.close()
+    this.popupPreview?.close()
   }
 
   get contentTrimmed() {

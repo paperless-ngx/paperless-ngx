@@ -35,6 +35,7 @@ describe('WidgetFrameComponent', () => {
 
     fixture = TestBed.createComponent(WidgetFrameComponent)
     component = fixture.componentInstance
+    jest.useFakeTimers()
 
     fixture.detectChanges()
   })
@@ -50,5 +51,11 @@ describe('WidgetFrameComponent', () => {
     component.loading = true
     fixture.detectChanges()
     expect(fixture.debugElement.query(By.css('.spinner-border'))).not.toBeNull()
+  })
+
+  it('should reveal', () => {
+    expect(component.reveal).toBeFalsy()
+    jest.advanceTimersByTime(100)
+    expect(component.reveal).toBeTruthy()
   })
 })

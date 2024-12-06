@@ -129,6 +129,8 @@ describe('MailComponent', () => {
     fixture = TestBed.createComponent(MailComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
+    jest.useFakeTimers()
+    jest.advanceTimersByTime(100)
   })
 
   function completeSetup(excludeService = null) {
@@ -386,6 +388,7 @@ describe('MailComponent', () => {
     component.oAuthAccountId = 3
     const editSpy = jest.spyOn(component, 'editMailAccount')
     component.ngOnInit()
+    jest.advanceTimersByTime(200)
     expect(editSpy).toHaveBeenCalled()
   })
 })

@@ -111,4 +111,12 @@ describe('DocumentCardSmallComponent', () => {
       fixture.debugElement.queryAll(By.directive(TagComponent))
     ).toHaveLength(6)
   })
+
+  it('should try to close the preview on mouse leave', () => {
+    component.popupPreview = {
+      close: jest.fn(),
+    } as any
+    component.mouseLeaveCard()
+    expect(component.popupPreview.close).toHaveBeenCalled()
+  })
 })

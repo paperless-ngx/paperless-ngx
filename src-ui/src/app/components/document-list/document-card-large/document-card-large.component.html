@@ -1,4 +1,4 @@
-<div class="card mb-3 shadow-sm bg-light placeholder-glow" [class.card-selected]="selected" [class.document-card]="selectable" (mouseleave)="mouseLeaveCard()">
+<div class="card document-card-large mb-3 shadow-sm bg-light placeholder-glow" [class.card-selected]="selected" [class.document-card]="selectable" (mouseleave)="mouseLeaveCard()">
   <div class="row g-0">
     <div class="col-md-2 doc-img-container rounded-start" (click)="this.toggleSelected.emit($event)" (dblclick)="dblClickDocument.emit()">
       @if (document) {
