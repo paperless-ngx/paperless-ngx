@@ -781,13 +781,6 @@
           <context context-type="linenumber">41</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="3029609593829675670" datatype="html">
-        <source>Content type</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-          <context context-type="linenumber">46</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="4712397801965897978" datatype="html">
         <source>Submmit by</source>
         <context-group purpose="location">
@@ -848,10 +841,6 @@
           <context context-type="linenumber">52</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-          <context context-type="linenumber">159</context>
-        </context-group>
-        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-approvals/document-approvals.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
@@ -862,10 +851,6 @@
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-          <context context-type="linenumber">162</context>
-        </context-group>
       </trans-unit>
       <trans-unit id="3098567260654808782" datatype="html">
         <source>Revoked at</source>
@@ -873,20 +858,12 @@
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-          <context context-type="linenumber">165</context>
-        </context-group>
       </trans-unit>
       <trans-unit id="8864288285279476751" datatype="html">
         <source>Method</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
           <context context-type="linenumber">60</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-          <context context-type="linenumber">170</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-approvals/document-approvals.component.html</context>
@@ -988,6 +965,17 @@
           <context context-type="linenumber">21</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="240806681889331244" datatype="html">
+        <source>Unlimited</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
+          <context context-type="linenumber">79</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-approvals/document-approvals.component.html</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="3821661153451769620" datatype="html">
         <source>Approve</source>
         <context-group purpose="location">
@@ -996,7 +984,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">126</context>
+          <context context-type="linenumber">127</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7378878529334768232" datatype="html">
@@ -1007,7 +995,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">137</context>
+          <context context-type="linenumber">138</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7096440230985171865" datatype="html">
@@ -1032,18 +1020,25 @@
           <context context-type="linenumber">90</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="9068548166678462999" datatype="html">
+        <source><x id="START_TAG_TABLE" ctype="x-table" equiv-text="&lt;table #collapse=&quot;ngbCollapse&quot; [ngbCollapse]=&quot;expandedApproval !== approval.id&quot; class=&quot;small mb-0&quot;&gt;"/><x id="START_TABLE_ROW" ctype="x-tr" equiv-text="&lt;tr&gt;"/><x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;"/>Name<x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;"/><x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;"/><x id="INTERPOLATION" equiv-text="{{ approval.name }}"/><x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;"/><x id="CLOSE_TABLE_ROW" ctype="x-tr" equiv-text="&lt;/tr&gt;"/><x id="START_TABLE_ROW" ctype="x-tr" equiv-text="&lt;tr&gt;"/><x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;"/>Submmit by<x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;"/><x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;"/><x id="INTERPOLATION_1" equiv-text="{{ displayName(approval) }}"/><x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;"/><x id="CLOSE_TABLE_ROW" ctype="x-tr" equiv-text="&lt;/tr&gt;"/><x id="START_TABLE_ROW" ctype="x-tr" equiv-text="&lt;tr&gt;"/><x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;"/>Created<x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;"/><x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;"/><x id="INTERPOLATION_2" equiv-text="{{ approval.created | customDate:&apos;short&apos; }}"/><x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;"/><x id="CLOSE_TABLE_ROW" ctype="x-tr" equiv-text="&lt;/tr&gt;"/><x id="START_TABLE_ROW" ctype="x-tr" equiv-text="&lt;tr&gt;"/><x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;"/>Expires<x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;"/><x id="START_BLOCK_IF" equiv-text="@if (approval.expiration==null){"/><x id="START_TABLE_CELL_1" equiv-text="&lt;td class=&quot;&quot;&gt;"/>Unlimited<x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/><x id="START_BLOCK_IF_1" equiv-text="@if (approval.expiration!=null){"/><x id="START_TABLE_CELL_1" equiv-text="&lt;td class=&quot;&quot;&gt;"/><x id="INTERPOLATION_3" equiv-text="{{ approval.expiration | customDate:&apos;short&apos; }}"/><x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/><x id="CLOSE_TABLE_ROW" ctype="x-tr" equiv-text="&lt;/tr&gt;"/><x id="START_TABLE_ROW" ctype="x-tr" equiv-text="&lt;tr&gt;"/><x id="START_BLOCK_IF_2" equiv-text="@if (activeTab == &apos;success&apos;) {"/><x id="START_TABLE_CELL_1" equiv-text="&lt;td class=&quot;&quot;&gt;"/>Approve at<x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/><x id="START_BLOCK_ELSE_IF" equiv-text="@else if (activeTab == &apos;failure&apos;) {"/><x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;"/>Reject at<x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;"/><x id="CLOSE_BLOCK_ELSE_IF" equiv-text="}"/><x id="START_BLOCK_ELSE_IF_1" equiv-text="@else if (activeTab == &apos;revoked&apos;) {"/><x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;"/>Revoked at<x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;"/><x id="CLOSE_BLOCK_ELSE_IF" equiv-text="}"/><x id="START_BLOCK_IF_3" equiv-text="@if (activeTab !=&apos;pending&apos;){"/><x id="START_TABLE_CELL_1" equiv-text="&lt;td class=&quot;&quot;&gt;"/><x id="INTERPOLATION_4" equiv-text="{{ approval.modified | customDate:&apos;short&apos; }}"/><x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/><x id="CLOSE_TABLE_ROW" ctype="x-tr" equiv-text="&lt;/tr&gt;"/><x id="START_TABLE_ROW" ctype="x-tr" equiv-text="&lt;tr&gt;"/><x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;"/>Method<x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;"/><x id="START_TABLE_CELL_1" equiv-text="&lt;td class=&quot;&quot;&gt;"/><x id="INTERPOLATION_5" equiv-text="{{ approval.access_type }}"/><x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;"/><x id="CLOSE_TABLE_ROW" ctype="x-tr" equiv-text="&lt;/tr&gt;"/><x id="CLOSE_TAG_TABLE" ctype="x-table" equiv-text="&lt;/table&gt;"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
+          <context context-type="linenumber">123,177</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="8755741334466695261" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {One <x id="INTERPOLATION"/> approval} other {<x id="INTERPOLATION_1"/> total <x id="INTERPOLATION"/> approvals}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-          <context context-type="linenumber">184</context>
+          <context context-type="linenumber">187</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1943508481059904274" datatype="html">
         <source> (<x id="INTERPOLATION" equiv-text="{{selectedApprovals.size}}"/> selected)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-          <context context-type="linenumber">186</context>
+          <context context-type="linenumber">189</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
@@ -1094,35 +1089,35 @@
         <source>Failure<x id="START_BLOCK_IF" equiv-text="@if (approvalsService.failureApprovals.length &gt; 0) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{approvalsService.failureApprovals.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-          <context context-type="linenumber">198,200</context>
+          <context context-type="linenumber">201,203</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="136397555182638294" datatype="html">
-        <source>Success<x id="START_BLOCK_IF" equiv-text="@if (approvalsService.successApprovals.length &gt; 0) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{approvalsService.successApprovals.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></source>
+      <trans-unit id="4505393859135259953" datatype="html">
+        <source>Success <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.successApprovals.length &gt; 0) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{approvalsService.successApprovals.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-          <context context-type="linenumber">206,208</context>
+          <context context-type="linenumber">209,211</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="96145576247090481" datatype="html">
-        <source>Pending<x id="START_BLOCK_IF" equiv-text="@if (approvalsService.pendingApprovals.length &gt; 0) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{approvalsService.pendingApprovals.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></source>
+      <trans-unit id="7942845149370049078" datatype="html">
+        <source>Pending <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.pendingApprovals.length &gt; 0) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{approvalsService.pendingApprovals.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-          <context context-type="linenumber">214,216</context>
+          <context context-type="linenumber">217,219</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="3626118319597880779" datatype="html">
-        <source>Revoked<x id="START_BLOCK_IF" equiv-text="@if (approvalsService.revokedApprovals.length &gt; 0) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{approvalsService.revokedApprovals.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></source>
+      <trans-unit id="7606624497891878555" datatype="html">
+        <source>Revoked <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.revokedApprovals.length &gt; 0) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{approvalsService.revokedApprovals.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-          <context context-type="linenumber">222,224</context>
+          <context context-type="linenumber">225,227</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5404910960991552159" datatype="html">
         <source>Dismiss selected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">39</context>
+          <context context-type="linenumber">40</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
@@ -1133,7 +1128,7 @@
         <source>Dismiss all</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">40</context>
+          <context context-type="linenumber">41</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
@@ -1144,119 +1139,119 @@
         <source>Approve selected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">44</context>
+          <context context-type="linenumber">45</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4129379143653892829" datatype="html">
         <source>Approval all</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">45</context>
+          <context context-type="linenumber">46</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2798224668377408222" datatype="html">
         <source>Reject selected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">50</context>
+          <context context-type="linenumber">51</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4000276901665060657" datatype="html">
         <source>Reject all</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">51</context>
+          <context context-type="linenumber">52</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3787250291389319100" datatype="html">
         <source>Revoke selected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">55</context>
+          <context context-type="linenumber">56</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3297056827948046782" datatype="html">
         <source>Revoke all</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">56</context>
+          <context context-type="linenumber">57</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5771917713425370123" datatype="html">
         <source>Confirm Approve All</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">123</context>
+          <context context-type="linenumber">124</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2970872166982364571" datatype="html">
         <source>Approve all <x id="PH" equiv-text="approvals.size"/> approvals?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">124</context>
+          <context context-type="linenumber">125</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8149316136396574153" datatype="html">
         <source>Confirm Reject All</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">135</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1744918556580631388" datatype="html">
         <source>Reject all <x id="PH" equiv-text="approvals.size"/> approvals?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">135</context>
+          <context context-type="linenumber">136</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1968812985483407517" datatype="html">
         <source>Confirm Revoke All</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">145</context>
+          <context context-type="linenumber">146</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6437132238624379798" datatype="html">
         <source>Revoke all <x id="PH" equiv-text="approvals.size"/> approvals?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">146</context>
+          <context context-type="linenumber">147</context>
         </context-group>
       </trans-unit>
       <trans-unit id="135077277733987408" datatype="html">
         <source>Revoke</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">148</context>
+          <context context-type="linenumber">149</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8986421314427632087" datatype="html">
         <source>pending</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">217</context>
+          <context context-type="linenumber">218</context>
         </context-group>
       </trans-unit>
       <trans-unit id="814017859461999578" datatype="html">
         <source>success</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">219</context>
+          <context context-type="linenumber">220</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5277498963728056196" datatype="html">
         <source>failure</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">221</context>
+          <context context-type="linenumber">222</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6020360998090708665" datatype="html">
         <source>revoked</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-          <context context-type="linenumber">223</context>
+          <context context-type="linenumber">224</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9063918187161876141" datatype="html">
@@ -2233,7 +2228,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">213</context>
+          <context context-type="linenumber">217</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/shelf/shelf.component.html</context>
@@ -2752,7 +2747,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">349</context>
+          <context context-type="linenumber">353</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
@@ -2823,7 +2818,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">351</context>
+          <context context-type="linenumber">355</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
@@ -6529,13 +6524,6 @@
           <context context-type="linenumber">7</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="240806681889331244" datatype="html">
-        <source>Unlimited</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-approvals/document-approvals.component.html</context>
-          <context context-type="linenumber">21</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="6071316570146376916" datatype="html">
         <source>Error saving approval</source>
         <context-group purpose="location">
@@ -6979,11 +6967,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">209</context>
+          <context context-type="linenumber">213</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">347</context>
+          <context context-type="linenumber">351</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5382975254277698192" datatype="html">
@@ -8632,7 +8620,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">211</context>
+          <context context-type="linenumber">200</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6639207128255974941" datatype="html">
@@ -8647,7 +8635,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">227</context>
+          <context context-type="linenumber">231</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4863024195229581844" datatype="html">
@@ -8662,7 +8650,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">327</context>
+          <context context-type="linenumber">331</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4639647950943944112" datatype="html">
@@ -8681,7 +8669,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">334</context>
+          <context context-type="linenumber">338</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1464476612812630086" datatype="html">
@@ -8696,7 +8684,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">348</context>
+          <context context-type="linenumber">352</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5897787932098828336" datatype="html">
@@ -8711,7 +8699,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">362</context>
+          <context context-type="linenumber">366</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8273353839648035634" datatype="html">
@@ -8726,7 +8714,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">368</context>
+          <context context-type="linenumber">372</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1488347670280290838" datatype="html">
@@ -8983,6 +8971,13 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
           <context context-type="linenumber">398</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2158704536244701304" datatype="html">
+        <source>Associated documents will be deleted.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
+          <context context-type="linenumber">402</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8957855217409261143" datatype="html">

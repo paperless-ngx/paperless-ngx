@@ -397,4 +397,8 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
   getDeleteMessage(object: Folder) {
     return $localize`Do you really want to delete the folder "${object.name}"?`
   }
+
+  getDeleteMassageContent() {
+    return $localize`Associated documents will be deleted.`
+  }
 }

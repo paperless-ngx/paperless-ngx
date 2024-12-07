@@ -1588,24 +1588,28 @@ class TasksViewSerializer(serializers.ModelSerializer):
 
         return result
 
+from rest_framework import serializers
+from django.utils.translation import gettext_lazy as _
+from .models import Approval
+
 class ApprovalSerializer(serializers.ModelSerializer):
-    # submitted_by = serializers.ReadOnlyField(source='submitted_by.username')
     ctype = serializers.ReadOnlyField(source='ctype.model')
-    # submitted_by_id = serializers.PrimaryKeyRelatedField(source='submitted_by', queryset=User.objects.all(), write_only=True, allow_null=True)
     ctype_id = serializers.PrimaryKeyRelatedField(source='ctype', queryset=ContentType.objects.all(), write_only=True)
     name = serializers.SerializerMethodField(read_only=True)
+    access_type = serializers.SerializerMethodField(read_only=True)
 
     def get_name(self, obj):
-        start = time.time()
         if not obj.ctype:
             return ''
         model_name = obj.ctype.name
-
         model_class = apps.get_model(obj.ctype.app_label, model_name)
         if model_class != Document:
             return ''
         document = model_class.objects.filter(id=int(obj.object_pk)).first()
-        return getattr(document,'title','')
+        return getattr(document, 'title', '')
+
+    def get_access_type(self, obj):
+        return obj.get_access_type_display()  # Trả về giá trị đã dịch
 
     class Meta:
         model = Approval

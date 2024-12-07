@@ -43,7 +43,7 @@
         </th>
         <th scope="col" class="d-table-cell d-lg-cell" i18n>Name</th>
         <th scope="col" class="d-table-cell d-lg-none" i18n>Info</th>
-        <th scope="col" class="d-none d-lg-table-cell" i18n>Content type</th>
+<!--        <th scope="col" class="d-none d-lg-table-cell" i18n>Content type</th>-->
         <th scope="col" class="d-none d-lg-table-cell" i18n>Submmit by</th>
 <!--        <th scope="col" class="d-none d-lg-table-cell" i18n>Submmit by group</th>-->
         <th scope="col" class="d-none d-lg-table-cell" i18n>Created</th>
@@ -71,12 +71,12 @@
             </div>
           </td>
           <td class="overflow-auto name-col">{{ approval.name }}</td>
-          <td class="d-none d-lg-table-cell">{{ approval.ctype }}</td>
+<!--          <td class="d-none d-lg-table-cell">{{ approval.ctype }}</td>-->
           <td class="d-none d-lg-table-cell">{{ displayName(approval) }}</td>
 <!--          <td class="d-none d-lg-table-cell">{{ displayGroup(approval) }}</td>-->
           <td class="d-none d-lg-table-cell">{{ approval.created | customDate:'short' }}</td>
           @if (approval.expiration==null){
-            <td class="d-none d-lg-table-cell">Unlimited</td>
+            <td class="d-none d-lg-table-cell" i18n>Unlimited</td>
           } @else if (approval.expiration!=null){
             <td class="d-none d-lg-table-cell">{{ approval.expiration | customDate:'short' }}</td>
           }
@@ -119,16 +119,16 @@
           </td>
         </tr>
         <tr>
-          <td class="p-0" [class.border-0]="expandedApproval !== approval.id" colspan="5">
+          <td class="p-0" [class.border-0]="expandedApproval !== approval.id" colspan="5" i18n>
             <table #collapse="ngbCollapse" [ngbCollapse]="expandedApproval !== approval.id" class="small mb-0">
               <tr>
                 <td>Name</td>
                 <td>{{ approval.name }}</td>
               </tr>
-              <tr>
-                <td>Content type</td>
-                <td>{{ approval.ctype }}</td>
-              </tr>
+<!--              <tr>-->
+<!--                <td>Content type</td>-->
+<!--                <td>{{ approval.ctype }}</td>-->
+<!--              </tr>-->
               <tr>
                 <td>Submmit by</td>
                 <td>{{ displayName(approval) }}</td>
@@ -141,10 +141,10 @@
                 <td>Created</td>
                 <td>{{ approval.created | customDate:'short' }}</td>
               </tr>
-              <tr>
-                <td>Created</td>
-                <td>{{ approval.created | customDate:'short' }}</td>
-              </tr>
+<!--              <tr>-->
+<!--                <td>Created</td>-->
+<!--                <td>{{ approval.created | customDate:'short' }}</td>-->
+<!--              </tr>-->
               <tr>
                 <td>Expires</td>
                 @if (approval.expiration==null){
@@ -156,18 +156,21 @@
               </tr>
               <tr>
                 @if (activeTab == 'success') {
-                  <td class="" i18n>Approve at</td>
+                  <td class="" >Approve at</td>
                 }
                 @else if (activeTab == 'failure') {
-                  <td i18n>Reject at</td>
+                  <td >Reject at</td>
                 }
                 @else if (activeTab == 'revoked') {
-                  <td i18n>Revoked at</td>
+                  <td >Revoked at</td>
                 }
-                <td class="">{{ approval.modified | customDate:'short' }}</td>
+                @if (activeTab !='pending'){
+                  <td class="">{{ approval.modified | customDate:'short' }}</td>
+
+                }
               </tr>
               <tr>
-                <td  i18n>Method</td>
+                <td >Method</td>
                 <td class="">{{ approval.access_type }}</td>
               </tr>
 
@@ -203,7 +206,7 @@
     </ng-template>
   </li>
   <li ngbNavItem="success">
-    <a ngbNavLink i18n>Success@if (approvalsService.successApprovals.length > 0) {
+    <a ngbNavLink i18n>Success @if (approvalsService.successApprovals.length > 0) {
       <span class="badge bg-secondary ms-2">{{approvalsService.successApprovals.length}}</span>
     }</a>
     <ng-template ngbNavContent>
@@ -211,7 +214,7 @@
     </ng-template>
   </li>
   <li ngbNavItem="pending">
-    <a ngbNavLink i18n>Pending@if (approvalsService.pendingApprovals.length > 0) {
+    <a ngbNavLink i18n>Pending @if (approvalsService.pendingApprovals.length > 0) {
       <span class="badge bg-secondary ms-2">{{approvalsService.pendingApprovals.length}}</span>
     }</a>
     <ng-template ngbNavContent>
@@ -219,7 +222,7 @@
     </ng-template>
   </li>
   <li ngbNavItem="revoked">
-    <a ngbNavLink i18n>Revoked@if (approvalsService.revokedApprovals.length > 0) {
+    <a ngbNavLink i18n>Revoked @if (approvalsService.revokedApprovals.length > 0) {
       <span class="badge bg-secondary ms-2">{{approvalsService.revokedApprovals.length}}</span>
     }</a>
     <ng-template ngbNavContent>

@@ -157,6 +157,10 @@ class Approval(models.Model):
         db_index=True,
     )
 
+    # @property
+    # def access_type_display(self):
+    #     return dict(self.APPROVAL_ACCESS_TYPE_CHOICES).get(self.access_type,self.access_type)
+
 
 class Correspondent(MatchingModel):
     class Meta(MatchingModel.Meta):

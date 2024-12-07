@@ -13,6 +13,7 @@ import { GroupService } from 'src/app/services/rest/group.service'
 import { PermissionsService } from '../../../services/permissions.service'
 import { app } from 'ngx-bootstrap-icons'
 
+
 @Component({
   selector: 'pngx-approvals',
   templateUrl: './approvals.component.html',

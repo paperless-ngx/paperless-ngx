@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-02 03:20+0000\n"
+"POT-Creation-Date: 2024-12-06 09:35+0000\n"
 "PO-Revision-Date: 2024-04-08 01:37\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese\n"
@@ -70,19 +70,19 @@ msgstr "thuật toán tìm kiếm"
 msgid "is insensitive"
 msgstr "không phân biệt chữ hoa/thường"
 
-#: documents/models.py:99 documents/models.py:1275
+#: documents/models.py:99
 #, fuzzy
 #| msgid "owner"
 msgid "Owner"
 msgstr "chủ sở hữu"
 
-#: documents/models.py:100 documents/models.py:1276
+#: documents/models.py:100
 msgid "Edit"
-msgstr ""
+msgstr "Chỉnh sửa"
 
-#: documents/models.py:101 documents/models.py:1277
+#: documents/models.py:101
 msgid "View"
-msgstr ""
+msgstr "Xem"
 
 #: documents/models.py:109
 msgid "submitted_by"
@@ -843,6 +843,18 @@ msgstr "có các nhãn này"
 msgid "approval state"
 msgstr ""
 
+#: documents/models.py:1275
+msgid "OWNER"
+msgstr "Sở hữu"
+
+#: documents/models.py:1276
+msgid "EDIT"
+msgstr "Chỉnh sửa"
+
+#: documents/models.py:1277
+msgid "VIEW"
+msgstr "Xem"
+
 #: documents/models.py:1288
 msgid "workflow trigger"
 msgstr "kích hoạt luồng công việc"
@@ -1274,10 +1286,6 @@ msgstr "Không thể phân tích URI {value}, thiếu vị trí mạng hoặc đ
 #, python-brace-format
 msgid "Unable to parse URI {value}"
 msgstr "Không thể phân tích URI {value}"
-
-#: documents/views.py:1500 documents/views.py:1508
-msgid "Other"
-msgstr "Khác"
 
 #: paperless/apps.py:10
 msgid "Paperless"
@@ -1879,10 +1887,13 @@ msgstr "đã xử lý"
 msgid "status"
 msgstr "trạng thái"
 
+#~ msgid "Other"
+#~ msgstr "Khác"
+
 #, fuzzy
 #~| msgid "folder"
 #~ msgid "folders"
 #~ msgstr "thư mục"
 
-msgid "The username and/or password you specified are not correct."
-msgstr "Tên người dùng hoặc mật khẩu bạn chỉ định không chính xác."
+#~ msgid "The username and/or password you specified are not correct."
+#~ msgstr "Tên người dùng hoặc mật khẩu bạn chỉ định không chính xác."

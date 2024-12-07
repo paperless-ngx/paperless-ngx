@@ -196,6 +196,10 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
 
   abstract getDeleteMessage(object: T)
 
+  getDeleteMassageContent(){
+    return $localize`Associated documents will not be deleted.`
+  }
+
   filterDocuments(object: ObjectWithId) {
     this.documentListViewService.quickFilter([
       { rule_type: this.filterRuleType, value: object.id.toString() },
@@ -208,7 +212,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     })
     activeModal.componentInstance.title = $localize`Confirm delete`
     activeModal.componentInstance.messageBold = this.getDeleteMessage(object)
-    activeModal.componentInstance.message = $localize`Associated documents will not be deleted.`
+    activeModal.componentInstance.message = this.getDeleteMassageContent()
     activeModal.componentInstance.btnClass = 'btn-danger'
     activeModal.componentInstance.btnCaption = $localize`Delete`
     activeModal.componentInstance.confirmClicked.subscribe(() => {
