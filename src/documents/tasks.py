@@ -321,6 +321,8 @@ def update_document_content_maybe_archive_file(document_id):
 
 @shared_task
 def empty_trash(doc_ids=None):
+    if doc_ids is None:
+        logger.info("Emptying trash of all expired documents")
     documents = (
         Document.deleted_objects.filter(id__in=doc_ids)
         if doc_ids is not None
@@ -337,6 +339,7 @@ def empty_trash(doc_ids=None):
         # Temporarily connect the cleanup handler
         models.signals.post_delete.connect(cleanup_document_deletion, sender=Document)
         documents.delete()  # this is effectively a hard delete
+        logger.info(f"Deleted {len(deleted_document_ids)} documents from trash")
 
         if settings.AUDIT_LOG_ENABLED:
             # Delete the audit log entries for documents that dont exist anymore
