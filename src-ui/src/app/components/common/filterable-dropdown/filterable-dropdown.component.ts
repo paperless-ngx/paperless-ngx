@@ -437,21 +437,6 @@ export class FilterableDropdownComponent
   @Input()
   createRef: (name) => void
 
-  creating: boolean = false
-
-  @Output()
-  apply = new EventEmitter<ChangedItems>()
-
-  @Output()
-  opened = new EventEmitter()
-
-  get modifierToggleEnabled(): boolean {
-    return this.manyToOne
-      ? this.selectionModel.selectionSize() > 1 &&
-          this.selectionModel.getExcludedItems().length == 0
-      : !this.selectionModel.isNoneSelected()
-  }
-
   @Input()
   set documentCounts(counts: SelectionDataItem[]) {
     if (counts) {
@@ -461,6 +446,27 @@ export class FilterableDropdownComponent
 
   @Input()
   shortcutKey: string
+
+  @Input()
+  extraButtonTitle: string
+
+  creating: boolean = false
+
+  @Output()
+  apply = new EventEmitter<ChangedItems>()
+
+  @Output()
+  opened = new EventEmitter()
+
+  @Output()
+  extraButton = new EventEmitter<ChangedItems>()
+
+  get modifierToggleEnabled(): boolean {
+    return this.manyToOne
+      ? this.selectionModel.selectionSize() > 1 &&
+          this.selectionModel.getExcludedItems().length == 0
+      : !this.selectionModel.isNoneSelected()
+  }
 
   get name(): string {
     return this.title ? this.title.replace(/\s/g, '_').toLowerCase() : null
@@ -640,5 +646,14 @@ export class FilterableDropdownComponent
       this.manyToOne &&
       this.selectionModel.get(item.id) !== ToggleableItemState.Selected
     )
+  }
+
+  extraButtonClicked() {
+    // don't apply changes when clicking the extra button
+    const applyOnClose = this.applyOnClose
+    this.applyOnClose = false
+    this.dropdown.close()
+    this.extraButton.emit(this.selectionModel.diff())
+    this.applyOnClose = applyOnClose
   }
 }

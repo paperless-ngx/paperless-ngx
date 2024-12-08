@@ -1416,4 +1416,55 @@ describe('BulkEditorComponent', () => {
     )
     expect(component.customFields).toEqual(customFields.results)
   })
+
+  it('should open the bulk edit custom field values dialog with correct parameters', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue([{ id: 3 }, { id: 4 }])
+    jest.spyOn(documentService, 'getFew').mockReturnValue(
+      of({
+        all: [3, 4],
+        count: 2,
+        results: [{ id: 3 }, { id: 4 }],
+      })
+    )
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([3, 4]))
+    fixture.detectChanges()
+    const toastServiceShowInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastServiceShowErrorSpy = jest.spyOn(toastService, 'showError')
+    const listReloadSpy = jest.spyOn(documentListViewService, 'reload')
+
+    component.customFields = [
+      { id: 1, name: 'Custom Field 1', data_type: CustomFieldDataType.String },
+      { id: 2, name: 'Custom Field 2', data_type: CustomFieldDataType.String },
+    ]
+
+    component.setCustomFieldValues({
+      itemsToAdd: [{ id: 1 }, { id: 2 }],
+      itemsToRemove: [1],
+    } as any)
+
+    expect(modal.componentInstance.customFields).toEqual(component.customFields)
+    expect(modal.componentInstance.fieldsToAddIds).toEqual([1, 2])
+    expect(modal.componentInstance.documents).toEqual([3, 4])
+
+    modal.componentInstance.failed.emit()
+    expect(toastServiceShowErrorSpy).toHaveBeenCalled()
+    expect(listReloadSpy).not.toHaveBeenCalled()
+
+    modal.componentInstance.succeeded.emit()
+    expect(toastServiceShowInfoSpy).toHaveBeenCalled()
+    expect(listReloadSpy).toHaveBeenCalled()
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
+    ) // list reload
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
+    ) // listAllFilteredIds
+  })
 })

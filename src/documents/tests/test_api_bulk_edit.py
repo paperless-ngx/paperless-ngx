@@ -244,7 +244,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
                     "documents": [self.doc1.id, self.doc3.id],
                     "method": "modify_custom_fields",
                     "parameters": {
-                        "add_custom_fields": [self.cf1.id],
+                        "add_custom_fields": [
+                            self.cf1.id,
+                        ],  # old format accepts list of IDs
                         "remove_custom_fields": [self.cf2.id],
                     },
                 },
@@ -256,6 +258,30 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         args, kwargs = m.call_args
         self.assertListEqual(args[0], [self.doc1.id, self.doc3.id])
         self.assertEqual(kwargs["add_custom_fields"], [self.cf1.id])
+        self.assertEqual(kwargs["remove_custom_fields"], [self.cf2.id])
+
+    @mock.patch("documents.serialisers.bulk_edit.modify_custom_fields")
+    def test_api_modify_custom_fields_with_values(self, m):
+        self.setup_mock(m, "modify_custom_fields")
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id, self.doc3.id],
+                    "method": "modify_custom_fields",
+                    "parameters": {
+                        "add_custom_fields": {self.cf1.id: "foo"},
+                        "remove_custom_fields": [self.cf2.id],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertListEqual(args[0], [self.doc1.id, self.doc3.id])
+        self.assertEqual(kwargs["add_custom_fields"], {str(self.cf1.id): "foo"})
         self.assertEqual(kwargs["remove_custom_fields"], [self.cf2.id])
 
     @mock.patch("documents.serialisers.bulk_edit.modify_custom_fields")
@@ -322,7 +348,23 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         m.assert_not_called()
 
-        # Not a list of integers
+        # Invalid dict
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id, self.doc3.id],
+                    "method": "modify_custom_fields",
+                    "parameters": {
+                        "add_custom_fields": {"foo": 99},
+                        "remove_custom_fields": [self.cf2.id],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        m.assert_not_called()
 
         # Missing remove_custom_fields
         response = self.client.post(

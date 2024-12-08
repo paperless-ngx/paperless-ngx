@@ -60,11 +60,17 @@
           </button>
         }
         @if ((selectionModel.items | filter: filterText:'name').length > 0) {
-          <button class="list-group-item list-group-item-action bg-light" (click)="applyClicked()" [disabled]="!modelIsDirty || disabled">
+          <button class="list-group-item list-group-item-action bg-light d-flex align-items-center" (click)="applyClicked()" [disabled]="!modelIsDirty || disabled">
             <small class="ms-2" [ngClass]="{'fw-bold': modelIsDirty}" i18n>Apply</small>
             <i-bs width="1.5em" height="1em" name="arrow-right"></i-bs>
           </button>
         }
+      }
+      @if (extraButtonTitle) {
+        <button class="list-group-item list-group-item-action bg-light d-flex align-items-center" (click)="extraButtonClicked($event)" [disabled]="disabled">
+          <small class="ms-2 fw-bold">{{extraButtonTitle}}</small>
+          <i-bs width="1.5em" height="1em" name="arrow-right"></i-bs>
+        </button>
       }
       @if (!editing && manyToOne) {
         <div class="list-group-item list-group-item-note pt-1 pb-2">
