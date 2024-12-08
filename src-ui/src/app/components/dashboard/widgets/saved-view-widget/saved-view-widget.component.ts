@@ -54,10 +54,6 @@ export class SavedViewWidgetComponent
 
   private customFields: CustomField[] = []
 
-  get pageSize(): number {
-    return this.savedView?.page_size ?? DEFAULT_DASHBOARD_VIEW_PAGE_SIZE
-  }
-
   constructor(
     private documentService: DocumentService,
     private router: Router,
