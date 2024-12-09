@@ -53,9 +53,9 @@ describe('WidgetFrameComponent', () => {
     expect(fixture.debugElement.query(By.css('.spinner-border'))).not.toBeNull()
   })
 
-  it('should reveal', () => {
-    expect(component.reveal).toBeFalsy()
+  it('should show', () => {
+    expect(component.show).toBeFalsy()
     jest.advanceTimersByTime(100)
-    expect(component.reveal).toBeTruthy()
+    expect(component.show).toBeTruthy()
   })
 })

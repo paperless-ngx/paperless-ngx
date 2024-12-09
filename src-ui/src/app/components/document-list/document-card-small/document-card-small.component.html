@@ -1,4 +1,4 @@
-<div class="col p-2 h-100">
+<div class="col p-2 h-100 fade" [class.show]="show">
   <div class="card h-100 shadow-sm document-card" [class.placeholder-glow]="!document" [class.card-selected]="selected" (mouseleave)="mouseLeaveCard()">
     <div class="border-bottom doc-img-container rounded-top" (click)="this.toggleSelected.emit($event)" (dblclick)="dblClickDocument.emit(this)">
       @if (document) {

@@ -25,7 +25,7 @@ export class WidgetFrameComponent
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      this.reveal = true
+      this.show = true
     }, 100)
   }
 }

@@ -961,7 +961,7 @@ export class FilterEditorComponent
     this.loadingCount++
     if (this.loadingCount == this.loadingCountTotal) {
       this.loading = false
-      this.reveal = true
+      this.show = true
     }
   }
 

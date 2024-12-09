@@ -48,9 +48,9 @@ export class MailComponent
   }
 
   public loadingRules: boolean = true
-  public revealRules: boolean = false
+  public showRules: boolean = false
   public loadingAccounts: boolean = true
-  public revealAccounts: boolean = false
+  public showAccounts: boolean = false
 
   constructor(
     public mailAccountService: MailAccountService,
@@ -85,7 +85,7 @@ export class MailComponent
       .subscribe({
         next: () => {
           this.loadingAccounts = false
-          this.revealAccounts = true
+          this.showAccounts = true
         },
         error: (e) => {
           this.toastService.showError(
@@ -108,7 +108,7 @@ export class MailComponent
       .subscribe({
         next: (r) => {
           this.loadingRules = false
-          this.revealRules = true
+          this.showRules = true
         },
         error: (e) => {
           this.toastService.showError($localize`Error retrieving mail rules`, e)

@@ -47,7 +47,7 @@
                 </tr>
             }
             @for (document of documentsInTrash; track document.id) {
-                <tr (click)="toggleSelected(document); $event.stopPropagation();" (mouseleave)="popupPreview.close()" class="data-row" [class.reveal]="reveal">
+                <tr (click)="toggleSelected(document); $event.stopPropagation();" (mouseleave)="popupPreview.close()" class="data-row fade" [class.show]="show">
                     <td>
                     <div class="form-check m-0 ms-2 me-n2">
                         <input type="checkbox" class="form-check-input" id="{{document.id}}" [checked]="selectedDocuments.has(document.id)" (click)="toggleSelected(document); $event.stopPropagation();">

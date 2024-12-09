@@ -153,7 +153,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
         delay(100)
       )
       .subscribe(() => {
-        this.reveal = true
+        this.show = true
         this.loading = false
       })
   }
