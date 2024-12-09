@@ -811,13 +811,13 @@ gpg --decrypt name_of_file.asc
 
 First, enable the [PAPERLESS_ENABLE_GPG_DECRYPTOR environment variable](configuration.md#PAPERLESS_ENABLE_GPG_DECRYPTOR).
 
-Then determine your local `gpg-agent.extra` socket by invoking
+Then determine your local `gpg-agent` socket by invoking
 
 ```
-gpgconf --list-dir agent-extra-socket
+gpgconf --list-dir agent-socket
 ```
 
-on your host. A possible output is `~/.gnupg/S.gpg-agent.extra`.
+on your host. A possible output is `~/.gnupg/S.gpg-agent`.
 Also find the location of your public keyring.
 
 If using docker, you'll need to add the following volume mounts to your `docker-compose.yml` file:
@@ -826,7 +826,7 @@ If using docker, you'll need to add the following volume mounts to your `docker-
 webserver:
     volumes:
         - /home/user/.gnupg/pubring.gpg:/usr/src/paperless/.gnupg/pubring.gpg
-        - <path to gpg-agent.extra socket>:/usr/src/paperless/.gnupg/S.gpg-agent
+        - <path to gpg-agent socket>:/usr/src/paperless/.gnupg/S.gpg-agent
 ```
 
 For a 'bare-metal' installation no further configuration is necessary. If you
