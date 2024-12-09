@@ -37,7 +37,7 @@
       </div>
     </div>
     <div class="form-check form-switch mb-0 ms-2">
-      <input class="form-check-input" type="checkbox" role="switch" id="autoRefreshSwitch" (click)="toggleAutoRefresh()" [attr.checked]="autoRefreshInterval">
+      <input class="form-check-input" type="checkbox" role="switch" [(ngModel)]="autoRefreshEnabled">
       <label class="form-check-label" for="autoRefreshSwitch" i18n>Auto refresh</label>
     </div>
   </div>
