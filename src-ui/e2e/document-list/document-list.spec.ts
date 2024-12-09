@@ -1,11 +1,12 @@
 import { test, expect } from '@playwright/test'
+import path from 'node:path'
 
-const REQUESTS_HAR1 = 'e2e/document-list/requests/api-document-list1.har'
-const REQUESTS_HAR2 = 'e2e/document-list/requests/api-document-list2.har'
-const REQUESTS_HAR3 = 'e2e/document-list/requests/api-document-list3.har'
-const REQUESTS_HAR4 = 'e2e/document-list/requests/api-document-list4.har'
-const REQUESTS_HAR5 = 'e2e/document-list/requests/api-document-list5.har'
-const REQUESTS_HAR6 = 'e2e/document-list/requests/api-document-list6.har'
+const REQUESTS_HAR1 = path.join(__dirname, 'requests/api-document-list1.har')
+const REQUESTS_HAR2 = path.join(__dirname, 'requests/api-document-list2.har')
+const REQUESTS_HAR3 = path.join(__dirname, 'requests/api-document-list3.har')
+const REQUESTS_HAR4 = path.join(__dirname, 'requests/api-document-list4.har')
+const REQUESTS_HAR5 = path.join(__dirname, 'requests/api-document-list5.har')
+const REQUESTS_HAR6 = path.join(__dirname, 'requests/api-document-list6.har')
 
 test('basic filtering', async ({ page }) => {
   await page.routeFromHAR(REQUESTS_HAR1, { notFound: 'fallback' })

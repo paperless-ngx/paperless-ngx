@@ -35,7 +35,7 @@
   <div class="col-auto">
     <div class="d-flex flex-wrap gap-3">
       <div class="d-flex flex-wrap gap-2">
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Tag)) {
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Tag) && tags.length > 0) {
           <pngx-filterable-dropdown class="flex-fill" title="Tags" icon="tag-fill" i18n-title
           filterPlaceholder="Filter tags" i18n-filterPlaceholder
           [items]="tags"
@@ -48,7 +48,7 @@
           [disabled]="disabled"
           shortcutKey="t"></pngx-filterable-dropdown>
         }
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Correspondent) && correspondents.length > 0) {
           <pngx-filterable-dropdown class="flex-fill" title="Correspondent" icon="person-fill" i18n-title
           filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
           [items]="correspondents"
@@ -60,7 +60,7 @@
           [disabled]="disabled"
           shortcutKey="y"></pngx-filterable-dropdown>
         }
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.DocumentType) && documentTypes.length > 0) {
             <pngx-filterable-dropdown class="flex-fill" title="Document type" icon="file-earmark-fill" i18n-title
             filterPlaceholder="Filter document types" i18n-filterPlaceholder
             [items]="documentTypes"
