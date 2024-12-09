@@ -44,6 +44,7 @@ import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-c
 import { CustomField } from 'src/app/data/custom-field'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { CustomFieldsBulkEditDialogComponent } from './custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component'
 
 @Component({
   selector: 'pngx-bulk-editor',
@@ -825,5 +826,39 @@ export class BulkEditorComponent
           $localize`Merged document will be queued for consumption.`
         )
       })
+  }
+
+  public setCustomFieldValues(changedCustomFields: ChangedItems) {
+    const modal = this.modalService.open(CustomFieldsBulkEditDialogComponent, {
+      backdrop: 'static',
+      size: 'lg',
+    })
+    const dialog =
+      modal.componentInstance as CustomFieldsBulkEditDialogComponent
+    dialog.customFields = this.customFields
+    dialog.fieldsToAddIds = changedCustomFields.itemsToAdd.map(
+      (item) => item.id
+    )
+    dialog.fieldsToRemoveIds = changedCustomFields.itemsToRemove.map(
+      (item) => item.id
+    )
+
+    dialog.documents = Array.from(this.list.selected)
+    dialog.succeeded.subscribe((result) => {
+      this.toastService.showInfo(
+        $localize`Bulk operation executed successfully`
+      )
+      this.list.reload()
+      this.list.reduceSelectionToFilter()
+      this.list.selected.forEach((id) => {
+        this.openDocumentService.refreshDocument(id)
+      })
+    })
+    dialog.failed.subscribe((error) => {
+      this.toastService.showError(
+        $localize`Error executing bulk operation`,
+        error
+      )
+    })
   }
 }

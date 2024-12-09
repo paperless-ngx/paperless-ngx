@@ -1,0 +1,81 @@
+<form [formGroup]="form" (ngSubmit)="save()" autocomplete="off">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title" i8n>{
+      documents.length,
+      plural,
+      =1 {Set custom fields for 1 document} other {Set custom fields for {{documents.length}} documents}
+      }</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="cancel()">
+    </button>
+  </div>
+  <div class="modal-body">
+    <pngx-input-select i18n-title title="" multiple="true" [items]="customFields" [(ngModel)]="fieldsToAddIds"
+      placeholder="Select custom fields" i18n-placeholder [ngModelOptions]="{standalone: true}">
+    </pngx-input-select>
+    <div class="d-flex flex-column gap-2">
+      @for (field of fieldsToAdd; track field.id) {
+        <div class="d-flex gap-2">
+          @switch (field.data_type) {
+            @case (CustomFieldDataType.String) {
+              <pngx-input-text formControlName="{{field.id}}" class="w-100" [title]="field.name" [horizontal]="true">
+              </pngx-input-text>
+            }
+            @case (CustomFieldDataType.Date) {
+              <pngx-input-date formControlName="{{field.id}}" class="w-100" [title]="field.name" [horizontal]="true">
+              </pngx-input-date>
+            }
+            @case (CustomFieldDataType.Integer) {
+              <pngx-input-number formControlName="{{field.id}}" class="w-100" [title]="field.name" [showAdd]="false"
+                [horizontal]="true">
+              </pngx-input-number>
+            }
+            @case (CustomFieldDataType.Float) {
+              <pngx-input-number formControlName="{{field.id}}" class="w-100" [title]="field.name" [showAdd]="false"
+                [step]=".1" [horizontal]="true">
+              </pngx-input-number>
+            }
+            @case (CustomFieldDataType.Monetary) {
+              <pngx-input-monetary formControlName="{{field.id}}" class="w-100" [title]="field.name"
+                [defaultCurrency]="field.extra_data?.default_currency" [horizontal]="true">
+              </pngx-input-monetary>
+            }
+            @case (CustomFieldDataType.Boolean) {
+              <pngx-input-check formControlName="{{field.id}}" class="w-100" [title]="field.name" [horizontal]="true">
+              </pngx-input-check>
+            }
+            @case (CustomFieldDataType.Url) {
+              <pngx-input-url formControlName="{{field.id}}" class="w-100" [title]="field.name" [horizontal]="true">
+              </pngx-input-url>
+            }
+            @case (CustomFieldDataType.DocumentLink) {
+              <pngx-input-document-link formControlName="{{field.id}}" class="w-100" [title]="field.name" [horizontal]="true">
+              </pngx-input-document-link>
+            }
+            @case (CustomFieldDataType.Select) {
+              <pngx-input-select formControlName="{{field.id}}" class="w-100" [title]="field.name"
+                [items]="field.extra_data.select_options" bindLabel="label" [allowNull]="true" [horizontal]="true">
+              </pngx-input-select>
+            }
+          }
+          <button type="button" class="btn btn-outline-danger mb-3" (click)="removeField(field.id)">
+            <i-bs name="x"></i-bs>
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+  <div class="modal-footer">
+    @if (fieldsToRemoveIds.length) {
+      <p class="mb-0 small"><em i18n>{
+          fieldsToRemoveIds.length,
+          plural,
+          =1 {This operation will also remove 1 custom field from the selected documents.} other {This operation will also
+          remove {{fieldsToRemoveIds.length}} custom fields from the selected documents.}
+          }</em></p>
+    }
+    <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n
+      [disabled]="networkActive">Cancel</button>
+    <button type="submit" class="btn btn-primary" i18n
+      [disabled]="networkActive || fieldsToRemoveIds.length + fieldsToAddIds.length === 0">Save</button>
+  </div>
+</form>

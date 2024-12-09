@@ -638,7 +638,10 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
                 uri_validator(data["value"])
             elif field.data_type == CustomField.FieldDataType.INT:
                 integer_validator(data["value"])
-            elif field.data_type == CustomField.FieldDataType.MONETARY:
+            elif (
+                field.data_type == CustomField.FieldDataType.MONETARY
+                and data["value"] != ""
+            ):
                 try:
                     # First try to validate as a number from legacy format
                     DecimalValidator(max_digits=12, decimal_places=2)(
@@ -1140,13 +1143,28 @@ class BulkEditSerializer(
                 f"Some tags in {name} don't exist or were specified twice.",
             )
 
-    def _validate_custom_field_id_list(self, custom_fields, name="custom_fields"):
-        if not isinstance(custom_fields, list):
-            raise serializers.ValidationError(f"{name} must be a list")
-        if not all(isinstance(i, int) for i in custom_fields):
-            raise serializers.ValidationError(f"{name} must be a list of integers")
-        count = CustomField.objects.filter(id__in=custom_fields).count()
-        if not count == len(custom_fields):
+    def _validate_custom_field_id_list_or_dict(
+        self,
+        custom_fields,
+        name="custom_fields",
+    ):
+        ids = custom_fields
+        if isinstance(custom_fields, dict):
+            try:
+                ids = [int(i[0]) for i in custom_fields.items()]
+            except Exception as e:
+                logger.exception(f"Error validating custom fields: {e}")
+                raise serializers.ValidationError(
+                    f"{name} must be a list of integers or a dict of id:value pairs, see the log for details",
+                )
+        elif not isinstance(custom_fields, list) or not all(
+            isinstance(i, int) for i in ids
+        ):
+            raise serializers.ValidationError(
+                f"{name} must be a list of integers or a dict of id:value pairs",
+            )
+        count = CustomField.objects.filter(id__in=ids).count()
+        if not count == len(ids):
             raise serializers.ValidationError(
                 f"Some custom fields in {name} don't exist or were specified twice.",
             )
@@ -1245,7 +1263,7 @@ class BulkEditSerializer(
 
     def _validate_parameters_modify_custom_fields(self, parameters):
         if "add_custom_fields" in parameters:
-            self._validate_custom_field_id_list(
+            self._validate_custom_field_id_list_or_dict(
                 parameters["add_custom_fields"],
                 "add_custom_fields",
             )
@@ -1253,7 +1271,7 @@ class BulkEditSerializer(
             raise serializers.ValidationError("add_custom_fields not specified")
 
         if "remove_custom_fields" in parameters:
-            self._validate_custom_field_id_list(
+            self._validate_custom_field_id_list_or_dict(
                 parameters["remove_custom_fields"],
                 "remove_custom_fields",
             )
