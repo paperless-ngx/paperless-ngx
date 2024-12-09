@@ -2174,7 +2174,7 @@ class BulkEditObjectsView(PassUserMixin):
 
         elif operation == "delete" and object_type == "folders":
             for folder in object_ids:
-                if object_ids.owner == user or folder.owner == user.is_superuser or folder.owner == None:
+                if folder.owner == user or folder.owner == user.is_superuser or folder.owner == None:
                     continue
                 elif folder.owner != user:
                     return HttpResponseForbidden(
