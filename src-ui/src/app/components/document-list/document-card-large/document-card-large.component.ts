@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   EventEmitter,
   Input,
@@ -13,7 +14,7 @@ import {
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
 
 @Component({
@@ -21,7 +22,10 @@ import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.
   templateUrl: './document-card-large.component.html',
   styleUrls: ['./document-card-large.component.scss'],
 })
-export class DocumentCardLargeComponent extends ComponentWithPermissions {
+export class DocumentCardLargeComponent
+  extends LoadingComponentWithPermissions
+  implements AfterViewInit
+{
   DisplayField = DisplayField
 
   constructor(
@@ -69,6 +73,12 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
 
   mouseOnPreview = false
   popoverHidden = true
+
+  ngAfterViewInit(): void {
+    setInterval(() => {
+      this.show = true
+    }, 100)
+  }
 
   get searchScoreClass() {
     if (this.document.__search_hit__) {

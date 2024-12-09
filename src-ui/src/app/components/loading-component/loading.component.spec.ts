@@ -29,8 +29,8 @@ describe('LoadingComponentWithPermissions', () => {
     expect(component.loading).toBeTruthy()
   })
 
-  it('should have reveal set to false by default', () => {
-    expect(component.reveal).toBeFalsy()
+  it('should have show set to false by default', () => {
+    expect(component.show).toBeFalsy()
   })
 
   it('should call next and complete on unsubscribeNotifier with itself on destroy', () => {

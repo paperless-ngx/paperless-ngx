@@ -71,6 +71,14 @@ describe('DocumentCardLargeComponent', () => {
     component = fixture.componentInstance
     component.document = doc
     fixture.detectChanges()
+    jest.useFakeTimers()
+  })
+
+  it('should show the card', () => {
+    expect(component.show).toBeFalsy()
+    component.ngAfterViewInit()
+    jest.advanceTimersByTime(100)
+    expect(component.show).toBeTruthy()
   })
 
   it('should display a document', () => {
