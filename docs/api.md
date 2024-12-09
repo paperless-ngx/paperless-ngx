@@ -473,6 +473,11 @@ The following methods are supported:
     -   Requires `parameters`:
         -   `"pages": [..]` The list should be a list of integers e.g. `"[2,3,4]"`
     -   The delete_pages operation only accepts a single document.
+-   `modify_custom_fields`
+    -   Requires `parameters`:
+        -   `"add_custom_fields": { CUSTOM_FIELD_ID: VALUE }`: JSON object consisting of custom field id:value pairs to add to the document, can also be a list of custom field IDs
+            to add with empty values.
+        -   `"remove_custom_fields": [CUSTOM_FIELD_ID]`: custom field ids to remove from the document.
 
 ### Objects
 
