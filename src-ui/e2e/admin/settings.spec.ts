@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
+import path from 'node:path'
 
-const REQUESTS_HAR = 'e2e/admin/requests/api-settings.har'
+const REQUESTS_HAR = path.join(__dirname, 'requests/api-settings.har')
 
 test('should activate / deactivate save button when settings change', async ({
   page,
