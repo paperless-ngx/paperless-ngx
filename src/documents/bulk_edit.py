@@ -17,6 +17,7 @@ from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.models import Correspondent
+from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
@@ -147,17 +148,34 @@ def modify_tags(
 
 def modify_custom_fields(
     doc_ids: list[int],
-    add_custom_fields,
-    remove_custom_fields,
+    add_custom_fields: list[int] | dict,
+    remove_custom_fields: list[int],
 ) -> Literal["OK"]:
     qs = Document.objects.filter(id__in=doc_ids).only("pk")
     affected_docs = list(qs.values_list("pk", flat=True))
+    # Ensure add_custom_fields is a list of tuples, supports old API
+    add_custom_fields = (
+        add_custom_fields.items()
+        if isinstance(add_custom_fields, dict)
+        else [(field, None) for field in add_custom_fields]
+    )
 
-    for field in add_custom_fields:
+    custom_fields = CustomField.objects.filter(
+        id__in=[int(field) for field, _ in add_custom_fields],
+    ).distinct()
+    for field_id, value in add_custom_fields:
         for doc_id in affected_docs:
+            defaults = {}
+            custom_field = custom_fields.get(id=field_id)
+            if custom_field:
+                value_field = CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    custom_field.data_type
+                ]
+                defaults[value_field] = value
             CustomFieldInstance.objects.update_or_create(
                 document_id=doc_id,
-                field_id=field,
+                field_id=field_id,
+                defaults=defaults,
             )
     CustomFieldInstance.objects.filter(
         document_id__in=affected_docs,

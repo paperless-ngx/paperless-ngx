@@ -616,4 +616,24 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 't' }))
     expect(openSpy).toHaveBeenCalled()
   })
+
+  it('should support an extra button and not apply changes when clicked', () => {
+    component.items = items
+    component.icon = 'tag-fill'
+    component.extraButtonTitle = 'Extra'
+    component.selectionModel = selectionModel
+    component.applyOnClose = true
+    let extraButtonClicked,
+      applied = false
+    component.extraButton.subscribe(() => (extraButtonClicked = true))
+    component.apply.subscribe(() => (applied = true))
+    fixture.nativeElement
+      .querySelector('button')
+      .dispatchEvent(new MouseEvent('click')) // open
+    fixture.detectChanges()
+    expect(fixture.debugElement.nativeElement.textContent).toContain('Extra')
+    component.extraButtonClicked()
+    expect(extraButtonClicked).toBeTruthy()
+    expect(applied).toBeFalsy()
+  })
 })
