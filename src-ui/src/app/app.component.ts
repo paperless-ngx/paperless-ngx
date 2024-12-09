@@ -12,6 +12,7 @@ import {
   PermissionsService,
   PermissionType,
 } from './services/permissions.service'
+import { SharedService } from './shared.service'
 
 @Component({
   selector: 'pngx-root',
@@ -31,7 +32,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private tasksService: TasksService,
     public tourService: TourService,
     private renderer: Renderer2,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    private sharedService: SharedService
   ) {
     this.settings.updateAppearanceSettings()
   }
@@ -85,6 +87,13 @@ export class AppComponent implements OnInit, OnDestroy {
                 this.router.navigate(['documents', status.documentId])
               },
             })
+
+            const folderMatch = this.router.url.match(/folders\/(root|\d+)/);
+            if (folderMatch) {
+              if(folderMatch[1]==(status.folderId?(status.folderId).toString():'root')){
+                this.sharedService.triggerReloadData()
+              }
+            }
           } else {
             this.toastService.show({
               content: $localize`Document ${status.filename} was added to Edocs.`,

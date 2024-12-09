@@ -46,6 +46,8 @@ export class FileStatus {
 
   documentId: number
 
+  folderId: number
+
   ownerId: number
 
   getProgress(): number {
@@ -177,6 +179,7 @@ export class ConsumerStatusService {
         status.message = statusMessage.message
       }
       status.documentId = statusMessage.document_id
+      status.folderId = statusMessage.folder_id
 
       if (statusMessage.status in FileStatusPhase) {
         status.phase = FileStatusPhase[statusMessage.status]

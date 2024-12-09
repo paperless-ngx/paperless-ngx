@@ -19,6 +19,7 @@ import { takeUntil } from 'rxjs/operators'
 import { BulkEditObjectOperation } from '../../../services/rest/abstract-name-filter-service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
+import { SharedService } from '../../../shared.service'
 
 
 @Component({
@@ -32,6 +33,7 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
   displayMode = 'details'
 
   constructor(
+    private sharedService: SharedService,
     private route: ActivatedRoute,
     private router: Router,
     public folderService: FolderService,
@@ -89,6 +91,9 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
     }
     // this.reloadData()
     super.ngOnInit()
+    this.sharedService.reloadData$.subscribe(() => {
+      this.reloadData(); // Gọi hàm để tải lại dữ liệu
+    });
 
 
   }

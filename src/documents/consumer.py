@@ -291,6 +291,7 @@ class Consumer(LoggingMixin):
         status: ConsumerFilePhase,
         message: Optional[ConsumerStatusShortMessage] = None,
         document_id=None,
+        folder_id=None,
     ):  # pragma: no cover
         payload = {
             "filename": os.path.basename(self.filename) if self.filename else None,
@@ -301,6 +302,7 @@ class Consumer(LoggingMixin):
             "message": message,
             "document_id": document_id,
             "owner_id": self.override_owner_id if self.override_owner_id else None,
+            "folder_id": folder_id
         }
         async_to_sync(self.channel_layer.group_send)(
             "status_updates",
@@ -991,6 +993,8 @@ class Consumer(LoggingMixin):
             ConsumerFilePhase.SUCCESS,
             ConsumerStatusShortMessage.FINISHED,
             document.id,
+            override_folder_id
+
         )
 
         from documents.tasks import update_document_archive_file
