@@ -101,6 +101,7 @@ import {
   CustomFieldQueryExpression,
   CustomFieldQueryAtom,
 } from 'src/app/utils/custom-field-query-element'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
 const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
@@ -187,7 +188,7 @@ const DEFAULT_TEXT_FILTER_MODIFIER_OPTIONS = [
   styleUrls: ['./filter-editor.component.scss'],
 })
 export class FilterEditorComponent
-  extends ComponentWithPermissions
+  extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy, AfterViewInit
 {
   generateFilterName() {
@@ -288,8 +289,6 @@ export class FilterEditorComponent
   _textFilter = ''
   _moreLikeId: number
   _moreLikeDoc: Document
-
-  unsubscribeNotifier: Subject<any> = new Subject()
 
   get textFilterTargets() {
     if (this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_MORELIKE) {
@@ -955,16 +954,30 @@ export class FilterEditorComponent
   @Input()
   public disabled: boolean = false
 
+  private loadingCountTotal: number = 0
+  private loadingCount: number = 0
+
+  private maybeCompleteLoading() {
+    this.loadingCount++
+    if (this.loadingCount == this.loadingCountTotal) {
+      this.loading = false
+      this.reveal = true
+    }
+  }
+
   ngOnInit() {
+    this.loading = true
     if (
       this.permissionsService.currentUserCan(
         PermissionAction.View,
         PermissionType.Tag
       )
     ) {
-      this.tagService
-        .listAll()
-        .subscribe((result) => (this.tags = result.results))
+      this.loadingCountTotal++
+      this.tagService.listAll().subscribe((result) => {
+        this.tags = result.results
+        this.maybeCompleteLoading()
+      })
     }
     if (
       this.permissionsService.currentUserCan(
@@ -972,9 +985,11 @@ export class FilterEditorComponent
         PermissionType.Correspondent
       )
     ) {
-      this.correspondentService
-        .listAll()
-        .subscribe((result) => (this.correspondents = result.results))
+      this.loadingCountTotal++
+      this.correspondentService.listAll().subscribe((result) => {
+        this.correspondents = result.results
+        this.maybeCompleteLoading()
+      })
     }
     if (
       this.permissionsService.currentUserCan(
@@ -982,9 +997,11 @@ export class FilterEditorComponent
         PermissionType.DocumentType
       )
     ) {
-      this.documentTypeService
-        .listAll()
-        .subscribe((result) => (this.documentTypes = result.results))
+      this.loadingCountTotal++
+      this.documentTypeService.listAll().subscribe((result) => {
+        this.documentTypes = result.results
+        this.maybeCompleteLoading()
+      })
     }
     if (
       this.permissionsService.currentUserCan(
@@ -992,9 +1009,11 @@ export class FilterEditorComponent
         PermissionType.StoragePath
       )
     ) {
-      this.storagePathService
-        .listAll()
-        .subscribe((result) => (this.storagePaths = result.results))
+      this.loadingCountTotal++
+      this.storagePathService.listAll().subscribe((result) => {
+        this.storagePaths = result.results
+        this.maybeCompleteLoading()
+      })
     }
     if (
       this.permissionsService.currentUserCan(
@@ -1002,9 +1021,11 @@ export class FilterEditorComponent
         PermissionType.CustomField
       )
     ) {
-      this.customFieldService
-        .listAll()
-        .subscribe((result) => (this.customFields = result.results))
+      this.loadingCountTotal++
+      this.customFieldService.listAll().subscribe((result) => {
+        this.customFields = result.results
+        this.maybeCompleteLoading()
+      })
     }
 
     this.textFilterDebounce = new Subject<string>()
