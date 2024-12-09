@@ -8,6 +8,7 @@ import {
   first,
   Subject,
   takeUntil,
+  timer,
 } from 'rxjs'
 import { PaperlessTask } from 'src/app/data/paperless-task'
 import { TasksService } from 'src/app/services/tasks.service'
@@ -48,7 +49,7 @@ export class TasksComponent
   public pageSize: number = 25
   public page: number = 1
 
-  public autoRefreshInterval: any
+  public autoRefreshEnabled: boolean = true
 
   private _filterText: string = ''
   get filterText() {
@@ -86,7 +87,14 @@ export class TasksComponent
 
   ngOnInit() {
     this.tasksService.reload()
-    this.toggleAutoRefresh()
+    timer(5000, 5000)
+      .pipe(
+        filter(() => this.autoRefreshEnabled),
+        takeUntil(this.unsubscribeNotifier)
+      )
+      .subscribe(() => {
+        this.tasksService.reload()
+      })
 
     this.filterDebounce
       .pipe(
@@ -101,7 +109,6 @@ export class TasksComponent
   ngOnDestroy() {
     super.ngOnDestroy()
     this.tasksService.cancelPending()
-    clearInterval(this.autoRefreshInterval)
   }
 
   dismissTask(task: PaperlessTask) {
@@ -209,17 +216,6 @@ export class TasksComponent
         return $localize`completed`
       case TaskTab.Failed:
         return $localize`failed`
-    }
-  }
-
-  toggleAutoRefresh(): void {
-    if (this.autoRefreshInterval) {
-      clearInterval(this.autoRefreshInterval)
-      this.autoRefreshInterval = null
-    } else {
-      this.autoRefreshInterval = setInterval(() => {
-        this.tasksService.reload()
-      }, 5000)
     }
   }
 
