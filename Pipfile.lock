@@ -605,12 +605,12 @@
         },
         "django-soft-delete": {
             "hashes": [
-                "sha256:36cf26a9eaa5f4c0fdb5cb6367ea183e91b7f73783cad173e4071a4747dd1277",
-                "sha256:fc16c870020984b7f58254adead12fdfb637a6c2f4bd8a93a3a636b18b1463e0"
+                "sha256:cc40398ccd869c75a6d6ba7f526e16c4afe2b0c0811c213a318d96bb4c58a787",
+                "sha256:fdaf2788d404930557f1300ce40bbd764f6938775a35a3175c66fe7778666093"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.6'",
-            "version": "==1.0.15"
+            "version": "==1.0.16"
         },
         "djangorestframework": {
             "hashes": [
