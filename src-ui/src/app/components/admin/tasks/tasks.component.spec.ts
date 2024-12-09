@@ -283,9 +283,7 @@ describe('TasksComponent', () => {
     expect(reloadSpy).toHaveBeenCalledTimes(1)
     jest.advanceTimersByTime(5000)
     expect(reloadSpy).toHaveBeenCalledTimes(2)
-
-    component.toggleAutoRefresh()
-    expect(component.autoRefreshInterval).toBeNull()
+    component.autoRefreshEnabled = false
     jest.advanceTimersByTime(6000)
     expect(reloadSpy).toHaveBeenCalledTimes(2)
   })

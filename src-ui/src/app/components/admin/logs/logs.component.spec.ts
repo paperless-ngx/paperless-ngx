@@ -1,9 +1,4 @@
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { LogService } from 'src/app/services/rest/log.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LogsComponent } from './logs.component'
@@ -90,8 +85,7 @@ describe('LogsComponent', () => {
     jest.advanceTimersByTime(6000)
     expect(reloadSpy).toHaveBeenCalledTimes(2)
 
-    component.toggleAutoRefresh()
-    expect(component.autoRefreshInterval).toBeNull()
+    component.autoRefreshEnabled = false
     jest.advanceTimersByTime(6000)
     expect(reloadSpy).toHaveBeenCalledTimes(2)
   })
