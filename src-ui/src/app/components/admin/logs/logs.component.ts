@@ -6,7 +6,7 @@ import {
   ChangeDetectorRef,
   OnDestroy,
 } from '@angular/core'
-import { takeUntil } from 'rxjs'
+import { filter, takeUntil, timer } from 'rxjs'
 import { LogService } from 'src/app/services/rest/log.service'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
@@ -32,7 +32,7 @@ export class LogsComponent
 
   public activeLog: string
 
-  public autoRefreshInterval: any
+  public autoRefreshEnabled: boolean = true
 
   @ViewChild('logContainer') logContainer: ElementRef
 
@@ -47,13 +47,19 @@ export class LogsComponent
           this.activeLog = this.logFiles[0]
           this.reloadLogs()
         }
-        this.toggleAutoRefresh()
+        timer(5000, 5000)
+          .pipe(
+            filter(() => this.autoRefreshEnabled),
+            takeUntil(this.unsubscribeNotifier)
+          )
+          .subscribe(() => {
+            this.reloadLogs()
+          })
       })
   }
 
   ngOnDestroy(): void {
     super.ngOnDestroy()
-    clearInterval(this.autoRefreshInterval)
   }
 
   reloadLogs() {
@@ -95,16 +101,5 @@ export class LogsComponent
       left: 0,
       behavior: 'auto',
     })
-  }
-
-  toggleAutoRefresh(): void {
-    if (this.autoRefreshInterval) {
-      clearInterval(this.autoRefreshInterval)
-      this.autoRefreshInterval = null
-    } else {
-      this.autoRefreshInterval = setInterval(() => {
-        this.reloadLogs()
-      }, 5000)
-    }
   }
 }
