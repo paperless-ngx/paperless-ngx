@@ -8,7 +8,7 @@ export abstract class LoadingComponentWithPermissions
   implements OnDestroy
 {
   public loading: boolean = true
-  public reveal: boolean = false
+  public show: boolean = false
 
   protected unsubscribeNotifier: Subject<any> = new Subject()
 

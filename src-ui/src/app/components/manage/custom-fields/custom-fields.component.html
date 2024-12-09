@@ -13,7 +13,7 @@
 <ul class="list-group">
 
   <li class="list-group-item">
-    <div class="row reveal">
+    <div class="row">
       <div class="col" i18n>Name</div>
       <div class="col" i18n>Data Type</div>
       <div class="col" i18n>Actions</div>
@@ -29,7 +29,7 @@
 
   @for (field of fields; track field) {
     <li class="list-group-item">
-      <div class="row" [class.reveal]="reveal">
+      <div class="row fade" [class.show]="show">
         <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editField(field)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.CustomField)">{{field.name}}</button></div>
         <div class="col d-flex align-items-center">{{getDataType(field)}}</div>
         <div class="col">

@@ -85,6 +85,14 @@ describe('DocumentCardSmallComponent', () => {
     component = fixture.componentInstance
     component.document = Object.assign({}, doc)
     fixture.detectChanges()
+    jest.useFakeTimers()
+  })
+
+  it('should show the card', () => {
+    expect(component.show).toBeFalsy()
+    component.ngAfterViewInit()
+    jest.advanceTimersByTime(100)
+    expect(component.show).toBeTruthy()
   })
 
   it('should display page count', () => {

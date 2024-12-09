@@ -140,7 +140,7 @@ export class SavedViewWidgetComponent
       .pipe(
         takeUntil(this.unsubscribeNotifier),
         tap((result) => {
-          this.reveal = true
+          this.show = true
           this.documents = result.results
         }),
         delay(500)

@@ -53,7 +53,7 @@
         </tr>
       }
       @for (object of data; track object) {
-        <tr (click)="toggleSelected(object); $event.stopPropagation();" class="data-row" [class.reveal]="reveal">
+        <tr (click)="toggleSelected(object); $event.stopPropagation();" class="data-row fade" [class.show]="show">
           <td>
             <div class="form-check m-0 ms-2 me-n2">
               <input type="checkbox" class="form-check-input" id="{{typeName}}{{object.id}}" [checked]="selectedObjects.has(object.id)" (click)="toggleSelected(object); $event.stopPropagation();">

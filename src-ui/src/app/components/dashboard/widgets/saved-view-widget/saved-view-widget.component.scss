@@ -2,13 +2,11 @@
   transition: all .3s ease-out;
   overflow: hidden;
   max-height: 0;
-  opacity: .1;
   width: 100%;
 }
 
-.reveal {
+.show {
   max-height: 1000px;
-  opacity: 1;
   overflow: visible;
 }
 

@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   EventEmitter,
   Input,
@@ -14,7 +15,7 @@ import {
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
 
 @Component({
@@ -22,7 +23,10 @@ import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.
   templateUrl: './document-card-small.component.html',
   styleUrls: ['./document-card-small.component.scss'],
 })
-export class DocumentCardSmallComponent extends ComponentWithPermissions {
+export class DocumentCardSmallComponent
+  extends LoadingComponentWithPermissions
+  implements AfterViewInit
+{
   DisplayField = DisplayField
 
   constructor(
@@ -62,6 +66,12 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
   moreTags: number = null
 
   @ViewChild('popupPreview') popupPreview: PreviewPopupComponent
+
+  ngAfterViewInit(): void {
+    setInterval(() => {
+      this.show = true
+    }, 50)
+  }
 
   getIsThumbInverted() {
     return this.settingsService.get(SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED)

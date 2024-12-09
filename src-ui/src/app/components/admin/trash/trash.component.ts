@@ -50,7 +50,7 @@ export class TrashComponent
         delay(100)
       )
       .subscribe(() => {
-        this.reveal = true
+        this.show = true
       })
   }
 
