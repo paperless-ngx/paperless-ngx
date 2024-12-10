@@ -206,8 +206,8 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     .document-card:not(.placeholder-glow),
     .document-card-large:not(.placeholder-glow) {
       .doc-img-container {
+        transition: none;
         background-color: #ffffff !important;
-        width: 101%;
       }
 
       .doc-img {
