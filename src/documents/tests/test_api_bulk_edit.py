@@ -2,6 +2,7 @@ import json
 from unittest import mock
 
 from auditlog.models import LogEntry
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import override_settings
 from guardian.shortcuts import assign_perm
@@ -858,6 +859,74 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         args, kwargs = m.call_args
         self.assertEqual(kwargs["merge"], True)
 
+    @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
+    @mock.patch("documents.serialisers.bulk_edit.merge")
+    def test_insufficient_global_perms(self, mock_merge, mock_set_storage):
+        """
+        GIVEN:
+            - User has no global permissions to change a document
+            - User has no global permissions to add a document
+            - User has no global permissions to delete a document
+        WHEN:
+            - API is called to set storage path
+            - API is called to merge documents
+            - API is called to merge with delete
+        THEN:
+            - API returns HTTP 403 for all calls unless global permissions are granted
+        """
+        user1 = User.objects.create(username="user1")
+        user1.save()
+        self.client.force_authenticate(user=user1)
+        self.setup_mock(mock_set_storage, "set_storage_path")
+        self.setup_mock(mock_merge, "merge")
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "set_storage_path",
+                    "parameters": {"storage_path": self.sp1.id},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        mock_set_storage.assert_not_called()
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "merge",
+                    "parameters": {"metadata_document_id": self.doc1.id},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        mock_merge.assert_not_called()
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "merge",
+                    "parameters": {
+                        "metadata_document_id": self.doc1.id,
+                        "delete_originals": True,
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        mock_merge.assert_not_called()
+
     @mock.patch("documents.serialisers.bulk_edit.set_permissions")
     def test_insufficient_permissions_ownership(self, m):
         """
@@ -872,6 +941,8 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
         user1 = User.objects.create(username="user1")
+        user1.user_permissions.add(*Permission.objects.all())
+        user1.save()
         self.client.force_authenticate(user=user1)
 
         permissions = {
@@ -925,6 +996,8 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc1.save()
         user1 = User.objects.create(username="user1")
         assign_perm("view_document", user1, self.doc1)
+        user1.user_permissions.add(*Permission.objects.all())
+        user1.save()
         self.client.force_authenticate(user=user1)
 
         response = self.client.post(
@@ -1044,6 +1117,8 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
         user1 = User.objects.create(username="user1")
+        user1.user_permissions.add(*Permission.objects.all())
+        user1.save()
         self.client.force_authenticate(user=user1)
 
         self.setup_mock(m, "merge")
