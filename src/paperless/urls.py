@@ -222,6 +222,10 @@ urlpatterns = [
                         ],
                     ),
                 ),
+                re_path(
+                    "^$",  # Redirect to the API swagger view
+                    RedirectView.as_view(url="schema/view/"),
+                ),
                 *api_router.urls,
             ],
         ),
