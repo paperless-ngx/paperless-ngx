@@ -6,10 +6,16 @@ from collections.abc import Callable
 from contextlib import contextmanager
 
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Case
 from django.db.models import CharField
 from django.db.models import Count
+from django.db.models import DateTimeField
+from django.db.models import FloatField
+from django.db.models import IntegerField
 from django.db.models import OuterRef
 from django.db.models import Q
+from django.db.models import Value
+from django.db.models import When
 from django.db.models.functions import Cast
 from django.utils.translation import gettext_lazy as _
 from django_filters.rest_framework import BooleanFilter
@@ -18,6 +24,7 @@ from django_filters.rest_framework import FilterSet
 from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
 from rest_framework import serializers
+from rest_framework.filters import OrderingFilter
 from rest_framework_guardian.filters import ObjectPermissionsFilter
 
 from documents.models import Correspondent
@@ -760,3 +767,158 @@ class ObjectOwnedPermissionsFilter(ObjectPermissionsFilter):
         objects_owned = queryset.filter(owner=request.user)
         objects_unowned = queryset.filter(owner__isnull=True)
         return objects_owned | objects_unowned
+
+
+class DocumentsOrderingFilter(OrderingFilter):
+    field_name = "ordering"
+    prefix = "custom_field_"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+
+    def filter_queryset(self, request, queryset, view):
+        param = request.query_params.get("ordering")
+        if param and self.prefix in param:
+            custom_field_id = int(param.split(self.prefix)[1])
+            field = CustomField.objects.get(pk=custom_field_id)
+            if not field:
+                raise ValueError("Custom field not found")
+
+            annotation = None
+            match field.data_type:
+                case CustomField.FieldDataType.STRING:
+                    annotation = Case(
+                        When(
+                            custom_fields__field_id=custom_field_id,
+                            then=Cast(
+                                "custom_fields__value_text",
+                                output_field=CharField(),
+                            ),
+                        ),
+                        default=Value(""),
+                        output_field=CharField(),
+                    )
+                case CustomField.FieldDataType.INT:
+                    annotation = Case(
+                        When(
+                            custom_fields__field_id=custom_field_id,
+                            then=Cast(
+                                "custom_fields__value_int",
+                                output_field=IntegerField(),
+                            ),
+                        ),
+                        default=Value(0),
+                        output_field=IntegerField(),
+                    )
+                case CustomField.FieldDataType.FLOAT:
+                    annotation = Case(
+                        When(
+                            custom_fields__field_id=custom_field_id,
+                            then=Cast(
+                                "custom_fields__value_float",
+                                output_field=FloatField(),
+                            ),
+                        ),
+                        default=Value(0),
+                        output_field=FloatField(),
+                    )
+                case CustomField.FieldDataType.DATE:
+                    annotation = Case(
+                        When(
+                            custom_fields__field_id=custom_field_id,
+                            then=Cast(
+                                "custom_fields__value_date",
+                                output_field=DateTimeField(),
+                            ),
+                        ),
+                        default=Value("1900-01-01T00:00:00Z"),
+                        output_field=DateTimeField(),
+                    )
+                case CustomField.FieldDataType.MONETARY:
+                    annotation = Case(
+                        When(
+                            custom_fields__field_id=custom_field_id,
+                            then=Cast(
+                                "custom_fields__value_monetary_amount",
+                                output_field=FloatField(),
+                            ),
+                        ),
+                        default=Value(0),
+                        output_field=FloatField(),
+                    )
+                case CustomField.FieldDataType.SELECT:
+                    annotation = Case(
+                        When(
+                            custom_fields__field_id=custom_field_id,
+                            then=Cast(
+                                "custom_fields__value_select_name",
+                                output_field=CharField(),
+                            ),
+                        ),
+                        default=Value(""),
+                        output_field=CharField(),
+                    )
+                case CustomField.FieldDataType.DOCUMENTLINK:
+                    annotation = Case(
+                        When(
+                            custom_fields__field_id=custom_field_id,
+                            then=Cast(
+                                "custom_fields__value_document_ids",
+                                output_field=CharField(),
+                            ),
+                        ),
+                        default=Value(""),
+                        output_field=CharField(),
+                    )
+                case CustomField.FieldDataType.URL:
+                    annotation = Case(
+                        When(
+                            custom_fields__field_id=custom_field_id,
+                            then=Cast(
+                                "custom_fields__value_url",
+                                output_field=CharField(),
+                            ),
+                        ),
+                        default=Value(""),
+                        output_field=CharField(),
+                    )
+
+                case CustomField.FieldDataType.BOOL:
+                    annotation = Case(
+                        When(
+                            custom_fields__field_id=custom_field_id,
+                            then=Cast(
+                                "custom_fields__value_bool",
+                                output_field=IntegerField(),
+                            ),
+                        ),
+                        default=Value(0),
+                        output_field=IntegerField(),
+                    )
+
+            if not annotation:
+                raise ValueError("Invalid custom field data type")
+
+            queryset = queryset.annotate(
+                # We need to annotate the queryset with the custom field value
+                custom_field_value=annotation,
+                # We also need to annotate the queryset with a boolean for sorting whether the field exists
+                has_field=Case(
+                    When(
+                        custom_fields__field_id=custom_field_id,
+                        then=Value(1),
+                    ),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                ),
+            )
+
+            return queryset.order_by(
+                "-has_field",
+                param.replace(
+                    self.prefix + str(custom_field_id),
+                    "custom_field_value",
+                ),
+            )
+
+        return super().filter_queryset(request, queryset, view)

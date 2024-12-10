@@ -96,6 +96,7 @@ from documents.data_models import DocumentSource
 from documents.filters import CorrespondentFilterSet
 from documents.filters import CustomFieldFilterSet
 from documents.filters import DocumentFilterSet
+from documents.filters import DocumentsOrderingFilter
 from documents.filters import DocumentTypeFilterSet
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
 from documents.filters import ObjectOwnedPermissionsFilter
@@ -350,7 +351,7 @@ class DocumentViewSet(
     filter_backends = (
         DjangoFilterBackend,
         SearchFilter,
-        OrderingFilter,
+        DocumentsOrderingFilter,
         ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = DocumentFilterSet
@@ -367,6 +368,7 @@ class DocumentViewSet(
         "num_notes",
         "owner",
         "page_count",
+        "custom_field_",
     )
 
     def get_queryset(self):

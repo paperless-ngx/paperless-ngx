@@ -5,6 +5,7 @@ import tempfile
 import uuid
 import zoneinfo
 from binascii import hexlify
+from datetime import date
 from datetime import timedelta
 from pathlib import Path
 from unittest import mock
@@ -2762,3 +2763,141 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
             self.client.get(f"/api/tags/{t.id}/", format="json").data["text_color"],
             "#000000",
         )
+
+
+class TestDocumentApiCustomFieldsSorting(DirectoriesMixin, APITestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=self.user)
+
+        self.doc1 = Document.objects.create(
+            title="none1",
+            checksum="A",
+            mime_type="application/pdf",
+        )
+        self.doc2 = Document.objects.create(
+            title="none2",
+            checksum="B",
+            mime_type="application/pdf",
+        )
+        self.doc3 = Document.objects.create(
+            title="none3",
+            checksum="C",
+            mime_type="application/pdf",
+        )
+
+        cache.clear()
+
+    def test_document_custom_fields_sorting(self):
+        """
+        GIVEN:
+            - Documents with custom fields
+        WHEN:
+            - API request for document filtering with custom field sorting
+        THEN:
+            - Documents are sorted by custom field values
+        """
+        values = {
+            CustomField.FieldDataType.STRING: {
+                "values": ["foo", "bar", "baz"],
+                "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    CustomField.FieldDataType.STRING
+                ],
+            },
+            CustomField.FieldDataType.INT: {
+                "values": [1, 2, 3],
+                "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    CustomField.FieldDataType.INT
+                ],
+            },
+            CustomField.FieldDataType.FLOAT: {
+                "values": [1.1, 2.2, 3.3],
+                "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    CustomField.FieldDataType.FLOAT
+                ],
+            },
+            CustomField.FieldDataType.BOOL: {
+                "values": [True, False, False],
+                "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    CustomField.FieldDataType.BOOL
+                ],
+            },
+            CustomField.FieldDataType.DATE: {
+                "values": [date(2021, 1, 1), date(2021, 1, 2), date(2021, 1, 3)],
+                "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    CustomField.FieldDataType.DATE
+                ],
+            },
+            CustomField.FieldDataType.URL: {
+                "values": [
+                    "http://example.com",
+                    "http://example.net",
+                    "http://example.org",
+                ],
+                "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    CustomField.FieldDataType.URL
+                ],
+            },
+            CustomField.FieldDataType.MONETARY: {
+                "values": ["USD123.00", "USD456.00", "USD789.00"],
+                "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    CustomField.FieldDataType.MONETARY
+                ],
+            },
+            CustomField.FieldDataType.DOCUMENTLINK: {
+                "values": [self.doc1.pk, self.doc2.pk, self.doc3.pk],
+                "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    CustomField.FieldDataType.DOCUMENTLINK
+                ],
+            },
+            CustomField.FieldDataType.SELECT: {
+                "values": ["abc-123", "def-456", "ghi-789"],
+                "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    CustomField.FieldDataType.SELECT
+                ],
+                "extra_data": {
+                    "select_options": [
+                        {"label": "Option 1", "id": "abc-123"},
+                        {"label": "Option 2", "id": "def-456"},
+                        {"label": "Option 3", "id": "ghi-789"},
+                    ],
+                },
+            },
+        }
+
+        for data_type, data in values.items():
+            custom_field = CustomField.objects.create(
+                name=f"custom field {data_type}",
+                data_type=data_type,
+                extra_data=data.get("extra_data", {}),
+            )
+            for i, value in enumerate(data["values"]):
+                CustomFieldInstance.objects.create(
+                    document=[self.doc1, self.doc2, self.doc3][i],
+                    field=custom_field,
+                    **{data["field_name"]: value},
+                )
+
+            response = self.client.get(
+                f"/api/documents/?ordering=custom_fields__{custom_field.pk}",
+            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            results = response.data["results"]
+            self.assertEqual(len(results), 3)
+            self.assertEqual(
+                [results[0]["id"], results[1]["id"], results[2]["id"]],
+                [self.doc3.id, self.doc2.id, self.doc1.id],
+            )
+
+            response = self.client.get(
+                f"/api/documents/?ordering=-custom_fields__{custom_field.pk}",
+            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            results = response.data["results"]
+            self.assertEqual(len(results), 3)
+            self.assertEqual(
+                [results[0]["id"], results[1]["id"], results[2]["id"]],
+                [self.doc3.id, self.doc2.id, self.doc1.id],
+            )
