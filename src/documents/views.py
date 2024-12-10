@@ -2173,20 +2173,21 @@ class BulkEditObjectsView(PassUserMixin):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         elif operation == "delete" and object_type == "folders":
+
             folder_list = Folder.objects.filter(id__in=object_ids)
             for f in folder_list:
-                if f.owner == user or f.owner == user.is_superuser or f.owner == None:
+                if f.owner == user or user.is_superuser or f.owner is None:
                     continue
-                elif f.owner != user:
-                    return HttpResponseForbidden(
-                        "Insufficient permissions")
-            for folder_id in object_ids:
-                folder = Folder.objects.get(id=int(folder_id))
-                folders = Folder.objects.filter(path__startswith=folder.path)
+                else:
+                    return HttpResponseForbidden("Insufficient permissions")
+
+            for f in folder_list:
+                folders = Folder.objects.filter(path__startswith=f.path)
                 documents = Document.objects.filter(folder__in=folders)
+                dossiers = Dossier.objects.filter(id__in = documents)
                 documents.delete()
                 folders.delete()
-
+                dossiers.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         elif operation == "delete" and object_type == "dossiers":

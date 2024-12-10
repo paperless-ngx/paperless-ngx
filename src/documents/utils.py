@@ -1,4 +1,5 @@
 import logging
+import re
 import shutil
 from os import utime
 from pathlib import Path
@@ -110,3 +111,9 @@ def run_subprocess(
         completed_proc.check_returncode()
 
     return completed_proc
+
+def get_content_before_last_number(input_string):
+    match = re.search(r'(.*)/\d+$', input_string)
+    if match:
+        return match.group(1)  # Trả về nhóm trước số cuối cùng
+    return input_string

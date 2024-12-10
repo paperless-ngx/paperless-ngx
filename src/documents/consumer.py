@@ -51,7 +51,8 @@ from documents.plugins.base import NoCleanupPluginMixin
 from documents.plugins.base import NoSetupPluginMixin
 from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
-from documents.utils import copy_basic_file_stats
+from documents.utils import copy_basic_file_stats, \
+    get_content_before_last_number
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
 from paperless.models import ApplicationConfiguration
@@ -278,7 +279,7 @@ def parse_and_update_data_document(working_copy, mime_type,
 def get_config_dossier_form(override_dossier_id):
     if override_dossier_id is None:
         return None
-    dossier = Dossier.objects.filter(id=override_dossier_id).select_related('dossier_form').first()
+    dossier = Dossier.objects.filter(id=override_dossier_id.id).select_related('dossier_form').first()
     return dossier.dossier_form
 
 class Consumer(LoggingMixin):
@@ -873,7 +874,17 @@ class Consumer(LoggingMixin):
                 new_file.checksum = hashlib.md5(
                     f'{new_file.id}.{new_file.name}'.encode()).hexdigest()
                 if document.folder:
-                    new_file.path = f"{document.folder.path}/{new_file.id}"
+                    folder_path = get_content_before_last_number(document.folder.path)
+                    if document.folder.type == Folder.FILE:
+                        if len(document.folder.path.split('/')) == 1:
+                            new_file.path = f"{new_file.id}"
+                            new_file.parent_folder_id = None
+                        elif len(document.folder.path.split('/')) > 1:
+                            new_file.path = f"{folder_path}/{new_file.id}"
+                            new_file.parent_folder_id = int(folder_path.split('/')[-1])
+                    elif document.folder.type == Folder.FOLDER:
+                        new_file.path = f"{document.folder.path}/{new_file.id}"
+                        new_file.parent_folder_id = int(folder_path.split('/')[-1])
                 else:
                     new_file.path = f"{new_file.id}"
                 new_file.save()
@@ -1114,9 +1125,10 @@ class Consumer(LoggingMixin):
             )
 
         if self.override_folder_id:
-            document.folder = Folder.objects.get(
-                pk=self.override_folder_id,
-            )
+            if self.override_folder_id:
+                document.folder = Folder.objects.get(
+                    pk=self.override_folder_id,
+                )
 
         if self.override_dossier_id:
             document.dossier = Dossier.objects.get(

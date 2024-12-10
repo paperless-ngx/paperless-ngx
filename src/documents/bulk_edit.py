@@ -356,6 +356,7 @@ def split(doc_ids: list[int], pages: list[list[int]]):
 
                 overrides = DocumentMetadataOverrides().from_document(doc)
                 overrides.title = f"{doc.title} (split {idx + 1})"
+                overrides.folder_id=doc.folder_id
                 logger.info(
                     f"Adding split document with pages {split_doc} to the task queue.",
                 )

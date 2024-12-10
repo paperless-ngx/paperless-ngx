@@ -2255,11 +2255,11 @@ class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         return os.path.getsize(path) if path !='' and os.path.exists(path) else 0
 
     def get_document_count(self, obj):
-        folders = Folder.objects.filter(path__startswith=obj.path, type = Folder.FILE)
-
+        if obj.type==Folder.FOLDER:
+            folders = Folder.objects.filter(path__startswith=obj.path, type = Folder.FILE)
         # documents = Document.objects.filter(folder__in=folders)
-
-        return folders.count()
+            return folders.count()
+        return 0
 
     def get_document(self, obj):
         if obj.type == Folder.FILE:
