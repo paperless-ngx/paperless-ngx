@@ -202,6 +202,17 @@ export class MailComponent
     })
   }
 
+  processAccount(account: MailAccount) {
+    this.mailAccountService.processAccount(account).subscribe({
+      next: () => {
+        this.toastService.showInfo($localize`Processing mail account`)
+      },
+      error: (e) => {
+        this.toastService.showError($localize`Error processing mail account`, e)
+      },
+    })
+  }
+
   editMailRule(rule: MailRule = null, forceCreate = false) {
     const modal = this.modalService.open(MailRuleEditDialogComponent, {
       backdrop: 'static',

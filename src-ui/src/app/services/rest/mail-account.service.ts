@@ -47,4 +47,8 @@ export class MailAccountService extends AbstractPaperlessService<MailAccount> {
     delete account['set_permissions']
     return this.http.post(this.getResourceUrl() + 'test/', account)
   }
+
+  processAccount(account: MailAccount) {
+    return this.http.post(this.getResourceUrl(account.id, 'process'), {})
+  }
 }

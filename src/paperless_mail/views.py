@@ -24,6 +24,7 @@ from paperless_mail.models import MailRule
 from paperless_mail.oauth import PaperlessMailOAuth2Manager
 from paperless_mail.serialisers import MailAccountSerializer
 from paperless_mail.serialisers import MailRuleSerializer
+from paperless_mail.tasks import process_mail_accounts
 
 
 class MailAccountViewSet(ModelViewSet, PassUserMixin):
@@ -86,6 +87,13 @@ class MailAccountViewSet(ModelViewSet, PassUserMixin):
                     f"Mail account {account} test failed: {e}",
                 )
                 return HttpResponseBadRequest("Unable to connect to server")
+
+    @action(methods=["post"], detail=True)
+    def process(self, request, pk=None):
+        account = self.get_object()
+        process_mail_accounts.delay([account.pk])
+
+        return Response({"result": "OK"})
 
 
 class MailRuleViewSet(ModelViewSet, PassUserMixin):
