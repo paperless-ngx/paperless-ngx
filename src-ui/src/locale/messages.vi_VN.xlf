@@ -10960,7 +10960,7 @@
                <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
                <context context-type="linenumber">66</context>
             </context-group>
-            <target state="translated">Cancel cut</target>
+            <target state="translated">Hủy bỏ cắt</target>
          </trans-unit>
          <trans-unit id="342662241267492860" datatype="html">
             <source>Folder Tree</source>
