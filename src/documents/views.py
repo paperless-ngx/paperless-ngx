@@ -1224,10 +1224,8 @@ class PostDocumentView(GenericAPIView):
             custom_field_ids=custom_field_ids,
         )
 
-
-        async_task = consume_file.delay(
-            input_doc,
-            input_doc_overrides,
+        async_task = consume_file.apply(
+            args=[input_doc, input_doc_overrides]
         )
 
         return Response(async_task.id)
