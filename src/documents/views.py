@@ -1197,6 +1197,14 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin):
             "description": "Further documentation",
             "url": "https://docs.paperless-ngx.com/api/#bulk-editing",
         },
+        responses={
+            200: inline_serializer(
+                name="BulkEditDocumentsResult",
+                fields={
+                    "result": serializers.CharField(),
+                },
+            ),
+        },
     ),
 )
 class BulkEditView(PassUserMixin):
@@ -2325,6 +2333,14 @@ def serve_file(doc: Document, use_archive: bool, disposition: str):
         external_docs={
             "description": "Further documentation",
             "url": "https://docs.paperless-ngx.com/api/#objects",
+        },
+        responses={
+            200: inline_serializer(
+                name="BulkEditResult",
+                fields={
+                    "result": serializers.CharField(),
+                },
+            ),
         },
     ),
 )

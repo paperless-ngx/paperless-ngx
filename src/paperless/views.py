@@ -327,6 +327,15 @@ class GenerateAuthTokenView(GenericAPIView):
         )
 
 
+@extend_schema_view(
+    list=extend_schema(
+        description="Get the application configuration",
+        external_docs={
+            "description": "Application Configuration",
+            "url": "https://docs.paperless-ngx.com/configuration/",
+        },
+    ),
+)
 class ApplicationConfigurationViewSet(ModelViewSet):
     model = ApplicationConfiguration
 
