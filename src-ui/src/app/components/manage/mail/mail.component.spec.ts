@@ -219,6 +219,23 @@ describe('MailComponent', () => {
     expect(toastInfoSpy).toHaveBeenCalledWith('Deleted mail account')
   })
 
+  it('should support process mail account, show error if needed', () => {
+    completeSetup()
+    const processSpy = jest.spyOn(mailAccountService, 'processAccount')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    component.processAccount(mailAccounts[0] as MailAccount)
+    expect(processSpy).toHaveBeenCalled()
+    processSpy.mockReturnValueOnce(
+      throwError(() => new Error('error processing mail account'))
+    )
+    component.processAccount(mailAccounts[0] as MailAccount)
+    expect(toastErrorSpy).toHaveBeenCalled()
+    processSpy.mockReturnValueOnce(of(true))
+    component.processAccount(mailAccounts[0] as MailAccount)
+    expect(toastInfoSpy).toHaveBeenCalledWith('Processing mail account')
+  })
+
   it('should support edit / create mail rule, show error if needed', () => {
     completeSetup()
     let modal: NgbModalRef
