@@ -66,4 +66,12 @@ export class PermissionsFormComponent
   writeValue(newValue: any): void {
     this.form.patchValue(newValue, { emitEvent: false })
   }
+
+  public setDisabledState(isDisabled: boolean): void {
+    if (isDisabled) {
+      this.form.disable()
+    } else {
+      this.form.enable()
+    }
+  }
 }

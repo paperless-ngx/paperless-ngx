@@ -132,6 +132,20 @@ export class BulkEditorComponent
     return ownsAll
   }
 
+  get userCanEdit(): boolean {
+    return this.permissionService.currentUserCan(
+      PermissionAction.Change,
+      PermissionType.Document
+    )
+  }
+
+  get userCanAdd(): boolean {
+    return this.permissionService.currentUserCan(
+      PermissionAction.Add,
+      PermissionType.Document
+    )
+  }
+
   ngOnInit() {
     if (
       this.permissionService.currentUserCan(

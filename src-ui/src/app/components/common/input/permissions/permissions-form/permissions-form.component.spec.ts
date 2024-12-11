@@ -66,4 +66,11 @@ describe('PermissionsFormComponent', () => {
       },
     })
   })
+
+  it('should disable form on disabled state change', () => {
+    component.setDisabledState(false)
+    expect(component.form.disabled).toBeFalsy()
+    component.setDisabledState(true)
+    expect(component.form.disabled).toBeTruthy()
+  })
 })
