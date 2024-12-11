@@ -45,7 +45,7 @@
       <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
-      <button ngbDropdownItem (click)="reprocess()" [disabled]="!userCanEdit">
+      <button ngbDropdownItem (click)="reprocess()" [disabled]="!userCanEdit || !userIsOwner">
         <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs>&nbsp;<span i18n>Reprocess</span>
       </button>
 
@@ -53,15 +53,15 @@
         <i-bs width="1em" height="1em" name="diagram-3"></i-bs>&nbsp;<span i18n>More like this</span>
       </button>
 
-      <button ngbDropdownItem (click)="splitDocument()" [disabled]="originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
+      <button ngbDropdownItem (click)="splitDocument()" [disabled]="!userCanAdd || originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
         <i-bs width="1em" height="1em" name="scissors"></i-bs>&nbsp;<span i18n>Split</span>
       </button>
 
-      <button ngbDropdownItem (click)="rotateDocument()" [disabled]="!userIsOwner || originalContentRenderType !== ContentRenderType.PDF">
+      <button ngbDropdownItem (click)="rotateDocument()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
         <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
       </button>
 
-      <button ngbDropdownItem (click)="deletePages()" [disabled]="!userIsOwner || originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
+      <button ngbDropdownItem (click)="deletePages()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
         <i-bs name="file-earmark-minus"></i-bs>&nbsp;<ng-container i18n>Delete page(s)</ng-container>
       </button>
     </div>
@@ -70,7 +70,7 @@
   <pngx-custom-fields-dropdown
     *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
     [documentId]="documentId"
-    [disabled]="!userIsOwner"
+    [disabled]="!userIsOwner || !userCanEdit"
     [existingFields]="document?.custom_fields"
     (created)="refreshCustomFields()"
     (added)="addField($event)">
@@ -122,7 +122,7 @@
                     @case (CustomFieldDataType.String) {
                       <pngx-input-text formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userIsOwner"
+                      [removable]="userIsOwner && userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [error]="getCustomFieldError(i)"></pngx-input-text>
@@ -130,7 +130,7 @@
                     @case (CustomFieldDataType.Date) {
                       <pngx-input-date formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userIsOwner"
+                      [removable]="userIsOwner && userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [error]="getCustomFieldError(i)"></pngx-input-date>
@@ -138,7 +138,7 @@
                     @case (CustomFieldDataType.Integer) {
                       <pngx-input-number formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userIsOwner"
+                      [removable]="userIsOwner && userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [showAdd]="false"
@@ -147,7 +147,7 @@
                     @case (CustomFieldDataType.Float) {
                       <pngx-input-number formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userIsOwner"
+                      [removable]="userIsOwner && userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [showAdd]="false"
@@ -158,7 +158,7 @@
                       <pngx-input-monetary formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
                       [defaultCurrency]="getCustomFieldFromInstance(fieldInstance)?.extra_data?.default_currency"
-                      [removable]="userIsOwner"
+                      [removable]="userIsOwner && userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [error]="getCustomFieldError(i)"></pngx-input-monetary>
@@ -166,14 +166,14 @@
                     @case (CustomFieldDataType.Boolean) {
                       <pngx-input-check formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userIsOwner"
+                      [removable]="userIsOwner && userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"></pngx-input-check>
                     }
                     @case (CustomFieldDataType.Url) {
                       <pngx-input-url formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userIsOwner"
+                      [removable]="userIsOwner && userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [error]="getCustomFieldError(i)"></pngx-input-url>
@@ -182,7 +182,7 @@
                       <pngx-input-document-link formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
                       [parentDocumentID]="documentId"
-                      [removable]="userIsOwner"
+                      [removable]="userIsOwner && userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [error]="getCustomFieldError(i)"></pngx-input-document-link>
@@ -194,7 +194,7 @@
                       bindLabel="label"
                       [allowNull]="true"
                       [horizontal]="true"
-                      [removable]="userIsOwner"
+                      [removable]="userIsOwner && userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [error]="getCustomFieldError(i)"></pngx-input-select>
                     }
