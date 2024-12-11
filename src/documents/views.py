@@ -1464,6 +1464,7 @@ class StatisticsCustomView(APIView):
         to_date = request.query_params.get('to_date')
         from_date = request.query_params.get('from_date')
         label_graph = []
+        data_count_page_graph = []
         data_graph = []
         data_document_type_graph = []
         label_document_type_graph = []
@@ -1487,26 +1488,28 @@ class StatisticsCustomView(APIView):
             to_date = timezone.localize(datetime.strptime(to_date, '%Y-%m-%d'))
             to_date = to_date + timedelta(hours=23, minutes=59, seconds=59,
                                           microseconds=999999)
-            date_dict = {}
+            date_value_dict = {}
             current_date = from_date
 
             while current_date <= to_date:
                 date_key = current_date.strftime('%Y-%m-%d')  # Định dạng ngày
-                date_dict[date_key] = 0  # Thêm vào dict
+                date_value_dict[date_key] = (0,0)  # Thêm vào dict
                 current_date += timedelta(days=1)
 
             documents_count_by_day = documents.filter(
                 created__range=(from_date, to_date)).annotate(
                 created_date=TruncDate('created')).values(
-                'created_date').annotate(document_count=Count('id')).order_by(
+                'created_date').annotate(document_count=Count('id'),total_page_number=Sum('page_count')).order_by(
                 'created_date')
             for entry in documents_count_by_day:
                 target_date_str = entry['created_date'].strftime('%Y-%m-%d')
-                if target_date_str  in date_dict:
-                    date_dict[target_date_str]=entry['document_count']
-            for key,value in date_dict.items():
+                if target_date_str  in date_value_dict:
+                    date_value_dict[target_date_str]=(entry['document_count'],entry['total_page_number'])
+            for key,value in date_value_dict.items():
                 label_graph.append(key)
-                data_graph.append(value)
+                data_graph.append(value[0])
+                data_count_page_graph.append(value[1])
+
 
 
         top_document_types = (documents.values('document_type__name').annotate(document_count=Count('id')) .order_by('-document_count')[:10])
@@ -1528,6 +1531,7 @@ class StatisticsCustomView(APIView):
         return Response(
             {
                 "labels_graph": label_graph,
+                "data_count_page_graph": data_count_page_graph,
                 "data_graph": data_graph,
                 "labels_document_type_pie_graph": label_document_type_graph,
                 "data_document_type_pie_graph": data_document_type_graph,

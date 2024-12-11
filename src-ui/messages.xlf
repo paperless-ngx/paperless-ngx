@@ -240,18 +240,18 @@
         <source>Document <x id="PH" equiv-text="status.filename"/> was added to Edocs.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">81</context>
+          <context context-type="linenumber">83</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">90</context>
+          <context context-type="linenumber">99</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html">
         <source>Open document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">85</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-button/upload-file-btn.component.html</context>
@@ -266,28 +266,28 @@
         <source>Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">105</context>
+          <context context-type="linenumber">114</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3360769330673660282" datatype="html">
         <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by Edocs.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">120</context>
+          <context context-type="linenumber">129</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2501522447884928778" datatype="html">
         <source>Prev</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">126</context>
+          <context context-type="linenumber">135</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3885497195825665706" datatype="html">
         <source>Next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">127</context>
+          <context context-type="linenumber">136</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -298,56 +298,56 @@
         <source>End</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">128</context>
+          <context context-type="linenumber">137</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3909462337752654810" datatype="html">
         <source>The dashboard can be used to show saved views, such as an &apos;Inbox&apos;. Those settings are found under Settings &gt; Saved Views once you have created some.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">143</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4176459502716818443" datatype="html">
         <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Edocs will start training its machine learning algorithms.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">141</context>
+          <context context-type="linenumber">150</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7495498057594070122" datatype="html">
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">146</context>
+          <context context-type="linenumber">155</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1334220418719920556" datatype="html">
         <source>The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">153</context>
+          <context context-type="linenumber">162</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5427326625898532358" datatype="html">
         <source>Any combination of filters can be saved as a &apos;view&apos; which can then be displayed on the dashboard and / or sidebar.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">159</context>
+          <context context-type="linenumber">168</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2804886236408698479" datatype="html">
         <source>Tags, correspondents, document types and storage paths can all be managed using these pages. They can also be created from the document edit view.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">164</context>
+          <context context-type="linenumber">173</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7851939076947092983" datatype="html">
         <source>Manage e-mail accounts and rules for automatically importing documents.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">172</context>
+          <context context-type="linenumber">181</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
@@ -358,14 +358,14 @@
         <source>Workflows give you more control over the document pipeline.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">180</context>
+          <context context-type="linenumber">189</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4680387114119209483" datatype="html">
         <source>File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">188</context>
+          <context context-type="linenumber">197</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
@@ -376,28 +376,28 @@
         <source>Check out the settings for various tweaks to the web app and toggle settings for saved views.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">196</context>
+          <context context-type="linenumber">205</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7172877665285340082" datatype="html">
         <source>Thank you! 🙏</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">204</context>
+          <context context-type="linenumber">213</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7354947513482088740" datatype="html">
         <source>There are &lt;em&gt;tons&lt;/em&gt; more features and info we didn&apos;t cover here, but this should get you started. Check out the documentation or visit the project on GitHub to learn more or to report issues.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">206</context>
+          <context context-type="linenumber">215</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7421249122519786700" datatype="html">
         <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Edocs!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">208</context>
+          <context context-type="linenumber">217</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5558547280081275233" datatype="html">
@@ -2735,7 +2735,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-          <context context-type="linenumber">337</context>
+          <context context-type="linenumber">342</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
@@ -2806,7 +2806,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-          <context context-type="linenumber">339</context>
+          <context context-type="linenumber">344</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
@@ -2947,7 +2947,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">81</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
@@ -3068,7 +3068,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
-          <context context-type="linenumber">177</context>
+          <context context-type="linenumber">230</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -6226,19 +6226,30 @@
           <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="538061070560610647" datatype="html">
+      <trans-unit id="5899374036418424699" datatype="html">
         <source><x id="START_TAG_DIV_6" ctype="x-div_6" equiv-text="&lt;div class=&quot;list-group border-light&quot;&gt;"/><x id="START_TAG_DIV" ctype="x-div" equiv-text="&lt;div class=&quot;d-flex flex-wrap gap-2 mt-1 mb-1&quot;&gt;"/><x id="START_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;h5 class=&quot;mt-2 mb-2 &quot;&gt;"/>Uploaded Document Statistics <x id="CLOSE_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;/h5&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_1" ctype="x-div_1" equiv-text="&lt;div class=&quot;mt-2 mb-2&quot;&gt;"/><x id="START_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&lt;pngx-input-datepicker-range  class=&quot;mb-2 mb-sm-0 &quot;
-                                     (dateRangeChange)=&quot;onDateRangeChange($event)&quot;&gt;"/><x id="CLOSE_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&lt;/pngx-input-datepicker-range&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;&quot;&gt;"/><x id="START_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;canvas id=&quot;DocumentChart&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{ chart }}"/><x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;/canvas&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="HORIZONTAL_RULE" ctype="x-hr" equiv-text="&lt;hr /&gt;"/><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;&quot;&gt;"/><x id="START_HEADING_LEVEL5_1" equiv-text="&lt;h5 class=&quot;mt-2 mb-2 text-center&quot;&gt;"/>Top Document Types/Tags with the Largest Number of Documents<x id="CLOSE_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;/h5&gt;"/><x id="START_TAG_DIV_5" ctype="x-div_5" equiv-text="&lt;div class=&quot;row&quot;&gt;"/><x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&lt;div class=&quot;col-md-6 d-flex flex-column align-items-center&quot;&gt;"/><x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&lt;div&gt;"/><x id="START_TAG_CANVAS_1" ctype="x-canvas_1" equiv-text="&lt;canvas id=&quot;DocumentTypePieChart&quot;&gt;"/><x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;/canvas&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>Document types<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&lt;div class=&quot;col-md-6 d-flex flex-column align-items-center&quot;&gt;"/><x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&lt;div&gt;"/><x id="START_TAG_CANVAS_2" ctype="x-canvas_2" equiv-text="&lt;canvas id=&quot;TagsPieChart&quot;&gt;"/><x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;/canvas&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>Tags<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="HORIZONTAL_RULE" ctype="x-hr" equiv-text="&lt;hr /&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></source>
+                                     (dateRangeChange)=&quot;onDateRangeChange($event)&quot;&gt;"/><x id="CLOSE_TAG_PNGX_INPUT_DATEPICKER_RANGE" ctype="x-pngx_input_datepicker_range" equiv-text="&lt;/pngx-input-datepicker-range&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;&quot;&gt;"/><x id="START_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;canvas id=&quot;DocumentChart&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{ documentCountChart }}"/><x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;/canvas&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="HORIZONTAL_RULE" ctype="x-hr" equiv-text="&lt;hr /&gt;"/><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;&quot;&gt;"/><x id="START_TAG_CANVAS_1" ctype="x-canvas_1" equiv-text="&lt;canvas id=&quot;CountPageChart&quot;&gt;"/><x id="INTERPOLATION_1" equiv-text="{{ pageCountChart }}"/><x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;/canvas&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="HORIZONTAL_RULE" ctype="x-hr" equiv-text="&lt;hr /&gt;"/><x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&lt;div class=&quot;&quot;&gt;"/><x id="START_HEADING_LEVEL5_1" equiv-text="&lt;h5 class=&quot;mt-2 mb-2 text-center&quot;&gt;"/>Top Document Types/Tags with the Largest Number of Documents<x id="CLOSE_HEADING_LEVEL5" ctype="x-h5" equiv-text="&lt;/h5&gt;"/><x id="START_TAG_DIV_5" ctype="x-div_5" equiv-text="&lt;div class=&quot;row&quot;&gt;"/><x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&lt;div class=&quot;col-md-6 d-flex flex-column align-items-center&quot;&gt;"/><x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&lt;div&gt;"/><x id="START_TAG_CANVAS_2" ctype="x-canvas_2" equiv-text="&lt;canvas id=&quot;DocumentTypePieChart&quot;&gt;"/><x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;/canvas&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>Document types<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_DIV_4" ctype="x-div_4" equiv-text="&lt;div class=&quot;col-md-6 d-flex flex-column align-items-center&quot;&gt;"/><x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&lt;div&gt;"/><x id="START_TAG_CANVAS_3" ctype="x-canvas_3" equiv-text="&lt;canvas id=&quot;TagsPieChart&quot;&gt;"/><x id="CLOSE_TAG_CANVAS" ctype="x-canvas" equiv-text="&lt;/canvas&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>Tags<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/><x id="HORIZONTAL_RULE" ctype="x-hr" equiv-text="&lt;hr /&gt;"/><x id="CLOSE_TAG_DIV" ctype="x-div" equiv-text="&lt;/div&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.html</context>
-          <context context-type="linenumber">3,115</context>
+          <context context-type="linenumber">3,119</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3817498941817715969" datatype="html">
+        <source>Pages</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
+          <context context-type="linenumber">131</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">97</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3264001515130844663" datatype="html">
         <source>Document Type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
-          <context context-type="linenumber">128</context>
+          <context context-type="linenumber">181</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2028517964701399614" datatype="html">
@@ -8438,7 +8449,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-          <context context-type="linenumber">387</context>
+          <context context-type="linenumber">392</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -8469,7 +8480,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-          <context context-type="linenumber">392</context>
+          <context context-type="linenumber">397</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -8921,63 +8932,63 @@
         <source>file</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-          <context context-type="linenumber">65</context>
+          <context context-type="linenumber">67</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6889473896134264260" datatype="html">
         <source>files</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-          <context context-type="linenumber">66</context>
+          <context context-type="linenumber">68</context>
         </context-group>
       </trans-unit>
       <trans-unit id="45739481977493163" datatype="html">
         <source>Size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-          <context context-type="linenumber">70</context>
+          <context context-type="linenumber">72</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2636341142529824389" datatype="html">
         <source>Confirm update</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-          <context context-type="linenumber">335</context>
+          <context context-type="linenumber">340</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1743564456946375306" datatype="html">
         <source>This operation will permanently update all objects.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-          <context context-type="linenumber">336</context>
+          <context context-type="linenumber">341</context>
         </context-group>
       </trans-unit>
       <trans-unit id="331020237076232956" datatype="html">
         <source>Objects update successfully</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-          <context context-type="linenumber">353</context>
+          <context context-type="linenumber">358</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5120718024775031361" datatype="html">
         <source>Error updating objects</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-          <context context-type="linenumber">370</context>
+          <context context-type="linenumber">375</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6970443300968731345" datatype="html">
         <source>Do you really want to delete the folder &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-          <context context-type="linenumber">398</context>
+          <context context-type="linenumber">403</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2158704536244701304" datatype="html">
         <source>Associated documents will be deleted.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-          <context context-type="linenumber">402</context>
+          <context context-type="linenumber">407</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8957855217409261143" datatype="html">
@@ -9498,13 +9509,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">90</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="3817498941817715969" datatype="html">
-        <source>Pages</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">97</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1713271461473302108" datatype="html">

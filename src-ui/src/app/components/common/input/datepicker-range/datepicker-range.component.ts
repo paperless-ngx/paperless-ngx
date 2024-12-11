@@ -33,7 +33,8 @@ export class DatepickerRangeComponent extends AbstractInputComponent<string>
     // toDate = this.settings.getLocalizedDateInputFormat()
     // this.placeholder = fromDate+" - "+ toDate
     // super.ngOnInit()
-    this.emitDateRangeChange()
+    // this.emitDateRangeChange()
+    this.setRange('last7days')
   }
 
   isHovered(date: NgbDate) {
