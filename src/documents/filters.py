@@ -10,6 +10,7 @@ from django.db.models import Case
 from django.db.models import CharField
 from django.db.models import Count
 from django.db.models import DateTimeField
+from django.db.models import Exists
 from django.db.models import FloatField
 from django.db.models import IntegerField
 from django.db.models import OuterRef
@@ -914,13 +915,11 @@ class DocumentsOrderingFilter(OrderingFilter):
                 # We need to annotate the queryset with the custom field value
                 custom_field_value=annotation,
                 # We also need to annotate the queryset with a boolean for sorting whether the field exists
-                has_field=Case(
-                    When(
-                        custom_fields__field_id=custom_field_id,
-                        then=Value(1),
+                has_field=Exists(
+                    CustomFieldInstance.objects.filter(
+                        document_id=OuterRef("id"),
+                        field_id=custom_field_id,
                     ),
-                    default=Value(0),
-                    output_field=IntegerField(),
                 ),
             )
 
