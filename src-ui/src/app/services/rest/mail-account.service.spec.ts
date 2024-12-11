@@ -68,6 +68,14 @@ describe(`Additional service tests for MailAccountService`, () => {
     expect(service.allAccounts).toEqual(mail_accounts)
   })
 
+  it('should support processAccount', () => {
+    subscription = service.processAccount(mail_accounts[0]).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${mail_accounts[0].id}/process/`
+    )
+    expect(req.request.method).toEqual('POST')
+  })
+
   beforeEach(() => {
     // Dont need to setup again
 
