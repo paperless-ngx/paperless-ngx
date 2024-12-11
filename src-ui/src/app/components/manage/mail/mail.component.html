@@ -65,19 +65,27 @@
                   <button (click)="editMailAccount(account)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" ngbDropdownItem i18n>Edit</button>
                   <button (click)="editPermissions(account)" *pngxIfOwner="account" ngbDropdownItem i18n>Permissions</button>
                   <button (click)="deleteMailAccount(account)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailAccount }" ngbDropdownItem i18n>Delete</button>
+                  <button (click)="processAccount(account)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" ngbDropdownItem i18n>Process Mail</button>
                 </div>
               </div>
             </div>
-            <div class="btn-group d-none d-sm-block">
-              <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" [disabled]="!userCanEdit(account)" class="btn btn-sm btn-outline-secondary" type="button" (click)="editMailAccount(account)">
-                <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
-              </button>
-              <button *pngxIfOwner="account" class="btn btn-sm btn-outline-secondary" type="button" (click)="editPermissions(account)">
-                <i-bs width="1em" height="1em" name="person-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
-              </button>
-              <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailAccount }" [disabled]="!userIsOwner(account)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)">
-                <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
-              </button>
+            <div class="btn-toolbar d-none d-sm-flex gap-2" role="toolbar">
+              <div class="btn-group">
+                <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" [disabled]="!userCanEdit(account)" class="btn btn-sm btn-outline-secondary" type="button" (click)="editMailAccount(account)">
+                  <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
+                </button>
+                <button *pngxIfOwner="account" class="btn btn-sm btn-outline-secondary" type="button" (click)="editPermissions(account)">
+                  <i-bs width="1em" height="1em" name="person-lock"></i-bs>&nbsp;<ng-container i18n>Permissions</ng-container>
+                </button>
+                <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.MailAccount }" [disabled]="!userIsOwner(account)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMailAccount(account)">
+                  <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+                </button>
+              </div>
+              <div class="btn-group">
+                <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailAccount }" class="btn btn-sm btn-outline-secondary" type="button" (click)="processAccount(account)">
+                  <i-bs width="1em" height="1em" name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Process Mail</ng-container>
+                </button>
+              </div>
             </div>
           </div>
         </div>
