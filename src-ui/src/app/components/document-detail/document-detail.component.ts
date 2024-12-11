@@ -577,6 +577,10 @@ export class DocumentDetailComponent
       this.permissionsService.currentUserHasObjectPermissions(
         PermissionAction.Change,
         doc
+      ) &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.Change,
+        PermissionType.Document
       )
     ) {
       this.documentsService
@@ -1063,6 +1067,13 @@ export class DocumentDetailComponent
           PermissionAction.Change,
           doc
         ))
+    )
+  }
+
+  get userCanAdd(): boolean {
+    return this.permissionsService.currentUserCan(
+      PermissionAction.Add,
+      PermissionType.Document
     )
   }
 
