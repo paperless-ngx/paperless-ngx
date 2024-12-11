@@ -773,9 +773,6 @@ class DocumentsOrderingFilter(OrderingFilter):
     field_name = "ordering"
     prefix = "custom_field_"
 
-    def __init__(self, *args, **kwargs):
-        super().__init__()
-
     def filter_queryset(self, request, queryset, view):
         param = request.query_params.get("ordering")
         if param and self.prefix in param:
@@ -927,7 +924,7 @@ class DocumentsOrderingFilter(OrderingFilter):
                 ),
             )
 
-            return queryset.order_by(
+            queryset = queryset.order_by(
                 "-has_field",
                 param.replace(
                     self.prefix + str(custom_field_id),
