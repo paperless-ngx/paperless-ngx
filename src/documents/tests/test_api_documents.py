@@ -2807,13 +2807,13 @@ class TestDocumentApiCustomFieldsSorting(DirectoriesMixin, APITestCase):
                 ],
             },
             CustomField.FieldDataType.INT: {
-                "values": [1, 2, 3],
+                "values": [3, 1, 2],
                 "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
                     CustomField.FieldDataType.INT
                 ],
             },
             CustomField.FieldDataType.FLOAT: {
-                "values": [1.1, 2.2, 3.3],
+                "values": [3.3, 1.1, 2.2],
                 "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
                     CustomField.FieldDataType.FLOAT
                 ],
@@ -2825,35 +2825,35 @@ class TestDocumentApiCustomFieldsSorting(DirectoriesMixin, APITestCase):
                 ],
             },
             CustomField.FieldDataType.DATE: {
-                "values": [date(2021, 1, 1), date(2021, 1, 2), date(2021, 1, 3)],
+                "values": [date(2021, 1, 3), date(2021, 1, 1), date(2021, 1, 2)],
                 "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
                     CustomField.FieldDataType.DATE
                 ],
             },
             CustomField.FieldDataType.URL: {
                 "values": [
+                    "http://example.org",
                     "http://example.com",
                     "http://example.net",
-                    "http://example.org",
                 ],
                 "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
                     CustomField.FieldDataType.URL
                 ],
             },
             CustomField.FieldDataType.MONETARY: {
-                "values": ["USD123.00", "USD456.00", "USD789.00"],
+                "values": ["USD789.00", "USD123.00", "USD456.00"],
                 "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
                     CustomField.FieldDataType.MONETARY
                 ],
             },
             CustomField.FieldDataType.DOCUMENTLINK: {
-                "values": [self.doc1.pk, self.doc2.pk, self.doc3.pk],
+                "values": [self.doc3.pk, self.doc1.pk, self.doc2.pk],
                 "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
                     CustomField.FieldDataType.DOCUMENTLINK
                 ],
             },
             CustomField.FieldDataType.SELECT: {
-                "values": ["abc-123", "def-456", "ghi-789"],
+                "values": ["ghi-789", "abc-123", "def-456"],
                 "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
                     CustomField.FieldDataType.SELECT
                 ],
@@ -2868,6 +2868,8 @@ class TestDocumentApiCustomFieldsSorting(DirectoriesMixin, APITestCase):
         }
 
         for data_type, data in values.items():
+            CustomField.objects.all().delete()
+            CustomFieldInstance.objects.all().delete()
             custom_field = CustomField.objects.create(
                 name=f"custom field {data_type}",
                 data_type=data_type,
@@ -2879,25 +2881,31 @@ class TestDocumentApiCustomFieldsSorting(DirectoriesMixin, APITestCase):
                     field=custom_field,
                     **{data["field_name"]: value},
                 )
-
             response = self.client.get(
-                f"/api/documents/?ordering=custom_fields__{custom_field.pk}",
+                f"/api/documents/?ordering=custom_field_{custom_field.pk}",
             )
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             results = response.data["results"]
             self.assertEqual(len(results), 3)
             self.assertEqual(
                 [results[0]["id"], results[1]["id"], results[2]["id"]],
-                [self.doc3.id, self.doc2.id, self.doc1.id],
+                [self.doc2.id, self.doc3.id, self.doc1.id],
             )
 
             response = self.client.get(
-                f"/api/documents/?ordering=-custom_fields__{custom_field.pk}",
+                f"/api/documents/?ordering=-custom_field_{custom_field.pk}",
             )
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             results = response.data["results"]
             self.assertEqual(len(results), 3)
-            self.assertEqual(
-                [results[0]["id"], results[1]["id"], results[2]["id"]],
-                [self.doc3.id, self.doc2.id, self.doc1.id],
-            )
+            if data_type == CustomField.FieldDataType.BOOL:
+                # just check the first one for bools, as the rest are the same
+                self.assertEqual(
+                    [results[0]["id"]],
+                    [self.doc1.id],
+                )
+            else:
+                self.assertEqual(
+                    [results[0]["id"], results[1]["id"], results[2]["id"]],
+                    [self.doc1.id, self.doc3.id, self.doc2.id],
+                )

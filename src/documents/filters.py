@@ -847,14 +847,19 @@ class DocumentsOrderingFilter(OrderingFilter):
                         output_field=FloatField(),
                     )
                 case CustomField.FieldDataType.SELECT:
-                    annotation = Case(
-                        When(
-                            custom_fields__field_id=custom_field_id,
-                            then=Cast(
-                                "custom_fields__value_select_name",
-                                output_field=CharField(),
+                    select_options = field.extra_data.get("select_options", [])
+                    whens = []
+                    # Create a case for each select option
+                    for option in select_options:
+                        whens.append(
+                            When(
+                                custom_fields__field_id=custom_field_id,
+                                custom_fields__value_select=option.get("id"),
+                                then=Value(option["label"], output_field=CharField()),
                             ),
-                        ),
+                        )
+                    annotation = Case(
+                        *whens,
                         default=Value(""),
                         output_field=CharField(),
                     )
@@ -887,8 +892,17 @@ class DocumentsOrderingFilter(OrderingFilter):
                     annotation = Case(
                         When(
                             custom_fields__field_id=custom_field_id,
-                            then=Cast(
-                                "custom_fields__value_bool",
+                            custom_fields__value_bool=True,
+                            then=Value(
+                                1,
+                                output_field=IntegerField(),
+                            ),
+                        ),
+                        When(
+                            custom_fields__field_id=custom_field_id,
+                            custom_fields__value_bool=False,
+                            then=Value(
+                                0,
                                 output_field=IntegerField(),
                             ),
                         ),
