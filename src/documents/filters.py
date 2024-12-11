@@ -911,24 +911,35 @@ class DocumentsOrderingFilter(OrderingFilter):
             if not annotation:
                 raise ValueError("Invalid custom field data type")
 
-            queryset = queryset.annotate(
-                # We need to annotate the queryset with the custom field value
-                custom_field_value=annotation,
-                # We also need to annotate the queryset with a boolean for sorting whether the field exists
-                has_field=Exists(
-                    CustomFieldInstance.objects.filter(
-                        document_id=OuterRef("id"),
-                        field_id=custom_field_id,
+            ids_sorted_by_cf = (
+                queryset.annotate(
+                    # We need to annotate the queryset with the custom field value
+                    custom_field_value=annotation,
+                    # We also need to annotate the queryset with a boolean for sorting whether the field exists
+                    has_field=Exists(
+                        CustomFieldInstance.objects.filter(
+                            document_id=OuterRef("id"),
+                            field_id=custom_field_id,
+                        ),
                     ),
-                ),
+                )
+                .order_by(
+                    "-has_field",
+                    param.replace(
+                        self.prefix + str(custom_field_id),
+                        "custom_field_value",
+                    ),
+                )
+                .values_list("id", flat=True)
             )
 
-            queryset = queryset.order_by(
-                "-has_field",
-                param.replace(
-                    self.prefix + str(custom_field_id),
-                    "custom_field_value",
-                ),
+            # We need to preserve the order of the ids sorted by custom field, see https://docs.djangoproject.com/en/dev/ref/models/querysets/#distinct
+            preserved = Case(
+                *[
+                    When(id=id, then=position)
+                    for position, id in enumerate(ids_sorted_by_cf)
+                ],
             )
+            queryset = queryset.filter(id__in=ids_sorted_by_cf).order_by(preserved)
 
         return super().filter_queryset(request, queryset, view)
