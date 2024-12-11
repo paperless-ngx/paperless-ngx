@@ -11,6 +11,7 @@ import { SavedView } from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { PermissionsService } from 'src/app/services/permissions.service'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
@@ -58,6 +59,17 @@ describe('SavedViewsComponent', () => {
           provide: PermissionsService,
           useValue: {
             currentUserCan: () => true,
+          },
+        },
+        {
+          provide: CustomFieldsService,
+          useValue: {
+            listAll: () =>
+              of({
+                all: [],
+                count: 0,
+                results: [],
+              }),
           },
         },
         PermissionsGuard,
