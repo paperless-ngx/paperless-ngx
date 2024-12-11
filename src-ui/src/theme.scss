@@ -25,6 +25,7 @@ $color-mode-type: data;
   --pngx-bg-alt: #fff;
   --pngx-bg-darker: var(--bs-gray-100);
   --pngx-bg-alt2: var(--bs-gray-200);
+  --pngx-bg-disabled: #f7f7f7;
   --pngx-focus-alpha: 0.3;
 }
 
@@ -83,6 +84,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   --pngx-bg-darker: #101216;
   --bs-tertiary-bg: var(--pngx-bg-darker);
   --pngx-bg-alt: #242529;
+  --pngx-bg-disabled: var(--pngx-bg-alt);
   --pngx-focus-alpha: 0.6;
   --pngx-primary-faded: var(--pngx-primary-darken-15);
   --pngx-primary-text-contrast: var(--bs-body-color);
