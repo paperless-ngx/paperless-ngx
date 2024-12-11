@@ -477,6 +477,18 @@ class Document(ModelWithOwner):
         help_text=_("Current filename in storage"),
     )
 
+    page_count = models.PositiveIntegerField(
+        _("page count"),
+        blank=False,
+        null=True,
+        unique=False,
+        db_index=False,
+        validators=[MinValueValidator(1)],
+        help_text=_(
+            "The number of pages of the document.",
+        ),
+    )
+
     archive_filename = models.FilePathField(
         _("archive filename"),
         max_length=1024,

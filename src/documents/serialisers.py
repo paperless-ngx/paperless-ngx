@@ -720,6 +720,7 @@ class DocumentSerializer(
         value = instance.created
         return value.astimezone(timezone.get_default_timezone()).isoformat()
 
+    page_count = SerializerMethodField()
 
     custom_fields = CustomFieldInstanceSerializer(
         many=True,
@@ -783,6 +784,9 @@ class DocumentSerializer(
         approvals = Approval.objects.filter(object_pk=obj.pk, status="SUCCESS")
         serializer = ApprovalSerializer(approvals, many=True)
         return serializer.data
+
+    def get_page_count(self, obj):
+        return obj.page_count
 
     def get_original_file_name(self, obj):
         return obj.original_filename
@@ -898,6 +902,7 @@ class DocumentSerializer(
             "custom_fields",
             "exploit",
             "remove_inbox_tags",
+            "page_count",
             'warehouse_s',
             'warehouse_w'
 

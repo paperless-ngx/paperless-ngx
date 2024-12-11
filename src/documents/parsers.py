@@ -395,7 +395,7 @@ class DocumentParser(LoggingMixin):
 
     def parse(self, document_path, mime_type, file_name=None):
         raise NotImplementedError
-    
+
     def parse_field(self, document_path, mime_type, file_name=None):
         raise NotImplementedError
 
@@ -417,3 +417,6 @@ class DocumentParser(LoggingMixin):
     def cleanup(self):
         self.log.debug(f"Deleting directory {self.tempdir}")
         shutil.rmtree(self.tempdir)
+
+    def get_page_count(self, document_path, mime_type):
+        return None

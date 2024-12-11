@@ -780,6 +780,7 @@ class Consumer(LoggingMixin):
         date = None
         thumbnail = None
         archive_path = None
+        page_count = None
         data_ocr_fields = (None,None)
         try:
             self._send_progress(
@@ -824,6 +825,8 @@ class Consumer(LoggingMixin):
                 )
                 date = parse_date(self.filename, text)
             archive_path = self.working_copy
+            page_count = document_parser.get_page_count(self.working_copy,
+                                                        mime_type)
 
         except ParseError as e:
             self._fail(
@@ -861,7 +864,12 @@ class Consumer(LoggingMixin):
         try:
             with transaction.atomic():
                 # store the document.
-                document = self._store(text=text, date=date, mime_type=mime_type)
+                document = self._store(
+                    text=text,
+                    date=date,
+                    page_count=page_count,
+                    mime_type=mime_type,
+                )
                 new_file = None
                 self.log.debug("Comsumer", document.folder)
 
@@ -1049,7 +1057,8 @@ class Consumer(LoggingMixin):
     def _store(
         self,
         text: str,
-        date: Optional[datetime.datetime],
+        date: datetime.datetime | None,
+        page_count: int | None,
         mime_type: str,
     ) -> Document:
         # If someone gave us the original filename, use it instead of doc.
@@ -1095,6 +1104,7 @@ class Consumer(LoggingMixin):
             created=create_date,
             modified=create_date,
             storage_type=storage_type,
+            page_count=page_count,
             original_filename=self.filename,
         )
 
