@@ -1005,25 +1005,49 @@ class BulkEditView(PassUserMixin):
                 (doc.owner == user or doc.owner is None) for doc in document_objs
             )
 
-            has_perms = (
-                user_is_owner_of_all_documents
-                if method
+            # check global and object permissions for all documents
+            has_perms = user.has_perm("documents.change_document") and all(
+                has_perms_owner_aware(user, "change_document", doc)
+                for doc in document_objs
+            )
+
+            # check ownership for methods that change original document
+            if (
+                has_perms
+                and method
                 in [
                     bulk_edit.set_permissions,
                     bulk_edit.delete,
                     bulk_edit.rotate,
                     bulk_edit.delete_pages,
                 ]
-                else all(
-                    has_perms_owner_aware(user, "change_document", doc)
-                    for doc in document_objs
-                )
-            )
-
-            if (
+            ) or (
                 method in [bulk_edit.merge, bulk_edit.split]
                 and parameters["delete_originals"]
-                and not user_is_owner_of_all_documents
+            ):
+                has_perms = user_is_owner_of_all_documents
+
+            # check global add permissions for methods that create documents
+            if (
+                has_perms
+                and method in [bulk_edit.split, bulk_edit.merge]
+                and not user.has_perm(
+                    "documents.add_document",
+                )
+            ):
+                has_perms = False
+
+            # check global delete permissions for methods that delete documents
+            if (
+                has_perms
+                and (
+                    method == bulk_edit.delete
+                    or (
+                        method in [bulk_edit.merge, bulk_edit.split]
+                        and parameters["delete_originals"]
+                    )
+                )
+                and not user.has_perm("documents.delete_document")
             ):
                 has_perms = False
 
