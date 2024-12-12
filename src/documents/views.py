@@ -1346,7 +1346,7 @@ class StatisticsView(APIView):
         user = request.user if request.user is not None else None
 
         documents = (
-            Document.objects.all()
+            Document.objects.all().annotate()
             if user is None
             else get_objects_for_user_owner_aware(
                 user,
@@ -1439,9 +1439,11 @@ class StatisticsView(APIView):
             .get("characters__sum")
         )
 
+        pages_total = documents.aggregate(Sum('page_count')).get("page_count__sum")
         return Response(
             {
                 "documents_total": documents_total,
+                "pages_total": pages_total,
                 "documents_inbox": documents_inbox,
                 "inbox_tag": inbox_tag.first().pk if inbox_tag.exists() else None,
                 "document_file_type_counts": document_file_type_counts,

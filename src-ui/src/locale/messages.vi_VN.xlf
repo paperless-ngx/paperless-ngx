@@ -3685,7 +3685,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
-               <context context-type="linenumber">116</context>
+               <context context-type="linenumber">120</context>
             </context-group>
             <target state="translated">Người biên tập</target>
          </trans-unit>
@@ -3709,11 +3709,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
-               <context context-type="linenumber">230</context>
+               <context context-type="linenumber">234</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
-               <context context-type="linenumber">58</context>
+               <context context-type="linenumber">62</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -3737,7 +3737,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
-               <context context-type="linenumber">124</context>
+               <context context-type="linenumber">128</context>
             </context-group>
             <target state="translated">Loại Tài liệu</target>
          </trans-unit>
@@ -3753,7 +3753,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
-               <context context-type="linenumber">182</context>
+               <context context-type="linenumber">186</context>
             </context-group>
             <target state="translated">Đường dẫn lưu dữ liệu</target>
          </trans-unit>
@@ -3769,7 +3769,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
-               <context context-type="linenumber">190</context>
+               <context context-type="linenumber">194</context>
             </context-group>
             <target state="translated">Kho</target>
          </trans-unit>
@@ -7509,6 +7509,10 @@
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
                <context context-type="linenumber">10</context>
             </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+               <context context-type="linenumber">14</context>
+            </context-group>
             <target state="translated">Đi tới tài liệu</target>
          </trans-unit>
          <trans-unit id="3823413855067727192" datatype="html">
@@ -7519,11 +7523,19 @@
             </context-group>
             <target state="translated">Tổng số tài liệu</target>
          </trans-unit>
+         <trans-unit id="4406550766513345620" datatype="html">
+            <source>Total pages</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+               <context context-type="linenumber">15</context>
+            </context-group>
+            <target state="translated">Tổng số trang</target>
+         </trans-unit>
          <trans-unit id="6503529145162789855" datatype="html">
             <source>Total characters</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
-               <context context-type="linenumber">15</context>
+               <context context-type="linenumber">19</context>
             </context-group>
             <target state="translated">Tổng kí tự</target>
          </trans-unit>
@@ -7538,7 +7550,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
-               <context context-type="linenumber">63,93</context>
+               <context context-type="linenumber">67,97</context>
             </context-group>
             <target state="translated">
                <x id="START_TAG_DIV_2" ctype="x-div_2" equiv-text="&amp;lt;div class=&amp;quot;progress flex-grow-1&amp;quot;&gt;" />
@@ -7553,11 +7565,11 @@
             <source>Tagged tags</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
-               <context context-type="linenumber">100</context>
+               <context context-type="linenumber">104</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
-               <context context-type="linenumber">51</context>
+               <context context-type="linenumber">52</context>
             </context-group>
             <target state="translated">Thẻ đã gán</target>
          </trans-unit>
@@ -7565,11 +7577,11 @@
             <source>Untagged tags</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
-               <context context-type="linenumber">106</context>
+               <context context-type="linenumber">110</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
-               <context context-type="linenumber">52</context>
+               <context context-type="linenumber">53</context>
             </context-group>
             <target state="translated">Thẻ chưa gán</target>
          </trans-unit>
@@ -7622,7 +7634,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
-               <context context-type="linenumber">129,176</context>
+               <context context-type="linenumber">133,180</context>
             </context-group>
             <target state="translated">
                <x id="START_TAG_DIV_3" ctype="x-div_3" equiv-text="&amp;lt;div class=&amp;quot;d-flex justify-content-between align-items-center my-2&amp;quot;&gt;" />
@@ -7673,7 +7685,7 @@
             <source>Assigned document type</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
-               <context context-type="linenumber">53</context>
+               <context context-type="linenumber">54</context>
             </context-group>
             <target state="translated">Loại tài liệu đã gán</target>
          </trans-unit>
@@ -7681,7 +7693,7 @@
             <source>Unassigned document type</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
-               <context context-type="linenumber">54</context>
+               <context context-type="linenumber">55</context>
             </context-group>
             <target state="translated">Loại tài liệu chưa gán</target>
          </trans-unit>
@@ -7689,7 +7701,7 @@
             <source>Other</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
-               <context context-type="linenumber">77</context>
+               <context context-type="linenumber">78</context>
             </context-group>
             <target state="translated">Khác</target>
          </trans-unit>
@@ -7699,7 +7711,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.ts</context>
-               <context context-type="linenumber">105</context>
+               <context context-type="linenumber">106</context>
             </context-group>
             <target state="translated">
                <x id="PH" equiv-text="value" />
@@ -7986,14 +7998,6 @@
                <context context-type="linenumber">126</context>
             </context-group>
             <target state="translated">Xoay</target>
-         </trans-unit>
-         <trans-unit id="7787014569189147478" datatype="html">
-            <source>Export to excel</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-               <context context-type="linenumber">71</context>
-            </context-group>
-            <target state="translated">Xuất sang Excel</target>
          </trans-unit>
          <trans-unit id="7819314041543176992" datatype="html">
             <source>Close</source>

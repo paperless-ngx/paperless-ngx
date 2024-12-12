@@ -10,6 +10,7 @@ import { ComponentWithPermissions } from 'src/app/components/with-permissions/wi
 
 export interface Statistics {
   documents_total?: number
+  pages_total?: number
   documents_inbox?: number
   inbox_tag?: number
   document_file_type_counts?: DocumentFileType[]

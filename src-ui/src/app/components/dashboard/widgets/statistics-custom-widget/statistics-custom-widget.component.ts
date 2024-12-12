@@ -205,9 +205,13 @@ export class StatisticsCustomWidgetComponent
           datalabels: {
             display: true,
             formatter: (value, ctx) => {
+
               const sum = ctx.dataset.data.reduce((a, b) => Number(a) + Number(b), 0)
-              const percentage = ((value / Number(sum)) * 100).toFixed(2) + '%'
-              return percentage
+              const result = ((value / Number(sum)) * 100).toFixed(2)
+              if (parseInt(result) >= 10)
+              // const percentage = ((value / Number(sum)) * 100).toFixed(2) + '%'
+                return result +'%'
+              return ''
             },
             color: 'white',
           },
@@ -255,8 +259,11 @@ export class StatisticsCustomWidgetComponent
             display: true,
             formatter: (value, ctx) => {
               const sum = ctx.dataset.data.reduce((a, b) => Number(a) + Number(b), 0)
-              const percentage = ((value / Number(sum)) * 100).toFixed(2) + '%'
-              return percentage
+              const result = ((value / Number(sum)) * 100).toFixed(2)
+              if (parseInt(result) >= 10)
+              // const percentage = ((value / Number(sum)) * 100).toFixed(2) + '%'
+                return result +'%'
+              return ''
             },
             color: 'white',
           },
