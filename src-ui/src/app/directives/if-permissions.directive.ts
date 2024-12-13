@@ -1,9 +1,9 @@
 import {
+  Directive,
   Input,
   OnInit,
-  Directive,
-  ViewContainerRef,
   TemplateRef,
+  ViewContainerRef,
 } from '@angular/core'
 import {
   PermissionAction,

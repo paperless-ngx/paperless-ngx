@@ -9,12 +9,12 @@ import {
 } from '@angular/core'
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgSelectComponent } from '@ng-select/ng-select'
+import { first, firstValueFrom, tap } from 'rxjs'
 import { Tag } from 'src/app/data/tag'
-import { TagEditDialogComponent } from '../../edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { EditDialogMode } from '../../edit-dialog/edit-dialog.component'
-import { first, firstValueFrom, tap } from 'rxjs'
-import { NgSelectComponent } from '@ng-select/ng-select'
+import { TagEditDialogComponent } from '../../edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 
 @Component({
   providers: [

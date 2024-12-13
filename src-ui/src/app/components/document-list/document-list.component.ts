@@ -9,18 +9,14 @@ import {
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { filter, first, map, Subject, switchMap, takeUntil } from 'rxjs'
-import { FilterRule } from 'src/app/data/filter-rule'
-import {
-  filterRulesDiffer,
-  isFullTextFilterRule,
-} from 'src/app/utils/filter-rules'
-import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 import {
   DEFAULT_DISPLAY_FIELDS,
   DisplayField,
   DisplayMode,
   Document,
 } from 'src/app/data/document'
+import { FilterRule } from 'src/app/data/filter-rule'
+import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 import { SavedView } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import {
@@ -29,15 +25,19 @@ import {
 } from 'src/app/directives/sortable.directive'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { HotKeyService } from 'src/app/services/hot-key.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import {
+  filterRulesDiffer,
+  isFullTextFilterRule,
+} from 'src/app/utils/filter-rules'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { FilterEditorComponent } from './filter-editor/filter-editor.component'
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component'
-import { HotKeyService } from 'src/app/services/hot-key.service'
 
 @Component({
   selector: 'pngx-document-list',

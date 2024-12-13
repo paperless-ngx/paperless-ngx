@@ -1,8 +1,8 @@
 import { Component, HostListener, ViewChild } from '@angular/core'
 import { NgxFileDropComponent, NgxFileDropEntry } from 'ngx-file-drop'
 import {
-  PermissionsService,
   PermissionAction,
+  PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
 import { SettingsService } from 'src/app/services/settings.service'

@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http'
 import { Component, OnDestroy, OnInit } from '@angular/core'
-import { first, Observable, Subject, Subscription, takeUntil } from 'rxjs'
+import * as mimeTypeNames from 'mime-names'
+import { first, Subject, Subscription, takeUntil } from 'rxjs'
+import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
 import { FILTER_HAS_TAGS_ANY } from 'src/app/data/filter-rule-type'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { environment } from 'src/environments/environment'
-import * as mimeTypeNames from 'mime-names'
-import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
 
 export interface Statistics {
   documents_total?: number

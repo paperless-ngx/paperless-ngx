@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { FILTER_HAS_CORRESPONDENT_ANY } from 'src/app/data/filter-rule-type'
 import { Correspondent } from 'src/app/data/correspondent'
+import { FILTER_HAS_CORRESPONDENT_ANY } from 'src/app/data/filter-rule-type'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {

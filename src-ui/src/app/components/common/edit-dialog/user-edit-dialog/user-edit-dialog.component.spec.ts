@@ -1,17 +1,22 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import {
+  AbstractControl,
   FormsModule,
   ReactiveFormsModule,
-  AbstractControl,
 } from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { PermissionsService } from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
+import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { PasswordComponent } from '../../input/password/password.component'
 import { PermissionsFormComponent } from '../../input/permissions/permissions-form/permissions-form.component'
 import { SelectComponent } from '../../input/select/select.component'
@@ -19,11 +24,6 @@ import { TextComponent } from '../../input/text/text.component'
 import { PermissionsSelectComponent } from '../../permissions-select/permissions-select.component'
 import { EditDialogMode } from '../edit-dialog.component'
 import { UserEditDialogComponent } from './user-edit-dialog.component'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { ToastService } from 'src/app/services/toast.service'
-import { UserService } from 'src/app/services/rest/user.service'
-import { PermissionsService } from 'src/app/services/permissions.service'
 
 describe('UserEditDialogComponent', () => {
   let component: UserEditDialogComponent

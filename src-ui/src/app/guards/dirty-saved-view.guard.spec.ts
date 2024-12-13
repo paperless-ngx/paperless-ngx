@@ -1,13 +1,13 @@
-import { TestBed } from '@angular/core/testing'
-import { DirtySavedViewGuard } from './dirty-saved-view.guard'
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
-import { SettingsService } from '../services/settings.service'
-import { DocumentListComponent } from '../components/document-list/document-list.component'
-import { RouterTestingModule } from '@angular/router/testing'
-import { routes } from '../app-routing.module'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { ConfirmDialogComponent } from '../components/common/confirm-dialog/confirm-dialog.component'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { TestBed } from '@angular/core/testing'
+import { RouterTestingModule } from '@angular/router/testing'
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
+import { routes } from '../app-routing.module'
+import { ConfirmDialogComponent } from '../components/common/confirm-dialog/confirm-dialog.component'
+import { DocumentListComponent } from '../components/document-list/document-list.component'
+import { SettingsService } from '../services/settings.service'
+import { DirtySavedViewGuard } from './dirty-saved-view.guard'
 
 describe('DirtySavedViewGuard', () => {
   let guard: DirtySavedViewGuard

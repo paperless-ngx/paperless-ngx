@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing'
+import { Document } from '../data/document'
 import {
   PermissionAction,
   PermissionType,
   PermissionsService,
 } from './permissions.service'
-import { Document } from '../data/document'
 
 describe('PermissionsService', () => {
   let permissionsService: PermissionsService

@@ -1,10 +1,10 @@
+import { DragDropModule } from '@angular/cdk/drag-drop'
 import { Component } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { WidgetFrameComponent } from './widget-frame.component'
-import { DragDropModule } from '@angular/cdk/drag-drop'
 
 @Component({
   template: `

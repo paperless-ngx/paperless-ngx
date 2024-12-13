@@ -9,23 +9,23 @@ import {
 } from '@angular/core'
 import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectComponent } from '@ng-select/ng-select'
-import { Subject, first, takeUntil } from 'rxjs'
+import { first, Subject, takeUntil } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
+  CUSTOM_FIELD_QUERY_MAX_ATOMS,
+  CUSTOM_FIELD_QUERY_MAX_DEPTH,
+  CUSTOM_FIELD_QUERY_OPERATOR_GROUPS_BY_TYPE,
+  CUSTOM_FIELD_QUERY_OPERATOR_LABELS,
+  CUSTOM_FIELD_QUERY_OPERATORS_BY_GROUP,
   CustomFieldQueryElementType,
   CustomFieldQueryOperator,
-  CUSTOM_FIELD_QUERY_OPERATOR_GROUPS_BY_TYPE,
-  CUSTOM_FIELD_QUERY_OPERATORS_BY_GROUP,
   CustomFieldQueryOperatorGroups,
-  CUSTOM_FIELD_QUERY_OPERATOR_LABELS,
-  CUSTOM_FIELD_QUERY_MAX_DEPTH,
-  CUSTOM_FIELD_QUERY_MAX_ATOMS,
 } from 'src/app/data/custom-field-query'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import {
+  CustomFieldQueryAtom,
   CustomFieldQueryElement,
   CustomFieldQueryExpression,
-  CustomFieldQueryAtom,
 } from 'src/app/utils/custom-field-query-element'
 import { popperOptionsReenablePreventOverflow } from 'src/app/utils/popper-options'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'

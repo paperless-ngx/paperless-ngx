@@ -1,24 +1,39 @@
+import { CdkDragDrop } from '@angular/cdk/drag-drop'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of } from 'rxjs'
+import { CustomFieldDataType } from 'src/app/data/custom-field'
+import { MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model'
+import { Workflow } from 'src/app/data/workflow'
+import {
+  WorkflowAction,
+  WorkflowActionType,
+} from 'src/app/data/workflow-action'
+import {
+  DocumentSource,
+  WorkflowTriggerType,
+} from 'src/app/data/workflow-trigger'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ConfirmButtonComponent } from '../../confirm-button/confirm-button.component'
 import { NumberComponent } from '../../input/number/number.component'
 import { PermissionsGroupComponent } from '../../input/permissions/permissions-group/permissions-group.component'
 import { PermissionsUserComponent } from '../../input/permissions/permissions-user/permissions-user.component'
 import { SelectComponent } from '../../input/select/select.component'
+import { SwitchComponent } from '../../input/switch/switch.component'
 import { TagsComponent } from '../../input/tags/tags.component'
 import { TextComponent } from '../../input/text/text.component'
-import { SwitchComponent } from '../../input/switch/switch.component'
 import { EditDialogMode } from '../edit-dialog.component'
 import {
   DOCUMENT_SOURCE_OPTIONS,
@@ -27,21 +42,6 @@ import {
   WORKFLOW_TYPE_OPTIONS,
   WorkflowEditDialogComponent,
 } from './workflow-edit-dialog.component'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { Workflow } from 'src/app/data/workflow'
-import {
-  WorkflowTriggerType,
-  DocumentSource,
-} from 'src/app/data/workflow-trigger'
-import { CdkDragDrop } from '@angular/cdk/drag-drop'
-import {
-  WorkflowAction,
-  WorkflowActionType,
-} from 'src/app/data/workflow-action'
-import { MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model'
-import { ConfirmButtonComponent } from '../../confirm-button/confirm-button.component'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { CustomFieldDataType } from 'src/app/data/custom-field'
 
 const workflow: Workflow = {
   name: 'Workflow 1',

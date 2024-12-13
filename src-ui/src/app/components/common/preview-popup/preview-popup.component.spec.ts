@@ -5,23 +5,23 @@ import {
   tick,
 } from '@angular/core/testing'
 
-import { PreviewPopupComponent } from './preview-popup.component'
-import { By } from '@angular/platform-browser'
-import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
-import { SettingsService } from 'src/app/services/settings.service'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { DocumentService } from 'src/app/services/rest/document.service'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { PdfViewerModule } from 'ng2-pdf-viewer'
 import {
   HttpClient,
   provideHttpClient,
   withInterceptorsFromDi,
 } from '@angular/common/http'
-import { of, throwError } from 'rxjs'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { By } from '@angular/platform-browser'
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
+import { PdfViewerModule } from 'ng2-pdf-viewer'
+import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { of, throwError } from 'rxjs'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
+import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
+import { DocumentService } from 'src/app/services/rest/document.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { PreviewPopupComponent } from './preview-popup.component'
 
 const doc = {
   id: 10,

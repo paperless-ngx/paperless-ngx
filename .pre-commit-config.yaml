@@ -46,6 +46,9 @@ repos:
           - ts
           - markdown
         exclude: "(^Pipfile\\.lock$)"
+        additional_dependencies:
+          - prettier@3.3.3
+          - 'prettier-plugin-organize-imports@4.1.0'
   # Python hooks
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.8.2

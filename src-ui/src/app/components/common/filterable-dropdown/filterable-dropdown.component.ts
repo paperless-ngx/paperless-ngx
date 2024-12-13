@@ -1,22 +1,22 @@
 import {
   Component,
+  ElementRef,
   EventEmitter,
   Input,
-  Output,
-  ElementRef,
-  ViewChild,
   OnInit,
+  Output,
+  ViewChild,
 } from '@angular/core'
-import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
-import { ToggleableItemState } from './toggleable-dropdown-button/toggleable-dropdown-button.component'
+import { Subject, filter, takeUntil } from 'rxjs'
 import { MatchingModel } from 'src/app/data/matching-model'
-import { Subject, filter, take, takeUntil } from 'rxjs'
-import { SelectionDataItem } from 'src/app/services/rest/document.service'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
+import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { HotKeyService } from 'src/app/services/hot-key.service'
+import { SelectionDataItem } from 'src/app/services/rest/document.service'
 import { popperOptionsReenablePreventOverflow } from 'src/app/utils/popper-options'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
+import { ToggleableItemState } from './toggleable-dropdown-button/toggleable-dropdown-button.component'
 
 export interface ChangedItems {
   itemsToAdd: MatchingModel[]

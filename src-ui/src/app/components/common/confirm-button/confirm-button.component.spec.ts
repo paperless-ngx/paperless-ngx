@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { ConfirmButtonComponent } from './confirm-button.component'
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { ConfirmButtonComponent } from './confirm-button.component'
 
 describe('ConfirmButtonComponent', () => {
   let component: ConfirmButtonComponent

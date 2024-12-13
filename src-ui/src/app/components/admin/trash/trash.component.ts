@@ -1,13 +1,13 @@
 import { Component, OnDestroy } from '@angular/core'
+import { Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { delay, takeUntil, tap } from 'rxjs'
 import { Document } from 'src/app/data/document'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { TrashService } from 'src/app/services/trash.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import { delay, takeUntil, tap } from 'rxjs'
-import { SettingsService } from 'src/app/services/settings.service'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { Router } from '@angular/router'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({

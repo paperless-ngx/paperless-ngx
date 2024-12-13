@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { MetadataCollapseComponent } from './metadata-collapse.component'
 import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { MetadataCollapseComponent } from './metadata-collapse.component'
 
 const metadata = [
   {

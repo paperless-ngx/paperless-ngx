@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
-import { NgbAlertModule, NgbAlert } from '@ng-bootstrap/ng-bootstrap'
+import { NgbAlert, NgbAlertModule } from '@ng-bootstrap/ng-bootstrap'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 import { WelcomeWidgetComponent } from './welcome-widget.component'

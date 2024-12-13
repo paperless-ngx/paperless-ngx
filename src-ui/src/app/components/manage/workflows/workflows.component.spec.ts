@@ -1,32 +1,32 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import {
   NgbModal,
-  NgbPaginationModule,
-  NgbModalRef,
   NgbModalModule,
+  NgbModalRef,
+  NgbPaginationModule,
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { Workflow } from 'src/app/data/workflow'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { WorkflowService } from 'src/app/services/rest/workflow.service'
-import { ToastService } from 'src/app/services/toast.service'
-import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-import { WorkflowsComponent } from './workflows.component'
-import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
-import { PermissionsService } from 'src/app/services/permissions.service'
+import { WorkflowActionType } from 'src/app/data/workflow-action'
 import {
   DocumentSource,
   WorkflowTriggerType,
 } from 'src/app/data/workflow-trigger'
-import { WorkflowActionType } from 'src/app/data/workflow-action'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { PermissionsService } from 'src/app/services/permissions.service'
+import { WorkflowService } from 'src/app/services/rest/workflow.service'
+import { ToastService } from 'src/app/services/toast.service'
+import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
+import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
+import { PageHeaderComponent } from '../../common/page-header/page-header.component'
+import { WorkflowsComponent } from './workflows.component'
 
 const workflows: Workflow[] = [
   {

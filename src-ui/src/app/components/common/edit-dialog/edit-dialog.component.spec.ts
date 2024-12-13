@@ -1,3 +1,4 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
@@ -10,8 +11,8 @@ import {
   tick,
 } from '@angular/core/testing'
 import {
-  FormGroup,
   FormControl,
+  FormGroup,
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
@@ -19,9 +20,9 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { of } from 'rxjs'
 import {
   DEFAULT_MATCHING_ALGORITHM,
+  MATCH_ALL,
   MATCH_AUTO,
   MATCH_NONE,
-  MATCH_ALL,
 } from 'src/app/data/matching-model'
 import { Tag } from 'src/app/data/tag'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
@@ -30,7 +31,6 @@ import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { environment } from 'src/environments/environment'
 import { EditDialogComponent, EditDialogMode } from './edit-dialog.component'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 @Component({
   template: `

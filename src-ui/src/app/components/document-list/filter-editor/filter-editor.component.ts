@@ -1,17 +1,14 @@
 import {
+  AfterViewInit,
   Component,
+  ElementRef,
   EventEmitter,
   Input,
-  Output,
-  OnInit,
   OnDestroy,
+  OnInit,
+  Output,
   ViewChild,
-  ElementRef,
-  AfterViewInit,
 } from '@angular/core'
-import { Tag } from 'src/app/data/tag'
-import { Correspondent } from 'src/app/data/correspondent'
-import { DocumentType } from 'src/app/data/document-type'
 import { Observable, Subject, from } from 'rxjs'
 import {
   catchError,
@@ -22,48 +19,76 @@ import {
   switchMap,
   takeUntil,
 } from 'rxjs/operators'
-import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import { TagService } from 'src/app/services/rest/tag.service'
-import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { Correspondent } from 'src/app/data/correspondent'
+import { CustomField } from 'src/app/data/custom-field'
+import {
+  CustomFieldQueryLogicalOperator,
+  CustomFieldQueryOperator,
+} from 'src/app/data/custom-field-query'
+import { Document } from 'src/app/data/document'
+import { DocumentType } from 'src/app/data/document-type'
 import { FilterRule } from 'src/app/data/filter-rule'
-import { filterRulesDiffer } from 'src/app/utils/filter-rules'
 import {
   FILTER_ADDED_AFTER,
   FILTER_ADDED_BEFORE,
   FILTER_ASN,
-  FILTER_HAS_CORRESPONDENT_ANY,
+  FILTER_ASN_GT,
+  FILTER_ASN_ISNULL,
+  FILTER_ASN_LT,
+  FILTER_CORRESPONDENT,
   FILTER_CREATED_AFTER,
   FILTER_CREATED_BEFORE,
-  FILTER_HAS_DOCUMENT_TYPE_ANY,
-  FILTER_FULLTEXT_MORELIKE,
-  FILTER_FULLTEXT_QUERY,
-  FILTER_HAS_ANY_TAG,
-  FILTER_HAS_TAGS_ALL,
-  FILTER_HAS_TAGS_ANY,
-  FILTER_DOES_NOT_HAVE_TAG,
-  FILTER_TITLE,
-  FILTER_TITLE_CONTENT,
-  FILTER_HAS_STORAGE_PATH_ANY,
-  FILTER_ASN_ISNULL,
-  FILTER_ASN_GT,
-  FILTER_ASN_LT,
+  FILTER_CUSTOM_FIELDS_QUERY,
+  FILTER_CUSTOM_FIELDS_TEXT,
+  FILTER_DOCUMENT_TYPE,
   FILTER_DOES_NOT_HAVE_CORRESPONDENT,
   FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
   FILTER_DOES_NOT_HAVE_STORAGE_PATH,
-  FILTER_DOCUMENT_TYPE,
-  FILTER_CORRESPONDENT,
-  FILTER_STORAGE_PATH,
+  FILTER_DOES_NOT_HAVE_TAG,
+  FILTER_FULLTEXT_MORELIKE,
+  FILTER_FULLTEXT_QUERY,
+  FILTER_HAS_ANY_TAG,
+  FILTER_HAS_CORRESPONDENT_ANY,
+  FILTER_HAS_CUSTOM_FIELDS_ALL,
+  FILTER_HAS_CUSTOM_FIELDS_ANY,
+  FILTER_HAS_DOCUMENT_TYPE_ANY,
+  FILTER_HAS_STORAGE_PATH_ANY,
+  FILTER_HAS_TAGS_ALL,
+  FILTER_HAS_TAGS_ANY,
   FILTER_OWNER,
+  FILTER_OWNER_ANY,
   FILTER_OWNER_DOES_NOT_INCLUDE,
   FILTER_OWNER_ISNULL,
-  FILTER_OWNER_ANY,
-  FILTER_CUSTOM_FIELDS_TEXT,
   FILTER_SHARED_BY_USER,
-  FILTER_HAS_CUSTOM_FIELDS_ANY,
-  FILTER_HAS_CUSTOM_FIELDS_ALL,
-  FILTER_HAS_ANY_CUSTOM_FIELDS,
-  FILTER_CUSTOM_FIELDS_QUERY,
+  FILTER_STORAGE_PATH,
+  FILTER_TITLE,
+  FILTER_TITLE_CONTENT,
 } from 'src/app/data/filter-rule-type'
+import { StoragePath } from 'src/app/data/storage-path'
+import { Tag } from 'src/app/data/tag'
+import {
+  PermissionAction,
+  PermissionType,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
+import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import {
+  DocumentService,
+  SelectionData,
+  SelectionDataItem,
+} from 'src/app/services/rest/document.service'
+import { SearchService } from 'src/app/services/rest/search.service'
+import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { TagService } from 'src/app/services/rest/tag.service'
+import {
+  CustomFieldQueryAtom,
+  CustomFieldQueryExpression,
+} from 'src/app/utils/custom-field-query-element'
+import { filterRulesDiffer } from 'src/app/utils/filter-rules'
+import { CustomFieldQueriesModel } from '../../common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
+import { RelativeDate } from '../../common/dates-dropdown/dates-dropdown.component'
 import {
   FilterableDropdownSelectionModel,
   Intersection,
@@ -71,36 +96,9 @@ import {
 } from '../../common/filterable-dropdown/filterable-dropdown.component'
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
 import {
-  DocumentService,
-  SelectionData,
-  SelectionDataItem,
-} from 'src/app/services/rest/document.service'
-import { Document } from 'src/app/data/document'
-import { StoragePath } from 'src/app/data/storage-path'
-import { StoragePathService } from 'src/app/services/rest/storage-path.service'
-import { RelativeDate } from '../../common/dates-dropdown/dates-dropdown.component'
-import {
   OwnerFilterType,
   PermissionsSelectionModel,
 } from '../../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
-import {
-  PermissionAction,
-  PermissionType,
-  PermissionsService,
-} from 'src/app/services/permissions.service'
-import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { CustomField } from 'src/app/data/custom-field'
-import { SearchService } from 'src/app/services/rest/search.service'
-import {
-  CustomFieldQueryLogicalOperator,
-  CustomFieldQueryOperator,
-} from 'src/app/data/custom-field-query'
-import { CustomFieldQueriesModel } from '../../common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
-import {
-  CustomFieldQueryExpression,
-  CustomFieldQueryAtom,
-} from 'src/app/utils/custom-field-query-element'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'

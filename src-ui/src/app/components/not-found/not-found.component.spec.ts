@@ -1,10 +1,10 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { NotFoundComponent } from './not-found.component'
-import { By } from '@angular/platform-browser'
-import { LogoComponent } from '../common/logo/logo.component'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { By } from '@angular/platform-browser'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { LogoComponent } from '../common/logo/logo.component'
+import { NotFoundComponent } from './not-found.component'
 
 describe('NotFoundComponent', () => {
   let component: NotFoundComponent

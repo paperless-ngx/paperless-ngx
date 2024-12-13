@@ -1,21 +1,21 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of } from 'rxjs'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { UserService } from 'src/app/services/rest/user.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
 import {
   OwnerFilterType,
   PermissionsFilterDropdownComponent,
   PermissionsSelectionModel,
 } from './permissions-filter-dropdown.component'
-import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
-import { SettingsService } from 'src/app/services/settings.service'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const currentUserID = 13
 

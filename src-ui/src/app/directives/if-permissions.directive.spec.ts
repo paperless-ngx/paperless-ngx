@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { IfPermissionsDirective } from './if-permissions.directive'
 import { PermissionsService } from '../services/permissions.service'
+import { IfPermissionsDirective } from './if-permissions.directive'
 
 @Component({
   template: `

@@ -1,12 +1,13 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { ElementRef } from '@angular/core'
 import {
   ComponentFixture,
   TestBed,
   fakeAsync,
   tick,
 } from '@angular/core/testing'
-import { GlobalSearchComponent } from './global-search.component'
-import { of } from 'rxjs'
-import { SearchService } from 'src/app/services/rest/search.service'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
 import {
   NgbDropdownModule,
@@ -14,11 +15,9 @@ import {
   NgbModalModule,
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
-import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
-import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { of } from 'rxjs'
+import { DataType } from 'src/app/data/datatype'
 import {
   FILTER_FULLTEXT_QUERY,
   FILTER_HAS_CORRESPONDENT_ANY,
@@ -27,20 +26,21 @@ import {
   FILTER_HAS_TAGS_ALL,
   FILTER_TITLE_CONTENT,
 } from 'src/app/data/filter-rule-type'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { DocumentService } from 'src/app/services/rest/document.service'
-import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
-import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
-import { GroupEditDialogComponent } from '../../common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
-import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
-import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
-import { ElementRef } from '@angular/core'
-import { ToastService } from 'src/app/services/toast.service'
-import { DataType } from 'src/app/data/datatype'
-import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
-import { SettingsService } from 'src/app/services/settings.service'
 import { GlobalSearchType, SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
+import { SearchService } from 'src/app/services/rest/search.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
+import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
+import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
+import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { GroupEditDialogComponent } from '../../common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
+import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
+import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
+import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
+import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
+import { GlobalSearchComponent } from './global-search.component'
 
 const searchResults = {
   total: 11,

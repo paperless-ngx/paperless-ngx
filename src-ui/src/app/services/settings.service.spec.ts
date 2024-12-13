@@ -1,3 +1,4 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
@@ -7,17 +8,16 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { RouterTestingModule } from '@angular/router/testing'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { CookieService } from 'ngx-cookie-service'
-import { Subscription, of } from 'rxjs'
+import { of, Subscription } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import { AppModule } from '../app.module'
-import { UiSettings, SETTINGS_KEYS } from '../data/ui-settings'
-import { SettingsService } from './settings.service'
-import { SavedView } from '../data/saved-view'
-import { CustomFieldsService } from './rest/custom-fields.service'
 import { CustomFieldDataType } from '../data/custom-field'
-import { PermissionsService } from './permissions.service'
 import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { SavedView } from '../data/saved-view'
+import { SETTINGS_KEYS, UiSettings } from '../data/ui-settings'
+import { PermissionsService } from './permissions.service'
+import { CustomFieldsService } from './rest/custom-fields.service'
+import { SettingsService } from './settings.service'
 import { ToastService } from './toast.service'
 
 const customFields = [

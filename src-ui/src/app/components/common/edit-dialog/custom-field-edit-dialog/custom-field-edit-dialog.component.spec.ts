@@ -1,10 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { CustomFieldEditDialogComponent } from './custom-field-edit-dialog.component'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { ElementRef, QueryList } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { CustomFieldDataType } from 'src/app/data/custom-field'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
@@ -12,10 +15,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { SelectComponent } from '../../input/select/select.component'
 import { TextComponent } from '../../input/text/text.component'
 import { EditDialogMode } from '../edit-dialog.component'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { CustomFieldDataType } from 'src/app/data/custom-field'
-import { ElementRef, QueryList } from '@angular/core'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { CustomFieldEditDialogComponent } from './custom-field-edit-dialog.component'
 
 describe('CustomFieldEditDialogComponent', () => {
   let component: CustomFieldEditDialogComponent

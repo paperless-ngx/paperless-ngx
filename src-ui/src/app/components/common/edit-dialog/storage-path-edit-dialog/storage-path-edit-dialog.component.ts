@@ -2,17 +2,17 @@ import { Component, OnDestroy } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import {
-  Subject,
   Observable,
+  Subject,
+  catchError,
   concat,
-  of,
   distinctUntilChanged,
+  filter,
+  map,
+  of,
+  switchMap,
   takeUntil,
   tap,
-  switchMap,
-  map,
-  catchError,
-  filter,
 } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Document } from 'src/app/data/document'

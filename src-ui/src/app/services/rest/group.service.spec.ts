@@ -1,9 +1,9 @@
 import { HttpTestingController } from '@angular/common/http/testing'
-import { Subscription } from 'rxjs'
 import { TestBed } from '@angular/core/testing'
+import { Subscription } from 'rxjs'
 import { environment } from 'src/environments/environment'
-import { GroupService } from './group.service'
 import { commonAbstractNameFilterPaperlessServiceTests } from './abstract-name-filter-service.spec'
+import { GroupService } from './group.service'
 
 let httpTestingController: HttpTestingController
 let service: GroupService

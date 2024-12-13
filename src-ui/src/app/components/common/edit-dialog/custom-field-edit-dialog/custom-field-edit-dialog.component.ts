@@ -6,18 +6,18 @@ import {
   QueryList,
   ViewChildren,
 } from '@angular/core'
-import { FormGroup, FormControl, FormArray } from '@angular/forms'
+import { FormArray, FormControl, FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { takeUntil } from 'rxjs'
 import {
-  DATA_TYPE_LABELS,
   CustomField,
   CustomFieldDataType,
+  DATA_TYPE_LABELS,
 } from 'src/app/data/custom-field'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { EditDialogComponent, EditDialogMode } from '../edit-dialog.component'
-import { takeUntil } from 'rxjs'
 
 @Component({
   selector: 'pngx-custom-field-edit-dialog',
