@@ -1,13 +1,13 @@
 import { ViewportScroller } from '@angular/common'
 import {
-  Component,
-  OnInit,
   AfterViewInit,
-  OnDestroy,
+  Component,
   Inject,
   LOCALE_ID,
+  OnDestroy,
+  OnInit,
 } from '@angular/core'
-import { FormGroup, FormControl } from '@angular/forms'
+import { FormControl, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import {
   NgbModal,
@@ -18,36 +18,36 @@ import { DirtyComponent, dirtyCheck } from '@ngneat/dirty-check-forms'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 import {
   BehaviorSubject,
-  Subscription,
   Observable,
   Subject,
+  Subscription,
   first,
   takeUntil,
   tap,
 } from 'rxjs'
 import { Group } from 'src/app/data/group'
+import {
+  SystemStatus,
+  SystemStatusItemStatus,
+} from 'src/app/data/system-status'
 import { GlobalSearchType, SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { User } from 'src/app/data/user'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
-  PermissionsService,
   PermissionAction,
   PermissionType,
+  PermissionsService,
 } from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import {
-  SettingsService,
   LanguageOption,
+  SettingsService,
 } from 'src/app/services/settings.service'
-import { ToastService, Toast } from 'src/app/services/toast.service'
-import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
-import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
 import { SystemStatusService } from 'src/app/services/system-status.service'
-import {
-  SystemStatusItemStatus,
-  SystemStatus,
-} from 'src/app/data/system-status'
+import { Toast, ToastService } from 'src/app/services/toast.service'
+import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
+import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 enum SettingsNavIDs {
   General = 1,

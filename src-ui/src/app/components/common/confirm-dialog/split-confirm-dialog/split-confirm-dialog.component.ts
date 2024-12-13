@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core'
-import { ConfirmDialogComponent } from '../confirm-dialog.component'
-import { Document } from 'src/app/data/document'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { DocumentService } from 'src/app/services/rest/document.service'
-import { PermissionsService } from 'src/app/services/permissions.service'
 import { PDFDocumentProxy } from 'ng2-pdf-viewer'
+import { Document } from 'src/app/data/document'
+import { PermissionsService } from 'src/app/services/permissions.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
+import { ConfirmDialogComponent } from '../confirm-dialog.component'
 
 @Component({
   selector: 'pngx-split-confirm-dialog',

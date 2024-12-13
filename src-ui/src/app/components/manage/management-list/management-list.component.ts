@@ -15,10 +15,10 @@ import {
   tap,
 } from 'rxjs/operators'
 import {
-  MatchingModel,
-  MATCHING_ALGORITHMS,
   MATCH_AUTO,
   MATCH_NONE,
+  MATCHING_ALGORITHMS,
+  MatchingModel,
 } from 'src/app/data/matching-model'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'

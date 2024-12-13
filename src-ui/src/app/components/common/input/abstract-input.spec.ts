@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
-import { AbstractInputComponent } from './abstract-input'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { AbstractInputComponent } from './abstract-input'
 
 @Component({
   template: `

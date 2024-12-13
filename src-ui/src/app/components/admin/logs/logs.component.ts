@@ -1,10 +1,10 @@
 import {
+  ChangeDetectorRef,
   Component,
   ElementRef,
+  OnDestroy,
   OnInit,
   ViewChild,
-  ChangeDetectorRef,
-  OnDestroy,
 } from '@angular/core'
 import { filter, takeUntil, timer } from 'rxjs'
 import { LogService } from 'src/app/services/rest/log.service'

@@ -1,13 +1,12 @@
-import { TestBed } from '@angular/core/testing'
-import { UsernamePipe } from './username.pipe'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
+import { TestBed } from '@angular/core/testing'
 import { environment } from 'src/environments/environment'
 import { PermissionsService } from '../services/permissions.service'
-import { UserService } from '../services/rest/user.service'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { UsernamePipe } from './username.pipe'
 
 describe('UsernamePipe', () => {
   let pipe: UsernamePipe

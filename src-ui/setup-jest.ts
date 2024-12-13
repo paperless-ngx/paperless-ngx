@@ -1,9 +1,9 @@
+import '@angular/localize/init'
 import { jest } from '@jest/globals'
+import { TextDecoder, TextEncoder } from 'util'
 if (process.env.NODE_ENV === 'test') {
   require('jest-preset-angular/setup-jest')
 }
-import '@angular/localize/init'
-import { TextEncoder, TextDecoder } from 'util'
 global.TextEncoder = TextEncoder
 global.TextDecoder = TextDecoder
 

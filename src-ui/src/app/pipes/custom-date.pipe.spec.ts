@@ -1,9 +1,9 @@
-import { TestBed } from '@angular/core/testing'
-import { CustomDatePipe } from './custom-date.pipe'
-import { SettingsService } from '../services/settings.service'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { DatePipe } from '@angular/common'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { TestBed } from '@angular/core/testing'
+import { SettingsService } from '../services/settings.service'
+import { CustomDatePipe } from './custom-date.pipe'
 
 describe('CustomDatePipe', () => {
   let datePipe: CustomDatePipe

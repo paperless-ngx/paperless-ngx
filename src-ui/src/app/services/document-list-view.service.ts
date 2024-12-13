@@ -1,21 +1,21 @@
 import { Injectable } from '@angular/core'
 import { ParamMap, Router } from '@angular/router'
 import { Observable, Subject, first, takeUntil } from 'rxjs'
-import { FilterRule } from '../data/filter-rule'
-import {
-  filterRulesDiffer,
-  cloneFilterRules,
-  isFullTextFilterRule,
-} from '../utils/filter-rules'
 import {
   DEFAULT_DISPLAY_FIELDS,
   DisplayField,
   DisplayMode,
   Document,
 } from '../data/document'
+import { FilterRule } from '../data/filter-rule'
 import { SavedView } from '../data/saved-view'
-import { SETTINGS_KEYS } from '../data/ui-settings'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
+import { SETTINGS_KEYS } from '../data/ui-settings'
+import {
+  cloneFilterRules,
+  filterRulesDiffer,
+  isFullTextFilterRule,
+} from '../utils/filter-rules'
 import { paramsFromViewState, paramsToViewState } from '../utils/query-params'
 import { DocumentService, SelectionData } from './rest/document.service'
 import { SettingsService } from './settings.service'

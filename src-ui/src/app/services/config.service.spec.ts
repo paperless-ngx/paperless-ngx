@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing'
 
-import { ConfigService } from './config.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { environment } from 'src/environments/environment'
 import { OutputTypeConfig, PaperlessConfig } from '../data/paperless-config'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { ConfigService } from './config.service'
 
 describe('ConfigService', () => {
   let service: ConfigService

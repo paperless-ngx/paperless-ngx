@@ -1,3 +1,4 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
@@ -7,58 +8,57 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import {
   NgbModal,
-  NgbModule,
   NgbModalModule,
   NgbModalRef,
+  NgbModule,
 } from '@ng-bootstrap/ng-bootstrap'
+import { NgSelectModule } from '@ng-select/ng-select'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
+import { Correspondent } from 'src/app/data/correspondent'
+import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
+import { DocumentType } from 'src/app/data/document-type'
+import { Results } from 'src/app/data/results'
+import { StoragePath } from 'src/app/data/storage-path'
+import { Tag } from 'src/app/data/tag'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { FilterPipe } from 'src/app/pipes/filter.pipe'
+import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import {
-  SelectionData,
   DocumentService,
+  SelectionData,
 } from 'src/app/services/rest/document.service'
+import { GroupService } from 'src/app/services/rest/group.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
+import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
+import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
+import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
+import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
+import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
+import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { FilterableDropdownComponent } from '../../common/filterable-dropdown/filterable-dropdown.component'
 import { ToggleableDropdownButtonComponent } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
-import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 import { PermissionsFormComponent } from '../../common/input/permissions/permissions-form/permissions-form.component'
-import { BulkEditorComponent } from './bulk-editor.component'
-import { SelectComponent } from '../../common/input/select/select.component'
-import { UserService } from 'src/app/services/rest/user.service'
 import { PermissionsGroupComponent } from '../../common/input/permissions/permissions-group/permissions-group.component'
 import { PermissionsUserComponent } from '../../common/input/permissions/permissions-user/permissions-user.component'
-import { NgSelectModule } from '@ng-select/ng-select'
-import { GroupService } from 'src/app/services/rest/group.service'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { SelectComponent } from '../../common/input/select/select.component'
 import { SwitchComponent } from '../../common/input/switch/switch.component'
-import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
-import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
-import { Results } from 'src/app/data/results'
-import { Tag } from 'src/app/data/tag'
-import { Correspondent } from 'src/app/data/correspondent'
-import { DocumentType } from 'src/app/data/document-type'
-import { StoragePath } from 'src/app/data/storage-path'
-import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
-import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
-import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
-import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
-import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
-import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
-import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
+import { BulkEditorComponent } from './bulk-editor.component'
 
 const selectionData: SelectionData = {
   selected_tags: [

@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import {
   FormsModule,
-  ReactiveFormsModule,
   NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
 } from '@angular/forms'
 import { TextAreaComponent } from './textarea.component'
 

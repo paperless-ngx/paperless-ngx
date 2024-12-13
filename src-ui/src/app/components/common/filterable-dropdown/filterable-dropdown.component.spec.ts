@@ -4,6 +4,18 @@ import {
   fakeAsync,
   tick,
 } from '@angular/core/testing'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import {
+  DEFAULT_MATCHING_ALGORITHM,
+  MATCH_ALL,
+} from 'src/app/data/matching-model'
+import { Tag } from 'src/app/data/tag'
+import { FilterPipe } from 'src/app/pipes/filter.pipe'
+import { HotKeyService } from 'src/app/services/hot-key.service'
+import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
+import { TagComponent } from '../tag/tag.component'
 import {
   ChangedItems,
   FilterableDropdownComponent,
@@ -11,22 +23,10 @@ import {
   Intersection,
   LogicalOperator,
 } from './filterable-dropdown.component'
-import { FilterPipe } from 'src/app/pipes/filter.pipe'
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
-import { Tag } from 'src/app/data/tag'
-import {
-  DEFAULT_MATCHING_ALGORITHM,
-  MATCH_ALL,
-} from 'src/app/data/matching-model'
 import {
   ToggleableDropdownButtonComponent,
   ToggleableItemState,
 } from './toggleable-dropdown-button/toggleable-dropdown-button.component'
-import { TagComponent } from '../tag/tag.component'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { HotKeyService } from 'src/app/services/hot-key.service'
 
 const items: Tag[] = [
   {

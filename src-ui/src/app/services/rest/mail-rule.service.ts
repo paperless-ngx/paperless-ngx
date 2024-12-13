@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { combineLatest, Observable } from 'rxjs'
 import { tap } from 'rxjs/operators'
 import { MailRule } from 'src/app/data/mail-rule'
 import { AbstractPaperlessService } from './abstract-paperless-service'

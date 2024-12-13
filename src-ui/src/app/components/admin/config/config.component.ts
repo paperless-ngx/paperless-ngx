@@ -1,24 +1,23 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms'
+import { DirtyComponent, dirtyCheck } from '@ngneat/dirty-check-forms'
 import {
   BehaviorSubject,
   Observable,
-  Subject,
   Subscription,
   first,
   takeUntil,
 } from 'rxjs'
 import {
-  PaperlessConfigOptions,
   ConfigCategory,
   ConfigOption,
   ConfigOptionType,
   PaperlessConfig,
+  PaperlessConfigOptions,
 } from 'src/app/data/paperless-config'
 import { ConfigService } from 'src/app/services/config.service'
-import { ToastService } from 'src/app/services/toast.service'
-import { DirtyComponent, dirtyCheck } from '@ngneat/dirty-check-forms'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({

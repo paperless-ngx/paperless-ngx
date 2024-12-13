@@ -1,26 +1,26 @@
 import { DatePipe } from '@angular/common'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { By } from '@angular/platform-browser'
 import { RouterTestingModule } from '@angular/router/testing'
 import {
   NgbPopoverModule,
-  NgbTooltipModule,
   NgbProgressbarModule,
+  NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { of } from 'rxjs'
+import { Tag } from 'src/app/data/tag'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
-import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
-import { DocumentCardSmallComponent } from './document-card-small.component'
-import { of } from 'rxjs'
-import { By } from '@angular/platform-browser'
-import { TagComponent } from '../../common/tag/tag.component'
-import { Tag } from 'src/app/data/tag'
 import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
-import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { CustomFieldDisplayComponent } from '../../common/custom-field-display/custom-field-display.component'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
+import { TagComponent } from '../../common/tag/tag.component'
+import { DocumentCardSmallComponent } from './document-card-small.component'
 
 const doc = {
   id: 10,

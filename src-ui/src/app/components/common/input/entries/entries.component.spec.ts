@@ -4,8 +4,8 @@ import {
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { EntriesComponent } from './entries.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { EntriesComponent } from './entries.component'
 
 describe('EntriesComponent', () => {
   let component: EntriesComponent

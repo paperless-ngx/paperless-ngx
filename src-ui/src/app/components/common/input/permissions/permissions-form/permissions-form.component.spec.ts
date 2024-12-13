@@ -1,17 +1,17 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import {
   FormsModule,
-  ReactiveFormsModule,
   NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
 } from '@angular/forms'
-import { PermissionsFormComponent } from './permissions-form.component'
-import { SelectComponent } from '../../select/select.component'
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgSelectModule } from '@ng-select/ng-select'
+import { SelectComponent } from '../../select/select.component'
 import { PermissionsGroupComponent } from '../permissions-group/permissions-group.component'
 import { PermissionsUserComponent } from '../permissions-user/permissions-user.component'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { NgSelectModule } from '@ng-select/ng-select'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { PermissionsFormComponent } from './permissions-form.component'
 
 describe('PermissionsFormComponent', () => {
   let component: PermissionsFormComponent

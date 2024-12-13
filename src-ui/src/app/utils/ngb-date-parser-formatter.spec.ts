@@ -1,11 +1,11 @@
-import { TestBed } from '@angular/core/testing'
-import { LocalizedDateParserFormatter } from './ngb-date-parser-formatter'
-import { SettingsService } from '../services/settings.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { TestBed } from '@angular/core/testing'
+import { SettingsService } from '../services/settings.service'
+import { LocalizedDateParserFormatter } from './ngb-date-parser-formatter'
 
 describe('LocalizedDateParserFormatter', () => {
   let dateParserFormatter: LocalizedDateParserFormatter

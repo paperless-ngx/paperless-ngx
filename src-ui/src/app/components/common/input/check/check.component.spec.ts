@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { CheckComponent } from './check.component'
 import {
   FormsModule,
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from '@angular/forms'
+import { CheckComponent } from './check.component'
 
 describe('CheckComponent', () => {
   let component: CheckComponent

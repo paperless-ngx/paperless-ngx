@@ -1,40 +1,40 @@
+import {
+  CdkDragDrop,
+  CdkDragEnd,
+  CdkDragStart,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop'
 import { Component, HostListener, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Observable } from 'rxjs'
 import { first } from 'rxjs/operators'
 import { Document } from 'src/app/data/document'
-import { OpenDocumentsService } from 'src/app/services/open-documents.service'
+import { SavedView } from 'src/app/data/saved-view'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { ComponentCanDeactivate } from 'src/app/guards/dirty-doc.guard'
 import {
   DjangoMessageLevel,
   DjangoMessagesService,
 } from 'src/app/services/django-messages.service'
-import { SavedViewService } from 'src/app/services/rest/saved-view.service'
-import { environment } from 'src/environments/environment'
-import { DocumentDetailComponent } from '../document-detail/document-detail.component'
-import {
-  RemoteVersionService,
-  AppRemoteVersion,
-} from 'src/app/services/rest/remote-version.service'
-import { SettingsService } from 'src/app/services/settings.service'
-import { TasksService } from 'src/app/services/tasks.service'
-import { ComponentCanDeactivate } from 'src/app/guards/dirty-doc.guard'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { ToastService } from 'src/app/services/toast.service'
-import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
+import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
   PermissionAction,
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
-import { SavedView } from 'src/app/data/saved-view'
 import {
-  CdkDragStart,
-  CdkDragEnd,
-  CdkDragDrop,
-  moveItemInArray,
-} from '@angular/cdk/drag-drop'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+  AppRemoteVersion,
+  RemoteVersionService,
+} from 'src/app/services/rest/remote-version.service'
+import { SavedViewService } from 'src/app/services/rest/saved-view.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { TasksService } from 'src/app/services/tasks.service'
+import { ToastService } from 'src/app/services/toast.service'
+import { environment } from 'src/environments/environment'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
+import { DocumentDetailComponent } from '../document-detail/document-detail.component'
+import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 
 @Component({
   selector: 'pngx-app-frame',

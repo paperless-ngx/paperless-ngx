@@ -1,6 +1,6 @@
 import { Component, forwardRef } from '@angular/core'
-import { AbstractInputComponent } from '../abstract-input'
 import { NG_VALUE_ACCESSOR } from '@angular/forms'
+import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
   providers: [

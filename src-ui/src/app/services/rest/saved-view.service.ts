@@ -2,11 +2,11 @@ import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { combineLatest, Observable } from 'rxjs'
 import { tap } from 'rxjs/operators'
-import { SavedView } from 'src/app/data/saved-view'
-import { AbstractPaperlessService } from './abstract-paperless-service'
-import { SettingsService } from '../settings.service'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { Results } from 'src/app/data/results'
+import { SavedView } from 'src/app/data/saved-view'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { SettingsService } from '../settings.service'
+import { AbstractPaperlessService } from './abstract-paperless-service'
 
 @Injectable({
   providedIn: 'root',

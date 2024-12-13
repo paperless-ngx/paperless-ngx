@@ -1,3 +1,4 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import {
   ComponentFixture,
@@ -8,14 +9,13 @@ import {
   tick,
 } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
+import { NgxFileDropEntry, NgxFileDropModule } from 'ngx-file-drop'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
 import { ToastsComponent } from '../common/toasts/toasts.component'
 import { FileDropComponent } from './file-drop.component'
-import { NgxFileDropEntry, NgxFileDropModule } from 'ngx-file-drop'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('FileDropComponent', () => {
   let component: FileDropComponent

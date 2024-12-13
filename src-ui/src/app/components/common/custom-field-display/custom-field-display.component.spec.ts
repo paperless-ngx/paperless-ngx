@@ -1,12 +1,12 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { of } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
+import { DisplayField, Document } from 'src/app/data/document'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { CustomFieldDisplayComponent } from './custom-field-display.component'
-import { DisplayField, Document } from 'src/app/data/document'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const customFields: CustomField[] = [
   { id: 1, name: 'Field 1', data_type: CustomFieldDataType.String },

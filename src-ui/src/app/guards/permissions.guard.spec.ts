@@ -1,15 +1,13 @@
 import { TestBed } from '@angular/core/testing'
-import { PermissionsGuard } from './permissions.guard'
+import { ActivatedRoute, RouterState } from '@angular/router'
+import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 import {
   PermissionAction,
   PermissionType,
   PermissionsService,
 } from '../services/permissions.service'
-import { ActivatedRoute } from '@angular/router'
-import { RouterStateSnapshot } from '@angular/router'
-import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { ToastService } from '../services/toast.service'
-import { RouterState } from '@angular/router'
+import { PermissionsGuard } from './permissions.guard'
 
 describe('PermissionsGuard', () => {
   let guard: PermissionsGuard

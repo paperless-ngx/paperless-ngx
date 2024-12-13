@@ -7,7 +7,10 @@ import {
   ViewChildren,
 } from '@angular/core'
 import { Router } from '@angular/router'
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { delay, Subject, takeUntil, tap } from 'rxjs'
+import { LoadingComponentWithPermissions } from 'src/app/components/loading-component/loading.component'
+import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
   DEFAULT_DASHBOARD_DISPLAY_FIELDS,
   DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
@@ -16,9 +19,6 @@ import {
   DisplayMode,
   Document,
 } from 'src/app/data/document'
-import { SavedView } from 'src/app/data/saved-view'
-import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
-import { DocumentService } from 'src/app/services/rest/document.service'
 import {
   FILTER_CORRESPONDENT,
   FILTER_DOCUMENT_TYPE,
@@ -26,18 +26,18 @@ import {
   FILTER_HAS_TAGS_ALL,
   FILTER_STORAGE_PATH,
 } from 'src/app/data/filter-rule-type'
-import { OpenDocumentsService } from 'src/app/services/open-documents.service'
+import { SavedView } from 'src/app/data/saved-view'
+import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
+import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
   PermissionAction,
-  PermissionType,
   PermissionsService,
+  PermissionType,
 } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
+import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { LoadingComponentWithPermissions } from 'src/app/components/loading-component/loading.component'
 
 @Component({
   selector: 'pngx-saved-view-widget',

@@ -1,4 +1,5 @@
 import { convertToParamMap } from '@angular/router'
+import { CustomFieldQueryLogicalOperator } from '../data/custom-field-query'
 import { FilterRule } from '../data/filter-rule'
 import {
   FILTER_CORRESPONDENT,
@@ -8,11 +9,13 @@ import {
   FILTER_HAS_CUSTOM_FIELDS_ANY,
   FILTER_HAS_TAGS_ALL,
 } from '../data/filter-rule-type'
-import { paramsToViewState, transformLegacyFilterRules } from './query-params'
-import { paramsFromViewState } from './query-params'
-import { queryParamsFromFilterRules } from './query-params'
-import { filterRulesFromQueryParams } from './query-params'
-import { CustomFieldQueryLogicalOperator } from '../data/custom-field-query'
+import {
+  filterRulesFromQueryParams,
+  paramsFromViewState,
+  paramsToViewState,
+  queryParamsFromFilterRules,
+  transformLegacyFilterRules,
+} from './query-params'
 
 const tags__id__all = '9'
 const filterRules: FilterRule[] = [

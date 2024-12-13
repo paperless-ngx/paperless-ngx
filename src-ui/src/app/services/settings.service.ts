@@ -17,22 +17,22 @@ import {
   hexToHsl,
 } from 'src/app/utils/color'
 import { environment } from 'src/environments/environment'
+import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
+import { SavedView } from '../data/saved-view'
 import {
-  UiSettings,
+  PAPERLESS_GREEN_HEX,
   SETTINGS,
   SETTINGS_KEYS,
-  PAPERLESS_GREEN_HEX,
+  UiSettings,
 } from '../data/ui-settings'
 import { User } from '../data/user'
 import {
   PermissionAction,
-  PermissionType,
   PermissionsService,
+  PermissionType,
 } from './permissions.service'
-import { ToastService } from './toast.service'
-import { SavedView } from '../data/saved-view'
 import { CustomFieldsService } from './rest/custom-fields.service'
-import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
+import { ToastService } from './toast.service'
 
 export interface LanguageOption {
   code: string

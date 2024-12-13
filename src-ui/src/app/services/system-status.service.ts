@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
-import { SystemStatus } from '../data/system-status'
 import { environment } from 'src/environments/environment'
+import { SystemStatus } from '../data/system-status'
 
 @Injectable({
   providedIn: 'root',

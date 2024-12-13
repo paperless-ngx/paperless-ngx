@@ -1,20 +1,20 @@
 import { Component, OnInit } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { delay, takeUntil, tap } from 'rxjs'
-import { DATA_TYPE_LABELS, CustomField } from 'src/app/data/custom-field'
-import { PermissionsService } from 'src/app/services/permissions.service'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { ToastService } from 'src/app/services/toast.service'
-import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
-import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { FILTER_CUSTOM_FIELDS_QUERY } from 'src/app/data/filter-rule-type'
+import { CustomField, DATA_TYPE_LABELS } from 'src/app/data/custom-field'
 import {
   CustomFieldQueryLogicalOperator,
   CustomFieldQueryOperator,
 } from 'src/app/data/custom-field-query'
+import { FILTER_CUSTOM_FIELDS_QUERY } from 'src/app/data/filter-rule-type'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { PermissionsService } from 'src/app/services/permissions.service'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
+import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({

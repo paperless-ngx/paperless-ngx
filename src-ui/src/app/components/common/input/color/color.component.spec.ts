@@ -4,10 +4,10 @@ import {
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { ColorComponent } from './color.component'
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
-import { ColorSliderModule } from 'ngx-color/slider'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { ColorSliderModule } from 'ngx-color/slider'
+import { ColorComponent } from './color.component'
 
 describe('ColorComponent', () => {
   let component: ColorComponent

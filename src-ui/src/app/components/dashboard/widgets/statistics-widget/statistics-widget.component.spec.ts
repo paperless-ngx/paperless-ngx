@@ -1,24 +1,23 @@
-import { TestBed } from '@angular/core/testing'
-import { StatisticsWidgetComponent } from './statistics-widget.component'
-import { ComponentFixture } from '@angular/core/testing'
+import { DragDropModule } from '@angular/cdk/drag-drop'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
-import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
-import { environment } from 'src/environments/environment'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { RouterTestingModule } from '@angular/router/testing'
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { Subject } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
-import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import {
   ConsumerStatusService,
   FileStatus,
 } from 'src/app/services/consumer-status.service'
-import { Subject } from 'rxjs'
-import { DragDropModule } from '@angular/cdk/drag-drop'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { environment } from 'src/environments/environment'
+import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
+import { StatisticsWidgetComponent } from './statistics-widget.component'
 
 describe('StatisticsWidgetComponent', () => {
   let component: StatisticsWidgetComponent

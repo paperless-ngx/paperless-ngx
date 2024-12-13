@@ -1,34 +1,45 @@
-import { ViewportScroller, DatePipe } from '@angular/common'
+import { DragDropModule } from '@angular/cdk/drag-drop'
+import { DatePipe, ViewportScroller } from '@angular/common'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
-import { Router, ActivatedRoute, convertToParamMap } from '@angular/router'
+import { ActivatedRoute, Router, convertToParamMap } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import {
-  NgbModule,
   NgbAlertModule,
-  NgbNavLink,
   NgbModal,
   NgbModalModule,
+  NgbModule,
+  NgbNavLink,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
+import {
+  InstallType,
+  SystemStatus,
+  SystemStatusItemStatus,
+} from 'src/app/data/system-status'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
-import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { ToastService, Toast } from 'src/app/services/toast.service'
+import { SystemStatusService } from 'src/app/services/system-status.service'
+import { Toast, ToastService } from 'src/app/services/toast.service'
+import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { CheckComponent } from '../../common/input/check/check.component'
 import { ColorComponent } from '../../common/input/color/color.component'
+import { DragDropSelectComponent } from '../../common/input/drag-drop-select/drag-drop-select.component'
 import { NumberComponent } from '../../common/input/number/number.component'
 import { PermissionsGroupComponent } from '../../common/input/permissions/permissions-group/permissions-group.component'
 import { PermissionsUserComponent } from '../../common/input/permissions/permissions-user/permissions-user.component'
@@ -36,20 +47,8 @@ import { SelectComponent } from '../../common/input/select/select.component'
 import { TagsComponent } from '../../common/input/tags/tags.component'
 import { TextComponent } from '../../common/input/text/text.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-import { SettingsComponent } from './settings.component'
-import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
 import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
-import { SystemStatusService } from 'src/app/services/system-status.service'
-import {
-  SystemStatus,
-  InstallType,
-  SystemStatusItemStatus,
-} from 'src/app/data/system-status'
-import { DragDropSelectComponent } from '../../common/input/drag-drop-select/drag-drop-select.component'
-import { DragDropModule } from '@angular/cdk/drag-drop'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { SettingsComponent } from './settings.component'
 
 const users = [
   { id: 1, username: 'user1', is_superuser: false },

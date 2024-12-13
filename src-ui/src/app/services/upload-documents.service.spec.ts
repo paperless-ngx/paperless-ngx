@@ -1,19 +1,19 @@
-import { TestBed } from '@angular/core/testing'
-import { UploadDocumentsService } from './upload-documents.service'
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing'
-import { environment } from 'src/environments/environment'
 import {
   HttpEventType,
   provideHttpClient,
   withInterceptorsFromDi,
 } from '@angular/common/http'
 import {
+  HttpTestingController,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing'
+import { TestBed } from '@angular/core/testing'
+import { environment } from 'src/environments/environment'
+import {
   ConsumerStatusService,
   FileStatusPhase,
 } from './consumer-status.service'
+import { UploadDocumentsService } from './upload-documents.service'
 
 const files = [
   {

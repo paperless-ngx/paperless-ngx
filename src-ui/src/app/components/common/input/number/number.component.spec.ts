@@ -1,14 +1,14 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import {
   FormsModule,
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { NumberComponent } from './number.component'
-import { DocumentService } from 'src/app/services/rest/document.service'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { of } from 'rxjs'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { DocumentService } from 'src/app/services/rest/document.service'
+import { NumberComponent } from './number.component'
 
 describe('NumberComponent', () => {
   let component: NumberComponent

@@ -1,4 +1,4 @@
-import { DisplayMode, DisplayField } from './document'
+import { DisplayField, DisplayMode } from './document'
 import { FilterRule } from './filter-rule'
 import { ObjectWithPermissions } from './object-with-permissions'
 

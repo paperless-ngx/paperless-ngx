@@ -1,7 +1,7 @@
+import { getLocaleCurrencyCode } from '@angular/common'
 import { Component, forwardRef, Inject, Input, LOCALE_ID } from '@angular/core'
 import { NG_VALUE_ACCESSOR } from '@angular/forms'
 import { AbstractInputComponent } from '../abstract-input'
-import { getLocaleCurrencyCode } from '@angular/common'
 
 @Component({
   providers: [

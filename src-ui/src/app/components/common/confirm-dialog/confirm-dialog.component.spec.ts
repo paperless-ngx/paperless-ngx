@@ -1,14 +1,8 @@
-import {
-  ComponentFixture,
-  TestBed,
-  discardPeriodicTasks,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
-import { ConfirmDialogComponent } from './confirm-dialog.component'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { Subject } from 'rxjs'
+import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
+import { ConfirmDialogComponent } from './confirm-dialog.component'
 
 describe('ConfirmDialogComponent', () => {
   let component: ConfirmDialogComponent

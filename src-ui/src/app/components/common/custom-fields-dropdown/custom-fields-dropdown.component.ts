@@ -3,7 +3,6 @@ import {
   ElementRef,
   EventEmitter,
   Input,
-  OnDestroy,
   Output,
   QueryList,
   ViewChild,
@@ -13,15 +12,15 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { first, takeUntil } from 'rxjs'
 import { CustomField, DATA_TYPE_LABELS } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { ToastService } from 'src/app/services/toast.service'
-import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import {
   PermissionAction,
   PermissionType,
   PermissionsService,
 } from 'src/app/services/permissions.service'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
+import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 
 @Component({
   selector: 'pngx-custom-fields-dropdown',

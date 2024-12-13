@@ -1,13 +1,12 @@
-import { TestBed } from '@angular/core/testing'
-import { TasksService } from './tasks.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
+import { TestBed } from '@angular/core/testing'
 import { environment } from 'src/environments/environment'
-import { PaperlessTaskType } from '../data/paperless-task'
-import { PaperlessTaskStatus } from '../data/paperless-task'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { PaperlessTaskStatus, PaperlessTaskType } from '../data/paperless-task'
+import { TasksService } from './tasks.service'
 
 describe('TasksService', () => {
   let httpTestingController: HttpTestingController

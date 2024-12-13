@@ -1,14 +1,14 @@
 import { HttpTestingController } from '@angular/common/http/testing'
 import { TestBed } from '@angular/core/testing'
-import { environment } from 'src/environments/environment'
-import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
-import { WorkflowService } from './workflow.service'
 import { Workflow } from 'src/app/data/workflow'
+import { WorkflowActionType } from 'src/app/data/workflow-action'
 import {
   DocumentSource,
   WorkflowTriggerType,
 } from 'src/app/data/workflow-trigger'
-import { WorkflowActionType } from 'src/app/data/workflow-action'
+import { environment } from 'src/environments/environment'
+import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
+import { WorkflowService } from './workflow.service'
 
 let httpTestingController: HttpTestingController
 let service: WorkflowService

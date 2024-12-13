@@ -1,8 +1,8 @@
-import { TestBed } from '@angular/core/testing'
-import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
-import { RouterTestingModule } from '@angular/router/testing'
-import { routes } from '../app-routing.module'
 import { Component } from '@angular/core'
+import { TestBed } from '@angular/core/testing'
+import { RouterTestingModule } from '@angular/router/testing'
+import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { routes } from '../app-routing.module'
 import { ComponentCanDeactivate, DirtyDocGuard } from './dirty-doc.guard'
 
 @Component({})
