@@ -1,15 +1,15 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { DocumentListComponent } from './document-list.component'
+import { DatePipe } from '@angular/common'
+import {
+  HttpErrorResponse,
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { By } from '@angular/platform-browser'
+import { ActivatedRoute, Router, convertToParamMap } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
-import { routes } from 'src/app/app-routing.module'
-import { FilterEditorComponent } from './filter-editor/filter-editor.component'
-import { PermissionsFilterDropdownComponent } from '../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
-import { DatesDropdownComponent } from '../common/dates-dropdown/dates-dropdown.component'
-import { FilterableDropdownComponent } from '../common/filterable-dropdown/filterable-dropdown.component'
-import { PageHeaderComponent } from '../common/page-header/page-header.component'
-import { BulkEditorComponent } from './bulk-editor/bulk-editor.component'
-import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import {
   NgbDatepickerModule,
   NgbDropdown,
@@ -21,58 +21,58 @@ import {
   NgbTooltipModule,
   NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { ClearableBadgeComponent } from '../common/clearable-badge/clearable-badge.component'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { ToggleableDropdownButtonComponent } from '../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
-import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
-import { DatePipe } from '@angular/common'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import {
-  ConsumerStatusService,
-  FileStatus,
-} from 'src/app/services/consumer-status.service'
+import { NgSelectModule } from '@ng-select/ng-select'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject, of, throwError } from 'rxjs'
-import { SavedViewService } from 'src/app/services/rest/saved-view.service'
-import { ActivatedRoute, Router, convertToParamMap } from '@angular/router'
-import { SavedView } from 'src/app/data/saved-view'
-import {
-  FILTER_FULLTEXT_MORELIKE,
-  FILTER_FULLTEXT_QUERY,
-  FILTER_HAS_TAGS_ANY,
-} from 'src/app/data/filter-rule-type'
-import { By } from '@angular/platform-browser'
-import { SortableDirective } from 'src/app/directives/sortable.directive'
-import { ToastService } from 'src/app/services/toast.service'
-import { DocumentCardSmallComponent } from './document-card-small/document-card-small.component'
-import { DocumentCardLargeComponent } from './document-card-large/document-card-large.component'
-import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
-import { UsernamePipe } from 'src/app/pipes/username.pipe'
+import { routes } from 'src/app/app-routing.module'
 import {
   DEFAULT_DISPLAY_FIELDS,
   DisplayField,
   DisplayMode,
   Document,
 } from 'src/app/data/document'
-import { DocumentService } from 'src/app/services/rest/document.service'
-import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
-import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component'
-import { TextComponent } from '../common/input/text/text.component'
-import { CheckComponent } from '../common/input/check/check.component'
 import {
-  HttpErrorResponse,
-  provideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http'
-import { PermissionsGuard } from 'src/app/guards/permissions.guard'
-import { SettingsService } from 'src/app/services/settings.service'
+  FILTER_FULLTEXT_MORELIKE,
+  FILTER_FULLTEXT_QUERY,
+  FILTER_HAS_TAGS_ANY,
+} from 'src/app/data/filter-rule-type'
+import { SavedView } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { SortableDirective } from 'src/app/directives/sortable.directive'
+import { PermissionsGuard } from 'src/app/guards/permissions.guard'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
+import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
+import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
+import { UsernamePipe } from 'src/app/pipes/username.pipe'
+import {
+  ConsumerStatusService,
+  FileStatus,
+} from 'src/app/services/consumer-status.service'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
-import { NgSelectModule } from '@ng-select/ng-select'
+import { DocumentService } from 'src/app/services/rest/document.service'
+import { SavedViewService } from 'src/app/services/rest/saved-view.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
+import { ClearableBadgeComponent } from '../common/clearable-badge/clearable-badge.component'
+import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
+import { DatesDropdownComponent } from '../common/dates-dropdown/dates-dropdown.component'
+import { FilterableDropdownComponent } from '../common/filterable-dropdown/filterable-dropdown.component'
+import { ToggleableDropdownButtonComponent } from '../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
+import { CheckComponent } from '../common/input/check/check.component'
+import { TextComponent } from '../common/input/text/text.component'
+import { PageHeaderComponent } from '../common/page-header/page-header.component'
+import { PermissionsFilterDropdownComponent } from '../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
 import { PreviewPopupComponent } from '../common/preview-popup/preview-popup.component'
+import { BulkEditorComponent } from './bulk-editor/bulk-editor.component'
+import { DocumentCardLargeComponent } from './document-card-large/document-card-large.component'
+import { DocumentCardSmallComponent } from './document-card-small/document-card-small.component'
+import { DocumentListComponent } from './document-list.component'
+import { FilterEditorComponent } from './filter-editor/filter-editor.component'
+import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component'
 
 const docs: Document[] = [
   {

@@ -1,30 +1,30 @@
+import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
+import { Observable } from 'rxjs'
+import { map, tap } from 'rxjs/operators'
+import { AuditLogEntry } from 'src/app/data/auditlog-entry'
 import {
   DOCUMENT_SORT_FIELDS,
   DOCUMENT_SORT_FIELDS_FULLTEXT,
   Document,
 } from 'src/app/data/document'
 import { DocumentMetadata } from 'src/app/data/document-metadata'
-import { AbstractPaperlessService } from './abstract-paperless-service'
-import { HttpClient } from '@angular/common/http'
-import { Observable } from 'rxjs'
-import { Results } from 'src/app/data/results'
-import { FilterRule } from 'src/app/data/filter-rule'
-import { map, tap } from 'rxjs/operators'
-import { CorrespondentService } from './correspondent.service'
-import { DocumentTypeService } from './document-type.service'
-import { TagService } from './tag.service'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
+import { FilterRule } from 'src/app/data/filter-rule'
+import { Results } from 'src/app/data/results'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { queryParamsFromFilterRules } from '../../utils/query-params'
-import { StoragePathService } from './storage-path.service'
 import {
   PermissionAction,
   PermissionType,
   PermissionsService,
 } from '../permissions.service'
 import { SettingsService } from '../settings.service'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { AuditLogEntry } from 'src/app/data/auditlog-entry'
+import { AbstractPaperlessService } from './abstract-paperless-service'
+import { CorrespondentService } from './correspondent.service'
+import { DocumentTypeService } from './document-type.service'
+import { StoragePathService } from './storage-path.service'
+import { TagService } from './tag.service'
 
 export interface SelectionDataItem {
   id: number

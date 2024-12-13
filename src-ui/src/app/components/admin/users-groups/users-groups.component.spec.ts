@@ -1,4 +1,5 @@
 import { DatePipe } from '@angular/common'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import {
   ComponentFixture,
@@ -9,14 +10,17 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { RouterTestingModule } from '@angular/router/testing'
 import {
-  NgbModule,
   NgbAlertModule,
   NgbModal,
   NgbModalRef,
+  NgbModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { throwError, of } from 'rxjs'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
+import { Group } from 'src/app/data/group'
+import { User } from 'src/app/data/user'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
@@ -41,10 +45,6 @@ import { TextComponent } from '../../common/input/text/text.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { SettingsComponent } from '../settings/settings.component'
 import { UsersAndGroupsComponent } from './users-groups.component'
-import { User } from 'src/app/data/user'
-import { Group } from 'src/app/data/group'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const users = [
   { id: 1, username: 'user1', is_superuser: false },

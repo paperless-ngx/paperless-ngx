@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core'
-import { WorkflowService } from 'src/app/services/rest/workflow.service'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { delay, takeUntil, tap } from 'rxjs'
 import { Workflow } from 'src/app/data/workflow'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { ToastService } from 'src/app/services/toast.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
-import {
-  WorkflowEditDialogComponent,
-  WORKFLOW_TYPE_OPTIONS,
-} from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
+import { WorkflowService } from 'src/app/services/rest/workflow.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
+import {
+  WORKFLOW_TYPE_OPTIONS,
+  WorkflowEditDialogComponent,
+} from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({

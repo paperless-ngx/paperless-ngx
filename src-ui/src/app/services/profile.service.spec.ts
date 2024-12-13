@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing'
 
-import { ProfileService } from './profile.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { environment } from 'src/environments/environment'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { ProfileService } from './profile.service'
 
 describe('ProfileService', () => {
   let httpTestingController: HttpTestingController

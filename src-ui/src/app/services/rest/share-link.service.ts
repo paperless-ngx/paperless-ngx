@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core'
-import { ShareLink, FileVersion } from 'src/app/data/share-link'
-import { AbstractNameFilterService } from './abstract-name-filter-service'
 import { HttpClient } from '@angular/common/http'
+import { Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
+import { FileVersion, ShareLink } from 'src/app/data/share-link'
+import { AbstractNameFilterService } from './abstract-name-filter-service'
 
 @Injectable({
   providedIn: 'root',

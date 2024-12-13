@@ -1,11 +1,11 @@
-import { Correspondent } from './correspondent'
-import { Tag } from './tag'
-import { DocumentType } from './document-type'
 import { Observable } from 'rxjs'
-import { StoragePath } from './storage-path'
-import { ObjectWithPermissions } from './object-with-permissions'
-import { DocumentNote } from './document-note'
+import { Correspondent } from './correspondent'
 import { CustomFieldInstance } from './custom-field-instance'
+import { DocumentNote } from './document-note'
+import { DocumentType } from './document-type'
+import { ObjectWithPermissions } from './object-with-permissions'
+import { StoragePath } from './storage-path'
+import { Tag } from './tag'
 
 export enum DisplayMode {
   TABLE = 'table',

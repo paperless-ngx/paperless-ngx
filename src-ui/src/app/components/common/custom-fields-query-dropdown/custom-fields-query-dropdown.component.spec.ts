@@ -1,14 +1,15 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import {
   ComponentFixture,
   fakeAsync,
   TestBed,
   tick,
 } from '@angular/core/testing'
-import {
-  CustomFieldQueriesModel,
-  CustomFieldsQueryDropdownComponent,
-} from './custom-fields-query-dropdown.component'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgSelectModule } from '@ng-select/ng-select'
+import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { of } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
@@ -16,17 +17,16 @@ import {
   CustomFieldQueryLogicalOperator,
   CustomFieldQueryOperatorGroups,
 } from 'src/app/data/custom-field-query'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import {
-  CustomFieldQueryExpression,
   CustomFieldQueryAtom,
   CustomFieldQueryElement,
+  CustomFieldQueryExpression,
 } from 'src/app/utils/custom-field-query-element'
-import { NgSelectModule } from '@ng-select/ng-select'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import {
+  CustomFieldQueriesModel,
+  CustomFieldsQueryDropdownComponent,
+} from './custom-fields-query-dropdown.component'
 
 const customFields = [
   {

@@ -1,22 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { TrashComponent } from './trash.component'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { PageHeaderComponent } from '../../common/page-header/page-header.component'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { By } from '@angular/platform-browser'
+import { Router } from '@angular/router'
 import {
   NgbModal,
   NgbPaginationModule,
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { TrashService } from 'src/app/services/trash.service'
 import { of, throwError } from 'rxjs'
-import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import { By } from '@angular/platform-browser'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { ToastService } from 'src/app/services/toast.service'
-import { Router } from '@angular/router'
+import { TrashService } from 'src/app/services/trash.service'
+import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { PageHeaderComponent } from '../../common/page-header/page-header.component'
+import { TrashComponent } from './trash.component'
 
 const documentsInTrash = [
   {

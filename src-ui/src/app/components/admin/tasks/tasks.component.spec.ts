@@ -1,25 +1,29 @@
 import { DatePipe } from '@angular/common'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { FormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import { Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import {
   NgbModal,
+  NgbModalRef,
   NgbModule,
   NgbNavItem,
-  NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
+import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { routes } from 'src/app/app-routing.module'
 import {
   PaperlessTask,
-  PaperlessTaskType,
   PaperlessTaskStatus,
+  PaperlessTaskType,
 } from 'src/app/data/paperless-task'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { TasksService } from 'src/app/services/tasks.service'
@@ -27,10 +31,6 @@ import { environment } from 'src/environments/environment'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { TasksComponent, TaskTab } from './tasks.component'
-import { PermissionsGuard } from 'src/app/guards/permissions.guard'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { FormsModule } from '@angular/forms'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const tasks: PaperlessTask[] = [
   {

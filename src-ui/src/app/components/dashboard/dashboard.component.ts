@@ -1,17 +1,17 @@
-import { Component } from '@angular/core'
-import { SavedViewService } from 'src/app/services/rest/saved-view.service'
-import { SettingsService } from 'src/app/services/settings.service'
-import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
-import { TourService } from 'ngx-ui-tour-ng-bootstrap'
-import { SavedView } from 'src/app/data/saved-view'
-import { ToastService } from 'src/app/services/toast.service'
 import {
   CdkDragDrop,
   CdkDragEnd,
   CdkDragStart,
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
+import { Component } from '@angular/core'
+import { TourService } from 'ngx-ui-tour-ng-bootstrap'
+import { SavedView } from 'src/app/data/saved-view'
+import { SavedViewService } from 'src/app/services/rest/saved-view.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
+import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 
 @Component({
   selector: 'pngx-dashboard',

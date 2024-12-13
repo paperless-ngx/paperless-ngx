@@ -1,5 +1,5 @@
-import { popperOptionsReenablePreventOverflow } from './popper-options'
 import { Options } from '@popperjs/core'
+import { popperOptionsReenablePreventOverflow } from './popper-options'
 
 describe('popperOptionsReenablePreventOverflow', () => {
   it('should return the config without the empty fun preventOverflow, add padding to other', () => {

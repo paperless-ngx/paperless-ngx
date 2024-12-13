@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import path from 'node:path'
 
 const REQUESTS_HAR1 = path.join(__dirname, 'requests/api-dashboard1.har')

@@ -1,3 +1,4 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import {
@@ -7,10 +8,9 @@ import {
 } from '@angular/forms'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
+import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { DocumentLinkComponent } from './document-link.component'
-import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const documents = [
   {

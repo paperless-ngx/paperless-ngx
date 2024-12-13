@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { SwitchComponent } from './switch.component'
 import {
   FormsModule,
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap'
+import { SwitchComponent } from './switch.component'
 
 describe('SwitchComponent', () => {
   let component: SwitchComponent

@@ -1,10 +1,10 @@
 import { HttpTestingController } from '@angular/common/http/testing'
-import { Subscription } from 'rxjs'
 import { TestBed } from '@angular/core/testing'
+import { Subscription } from 'rxjs'
+import { IMAPSecurity, MailAccountType } from 'src/app/data/mail-account'
 import { environment } from 'src/environments/environment'
 import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
 import { MailAccountService } from './mail-account.service'
-import { IMAPSecurity, MailAccountType } from 'src/app/data/mail-account'
 
 let httpTestingController: HttpTestingController
 let service: MailAccountService

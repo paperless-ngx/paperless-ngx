@@ -1,5 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { DragDropModule } from '@angular/cdk/drag-drop'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms'
 import { DragDropSelectComponent } from './drag-drop-select.component'
 

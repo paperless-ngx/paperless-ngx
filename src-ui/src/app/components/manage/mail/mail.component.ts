@@ -1,16 +1,19 @@
-import { Component, OnInit, OnDestroy } from '@angular/core'
+import { Component, OnDestroy, OnInit } from '@angular/core'
+import { ActivatedRoute } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, delay, first, takeUntil, tap } from 'rxjs'
-import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { MailAccount, MailAccountType } from 'src/app/data/mail-account'
 import { MailRule } from 'src/app/data/mail-rule'
+import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import {
-  PermissionsService,
   PermissionAction,
+  PermissionsService,
 } from 'src/app/services/permissions.service'
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
@@ -18,9 +21,6 @@ import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-ac
 import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
-import { SettingsService } from 'src/app/services/settings.service'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { ActivatedRoute } from '@angular/router'
 
 @Component({
   selector: 'pngx-mail',

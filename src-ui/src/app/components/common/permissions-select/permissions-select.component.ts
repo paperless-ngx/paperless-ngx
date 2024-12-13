@@ -6,14 +6,14 @@ import {
   FormGroup,
   NG_VALUE_ACCESSOR,
 } from '@angular/forms'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import {
   PermissionAction,
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
-import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { SettingsService } from 'src/app/services/settings.service'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 @Component({
   providers: [

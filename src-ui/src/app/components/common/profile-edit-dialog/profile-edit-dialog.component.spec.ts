@@ -5,8 +5,8 @@ import {
   tick,
 } from '@angular/core/testing'
 
-import { ProfileEditDialogComponent } from './profile-edit-dialog.component'
-import { ProfileService } from 'src/app/services/profile.service'
+import { Clipboard } from '@angular/cdk/clipboard'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
   NgbAccordionModule,
@@ -14,14 +14,14 @@ import {
   NgbModalModule,
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { TextComponent } from '../input/text/text.component'
-import { PasswordComponent } from '../input/password/password.component'
-import { of, throwError } from 'rxjs'
-import { ToastService } from 'src/app/services/toast.service'
-import { Clipboard } from '@angular/cdk/clipboard'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { of, throwError } from 'rxjs'
+import { ProfileService } from 'src/app/services/profile.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmButtonComponent } from '../confirm-button/confirm-button.component'
+import { PasswordComponent } from '../input/password/password.component'
+import { TextComponent } from '../input/text/text.component'
+import { ProfileEditDialogComponent } from './profile-edit-dialog.component'
 
 const socialAccount = {
   id: 1,

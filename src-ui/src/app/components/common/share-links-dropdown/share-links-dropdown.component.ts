@@ -1,10 +1,10 @@
+import { Clipboard } from '@angular/cdk/clipboard'
 import { Component, Input, OnInit } from '@angular/core'
 import { first } from 'rxjs'
-import { ShareLink, FileVersion } from 'src/app/data/share-link'
+import { FileVersion, ShareLink } from 'src/app/data/share-link'
 import { ShareLinkService } from 'src/app/services/rest/share-link.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
-import { Clipboard } from '@angular/cdk/clipboard'
 
 @Component({
   selector: 'pngx-share-links-dropdown',

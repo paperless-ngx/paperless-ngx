@@ -1,15 +1,15 @@
+import { Clipboard } from '@angular/cdk/clipboard'
 import { Component, OnInit } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { ProfileService } from 'src/app/services/profile.service'
+import { takeUntil } from 'rxjs'
 import {
-  TotpSettings,
   SocialAccount,
   SocialAccountProvider,
+  TotpSettings,
 } from 'src/app/data/user-profile'
+import { ProfileService } from 'src/app/services/profile.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { takeUntil } from 'rxjs'
-import { Clipboard } from '@angular/cdk/clipboard'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({

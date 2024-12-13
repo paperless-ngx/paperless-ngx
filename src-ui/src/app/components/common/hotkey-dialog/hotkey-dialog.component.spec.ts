@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { HotkeyDialogComponent } from './hotkey-dialog.component'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { HotkeyDialogComponent } from './hotkey-dialog.component'
 
 describe('HotkeyDialogComponent', () => {
   let component: HotkeyDialogComponent

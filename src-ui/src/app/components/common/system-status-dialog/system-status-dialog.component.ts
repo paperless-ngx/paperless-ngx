@@ -1,11 +1,10 @@
-import { Component, Input } from '@angular/core'
+import { Clipboard } from '@angular/cdk/clipboard'
+import { Component } from '@angular/core'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import {
   SystemStatus,
   SystemStatusItemStatus,
 } from 'src/app/data/system-status'
-import { SystemStatusService } from 'src/app/services/system-status.service'
-import { Clipboard } from '@angular/cdk/clipboard'
 
 @Component({
   selector: 'pngx-system-status-dialog',

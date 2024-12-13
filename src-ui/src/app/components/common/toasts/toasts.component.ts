@@ -1,7 +1,7 @@
+import { Clipboard } from '@angular/cdk/clipboard'
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { Subscription, interval, take } from 'rxjs'
 import { Toast, ToastService } from 'src/app/services/toast.service'
-import { Clipboard } from '@angular/cdk/clipboard'
 
 @Component({
   selector: 'pngx-toasts',

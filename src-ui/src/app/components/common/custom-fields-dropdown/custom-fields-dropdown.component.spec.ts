@@ -1,28 +1,28 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import {
   ComponentFixture,
   TestBed,
   fakeAsync,
   tick,
 } from '@angular/core/testing'
-import { CustomFieldsDropdownComponent } from './custom-fields-dropdown.component'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { ToastService } from 'src/app/services/toast.service'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { of } from 'rxjs'
-import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
-import { SelectComponent } from '../input/select/select.component'
-import { NgSelectModule } from '@ng-select/ng-select'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { By } from '@angular/platform-browser'
 import {
   NgbDropdownModule,
   NgbModal,
   NgbModalModule,
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
-import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
-import { By } from '@angular/platform-browser'
+import { NgSelectModule } from '@ng-select/ng-select'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { of } from 'rxjs'
+import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { ToastService } from 'src/app/services/toast.service'
+import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { SelectComponent } from '../input/select/select.component'
+import { CustomFieldsDropdownComponent } from './custom-fields-dropdown.component'
 
 const fields: CustomField[] = [
   {

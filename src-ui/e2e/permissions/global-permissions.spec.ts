@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import path from 'node:path'
 
 const REQUESTS_HAR = path.join(__dirname, 'requests/api-global-permissions.har')

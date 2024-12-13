@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { interval, Subject, take } from 'rxjs'
+import { Subject } from 'rxjs'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({

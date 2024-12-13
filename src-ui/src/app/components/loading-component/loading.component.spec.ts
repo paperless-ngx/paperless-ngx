@@ -1,8 +1,7 @@
-import { TestBed } from '@angular/core/testing'
-import { Subject } from 'rxjs'
-import { LoadingComponentWithPermissions } from './loading.component'
-import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { Component } from '@angular/core'
+import { TestBed } from '@angular/core/testing'
+import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
+import { LoadingComponentWithPermissions } from './loading.component'
 
 class MockComponentWithPermissions extends ComponentWithPermissions {}
 

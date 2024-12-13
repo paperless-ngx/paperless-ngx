@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { FileComponent } from './file.component'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { FileComponent } from './file.component'
 
 describe('FileComponent', () => {
   let component: FileComponent

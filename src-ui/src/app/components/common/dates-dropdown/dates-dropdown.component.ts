@@ -2,9 +2,9 @@ import {
   Component,
   EventEmitter,
   Input,
-  Output,
-  OnInit,
   OnDestroy,
+  OnInit,
+  Output,
 } from '@angular/core'
 import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap'
 import { Subject, Subscription } from 'rxjs'

@@ -1,8 +1,8 @@
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs'
 import { v4 as uuidv4 } from 'uuid'
 import {
-  CustomFieldQueryElementType,
   CUSTOM_FIELD_QUERY_VALUE_TYPES_BY_OPERATOR,
+  CustomFieldQueryElementType,
   CustomFieldQueryLogicalOperator,
   CustomFieldQueryOperator,
 } from '../data/custom-field-query'

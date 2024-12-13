@@ -1,11 +1,11 @@
-import { Component, Input, ViewChild, forwardRef } from '@angular/core'
-import { NG_VALUE_ACCESSOR } from '@angular/forms'
-import { AbstractInputComponent } from '../abstract-input'
 import {
   CdkDragDrop,
   CdkDropList,
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
+import { Component, Input, ViewChild, forwardRef } from '@angular/core'
+import { NG_VALUE_ACCESSOR } from '@angular/forms'
+import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
   providers: [

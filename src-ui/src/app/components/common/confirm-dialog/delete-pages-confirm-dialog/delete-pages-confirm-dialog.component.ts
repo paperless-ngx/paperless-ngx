@@ -1,8 +1,8 @@
 import { Component, TemplateRef, ViewChild } from '@angular/core'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { PDFDocumentProxy, PdfViewerComponent } from 'ng2-pdf-viewer'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { ConfirmDialogComponent } from '../confirm-dialog.component'
-import { PDFDocumentProxy, PdfViewerComponent } from 'ng2-pdf-viewer'
 
 @Component({
   selector: 'pngx-delete-pages-confirm-dialog',

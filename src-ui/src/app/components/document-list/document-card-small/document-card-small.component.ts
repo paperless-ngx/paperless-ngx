@@ -12,11 +12,11 @@ import {
   DisplayField,
   Document,
 } from 'src/app/data/document'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
   selector: 'pngx-document-card-small',

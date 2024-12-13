@@ -1,11 +1,11 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core'
-import { DocumentNotesService } from 'src/app/services/rest/document-notes.service'
-import { DocumentNote } from 'src/app/data/document-note'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
+import { DocumentNote } from 'src/app/data/document-note'
+import { User } from 'src/app/data/user'
+import { DocumentNotesService } from 'src/app/services/rest/document-notes.service'
+import { UserService } from 'src/app/services/rest/user.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
-import { UserService } from 'src/app/services/rest/user.service'
-import { User } from 'src/app/data/user'
 
 @Component({
   selector: 'pngx-document-notes',

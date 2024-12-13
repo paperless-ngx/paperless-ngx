@@ -1,49 +1,49 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core'
-import { Tag } from 'src/app/data/tag'
-import { Correspondent } from 'src/app/data/correspondent'
-import { DocumentType } from 'src/app/data/document-type'
-import { TagService } from 'src/app/services/rest/tag.service'
-import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
-import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { FormControl, FormGroup } from '@angular/forms'
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
-import {
-  DocumentService,
-  SelectionDataItem,
-} from 'src/app/services/rest/document.service'
-import { OpenDocumentsService } from 'src/app/services/open-documents.service'
-import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
-import {
-  ChangedItems,
-  FilterableDropdownSelectionModel,
-} from '../../common/filterable-dropdown/filterable-dropdown.component'
-import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
-import { MatchingModel } from 'src/app/data/matching-model'
-import { SettingsService } from 'src/app/services/settings.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { saveAs } from 'file-saver'
-import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { first, map, Subject, switchMap, takeUntil } from 'rxjs'
+import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
+import { Correspondent } from 'src/app/data/correspondent'
+import { CustomField } from 'src/app/data/custom-field'
+import { DocumentType } from 'src/app/data/document-type'
+import { MatchingModel } from 'src/app/data/matching-model'
 import { StoragePath } from 'src/app/data/storage-path'
+import { Tag } from 'src/app/data/tag'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
-import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
   PermissionAction,
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
-import { FormControl, FormGroup } from '@angular/forms'
-import { first, map, Subject, switchMap, takeUntil } from 'rxjs'
-import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
-import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
-import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
-import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
-import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
-import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
-import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
-import { CustomField } from 'src/app/data/custom-field'
+import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import {
+  DocumentService,
+  SelectionDataItem,
+} from 'src/app/services/rest/document.service'
+import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { TagService } from 'src/app/services/rest/tag.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
+import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
+import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
+import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
+import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
+import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
+import {
+  ChangedItems,
+  FilterableDropdownSelectionModel,
+} from '../../common/filterable-dropdown/filterable-dropdown.component'
+import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
+import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
+import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { CustomFieldsBulkEditDialogComponent } from './custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component'
 
 @Component({

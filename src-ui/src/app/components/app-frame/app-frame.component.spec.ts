@@ -1,43 +1,43 @@
+import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
-import { AppFrameComponent } from './app-frame.component'
 import {
   ComponentFixture,
   TestBed,
   fakeAsync,
   tick,
 } from '@angular/core/testing'
-import { NgbModal, NgbModalModule, NgbModule } from '@ng-bootstrap/ng-bootstrap'
-import { BrowserModule } from '@angular/platform-browser'
-import { RouterTestingModule } from '@angular/router/testing'
-import { SettingsService } from 'src/app/services/settings.service'
-import { SavedViewService } from 'src/app/services/rest/saved-view.service'
-import { PermissionsService } from 'src/app/services/permissions.service'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { RemoteVersionService } from 'src/app/services/rest/remote-version.service'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { BrowserModule } from '@angular/platform-browser'
+import { ActivatedRoute, Router } from '@angular/router'
+import { RouterTestingModule } from '@angular/router/testing'
+import { NgbModal, NgbModalModule, NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
-import { ToastService } from 'src/app/services/toast.service'
+import { routes } from 'src/app/app-routing.module'
+import { SavedView } from 'src/app/data/saved-view'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import {
   DjangoMessageLevel,
   DjangoMessagesService,
 } from 'src/app/services/django-messages.service'
-import { environment } from 'src/environments/environment'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
-import { ActivatedRoute, Router } from '@angular/router'
-import { DocumentDetailComponent } from '../document-detail/document-detail.component'
+import { PermissionsService } from 'src/app/services/permissions.service'
+import { RemoteVersionService } from 'src/app/services/rest/remote-version.service'
+import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SearchService } from 'src/app/services/rest/search.service'
-import { routes } from 'src/app/app-routing.module'
-import { PermissionsGuard } from 'src/app/guards/permissions.guard'
-import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop'
-import { SavedView } from 'src/app/data/saved-view'
+import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
+import { environment } from 'src/environments/environment'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { DocumentDetailComponent } from '../document-detail/document-detail.component'
+import { AppFrameComponent } from './app-frame.component'
 import { GlobalSearchComponent } from './global-search/global-search.component'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const saved_views = [
   {

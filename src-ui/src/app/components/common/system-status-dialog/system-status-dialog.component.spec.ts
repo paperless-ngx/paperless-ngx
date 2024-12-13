@@ -1,3 +1,6 @@
+import { Clipboard, ClipboardModule } from '@angular/cdk/clipboard'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import {
   ComponentFixture,
   TestBed,
@@ -10,17 +13,14 @@ import {
   NgbPopoverModule,
   NgbProgressbarModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { Clipboard, ClipboardModule } from '@angular/cdk/clipboard'
-import { SystemStatusDialogComponent } from './system-status-dialog.component'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import {
-  SystemStatusItemStatus,
   InstallType,
   SystemStatus,
+  SystemStatusItemStatus,
 } from 'src/app/data/system-status'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { FileSizePipe } from 'src/app/pipes/file-size.pipe'
+import { SystemStatusDialogComponent } from './system-status-dialog.component'
 
 const status: SystemStatus = {
   pngx_version: '2.4.3',
