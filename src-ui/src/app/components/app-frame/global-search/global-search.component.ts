@@ -8,7 +8,7 @@ import {
 } from '@angular/core'
 import { Router } from '@angular/router'
 import { NgbDropdown, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
-import { Subject, debounceTime, distinctUntilChanged, filter, map } from 'rxjs'
+import { Subject, debounceTime, distinctUntilChanged, filter } from 'rxjs'
 import { DataType } from 'src/app/data/datatype'
 import {
   FILTER_FULLTEXT_QUERY,
@@ -89,7 +89,6 @@ export class GlobalSearchComponent implements OnInit {
     this.queryDebounce
       .pipe(
         debounceTime(400),
-        map((query) => query?.trim()),
         filter((query) => !query?.length || query?.length > 2),
         distinctUntilChanged()
       )
