@@ -108,7 +108,7 @@ export class GlobalSearchComponent implements OnInit {
 
   private search(query: string) {
     this.loading = true
-    this.searchService.globalSearch(query).subscribe((results) => {
+    this.searchService.globalSearch(query.trim()).subscribe((results) => {
       this.searchResults = results
       this.loading = false
       this.resultsDropdown.open()
