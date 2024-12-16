@@ -289,7 +289,7 @@ def update_document_archive_file(document_id=None):
                 if document.dossier is not None:
                     dossier = Document.objects.filter(id = document.dossier.id)
                 parent_dossier = None
-                if dossier.parent_dossier is not None:
+                if dossier is not None:
                     parent_dossier = dossier.parent_dossier
                 data_ocr_fields = parser.parse(document.source_path, mime_type, document.get_public_filename(), get_config_dossier_form(parent_dossier))
             else:
