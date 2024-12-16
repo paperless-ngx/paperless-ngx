@@ -892,7 +892,8 @@ class Consumer(LoggingMixin):
                             new_file.parent_folder_id = int(folder_path.split('/')[-1])
                     elif document.folder.type == Folder.FOLDER:
                         new_file.path = f"{document.folder.path}/{new_file.id}"
-                        new_file.parent_folder_id = int(folder_path.split('/')[-1])
+                        # self.log.debug("parent_folder_id___1",folder_path , document.folder.path)
+                        new_file.parent_folder_id = int(document.folder.path.split('/')[-1])
                 else:
                     new_file.path = f"{new_file.id}"
                 new_file.save()
