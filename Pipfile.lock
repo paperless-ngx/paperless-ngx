@@ -206,11 +206,11 @@
         },
         "certifi": {
             "hashes": [
-                "sha256:922820b53db7a7257ffbda3f597266d435245903d80737e34f8a45ff3e3230d8",
-                "sha256:bec941d2aa8195e248a60b31ff9f0558284cf01a52591ceda73ea9afffd69fd9"
+                "sha256:1275f7a45be9464efc1173084eaa30f866fe2e47d389406136d332ed4967ec56",
+                "sha256:b650d30f370c2b724812bee08008be0c4163b163ddaec3f2546c1caf65f191db"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==2024.8.30"
+            "version": "==2024.12.14"
         },
         "cffi": {
             "hashes": [
@@ -672,12 +672,12 @@
         },
         "gotenberg-client": {
             "hashes": [
-                "sha256:3c1ee0aabb9107f0cf9aed84647575b322406ad9eb2c794e1da62bda6a4e74fa",
-                "sha256:8e626307f31bb8e07f2f7153eba57910c6bb15dbad15bc945e15d71aa847bc53"
+                "sha256:4fbdb07cbcdfd43bd8253364d73aada71911ae5e7ee3419d0da8fdcf1628f2af",
+                "sha256:5eb80f0bc3fbf9c7ec9519e32bf447d694a3a8fa80b889a6f6e9a225abf0ec42"
             ],
             "index": "pypi",
-            "markers": "python_version >= '3.8'",
-            "version": "==0.7.0"
+            "markers": "python_version >= '3.9'",
+            "version": "==0.8.0"
         },
         "gunicorn": {
             "hashes": [
@@ -874,11 +874,11 @@
                 "http2"
             ],
             "hashes": [
-                "sha256:7bb2708e112d8fdd7829cd4243970f0c223274051cb35ee80c03301ee29a3df0",
-                "sha256:f7c2be1d2f3c3c3160d441802406b206c2b76f5947b11115e6df10c6c65e66c2"
+                "sha256:75e98c5f16b0f35b567856f597f06ff2270a374470a5c2392242528e3e3e42fc",
+                "sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==0.27.2"
+            "version": "==0.28.1"
         },
         "httpx-oauth": {
             "hashes": [
@@ -915,11 +915,11 @@
         },
         "imap-tools": {
             "hashes": [
-                "sha256:ad3b4ca29141c1fba28e697f4c93bdc1cd4c05c44d60ee89dec4a3ac308f8acf",
-                "sha256:de66fb949d84f9cd411e4937daef17604db629c312954ebb1edb0ba88caf26c5"
+                "sha256:ac6a7a9c2a6a83cfbd09f97bd4e33c2e5adbb98882a1374ce14f03be613ed93c",
+                "sha256:eda242c224ac335b46bdd571b40d5ea2539059cc1b11fd6b8ba134cfbe8f1d7f"
             ],
             "index": "pypi",
-            "version": "==1.7.4"
+            "version": "==1.8.0"
         },
         "img2pdf": {
             "hashes": [
