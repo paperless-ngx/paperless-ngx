@@ -285,7 +285,9 @@ def update_document_archive_file(document_id=None):
             # self.log.debug(f"Parsing {self.filename}...")
 
             if isinstance(parser,RasterisedDocumentCustomParser):
-                dossier = Document.objects.filter(id = document.dossier.id)
+                dossier = None
+                if document.dossier is None:
+                    dossier = Document.objects.filter(id = document.dossier.id)
                 parent_dossier = None
                 if dossier.parent_dossier is not None:
                     parent_dossier = dossier.parent_dossier
