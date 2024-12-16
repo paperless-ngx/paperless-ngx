@@ -285,7 +285,11 @@ def update_document_archive_file(document_id=None):
             # self.log.debug(f"Parsing {self.filename}...")
 
             if isinstance(parser,RasterisedDocumentCustomParser):
-                data_ocr_fields = parser.parse(document.source_path, mime_type, document.get_public_filename(), get_config_dossier_form(document.dossier.parent_dossier))
+                dossier = Document.objects.filter(id = document.dossier.id)
+                parent_dossier = None
+                if dossier.parent_dossier is not None:
+                    parent_dossier = dossier.parent_dossier
+                data_ocr_fields = parser.parse(document.source_path, mime_type, document.get_public_filename(), get_config_dossier_form(parent_dossier))
             else:
                 parser.parse(document.source_path, mime_type, document.get_public_filename())
         # parser.parse(document.source_path, mime_type, document.get_public_filename())
