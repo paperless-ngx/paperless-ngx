@@ -915,11 +915,11 @@
         },
         "imap-tools": {
             "hashes": [
-                "sha256:ad3b4ca29141c1fba28e697f4c93bdc1cd4c05c44d60ee89dec4a3ac308f8acf",
-                "sha256:de66fb949d84f9cd411e4937daef17604db629c312954ebb1edb0ba88caf26c5"
+                "sha256:ac6a7a9c2a6a83cfbd09f97bd4e33c2e5adbb98882a1374ce14f03be613ed93c",
+                "sha256:eda242c224ac335b46bdd571b40d5ea2539059cc1b11fd6b8ba134cfbe8f1d7f"
             ],
             "index": "pypi",
-            "version": "==1.7.4"
+            "version": "==1.8.0"
         },
         "img2pdf": {
             "hashes": [
