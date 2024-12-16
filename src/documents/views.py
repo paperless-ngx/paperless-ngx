@@ -421,13 +421,15 @@ class DocumentViewSet(
     def destroy(self, request, *args, **kwargs):
         from documents import index
         instance = self.get_object()
-        fold = instance.folder
+        folder = instance.folder
         dossier = instance.dossier
         instance.folder = None
         instance.dossier = None
         instance.save()
-        fold.delete()
-        dossier.delete()
+        if folder is not None:
+            folder.delete()
+        if dossier is not None:
+            dossier.delete()
         index.remove_document_from_index(self.get_object())
 
         return super().destroy(request, *args, **kwargs)
