@@ -339,16 +339,19 @@ class Consumer(LoggingMixin):
         self.override_custom_field_ids = None
 
         self.channel_layer = get_channel_layer()
-    def pre_change_folder(self,folder_id, user_id, doc_name):
+    def pre_change_folder(self):
         # check folder when uploading documents
-        folder = Folder.objects.filter(id=folder_id).first()
-        user = User.objects.get(id=user_id)
+        if self.override_owner_id is None:
+            return
+        folder = Folder.objects.filter(id=self.override_folder_id).first()
+        # print('gia tri user_id',user_id)
+        user = User.objects.get(id=self.override_owner_id)
         if folder:
             user_can_change = check_user_can_change_folder(user, folder)
             if not user_can_change:
                 self._fail(
                     ConsumerStatusShortMessage.NO_UPLOAD_PERMISSION_TO_FOLDER,
-                    f"Cannot consume {doc_name}: no upload permission to folder",
+                    f"Cannot consume {self.filename}: no upload permission to folder",
                 )
 
     def pre_check_file_exists(self):
@@ -714,7 +717,7 @@ class Consumer(LoggingMixin):
         )
 
         # Make sure that preconditions for consuming the file are met.
-        self.pre_change_folder(self.override_folder_id,self.override_owner_id, self.override_title)
+        self.pre_change_folder()
         self.pre_check_file_exists()
         self.pre_check_directories()
         self.pre_check_duplicate()

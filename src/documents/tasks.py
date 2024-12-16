@@ -29,7 +29,7 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
-from documents.models import Correspondent, CustomFieldInstance
+from documents.models import Correspondent, CustomFieldInstance, Dossier
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Folder
@@ -287,7 +287,8 @@ def update_document_archive_file(document_id=None):
             if isinstance(parser,RasterisedDocumentCustomParser):
                 dossier = None
                 if document.dossier is not None:
-                    dossier = Document.objects.filter(id = document.dossier.id).first()
+                    dossier = Dossier.objects.filter(id = document.dossier.id).first()
+
                 parent_dossier = None
                 if dossier is not None:
                     parent_dossier = dossier.parent_dossier
