@@ -405,7 +405,8 @@ class DocumentViewSet(
         serializer = self.get_serializer(instance, data=data, partial=partial)
         serializer.is_valid(raise_exception=True)
         response = super().update(request, *args, **kwargs)
-        logger.debug(response)
+        # logger.debug(response)
+        self.update_name_folder(self.get_object(), serializer)
         self.update_folder_permisisons(self.get_object(), serializer)
         self.update_dossier_permisisons(self.get_object(), serializer)
         from documents import index
@@ -925,9 +926,12 @@ class DocumentViewSet(
                 .order_by("-created")
             ]
             return Response(links)
+    def update_name_folder(self, instance, serializer):
+        instance.folder.name = serializer.validated_data.get("title")
+        instance.folder.save()
+
     def update_folder_permisisons(self, instance, serializer):
         folder =  instance.folder
-        logger.debug("serializer.validated_data")
         permissions = serializer.validated_data.get("set_permissions")
         owner = serializer.validated_data.get("owner")
         merge = serializer.validated_data.get("merge")
@@ -2886,6 +2890,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         old_parent_folder = instance.parent_folder
 
         self.perform_update(serializer)
+        self.update_document_name(instance, serializer)
         # update permission document
         # update permisson folder child
         self.update_child_folder_permisisons(instance, serializer)
@@ -2901,6 +2906,13 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
 
         return Response(serializer.data)
+
+    def update_document_name(self, instance, serializer):
+        document = Document.objects.filter(folder_id=instance.id).first()
+        if document is None:
+            return
+        document.title = serializer.validated_data.get("name")
+        document.save()
 
 
 
