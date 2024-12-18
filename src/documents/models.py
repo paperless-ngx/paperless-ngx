@@ -184,6 +184,14 @@ class Tag(MatchingModel):
         verbose_name = _("tag")
         verbose_name_plural = _("tags")
 
+class FontLanguage(MatchingModel):
+    code = models.CharField(_("code"), max_length=20, blank=True, db_index=True)
+
+    class Meta(MatchingModel.Meta):
+        verbose_name = _("language")
+        verbose_name_plural = _("languages")
+
+
 class ArchiveFont(MatchingModel):
     first_upload = models.DateTimeField(
         _("first_upload"),
@@ -199,7 +207,12 @@ class ArchiveFont(MatchingModel):
         db_index=True,
     )
 
-
+    languages = models.ManyToManyField(
+        FontLanguage,
+        related_name="archive_fonts",
+        blank=True,
+        verbose_name=_("languages"),
+    )
 
     note = models.TextField(
         _("note"),
@@ -210,14 +223,6 @@ class ArchiveFont(MatchingModel):
     class Meta(MatchingModel.Meta):
         verbose_name = _("archive_font")
         verbose_name_plural = _("archive_fonts")
-
-class FontLanguage(MatchingModel):
-    code = models.CharField(_("code"), max_length=20, blank=True, db_index=True)
-
-    class Meta(MatchingModel.Meta):
-        verbose_name = _("language")
-        verbose_name_plural = _("languages")
-
 
 class DocumentType(MatchingModel):
     class Meta(MatchingModel.Meta):
@@ -458,6 +463,15 @@ class Document(ModelWithOwner):
         related_name="documents",
         blank=True,
         verbose_name=_("tags"),
+    )
+
+    archive_font = models.ForeignKey(
+        ArchiveFont,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL,
+        verbose_name=_("archive font"),
     )
 
     checksum = models.CharField(
