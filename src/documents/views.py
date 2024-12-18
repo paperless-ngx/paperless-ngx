@@ -104,7 +104,8 @@ from documents.consumer import Consumer, ConsumerStatusShortMessage
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
-from documents.filters import CorrespondentFilterSet, DossierFilterSet, DossierFormFilterSet
+from documents.filters import CorrespondentFilterSet, DossierFilterSet, \
+    DossierFormFilterSet, ArchiveFontFilterSet, FontLanguageFilterSet
 from documents.filters import CustomFieldFilterSet
 from documents.filters import DocumentFilterSet
 from documents.filters import DocumentTypeFilterSet
@@ -121,7 +122,8 @@ from documents.matching import match_storage_paths
 from documents.matching import match_warehouses
 from documents.matching import match_folders
 from documents.matching import match_tags
-from documents.models import Approval, Correspondent, CustomFieldInstance, Dossier, DossierForm
+from documents.models import Approval, Correspondent, CustomFieldInstance, \
+    Dossier, DossierForm, ArchiveFont, FontLanguage
 from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
@@ -148,7 +150,10 @@ from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
-from documents.serialisers import AcknowledgeTasksViewSerializer, ApprovalSerializer, ApprovalViewSerializer, DossierFormSerializer, DossierSerializer, ExportDocumentFromFolderSerializer
+from documents.serialisers import AcknowledgeTasksViewSerializer, \
+    ApprovalSerializer, ApprovalViewSerializer, DossierFormSerializer, \
+    DossierSerializer, ExportDocumentFromFolderSerializer, \
+    FontLanguageSerializer, ArchiveFontSerializer
 from documents.serialisers import BulkDownloadSerializer
 from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
@@ -335,6 +340,39 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = DocumentTypeFilterSet
+    ordering_fields = ("name", "matching_algorithm", "match", "document_count")
+
+
+class ArchiveFontViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
+    model = ArchiveFont
+
+    queryset = ArchiveFont.objects.select_related("owner").order_by(Lower("name"))
+
+    serializer_class = ArchiveFontSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    filterset_class = ArchiveFontFilterSet
+    ordering_fields = ("name", "matching_algorithm", "match", "document_count")
+
+class FontLanguageViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
+    model = FontLanguage
+
+    queryset = FontLanguage.objects.select_related("owner").order_by(Lower("name"))
+
+    serializer_class = FontLanguageSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    filterset_class = FontLanguageFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
 

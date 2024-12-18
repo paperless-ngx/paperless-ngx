@@ -33,7 +33,8 @@ from rest_framework.fields import SerializerMethodField
 
 from documents import bulk_edit
 from documents.data_models import DocumentSource
-from documents.models import Approval, Correspondent, Dossier, DossierForm
+from documents.models import Approval, Correspondent, Dossier, DossierForm, \
+    ArchiveFont, FontLanguage
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -322,6 +323,45 @@ class DocumentTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "slug",
             "name",
             "match",
+            "matching_algorithm",
+            "is_insensitive",
+            "document_count",
+            "owner",
+            "permissions",
+            "user_can_change",
+            "set_permissions",
+        )
+
+class ArchiveFontSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+    class Meta:
+        model = ArchiveFont
+        fields = (
+            "id",
+            "slug",
+            "name",
+            "match",
+            "first_upload",
+            "last_upload",
+            "languages",
+            "note",
+            "matching_algorithm",
+            "is_insensitive",
+            "document_count",
+            "owner",
+            "permissions",
+            "user_can_change",
+            "set_permissions",
+        )
+
+class FontLanguageSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+    class Meta:
+        model = FontLanguage
+        fields = (
+            "id",
+            "slug",
+            "name",
+            "match",
+            "code",
             "matching_algorithm",
             "is_insensitive",
             "document_count",

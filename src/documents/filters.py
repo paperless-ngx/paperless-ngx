@@ -14,7 +14,8 @@ from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
 from rest_framework_guardian.filters import ObjectPermissionsFilter
 
-from documents.models import Approval, Correspondent, Dossier, DossierForm
+from documents.models import Approval, Correspondent, Dossier, DossierForm, \
+    ArchiveFont, FontLanguage
 from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
@@ -52,6 +53,23 @@ class TagFilterSet(FilterSet):
 class DocumentTypeFilterSet(FilterSet):
     class Meta:
         model = DocumentType
+        fields = {
+            "id": ID_KWARGS,
+            "name": CHAR_KWARGS,
+        }
+
+class FontLanguageFilterSet(FilterSet):
+    class Meta:
+        model = FontLanguage
+        fields = {
+            "id": ID_KWARGS,
+            "name": CHAR_KWARGS,
+        }
+
+
+class ArchiveFontFilterSet(FilterSet):
+    class Meta:
+        model = ArchiveFont
         fields = {
             "id": ID_KWARGS,
             "name": CHAR_KWARGS,
@@ -168,7 +186,7 @@ class FolderFilter(Filter):
                     qs = qs.filter(**{f"{self.field_name}__id": obj_id})
 
         return qs
-    
+
 class DossierFilter(Filter):
     def __init__(self, exclude=False, in_list=False, field_name=""):
         super().__init__()
@@ -298,29 +316,29 @@ class DocumentFilterSet(FilterSet):
     document_type__id__none = ObjectFilter(field_name="document_type", exclude=True)
 
     storage_path__id__none = ObjectFilter(field_name="storage_path", exclude=True)
-    
+
     warehouse__id__none = WarehouseFilter(field_name="warehouse", exclude=True)
-    
+
     warehouse__id__in = WarehouseFilter(field_name="warehouse", in_list=True)
-    
+
     warehouse_s__isnull = WarehouseFilter(field_name="warehouse", isnull=True)
 
     warehouse_s__id__none = WarehouseFilter(field_name="warehouse", exclude=True)
-    
+
     warehouse_s__id__in = WarehouseFilter(field_name="warehouse", in_list=True)
-    
+
     warehouse_w__isnull = WarehouseFilter(field_name="warehouse", isnull=True)
 
     warehouse_w__id__none = WarehouseFilter(field_name="warehouse", exclude=True)
-    
+
     warehouse_w__id__in = WarehouseFilter(field_name="warehouse", in_list=True)
-    
+
     folder__id__none = FolderFilter(field_name="folder", exclude=True)
-    
+
     folder__id__in = FolderFilter(field_name="folder", in_list=True)
 
     dossier__id__none = DossierFilter(field_name="dossier", exclude=True)
-    
+
     dossier__id__in = DossierFilter(field_name="dossier", in_list=True)
 
     is_in_inbox = InboxFilter()
@@ -332,7 +350,7 @@ class DocumentFilterSet(FilterSet):
     custom_fields__icontains = CustomFieldsFilter()
 
     shared_by__id = SharedByUser()
- 
+
 
     class Meta:
         model = Document
@@ -418,7 +436,7 @@ class WarehouseFilterSet(FilterSet):
 #             "ctype": CHAR_KWARGS,
 #             "path": CHAR_KWARGS,
 #         }
-        
+
 class FolderFilterSet(FilterSet):
     parent_folder__id__none = ObjectFilter(field_name="parent_folder", exclude=True)
     class Meta:
@@ -460,7 +478,7 @@ class DossierFormFilterSet(FilterSet):
             "name": ["exact", "icontains"],
             "type": ["exact", "isnull"],
         }
-    
+
 
 # class ApprovalFilterSet(FilterSet):
 #     class Meta:
