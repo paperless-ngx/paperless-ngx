@@ -12,6 +12,7 @@ on:
   pull_request:
     branches-ignore:
       - 'translations**'
+  workflow_dispatch:
 
 env:
   # This is the version of pipenv all the steps will use
