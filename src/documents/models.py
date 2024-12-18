@@ -184,6 +184,40 @@ class Tag(MatchingModel):
         verbose_name = _("tag")
         verbose_name_plural = _("tags")
 
+class ArchiveFont(MatchingModel):
+    first_upload = models.DateTimeField(
+        _("first_upload"),
+        blank=True,
+        null=True,
+        db_index=True,
+    )
+
+    last_upload = models.DateTimeField(
+        _("last_upload"),
+        blank=True,
+        null=True,
+        db_index=True,
+    )
+
+
+
+    note = models.TextField(
+        _("note"),
+        blank=True,
+        help_text=_("Note for the archive font"),
+    )
+
+    class Meta(MatchingModel.Meta):
+        verbose_name = _("archive_font")
+        verbose_name_plural = _("archive_fonts")
+
+class FontLanguage(MatchingModel):
+    code = models.CharField(_("code"), max_length=20, blank=True, db_index=True)
+
+    class Meta(MatchingModel.Meta):
+        verbose_name = _("language")
+        verbose_name_plural = _("languages")
+
 
 class DocumentType(MatchingModel):
     class Meta(MatchingModel.Meta):
