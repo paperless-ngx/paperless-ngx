@@ -334,7 +334,7 @@
                         </a>
                       }
                     } @else {
-                      <a class="small text-decoration-none" routerLink="/settings" fragment="update-checking"
+                      <a  *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }" class="small text-decoration-none" routerLink="/settings" fragment="update-checking"
                         [ngbPopover]="updateCheckingNotEnabledPopContent" popoverClass="shadow" triggers="mouseenter"
                         container="body">
                         <i-bs width="1.2em" height="1.2em" name="info-circle"></i-bs>
