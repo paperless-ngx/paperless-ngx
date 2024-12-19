@@ -32,7 +32,9 @@ export enum PermissionType {
   Approval = '%s_approval',
   Folder = '%s_folder',
   Dossier = '%s_dossier',
-  DossierForm = '%s_dossierform'
+  DossierForm = '%s_dossierform',
+  FontLanguage = '%s_fontlanguage',
+  ArchiveFont = '%s_archivefont'
 }
 
 export enum DevelopPermissionType {
@@ -56,7 +58,8 @@ export enum DevelopPermissionType {
   Workflow = '%s_workflow',
   Approval = '%s_approval',
   Folder = '%s_folder',
-
+  FontLanguage = '%s_fontlanguage',
+  ArchiveFont = '%s_archivefont'
 }
 
 

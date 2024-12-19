@@ -73,6 +73,14 @@ export const FILTER_HAS_DOSSIER_ANY = 67
 export const FILTER_DOES_NOT_HAVE_DOSSIER = 68
 export const FILTER_HAS_DOSSIER_ALL = 69
 
+export const FILTER_ARCHIVE_FONT = 70
+export const FILTER_HAS_ARCHIVE_FONT_ANY = 71
+export const FILTER_DOES_NOT_HAVE_ARCHIVE_FONT = 72
+
+export const FILTER_FONT_LANGUAGE = 73
+export const FILTER_HAS_FONT_LANGUAGE_ANY = 74
+export const FILTER_DOES_NOT_HAVE_FONT_LANGUAGE = 75
+
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
     id: FILTER_TITLE,
@@ -394,6 +402,44 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     filtervar: 'custom_fields__icontains',
     datatype: 'string',
     multi: false,
+  },
+  {
+    id: FILTER_ARCHIVE_FONT,
+    filtervar: 'archive_font__id',
+    isnull_filtervar: 'archive_font__isnull',
+    datatype: 'archive_font',
+    multi: false,
+  },
+  {
+    id: FILTER_HAS_ARCHIVE_FONT_ANY,
+    filtervar: 'archive_font__id__in',
+    datatype: 'archive_font',
+    multi: true,
+  },
+  {
+    id: FILTER_DOES_NOT_HAVE_ARCHIVE_FONT,
+    filtervar: 'archive_font__id__none',
+    datatype: 'archive_font',
+    multi: true,
+  },
+  {
+    id: FILTER_FONT_LANGUAGE,
+    filtervar: 'font_language__id',
+    isnull_filtervar: 'font_language__isnull',
+    datatype: 'font_language',
+    multi: false,
+  },
+  {
+    id: FILTER_HAS_FONT_LANGUAGE_ANY,
+    filtervar: 'font_language__id__in',
+    datatype: 'font_language',
+    multi: true,
+  },
+  {
+    id: FILTER_DOES_NOT_HAVE_FONT_LANGUAGE,
+    filtervar: 'font_language__id__none',
+    datatype: 'font_language',
+    multi: true,
   },
 ]
 

@@ -57,7 +57,7 @@ export class AppFrameComponent
   implements OnInit, ComponentCanDeactivate {
   versionString = `${environment.appTitle} ${environment.version}`
   appRemoteVersion: AppRemoteVersion
-
+  
   isMenuCollapsed: boolean = true
 
   slimSidebarAnimating: boolean = false

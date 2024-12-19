@@ -38,6 +38,8 @@ import { CustomFieldsComponent } from './components/manage/custom-fields/custom-
 import { FoldersComponent } from './components/manage/folder-list/folder-list.component'
 import { DossiersComponent } from './components/manage/dossier-list/dossier-list.component'
 import { DossiersFormComponent } from './components/manage/dossier-form-list/dossier-form-list.component'
+import { FontLanguageListComponent } from './components/manage/font-language-list/font-language-list.component'
+import { ArchiveFontListComponent } from './components/manage/archive-font-list/archive-font-list.component'
 
 
 
@@ -116,6 +118,28 @@ export const routes: Routes = [
           requiredPermission: {
             action: PermissionAction.View,
             type: PermissionType.Tag,
+          },
+        },
+      },
+      {
+        path: 'font_languages',
+        component: FontLanguageListComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.FontLanguage,
+          },
+        },
+      },
+      {
+        path: 'archive_fonts',
+        component: ArchiveFontListComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.ArchiveFont,
           },
         },
       },

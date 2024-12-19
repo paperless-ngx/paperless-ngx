@@ -471,7 +471,16 @@ class Document(ModelWithOwner):
         null=True,
         related_name="documents",
         on_delete=models.SET_NULL,
-        verbose_name=_("archive font"),
+        verbose_name=_("archive fonts"),
+    )
+
+    font_language = models.ForeignKey(
+        FontLanguage,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL,
+        verbose_name=_("font languages"),
     )
 
     checksum = models.CharField(

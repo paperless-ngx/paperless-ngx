@@ -267,7 +267,21 @@
               <a class="nav-link" routerLink="approvals" routerLinkActive="active" (click)="closeMenu()"
                 ngbPopover="Approvals" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
                 container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-1" name="ui-radios"></i-bs><span>&nbsp;<ng-container i18n>Approvals</ng-container></span>
+                <i-bs class="me-1" name="menu-app"></i-bs><span>&nbsp;<ng-container i18n>Approvals</ng-container></span>
+              </a>
+            </li>
+            <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.FontLanguage }">
+              <a class="nav-link" routerLink="font_languages" routerLinkActive="active" (click)="closeMenu()"
+                ngbPopover="Approvals" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
+                container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+                <i-bs class="me-1" name="file-font"></i-bs><span>&nbsp;<ng-container i18n>Font Language</ng-container></span>
+              </a>
+            </li>
+            <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.ArchiveFont }">
+              <a class="nav-link" routerLink="archive_fonts" routerLinkActive="active" (click)="closeMenu()"
+                ngbPopover="Approvals" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
+                container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+                <i-bs class="me-1" name="journal-text"></i-bs><span>&nbsp;<ng-container i18n>Archive Font</ng-container></span>
               </a>
             </li>
           </ul>

@@ -12,6 +12,8 @@ import { DocumentListComponent } from './components/document-list/document-list.
 import { DocumentDetailComponent } from './components/document-detail/document-detail.component'
 import { DashboardComponent } from './components/dashboard/dashboard.component'
 import { TagListComponent } from './components/manage/tag-list/tag-list.component'
+import { FontLanguageListComponent } from './components/manage/font-language-list/font-language-list.component'
+import { ArchiveFontListComponent } from './components/manage/archive-font-list/archive-font-list.component'
 import { DocumentTypeListComponent } from './components/manage/document-type-list/document-type-list.component'
 import { CorrespondentListComponent } from './components/manage/correspondent-list/correspondent-list.component'
 import { LogsComponent } from './components/admin/logs/logs.component'
@@ -196,6 +198,7 @@ import {
   files,
   fileText,
   filter,
+  fileFont,
   folder,
   folderFill,
   funnel,
@@ -208,9 +211,11 @@ import {
   houseDoorFill,
   infoCircle,
   journals,
+  journalText,
   link,
   listTask,
   listUl,
+  menuApp,
   pencil,
   people,
   peopleFill,
@@ -306,6 +311,7 @@ const icons = {
   filter,
   folder,
   folderFill,
+  fileFont,
   funnel,
   gear,
   grid,
@@ -316,9 +322,11 @@ const icons = {
   houseDoorFill,
   infoCircle,
   journals,
+  journalText,
   link,
   listTask,
   listUl,
+  menuApp,
   pencil,
   people,
   peopleFill,
@@ -392,6 +400,12 @@ import { DossierCustomFieldSelectComponent } from './components/common/custom-fi
 import { DossierFormCustomFieldSelectComponent } from './components/common/custom-field-select/dossier-form-custom-field-select/dossier-form-custom-field-select.component'
 import { NodeFileWidgetComponent } from './components/dashboard/widgets/folder-node-widget/node-tree-widget.component'
 import { UploadFileButtonComponent } from './components/dashboard/widgets/upload-file-button/upload-file-btn.component'
+import {
+  FontLanguageEditDialogComponent
+} from './components/common/edit-dialog/font-language-edit-dialog/font-language-edit-dialog.component'
+import {
+  ArchiveFontEditDialogComponent
+} from './components/common/edit-dialog/archive-font-edit-dialog/archive-font-edit-dialog.component'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -451,6 +465,8 @@ function initializeApp(settings: SettingsService) {
     FoldersComponent,
     FolderEditDialogComponent,
     TagListComponent,
+    FontLanguageListComponent,
+    ArchiveFontListComponent,
     DocumentTypeListComponent,
     CorrespondentListComponent,
     StoragePathListComponent,
@@ -461,6 +477,8 @@ function initializeApp(settings: SettingsService) {
     CorrespondentEditDialogComponent,
     ConfirmDialogComponent,
     TagEditDialogComponent,
+    FontLanguageEditDialogComponent,
+    ArchiveFontEditDialogComponent,
     DocumentTypeEditDialogComponent,
     StoragePathEditDialogComponent,
     WarehouseEditDialogComponent,
