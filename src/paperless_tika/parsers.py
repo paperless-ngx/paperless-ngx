@@ -33,7 +33,10 @@ class TikaDocumentParser(DocumentParser):
 
     def extract_metadata(self, document_path, mime_type):
         try:
-            with TikaClient(tika_url=settings.TIKA_ENDPOINT) as client:
+            with TikaClient(
+                tika_url=settings.TIKA_ENDPOINT,
+                timeout=settings.CELERY_TASK_TIME_LIMIT,
+            ) as client:
                 parsed = client.metadata.from_file(document_path, mime_type)
                 return [
                     {
@@ -54,7 +57,10 @@ class TikaDocumentParser(DocumentParser):
         self.log.info(f"Sending {document_path} to Tika server")
 
         try:
-            with TikaClient(tika_url=settings.TIKA_ENDPOINT) as client:
+            with TikaClient(
+                tika_url=settings.TIKA_ENDPOINT,
+                timeout=settings.CELERY_TASK_TIME_LIMIT,
+            ) as client:
                 try:
                     parsed = client.tika.as_text.from_file(document_path, mime_type)
                 except httpx.HTTPStatusError as err:
