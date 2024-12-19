@@ -1,5 +1,3 @@
-import os
-
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
@@ -14,7 +12,7 @@ class Command(BaseCommand):
         "state to an unencrypted one (or vice-versa)"
     )
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument(
             "--passphrase",
             help=(
@@ -23,7 +21,7 @@ class Command(BaseCommand):
             ),
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         try:
             self.stdout.write(
                 self.style.WARNING(
@@ -52,7 +50,7 @@ class Command(BaseCommand):
 
         self.__gpg_to_unencrypted(passphrase)
 
-    def __gpg_to_unencrypted(self, passphrase: str):
+    def __gpg_to_unencrypted(self, passphrase: str) -> None:
         encrypted_files = Document.objects.filter(
             storage_type=Document.STORAGE_TYPE_GPG,
         )
@@ -69,7 +67,7 @@ class Command(BaseCommand):
 
             document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
-            ext = os.path.splitext(document.filename)[1]
+            ext: str = document.filename.suffix
 
             if not ext == ".gpg":
                 raise CommandError(
@@ -77,12 +75,12 @@ class Command(BaseCommand):
                     f"end with .gpg",
                 )
 
-            document.filename = os.path.splitext(document.filename)[0]
+            document.filename = document.filename.stem
 
-            with open(document.source_path, "wb") as f:
+            with document.source_path.open("wb") as f:
                 f.write(raw_document)
 
-            with open(document.thumbnail_path, "wb") as f:
+            with document.thumbnail_path.open("wb") as f:
                 f.write(raw_thumb)
 
             Document.objects.filter(id=document.id).update(
@@ -91,4 +89,4 @@ class Command(BaseCommand):
             )
 
             for path in old_paths:
-                os.unlink(path)
+                path.unlink()

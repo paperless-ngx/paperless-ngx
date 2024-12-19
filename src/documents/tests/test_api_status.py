@@ -173,7 +173,7 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.data["tasks"]["index_status"], "OK")
         self.assertIsNotNone(response.data["tasks"]["index_last_modified"])
 
-    @override_settings(INDEX_DIR="/tmp/index/")
+    @override_settings(INDEX_DIR=Path("/tmp/index/"))
     @mock.patch("documents.index.open_index", autospec=True)
     def test_system_status_index_error(self, mock_open_index):
         """
@@ -193,7 +193,7 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.data["tasks"]["index_status"], "ERROR")
         self.assertIsNotNone(response.data["tasks"]["index_error"])
 
-    @override_settings(DATA_DIR="/tmp/does_not_exist/data/")
+    @override_settings(DATA_DIR=Path("/tmp/does_not_exist/data/"))
     def test_system_status_classifier_ok(self):
         """
         GIVEN:
