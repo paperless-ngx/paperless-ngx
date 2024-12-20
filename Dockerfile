@@ -118,9 +118,7 @@ ARG RUNTIME_PACKAGES="\
   zlib1g \
   # Barcode splitter
   libzbar0 \
-  poppler-utils \
-  # XRechnung
-  default-jre"
+  poppler-utils"
 
 # Install basic runtime packages.
 # These change very infrequently
@@ -161,8 +159,6 @@ RUN set -eux \
     && rm --recursive --force --verbose /var/lib/apt/lists/* \
   && echo "Installing supervisor" \
     && python3 -m pip install --default-timeout=1000 --upgrade --no-cache-dir supervisor==4.2.5
-
-RUN curl -o /usr/local/bin/mustang-cli.jar https://github.com/ZUGFeRD/mustangproject/releases/download/core-2.15.1/Mustang-CLI-2.15.1.jar && chmod +x /usr/local/bin/mustang-cli.jar
 
 # Copy gunicorn config
 # Changes very infrequently
