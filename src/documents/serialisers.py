@@ -1757,7 +1757,9 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
             "storage_paths",
             "warehouses",
             "folders",
-            "dossiers"
+            "dossiers",
+            "font_languages",
+            "archive_fonts"
         ],
         label="Object Type",
         write_only=True,
@@ -1809,6 +1811,10 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
             object_class = Folder
         elif object_type == "dossiers":
             object_class = Dossier
+        elif object_type == "font_languages":
+            object_class = FontLanguage
+        elif object_type == "archive_fonts":
+            object_class = ArchiveFont
         return object_class
 
     def _validate_objects(self, objects, object_type):

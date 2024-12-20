@@ -1,8 +1,8 @@
 <form [formGroup]="objectForm" (ngSubmit)="save()" autocomplete="off">
   <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
+    <h4 class="modal-title" id="modal-basic-title">{{ getTitle() }}</h4>
     @if (object?.id) {
-      <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{object.id}}</span>
+      <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{ object.id }}</span>
     }
     <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
     </button>
@@ -11,9 +11,16 @@
 
     <div class="col">
       <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></pngx-input-text>
-      <pngx-input-select i18n-title title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></pngx-input-select>
+<!--      <div class="col-lg-9">-->
+<!--        <pngx-font-language-input type="change" formControlName="font_language"></pngx-font-language-input>-->
+<!--      </div>-->
+      <pngx-input-select i18n-title title="Language" [items]="fontLanguages" [multiple]="true"
+                         formControlName="languages"></pngx-input-select>
+<!--      <pngx-input-select i18n-title title="Matching algorithm" [items]="getMatchingAlgorithms()"-->
+<!--                         formControlName="matching_algorithm"></pngx-input-select>-->
       @if (patternRequired) {
-        <pngx-input-text i18n-title title="Matching pattern" formControlName="match" [error]="error?.match"></pngx-input-text>
+        <pngx-input-text i18n-title title="Matching pattern" formControlName="match"
+                         [error]="error?.match"></pngx-input-text>
       }
       @if (patternRequired) {
         <pngx-input-check i18n-title title="Case insensitive" formControlName="is_insensitive"></pngx-input-check>
@@ -21,12 +28,14 @@
     </div>
 
     <div *pngxIfOwner="object">
-      <pngx-permissions-form [users]="users" accordion="true" formControlName="permissions_form"></pngx-permissions-form>
+      <pngx-permissions-form [users]="users" accordion="true"
+                             formControlName="permissions_form"></pngx-permissions-form>
     </div>
 
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
+    <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel
+    </button>
     <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
   </div>
 </form>

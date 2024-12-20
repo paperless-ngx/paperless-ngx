@@ -2204,6 +2204,7 @@ class BulkEditObjectsView(PassUserMixin):
                     self.update_child_folder_paths(folder)
 
             return Response(status=status.HTTP_204_NO_CONTENT)
+        # elif operation == "update" and object_type == "archive_fonts":
 
         elif operation == "delete" and object_type == "warehouses":
             warehouses_list = Warehouse.objects.filter(id__in=object_ids)

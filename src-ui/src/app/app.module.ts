@@ -95,6 +95,7 @@ import { MailAccountEditDialogComponent } from './components/common/edit-dialog/
 import { MailRuleEditDialogComponent } from './components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
 import { PermissionsUserComponent } from './components/common/input/permissions/permissions-user/permissions-user.component'
 import { PermissionsGroupComponent } from './components/common/input/permissions/permissions-group/permissions-group.component'
+import { FontLanguageComponentInput } from './components/common/input/font-language/font-language.component'
 import { IfOwnerDirective } from './directives/if-owner.directive'
 import { IfObjectPermissionsDirective } from './directives/if-object-permissions.directive'
 import { PermissionsDialogComponent } from './components/common/permissions-dialog/permissions-dialog.component'
@@ -542,6 +543,7 @@ function initializeApp(settings: SettingsService) {
     MailRuleEditDialogComponent,
     PermissionsUserComponent,
     PermissionsGroupComponent,
+    FontLanguageComponentInput,
     IfOwnerDirective,
     IfObjectPermissionsDirective,
     PermissionsDialogComponent,

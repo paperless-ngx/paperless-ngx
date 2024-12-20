@@ -14,7 +14,7 @@ import { ToastService } from 'src/app/services/toast.service'
 import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { ManagementListComponent } from '../management-list/management-list.component'
 import {
-  ArchiveFontEditDialogComponent
+  ArchiveFontEditDialogComponent,
 } from '../../common/edit-dialog/archive-font-edit-dialog/archive-font-edit-dialog.component'
 
 @Component({
@@ -28,7 +28,7 @@ export class ArchiveFontListComponent extends ManagementListComponent<ArchiveFon
     modalService: NgbModal,
     toastService: ToastService,
     documentListViewService: DocumentListViewService,
-    permissionsService: PermissionsService
+    permissionsService: PermissionsService,
   ) {
     super(
       archiveFontService,
@@ -43,14 +43,18 @@ export class ArchiveFontListComponent extends ManagementListComponent<ArchiveFon
       PermissionType.ArchiveFont,
       [
         // {
-        //   key: 'color',
-        //   name: $localize`Color`,
+        //   key: 'languages',
+        //   name: $localize`Languages`,
         //   rendersHtml: true,
         //   valueFn: (t: ArchiveFont) => {
-        //     return `<span class="badge" style="color: ${t.text_color}; background-color: ${t.color}">${t.color}</span>`
+        //     console.log(t)
+        //     for (let key in t.languages) {
+        //       console.log(key + ': ' + t.languages[key])
+        //     }
+        //     // return `@for<span class="badge" style="color: ${t.languages}; background-color: ${t.color}">${t.color}</span>`
         //   },
         // },
-      ]
+      ],
     )
   }
 

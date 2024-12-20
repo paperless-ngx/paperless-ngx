@@ -15,7 +15,7 @@ import { ManagementListComponent } from '../management-list/management-list.comp
 
 @Component({
   selector: 'pngx-font-language-list',
-  templateUrl: './../management-list/management-list.component.html',
+  templateUrl: '/font-language-list.component.html',
   styleUrls: ['./../management-list/management-list.component.scss'],
 })
 export class FontLanguageListComponent extends ManagementListComponent<FontLanguage> {
