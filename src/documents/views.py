@@ -402,6 +402,7 @@ class DocumentViewSet(
         "title",
         "correspondent__name",
         "document_type__name",
+        "archive_font__name"
         "created",
         "modified",
         "added",

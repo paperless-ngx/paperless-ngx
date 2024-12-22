@@ -11,16 +11,19 @@ import { Correspondent } from 'src/app/data/correspondent'
 import { Document } from 'src/app/data/document'
 import { DocumentMetadata } from 'src/app/data/document-metadata'
 import { DocumentType } from 'src/app/data/document-type'
+import { ArchiveFont } from 'src/app/data/archive-font'
 import { Tag } from 'src/app/data/tag'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { ArchiveFontService } from 'src/app/services/rest/archive-font.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
 import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
+import { ArchiveFontEditDialogComponent } from '../common/edit-dialog/archive-font-edit-dialog/archive-font-edit-dialog.component'
 import { ToastService } from 'src/app/services/toast.service'
 import { TextComponent } from '../common/input/text/text.component'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -37,6 +40,7 @@ import {
 } from 'rxjs/operators'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
 import {
+  FILTER_ARCHIVE_FONT,
   FILTER_CORRESPONDENT,
   FILTER_CREATED_AFTER,
   FILTER_CREATED_BEFORE,
@@ -142,6 +146,7 @@ export class DocumentDetailComponent
 
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
+  archiveFonts: ArchiveFont[]
   storagePaths: StoragePath[]
   warehouses: Warehouse[]
   shelfs: Warehouse[]
@@ -154,6 +159,7 @@ export class DocumentDetailComponent
     created_date: new FormControl(),
     correspondent: new FormControl(),
     document_type: new FormControl(),
+    archive_font: new FormControl(),
     storage_path: new FormControl(),
     warehouse_w: new FormControl(),
     warehouse_s: new FormControl(),
@@ -205,6 +211,7 @@ export class DocumentDetailComponent
     private route: ActivatedRoute,
     private correspondentService: CorrespondentService,
     private documentTypeService: DocumentTypeService,
+    private archiveFontTypeService: ArchiveFontService,
     private router: Router,
     private modalService: NgbModal,
     private openDocumentService: OpenDocumentsService,
@@ -342,6 +349,17 @@ export class DocumentDetailComponent
     if (
       this.permissionsService.currentUserCan(
         PermissionAction.View,
+        PermissionType.ArchiveFont
+      )
+    ) {
+      this.archiveFontTypeService
+        .listAll()
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .subscribe((result) => (this.archiveFonts = result.results))
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
         PermissionType.StoragePath
       )
     ) {
@@ -474,6 +492,7 @@ export class DocumentDetailComponent
             created_date: doc.created_date,
             correspondent: doc.correspondent,
             document_type: doc.document_type,
+            archive_font: doc.archive_font,
             storage_path: doc.storage_path,
             warehouse: doc.warehouse,
             archive_serial_number: doc.archive_serial_number,
@@ -623,6 +642,26 @@ export class DocumentDetailComponent
       .subscribe(({ newDocumentType, documentTypes }) => {
         this.documentTypes = documentTypes.results
         this.documentForm.get('document_type').setValue(newDocumentType.id)
+      })
+  }
+  createArchiveFont(newName: string) {
+    var modal = this.modalService.open(ArchiveFontEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    if (newName) modal.componentInstance.object = { name: newName }
+    modal.componentInstance.succeeded
+      .pipe(
+        switchMap((newDocumentType) => {
+          return this.archiveFontTypeService
+            .listAll()
+            .pipe(map((archiveFonts) => ({ newDocumentType, archiveFonts })))
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newArchiveFont, archiveFonts }) => {
+        this.archiveFonts = archiveFonts.results
+        this.documentForm.get('archive_font').setValue(newArchiveFont.id)
       })
   }
 
@@ -1077,7 +1116,6 @@ export class DocumentDetailComponent
 
   filterDocuments(items: ObjectWithId[] | NgbDateStruct[]) {
     const filterRules: FilterRule[] = items.flatMap((i) => {
-      console.log('gia tri i',i)
       if (i.hasOwnProperty('year')) {
         const isoDateAdapter = new ISODateAdapter()
         const dateAfter: Date = new Date(isoDateAdapter.toModel(i))
@@ -1120,7 +1158,14 @@ export class DocumentDetailComponent
           rule_type: FILTER_HAS_TAGS_ALL,
           value: (i as Tag).id.toString(),
         }
-      } else {
+      }
+      else if (i.hasOwnProperty('languages')){
+        return {
+          rule_type: FILTER_ARCHIVE_FONT,
+          value: (i as ArchiveFont).id.toString(),
+        }
+      }
+      else {
         // Document Type, has no specific props
         return {
           rule_type: FILTER_DOCUMENT_TYPE,

@@ -9,6 +9,7 @@ import { FilterRule } from 'src/app/data/filter-rule'
 import { map, tap } from 'rxjs/operators'
 import { CorrespondentService } from './correspondent.service'
 import { DocumentTypeService } from './document-type.service'
+import { ArchiveFontService } from './archive-font.service'
 import { TagService } from './tag.service'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
 import { queryParamsFromFilterRules } from '../../utils/query-params'
@@ -73,6 +74,7 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     http: HttpClient,
     private correspondentService: CorrespondentService,
     private documentTypeService: DocumentTypeService,
+    private archiveFontService: ArchiveFontService,
     private tagService: TagService,
     private storagePathService: StoragePathService,
     private warehouseService: WarehouseService,
@@ -102,6 +104,15 @@ export class DocumentService extends AbstractPaperlessService<Document> {
       )
     ) {
       doc.document_type$ = this.documentTypeService.getCached(doc.document_type)
+    }
+    if (
+      doc.archive_font &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.ArchiveFont
+      )
+    ) {
+      doc.archive_font$ = this.archiveFontService.getCached(doc.archive_font)
     }
     if (
       doc.tags &&

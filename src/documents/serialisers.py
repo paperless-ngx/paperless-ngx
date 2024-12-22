@@ -486,6 +486,10 @@ class DocumentTypeField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         return DocumentType.objects.all()
 
+class ArchiveFontField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        return ArchiveFont.objects.all()
+
 
 class StoragePathField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
@@ -732,6 +736,7 @@ class DocumentSerializer(
     warehouse_s = SerializerMethodField(read_only=True)
     folder = FolderField(allow_null=True)
     document_type = DocumentTypeField(allow_null=True)
+    archive_font = ArchiveFontField(allow_null=True)
     storage_path = StoragePathField(allow_null=True)
 
     original_file_name = SerializerMethodField()
@@ -920,6 +925,7 @@ class DocumentSerializer(
             "approvals",
             "correspondent",
             "document_type",
+            "archive_font",
             "storage_path",
             "warehouse",
             "folder",

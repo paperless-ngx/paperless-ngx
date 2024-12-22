@@ -315,6 +315,8 @@ class DocumentFilterSet(FilterSet):
 
     document_type__id__none = ObjectFilter(field_name="document_type", exclude=True)
 
+    archive_font__id__none = ObjectFilter(field_name="archive_font", exclude=True)
+
     storage_path__id__none = ObjectFilter(field_name="storage_path", exclude=True)
 
     warehouse__id__none = WarehouseFilter(field_name="warehouse", exclude=True)
@@ -372,6 +374,9 @@ class DocumentFilterSet(FilterSet):
             "document_type": ["isnull"],
             "document_type__id": ID_KWARGS,
             "document_type__name": CHAR_KWARGS,
+            "archive_font": ["isnull"],
+            "archive_font__id": ID_KWARGS,
+            "archive_font__name": CHAR_KWARGS,
             "storage_path": ["isnull"],
             "storage_path__id": ID_KWARGS,
             "storage_path__name": CHAR_KWARGS,

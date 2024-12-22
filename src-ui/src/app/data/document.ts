@@ -1,6 +1,7 @@
 import { Correspondent } from './correspondent'
 import { Tag } from './tag'
 import { DocumentType } from './document-type'
+import { ArchiveFont } from './archive-font'
 import { Observable } from 'rxjs'
 import { StoragePath } from './storage-path'
 import { Warehouse } from './warehouse'
@@ -26,6 +27,10 @@ export interface Document extends ObjectWithPermissions {
   document_type$?: Observable<DocumentType>
 
   document_type?: number
+
+  archive_font$?: Observable<ArchiveFont>
+
+  archive_font?: number
 
   storage_path$?: Observable<StoragePath>
 
@@ -74,7 +79,7 @@ export interface Document extends ObjectWithPermissions {
   archive_serial_number?: number
 
   notes?: DocumentNote[]
-  
+
   approvals?: DocumentApproval[]
 
   __search_hit__?: SearchHit

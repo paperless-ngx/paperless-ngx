@@ -59,6 +59,15 @@
             (opened)="onDocumentTypeDropdownOpen()"
             [documentCounts]="documentTypeDocumentCounts"
             [allowSelectNone]="true"></pngx-filterable-dropdown>
+        }@if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.ArchiveFont)) {
+            <pngx-filterable-dropdown class="flex-fill" title="Archive font" icon="journal-text" i18n-title
+            filterPlaceholder="Filter archive fonts" i18n-filterPlaceholder
+            [items]="archiveFonts"
+            [(selectionModel)]="archiveFontSelectionModel"
+            (selectionModelChange)="updateRules()"
+            (opened)="onDocumentTypeDropdownOpen()"
+            [documentCounts]="archiveFontDocumentCounts"
+            [allowSelectNone]="true"></pngx-filterable-dropdown>
         }
         @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
           <pngx-filterable-dropdown class="flex-fill" title="Storage path" icon="folder-fill" i18n-title

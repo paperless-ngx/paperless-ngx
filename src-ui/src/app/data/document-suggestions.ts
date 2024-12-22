@@ -5,6 +5,8 @@ export interface DocumentSuggestions {
 
   document_types?: number[]
 
+  archive_fonts?: number[]
+
   storage_paths?: number[]
 
   warehouses?: number[]

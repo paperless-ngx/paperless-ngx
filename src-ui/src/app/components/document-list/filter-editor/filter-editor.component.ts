@@ -11,10 +11,12 @@ import {
 import { Tag } from 'src/app/data/tag'
 import { Correspondent } from 'src/app/data/correspondent'
 import { DocumentType } from 'src/app/data/document-type'
+import { ArchiveFont } from 'src/app/data/archive-font'
 import { Warehouse } from 'src/app/data/warehouse'
 import { Subject, Subscription } from 'rxjs'
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { ArchiveFontService } from 'src/app/services/rest/archive-font.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { FilterRule } from 'src/app/data/filter-rule'
@@ -59,7 +61,7 @@ import {
   FILTER_BOX,
   FILTER_HAS_BOX_ANY,
   FILTER_DOES_NOT_HAVE_CUSTOM_SHELF,
-  FILTER_DOES_NOT_HAVE_BOX,
+  FILTER_DOES_NOT_HAVE_BOX, FILTER_ARCHIVE_FONT, FILTER_HAS_ARCHIVE_FONT_ANY, FILTER_DOES_NOT_HAVE_ARCHIVE_FONT,
 } from 'src/app/data/filter-rule-type'
 import {
   FilterableDropdownSelectionModel,
@@ -87,7 +89,6 @@ import {
 } from 'src/app/services/permissions.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { WarehouseService } from 'src/app/services/rest/warehouse.service'
-
 const TEXT_FILTER_TARGET_TITLE = 'title'
 const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
 const TEXT_FILTER_TARGET_ASN = 'asn'
@@ -268,6 +269,7 @@ export class FilterEditorComponent
 
   constructor(
     private documentTypeService: DocumentTypeService,
+    private archiveFontService: ArchiveFontService,
     private tagService: TagService,
     private warehouseService: WarehouseService,
     private correspondentService: CorrespondentService,
@@ -284,6 +286,7 @@ export class FilterEditorComponent
   tags: Tag[] = []
   correspondents: Correspondent[] = []
   documentTypes: DocumentType[] = []
+  archiveFonts: ArchiveFont[] = []
   storagePaths: StoragePath[] = []
   warehouses: Warehouse[] = []
   shelfs: Warehouse[] = []
@@ -292,6 +295,7 @@ export class FilterEditorComponent
   tagDocumentCounts: SelectionDataItem[]
   correspondentDocumentCounts: SelectionDataItem[]
   documentTypeDocumentCounts: SelectionDataItem[]
+  archiveFontDocumentCounts: SelectionDataItem[]
   storagePathDocumentCounts: SelectionDataItem[]
   warehouseDocumentCounts: SelectionDataItem[]
   shelfDocumentCounts: SelectionDataItem[]
@@ -332,6 +336,7 @@ export class FilterEditorComponent
   tagSelectionModel = new FilterableDropdownSelectionModel()
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
+  archiveFontSelectionModel = new FilterableDropdownSelectionModel()
   storagePathSelectionModel = new FilterableDropdownSelectionModel()
   warehouseSelectionModel = new FilterableDropdownSelectionModel()
   shelfSelectionModel = new FilterableDropdownSelectionModel()
@@ -368,6 +373,7 @@ export class FilterEditorComponent
     this._filterRules = value
 
     this.documentTypeSelectionModel.clear(false)
+    this.archiveFontSelectionModel.clear(false)
     this.storagePathSelectionModel.clear(false)
     this.warehouseSelectionModel.clear(false)
     this.shelfSelectionModel.clear(false)
@@ -517,6 +523,24 @@ export class FilterEditorComponent
         case FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE:
           this.documentTypeSelectionModel.intersection = Intersection.Exclude
           this.documentTypeSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Excluded,
+            false
+          )
+          break
+        case FILTER_ARCHIVE_FONT:
+        case FILTER_HAS_ARCHIVE_FONT_ANY:
+          this.archiveFontSelectionModel.logicalOperator = LogicalOperator.Or
+          this.archiveFontSelectionModel.intersection = Intersection.Include
+          this.archiveFontSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Selected,
+            false
+          )
+          break
+        case FILTER_DOES_NOT_HAVE_ARCHIVE_FONT:
+          this.archiveFontSelectionModel.intersection = Intersection.Exclude
+          this.archiveFontSelectionModel.set(
             rule.value ? +rule.value : null,
             ToggleableItemState.Excluded,
             false
@@ -786,6 +810,26 @@ export class FilterEditorComponent
           filterRules.push({
             rule_type: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
             value: documentType.id?.toString(),
+          })
+        })
+    }
+    if (this.archiveFontSelectionModel.isNoneSelected()) {
+      filterRules.push({ rule_type: FILTER_ARCHIVE_FONT, value: null })
+    } else {
+      this.archiveFontSelectionModel
+        .getSelectedItems()
+        .forEach((archiveFont) => {
+          filterRules.push({
+            rule_type: FILTER_HAS_ARCHIVE_FONT_ANY,
+            value: archiveFont.id?.toString(),
+          })
+        })
+      this.archiveFontSelectionModel
+        .getExcludedItems()
+        .forEach((archiveFont) => {
+          filterRules.push({
+            rule_type: FILTER_DOES_NOT_HAVE_ARCHIVE_FONT,
+            value: archiveFont.id?.toString(),
           })
         })
     }
@@ -1068,13 +1112,23 @@ export class FilterEditorComponent
     if (
       this.permissionsService.currentUserCan(
         PermissionAction.View,
+        PermissionType.ArchiveFont
+      )
+    ) {
+      this.archiveFontService
+        .listAll()
+        .subscribe((result) => (this.archiveFonts = result.results))
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
         PermissionType.Warehouse
       )
     ) {
       // this.warehouseService
       //   .listAll(null, null, { type__iexact: 'Warehouse' })
       //   .subscribe((result) => (this.warehouses = result.results))
-        
+
       // this.warehouseService
       //   .listAll(null, null, { type__iexact: 'Shelf' })
       //   .subscribe((result) => (this.shelfs = result.results))
