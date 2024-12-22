@@ -2,7 +2,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "manage.py runserver",
+            "name": "Chrome: Angular Frontend",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:4200",
+            "webRoot": "${workspaceFolder}/src-ui"
+        },
+        {
+            "name": "Debug: Backend(manage.py runserver)",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/src/manage.py",
@@ -12,7 +19,7 @@
             "django": true
         },
         {
-            "name": "manage.py document_consumer",
+            "name": "Debug: Consumer Service (manage.py document_consumer)",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/src/manage.py",
@@ -22,7 +29,7 @@
             "django": true
         },
         {
-            "name": "celery",
+            "name": "Debug: Celery Service",
             "type": "python",
             "cwd": "${workspaceFolder}/src",
             "request": "launch",
@@ -37,6 +44,24 @@
                 "worker",
                 "-l",
                 "DEBUG"
+            ]
+        },
+        {
+            "name": "Debug: Angular Frontend",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/src-ui/node_modules/.bin/npm",
+            "args": ["start"],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug: FullStack",
+            "type": "compound",
+            "configurations": [
+                "manage.py runserver",
+                "manage.py document_consumer",
+                "celery",
+                "npm start"
             ]
         }
     ]
