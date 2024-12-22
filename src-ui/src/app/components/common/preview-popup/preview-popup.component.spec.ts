@@ -1,9 +1,4 @@
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import {
   HttpClient,
@@ -61,6 +56,7 @@ describe('PreviewPopupComponent', () => {
     fixture = TestBed.createComponent(PreviewPopupComponent)
     component = fixture.componentInstance
     component.document = { ...doc }
+    jest.useFakeTimers()
     fixture.detectChanges()
   })
 
@@ -139,16 +135,36 @@ describe('PreviewPopupComponent', () => {
     expect(component.previewText).toEqual('Preview text')
   })
 
-  it('should show preview on mouseover after delay to preload content', fakeAsync(() => {
+  it('should show preview on mouseover after delay to preload content', () => {
     component.mouseEnterPreview()
     expect(component.popover.isOpen()).toBeTruthy()
-    tick(600)
+    jest.advanceTimersByTime(600)
     component.close()
+    jest.advanceTimersByTime(600)
+  })
 
+  it('should not show preview on mouseover if mouse no longer on preview', () => {
     component.mouseEnterPreview()
-    tick(100)
+    jest.advanceTimersByTime(100)
     component.mouseLeavePreview()
-    tick(600)
+    jest.advanceTimersByTime(600)
     expect(component.popover.isOpen()).toBeFalsy()
-  }))
+  })
+
+  it('should not close preview on mouseleave if mouse back on preview', () => {
+    component.close()
+    component.mouseEnterPreview()
+    jest.advanceTimersByTime(300)
+    expect(component.popover.isOpen()).toBeTruthy()
+  })
+
+  it('should support immediate close on mouseleave', () => {
+    component.mouseEnterPreview()
+    jest.advanceTimersByTime(600)
+    expect(component.popover.isOpen()).toBeTruthy()
+    component.mouseLeavePreview()
+    component.close(true)
+    jest.advanceTimersByTime(1)
+    expect(component.popover.isOpen()).toBeFalsy()
+  })
 })

@@ -46,7 +46,7 @@ export class PreviewPopupComponent implements OnDestroy {
 
   @ViewChild('popover') popover: NgbPopover
 
-  mouseOnPreview: boolean
+  mouseOnPreview: boolean = false
 
   popoverClass: string = 'shadow popover-preview'
 
@@ -118,7 +118,7 @@ export class PreviewPopupComponent implements OnDestroy {
           // show popover
           this.popoverClass = this.popoverClass.replace('pe-none opacity-0', '')
         } else {
-          this.popover.close()
+          this.popover.close(true)
         }
       }, 600)
     }
@@ -128,7 +128,12 @@ export class PreviewPopupComponent implements OnDestroy {
     this.mouseOnPreview = false
   }
 
-  public close() {
-    this.popover.close(false)
+  public close(immediate: boolean = false) {
+    setTimeout(
+      () => {
+        if (!this.mouseOnPreview) this.popover.close()
+      },
+      immediate ? 0 : 300
+    )
   }
 }

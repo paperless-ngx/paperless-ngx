@@ -4,7 +4,7 @@
   <ng-content></ng-content>
 </a>
 <ng-template #previewContent>
-  <div class="preview-popup-container">
+  <div class="preview-popup-container" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview(); close()">
     @if (error) {
       <div class="w-100 h-100 position-relative">
         <p class="fst-italic position-absolute top-50 start-50 translate-middle" i18n>Error loading preview</p>
