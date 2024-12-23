@@ -1250,7 +1250,7 @@
                Method
                <x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;" />
                <x id="START_TABLE_CELL_1" equiv-text="&lt;td class=&quot;&quot;&gt;" />
-               <x id="INTERPOLATION_5" equiv-text="{{ approval.access_type }}" />
+               <x id="INTERPOLATION_5" equiv-text="{{ approval.access_type_display }}" />
                <x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;" />
                <x id="CLOSE_TABLE_ROW" ctype="x-tr" equiv-text="&lt;/tr&gt;" />
                <x id="CLOSE_TAG_TABLE" ctype="x-table" equiv-text="&lt;/table&gt;" />

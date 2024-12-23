@@ -1938,7 +1938,7 @@ class ApprovalViewSet(ModelViewSet):
                 object_pk=serializer.validated_data.get("object_pk"),
                 access_type=serializer.validated_data.get("access_type"),
                 ctype=serializer.validated_data.get("ctype"),
-                submitted_by=serializer.validated_data.get("submitted_by"),
+                submitted_by=self.request.user,
                 status__in=["SUCCESS", "PENDING"]
             )
 

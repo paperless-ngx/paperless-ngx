@@ -1650,7 +1650,8 @@ class ApprovalSerializer(serializers.ModelSerializer):
     ctype = serializers.ReadOnlyField(source='ctype.model')
     ctype_id = serializers.PrimaryKeyRelatedField(source='ctype', queryset=ContentType.objects.all(), write_only=True)
     name = serializers.SerializerMethodField(read_only=True)
-    access_type = serializers.SerializerMethodField(read_only=True)
+    # access_type = serializers.SerializerMethodField(read_only=True)
+    access_type_display = serializers.SerializerMethodField(read_only=True)
 
     def get_name(self, obj):
         if not obj.ctype:
@@ -1662,7 +1663,7 @@ class ApprovalSerializer(serializers.ModelSerializer):
         document = model_class.objects.filter(id=int(obj.object_pk)).first()
         return getattr(document, 'title', '')
 
-    def get_access_type(self, obj):
+    def get_access_type_display(self, obj):
         return obj.get_access_type_display()  # Trả về giá trị đã dịch
 
     class Meta:

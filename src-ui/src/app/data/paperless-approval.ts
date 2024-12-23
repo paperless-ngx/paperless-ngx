@@ -16,8 +16,10 @@ export enum PaperlessApprovalStatus {
 }
 
 export interface PaperlessApproval extends ObjectWithId {
-  
+
   access_type: PaperlessApprovalAccessType
+
+  access_type_display?: string
 
   status: PaperlessApprovalStatus
 
