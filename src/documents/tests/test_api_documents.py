@@ -2920,11 +2920,10 @@ class TestDocumentApiCustomFieldsSorting(DirectoriesMixin, APITestCase):
             - 400 is returned
         """
 
-        with self.assertRaises(ValueError):
-            response = self.client.get(
-                "/api/documents/?ordering=custom_field_999",
-            )
-            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        response = self.client.get(
+            "/api/documents/?ordering=custom_field_999",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_document_custom_fields_sorting_invalid_data_type(self):
         """
@@ -2933,7 +2932,7 @@ class TestDocumentApiCustomFieldsSorting(DirectoriesMixin, APITestCase):
         WHEN:
             - API request for document filtering with a custom field sorting with a new (unhandled) data type
         THEN:
-            - 400 is returned
+            - Error is raised
         """
 
         custom_field = CustomField.objects.create(
@@ -2942,7 +2941,6 @@ class TestDocumentApiCustomFieldsSorting(DirectoriesMixin, APITestCase):
         )
 
         with self.assertRaises(ValueError):
-            response = self.client.get(
+            self.client.get(
                 f"/api/documents/?ordering=custom_field_{custom_field.pk}",
             )
-            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

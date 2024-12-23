@@ -781,7 +781,9 @@ class DocumentsOrderingFilter(OrderingFilter):
             try:
                 field = CustomField.objects.get(pk=custom_field_id)
             except CustomField.DoesNotExist:
-                raise ValueError("Custom field not found")
+                raise serializers.ValidationError(
+                    {self.prefix + str(custom_field_id): [_("Custom field not found")]},
+                )
 
             annotation = None
             match field.data_type:
