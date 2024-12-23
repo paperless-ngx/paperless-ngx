@@ -778,8 +778,9 @@ class DocumentsOrderingFilter(OrderingFilter):
         param = request.query_params.get("ordering")
         if param and self.prefix in param:
             custom_field_id = int(param.split(self.prefix)[1])
-            field = CustomField.objects.get(pk=custom_field_id)
-            if not field:
+            try:
+                field = CustomField.objects.get(pk=custom_field_id)
+            except CustomField.DoesNotExist:
                 raise ValueError("Custom field not found")
 
             annotation = None
@@ -877,6 +878,7 @@ class DocumentsOrderingFilter(OrderingFilter):
                     )
 
             if not annotation:
+                # Only happens if a new data type is added and not handled here
                 raise ValueError("Invalid custom field data type")
 
             queryset = (
