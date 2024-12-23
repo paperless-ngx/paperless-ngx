@@ -2,9 +2,11 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 import { Tag } from 'src/app/data/tag'
 import { Correspondent } from 'src/app/data/correspondent'
 import { DocumentType } from 'src/app/data/document-type'
+import { ArchiveFont } from 'src/app/data/archive-font'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { ArchiveFontService } from 'src/app/services/rest/archive-font.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
 import {
@@ -46,6 +48,9 @@ import { WarehouseEditDialogComponent } from '../../common/edit-dialog/warehouse
 import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
 import { WarehouseService } from 'src/app/services/rest/warehouse.service'
+import {
+  ArchiveFontEditDialogComponent
+} from '../../common/edit-dialog/archive-font-edit-dialog/archive-font-edit-dialog.component'
 
 @Component({
   selector: 'pngx-bulk-editor',
@@ -58,6 +63,7 @@ export class BulkEditorComponent
   tags: Tag[]
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
+  archiveFonts: ArchiveFont[]
   storagePaths: StoragePath[]
   warehouses: Warehouse[]
   shelfs: Warehouse[]
@@ -70,6 +76,7 @@ export class BulkEditorComponent
   tagSelectionModel = new FilterableDropdownSelectionModel()
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
+  archiveFontSelectionModel = new FilterableDropdownSelectionModel()
   storagePathsSelectionModel = new FilterableDropdownSelectionModel()
   warehouseSelectionModel = new FilterableDropdownSelectionModel()
   shelfSelectionModel = new FilterableDropdownSelectionModel()
@@ -77,6 +84,7 @@ export class BulkEditorComponent
   tagDocumentCounts: SelectionDataItem[]
   correspondentDocumentCounts: SelectionDataItem[]
   documentTypeDocumentCounts: SelectionDataItem[]
+  archiveFontDocumentCounts: SelectionDataItem[]
   storagePathDocumentCounts: SelectionDataItem[]
   warehouseDocumentCounts: SelectionDataItem[]
   shelfDocumentCounts: SelectionDataItem[]
@@ -93,6 +101,7 @@ export class BulkEditorComponent
 
   constructor(
     private documentTypeService: DocumentTypeService,
+    private archiveFontService: ArchiveFontService,
     private tagService: TagService,
     private correspondentService: CorrespondentService,
     public list: DocumentListViewService,
@@ -172,6 +181,17 @@ export class BulkEditorComponent
         .listAll()
         .pipe(first())
         .subscribe((result) => (this.documentTypes = result.results))
+    }
+    if (
+      this.permissionService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.ArchiveFont
+      )
+    ) {
+      this.archiveFontService
+        .listAll()
+        .pipe(first())
+        .subscribe((result) => (this.archiveFonts = result.results))
     }
     if (
       this.permissionService.currentUserCan(
@@ -301,6 +321,18 @@ export class BulkEditorComponent
         this.applySelectionData(
           s.selected_document_types,
           this.documentTypeSelectionModel
+        )
+      })
+  }
+  openArchiveFontDropdown() {
+    this.documentService
+      .getSelectionData(Array.from(this.list.selected))
+      .pipe(first())
+      .subscribe((s) => {
+        this.archiveFontDocumentCounts = s.selected_archive_fonts
+        this.applySelectionData(
+          s.selected_archive_fonts,
+          this.archiveFontSelectionModel
         )
       })
   }
@@ -527,6 +559,44 @@ export class BulkEditorComponent
     }
   }
 
+  setArchiveFonts(changedArchiveFonts: ChangedItems) {
+    if (
+      changedArchiveFonts.itemsToAdd.length == 0 &&
+      changedArchiveFonts.itemsToRemove.length == 0
+    )
+      return
+
+    let archiveFont =
+      changedArchiveFonts.itemsToAdd.length > 0
+        ? changedArchiveFonts.itemsToAdd[0]
+        : null
+
+    if (this.showConfirmationDialogs) {
+      let modal = this.modalService.open(ConfirmDialogComponent, {
+        backdrop: 'static',
+      })
+      modal.componentInstance.title = $localize`Confirm archive font assignment`
+      if (archiveFont) {
+        modal.componentInstance.message = $localize`This operation will assign the archive font "${archiveFont.name}" to ${this.list.selected.size} selected document(s).`
+      } else {
+        modal.componentInstance.message = $localize`This operation will remove the archive font from ${this.list.selected.size} selected document(s).`
+      }
+      modal.componentInstance.btnClass = 'btn-warning'
+      modal.componentInstance.btnCaption = $localize`Confirm`
+      modal.componentInstance.confirmClicked
+        .pipe(takeUntil(this.unsubscribeNotifier))
+        .subscribe(() => {
+          this.executeBulkOperation(modal, 'set_archive_font', {
+            archive_font: archiveFont ? archiveFont.id : null,
+          })
+        })
+    } else {
+      this.executeBulkOperation(null, 'set_archive_font', {
+        archive_font: archiveFont ? archiveFont.id : null,
+      })
+    }
+  }
+
   setStoragePaths(changedDocumentPaths: ChangedItems) {
     if (
       changedDocumentPaths.itemsToAdd.length == 0 &&
@@ -617,7 +687,7 @@ export class BulkEditorComponent
     // this.warehouseService.clearCache()
     this.warehouseService.list(1,null,null,true,{type__iexact:"Shelf",parent_warehouse:this.select_warehouse})
         .pipe(first())
-        .subscribe((result) => (this.shelfs = result.results))    
+        .subscribe((result) => (this.shelfs = result.results))
   }
 
   setShelfs(changedShelf: ChangedItems) {
@@ -634,8 +704,8 @@ export class BulkEditorComponent
     this.select_shelf=objShelf?.id
     this.warehouseService.list(1,null,null,true,{type__iexact:"Boxcase",parent_warehouse:this.select_shelf})
     .pipe(first())
-    .subscribe((result) => (this.boxcases = result.results))    
-    
+    .subscribe((result) => (this.boxcases = result.results))
+
   }
 
   createTag(name: string) {
@@ -705,6 +775,27 @@ export class BulkEditorComponent
 
   createDocumentType(name: string) {
     let modal = this.modalService.open(DocumentTypeEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.object = { name }
+    modal.componentInstance.succeeded
+      .pipe(
+        switchMap((newDocumentType) => {
+          return this.documentTypeService
+            .listAll()
+            .pipe(map((documentTypes) => ({ newDocumentType, documentTypes })))
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newDocumentType, documentTypes }) => {
+        this.documentTypes = documentTypes.results
+        this.documentTypeSelectionModel.toggle(newDocumentType.id)
+      })
+  }
+
+  createArchiveFont(name: string) {
+      let modal = this.modalService.open(ArchiveFontEditDialogComponent, {
       backdrop: 'static',
     })
     modal.componentInstance.dialogMode = EditDialogMode.CREATE

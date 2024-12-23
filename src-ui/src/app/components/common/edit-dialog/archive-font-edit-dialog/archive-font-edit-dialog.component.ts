@@ -48,6 +48,7 @@ export class ArchiveFontEditDialogComponent extends EditDialogComponent<ArchiveF
       // color: new FormControl(randomColor()),
       // is_inbox_tag: new FormControl(false),
       languages: new FormControl(),
+      note: new FormControl(),
       matching_algorithm: new FormControl(DEFAULT_MATCHING_ALGORITHM),
       match: new FormControl(''),
       is_insensitive: new FormControl(true),

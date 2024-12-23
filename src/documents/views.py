@@ -445,6 +445,7 @@ class DocumentViewSet(
         serializer.is_valid(raise_exception=True)
         response = super().update(request, *args, **kwargs)
         # logger.debug(response)
+        self.update_time_archive_font(self.get_object())
         self.update_name_folder(self.get_object(), serializer)
         self.update_folder_permisisons(self.get_object(), serializer)
         self.update_dossier_permisisons(self.get_object(), serializer)
@@ -968,6 +969,20 @@ class DocumentViewSet(
     def update_name_folder(self, instance, serializer):
         instance.folder.name = serializer.validated_data.get("title")
         instance.folder.save()
+
+    def update_time_archive_font(self,instance):
+        if instance.archive_font is None:
+            return
+        if instance.archive_font.last_upload is None:
+            instance.archive_font.last_upload = instance.created
+            instance.archive_font.first_upload = instance.created
+        elif instance.created > instance.archive_font.last_upload:
+            instance.archive_font.last_upload = instance.created
+        elif instance.created < instance.archive_font.first_upload:
+            instance.archive_font.first_upload = instance.created
+        instance.archive_font.save()
+
+
 
     def update_folder_permisisons(self, instance, serializer):
         folder =  instance.folder

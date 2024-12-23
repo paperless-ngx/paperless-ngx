@@ -16,6 +16,8 @@
 <!--      </div>-->
       <pngx-input-select i18n-title title="Language" [items]="fontLanguages" [multiple]="true"
                          formControlName="languages"></pngx-input-select>
+
+      <pngx-input-text i18n-title title="Note" formControlName="note" [error]="error?.name"></pngx-input-text>
 <!--      <pngx-input-select i18n-title title="Matching algorithm" [items]="getMatchingAlgorithms()"-->
 <!--                         formControlName="matching_algorithm"></pngx-input-select>-->
       @if (patternRequired) {

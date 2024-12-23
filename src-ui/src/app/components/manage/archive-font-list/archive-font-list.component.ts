@@ -16,13 +16,15 @@ import { ManagementListComponent } from '../management-list/management-list.comp
 import {
   ArchiveFontEditDialogComponent,
 } from '../../common/edit-dialog/archive-font-edit-dialog/archive-font-edit-dialog.component'
+import { CustomDatePipe } from '../../../pipes/custom-date.pipe'
 
 @Component({
   selector: 'pngx-archive-font-list',
-  templateUrl: './../management-list/management-list.component.html',
+  templateUrl: 'archive-font-list.component.html',
   styleUrls: ['./../management-list/management-list.component.scss'],
 })
 export class ArchiveFontListComponent extends ManagementListComponent<ArchiveFont> {
+  private customDatePipe: CustomDatePipe;
   constructor(
     archiveFontService: ArchiveFontService,
     modalService: NgbModal,
@@ -42,6 +44,15 @@ export class ArchiveFontListComponent extends ManagementListComponent<ArchiveFon
       $localize`archive fonts`,
       PermissionType.ArchiveFont,
       [
+        {
+          key: 'note',
+          name: $localize`Note`,
+          rendersHtml: true,
+          valueFn: (t: ArchiveFont) => {
+            return `<span class="" ">${t.note}</span>`
+          },
+        },
+
         // {
         //   key: 'languages',
         //   name: $localize`Languages`,
@@ -54,6 +65,7 @@ export class ArchiveFontListComponent extends ManagementListComponent<ArchiveFon
         //     // return `@for<span class="badge" style="color: ${t.languages}; background-color: ${t.color}">${t.color}</span>`
         //   },
         // },
+
       ],
     )
   }

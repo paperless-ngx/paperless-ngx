@@ -57,6 +57,7 @@ export interface SelectionData {
   selected_correspondents: SelectionDataItem[]
   selected_tags: SelectionDataItem[]
   selected_document_types: SelectionDataItem[]
+  selected_archive_fonts: SelectionDataItem[]
   selected_warehouses: SelectionDataItem[]
   selected_shelfs: SelectionDataItem[]
   selected_boxcases: SelectionDataItem[]

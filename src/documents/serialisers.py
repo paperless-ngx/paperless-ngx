@@ -1092,6 +1092,7 @@ class BulkEditSerializer(
         choices=[
             "set_correspondent",
             "set_document_type",
+            "set_archive_font",
             "set_storage_path",
             "set_warehouse",
             "set_folder",
@@ -1128,6 +1129,8 @@ class BulkEditSerializer(
             return bulk_edit.set_correspondent
         elif method == "set_document_type":
             return bulk_edit.set_document_type
+        elif method == "set_archive_font":
+            return bulk_edit.set_archive_font
         elif method == "set_storage_path":
             return bulk_edit.set_storage_path
         elif method == "set_warehouse":

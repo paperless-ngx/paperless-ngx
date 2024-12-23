@@ -60,6 +60,20 @@
               (apply)="setDocumentTypes($event)">
             </pngx-filterable-dropdown>
           }
+          @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.ArchiveFont)) {
+            <pngx-filterable-dropdown title="Archive font" icon="journal-text" i18n-title
+              filterPlaceholder="Filter archive fonts" i18n-filterPlaceholder
+              [items]="archiveFonts"
+              [disabled]="!userCanEditAll"
+              [editing]="true"
+              [applyOnClose]="applyOnClose"
+              [createRef]="createArchiveFont.bind(this)"
+              (opened)="openArchiveFontDropdown()"
+              [(selectionModel)]="archiveFontSelectionModel"
+              [documentCounts]="archiveFontDocumentCounts"
+              (apply)="setArchiveFonts($event)">
+            </pngx-filterable-dropdown>
+          }
           @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
             <pngx-filterable-dropdown title="Storage path" icon="folder-fill" i18n-title
               filterPlaceholder="Filter storage paths" i18n-filterPlaceholder

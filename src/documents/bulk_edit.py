@@ -6,12 +6,12 @@ from typing import Optional
 
 from celery import chord
 from django.conf import settings
-from django.db.models import Q
+from django.db.models import Q, Subquery, OuterRef, Max, Min
 
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
-from documents.models import Correspondent, Dossier
+from documents.models import Correspondent, Dossier, ArchiveFont
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
@@ -115,6 +115,44 @@ def set_document_type(doc_ids, document_type):
 
     return "OK"
 
+def set_archive_font(doc_ids, archive_font):
+    if archive_font:
+        archive_font = ArchiveFont.objects.get(id=archive_font)
+
+    qs = Document.objects.filter(Q(id__in=doc_ids) & ~Q(archive_font=archive_font))
+    doc_lst = Document.objects.filter(id__in=doc_ids,archive_font=archive_font)
+
+    if doc_lst.count()>0:
+        set_created_archive_font(archive_font,doc_lst)
+
+
+    affected_docs = [doc.id for doc in qs]
+
+    qs.update(archive_font=archive_font)
+
+    bulk_update_documents.delay(document_ids=affected_docs)
+
+    return "OK"
+
+def set_created_archive_font(object, document):
+    max_create_record = document.aggregate(Max('created'))
+    largest_create = max_create_record['created__max']
+    min_create_record = document.aggregate(Min('created'))
+    smallest_create = min_create_record['created__min']
+    object.first_upload = smallest_create
+    object.last_upload = largest_create
+    # # Sử dụng annotate để thêm max_created và min_created
+    # max_min_created_document = Document.objects.annotate(
+    #     max_created=Subquery(max_created_subquery),
+    #     min_created=Subquery(min_created_subquery)
+    # ).filter(created__in=[OuterRef('max_created'), OuterRef('min_created')])
+    # if max_min_created_document.count()==1:
+    #     object.first_upload = max_min_created_document[0].created
+    #     object.last_upload = max_min_created_document[0].created
+    # elif max_min_created_document.count()>1:
+    #     object.first_upload = max_min_created_document[0].created
+    #     object.last_upload = max_min_created_document[1].created
+    object.save()
 
 def add_tag(doc_ids, tag):
     qs = Document.objects.filter(Q(id__in=doc_ids) & ~Q(tags__id=tag))
