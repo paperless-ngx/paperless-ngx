@@ -222,7 +222,6 @@ def update_view_warehouse_shelf_boxcase_permissions(warehouse, permission_copy):
 
 
     for obj in warehouses_list:
-        print('trong for',permission_copy)
         set_permissions_for_object(
             permissions=permission_copy,
             object=obj,
