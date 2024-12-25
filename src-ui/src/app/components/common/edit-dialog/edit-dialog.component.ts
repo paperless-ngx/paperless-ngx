@@ -33,7 +33,7 @@ export abstract class EditDialogComponent<
     protected service: AbstractPaperlessService<T>,
     private activeModal: NgbActiveModal,
     private userService: UserService,
-    private settingsService: SettingsService
+    protected settingsService: SettingsService
   ) {
     super()
   }
