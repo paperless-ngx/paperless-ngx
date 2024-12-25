@@ -35,8 +35,17 @@ export class ShareLinksDropdownComponent implements OnInit {
   @Input()
   disabled: boolean = false
 
+  private _hasArchiveVersion: boolean = true
+
   @Input()
-  hasArchiveVersion: boolean = true
+  set hasArchiveVersion(value: boolean) {
+    this._hasArchiveVersion = value
+    this.useArchiveVersion = value
+  }
+
+  get hasArchiveVersion(): boolean {
+    return this._hasArchiveVersion
+  }
 
   shareLinks: ShareLink[]
 
@@ -56,7 +65,6 @@ export class ShareLinksDropdownComponent implements OnInit {
 
   ngOnInit(): void {
     if (this._documentId !== undefined) this.refresh()
-    this.useArchiveVersion = this.hasArchiveVersion
   }
 
   refresh() {
