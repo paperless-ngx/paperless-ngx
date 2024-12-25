@@ -17,8 +17,8 @@
       <div>
         <p class="ms-2 mb-0">{{toast.content}}</p>
         @if (toast.error) {
-          <details>
-            <div class="mt-2">
+          <details class="ms-2">
+            <div class="mt-2 ms-n4 me-n2 small">
               @if (isDetailedError(toast.error)) {
                 <dl class="row mb-0">
                   <dt class="col-sm-3 fw-normal text-end">URL</dt>
