@@ -14,8 +14,7 @@ repos:
         args:
           - "--unsafe"
       - id: check-toml
-      # disabled due to issue https://github.com/docker/for-mac/issues/5029 on Macbook Docker
-      # - id: check-executables-have-shebangs
+      - id: check-executables-have-shebangs
       - id: end-of-file-fixer
         exclude_types:
           - svg
