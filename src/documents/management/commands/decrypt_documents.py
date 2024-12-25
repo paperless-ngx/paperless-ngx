@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
@@ -67,7 +69,7 @@ class Command(BaseCommand):
 
             document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
-            ext: str = document.filename.suffix
+            ext: str = Path(document.filename).suffix
 
             if not ext == ".gpg":
                 raise CommandError(
@@ -75,7 +77,7 @@ class Command(BaseCommand):
                     f"end with .gpg",
                 )
 
-            document.filename = document.filename.stem
+            document.filename = Path(document.filename).stem
 
             with document.source_path.open("wb") as f:
                 f.write(raw_document)
