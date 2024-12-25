@@ -169,6 +169,7 @@
 		},
 		{
 			"label": "Project Setup: Run all Init Tasks",
+			"dependsOrder": "sequence",
 			"dependsOn": [
 				"Maintenance: manage.py migrate",
 				"Maintenance: manage.py createsuperuser",
