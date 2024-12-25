@@ -2,41 +2,48 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "manage.py runserver",
+            "name": "Chrome: Debug Angular Frontend",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:4200",
+            "webRoot": "${workspaceFolder}/src-ui",
+            "preLaunchTask": "Start: Frontend Angular"
+        },
+        {
+            "name": "Debug: Backend Server (manage.py runserver)",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/src/manage.py",
-            "console": "integratedTerminal",
-            "justMyCode": true,
             "args": ["runserver"],
-            "django": true
-        },
-        {
-            "name": "manage.py document_consumer",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceFolder}/src/manage.py",
-            "console": "integratedTerminal",
-            "justMyCode": true,
-            "args": ["document_consumer"],
-            "django": true
-        },
-        {
-            "name": "celery",
-            "type": "python",
-            "cwd": "${workspaceFolder}/src",
-            "request": "launch",
-            "module": "celery",
+            "django": true,
             "console": "integratedTerminal",
             "env": {
-                "PYTHONPATH": "${workspaceFolder}/src"
-              },
-            "args": [
-                "-A",
-                "paperless",
-                "worker",
-                "-l",
-                "DEBUG"
+            "PYTHONPATH": "${workspaceFolder}/src"
+            },
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "Debug: Consumer Service (manage.py document_consumer)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/manage.py",
+            "args": ["document_consumer"],
+            "django": true,
+            "console": "integratedTerminal",
+            "env": {
+            "PYTHONPATH": "${workspaceFolder}/src"
+            },
+            "python": "${workspaceFolder}/.venv/bin/python"
+        }
+
+    ],
+    "compounds": [
+        {
+            "name": "Debug: FullStack",
+            "configurations": [
+                "Chrome: Debug Angular Frontend",
+                "Debug: Backend Server (manage.py runserver)",
+                "Debug: Consumer Service (manage.py document_consumer)"
             ]
         }
     ]
