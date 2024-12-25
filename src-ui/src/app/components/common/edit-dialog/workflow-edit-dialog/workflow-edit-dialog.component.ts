@@ -13,6 +13,7 @@ import {
   MATCH_NONE,
 } from 'src/app/data/matching-model'
 import { StoragePath } from 'src/app/data/storage-path'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { Workflow } from 'src/app/data/workflow'
 import {
   WorkflowAction,
@@ -132,6 +133,8 @@ export class WorkflowEditDialogComponent
 
   expandedItem: number = null
 
+  private allowedActionTypes = []
+
   constructor(
     service: WorkflowService,
     activeModal: NgbActiveModal,
@@ -206,6 +209,11 @@ export class WorkflowEditDialogComponent
       this.checkRemovalActionFields.bind(this)
     )
     this.checkRemovalActionFields(this.objectForm.value)
+    this.allowedActionTypes = this.settingsService.get(
+      SETTINGS_KEYS.EMAIL_ENABLED
+    )
+      ? WORKFLOW_ACTION_OPTIONS
+      : WORKFLOW_ACTION_OPTIONS.filter((a) => a.id !== WorkflowActionType.Email)
   }
 
   private checkRemovalActionFields(formWorkflow: Workflow) {
@@ -486,7 +494,7 @@ export class WorkflowEditDialogComponent
   }
 
   get actionTypeOptions() {
-    return WORKFLOW_ACTION_OPTIONS
+    return this.allowedActionTypes
   }
 
   getActionTypeOptionName(type: WorkflowActionType): string {

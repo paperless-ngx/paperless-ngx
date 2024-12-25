@@ -70,6 +70,7 @@ export const SETTINGS_KEYS = {
   EMPTY_TRASH_DELAY: 'trash_delay',
   GMAIL_OAUTH_URL: 'gmail_oauth_url',
   OUTLOOK_OAUTH_URL: 'outlook_oauth_url',
+  EMAIL_ENABLED: 'email_enabled',
 }
 
 export const SETTINGS: UiSetting[] = [
@@ -262,5 +263,10 @@ export const SETTINGS: UiSetting[] = [
     key: SETTINGS_KEYS.OUTLOOK_OAUTH_URL,
     type: 'string',
     default: null,
+  },
+  {
+    key: SETTINGS_KEYS.EMAIL_ENABLED,
+    type: 'boolean',
+    default: false,
   },
 ]
