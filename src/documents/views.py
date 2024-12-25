@@ -2159,7 +2159,7 @@ class SystemStatusView(PassUserMixin):
                             matching_algorithm=Tag.MATCH_AUTO,
                         ).exists()
                     )
-                    and not os.path.isfile(settings.MODEL_FILE)
+                    and not settings.MODEL_FILE.exists()
                 ):
                     # if classifier file doesn't exist just classify as a warning
                     classifier_error = "Classifier file does not exist (yet). Re-training may be pending."
