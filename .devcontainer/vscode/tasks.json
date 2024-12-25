@@ -105,6 +105,24 @@
 			}
 		},
 		{
+			"label": "Maintenance: Build Documentation",
+			"type": "shell",
+			"command": "pipenv run mkdocs build --config-file mkdocs.yml && pipenv run mkdocs serve",
+			"group": "none",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": true,
+				"panel": "shared",
+				"showReuseMessage": false,
+				"clear": true,
+				"revealProblems": "onProblem"
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
 			"label": "Maintenance: manage.py createsuperuser",
 			"type": "shell",
 			"command": "pipenv run python manage.py createsuperuser",
@@ -120,6 +138,24 @@
 			},
 			"options": {
 				"cwd": "${workspaceFolder}/src"
+			}
+		},
+		{
+			"label": "Maintenance: Install Angular CLI",
+			"type": "shell",
+			"command": "npm ci && ./node_modules/.bin/ng build --configuration production",
+			"group": "none",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": true,
+				"panel": "shared",
+				"showReuseMessage": false,
+				"clear": true,
+				"revealProblems": "onProblem"
+			},
+			"options": {
+				"cwd": "${workspaceFolder}/src-ui"
 			}
 		},
 		{
@@ -159,7 +195,7 @@
 			}
 		},
 		{
-			"label": "Maintenance: Install Angular Frontend for Debug",
+			"label": "Maintenance: Install Frontend Dependencies",
 			"type": "npm",
 			"script": "install",
 			"path": "src-ui",
