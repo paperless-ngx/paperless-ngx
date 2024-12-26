@@ -451,11 +451,11 @@ def myparser_consumer_declaration(sender, **kwargs):
     methods responsible for guessing the extension do not always return
     the same value.
 
-## Using Visual Studio Code devcontainers
+## Using Visual Studio Code devcontainer
 
 Another easy way to get started with development is to use Visual Studio
-Code with devcontainers. This approach will create a preconfigured development
-environment with all the tools you need.
+Code devcontainers. This approach will create a preconfigured development
+environment with all of the required tools and dependencies.
 [Learn more about devcontainers](https://code.visualstudio.com/docs/devcontainers/containers).
 
 To get started:
