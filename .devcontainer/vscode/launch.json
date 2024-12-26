@@ -14,11 +14,13 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/src/manage.py",
-            "args": ["runserver"],
+            "args": [
+                "runserver"
+            ],
             "django": true,
             "console": "integratedTerminal",
             "env": {
-            "PYTHONPATH": "${workspaceFolder}/src"
+                "PYTHONPATH": "${workspaceFolder}/src"
             },
             "python": "${workspaceFolder}/.venv/bin/python"
         },
@@ -27,15 +29,16 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/src/manage.py",
-            "args": ["document_consumer"],
+            "args": [
+                "document_consumer"
+            ],
             "django": true,
             "console": "integratedTerminal",
             "env": {
-            "PYTHONPATH": "${workspaceFolder}/src"
+                "PYTHONPATH": "${workspaceFolder}/src"
             },
             "python": "${workspaceFolder}/.venv/bin/python"
         }
-
     ],
     "compounds": [
         {
@@ -44,7 +47,8 @@
                 "Chrome: Debug Angular Frontend",
                 "Debug: Backend Server (manage.py runserver)",
                 "Debug: Consumer Service (manage.py document_consumer)"
-            ]
+            ],
+            "preLaunchTask": "Start: Celery Worker"
         }
     ]
 }

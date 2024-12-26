@@ -1,54 +1,61 @@
 {
 	"version": "2.0.0",
 	"tasks": [
-        {
-            "label": "Start: Frontend Angular",
-            "type": "shell",
-            "command": "npm start",
-            "isBackground": true,
-            "options": {
-              "cwd": "${workspaceFolder}/src-ui"
-            },
-            "problemMatcher": [
-              {
-                "owner": "custom",
-                "pattern": [
-                  {
-                    "regexp": ".",
-                    "file": 1,
-                    "location": 2,
-                    "message": 3
-                  }
-                ],
-                "background": {
-                  "activeOnStart": true,
-                  "beginsPattern": ".*",
-                  "endsPattern": "Compiled successfully"
-                }
-              }
-            ],
-            "detail": "triggered also by launch option Chrome: Debug Angular Frontend"
-        },
 		{
 			"label": "Start: Celery Worker",
 			"type": "shell",
 			"command": "pipenv run celery --app paperless worker -l DEBUG",
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
-			"presentation": {
-				"echo": true,
-				"reveal": "always",
-				"focus": true,
-				"panel": "shared",
-				"showReuseMessage": false,
-				"clear": true,
-				"revealProblems": "onProblem"
-			},
+			"isBackground": true,
 			"options": {
 				"cwd": "${workspaceFolder}/src"
-			}
+			},
+			"problemMatcher": [
+				{
+					"owner": "custom",
+					"pattern": [
+						{
+							"regexp": ".",
+							"file": 1,
+							"location": 2,
+							"message": 3
+						}
+					],
+					"background": {
+						"activeOnStart": true,
+						"beginsPattern": "celery.*",
+						"endsPattern": "ready"
+					}
+				}
+			],
+			"detail": ""
+		},
+		{
+			"label": "Start: Frontend Angular",
+			"type": "shell",
+			"command": "npm start",
+			"isBackground": true,
+			"options": {
+				"cwd": "${workspaceFolder}/src-ui"
+			},
+			"problemMatcher": [
+				{
+					"owner": "custom",
+					"pattern": [
+						{
+							"regexp": ".",
+							"file": 1,
+							"location": 2,
+							"message": 3
+						}
+					],
+					"background": {
+						"activeOnStart": true,
+						"beginsPattern": ".*",
+						"endsPattern": "Compiled successfully"
+					}
+				}
+			],
+			"detail": "triggered also by launch option Chrome: Debug Angular Frontend"
 		},
 		{
 			"label": "Start: Consumer Service (manage.py document_consumer)",
