@@ -472,7 +472,7 @@ This approach will create a preconfigured development environment with all the t
 
 ![alt text](assets/screenshots/vscode_prompt_devcontainer.png){: style="width:32%"}
 
-#### 4) Wait for the dev environment to spinn up
+#### 4) Wait for the dev environment to spin up
 
 ![alt text](assets/screenshots/devcontainer_environement_ready.png){: style="width:32%"}
 
@@ -498,7 +498,7 @@ This task will:
     > you will be prompted to create the superuser for paperless
 
 -   compile the front end for production
-    > this is necessary if run run only the backend server in order to have a front end application
+    > this is necessary if you run only the backend server in order to have a front end application
 
 #### 6) Now the project is ready for debugging
 
@@ -512,4 +512,4 @@ This task will:
 >
 > first it starts task labeled **Start: Frontend Angular** and when angular is ready it will open a chrome browser for debugging
 
-**Note**: If you only want to spinn up the whole project without debugging you can run the task labeled **Project Start: Run all Services**
+**Note**: If you only want to spin up the whole project without debugging you can run the task labeled **Project Start: Run all Services**
