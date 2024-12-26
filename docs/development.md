@@ -450,3 +450,23 @@ def myparser_consumer_declaration(sender, **kwargs):
     mime types have many extensions associated with them and the Python
     methods responsible for guessing the extension do not always return
     the same value.
+
+## Using Visual Studio Code devcontainer
+
+Another easy way to get started with development is to use Visual Studio
+Code devcontainers. This approach will create a preconfigured development
+environment with all of the required tools and dependencies.
+[Learn more about devcontainers](https://code.visualstudio.com/docs/devcontainers/containers).
+
+To get started:
+
+1. Clone the repository on your machine and open the Paperless-ngx folder in VS Code.
+
+2. VS Code will prompt you with "Reopen in container". Do so and wait for the environment to start.
+
+3. Initialize the project by running the task **Project Setup: Run all Init Tasks**. This
+   will initialize the database tables and create a superuser. Then you can compile the front end
+   for production or run the frontend in debug mode.
+
+4. The project is ready for debugging, start either run the fullstack debug or individual debug
+   processes. Yo spin up the project without debugging run the task **Project Start: Run all Services**
