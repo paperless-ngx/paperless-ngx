@@ -148,8 +148,10 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
   set -eux \
   && echo "Installing build system packages" \
     && apt-get update \
-    && apt-get install --yes --quiet ${BUILD_PACKAGES} \
-    && npm update npm -g
+    && apt-get install --yes --quiet ${BUILD_PACKAGES}
+
+RUN set -eux \
+  && npm update npm -g
 
 # add users, setup scripts
 # Mount the compiled frontend to expected location
