@@ -451,65 +451,22 @@ def myparser_consumer_declaration(sender, **kwargs):
     methods responsible for guessing the extension do not always return
     the same value.
 
-## Easy startup with devcontainers
+## Using Visual Studio Code devcontainers
 
-The easiest way to get started with development is to use Visual Studio Code with devcontainers.<br>
-This approach will create a preconfigured development environment with all the tools you need.<br>
-[Learn more about devcontainers](https://code.visualstudio.com/docs/devcontainers/containers)
+Another easy way to get started with development is to use Visual Studio
+Code with devcontainers. This approach will create a preconfigured development
+environment with all the tools you need.
+[Learn more about devcontainers](https://code.visualstudio.com/docs/devcontainers/containers).
 
-### Prerequisites
+To get started:
 
-[Docker Desktop](https://docs.docker.com/get-docker/) <br>
-[Visual Studio code](https://code.visualstudio.com/) <br>
+1. Clone the repository on your machine and open the Paperless-ngx folder in VS Code.
 
-### Getting started:
+2. VS Code will prompt you with "Reopen in container". Do so and wait for the environment to start.
 
-#### 1) Clone the repository on your machine
+3. Initialize the project by running the task **Project Setup: Run all Init Tasks**. This
+   will initialize the database tables and create a superuser. Then you can compile the front end
+   for production or run the frontend in debug mode.
 
-#### 2) Open the paperless-ngx folder in Visual Studio Code
-
-#### 3) Visual Studio Code will prompt you with "Reopen in container"
-
-![alt text](assets/screenshots/vscode_prompt_devcontainer.png){: style="width:32%"}
-
-#### 4) Wait for the dev environment to spin up
-
-![alt text](assets/screenshots/devcontainer_environement_ready.png){: style="width:32%"}
-
-#### 5) You have to run the task for the project initialisation
-
-Run Task labeled: **Project Setup: Run all Init Tasks**
-
-> Open the 'Run Task' menu in Visual Studio Code:
-> Open via menu
->
-> Terminal -> Run Task
-
-> Open via keyboard shortcut
->
-> -   Mac: **Shift+Command+T**
-> -   Windows/Linux: **Ctrl+Shift+T**
-
-This task will:
-
--   initialise the database tables
--   create the superuser for paperless
-
-    > you will be prompted to create the superuser for paperless
-
--   compile the front end for production
-    > this is necessary if you run only the backend server in order to have a front end application
-
-#### 6) Now the project is ready for debugging
-
--   Set your breakpoints
-
--   Start either run the fullstack debug or individual debug processes
-
-    ![alt text](assets/screenshots/devcontainer_run_debug.png){: style="width:32%"}
-
-> note that the debug option **Chrome: Debug Angular Frontend** is a 2 step process.
->
-> first it starts task labeled **Start: Frontend Angular** and when angular is ready it will open a chrome browser for debugging
-
-**Note**: If you only want to spin up the whole project without debugging you can run the task labeled **Project Start: Run all Services**
+4. The project is ready for debugging, start either run the fullstack debug or individual debug
+   processes. Yo spin up the project without debugging run the task **Project Start: Run all Services**
