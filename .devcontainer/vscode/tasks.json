@@ -3,6 +3,7 @@
 	"tasks": [
 		{
 			"label": "Start: Celery Worker",
+			"description": "Start the Celery Worker which processes background and consume tasks",
 			"type": "shell",
 			"command": "pipenv run celery --app paperless worker -l DEBUG",
 			"isBackground": true,
@@ -26,11 +27,11 @@
 						"endsPattern": "ready"
 					}
 				}
-			],
-			"detail": ""
+			]
 		},
 		{
 			"label": "Start: Frontend Angular",
+			"description": "Start the Frontend Angular Dev Server",
 			"type": "shell",
 			"command": "npm start",
 			"isBackground": true,
@@ -54,11 +55,11 @@
 						"endsPattern": "Compiled successfully"
 					}
 				}
-			],
-			"detail": "triggered also by launch option Chrome: Debug Angular Frontend"
+			]
 		},
 		{
 			"label": "Start: Consumer Service (manage.py document_consumer)",
+			"description": "Start the Consumer Service which processes files from a directory",
 			"type": "shell",
 			"command": "pipenv run python manage.py document_consumer",
 			"group": "build",
@@ -77,6 +78,7 @@
 		},
 		{
 			"label": "Start: Backend Server (manage.py runserver)",
+			"description": "Start the Backend Server which serves the Django API and the compiled Angular frontend",
 			"type": "shell",
 			"command": "pipenv run python manage.py runserver",
 			"group": "build",
@@ -95,6 +97,7 @@
 		},
 		{
 			"label": "Maintenance: manage.py migrate",
+			"description": "Apply database migrations",
 			"type": "shell",
 			"command": "pipenv run python manage.py migrate",
 			"group": "none",
@@ -113,6 +116,7 @@
 		},
 		{
 			"label": "Maintenance: Build Documentation",
+			"description": "Build the documentation with MkDocs",
 			"type": "shell",
 			"command": "pipenv run mkdocs build --config-file mkdocs.yml && pipenv run mkdocs serve",
 			"group": "none",
@@ -131,6 +135,7 @@
 		},
 		{
 			"label": "Maintenance: manage.py createsuperuser",
+			"description": "Create a superuser",
 			"type": "shell",
 			"command": "pipenv run python manage.py createsuperuser",
 			"group": "none",
@@ -148,43 +153,8 @@
 			}
 		},
 		{
-			"label": "Maintenance: Install Angular CLI",
-			"type": "shell",
-			"command": "npm ci && ./node_modules/.bin/ng build --configuration production",
-			"group": "none",
-			"presentation": {
-				"echo": true,
-				"reveal": "always",
-				"focus": true,
-				"panel": "shared",
-				"showReuseMessage": false,
-				"clear": true,
-				"revealProblems": "onProblem"
-			},
-			"options": {
-				"cwd": "${workspaceFolder}/src-ui"
-			}
-		},
-		{
-			"label": "Maintenance: Compile frontend for production",
-			"type": "shell",
-			"command": "npm ci && ./node_modules/.bin/ng build --configuration production",
-			"group": "none",
-			"presentation": {
-				"echo": true,
-				"reveal": "always",
-				"focus": true,
-				"panel": "shared",
-				"showReuseMessage": false,
-				"clear": true,
-				"revealProblems": "onProblem"
-			},
-			"options": {
-				"cwd": "${workspaceFolder}/src-ui"
-			}
-		},
-		{
 			"label": "Maintenance: recreate .venv",
+			"description": "Recreate the python virtual environment and install python dependencies",
 			"type": "shell",
 			"command": "rm -R -v .venv/* || pipenv install --dev",
 			"group": "none",
@@ -203,6 +173,7 @@
 		},
 		{
 			"label": "Maintenance: Install Frontend Dependencies",
+			"description": "Install frontend (npm) dependencies",
 			"type": "npm",
 			"script": "install",
 			"path": "src-ui",
@@ -211,7 +182,27 @@
 			"detail": "install dependencies from package"
 		},
 		{
+			"description": "Clean install frontend dependencies and build the frontend for production",
+			"label": "Maintenance: Compile frontend for production",
+			"type": "shell",
+			"command": "npm ci && ./node_modules/.bin/ng build --configuration production",
+			"group": "none",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": true,
+				"panel": "shared",
+				"showReuseMessage": false,
+				"clear": true,
+				"revealProblems": "onProblem"
+			},
+			"options": {
+				"cwd": "${workspaceFolder}/src-ui"
+			}
+		},
+		{
 			"label": "Project Setup: Run all Init Tasks",
+			"description": "Runs all init tasks to setup the project including migrate the database, create a superuser and compile the frontend for production",
 			"dependsOrder": "sequence",
 			"dependsOn": [
 				"Maintenance: manage.py migrate",
@@ -221,6 +212,7 @@
 		},
 		{
 			"label": "Project Start: Run all Services",
+			"description": "Runs all services required to start the project including the Celery Worker, the Consumer Service and the Backend Server",
 			"dependsOn": [
 				"Start: Celery Worker",
 				"Start: Consumer Service (manage.py document_consumer)",

@@ -457,6 +457,9 @@ Another easy way to get started with development is to use Visual Studio
 Code devcontainers. This approach will create a preconfigured development
 environment with all of the required tools and dependencies.
 [Learn more about devcontainers](https://code.visualstudio.com/docs/devcontainers/containers).
+The .devcontainer/vscode/tasks.json and .devcontainer/vscode/launch.json files
+contain more information about the specific tasks and launch configurations (see the
+non-standard "description" field).
 
 To get started:
 
