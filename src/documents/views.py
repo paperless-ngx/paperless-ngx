@@ -2139,7 +2139,7 @@ class SystemStatusView(PassUserMixin):
         classifier_error = None
         classifier_status = None
         try:
-            classifier = load_classifier()
+            classifier = load_classifier(raise_exception=True)
             if classifier is None:
                 # Make sure classifier should exist
                 docs_queryset = Document.objects.exclude(

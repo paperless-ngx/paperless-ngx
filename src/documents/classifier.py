@@ -37,7 +37,7 @@ class ClassifierModelCorruptError(Exception):
     pass
 
 
-def load_classifier() -> Optional["DocumentClassifier"]:
+def load_classifier(raise_exception: bool = False) -> Optional["DocumentClassifier"]:
     if not settings.MODEL_FILE.is_file():
         logger.debug(
             "Document classification model does not exist (yet), not "
@@ -53,7 +53,9 @@ def load_classifier() -> Optional["DocumentClassifier"]:
         logger.info(f"Classifier version incompatible: {e.message}, will re-train")
         Path(settings.MODEL_FILE).unlink()
         classifier = None
-    except ClassifierModelCorruptError:
+        if raise_exception:
+            raise e
+    except ClassifierModelCorruptError as e:
         # there's something wrong with the model file.
         logger.exception(
             "Unrecoverable error while loading document "
@@ -61,12 +63,18 @@ def load_classifier() -> Optional["DocumentClassifier"]:
         )
         Path(settings.MODEL_FILE).unlink
         classifier = None
-    except OSError:
+        if raise_exception:
+            raise e
+    except OSError as e:
         logger.exception("IO error while loading document classification model")
         classifier = None
-    except Exception:  # pragma: no cover
+        if raise_exception:
+            raise e
+    except Exception as e:  # pragma: no cover
         logger.exception("Unknown error while loading document classification model")
         classifier = None
+        if raise_exception:
+            raise e
 
     return classifier
 
