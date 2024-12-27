@@ -3269,8 +3269,7 @@
             </context-group>
             <target state="translated">
                {VAR_PLURAL, plural, =1 {Một tài liệu trong thùng rác} other  {
-               <x id="INTERPOLATION" />
-               tổng số tài liệu trong thùng rác}}
+               tổng <x id="INTERPOLATION" /> tài liệu trong thùng rác}}
             </target>
          </trans-unit>
          <trans-unit id="9021887951960049161" datatype="html">
