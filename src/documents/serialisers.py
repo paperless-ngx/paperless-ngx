@@ -801,13 +801,13 @@ class DocumentSerializer(
     exploit = serializers.SerializerMethodField(read_only=True)
 
     def get_exploit(self, obj):
-        doc = Document.objects.get(pk=obj.pk)
+        # doc = Document.objects.get(pk=obj.pk)
         current_user = self.context.get("request").user
 
         if current_user is not None and has_perms_owner_aware(
             current_user,
             "view_document",
-            doc,
+            obj,
         ):
             return 1
         elif Approval.objects.filter(object_pk=obj.pk, status="PENDING", submitted_by=current_user):
@@ -818,12 +818,13 @@ class DocumentSerializer(
 
 
     def get_approvals(self, obj):
-        doc = Document.objects.get(pk=obj.pk)
+        # doc = Document.objects.get(pk=obj.pk)
+        print("----------------",obj)
         currentUser = self.context.get("request").user
         if currentUser is not None and not has_perms_owner_aware(
             currentUser,
             "view_document",
-            doc,
+            obj,
         ):
             return None
         approvals = Approval.objects.filter(object_pk=obj.pk, status="SUCCESS")
@@ -936,6 +937,7 @@ class DocumentSerializer(
             "created_date",
             "modified",
             "added",
+            "deleted_at",
             "archive_serial_number",
             "original_file_name",
             "archived_file_name",
@@ -2579,3 +2581,25 @@ class DossierFormSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             'set_permissions',
             'permissions'
         ]
+
+class TrashSerializer(SerializerWithPerms):
+    documents = serializers.ListField(
+        required=False,
+        label="Documents",
+        write_only=True,
+        child=serializers.IntegerField(),
+    )
+
+    action = serializers.ChoiceField(
+        choices=["restore", "empty"],
+        label="Action",
+        write_only=True,
+    )
+
+    def validate_documents(self, documents):
+        count = Document.deleted_objects.filter(id__in=documents).count()
+        if not count == len(documents):
+            raise serializers.ValidationError(
+                "Some documents in the list have not yet been deleted.",
+            )
+        return documents

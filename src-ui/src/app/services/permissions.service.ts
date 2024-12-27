@@ -34,7 +34,8 @@ export enum PermissionType {
   Dossier = '%s_dossier',
   DossierForm = '%s_dossierform',
   FontLanguage = '%s_fontlanguage',
-  ArchiveFont = '%s_archivefont'
+  ArchiveFont = '%s_archivefont',
+  Trash = '%s_trash'
 }
 
 export enum DevelopPermissionType {
@@ -59,7 +60,8 @@ export enum DevelopPermissionType {
   Approval = '%s_approval',
   Folder = '%s_folder',
   FontLanguage = '%s_fontlanguage',
-  ArchiveFont = '%s_archivefont'
+  ArchiveFont = '%s_archivefont',
+  Trash = '%s_trash'
 }
 
 

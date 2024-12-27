@@ -57,6 +57,11 @@ export const SETTINGS_KEYS = {
   DEFAULT_PERMS_EDIT_GROUPS: 'general-settings:permissions:default-edit-groups',
   DOCUMENT_EDITING_REMOVE_INBOX_TAGS:
     'general-settings:document-editing:remove-inbox-tags',
+  DOCUMENT_EDITING_OVERLAY_THUMBNAIL:
+    'general-settings:document-editing:overlay-thumbnail',
+  SEARCH_DB_ONLY: 'general-settings:search:db-only',
+  SEARCH_FULL_TYPE: 'general-settings:search:more-link',
+  EMPTY_TRASH_DELAY: 'trash_delay',
 }
 
 export const SETTINGS: UiSetting[] = [
@@ -224,5 +229,10 @@ export const SETTINGS: UiSetting[] = [
     key: SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS,
     type: 'boolean',
     default: false,
+  },
+  {
+    key: SETTINGS_KEYS.EMPTY_TRASH_DELAY,
+    type: 'number',
+    default: 30,
   },
 ]

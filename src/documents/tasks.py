@@ -2,6 +2,7 @@ import hashlib
 import logging
 import shutil
 import uuid
+from datetime import timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Optional
@@ -10,8 +11,10 @@ import tqdm
 from celery import Task
 from celery import shared_task
 from django.conf import settings
-from django.db import transaction
+from django.contrib.contenttypes.models import ContentType
+from django.db import transaction, models
 from django.db.models.signals import post_save
+from django.utils import timezone
 from filelock import FileLock
 from whoosh.writing import AsyncWriter
 
@@ -44,6 +47,7 @@ from documents.plugins.base import StopConsumeTaskError
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
+from documents.signals.handlers import cleanup_document_deletion
 from paperless.models import ApplicationConfiguration
 from paperless_ocr_custom.parsers import RasterisedDocumentCustomParser
 
@@ -366,6 +370,7 @@ def update_document_archive_file(document_id=None):
     return f"Success. New document id {document.pk} created"
 
 
+
 @shared_task
 def update_document_field(document_id):
     """
@@ -441,3 +446,39 @@ def update_document_field(document_id):
         )
     finally:
         parser.cleanup()
+
+@shared_task
+def empty_trash(doc_ids=None):
+    if doc_ids is None:
+        logger.info("Emptying trash of all expired documents")
+    documents = (
+        Document.deleted_objects.filter(id__in=doc_ids)
+        if doc_ids is not None
+        else Document.deleted_objects.filter(
+            deleted_at__lt=timezone.localtime(timezone.now())
+            - timedelta(
+                days=settings.EMPTY_TRASH_DELAY,
+            ),
+        )
+    )
+
+    try:
+        deleted_document_ids = documents.values_list("id", flat=True)
+        # Temporarily connect the cleanup handler
+        models.signals.post_delete.connect(cleanup_document_deletion, sender=Document)
+        documents.delete()  # this is effectively a hard delete
+        logger.info(f"Deleted {len(deleted_document_ids)} documents from trash")
+
+        if settings.AUDIT_LOG_ENABLED:
+            # Delete the audit log entries for documents that dont exist anymore
+            LogEntry.objects.filter(
+                content_type=ContentType.objects.get_for_model(Document),
+                object_id__in=deleted_document_ids,
+            ).delete()
+    except Exception as e:  # pragma: no cover
+        logger.exception(f"Error while emptying trash: {e}")
+    finally:
+        models.signals.post_delete.disconnect(
+            cleanup_document_deletion,
+            sender=Document,
+        )

@@ -115,6 +115,7 @@ from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
 from documents.filters import WarehouseFilterSet
 from documents.filters import FolderFilterSet
+from documents.filters import ObjectOwnedPermissionsFilter
 
 from documents.matching import match_correspondents
 from documents.matching import match_document_types
@@ -153,7 +154,7 @@ from documents.permissions import set_permissions_for_object
 from documents.serialisers import AcknowledgeTasksViewSerializer, \
     ApprovalSerializer, ApprovalViewSerializer, DossierFormSerializer, \
     DossierSerializer, ExportDocumentFromFolderSerializer, \
-    FontLanguageSerializer, ArchiveFontSerializer
+    FontLanguageSerializer, ArchiveFontSerializer, TrashSerializer
 from documents.serialisers import BulkDownloadSerializer
 from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
@@ -178,7 +179,7 @@ from documents.serialisers import FolderSerializer
 
 from documents.signals import document_updated
 from documents.signals import approval_updated
-from documents.tasks import consume_file
+from documents.tasks import consume_file, empty_trash
 from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import GeneralConfig
@@ -2518,6 +2519,43 @@ class SystemStatusView(PassUserMixin):
                 },
             },
         )
+
+class TrashView(ListModelMixin, PassUserMixin):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TrashSerializer
+    filter_backends = (ObjectOwnedPermissionsFilter,)
+    pagination_class = StandardPagination
+
+    model = Document
+
+    queryset = Document.deleted_objects.all()
+
+    def get(self, request, format=None):
+        self.serializer_class = DocumentSerializer
+        return self.list(request, format)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        doc_ids = serializer.validated_data.get("documents")
+        docs = (
+            Document.global_objects.filter(id__in=doc_ids)
+            if doc_ids is not None
+            else self.filter_queryset(self.get_queryset()).all()
+        )
+        for doc in docs:
+            if not has_perms_owner_aware(request.user, "delete_document", doc):
+                return HttpResponseForbidden("Insufficient permissions")
+        action = serializer.validated_data.get("action")
+        if action == "restore":
+            for doc in Document.deleted_objects.filter(id__in=doc_ids).all():
+                doc.restore(strict=False)
+        elif action == "empty":
+            if doc_ids is None:
+                doc_ids = [doc.id for doc in docs]
+            empty_trash(doc_ids=doc_ids)
+        return Response({"result": "OK", "doc_ids": doc_ids})
 
 
 

@@ -462,6 +462,19 @@ class CustomParentDossierIDFilter(NumberFilter):
         qs = qs.filter(path__startswith=str(d.path))
         return qs.exclude(id = d.id)
 
+class ObjectOwnedPermissionsFilter(ObjectPermissionsFilter):
+    """
+    A filter backend that limits results to those where the requesting user
+    owns the objects or objects without an owner (for backwards compat)
+    """
+
+    def filter_queryset(self, request, queryset, view):
+        if request.user.is_superuser:
+            return queryset
+        objects_owned = queryset.filter(owner=request.user)
+        objects_unowned = queryset.filter(owner__isnull=True)
+        return objects_owned | objects_unowned
+
 class DossierFilterSet(FilterSet):
     # parent_dossier__id = CustomParentDossierIDFilter(field_name="parent_dossier__id")
 

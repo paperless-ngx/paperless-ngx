@@ -20,6 +20,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from multiselectfield import MultiSelectField
+from django_softdelete.models import SoftDeleteModel
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
@@ -374,7 +375,7 @@ class Dossier(MatchingModel):
         return self.name
 
 
-class Document(ModelWithOwner):
+class Document(SoftDeleteModel, ModelWithOwner):
     STORAGE_TYPE_UNENCRYPTED = "unencrypted"
     STORAGE_TYPE_GPG = "gpg"
     STORAGE_TYPES = (

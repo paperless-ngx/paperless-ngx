@@ -18,7 +18,7 @@ from documents.models import FontLanguage
 from documents.views import AcknowledgeTasksView, ApprovalUpdateMutipleView, \
     ApprovalViewSet, BulkExportExcelFromFolderView, BulkExportExcelView, \
     DossierFormViewSet, DossierViewSet, StatisticsCustomView, \
-    ArchiveFontViewSet, FontLanguageViewSet
+    ArchiveFontViewSet, FontLanguageViewSet, TrashView
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
@@ -191,6 +191,11 @@ urlpatterns = [
                     "^status/",
                     SystemStatusView.as_view(),
                     name="system_status",
+                ),
+                re_path(
+                    "^trash/",
+                    TrashView.as_view(),
+                    name="trash",
                 ),
                 *api_router.urls,
             ],

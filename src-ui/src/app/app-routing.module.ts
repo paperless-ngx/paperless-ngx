@@ -15,6 +15,7 @@ import { DocumentAsnComponent } from './components/document-asn/document-asn.com
 import { DirtyFormGuard } from './guards/dirty-form.guard'
 import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
 import { TasksComponent } from './components/admin/tasks/tasks.component'
+import { TrashComponent } from './components/admin/trash/trash.component'
 import { PermissionsGuard } from './guards/permissions.guard'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
@@ -341,6 +342,17 @@ export const routes: Routes = [
       {
         path: 'tasks',
         component: TasksComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.PaperlessTask,
+          },
+        },
+      },
+      {
+        path: 'trash',
+        component: TrashComponent,
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
