@@ -266,7 +266,7 @@ class Warehouse(MatchingModel):
     def __str__(self):
         return self.name
 
-class Folder(MatchingModel):
+class Folder(SoftDeleteModel, MatchingModel):
     parent_folder = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True )
     path = models.TextField(_("path"), null=True, blank=True)
     checksum = models.CharField(
@@ -337,7 +337,7 @@ class DossierForm(MatchingModel):
         return self.name
 
 
-class Dossier(MatchingModel):
+class Dossier(SoftDeleteModel, MatchingModel):
 
     DOSSIER_TYPE_CHOICES = [
         ('DOSSIER', _('Dossier')),
@@ -406,7 +406,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
         blank=True,
         null=True,
         related_name="documents",
-        on_delete=models.SET_NULL,
+        on_delete=models.DO_NOTHING,
         verbose_name=_("folder"),
     )
 
@@ -415,7 +415,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
         blank=True,
         null=True,
         related_name="documents",
-        on_delete=models.SET_NULL,
+        on_delete=models.DO_NOTHING,
         verbose_name=_("dossier"),
     )
 

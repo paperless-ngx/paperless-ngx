@@ -268,6 +268,7 @@ def update_document_archive_file(document_id=None):
     """
     Re-creates the archive file of a document, including new OCR content and thumbnail
     """
+    print('-------------',document_id)
     document = Document.objects.get(id=document_id)
 
     mime_type = document.mime_type
@@ -463,10 +464,19 @@ def empty_trash(doc_ids=None):
     )
 
     try:
-        deleted_document_ids = documents.values_list("id", flat=True)
+        # deleted_document_ids = documents.values_list("id", flat=True)
+        deleted_documents = documents.values('id', 'folder_id', 'dossier_id')
+
+        deleted_document_ids = [doc['id'] for doc in deleted_documents]
+        deleted_folder_ids = [doc['folder_id'] for doc in deleted_documents]
+        deleted_dossier_ids = [doc['dossier_id'] for doc in deleted_documents]
         # Temporarily connect the cleanup handler
         models.signals.post_delete.connect(cleanup_document_deletion, sender=Document)
         documents.delete()  # this is effectively a hard delete
+        # delete Folder
+        Folder.deleted_objects.filter(id__in = deleted_folder_ids).delete()
+        # delete Dossier
+        Dossier.deleted_objects.filter(id__in = deleted_dossier_ids).delete()
         logger.info(f"Deleted {len(deleted_document_ids)} documents from trash")
 
         if settings.AUDIT_LOG_ENABLED:

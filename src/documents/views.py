@@ -465,9 +465,9 @@ class DocumentViewSet(
         instance = self.get_object()
         folder = instance.folder
         dossier = instance.dossier
-        instance.folder = None
-        instance.dossier = None
-        instance.save()
+        # instance.folder = None
+        # instance.dossier = None
+        # instance.save()
         if folder is not None:
             folder.delete()
         if dossier is not None:
@@ -2551,6 +2551,10 @@ class TrashView(ListModelMixin, PassUserMixin):
         if action == "restore":
             for doc in Document.deleted_objects.filter(id__in=doc_ids).all():
                 doc.restore(strict=False)
+                if doc.folder is not None:
+                    doc.folder.restore(strict=False)
+                if doc.dossier is not None:
+                    doc.dossier.restore(strict=False)
         elif action == "empty":
             if doc_ids is None:
                 doc_ids = [doc.id for doc in docs]

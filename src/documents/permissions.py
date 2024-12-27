@@ -174,7 +174,7 @@ def update_view_folder_parent_permissions(folder, permissions):
 def update_view_warehouse_shelf_boxcase_permissions(warehouse, permission_copy):
     list_warehouse_ids = warehouse.path.split("/")
     warehouses_list = Warehouse.objects.filter(id__in = list_warehouse_ids)
-    print(f'permission ----{permission_copy}')
+
 
     # Lấy QuerySet từ cả hai quyền
     view_users = permission_copy['view']['users']

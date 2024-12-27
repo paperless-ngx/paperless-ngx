@@ -819,7 +819,7 @@ class DocumentSerializer(
 
     def get_approvals(self, obj):
         # doc = Document.objects.get(pk=obj.pk)
-        print("----------------",obj)
+
         currentUser = self.context.get("request").user
         if currentUser is not None and not has_perms_owner_aware(
             currentUser,
