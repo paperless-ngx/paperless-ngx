@@ -400,10 +400,13 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
     })
   }
   getDeleteMessage(object: Folder) {
-    return $localize`Do you really want to delete the folder "${object.name}"?`
+    if (object.type == 'folder')
+      return $localize`Do you really want to delete the folder "${object.name}"?`
+    return $localize`Do you really want to delete the file "${object.name}"?`
+
   }
 
   getDeleteMassageContent() {
-    return $localize`Associated documents will be deleted.`
+    return $localize`Associated documents will be move to trash.`
   }
 }

@@ -3269,7 +3269,9 @@
             </context-group>
             <target state="translated">
                {VAR_PLURAL, plural, =1 {Một tài liệu trong thùng rác} other  {
-               Tổng <x id="INTERPOLATION" /> tài liệu trong thùng rác}}
+               Tổng
+               <x id="INTERPOLATION" />
+               tài liệu trong thùng rác}}
             </target>
          </trans-unit>
          <trans-unit id="9021887951960049161" datatype="html">
@@ -3345,10 +3347,6 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
                <context context-type="linenumber">931</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-               <context context-type="linenumber">847</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -4363,6 +4361,10 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
                <context context-type="linenumber">661</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+               <context context-type="linenumber">845</context>
             </context-group>
             <target state="translated">Xác nhận</target>
          </trans-unit>
@@ -8932,6 +8934,10 @@
                <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
                <context context-type="linenumber">853</context>
             </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+               <context context-type="linenumber">847</context>
+            </context-group>
             <target state="translated">Tài liệu có thể được khôi phục trước khi xóa vĩnh viễn.</target>
          </trans-unit>
          <trans-unit id="2048798344356757326" datatype="html">
@@ -8939,6 +8945,10 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
                <context context-type="linenumber">855</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+               <context context-type="linenumber">849</context>
             </context-group>
             <target state="translated">Di chuyển tới thùng rác</target>
          </trans-unit>
@@ -9639,37 +9649,21 @@
                tài liệu đã chọn.
             </target>
          </trans-unit>
-         <trans-unit id="749430623564850405" datatype="html">
-            <source>Delete confirm</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-               <context context-type="linenumber">845</context>
-            </context-group>
-            <target state="translated">Xác nhận xóa</target>
-         </trans-unit>
-         <trans-unit id="4303174930844518780" datatype="html">
+         <trans-unit id="8615059324209654051" datatype="html">
             <source>
-               This operation will permanently delete
+               Move
                <x id="PH" equiv-text="this.list.selected.size" />
-               selected document(s).
+               selected document(s) to the trash?
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
                <context context-type="linenumber">846</context>
             </context-group>
             <target state="translated">
-               Thao tác này sẽ xóa vĩnh viễn
+               Di chuyển
                <x id="PH" equiv-text="this.list.selected.size" />
-               tài liệu đã chọn
+               tài liệu đã chọn tới thùng rác?
             </target>
-         </trans-unit>
-         <trans-unit id="6734339521247847366" datatype="html">
-            <source>Delete document(s)</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-               <context context-type="linenumber">849</context>
-            </context-group>
-            <target state="translated">Xóa (các) tài liệu</target>
          </trans-unit>
          <trans-unit id="8968869182645922415" datatype="html">
             <source>
@@ -11671,7 +11665,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-               <context context-type="linenumber">403</context>
+               <context context-type="linenumber">404</context>
             </context-group>
             <target state="translated">
                Bạn có thực sự muốn xóa file "
@@ -11679,13 +11673,29 @@
                "?
             </target>
          </trans-unit>
-         <trans-unit id="2158704536244701304" datatype="html">
-            <source>Associated documents will be deleted.</source>
+         <trans-unit id="1918450880409150681" datatype="html">
+            <source>
+               Do you really want to delete the file "
+               <x id="PH" equiv-text="object.name" />
+               "?
+            </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-               <context context-type="linenumber">407</context>
+               <context context-type="linenumber">405</context>
             </context-group>
-            <target state="translated">Các tài liệu liên quan sẽ bị xóa.</target>
+            <target state="translated">
+               Bạn có thực sự muốn xóa tập tin "
+               <x id="PH" equiv-text="object.name" />
+               "?
+            </target>
+         </trans-unit>
+         <trans-unit id="3990823630327067893" datatype="html">
+            <source>Associated documents will be move to trash.</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
+               <context context-type="linenumber">410</context>
+            </context-group>
+            <target state="translated">Các tài liệu liên quan sẽ được chuyển vào thùng rác.</target>
          </trans-unit>
          <trans-unit id="4279382080713150304" datatype="html">
             <source>font language</source>
