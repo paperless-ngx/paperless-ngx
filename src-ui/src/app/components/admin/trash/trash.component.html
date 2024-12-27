@@ -93,7 +93,8 @@
         <div>
             <ng-container i18n>{totalDocuments, plural, =1 {One document in trash} other {{{totalDocuments || 0}} total documents in trash}}</ng-container>
             @if (selectedDocuments.size > 0) {
-                &nbsp;({{selectedDocuments.size}} selected)
+              <ng-container i18n>&nbsp;({{ selectedDocuments.size }} selected)</ng-container>
+<!--                &nbsp;({{selectedDocuments.size}} selected)-->
             }
         </div>
         @if (documentsInTrash.length > 20) {
