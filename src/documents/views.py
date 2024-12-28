@@ -2191,6 +2191,7 @@ class BulkEditObjectsView(PassUserMixin):
 
                 # print(folder.id)
                 # print(int(request.data['parent_folder'][0]))
+                # test
                 old_parent_folder = folder.parent_folder
                 folder.parent_folder = parent_folder_obj
 
