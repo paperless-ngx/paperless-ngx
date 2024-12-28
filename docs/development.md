@@ -442,7 +442,7 @@ def myparser_consumer_declaration(sender, **kwargs):
 -   `parser` is a reference to a class that extends `DocumentParser`.
 -   `weight` is used whenever two or more parsers are able to parse a
     file: The parser with the higher weight wins. This can be used to
-    override the parsers provided by Paperless-ngx.
+    override the parsers provided by Koden.
 -   `mime_types` is a dictionary. The keys are the mime types your
     parser supports and the value is the default file extension that
     Paperless-ngx should use when storing files and serving them for

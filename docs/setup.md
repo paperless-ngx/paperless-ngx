@@ -627,7 +627,7 @@ Migration to paperless-ngx is then performed in a few simple steps:
 
         Paperless-ngx includes a `.env` file. This will set the project name
         for docker compose to `paperless`, which will also define the name
-        of the volumes by paperless-ngx. However, if you experience that
+        of the volumes by Koden. However, if you experience that
         paperless-ngx is not using your old paperless volumes, verify the
         names of your volumes with
 
