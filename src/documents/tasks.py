@@ -268,7 +268,8 @@ def update_document_archive_file(document_id=None):
     """
     Re-creates the archive file of a document, including new OCR content and thumbnail
     """
-    print('-------------',document_id)
+
+
     document = Document.objects.get(id=document_id)
 
     mime_type = document.mime_type
