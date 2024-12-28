@@ -2549,10 +2549,16 @@ class TrashView(ListModelMixin, PassUserMixin):
                 return HttpResponseForbidden("Insufficient permissions")
         action = serializer.validated_data.get("action")
         if action == "restore":
-            for doc in Document.deleted_objects.filter(id__in=doc_ids).all():
+            deleted_docs = Document.deleted_objects.filter(id__in=doc_ids).select_related('folder', 'dossier')
+            # folders = {doc.folder for doc in deleted_docs}
+            # dossiers = {doc.dossier for doc in deleted_docs}
+
+            for doc in deleted_docs:
                 doc.restore(strict=False)
                 if doc.folder is not None:
                     doc.folder.restore(strict=False)
+                    if doc.folder.parent_folder is not None:
+                        doc.folder.parent_folder.restore(strict=False)
                 if doc.dossier is not None:
                     doc.dossier.restore(strict=False)
         elif action == "empty":
