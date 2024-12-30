@@ -547,7 +547,7 @@ def set_log_entry(sender, document: Document, logging_group=None, **kwargs):
         content_type=ct,
         object_id=document.pk,
         user=user,
-        object_repr=document.__str__(),
+        object_repr=document.__str__()[:200],
     )
 
 
