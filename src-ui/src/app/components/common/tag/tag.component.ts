@@ -5,7 +5,6 @@ import { Tag } from 'src/app/data/tag'
   selector: 'pngx-tag',
   templateUrl: './tag.component.html',
   styleUrls: ['./tag.component.scss'],
-  standalone: false,
 })
 export class TagComponent {
   constructor() {}

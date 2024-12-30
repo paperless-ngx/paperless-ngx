@@ -16,7 +16,7 @@ import { IfObjectPermissionsDirective } from './if-object-permissions.directive'
       </button>
     </div>
   `,
-  standalone: false,
+  imports: [IfObjectPermissionsDirective],
 })
 class TestComponent {}
 
@@ -26,7 +26,7 @@ describe('IfObjectPermissionsDirective', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [IfObjectPermissionsDirective, TestComponent],
+      imports: [IfObjectPermissionsDirective, TestComponent],
       providers: [PermissionsService],
     })
     permissionsService = TestBed.inject(PermissionsService)

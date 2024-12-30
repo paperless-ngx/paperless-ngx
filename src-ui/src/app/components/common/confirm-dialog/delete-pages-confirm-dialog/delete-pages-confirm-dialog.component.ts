@@ -1,6 +1,12 @@
 import { Component, TemplateRef, ViewChild } from '@angular/core'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { PDFDocumentProxy, PdfViewerComponent } from 'ng2-pdf-viewer'
+import {
+  PDFDocumentProxy,
+  PdfViewerComponent,
+  PdfViewerModule,
+} from 'ng2-pdf-viewer'
+import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { ConfirmDialogComponent } from '../confirm-dialog.component'
 
@@ -8,7 +14,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog.component'
   selector: 'pngx-delete-pages-confirm-dialog',
   templateUrl: './delete-pages-confirm-dialog.component.html',
   styleUrl: './delete-pages-confirm-dialog.component.scss',
-  standalone: false,
+  imports: [PdfViewerModule, FormsModule, ReactiveFormsModule, SafeHtmlPipe],
 })
 export class DeletePagesConfirmDialogComponent extends ConfirmDialogComponent {
   public documentID: number

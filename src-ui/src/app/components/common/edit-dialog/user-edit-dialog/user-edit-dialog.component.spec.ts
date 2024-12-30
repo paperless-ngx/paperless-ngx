@@ -34,7 +34,12 @@ describe('UserEditDialogComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        NgbModule,
+        NgxBootstrapIconsModule.pick(allIcons),
         UserEditDialogComponent,
         IfPermissionsDirective,
         IfOwnerDirective,
@@ -43,13 +48,6 @@ describe('UserEditDialogComponent', () => {
         PasswordComponent,
         PermissionsFormComponent,
         PermissionsSelectComponent,
-      ],
-      imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        NgSelectModule,
-        NgbModule,
-        NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         NgbActiveModal,

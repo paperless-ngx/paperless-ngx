@@ -16,7 +16,6 @@ describe('DocumentAsnComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [DocumentAsnComponent],
       providers: [
         {
           provide: DocumentService,
@@ -27,7 +26,7 @@ describe('DocumentAsnComponent', () => {
         },
         PermissionsGuard,
       ],
-      imports: [RouterTestingModule.withRoutes(routes)],
+      imports: [RouterTestingModule.withRoutes(routes), DocumentAsnComponent],
     }).compileComponents()
 
     router = TestBed.inject(Router)

@@ -9,7 +9,6 @@ import { UserService } from '../services/rest/user.service'
 
 @Pipe({
   name: 'username',
-  standalone: false,
 })
 export class UsernamePipe implements PipeTransform {
   users: User[]

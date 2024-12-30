@@ -12,7 +12,6 @@ import { PermissionsService } from '../services/permissions.service'
 
 @Directive({
   selector: '[pngxIfOwner]',
-  standalone: false,
 })
 export class IfOwnerDirective implements OnInit, OnChanges {
   // The role the user must have

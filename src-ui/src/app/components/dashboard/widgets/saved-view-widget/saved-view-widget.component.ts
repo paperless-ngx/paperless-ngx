@@ -1,3 +1,4 @@
+import { AsyncPipe, NgClass, NgStyle } from '@angular/common'
 import {
   Component,
   Input,
@@ -6,9 +7,14 @@ import {
   QueryList,
   ViewChildren,
 } from '@angular/core'
-import { Router } from '@angular/router'
+import { Router, RouterModule } from '@angular/router'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { delay, Subject, takeUntil, tap } from 'rxjs'
+import { PreviewPopupComponent } from 'src/app/components/common/preview-popup/preview-popup.component'
+import { TagComponent } from 'src/app/components/common/tag/tag.component'
+import { DocumentCardLargeComponent } from 'src/app/components/document-list/document-card-large/document-card-large.component'
+import { DocumentCardSmallComponent } from 'src/app/components/document-list/document-card-small/document-card-small.component'
 import { LoadingComponentWithPermissions } from 'src/app/components/loading-component/loading.component'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
@@ -27,6 +33,9 @@ import {
   FILTER_STORAGE_PATH,
 } from 'src/app/data/filter-rule-type'
 import { SavedView } from 'src/app/data/saved-view'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
+import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
@@ -38,12 +47,27 @@ import {
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 
 @Component({
   selector: 'pngx-saved-view-widget',
   templateUrl: './saved-view-widget.component.html',
   styleUrls: ['./saved-view-widget.component.scss'],
-  standalone: false,
+  imports: [
+    DocumentCardSmallComponent,
+    DocumentCardLargeComponent,
+    PreviewPopupComponent,
+    TagComponent,
+    WidgetFrameComponent,
+    IfPermissionsDirective,
+    AsyncPipe,
+    DocumentTitlePipe,
+    CustomDatePipe,
+    NgClass,
+    NgStyle,
+    RouterModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class SavedViewWidgetComponent
   extends LoadingComponentWithPermissions

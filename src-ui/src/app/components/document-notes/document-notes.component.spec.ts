@@ -56,15 +56,13 @@ describe('DocumentNotesComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        DocumentNotesComponent,
-        CustomDatePipe,
-        IfPermissionsDirective,
-      ],
       imports: [
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        DocumentNotesComponent,
+        CustomDatePipe,
+        IfPermissionsDirective,
       ],
       providers: [
         {

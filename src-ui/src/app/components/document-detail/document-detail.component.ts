@@ -1,15 +1,25 @@
+import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
-import { FormArray, FormControl, FormGroup } from '@angular/forms'
+import {
+  FormArray,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import {
   NgbDateStruct,
+  NgbDropdownModule,
   NgbModal,
   NgbNav,
   NgbNavChangeEvent,
+  NgbNavModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
-import { PDFDocumentProxy } from 'ng2-pdf-viewer'
+import { PDFDocumentProxy, PdfViewerModule } from 'ng2-pdf-viewer'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { BehaviorSubject, Observable, Subject } from 'rxjs'
 import {
   debounceTime,
@@ -44,7 +54,11 @@ import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { User } from 'src/app/data/user'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
+import { FileSizePipe } from 'src/app/pipes/file-size.pipe'
+import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { HotKeyService } from 'src/app/services/hot-key.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
@@ -67,12 +81,27 @@ import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.
 import { DeletePagesConfirmDialogComponent } from '../common/confirm-dialog/delete-pages-confirm-dialog/delete-pages-confirm-dialog.component'
 import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
+import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
 import { EditDialogMode } from '../common/edit-dialog/edit-dialog.component'
 import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { CheckComponent } from '../common/input/check/check.component'
+import { DateComponent } from '../common/input/date/date.component'
+import { DocumentLinkComponent } from '../common/input/document-link/document-link.component'
+import { MonetaryComponent } from '../common/input/monetary/monetary.component'
+import { NumberComponent } from '../common/input/number/number.component'
+import { PermissionsFormComponent } from '../common/input/permissions/permissions-form/permissions-form.component'
+import { SelectComponent } from '../common/input/select/select.component'
+import { TagsComponent } from '../common/input/tags/tags.component'
 import { TextComponent } from '../common/input/text/text.component'
+import { UrlComponent } from '../common/input/url/url.component'
+import { PageHeaderComponent } from '../common/page-header/page-header.component'
+import { ShareLinksDropdownComponent } from '../common/share-links-dropdown/share-links-dropdown.component'
+import { DocumentHistoryComponent } from '../document-history/document-history.component'
+import { DocumentNotesComponent } from '../document-notes/document-notes.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
+import { MetadataCollapseComponent } from './metadata-collapse/metadata-collapse.component'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -109,7 +138,36 @@ enum ZoomSetting {
   selector: 'pngx-document-detail',
   templateUrl: './document-detail.component.html',
   styleUrls: ['./document-detail.component.scss'],
-  standalone: false,
+  imports: [
+    PageHeaderComponent,
+    CustomFieldsDropdownComponent,
+    DocumentNotesComponent,
+    DocumentHistoryComponent,
+    ShareLinksDropdownComponent,
+    CheckComponent,
+    DateComponent,
+    DocumentLinkComponent,
+    MetadataCollapseComponent,
+    PermissionsFormComponent,
+    SelectComponent,
+    TagsComponent,
+    TextComponent,
+    NumberComponent,
+    MonetaryComponent,
+    UrlComponent,
+    CustomDatePipe,
+    FileSizePipe,
+    IfPermissionsDirective,
+    AsyncPipe,
+    FormsModule,
+    ReactiveFormsModule,
+    NgTemplateOutlet,
+    SafeUrlPipe,
+    NgbNavModule,
+    NgbDropdownModule,
+    NgxBootstrapIconsModule,
+    PdfViewerModule,
+  ],
 })
 export class DocumentDetailComponent
   extends ComponentWithPermissions

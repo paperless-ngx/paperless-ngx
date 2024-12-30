@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common'
 import {
   Component,
   ElementRef,
@@ -7,7 +8,9 @@ import {
   Output,
   ViewChild,
 } from '@angular/core'
-import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, filter, takeUntil } from 'rxjs'
 import { MatchingModel } from 'src/app/data/matching-model'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
@@ -16,7 +19,11 @@ import { HotKeyService } from 'src/app/services/hot-key.service'
 import { SelectionDataItem } from 'src/app/services/rest/document.service'
 import { popperOptionsReenablePreventOverflow } from 'src/app/utils/popper-options'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
-import { ToggleableItemState } from './toggleable-dropdown-button/toggleable-dropdown-button.component'
+import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
+import {
+  ToggleableDropdownButtonComponent,
+  ToggleableItemState,
+} from './toggleable-dropdown-button/toggleable-dropdown-button.component'
 
 export interface ChangedItems {
   itemsToAdd: MatchingModel[]
@@ -352,7 +359,16 @@ export class FilterableDropdownSelectionModel {
   selector: 'pngx-filterable-dropdown',
   templateUrl: './filterable-dropdown.component.html',
   styleUrls: ['./filterable-dropdown.component.scss'],
-  standalone: false,
+  imports: [
+    ClearableBadgeComponent,
+    ToggleableDropdownButtonComponent,
+    FilterPipe,
+    FormsModule,
+    ReactiveFormsModule,
+    NgxBootstrapIconsModule,
+    NgbDropdownModule,
+    NgClass,
+  ],
 })
 export class FilterableDropdownComponent
   extends LoadingComponentWithPermissions

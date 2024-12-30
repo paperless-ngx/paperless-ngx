@@ -63,7 +63,15 @@ describe('TagsComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        RouterTestingModule,
+        NgbModalModule,
+        NgbAccordionModule,
+        NgbPopoverModule,
+        NgxBootstrapIconsModule.pick(allIcons),
         TagsComponent,
         TagEditDialogComponent,
         TextComponent,
@@ -74,16 +82,6 @@ describe('TagsComponent', () => {
         PermissionsFormComponent,
         ColorComponent,
         CheckComponent,
-      ],
-      imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        NgSelectModule,
-        RouterTestingModule,
-        NgbModalModule,
-        NgbAccordionModule,
-        NgbPopoverModule,
-        NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         {

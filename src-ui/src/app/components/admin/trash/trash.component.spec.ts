@@ -43,12 +43,6 @@ describe('TrashComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [
-        TrashComponent,
-        PageHeaderComponent,
-        ConfirmDialogComponent,
-        SafeHtmlPipe,
-      ],
       imports: [
         HttpClientTestingModule,
         FormsModule,
@@ -56,6 +50,10 @@ describe('TrashComponent', () => {
         NgbPopoverModule,
         NgbPaginationModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        TrashComponent,
+        PageHeaderComponent,
+        ConfirmDialogComponent,
+        SafeHtmlPipe,
       ],
     }).compileComponents()
 

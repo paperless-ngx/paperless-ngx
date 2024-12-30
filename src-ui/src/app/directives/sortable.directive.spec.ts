@@ -24,7 +24,7 @@ import { SortEvent, SortableDirective } from './sortable.directive'
       </tbody>
     </table>
   `,
-  standalone: false,
+  imports: [SortableDirective],
 })
 class TestComponent {}
 
@@ -35,7 +35,7 @@ describe('SortableDirective', () => {
 
   beforeEach(() => {
     fixture = TestBed.configureTestingModule({
-      declarations: [SortableDirective, TestComponent],
+      imports: [SortableDirective, TestComponent],
     }).createComponent(TestComponent)
 
     fixture.detectChanges() // initial binding

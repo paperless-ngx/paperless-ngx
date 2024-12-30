@@ -1,22 +1,46 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { Component, OnInit } from '@angular/core'
-import { FormControl, FormGroup } from '@angular/forms'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms'
+import {
+  NgbAccordionModule,
+  NgbActiveModal,
+  NgbPopoverModule,
+} from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { takeUntil } from 'rxjs'
 import {
   SocialAccount,
   SocialAccountProvider,
   TotpSettings,
 } from 'src/app/data/user-profile'
+import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { ProfileService } from 'src/app/services/profile.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
+import { ConfirmButtonComponent } from '../confirm-button/confirm-button.component'
+import { PasswordComponent } from '../input/password/password.component'
+import { TextComponent } from '../input/text/text.component'
 
 @Component({
   selector: 'pngx-profile-edit-dialog',
   templateUrl: './profile-edit-dialog.component.html',
   styleUrls: ['./profile-edit-dialog.component.scss'],
-  standalone: false,
+  imports: [
+    ConfirmButtonComponent,
+    TextComponent,
+    PasswordComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    SafeHtmlPipe,
+    NgbAccordionModule,
+    NgbPopoverModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class ProfileEditDialogComponent
   extends LoadingComponentWithPermissions

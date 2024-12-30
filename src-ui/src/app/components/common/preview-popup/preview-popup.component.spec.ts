@@ -7,13 +7,9 @@ import {
 } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { By } from '@angular/platform-browser'
-import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
-import { PdfViewerModule } from 'ng2-pdf-viewer'
 import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
-import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { PreviewPopupComponent } from './preview-popup.component'
@@ -36,12 +32,7 @@ describe('PreviewPopupComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [PreviewPopupComponent, SafeUrlPipe, DocumentTitlePipe],
-      imports: [
-        NgxBootstrapIconsModule.pick(allIcons),
-        PdfViewerModule,
-        NgbPopoverModule,
-      ],
+      imports: [NgxBootstrapIconsModule.pick(allIcons)],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),

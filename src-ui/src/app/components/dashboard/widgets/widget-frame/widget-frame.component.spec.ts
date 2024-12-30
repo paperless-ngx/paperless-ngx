@@ -19,7 +19,6 @@ import { WidgetFrameComponent } from './widget-frame.component'
       </button>
     </div>
   `,
-  standalone: false,
 })
 class TestComponent extends WidgetFrameComponent {}
 
@@ -29,9 +28,13 @@ describe('WidgetFrameComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [WidgetFrameComponent, WidgetFrameComponent],
       providers: [PermissionsGuard],
-      imports: [NgbAlertModule, DragDropModule],
+      imports: [
+        NgbAlertModule,
+        DragDropModule,
+        WidgetFrameComponent,
+        WidgetFrameComponent,
+      ],
     }).compileComponents()
 
     fixture = TestBed.createComponent(WidgetFrameComponent)

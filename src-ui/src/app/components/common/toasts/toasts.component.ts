@@ -1,5 +1,11 @@
 import { Clipboard } from '@angular/cdk/clipboard'
+import { DecimalPipe } from '@angular/common'
 import { Component, OnDestroy, OnInit } from '@angular/core'
+import {
+  NgbProgressbarModule,
+  NgbToastModule,
+} from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subscription, interval, take } from 'rxjs'
 import { Toast, ToastService } from 'src/app/services/toast.service'
 
@@ -7,7 +13,12 @@ import { Toast, ToastService } from 'src/app/services/toast.service'
   selector: 'pngx-toasts',
   templateUrl: './toasts.component.html',
   styleUrls: ['./toasts.component.scss'],
-  standalone: false,
+  imports: [
+    DecimalPipe,
+    NgbToastModule,
+    NgbProgressbarModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class ToastsComponent implements OnInit, OnDestroy {
   constructor(

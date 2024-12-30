@@ -20,18 +20,16 @@ describe('TagListComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        TagListComponent,
-        SortableDirective,
-        PageHeaderComponent,
-        IfPermissionsDirective,
-        SafeHtmlPipe,
-      ],
       imports: [
         NgbPaginationModule,
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        TagListComponent,
+        SortableDirective,
+        PageHeaderComponent,
+        IfPermissionsDirective,
+        SafeHtmlPipe,
       ],
       providers: [
         DatePipe,

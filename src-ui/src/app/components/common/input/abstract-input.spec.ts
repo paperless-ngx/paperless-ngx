@@ -18,7 +18,7 @@ import { AbstractInputComponent } from './abstract-input'
       />
     </div>
   `,
-  standalone: false,
+  imports: [FormsModule, ReactiveFormsModule],
 })
 class TestComponent extends AbstractInputComponent<string> {
   constructor() {
@@ -32,9 +32,8 @@ describe(`AbstractInputComponent`, () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [TestComponent],
       providers: [],
-      imports: [FormsModule, ReactiveFormsModule],
+      imports: [FormsModule, ReactiveFormsModule, TestComponent],
     }).compileComponents()
 
     fixture = TestBed.createComponent(TestComponent)

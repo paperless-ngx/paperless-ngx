@@ -1,6 +1,8 @@
 import { Component, OnDestroy } from '@angular/core'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModal, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { delay, takeUntil, tap } from 'rxjs'
 import { Document } from 'src/app/data/document'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
@@ -8,13 +10,22 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { TrashService } from 'src/app/services/trash.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { PageHeaderComponent } from '../../common/page-header/page-header.component'
+import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
   selector: 'pngx-trash',
   templateUrl: './trash.component.html',
   styleUrl: './trash.component.scss',
-  standalone: false,
+  imports: [
+    PageHeaderComponent,
+    PreviewPopupComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    NgbPaginationModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class TrashComponent
   extends LoadingComponentWithPermissions

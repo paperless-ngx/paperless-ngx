@@ -5,9 +5,7 @@ import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { routes } from '../app-routing.module'
 import { ComponentCanDeactivate, DirtyDocGuard } from './dirty-doc.guard'
 
-@Component({
-  standalone: false,
-})
+@Component({ imports: [NgbModule] })
 class GenericDirtyDocComponent implements ComponentCanDeactivate {
   canDeactivate: () => boolean
 }
@@ -19,8 +17,11 @@ describe('DirtyDocGuard', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [DirtyDocGuard, NgbModal, GenericDirtyDocComponent],
-      imports: [RouterTestingModule.withRoutes(routes), NgbModule],
-      declarations: [GenericDirtyDocComponent],
+      imports: [
+        RouterTestingModule.withRoutes(routes),
+        NgbModule,
+        GenericDirtyDocComponent,
+      ],
     }).compileComponents()
 
     guard = TestBed.inject(DirtyDocGuard)

@@ -10,8 +10,11 @@ describe('ConfirmButtonComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ConfirmButtonComponent],
-      imports: [NgbPopoverModule, NgxBootstrapIconsModule.pick(allIcons)],
+      imports: [
+        NgbPopoverModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+        ConfirmButtonComponent,
+      ],
     }).compileComponents()
 
     fixture = TestBed.createComponent(ConfirmButtonComponent)

@@ -18,8 +18,7 @@ describe('NumberComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [NumberComponent],
-      imports: [FormsModule, ReactiveFormsModule],
+      imports: [FormsModule, ReactiveFormsModule, NumberComponent],
       providers: [
         DocumentService,
         provideHttpClient(withInterceptorsFromDi()),

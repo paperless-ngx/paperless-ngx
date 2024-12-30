@@ -1,12 +1,17 @@
+import { DecimalPipe } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import { Component, OnDestroy, OnInit } from '@angular/core'
+import { RouterModule } from '@angular/router'
+import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
 import * as mimeTypeNames from 'mime-names'
 import { first, Subject, Subscription, takeUntil } from 'rxjs'
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
 import { FILTER_HAS_TAGS_ANY } from 'src/app/data/filter-rule-type'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { environment } from 'src/environments/environment'
+import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 
 export interface Statistics {
   documents_total?: number
@@ -30,7 +35,13 @@ interface DocumentFileType {
   selector: 'pngx-statistics-widget',
   templateUrl: './statistics-widget.component.html',
   styleUrls: ['./statistics-widget.component.scss'],
-  standalone: false,
+  imports: [
+    WidgetFrameComponent,
+    IfPermissionsDirective,
+    NgbPopoverModule,
+    DecimalPipe,
+    RouterModule,
+  ],
 })
 export class StatisticsWidgetComponent
   extends ComponentWithPermissions

@@ -33,7 +33,11 @@ describe('MailAccountEditDialogComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        NgbModule,
         MailAccountEditDialogComponent,
         IfPermissionsDirective,
         IfOwnerDirective,
@@ -43,7 +47,6 @@ describe('MailAccountEditDialogComponent', () => {
         PermissionsFormComponent,
         PasswordComponent,
       ],
-      imports: [FormsModule, ReactiveFormsModule, NgSelectModule, NgbModule],
       providers: [
         NgbActiveModal,
         provideHttpClient(withInterceptorsFromDi()),

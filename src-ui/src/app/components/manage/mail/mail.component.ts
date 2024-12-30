@@ -1,11 +1,16 @@
+import { AsyncPipe } from '@angular/common'
 import { Component, OnDestroy, OnInit } from '@angular/core'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, delay, first, takeUntil, tap } from 'rxjs'
 import { MailAccount, MailAccountType } from 'src/app/data/mail-account'
 import { MailRule } from 'src/app/data/mail-rule'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import {
   PermissionAction,
   PermissionsService,
@@ -19,6 +24,7 @@ import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dial
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
 import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
+import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
@@ -26,7 +32,15 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
   selector: 'pngx-mail',
   templateUrl: './mail.component.html',
   styleUrls: ['./mail.component.scss'],
-  standalone: false,
+  imports: [
+    PageHeaderComponent,
+    IfPermissionsDirective,
+    IfOwnerDirective,
+    AsyncPipe,
+    FormsModule,
+    ReactiveFormsModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class MailComponent
   extends ComponentWithPermissions

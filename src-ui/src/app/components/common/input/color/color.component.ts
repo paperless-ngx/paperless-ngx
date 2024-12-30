@@ -1,5 +1,12 @@
 import { Component, forwardRef } from '@angular/core'
-import { NG_VALUE_ACCESSOR } from '@angular/forms'
+import {
+  FormsModule,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
+} from '@angular/forms'
+import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { ColorSliderModule } from 'ngx-color/slider'
 import { randomColor } from 'src/app/utils/color'
 import { AbstractInputComponent } from '../abstract-input'
 
@@ -14,7 +21,13 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-color',
   templateUrl: './color.component.html',
   styleUrls: ['./color.component.scss'],
-  standalone: false,
+  imports: [
+    NgxBootstrapIconsModule,
+    NgbPopoverModule,
+    FormsModule,
+    ReactiveFormsModule,
+    ColorSliderModule,
+  ],
 })
 export class ColorComponent extends AbstractInputComponent<string> {
   constructor() {

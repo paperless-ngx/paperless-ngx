@@ -8,9 +8,7 @@ import { routes } from '../app-routing.module'
 import { ConfirmDialogComponent } from '../components/common/confirm-dialog/confirm-dialog.component'
 import { DirtyFormGuard } from './dirty-form.guard'
 
-@Component({
-  standalone: false,
-})
+@Component({ imports: [NgbModule] })
 class GenericDirtyComponent implements DirtyComponent {
   isDirty$: boolean
 }
@@ -34,8 +32,12 @@ describe('DirtyFormGuard', () => {
         },
         GenericDirtyComponent,
       ],
-      imports: [RouterTestingModule.withRoutes(routes), NgbModule],
-      declarations: [ConfirmDialogComponent, GenericDirtyComponent],
+      imports: [
+        RouterTestingModule.withRoutes(routes),
+        NgbModule,
+        ConfirmDialogComponent,
+        GenericDirtyComponent,
+      ],
     }).compileComponents()
 
     guard = TestBed.inject(DirtyFormGuard)

@@ -9,7 +9,7 @@ import { IfOwnerDirective } from './if-owner.directive'
       <button *pngxIfOwner="{ id: 2, owner: user1 }">Some Text</button>
     </div>
   `,
-  standalone: false,
+  imports: [IfOwnerDirective],
 })
 class TestComponent {}
 
@@ -19,7 +19,7 @@ describe('IfOwnerDirective', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [IfOwnerDirective, TestComponent],
+      imports: [IfOwnerDirective, TestComponent],
       providers: [PermissionsService],
     })
     permissionsService = TestBed.inject(PermissionsService)

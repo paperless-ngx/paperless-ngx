@@ -11,9 +11,8 @@ describe('ConfirmDialogComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [ConfirmDialogComponent, SafeHtmlPipe],
       providers: [NgbActiveModal, SafeHtmlPipe],
-      imports: [],
+      imports: [ConfirmDialogComponent, SafeHtmlPipe],
     }).compileComponents()
 
     modal = TestBed.inject(NgbActiveModal)

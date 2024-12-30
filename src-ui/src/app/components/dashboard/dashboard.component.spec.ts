@@ -72,7 +72,12 @@ describe('DashboardComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        NgbAlertModule,
+        RouterTestingModule,
+        TourNgBootstrapModule,
+        DragDropModule,
+        NgxBootstrapIconsModule.pick(allIcons),
         DashboardComponent,
         StatisticsWidgetComponent,
         PageHeaderComponent,
@@ -81,13 +86,6 @@ describe('DashboardComponent', () => {
         IfPermissionsDirective,
         SavedViewWidgetComponent,
         LogoComponent,
-      ],
-      imports: [
-        NgbAlertModule,
-        RouterTestingModule,
-        TourNgBootstrapModule,
-        DragDropModule,
-        NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         PermissionsGuard,

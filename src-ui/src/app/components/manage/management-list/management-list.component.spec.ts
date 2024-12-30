@@ -78,15 +78,6 @@ describe('ManagementListComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        TagListComponent,
-        SortableDirective,
-        PageHeaderComponent,
-        IfPermissionsDirective,
-        SafeHtmlPipe,
-        ConfirmDialogComponent,
-        PermissionsDialogComponent,
-      ],
       imports: [
         NgbPaginationModule,
         FormsModule,
@@ -94,6 +85,13 @@ describe('ManagementListComponent', () => {
         NgbModalModule,
         RouterTestingModule.withRoutes(routes),
         NgxBootstrapIconsModule.pick(allIcons),
+        TagListComponent,
+        SortableDirective,
+        PageHeaderComponent,
+        IfPermissionsDirective,
+        SafeHtmlPipe,
+        ConfirmDialogComponent,
+        PermissionsDialogComponent,
       ],
       providers: [
         DatePipe,

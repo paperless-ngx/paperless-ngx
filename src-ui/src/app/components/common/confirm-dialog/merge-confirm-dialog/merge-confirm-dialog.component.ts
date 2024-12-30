@@ -1,6 +1,8 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop'
 import { Component, OnInit } from '@angular/core'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { takeUntil } from 'rxjs'
 import { Document } from 'src/app/data/document'
 import { PermissionsService } from 'src/app/services/permissions.service'
@@ -11,7 +13,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog.component'
   selector: 'pngx-merge-confirm-dialog',
   templateUrl: './merge-confirm-dialog.component.html',
   styleUrl: './merge-confirm-dialog.component.scss',
-  standalone: false,
+  imports: [FormsModule, ReactiveFormsModule, NgxBootstrapIconsModule],
 })
 export class MergeConfirmDialogComponent
   extends ConfirmDialogComponent

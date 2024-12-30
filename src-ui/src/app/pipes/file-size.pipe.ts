@@ -53,10 +53,7 @@ const defaultPrecisionMap: unitPrecisionMap = {
  * // returns 1.46 KB
  * {{ 1500 | fileSize:2 }}
  */
-@Pipe({
-  name: 'fileSize',
-  standalone: false,
-})
+@Pipe({ name: 'fileSize' })
 export class FileSizePipe implements PipeTransform {
   private readonly units: unit[] = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB']
 

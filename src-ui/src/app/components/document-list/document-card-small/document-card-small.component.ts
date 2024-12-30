@@ -1,3 +1,4 @@
+import { AsyncPipe } from '@angular/common'
 import {
   AfterViewInit,
   Component,
@@ -6,6 +7,12 @@ import {
   Output,
   ViewChild,
 } from '@angular/core'
+import { RouterModule } from '@angular/router'
+import {
+  NgbProgressbarModule,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { map } from 'rxjs/operators'
 import {
   DEFAULT_DISPLAY_FIELDS,
@@ -13,16 +20,37 @@ import {
   Document,
 } from 'src/app/data/document'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
+import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
+import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
+import { UsernamePipe } from 'src/app/pipes/username.pipe'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { CustomFieldDisplayComponent } from '../../common/custom-field-display/custom-field-display.component'
 import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
+import { TagComponent } from '../../common/tag/tag.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
   selector: 'pngx-document-card-small',
   templateUrl: './document-card-small.component.html',
   styleUrls: ['./document-card-small.component.scss'],
-  standalone: false,
+  imports: [
+    DocumentTitlePipe,
+    IsNumberPipe,
+    PreviewPopupComponent,
+    TagComponent,
+    CustomFieldDisplayComponent,
+    AsyncPipe,
+    UsernamePipe,
+    IfPermissionsDirective,
+    CustomDatePipe,
+    RouterModule,
+    NgbTooltipModule,
+    NgbProgressbarModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class DocumentCardSmallComponent
   extends LoadingComponentWithPermissions

@@ -10,7 +10,6 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { CookieService } from 'ngx-cookie-service'
 import { of, Subscription } from 'rxjs'
 import { environment } from 'src/environments/environment'
-import { AppModule } from '../app.module'
 import { CustomFieldDataType } from '../data/custom-field'
 import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
 import { SavedView } from '../data/saved-view'
@@ -92,7 +91,6 @@ describe('SettingsService', () => {
         NgbModule,
         FormsModule,
         ReactiveFormsModule,
-        AppModule,
       ],
       providers: [
         SettingsService,
@@ -108,6 +106,8 @@ describe('SettingsService', () => {
     permissionService = TestBed.inject(PermissionsService)
     settingsService = TestBed.inject(SettingsService)
     toastService = TestBed.inject(ToastService)
+    // Normally done in app initializer
+    settingsService.initializeSettings().subscribe()
   })
 
   afterEach(() => {

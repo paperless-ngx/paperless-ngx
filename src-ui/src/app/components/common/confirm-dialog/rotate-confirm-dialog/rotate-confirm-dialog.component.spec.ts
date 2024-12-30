@@ -12,8 +12,11 @@ describe('RotateConfirmDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [RotateConfirmDialogComponent, SafeHtmlPipe],
-      imports: [NgxBootstrapIconsModule.pick(allIcons)],
+      imports: [
+        NgxBootstrapIconsModule.pick(allIcons),
+        RotateConfirmDialogComponent,
+        SafeHtmlPipe,
+      ],
       providers: [
         NgbActiveModal,
         SafeHtmlPipe,

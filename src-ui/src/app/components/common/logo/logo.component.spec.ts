@@ -14,8 +14,7 @@ describe('LogoComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [LogoComponent],
-      imports: [],
+      imports: [LogoComponent],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),

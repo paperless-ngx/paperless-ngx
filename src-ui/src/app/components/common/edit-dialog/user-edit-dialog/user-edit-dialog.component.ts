@@ -1,5 +1,10 @@
 import { Component, OnInit } from '@angular/core'
-import { FormControl, FormGroup } from '@angular/forms'
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { first } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
@@ -10,12 +15,23 @@ import { GroupService } from 'src/app/services/rest/group.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { PasswordComponent } from '../../input/password/password.component'
+import { SelectComponent } from '../../input/select/select.component'
+import { TextComponent } from '../../input/text/text.component'
+import { PermissionsSelectComponent } from '../../permissions-select/permissions-select.component'
 
 @Component({
   selector: 'pngx-user-edit-dialog',
   templateUrl: './user-edit-dialog.component.html',
   styleUrls: ['./user-edit-dialog.component.scss'],
-  standalone: false,
+  imports: [
+    PermissionsSelectComponent,
+    SelectComponent,
+    TextComponent,
+    PasswordComponent,
+    FormsModule,
+    ReactiveFormsModule,
+  ],
 })
 export class UserEditDialogComponent
   extends EditDialogComponent<User>

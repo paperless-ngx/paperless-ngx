@@ -1,5 +1,10 @@
 import { Component, Input, forwardRef } from '@angular/core'
-import { NG_VALUE_ACCESSOR } from '@angular/forms'
+import {
+  FormsModule,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
+} from '@angular/forms'
+import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
@@ -13,7 +18,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-textarea',
   templateUrl: './textarea.component.html',
   styleUrls: ['./textarea.component.scss'],
-  standalone: false,
+  imports: [FormsModule, ReactiveFormsModule, SafeHtmlPipe],
 })
 export class TextAreaComponent extends AbstractInputComponent<string> {
   @Input()

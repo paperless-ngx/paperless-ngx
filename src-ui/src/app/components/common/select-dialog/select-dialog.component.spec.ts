@@ -12,9 +12,14 @@ describe('SelectDialogComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [SelectDialogComponent, SelectComponent],
       providers: [NgbActiveModal],
-      imports: [NgSelectModule, FormsModule, ReactiveFormsModule],
+      imports: [
+        NgSelectModule,
+        FormsModule,
+        ReactiveFormsModule,
+        SelectDialogComponent,
+        SelectComponent,
+      ],
     }).compileComponents()
 
     modal = TestBed.inject(NgbActiveModal)

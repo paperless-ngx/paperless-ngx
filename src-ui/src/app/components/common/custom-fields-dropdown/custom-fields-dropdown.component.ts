@@ -8,7 +8,9 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first, takeUntil } from 'rxjs'
 import { CustomField, DATA_TYPE_LABELS } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
@@ -26,7 +28,12 @@ import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit
   selector: 'pngx-custom-fields-dropdown',
   templateUrl: './custom-fields-dropdown.component.html',
   styleUrls: ['./custom-fields-dropdown.component.scss'],
-  standalone: false,
+  imports: [
+    NgbDropdownModule,
+    NgxBootstrapIconsModule,
+    FormsModule,
+    ReactiveFormsModule,
+  ],
 })
 export class CustomFieldsDropdownComponent extends LoadingComponentWithPermissions {
   @Input()

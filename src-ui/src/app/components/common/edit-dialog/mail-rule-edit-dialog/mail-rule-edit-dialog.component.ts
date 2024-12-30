@@ -1,5 +1,10 @@
 import { Component } from '@angular/core'
-import { FormControl, FormGroup } from '@angular/forms'
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { first } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
@@ -20,6 +25,12 @@ import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { CheckComponent } from '../../input/check/check.component'
+import { NumberComponent } from '../../input/number/number.component'
+import { SelectComponent } from '../../input/select/select.component'
+import { SwitchComponent } from '../../input/switch/switch.component'
+import { TagsComponent } from '../../input/tags/tags.component'
+import { TextComponent } from '../../input/text/text.component'
 
 const ATTACHMENT_TYPE_OPTIONS = [
   {
@@ -108,7 +119,16 @@ const METADATA_CORRESPONDENT_OPTIONS = [
   selector: 'pngx-mail-rule-edit-dialog',
   templateUrl: './mail-rule-edit-dialog.component.html',
   styleUrls: ['./mail-rule-edit-dialog.component.scss'],
-  standalone: false,
+  imports: [
+    SelectComponent,
+    TagsComponent,
+    CheckComponent,
+    TextComponent,
+    NumberComponent,
+    SwitchComponent,
+    FormsModule,
+    ReactiveFormsModule,
+  ],
 })
 export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
   accounts: MailAccount[]

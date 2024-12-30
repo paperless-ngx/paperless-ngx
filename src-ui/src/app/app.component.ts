@@ -1,7 +1,9 @@
 import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core'
-import { Router } from '@angular/router'
-import { TourService } from 'ngx-ui-tour-ng-bootstrap'
+import { Router, RouterOutlet } from '@angular/router'
+import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { first, Subscription } from 'rxjs'
+import { ToastsComponent } from './components/common/toasts/toasts.component'
+import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { SETTINGS_KEYS } from './data/ui-settings'
 import { ConsumerStatusService } from './services/consumer-status.service'
 import { HotKeyService } from './services/hot-key.service'
@@ -18,7 +20,12 @@ import { ToastService } from './services/toast.service'
   selector: 'pngx-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  standalone: false,
+  imports: [
+    FileDropComponent,
+    ToastsComponent,
+    TourNgBootstrapModule,
+    RouterOutlet,
+  ],
 })
 export class AppComponent implements OnInit, OnDestroy {
   newDocumentSubscription: Subscription

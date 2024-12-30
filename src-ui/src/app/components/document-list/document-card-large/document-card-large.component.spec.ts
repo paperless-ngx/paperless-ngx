@@ -43,7 +43,12 @@ describe('DocumentCardLargeComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        RouterTestingModule,
+        NgbPopoverModule,
+        NgbTooltipModule,
+        NgbProgressbarModule,
+        NgxBootstrapIconsModule.pick(allIcons),
         DocumentCardLargeComponent,
         DocumentTitlePipe,
         CustomDatePipe,
@@ -52,13 +57,6 @@ describe('DocumentCardLargeComponent', () => {
         IsNumberPipe,
         PreviewPopupComponent,
         CustomFieldDisplayComponent,
-      ],
-      imports: [
-        RouterTestingModule,
-        NgbPopoverModule,
-        NgbTooltipModule,
-        NgbProgressbarModule,
-        NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         DatePipe,

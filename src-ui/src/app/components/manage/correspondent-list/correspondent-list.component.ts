@@ -1,7 +1,12 @@
+import { NgClass, TitleCasePipe } from '@angular/common'
 import { Component } from '@angular/core'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { NgbModal, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Correspondent } from 'src/app/data/correspondent'
 import { FILTER_HAS_CORRESPONDENT_ANY } from 'src/app/data/filter-rule-type'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
@@ -11,6 +16,7 @@ import {
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
+import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { ManagementListComponent } from '../management-list/management-list.component'
 
 @Component({
@@ -18,7 +24,17 @@ import { ManagementListComponent } from '../management-list/management-list.comp
   templateUrl: './../management-list/management-list.component.html',
   styleUrls: ['./../management-list/management-list.component.scss'],
   providers: [{ provide: CustomDatePipe }],
-  standalone: false,
+  imports: [
+    SortableDirective,
+    IfPermissionsDirective,
+    PageHeaderComponent,
+    TitleCasePipe,
+    FormsModule,
+    ReactiveFormsModule,
+    NgClass,
+    NgbPaginationModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class CorrespondentListComponent extends ManagementListComponent<Correspondent> {
   constructor(

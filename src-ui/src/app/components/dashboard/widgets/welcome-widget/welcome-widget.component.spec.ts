@@ -11,9 +11,8 @@ describe('WelcomeWidgetComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [WelcomeWidgetComponent, WidgetFrameComponent],
       providers: [PermissionsGuard],
-      imports: [NgbAlertModule],
+      imports: [NgbAlertModule, WelcomeWidgetComponent, WidgetFrameComponent],
     }).compileComponents()
 
     fixture = TestBed.createComponent(WelcomeWidgetComponent)

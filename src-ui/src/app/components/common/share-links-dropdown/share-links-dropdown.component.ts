@@ -1,5 +1,8 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { Component, Input, OnInit } from '@angular/core'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first } from 'rxjs'
 import { FileVersion, ShareLink } from 'src/app/data/share-link'
 import { ShareLinkService } from 'src/app/services/rest/share-link.service'
@@ -10,7 +13,12 @@ import { environment } from 'src/environments/environment'
   selector: 'pngx-share-links-dropdown',
   templateUrl: './share-links-dropdown.component.html',
   styleUrls: ['./share-links-dropdown.component.scss'],
-  standalone: false,
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    NgbDropdownModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class ShareLinksDropdownComponent implements OnInit {
   EXPIRATION_OPTIONS = [

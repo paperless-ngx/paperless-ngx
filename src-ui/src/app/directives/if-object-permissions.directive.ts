@@ -15,7 +15,6 @@ import {
 
 @Directive({
   selector: '[pngxIfObjectPermissions]',
-  standalone: false,
 })
 export class IfObjectPermissionsDirective implements OnInit, OnChanges {
   // The role the user must have

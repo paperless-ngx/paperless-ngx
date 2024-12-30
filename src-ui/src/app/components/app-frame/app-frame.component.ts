@@ -2,17 +2,29 @@ import {
   CdkDragDrop,
   CdkDragEnd,
   CdkDragStart,
+  DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
+import { NgClass } from '@angular/common'
 import { Component, HostListener, OnInit } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { ActivatedRoute, Router, RouterModule } from '@angular/router'
+import {
+  NgbCollapseModule,
+  NgbDropdownModule,
+  NgbModal,
+  NgbNavModule,
+  NgbPopoverModule,
+} from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { Observable } from 'rxjs'
 import { first } from 'rxjs/operators'
 import { Document } from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { ComponentCanDeactivate } from 'src/app/guards/dirty-doc.guard'
+import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import {
   DjangoMessageLevel,
   DjangoMessagesService,
@@ -35,12 +47,26 @@ import { environment } from 'src/environments/environment'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
+import { GlobalSearchComponent } from './global-search/global-search.component'
 
 @Component({
   selector: 'pngx-app-frame',
   templateUrl: './app-frame.component.html',
   styleUrls: ['./app-frame.component.scss'],
-  standalone: false,
+  imports: [
+    GlobalSearchComponent,
+    DocumentTitlePipe,
+    IfPermissionsDirective,
+    RouterModule,
+    NgClass,
+    NgbDropdownModule,
+    NgbPopoverModule,
+    NgbCollapseModule,
+    NgbNavModule,
+    NgxBootstrapIconsModule,
+    DragDropModule,
+    TourNgBootstrapModule,
+  ],
 })
 export class AppFrameComponent
   extends ComponentWithPermissions

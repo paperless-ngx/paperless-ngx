@@ -1,6 +1,15 @@
+import { AsyncPipe } from '@angular/common'
 import { Component, OnDestroy, OnInit } from '@angular/core'
-import { AbstractControl, FormControl, FormGroup } from '@angular/forms'
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms'
+import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
 import { DirtyComponent, dirtyCheck } from '@ngneat/dirty-check-forms'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import {
   BehaviorSubject,
   Observable,
@@ -18,13 +27,31 @@ import {
 import { ConfigService } from 'src/app/services/config.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { FileComponent } from '../../common/input/file/file.component'
+import { NumberComponent } from '../../common/input/number/number.component'
+import { SelectComponent } from '../../common/input/select/select.component'
+import { SwitchComponent } from '../../common/input/switch/switch.component'
+import { TextComponent } from '../../common/input/text/text.component'
+import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
   selector: 'pngx-config',
   templateUrl: './config.component.html',
   styleUrl: './config.component.scss',
-  standalone: false,
+  imports: [
+    PageHeaderComponent,
+    SelectComponent,
+    SwitchComponent,
+    TextComponent,
+    NumberComponent,
+    FileComponent,
+    AsyncPipe,
+    NgbNavModule,
+    FormsModule,
+    ReactiveFormsModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class ConfigComponent
   extends LoadingComponentWithPermissions

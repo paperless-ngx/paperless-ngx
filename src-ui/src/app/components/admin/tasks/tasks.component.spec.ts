@@ -119,18 +119,16 @@ describe('TasksComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        TasksComponent,
-        PageHeaderComponent,
-        IfPermissionsDirective,
-        CustomDatePipe,
-        ConfirmDialogComponent,
-      ],
       imports: [
         NgbModule,
         RouterTestingModule.withRoutes(routes),
         NgxBootstrapIconsModule.pick(allIcons),
         FormsModule,
+        TasksComponent,
+        PageHeaderComponent,
+        IfPermissionsDirective,
+        CustomDatePipe,
+        ConfirmDialogComponent,
       ],
       providers: [
         {

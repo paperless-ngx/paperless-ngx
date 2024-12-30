@@ -2,7 +2,7 @@
   <div content tourAnchor="tour.upload-widget">
     <form class="justify-content-center d-flex flex-column align-items-center py-3 px-2">
       <span class="text-muted" i18n>Drop documents anywhere or</span>
-      <button class="btn btn-sm btn-outline-primary mt-3" (click)="fileUpload.click()" i18n>Browse files</button>
+      <button type="button" class="btn btn-sm btn-outline-primary mt-3" (click)="fileUpload.click()" i18n>Browse files</button>
       <input type="file" class="visually-hidden" (change)="onFileSelected($event)" multiple #fileUpload>
     </form>
     @if (getStatus().length > 0) {

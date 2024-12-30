@@ -28,15 +28,13 @@ describe('StatisticsWidgetComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        StatisticsWidgetComponent,
-        WidgetFrameComponent,
-        IfPermissionsDirective,
-      ],
       imports: [
         NgbModule,
         RouterTestingModule.withRoutes(routes),
         DragDropModule,
+        StatisticsWidgetComponent,
+        WidgetFrameComponent,
+        IfPermissionsDirective,
       ],
       providers: [
         PermissionsGuard,

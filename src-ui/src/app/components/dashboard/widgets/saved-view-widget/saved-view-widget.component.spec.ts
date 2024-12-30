@@ -117,7 +117,11 @@ describe('SavedViewWidgetComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        NgbModule,
+        RouterTestingModule.withRoutes(routes),
+        DragDropModule,
+        NgxBootstrapIconsModule.pick(allIcons),
         SavedViewWidgetComponent,
         WidgetFrameComponent,
         IfPermissionsDirective,
@@ -126,12 +130,6 @@ describe('SavedViewWidgetComponent', () => {
         SafeUrlPipe,
         PreviewPopupComponent,
         CustomFieldDisplayComponent,
-      ],
-      imports: [
-        NgbModule,
-        RouterTestingModule.withRoutes(routes),
-        DragDropModule,
-        NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         PermissionsGuard,

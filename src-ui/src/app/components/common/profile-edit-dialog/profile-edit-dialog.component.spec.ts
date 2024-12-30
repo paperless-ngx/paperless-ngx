@@ -49,12 +49,6 @@ describe('ProfileEditDialogComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        ProfileEditDialogComponent,
-        TextComponent,
-        PasswordComponent,
-        ConfirmButtonComponent,
-      ],
       imports: [
         ReactiveFormsModule,
         FormsModule,
@@ -62,6 +56,10 @@ describe('ProfileEditDialogComponent', () => {
         NgbAccordionModule,
         NgxBootstrapIconsModule.pick(allIcons),
         NgbPopoverModule,
+        ProfileEditDialogComponent,
+        TextComponent,
+        PasswordComponent,
+        ConfirmButtonComponent,
       ],
       providers: [NgbActiveModal, provideHttpClient(withInterceptorsFromDi())],
     })

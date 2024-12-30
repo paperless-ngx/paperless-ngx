@@ -13,11 +13,11 @@ describe('EntriesComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [EntriesComponent],
       imports: [
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        EntriesComponent,
       ],
     }).compileComponents()
   })
