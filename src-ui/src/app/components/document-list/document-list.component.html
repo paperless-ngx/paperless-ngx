@@ -262,9 +262,14 @@
                   Shared
                 </th>
               }
-              @for (field of activeDisplayCustomFields; track field) {
-                <th>
-                  {{getDisplayCustomFieldTitle(field)}}
+              @for (field_id of activeDisplayCustomFields; track field_id) {
+                <th class="cursor-pointer"
+                  pngxSortable="{{field_id}}"
+                  title="Sort by {{getDisplayCustomFieldTitle(field_id)}}" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)">
+                  {{getDisplayCustomFieldTitle(field_id)}}
                 </th>
               }
             </tr>
