@@ -528,11 +528,11 @@
                 "socialaccount"
             ],
             "hashes": [
-                "sha256:92e0242724af03458b05b88c5fa798b01112ab22a86d873a8a9fd8f0ec57bbbf"
+                "sha256:e02e951b71a2753a746459f2efa114c7c72bf2cef6887dbe8607a577c0350587"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==65.3.0"
+            "version": "==65.3.1"
         },
         "django-auditlog": {
             "hashes": [
@@ -2211,11 +2211,11 @@
         },
         "sqlparse": {
             "hashes": [
-                "sha256:9e37b35e16d1cc652a2545f0997c1deb23ea28fa1f3eefe609eee3063c3b105f",
-                "sha256:e99bc85c78160918c3e1d9230834ab8d80fc06c59d03f8db2618f65f65dda55e"
+                "sha256:09f67787f56a0b16ecdbde1bfc7f5d9c3371ca683cfeaa8e6ff60b4807ec9272",
+                "sha256:cf2196ed3418f3ba5de6af7e82c694a9fbdbfecccdfc72e281548517081f16ca"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==0.5.2"
+            "version": "==0.5.3"
         },
         "threadpoolctl": {
             "hashes": [
