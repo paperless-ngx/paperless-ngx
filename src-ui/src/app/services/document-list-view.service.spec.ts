@@ -156,7 +156,7 @@ describe('DocumentListViewService', () => {
     expect(documentListViewService.currentPage).toEqual(1)
   })
 
-  it('should handle error on filtering request', () => {
+  it('should handle object error on filtering request', () => {
     documentListViewService.currentPage = 1
     const tags__id__in = 'hello'
     const filterRulesAny = [
@@ -178,6 +178,50 @@ describe('DocumentListViewService', () => {
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
     )
     expect(req.request.method).toEqual('GET')
+    // reset the list
+    documentListViewService.filterRules = []
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
+    )
+  })
+
+  it('should handle object error on filtering request for custom field sorts', () => {
+    documentListViewService.currentPage = 1
+    documentListViewService.sortField = 'custom_field_999'
+    let req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-custom_field_999&truncate_content=true`
+    )
+    expect(req.request.method).toEqual('GET')
+    req.flush(
+      { custom_field_999: ['Custom field not found'] },
+      { status: 400, statusText: 'Unexpected error' }
+    )
+    expect(documentListViewService.error).toEqual(
+      'custom_field_999: Custom field not found'
+    )
+    // reset the list
+    documentListViewService.sortField = 'created'
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
+    )
+  })
+
+  it('should handle string error on filtering request', () => {
+    documentListViewService.currentPage = 1
+    const tags__id__in = 'hello'
+    const filterRulesAny = [
+      {
+        rule_type: FILTER_HAS_TAGS_ANY,
+        value: tags__id__in,
+      },
+    ]
+    documentListViewService.filterRules = filterRulesAny
+    let req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&tags__id__in=${tags__id__in}`
+    )
+    expect(req.request.method).toEqual('GET')
+    req.flush('Generic error', { status: 404, statusText: 'Unexpected error' })
+    expect(documentListViewService.error).toEqual('Generic error')
     // reset the list
     documentListViewService.filterRules = []
     req = httpTestingController.expectOne(

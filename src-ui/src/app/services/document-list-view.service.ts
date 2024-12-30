@@ -307,18 +307,23 @@ export class DocumentListViewService {
             activeListViewState.currentPage = 1
             this.reload()
           } else {
+            console.log(error)
+
             this.selectionData = null
             let errorMessage
             if (
-              typeof error.error !== 'string' &&
+              typeof error.error === 'object' &&
               Object.keys(error.error).length > 0
             ) {
               // e.g. { archive_serial_number: Array<string> }
               errorMessage = Object.keys(error.error)
                 .map((fieldName) => {
+                  const fieldNameBase = fieldName.split('__')[0]
                   const fieldError: Array<string> = error.error[fieldName]
                   return `${
-                    this.sortFields.find((f) => f.field == fieldName)?.name
+                    this.sortFields.find(
+                      (f) => f.field?.split('__')[0] == fieldNameBase
+                    )?.name ?? fieldNameBase
                   }: ${fieldError[0]}`
                 })
                 .join(', ')

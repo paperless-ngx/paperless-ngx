@@ -4,7 +4,8 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { TestBed } from '@angular/core/testing'
-import { Subscription } from 'rxjs'
+import { of, Subscription } from 'rxjs'
+import { CustomFieldDataType } from 'src/app/data/custom-field'
 import {
   DOCUMENT_SORT_FIELDS,
   DOCUMENT_SORT_FIELDS_FULLTEXT,
@@ -14,12 +15,15 @@ import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { environment } from 'src/environments/environment'
 import { PermissionsService } from '../permissions.service'
 import { SettingsService } from '../settings.service'
+import { CustomFieldsService } from './custom-fields.service'
 import { DocumentService } from './document.service'
 
 let httpTestingController: HttpTestingController
 let service: DocumentService
 let subscription: Subscription
 let settingsService: SettingsService
+let permissionsService: PermissionsService
+let customFieldsService: CustomFieldsService
 
 const endpoint = 'documents'
 const documents = [
@@ -55,8 +59,29 @@ beforeEach(() => {
   })
 
   httpTestingController = TestBed.inject(HttpTestingController)
-  service = TestBed.inject(DocumentService)
   settingsService = TestBed.inject(SettingsService)
+  customFieldsService = TestBed.inject(CustomFieldsService)
+  permissionsService = TestBed.inject(PermissionsService)
+  jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+  jest.spyOn(customFieldsService, 'listAll').mockReturnValue(
+    of({
+      all: [1, 2, 3],
+      count: 3,
+      results: [
+        {
+          id: 1,
+          name: 'Custom Field 1',
+          data_type: CustomFieldDataType.String,
+        },
+        {
+          id: 2,
+          name: 'Custom Field 2',
+          data_type: CustomFieldDataType.Integer,
+        },
+      ],
+    })
+  )
+  service = TestBed.inject(DocumentService)
 })
 
 describe(`DocumentService`, () => {
@@ -289,18 +314,25 @@ describe(`DocumentService`, () => {
 it('should construct sort fields respecting permissions', () => {
   expect(
     service.sortFields.find((f) => f.field === 'correspondent__name')
-  ).toBeUndefined()
+  ).not.toBeUndefined()
   expect(
     service.sortFields.find((f) => f.field === 'document_type__name')
-  ).toBeUndefined()
+  ).not.toBeUndefined()
+  expect(
+    service.sortFields.find((f) => f.field === 'owner')
+  ).not.toBeUndefined()
 
-  const permissionsService: PermissionsService =
-    TestBed.inject(PermissionsService)
-  jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+  jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(false)
   service['setupSortFields']()
-  expect(service.sortFields).toEqual(DOCUMENT_SORT_FIELDS)
+  const fields = DOCUMENT_SORT_FIELDS.filter(
+    (f) =>
+      ['correspondent__name', 'document_type__name', 'owner'].indexOf(
+        f.field
+      ) === -1
+  )
+  expect(service.sortFields).toEqual(fields)
   expect(service.sortFieldsFullText).toEqual([
-    ...DOCUMENT_SORT_FIELDS,
+    ...fields,
     ...DOCUMENT_SORT_FIELDS_FULLTEXT,
   ])
 
@@ -309,6 +341,38 @@ it('should construct sort fields respecting permissions', () => {
   expect(
     service.sortFields.find((f) => f.field === 'num_notes')
   ).toBeUndefined()
+})
+
+it('should include custom fields in sort fields if user has permission', () => {
+  const permissionsService: PermissionsService =
+    TestBed.inject(PermissionsService)
+  jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+
+  service['customFields'] = [
+    {
+      id: 1,
+      name: 'Custom Field 1',
+      data_type: CustomFieldDataType.String,
+    },
+    {
+      id: 2,
+      name: 'Custom Field 2',
+      data_type: CustomFieldDataType.Integer,
+    },
+  ]
+
+  service['setupSortFields']()
+  expect(service.sortFields).toEqual([
+    ...DOCUMENT_SORT_FIELDS,
+    {
+      field: 'custom_field_1',
+      name: 'Custom Field 1',
+    },
+    {
+      field: 'custom_field_2',
+      name: 'Custom Field 2',
+    },
+  ])
 })
 
 afterEach(() => {
