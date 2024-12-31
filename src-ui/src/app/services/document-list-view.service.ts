@@ -307,8 +307,6 @@ export class DocumentListViewService {
             activeListViewState.currentPage = 1
             this.reload()
           } else {
-            console.log(error)
-
             this.selectionData = null
             let errorMessage
             if (
