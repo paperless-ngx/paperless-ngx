@@ -39,10 +39,12 @@ describe('CustomDatePipe', () => {
     const now = new Date()
     const notNow = new Date(now)
     notNow.setDate(now.getDate() - 1)
-    expect(datePipe.transform(notNow, 'relative')).toEqual('1 day ago')
+    expect(datePipe.transform(notNow, 'relative')).toEqual('Yesterday')
     notNow.setDate(now.getDate())
     notNow.setMonth(now.getMonth() - 1)
-    expect(datePipe.transform(notNow, 'relative')).toEqual('1 month ago')
+    expect(datePipe.transform(notNow, 'relative')).toEqual(
+      now.getMonth() > 1 ? 'Last month' : 'Last year'
+    )
     expect(datePipe.transform(now, 'relative')).toEqual('Just now')
   })
 })
