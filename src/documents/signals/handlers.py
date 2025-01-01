@@ -10,10 +10,6 @@ from celery.signals import task_failure
 from celery.signals import task_postrun
 from celery.signals import task_prerun
 from django.conf import settings
-from django.contrib.admin.models import ADDITION
-from django.contrib.admin.models import LogEntry
-from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
 from django.core.mail import EmailMessage
 from django.db import DatabaseError
 from django.db import close_old_connections
@@ -535,20 +531,6 @@ def check_paths_and_prune_custom_fields(sender, instance: CustomField, **kwargs)
                 cf_instance.value_select = None
                 cf_instance.save()
             update_filename_and_move_files(sender, cf_instance)
-
-
-def set_log_entry(sender, document: Document, logging_group=None, **kwargs):
-    ct = ContentType.objects.get(model="document")
-    user = User.objects.get(username="consumer")
-
-    LogEntry.objects.create(
-        action_flag=ADDITION,
-        action_time=timezone.now(),
-        content_type=ct,
-        object_id=document.pk,
-        user=user,
-        object_repr=document.__str__(),
-    )
 
 
 def add_to_index(sender, document, **kwargs):
