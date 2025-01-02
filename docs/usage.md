@@ -197,6 +197,11 @@ different means. These are as follows:
     "Unknown mail document" tag to consumed documents so you can inspect
     them further.
 
+!!! tip
+
+    Outlook users may need to change the character set of their mail account in 
+    Paperless-ngx to US-ASCII from the default UTF-8 in order to process emails.
+
 Paperless is set up to check your mails every 10 minutes. This can be
 configured via [`PAPERLESS_EMAIL_TASK_CRON`](configuration.md#PAPERLESS_EMAIL_TASK_CRON)
 
