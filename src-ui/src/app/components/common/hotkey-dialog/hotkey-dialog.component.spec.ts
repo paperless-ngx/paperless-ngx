@@ -29,7 +29,7 @@ describe('HotkeyDialogComponent', () => {
   })
 
   it('should format keys', () => {
-    expect(component.formatKey('control.a')).toEqual('&#8963; + a') // ⌃ + a
-    expect(component.formatKey('control.a', true)).toEqual('&#8984; + a') // ⌘ + a
+    expect(component.formatKey('control.a')).toEqual('&#8963; a') // ⌃ + a
+    expect(component.formatKey('control.a', true)).toEqual('&#8984; a') // ⌘ + a
   })
 })
