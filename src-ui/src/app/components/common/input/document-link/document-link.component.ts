@@ -1,5 +1,13 @@
+import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
 import { Component, forwardRef, Input, OnDestroy, OnInit } from '@angular/core'
-import { NG_VALUE_ACCESSOR } from '@angular/forms'
+import {
+  FormsModule,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
+} from '@angular/forms'
+import { RouterModule } from '@angular/router'
+import { NgSelectModule } from '@ng-select/ng-select'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import {
   catchError,
   concat,
@@ -14,6 +22,7 @@ import {
 } from 'rxjs'
 import { Document } from 'src/app/data/document'
 import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { AbstractInputComponent } from '../abstract-input'
 
@@ -28,6 +37,16 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-document-link',
   templateUrl: './document-link.component.html',
   styleUrls: ['./document-link.component.scss'],
+  imports: [
+    CustomDatePipe,
+    AsyncPipe,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
+    NgTemplateOutlet,
+    NgSelectModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class DocumentLinkComponent
   extends AbstractInputComponent<any[]>

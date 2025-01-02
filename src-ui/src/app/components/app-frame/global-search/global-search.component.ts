@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common'
 import {
   Component,
   ElementRef,
@@ -6,8 +7,15 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
-import { NgbDropdown, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
+import {
+  NgbDropdown,
+  NgbDropdownModule,
+  NgbModal,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, debounceTime, distinctUntilChanged, filter } from 'rxjs'
 import { DataType } from 'src/app/data/datatype'
 import {
@@ -20,6 +28,7 @@ import {
 } from 'src/app/data/filter-rule-type'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { GlobalSearchType, SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { HotKeyService } from 'src/app/services/hot-key.service'
 import {
@@ -50,6 +59,14 @@ import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-e
   selector: 'pngx-global-search',
   templateUrl: './global-search.component.html',
   styleUrl: './global-search.component.scss',
+  imports: [
+    CustomDatePipe,
+    FormsModule,
+    ReactiveFormsModule,
+    NgxBootstrapIconsModule,
+    NgbDropdownModule,
+    NgTemplateOutlet,
+  ],
 })
 export class GlobalSearchComponent implements OnInit {
   public DataType = DataType

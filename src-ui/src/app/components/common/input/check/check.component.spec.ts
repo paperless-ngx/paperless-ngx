@@ -13,9 +13,8 @@ describe('CheckComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [CheckComponent],
       providers: [],
-      imports: [FormsModule, ReactiveFormsModule],
+      imports: [FormsModule, ReactiveFormsModule, CheckComponent],
     }).compileComponents()
 
     fixture = TestBed.createComponent(CheckComponent)

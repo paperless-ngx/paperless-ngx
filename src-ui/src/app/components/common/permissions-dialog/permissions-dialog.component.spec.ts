@@ -35,7 +35,11 @@ describe('PermissionsDialogComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        NgSelectModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NgbModule,
         PermissionsDialogComponent,
         SafeHtmlPipe,
         SelectComponent,
@@ -44,7 +48,6 @@ describe('PermissionsDialogComponent', () => {
         PermissionsUserComponent,
         PermissionsGroupComponent,
       ],
-      imports: [NgSelectModule, FormsModule, ReactiveFormsModule, NgbModule],
       providers: [
         NgbActiveModal,
         {

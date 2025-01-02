@@ -19,8 +19,12 @@ describe('PermissionsGroupComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [PermissionsGroupComponent],
-      imports: [FormsModule, ReactiveFormsModule, NgSelectModule],
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        PermissionsGroupComponent,
+      ],
       providers: [
         GroupService,
         provideHttpClient(withInterceptorsFromDi()),

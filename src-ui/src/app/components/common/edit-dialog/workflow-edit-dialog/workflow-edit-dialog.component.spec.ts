@@ -77,7 +77,11 @@ describe('WorkflowEditDialogComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        NgbModule,
         WorkflowEditDialogComponent,
         IfPermissionsDirective,
         IfOwnerDirective,
@@ -91,7 +95,6 @@ describe('WorkflowEditDialogComponent', () => {
         SafeHtmlPipe,
         ConfirmButtonComponent,
       ],
-      imports: [FormsModule, ReactiveFormsModule, NgSelectModule, NgbModule],
       providers: [
         NgbActiveModal,
         {

@@ -70,7 +70,14 @@ describe('MailComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        NgbModule,
+        RouterTestingModule.withRoutes(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        NgbAlertModule,
+        NgSelectModule,
+        NgxBootstrapIconsModule.pick(allIcons),
         MailComponent,
         PageHeaderComponent,
         IfPermissionsDirective,
@@ -91,15 +98,6 @@ describe('MailComponent', () => {
         PermissionsDialogComponent,
         PermissionsFormComponent,
         SwitchComponent,
-      ],
-      imports: [
-        NgbModule,
-        RouterTestingModule.withRoutes(routes),
-        FormsModule,
-        ReactiveFormsModule,
-        NgbAlertModule,
-        NgSelectModule,
-        NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         CustomDatePipe,

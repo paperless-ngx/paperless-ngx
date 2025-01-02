@@ -23,7 +23,12 @@ describe('TagEditDialogComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        NgbModule,
+        NgxBootstrapIconsModule.pick(allIcons),
         TagEditDialogComponent,
         IfPermissionsDirective,
         IfOwnerDirective,
@@ -32,13 +37,6 @@ describe('TagEditDialogComponent', () => {
         PermissionsFormComponent,
         ColorComponent,
         CheckComponent,
-      ],
-      imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        NgSelectModule,
-        NgbModule,
-        NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         NgbActiveModal,

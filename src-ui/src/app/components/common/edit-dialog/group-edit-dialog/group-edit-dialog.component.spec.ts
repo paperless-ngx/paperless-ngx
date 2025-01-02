@@ -22,7 +22,12 @@ describe('GroupEditDialogComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        NgbModule,
+        NgxBootstrapIconsModule.pick(allIcons),
         GroupEditDialogComponent,
         IfPermissionsDirective,
         IfOwnerDirective,
@@ -30,13 +35,6 @@ describe('GroupEditDialogComponent', () => {
         TextComponent,
         PermissionsFormComponent,
         PermissionsSelectComponent,
-      ],
-      imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        NgSelectModule,
-        NgbModule,
-        NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         NgbActiveModal,

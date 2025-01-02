@@ -1,11 +1,16 @@
+import { KeyValuePipe } from '@angular/common'
 import { Component, forwardRef, Input, OnInit } from '@angular/core'
 import {
   AbstractControl,
   ControlValueAccessor,
   FormControl,
   FormGroup,
+  FormsModule,
   NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
 } from '@angular/forms'
+import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import {
   PermissionAction,
@@ -26,6 +31,13 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
   selector: 'pngx-permissions-select',
   templateUrl: './permissions-select.component.html',
   styleUrls: ['./permissions-select.component.scss'],
+  imports: [
+    KeyValuePipe,
+    NgxBootstrapIconsModule,
+    NgbPopoverModule,
+    FormsModule,
+    ReactiveFormsModule,
+  ],
 })
 export class PermissionsSelectComponent
   extends ComponentWithPermissions

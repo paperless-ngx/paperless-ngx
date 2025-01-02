@@ -1,7 +1,18 @@
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop'
+import {
+  CdkDragDrop,
+  DragDropModule,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop'
+import { NgTemplateOutlet } from '@angular/common'
 import { Component, OnInit } from '@angular/core'
-import { FormArray, FormControl, FormGroup } from '@angular/forms'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import {
+  FormArray,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms'
+import { NgbAccordionModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { first } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
@@ -33,6 +44,15 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ConfirmButtonComponent } from '../../confirm-button/confirm-button.component'
+import { NumberComponent } from '../../input/number/number.component'
+import { PermissionsGroupComponent } from '../../input/permissions/permissions-group/permissions-group.component'
+import { PermissionsUserComponent } from '../../input/permissions/permissions-user/permissions-user.component'
+import { SelectComponent } from '../../input/select/select.component'
+import { SwitchComponent } from '../../input/switch/switch.component'
+import { TagsComponent } from '../../input/tags/tags.component'
+import { TextComponent } from '../../input/text/text.component'
+import { TextAreaComponent } from '../../input/textarea/textarea.component'
 import { EditDialogComponent } from '../edit-dialog.component'
 
 export const DOCUMENT_SOURCE_OPTIONS = [
@@ -115,6 +135,22 @@ const TRIGGER_MATCHING_ALGORITHMS = MATCHING_ALGORITHMS.filter(
   selector: 'pngx-workflow-edit-dialog',
   templateUrl: './workflow-edit-dialog.component.html',
   styleUrls: ['./workflow-edit-dialog.component.scss'],
+  imports: [
+    SwitchComponent,
+    NumberComponent,
+    TextComponent,
+    SelectComponent,
+    TextAreaComponent,
+    TagsComponent,
+    PermissionsGroupComponent,
+    PermissionsUserComponent,
+    ConfirmButtonComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    NgbAccordionModule,
+    NgTemplateOutlet,
+    DragDropModule,
+  ],
 })
 export class WorkflowEditDialogComponent
   extends EditDialogComponent<Workflow>

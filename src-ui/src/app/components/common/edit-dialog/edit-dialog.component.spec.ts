@@ -38,6 +38,7 @@ import { EditDialogComponent, EditDialogMode } from './edit-dialog.component'
       <h4 class="modal-title" id="modal-basic-title">{{ getTitle() }}</h4>
     </div>
   `,
+  imports: [FormsModule, ReactiveFormsModule],
 })
 class TestComponent extends EditDialogComponent<Tag> {
   constructor(
@@ -96,8 +97,7 @@ describe('EditDialogComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [TestComponent],
-      imports: [FormsModule, ReactiveFormsModule],
+      imports: [FormsModule, ReactiveFormsModule, TestComponent],
       providers: [
         NgbActiveModal,
         {

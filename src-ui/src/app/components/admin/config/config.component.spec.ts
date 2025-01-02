@@ -29,15 +29,6 @@ describe('ConfigComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [
-        ConfigComponent,
-        TextComponent,
-        SelectComponent,
-        NumberComponent,
-        SwitchComponent,
-        FileComponent,
-        PageHeaderComponent,
-      ],
       imports: [
         BrowserModule,
         NgbModule,
@@ -45,6 +36,13 @@ describe('ConfigComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        ConfigComponent,
+        TextComponent,
+        SelectComponent,
+        NumberComponent,
+        SwitchComponent,
+        FileComponent,
+        PageHeaderComponent,
       ],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),

@@ -12,9 +12,8 @@ describe('ToggleableDropdownButtonComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [ToggleableDropdownButtonComponent, TagComponent],
       providers: [],
-      imports: [],
+      imports: [ToggleableDropdownButtonComponent, TagComponent],
     }).compileComponents()
 
     fixture = TestBed.createComponent(ToggleableDropdownButtonComponent)

@@ -138,13 +138,13 @@ describe('GlobalSearchComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [GlobalSearchComponent],
       imports: [
         NgbModalModule,
         NgbDropdownModule,
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        GlobalSearchComponent,
       ],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),

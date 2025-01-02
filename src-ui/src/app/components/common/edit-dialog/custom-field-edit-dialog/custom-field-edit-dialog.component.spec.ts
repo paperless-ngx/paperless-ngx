@@ -24,20 +24,18 @@ describe('CustomFieldEditDialogComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        CustomFieldEditDialogComponent,
-        IfPermissionsDirective,
-        IfOwnerDirective,
-        SelectComponent,
-        TextComponent,
-        SafeHtmlPipe,
-      ],
       imports: [
         FormsModule,
         ReactiveFormsModule,
         NgSelectModule,
         NgbModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        CustomFieldEditDialogComponent,
+        IfPermissionsDirective,
+        IfOwnerDirective,
+        SelectComponent,
+        TextComponent,
+        SafeHtmlPipe,
       ],
       providers: [
         NgbActiveModal,

@@ -27,16 +27,14 @@ describe('DatesDropdownComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        DatesDropdownComponent,
-        ClearableBadgeComponent,
-        CustomDatePipe,
-      ],
       imports: [
         NgbModule,
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        DatesDropdownComponent,
+        ClearableBadgeComponent,
+        CustomDatePipe,
       ],
       providers: [
         SettingsService,

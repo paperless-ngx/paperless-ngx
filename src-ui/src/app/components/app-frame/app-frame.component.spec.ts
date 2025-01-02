@@ -95,11 +95,6 @@ describe('AppFrameComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        AppFrameComponent,
-        IfPermissionsDirective,
-        GlobalSearchComponent,
-      ],
       imports: [
         BrowserModule,
         RouterTestingModule.withRoutes(routes),
@@ -109,6 +104,9 @@ describe('AppFrameComponent', () => {
         DragDropModule,
         NgbModalModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        AppFrameComponent,
+        IfPermissionsDirective,
+        GlobalSearchComponent,
       ],
       providers: [
         SettingsService,

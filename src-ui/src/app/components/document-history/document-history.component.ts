@@ -1,7 +1,11 @@
+import { AsyncPipe, KeyValuePipe, TitleCasePipe } from '@angular/common'
 import { Component, Input, OnInit } from '@angular/core'
+import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Observable, first, map, of } from 'rxjs'
 import { AuditLogAction, AuditLogEntry } from 'src/app/data/auditlog-entry'
 import { DataType } from 'src/app/data/datatype'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -12,6 +16,14 @@ import { UserService } from 'src/app/services/rest/user.service'
   selector: 'pngx-document-history',
   templateUrl: './document-history.component.html',
   styleUrl: './document-history.component.scss',
+  imports: [
+    CustomDatePipe,
+    NgbTooltipModule,
+    AsyncPipe,
+    KeyValuePipe,
+    TitleCasePipe,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class DocumentHistoryComponent implements OnInit {
   public AuditLogAction = AuditLogAction

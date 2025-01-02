@@ -27,8 +27,7 @@ describe('FileDropComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [FileDropComponent, ToastsComponent],
-      imports: [NgxFileDropModule],
+      imports: [NgxFileDropModule, FileDropComponent, ToastsComponent],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),

@@ -1,5 +1,34 @@
-// bs options
-$enable-negative-margins: true;
+@use "sass:meta";
+// bs variables
+$grid-gutter-width: 1.5rem;
+$border-radius: .375rem;
+$btn-border-width: var(--bs-border-width);
+
+$form-file-button-bg: var(--bs-body-bg);
+$form-file-button-hover-bg: var(--pngx-bg-alt);
+
+@import "node_modules/bootstrap/dist/css/bootstrap.css";
+@include meta.load-css("theme");
+@import "~@ng-select/ng-select/themes/default.theme.css";
+@include meta.load-css("print");
+
+// re-created bootstrap styles
+.mt-n2 {
+  margin-top: -0.5rem;
+}
+.me-n2 {
+  margin-right: -0.5rem;
+}
+.mb-n2 {
+  margin-bottom: -0.5rem;
+}
+.ms-n2 {
+  margin-left: -0.5rem;
+}
+.my-n2 {
+  margin-top: -0.5rem;
+  margin-bottom: -0.5rem;
+}
 
 $grid-breakpoints: (
   xs: 0,
@@ -11,13 +40,22 @@ $grid-breakpoints: (
   xxxl: 2400px
 );
 
-$form-file-button-bg: var(--bs-body-bg);
-$form-file-button-hover-bg: var(--pngx-bg-alt);
+:root {
+  @each $name, $value in $grid-breakpoints {
+    --bs-breakpoint-#{$name}: #{$value};
+  }
+}
 
-@import "node_modules/bootstrap/scss/bootstrap";
-@import "theme";
-@import "~@ng-select/ng-select/themes/default.theme.css";
-@import "print";
+@media (min-width: 2400px) {
+  .col-xxxl-1 {
+    flex: 0 0 auto;
+    width: 8.33333333%;
+  }
+  .col-xxxl-11 {
+    flex: 0 0 auto;
+    width:91.66666667%
+  }
+}
 
 // Paperless-ngx styles
 body {
@@ -731,12 +769,14 @@ canvas.hiddenCanvasElement {
     margin-left: calc(#{$btn-border-width} * -1);
   }
   > .btn {
-    @include border-end-radius(0);
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
   }
 }
 .btn-group pngx-preview-popup:not(:first-child) {
   > .btn {
-    @include border-start-radius(0);
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
   }
 }
 .btn-group pngx-preview-popup {

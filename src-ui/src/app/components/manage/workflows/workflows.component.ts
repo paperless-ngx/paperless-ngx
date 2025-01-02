@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { delay, takeUntil, tap } from 'rxjs'
 import { Workflow } from 'src/app/data/workflow'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -11,12 +14,20 @@ import {
   WORKFLOW_TYPE_OPTIONS,
   WorkflowEditDialogComponent,
 } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
+import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
   selector: 'pngx-workflows',
   templateUrl: './workflows.component.html',
   styleUrls: ['./workflows.component.scss'],
+  imports: [
+    PageHeaderComponent,
+    IfPermissionsDirective,
+    FormsModule,
+    ReactiveFormsModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class WorkflowsComponent
   extends LoadingComponentWithPermissions

@@ -56,8 +56,7 @@ describe('OpenDocumentsService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ConfirmDialogComponent],
-      imports: [],
+      imports: [ConfirmDialogComponent],
       providers: [
         OpenDocumentsService,
         NgbModal,

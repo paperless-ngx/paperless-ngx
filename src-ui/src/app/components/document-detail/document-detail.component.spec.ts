@@ -11,7 +11,6 @@ import {
   fakeAsync,
   tick,
 } from '@angular/core/testing'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import {
   ActivatedRoute,
@@ -22,12 +21,8 @@ import {
 import {
   NgbDateStruct,
   NgbModal,
-  NgbModalModule,
   NgbModalRef,
-  NgbModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgSelectModule } from '@ng-select/ng-select'
-import { PdfViewerModule } from 'ng2-pdf-viewer'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
@@ -47,13 +42,9 @@ import {
 } from 'src/app/data/filter-rule-type'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
-import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
-import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
@@ -68,23 +59,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
-import { DeletePagesConfirmDialogComponent } from '../common/confirm-dialog/delete-pages-confirm-dialog/delete-pages-confirm-dialog.component'
-import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
-import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
-import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
-import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
-import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
-import { DateComponent } from '../common/input/date/date.component'
-import { NumberComponent } from '../common/input/number/number.component'
-import { PermissionsFormComponent } from '../common/input/permissions/permissions-form/permissions-form.component'
-import { SelectComponent } from '../common/input/select/select.component'
-import { TagsComponent } from '../common/input/tags/tags.component'
-import { TextComponent } from '../common/input/text/text.component'
-import { TextAreaComponent } from '../common/input/textarea/textarea.component'
-import { PageHeaderComponent } from '../common/page-header/page-header.component'
-import { ShareLinksDropdownComponent } from '../common/share-links-dropdown/share-links-dropdown.component'
-import { DocumentNotesComponent } from '../document-notes/document-notes.component'
 import { DocumentDetailComponent } from './document-detail.component'
 
 const doc: Document = {
@@ -159,42 +134,10 @@ describe('DocumentDetailComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        DocumentDetailComponent,
-        DocumentTitlePipe,
-        PageHeaderComponent,
-        IfPermissionsDirective,
-        TagsComponent,
-        SelectComponent,
-        TextComponent,
-        NumberComponent,
-        DateComponent,
-        DocumentNotesComponent,
-        CustomDatePipe,
-        DocumentTypeEditDialogComponent,
-        CorrespondentEditDialogComponent,
-        StoragePathEditDialogComponent,
-        IfOwnerDirective,
-        PermissionsFormComponent,
-        SafeHtmlPipe,
-        ConfirmDialogComponent,
-        SafeUrlPipe,
-        ShareLinksDropdownComponent,
-        CustomFieldsDropdownComponent,
-        SplitConfirmDialogComponent,
-        RotateConfirmDialogComponent,
-        DeletePagesConfirmDialogComponent,
-        TextAreaComponent,
-      ],
       imports: [
+        DocumentDetailComponent,
         RouterModule.forRoot(routes),
-        NgbModule,
-        NgSelectModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NgbModalModule,
         NgxBootstrapIconsModule.pick(allIcons),
-        PdfViewerModule,
       ],
       providers: [
         DocumentTitlePipe,

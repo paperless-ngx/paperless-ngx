@@ -10,7 +10,6 @@ import {
   fakeAsync,
   tick,
 } from '@angular/core/testing'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
@@ -30,10 +29,8 @@ describe('ShareLinksDropdownComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ShareLinksDropdownComponent],
       imports: [
-        FormsModule,
-        ReactiveFormsModule,
+        ShareLinksDropdownComponent,
         NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [

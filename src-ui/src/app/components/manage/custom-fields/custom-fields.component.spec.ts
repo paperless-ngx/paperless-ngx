@@ -54,12 +54,6 @@ describe('CustomFieldsComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        CustomFieldsComponent,
-        IfPermissionsDirective,
-        PageHeaderComponent,
-        ConfirmDialogComponent,
-      ],
       imports: [
         NgbPaginationModule,
         FormsModule,
@@ -67,6 +61,10 @@ describe('CustomFieldsComponent', () => {
         NgbModalModule,
         NgbPopoverModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        CustomFieldsComponent,
+        IfPermissionsDirective,
+        PageHeaderComponent,
+        ConfirmDialogComponent,
       ],
       providers: [
         {

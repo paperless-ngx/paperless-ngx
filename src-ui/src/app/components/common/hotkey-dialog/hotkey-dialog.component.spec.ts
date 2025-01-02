@@ -9,7 +9,7 @@ describe('HotkeyDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [HotkeyDialogComponent],
+      imports: [HotkeyDialogComponent],
       providers: [NgbActiveModal],
     }).compileComponents()
 

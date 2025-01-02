@@ -12,8 +12,11 @@ describe('NotFoundComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [NotFoundComponent, LogoComponent],
-      imports: [NgxBootstrapIconsModule.pick(allIcons)],
+      imports: [
+        NgxBootstrapIconsModule.pick(allIcons),
+        NotFoundComponent,
+        LogoComponent,
+      ],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),

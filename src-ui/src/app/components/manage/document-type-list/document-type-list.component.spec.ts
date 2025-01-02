@@ -19,17 +19,15 @@ describe('DocumentTypeListComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        DocumentTypeListComponent,
-        SortableDirective,
-        PageHeaderComponent,
-        IfPermissionsDirective,
-      ],
       imports: [
         NgbPaginationModule,
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        DocumentTypeListComponent,
+        SortableDirective,
+        PageHeaderComponent,
+        IfPermissionsDirective,
       ],
       providers: [
         DatePipe,

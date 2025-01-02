@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common'
 import {
   Component,
   EventEmitter,
@@ -6,12 +7,20 @@ import {
   OnInit,
   Output,
 } from '@angular/core'
-import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import {
+  NgbDateAdapter,
+  NgbDatepickerModule,
+  NgbDropdownModule,
+} from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, Subscription } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import { popperOptionsReenablePreventOverflow } from 'src/app/utils/popper-options'
+import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
 
 export interface DateSelection {
   createdBefore?: string
@@ -34,6 +43,16 @@ export enum RelativeDate {
   templateUrl: './dates-dropdown.component.html',
   styleUrls: ['./dates-dropdown.component.scss'],
   providers: [{ provide: NgbDateAdapter, useClass: ISODateAdapter }],
+  imports: [
+    ClearableBadgeComponent,
+    CustomDatePipe,
+    NgxBootstrapIconsModule,
+    NgbDatepickerModule,
+    NgbDropdownModule,
+    FormsModule,
+    ReactiveFormsModule,
+    NgClass,
+  ],
 })
 export class DatesDropdownComponent implements OnInit, OnDestroy {
   public popperOptions = popperOptionsReenablePreventOverflow

@@ -1,7 +1,4 @@
-$color-mode-type: data;
-
-@import 'bootstrap/scss/mixins/color-mode';
-
+@use "sass:color";
 @mixin paperless-green {
   // base color e.g. #17541f = hsl(128, 57%, 21%)
   --pngx-primary: 128, 57%;
@@ -32,7 +29,7 @@ $color-mode-type: data;
 // Dark text colors allow for maintain contrast with theme color changes
 $text-color-light-bg: #212529;
 $text-color-dark-bg: #abb2bf;
-$text-color-dark-bg-accent: lighten($text-color-dark-bg, 10%);
+$text-color-dark-bg-accent: color.adjust($text-color-dark-bg, $lightness: 10%);
 // Taken from bootstrap
 $form-check-input-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#{$text-color-light-bg}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/></svg>");
 $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='#{$text-color-light-bg}'/></svg>");
@@ -333,7 +330,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   }
 }
 
-@include color-mode(dark) {
+[data-bs-theme="dark"] {
   body:not(.primary-light):not(.primary-dark) {
     @include paperless-green-dark-mode;
 
@@ -347,7 +344,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 }
 
 // Temp to not blink with white before angular loads
-@include color-mode(auto) {
+[data-bs-theme="auto"] {
   @media (prefers-color-scheme: dark) {
     body {
       // no custom theme color

@@ -26,17 +26,15 @@ describe('PermissionsFilterDropdownComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        PermissionsFilterDropdownComponent,
-        ClearableBadgeComponent,
-        IfPermissionsDirective,
-      ],
       imports: [
         NgSelectModule,
         FormsModule,
         ReactiveFormsModule,
         NgbModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        PermissionsFilterDropdownComponent,
+        ClearableBadgeComponent,
+        IfPermissionsDirective,
       ],
       providers: [
         {

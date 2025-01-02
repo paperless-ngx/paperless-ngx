@@ -47,13 +47,13 @@ describe('SelectComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [SelectComponent],
       providers: [],
       imports: [
         FormsModule,
         ReactiveFormsModule,
         NgSelectModule,
         RouterTestingModule,
+        SelectComponent,
       ],
     }).compileComponents()
 

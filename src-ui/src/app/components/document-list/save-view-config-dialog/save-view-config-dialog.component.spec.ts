@@ -18,13 +18,15 @@ describe('SaveViewConfigDialogComponent', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
+      providers: [NgbActiveModal],
+      imports: [
+        NgbModalModule,
+        FormsModule,
+        ReactiveFormsModule,
         SaveViewConfigDialogComponent,
         TextComponent,
         CheckComponent,
       ],
-      providers: [NgbActiveModal],
-      imports: [NgbModalModule, FormsModule, ReactiveFormsModule],
     }).compileComponents()
 
     modal = TestBed.inject(NgbActiveModal)

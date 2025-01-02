@@ -1,7 +1,17 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core'
-import { FormControl, FormGroup } from '@angular/forms'
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms'
+import {
+  NgbDropdownModule,
+  NgbModal,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap'
 import { saveAs } from 'file-saver'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first, map, Subject, switchMap, takeUntil } from 'rxjs'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
 import { Correspondent } from 'src/app/data/correspondent'
@@ -11,6 +21,7 @@ import { MatchingModel } from 'src/app/data/matching-model'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
@@ -39,6 +50,7 @@ import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage
 import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import {
   ChangedItems,
+  FilterableDropdownComponent,
   FilterableDropdownSelectionModel,
 } from '../../common/filterable-dropdown/filterable-dropdown.component'
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
@@ -50,6 +62,14 @@ import { CustomFieldsBulkEditDialogComponent } from './custom-fields-bulk-edit-d
   selector: 'pngx-bulk-editor',
   templateUrl: './bulk-editor.component.html',
   styleUrls: ['./bulk-editor.component.scss'],
+  imports: [
+    FilterableDropdownComponent,
+    IfPermissionsDirective,
+    FormsModule,
+    ReactiveFormsModule,
+    NgbDropdownModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class BulkEditorComponent
   extends ComponentWithPermissions

@@ -9,6 +9,13 @@ import {
   Output,
   ViewChild,
 } from '@angular/core'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import {
+  NgbDropdownModule,
+  NgbTypeaheadModule,
+} from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { Observable, Subject, from } from 'rxjs'
 import {
   catchError,
@@ -87,9 +94,16 @@ import {
   CustomFieldQueryExpression,
 } from 'src/app/utils/custom-field-query-element'
 import { filterRulesDiffer } from 'src/app/utils/filter-rules'
-import { CustomFieldQueriesModel } from '../../common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
-import { RelativeDate } from '../../common/dates-dropdown/dates-dropdown.component'
 import {
+  CustomFieldQueriesModel,
+  CustomFieldsQueryDropdownComponent,
+} from '../../common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
+import {
+  DatesDropdownComponent,
+  RelativeDate,
+} from '../../common/dates-dropdown/dates-dropdown.component'
+import {
+  FilterableDropdownComponent,
   FilterableDropdownSelectionModel,
   Intersection,
   LogicalOperator,
@@ -97,6 +111,7 @@ import {
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
 import {
   OwnerFilterType,
+  PermissionsFilterDropdownComponent,
   PermissionsSelectionModel,
 } from '../../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
@@ -184,6 +199,18 @@ const DEFAULT_TEXT_FILTER_MODIFIER_OPTIONS = [
   selector: 'pngx-filter-editor',
   templateUrl: './filter-editor.component.html',
   styleUrls: ['./filter-editor.component.scss'],
+  imports: [
+    FilterableDropdownComponent,
+    CustomFieldsQueryDropdownComponent,
+    DatesDropdownComponent,
+    PermissionsFilterDropdownComponent,
+    NgxBootstrapIconsModule,
+    NgbDropdownModule,
+    NgbTypeaheadModule,
+    FormsModule,
+    ReactiveFormsModule,
+    TourNgBootstrapModule,
+  ],
 })
 export class FilterEditorComponent
   extends LoadingComponentWithPermissions

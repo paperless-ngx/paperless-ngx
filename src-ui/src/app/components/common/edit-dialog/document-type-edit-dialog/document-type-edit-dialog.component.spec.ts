@@ -20,7 +20,11 @@ describe('DocumentTypeEditDialogComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        NgbModule,
         DocumentTypeEditDialogComponent,
         IfPermissionsDirective,
         IfOwnerDirective,
@@ -28,7 +32,6 @@ describe('DocumentTypeEditDialogComponent', () => {
         TextComponent,
         PermissionsFormComponent,
       ],
-      imports: [FormsModule, ReactiveFormsModule, NgSelectModule, NgbModule],
       providers: [
         NgbActiveModal,
         provideHttpClient(withInterceptorsFromDi()),

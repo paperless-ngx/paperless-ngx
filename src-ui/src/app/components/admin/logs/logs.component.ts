@@ -6,14 +6,23 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
 import { filter, takeUntil, timer } from 'rxjs'
 import { LogService } from 'src/app/services/rest/log.service'
+import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
   selector: 'pngx-logs',
   templateUrl: './logs.component.html',
   styleUrls: ['./logs.component.scss'],
+  imports: [
+    PageHeaderComponent,
+    NgbNavModule,
+    FormsModule,
+    ReactiveFormsModule,
+  ],
 })
 export class LogsComponent
   extends LoadingComponentWithPermissions
