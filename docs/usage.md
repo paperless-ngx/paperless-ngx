@@ -208,6 +208,10 @@ Specific instructions for setting up the required 'developer' app with Google or
 
 Once setup, navigating to the email settings page in Paperless-ngx will allow you to add an email account for Gmail or Outlook using OAuth2. After authenticating, you will be presented with the newly-created account where you will need to enter and save your email address. After this, the account will work as any other email account in Paperless-ngx and refreshing tokens will be handled automatically.
 
+!!! tip
+
+    Outlook email accounts must be configured to use the US-ASCII charset rather than the default UTF-8 charset.
+
 ### REST API
 
 You can also submit a document using the REST API, see [POSTing documents](api.md#file-uploads)
