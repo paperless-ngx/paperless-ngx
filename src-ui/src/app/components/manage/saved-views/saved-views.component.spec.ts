@@ -36,7 +36,12 @@ describe('SavedViewsComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        NgbModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+        ReactiveFormsModule,
+        FormsModule,
+        DragDropModule,
         SavedViewsComponent,
         PageHeaderComponent,
         IfPermissionsDirective,
@@ -46,13 +51,6 @@ describe('SavedViewsComponent', () => {
         NumberComponent,
         ConfirmButtonComponent,
         DragDropSelectComponent,
-      ],
-      imports: [
-        NgbModule,
-        NgxBootstrapIconsModule.pick(allIcons),
-        ReactiveFormsModule,
-        FormsModule,
-        DragDropModule,
       ],
       providers: [
         {

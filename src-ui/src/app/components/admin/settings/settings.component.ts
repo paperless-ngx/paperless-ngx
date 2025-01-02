@@ -1,4 +1,4 @@
-import { ViewportScroller } from '@angular/common'
+import { AsyncPipe, ViewportScroller } from '@angular/common'
 import {
   AfterViewInit,
   Component,
@@ -7,14 +7,22 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core'
-import { FormControl, FormGroup } from '@angular/forms'
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import {
   NgbModal,
   NgbModalRef,
   NgbNavChangeEvent,
+  NgbNavModule,
+  NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { DirtyComponent, dirtyCheck } from '@ngneat/dirty-check-forms'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 import {
   BehaviorSubject,
@@ -32,6 +40,8 @@ import {
 } from 'src/app/data/system-status'
 import { GlobalSearchType, SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { User } from 'src/app/data/user'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
   PermissionAction,
@@ -46,6 +56,12 @@ import {
 } from 'src/app/services/settings.service'
 import { SystemStatusService } from 'src/app/services/system-status.service'
 import { Toast, ToastService } from 'src/app/services/toast.service'
+import { CheckComponent } from '../../common/input/check/check.component'
+import { ColorComponent } from '../../common/input/color/color.component'
+import { PermissionsGroupComponent } from '../../common/input/permissions/permissions-group/permissions-group.component'
+import { PermissionsUserComponent } from '../../common/input/permissions/permissions-user/permissions-user.component'
+import { SelectComponent } from '../../common/input/select/select.component'
+import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
@@ -66,6 +82,22 @@ const systemDateFormat = {
   selector: 'pngx-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
+  imports: [
+    PageHeaderComponent,
+    CheckComponent,
+    ColorComponent,
+    SelectComponent,
+    PermissionsGroupComponent,
+    PermissionsUserComponent,
+    CustomDatePipe,
+    IfPermissionsDirective,
+    AsyncPipe,
+    FormsModule,
+    ReactiveFormsModule,
+    NgbNavModule,
+    NgbPopoverModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class SettingsComponent
   extends ComponentWithPermissions

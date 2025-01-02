@@ -8,8 +8,10 @@ describe('ClearableBadgeComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [ClearableBadgeComponent],
-      imports: [NgxBootstrapIconsModule.pick(allIcons)],
+      imports: [
+        NgxBootstrapIconsModule.pick(allIcons),
+        ClearableBadgeComponent,
+      ],
     }).compileComponents()
 
     fixture = TestBed.createComponent(ClearableBadgeComponent)

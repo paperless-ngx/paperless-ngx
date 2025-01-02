@@ -4,21 +4,9 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { RouterTestingModule } from '@angular/router/testing'
-import {
-  NgbPopoverModule,
-  NgbProgressbarModule,
-  NgbTooltipModule,
-} from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of } from 'rxjs'
 import { Tag } from 'src/app/data/tag'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
-import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
-import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
-import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
-import { CustomFieldDisplayComponent } from '../../common/custom-field-display/custom-field-display.component'
-import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
 import { TagComponent } from '../../common/tag/tag.component'
 import { DocumentCardSmallComponent } from './document-card-small.component'
 
@@ -56,23 +44,10 @@ describe('DocumentCardSmallComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        DocumentCardSmallComponent,
-        DocumentTitlePipe,
-        CustomDatePipe,
-        IfPermissionsDirective,
-        SafeUrlPipe,
-        TagComponent,
-        IsNumberPipe,
-        PreviewPopupComponent,
-        CustomFieldDisplayComponent,
-      ],
       imports: [
         RouterTestingModule,
-        NgbPopoverModule,
-        NgbTooltipModule,
-        NgbProgressbarModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        DocumentCardSmallComponent,
       ],
       providers: [
         DatePipe,

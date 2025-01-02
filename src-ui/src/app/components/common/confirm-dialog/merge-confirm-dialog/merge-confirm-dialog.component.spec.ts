@@ -15,11 +15,11 @@ describe('MergeConfirmDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [MergeConfirmDialogComponent],
       imports: [
         NgxBootstrapIconsModule.pick(allIcons),
         ReactiveFormsModule,
         FormsModule,
+        MergeConfirmDialogComponent,
       ],
       providers: [
         NgbActiveModal,

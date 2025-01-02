@@ -49,8 +49,7 @@ describe('CustomFieldDisplayComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [CustomFieldDisplayComponent],
-      imports: [],
+      imports: [CustomFieldDisplayComponent],
       providers: [
         DocumentService,
         provideHttpClient(withInterceptorsFromDi()),

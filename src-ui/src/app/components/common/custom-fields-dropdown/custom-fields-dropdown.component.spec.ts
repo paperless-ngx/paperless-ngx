@@ -19,6 +19,7 @@ import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { SelectComponent } from '../input/select/select.component'
@@ -43,10 +44,10 @@ describe('CustomFieldsDropdownComponent', () => {
   let customFieldService: CustomFieldsService
   let toastService: ToastService
   let modalService: NgbModal
+  let settingsService: SettingsService
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [CustomFieldsDropdownComponent, SelectComponent],
       imports: [
         NgSelectModule,
         FormsModule,
@@ -54,6 +55,8 @@ describe('CustomFieldsDropdownComponent', () => {
         NgbModalModule,
         NgbDropdownModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        CustomFieldsDropdownComponent,
+        SelectComponent,
       ],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
@@ -70,6 +73,8 @@ describe('CustomFieldsDropdownComponent', () => {
         results: fields.concat([]),
       })
     )
+    settingsService = TestBed.inject(SettingsService)
+    settingsService.currentUser = { id: 1, username: 'test' }
     fixture = TestBed.createComponent(CustomFieldsDropdownComponent)
     component = fixture.componentInstance
     fixture.detectChanges()

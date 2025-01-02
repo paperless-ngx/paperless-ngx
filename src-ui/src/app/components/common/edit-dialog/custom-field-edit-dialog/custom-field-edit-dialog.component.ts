@@ -6,8 +6,15 @@ import {
   QueryList,
   ViewChildren,
 } from '@angular/core'
-import { FormArray, FormControl, FormGroup } from '@angular/forms'
+import {
+  FormArray,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { takeUntil } from 'rxjs'
 import {
   CustomField,
@@ -17,12 +24,21 @@ import {
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { SelectComponent } from '../../input/select/select.component'
+import { TextComponent } from '../../input/text/text.component'
 import { EditDialogComponent, EditDialogMode } from '../edit-dialog.component'
 
 @Component({
   selector: 'pngx-custom-field-edit-dialog',
   templateUrl: './custom-field-edit-dialog.component.html',
   styleUrls: ['./custom-field-edit-dialog.component.scss'],
+  imports: [
+    SelectComponent,
+    TextComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class CustomFieldEditDialogComponent
   extends EditDialogComponent<CustomField>

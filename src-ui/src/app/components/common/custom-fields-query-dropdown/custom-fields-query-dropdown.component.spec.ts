@@ -55,13 +55,13 @@ describe('CustomFieldsQueryDropdownComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [CustomFieldsQueryDropdownComponent],
       imports: [
         NgbDropdownModule,
         NgxBootstrapIconsModule.pick(allIcons),
         NgSelectModule,
         FormsModule,
         ReactiveFormsModule,
+        CustomFieldsQueryDropdownComponent,
       ],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),

@@ -20,7 +20,11 @@ describe('CorrespondentEditDialogComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        NgbModule,
         CorrespondentEditDialogComponent,
         IfPermissionsDirective,
         IfOwnerDirective,
@@ -28,7 +32,6 @@ describe('CorrespondentEditDialogComponent', () => {
         TextComponent,
         PermissionsFormComponent,
       ],
-      imports: [FormsModule, ReactiveFormsModule, NgSelectModule, NgbModule],
       providers: [
         NgbActiveModal,
         provideHttpClient(withInterceptorsFromDi()),

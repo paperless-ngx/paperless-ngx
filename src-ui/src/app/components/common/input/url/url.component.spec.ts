@@ -14,12 +14,12 @@ describe('TextComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [UrlComponent],
       providers: [],
       imports: [
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        UrlComponent,
       ],
     }).compileComponents()
 

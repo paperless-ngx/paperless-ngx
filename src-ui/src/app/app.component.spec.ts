@@ -2,12 +2,13 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import {
   ComponentFixture,
-  TestBed,
   fakeAsync,
+  TestBed,
   tick,
 } from '@angular/core/testing'
 import { Router, RouterModule } from '@angular/router'
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap'
+import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { NgxFileDropModule } from 'ngx-file-drop'
 import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { Subject } from 'rxjs'
@@ -39,12 +40,15 @@ describe('AppComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [AppComponent, ToastsComponent, FileDropComponent],
       imports: [
         TourNgBootstrapModule,
         RouterModule.forRoot(routes),
         NgxFileDropModule,
         NgbModalModule,
+        AppComponent,
+        ToastsComponent,
+        FileDropComponent,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         PermissionsGuard,

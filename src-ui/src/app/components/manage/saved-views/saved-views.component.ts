@@ -1,18 +1,40 @@
+import { AsyncPipe } from '@angular/common'
 import { Component, OnDestroy, OnInit } from '@angular/core'
-import { FormControl, FormGroup } from '@angular/forms'
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms'
 import { dirtyCheck } from '@ngneat/dirty-check-forms'
 import { BehaviorSubject, Observable, takeUntil } from 'rxjs'
 import { DisplayMode } from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
+import { DragDropSelectComponent } from '../../common/input/drag-drop-select/drag-drop-select.component'
+import { NumberComponent } from '../../common/input/number/number.component'
+import { TextComponent } from '../../common/input/text/text.component'
+import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
-
 @Component({
   selector: 'pngx-saved-views',
   templateUrl: './saved-views.component.html',
   styleUrl: './saved-views.component.scss',
+  imports: [
+    PageHeaderComponent,
+    ConfirmButtonComponent,
+    NumberComponent,
+    TextComponent,
+    IfPermissionsDirective,
+    DragDropSelectComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    AsyncPipe,
+  ],
 })
 export class SavedViewsComponent
   extends LoadingComponentWithPermissions

@@ -75,7 +75,16 @@ describe('SettingsComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        NgbModule,
+        RouterTestingModule.withRoutes(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        NgbAlertModule,
+        NgSelectModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+        NgbModalModule,
+        DragDropModule,
         SettingsComponent,
         PageHeaderComponent,
         IfPermissionsDirective,
@@ -93,17 +102,6 @@ describe('SettingsComponent', () => {
         IfOwnerDirective,
         ConfirmButtonComponent,
         DragDropSelectComponent,
-      ],
-      imports: [
-        NgbModule,
-        RouterTestingModule.withRoutes(routes),
-        FormsModule,
-        ReactiveFormsModule,
-        NgbAlertModule,
-        NgSelectModule,
-        NgxBootstrapIconsModule.pick(allIcons),
-        NgbModalModule,
-        DragDropModule,
       ],
       providers: [
         CustomDatePipe,

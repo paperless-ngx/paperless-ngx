@@ -1,6 +1,7 @@
 import {
   CdkDragDrop,
   CdkDropList,
+  DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
 import { Component, Input, ViewChild, forwardRef } from '@angular/core'
@@ -18,6 +19,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-drag-drop-select',
   templateUrl: './drag-drop-select.component.html',
   styleUrl: './drag-drop-select.component.scss',
+  imports: [DragDropModule],
 })
 export class DragDropSelectComponent extends AbstractInputComponent<string[]> {
   @Input() title: string = $localize`Selected items`

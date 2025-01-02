@@ -16,7 +16,6 @@ describe('ColorComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [ColorComponent],
       providers: [],
       imports: [
         FormsModule,
@@ -24,6 +23,7 @@ describe('ColorComponent', () => {
         NgbPopoverModule,
         ColorSliderModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        ColorComponent,
       ],
     }).compileComponents()
 

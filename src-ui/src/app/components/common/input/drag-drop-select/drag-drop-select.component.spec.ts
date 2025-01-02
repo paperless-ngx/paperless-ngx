@@ -9,8 +9,7 @@ describe('DragDropSelectComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DragDropModule, FormsModule],
-      declarations: [DragDropSelectComponent],
+      imports: [DragDropModule, FormsModule, DragDropSelectComponent],
     }).compileComponents()
 
     fixture = TestBed.createComponent(DragDropSelectComponent)

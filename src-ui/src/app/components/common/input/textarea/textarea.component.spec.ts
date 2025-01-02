@@ -13,9 +13,8 @@ describe('TextComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [TextAreaComponent],
       providers: [],
-      imports: [FormsModule, ReactiveFormsModule],
+      imports: [FormsModule, ReactiveFormsModule, TextAreaComponent],
     }).compileComponents()
 
     fixture = TestBed.createComponent(TextAreaComponent)

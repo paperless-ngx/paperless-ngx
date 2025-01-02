@@ -81,12 +81,6 @@ describe('WorkflowsComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        WorkflowsComponent,
-        IfPermissionsDirective,
-        PageHeaderComponent,
-        ConfirmDialogComponent,
-      ],
       imports: [
         NgbPaginationModule,
         FormsModule,
@@ -94,6 +88,10 @@ describe('WorkflowsComponent', () => {
         NgbModalModule,
         NgbPopoverModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        WorkflowsComponent,
+        IfPermissionsDirective,
+        PageHeaderComponent,
+        ConfirmDialogComponent,
       ],
       providers: [
         {

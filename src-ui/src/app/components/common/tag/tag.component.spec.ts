@@ -15,9 +15,8 @@ describe('TagComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [TagComponent],
       providers: [],
-      imports: [],
+      imports: [TagComponent],
     }).compileComponents()
 
     fixture = TestBed.createComponent(TagComponent)

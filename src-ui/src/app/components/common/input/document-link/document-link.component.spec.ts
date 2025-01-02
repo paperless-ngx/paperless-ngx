@@ -1,12 +1,7 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import {
-  FormsModule,
-  NG_VALUE_ACCESSOR,
-  ReactiveFormsModule,
-} from '@angular/forms'
-import { NgSelectModule } from '@ng-select/ng-select'
+import { NG_VALUE_ACCESSOR } from '@angular/forms'
 import { of, throwError } from 'rxjs'
 import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -38,8 +33,7 @@ describe('DocumentLinkComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [DocumentLinkComponent],
-      imports: [NgSelectModule, FormsModule, ReactiveFormsModule],
+      imports: [DocumentLinkComponent],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),

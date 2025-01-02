@@ -17,12 +17,12 @@ describe('SplitConfirmDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [SplitConfirmDialogComponent],
       imports: [
         NgxBootstrapIconsModule.pick(allIcons),
         ReactiveFormsModule,
         FormsModule,
         PdfViewerModule,
+        SplitConfirmDialogComponent,
       ],
       providers: [
         NgbActiveModal,

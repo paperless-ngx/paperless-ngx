@@ -21,18 +21,16 @@ describe('StoragePathListComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        StoragePathListComponent,
-        SortableDirective,
-        PageHeaderComponent,
-        IfPermissionsDirective,
-        SafeHtmlPipe,
-      ],
       imports: [
         NgbPaginationModule,
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        StoragePathListComponent,
+        SortableDirective,
+        PageHeaderComponent,
+        IfPermissionsDirective,
+        SafeHtmlPipe,
       ],
       providers: [
         DatePipe,

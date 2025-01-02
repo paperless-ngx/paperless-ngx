@@ -1,13 +1,8 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import {
-  FormsModule,
-  NG_VALUE_ACCESSOR,
-  ReactiveFormsModule,
-} from '@angular/forms'
+import { NG_VALUE_ACCESSOR } from '@angular/forms'
 import { By } from '@angular/platform-browser'
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import {
@@ -36,12 +31,9 @@ describe('PermissionsSelectComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [PermissionsSelectComponent],
       imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        NgbModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        PermissionsSelectComponent,
       ],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),

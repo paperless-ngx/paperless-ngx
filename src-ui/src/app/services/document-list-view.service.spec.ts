@@ -92,9 +92,8 @@ describe('DocumentListViewService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ConfirmDialogComponent],
       teardown: { destroyAfterEach: true },
-      imports: [RouterTestingModule.withRoutes(routes)],
+      imports: [RouterTestingModule.withRoutes(routes), ConfirmDialogComponent],
       providers: [
         DocumentListViewService,
         PermissionsGuard,

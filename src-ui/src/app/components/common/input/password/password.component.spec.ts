@@ -15,12 +15,12 @@ describe('PasswordComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [PasswordComponent],
       providers: [],
       imports: [
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        PasswordComponent,
       ],
     }).compileComponents()
 

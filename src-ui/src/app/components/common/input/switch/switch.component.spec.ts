@@ -14,9 +14,13 @@ describe('SwitchComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [SwitchComponent],
       providers: [],
-      imports: [FormsModule, ReactiveFormsModule, NgbTooltipModule],
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgbTooltipModule,
+        SwitchComponent,
+      ],
     }).compileComponents()
 
     fixture = TestBed.createComponent(SwitchComponent)

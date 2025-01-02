@@ -33,7 +33,11 @@ describe('MailRuleEditDialogComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        NgbModule,
         MailRuleEditDialogComponent,
         IfPermissionsDirective,
         IfOwnerDirective,
@@ -46,7 +50,6 @@ describe('MailRuleEditDialogComponent', () => {
         CheckComponent,
         SwitchComponent,
       ],
-      imports: [FormsModule, ReactiveFormsModule, NgSelectModule, NgbModule],
       providers: [
         NgbActiveModal,
         {

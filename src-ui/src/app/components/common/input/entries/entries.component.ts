@@ -1,5 +1,6 @@
 import { Component, forwardRef } from '@angular/core'
 import { NG_VALUE_ACCESSOR } from '@angular/forms'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
@@ -13,6 +14,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-entries',
   templateUrl: './entries.component.html',
   styleUrl: './entries.component.scss',
+  imports: [NgxBootstrapIconsModule],
 })
 export class EntriesComponent extends AbstractInputComponent<object> {
   entries = []

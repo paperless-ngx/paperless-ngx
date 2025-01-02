@@ -1,7 +1,15 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
-import { FormControl, FormGroup } from '@angular/forms'
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { DocumentNote } from 'src/app/data/document-note'
 import { User } from 'src/app/data/user'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentNotesService } from 'src/app/services/rest/document-notes.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -11,6 +19,13 @@ import { ComponentWithPermissions } from '../with-permissions/with-permissions.c
   selector: 'pngx-document-notes',
   templateUrl: './document-notes.component.html',
   styleUrls: ['./document-notes.component.scss'],
+  imports: [
+    IfPermissionsDirective,
+    CustomDatePipe,
+    FormsModule,
+    ReactiveFormsModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class DocumentNotesComponent extends ComponentWithPermissions {
   noteForm: FormGroup = new FormGroup({

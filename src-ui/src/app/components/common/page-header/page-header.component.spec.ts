@@ -10,9 +10,8 @@ describe('PageHeaderComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [PageHeaderComponent],
       providers: [],
-      imports: [],
+      imports: [PageHeaderComponent],
     }).compileComponents()
 
     titleService = TestBed.inject(Title)

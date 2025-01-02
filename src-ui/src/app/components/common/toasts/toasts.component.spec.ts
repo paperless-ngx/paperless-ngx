@@ -9,7 +9,6 @@ import {
   flush,
   tick,
 } from '@angular/core/testing'
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of } from 'rxjs'
 import { ToastService } from 'src/app/services/toast.service'
@@ -46,8 +45,7 @@ describe('ToastsComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [ToastsComponent],
-      imports: [NgbModule, NgxBootstrapIconsModule.pick(allIcons)],
+      imports: [ToastsComponent, NgxBootstrapIconsModule.pick(allIcons)],
       providers: [
         {
           provide: ToastService,

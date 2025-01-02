@@ -1,15 +1,32 @@
-import { Clipboard } from '@angular/cdk/clipboard'
+import { Clipboard, ClipboardModule } from '@angular/cdk/clipboard'
 import { Component } from '@angular/core'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import {
+  NgbActiveModal,
+  NgbModalModule,
+  NgbPopoverModule,
+  NgbProgressbarModule,
+} from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import {
   SystemStatus,
   SystemStatusItemStatus,
 } from 'src/app/data/system-status'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
+import { FileSizePipe } from 'src/app/pipes/file-size.pipe'
 
 @Component({
   selector: 'pngx-system-status-dialog',
   templateUrl: './system-status-dialog.component.html',
   styleUrl: './system-status-dialog.component.scss',
+  imports: [
+    NgbModalModule,
+    ClipboardModule,
+    NgbPopoverModule,
+    NgbProgressbarModule,
+    CustomDatePipe,
+    FileSizePipe,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class SystemStatusDialogComponent {
   public SystemStatusItemStatus = SystemStatusItemStatus

@@ -1,7 +1,6 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { BrowserModule, By } from '@angular/platform-browser'
 import { NgbModule, NgbNavLink } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
@@ -33,13 +32,12 @@ describe('LogsComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [LogsComponent, PageHeaderComponent],
       imports: [
         BrowserModule,
         NgbModule,
         NgxBootstrapIconsModule.pick(allIcons),
-        FormsModule,
-        ReactiveFormsModule,
+        LogsComponent,
+        PageHeaderComponent,
       ],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),

@@ -2,11 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
-import { NgSelectModule } from '@ng-select/ng-select'
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { of, throwError } from 'rxjs'
-import { SelectComponent } from 'src/app/components/common/input/select/select.component'
 import { CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { CustomFieldsBulkEditDialogComponent } from './custom-fields-bulk-edit-dialog.component'
@@ -19,8 +16,8 @@ describe('CustomFieldsBulkEditDialogComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [CustomFieldsBulkEditDialogComponent, SelectComponent],
-      imports: [FormsModule, ReactiveFormsModule, NgbModule, NgSelectModule],
+      declarations: [],
+      imports: [CustomFieldsBulkEditDialogComponent],
       providers: [
         NgbActiveModal,
         provideHttpClient(),

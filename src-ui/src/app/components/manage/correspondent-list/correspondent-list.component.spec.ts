@@ -19,17 +19,15 @@ describe('CorrespondentListComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        CorrespondentListComponent,
-        SortableDirective,
-        PageHeaderComponent,
-        IfPermissionsDirective,
-      ],
       imports: [
         NgbPaginationModule,
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        CorrespondentListComponent,
+        SortableDirective,
+        PageHeaderComponent,
+        IfPermissionsDirective,
       ],
       providers: [
         DatePipe,
