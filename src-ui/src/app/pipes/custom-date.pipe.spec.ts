@@ -42,9 +42,10 @@ describe('CustomDatePipe', () => {
     expect(datePipe.transform(notNow, 'relative')).toEqual('Yesterday')
     notNow.setDate(now.getDate())
     notNow.setMonth(now.getMonth() - 1)
-    expect(datePipe.transform(notNow, 'relative')).toEqual(
-      now.getMonth() > 1 ? 'Last month' : 'Last year'
-    )
+    if (now.getMonth() === 0) {
+      notNow.setFullYear(now.getFullYear() - 1)
+    }
+    expect(datePipe.transform(notNow, 'relative')).toEqual('Last month')
     expect(datePipe.transform(now, 'relative')).toEqual('Just now')
   })
 })
