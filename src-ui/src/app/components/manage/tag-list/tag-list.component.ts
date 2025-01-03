@@ -1,7 +1,11 @@
 import { NgClass, TitleCasePipe } from '@angular/common'
 import { Component } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { NgbModal, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
+import {
+  NgbDropdownModule,
+  NgbModal,
+  NgbPaginationModule,
+} from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
 import { Tag } from 'src/app/data/tag'
@@ -32,6 +36,7 @@ import { ManagementListComponent } from '../management-list/management-list.comp
     FormsModule,
     ReactiveFormsModule,
     NgClass,
+    NgbDropdownModule,
     NgbPaginationModule,
     NgxBootstrapIconsModule,
   ],

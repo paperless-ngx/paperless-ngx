@@ -1,7 +1,11 @@
-import { TitleCasePipe } from '@angular/common'
+import { NgClass, TitleCasePipe } from '@angular/common'
 import { Component } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { NgbModal, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
+import {
+  NgbDropdownModule,
+  NgbModal,
+  NgbPaginationModule,
+} from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { DocumentType } from 'src/app/data/document-type'
 import { FILTER_HAS_DOCUMENT_TYPE_ANY } from 'src/app/data/filter-rule-type'
@@ -29,6 +33,8 @@ import { ManagementListComponent } from '../management-list/management-list.comp
     IfPermissionsDirective,
     FormsModule,
     ReactiveFormsModule,
+    NgClass,
+    NgbDropdownModule,
     NgbPaginationModule,
     NgxBootstrapIconsModule,
   ],

@@ -2,7 +2,7 @@ import { AsyncPipe } from '@angular/common'
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, delay, first, takeUntil, tap } from 'rxjs'
 import { MailAccount, MailAccountType } from 'src/app/data/mail-account'
@@ -39,6 +39,7 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
     AsyncPipe,
     FormsModule,
     ReactiveFormsModule,
+    NgbDropdownModule,
     NgxBootstrapIconsModule,
   ],
 })

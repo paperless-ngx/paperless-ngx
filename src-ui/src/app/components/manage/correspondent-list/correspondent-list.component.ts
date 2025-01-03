@@ -1,7 +1,11 @@
 import { NgClass, TitleCasePipe } from '@angular/common'
 import { Component } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { NgbModal, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
+import {
+  NgbDropdownModule,
+  NgbModal,
+  NgbPaginationModule,
+} from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Correspondent } from 'src/app/data/correspondent'
 import { FILTER_HAS_CORRESPONDENT_ANY } from 'src/app/data/filter-rule-type'
@@ -32,6 +36,7 @@ import { ManagementListComponent } from '../management-list/management-list.comp
     FormsModule,
     ReactiveFormsModule,
     NgClass,
+    NgbDropdownModule,
     NgbPaginationModule,
     NgxBootstrapIconsModule,
   ],

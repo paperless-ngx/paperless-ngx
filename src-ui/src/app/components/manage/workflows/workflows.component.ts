@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { delay, takeUntil, tap } from 'rxjs'
 import { Workflow } from 'src/app/data/workflow'
@@ -26,6 +26,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     IfPermissionsDirective,
     FormsModule,
     ReactiveFormsModule,
+    NgbDropdownModule,
     NgxBootstrapIconsModule,
   ],
 })

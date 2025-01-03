@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core'
-import { NgbModal, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
+import {
+  NgbDropdownModule,
+  NgbModal,
+  NgbPaginationModule,
+} from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { delay, takeUntil, tap } from 'rxjs'
 import { CustomField, DATA_TYPE_LABELS } from 'src/app/data/custom-field'
@@ -27,6 +31,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
   imports: [
     PageHeaderComponent,
     IfPermissionsDirective,
+    NgbDropdownModule,
     NgbPaginationModule,
     NgxBootstrapIconsModule,
   ],
