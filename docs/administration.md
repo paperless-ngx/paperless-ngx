@@ -81,8 +81,8 @@ $ docker compose down
 1.  If you pull the image from the docker hub, all you need to do is:
 
     ```shell-session
-    $ docker compose pull
-    $ docker compose up
+    docker compose pull
+    docker compose up
     ```
 
     The Docker Compose files refer to the `latest` version, which is
@@ -91,9 +91,9 @@ $ docker compose down
 1.  If you built the image yourself, do the following:
 
     ```shell-session
-    $ git pull
-    $ docker compose build
-    $ docker compose up
+    git pull
+    docker compose build
+    docker compose up
     ```
 
 Running `docker compose up` will also apply any new database migrations.
@@ -155,7 +155,7 @@ following:
     environment before that, if you use one.
 
     ```shell-session
-    $ pip install -r requirements.txt
+    pip install -r requirements.txt
     ```
 
     !!! note
@@ -168,8 +168,8 @@ following:
 3.  Migrate the database.
 
     ```shell-session
-    $ cd src
-    $ python3 manage.py migrate # (1)
+    cd src
+    python3 manage.py migrate # (1)
     ```
 
     1.  Including `sudo -Hu <paperless_user>` may be required

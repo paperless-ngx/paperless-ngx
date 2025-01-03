@@ -1519,7 +1519,7 @@ one pod).
 actual user ID on the host system, which you can get by executing
 
     ``` shell-session
-    $ id -u
+    id -u
     ```
 
     Paperless will change ownership on its folders to this user, so you
@@ -1534,7 +1534,7 @@ actual user ID on the host system, which you can get by executing
 actual group ID on the host system, which you can get by executing
 
     ``` shell-session
-    $ id -g
+    id -g
     ```
 
     Paperless will change ownership on its folders to this group, so you
