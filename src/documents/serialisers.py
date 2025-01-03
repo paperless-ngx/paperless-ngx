@@ -668,6 +668,10 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
                         f"Value must be an id of an element in {select_options}",
                     )
             elif field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
+                if not (isinstance(data["value"], list) or data["value"] is None):
+                    raise serializers.ValidationError(
+                        "Value must be a list",
+                    )
                 doc_ids = data["value"]
                 if Document.objects.filter(id__in=doc_ids).count() != len(
                     data["value"],

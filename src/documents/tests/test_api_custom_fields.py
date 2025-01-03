@@ -886,6 +886,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             - Document & custom field exist
         WHEN:
             - API request to set a field value to a document that does not exist
+            - API request to set a field value to empty string
         THEN:
             - HTTP 400 is returned
             - No field instance is created or attached to the document
@@ -915,6 +916,19 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(CustomFieldInstance.objects.count(), 0)
         self.assertEqual(len(doc.custom_fields.all()), 0)
+
+        resp = self.client.patch(
+            f"/api/documents/{doc.id}/",
+            data={
+                "custom_fields": [
+                    {"field": custom_field_documentlink.id, "value": ""},
+                ],
+            },
+            format="json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(CustomFieldInstance.objects.count(), 0)
 
     def test_custom_field_not_null(self):
         """
