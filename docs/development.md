@@ -69,13 +69,13 @@ first-time setup.
 3.  Create `consume` and `media` directories:
 
     ```bash
-    $ mkdir -p consume media
+    mkdir -p consume media
     ```
 
 4.  Install the Python dependencies:
 
     ```bash
-    $ pipenv install --dev
+    pipenv install --dev
     ```
 
     !!! note
@@ -85,7 +85,7 @@ first-time setup.
 5.  Install pre-commit hooks:
 
     ```bash
-    $ pre-commit install
+    pre-commit install
     ```
 
 6.  Apply migrations and create a superuser for your development instance:
@@ -93,8 +93,8 @@ first-time setup.
     ```bash
     # src/
 
-    $ python3 manage.py migrate
-    $ python3 manage.py createsuperuser
+    python3 manage.py migrate
+    python3 manage.py createsuperuser
     ```
 
 7.  You can now either ...
@@ -108,7 +108,7 @@ first-time setup.
     -   spin up a bare redis container
 
         ```
-        $ docker run -d -p 6379:6379 --restart unless-stopped redis:latest
+        docker run -d -p 6379:6379 --restart unless-stopped redis:latest
         ```
 
 8.  Continue with either back-end or front-end development – or both :-).
@@ -176,7 +176,7 @@ The front end is built using AngularJS. In order to get started, you need Node.j
 1.  Install the Angular CLI. You might need sudo privileges to perform this command:
 
     ```bash
-    $ npm install -g @angular/cli
+    npm install -g @angular/cli
     ```
 
 2.  Make sure that it's on your path.
@@ -184,13 +184,13 @@ The front end is built using AngularJS. In order to get started, you need Node.j
 3.  Install all necessary modules:
 
     ```bash
-    $ npm install
+    npm install
     ```
 
 4.  You can launch a development server by running:
 
     ```bash
-    $ ng serve
+    ng serve
     ```
 
     This will automatically update whenever you save. However, in-place
@@ -335,13 +335,13 @@ If you want to build the documentation locally, this is how you do it:
 1.  Have an active pipenv shell (`pipenv shell`) and install Python dependencies:
 
     ```bash
-    $ pipenv install --dev
+    pipenv install --dev
     ```
 
 2.  Build the documentation
 
     ```bash
-    $ mkdocs build --config-file mkdocs.yml
+    mkdocs build --config-file mkdocs.yml
     ```
 
     _alternatively..._
@@ -352,7 +352,7 @@ If you want to build the documentation locally, this is how you do it:
     something.
 
     ```bash
-    $ mkdocs serve
+    mkdocs serve
     ```
 
 ## Building the Docker image
