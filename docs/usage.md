@@ -788,8 +788,8 @@ Paperless-ngx consists of the following components:
     with paperless. You may start the webserver directly with
 
     ```shell-session
-    $ cd /path/to/paperless/src/
-    $ gunicorn -c ../gunicorn.conf.py paperless.wsgi
+    cd /path/to/paperless/src/
+    gunicorn -c ../gunicorn.conf.py paperless.wsgi
     ```
 
     or by any other means such as Apache `mod_wsgi`.
@@ -804,8 +804,8 @@ Paperless-ngx consists of the following components:
     Start the consumer with the management command `document_consumer`:
 
     ```shell-session
-    $ cd /path/to/paperless/src/
-    $ python3 manage.py document_consumer
+    cd /path/to/paperless/src/
+    python3 manage.py document_consumer
     ```
 
 -   **The task processor:** Paperless relies on [Celery - Distributed
