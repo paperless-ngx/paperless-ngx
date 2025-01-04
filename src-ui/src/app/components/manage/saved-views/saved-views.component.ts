@@ -61,11 +61,11 @@ export class SavedViewsComponent
     private toastService: ToastService
   ) {
     super()
+    this.settings.organizingSidebarSavedViews = true
   }
 
   ngOnInit(): void {
-    this.settings.organizingSidebarSavedViews = true
-
+    this.loading = true
     this.savedViewService.listAll().subscribe((r) => {
       this.savedViews = r.results
       this.initialize()
@@ -78,6 +78,7 @@ export class SavedViewsComponent
   }
 
   private initialize() {
+    this.loading = false
     this.emptyGroup(this.savedViewsGroup)
 
     let storeData = {
