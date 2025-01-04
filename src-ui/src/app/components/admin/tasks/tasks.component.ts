@@ -6,6 +6,7 @@ import {
   NgbCollapseModule,
   NgbModal,
   NgbNavModule,
+  NgbPaginationModule,
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -57,6 +58,7 @@ const FILTER_TARGETS = [
     NgTemplateOutlet,
     NgbCollapseModule,
     NgbNavModule,
+    NgbPaginationModule,
     NgbPopoverModule,
     NgxBootstrapIconsModule,
   ],
