@@ -45,6 +45,8 @@ import { UserService } from 'src/app/services/rest/user.service'
 import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ConfirmButtonComponent } from '../../confirm-button/confirm-button.component'
+import { CheckComponent } from '../../input/check/check.component'
+import { EntriesComponent } from '../../input/entries/entries.component'
 import { NumberComponent } from '../../input/number/number.component'
 import { PermissionsGroupComponent } from '../../input/permissions/permissions-group/permissions-group.component'
 import { PermissionsUserComponent } from '../../input/permissions/permissions-user/permissions-user.component'
@@ -136,6 +138,8 @@ const TRIGGER_MATCHING_ALGORITHMS = MATCHING_ALGORITHMS.filter(
   templateUrl: './workflow-edit-dialog.component.html',
   styleUrls: ['./workflow-edit-dialog.component.scss'],
   imports: [
+    CheckComponent,
+    EntriesComponent,
     SwitchComponent,
     NumberComponent,
     TextComponent,

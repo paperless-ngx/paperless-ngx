@@ -14,7 +14,11 @@ import {
   Router,
   RouterModule,
 } from '@angular/router'
-import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import {
+  NgbDropdownModule,
+  NgbModal,
+  NgbPaginationModule,
+} from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { filter, first, map, Subject, switchMap, takeUntil } from 'rxjs'
@@ -79,6 +83,7 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
     ReactiveFormsModule,
     NgTemplateOutlet,
     NgbDropdownModule,
+    NgbPaginationModule,
     NgClass,
     RouterModule,
     TourNgBootstrapModule,
