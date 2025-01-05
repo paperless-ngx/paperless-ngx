@@ -11,6 +11,7 @@ import { Router, RouterModule } from '@angular/router'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { delay, Subject, takeUntil, tap } from 'rxjs'
+import { CustomFieldDisplayComponent } from 'src/app/components/common/custom-field-display/custom-field-display.component'
 import { PreviewPopupComponent } from 'src/app/components/common/preview-popup/preview-popup.component'
 import { TagComponent } from 'src/app/components/common/tag/tag.component'
 import { DocumentCardLargeComponent } from 'src/app/components/document-list/document-card-large/document-card-large.component'
@@ -54,6 +55,7 @@ import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
   templateUrl: './saved-view-widget.component.html',
   styleUrls: ['./saved-view-widget.component.scss'],
   imports: [
+    CustomFieldDisplayComponent,
     DocumentCardSmallComponent,
     DocumentCardLargeComponent,
     PreviewPopupComponent,
