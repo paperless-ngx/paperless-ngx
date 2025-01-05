@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 import logging
 import os
 import re
@@ -21,6 +22,9 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from multiselectfield import MultiSelectField
 from django_softdelete.models import SoftDeleteModel
+from sympy import false
+
+from documents.utils import generate_unique_name
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
@@ -300,6 +304,22 @@ class Folder(SoftDeleteModel, MatchingModel):
         constraints = []
     def __str__(self):
         return self.name
+
+    # @classmethod
+    # def create_folder(cls, name = '', parent_folder = None):
+    #     # check duplicate
+    #     existing_names = cls.objects.filter(name__startswith=name.strip(),
+    #                                           parent_folder=None).order_by(
+    #         'name').values_list('name', flat=True)
+    #
+    #     if name.strip() in existing_names:
+    #         name = generate_unique_name(name.strip(), existing_names)
+    #     folder = cls.objects.create(name=name, parent_folder=parent_folder )
+    #     folder.path = str(folder.id)
+    #     folder.type = Folder.FOLDER
+    #     folder.checksum = hashlib.md5(f'{folder.id}.{folder.name}'.encode()).hexdigest()
+    #     folder.save()
+    #     return folder
 
 class DossierForm(MatchingModel):
 
@@ -1625,5 +1645,17 @@ class Workflow(models.Model):
         return f"Workflow: {self.name}"
 
 
+class BackupRecord(ModelWithOwner):
+    filename = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    restore_at = models.DateTimeField(_("restored_at"), null=True,
+                                      default=timezone.now, editable=False,
+                                      db_index=True)
+    restore_status = models.FloatField(blank=True, default=0)
+    backup_status = models.FloatField(blank=True, default=0)
+    detail = models.JSONField(blank=True, null=True)
+    log = models.TextField(blank=True)
+    count = models.IntegerField(blank=True, default=0)
 
-
+    def __str__(self):
+        return f"{self.filename} - {self.created_at}"

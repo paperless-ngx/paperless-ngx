@@ -882,8 +882,7 @@ class Consumer(LoggingMixin):
                                                  owner=document.owner,
                                                  created=document.created,
                                                  updated=document.modified)
-                new_file.checksum = hashlib.md5(
-                    f'{new_file.id}.{new_file.name}'.encode()).hexdigest()
+                new_file.checksum = document.checksum
                 if document.folder:
                     folder_path = get_content_before_last_number(document.folder.path)
                     if document.folder.type == Folder.FILE:
@@ -920,7 +919,6 @@ class Consumer(LoggingMixin):
                 else:
                     new_dossier_document.path = f"{new_file.id}"
                 new_dossier_document.save()
-                self.log.debug("dossier log",new_dossier_document)
                 document.dossier = new_dossier_document
 
                 # If we get here, it was successful. Proceed with post-consume

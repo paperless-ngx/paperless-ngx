@@ -1,20 +1,23 @@
 import hashlib
 import logging
+import os
 import shutil
 import uuid
 from datetime import timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Optional
+from typing import Optional, final
 
 import tqdm
 from celery import Task
 from celery import shared_task
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.core.serializers import deserialize, serialize
 from django.db import transaction, models
 from django.db.models.signals import post_save
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from filelock import FileLock
 from whoosh.writing import AsyncWriter
 
@@ -32,7 +35,8 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
-from documents.models import Correspondent, CustomFieldInstance, Dossier
+from documents.models import Correspondent, CustomFieldInstance, Dossier, \
+    BackupRecord
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Folder
@@ -48,8 +52,10 @@ from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
+from documents.utils import generate_unique_name
 from paperless.models import ApplicationConfiguration
 from paperless_ocr_custom.parsers import RasterisedDocumentCustomParser
+
 
 if settings.AUDIT_LOG_ENABLED:
     import json
@@ -467,17 +473,24 @@ def empty_trash(doc_ids=None):
     try:
         # deleted_document_ids = documents.values_list("id", flat=True)
         deleted_documents = documents.values('id', 'folder_id', 'dossier_id')
-
         deleted_document_ids = [doc['id'] for doc in deleted_documents]
         deleted_folder_ids = [doc['folder_id'] for doc in deleted_documents]
         deleted_dossier_ids = [doc['dossier_id'] for doc in deleted_documents]
+        # print('deleted folder',deleted_folder_ids)
+        # print('deleted dossier',deleted_dossier_ids)
         # Temporarily connect the cleanup handler
         models.signals.post_delete.connect(cleanup_document_deletion, sender=Document)
         documents.delete()  # this is effectively a hard delete
         # delete Folder
-        Folder.deleted_objects.filter(id__in = deleted_folder_ids).delete()
+        folders = Folder.deleted_objects.filter(id__in=deleted_folder_ids)
+
+        folders.delete()
+
         # delete Dossier
-        Dossier.deleted_objects.filter(id__in = deleted_dossier_ids).delete()
+        dossiers = Dossier.deleted_objects.filter(id__in=deleted_dossier_ids)
+
+        dossiers.delete()
+
         logger.info(f"Deleted {len(deleted_document_ids)} documents from trash")
 
         if settings.AUDIT_LOG_ENABLED:
@@ -493,3 +506,194 @@ def empty_trash(doc_ids=None):
             cleanup_document_deletion,
             sender=Document,
         )
+
+
+def remove_folder_dossier_related(list_checksum):
+    docs = Document.objects.filter(checksum__in=list_checksum)
+    # docs = Document.objects.filter(id__in=doc_ids)
+    for doc in docs:
+        doc_folder = doc.folder
+        # doc.folder = None
+        doc_dossier = doc.dossier
+        # doc.dossier = None
+        # doc.save()
+        if doc_folder is not None:
+            doc_folder.hard_delete()
+        if doc_dossier is not None:
+            doc_dossier.hard_delete()
+    docs.hard_delete()
+    from documents import index
+
+    with index.open_index_writer() as writer:
+        for doc in docs:
+            index.remove_document_by_id(writer, doc.id)
+
+
+def restore_model(file_path, cls, compare_field):
+    obj_set = set(cls.objects.all().values_list(compare_field, flat=True))
+    with open(file_path, 'r') as backup_obj:
+        # update document exist and add document
+        objs_update = []
+        objs_create = []
+        objs_checksum = []
+        for obj in deserialize('json', backup_obj.read()):
+            if 'pk' in obj.object.__dict__:
+                obj.id = obj.object.__dict__['pk']
+            if getattr(obj.object, compare_field, None) in obj_set:
+                objs_update.append(obj.object)
+                if cls == Document:
+                    objs_checksum.append(
+                        getattr(obj.object, compare_field, None))
+                    objs_create.append(obj.object)
+                obj_set.discard(getattr(obj.object, compare_field))
+                continue
+            objs_create.append(obj.object)
+
+        # cls.objects.bulk_update(objs=objs_update,
+        #                         fields = [field.name for field in cls._meta.fields if field.name != 'id'],  batch_size=1000)
+        if cls == Document:
+            remove_folder_dossier_related(objs_checksum)
+        cls.objects.bulk_create(objs=objs_create, batch_size=1000)
+
+
+@shared_task()
+def restore_documents(backup_record: BackupRecord):
+    """
+    copy source -> temp -> copy source to -> destination_directory
+    """
+    backup_root_dir = os.path.join(settings.BACKUP_DIR, backup_record.filename)
+    temp_backup_dir = os.path.join(backup_root_dir, 'temp_backup')
+    try:
+        with transaction.atomic():
+            file_document_backup = os.path.join(backup_root_dir,
+                                                f'documents_backup.json')
+            file_folder_backup = os.path.join(backup_root_dir,
+                                              f'folders_backup.json')
+            file_dossier_backup = os.path.join(backup_root_dir,
+                                               f'dossiers_backup.json')
+            restore_model(file_path=file_document_backup, cls=Document,
+                          compare_field='checksum')
+            restore_model(file_path=file_folder_backup, cls=Folder,
+                          compare_field="checksum")
+            restore_model(file_path=file_dossier_backup, cls=Dossier,
+                          compare_field="id")
+            # document_ids_set = set(Document.objects.values_list('id', flat=True))
+            # with open(file_document_backup, 'r') as backup_document:
+            #     # update document exist and add document
+            #     documents_update=[]
+            #     documents_create=[]
+            #     for obj in deserialize('json', backup_document.read()):
+            #         if getattr(obj,'id') in document_ids_set:
+            #             documents_update.append(obj)
+            #             document_ids_set.discard(getattr(obj,'id'))
+            #             continue
+            #         documents_create.append(obj)
+            #
+            #
+            #     Document.objects.bulk_update(objs=documents_update,batch_size=1000)
+            #     Document.objects.bulk_create(objs=documents_create,batch_size=1000)
+            # file_folder_backup = os.path.join(backup_root_dir, f'folders_backup.json')
+            # # Create a folder containing backup documents
+            # folder_ids_set = set(
+            #     Document.objects.values_list('id', flat=True))
+            # # if folder_backup is None:
+            # #     folder_backup = Folder.create_folder(name='backup')
+            # with open(file_folder_backup, 'r') as backup_file:
+            #     folders_update = []
+            #     folders_create = []
+            #     for obj in deserialize('json', backup_file.read()):
+            #         if getattr(obj,'id') in folder_ids_set:
+            #             folders_update.append(obj)
+            #             folder_ids_set.discard(getattr(obj,'id'))
+            #             continue
+            #         folders_create.append(obj)
+            #     Document.objects.bulk_update(objs=folders_update,
+            #                                  batch_size=1000)
+            #     Document.objects.bulk_create(objs=folders_create,
+            #                                  batch_size=1000)
+
+            os.makedirs(temp_backup_dir, exist_ok=True)
+            if os.path.exists(temp_backup_dir):
+                shutil.copytree(settings.MEDIA_ROOT / "documents",
+                                temp_backup_dir, dirs_exist_ok=True)
+            if os.path.exists(backup_root_dir):
+                shutil.copytree(backup_root_dir,
+                                settings.MEDIA_ROOT / "documents",
+                                dirs_exist_ok=True)
+            backup_record.log = _("Restore successful")
+    except Exception as e:
+        backup_record.log = e
+        logger.debug(e)
+        # retore
+        if os.path.exists(temp_backup_dir):
+            shutil.copytree(temp_backup_dir, settings.MEDIA_ROOT / "documents")
+    finally:
+        # shutil.rmtree(temp_backup_dir)
+        backup_record.count = backup_record.count + 1
+        backup_record.save()
+
+
+@shared_task()
+def backup_documents():
+    # Lưu thông tin vào BackupRecord
+    backup_dir = settings.BACKUP_DIR
+    os.makedirs(backup_dir, exist_ok=True)
+
+    # Sao lưu các bản ghi Document
+    documents = Document.objects.all()
+    folders = Folder.objects.all()
+    dossiers = Dossier.objects.all()
+    detail = {'documents': documents.count()}
+
+    from datetime import datetime
+    current_date = datetime.now().strftime('%Y_%m_%d')
+
+    # Tạo thư mục sao lưu theo ngày tháng năm
+    backups_name = BackupRecord.objects.filter(
+        filename__startswith=current_date).order_by('filename').values_list(
+        'filename', flat=True)
+    name = current_date
+    if backups_name.count() > 0:
+        name = generate_unique_name(current_date, backups_name)
+    backup_root_dir = os.path.join(settings.BACKUP_DIR, name)
+    backup = BackupRecord.objects.create(filename=name, detail=detail)
+    backup_document_file_path = os.path.join(backup_root_dir,
+                                             f'documents_backup.json')
+    backup_folder_file_path = os.path.join(backup_root_dir,
+                                           f'folders_backup.json')
+    backup_dossier_path = os.path.join(backup_root_dir,
+                                       f'dossiers_backup.json')
+    archive_dir = os.path.join(backup_root_dir, 'archive')
+    originals_dir = os.path.join(backup_root_dir, 'originals')
+    thumbnails_dir = os.path.join(backup_root_dir, 'thumbnails')
+    try:
+        os.makedirs(archive_dir, exist_ok=True)
+        os.makedirs(originals_dir, exist_ok=True)
+        os.makedirs(thumbnails_dir, exist_ok=True)
+
+        if os.path.exists(settings.ORIGINALS_DIR):
+            shutil.copytree(settings.ORIGINALS_DIR, originals_dir,
+                            dirs_exist_ok=True)
+        if os.path.exists(settings.ORIGINALS_DIR):
+            shutil.copytree(settings.ARCHIVE_DIR, archive_dir,
+                            dirs_exist_ok=True)
+        if os.path.exists(settings.THUMBNAIL_DIR):
+            shutil.copytree(settings.THUMBNAIL_DIR, thumbnails_dir,
+                            dirs_exist_ok=True)
+
+        # Xuất dữ liệu thành JSON
+        with open(backup_document_file_path, 'w') as backup_document_file:
+            backup_document_file.write(serialize('json', documents))
+        with open(backup_folder_file_path, 'w') as backup_folder_file:
+            backup_folder_file.write(serialize('json', folders))
+        with open(backup_dossier_path, 'w') as backup_dossier_file:
+            backup_dossier_file.write(serialize('json', dossiers))
+
+        backup.log = _('Backup successful')
+
+
+    except Exception as e:
+        shutil.rmtree(backup_root_dir)
+        backup.log = e
+    finally:
+        backup.save()

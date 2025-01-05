@@ -14,11 +14,11 @@ from django.views.static import serve
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
-from documents.models import FontLanguage
+from documents.models import FontLanguage, BackupRecord
 from documents.views import AcknowledgeTasksView, ApprovalUpdateMutipleView, \
     ApprovalViewSet, BulkExportExcelFromFolderView, BulkExportExcelView, \
     DossierFormViewSet, DossierViewSet, StatisticsCustomView, \
-    ArchiveFontViewSet, FontLanguageViewSet, TrashView
+    ArchiveFontViewSet, FontLanguageViewSet, TrashView, BackupRecordViewSet
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
@@ -87,6 +87,7 @@ api_router.register(r"content_types", ContentTypeViewSet, basename="content_type
 api_router.register(r"folders", FolderViewSet)
 api_router.register(r"dossiers", DossierViewSet)
 api_router.register(r"dossier_forms", DossierFormViewSet)
+api_router.register(r"backup_records", BackupRecordViewSet)
 
 # api_router.register(r"approvals", ApprovalViewSet)
 api_router.register(r"content_types", ContentTypeViewSet, basename="content_types")
@@ -231,6 +232,13 @@ urlpatterns = [
                     RedirectView.as_view(
                         url=settings.BASE_URL + "api/documents/%(pk)s/preview/",
                     ),
+                ),
+                re_path(
+                    "^restore/",
+                    RedirectView.as_view(
+                        url=settings.BASE_URL + "api/backup_records/restore/"
+                    ),
+                    name="restore",
                 ),
             ],
         ),

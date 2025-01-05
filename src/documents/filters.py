@@ -15,7 +15,7 @@ from guardian.utils import get_user_obj_perms_model
 from rest_framework_guardian.filters import ObjectPermissionsFilter
 
 from documents.models import Approval, Correspondent, Dossier, DossierForm, \
-    ArchiveFont, FontLanguage
+    ArchiveFont, FontLanguage, BackupRecord
 from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
@@ -404,6 +404,15 @@ class ShareLinkFilterSet(FilterSet):
         fields = {
             "created": DATE_KWARGS,
             "expiration": DATE_KWARGS,
+        }
+
+
+class BackupRecordFilterSet(FilterSet):
+    class Meta:
+        model = BackupRecord
+        fields = {
+            "filename": CHAR_KWARGS,
+            "created_at": DATE_KWARGS
         }
 
 

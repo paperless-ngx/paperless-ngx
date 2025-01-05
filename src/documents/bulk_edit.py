@@ -212,10 +212,10 @@ def delete(doc_ids):
     docs = Document.objects.filter(id__in=doc_ids)
     for doc in docs:
         doc_folder = doc.folder
-        doc.folder = None
+        # doc.folder = None
         doc_dossier = doc.dossier
-        doc.dossier = None
-        doc.save()
+        # doc.dossier = None
+        # doc.save()
         if doc_folder is not None:
             doc_folder.delete()
         if doc_dossier is not None:

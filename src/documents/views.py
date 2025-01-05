@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from logging import Logger
 from pathlib import Path
 from time import mktime
-from unicodedata import normalize
+from unicodedata import normalize, category
 from urllib.parse import quote
 from urllib.parse import urlparse
 import pandas as pd
@@ -105,7 +105,8 @@ from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.filters import CorrespondentFilterSet, DossierFilterSet, \
-    DossierFormFilterSet, ArchiveFontFilterSet, FontLanguageFilterSet
+    DossierFormFilterSet, ArchiveFontFilterSet, FontLanguageFilterSet, \
+    BackupRecordFilterSet
 from documents.filters import CustomFieldFilterSet
 from documents.filters import DocumentFilterSet
 from documents.filters import DocumentTypeFilterSet
@@ -124,7 +125,7 @@ from documents.matching import match_warehouses
 from documents.matching import match_folders
 from documents.matching import match_tags
 from documents.models import Approval, Correspondent, CustomFieldInstance, \
-    Dossier, DossierForm, ArchiveFont, FontLanguage
+    Dossier, DossierForm, ArchiveFont, FontLanguage, BackupRecord
 from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
@@ -154,7 +155,8 @@ from documents.permissions import set_permissions_for_object
 from documents.serialisers import AcknowledgeTasksViewSerializer, \
     ApprovalSerializer, ApprovalViewSerializer, DossierFormSerializer, \
     DossierSerializer, ExportDocumentFromFolderSerializer, \
-    FontLanguageSerializer, ArchiveFontSerializer, TrashSerializer
+    FontLanguageSerializer, ArchiveFontSerializer, TrashSerializer, \
+    BackupRecordSerializer
 from documents.serialisers import BulkDownloadSerializer
 from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
@@ -179,7 +181,8 @@ from documents.serialisers import FolderSerializer
 
 from documents.signals import document_updated
 from documents.signals import approval_updated
-from documents.tasks import consume_file, empty_trash
+from documents.tasks import consume_file, empty_trash, backup_documents, \
+    restore_documents
 from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import GeneralConfig
@@ -3460,3 +3463,53 @@ class DossierFormViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     #                 {"error": "Error retrieving dossiers, check logs for more detail."},
     #             )
 
+
+class BackupRecordViewSet(ModelViewSet):
+    model = BackupRecord
+
+    queryset = BackupRecord.objects.all()
+
+    serializer_class = BackupRecordSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    filterset_class = BackupRecordFilterSet
+    ordering_fields = ("created_at")
+
+    def create(self, request, *args, **kwargs):
+        try:
+            async_task_backup = backup_documents.apply(
+                args=[]
+            )
+            return Response(async_task_backup.id)
+        except Exception as e:
+            raise Http404
+
+    # def backup(self, request, pk=None):
+    #     try:
+    #         async_task_backup = backup_documents.apply(
+    #             args=[]
+    #         )
+    #         return Response(async_task_backup.id)
+    #     except Exception as e:
+    #         raise Http404
+
+    @action(methods=["post"], detail=True)
+    def restore(self, request, pk=None):
+        try:
+            backup = BackupRecord.objects.get(id=pk)
+            if request.user is not None and not has_perms_owner_aware(
+                request.user,
+                "view_backup_record",
+                backup,
+            ):
+                return HttpResponseForbidden("Insufficient permissions")
+            async_task_restore = restore_documents.apply(args=[backup])
+
+            return Response(async_task_restore.id)
+        except (FileNotFoundError, Document.DoesNotExist):
+            raise Http404

@@ -34,7 +34,7 @@ from rest_framework.fields import SerializerMethodField
 from documents import bulk_edit
 from documents.data_models import DocumentSource
 from documents.models import Approval, Correspondent, Dossier, DossierForm, \
-    ArchiveFont, FontLanguage
+    ArchiveFont, FontLanguage, BackupRecord
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -1743,6 +1743,15 @@ class ShareLinkSerializer(OwnedObjectSerializer):
         validated_data["slug"] = get_random_string(50)
         return super().create(validated_data)
 
+
+class BackupRecordSerializer(OwnedObjectSerializer):
+    class Meta:
+        model = BackupRecord
+        fields = '__all__'
+
+    # def create(self, validated_data):
+    #     validated_data["slug"] = get_random_string(50)
+    #     return super().create(validated_data)
 
 class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
     objects = serializers.ListField(

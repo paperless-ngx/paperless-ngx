@@ -117,3 +117,12 @@ def get_content_before_last_number(input_string):
     if match:
         return match.group(1)  # Trả về nhóm trước số cuối cùng
     return input_string
+
+
+def generate_unique_name(name, existing_names):
+    i = 1
+    new_name = name
+    while new_name in existing_names:
+        new_name = f"{name}({i})"
+        i += 1
+    return new_name
