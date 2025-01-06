@@ -37,7 +37,7 @@ class ClassifierModelCorruptError(Exception):
     pass
 
 
-def load_classifier(raise_exception: bool = False) -> Optional["DocumentClassifier"]:
+def load_classifier(*, raise_exception: bool = False) -> Optional["DocumentClassifier"]:
     if not settings.MODEL_FILE.is_file():
         logger.debug(
             "Document classification model does not exist (yet), not "
