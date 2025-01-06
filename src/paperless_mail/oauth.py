@@ -49,6 +49,7 @@ class PaperlessMailOAuth2Manager:
                 redirect_uri=self.oauth_callback_url,
                 scope=["https://mail.google.com/"],
                 extras_params={"prompt": "consent", "access_type": "offline"},
+                state=settings.GMAIL_OAUTH_CLIENT_STATE,
             ),
         )
 
@@ -60,6 +61,7 @@ class PaperlessMailOAuth2Manager:
                     "offline_access",
                     "https://outlook.office.com/IMAP.AccessAsUser.All",
                 ],
+                self=settings.OUTLOOK_OAUTH_CLIENT_STATE,
             ),
         )
 
