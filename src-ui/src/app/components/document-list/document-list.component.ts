@@ -52,6 +52,7 @@ import {
   filterRulesDiffer,
   isFullTextFilterRule,
 } from 'src/app/utils/filter-rules'
+import { CustomFieldDisplayComponent } from '../common/custom-field-display/custom-field-display.component'
 import { PageHeaderComponent } from '../common/page-header/page-header.component'
 import { PreviewPopupComponent } from '../common/preview-popup/preview-popup.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
@@ -66,6 +67,7 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
   templateUrl: './document-list.component.html',
   styleUrls: ['./document-list.component.scss'],
   imports: [
+    CustomFieldDisplayComponent,
     PageHeaderComponent,
     BulkEditorComponent,
     FilterEditorComponent,
