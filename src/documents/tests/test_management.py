@@ -108,18 +108,18 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
 class TestDecryptDocuments(FileSystemAssertsMixin, TestCase):
     @override_settings(
-        ORIGINALS_DIR=os.path.join(os.path.dirname(__file__), "samples", "originals"),
-        THUMBNAIL_DIR=os.path.join(os.path.dirname(__file__), "samples", "thumb"),
+        ORIGINALS_DIR=(Path(__file__).parent / "samples" / "originals"),
+        THUMBNAIL_DIR=(Path(__file__).parent / "samples" / "thumb"),
         PASSPHRASE="test",
         FILENAME_FORMAT=None,
     )
     @mock.patch("documents.management.commands.decrypt_documents.input")
     def test_decrypt(self, m):
         media_dir = tempfile.mkdtemp()
-        originals_dir = os.path.join(media_dir, "documents", "originals")
-        thumb_dir = os.path.join(media_dir, "documents", "thumbnails")
-        os.makedirs(originals_dir, exist_ok=True)
-        os.makedirs(thumb_dir, exist_ok=True)
+        originals_dir = Path(media_dir) / "documents" / "originals"
+        thumb_dir = Path(media_dir) / "documents" / "thumbnails"
+        originals_dir.mkdir(parents=True, exist_ok=True)
+        thumb_dir.mkdir(parents=True, exist_ok=True)
 
         override_settings(
             ORIGINALS_DIR=originals_dir,
@@ -143,7 +143,7 @@ class TestDecryptDocuments(FileSystemAssertsMixin, TestCase):
                 "originals",
                 "0000004.pdf.gpg",
             ),
-            os.path.join(originals_dir, "0000004.pdf.gpg"),
+            originals_dir / "0000004.pdf.gpg",
         )
         shutil.copy(
             os.path.join(
@@ -153,7 +153,7 @@ class TestDecryptDocuments(FileSystemAssertsMixin, TestCase):
                 "thumbnails",
                 "0000004.webp.gpg",
             ),
-            os.path.join(thumb_dir, f"{doc.id:07}.webp.gpg"),
+            thumb_dir / f"{doc.id:07}.webp.gpg",
         )
 
         call_command("decrypt_documents")

@@ -173,7 +173,7 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.data["tasks"]["index_status"], "OK")
         self.assertIsNotNone(response.data["tasks"]["index_last_modified"])
 
-    @override_settings(INDEX_DIR="/tmp/index/")
+    @override_settings(INDEX_DIR=Path("/tmp/index/"))
     @mock.patch("documents.index.open_index", autospec=True)
     def test_system_status_index_error(self, mock_open_index):
         """
@@ -193,7 +193,7 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.data["tasks"]["index_status"], "ERROR")
         self.assertIsNotNone(response.data["tasks"]["index_error"])
 
-    @override_settings(DATA_DIR="/tmp/does_not_exist/data/")
+    @override_settings(DATA_DIR=Path("/tmp/does_not_exist/data/"))
     def test_system_status_classifier_ok(self):
         """
         GIVEN:
@@ -222,7 +222,7 @@ class TestSystemStatus(APITestCase):
         THEN:
             - The response contains an WARNING classifier status
         """
-        with override_settings(MODEL_FILE="does_not_exist"):
+        with override_settings(MODEL_FILE=Path("does_not_exist")):
             Document.objects.create(
                 title="Test Document",
             )
@@ -233,7 +233,11 @@ class TestSystemStatus(APITestCase):
             self.assertEqual(response.data["tasks"]["classifier_status"], "WARNING")
             self.assertIsNotNone(response.data["tasks"]["classifier_error"])
 
-    def test_system_status_classifier_error(self):
+    @mock.patch(
+        "documents.classifier.load_classifier",
+        side_effect=ClassifierModelCorruptError(),
+    )
+    def test_system_status_classifier_error(self, mock_load_classifier):
         """
         GIVEN:
             - The classifier does exist but is corrupt
@@ -248,25 +252,23 @@ class TestSystemStatus(APITestCase):
                 dir="/tmp",
                 delete=False,
             ) as does_exist,
-            override_settings(MODEL_FILE=does_exist),
+            override_settings(MODEL_FILE=Path(does_exist.name)),
         ):
-            with mock.patch("documents.classifier.load_classifier") as mock_load:
-                mock_load.side_effect = ClassifierModelCorruptError()
-                Document.objects.create(
-                    title="Test Document",
-                )
-                Tag.objects.create(
-                    name="Test Tag",
-                    matching_algorithm=Tag.MATCH_AUTO,
-                )
-                self.client.force_login(self.user)
-                response = self.client.get(self.ENDPOINT)
-                self.assertEqual(response.status_code, status.HTTP_200_OK)
-                self.assertEqual(
-                    response.data["tasks"]["classifier_status"],
-                    "ERROR",
-                )
-                self.assertIsNotNone(response.data["tasks"]["classifier_error"])
+            Document.objects.create(
+                title="Test Document",
+            )
+            Tag.objects.create(
+                name="Test Tag",
+                matching_algorithm=Tag.MATCH_AUTO,
+            )
+            self.client.force_login(self.user)
+            response = self.client.get(self.ENDPOINT)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(
+                response.data["tasks"]["classifier_status"],
+                "ERROR",
+            )
+            self.assertIsNotNone(response.data["tasks"]["classifier_error"])
 
     def test_system_status_classifier_ok_no_objects(self):
         """
@@ -278,7 +280,7 @@ class TestSystemStatus(APITestCase):
         THEN:
             - The response contains an OK classifier status
         """
-        with override_settings(MODEL_FILE="does_not_exist"):
+        with override_settings(MODEL_FILE=Path("does_not_exist")):
             self.client.force_login(self.user)
             response = self.client.get(self.ENDPOINT)
             self.assertEqual(response.status_code, status.HTTP_200_OK)

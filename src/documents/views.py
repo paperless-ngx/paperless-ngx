@@ -2139,7 +2139,7 @@ class SystemStatusView(PassUserMixin):
         classifier_error = None
         classifier_status = None
         try:
-            classifier = load_classifier()
+            classifier = load_classifier(raise_exception=True)
             if classifier is None:
                 # Make sure classifier should exist
                 docs_queryset = Document.objects.exclude(
@@ -2159,7 +2159,7 @@ class SystemStatusView(PassUserMixin):
                             matching_algorithm=Tag.MATCH_AUTO,
                         ).exists()
                     )
-                    and not os.path.isfile(settings.MODEL_FILE)
+                    and not settings.MODEL_FILE.exists()
                 ):
                     # if classifier file doesn't exist just classify as a warning
                     classifier_error = "Classifier file does not exist (yet). Re-training may be pending."
