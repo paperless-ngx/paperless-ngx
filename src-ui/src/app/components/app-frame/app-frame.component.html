@@ -255,6 +255,15 @@
                 <i-bs class="me-1" name="trash"></i-bs><span>&nbsp;<ng-container i18n>Trash</ng-container></span>
               </a>
             </li>
+            <li class="nav-item app-link"
+                *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Backup }">
+              <a class="nav-link" routerLink="backup" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Trash"
+                 i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body"
+                 triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+                <i-bs class="me-1" name="arrow-repeat"></i-bs>
+                <span>&nbsp;<ng-container i18n>Backup & Restore</ng-container></span>
+              </a>
+            </li>
             <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailAccount }"
               tourAnchor="tour.mail">
               <a class="nav-link" routerLink="mail" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Mail"

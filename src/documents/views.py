@@ -2254,10 +2254,13 @@ class BulkEditObjectsView(PassUserMixin):
             for f in folder_list:
                 folders = Folder.objects.filter(path__startswith=f.path)
                 documents = Document.objects.filter(folder__in=folders)
-                dossiers = Dossier.objects.filter(id__in = documents)
+                dossier_ids = []
+                for d in documents:
+                    dossier_ids.append(d.dossier.id)
                 documents.delete()
+                documents.delete()
+                Dossier.objects.filter(id__in=dossier_ids).delete()
                 folders.delete()
-                dossiers.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         elif operation == "delete" and object_type == "dossiers":
@@ -2555,13 +2558,20 @@ class TrashView(ListModelMixin, PassUserMixin):
             deleted_docs = Document.deleted_objects.filter(id__in=doc_ids).select_related('folder', 'dossier')
             # folders = {doc.folder for doc in deleted_docs}
             # dossiers = {doc.dossier for doc in deleted_docs}
-
+            folder_set = set()
+            for doc in deleted_docs:
+                folder_set.update(doc.folder.path.split('/'))
+            # restore folder
+            folders_restore = Folder.deleted_objects.filter(
+                id__in=list(folder_set))
+            for f in folders_restore:
+                f.restore(strict=False)
             for doc in deleted_docs:
                 doc.restore(strict=False)
-                if doc.folder is not None:
-                    doc.folder.restore(strict=False)
-                    if doc.folder.parent_folder is not None:
-                        doc.folder.parent_folder.restore(strict=False)
+                # if doc.folder is not None:
+                #     doc.folder.restore(strict=False)
+                #     if doc.folder.parent_folder is not None:
+                #         doc.folder.parent_folder.restore(strict=False)
                 if doc.dossier is not None:
                     doc.dossier.restore(strict=False)
         elif action == "empty":
@@ -3128,12 +3138,13 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         folder = Folder.objects.get(id=pk)
         folders = Folder.objects.filter(path__startswith=folder.path)
         documents = Document.objects.filter(folder__in=folders)
-        dossiers = []
+        dossier_ids = []
         for d in documents:
-            dossiers.append(d.dossier.id)
+            dossier_ids.append(d.dossier.id)
 
+        dossier = Dossier.objects.filter(id__in=dossier_ids)
         documents.delete()
-        Dossier.objects.filter(id__in = dossiers).delete()
+        dossier.delete()
         folders.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -3502,6 +3513,7 @@ class BackupRecordViewSet(ModelViewSet):
     def restore(self, request, pk=None):
         try:
             backup = BackupRecord.objects.get(id=pk)
+            backup.restore_at = timezone.now()
             if request.user is not None and not has_perms_owner_aware(
                 request.user,
                 "view_backup_record",

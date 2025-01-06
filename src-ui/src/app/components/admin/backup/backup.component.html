@@ -1,0 +1,150 @@
+<pngx-page-header
+  title="Backup & Restore"
+  i18n-title
+  info="Manage backup and restore versions."
+  i18n-info
+  infoLink="">
+  <button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()" [hidden]="selectedBackups.size === 0">
+    <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
+  </button>
+  <!--    <button type="button" class="btn btn-sm btn-outline-primary" (click)="restoreAll(selectedBackups)" [disabled]="selectedBackups.size === 0">-->
+  <!--        <i-bs name="arrow-counterclockwise"></i-bs>&nbsp;<ng-container i18n>Restore selected</ng-container>-->
+  <!--    </button>-->
+  <!--    <button type="button" class="btn btn-sm btn-outline-danger" (click)="emptyTrash(selectedBackups)" [disabled]="selectedBackups.size === 0">-->
+  <!--        <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete selected</ng-container>-->
+  <!--    </button>-->
+  <!--    <button type="button" class="btn btn-sm btn-outline-danger" (click)="emptyTrash()" [disabled]="backups.length === 0">-->
+  <!--        <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Empty trash</ng-container>-->
+  <!--    </button>-->
+</pngx-page-header>
+
+<div class="row mb-3">
+  <ngb-pagination class="col-auto" [pageSize]="25" [collectionSize]="totalBackups" [(page)]="page" [maxSize]="5"
+                  (pageChange)="reload()" size="sm" aria-label="Pagination"></ngb-pagination>
+</div>
+
+<div class="card border table-responsive mb-3">
+  <table class="table table-striped align-middle shadow-sm mb-0">
+    <thead>
+    <tr>
+      <th scope="col">
+        <div class="form-check m-0 ms-2 me-n2">
+          <input type="checkbox" class="form-check-input" id="all-objects" [(ngModel)]="allToggled"
+                 [disabled]="backups.length === 0" (click)="toggleAll($event); $event.stopPropagation();">
+          <label class="form-check-label" for="all-objects"></label>
+        </div>
+      </th>
+      <th scope="col" class="fw-normal" i18n>Name</th>
+      <th scope="col" class="fw-normal d-none d-sm-table-cell" i18n>Backup at</th>
+      <th scope="col" class="fw-normal d-none d-sm-table-cell" i18n>Restore at</th>
+      <th scope="col" class="fw-normal d-none d-sm-table-cell" i18n>Count</th>
+      <th scope="col" class="fw-normal d-none d-sm-table-cell" i18n>Result</th>
+      <th scope="col" class="fw-normal" i18n>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+      @if (loading) {
+        <tr>
+          <td colspan="5">
+            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+            <ng-container i18n>Loading...</ng-container>
+          </td>
+        </tr>
+      }
+      @for (backup of backups; track backup.id) {
+        <tr (click)="toggleSelected(backup); $event.stopPropagation();" class="data-row fade" [class.show]="show">
+          <td>
+            <div class="form-check m-0 ms-2 me-n2">
+              <input type="checkbox" class="form-check-input" id="{{backup.id}}"
+                     [checked]="selectedBackups.has(backup.id)"
+                     (click)="toggleSelected(backup); $event.stopPropagation();">
+              <label class="form-check-label" for="{{backup.id}}"></label>
+            </div>
+          </td>
+          <td scope="row">
+            {{ backup.filename }}
+            <!--                      <pngx-preview-popup [backup]="backup" linkClasses="btn btn-sm btn-link" #popupPreview>-->
+            <!--                        <i-bs name="eye"></i-bs>-->
+            <!--                      </pngx-preview-popup>-->
+          </td>
+          <td scope="row" class="d-none d-sm-table-cell" i18n>{{ backup.created_at | customDate:'short' }}</td>
+          <td scope="row" class="d-none d-sm-table-cell" i18n>{{ backup.restore_at | customDate:'short' }}</td>
+          <td scope="row" class="d-none d-sm-table-cell" i18n>{{ backup.count }}</td>
+          <td class="d-none d-lg-table-cell">
+            @if (backup.log?.length > 50) {
+              <div class="result" (click)="expandBackup(backup); $event.stopPropagation();"
+                   [ngbPopover]="resultPopover" popoverClass="shadow small mobile" triggers="mouseenter:mouseleave"
+                   container="body">
+                <span class="small d-none d-md-inline-block font-monospace text-muted">{{ backup.log | slice:0:50 }}&hellip;</span>
+              </div>
+            }
+            @if (backup.log?.length <= 50) {
+              <span class="small d-none d-md-inline-block font-monospace text-muted">{{ backup.log }}</span>
+            }
+            <ng-template #resultPopover>
+                      <pre class="small mb-0">{{ backup.log | slice:0:300 }}@if (backup.log > 300) {
+                        &hellip;
+                      }</pre>
+              @if (backup.log?.length > 300) {
+                <br /><em>(
+                  <ng-container i18n>click for full output</ng-container>
+                  )</em>
+              }
+            </ng-template>
+          </td>
+          <td class="d-lg-none">
+            <button class="btn btn-link" (click)="expandBackup(backup); $event.stopPropagation();">
+              <i-bs width="1.2em" height="1.2em" name="info-circle"></i-bs>
+            </button>
+          </td>
+          <td scope="row">
+            <div class="btn-group d-block d-sm-none">
+              <div ngbDropdown container="body" class="d-inline-block">
+                <button type="button" class="btn btn-link" id="actionsMenuMobile" (click)="$event.stopPropagation()"
+                        ngbDropdownToggle>
+                  <i-bs name="three-dots-vertical"></i-bs>
+                </button>
+                <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
+                  <button (click)="restore(backup)" ngbDropdownItem i18n>Restore</button>
+                  <!--                            <button (click)="delete(backup)" ngbDropdownItem i18n>Delete</button>-->
+                </div>
+              </div>
+            </div>
+            <div class="btn-group d-none d-sm-block">
+              <button class="btn btn-sm btn-outline-secondary" (click)="restore(backup); $event.stopPropagation();">
+                <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs>&nbsp;<ng-container i18n>Restore
+              </ng-container>
+              </button>
+              <!--                        <button class="btn btn-sm btn-outline-danger" (click)="delete(backup); $event.stopPropagation();">-->
+              <!--                            <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>-->
+              <!--                        </button>-->
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="p-0" [class.border-0]="expandedBackup !== backup.id" colspan="5">
+            <pre #collapse="ngbCollapse" [ngbCollapse]="expandedBackup !== backup.id" class="small mb-0"><div
+              class="small p-1 p-lg-3 ms-lg-3">{{ backup.log }}</div></pre>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+@if (!loading) {
+  <div class="d-flex mb-2">
+    <div>
+      <ng-container
+        i18n>{totalBackups, plural, =1 {One backup} other {{{ totalBackups || 0 }} total backup in backups}}</ng-container>
+      @if (selectedBackups.size > 0) {
+        <ng-container i18n>&nbsp;({{ selectedBackups.size }} selected)</ng-container>
+        <!--                &nbsp;({{selectedBackups.size}} selected)-->
+      }
+    </div>
+    @if (backups.length > 20) {
+      <ngb-pagination class="ms-auto" [pageSize]="25" [collectionSize]="totalBackups" [(page)]="page" [maxSize]="5"
+                      (pageChange)="reload()" size="sm" aria-label="Pagination"></ngb-pagination>
+    }
+  </div>
+}

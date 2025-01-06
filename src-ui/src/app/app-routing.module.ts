@@ -16,6 +16,7 @@ import { DirtyFormGuard } from './guards/dirty-form.guard'
 import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
 import { TasksComponent } from './components/admin/tasks/tasks.component'
 import { TrashComponent } from './components/admin/trash/trash.component'
+import { BackupComponent } from './components/admin/backup/backup.component'
 import { PermissionsGuard } from './guards/permissions.guard'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
@@ -358,6 +359,17 @@ export const routes: Routes = [
           requiredPermission: {
             action: PermissionAction.View,
             type: PermissionType.PaperlessTask,
+          },
+        },
+      },
+      {
+        path: 'backup',
+        component: BackupComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Backup,
           },
         },
       },

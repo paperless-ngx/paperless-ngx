@@ -123,6 +123,7 @@ import { BoxCaseComponent } from './components/manage/boxcase/boxcase.component'
 import { WarehouseEditDialogComponent } from './components/common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
 import { WarehouseComponent } from './components/manage/warehouse/warehouse.component'
 import { BoxEditDialogComponent } from './components/common/edit-dialog/box-edit-dialog/box-edit-dialog.component'
+import { BackupComponent } from './components/admin/backup/backup.component'
 import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { ShelfComponent } from './components/manage/shelf/shelf.component'
 import { CustomShelfEditDialogComponent } from './components/common/edit-dialog/custom-shelf-edit-dialog/custom-shelf-edit-dialog.component'
@@ -409,6 +410,7 @@ import {
   ArchiveFontEditDialogComponent
 } from './components/common/edit-dialog/archive-font-edit-dialog/archive-font-edit-dialog.component'
 
+
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
 registerLocaleData(localeBe)
@@ -454,6 +456,7 @@ function initializeApp(settings: SettingsService) {
     FolderCardSmallComponent,
     ShelfComponent,
     BoxEditDialogComponent,
+    BackupComponent,
     AppComponent,
     DocumentListComponent,
     DocumentDetailComponent,
