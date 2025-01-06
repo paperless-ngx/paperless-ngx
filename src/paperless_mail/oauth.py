@@ -61,7 +61,7 @@ class PaperlessMailOAuth2Manager:
                     "offline_access",
                     "https://outlook.office.com/IMAP.AccessAsUser.All",
                 ],
-                self=settings.OUTLOOK_OAUTH_CLIENT_STATE,
+                state=settings.OUTLOOK_OAUTH_CLIENT_STATE,
             ),
         )
 
