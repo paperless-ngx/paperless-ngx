@@ -75,7 +75,6 @@ from documents import index
 from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
-from documents.caching import CACHE_50_MINUTES
 from documents.caching import get_metadata_cache
 from documents.caching import get_suggestion_cache
 from documents.caching import refresh_metadata_cache
@@ -469,6 +468,7 @@ class DocumentViewSet(
             return None
 
     @action(methods=["get"], detail=True)
+    @method_decorator(cache_control(no_cache=True))
     @method_decorator(
         condition(etag_func=metadata_etag, last_modified_func=metadata_last_modified),
     )
@@ -527,6 +527,7 @@ class DocumentViewSet(
         return Response(meta)
 
     @action(methods=["get"], detail=True)
+    @method_decorator(cache_control(no_cache=True))
     @method_decorator(
         condition(
             etag_func=suggestions_etag,
@@ -577,7 +578,7 @@ class DocumentViewSet(
         return Response(resp_data)
 
     @action(methods=["get"], detail=True)
-    @method_decorator(cache_control(public=False, max_age=5 * 60))
+    @method_decorator(cache_control(no_cache=True))
     @method_decorator(
         condition(etag_func=preview_etag, last_modified_func=preview_last_modified),
     )
@@ -589,7 +590,7 @@ class DocumentViewSet(
             raise Http404
 
     @action(methods=["get"], detail=True)
-    @method_decorator(cache_control(public=False, max_age=CACHE_50_MINUTES))
+    @method_decorator(cache_control(no_cache=True))
     @method_decorator(last_modified(thumbnail_last_modified))
     def thumb(self, request, pk=None):
         try:
