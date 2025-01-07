@@ -23,8 +23,8 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
     def setUp(self):
         super().setUp()
 
-        user = User.objects.create_superuser(username="temp_admin")
-        self.client.force_authenticate(user=user)
+        self.user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=self.user)
 
         self.doc1 = Document.objects.create(title="unrelated", checksum="A")
         self.doc2 = Document.objects.create(
@@ -333,3 +333,19 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
                     f.read(),
                     zipf.read("originals/statement/Title 2 - Doc 3.jpg"),
                 )
+
+    def test_download_insufficient_permissions(self):
+        user = User.objects.create_user(username="temp_user")
+        self.client.force_authenticate(user=user)
+
+        self.doc2.owner = self.user
+        self.doc2.save()
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps({"documents": [self.doc2.id, self.doc3.id]}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.content, b"Insufficient permissions")
