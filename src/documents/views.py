@@ -1584,9 +1584,14 @@ class BulkDownloadView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         ids = serializer.validated_data.get("documents")
+        documents = Document.objects.filter(pk__in=ids)
         compression = serializer.validated_data.get("compression")
         content = serializer.validated_data.get("content")
         follow_filename_format = serializer.validated_data.get("follow_formatting")
+
+        for document in documents:
+            if not has_perms_owner_aware(request.user, "view_document", document):
+                return HttpResponseForbidden("Insufficient permissions")
 
         settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
         temp = tempfile.NamedTemporaryFile(  # noqa: SIM115
@@ -1604,7 +1609,7 @@ class BulkDownloadView(GenericAPIView):
 
         with zipfile.ZipFile(temp.name, "w", compression) as zipf:
             strategy = strategy_class(zipf, follow_filename_format)
-            for document in Document.objects.filter(pk__in=ids):
+            for document in documents:
                 strategy.add_document(document)
 
         # TODO(stumpylog): Investigate using FileResponse here
