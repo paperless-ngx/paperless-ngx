@@ -4,6 +4,7 @@ import logging
 import os
 import platform
 import re
+import secrets
 import tempfile
 import urllib
 import zipfile
@@ -11,6 +12,7 @@ from datetime import datetime
 from pathlib import Path
 from time import mktime
 from unicodedata import normalize
+from urllib.parse import parse_qs
 from urllib.parse import quote
 from urllib.parse import urlparse
 
@@ -1714,13 +1716,34 @@ class UiSettingsView(GenericAPIView):
         ui_settings["auditlog_enabled"] = settings.AUDIT_LOG_ENABLED
 
         if settings.GMAIL_OAUTH_ENABLED or settings.OUTLOOK_OAUTH_ENABLED:
+            state = secrets.token_urlsafe(32)
             manager = PaperlessMailOAuth2Manager()
             if settings.GMAIL_OAUTH_ENABLED:
-                ui_settings["gmail_oauth_url"] = manager.get_gmail_authorization_url()
+                gmail_oauth_url = manager.get_gmail_authorization_url(state)
+                # Validate the URL
+                parsed_url_query = parse_qs(urlparse(gmail_oauth_url).query)
+                if (
+                    parsed_url_query.get("state")
+                    and parsed_url_query.get("state")[0] != state
+                ):
+                    logger.error(
+                        f"Invalid oauth callback {gmail_oauth_url} for state {state}",
+                    )
+                    raise ValueError("State not found in authorization url")
+                ui_settings["gmail_oauth_url"] = gmail_oauth_url
             if settings.OUTLOOK_OAUTH_ENABLED:
-                ui_settings["outlook_oauth_url"] = (
-                    manager.get_outlook_authorization_url()
-                )
+                outlook_oauth_url = manager.get_outlook_authorization_url(state)
+                # Validate the URL
+                parsed_url_query = parse_qs(urlparse(outlook_oauth_url).query)
+                if (
+                    parsed_url_query.get("state")
+                    and parsed_url_query.get("state")[0] != state
+                ):
+                    logger.error(
+                        f"Invalid oauth callback {outlook_oauth_url} for state {state}",
+                    )
+                    raise ValueError("State not found in authorization url")
+                ui_settings["outlook_oauth_url"] = outlook_oauth_url
 
         ui_settings["email_enabled"] = settings.EMAIL_ENABLED
 

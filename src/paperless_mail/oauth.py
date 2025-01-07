@@ -43,16 +43,17 @@ class PaperlessMailOAuth2Manager:
     def oauth_redirect_url(self) -> str:
         return f"{'http://localhost:4200/' if settings.DEBUG else settings.BASE_URL}mail"  # e.g. "http://localhost:4200/mail" or "/mail"
 
-    def get_gmail_authorization_url(self) -> str:
+    def get_gmail_authorization_url(self, state: str) -> str:
         return asyncio.run(
             self.gmail_client.get_authorization_url(
                 redirect_uri=self.oauth_callback_url,
                 scope=["https://mail.google.com/"],
                 extras_params={"prompt": "consent", "access_type": "offline"},
+                state=state,
             ),
         )
 
-    def get_outlook_authorization_url(self) -> str:
+    def get_outlook_authorization_url(self, state: str) -> str:
         return asyncio.run(
             self.outlook_client.get_authorization_url(
                 redirect_uri=self.oauth_callback_url,
@@ -60,6 +61,7 @@ class PaperlessMailOAuth2Manager:
                     "offline_access",
                     "https://outlook.office.com/IMAP.AccessAsUser.All",
                 ],
+                state=state,
             ),
         )
 
