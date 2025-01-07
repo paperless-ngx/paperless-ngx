@@ -784,12 +784,18 @@ class TestMail(
         )
 
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
-        self.assertEqual(len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", False)), 2)
+        self.assertEqual(
+            len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", mark_seen=False)),
+            2,
+        )
 
         self.mail_account_handler.handle_mail_account(account)
         self.mailMocker.apply_mail_actions()
 
-        self.assertEqual(len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", False)), 0)
+        self.assertEqual(
+            len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", mark_seen=False)),
+            0,
+        )
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
     def test_handle_mail_account_delete(self):
@@ -854,7 +860,7 @@ class TestMail(
 
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
         self.assertEqual(
-            len(self.mailMocker.bogus_mailbox.fetch("UNFLAGGED", False)),
+            len(self.mailMocker.bogus_mailbox.fetch("UNFLAGGED", mark_seen=False)),
             2,
         )
 
@@ -862,7 +868,7 @@ class TestMail(
         self.mailMocker.apply_mail_actions()
 
         self.assertEqual(
-            len(self.mailMocker.bogus_mailbox.fetch("UNFLAGGED", False)),
+            len(self.mailMocker.bogus_mailbox.fetch("UNFLAGGED", mark_seen=False)),
             1,
         )
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
@@ -935,7 +941,12 @@ class TestMail(
 
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
         self.assertEqual(
-            len(self.mailMocker.bogus_mailbox.fetch("UNKEYWORD processed", False)),
+            len(
+                self.mailMocker.bogus_mailbox.fetch(
+                    "UNKEYWORD processed",
+                    mark_seen=False,
+                ),
+            ),
             2,
         )
 
@@ -944,7 +955,12 @@ class TestMail(
 
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
         self.assertEqual(
-            len(self.mailMocker.bogus_mailbox.fetch("UNKEYWORD processed", False)),
+            len(
+                self.mailMocker.bogus_mailbox.fetch(
+                    "UNKEYWORD processed",
+                    mark_seen=False,
+                ),
+            ),
             0,
         )
 
@@ -968,12 +984,18 @@ class TestMail(
 
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
         criteria = NOT(gmail_label="processed")
-        self.assertEqual(len(self.mailMocker.bogus_mailbox.fetch(criteria, False)), 2)
+        self.assertEqual(
+            len(self.mailMocker.bogus_mailbox.fetch(criteria, mark_seen=False)),
+            2,
+        )
 
         self.mail_account_handler.handle_mail_account(account)
         self.mailMocker.apply_mail_actions()
 
-        self.assertEqual(len(self.mailMocker.bogus_mailbox.fetch(criteria, False)), 0)
+        self.assertEqual(
+            len(self.mailMocker.bogus_mailbox.fetch(criteria, mark_seen=False)),
+            0,
+        )
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
     def test_tag_mail_action_applemail_wrong_input(self):
@@ -1003,7 +1025,7 @@ class TestMail(
 
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
         self.assertEqual(
-            len(self.mailMocker.bogus_mailbox.fetch("UNFLAGGED", False)),
+            len(self.mailMocker.bogus_mailbox.fetch("UNFLAGGED", mark_seen=False)),
             2,
         )
 
@@ -1011,7 +1033,7 @@ class TestMail(
         self.mailMocker.apply_mail_actions()
 
         self.assertEqual(
-            len(self.mailMocker.bogus_mailbox.fetch("UNFLAGGED", False)),
+            len(self.mailMocker.bogus_mailbox.fetch("UNFLAGGED", mark_seen=False)),
             0,
         )
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
@@ -1325,13 +1347,19 @@ class TestMail(
 
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
         self.mailMocker._queue_consumption_tasks_mock.assert_not_called()
-        self.assertEqual(len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", False)), 2)
+        self.assertEqual(
+            len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", mark_seen=False)),
+            2,
+        )
 
         self.mail_account_handler.handle_mail_account(account)
         self.mailMocker.apply_mail_actions()
 
         self.assertEqual(self.mailMocker._queue_consumption_tasks_mock.call_count, 2)
-        self.assertEqual(len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", False)), 0)
+        self.assertEqual(
+            len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", mark_seen=False)),
+            0,
+        )
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
     def test_auth_plain_fallback_fails_still(self):
@@ -1391,13 +1419,19 @@ class TestMail(
 
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
         self.assertEqual(self.mailMocker._queue_consumption_tasks_mock.call_count, 0)
-        self.assertEqual(len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", False)), 2)
+        self.assertEqual(
+            len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", mark_seen=False)),
+            2,
+        )
 
         self.mail_account_handler.handle_mail_account(account)
         self.mailMocker.apply_mail_actions()
 
         self.assertEqual(self.mailMocker._queue_consumption_tasks_mock.call_count, 2)
-        self.assertEqual(len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", False)), 0)
+        self.assertEqual(
+            len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", mark_seen=False)),
+            0,
+        )
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
 
     def test_disabled_rule(self):
@@ -1426,12 +1460,15 @@ class TestMail(
         self.mailMocker.apply_mail_actions()
 
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 3)
-        self.assertEqual(len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", False)), 2)
+        self.assertEqual(
+            len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", mark_seen=False)),
+            2,
+        )
 
         self.mail_account_handler.handle_mail_account(account)
         self.mailMocker.apply_mail_actions()
         self.assertEqual(
-            len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", False)),
+            len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", mark_seen=False)),
             2,
         )  # still 2
 

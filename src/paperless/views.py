@@ -148,7 +148,7 @@ class UserViewSet(ModelViewSet):
         ).first()
         if authenticator is not None:
             delete_and_cleanup(request, authenticator)
-            return Response(True)
+            return Response(data=True)
         else:
             return HttpResponseNotFound("TOTP not found")
 
@@ -262,7 +262,7 @@ class TOTPView(GenericAPIView):
         ).first()
         if authenticator is not None:
             delete_and_cleanup(request, authenticator)
-            return Response(True)
+            return Response(data=True)
         else:
             return HttpResponseNotFound("TOTP not found")
 
