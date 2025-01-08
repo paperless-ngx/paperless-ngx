@@ -115,4 +115,4 @@ class PaperlessMailOAuth2Manager:
             return False
 
     def validate_state(self, state: str) -> bool:
-        return not settings.DEBUG and len(state) > 0 and state == self.state
+        return settings.DEBUG or (len(state) > 0 and state == self.state)
