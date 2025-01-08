@@ -118,9 +118,17 @@ class TestMailOAuth(
             "expires_in": 3600,
         }
 
+        session = self.client.session
+        session.update(
+            {
+                "oauth_state": "test_state",
+            },
+        )
+        session.save()
+
         # Test Google OAuth callback
         response = self.client.get(
-            "/api/oauth/callback/?code=test_code&scope=https://mail.google.com/",
+            "/api/oauth/callback/?code=test_code&scope=https://mail.google.com/&state=test_state",
         )
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertIn("oauth_success=1", response.url)
@@ -130,7 +138,9 @@ class TestMailOAuth(
         )
 
         # Test Outlook OAuth callback
-        response = self.client.get("/api/oauth/callback/?code=test_code")
+        response = self.client.get(
+            "/api/oauth/callback/?code=test_code&state=test_state",
+        )
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertIn("oauth_success=1", response.url)
         self.assertTrue(
@@ -150,10 +160,18 @@ class TestMailOAuth(
         """
         mock_get_access_token.side_effect = GetAccessTokenError("test_error")
 
+        session = self.client.session
+        session.update(
+            {
+                "oauth_state": "test_state",
+            },
+        )
+        session.save()
+
         with self.assertLogs("paperless_mail", level="ERROR") as cm:
             # Test Google OAuth callback
             response = self.client.get(
-                "/api/oauth/callback/?code=test_code&scope=https://mail.google.com/",
+                "/api/oauth/callback/?code=test_code&scope=https://mail.google.com/&state=test_state",
             )
             self.assertEqual(response.status_code, status.HTTP_302_FOUND)
             self.assertIn("oauth_success=0", response.url)
@@ -162,7 +180,9 @@ class TestMailOAuth(
             )
 
             # Test Outlook OAuth callback
-            response = self.client.get("/api/oauth/callback/?code=test_code")
+            response = self.client.get(
+                "/api/oauth/callback/?code=test_code&state=test_state",
+            )
             self.assertEqual(response.status_code, status.HTTP_302_FOUND)
             self.assertIn("oauth_success=0", response.url)
             self.assertFalse(
@@ -215,6 +235,27 @@ class TestMailOAuth(
 
         response = self.client.get(
             "/api/oauth/callback/",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(
+            MailAccount.objects.filter(imap_server="imap.gmail.com").exists(),
+        )
+        self.assertFalse(
+            MailAccount.objects.filter(imap_server="outlook.office365.com").exists(),
+        )
+
+    def test_oauth_callback_view_invalid_state(self):
+        """
+        GIVEN:
+            - Mocked settings for Gmail and Outlook OAuth client IDs and secrets
+        WHEN:
+            - OAuth callback is called with an invalid state
+        THEN:
+            - 400 bad request returned, no mail accounts are created
+        """
+
+        response = self.client.get(
+            "/api/oauth/callback/?code=test_code&state=invalid_state",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(

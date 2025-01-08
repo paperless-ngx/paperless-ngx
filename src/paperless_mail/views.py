@@ -128,7 +128,16 @@ class OauthCallbackView(GenericAPIView):
             )
             return HttpResponseBadRequest("Invalid request, see logs for more detail")
 
-        oauth_manager = PaperlessMailOAuth2Manager()
+        oauth_manager = PaperlessMailOAuth2Manager(
+            state=request.session.get("oauth_state"),
+        )
+
+        state = request.query_params.get("state", "")
+        if not oauth_manager.validate_state(state):
+            logger.error(
+                f"Invalid oauth callback request received state: {state}, expected: {oauth_manager.state}",
+            )
+            return HttpResponseBadRequest("Invalid request, see logs for more detail")
 
         try:
             if scope is not None and "google" in scope:
