@@ -1217,6 +1217,10 @@ consumers working on the same file. Configure this to prevent that.
 
     Defaults to none (thus will use [PAPERLESS_URL](#PAPERLESS_URL)).
 
+!!! note
+
+    This setting only applies to OAuth Email setup (not to the SSO setup).
+
 #### [`PAPERLESS_GMAIL_OAUTH_CLIENT_ID=<str>`](#PAPERLESS_GMAIL_OAUTH_CLIENT_ID) {#PAPERLESS_GMAIL_OAUTH_CLIENT_ID}
 
 : The OAuth client ID for Gmail. This is required for Gmail OAuth Email setup. See [OAuth Email Setup](usage.md#oauth-email-setup) for more information.
