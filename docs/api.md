@@ -365,7 +365,6 @@ The endpoint supports the following optional form fields:
 -   `custom_fields`: An array of custom field ids to assign (with an empty
     value) to the document.
 
-
 !!! note
 
     Sending a `Content-Length` header with correct size is mandatory.
