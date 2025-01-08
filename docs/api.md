@@ -365,6 +365,10 @@ The endpoint supports the following optional form fields:
 -   `custom_fields`: An array of custom field ids to assign (with an empty
     value) to the document.
 
+!!! note
+
+    Sending a `Content-Length` header with correct size is mandatory.
+
 The endpoint will immediately return HTTP 200 if the document consumption
 process was started successfully, with the UUID of the consumption task
 as the data. No additional status information about the consumption process
