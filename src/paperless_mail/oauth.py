@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import secrets
 from datetime import timedelta
 
 from django.conf import settings
@@ -13,9 +14,10 @@ from paperless_mail.models import MailAccount
 
 
 class PaperlessMailOAuth2Manager:
-    def __init__(self):
+    def __init__(self, state: str | None = None):
         self._gmail_client = None
         self._outlook_client = None
+        self.state = state if state is not None else secrets.token_urlsafe(32)
 
     @property
     def gmail_client(self) -> GoogleOAuth2:
@@ -49,6 +51,7 @@ class PaperlessMailOAuth2Manager:
                 redirect_uri=self.oauth_callback_url,
                 scope=["https://mail.google.com/"],
                 extras_params={"prompt": "consent", "access_type": "offline"},
+                state=self.state,
             ),
         )
 
@@ -60,6 +63,7 @@ class PaperlessMailOAuth2Manager:
                     "offline_access",
                     "https://outlook.office.com/IMAP.AccessAsUser.All",
                 ],
+                state=self.state,
             ),
         )
 
@@ -109,3 +113,6 @@ class PaperlessMailOAuth2Manager:
         except RefreshTokenError as e:
             logger.error(f"Failed to refresh oauth token for account {account}: {e}")
             return False
+
+    def validate_state(self, state: str) -> bool:
+        return settings.DEBUG or (len(state) > 0 and state == self.state)
