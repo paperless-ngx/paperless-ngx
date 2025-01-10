@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
 import {
   NgbCollapseModule,
+  NgbDropdownModule,
   NgbModal,
   NgbNavModule,
   NgbPaginationModule,
@@ -57,6 +58,7 @@ const FILTER_TARGETS = [
     ReactiveFormsModule,
     NgTemplateOutlet,
     NgbCollapseModule,
+    NgbDropdownModule,
     NgbNavModule,
     NgbPaginationModule,
     NgbPopoverModule,
