@@ -879,9 +879,7 @@ export class BulkEditorComponent
 
     dialog.documents = Array.from(this.list.selected)
     dialog.succeeded.subscribe((result) => {
-      this.toastService.showInfo(
-        $localize`Bulk operation executed successfully`
-      )
+      this.toastService.showInfo($localize`Custom fields updated.`)
       this.list.reload()
       this.list.reduceSelectionToFilter()
       this.list.selected.forEach((id) => {
@@ -890,7 +888,7 @@ export class BulkEditorComponent
     })
     dialog.failed.subscribe((error) => {
       this.toastService.showError(
-        $localize`Error executing bulk operation`,
+        $localize`Error updating custom fields.`,
         error
       )
     })
