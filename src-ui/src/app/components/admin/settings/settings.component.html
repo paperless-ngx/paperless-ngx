@@ -157,27 +157,27 @@
             <h4 class="mt-4" i18n>Document editing</h4>
 
             <div class="row mb-3">
-              <div class="offset-md-3 col">
+              <div class="col">
                 <pngx-input-check i18n-title title="Use PDF viewer provided by the browser" i18n-hint hint="This is usually faster for displaying large PDF documents, but it might not work on some browsers." formControlName="useNativePdfViewer"></pngx-input-check>
               </div>
             </div>
 
             <div class="row mb-3">
-              <div class="offset-md-3 col">
+              <div class="col">
                 <pngx-input-check i18n-title title="Automatically remove inbox tag(s) on save" formControlName="documentEditingRemoveInboxTags"></pngx-input-check>
               </div>
             </div>
 
             <div class="row mb-3">
-              <div class="offset-md-3 col">
+              <div class="col">
                 <pngx-input-check i18n-title title="Show document thumbnail during loading" formControlName="documentEditingOverlayThumbnail"></pngx-input-check>
               </div>
             </div>
           </div>
           <div class="col-xl-6 ps-xl-5">
-            <h4 class="mt-4" id="update-checking" i18n>Update checking</h4>
+            <h4 class="mt-4 mt-md-0" id="update-checking" i18n>Update checking</h4>
             <div class="row mb-3">
-              <div class="offset-md-3 col d-flex flex-row align-items-start">
+              <div class="col d-flex flex-row align-items-start">
                 <pngx-input-check i18n-title title="Enable update checking" formControlName="updateCheckingEnabled"></pngx-input-check>
                 <button class="btn btn-sm btn-link text-muted me-auto p-0 ms-2" title="What's this?" i18n-title type="button" triggers="mouseenter:mouseleave" [ngbPopover]="updatesPopover" [autoClose]="true">
                   <i-bs name="question-circle"></i-bs>
@@ -195,7 +195,7 @@
 
             <h4 class="mt-4" i18n>Bulk editing</h4>
             <div class="row mb-3">
-              <div class="offset-md-3 col">
+              <div class="col">
                 <pngx-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs"></pngx-input-check>
                 <pngx-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></pngx-input-check>
               </div>
@@ -203,15 +203,15 @@
 
             <h4 class="mt-4" i18n>Global search</h4>
             <div class="row mb-3">
-              <div class="offset-md-3 col">
+              <div class="col">
                 <pngx-input-check i18n-title title="Do not include advanced search results" formControlName="searchDbOnly"></pngx-input-check>
               </div>
             </div>
 
             <div class="row mb-3">
-              <div class="offset-md-3 col">
+              <div class="col">
                 <div class="row">
-                  <div class="col-md-2 col-form-label pt-0">
+                  <div class="col-md-3 col-form-label pt-0">
                     <span i18n>Full search links to</span>
                   </div>
                   <div class="col">
@@ -226,14 +226,14 @@
 
             <h4 class="mt-4" i18n>Saved Views</h4>
             <div class="row mb-3">
-              <div class="offset-md-3 col">
+              <div class="col">
                 <pngx-input-check i18n-title title="Show warning when closing saved views with unsaved changes" formControlName="savedViewsWarnOnUnsavedChange"></pngx-input-check>
               </div>
             </div>
 
             <h4 class="mt-4" i18n>Notes</h4>
             <div class="row mb-3">
-              <div class="offset-md-3 col">
+              <div class="col">
                 <pngx-input-check i18n-title title="Enable notes" formControlName="notesEnabled"></pngx-input-check>
               </div>
             </div>
@@ -250,7 +250,7 @@
         <h4 i18n>Default Permissions</h4>
 
         <div class="row mb-3">
-          <div class="offset-md-3 col">
+          <div class="col">
             <p i18n>
             Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI
           </p>
@@ -332,7 +332,7 @@
         <h4 i18n>Document processing</h4>
 
         <div class="row mb-3">
-          <div class="offset-md-3 col">
+          <div class="col">
             <pngx-input-check i18n-title title="Show notifications when new documents are detected" formControlName="notificationsConsumerNewDocument"></pngx-input-check>
             <pngx-input-check i18n-title title="Show notifications when document processing completes successfully" formControlName="notificationsConsumerSuccess"></pngx-input-check>
             <pngx-input-check i18n-title title="Show notifications when document processing fails" formControlName="notificationsConsumerFailed"></pngx-input-check>
