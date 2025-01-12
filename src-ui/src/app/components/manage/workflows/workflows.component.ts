@@ -147,7 +147,7 @@ export class WorkflowsComponent
     })
   }
 
-  onWorkflowEnableToggled(workflow: Workflow) {
+  toggleWorkflowEnabled(workflow: Workflow) {
     this.workflowService.patch(workflow).subscribe({
       next: () => {
         this.toastService.showInfo(
