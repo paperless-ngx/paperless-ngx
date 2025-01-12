@@ -13,6 +13,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgbAccordionModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
@@ -154,6 +155,7 @@ const TRIGGER_MATCHING_ALGORITHMS = MATCHING_ALGORITHMS.filter(
     NgbAccordionModule,
     NgTemplateOutlet,
     DragDropModule,
+    NgxBootstrapIconsModule,
   ],
 })
 export class WorkflowEditDialogComponent
