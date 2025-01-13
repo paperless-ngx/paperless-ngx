@@ -7909,7 +7909,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component.html</context>
           <context context-type="linenumber">69,74</context>
         </context-group>
-        <target state="translated">{VAR_PLURAL, plural, =1 {이 작업은 선택한 문서에서 사용자 지정 필드 1개도 제거합니다.} other {이 작업은 선택한 문서에서
+        <target state="translated">{VAR_PLURAL, plural, =1 {이 작업은 선택한 문서에서 사용자 지정 필드 1개도 제거합니다.} other {이 작업은 선택한 문서에서 
           <x id="INTERPOLATION"/>개의 사용자 지정 필드도 제거합니다.}}</target>
       </trans-unit>
       <trans-unit id="2784168796433474565" datatype="html">
