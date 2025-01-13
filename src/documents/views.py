@@ -980,6 +980,7 @@ class BulkEditView(PassUserMixin):
         "delete_pages": "checksum",
         "split": None,
         "merge": None,
+        "reprocess": "checksum",
     }
 
     permission_classes = (IsAuthenticated,)
@@ -1058,7 +1059,7 @@ class BulkEditView(PassUserMixin):
                 return HttpResponseForbidden("Insufficient permissions")
 
         try:
-            modified_field = self.MODIFIED_FIELD_BY_METHOD[method.__name__]
+            modified_field = self.MODIFIED_FIELD_BY_METHOD.get(method.__name__, None)
             if settings.AUDIT_LOG_ENABLED and modified_field:
                 old_documents = {
                     obj["pk"]: obj
