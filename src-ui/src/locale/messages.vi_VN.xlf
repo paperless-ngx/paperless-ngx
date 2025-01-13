@@ -306,6 +306,10 @@
                <context context-type="linenumber">85</context>
             </context-group>
             <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">176</context>
+            </context-group>
+            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
                <context context-type="linenumber">124</context>
             </context-group>
@@ -501,19 +505,19 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">275</context>
+               <context context-type="linenumber">284</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">277</context>
+               <context context-type="linenumber">286</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">282</context>
+               <context context-type="linenumber">291</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">289</context>
+               <context context-type="linenumber">299</context>
             </context-group>
             <target state="translated">Xét duyệt</target>
          </trans-unit>
@@ -530,6 +534,10 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
                <context context-type="linenumber">9</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">8</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
@@ -610,6 +618,10 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
                <context context-type="linenumber">31</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">105</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/logs/logs.component.html</context>
@@ -738,6 +750,10 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
                <context context-type="linenumber">44</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">92</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
@@ -1038,6 +1054,10 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
                <context context-type="linenumber">61</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">97</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
@@ -1390,6 +1410,10 @@
                <context context-type="linenumber">189</context>
             </context-group>
             <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">199</context>
+            </context-group>
+            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
                <context context-type="linenumber">111</context>
             </context-group>
@@ -1709,26 +1733,212 @@
             </context-group>
             <target state="translated">đã thu hồi</target>
          </trans-unit>
-         <trans-unit id="9063918187161876141" datatype="html">
-            <source>Application Configuration</source>
+         <trans-unit id="6561447583025440588" datatype="html">
+            <source>Backup &amp; Restore</source>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
                <context context-type="linenumber">2</context>
             </context-group>
-            <target state="translated">Cấu hình ứng dụng</target>
-         </trans-unit>
-         <trans-unit id="8528041182664173532" datatype="html">
-            <source>Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of Paperless-ngx. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</source>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
+               <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+               <context context-type="linenumber">264</context>
+            </context-group>
+            <target state="translated">Sao lưu &amp; Khôi phục</target>
+         </trans-unit>
+         <trans-unit id="2815603816761176174" datatype="html">
+            <source>Manage backup and restore versions.</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
                <context context-type="linenumber">4</context>
             </context-group>
-            <target state="translated">&gt;Các tùy chọn cấu hình ứng dụng toàn cầu áp dụng cho &amp;lt;strong&gt;mọi&amp;lt;/strong&gt; người dùng của bản cài đặt EDOCS này. Các tùy chọn cũng có thể được đặt bằng cách sử dụng các biến môi trường hoặc tệp cấu hình, nhưng giá trị được chỉ định ở đây sẽ luôn được ưu tiên.</target>
+            <target state="translated">Quản lý các phiên bản sao lưu và khôi phục</target>
+         </trans-unit>
+         <trans-unit id="5621597867547268354" datatype="html">
+            <source>Backup</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">11</context>
+            </context-group>
+            <target state="translated">Sao lưu</target>
+         </trans-unit>
+         <trans-unit id="8831459317888986184" datatype="html">
+            <source>Delete selected</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">15</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+               <context context-type="linenumber">14</context>
+            </context-group>
+            <target state="translated">Xóa mục đã chọn</target>
+         </trans-unit>
+         <trans-unit id="4244894609202394833" datatype="html">
+            <source>Storage status</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">26</context>
+            </context-group>
+            <target state="translated">Trạng thái lưu trữ</target>
+         </trans-unit>
+         <trans-unit id="8150095600025698593" datatype="html">
+            <source>
+               Used
+               <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;" />
+               <x id="INTERPOLATION" equiv-text="{{ anotherStorage + backupversionStorage + documentStorage  | fileSize }}" />
+               <x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;" />
+               /
+               <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;" />
+               <x id="INTERPOLATION_1" equiv-text="{{ totalStorage |fileSize }}" />
+               <x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;" />
+            </source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">40,41</context>
+            </context-group>
+            <target state="translated">
+               Đã dùng
+               <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&amp;lt;strong&gt;" />
+               <x id="INTERPOLATION" equiv-text="{{ anotherStorage + backupversionStorage + documentStorage  | fileSize }}" />
+               <x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&amp;lt;/strong&gt;" />
+               /
+               <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&amp;lt;strong&gt;" />
+               <x id="INTERPOLATION_1" equiv-text="{{ totalStorage |fileSize }}" />
+               <x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&amp;lt;/strong&gt;" />
+            </target>
+         </trans-unit>
+         <trans-unit id="7516453440672168002" datatype="html">
+            <source>
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;dot &quot; style=&quot;background-color: #ff453a;&quot;&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
+               <x id="INTERPOLATION" equiv-text="{{ anotherStorage|fileSize }}" />
+               -
+               <x id="INTERPOLATION_1" equiv-text="{{ anotherPercentage.toFixed() }}" />
+               % Another
+            </source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">56,57</context>
+            </context-group>
+            <target state="translated">
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;span class=&amp;quot;dot &amp;quot; style=&amp;quot;background-color: #ff453a;&amp;quot;&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;/span&gt;" />
+               <x id="INTERPOLATION" equiv-text="{{ anotherStorage|fileSize }}" />
+               -
+               <x id="INTERPOLATION_1" equiv-text="{{ anotherPercentage.toFixed() }}" />
+               % Khác
+            </target>
+         </trans-unit>
+         <trans-unit id="379786930182019578" datatype="html">
+            <source>
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;dot ms-2&quot;                                  style=&quot;background-color: #ffcc00;&quot;&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
+               <x id="INTERPOLATION" equiv-text="{{ documentStorage|fileSize }}" />
+               -
+               <x id="INTERPOLATION_1" equiv-text="{{ documentStoragePercentage.toFixed() }}" />
+               % Document
+            </source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">58,60</context>
+            </context-group>
+            <target state="translated">
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;span class=&amp;quot;dot ms-2&amp;quot;                                  style=&amp;quot;background-color: #ffcc00;&amp;quot;&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;/span&gt;" />
+               <x id="INTERPOLATION" equiv-text="{{ documentStorage|fileSize }}" />
+               -
+               <x id="INTERPOLATION_1" equiv-text="{{ documentStoragePercentage.toFixed() }}" />
+               % Tài liệu
+            </target>
+         </trans-unit>
+         <trans-unit id="5823088340008315023" datatype="html">
+            <source>
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;dot ms-2&quot;                                  style=&quot;background-color: #a0a0a0;&quot;&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
+               <x id="INTERPOLATION" equiv-text="{{ backupversionStorage|fileSize }}" />
+               -
+               <x id="INTERPOLATION_1" equiv-text="{{ backupversionStoragePercentage.toFixed() }}" />
+               % Backup versions
+            </source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">61,63</context>
+            </context-group>
+            <target state="translated">
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;span class=&amp;quot;dot ms-2&amp;quot;                                  style=&amp;quot;background-color: #a0a0a0;&amp;quot;&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;/span&gt;" />
+               <x id="INTERPOLATION" equiv-text="{{ backupversionStorage|fileSize }}" />
+               -
+               <x id="INTERPOLATION_1" equiv-text="{{ backupversionStoragePercentage.toFixed() }}" />
+               % Phiên bản sao lưu
+            </target>
+         </trans-unit>
+         <trans-unit id="7702863042635859022" datatype="html">
+            <source>
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;dot ms-2 bg-primary opacity-50&quot;&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
+               <x id="INTERPOLATION" equiv-text="{{ availableStorage|fileSize }}" />
+               -
+               <x id="INTERPOLATION_1" equiv-text="{{ availableStoragePercentage.toFixed() }}" />
+               % Available
+            </source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">64,65</context>
+            </context-group>
+            <target state="translated">
+               <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;span class=&amp;quot;dot ms-2 bg-primary opacity-50&amp;quot;&gt;" />
+               <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;/span&gt;" />
+               <x id="INTERPOLATION" equiv-text="{{ availableStorage|fileSize }}" />
+               -
+               <x id="INTERPOLATION_1" equiv-text="{{ availableStoragePercentage.toFixed() }}" />
+               % Khả dụng
+            </target>
+         </trans-unit>
+         <trans-unit id="4674602491063162651" datatype="html">
+            <source>Backup at</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">93</context>
+            </context-group>
+            <target state="translated">Sao lưu lúc</target>
+         </trans-unit>
+         <trans-unit id="6771495566532899891" datatype="html">
+            <source>Restore at</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">94</context>
+            </context-group>
+            <target state="translated">Khôi phục lúc</target>
+         </trans-unit>
+         <trans-unit id="1855575025865123144" datatype="html">
+            <source>Document/Size</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">95</context>
+            </context-group>
+            <target state="translated">Số lượng tài liệu/Dung lượng</target>
+         </trans-unit>
+         <trans-unit id="2525230676386818985" datatype="html">
+            <source>Result</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">96</context>
+            </context-group>
+            <target state="translated">Kết quả</target>
          </trans-unit>
          <trans-unit id="187187500641108332" datatype="html">
             <source>
-               <x id="INTERPOLATION" equiv-text="ategory}}" />
+               <x id="INTERPOLATION" equiv-text="{{ backup.created_at | customDate:'short' }}" />
             </source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">125</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">126</context>
+            </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
                <context context-type="linenumber">14,15</context>
@@ -1773,6 +1983,557 @@
                <context context-type="sourcefile">src/app/components/document-approvals/document-approvals.component.html</context>
                <context context-type="linenumber">27</context>
             </context-group>
+         </trans-unit>
+         <trans-unit id="4916615183488807818" datatype="html">
+            <source>
+               <x id="INTERPOLATION" equiv-text="{{ backup.detail.documents }}" />
+               -
+               <x id="INTERPOLATION_1" equiv-text="{{ backup.detail.size| filesize }}" />
+            </source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">127,129</context>
+            </context-group>
+            <target state="translated">
+               <x id="INTERPOLATION" equiv-text="{{ backup.detail.documents }}" />
+               -
+               <x id="INTERPOLATION_1" equiv-text="{{ backup.detail.size| filesize }}" />
+            </target>
+         </trans-unit>
+         <trans-unit id="8958063833276423847" datatype="html">
+            <source>click for full output</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">147</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
+               <context context-type="linenumber">72</context>
+            </context-group>
+            <target state="translated">click để có đầu ra đầy đủ</target>
+         </trans-unit>
+         <trans-unit id="6770769801335635194" datatype="html">
+            <source>Restore</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">165</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">166</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+               <context context-type="linenumber">71</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+               <context context-type="linenumber">78</context>
+            </context-group>
+            <target state="translated">Khôi phục</target>
+         </trans-unit>
+         <trans-unit id="7022070615528435141" datatype="html">
+            <source>Delete</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">166</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">176</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">200</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">235</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
+               <context context-type="linenumber">346</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+               <context context-type="linenumber">72</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
+               <context context-type="linenumber">81</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+               <context context-type="linenumber">65</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+               <context context-type="linenumber">94</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.html</context>
+               <context context-type="linenumber">38</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.html</context>
+               <context context-type="linenumber">76</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
+               <context context-type="linenumber">53</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
+               <context context-type="linenumber">45</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
+               <context context-type="linenumber">87</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
+               <context context-type="linenumber">9</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
+               <context context-type="linenumber">37</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+               <context context-type="linenumber">24</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
+               <context context-type="linenumber">190</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/archive-font-list/archive-font-list.component.html</context>
+               <context context-type="linenumber">11</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/archive-font-list/archive-font-list.component.html</context>
+               <context context-type="linenumber">141</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/boxcase/boxcase.component.html</context>
+               <context context-type="linenumber">11</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/boxcase/boxcase.component.html</context>
+               <context context-type="linenumber">165</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-dossier-form-list/custom-dossier-form-list.component.html</context>
+               <context context-type="linenumber">41</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-dossier-form-list/custom-dossier-form-list.component.html</context>
+               <context context-type="linenumber">139</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-dossier-form-list/custom-dossier-form-list.component.html</context>
+               <context context-type="linenumber">148</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-dossier-form-list/custom-dossier-form-list.component.ts</context>
+               <context context-type="linenumber">316</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.html</context>
+               <context context-type="linenumber">49</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.html</context>
+               <context context-type="linenumber">216</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.html</context>
+               <context context-type="linenumber">228</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.ts</context>
+               <context context-type="linenumber">308</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.html</context>
+               <context context-type="linenumber">34</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
+               <context context-type="linenumber">58</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
+               <context context-type="linenumber">283</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/font-language-list/font-language-list.component.html</context>
+               <context context-type="linenumber">9</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/font-language-list/font-language-list.component.html</context>
+               <context context-type="linenumber">84</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/font-language-list/font-language-list.component.html</context>
+               <context context-type="linenumber">96</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
+               <context context-type="linenumber">40</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
+               <context context-type="linenumber">84</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
+               <context context-type="linenumber">9</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
+               <context context-type="linenumber">9</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
+               <context context-type="linenumber">9</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
+               <context context-type="linenumber">9</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
+               <context context-type="linenumber">84</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
+               <context context-type="linenumber">84</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
+               <context context-type="linenumber">84</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
+               <context context-type="linenumber">84</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
+               <context context-type="linenumber">96</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
+               <context context-type="linenumber">96</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
+               <context context-type="linenumber">96</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
+               <context context-type="linenumber">96</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
+               <context context-type="linenumber">217</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/shelf/shelf.component.html</context>
+               <context context-type="linenumber">11</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/shelf/shelf.component.html</context>
+               <context context-type="linenumber">166</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/warehouse/warehouse.component.html</context>
+               <context context-type="linenumber">12</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/warehouse/warehouse.component.html</context>
+               <context context-type="linenumber">166</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
+               <context context-type="linenumber">38</context>
+            </context-group>
+            <target state="translated">Xóa</target>
+         </trans-unit>
+         <trans-unit id="2399605986862315793" datatype="html">
+            <source>Restore</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">172,173</context>
+            </context-group>
+            <target state="translated">Khôi phục</target>
+         </trans-unit>
+         <trans-unit id="1929289430504542909" datatype="html">
+            <source>
+               {VAR_PLURAL, plural, =1 {One backup} other {
+               <x id="INTERPOLATION" />
+               total backup versions}}
+            </source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
+               <context context-type="linenumber">197</context>
+            </context-group>
+            <target state="translated">
+               {VAR_PLURAL, plural, =1 {Một phiên bản sao lưu} other {
+               Tổng <x id="INTERPOLATION" /> phiên bản sao lưu}}
+            </target>
+         </trans-unit>
+         <trans-unit id="3576742020206668296" datatype="html">
+            <source>Confirm restore</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">162</context>
+            </context-group>
+            <target state="translated">Xác nhận khôi phục</target>
+         </trans-unit>
+         <trans-unit id="6524887362180496344" datatype="html">
+            <source>Please note that all changes after the restore will be lost. Are you sure you want to proceed?</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">163</context>
+            </context-group>
+            <target state="translated">Xin lưu ý rằng mọi thay đổi sau khi khôi phục sẽ bị mất. Bạn có chắc chắn muốn tiếp tục không?</target>
+         </trans-unit>
+         <trans-unit id="5641451190833696892" datatype="html">
+            <source>This operation cannot be undone.</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">164</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">198</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">233</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+               <context context-type="linenumber">63</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+               <context context-type="linenumber">92</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
+               <context context-type="linenumber">116</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
+               <context context-type="linenumber">166</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+               <context context-type="linenumber">896</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+               <context context-type="linenumber">931</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+               <context context-type="linenumber">898</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-dossier-form-list/custom-dossier-form-list.component.ts</context>
+               <context context-type="linenumber">437</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.ts</context>
+               <context context-type="linenumber">429</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.ts</context>
+               <context context-type="linenumber">72</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
+               <context context-type="linenumber">342</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
+               <context context-type="linenumber">114</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
+               <context context-type="linenumber">173</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
+               <context context-type="linenumber">353</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
+               <context context-type="linenumber">97</context>
+            </context-group>
+            <target state="translated">Thao tác này không thể hoàn tác.</target>
+         </trans-unit>
+         <trans-unit id="7534569062269274401" datatype="html">
+            <source>Document restored</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">174</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+               <context context-type="linenumber">122</context>
+            </context-group>
+            <target state="translated">Tài liệu đã khôi phục</target>
+         </trans-unit>
+         <trans-unit id="9136016619414048201" datatype="html">
+            <source>Error restoring document</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">185</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+               <context context-type="linenumber">132</context>
+            </context-group>
+            <target state="translated">Lỗi khôi phục tài liệu</target>
+         </trans-unit>
+         <trans-unit id="9021887951960049161" datatype="html">
+            <source>Confirm delete</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">196</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">229</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+               <context context-type="linenumber">61</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
+               <context context-type="linenumber">88</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+               <context context-type="linenumber">851</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-dossier-form-list/custom-dossier-form-list.component.ts</context>
+               <context context-type="linenumber">312</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-dossier-form-list/custom-dossier-form-list.component.ts</context>
+               <context context-type="linenumber">435</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.ts</context>
+               <context context-type="linenumber">304</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.ts</context>
+               <context context-type="linenumber">427</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
+               <context context-type="linenumber">213</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
+               <context context-type="linenumber">351</context>
+            </context-group>
+            <target state="translated">Xác nhận xóa</target>
+         </trans-unit>
+         <trans-unit id="5649773230386489170" datatype="html">
+            <source>This operation will permanently delete this backup version.</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">197</context>
+            </context-group>
+            <target state="translated">Thao tác này sẽ xóa vĩnh viễn phiên bản sao lưu này.</target>
+         </trans-unit>
+         <trans-unit id="261483532591755754" datatype="html">
+            <source>Backup version deleted</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">213</context>
+            </context-group>
+            <target state="translated">Đã xóa phiên bản sao lưu</target>
+         </trans-unit>
+         <trans-unit id="7200418682978768865" datatype="html">
+            <source>Error deleting backup version</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">218</context>
+            </context-group>
+            <target state="translated">Lỗi xóa phiên bản sao lưu</target>
+         </trans-unit>
+         <trans-unit id="6554806464139125441" datatype="html">
+            <source>This operation will permanently delete the selected backup versions.</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">231</context>
+            </context-group>
+            <target state="translated">Thao tác này sẽ xóa vĩnh viễn các phiên bản sao lưu đã chọn.</target>
+         </trans-unit>
+         <trans-unit id="5968945172550919914" datatype="html">
+            <source>This operation will permanently delete all backup versions in the trash.</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">232</context>
+            </context-group>
+            <target state="translated">Thao tác này sẽ xóa vĩnh viễn tất cả các phiên bản sao lưu vào thùng rác.</target>
+         </trans-unit>
+         <trans-unit id="1336925933444477292" datatype="html">
+            <source>Backup version(s) deleted</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">248</context>
+            </context-group>
+            <target state="translated">(Các) phiên bản sao lưu đã được xóa</target>
+         </trans-unit>
+         <trans-unit id="8635578338061592053" datatype="html">
+            <source>Error deleting backup version(s)</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">255</context>
+            </context-group>
+            <target state="translated">Lỗi xóa (các) phiên bản sao lưu</target>
+         </trans-unit>
+         <trans-unit id="5717767335699055842" datatype="html">
+            <source>Document(s) backed up</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">268</context>
+            </context-group>
+            <target state="translated">(Các) tài liệu được sao lưu</target>
+         </trans-unit>
+         <trans-unit id="7613292396226571070" datatype="html">
+            <source>Error backup document(s)</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+               <context context-type="linenumber">274</context>
+            </context-group>
+            <target state="translated">Lỗi sao lưu tài liệu</target>
+         </trans-unit>
+         <trans-unit id="9063918187161876141" datatype="html">
+            <source>Application Configuration</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
+               <context context-type="linenumber">2</context>
+            </context-group>
+            <target state="translated">Cấu hình ứng dụng</target>
+         </trans-unit>
+         <trans-unit id="8528041182664173532" datatype="html">
+            <source>Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of Paperless-ngx. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
+               <context context-type="linenumber">4</context>
+            </context-group>
+            <target state="translated">&gt;Các tùy chọn cấu hình ứng dụng toàn cầu áp dụng cho &amp;lt;strong&gt;mọi&amp;lt;/strong&gt; người dùng của bản cài đặt EDOCS này. Các tùy chọn cũng có thể được đặt bằng cách sử dụng các biến môi trường hoặc tệp cấu hình, nhưng giá trị được chỉ định ở đây sẽ luôn được ưu tiên.</target>
          </trans-unit>
          <trans-unit id="2180291763949669799" datatype="html">
             <source>Enable</source>
@@ -1966,11 +2727,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">340</context>
+               <context context-type="linenumber">351</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">343</context>
+               <context context-type="linenumber">354</context>
             </context-group>
             <target state="translated">Nhật ký</target>
          </trans-unit>
@@ -1998,11 +2759,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">305</context>
+               <context context-type="linenumber">316</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">307</context>
+               <context context-type="linenumber">318</context>
             </context-group>
             <target state="translated">Cài đặt</target>
          </trans-unit>
@@ -2645,218 +3406,6 @@
             </context-group>
             <target state="translated">Hiển thị thanh bên</target>
          </trans-unit>
-         <trans-unit id="7022070615528435141" datatype="html">
-            <source>Delete</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
-               <context context-type="linenumber">346</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
-               <context context-type="linenumber">72</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
-               <context context-type="linenumber">81</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-               <context context-type="linenumber">65</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-               <context context-type="linenumber">94</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.html</context>
-               <context context-type="linenumber">38</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.html</context>
-               <context context-type="linenumber">76</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
-               <context context-type="linenumber">53</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-               <context context-type="linenumber">45</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-               <context context-type="linenumber">87</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
-               <context context-type="linenumber">9</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/common/share-links-dropdown/share-links-dropdown.component.html</context>
-               <context context-type="linenumber">37</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-               <context context-type="linenumber">24</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-               <context context-type="linenumber">190</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/archive-font-list/archive-font-list.component.html</context>
-               <context context-type="linenumber">11</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/archive-font-list/archive-font-list.component.html</context>
-               <context context-type="linenumber">141</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/boxcase/boxcase.component.html</context>
-               <context context-type="linenumber">11</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/boxcase/boxcase.component.html</context>
-               <context context-type="linenumber">165</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-dossier-form-list/custom-dossier-form-list.component.html</context>
-               <context context-type="linenumber">41</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-dossier-form-list/custom-dossier-form-list.component.html</context>
-               <context context-type="linenumber">139</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-dossier-form-list/custom-dossier-form-list.component.html</context>
-               <context context-type="linenumber">148</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-dossier-form-list/custom-dossier-form-list.component.ts</context>
-               <context context-type="linenumber">316</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.html</context>
-               <context context-type="linenumber">49</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.html</context>
-               <context context-type="linenumber">216</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.html</context>
-               <context context-type="linenumber">228</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.ts</context>
-               <context context-type="linenumber">308</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.html</context>
-               <context context-type="linenumber">34</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
-               <context context-type="linenumber">58</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
-               <context context-type="linenumber">283</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/font-language-list/font-language-list.component.html</context>
-               <context context-type="linenumber">9</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/font-language-list/font-language-list.component.html</context>
-               <context context-type="linenumber">84</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/font-language-list/font-language-list.component.html</context>
-               <context context-type="linenumber">96</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
-               <context context-type="linenumber">40</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
-               <context context-type="linenumber">84</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">9</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">9</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">9</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">9</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">84</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">84</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">84</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">84</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">96</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">96</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">96</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">96</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-               <context context-type="linenumber">217</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/shelf/shelf.component.html</context>
-               <context context-type="linenumber">11</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/shelf/shelf.component.html</context>
-               <context context-type="linenumber">166</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/warehouse/warehouse.component.html</context>
-               <context context-type="linenumber">12</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/warehouse/warehouse.component.html</context>
-               <context context-type="linenumber">166</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
-               <context context-type="linenumber">38</context>
-            </context-group>
-            <target state="translated">Xóa</target>
-         </trans-unit>
          <trans-unit id="7877440816920439876" datatype="html">
             <source>No saved views defined.</source>
             <context-group purpose="location">
@@ -2973,11 +3522,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">328</context>
+               <context context-type="linenumber">339</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">330</context>
+               <context context-type="linenumber">341</context>
             </context-group>
             <target state="translated">Tác vụ tệp</target>
          </trans-unit>
@@ -2988,14 +3537,6 @@
                <context context-type="linenumber">39</context>
             </context-group>
             <target state="translated">Kết quả</target>
-         </trans-unit>
-         <trans-unit id="8958063833276423847" datatype="html">
-            <source>click for full output</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
-               <context context-type="linenumber">72</context>
-            </context-group>
-            <target state="translated">click để có đầu ra đầy đủ</target>
          </trans-unit>
          <trans-unit id="1536087519743707362" datatype="html">
             <source>Dismiss</source>
@@ -3189,6 +3730,10 @@
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
                <context context-type="linenumber">255</context>
             </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+               <context context-type="linenumber">260</context>
+            </context-group>
             <target state="translated">Thùng rác</target>
          </trans-unit>
          <trans-unit id="3818027200170621545" datatype="html">
@@ -3206,14 +3751,6 @@
                <context context-type="linenumber">11</context>
             </context-group>
             <target state="translated">Khôi phục đã chọn</target>
-         </trans-unit>
-         <trans-unit id="8831459317888986184" datatype="html">
-            <source>Delete selected</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
-               <context context-type="linenumber">14</context>
-            </context-group>
-            <target state="translated">Xóa mục đã chọn</target>
          </trans-unit>
          <trans-unit id="8597030111956627342" datatype="html">
             <source>Empty trash</source>
@@ -3245,18 +3782,6 @@
                ngày
             </target>
          </trans-unit>
-         <trans-unit id="6770769801335635194" datatype="html">
-            <source>Restore</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
-               <context context-type="linenumber">71</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
-               <context context-type="linenumber">78</context>
-            </context-group>
-            <target state="translated">Khôi phục</target>
-         </trans-unit>
          <trans-unit id="2308646316372333720" datatype="html">
             <source>
                {VAR_PLURAL, plural, =1 {One document in trash} other {
@@ -3274,46 +3799,6 @@
                tài liệu trong thùng rác}}
             </target>
          </trans-unit>
-         <trans-unit id="9021887951960049161" datatype="html">
-            <source>Confirm delete</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-               <context context-type="linenumber">61</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-               <context context-type="linenumber">88</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-               <context context-type="linenumber">851</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-dossier-form-list/custom-dossier-form-list.component.ts</context>
-               <context context-type="linenumber">312</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-dossier-form-list/custom-dossier-form-list.component.ts</context>
-               <context context-type="linenumber">435</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.ts</context>
-               <context context-type="linenumber">304</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.ts</context>
-               <context context-type="linenumber">427</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-               <context context-type="linenumber">213</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-               <context context-type="linenumber">351</context>
-            </context-group>
-            <target state="translated">Xác nhận xóa</target>
-         </trans-unit>
          <trans-unit id="1373208150912772963" datatype="html">
             <source>This operation will permanently delete this document.</source>
             <context-group purpose="location">
@@ -3321,70 +3806,6 @@
                <context context-type="linenumber">62</context>
             </context-group>
             <target state="translated">Thao tác này sẽ xóa vĩnh viễn tài liệu này.</target>
-         </trans-unit>
-         <trans-unit id="5641451190833696892" datatype="html">
-            <source>This operation cannot be undone.</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-               <context context-type="linenumber">63</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-               <context context-type="linenumber">92</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-               <context context-type="linenumber">116</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
-               <context context-type="linenumber">166</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-               <context context-type="linenumber">896</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-               <context context-type="linenumber">931</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-               <context context-type="linenumber">898</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-dossier-form-list/custom-dossier-form-list.component.ts</context>
-               <context context-type="linenumber">437</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.ts</context>
-               <context context-type="linenumber">429</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.ts</context>
-               <context context-type="linenumber">72</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.ts</context>
-               <context context-type="linenumber">342</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-               <context context-type="linenumber">114</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
-               <context context-type="linenumber">173</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-               <context context-type="linenumber">353</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
-               <context context-type="linenumber">97</context>
-            </context-group>
-            <target state="translated">Thao tác này không thể hoàn tác.</target>
          </trans-unit>
          <trans-unit id="1980187861066369604" datatype="html">
             <source>Document deleted</source>
@@ -3438,22 +3859,6 @@
             </context-group>
             <target state="translated">Lỗi xóa tài liệu</target>
          </trans-unit>
-         <trans-unit id="7534569062269274401" datatype="html">
-            <source>Document restored</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-               <context context-type="linenumber">122</context>
-            </context-group>
-            <target state="translated">Tài liệu đã khôi phục</target>
-         </trans-unit>
-         <trans-unit id="9136016619414048201" datatype="html">
-            <source>Error restoring document</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
-               <context context-type="linenumber">132</context>
-            </context-group>
-            <target state="translated">Lỗi khôi phục tài liệu</target>
-         </trans-unit>
          <trans-unit id="960063472770266304" datatype="html">
             <source>Document(s) restored</source>
             <context-group purpose="location">
@@ -3478,11 +3883,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">319</context>
+               <context context-type="linenumber">330</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">321</context>
+               <context context-type="linenumber">332</context>
             </context-group>
             <target state="translated">Người dùng &amp; Nhóm</target>
          </trans-unit>
@@ -4200,11 +4605,11 @@
             <source>Mail</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">260</context>
+               <context context-type="linenumber">269</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">263</context>
+               <context context-type="linenumber">272</context>
             </context-group>
             <target state="translated">Mail</target>
          </trans-unit>
@@ -4212,11 +4617,11 @@
             <source>Dossier Form</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">268</context>
+               <context context-type="linenumber">277</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">270</context>
+               <context context-type="linenumber">279</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/dossier-edit-dialog/dossier-edit-dialog.component.html</context>
@@ -4224,19 +4629,27 @@
             </context-group>
             <target state="translated">Mẫu hồ sơ</target>
          </trans-unit>
-         <trans-unit id="577530814340008437" datatype="html">
-            <source>Font Language</source>
+         <trans-unit id="2826581353496868063" datatype="html">
+            <source>Language</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">284</context>
+               <context context-type="linenumber">294</context>
             </context-group>
-            <target state="translated">Ngôn ngữ phông</target>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/common/edit-dialog/archive-font-edit-dialog/archive-font-edit-dialog.component.html</context>
+               <context context-type="linenumber">17</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+               <context context-type="linenumber">90</context>
+            </context-group>
+            <target state="translated">Ngôn ngữ</target>
          </trans-unit>
-         <trans-unit id="6709161602409680994" datatype="html">
-            <source>Archive Font</source>
+         <trans-unit id="1055686627716339120" datatype="html">
+            <source>Archive</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">291</context>
+               <context context-type="linenumber">302</context>
             </context-group>
             <target state="translated">Phông lưu trữ</target>
          </trans-unit>
@@ -4244,7 +4657,7 @@
             <source>Administration</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">299</context>
+               <context context-type="linenumber">310</context>
             </context-group>
             <target state="translated">Quản trị</target>
          </trans-unit>
@@ -4252,11 +4665,11 @@
             <source>Configuration</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">312</context>
+               <context context-type="linenumber">323</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-               <context context-type="linenumber">314</context>
+               <context context-type="linenumber">325</context>
             </context-group>
             <target state="translated">Cấu hình</target>
          </trans-unit>
@@ -4913,18 +5326,6 @@
                <context context-type="linenumber">76</context>
             </context-group>
             <target state="translated">Tạo yêu cầu khai thác</target>
-         </trans-unit>
-         <trans-unit id="2826581353496868063" datatype="html">
-            <source>Language</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/common/edit-dialog/archive-font-edit-dialog/archive-font-edit-dialog.component.html</context>
-               <context context-type="linenumber">17</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-               <context context-type="linenumber">90</context>
-            </context-group>
-            <target state="translated">Ngôn ngữ</target>
          </trans-unit>
          <trans-unit id="4388879716045736175" datatype="html">
             <source>Note</source>
@@ -7502,13 +7903,13 @@
             </context-group>
             <target state="translated">Môi trường</target>
          </trans-unit>
-         <trans-unit id="5973078531069712831" datatype="html">
-            <source>Paperless-ngx Version</source>
+         <trans-unit id="4480176351255246636" datatype="html">
+            <source>Edocs Version</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
                <context context-type="linenumber">22</context>
             </context-group>
-            <target state="translated">EDOCS Version</target>
+            <target state="translated">Edocs phiên bản</target>
          </trans-unit>
          <trans-unit id="6269705781013540301" datatype="html">
             <source>Install Type</source>
@@ -12684,6 +13085,14 @@
                <context context-type="linenumber">31</context>
             </context-group>
             <target state="translated">Không có quyền tải lên thư mục.</target>
+         </trans-unit>
+         <trans-unit id="8877790095332811953" datatype="html">
+            <source>The system is backing up/restore</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+               <context context-type="linenumber">32</context>
+            </context-group>
+            <target state="translated">Hệ thống đang sao lưu/khôi phục</target>
          </trans-unit>
          <trans-unit id="5523607037798226031" datatype="html">
             <source>You have unsaved changes to the document</source>

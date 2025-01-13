@@ -194,7 +194,7 @@
   <div class="d-flex mb-2">
     <div>
       <ng-container
-        i18n>{totalBackups, plural, =1 {One backup} other {{{ totalBackups || 0 }} total backup versions in backup versions}}</ng-container>
+        i18n>{totalBackups, plural, =1 {One backup} other {{{ totalBackups || 0 }} total backup versions}}</ng-container>
       @if (selectedBackups.size > 0) {
         <ng-container i18n>&nbsp;({{ selectedBackups.size }} selected)</ng-container>
         <!--                &nbsp;({{selectedBackups.size}} selected)-->
