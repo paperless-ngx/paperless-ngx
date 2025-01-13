@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { Title } from '@angular/platform-browser'
-import { PageHeaderComponent } from './page-header.component'
 import { environment } from 'src/environments/environment'
+import { PageHeaderComponent } from './page-header.component'
 
 describe('PageHeaderComponent', () => {
   let component: PageHeaderComponent
@@ -10,9 +10,8 @@ describe('PageHeaderComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [PageHeaderComponent],
       providers: [],
-      imports: [],
+      imports: [PageHeaderComponent],
     }).compileComponents()
 
     titleService = TestBed.inject(Title)

@@ -7,14 +7,22 @@ import {
   Output,
   ViewChild,
 } from '@angular/core'
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
+import {
+  ControlValueAccessor,
+  FormsModule,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
+} from '@angular/forms'
+import { RouterModule } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { first, firstValueFrom, tap } from 'rxjs'
 import { Tag } from 'src/app/data/tag'
-import { TagEditDialogComponent } from '../../edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { EditDialogMode } from '../../edit-dialog/edit-dialog.component'
-import { first, firstValueFrom, tap } from 'rxjs'
-import { NgSelectComponent } from '@ng-select/ng-select'
+import { TagEditDialogComponent } from '../../edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
+import { TagComponent } from '../../tag/tag.component'
 
 @Component({
   providers: [
@@ -27,6 +35,14 @@ import { NgSelectComponent } from '@ng-select/ng-select'
   selector: 'pngx-input-tags',
   templateUrl: './tags.component.html',
   styleUrls: ['./tags.component.scss'],
+  imports: [
+    TagComponent,
+    NgSelectModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class TagsComponent implements OnInit, ControlValueAccessor {
   constructor(

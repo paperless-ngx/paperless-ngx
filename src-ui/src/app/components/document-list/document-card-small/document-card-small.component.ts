@@ -1,28 +1,61 @@
+import { AsyncPipe } from '@angular/common'
 import {
+  AfterViewInit,
   Component,
   EventEmitter,
   Input,
   Output,
   ViewChild,
 } from '@angular/core'
+import { RouterModule } from '@angular/router'
+import {
+  NgbProgressbarModule,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { map } from 'rxjs/operators'
 import {
   DEFAULT_DISPLAY_FIELDS,
   DisplayField,
   Document,
 } from 'src/app/data/document'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
+import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
+import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
+import { UsernamePipe } from 'src/app/pipes/username.pipe'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { CustomFieldDisplayComponent } from '../../common/custom-field-display/custom-field-display.component'
+import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
+import { TagComponent } from '../../common/tag/tag.component'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
   selector: 'pngx-document-card-small',
   templateUrl: './document-card-small.component.html',
   styleUrls: ['./document-card-small.component.scss'],
+  imports: [
+    DocumentTitlePipe,
+    IsNumberPipe,
+    PreviewPopupComponent,
+    TagComponent,
+    CustomFieldDisplayComponent,
+    AsyncPipe,
+    UsernamePipe,
+    IfPermissionsDirective,
+    CustomDatePipe,
+    RouterModule,
+    NgbTooltipModule,
+    NgbProgressbarModule,
+    NgxBootstrapIconsModule,
+  ],
 })
-export class DocumentCardSmallComponent extends ComponentWithPermissions {
+export class DocumentCardSmallComponent
+  extends LoadingComponentWithPermissions
+  implements AfterViewInit
+{
   DisplayField = DisplayField
 
   constructor(
@@ -61,10 +94,13 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
 
   moreTags: number = null
 
-  @ViewChild('popover') popover: NgbPopover
+  @ViewChild('popupPreview') popupPreview: PreviewPopupComponent
 
-  mouseOnPreview = false
-  popoverHidden = true
+  ngAfterViewInit(): void {
+    setInterval(() => {
+      this.show = true
+    }, 50)
+  }
 
   getIsThumbInverted() {
     return this.settingsService.get(SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED)
@@ -76,10 +112,6 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
 
   getDownloadUrl() {
     return this.documentService.getDownloadUrl(this.document.id)
-  }
-
-  get previewUrl() {
-    return this.documentService.getPreviewUrl(this.document.id)
   }
 
   get privateName() {
@@ -100,29 +132,8 @@ export class DocumentCardSmallComponent extends ComponentWithPermissions {
     )
   }
 
-  mouseEnterPreview() {
-    this.mouseOnPreview = true
-    if (!this.popover.isOpen()) {
-      // we're going to open but hide to pre-load content during hover delay
-      this.popover.open()
-      this.popoverHidden = true
-      setTimeout(() => {
-        if (this.mouseOnPreview) {
-          // show popover
-          this.popoverHidden = false
-        } else {
-          this.popover.close()
-        }
-      }, 600)
-    }
-  }
-
-  mouseLeavePreview() {
-    this.mouseOnPreview = false
-  }
-
   mouseLeaveCard() {
-    this.popover.close()
+    this.popupPreview?.close()
   }
 
   get notesEnabled(): boolean {

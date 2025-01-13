@@ -26,3 +26,14 @@ pre {
         max-width: 150px;
     }
 }
+
+.input-group .dropdown .btn {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.z-10 {
+    z-index: 10;
+}

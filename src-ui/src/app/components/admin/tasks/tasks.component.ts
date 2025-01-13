@@ -1,22 +1,75 @@
-import { Component, OnInit, OnDestroy } from '@angular/core'
+import { NgTemplateOutlet, SlicePipe } from '@angular/common'
+import { Component, OnDestroy, OnInit } from '@angular/core'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { first } from 'rxjs'
+import {
+  NgbCollapseModule,
+  NgbDropdownModule,
+  NgbModal,
+  NgbNavModule,
+  NgbPaginationModule,
+  NgbPopoverModule,
+} from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import {
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  first,
+  Subject,
+  takeUntil,
+  timer,
+} from 'rxjs'
 import { PaperlessTask } from 'src/app/data/paperless-task'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { PageHeaderComponent } from '../../common/page-header/page-header.component'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
+
+export enum TaskTab {
+  Queued = 'queued',
+  Started = 'started',
+  Completed = 'completed',
+  Failed = 'failed',
+}
+
+enum TaskFilterTargetID {
+  Name,
+  Result,
+}
+
+const FILTER_TARGETS = [
+  { id: TaskFilterTargetID.Name, name: $localize`Name` },
+  { id: TaskFilterTargetID.Result, name: $localize`Result` },
+]
 
 @Component({
   selector: 'pngx-tasks',
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.scss'],
+  imports: [
+    PageHeaderComponent,
+    IfPermissionsDirective,
+    CustomDatePipe,
+    SlicePipe,
+    FormsModule,
+    ReactiveFormsModule,
+    NgTemplateOutlet,
+    NgbCollapseModule,
+    NgbDropdownModule,
+    NgbNavModule,
+    NgbPaginationModule,
+    NgbPopoverModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class TasksComponent
-  extends ComponentWithPermissions
+  extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy
 {
-  public activeTab: string
+  public activeTab: TaskTab
   public selectedTasks: Set<number> = new Set()
   public togggleAll: boolean = false
   public expandedTask: number
@@ -24,7 +77,27 @@ export class TasksComponent
   public pageSize: number = 25
   public page: number = 1
 
-  public autoRefreshInterval: any
+  public autoRefreshEnabled: boolean = true
+
+  private _filterText: string = ''
+  get filterText() {
+    return this._filterText
+  }
+  set filterText(value: string) {
+    this.filterDebounce.next(value)
+  }
+
+  public filterTargetID: TaskFilterTargetID = TaskFilterTargetID.Name
+  public get filterTargetName(): string {
+    return this.filterTargets.find((t) => t.id == this.filterTargetID).name
+  }
+  private filterDebounce: Subject<string> = new Subject<string>()
+
+  public get filterTargets(): Array<{ id: number; name: string }> {
+    return [TaskTab.Failed, TaskTab.Completed].includes(this.activeTab)
+      ? FILTER_TARGETS
+      : FILTER_TARGETS.slice(0, 1)
+  }
 
   get dismissButtonText(): string {
     return this.selectedTasks.size > 0
@@ -42,12 +115,28 @@ export class TasksComponent
 
   ngOnInit() {
     this.tasksService.reload()
-    this.toggleAutoRefresh()
+    timer(5000, 5000)
+      .pipe(
+        filter(() => this.autoRefreshEnabled),
+        takeUntil(this.unsubscribeNotifier)
+      )
+      .subscribe(() => {
+        this.tasksService.reload()
+      })
+
+    this.filterDebounce
+      .pipe(
+        takeUntil(this.unsubscribeNotifier),
+        debounceTime(100),
+        distinctUntilChanged(),
+        filter((query) => !query.length || query.length > 2)
+      )
+      .subscribe((query) => (this._filterText = query))
   }
 
   ngOnDestroy() {
+    super.ngOnDestroy()
     this.tasksService.cancelPending()
-    clearInterval(this.autoRefreshInterval)
   }
 
   dismissTask(task: PaperlessTask) {
@@ -96,18 +185,29 @@ export class TasksComponent
   get currentTasks(): PaperlessTask[] {
     let tasks: PaperlessTask[] = []
     switch (this.activeTab) {
-      case 'queued':
+      case TaskTab.Queued:
         tasks = this.tasksService.queuedFileTasks
         break
-      case 'started':
+      case TaskTab.Started:
         tasks = this.tasksService.startedFileTasks
         break
-      case 'completed':
+      case TaskTab.Completed:
         tasks = this.tasksService.completedFileTasks
         break
-      case 'failed':
+      case TaskTab.Failed:
         tasks = this.tasksService.failedFileTasks
         break
+    }
+    if (this._filterText.length) {
+      tasks = tasks.filter((t) => {
+        if (this.filterTargetID == TaskFilterTargetID.Name) {
+          return t.task_file_name
+            .toLowerCase()
+            .includes(this._filterText.toLowerCase())
+        } else if (this.filterTargetID == TaskFilterTargetID.Result) {
+          return t.result.toLowerCase().includes(this._filterText.toLowerCase())
+        }
+      })
     }
     return tasks
   }
@@ -125,31 +225,37 @@ export class TasksComponent
     this.selectedTasks.clear()
   }
 
-  duringTabChange(navID: number) {
+  duringTabChange() {
     this.page = 1
+  }
+
+  beforeTabChange() {
+    this.resetFilter()
+    this.filterTargetID = TaskFilterTargetID.Name
   }
 
   get activeTabLocalized(): string {
     switch (this.activeTab) {
-      case 'queued':
+      case TaskTab.Queued:
         return $localize`queued`
-      case 'started':
+      case TaskTab.Started:
         return $localize`started`
-      case 'completed':
+      case TaskTab.Completed:
         return $localize`completed`
-      case 'failed':
+      case TaskTab.Failed:
         return $localize`failed`
     }
   }
 
-  toggleAutoRefresh(): void {
-    if (this.autoRefreshInterval) {
-      clearInterval(this.autoRefreshInterval)
-      this.autoRefreshInterval = null
-    } else {
-      this.autoRefreshInterval = setInterval(() => {
-        this.tasksService.reload()
-      }, 5000)
+  public resetFilter() {
+    this._filterText = ''
+  }
+
+  filterInputKeyup(event: KeyboardEvent) {
+    if (event.key == 'Enter') {
+      this._filterText = (event.target as HTMLInputElement).value
+    } else if (event.key === 'Escape') {
+      this.resetFilter()
     }
   }
 }

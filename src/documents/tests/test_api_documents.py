@@ -5,6 +5,7 @@ import tempfile
 import uuid
 import zoneinfo
 from binascii import hexlify
+from datetime import date
 from datetime import timedelta
 from pathlib import Path
 from unittest import mock
@@ -657,13 +658,16 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             name="Test Custom Field Select",
             data_type=CustomField.FieldDataType.SELECT,
             extra_data={
-                "select_options": ["Option 1", "Choice 2"],
+                "select_options": [
+                    {"label": "Option 1", "id": "abc123"},
+                    {"label": "Choice 2", "id": "def456"},
+                ],
             },
         )
         CustomFieldInstance.objects.create(
             document=doc1,
             field=custom_field_select,
-            value_select=1,
+            value_select="def456",
         )
 
         r = self.client.get("/api/documents/?custom_fields__icontains=choice")
@@ -2759,3 +2763,184 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
             self.client.get(f"/api/tags/{t.id}/", format="json").data["text_color"],
             "#000000",
         )
+
+
+class TestDocumentApiCustomFieldsSorting(DirectoriesMixin, APITestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_authenticate(user=self.user)
+
+        self.doc1 = Document.objects.create(
+            title="none1",
+            checksum="A",
+            mime_type="application/pdf",
+        )
+        self.doc2 = Document.objects.create(
+            title="none2",
+            checksum="B",
+            mime_type="application/pdf",
+        )
+        self.doc3 = Document.objects.create(
+            title="none3",
+            checksum="C",
+            mime_type="application/pdf",
+        )
+
+        cache.clear()
+
+    def test_document_custom_fields_sorting(self):
+        """
+        GIVEN:
+            - Documents with custom fields
+        WHEN:
+            - API request for document filtering with custom field sorting
+        THEN:
+            - Documents are sorted by custom field values
+        """
+        values = {
+            CustomField.FieldDataType.STRING: {
+                "values": ["foo", "bar", "baz"],
+                "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    CustomField.FieldDataType.STRING
+                ],
+            },
+            CustomField.FieldDataType.INT: {
+                "values": [3, 1, 2],
+                "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    CustomField.FieldDataType.INT
+                ],
+            },
+            CustomField.FieldDataType.FLOAT: {
+                "values": [3.3, 1.1, 2.2],
+                "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    CustomField.FieldDataType.FLOAT
+                ],
+            },
+            CustomField.FieldDataType.BOOL: {
+                "values": [True, False, False],
+                "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    CustomField.FieldDataType.BOOL
+                ],
+            },
+            CustomField.FieldDataType.DATE: {
+                "values": [date(2021, 1, 3), date(2021, 1, 1), date(2021, 1, 2)],
+                "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    CustomField.FieldDataType.DATE
+                ],
+            },
+            CustomField.FieldDataType.URL: {
+                "values": [
+                    "http://example.org",
+                    "http://example.com",
+                    "http://example.net",
+                ],
+                "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    CustomField.FieldDataType.URL
+                ],
+            },
+            CustomField.FieldDataType.MONETARY: {
+                "values": ["USD789.00", "USD123.00", "USD456.00"],
+                "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    CustomField.FieldDataType.MONETARY
+                ],
+            },
+            CustomField.FieldDataType.DOCUMENTLINK: {
+                "values": [self.doc3.pk, self.doc1.pk, self.doc2.pk],
+                "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    CustomField.FieldDataType.DOCUMENTLINK
+                ],
+            },
+            CustomField.FieldDataType.SELECT: {
+                "values": ["ghi-789", "abc-123", "def-456"],
+                "field_name": CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    CustomField.FieldDataType.SELECT
+                ],
+                "extra_data": {
+                    "select_options": [
+                        {"label": "Option 1", "id": "abc-123"},
+                        {"label": "Option 2", "id": "def-456"},
+                        {"label": "Option 3", "id": "ghi-789"},
+                    ],
+                },
+            },
+        }
+
+        for data_type, data in values.items():
+            CustomField.objects.all().delete()
+            CustomFieldInstance.objects.all().delete()
+            custom_field = CustomField.objects.create(
+                name=f"custom field {data_type}",
+                data_type=data_type,
+                extra_data=data.get("extra_data", {}),
+            )
+            for i, value in enumerate(data["values"]):
+                CustomFieldInstance.objects.create(
+                    document=[self.doc1, self.doc2, self.doc3][i],
+                    field=custom_field,
+                    **{data["field_name"]: value},
+                )
+            response = self.client.get(
+                f"/api/documents/?ordering=custom_field_{custom_field.pk}",
+            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            results = response.data["results"]
+            self.assertEqual(len(results), 3)
+            self.assertEqual(
+                [results[0]["id"], results[1]["id"], results[2]["id"]],
+                [self.doc2.id, self.doc3.id, self.doc1.id],
+            )
+
+            response = self.client.get(
+                f"/api/documents/?ordering=-custom_field_{custom_field.pk}",
+            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            results = response.data["results"]
+            self.assertEqual(len(results), 3)
+            if data_type == CustomField.FieldDataType.BOOL:
+                # just check the first one for bools, as the rest are the same
+                self.assertEqual(
+                    [results[0]["id"]],
+                    [self.doc1.id],
+                )
+            else:
+                self.assertEqual(
+                    [results[0]["id"], results[1]["id"], results[2]["id"]],
+                    [self.doc1.id, self.doc3.id, self.doc2.id],
+                )
+
+    def test_document_custom_fields_sorting_invalid(self):
+        """
+        GIVEN:
+            - Documents with custom fields
+        WHEN:
+            - API request for document filtering with invalid custom field sorting
+        THEN:
+            - 400 is returned
+        """
+
+        response = self.client.get(
+            "/api/documents/?ordering=custom_field_999",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_document_custom_fields_sorting_invalid_data_type(self):
+        """
+        GIVEN:
+            - Documents with custom fields
+        WHEN:
+            - API request for document filtering with a custom field sorting with a new (unhandled) data type
+        THEN:
+            - Error is raised
+        """
+
+        custom_field = CustomField.objects.create(
+            name="custom field",
+            data_type="foo",
+        )
+
+        with self.assertRaises(ValueError):
+            self.client.get(
+                f"/api/documents/?ordering=custom_field_{custom_field.pk}",
+            )

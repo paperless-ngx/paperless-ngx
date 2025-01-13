@@ -4,6 +4,14 @@ import {
   fakeAsync,
   tick,
 } from '@angular/core/testing'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import {
+  DEFAULT_MATCHING_ALGORITHM,
+  MATCH_ALL,
+} from 'src/app/data/matching-model'
+import { Tag } from 'src/app/data/tag'
+import { FilterPipe } from 'src/app/pipes/filter.pipe'
+import { HotKeyService } from 'src/app/services/hot-key.service'
 import {
   ChangedItems,
   FilterableDropdownComponent,
@@ -11,22 +19,7 @@ import {
   Intersection,
   LogicalOperator,
 } from './filterable-dropdown.component'
-import { FilterPipe } from 'src/app/pipes/filter.pipe'
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
-import { Tag } from 'src/app/data/tag'
-import {
-  DEFAULT_MATCHING_ALGORITHM,
-  MATCH_ALL,
-} from 'src/app/data/matching-model'
-import {
-  ToggleableDropdownButtonComponent,
-  ToggleableItemState,
-} from './toggleable-dropdown-button/toggleable-dropdown-button.component'
-import { TagComponent } from '../tag/tag.component'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { HotKeyService } from 'src/app/services/hot-key.service'
+import { ToggleableItemState } from './toggleable-dropdown-button/toggleable-dropdown-button.component'
 
 const items: Tag[] = [
   {
@@ -58,20 +51,8 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        FilterableDropdownComponent,
-        FilterPipe,
-        ToggleableDropdownButtonComponent,
-        TagComponent,
-        ClearableBadgeComponent,
-      ],
       providers: [FilterPipe],
-      imports: [
-        NgbModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NgxBootstrapIconsModule.pick(allIcons),
-      ],
+      imports: [NgxBootstrapIconsModule.pick(allIcons)],
     }).compileComponents()
 
     hotkeyService = TestBed.inject(HotKeyService)
@@ -501,11 +482,42 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     component.selectionModel = selectionModel
     selectionModel.toggle(items[1].id)
     selectionModel.apply()
-    expect(selectionModel.itemsSorted).toEqual([
+    expect(selectionModel.items).toEqual([
       nullItem,
       { id: null, name: 'Null B' },
       items[1],
       items[0],
+    ])
+  })
+
+  it('selection model should sort items by state and document counts, if set', () => {
+    component.items = items.concat([{ id: 4, name: 'Item D' }])
+    component.selectionModel = selectionModel
+    component.documentCounts = [
+      { id: 1, document_count: 0 }, // Tag1
+      { id: 2, document_count: 1 }, // Tag2
+      { id: 4, document_count: 2 },
+    ]
+    component.selectionModel.apply()
+    expect(selectionModel.items).toEqual([
+      nullItem,
+      { id: 4, name: 'Item D' },
+      items[1], // Tag2
+      items[0], // Tag1
+    ])
+
+    selectionModel.toggle(items[1].id)
+    component.documentCounts = [
+      { id: 1, document_count: 0 },
+      { id: 2, document_count: 1 },
+      { id: 4, document_count: 0 },
+    ]
+    selectionModel.apply()
+    expect(selectionModel.items).toEqual([
+      nullItem,
+      items[1], // Tag2
+      { id: 4, name: 'Item D' },
+      items[0], // Tag1
     ])
   })
 
@@ -584,5 +596,25 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     const openSpy = jest.spyOn(component.dropdown, 'open')
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 't' }))
     expect(openSpy).toHaveBeenCalled()
+  })
+
+  it('should support an extra button and not apply changes when clicked', () => {
+    component.items = items
+    component.icon = 'tag-fill'
+    component.extraButtonTitle = 'Extra'
+    component.selectionModel = selectionModel
+    component.applyOnClose = true
+    let extraButtonClicked,
+      applied = false
+    component.extraButton.subscribe(() => (extraButtonClicked = true))
+    component.apply.subscribe(() => (applied = true))
+    fixture.nativeElement
+      .querySelector('button')
+      .dispatchEvent(new MouseEvent('click')) // open
+    fixture.detectChanges()
+    expect(fixture.debugElement.nativeElement.textContent).toContain('Extra')
+    component.extraButtonClicked()
+    expect(extraButtonClicked).toBeTruthy()
+    expect(applied).toBeFalsy()
   })
 })

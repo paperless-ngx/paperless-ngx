@@ -1,33 +1,60 @@
+import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
 import { Component, OnDestroy } from '@angular/core'
-import { FormControl, FormGroup } from '@angular/forms'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import {
-  Subject,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms'
+import { NgbAccordionModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgSelectComponent } from '@ng-select/ng-select'
+import {
   Observable,
+  Subject,
+  catchError,
   concat,
-  of,
   distinctUntilChanged,
+  filter,
+  map,
+  of,
+  switchMap,
   takeUntil,
   tap,
-  switchMap,
-  map,
-  catchError,
-  filter,
 } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Document } from 'src/app/data/document'
 import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
 import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
 import { StoragePath } from 'src/app/data/storage-path'
+import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { CheckComponent } from '../../input/check/check.component'
+import { PermissionsFormComponent } from '../../input/permissions/permissions-form/permissions-form.component'
+import { SelectComponent } from '../../input/select/select.component'
+import { TextComponent } from '../../input/text/text.component'
+import { TextAreaComponent } from '../../input/textarea/textarea.component'
 
 @Component({
   selector: 'pngx-storage-path-edit-dialog',
   templateUrl: './storage-path-edit-dialog.component.html',
   styleUrls: ['./storage-path-edit-dialog.component.scss'],
+  imports: [
+    SelectComponent,
+    TextAreaComponent,
+    TextComponent,
+    CheckComponent,
+    PermissionsFormComponent,
+    IfOwnerDirective,
+    AsyncPipe,
+    NgTemplateOutlet,
+    FormsModule,
+    ReactiveFormsModule,
+    NgbAccordionModule,
+    NgSelectComponent,
+  ],
 })
 export class StoragePathEditDialogComponent
   extends EditDialogComponent<StoragePath>
@@ -41,8 +68,6 @@ export class StoragePathEditDialogComponent
   public loading = false
   public testLoading = false
 
-  private unsubscribeNotifier: Subject<any> = new Subject()
-
   constructor(
     service: StoragePathService,
     activeModal: NgbActiveModal,
@@ -52,11 +77,6 @@ export class StoragePathEditDialogComponent
   ) {
     super(service, activeModal, userService, settingsService)
     this.initPathObservables()
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribeNotifier.next(this)
-    this.unsubscribeNotifier.complete()
   }
 
   getCreateTitle() {

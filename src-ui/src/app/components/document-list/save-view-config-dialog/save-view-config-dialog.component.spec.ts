@@ -4,12 +4,12 @@ import {
   fakeAsync,
   tick,
 } from '@angular/core/testing'
-import { SaveViewConfigDialogComponent } from './save-view-config-dialog.component'
-import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap'
-import { By } from '@angular/platform-browser'
-import { TextComponent } from '../../common/input/text/text.component'
-import { CheckComponent } from '../../common/input/check/check.component'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { By } from '@angular/platform-browser'
+import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap'
+import { CheckComponent } from '../../common/input/check/check.component'
+import { TextComponent } from '../../common/input/text/text.component'
+import { SaveViewConfigDialogComponent } from './save-view-config-dialog.component'
 
 describe('SaveViewConfigDialogComponent', () => {
   let component: SaveViewConfigDialogComponent
@@ -18,13 +18,15 @@ describe('SaveViewConfigDialogComponent', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
+      providers: [NgbActiveModal],
+      imports: [
+        NgbModalModule,
+        FormsModule,
+        ReactiveFormsModule,
         SaveViewConfigDialogComponent,
         TextComponent,
         CheckComponent,
       ],
-      providers: [NgbActiveModal],
-      imports: [NgbModalModule, FormsModule, ReactiveFormsModule],
     }).compileComponents()
 
     modal = TestBed.inject(NgbActiveModal)

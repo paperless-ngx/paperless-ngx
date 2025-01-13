@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import {
   FormsModule,
-  ReactiveFormsModule,
   NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
 } from '@angular/forms'
 import { TextComponent } from './text.component'
 
@@ -13,9 +13,8 @@ describe('TextComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [TextComponent],
       providers: [],
-      imports: [FormsModule, ReactiveFormsModule],
+      imports: [FormsModule, ReactiveFormsModule, TextComponent],
     }).compileComponents()
 
     fixture = TestBed.createComponent(TextComponent)

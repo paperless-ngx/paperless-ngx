@@ -6,17 +6,17 @@ import {
 } from '@angular/core/testing'
 import {
   FormsModule,
-  ReactiveFormsModule,
   NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
 } from '@angular/forms'
-import { SelectComponent } from './select.component'
-import { Tag } from 'src/app/data/tag'
+import { RouterTestingModule } from '@angular/router/testing'
+import { NgSelectModule } from '@ng-select/ng-select'
 import {
   DEFAULT_MATCHING_ALGORITHM,
   MATCH_ALL,
 } from 'src/app/data/matching-model'
-import { NgSelectModule } from '@ng-select/ng-select'
-import { RouterTestingModule } from '@angular/router/testing'
+import { Tag } from 'src/app/data/tag'
+import { SelectComponent } from './select.component'
 
 const items: Tag[] = [
   {
@@ -47,13 +47,13 @@ describe('SelectComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [SelectComponent],
       providers: [],
       imports: [
         FormsModule,
         ReactiveFormsModule,
         NgSelectModule,
         RouterTestingModule,
+        SelectComponent,
       ],
     }).compileComponents()
 
@@ -131,13 +131,5 @@ describe('SelectComponent', () => {
     component.title = 'Tag'
     const expectedTitle = `Filter documents with this ${component.title}`
     expect(component.filterButtonTitle).toEqual(expectedTitle)
-  })
-
-  it('should support setting items as a plain array', () => {
-    component.itemsArray = ['foo', 'bar']
-    expect(component.items).toEqual([
-      { id: 0, name: 'foo' },
-      { id: 1, name: 'bar' },
-    ])
   })
 })

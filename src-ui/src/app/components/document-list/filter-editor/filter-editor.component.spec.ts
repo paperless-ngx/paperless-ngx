@@ -1,110 +1,108 @@
 import { DatePipe } from '@angular/common'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import {
   ComponentFixture,
-  fakeAsync,
   TestBed,
+  fakeAsync,
   tick,
 } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
+import { RouterModule } from '@angular/router'
 import {
-  NgbDropdownModule,
   NgbDatepickerModule,
   NgbDropdownItem,
+  NgbDropdownModule,
   NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
+import { Correspondent } from 'src/app/data/correspondent'
+import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
-  FILTER_TITLE,
-  FILTER_TITLE_CONTENT,
-  FILTER_ASN,
-  FILTER_ASN_ISNULL,
-  FILTER_ASN_GT,
-  FILTER_ASN_LT,
-  FILTER_FULLTEXT_QUERY,
-  FILTER_FULLTEXT_MORELIKE,
-  FILTER_CREATED_AFTER,
-  FILTER_CREATED_BEFORE,
+  CustomFieldQueryLogicalOperator,
+  CustomFieldQueryOperator,
+} from 'src/app/data/custom-field-query'
+import { DocumentType } from 'src/app/data/document-type'
+import {
   FILTER_ADDED_AFTER,
   FILTER_ADDED_BEFORE,
+  FILTER_ASN,
+  FILTER_ASN_GT,
+  FILTER_ASN_ISNULL,
+  FILTER_ASN_LT,
+  FILTER_CORRESPONDENT,
+  FILTER_CREATED_AFTER,
+  FILTER_CREATED_BEFORE,
+  FILTER_CUSTOM_FIELDS_QUERY,
+  FILTER_CUSTOM_FIELDS_TEXT,
+  FILTER_DOCUMENT_TYPE,
+  FILTER_DOES_NOT_HAVE_CORRESPONDENT,
+  FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
+  FILTER_DOES_NOT_HAVE_STORAGE_PATH,
+  FILTER_DOES_NOT_HAVE_TAG,
+  FILTER_FULLTEXT_MORELIKE,
+  FILTER_FULLTEXT_QUERY,
+  FILTER_HAS_ANY_TAG,
+  FILTER_HAS_CORRESPONDENT_ANY,
+  FILTER_HAS_CUSTOM_FIELDS_ALL,
+  FILTER_HAS_CUSTOM_FIELDS_ANY,
+  FILTER_HAS_DOCUMENT_TYPE_ANY,
+  FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_HAS_TAGS_ALL,
   FILTER_HAS_TAGS_ANY,
-  FILTER_HAS_ANY_TAG,
-  FILTER_DOES_NOT_HAVE_TAG,
-  FILTER_CORRESPONDENT,
-  FILTER_HAS_CORRESPONDENT_ANY,
-  FILTER_DOES_NOT_HAVE_CORRESPONDENT,
-  FILTER_DOCUMENT_TYPE,
-  FILTER_HAS_DOCUMENT_TYPE_ANY,
-  FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
-  FILTER_STORAGE_PATH,
-  FILTER_HAS_STORAGE_PATH_ANY,
-  FILTER_DOES_NOT_HAVE_STORAGE_PATH,
   FILTER_OWNER,
   FILTER_OWNER_ANY,
   FILTER_OWNER_DOES_NOT_INCLUDE,
   FILTER_OWNER_ISNULL,
-  FILTER_CUSTOM_FIELDS_TEXT,
   FILTER_SHARED_BY_USER,
-  FILTER_HAS_CUSTOM_FIELDS_ANY,
-  FILTER_HAS_ANY_CUSTOM_FIELDS,
-  FILTER_DOES_NOT_HAVE_CUSTOM_FIELDS,
-  FILTER_HAS_CUSTOM_FIELDS_ALL,
-  FILTER_CUSTOM_FIELDS_QUERY,
+  FILTER_STORAGE_PATH,
+  FILTER_TITLE,
+  FILTER_TITLE_CONTENT,
 } from 'src/app/data/filter-rule-type'
-import { Correspondent } from 'src/app/data/correspondent'
-import { DocumentType } from 'src/app/data/document-type'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
 import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { FilterPipe } from 'src/app/pipes/filter.pipe'
-import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
-import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import { DocumentService } from 'src/app/services/rest/document.service'
-import { StoragePathService } from 'src/app/services/rest/storage-path.service'
-import { TagService } from 'src/app/services/rest/tag.service'
-import { UserService } from 'src/app/services/rest/user.service'
-import { SettingsService } from 'src/app/services/settings.service'
-import { ClearableBadgeComponent } from '../../common/clearable-badge/clearable-badge.component'
-import { DatesDropdownComponent } from '../../common/dates-dropdown/dates-dropdown.component'
-import {
-  FilterableDropdownComponent,
-  LogicalOperator,
-  Intersection,
-} from '../../common/filterable-dropdown/filterable-dropdown.component'
-import { ToggleableDropdownButtonComponent } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
-import {
-  PermissionsFilterDropdownComponent,
-  OwnerFilterType,
-} from '../../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
-import { FilterEditorComponent } from './filter-editor.component'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import {
   PermissionType,
   PermissionsService,
 } from 'src/app/services/permissions.service'
-import { environment } from 'src/environments/environment'
-import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
+import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { RouterModule } from '@angular/router'
+import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
 import { SearchService } from 'src/app/services/rest/search.service'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { CustomFieldsQueryDropdownComponent } from '../../common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
-import {
-  CustomFieldQueryLogicalOperator,
-  CustomFieldQueryOperator,
-} from 'src/app/data/custom-field-query'
+import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { TagService } from 'src/app/services/rest/tag.service'
+import { UserService } from 'src/app/services/rest/user.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import {
   CustomFieldQueryAtom,
   CustomFieldQueryExpression,
 } from 'src/app/utils/custom-field-query-element'
+import { environment } from 'src/environments/environment'
+import { ClearableBadgeComponent } from '../../common/clearable-badge/clearable-badge.component'
+import { CustomFieldsQueryDropdownComponent } from '../../common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
+import { DatesDropdownComponent } from '../../common/dates-dropdown/dates-dropdown.component'
+import {
+  FilterableDropdownComponent,
+  Intersection,
+  LogicalOperator,
+} from '../../common/filterable-dropdown/filterable-dropdown.component'
+import { ToggleableDropdownButtonComponent } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
+import {
+  OwnerFilterType,
+  PermissionsFilterDropdownComponent,
+} from '../../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
+import { FilterEditorComponent } from './filter-editor.component'
 
 const tags: Tag[] = [
   {
@@ -181,7 +179,15 @@ describe('FilterEditorComponent', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        RouterModule,
+        NgbDropdownModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NgbDatepickerModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+        NgbTypeaheadModule,
+        NgSelectModule,
         FilterEditorComponent,
         FilterableDropdownComponent,
         PermissionsFilterDropdownComponent,
@@ -192,16 +198,6 @@ describe('FilterEditorComponent', () => {
         DatesDropdownComponent,
         CustomDatePipe,
         CustomFieldsQueryDropdownComponent,
-      ],
-      imports: [
-        RouterModule,
-        NgbDropdownModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NgbDatepickerModule,
-        NgxBootstrapIconsModule.pick(allIcons),
-        NgbTypeaheadModule,
-        NgSelectModule,
       ],
       providers: [
         FilterPipe,

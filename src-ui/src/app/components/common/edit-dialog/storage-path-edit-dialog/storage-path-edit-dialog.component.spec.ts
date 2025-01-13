@@ -1,28 +1,15 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import {
-  NgbAccordionButton,
-  NgbActiveModal,
-  NgbModule,
-} from '@ng-bootstrap/ng-bootstrap'
-import { NgSelectModule } from '@ng-select/ng-select'
-import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
-import { SettingsService } from 'src/app/services/settings.service'
-import { PermissionsFormComponent } from '../../input/permissions/permissions-form/permissions-form.component'
-import { SelectComponent } from '../../input/select/select.component'
-import { TextComponent } from '../../input/text/text.component'
-import { TextAreaComponent } from '../../input/textarea/textarea.component'
-import { EditDialogMode } from '../edit-dialog.component'
-import { StoragePathEditDialogComponent } from './storage-path-edit-dialog.component'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { StoragePathService } from 'src/app/services/rest/storage-path.service'
-import { DocumentService } from 'src/app/services/rest/document.service'
+import { By } from '@angular/platform-browser'
+import { NgbAccordionButton, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { of, throwError } from 'rxjs'
 import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
-import { By } from '@angular/platform-browser'
+import { DocumentService } from 'src/app/services/rest/document.service'
+import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { EditDialogMode } from '../edit-dialog.component'
+import { StoragePathEditDialogComponent } from './storage-path-edit-dialog.component'
 
 describe('StoragePathEditDialogComponent', () => {
   let component: StoragePathEditDialogComponent
@@ -32,17 +19,7 @@ describe('StoragePathEditDialogComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        StoragePathEditDialogComponent,
-        IfPermissionsDirective,
-        IfOwnerDirective,
-        SelectComponent,
-        TextComponent,
-        TextAreaComponent,
-        PermissionsFormComponent,
-        SafeHtmlPipe,
-      ],
-      imports: [FormsModule, ReactiveFormsModule, NgSelectModule, NgbModule],
+      imports: [],
       providers: [
         NgbActiveModal,
         provideHttpClient(withInterceptorsFromDi()),

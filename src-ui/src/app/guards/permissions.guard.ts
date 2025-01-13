@@ -1,13 +1,13 @@
+import { Injectable } from '@angular/core'
 import {
   ActivatedRouteSnapshot,
+  Router,
   RouterStateSnapshot,
   UrlTree,
-  Router,
 } from '@angular/router'
-import { Injectable } from '@angular/core'
+import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { PermissionsService } from '../services/permissions.service'
 import { ToastService } from '../services/toast.service'
-import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 
 @Injectable()
 export class PermissionsGuard {

@@ -365,6 +365,10 @@ The endpoint supports the following optional form fields:
 -   `custom_fields`: An array of custom field ids to assign (with an empty
     value) to the document.
 
+!!! note
+
+    Sending a `Content-Length` header with correct size is mandatory.
+
 The endpoint will immediately return HTTP 200 if the document consumption
 process was started successfully, with the UUID of the consumption task
 as the data. No additional status information about the consumption process
@@ -473,6 +477,11 @@ The following methods are supported:
     -   Requires `parameters`:
         -   `"pages": [..]` The list should be a list of integers e.g. `"[2,3,4]"`
     -   The delete_pages operation only accepts a single document.
+-   `modify_custom_fields`
+    -   Requires `parameters`:
+        -   `"add_custom_fields": { CUSTOM_FIELD_ID: VALUE }`: JSON object consisting of custom field id:value pairs to add to the document, can also be a list of custom field IDs
+            to add with empty values.
+        -   `"remove_custom_fields": [CUSTOM_FIELD_ID]`: custom field ids to remove from the document.
 
 ### Objects
 
@@ -556,3 +565,11 @@ Initial API version.
 
 -   Consumption templates were refactored to workflows and API endpoints
     changed as such.
+
+#### Version 5
+
+-   Added bulk deletion methods for documents and objects.
+
+#### Version 6
+
+-   Moved acknowledge tasks endpoint to be under `/api/tasks/acknowledge/`.

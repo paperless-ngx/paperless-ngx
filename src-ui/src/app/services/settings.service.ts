@@ -17,17 +17,22 @@ import {
   hexToHsl,
 } from 'src/app/utils/color'
 import { environment } from 'src/environments/environment'
-import { UiSettings, SETTINGS, SETTINGS_KEYS } from '../data/ui-settings'
+import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
+import { SavedView } from '../data/saved-view'
+import {
+  PAPERLESS_GREEN_HEX,
+  SETTINGS,
+  SETTINGS_KEYS,
+  UiSettings,
+} from '../data/ui-settings'
 import { User } from '../data/user'
 import {
   PermissionAction,
-  PermissionType,
   PermissionsService,
+  PermissionType,
 } from './permissions.service'
-import { ToastService } from './toast.service'
-import { SavedView } from '../data/saved-view'
 import { CustomFieldsService } from './rest/custom-fields.service'
-import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
+import { ToastService } from './toast.service'
 
 export interface LanguageOption {
   code: string
@@ -420,7 +425,7 @@ export class SettingsService {
       )
     }
 
-    if (themeColor) {
+    if (themeColor?.length) {
       const hsl = hexToHsl(themeColor)
       const bgBrightnessEstimate = estimateBrightnessForColor(themeColor)
 
@@ -445,6 +450,11 @@ export class SettingsService {
       document.documentElement.style.removeProperty('--pngx-primary')
       document.documentElement.style.removeProperty('--pngx-primary-lightness')
     }
+
+    this.meta.updateTag({
+      name: 'theme-color',
+      content: themeColor?.length ? themeColor : PAPERLESS_GREEN_HEX,
+    })
   }
 
   getLanguageOptions(): LanguageOption[] {
@@ -636,7 +646,13 @@ export class SettingsService {
 
   completeTour() {
     const tourCompleted = this.get(SETTINGS_KEYS.TOUR_COMPLETE)
-    if (!tourCompleted) {
+    if (
+      !tourCompleted &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.Change,
+        PermissionType.UISettings
+      )
+    ) {
       this.set(SETTINGS_KEYS.TOUR_COMPLETE, true)
       this.storeSettings()
         .pipe(first())

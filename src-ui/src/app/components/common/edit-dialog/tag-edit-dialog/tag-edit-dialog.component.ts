@@ -1,18 +1,39 @@
 import { Component } from '@angular/core'
-import { FormControl, FormGroup } from '@angular/forms'
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
-import { Tag } from 'src/app/data/tag'
-import { TagService } from 'src/app/services/rest/tag.service'
-import { randomColor } from 'src/app/utils/color'
 import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
+import { Tag } from 'src/app/data/tag'
+import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
+import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { randomColor } from 'src/app/utils/color'
+import { CheckComponent } from '../../input/check/check.component'
+import { ColorComponent } from '../../input/color/color.component'
+import { PermissionsFormComponent } from '../../input/permissions/permissions-form/permissions-form.component'
+import { SelectComponent } from '../../input/select/select.component'
+import { TextComponent } from '../../input/text/text.component'
 
 @Component({
   selector: 'pngx-tag-edit-dialog',
   templateUrl: './tag-edit-dialog.component.html',
   styleUrls: ['./tag-edit-dialog.component.scss'],
+  imports: [
+    SelectComponent,
+    CheckComponent,
+    ColorComponent,
+    TextComponent,
+    IfOwnerDirective,
+    PermissionsFormComponent,
+    FormsModule,
+    ReactiveFormsModule,
+  ],
 })
 export class TagEditDialogComponent extends EditDialogComponent<Tag> {
   constructor(

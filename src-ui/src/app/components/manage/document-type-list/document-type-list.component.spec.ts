@@ -1,16 +1,16 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { DatePipe } from '@angular/common'
-import { SortableDirective } from 'src/app/directives/sortable.directive'
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { of } from 'rxjs'
-import { DocumentTypeListComponent } from './document-type-list.component'
-import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { of } from 'rxjs'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { SortableDirective } from 'src/app/directives/sortable.directive'
+import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { PageHeaderComponent } from '../../common/page-header/page-header.component'
+import { DocumentTypeListComponent } from './document-type-list.component'
 
 describe('DocumentTypeListComponent', () => {
   let component: DocumentTypeListComponent
@@ -19,17 +19,15 @@ describe('DocumentTypeListComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        DocumentTypeListComponent,
-        SortableDirective,
-        PageHeaderComponent,
-        IfPermissionsDirective,
-      ],
       imports: [
         NgbPaginationModule,
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        DocumentTypeListComponent,
+        SortableDirective,
+        PageHeaderComponent,
+        IfPermissionsDirective,
       ],
       providers: [
         DatePipe,

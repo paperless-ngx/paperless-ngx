@@ -44,7 +44,7 @@
       </tr>
     </thead>
     <tbody>
-      @if (isLoading) {
+      @if (loading) {
         <tr>
           <td colspan="5">
             <div class="spinner-border spinner-border-sm me-2" role="status"></div>
@@ -53,7 +53,7 @@
         </tr>
       }
       @for (object of data; track object) {
-        <tr (click)="toggleSelected(object); $event.stopPropagation();">
+        <tr (click)="toggleSelected(object); $event.stopPropagation();" class="data-row fade" [class.show]="show">
           <td>
             <div class="form-check m-0 ms-2 me-n2">
               <input type="checkbox" class="form-check-input" id="{{typeName}}{{object.id}}" [checked]="selectedObjects.has(object.id)" (click)="toggleSelected(object); $event.stopPropagation();">
@@ -109,7 +109,7 @@
   </table>
 </div>
 
-@if (!isLoading) {
+@if (!loading) {
   <div class="d-flex mb-2">
     @if (collectionSize > 0) {
       <div>

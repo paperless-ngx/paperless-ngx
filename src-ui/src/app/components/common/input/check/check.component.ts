@@ -1,5 +1,10 @@
+import { NgClass } from '@angular/common'
 import { Component, forwardRef } from '@angular/core'
-import { NG_VALUE_ACCESSOR } from '@angular/forms'
+import {
+  FormsModule,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
+} from '@angular/forms'
 import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
@@ -13,6 +18,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-check',
   templateUrl: './check.component.html',
   styleUrls: ['./check.component.scss'],
+  imports: [FormsModule, ReactiveFormsModule, NgClass],
 })
 export class CheckComponent extends AbstractInputComponent<boolean> {
   constructor() {

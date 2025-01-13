@@ -1,77 +1,56 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { DocumentListComponent } from './document-list.component'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { RouterTestingModule } from '@angular/router/testing'
-import { routes } from 'src/app/app-routing.module'
-import { FilterEditorComponent } from './filter-editor/filter-editor.component'
-import { PermissionsFilterDropdownComponent } from '../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
-import { DatesDropdownComponent } from '../common/dates-dropdown/dates-dropdown.component'
-import { FilterableDropdownComponent } from '../common/filterable-dropdown/filterable-dropdown.component'
-import { PageHeaderComponent } from '../common/page-header/page-header.component'
-import { BulkEditorComponent } from './bulk-editor/bulk-editor.component'
-import { FilterPipe } from 'src/app/pipes/filter.pipe'
+import { DatePipe } from '@angular/common'
 import {
-  NgbDatepickerModule,
+  HttpErrorResponse,
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { By } from '@angular/platform-browser'
+import { ActivatedRoute, Router, convertToParamMap } from '@angular/router'
+import { RouterTestingModule } from '@angular/router/testing'
+import {
   NgbDropdown,
   NgbDropdownItem,
-  NgbDropdownModule,
   NgbModal,
   NgbModalRef,
-  NgbPopoverModule,
-  NgbTooltipModule,
-  NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { ClearableBadgeComponent } from '../common/clearable-badge/clearable-badge.component'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { ToggleableDropdownButtonComponent } from '../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
-import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
-import { DatePipe } from '@angular/common'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import {
-  ConsumerStatusService,
-  FileStatus,
-} from 'src/app/services/consumer-status.service'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject, of, throwError } from 'rxjs'
-import { SavedViewService } from 'src/app/services/rest/saved-view.service'
-import { ActivatedRoute, Router, convertToParamMap } from '@angular/router'
-import { SavedView } from 'src/app/data/saved-view'
-import {
-  FILTER_FULLTEXT_MORELIKE,
-  FILTER_FULLTEXT_QUERY,
-  FILTER_HAS_TAGS_ANY,
-} from 'src/app/data/filter-rule-type'
-import { By } from '@angular/platform-browser'
-import { SortableDirective } from 'src/app/directives/sortable.directive'
-import { ToastService } from 'src/app/services/toast.service'
-import { DocumentCardSmallComponent } from './document-card-small/document-card-small.component'
-import { DocumentCardLargeComponent } from './document-card-large/document-card-large.component'
-import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
-import { UsernamePipe } from 'src/app/pipes/username.pipe'
+import { routes } from 'src/app/app-routing.module'
 import {
   DEFAULT_DISPLAY_FIELDS,
   DisplayField,
   DisplayMode,
   Document,
 } from 'src/app/data/document'
-import { DocumentService } from 'src/app/services/rest/document.service'
-import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
-import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component'
-import { TextComponent } from '../common/input/text/text.component'
-import { CheckComponent } from '../common/input/check/check.component'
 import {
-  HttpErrorResponse,
-  provideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http'
-import { PermissionsGuard } from 'src/app/guards/permissions.guard'
-import { SettingsService } from 'src/app/services/settings.service'
+  FILTER_FULLTEXT_MORELIKE,
+  FILTER_FULLTEXT_QUERY,
+  FILTER_HAS_TAGS_ANY,
+} from 'src/app/data/filter-rule-type'
+import { SavedView } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { SortableDirective } from 'src/app/directives/sortable.directive'
+import { PermissionsGuard } from 'src/app/guards/permissions.guard'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
+import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
+import { FilterPipe } from 'src/app/pipes/filter.pipe'
+import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
+import { UsernamePipe } from 'src/app/pipes/username.pipe'
+import {
+  ConsumerStatusService,
+  FileStatus,
+} from 'src/app/services/consumer-status.service'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
-import { NgSelectModule } from '@ng-select/ng-select'
+import { DocumentService } from 'src/app/services/rest/document.service'
+import { SavedViewService } from 'src/app/services/rest/saved-view.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
+import { DocumentCardLargeComponent } from './document-card-large/document-card-large.component'
+import { DocumentCardSmallComponent } from './document-card-small/document-card-small.component'
+import { DocumentListComponent } from './document-list.component'
 
 const docs: Document[] = [
   {
@@ -113,42 +92,10 @@ describe('DocumentListComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        DocumentListComponent,
-        PageHeaderComponent,
-        FilterEditorComponent,
-        FilterableDropdownComponent,
-        DatesDropdownComponent,
-        PermissionsFilterDropdownComponent,
-        ToggleableDropdownButtonComponent,
-        BulkEditorComponent,
-        ClearableBadgeComponent,
-        DocumentCardSmallComponent,
-        DocumentCardLargeComponent,
-        ConfirmDialogComponent,
-        SaveViewConfigDialogComponent,
-        TextComponent,
-        CheckComponent,
-        IfPermissionsDirective,
-        FilterPipe,
-        CustomDatePipe,
-        SortableDirective,
-        DocumentTitlePipe,
-        UsernamePipe,
-        SafeHtmlPipe,
-        IsNumberPipe,
-      ],
       imports: [
         RouterTestingModule.withRoutes(routes),
-        FormsModule,
-        ReactiveFormsModule,
-        NgbDropdownModule,
-        NgbDatepickerModule,
-        NgbPopoverModule,
-        NgbTooltipModule,
         NgxBootstrapIconsModule.pick(allIcons),
-        NgSelectModule,
-        NgbTypeaheadModule,
+        DocumentListComponent,
       ],
       providers: [
         FilterPipe,
@@ -698,5 +645,31 @@ describe('DocumentListComponent', () => {
     fixture.detectChanges()
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'o' }))
     expect(detailSpy).toHaveBeenCalledWith(docs[1].id)
+
+    const lotsOfDocs: Document[] = Array.from({ length: 100 }, (_, i) => ({
+      id: i + 1,
+      title: `Doc${i + 1}`,
+      notes: [],
+      tags$: new Subject(),
+      content: `document content ${i + 1}`,
+    }))
+    jest
+      .spyOn(documentListService, 'documents', 'get')
+      .mockReturnValue(lotsOfDocs)
+    jest
+      .spyOn(documentService, 'listAllFilteredIds')
+      .mockReturnValue(of(lotsOfDocs.map((d) => d.id)))
+    jest.spyOn(documentListService, 'getLastPage').mockReturnValue(4)
+    fixture.detectChanges()
+
+    expect(component.list.currentPage).toEqual(1)
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowRight', ctrlKey: true })
+    )
+    expect(component.list.currentPage).toEqual(2)
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowLeft', ctrlKey: true })
+    )
+    expect(component.list.currentPage).toEqual(1)
   })
 })

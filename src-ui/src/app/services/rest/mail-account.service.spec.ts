@@ -1,10 +1,10 @@
 import { HttpTestingController } from '@angular/common/http/testing'
-import { Subscription } from 'rxjs'
 import { TestBed } from '@angular/core/testing'
+import { Subscription } from 'rxjs'
+import { IMAPSecurity, MailAccountType } from 'src/app/data/mail-account'
 import { environment } from 'src/environments/environment'
 import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
 import { MailAccountService } from './mail-account.service'
-import { IMAPSecurity, MailAccountType } from 'src/app/data/mail-account'
 
 let httpTestingController: HttpTestingController
 let service: MailAccountService
@@ -66,6 +66,14 @@ describe(`Additional service tests for MailAccountService`, () => {
     expect(req.request.method).toEqual('GET')
     req.flush({ results: mail_accounts })
     expect(service.allAccounts).toEqual(mail_accounts)
+  })
+
+  it('should support processAccount', () => {
+    subscription = service.processAccount(mail_accounts[0]).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${mail_accounts[0].id}/process/`
+    )
+    expect(req.request.method).toEqual('POST')
   })
 
   beforeEach(() => {

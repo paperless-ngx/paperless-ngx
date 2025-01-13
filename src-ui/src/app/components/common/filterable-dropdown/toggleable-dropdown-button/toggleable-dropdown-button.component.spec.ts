@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { Tag } from 'src/app/data/tag'
+import { TagComponent } from '../../tag/tag.component'
 import {
   ToggleableDropdownButtonComponent,
   ToggleableItemState,
 } from './toggleable-dropdown-button.component'
-import { TagComponent } from '../../tag/tag.component'
-import { Tag } from 'src/app/data/tag'
 
 describe('ToggleableDropdownButtonComponent', () => {
   let component: ToggleableDropdownButtonComponent
@@ -12,9 +12,8 @@ describe('ToggleableDropdownButtonComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [ToggleableDropdownButtonComponent, TagComponent],
       providers: [],
-      imports: [],
+      imports: [ToggleableDropdownButtonComponent, TagComponent],
     }).compileComponents()
 
     fixture = TestBed.createComponent(ToggleableDropdownButtonComponent)

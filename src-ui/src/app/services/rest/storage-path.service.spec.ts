@@ -1,9 +1,9 @@
-import { StoragePathService } from './storage-path.service'
-import { commonAbstractNameFilterPaperlessServiceTests } from './abstract-name-filter-service.spec'
-import { Subscription } from 'rxjs'
 import { HttpTestingController } from '@angular/common/http/testing'
 import { TestBed } from '@angular/core/testing'
+import { Subscription } from 'rxjs'
 import { environment } from 'src/environments/environment'
+import { commonAbstractNameFilterPaperlessServiceTests } from './abstract-name-filter-service.spec'
+import { StoragePathService } from './storage-path.service'
 
 let httpTestingController: HttpTestingController
 let service: StoragePathService

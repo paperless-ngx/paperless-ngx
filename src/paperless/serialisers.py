@@ -1,5 +1,6 @@
 import logging
 
+from allauth.mfa.adapter import get_adapter as get_mfa_adapter
 from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
@@ -32,6 +33,11 @@ class UserSerializer(serializers.ModelSerializer):
         required=False,
     )
     inherited_permissions = serializers.SerializerMethodField()
+    is_mfa_enabled = serializers.SerializerMethodField()
+
+    def get_is_mfa_enabled(self, user: User):
+        mfa_adapter = get_mfa_adapter()
+        return mfa_adapter.is_mfa_enabled(user)
 
     class Meta:
         model = User
@@ -49,6 +55,7 @@ class UserSerializer(serializers.ModelSerializer):
             "groups",
             "user_permissions",
             "inherited_permissions",
+            "is_mfa_enabled",
         )
 
     def get_inherited_permissions(self, obj):
@@ -130,6 +137,11 @@ class ProfileSerializer(serializers.ModelSerializer):
         read_only=True,
         source="socialaccount_set",
     )
+    is_mfa_enabled = serializers.SerializerMethodField()
+
+    def get_is_mfa_enabled(self, user: User):
+        mfa_adapter = get_mfa_adapter()
+        return mfa_adapter.is_mfa_enabled(user)
 
     class Meta:
         model = User
@@ -141,6 +153,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "auth_token",
             "social_accounts",
             "has_usable_password",
+            "is_mfa_enabled",
         )
 
 

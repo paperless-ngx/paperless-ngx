@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
-import { AbstractPaperlessService } from './abstract-paperless-service'
+import { Injectable } from '@angular/core'
 import { CustomField } from 'src/app/data/custom-field'
+import { AbstractPaperlessService } from './abstract-paperless-service'
 
 @Injectable({
   providedIn: 'root',

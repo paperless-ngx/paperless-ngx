@@ -6,12 +6,14 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.test import override_settings
 from django.utils import timezone
 from rest_framework import status
 
 from documents.models import Document
 from documents.models import ShareLink
 from documents.tests.utils import DirectoriesMixin
+from paperless.models import ApplicationConfiguration
 
 
 class TestViews(DirectoriesMixin, TestCase):
@@ -66,6 +68,26 @@ class TestViews(DirectoriesMixin, TestCase):
                 response.context_data["main_js"],
                 f"frontend/{language_actual}/main.js",
             )
+
+    @override_settings(BASE_URL="/paperless/")
+    def test_index_app_logo_with_base_url(self):
+        """
+        GIVEN:
+            - Existing config with app_logo specified
+        WHEN:
+            - Index page is loaded
+        THEN:
+            - app_logo is prefixed with BASE_URL
+        """
+        config = ApplicationConfiguration.objects.first()
+        config.app_logo = "/logo/example.jpg"
+        config.save()
+        self.client.force_login(self.user)
+        response = self.client.get("/")
+        self.assertEqual(
+            response.context["APP_LOGO"],
+            f"/paperless{config.app_logo}",
+        )
 
     def test_share_link_views(self):
         """

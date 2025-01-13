@@ -1,14 +1,14 @@
-import {
-  CustomFieldQueryElement,
-  CustomFieldQueryAtom,
-  CustomFieldQueryExpression,
-} from './custom-field-query-element'
+import { fakeAsync, tick } from '@angular/core/testing'
 import {
   CustomFieldQueryElementType,
   CustomFieldQueryLogicalOperator,
   CustomFieldQueryOperator,
 } from '../data/custom-field-query'
-import { fakeAsync, tick } from '@angular/core/testing'
+import {
+  CustomFieldQueryAtom,
+  CustomFieldQueryElement,
+  CustomFieldQueryExpression,
+} from './custom-field-query-element'
 
 describe('CustomFieldQueryElement', () => {
   it('should initialize with correct type and id', () => {

@@ -44,6 +44,8 @@
     <ng-select #fieldSelects
       class="paperless-input-select rounded-end"
       [items]="getSelectOptionsForField(atom.field)"
+      bindLabel="label"
+      bindValue="id"
       [(ngModel)]="atom.value"
       [disabled]="disabled"
       (mousedown)="$event.stopImmediatePropagation()"
@@ -65,7 +67,9 @@
       (mousedown)="$event.stopImmediatePropagation()"
     ></ng-select>
     <select class="w-25 form-select" [(ngModel)]="atom.operator" [disabled]="disabled">
-      <option *ngFor="let operator of getOperatorsForField(atom.field)" [ngValue]="operator.value">{{operator.label}}</option>
+      @for (operator of getOperatorsForField(atom.field); track operator.label) {
+        <option [ngValue]="operator.value">{{operator.label}}</option>
+      }
     </select>
     @switch (atom.operator) {
       @case (CustomFieldQueryOperator.Exists) {
@@ -99,6 +103,8 @@
         <ng-select
           class="paperless-input-select rounded-end"
           [items]="getSelectOptionsForField(atom.field)"
+          bindLabel="label"
+          bindValue="id"
           [(ngModel)]="atom.value"
           [disabled]="disabled"
           [multiple]="true"

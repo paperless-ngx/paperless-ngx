@@ -1,33 +1,34 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { CustomFieldsComponent } from './custom-fields.component'
-import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import {
   NgbModal,
-  NgbPaginationModule,
   NgbModalModule,
   NgbModalRef,
+  NgbPaginationModule,
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { of, throwError } from 'rxjs'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { PermissionsService } from 'src/app/services/permissions.service'
-import { ToastService } from 'src/app/services/toast.service'
-import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { FILTER_CUSTOM_FIELDS_QUERY } from 'src/app/data/filter-rule-type'
+import { of, throwError } from 'rxjs'
+import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
   CustomFieldQueryLogicalOperator,
   CustomFieldQueryOperator,
 } from 'src/app/data/custom-field-query'
+import { FILTER_CUSTOM_FIELDS_QUERY } from 'src/app/data/filter-rule-type'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { PermissionsService } from 'src/app/services/permissions.service'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
+import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { PageHeaderComponent } from '../../common/page-header/page-header.component'
+import { CustomFieldsComponent } from './custom-fields.component'
 
 const fields: CustomField[] = [
   {
@@ -49,15 +50,10 @@ describe('CustomFieldsComponent', () => {
   let modalService: NgbModal
   let toastService: ToastService
   let listViewService: DocumentListViewService
+  let settingsService: SettingsService
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        CustomFieldsComponent,
-        IfPermissionsDirective,
-        PageHeaderComponent,
-        ConfirmDialogComponent,
-      ],
       imports: [
         NgbPaginationModule,
         FormsModule,
@@ -65,6 +61,10 @@ describe('CustomFieldsComponent', () => {
         NgbModalModule,
         NgbPopoverModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        CustomFieldsComponent,
+        IfPermissionsDirective,
+        PageHeaderComponent,
+        ConfirmDialogComponent,
       ],
       providers: [
         {
@@ -91,10 +91,14 @@ describe('CustomFieldsComponent', () => {
     modalService = TestBed.inject(NgbModal)
     toastService = TestBed.inject(ToastService)
     listViewService = TestBed.inject(DocumentListViewService)
+    settingsService = TestBed.inject(SettingsService)
+    settingsService.currentUser = { id: 0, username: 'test' }
 
     fixture = TestBed.createComponent(CustomFieldsComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
+    jest.useFakeTimers()
+    jest.advanceTimersByTime(100)
   })
 
   it('should support create, show notification on error / success', () => {
@@ -119,6 +123,7 @@ describe('CustomFieldsComponent', () => {
     editDialog.succeeded.emit(fields[0])
     expect(toastInfoSpy).toHaveBeenCalled()
     expect(reloadSpy).toHaveBeenCalled()
+    jest.advanceTimersByTime(100)
   })
 
   it('should support edit, show notification on error / success', () => {

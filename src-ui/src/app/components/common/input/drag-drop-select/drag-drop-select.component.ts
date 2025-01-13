@@ -1,11 +1,12 @@
-import { Component, Input, ViewChild, forwardRef } from '@angular/core'
-import { NG_VALUE_ACCESSOR } from '@angular/forms'
-import { AbstractInputComponent } from '../abstract-input'
 import {
   CdkDragDrop,
   CdkDropList,
+  DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
+import { Component, Input, ViewChild, forwardRef } from '@angular/core'
+import { NG_VALUE_ACCESSOR } from '@angular/forms'
+import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
   providers: [
@@ -18,6 +19,7 @@ import {
   selector: 'pngx-input-drag-drop-select',
   templateUrl: './drag-drop-select.component.html',
   styleUrl: './drag-drop-select.component.scss',
+  imports: [DragDropModule],
 })
 export class DragDropSelectComponent extends AbstractInputComponent<string[]> {
   @Input() title: string = $localize`Selected items`

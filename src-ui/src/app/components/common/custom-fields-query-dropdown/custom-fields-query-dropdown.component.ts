@@ -1,34 +1,38 @@
+import { NgTemplateOutlet } from '@angular/common'
 import {
   Component,
   EventEmitter,
   Input,
-  OnDestroy,
   Output,
   QueryList,
   ViewChild,
   ViewChildren,
 } from '@angular/core'
-import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
-import { NgSelectComponent } from '@ng-select/ng-select'
-import { Subject, first, takeUntil } from 'rxjs'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { first, Subject, takeUntil } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
+  CUSTOM_FIELD_QUERY_MAX_ATOMS,
+  CUSTOM_FIELD_QUERY_MAX_DEPTH,
+  CUSTOM_FIELD_QUERY_OPERATOR_GROUPS_BY_TYPE,
+  CUSTOM_FIELD_QUERY_OPERATOR_LABELS,
+  CUSTOM_FIELD_QUERY_OPERATORS_BY_GROUP,
   CustomFieldQueryElementType,
   CustomFieldQueryOperator,
-  CUSTOM_FIELD_QUERY_OPERATOR_GROUPS_BY_TYPE,
-  CUSTOM_FIELD_QUERY_OPERATORS_BY_GROUP,
   CustomFieldQueryOperatorGroups,
-  CUSTOM_FIELD_QUERY_OPERATOR_LABELS,
-  CUSTOM_FIELD_QUERY_MAX_DEPTH,
-  CUSTOM_FIELD_QUERY_MAX_ATOMS,
 } from 'src/app/data/custom-field-query'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import {
+  CustomFieldQueryAtom,
   CustomFieldQueryElement,
   CustomFieldQueryExpression,
-  CustomFieldQueryAtom,
 } from 'src/app/utils/custom-field-query-element'
 import { popperOptionsReenablePreventOverflow } from 'src/app/utils/popper-options'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
+import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
 
 export class CustomFieldQueriesModel {
   public queries: CustomFieldQueryElement[] = []
@@ -156,8 +160,17 @@ export class CustomFieldQueriesModel {
   selector: 'pngx-custom-fields-query-dropdown',
   templateUrl: './custom-fields-query-dropdown.component.html',
   styleUrls: ['./custom-fields-query-dropdown.component.scss'],
+  imports: [
+    ClearableBadgeComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    NgTemplateOutlet,
+    NgSelectModule,
+    NgxBootstrapIconsModule,
+    NgbDropdownModule,
+  ],
 })
-export class CustomFieldsQueryDropdownComponent implements OnDestroy {
+export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPermissions {
   public CustomFieldQueryComponentType = CustomFieldQueryElementType
   public CustomFieldQueryOperator = CustomFieldQueryOperator
   public CustomFieldDataType = CustomFieldDataType
@@ -223,17 +236,11 @@ export class CustomFieldsQueryDropdownComponent implements OnDestroy {
 
   customFields: CustomField[] = []
 
-  private unsubscribeNotifier: Subject<any> = new Subject()
-
   constructor(protected customFieldsService: CustomFieldsService) {
+    super()
     this.selectionModel = new CustomFieldQueriesModel()
     this.getFields()
     this.reset()
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribeNotifier.next(this)
-    this.unsubscribeNotifier.complete()
   }
 
   public onOpenChange(open: boolean) {
@@ -311,7 +318,9 @@ export class CustomFieldsQueryDropdownComponent implements OnDestroy {
     }))
   }
 
-  getSelectOptionsForField(fieldID: number): string[] {
+  getSelectOptionsForField(
+    fieldID: number
+  ): Array<{ label: string; id: string }> {
     const field = this.customFields.find((field) => field.id === fieldID)
     if (field) {
       return field.extra_data['select_options']

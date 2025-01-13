@@ -1,15 +1,15 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import {
   FormsModule,
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { PermissionsGroupComponent } from './permissions-group.component'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { GroupService } from 'src/app/services/rest/group.service'
 import { of } from 'rxjs'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { GroupService } from 'src/app/services/rest/group.service'
+import { PermissionsGroupComponent } from './permissions-group.component'
 
 describe('PermissionsGroupComponent', () => {
   let component: PermissionsGroupComponent
@@ -19,8 +19,12 @@ describe('PermissionsGroupComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [PermissionsGroupComponent],
-      imports: [FormsModule, ReactiveFormsModule, NgSelectModule],
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        PermissionsGroupComponent,
+      ],
       providers: [
         GroupService,
         provideHttpClient(withInterceptorsFromDi()),

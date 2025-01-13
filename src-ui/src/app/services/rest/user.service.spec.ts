@@ -1,6 +1,6 @@
 import { HttpTestingController } from '@angular/common/http/testing'
-import { Subscription } from 'rxjs'
 import { TestBed } from '@angular/core/testing'
+import { Subscription } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import { commonAbstractNameFilterPaperlessServiceTests } from './abstract-name-filter-service.spec'
 import { UserService } from './user.service'
@@ -160,6 +160,18 @@ const user = {
 commonAbstractNameFilterPaperlessServiceTests(endpoint, UserService)
 
 describe('Additional service tests for UserService', () => {
+  beforeEach(() => {
+    // Dont need to setup again
+
+    httpTestingController = TestBed.inject(HttpTestingController)
+    service = TestBed.inject(UserService)
+  })
+
+  afterEach(() => {
+    subscription?.unsubscribe()
+    httpTestingController.verify()
+  })
+
   it('should retain permissions on update', () => {
     subscription = service.listAll().subscribe()
     let req = httpTestingController.expectOne(
@@ -179,15 +191,11 @@ describe('Additional service tests for UserService', () => {
     )
   })
 
-  beforeEach(() => {
-    // Dont need to setup again
-
-    httpTestingController = TestBed.inject(HttpTestingController)
-    service = TestBed.inject(UserService)
-  })
-
-  afterEach(() => {
-    subscription?.unsubscribe()
-    httpTestingController.verify()
+  it('should deactivate totp', () => {
+    subscription = service.deactivateTotp(user).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${user.id}/deactivate_totp/`
+    )
+    expect(req.request.method).toEqual('POST')
   })
 })

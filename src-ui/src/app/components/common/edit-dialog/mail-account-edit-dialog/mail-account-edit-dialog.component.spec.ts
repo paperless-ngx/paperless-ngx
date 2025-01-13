@@ -1,3 +1,4 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
@@ -23,7 +24,6 @@ import { SelectComponent } from '../../input/select/select.component'
 import { TextComponent } from '../../input/text/text.component'
 import { EditDialogMode } from '../edit-dialog.component'
 import { MailAccountEditDialogComponent } from './mail-account-edit-dialog.component'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('MailAccountEditDialogComponent', () => {
   let component: MailAccountEditDialogComponent
@@ -33,7 +33,11 @@ describe('MailAccountEditDialogComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        NgbModule,
         MailAccountEditDialogComponent,
         IfPermissionsDirective,
         IfOwnerDirective,
@@ -43,7 +47,6 @@ describe('MailAccountEditDialogComponent', () => {
         PermissionsFormComponent,
         PasswordComponent,
       ],
-      imports: [FormsModule, ReactiveFormsModule, NgSelectModule, NgbModule],
       providers: [
         NgbActiveModal,
         provideHttpClient(withInterceptorsFromDi()),

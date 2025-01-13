@@ -1,23 +1,31 @@
-import { SettingsService } from './services/settings.service'
-import { SETTINGS_KEYS } from './data/ui-settings'
 import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core'
-import { Router } from '@angular/router'
-import { Subscription, first } from 'rxjs'
+import { Router, RouterOutlet } from '@angular/router'
+import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
+import { first, Subscription } from 'rxjs'
+import { ToastsComponent } from './components/common/toasts/toasts.component'
+import { FileDropComponent } from './components/file-drop/file-drop.component'
+import { SETTINGS_KEYS } from './data/ui-settings'
 import { ConsumerStatusService } from './services/consumer-status.service'
-import { ToastService } from './services/toast.service'
-import { TasksService } from './services/tasks.service'
-import { TourService } from 'ngx-ui-tour-ng-bootstrap'
+import { HotKeyService } from './services/hot-key.service'
 import {
   PermissionAction,
   PermissionsService,
   PermissionType,
 } from './services/permissions.service'
-import { HotKeyService } from './services/hot-key.service'
+import { SettingsService } from './services/settings.service'
+import { TasksService } from './services/tasks.service'
+import { ToastService } from './services/toast.service'
 
 @Component({
   selector: 'pngx-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  imports: [
+    FileDropComponent,
+    ToastsComponent,
+    TourNgBootstrapModule,
+    RouterOutlet,
+  ],
 })
 export class AppComponent implements OnInit, OnDestroy {
   newDocumentSubscription: Subscription
@@ -165,7 +173,7 @@ export class AppComponent implements OnInit, OnDestroy {
       [
         {
           anchorId: 'tour.dashboard',
-          content: $localize`The dashboard can be used to show saved views, such as an 'Inbox'. Those settings are found under Settings > Saved Views once you have created some.`,
+          content: $localize`The dashboard can be used to show saved views, such as an 'Inbox'. Views are found under Manage > Saved Views once you have created some.`,
           route: '/dashboard',
           delayAfterNavigation: 500,
           isOptional: false,
@@ -227,7 +235,7 @@ export class AppComponent implements OnInit, OnDestroy {
         },
         {
           anchorId: 'tour.settings',
-          content: $localize`Check out the settings for various tweaks to the web app and toggle settings for saved views.`,
+          content: $localize`Check out the settings for various tweaks to the web app.`,
           route: '/settings',
           backdropConfig: {
             offset: 0,

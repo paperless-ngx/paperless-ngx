@@ -30,7 +30,7 @@ account. The script essentially automatically performs the steps described in [D
 2.  Download and run the installation script:
 
     ```shell-session
-    $ bash -c "$(curl --location --silent --show-error https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/install-paperless-ngx.sh)"
+    bash -c "$(curl --location --silent --show-error https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/install-paperless-ngx.sh)"
     ```
 
     !!! note
@@ -135,13 +135,13 @@ account. The script essentially automatically performs the steps described in [D
     execute the following command:
 
     ```shell-session
-    $ docker compose run --rm webserver createsuperuser
+    docker compose run --rm webserver createsuperuser
     ```
 
     or using docker exec from within the container:
 
     ```shell-session
-    $ python3 manage.py createsuperuser
+    python3 manage.py createsuperuser
     ```
 
     This will guide you through the superuser setup.
@@ -188,7 +188,7 @@ account. The script essentially automatically performs the steps described in [D
     `docker compose pull` to pull the image, run
 
     ```shell-session
-    $ docker compose build
+    docker compose build
     ```
 
     instead to build the image.
@@ -557,8 +557,8 @@ Migration to paperless-ngx is then performed in a few simple steps:
 1.  Stop paperless.
 
     ```bash
-    $ cd /path/to/current/paperless
-    $ docker compose down
+    cd /path/to/current/paperless
+    docker compose down
     ```
 
 2.  Do a backup for two purposes: If something goes wrong, you still
@@ -582,7 +582,7 @@ Migration to paperless-ngx is then performed in a few simple steps:
         names of your volumes with
 
         ``` shell-session
-        $ docker volume ls | grep _data
+        docker volume ls | grep _data
         ```
 
         and adjust the project name in the `.env` file so that it matches
@@ -603,7 +603,7 @@ Migration to paperless-ngx is then performed in a few simple steps:
     the search index:
 
     ```shell-session
-    $ docker compose run --rm webserver document_index reindex
+    docker compose run --rm webserver document_index reindex
     ```
 
     This will migrate your database and create the search index. After
@@ -612,7 +612,7 @@ Migration to paperless-ngx is then performed in a few simple steps:
 8.  Start paperless-ngx.
 
     ```bash
-    $ docker compose up -d
+    docker compose up -d
     ```
 
     This will run paperless in the background and automatically start it

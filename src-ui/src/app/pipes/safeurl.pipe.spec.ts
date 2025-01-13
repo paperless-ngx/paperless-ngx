@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing'
-import { SafeUrlPipe } from './safeurl.pipe'
 import { BrowserModule, DomSanitizer } from '@angular/platform-browser'
+import { SafeUrlPipe } from './safeurl.pipe'
 
 describe('SafeUrlPipe', () => {
   let pipe: SafeUrlPipe

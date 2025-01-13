@@ -100,3 +100,9 @@ scripts/nuke
 
 # celery schedule file
 celerybeat-schedule*
+
+# ignore .devcontainer sub folders
+/.devcontainer/consume/
+/.devcontainer/data/
+/.devcontainer/media/
+/.devcontainer/redisdata/

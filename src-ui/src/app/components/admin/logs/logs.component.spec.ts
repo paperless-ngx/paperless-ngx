@@ -1,18 +1,13 @@
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { BrowserModule, By } from '@angular/platform-browser'
+import { NgbModule, NgbNavLink } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { of, throwError } from 'rxjs'
 import { LogService } from 'src/app/services/rest/log.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LogsComponent } from './logs.component'
-import { of, throwError } from 'rxjs'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { NgbModule, NgbNavLink } from '@ng-bootstrap/ng-bootstrap'
-import { BrowserModule, By } from '@angular/platform-browser'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const paperless_logs = [
   '[2023-05-29 03:05:01,224] [DEBUG] [paperless.tasks] Training data unchanged.',
@@ -37,11 +32,12 @@ describe('LogsComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [LogsComponent, PageHeaderComponent],
       imports: [
         BrowserModule,
         NgbModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        LogsComponent,
+        PageHeaderComponent,
       ],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
@@ -90,8 +86,7 @@ describe('LogsComponent', () => {
     jest.advanceTimersByTime(6000)
     expect(reloadSpy).toHaveBeenCalledTimes(2)
 
-    component.toggleAutoRefresh()
-    expect(component.autoRefreshInterval).toBeNull()
+    component.autoRefreshEnabled = false
     jest.advanceTimersByTime(6000)
     expect(reloadSpy).toHaveBeenCalledTimes(2)
   })

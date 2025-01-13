@@ -1,15 +1,24 @@
+import { Clipboard } from '@angular/cdk/clipboard'
 import { Component, Input, OnInit } from '@angular/core'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first } from 'rxjs'
-import { ShareLink, FileVersion } from 'src/app/data/share-link'
+import { FileVersion, ShareLink } from 'src/app/data/share-link'
 import { ShareLinkService } from 'src/app/services/rest/share-link.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
-import { Clipboard } from '@angular/cdk/clipboard'
 
 @Component({
   selector: 'pngx-share-links-dropdown',
   templateUrl: './share-links-dropdown.component.html',
   styleUrls: ['./share-links-dropdown.component.scss'],
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    NgbDropdownModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class ShareLinksDropdownComponent implements OnInit {
   EXPIRATION_OPTIONS = [
@@ -35,8 +44,17 @@ export class ShareLinksDropdownComponent implements OnInit {
   @Input()
   disabled: boolean = false
 
+  private _hasArchiveVersion: boolean = true
+
   @Input()
-  hasArchiveVersion: boolean = true
+  set hasArchiveVersion(value: boolean) {
+    this._hasArchiveVersion = value
+    this.useArchiveVersion = value
+  }
+
+  get hasArchiveVersion(): boolean {
+    return this._hasArchiveVersion
+  }
 
   shareLinks: ShareLink[]
 
@@ -56,7 +74,6 @@ export class ShareLinksDropdownComponent implements OnInit {
 
   ngOnInit(): void {
     if (this._documentId !== undefined) this.refresh()
-    this.useArchiveVersion = this.hasArchiveVersion
   }
 
   refresh() {

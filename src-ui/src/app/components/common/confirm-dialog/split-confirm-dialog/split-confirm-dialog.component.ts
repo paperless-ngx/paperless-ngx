@@ -1,15 +1,23 @@
 import { Component, OnInit } from '@angular/core'
-import { ConfirmDialogComponent } from '../confirm-dialog.component'
-import { Document } from 'src/app/data/document'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { DocumentService } from 'src/app/services/rest/document.service'
+import { PDFDocumentProxy, PdfViewerModule } from 'ng2-pdf-viewer'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { Document } from 'src/app/data/document'
 import { PermissionsService } from 'src/app/services/permissions.service'
-import { PDFDocumentProxy } from 'ng2-pdf-viewer'
+import { DocumentService } from 'src/app/services/rest/document.service'
+import { ConfirmDialogComponent } from '../confirm-dialog.component'
 
 @Component({
   selector: 'pngx-split-confirm-dialog',
   templateUrl: './split-confirm-dialog.component.html',
   styleUrl: './split-confirm-dialog.component.scss',
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    NgxBootstrapIconsModule,
+    PdfViewerModule,
+  ],
 })
 export class SplitConfirmDialogComponent
   extends ConfirmDialogComponent

@@ -38,7 +38,7 @@
             </tr>
         </thead>
         <tbody>
-            @if (isLoading) {
+            @if (loading) {
                 <tr>
                     <td colspan="5">
                     <div class="spinner-border spinner-border-sm me-2" role="status"></div>
@@ -47,15 +47,20 @@
                 </tr>
             }
             @for (document of documentsInTrash; track document.id) {
-                <tr (click)="toggleSelected(document); $event.stopPropagation();">
+                <tr (click)="toggleSelected(document); $event.stopPropagation();" (mouseleave)="popupPreview.close()" class="data-row fade" [class.show]="show">
                     <td>
                     <div class="form-check m-0 ms-2 me-n2">
                         <input type="checkbox" class="form-check-input" id="{{document.id}}" [checked]="selectedDocuments.has(document.id)" (click)="toggleSelected(document); $event.stopPropagation();">
                         <label class="form-check-label" for="{{document.id}}"></label>
                     </div>
                     </td>
-                    <td scope="row">{{ document.title }}</td>
-                    <td scope="row" i18n>{{ getDaysRemaining(document) }} days</td>
+                    <td scope="row">
+                      {{ document.title }}
+                      <pngx-preview-popup [document]="document" linkClasses="btn btn-sm btn-link" #popupPreview>
+                        <i-bs name="eye"></i-bs>
+                      </pngx-preview-popup>
+                    </td>
+                    <td scope="row" class="d-none d-sm-table-cell" i18n>{{ getDaysRemaining(document) }} days</td>
                     <td scope="row">
                     <div class="btn-group d-block d-sm-none">
                         <div ngbDropdown container="body" class="d-inline-block">
@@ -83,7 +88,7 @@
     </table>
 </div>
 
-@if (!isLoading) {
+@if (!loading) {
     <div class="d-flex mb-2">
         <div>
             <ng-container i18n>{totalDocuments, plural, =1 {One document in trash} other {{{totalDocuments || 0}} total documents in trash}}</ng-container>
