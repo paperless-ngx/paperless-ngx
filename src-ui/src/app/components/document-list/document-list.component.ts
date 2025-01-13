@@ -55,6 +55,7 @@ import {
 import { CustomFieldDisplayComponent } from '../common/custom-field-display/custom-field-display.component'
 import { PageHeaderComponent } from '../common/page-header/page-header.component'
 import { PreviewPopupComponent } from '../common/preview-popup/preview-popup.component'
+import { TagComponent } from '../common/tag/tag.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { BulkEditorComponent } from './bulk-editor/bulk-editor.component'
 import { DocumentCardLargeComponent } from './document-card-large/document-card-large.component'
@@ -74,6 +75,7 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
     DocumentCardSmallComponent,
     DocumentCardLargeComponent,
     PreviewPopupComponent,
+    TagComponent,
     CustomDatePipe,
     DocumentTitlePipe,
     IfPermissionsDirective,
