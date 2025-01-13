@@ -324,7 +324,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">185</context>
+          <context context-type="linenumber">187</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.html</context>
@@ -7337,7 +7337,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">302</context>
+          <context context-type="linenumber">304</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1494518490116523821" datatype="html">
@@ -7348,7 +7348,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">295</context>
+          <context context-type="linenumber">297</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8461842260159597706" datatype="html">
@@ -7605,42 +7605,42 @@
         <source>Reset filters / selection</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">283</context>
+          <context context-type="linenumber">285</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4135055128446167640" datatype="html">
         <source>Open first [selected] document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">311</context>
+          <context context-type="linenumber">313</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3629960544875360046" datatype="html">
         <source>Previous page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">327</context>
+          <context context-type="linenumber">329</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3337301694210287595" datatype="html">
         <source>Next page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">339</context>
+          <context context-type="linenumber">341</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2155249406916744630" datatype="html">
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">371</context>
+          <context context-type="linenumber">373</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6837554170707123455" datatype="html">
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">414</context>
+          <context context-type="linenumber">416</context>
         </context-group>
       </trans-unit>
       <trans-unit id="739880801667335279" datatype="html">
