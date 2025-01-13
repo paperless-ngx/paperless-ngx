@@ -980,6 +980,7 @@ class BulkEditView(PassUserMixin):
         "delete_pages": "checksum",
         "split": None,
         "merge": None,
+        "reprocess": "checksum",
     }
 
     permission_classes = (IsAuthenticated,)
