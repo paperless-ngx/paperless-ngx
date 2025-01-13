@@ -1,30 +1,30 @@
-import { TestBed } from '@angular/core/testing'
-import { DocumentListViewService } from './document-list-view.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
-import { environment } from 'src/environments/environment'
-import { Subscription } from 'rxjs'
-import { ConfirmDialogComponent } from '../components/common/confirm-dialog/confirm-dialog.component'
+import { TestBed } from '@angular/core/testing'
 import { Params, Router, convertToParamMap } from '@angular/router'
+import { RouterTestingModule } from '@angular/router/testing'
+import { Subscription } from 'rxjs'
+import { routes } from 'src/app/app-routing.module'
+import { environment } from 'src/environments/environment'
+import { ConfirmDialogComponent } from '../components/common/confirm-dialog/confirm-dialog.component'
+import {
+  DEFAULT_DISPLAY_FIELDS,
+  DisplayField,
+  DisplayMode,
+} from '../data/document'
+import { FilterRule } from '../data/filter-rule'
 import {
   FILTER_HAS_TAGS_ALL,
   FILTER_HAS_TAGS_ANY,
 } from '../data/filter-rule-type'
 import { SavedView } from '../data/saved-view'
-import { FilterRule } from '../data/filter-rule'
-import { RouterTestingModule } from '@angular/router/testing'
-import { routes } from 'src/app/app-routing.module'
-import { PermissionsGuard } from '../guards/permissions.guard'
-import { SettingsService } from './settings.service'
 import { SETTINGS_KEYS } from '../data/ui-settings'
-import {
-  DisplayMode,
-  DisplayField,
-  DEFAULT_DISPLAY_FIELDS,
-} from '../data/document'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { PermissionsGuard } from '../guards/permissions.guard'
+import { DocumentListViewService } from './document-list-view.service'
+import { SettingsService } from './settings.service'
 
 const documents = [
   {
@@ -92,9 +92,8 @@ describe('DocumentListViewService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ConfirmDialogComponent],
       teardown: { destroyAfterEach: true },
-      imports: [RouterTestingModule.withRoutes(routes)],
+      imports: [RouterTestingModule.withRoutes(routes), ConfirmDialogComponent],
       providers: [
         DocumentListViewService,
         PermissionsGuard,
@@ -156,7 +155,7 @@ describe('DocumentListViewService', () => {
     expect(documentListViewService.currentPage).toEqual(1)
   })
 
-  it('should handle error on filtering request', () => {
+  it('should handle object error on filtering request', () => {
     documentListViewService.currentPage = 1
     const tags__id__in = 'hello'
     const filterRulesAny = [
@@ -178,6 +177,50 @@ describe('DocumentListViewService', () => {
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
     )
     expect(req.request.method).toEqual('GET')
+    // reset the list
+    documentListViewService.filterRules = []
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
+    )
+  })
+
+  it('should handle object error on filtering request for custom field sorts', () => {
+    documentListViewService.currentPage = 1
+    documentListViewService.sortField = 'custom_field_999'
+    let req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-custom_field_999&truncate_content=true`
+    )
+    expect(req.request.method).toEqual('GET')
+    req.flush(
+      { custom_field_999: ['Custom field not found'] },
+      { status: 400, statusText: 'Unexpected error' }
+    )
+    expect(documentListViewService.error).toEqual(
+      'custom_field_999: Custom field not found'
+    )
+    // reset the list
+    documentListViewService.sortField = 'created'
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
+    )
+  })
+
+  it('should handle string error on filtering request', () => {
+    documentListViewService.currentPage = 1
+    const tags__id__in = 'hello'
+    const filterRulesAny = [
+      {
+        rule_type: FILTER_HAS_TAGS_ANY,
+        value: tags__id__in,
+      },
+    ]
+    documentListViewService.filterRules = filterRulesAny
+    let req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&tags__id__in=${tags__id__in}`
+    )
+    expect(req.request.method).toEqual('GET')
+    req.flush('Generic error', { status: 404, statusText: 'Unexpected error' })
+    expect(documentListViewService.error).toEqual('Generic error')
     // reset the list
     documentListViewService.filterRules = []
     req = httpTestingController.expectOne(

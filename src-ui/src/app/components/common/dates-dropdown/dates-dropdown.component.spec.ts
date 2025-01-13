@@ -1,24 +1,24 @@
+import { DatePipe } from '@angular/common'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import {
   ComponentFixture,
   TestBed,
   fakeAsync,
   tick,
 } from '@angular/core/testing'
-let fixture: ComponentFixture<DatesDropdownComponent>
-import {
-  DatesDropdownComponent,
-  DateSelection,
-  RelativeDate,
-} from './dates-dropdown.component'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
-import { DatePipe } from '@angular/common'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import {
+  DateSelection,
+  DatesDropdownComponent,
+  RelativeDate,
+} from './dates-dropdown.component'
+let fixture: ComponentFixture<DatesDropdownComponent>
 
 describe('DatesDropdownComponent', () => {
   let component: DatesDropdownComponent
@@ -27,16 +27,14 @@ describe('DatesDropdownComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        DatesDropdownComponent,
-        ClearableBadgeComponent,
-        CustomDatePipe,
-      ],
       imports: [
         NgbModule,
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        DatesDropdownComponent,
+        ClearableBadgeComponent,
+        CustomDatePipe,
       ],
       providers: [
         SettingsService,

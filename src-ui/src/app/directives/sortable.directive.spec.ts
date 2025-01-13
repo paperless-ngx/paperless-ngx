@@ -1,7 +1,7 @@
 import { Component, DebugElement } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { SortEvent, SortableDirective } from './sortable.directive'
 import { By } from '@angular/platform-browser'
+import { SortEvent, SortableDirective } from './sortable.directive'
 
 @Component({
   template: `
@@ -24,6 +24,7 @@ import { By } from '@angular/platform-browser'
       </tbody>
     </table>
   `,
+  imports: [SortableDirective],
 })
 class TestComponent {}
 
@@ -34,7 +35,7 @@ describe('SortableDirective', () => {
 
   beforeEach(() => {
     fixture = TestBed.configureTestingModule({
-      declarations: [SortableDirective, TestComponent],
+      imports: [SortableDirective, TestComponent],
     }).createComponent(TestComponent)
 
     fixture.detectChanges() // initial binding

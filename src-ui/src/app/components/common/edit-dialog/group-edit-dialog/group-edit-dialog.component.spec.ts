@@ -1,8 +1,10 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -12,8 +14,6 @@ import { TextComponent } from '../../input/text/text.component'
 import { PermissionsSelectComponent } from '../../permissions-select/permissions-select.component'
 import { EditDialogMode } from '../edit-dialog.component'
 import { GroupEditDialogComponent } from './group-edit-dialog.component'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
 describe('GroupEditDialogComponent', () => {
   let component: GroupEditDialogComponent
@@ -22,7 +22,12 @@ describe('GroupEditDialogComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        NgbModule,
+        NgxBootstrapIconsModule.pick(allIcons),
         GroupEditDialogComponent,
         IfPermissionsDirective,
         IfOwnerDirective,
@@ -30,13 +35,6 @@ describe('GroupEditDialogComponent', () => {
         TextComponent,
         PermissionsFormComponent,
         PermissionsSelectComponent,
-      ],
-      imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        NgSelectModule,
-        NgbModule,
-        NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         NgbActiveModal,

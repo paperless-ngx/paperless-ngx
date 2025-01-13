@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing'
+import { Document } from '../data/document'
 import {
   PermissionAction,
   PermissionType,
   PermissionsService,
 } from './permissions.service'
-import { Document } from '../data/document'
 
 describe('PermissionsService', () => {
   let permissionsService: PermissionsService
@@ -438,5 +438,26 @@ describe('PermissionsService', () => {
     })
 
     expect(permissionsService.isAdmin()).toBeFalsy()
+  })
+
+  it('correctly checks superuser status', () => {
+    permissionsService.initialize([], {
+      username: 'testuser',
+      last_name: 'User',
+      first_name: 'Test',
+      id: 1,
+      is_superuser: true,
+    })
+
+    expect(permissionsService.isSuperUser()).toBeTruthy()
+
+    permissionsService.initialize([], {
+      username: 'testuser',
+      last_name: 'User',
+      first_name: 'Test',
+      id: 1,
+    })
+
+    expect(permissionsService.isSuperUser()).toBeFalsy()
   })
 })

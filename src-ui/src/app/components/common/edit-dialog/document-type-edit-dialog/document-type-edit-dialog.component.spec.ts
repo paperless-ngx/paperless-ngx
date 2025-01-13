@@ -1,3 +1,4 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -11,7 +12,6 @@ import { SelectComponent } from '../../input/select/select.component'
 import { TextComponent } from '../../input/text/text.component'
 import { EditDialogMode } from '../edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from './document-type-edit-dialog.component'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('DocumentTypeEditDialogComponent', () => {
   let component: DocumentTypeEditDialogComponent
@@ -20,7 +20,11 @@ describe('DocumentTypeEditDialogComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        NgbModule,
         DocumentTypeEditDialogComponent,
         IfPermissionsDirective,
         IfOwnerDirective,
@@ -28,7 +32,6 @@ describe('DocumentTypeEditDialogComponent', () => {
         TextComponent,
         PermissionsFormComponent,
       ],
-      imports: [FormsModule, ReactiveFormsModule, NgSelectModule, NgbModule],
       providers: [
         NgbActiveModal,
         provideHttpClient(withInterceptorsFromDi()),

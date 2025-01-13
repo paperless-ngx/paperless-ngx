@@ -1,13 +1,13 @@
-import { Injectable } from '@angular/core'
 import {
-  HttpRequest,
-  HttpHandler,
   HttpEvent,
+  HttpHandler,
   HttpInterceptor,
+  HttpRequest,
 } from '@angular/common/http'
-import { Observable } from 'rxjs'
-import { CookieService } from 'ngx-cookie-service'
+import { Injectable } from '@angular/core'
 import { Meta } from '@angular/platform-browser'
+import { CookieService } from 'ngx-cookie-service'
+import { Observable } from 'rxjs'
 
 @Injectable()
 export class CsrfInterceptor implements HttpInterceptor {

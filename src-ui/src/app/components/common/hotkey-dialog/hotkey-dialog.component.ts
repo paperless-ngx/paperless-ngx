@@ -9,6 +9,8 @@ const SYMBOLS = {
   right: '&#8594;', // →
   up: '&#8593;', // ↑
   down: '&#8595;', // ↓
+  arrowleft: '&#8592;', // ←
+  arrowright: '&#8594;', // →
 }
 
 @Component({
@@ -33,6 +35,6 @@ export class HotkeyDialogComponent {
     return key
       .split('.')
       .map((k) => SYMBOLS[k] || k)
-      .join(' + ')
+      .join(' ')
   }
 }

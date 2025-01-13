@@ -18,7 +18,7 @@ Check for the following issues:
     automatically. Manually invoke the task processor by executing
 
     ```shell-session
-    $ celery --app paperless worker
+    celery --app paperless worker
     ```
 
 -   Look at the output of paperless and inspect it for any errors.

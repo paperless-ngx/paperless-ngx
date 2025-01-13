@@ -1,10 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { CustomFieldEditDialogComponent } from './custom-field-edit-dialog.component'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { ElementRef, QueryList } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { CustomFieldDataType } from 'src/app/data/custom-field'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
@@ -12,10 +15,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { SelectComponent } from '../../input/select/select.component'
 import { TextComponent } from '../../input/text/text.component'
 import { EditDialogMode } from '../edit-dialog.component'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { CustomFieldDataType } from 'src/app/data/custom-field'
-import { ElementRef, QueryList } from '@angular/core'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { CustomFieldEditDialogComponent } from './custom-field-edit-dialog.component'
 
 describe('CustomFieldEditDialogComponent', () => {
   let component: CustomFieldEditDialogComponent
@@ -24,20 +24,18 @@ describe('CustomFieldEditDialogComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        CustomFieldEditDialogComponent,
-        IfPermissionsDirective,
-        IfOwnerDirective,
-        SelectComponent,
-        TextComponent,
-        SafeHtmlPipe,
-      ],
       imports: [
         FormsModule,
         ReactiveFormsModule,
         NgSelectModule,
         NgbModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        CustomFieldEditDialogComponent,
+        IfPermissionsDirective,
+        IfOwnerDirective,
+        SelectComponent,
+        TextComponent,
+        SafeHtmlPipe,
       ],
       providers: [
         NgbActiveModal,
@@ -80,7 +78,11 @@ describe('CustomFieldEditDialogComponent', () => {
       name: 'Field 1',
       data_type: CustomFieldDataType.Select,
       extra_data: {
-        select_options: ['Option 1', 'Option 2', 'Option 3'],
+        select_options: [
+          { label: 'Option 1', id: '123-xyz' },
+          { label: 'Option 2', id: '456-abc' },
+          { label: 'Option 3', id: '789-123' },
+        ],
       },
     }
     fixture.detectChanges()
@@ -96,19 +98,19 @@ describe('CustomFieldEditDialogComponent', () => {
     component.ngOnInit()
     expect(
       component.objectForm.get('extra_data').get('select_options').value.length
+    ).toBe(0)
+    component.addSelectOption()
+    expect(
+      component.objectForm.get('extra_data').get('select_options').value.length
     ).toBe(1)
     component.addSelectOption()
     expect(
       component.objectForm.get('extra_data').get('select_options').value.length
     ).toBe(2)
-    component.addSelectOption()
-    expect(
-      component.objectForm.get('extra_data').get('select_options').value.length
-    ).toBe(3)
     component.removeSelectOption(0)
     expect(
       component.objectForm.get('extra_data').get('select_options').value.length
-    ).toBe(2)
+    ).toBe(1)
   })
 
   it('should focus on last select option input', () => {

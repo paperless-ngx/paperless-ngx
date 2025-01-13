@@ -6,6 +6,7 @@ from django.http import HttpResponseBadRequest
 from django.http import HttpResponseRedirect
 from django.utils import timezone
 from httpx_oauth.oauth2 import GetAccessTokenError
+from rest_framework.decorators import action
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -23,6 +24,7 @@ from paperless_mail.models import MailRule
 from paperless_mail.oauth import PaperlessMailOAuth2Manager
 from paperless_mail.serialisers import MailAccountSerializer
 from paperless_mail.serialisers import MailRuleSerializer
+from paperless_mail.tasks import process_mail_accounts
 
 
 class MailAccountViewSet(ModelViewSet, PassUserMixin):
@@ -34,22 +36,14 @@ class MailAccountViewSet(ModelViewSet, PassUserMixin):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
 
+    def get_permissions(self):
+        if self.action == "test":
+            # Test action does not require object level permissions
+            self.permission_classes = (IsAuthenticated,)
+        return super().get_permissions()
 
-class MailRuleViewSet(ModelViewSet, PassUserMixin):
-    model = MailRule
-
-    queryset = MailRule.objects.all().order_by("order")
-    serializer_class = MailRuleSerializer
-    pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
-    filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
-
-
-class MailAccountTestView(GenericAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = MailAccountSerializer
-
-    def post(self, request, *args, **kwargs):
+    @action(methods=["post"], detail=False)
+    def test(self, request):
         logger = logging.getLogger("paperless_mail")
         request.data["name"] = datetime.datetime.now().isoformat()
         serializer = self.get_serializer(data=request.data)
@@ -94,6 +88,23 @@ class MailAccountTestView(GenericAPIView):
                 )
                 return HttpResponseBadRequest("Unable to connect to server")
 
+    @action(methods=["post"], detail=True)
+    def process(self, request, pk=None):
+        account = self.get_object()
+        process_mail_accounts.delay([account.pk])
+
+        return Response({"result": "OK"})
+
+
+class MailRuleViewSet(ModelViewSet, PassUserMixin):
+    model = MailRule
+
+    queryset = MailRule.objects.all().order_by("order")
+    serializer_class = MailRuleSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
+
 
 class OauthCallbackView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
@@ -117,7 +128,16 @@ class OauthCallbackView(GenericAPIView):
             )
             return HttpResponseBadRequest("Invalid request, see logs for more detail")
 
-        oauth_manager = PaperlessMailOAuth2Manager()
+        oauth_manager = PaperlessMailOAuth2Manager(
+            state=request.session.get("oauth_state"),
+        )
+
+        state = request.query_params.get("state", "")
+        if not oauth_manager.validate_state(state):
+            logger.error(
+                f"Invalid oauth callback request received state: {state}, expected: {oauth_manager.state}",
+            )
+            return HttpResponseBadRequest("Invalid request, see logs for more detail")
 
         try:
             if scope is not None and "google" in scope:

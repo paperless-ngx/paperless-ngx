@@ -1,21 +1,16 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { PermissionsSelectComponent } from './permissions-select.component'
-import {
-  FormsModule,
-  NG_VALUE_ACCESSOR,
-  ReactiveFormsModule,
-} from '@angular/forms'
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { NG_VALUE_ACCESSOR } from '@angular/forms'
+import { By } from '@angular/platform-browser'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import {
   PermissionAction,
   PermissionType,
 } from 'src/app/services/permissions.service'
-import { By } from '@angular/platform-browser'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { SettingsService } from 'src/app/services/settings.service'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { PermissionsSelectComponent } from './permissions-select.component'
 
 const permissions = [
   'add_document',
@@ -36,12 +31,9 @@ describe('PermissionsSelectComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [PermissionsSelectComponent],
       imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        NgbModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        PermissionsSelectComponent,
       ],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),

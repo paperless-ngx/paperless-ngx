@@ -1,16 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { MailComponent } from './mail.component'
 import { DatePipe } from '@angular/common'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { By } from '@angular/platform-browser'
+import { ActivatedRoute, convertToParamMap } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import {
-  NgbModule,
   NgbAlertModule,
-  NgbModalRef,
   NgbModal,
+  NgbModalRef,
+  NgbModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import { MailAccount, MailAccountType } from 'src/app/data/mail-account'
@@ -20,9 +24,13 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
+import { PermissionsService } from 'src/app/services/permissions.service'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
 import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
 import { CheckComponent } from '../../common/input/check/check.component'
@@ -32,20 +40,12 @@ import { PermissionsFormComponent } from '../../common/input/permissions/permiss
 import { PermissionsGroupComponent } from '../../common/input/permissions/permissions-group/permissions-group.component'
 import { PermissionsUserComponent } from '../../common/input/permissions/permissions-user/permissions-user.component'
 import { SelectComponent } from '../../common/input/select/select.component'
+import { SwitchComponent } from '../../common/input/switch/switch.component'
+import { TagsComponent } from '../../common/input/tags/tags.component'
 import { TextComponent } from '../../common/input/text/text.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
-import { PermissionsService } from 'src/app/services/permissions.service'
-import { ToastService } from 'src/app/services/toast.service'
-import { TagsComponent } from '../../common/input/tags/tags.component'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { SwitchComponent } from '../../common/input/switch/switch.component'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { By } from '@angular/platform-browser'
-import { ActivatedRoute, convertToParamMap } from '@angular/router'
-import { SettingsService } from 'src/app/services/settings.service'
+import { MailComponent } from './mail.component'
 
 const mailAccounts = [
   { id: 1, name: 'account1', account_type: MailAccountType.IMAP },
@@ -70,7 +70,14 @@ describe('MailComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        NgbModule,
+        RouterTestingModule.withRoutes(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        NgbAlertModule,
+        NgSelectModule,
+        NgxBootstrapIconsModule.pick(allIcons),
         MailComponent,
         PageHeaderComponent,
         IfPermissionsDirective,
@@ -91,15 +98,6 @@ describe('MailComponent', () => {
         PermissionsDialogComponent,
         PermissionsFormComponent,
         SwitchComponent,
-      ],
-      imports: [
-        NgbModule,
-        RouterTestingModule.withRoutes(routes),
-        FormsModule,
-        ReactiveFormsModule,
-        NgbAlertModule,
-        NgSelectModule,
-        NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         CustomDatePipe,
@@ -129,6 +127,8 @@ describe('MailComponent', () => {
     fixture = TestBed.createComponent(MailComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
+    jest.useFakeTimers()
+    jest.advanceTimersByTime(100)
   })
 
   function completeSetup(excludeService = null) {
@@ -215,6 +215,23 @@ describe('MailComponent', () => {
     deleteDialog.confirm()
     expect(listAllSpy).toHaveBeenCalled()
     expect(toastInfoSpy).toHaveBeenCalledWith('Deleted mail account')
+  })
+
+  it('should support process mail account, show error if needed', () => {
+    completeSetup()
+    const processSpy = jest.spyOn(mailAccountService, 'processAccount')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    component.processAccount(mailAccounts[0] as MailAccount)
+    expect(processSpy).toHaveBeenCalled()
+    processSpy.mockReturnValueOnce(
+      throwError(() => new Error('error processing mail account'))
+    )
+    component.processAccount(mailAccounts[0] as MailAccount)
+    expect(toastErrorSpy).toHaveBeenCalled()
+    processSpy.mockReturnValueOnce(of(true))
+    component.processAccount(mailAccounts[0] as MailAccount)
+    expect(toastInfoSpy).toHaveBeenCalledWith('Processing mail account')
   })
 
   it('should support edit / create mail rule, show error if needed', () => {
@@ -386,6 +403,7 @@ describe('MailComponent', () => {
     component.oAuthAccountId = 3
     const editSpy = jest.spyOn(component, 'editMailAccount')
     component.ngOnInit()
+    jest.advanceTimersByTime(200)
     expect(editSpy).toHaveBeenCalled()
   })
 })

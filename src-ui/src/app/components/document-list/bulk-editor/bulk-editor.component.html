@@ -90,6 +90,9 @@
               (opened)="openCustomFieldsDropdown()"
               [(selectionModel)]="customFieldsSelectionModel"
               [documentCounts]="customFieldDocumentCounts"
+              extraButtonTitle="Set values"
+              i18n-extraButtonTitle
+              (extraButton)="setCustomFieldValues($event)"
               (apply)="setCustomFields($event)">
             </pngx-filterable-dropdown>
           }
@@ -102,18 +105,18 @@
             </button>
 
             <div ngbDropdown>
-              <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
+              <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" [disabled]="!userCanEdit && !userCanAdd" ngbDropdownToggle>
                 <i-bs name="three-dots"></i-bs>
                 <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
               </button>
               <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
-                <button ngbDropdownItem (click)="reprocessSelected()" [disabled]="!userCanEditAll">
+                <button ngbDropdownItem (click)="reprocessSelected()" [disabled]="!userCanEditAll && !userCanEditAll">
                   <i-bs name="body-text"></i-bs>&nbsp;<ng-container i18n>Reprocess</ng-container>
                 </button>
-                <button ngbDropdownItem (click)="rotateSelected()" [disabled]="!userOwnsAll">
+                <button ngbDropdownItem (click)="rotateSelected()" [disabled]="!userOwnsAll && !userCanEditAll">
                   <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
                 </button>
-                <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanEditAll || list.selected.size < 2">
+                <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanAdd || list.selected.size < 2">
                   <i-bs name="journals"></i-bs>&nbsp;<ng-container i18n>Merge</ng-container>
                 </button>
               </div>

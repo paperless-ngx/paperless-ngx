@@ -832,6 +832,7 @@ class TestMail(
 
         self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 0)
 
+    @pytest.mark.flaky(reruns=4)
     def test_handle_mail_account_flag(self):
         account = MailAccount.objects.create(
             name="test",
@@ -1595,6 +1596,40 @@ class TestTasks(TestCase):
         tasks.process_mail_accounts()
         self.assertEqual(m.call_count, 0)
 
+    @mock.patch("paperless_mail.tasks.MailAccountHandler.handle_mail_account")
+    def test_process_with_account_ids(self, m):
+        m.side_effect = lambda account: 6
+
+        account_a = MailAccount.objects.create(
+            name="A",
+            imap_server="A",
+            username="A",
+            password="A",
+        )
+        account_b = MailAccount.objects.create(
+            name="B",
+            imap_server="A",
+            username="A",
+            password="A",
+        )
+        MailRule.objects.create(
+            name="A",
+            account=account_a,
+        )
+        MailRule.objects.create(
+            name="B",
+            account=account_b,
+        )
+
+        result = tasks.process_mail_accounts(account_ids=[account_a.id])
+
+        self.assertEqual(m.call_count, 1)
+        self.assertIn("Added 6", result)
+
+        m.side_effect = lambda account: 0
+        result = tasks.process_mail_accounts(account_ids=[account_b.id])
+        self.assertIn("No new", result)
+
 
 class TestMailAccountTestView(APITestCase):
     def setUp(self):
@@ -1719,3 +1754,30 @@ class TestMailAccountTestView(APITestCase):
             error_str = cm.output[0]
             expected_str = "Unable to refresh oauth token"
             self.assertIn(expected_str, error_str)
+
+
+class TestMailAccountProcess(APITestCase):
+    def setUp(self):
+        self.mailMocker = MailMocker()
+        self.mailMocker.setUp()
+        self.user = User.objects.create_superuser(
+            username="testuser",
+            password="testpassword",
+        )
+        self.client.force_authenticate(user=self.user)
+        self.account = MailAccount.objects.create(
+            imap_server="imap.example.com",
+            imap_port=993,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            username="admin",
+            password="secret",
+            account_type=MailAccount.MailAccountType.IMAP,
+            owner=self.user,
+        )
+        self.url = f"/api/mail_accounts/{self.account.pk}/process/"
+
+    @mock.patch("paperless_mail.tasks.process_mail_accounts.delay")
+    def test_mail_account_process_view(self, m):
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()

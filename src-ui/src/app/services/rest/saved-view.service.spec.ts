@@ -1,11 +1,11 @@
 import { HttpTestingController } from '@angular/common/http/testing'
-import { Subscription } from 'rxjs'
 import { TestBed } from '@angular/core/testing'
+import { Subscription } from 'rxjs'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { environment } from 'src/environments/environment'
+import { SettingsService } from '../settings.service'
 import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
 import { SavedViewService } from './saved-view.service'
-import { SettingsService } from '../settings.service'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 
 let httpTestingController: HttpTestingController
 let service: SavedViewService

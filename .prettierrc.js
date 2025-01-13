@@ -1,0 +1,19 @@
+const config = {
+	// https://prettier.io/docs/en/options.html#semicolons
+	semi: false,
+	// https://prettier.io/docs/en/options.html#quotes
+	singleQuote: true,
+	// https://prettier.io/docs/en/options.html#trailing-commas
+	trailingComma: 'es5',
+	overrides: [
+		{
+			files: ['docs/*.md'],
+			options: {
+				tabWidth: 4,
+			},
+		},
+	],
+	plugins: [require('prettier-plugin-organize-imports')],
+}
+
+module.exports = config

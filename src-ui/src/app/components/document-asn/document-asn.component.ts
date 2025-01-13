@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
-import { DocumentService } from '../../services/rest/document.service'
 import { ActivatedRoute, Router } from '@angular/router'
 import { FILTER_ASN } from '../../data/filter-rule-type'
+import { DocumentService } from '../../services/rest/document.service'
 
 @Component({
   selector: 'pngx-document-asncomponent',

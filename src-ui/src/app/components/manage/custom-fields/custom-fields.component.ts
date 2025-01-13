@@ -1,34 +1,47 @@
 import { Component, OnInit } from '@angular/core'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { Subject, takeUntil } from 'rxjs'
-import { DATA_TYPE_LABELS, CustomField } from 'src/app/data/custom-field'
-import { PermissionsService } from 'src/app/services/permissions.service'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { ToastService } from 'src/app/services/toast.service'
-import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
-import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
-import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { FILTER_CUSTOM_FIELDS_QUERY } from 'src/app/data/filter-rule-type'
+import {
+  NgbDropdownModule,
+  NgbModal,
+  NgbPaginationModule,
+} from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { delay, takeUntil, tap } from 'rxjs'
+import { CustomField, DATA_TYPE_LABELS } from 'src/app/data/custom-field'
 import {
   CustomFieldQueryLogicalOperator,
   CustomFieldQueryOperator,
 } from 'src/app/data/custom-field-query'
+import { FILTER_CUSTOM_FIELDS_QUERY } from 'src/app/data/filter-rule-type'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { PermissionsService } from 'src/app/services/permissions.service'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
+import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
+import { PageHeaderComponent } from '../../common/page-header/page-header.component'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
   selector: 'pngx-custom-fields',
   templateUrl: './custom-fields.component.html',
   styleUrls: ['./custom-fields.component.scss'],
+  imports: [
+    PageHeaderComponent,
+    IfPermissionsDirective,
+    NgbDropdownModule,
+    NgbPaginationModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class CustomFieldsComponent
-  extends ComponentWithPermissions
+  extends LoadingComponentWithPermissions
   implements OnInit
 {
   public fields: CustomField[] = []
 
-  private unsubscribeNotifier: Subject<any> = new Subject()
   constructor(
     private customFieldsService: CustomFieldsService,
     public permissionsService: PermissionsService,
@@ -47,9 +60,16 @@ export class CustomFieldsComponent
   reload() {
     this.customFieldsService
       .listAll()
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((r) => {
-        this.fields = r.results
+      .pipe(
+        takeUntil(this.unsubscribeNotifier),
+        tap((r) => {
+          this.fields = r.results
+        }),
+        delay(100)
+      )
+      .subscribe(() => {
+        this.show = true
+        this.loading = false
       })
   }
 

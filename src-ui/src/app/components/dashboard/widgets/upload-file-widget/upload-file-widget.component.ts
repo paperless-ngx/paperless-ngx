@@ -1,7 +1,17 @@
+import { NgClass, NgTemplateOutlet } from '@angular/common'
 import { Component, QueryList, ViewChildren } from '@angular/core'
-import { NgbAlert } from '@ng-bootstrap/ng-bootstrap'
+import { RouterModule } from '@angular/router'
+import {
+  NgbAlert,
+  NgbAlertModule,
+  NgbCollapseModule,
+  NgbProgressbarModule,
+} from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import {
   ConsumerStatusService,
   FileStatus,
@@ -9,6 +19,7 @@ import {
 } from 'src/app/services/consumer-status.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
+import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 
 const MAX_ALERTS = 5
 
@@ -16,6 +27,18 @@ const MAX_ALERTS = 5
   selector: 'pngx-upload-file-widget',
   templateUrl: './upload-file-widget.component.html',
   styleUrls: ['./upload-file-widget.component.scss'],
+  imports: [
+    WidgetFrameComponent,
+    IfPermissionsDirective,
+    NgClass,
+    NgTemplateOutlet,
+    RouterModule,
+    NgbAlertModule,
+    NgbCollapseModule,
+    NgbProgressbarModule,
+    NgxBootstrapIconsModule,
+    TourNgBootstrapModule,
+  ],
 })
 export class UploadFileWidgetComponent extends ComponentWithPermissions {
   alertsExpanded = false

@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing'
 
-import { SystemStatusService } from './system-status.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { environment } from 'src/environments/environment'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { SystemStatusService } from './system-status.service'
 
 describe('SystemStatusService', () => {
   let httpTestingController: HttpTestingController

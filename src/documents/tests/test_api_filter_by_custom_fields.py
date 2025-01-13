@@ -46,7 +46,13 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
 
         # Add some options to the select_field
         select = self.custom_fields["select_field"]
-        select.extra_data = {"select_options": ["A", "B", "C"]}
+        select.extra_data = {
+            "select_options": [
+                {"label": "A", "id": "abc-123"},
+                {"label": "B", "id": "def-456"},
+                {"label": "C", "id": "ghi-789"},
+            ],
+        }
         select.save()
 
         # Now we will create some test documents
@@ -122,9 +128,9 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
 
         # CustomField.FieldDataType.SELECT
         self._create_document(select_field=None)
-        self._create_document(select_field=0)
-        self._create_document(select_field=1)
-        self._create_document(select_field=2)
+        self._create_document(select_field="abc-123")
+        self._create_document(select_field="def-456")
+        self._create_document(select_field="ghi-789")
 
     def _create_document(self, **kwargs):
         title = str(kwargs)
@@ -296,18 +302,18 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
         )
 
     def test_select(self):
-        # For select fields, you can either specify the index
+        # For select fields, you can either specify the id of the option
         # or the name of the option. They function exactly the same.
         self._assert_query_match_predicate(
-            ["select_field", "exact", 1],
+            ["select_field", "exact", "def-456"],
             lambda document: "select_field" in document
-            and document["select_field"] == 1,
+            and document["select_field"] == "def-456",
         )
         # This is the same as:
         self._assert_query_match_predicate(
             ["select_field", "exact", "B"],
             lambda document: "select_field" in document
-            and document["select_field"] == 1,
+            and document["select_field"] == "def-456",
         )
 
     # ==========================================================#
@@ -522,9 +528,9 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
 
     def test_invalid_value(self):
         self._assert_validation_error(
-            json.dumps(["select_field", "exact", "not an option"]),
+            json.dumps(["select_field", "exact", []]),
             ["custom_field_query", "2"],
-            "integer",
+            "string",
         )
 
     def test_invalid_logical_operator(self):

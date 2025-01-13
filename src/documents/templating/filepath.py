@@ -253,7 +253,11 @@ def get_custom_fields_context(
         ):
             options = field_instance.field.extra_data["select_options"]
             value = pathvalidate.sanitize_filename(
-                options[int(field_instance.value)],
+                next(
+                    option["label"]
+                    for option in options
+                    if option["id"] == field_instance.value
+                ),
                 replacement_text="-",
             )
         else:

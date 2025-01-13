@@ -17,4 +17,11 @@ export interface PaperlessUserProfile {
   auth_token?: string
   social_accounts?: SocialAccount[]
   has_usable_password?: boolean
+  is_mfa_enabled?: boolean
+}
+
+export interface TotpSettings {
+  url: string
+  qr_svg: string
+  secret: string
 }

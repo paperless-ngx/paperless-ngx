@@ -1,20 +1,12 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import {
   FormsModule,
-  ReactiveFormsModule,
   NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
 } from '@angular/forms'
-import { TagsComponent } from './tags.component'
-import { Tag } from 'src/app/data/tag'
-import {
-  DEFAULT_MATCHING_ALGORITHM,
-  MATCH_ALL,
-} from 'src/app/data/matching-model'
-import { NgSelectModule } from '@ng-select/ng-select'
 import { RouterTestingModule } from '@angular/router/testing'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { of } from 'rxjs'
-import { TagService } from 'src/app/services/rest/tag.service'
 import {
   NgbAccordionModule,
   NgbModal,
@@ -22,16 +14,24 @@ import {
   NgbModalRef,
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
+import { NgSelectModule } from '@ng-select/ng-select'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { of } from 'rxjs'
+import {
+  DEFAULT_MATCHING_ALGORITHM,
+  MATCH_ALL,
+} from 'src/app/data/matching-model'
+import { Tag } from 'src/app/data/tag'
+import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
+import { TagService } from 'src/app/services/rest/tag.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { TagEditDialogComponent } from '../../edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { CheckComponent } from '../check/check.component'
-import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
-import { TextComponent } from '../text/text.component'
 import { ColorComponent } from '../color/color.component'
 import { PermissionsFormComponent } from '../permissions/permissions-form/permissions-form.component'
 import { SelectComponent } from '../select/select.component'
-import { SettingsService } from 'src/app/services/settings.service'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { TextComponent } from '../text/text.component'
+import { TagsComponent } from './tags.component'
 
 const tags: Tag[] = [
   {
@@ -63,7 +63,15 @@ describe('TagsComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        RouterTestingModule,
+        NgbModalModule,
+        NgbAccordionModule,
+        NgbPopoverModule,
+        NgxBootstrapIconsModule.pick(allIcons),
         TagsComponent,
         TagEditDialogComponent,
         TextComponent,
@@ -74,16 +82,6 @@ describe('TagsComponent', () => {
         PermissionsFormComponent,
         ColorComponent,
         CheckComponent,
-      ],
-      imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        NgSelectModule,
-        RouterTestingModule,
-        NgbModalModule,
-        NgbAccordionModule,
-        NgbPopoverModule,
-        NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         {

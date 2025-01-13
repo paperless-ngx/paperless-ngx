@@ -43,7 +43,7 @@ from documents.plugins.helpers import ProgressStatusOptions
 from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
 from documents.signals.handlers import run_workflows
-from documents.templating.title import parse_doc_title_w_placeholders
+from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
@@ -666,12 +666,13 @@ class ConsumerPlugin(
             else None
         )
 
-        return parse_doc_title_w_placeholders(
+        return parse_w_workflow_placeholders(
             title,
             correspondent_name,
             doc_type_name,
             owner_username,
             local_added,
+            self.filename,
             self.filename,
         )
 

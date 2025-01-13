@@ -1,12 +1,14 @@
 import { HttpTestingController } from '@angular/common/http/testing'
-import { Subscription } from 'rxjs'
 import { TestBed } from '@angular/core/testing'
+import { Subscription } from 'rxjs'
+import {
+  MailAction,
+  MailFilterAttachmentType,
+  MailMetadataTitleOption,
+} from 'src/app/data/mail-rule'
 import { environment } from 'src/environments/environment'
 import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
 import { MailRuleService } from './mail-rule.service'
-import { MailFilterAttachmentType } from 'src/app/data/mail-rule'
-import { MailMetadataTitleOption } from 'src/app/data/mail-rule'
-import { MailAction } from 'src/app/data/mail-rule'
 
 let httpTestingController: HttpTestingController
 let service: MailRuleService

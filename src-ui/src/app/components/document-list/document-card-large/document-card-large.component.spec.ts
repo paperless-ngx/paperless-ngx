@@ -1,28 +1,23 @@
 import { DatePipe } from '@angular/common'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { RouterTestingModule } from '@angular/router/testing'
 import {
   NgbPopoverModule,
-  NgbTooltipModule,
   NgbProgressbarModule,
+  NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
-import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
-import { DocumentCardLargeComponent } from './document-card-large.component'
 import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
-import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { CustomFieldDisplayComponent } from '../../common/custom-field-display/custom-field-display.component'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { PreviewPopupComponent } from '../../common/preview-popup/preview-popup.component'
+import { DocumentCardLargeComponent } from './document-card-large.component'
 
 const doc = {
   id: 10,
@@ -48,7 +43,12 @@ describe('DocumentCardLargeComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        RouterTestingModule,
+        NgbPopoverModule,
+        NgbTooltipModule,
+        NgbProgressbarModule,
+        NgxBootstrapIconsModule.pick(allIcons),
         DocumentCardLargeComponent,
         DocumentTitlePipe,
         CustomDatePipe,
@@ -57,13 +57,6 @@ describe('DocumentCardLargeComponent', () => {
         IsNumberPipe,
         PreviewPopupComponent,
         CustomFieldDisplayComponent,
-      ],
-      imports: [
-        RouterTestingModule,
-        NgbPopoverModule,
-        NgbTooltipModule,
-        NgbProgressbarModule,
-        NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         DatePipe,
@@ -76,6 +69,14 @@ describe('DocumentCardLargeComponent', () => {
     component = fixture.componentInstance
     component.document = doc
     fixture.detectChanges()
+    jest.useFakeTimers()
+  })
+
+  it('should show the card', () => {
+    expect(component.show).toBeFalsy()
+    component.ngAfterViewInit()
+    jest.advanceTimersByTime(100)
+    expect(component.show).toBeTruthy()
   })
 
   it('should display a document', () => {
@@ -83,21 +84,6 @@ describe('DocumentCardLargeComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Cupcake ipsum')
     expect(fixture.nativeElement.textContent).toContain('8 pages')
   })
-
-  it('should show preview on mouseover after delay to preload content', fakeAsync(() => {
-    component.mouseEnterPreview()
-    expect(component.popover.isOpen()).toBeTruthy()
-    expect(component.popoverHidden).toBeTruthy()
-    tick(600)
-    expect(component.popoverHidden).toBeFalsy()
-    component.mouseLeaveCard()
-
-    component.mouseEnterPreview()
-    tick(100)
-    component.mouseLeavePreview()
-    tick(600)
-    expect(component.popover.isOpen()).toBeFalsy()
-  }))
 
   it('should trim content', () => {
     expect(component.contentTrimmed).toHaveLength(503) // includes ...
@@ -139,5 +125,13 @@ describe('DocumentCardLargeComponent', () => {
     fixture.detectChanges()
     expect(fixture.nativeElement.textContent).toContain('bananas')
     expect(component.searchNoteHighlights).toContain('<span>bananas</span>')
+  })
+
+  it('should try to close the preview on mouse leave', () => {
+    component.popupPreview = {
+      close: jest.fn(),
+    } as any
+    component.mouseLeaveCard()
+    expect(component.popupPreview.close).toHaveBeenCalled()
   })
 })

@@ -1,3 +1,4 @@
+import { AsyncPipe, NgClass, NgStyle } from '@angular/common'
 import {
   Component,
   Input,
@@ -6,8 +7,17 @@ import {
   QueryList,
   ViewChildren,
 } from '@angular/core'
-import { Router } from '@angular/router'
-import { Subject, takeUntil } from 'rxjs'
+import { Router, RouterModule } from '@angular/router'
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { delay, Subject, takeUntil, tap } from 'rxjs'
+import { CustomFieldDisplayComponent } from 'src/app/components/common/custom-field-display/custom-field-display.component'
+import { PreviewPopupComponent } from 'src/app/components/common/preview-popup/preview-popup.component'
+import { TagComponent } from 'src/app/components/common/tag/tag.component'
+import { DocumentCardLargeComponent } from 'src/app/components/document-list/document-card-large/document-card-large.component'
+import { DocumentCardSmallComponent } from 'src/app/components/document-list/document-card-small/document-card-small.component'
+import { LoadingComponentWithPermissions } from 'src/app/components/loading-component/loading.component'
+import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
   DEFAULT_DASHBOARD_DISPLAY_FIELDS,
   DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
@@ -16,9 +26,6 @@ import {
   DisplayMode,
   Document,
 } from 'src/app/data/document'
-import { SavedView } from 'src/app/data/saved-view'
-import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
-import { DocumentService } from 'src/app/services/rest/document.service'
 import {
   FILTER_CORRESPONDENT,
   FILTER_DOCUMENT_TYPE,
@@ -26,33 +33,51 @@ import {
   FILTER_HAS_TAGS_ALL,
   FILTER_STORAGE_PATH,
 } from 'src/app/data/filter-rule-type'
-import { OpenDocumentsService } from 'src/app/services/open-documents.service'
+import { SavedView } from 'src/app/data/saved-view'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
+import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
+import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
-import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
+import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
   PermissionAction,
-  PermissionType,
   PermissionsService,
+  PermissionType,
 } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
+import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 
 @Component({
   selector: 'pngx-saved-view-widget',
   templateUrl: './saved-view-widget.component.html',
   styleUrls: ['./saved-view-widget.component.scss'],
+  imports: [
+    CustomFieldDisplayComponent,
+    DocumentCardSmallComponent,
+    DocumentCardLargeComponent,
+    PreviewPopupComponent,
+    TagComponent,
+    WidgetFrameComponent,
+    IfPermissionsDirective,
+    AsyncPipe,
+    DocumentTitlePipe,
+    CustomDatePipe,
+    NgClass,
+    NgStyle,
+    RouterModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class SavedViewWidgetComponent
-  extends ComponentWithPermissions
+  extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy
 {
   public DisplayMode = DisplayMode
   public DisplayField = DisplayField
   public CustomFieldDataType = CustomFieldDataType
-
-  loading: boolean = true
 
   private customFields: CustomField[] = []
 
@@ -133,16 +158,22 @@ export class SavedViewWidgetComponent
     this.documentService
       .listFiltered(
         1,
-        this.savedView.page_size ?? DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
+        this.savedView?.page_size ?? DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
         this.savedView.sort_field,
         this.savedView.sort_reverse,
         this.savedView.filter_rules,
         { truncate_content: true }
       )
-      .pipe(takeUntil(this.unsubscribeNotifier))
+      .pipe(
+        takeUntil(this.unsubscribeNotifier),
+        tap((result) => {
+          this.show = true
+          this.documents = result.results
+        }),
+        delay(500)
+      )
       .subscribe((result) => {
         this.loading = false
-        this.documents = result.results
       })
   }
 
@@ -202,53 +233,8 @@ export class SavedViewWidgetComponent
     this.router.navigate(['documents', document.id])
   }
 
-  getPreviewUrl(document: Document): string {
-    return this.documentService.getPreviewUrl(document.id)
-  }
-
   getDownloadUrl(document: Document): string {
     return this.documentService.getDownloadUrl(document.id)
-  }
-
-  mouseEnterPreviewButton(doc: Document) {
-    const newPopover = this.popovers.get(this.documents.indexOf(doc))
-    if (this.popover !== newPopover && this.popover?.isOpen())
-      this.popover.close()
-    this.popover = newPopover
-    this.mouseOnPreview = true
-    if (!this.popover.isOpen()) {
-      // we're going to open but hide to pre-load content during hover delay
-      this.popover.open()
-      this.popoverHidden = true
-      setTimeout(() => {
-        if (this.mouseOnPreview) {
-          // show popover
-          this.popoverHidden = false
-        } else {
-          this.popover.close()
-        }
-      }, 600)
-    }
-  }
-
-  mouseEnterPreview() {
-    this.mouseOnPreview = true
-  }
-
-  mouseLeavePreview() {
-    this.mouseOnPreview = false
-    this.maybeClosePopover()
-  }
-
-  mouseLeavePreviewButton() {
-    this.mouseOnPreview = false
-    this.maybeClosePopover()
-  }
-
-  maybeClosePopover() {
-    setTimeout(() => {
-      if (!this.mouseOnPreview) this.popover?.close()
-    }, 300)
   }
 
   public getColumnTitle(field: DisplayField): string {

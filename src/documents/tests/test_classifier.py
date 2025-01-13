@@ -650,7 +650,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         Path(settings.MODEL_FILE).touch()
         self.assertTrue(os.path.exists(settings.MODEL_FILE))
 
-        load.side_effect = IncompatibleClassifierVersionError("Dummey Error")
+        load.side_effect = IncompatibleClassifierVersionError("Dummy Error")
         self.assertIsNone(load_classifier())
         self.assertFalse(os.path.exists(settings.MODEL_FILE))
 
@@ -673,3 +673,25 @@ class TestClassifier(DirectoriesMixin, TestCase):
         ):
             classifier = load_classifier()
             self.assertIsNone(classifier)
+
+    @mock.patch("documents.classifier.DocumentClassifier.load")
+    def test_load_classifier_raise_exception(self, mock_load):
+        Path(settings.MODEL_FILE).touch()
+        mock_load.side_effect = IncompatibleClassifierVersionError("Dummy Error")
+        with self.assertRaises(IncompatibleClassifierVersionError):
+            load_classifier(raise_exception=True)
+
+        Path(settings.MODEL_FILE).touch()
+        mock_load.side_effect = ClassifierModelCorruptError()
+        with self.assertRaises(ClassifierModelCorruptError):
+            load_classifier(raise_exception=True)
+
+        Path(settings.MODEL_FILE).touch()
+        mock_load.side_effect = OSError()
+        with self.assertRaises(OSError):
+            load_classifier(raise_exception=True)
+
+        Path(settings.MODEL_FILE).touch()
+        mock_load.side_effect = Exception()
+        with self.assertRaises(Exception):
+            load_classifier(raise_exception=True)

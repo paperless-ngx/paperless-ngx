@@ -1,45 +1,72 @@
+import {
+  CdkDragDrop,
+  CdkDragEnd,
+  CdkDragStart,
+  DragDropModule,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop'
+import { NgClass } from '@angular/common'
 import { Component, HostListener, OnInit } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
+import { ActivatedRoute, Router, RouterModule } from '@angular/router'
+import {
+  NgbCollapseModule,
+  NgbDropdownModule,
+  NgbModal,
+  NgbNavModule,
+  NgbPopoverModule,
+} from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { Observable } from 'rxjs'
 import { first } from 'rxjs/operators'
 import { Document } from 'src/app/data/document'
-import { OpenDocumentsService } from 'src/app/services/open-documents.service'
+import { SavedView } from 'src/app/data/saved-view'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { ComponentCanDeactivate } from 'src/app/guards/dirty-doc.guard'
+import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import {
   DjangoMessageLevel,
   DjangoMessagesService,
 } from 'src/app/services/django-messages.service'
-import { SavedViewService } from 'src/app/services/rest/saved-view.service'
-import { environment } from 'src/environments/environment'
-import { DocumentDetailComponent } from '../document-detail/document-detail.component'
-import {
-  RemoteVersionService,
-  AppRemoteVersion,
-} from 'src/app/services/rest/remote-version.service'
-import { SettingsService } from 'src/app/services/settings.service'
-import { TasksService } from 'src/app/services/tasks.service'
-import { ComponentCanDeactivate } from 'src/app/guards/dirty-doc.guard'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { ToastService } from 'src/app/services/toast.service'
-import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
+import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
   PermissionAction,
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
-import { SavedView } from 'src/app/data/saved-view'
 import {
-  CdkDragStart,
-  CdkDragEnd,
-  CdkDragDrop,
-  moveItemInArray,
-} from '@angular/cdk/drag-drop'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+  AppRemoteVersion,
+  RemoteVersionService,
+} from 'src/app/services/rest/remote-version.service'
+import { SavedViewService } from 'src/app/services/rest/saved-view.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { TasksService } from 'src/app/services/tasks.service'
+import { ToastService } from 'src/app/services/toast.service'
+import { environment } from 'src/environments/environment'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
+import { DocumentDetailComponent } from '../document-detail/document-detail.component'
+import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
+import { GlobalSearchComponent } from './global-search/global-search.component'
 
 @Component({
   selector: 'pngx-app-frame',
   templateUrl: './app-frame.component.html',
   styleUrls: ['./app-frame.component.scss'],
+  imports: [
+    GlobalSearchComponent,
+    DocumentTitlePipe,
+    IfPermissionsDirective,
+    RouterModule,
+    NgClass,
+    NgbDropdownModule,
+    NgbPopoverModule,
+    NgbCollapseModule,
+    NgbNavModule,
+    NgxBootstrapIconsModule,
+    DragDropModule,
+    TourNgBootstrapModule,
+  ],
 })
 export class AppFrameComponent
   extends ComponentWithPermissions
@@ -81,7 +108,14 @@ export class AppFrameComponent
     if (this.settingsService.get(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED)) {
       this.checkForUpdates()
     }
-    this.tasksService.reload()
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.PaperlessTask
+      )
+    ) {
+      this.tasksService.reload()
+    }
 
     this.djangoMessagesService.get().forEach((message) => {
       switch (message.level) {
@@ -136,6 +170,7 @@ export class AppFrameComponent
   editProfile() {
     this.modalService.open(ProfileEditDialogComponent, {
       backdrop: 'static',
+      size: 'xl',
     })
     this.closeMenu()
   }

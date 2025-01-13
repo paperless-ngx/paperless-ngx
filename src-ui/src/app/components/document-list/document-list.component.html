@@ -1,6 +1,6 @@
 <pngx-page-header [title]="getTitle()">
 
-  <div ngbDropdown class="d-flex">
+  <div ngbDropdown class="btn-group flex-fill">
     <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
       <i-bs name="text-indent-left"></i-bs>
       <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Select</ng-container></div>
@@ -11,7 +11,7 @@
       <button ngbDropdownItem (click)="list.selectAll()" i18n>Select all</button>
     </div>
   </div>
-  <div ngbDropdown class="d-flex">
+  <div ngbDropdown class="btn-group flex-fill">
     <button class="btn btn-sm btn-outline-primary" id="dropdownDisplayFields" ngbDropdownToggle>
       <i-bs name="card-heading"></i-bs>
       <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Show</ng-container></div>
@@ -43,7 +43,10 @@
   </div>
 
   <div ngbDropdown class="btn-group flex-fill">
-    <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle i18n>Sort</button>
+    <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle>
+      <i-bs name="arrow-down-up"></i-bs>
+      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Sort</ng-container></div>
+    </button>
     <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow dropdown-menu-right">
       <div class="w-100 d-flex pb-2 mb-1 border-bottom">
         <input type="radio" class="btn-check" [value]="false" [(ngModel)]="listSortReverse" id="listSortReverseFalse">
@@ -67,7 +70,8 @@
 
   <div class="btn-group flex-fill" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }" ngbDropdown role="group">
     <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" tourAnchor="tour.documents-views" ngbDropdownToggle>
-      <ng-container i18n>Views</ng-container>
+      <i-bs class="me-1" name="window-stack"></i-bs>
+      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Views</ng-container></div>
       @if (savedViewIsModified) {
         <div class="position-absolute top-0 start-100 p-2 translate-middle badge bg-secondary border border-light rounded-circle">
           <span class="visually-hidden">selected</span>
@@ -90,6 +94,7 @@
         }
       </div>
       <button ngbDropdownItem (click)="saveViewConfigAs()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.SavedView }" i18n>Save as...</button>
+      <a ngbDropdownItem routerLink="/savedviews" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }" i18n>All saved views</a>
     </div>
   </div>
 
@@ -261,9 +266,14 @@
                   Shared
                 </th>
               }
-              @for (field of activeDisplayCustomFields; track field) {
-                <th>
-                  {{getDisplayCustomFieldTitle(field)}}
+              @for (field_id of activeDisplayCustomFields; track field_id) {
+                <th class="cursor-pointer"
+                  pngxSortable="{{field_id}}"
+                  title="Sort by {{getDisplayCustomFieldTitle(field_id)}}" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)">
+                  {{getDisplayCustomFieldTitle(field_id)}}
                 </th>
               }
             </tr>
@@ -292,7 +302,12 @@
                 @if (activeDisplayFields.includes(DisplayField.TITLE) || activeDisplayFields.includes(DisplayField.TAGS)) {
                   <td width="30%">
                     @if (activeDisplayFields.includes(DisplayField.TITLE)) {
-                      <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
+                      <div class="d-inline-block" (mouseleave)="popupPreview.close()">
+                        <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
+                        <pngx-preview-popup [document]="d" linkClasses="btn btn-sm btn-link text-secondary" linkTitle="Preview document" (click)="$event.stopPropagation()" i18n-linkTitle #popupPreview>
+                          <i-bs name="eye"></i-bs>
+                        </pngx-preview-popup>
+                      </div>
                     }
                     @if (activeDisplayFields.includes(DisplayField.TAGS)) {
                       @for (t of d.tags$ | async; track t) {

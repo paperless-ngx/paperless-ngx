@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core'
 import { HttpClient, HttpParams } from '@angular/common/http'
+import { Injectable } from '@angular/core'
+import { Observable } from 'rxjs'
 import { DocumentNote } from 'src/app/data/document-note'
 import { AbstractPaperlessService } from './abstract-paperless-service'
-import { Observable } from 'rxjs'
 
 @Injectable({
   providedIn: 'root',

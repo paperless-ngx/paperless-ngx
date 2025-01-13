@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { ConfirmButtonComponent } from './confirm-button.component'
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { ConfirmButtonComponent } from './confirm-button.component'
 
 describe('ConfirmButtonComponent', () => {
   let component: ConfirmButtonComponent
@@ -10,8 +10,11 @@ describe('ConfirmButtonComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ConfirmButtonComponent],
-      imports: [NgbPopoverModule, NgxBootstrapIconsModule.pick(allIcons)],
+      imports: [
+        NgbPopoverModule,
+        NgxBootstrapIconsModule.pick(allIcons),
+        ConfirmButtonComponent,
+      ],
     }).compileComponents()
 
     fixture = TestBed.createComponent(ConfirmButtonComponent)

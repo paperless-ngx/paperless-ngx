@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import {
   FormsModule,
-  ReactiveFormsModule,
   NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
 } from '@angular/forms'
-import { PasswordComponent } from './password.component'
 import { By } from '@angular/platform-browser'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { PasswordComponent } from './password.component'
 
 describe('PasswordComponent', () => {
   let component: PasswordComponent
@@ -15,12 +15,12 @@ describe('PasswordComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [PasswordComponent],
       providers: [],
       imports: [
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        PasswordComponent,
       ],
     }).compileComponents()
 

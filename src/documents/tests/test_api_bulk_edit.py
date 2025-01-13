@@ -1,7 +1,10 @@
 import json
 from unittest import mock
 
+from auditlog.models import LogEntry
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.test import override_settings
 from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -51,8 +54,12 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc3.tags.add(self.t2)
         self.doc4.tags.add(self.t1, self.t2)
         self.sp1 = StoragePath.objects.create(name="sp1", path="Something/{checksum}")
-        self.cf1 = CustomField.objects.create(name="cf1", data_type="text")
-        self.cf2 = CustomField.objects.create(name="cf2", data_type="text")
+        self.cf1 = CustomField.objects.create(name="cf1", data_type="string")
+        self.cf2 = CustomField.objects.create(name="cf2", data_type="string")
+
+    def setup_mock(self, m, method_name, return_value="OK"):
+        m.return_value = return_value
+        m.__name__ = method_name
 
     @mock.patch("documents.bulk_edit.bulk_update_documents.delay")
     def test_api_set_correspondent(self, bulk_update_task_mock):
@@ -178,7 +185,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.serialisers.bulk_edit.modify_tags")
     def test_api_modify_tags(self, m):
-        m.return_value = "OK"
+        self.setup_mock(m, "modify_tags")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -211,7 +218,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             - API returns HTTP 400
             - modify_tags is not called
         """
-        m.return_value = "OK"
+        self.setup_mock(m, "modify_tags")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -230,7 +237,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.serialisers.bulk_edit.modify_custom_fields")
     def test_api_modify_custom_fields(self, m):
-        m.return_value = "OK"
+        self.setup_mock(m, "modify_custom_fields")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -238,7 +245,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
                     "documents": [self.doc1.id, self.doc3.id],
                     "method": "modify_custom_fields",
                     "parameters": {
-                        "add_custom_fields": [self.cf1.id],
+                        "add_custom_fields": [
+                            self.cf1.id,
+                        ],  # old format accepts list of IDs
                         "remove_custom_fields": [self.cf2.id],
                     },
                 },
@@ -253,6 +262,30 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(kwargs["remove_custom_fields"], [self.cf2.id])
 
     @mock.patch("documents.serialisers.bulk_edit.modify_custom_fields")
+    def test_api_modify_custom_fields_with_values(self, m):
+        self.setup_mock(m, "modify_custom_fields")
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id, self.doc3.id],
+                    "method": "modify_custom_fields",
+                    "parameters": {
+                        "add_custom_fields": {self.cf1.id: "foo"},
+                        "remove_custom_fields": [self.cf2.id],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertListEqual(args[0], [self.doc1.id, self.doc3.id])
+        self.assertEqual(kwargs["add_custom_fields"], {str(self.cf1.id): "foo"})
+        self.assertEqual(kwargs["remove_custom_fields"], [self.cf2.id])
+
+    @mock.patch("documents.serialisers.bulk_edit.modify_custom_fields")
     def test_api_modify_custom_fields_invalid_params(self, m):
         """
         GIVEN:
@@ -263,8 +296,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             - API returns HTTP 400
             - modify_custom_fields is not called
         """
-        m.return_value = "OK"
-
+        self.setup_mock(m, "modify_custom_fields")
         # Missing add_custom_fields
         response = self.client.post(
             "/api/documents/bulk_edit/",
@@ -317,7 +349,23 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         m.assert_not_called()
 
-        # Not a list of integers
+        # Invalid dict
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id, self.doc3.id],
+                    "method": "modify_custom_fields",
+                    "parameters": {
+                        "add_custom_fields": {"foo": 99},
+                        "remove_custom_fields": [self.cf2.id],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        m.assert_not_called()
 
         # Missing remove_custom_fields
         response = self.client.post(
@@ -359,7 +407,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.serialisers.bulk_edit.delete")
     def test_api_delete(self, m):
-        m.return_value = "OK"
+        self.setup_mock(m, "delete")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -383,8 +431,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         THEN:
             - set_storage_path is called with correct document IDs and storage_path ID
         """
-        m.return_value = "OK"
-
+        self.setup_mock(m, "set_storage_path")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -414,8 +461,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         THEN:
             - set_storage_path is called with correct document IDs and None storage_path
         """
-        m.return_value = "OK"
-
+        self.setup_mock(m, "set_storage_path")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -728,7 +774,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.serialisers.bulk_edit.set_permissions")
     def test_set_permissions(self, m):
-        m.return_value = "OK"
+        self.setup_mock(m, "set_permissions")
         user1 = User.objects.create(username="user1")
         user2 = User.objects.create(username="user2")
         permissions = {
@@ -763,7 +809,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.serialisers.bulk_edit.set_permissions")
     def test_set_permissions_merge(self, m):
-        m.return_value = "OK"
+        self.setup_mock(m, "set_permissions")
         user1 = User.objects.create(username="user1")
         user2 = User.objects.create(username="user2")
         permissions = {
@@ -813,6 +859,74 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         args, kwargs = m.call_args
         self.assertEqual(kwargs["merge"], True)
 
+    @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
+    @mock.patch("documents.serialisers.bulk_edit.merge")
+    def test_insufficient_global_perms(self, mock_merge, mock_set_storage):
+        """
+        GIVEN:
+            - User has no global permissions to change a document
+            - User has no global permissions to add a document
+            - User has no global permissions to delete a document
+        WHEN:
+            - API is called to set storage path
+            - API is called to merge documents
+            - API is called to merge with delete
+        THEN:
+            - API returns HTTP 403 for all calls unless global permissions are granted
+        """
+        user1 = User.objects.create(username="user1")
+        user1.save()
+        self.client.force_authenticate(user=user1)
+        self.setup_mock(mock_set_storage, "set_storage_path")
+        self.setup_mock(mock_merge, "merge")
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "set_storage_path",
+                    "parameters": {"storage_path": self.sp1.id},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        mock_set_storage.assert_not_called()
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "merge",
+                    "parameters": {"metadata_document_id": self.doc1.id},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        mock_merge.assert_not_called()
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "merge",
+                    "parameters": {
+                        "metadata_document_id": self.doc1.id,
+                        "delete_originals": True,
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        mock_merge.assert_not_called()
+
     @mock.patch("documents.serialisers.bulk_edit.set_permissions")
     def test_insufficient_permissions_ownership(self, m):
         """
@@ -823,10 +937,12 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         THEN:
             - User is not able to change permissions
         """
-        m.return_value = "OK"
+        self.setup_mock(m, "set_permissions")
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
         user1 = User.objects.create(username="user1")
+        user1.user_permissions.add(*Permission.objects.all())
+        user1.save()
         self.client.force_authenticate(user=user1)
 
         permissions = {
@@ -875,11 +991,13 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         THEN:
             - set_storage_path only called if user can edit all docs
         """
-        m.return_value = "OK"
+        self.setup_mock(m, "set_storage_path")
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
         user1 = User.objects.create(username="user1")
         assign_perm("view_document", user1, self.doc1)
+        user1.user_permissions.add(*Permission.objects.all())
+        user1.save()
         self.client.force_authenticate(user=user1)
 
         response = self.client.post(
@@ -919,8 +1037,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.serialisers.bulk_edit.rotate")
     def test_rotate(self, m):
-        m.return_value = "OK"
-
+        self.setup_mock(m, "rotate")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -974,8 +1091,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.serialisers.bulk_edit.merge")
     def test_merge(self, m):
-        m.return_value = "OK"
-
+        self.setup_mock(m, "merge")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -1001,10 +1117,11 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
         user1 = User.objects.create(username="user1")
+        user1.user_permissions.add(*Permission.objects.all())
+        user1.save()
         self.client.force_authenticate(user=user1)
 
-        m.return_value = "OK"
-
+        self.setup_mock(m, "merge")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -1053,8 +1170,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         THEN:
             - The API fails with a correct error code
         """
-        m.return_value = "OK"
-
+        self.setup_mock(m, "merge")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -1074,8 +1190,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.serialisers.bulk_edit.split")
     def test_split(self, m):
-        m.return_value = "OK"
-
+        self.setup_mock(m, "split")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -1165,8 +1280,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.serialisers.bulk_edit.delete_pages")
     def test_delete_pages(self, m):
-        m.return_value = "OK"
-
+        self.setup_mock(m, "delete_pages")
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
@@ -1254,3 +1368,87 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(b"pages must be a list of integers", response.content)
+
+    @override_settings(AUDIT_LOG_ENABLED=True)
+    def test_bulk_edit_audit_log_enabled_simple_field(self):
+        """
+        GIVEN:
+            - Audit log is enabled
+        WHEN:
+            - API to bulk edit documents is called
+        THEN:
+            - Audit log is created
+        """
+        LogEntry.objects.all().delete()
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "set_correspondent",
+                    "parameters": {"correspondent": self.c2.id},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(LogEntry.objects.filter(object_pk=self.doc1.id).count(), 1)
+
+    @override_settings(AUDIT_LOG_ENABLED=True)
+    def test_bulk_edit_audit_log_enabled_tags(self):
+        """
+        GIVEN:
+            - Audit log is enabled
+        WHEN:
+            - API to bulk edit tags is called
+        THEN:
+            - Audit log is created
+        """
+        LogEntry.objects.all().delete()
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "modify_tags",
+                    "parameters": {
+                        "add_tags": [self.t1.id],
+                        "remove_tags": [self.t2.id],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(LogEntry.objects.filter(object_pk=self.doc1.id).count(), 1)
+
+    @override_settings(AUDIT_LOG_ENABLED=True)
+    def test_bulk_edit_audit_log_enabled_custom_fields(self):
+        """
+        GIVEN:
+            - Audit log is enabled
+        WHEN:
+            - API to bulk edit custom fields is called
+        THEN:
+            - Audit log is created
+        """
+        LogEntry.objects.all().delete()
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "modify_custom_fields",
+                    "parameters": {
+                        "add_custom_fields": [self.cf1.id],
+                        "remove_custom_fields": [],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(LogEntry.objects.filter(object_pk=self.doc1.id).count(), 2)

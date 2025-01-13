@@ -596,7 +596,7 @@ system. See the corresponding
 
 : Disables the regular frontend username / password login, i.e. once you have setup SSO. Note that this setting does not disable the Django admin login nor logging in with local credentials via the API. To prevent access to the Django admin, consider blocking `/admin/` in your [web server or reverse proxy configuration](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-a-Reverse-Proxy-with-Paperless-ngx).
 
-You can optionally also automatically redirect users to the SSO login with [PAPERLESS_REDIRECT_LOGIN_TO_SSO](#PAPERLESS_REDIRECT_LOGIN_TO_SSO)
+    You can optionally also automatically redirect users to the SSO login with [PAPERLESS_REDIRECT_LOGIN_TO_SSO](#PAPERLESS_REDIRECT_LOGIN_TO_SSO)
 
     Defaults to False
 
@@ -1523,7 +1523,7 @@ one pod).
 actual user ID on the host system, which you can get by executing
 
     ``` shell-session
-    $ id -u
+    id -u
     ```
 
     Paperless will change ownership on its folders to this user, so you
@@ -1538,7 +1538,7 @@ actual user ID on the host system, which you can get by executing
 actual group ID on the host system, which you can get by executing
 
     ``` shell-session
-    $ id -g
+    id -g
     ```
 
     Paperless will change ownership on its folders to this group, so you

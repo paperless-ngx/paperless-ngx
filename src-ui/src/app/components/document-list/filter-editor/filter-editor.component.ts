@@ -1,17 +1,21 @@
 import {
+  AfterViewInit,
   Component,
+  ElementRef,
   EventEmitter,
   Input,
-  Output,
-  OnInit,
   OnDestroy,
+  OnInit,
+  Output,
   ViewChild,
-  ElementRef,
-  AfterViewInit,
 } from '@angular/core'
-import { Tag } from 'src/app/data/tag'
-import { Correspondent } from 'src/app/data/correspondent'
-import { DocumentType } from 'src/app/data/document-type'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import {
+  NgbDropdownModule,
+  NgbTypeaheadModule,
+} from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { Observable, Subject, from } from 'rxjs'
 import {
   catchError,
@@ -22,85 +26,95 @@ import {
   switchMap,
   takeUntil,
 } from 'rxjs/operators'
-import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import { TagService } from 'src/app/services/rest/tag.service'
-import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { Correspondent } from 'src/app/data/correspondent'
+import { CustomField } from 'src/app/data/custom-field'
+import {
+  CustomFieldQueryLogicalOperator,
+  CustomFieldQueryOperator,
+} from 'src/app/data/custom-field-query'
+import { Document } from 'src/app/data/document'
+import { DocumentType } from 'src/app/data/document-type'
 import { FilterRule } from 'src/app/data/filter-rule'
-import { filterRulesDiffer } from 'src/app/utils/filter-rules'
 import {
   FILTER_ADDED_AFTER,
   FILTER_ADDED_BEFORE,
   FILTER_ASN,
-  FILTER_HAS_CORRESPONDENT_ANY,
+  FILTER_ASN_GT,
+  FILTER_ASN_ISNULL,
+  FILTER_ASN_LT,
+  FILTER_CORRESPONDENT,
   FILTER_CREATED_AFTER,
   FILTER_CREATED_BEFORE,
-  FILTER_HAS_DOCUMENT_TYPE_ANY,
-  FILTER_FULLTEXT_MORELIKE,
-  FILTER_FULLTEXT_QUERY,
-  FILTER_HAS_ANY_TAG,
-  FILTER_HAS_TAGS_ALL,
-  FILTER_HAS_TAGS_ANY,
-  FILTER_DOES_NOT_HAVE_TAG,
-  FILTER_TITLE,
-  FILTER_TITLE_CONTENT,
-  FILTER_HAS_STORAGE_PATH_ANY,
-  FILTER_ASN_ISNULL,
-  FILTER_ASN_GT,
-  FILTER_ASN_LT,
+  FILTER_CUSTOM_FIELDS_QUERY,
+  FILTER_CUSTOM_FIELDS_TEXT,
+  FILTER_DOCUMENT_TYPE,
   FILTER_DOES_NOT_HAVE_CORRESPONDENT,
   FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
   FILTER_DOES_NOT_HAVE_STORAGE_PATH,
-  FILTER_DOCUMENT_TYPE,
-  FILTER_CORRESPONDENT,
-  FILTER_STORAGE_PATH,
+  FILTER_DOES_NOT_HAVE_TAG,
+  FILTER_FULLTEXT_MORELIKE,
+  FILTER_FULLTEXT_QUERY,
+  FILTER_HAS_ANY_TAG,
+  FILTER_HAS_CORRESPONDENT_ANY,
+  FILTER_HAS_CUSTOM_FIELDS_ALL,
+  FILTER_HAS_CUSTOM_FIELDS_ANY,
+  FILTER_HAS_DOCUMENT_TYPE_ANY,
+  FILTER_HAS_STORAGE_PATH_ANY,
+  FILTER_HAS_TAGS_ALL,
+  FILTER_HAS_TAGS_ANY,
   FILTER_OWNER,
+  FILTER_OWNER_ANY,
   FILTER_OWNER_DOES_NOT_INCLUDE,
   FILTER_OWNER_ISNULL,
-  FILTER_OWNER_ANY,
-  FILTER_CUSTOM_FIELDS_TEXT,
   FILTER_SHARED_BY_USER,
-  FILTER_HAS_CUSTOM_FIELDS_ANY,
-  FILTER_HAS_CUSTOM_FIELDS_ALL,
-  FILTER_HAS_ANY_CUSTOM_FIELDS,
-  FILTER_CUSTOM_FIELDS_QUERY,
+  FILTER_STORAGE_PATH,
+  FILTER_TITLE,
+  FILTER_TITLE_CONTENT,
 } from 'src/app/data/filter-rule-type'
+import { StoragePath } from 'src/app/data/storage-path'
+import { Tag } from 'src/app/data/tag'
 import {
+  PermissionAction,
+  PermissionType,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
+import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import {
+  DocumentService,
+  SelectionData,
+  SelectionDataItem,
+} from 'src/app/services/rest/document.service'
+import { SearchService } from 'src/app/services/rest/search.service'
+import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { TagService } from 'src/app/services/rest/tag.service'
+import {
+  CustomFieldQueryAtom,
+  CustomFieldQueryExpression,
+} from 'src/app/utils/custom-field-query-element'
+import { filterRulesDiffer } from 'src/app/utils/filter-rules'
+import {
+  CustomFieldQueriesModel,
+  CustomFieldsQueryDropdownComponent,
+} from '../../common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
+import {
+  DatesDropdownComponent,
+  RelativeDate,
+} from '../../common/dates-dropdown/dates-dropdown.component'
+import {
+  FilterableDropdownComponent,
   FilterableDropdownSelectionModel,
   Intersection,
   LogicalOperator,
 } from '../../common/filterable-dropdown/filterable-dropdown.component'
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
 import {
-  DocumentService,
-  SelectionData,
-  SelectionDataItem,
-} from 'src/app/services/rest/document.service'
-import { Document } from 'src/app/data/document'
-import { StoragePath } from 'src/app/data/storage-path'
-import { StoragePathService } from 'src/app/services/rest/storage-path.service'
-import { RelativeDate } from '../../common/dates-dropdown/dates-dropdown.component'
-import {
   OwnerFilterType,
+  PermissionsFilterDropdownComponent,
   PermissionsSelectionModel,
 } from '../../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
-import {
-  PermissionAction,
-  PermissionType,
-  PermissionsService,
-} from 'src/app/services/permissions.service'
-import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { CustomField } from 'src/app/data/custom-field'
-import { SearchService } from 'src/app/services/rest/search.service'
-import {
-  CustomFieldQueryLogicalOperator,
-  CustomFieldQueryOperator,
-} from 'src/app/data/custom-field-query'
-import { CustomFieldQueriesModel } from '../../common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
-import {
-  CustomFieldQueryExpression,
-  CustomFieldQueryAtom,
-} from 'src/app/utils/custom-field-query-element'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
 const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
@@ -185,9 +199,21 @@ const DEFAULT_TEXT_FILTER_MODIFIER_OPTIONS = [
   selector: 'pngx-filter-editor',
   templateUrl: './filter-editor.component.html',
   styleUrls: ['./filter-editor.component.scss'],
+  imports: [
+    FilterableDropdownComponent,
+    CustomFieldsQueryDropdownComponent,
+    DatesDropdownComponent,
+    PermissionsFilterDropdownComponent,
+    NgxBootstrapIconsModule,
+    NgbDropdownModule,
+    NgbTypeaheadModule,
+    FormsModule,
+    ReactiveFormsModule,
+    TourNgBootstrapModule,
+  ],
 })
 export class FilterEditorComponent
-  extends ComponentWithPermissions
+  extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy, AfterViewInit
 {
   generateFilterName() {
@@ -288,8 +314,6 @@ export class FilterEditorComponent
   _textFilter = ''
   _moreLikeId: number
   _moreLikeDoc: Document
-
-  unsubscribeNotifier: Subject<any> = new Subject()
 
   get textFilterTargets() {
     if (this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_MORELIKE) {
@@ -955,16 +979,30 @@ export class FilterEditorComponent
   @Input()
   public disabled: boolean = false
 
+  private loadingCountTotal: number = 0
+  private loadingCount: number = 0
+
+  private maybeCompleteLoading() {
+    this.loadingCount++
+    if (this.loadingCount == this.loadingCountTotal) {
+      this.loading = false
+      this.show = true
+    }
+  }
+
   ngOnInit() {
+    this.loading = true
     if (
       this.permissionsService.currentUserCan(
         PermissionAction.View,
         PermissionType.Tag
       )
     ) {
-      this.tagService
-        .listAll()
-        .subscribe((result) => (this.tags = result.results))
+      this.loadingCountTotal++
+      this.tagService.listAll().subscribe((result) => {
+        this.tags = result.results
+        this.maybeCompleteLoading()
+      })
     }
     if (
       this.permissionsService.currentUserCan(
@@ -972,9 +1010,11 @@ export class FilterEditorComponent
         PermissionType.Correspondent
       )
     ) {
-      this.correspondentService
-        .listAll()
-        .subscribe((result) => (this.correspondents = result.results))
+      this.loadingCountTotal++
+      this.correspondentService.listAll().subscribe((result) => {
+        this.correspondents = result.results
+        this.maybeCompleteLoading()
+      })
     }
     if (
       this.permissionsService.currentUserCan(
@@ -982,9 +1022,11 @@ export class FilterEditorComponent
         PermissionType.DocumentType
       )
     ) {
-      this.documentTypeService
-        .listAll()
-        .subscribe((result) => (this.documentTypes = result.results))
+      this.loadingCountTotal++
+      this.documentTypeService.listAll().subscribe((result) => {
+        this.documentTypes = result.results
+        this.maybeCompleteLoading()
+      })
     }
     if (
       this.permissionsService.currentUserCan(
@@ -992,9 +1034,11 @@ export class FilterEditorComponent
         PermissionType.StoragePath
       )
     ) {
-      this.storagePathService
-        .listAll()
-        .subscribe((result) => (this.storagePaths = result.results))
+      this.loadingCountTotal++
+      this.storagePathService.listAll().subscribe((result) => {
+        this.storagePaths = result.results
+        this.maybeCompleteLoading()
+      })
     }
     if (
       this.permissionsService.currentUserCan(
@@ -1002,9 +1046,11 @@ export class FilterEditorComponent
         PermissionType.CustomField
       )
     ) {
-      this.customFieldService
-        .listAll()
-        .subscribe((result) => (this.customFields = result.results))
+      this.loadingCountTotal++
+      this.customFieldService.listAll().subscribe((result) => {
+        this.customFields = result.results
+        this.maybeCompleteLoading()
+      })
     }
 
     this.textFilterDebounce = new Subject<string>()

@@ -1,9 +1,9 @@
-import { TestBed } from '@angular/core/testing'
-import { CsrfInterceptor } from './csrf.interceptor'
-import { Meta } from '@angular/platform-browser'
 import { HttpEvent, HttpRequest } from '@angular/common/http'
-import { of } from 'rxjs'
+import { TestBed } from '@angular/core/testing'
+import { Meta } from '@angular/platform-browser'
 import { CookieService } from 'ngx-cookie-service'
+import { of } from 'rxjs'
+import { CsrfInterceptor } from './csrf.interceptor'
 
 describe('CsrfInterceptor', () => {
   let interceptor: CsrfInterceptor

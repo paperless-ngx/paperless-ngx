@@ -1,20 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { DocumentHistoryComponent } from './document-history.component'
-import { DocumentService } from 'src/app/services/rest/document.service'
+import { DatePipe } from '@angular/common'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of } from 'rxjs'
 import { AuditLogAction } from 'src/app/data/auditlog-entry'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
-import { DatePipe } from '@angular/common'
-import { NgbCollapseModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { DataType } from 'src/app/data/datatype'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { UserService } from 'src/app/services/rest/user.service'
-import { DataType } from 'src/app/data/datatype'
+import { DocumentHistoryComponent } from './document-history.component'
 
 describe('DocumentHistoryComponent', () => {
   let component: DocumentHistoryComponent
@@ -27,11 +26,10 @@ describe('DocumentHistoryComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [DocumentHistoryComponent, CustomDatePipe],
       imports: [
+        DocumentHistoryComponent,
         NgbCollapseModule,
         NgxBootstrapIconsModule.pick(allIcons),
-        NgbTooltipModule,
       ],
       providers: [
         DatePipe,

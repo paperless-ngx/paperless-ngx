@@ -1,21 +1,21 @@
 import { Injectable } from '@angular/core'
 import { ParamMap, Router } from '@angular/router'
 import { Observable, Subject, first, takeUntil } from 'rxjs'
-import { FilterRule } from '../data/filter-rule'
-import {
-  filterRulesDiffer,
-  cloneFilterRules,
-  isFullTextFilterRule,
-} from '../utils/filter-rules'
 import {
   DEFAULT_DISPLAY_FIELDS,
   DisplayField,
   DisplayMode,
   Document,
 } from '../data/document'
+import { FilterRule } from '../data/filter-rule'
 import { SavedView } from '../data/saved-view'
-import { SETTINGS_KEYS } from '../data/ui-settings'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
+import { SETTINGS_KEYS } from '../data/ui-settings'
+import {
+  cloneFilterRules,
+  filterRulesDiffer,
+  isFullTextFilterRule,
+} from '../utils/filter-rules'
 import { paramsFromViewState, paramsToViewState } from '../utils/query-params'
 import { DocumentService, SelectionData } from './rest/document.service'
 import { SettingsService } from './settings.service'
@@ -310,15 +310,18 @@ export class DocumentListViewService {
             this.selectionData = null
             let errorMessage
             if (
-              typeof error.error !== 'string' &&
+              typeof error.error === 'object' &&
               Object.keys(error.error).length > 0
             ) {
               // e.g. { archive_serial_number: Array<string> }
               errorMessage = Object.keys(error.error)
                 .map((fieldName) => {
+                  const fieldNameBase = fieldName.split('__')[0]
                   const fieldError: Array<string> = error.error[fieldName]
                   return `${
-                    this.sortFields.find((f) => f.field == fieldName)?.name
+                    this.sortFields.find(
+                      (f) => f.field?.split('__')[0] == fieldNameBase
+                    )?.name ?? fieldNameBase
                   }: ${fieldError[0]}`
                 })
                 .join(', ')

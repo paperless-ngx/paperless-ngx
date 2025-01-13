@@ -1,3 +1,15 @@
+.wrapper {
+  transition: all .3s ease-out;
+  overflow: hidden;
+  max-height: 0;
+  width: 100%;
+}
+
+.show {
+  max-height: 99999px;
+  overflow: visible;
+}
+
 table {
   overflow-wrap: anywhere;
   table-layout: fixed;

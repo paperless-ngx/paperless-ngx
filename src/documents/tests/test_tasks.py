@@ -1,5 +1,7 @@
 import os
+import shutil
 from datetime import timedelta
+from pathlib import Path
 from unittest import mock
 
 from django.conf import settings
@@ -184,3 +186,75 @@ class TestEmptyTrashTask(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         tasks.empty_trash()
         self.assertEqual(Document.global_objects.count(), 0)
+
+
+class TestUpdateContent(DirectoriesMixin, TestCase):
+    def test_update_content_maybe_archive_file(self):
+        """
+        GIVEN:
+            - Existing document with archive file
+        WHEN:
+            - Update content task is called
+        THEN:
+            - Document is reprocessed, content and checksum are updated
+        """
+        sample1 = self.dirs.scratch_dir / "sample.pdf"
+        shutil.copy(
+            Path(__file__).parent
+            / "samples"
+            / "documents"
+            / "originals"
+            / "0000001.pdf",
+            sample1,
+        )
+        sample1_archive = self.dirs.archive_dir / "sample_archive.pdf"
+        shutil.copy(
+            Path(__file__).parent
+            / "samples"
+            / "documents"
+            / "originals"
+            / "0000001.pdf",
+            sample1_archive,
+        )
+        doc = Document.objects.create(
+            title="test",
+            content="my document",
+            checksum="wow",
+            archive_checksum="wow",
+            filename=sample1,
+            mime_type="application/pdf",
+            archive_filename=sample1_archive,
+        )
+
+        tasks.update_document_content_maybe_archive_file(doc.pk)
+        self.assertNotEqual(Document.objects.get(pk=doc.pk).content, "test")
+        self.assertNotEqual(Document.objects.get(pk=doc.pk).archive_checksum, "wow")
+
+    def test_update_content_maybe_archive_file_no_archive(self):
+        """
+        GIVEN:
+            - Existing document without archive file
+        WHEN:
+            - Update content task is called
+        THEN:
+            - Document is reprocessed, content is updated
+        """
+        sample1 = self.dirs.scratch_dir / "sample.pdf"
+        shutil.copy(
+            Path(__file__).parent
+            / "samples"
+            / "documents"
+            / "originals"
+            / "0000001.pdf",
+            sample1,
+        )
+        doc = Document.objects.create(
+            title="test",
+            content="my document",
+            checksum="wow",
+            filename=sample1,
+            mime_type="application/pdf",
+        )
+
+        tasks.update_document_content_maybe_archive_file(doc.pk)
+        self.assertNotEqual(Document.objects.get(pk=doc.pk).content, "test")

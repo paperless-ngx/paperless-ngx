@@ -1,8 +1,8 @@
-import * as webpack from 'webpack'
 import {
   CustomWebpackBrowserSchema,
   TargetOptions,
 } from '@angular-builders/custom-webpack'
+import * as webpack from 'webpack'
 const { codecovWebpackPlugin } = require('@codecov/webpack-plugin')
 
 export default (

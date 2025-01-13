@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { TagComponent } from './tag.component'
-import { Tag } from 'src/app/data/tag'
 import { By } from '@angular/platform-browser'
+import { Tag } from 'src/app/data/tag'
+import { TagComponent } from './tag.component'
 
 const tag: Tag = {
   id: 1,
@@ -15,9 +15,8 @@ describe('TagComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [TagComponent],
       providers: [],
-      imports: [],
+      imports: [TagComponent],
     }).compileComponents()
 
     fixture = TestBed.createComponent(TagComponent)

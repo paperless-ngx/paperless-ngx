@@ -119,6 +119,32 @@
   <div [formGroup]="formGroup">
     <input type="hidden" formControlName="id" />
     <pngx-input-select i18n-title title="Trigger type" [horizontal]="true" [items]="triggerTypeOptions" formControlName="type"></pngx-input-select>
+    @if (formGroup.get('type').value === WorkflowTriggerType.Scheduled) {
+      <p class="small" i18n>Set scheduled trigger offset and which date field to use.</p>
+      <div class="row">
+        <div class="col-4">
+          <pngx-input-number i18n-title title="Offset days" formControlName="schedule_offset_days" [showAdd]="false" [error]="error?.schedule_offset_days"></pngx-input-number>
+        </div>
+        <div class="col-4">
+          <pngx-input-select i18n-title title="Relative to" formControlName="schedule_date_field" [items]="scheduleDateFieldOptions" [error]="error?.schedule_date_field"></pngx-input-select>
+        </div>
+        @if (formGroup.get('schedule_date_field').value === 'custom_field') {
+          <div class="col-4">
+            <pngx-input-select i18n-title title="Custom field" formControlName="schedule_date_custom_field" [items]="dateCustomFields" i18n-hint hint="Custom field to use for date." [error]="error?.schedule_date_custom_field"></pngx-input-select>
+          </div>
+        }
+      </div>
+      <div class="row">
+        <div class="col-4">
+          <pngx-input-check i18n-title title="Recurring" formControlName="schedule_is_recurring" i18n-hint hint="Trigger is recurring." [error]="error?.schedule_is_recurring"></pngx-input-check>
+        </div>
+        <div class="col-4">
+          @if (formGroup.get('schedule_is_recurring').value === true) {
+            <pngx-input-number i18n-title title="Recurring interval days" formControlName="schedule_recurring_interval_days" i18n-hint hint="Repeat the trigger every n days." [showAdd]="false" [error]="error?.schedule_recurring_interval_days"></pngx-input-number>
+          }
+        </div>
+      </div>
+    }
     <p class="small" i18n>Trigger for documents that match <em>all</em> filters specified below.</p>
     <div class="row">
       <div class="col">
@@ -128,7 +154,7 @@
           <pngx-input-text i18n-title title="Filter path" formControlName="filter_path" i18n-hint hint="Apply to documents that match this path. Wildcards specified as * are allowed. Case-normalized.</a>" [error]="error?.filter_path"></pngx-input-text>
           <pngx-input-select i18n-title title="Filter mail rule" [items]="mailRules" [allowNull]="true" formControlName="filter_mailrule" i18n-hint hint="Apply to documents consumed via this mail rule." [error]="error?.filter_mailrule"></pngx-input-select>
         }
-        @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated) {
+        @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated || formGroup.get('type').value === WorkflowTriggerType.Scheduled) {
           <pngx-input-select i18n-title title="Content matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></pngx-input-select>
           @if (patternRequired) {
             <pngx-input-text i18n-title title="Content matching pattern" formControlName="match" [error]="error?.match"></pngx-input-text>
@@ -138,7 +164,7 @@
           }
         }
       </div>
-      @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated) {
+      @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated || formGroup.get('type').value === WorkflowTriggerType.Scheduled) {
         <div class="col-md-6">
           <pngx-input-tags [allowCreate]="false" i18n-title title="Has any of tags" formControlName="filter_has_tags"></pngx-input-tags>
           <pngx-input-select i18n-title title="Has correspondent" [items]="correspondents" [allowNull]="true" formControlName="filter_has_correspondent"></pngx-input-select>
@@ -293,6 +319,33 @@
                 <small class="form-text text-muted text-end d-block" i18n>Edit permissions also grant viewing permissions</small>
               </div>
             </div>
+          </div>
+        </div>
+      }
+      @case (WorkflowActionType.Email) {
+        <div class="row" [formGroup]="formGroup.get('email')">
+          <input type="hidden" formControlName="id" />
+          <div class="col">
+            <pngx-input-text i18n-title title="Email subject" formControlName="subject" [error]="error?.actions?.[i]?.email?.subject"></pngx-input-text>
+            <pngx-input-textarea i18n-title title="Email body" formControlName="body" [error]="error?.actions?.[i]?.email?.body"></pngx-input-textarea>
+            <pngx-input-text i18n-title title="Email recipients" formControlName="to" [error]="error?.actions?.[i]?.email?.to"></pngx-input-text>
+            <pngx-input-switch i18n-title title="Attach document" formControlName="include_document"></pngx-input-switch>
+          </div>
+        </div>
+      }
+      @case (WorkflowActionType.Webhook) {
+        <div class="row" [formGroup]="formGroup.get('webhook')">
+          <input type="hidden" formControlName="id" />
+          <div class="col">
+            <pngx-input-text i18n-title title="Webhook url" formControlName="url" [error]="error?.actions?.[i]?.url"></pngx-input-text>
+            <pngx-input-switch i18n-title title="Use parameters for webhook body" formControlName="use_params"></pngx-input-switch>
+            @if (formGroup.get('webhook').value['use_params']) {
+              <pngx-input-entries i18n-title title="Webhook params" formControlName="params" [error]="error?.actions?.[i]?.params"></pngx-input-entries>
+            } @else {
+              <pngx-input-textarea i18n-title title="Webhook body" formControlName="body" [error]="error?.actions?.[i]?.body"></pngx-input-textarea>
+            }
+            <pngx-input-entries i18n-title title="Webhook headers" formControlName="headers" [error]="error?.actions?.[i]?.headers"></pngx-input-entries>
+            <pngx-input-switch i18n-title title="Include document" formControlName="include_document"></pngx-input-switch>
           </div>
         </div>
       }

@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing'
 
-import { TrashService } from './trash.service'
 import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing'
 import { environment } from 'src/environments/environment'
+import { TrashService } from './trash.service'
 
 describe('TrashService', () => {
   let service: TrashService

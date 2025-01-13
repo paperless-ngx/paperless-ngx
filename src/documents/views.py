@@ -26,11 +26,13 @@ from django.db.models import Case
 from django.db.models import Count
 from django.db.models import IntegerField
 from django.db.models import Max
+from django.db.models import Model
 from django.db.models import Q
 from django.db.models import Sum
 from django.db.models import When
 from django.db.models.functions import Length
 from django.db.models.functions import Lower
+from django.db.models.manager import Manager
 from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
@@ -73,7 +75,6 @@ from documents import index
 from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
-from documents.caching import CACHE_50_MINUTES
 from documents.caching import get_metadata_cache
 from documents.caching import get_suggestion_cache
 from documents.caching import refresh_metadata_cache
@@ -94,6 +95,7 @@ from documents.data_models import DocumentSource
 from documents.filters import CorrespondentFilterSet
 from documents.filters import CustomFieldFilterSet
 from documents.filters import DocumentFilterSet
+from documents.filters import DocumentsOrderingFilter
 from documents.filters import DocumentTypeFilterSet
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
 from documents.filters import ObjectOwnedPermissionsFilter
@@ -348,7 +350,7 @@ class DocumentViewSet(
     filter_backends = (
         DjangoFilterBackend,
         SearchFilter,
-        OrderingFilter,
+        DocumentsOrderingFilter,
         ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = DocumentFilterSet
@@ -365,6 +367,7 @@ class DocumentViewSet(
         "num_notes",
         "owner",
         "page_count",
+        "custom_field_",
     )
 
     def get_queryset(self):
@@ -426,7 +429,7 @@ class DocumentViewSet(
         )
 
     def file_response(self, pk, request, disposition):
-        doc = Document.objects.select_related("owner").get(id=pk)
+        doc = Document.global_objects.select_related("owner").get(id=pk)
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "view_document",
@@ -465,6 +468,7 @@ class DocumentViewSet(
             return None
 
     @action(methods=["get"], detail=True)
+    @method_decorator(cache_control(no_cache=True))
     @method_decorator(
         condition(etag_func=metadata_etag, last_modified_func=metadata_last_modified),
     )
@@ -523,6 +527,7 @@ class DocumentViewSet(
         return Response(meta)
 
     @action(methods=["get"], detail=True)
+    @method_decorator(cache_control(no_cache=True))
     @method_decorator(
         condition(
             etag_func=suggestions_etag,
@@ -573,7 +578,7 @@ class DocumentViewSet(
         return Response(resp_data)
 
     @action(methods=["get"], detail=True)
-    @method_decorator(cache_control(public=False, max_age=5 * 60))
+    @method_decorator(cache_control(no_cache=True))
     @method_decorator(
         condition(etag_func=preview_etag, last_modified_func=preview_last_modified),
     )
@@ -585,7 +590,7 @@ class DocumentViewSet(
             raise Http404
 
     @action(methods=["get"], detail=True)
-    @method_decorator(cache_control(public=False, max_age=CACHE_50_MINUTES))
+    @method_decorator(cache_control(no_cache=True))
     @method_decorator(last_modified(thumbnail_last_modified))
     def thumb(self, request, pk=None):
         try:
@@ -961,6 +966,22 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin):
 
 
 class BulkEditView(PassUserMixin):
+    MODIFIED_FIELD_BY_METHOD = {
+        "set_correspondent": "correspondent",
+        "set_document_type": "document_type",
+        "set_storage_path": "storage_path",
+        "add_tag": "tags",
+        "remove_tag": "tags",
+        "modify_tags": "tags",
+        "modify_custom_fields": "custom_fields",
+        "set_permissions": None,
+        "delete": "deleted_at",
+        "rotate": "checksum",
+        "delete_pages": "checksum",
+        "split": None,
+        "merge": None,
+    }
+
     permission_classes = (IsAuthenticated,)
     serializer_class = BulkEditSerializer
     parser_classes = (parsers.JSONParser,)
@@ -987,25 +1008,49 @@ class BulkEditView(PassUserMixin):
                 (doc.owner == user or doc.owner is None) for doc in document_objs
             )
 
-            has_perms = (
-                user_is_owner_of_all_documents
-                if method
+            # check global and object permissions for all documents
+            has_perms = user.has_perm("documents.change_document") and all(
+                has_perms_owner_aware(user, "change_document", doc)
+                for doc in document_objs
+            )
+
+            # check ownership for methods that change original document
+            if (
+                has_perms
+                and method
                 in [
                     bulk_edit.set_permissions,
                     bulk_edit.delete,
                     bulk_edit.rotate,
                     bulk_edit.delete_pages,
                 ]
-                else all(
-                    has_perms_owner_aware(user, "change_document", doc)
-                    for doc in document_objs
-                )
-            )
-
-            if (
+            ) or (
                 method in [bulk_edit.merge, bulk_edit.split]
                 and parameters["delete_originals"]
-                and not user_is_owner_of_all_documents
+            ):
+                has_perms = user_is_owner_of_all_documents
+
+            # check global add permissions for methods that create documents
+            if (
+                has_perms
+                and method in [bulk_edit.split, bulk_edit.merge]
+                and not user.has_perm(
+                    "documents.add_document",
+                )
+            ):
+                has_perms = False
+
+            # check global delete permissions for methods that delete documents
+            if (
+                has_perms
+                and (
+                    method == bulk_edit.delete
+                    or (
+                        method in [bulk_edit.merge, bulk_edit.split]
+                        and parameters["delete_originals"]
+                    )
+                )
+                and not user.has_perm("documents.delete_document")
             ):
                 has_perms = False
 
@@ -1013,8 +1058,53 @@ class BulkEditView(PassUserMixin):
                 return HttpResponseForbidden("Insufficient permissions")
 
         try:
+            modified_field = self.MODIFIED_FIELD_BY_METHOD[method.__name__]
+            if settings.AUDIT_LOG_ENABLED and modified_field:
+                old_documents = {
+                    obj["pk"]: obj
+                    for obj in Document.objects.filter(pk__in=documents).values(
+                        "pk",
+                        "correspondent",
+                        "document_type",
+                        "storage_path",
+                        "tags",
+                        "custom_fields",
+                        "deleted_at",
+                        "checksum",
+                    )
+                }
+
             # TODO: parameter validation
             result = method(documents, **parameters)
+
+            if settings.AUDIT_LOG_ENABLED and modified_field:
+                new_documents = Document.objects.filter(pk__in=documents)
+                for doc in new_documents:
+                    old_value = old_documents[doc.pk][modified_field]
+                    new_value = getattr(doc, modified_field)
+
+                    if isinstance(new_value, Model):
+                        # correspondent, document type, etc.
+                        new_value = new_value.pk
+                    elif isinstance(new_value, Manager):
+                        # tags, custom fields
+                        new_value = list(new_value.values_list("pk", flat=True))
+
+                    LogEntry.objects.log_create(
+                        instance=doc,
+                        changes={
+                            modified_field: [
+                                old_value,
+                                new_value,
+                            ],
+                        },
+                        action=LogEntry.Action.UPDATE,
+                        actor=user,
+                        additional_data={
+                            "reason": f"Bulk edit: {method.__name__}",
+                        },
+                    )
+
             return Response({"result": result})
         except Exception as e:
             logger.warning(f"An error occurred performing bulk edit: {e!s}")
@@ -1494,12 +1584,17 @@ class BulkDownloadView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         ids = serializer.validated_data.get("documents")
+        documents = Document.objects.filter(pk__in=ids)
         compression = serializer.validated_data.get("compression")
         content = serializer.validated_data.get("content")
         follow_filename_format = serializer.validated_data.get("follow_formatting")
 
+        for document in documents:
+            if not has_perms_owner_aware(request.user, "view_document", document):
+                return HttpResponseForbidden("Insufficient permissions")
+
         settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
-        temp = tempfile.NamedTemporaryFile(
+        temp = tempfile.NamedTemporaryFile(  # noqa: SIM115
             dir=settings.SCRATCH_DIR,
             suffix="-compressed-archive",
             delete=False,
@@ -1514,9 +1609,10 @@ class BulkDownloadView(GenericAPIView):
 
         with zipfile.ZipFile(temp.name, "w", compression) as zipf:
             strategy = strategy_class(zipf, follow_filename_format)
-            for document in Document.objects.filter(pk__in=ids):
+            for document in documents:
                 strategy.add_document(document)
 
+        # TODO(stumpylog): Investigate using FileResponse here
         with open(temp.name, "rb") as f:
             response = HttpResponse(f, content_type="application/zip")
             response["Content-Disposition"] = '{}; filename="{}"'.format(
@@ -1545,6 +1641,12 @@ class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     filterset_class = StoragePathFilterSet
     ordering_fields = ("name", "path", "matching_algorithm", "match", "document_count")
 
+    def get_permissions(self):
+        if self.action == "test":
+            # Test action does not require object level permissions
+            self.permission_classes = (IsAuthenticated,)
+        return super().get_permissions()
+
     def destroy(self, request, *args, **kwargs):
         """
         When a storage path is deleted, see if documents
@@ -1561,17 +1663,12 @@ class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
         return response
 
-
-class StoragePathTestView(GenericAPIView):
-    """
-    Test storage path against a document
-    """
-
-    permission_classes = [IsAuthenticated]
-    serializer_class = StoragePathTestSerializer
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+    @action(methods=["post"], detail=False)
+    def test(self, request):
+        """
+        Test storage path against a document
+        """
+        serializer = StoragePathTestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         document = serializer.validated_data.get("document")
@@ -1620,10 +1717,14 @@ class UiSettingsView(GenericAPIView):
             manager = PaperlessMailOAuth2Manager()
             if settings.GMAIL_OAUTH_ENABLED:
                 ui_settings["gmail_oauth_url"] = manager.get_gmail_authorization_url()
+                request.session["oauth_state"] = manager.state
             if settings.OUTLOOK_OAUTH_ENABLED:
                 ui_settings["outlook_oauth_url"] = (
                     manager.get_outlook_authorization_url()
                 )
+                request.session["oauth_state"] = manager.state
+
+        ui_settings["email_enabled"] = settings.EMAIL_ENABLED
 
         user_resp = {
             "id": user.id,
@@ -1704,6 +1805,7 @@ class RemoteVersionView(GenericAPIView):
 class TasksViewSet(ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     serializer_class = TasksViewSerializer
+    filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
 
     def get_queryset(self):
         queryset = (
@@ -1718,19 +1820,17 @@ class TasksViewSet(ReadOnlyModelViewSet):
             queryset = PaperlessTask.objects.filter(task_id=task_id)
         return queryset
 
-
-class AcknowledgeTasksView(GenericAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = AcknowledgeTasksViewSerializer
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+    @action(methods=["post"], detail=False)
+    def acknowledge(self, request):
+        serializer = AcknowledgeTasksViewSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        tasks = serializer.validated_data.get("tasks")
+        task_ids = serializer.validated_data.get("tasks")
 
         try:
-            result = PaperlessTask.objects.filter(id__in=tasks).update(
+            tasks = PaperlessTask.objects.filter(id__in=task_ids)
+            if request.user is not None and not request.user.is_superuser:
+                tasks = tasks.filter(owner=request.user) | tasks.filter(owner=None)
+            result = tasks.update(
                 acknowledged=True,
             )
             return Response({"result": result})
@@ -2046,7 +2146,7 @@ class SystemStatusView(PassUserMixin):
         classifier_error = None
         classifier_status = None
         try:
-            classifier = load_classifier()
+            classifier = load_classifier(raise_exception=True)
             if classifier is None:
                 # Make sure classifier should exist
                 docs_queryset = Document.objects.exclude(
@@ -2066,7 +2166,7 @@ class SystemStatusView(PassUserMixin):
                             matching_algorithm=Tag.MATCH_AUTO,
                         ).exists()
                     )
-                    and not os.path.isfile(settings.MODEL_FILE)
+                    and not settings.MODEL_FILE.exists()
                 ):
                     # if classifier file doesn't exist just classify as a warning
                     classifier_error = "Classifier file does not exist (yet). Re-training may be pending."

@@ -22,14 +22,21 @@
     </div>
   </li>
 
+  @if (loading && workflows.length === 0) {
+    <li class="list-group-item">
+      <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+      <ng-container i18n>Loading...</ng-container>
+    </li>
+  }
+
   @for (workflow of workflows; track workflow.id) {
     <li class="list-group-item">
-      <div class="row">
+      <div class="row fade" [class.show]="show">
         <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editWorkflow(workflow)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.Workflow)">{{workflow.name}}</button></div>
         <div class="col d-flex align-items-center d-none d-sm-flex"><code>{{workflow.order}}</code></div>
         <div class="col d-flex align-items-center">
           <div class="form-check form-switch mb-0">
-            <input #inputField type="checkbox" class="form-check-input cursor-pointer" [id]="workflow.id+'_enable'" [(ngModel)]="workflow.enabled" (change)="onWorkflowEnableToggled(workflow)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Workflow }">
+            <input #inputField type="checkbox" class="form-check-input cursor-pointer" [id]="workflow.id+'_enable'" [(ngModel)]="workflow.enabled" (change)="toggleWorkflowEnabled(workflow)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Workflow }">
             <label class="form-check-label cursor-pointer" [for]="workflow.id+'_enable'">
               <code> @if(workflow.enabled) { <ng-container i18n>Enabled</ng-container> } @else { <span i18n class="text-muted">Disabled</span> }</code>
             </label>
@@ -69,7 +76,7 @@
       </div>
     </li>
   }
-  @if (workflows.length === 0) {
-    <li class="list-group-item" i18n>No workflows defined.</li>
+  @if (!loading && workflows.length === 0) {
+    <li class="list-group-item" [class.show]="show" i18n>No workflows defined.</li>
   }
 </ul>

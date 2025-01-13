@@ -1,22 +1,22 @@
-import { TestBed } from '@angular/core/testing'
-import {
-  ConsumerStatusService,
-  FILE_STATUS_MESSAGES,
-  FileStatusPhase,
-} from './consumer-status.service'
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing'
-import { environment } from 'src/environments/environment'
-import { DocumentService } from './rest/document.service'
 import {
   HttpEventType,
   HttpResponse,
   provideHttpClient,
   withInterceptorsFromDi,
 } from '@angular/common/http'
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing'
+import { TestBed } from '@angular/core/testing'
 import WS from 'jest-websocket-mock'
+import { environment } from 'src/environments/environment'
+import {
+  ConsumerStatusService,
+  FILE_STATUS_MESSAGES,
+  FileStatusPhase,
+} from './consumer-status.service'
+import { DocumentService } from './rest/document.service'
 import { SettingsService } from './settings.service'
 
 describe('ConsumerStatusService', () => {

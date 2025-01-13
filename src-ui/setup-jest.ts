@@ -1,9 +1,10 @@
-import { jest } from '@jest/globals'
-if (process.env.NODE_ENV === 'test') {
-  require('jest-preset-angular/setup-jest')
-}
 import '@angular/localize/init'
-import { TextEncoder, TextDecoder } from 'util'
+import { jest } from '@jest/globals'
+import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone'
+import { TextDecoder, TextEncoder } from 'util'
+if (process.env.NODE_ENV === 'test') {
+  setupZoneTestEnv()
+}
 global.TextEncoder = TextEncoder
 global.TextDecoder = TextDecoder
 

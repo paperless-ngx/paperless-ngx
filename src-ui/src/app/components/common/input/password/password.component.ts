@@ -1,5 +1,10 @@
 import { Component, Input, forwardRef } from '@angular/core'
-import { NG_VALUE_ACCESSOR } from '@angular/forms'
+import {
+  FormsModule,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
+} from '@angular/forms'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
@@ -13,6 +18,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-password',
   templateUrl: './password.component.html',
   styleUrls: ['./password.component.scss'],
+  imports: [FormsModule, ReactiveFormsModule, NgxBootstrapIconsModule],
 })
 export class PasswordComponent extends AbstractInputComponent<string> {
   @Input()

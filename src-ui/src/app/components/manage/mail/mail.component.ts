@@ -1,31 +1,47 @@
-import { Component, OnInit, OnDestroy } from '@angular/core'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { Subject, first, takeUntil } from 'rxjs'
-import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
+import { AsyncPipe } from '@angular/common'
+import { Component, OnDestroy, OnInit } from '@angular/core'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { ActivatedRoute } from '@angular/router'
+import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { Subject, delay, first, takeUntil, tap } from 'rxjs'
 import { MailAccount, MailAccountType } from 'src/app/data/mail-account'
 import { MailRule } from 'src/app/data/mail-rule'
+import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import {
-  PermissionsService,
   PermissionAction,
+  PermissionsService,
 } from 'src/app/services/permissions.service'
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
 import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
+import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
-import { SettingsService } from 'src/app/services/settings.service'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { ActivatedRoute } from '@angular/router'
 
 @Component({
   selector: 'pngx-mail',
   templateUrl: './mail.component.html',
   styleUrls: ['./mail.component.scss'],
+  imports: [
+    PageHeaderComponent,
+    IfPermissionsDirective,
+    IfOwnerDirective,
+    AsyncPipe,
+    FormsModule,
+    ReactiveFormsModule,
+    NgbDropdownModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class MailComponent
   extends ComponentWithPermissions
@@ -47,6 +63,11 @@ export class MailComponent
     return this.settingsService.get(SETTINGS_KEYS.OUTLOOK_OAUTH_URL)
   }
 
+  public loadingRules: boolean = true
+  public showRules: boolean = false
+  public loadingAccounts: boolean = true
+  public showAccounts: boolean = false
+
   constructor(
     public mailAccountService: MailAccountService,
     public mailRuleService: MailRuleService,
@@ -62,9 +83,10 @@ export class MailComponent
   ngOnInit(): void {
     this.mailAccountService
       .listAll(null, null, { full_perms: true })
-      .pipe(first(), takeUntil(this.unsubscribeNotifier))
-      .subscribe({
-        next: (r) => {
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        tap((r) => {
           this.mailAccounts = r.results
           if (this.oAuthAccountId) {
             this.editMailAccount(
@@ -73,6 +95,13 @@ export class MailComponent
               )
             )
           }
+        }),
+        delay(100)
+      )
+      .subscribe({
+        next: () => {
+          this.loadingAccounts = false
+          this.showAccounts = true
         },
         error: (e) => {
           this.toastService.showError(
@@ -84,10 +113,18 @@ export class MailComponent
 
     this.mailRuleService
       .listAll(null, null, { full_perms: true })
-      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        tap((r) => {
+          this.mailRules = r.results
+        }),
+        delay(100)
+      )
       .subscribe({
         next: (r) => {
-          this.mailRules = r.results
+          this.loadingRules = false
+          this.showRules = true
         },
         error: (e) => {
           this.toastService.showError($localize`Error retrieving mail rules`, e)
@@ -178,6 +215,17 @@ export class MailComponent
           )
         },
       })
+    })
+  }
+
+  processAccount(account: MailAccount) {
+    this.mailAccountService.processAccount(account).subscribe({
+      next: () => {
+        this.toastService.showInfo($localize`Processing mail account`)
+      },
+      error: (e) => {
+        this.toastService.showError($localize`Error processing mail account`, e)
+      },
     })
   }
 

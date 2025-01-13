@@ -2,16 +2,15 @@ import logging
 import os
 import shutil
 
+import httpx
+from celery import shared_task
 from celery import states
 from celery.signals import before_task_publish
 from celery.signals import task_failure
 from celery.signals import task_postrun
 from celery.signals import task_prerun
 from django.conf import settings
-from django.contrib.admin.models import ADDITION
-from django.contrib.admin.models import LogEntry
-from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
+from django.core.mail import EmailMessage
 from django.db import DatabaseError
 from django.db import close_old_connections
 from django.db import models
@@ -37,10 +36,11 @@ from documents.models import PaperlessTask
 from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
+from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import set_permissions_for_object
-from documents.templating.title import parse_doc_title_w_placeholders
+from documents.templating.workflows import parse_w_workflow_placeholders
 
 logger = logging.getLogger("paperless.handlers")
 
@@ -368,21 +368,6 @@ class CannotMoveFilesException(Exception):
 
 
 # should be disabled in /src/documents/management/commands/document_importer.py handle
-@receiver(models.signals.post_save, sender=CustomField)
-def update_cf_instance_documents(sender, instance: CustomField, **kwargs):
-    """
-    'Select' custom field instances get their end-user value (e.g. in file names) from the select_options in extra_data,
-    which is contained in the custom field itself. So when the field is changed, we (may) need to update the file names
-    of all documents that have this custom field.
-    """
-    if (
-        instance.data_type == CustomField.FieldDataType.SELECT
-    ):  # Only select fields, for now
-        for cf_instance in instance.fields.all():
-            update_filename_and_move_files(sender, cf_instance)
-
-
-# should be disabled in /src/documents/management/commands/document_importer.py handle
 @receiver(models.signals.post_save, sender=CustomFieldInstance)
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
 @receiver(models.signals.post_save, sender=Document)
@@ -520,18 +505,32 @@ def update_filename_and_move_files(
             )
 
 
-def set_log_entry(sender, document: Document, logging_group=None, **kwargs):
-    ct = ContentType.objects.get(model="document")
-    user = User.objects.get(username="consumer")
-
-    LogEntry.objects.create(
-        action_flag=ADDITION,
-        action_time=timezone.now(),
-        content_type=ct,
-        object_id=document.pk,
-        user=user,
-        object_repr=document.__str__(),
-    )
+# should be disabled in /src/documents/management/commands/document_importer.py handle
+@receiver(models.signals.post_save, sender=CustomField)
+def check_paths_and_prune_custom_fields(sender, instance: CustomField, **kwargs):
+    """
+    When a custom field is updated:
+    1. 'Select' custom field instances get their end-user value (e.g. in file names) from the select_options in extra_data,
+    which is contained in the custom field itself. So when the field is changed, we (may) need to update the file names
+    of all documents that have this custom field.
+    2. If a 'Select' field option was removed, we need to nullify the custom field instances that have the option.
+    """
+    if (
+        instance.data_type == CustomField.FieldDataType.SELECT
+    ):  # Only select fields, for now
+        for cf_instance in instance.fields.all():
+            options = instance.extra_data.get("select_options", [])
+            try:
+                next(
+                    option["label"]
+                    for option in options
+                    if option["id"] == cf_instance.value
+                )
+            except StopIteration:
+                # The value of this custom field instance is not in the select options anymore
+                cf_instance.value_select = None
+                cf_instance.save()
+            update_filename_and_move_files(sender, cf_instance)
 
 
 def add_to_index(sender, document, **kwargs):
@@ -554,6 +553,30 @@ def run_workflows_updated(sender, document: Document, logging_group=None, **kwar
         document,
         logging_group,
     )
+
+
+@shared_task(
+    retry_backoff=True,
+    autoretry_for=(httpx.HTTPStatusError,),
+    max_retries=3,
+    throws=(httpx.HTTPError,),
+)
+def send_webhook(url, data, headers, files):
+    try:
+        httpx.post(
+            url,
+            data=data,
+            files=files,
+            headers=headers,
+        ).raise_for_status()
+        logger.info(
+            f"Webhook sent to {url}",
+        )
+    except Exception as e:
+        logger.error(
+            f"Failed attempt sending webhook to {url}: {e}",
+        )
+        raise e
 
 
 def run_workflows(
@@ -608,13 +631,14 @@ def run_workflows(
         if action.assign_title:
             if not use_overrides:
                 try:
-                    document.title = parse_doc_title_w_placeholders(
+                    document.title = parse_w_workflow_placeholders(
                         action.assign_title,
                         document.correspondent.name if document.correspondent else "",
                         document.document_type.name if document.document_type else "",
                         document.owner.username if document.owner else "",
                         timezone.localtime(document.added),
                         document.original_filename or "",
+                        document.filename or "",
                         timezone.localtime(document.created),
                     )
                 except Exception:
@@ -865,6 +889,157 @@ def run_workflows(
                 ):
                     overrides.custom_field_ids.remove(field.pk)
 
+    def email_action():
+        if not settings.EMAIL_ENABLED:
+            logger.error(
+                "Email backend has not been configured, cannot send email notifications",
+                extra={"group": logging_group},
+            )
+            return
+
+        title = (
+            document.title
+            if isinstance(document, Document)
+            else str(document.original_file)
+        )
+        doc_url = None
+        if isinstance(document, Document):
+            doc_url = f"{settings.PAPERLESS_URL}/documents/{document.pk}/"
+        correspondent = document.correspondent.name if document.correspondent else ""
+        document_type = document.document_type.name if document.document_type else ""
+        owner_username = document.owner.username if document.owner else ""
+        filename = document.original_filename or ""
+        current_filename = document.filename or ""
+        added = timezone.localtime(document.added)
+        created = timezone.localtime(document.created)
+        subject = parse_w_workflow_placeholders(
+            action.email.subject,
+            correspondent,
+            document_type,
+            owner_username,
+            added,
+            filename,
+            current_filename,
+            created,
+            title,
+            doc_url,
+        )
+        body = parse_w_workflow_placeholders(
+            action.email.body,
+            correspondent,
+            document_type,
+            owner_username,
+            added,
+            filename,
+            current_filename,
+            created,
+            title,
+            doc_url,
+        )
+        try:
+            email = EmailMessage(
+                subject=subject,
+                body=body,
+                to=action.email.to.split(","),
+            )
+            if action.email.include_document:
+                email.attach_file(document.source_path)
+            n_messages = email.send()
+            logger.debug(
+                f"Sent {n_messages} notification email(s) to {action.email.to}",
+                extra={"group": logging_group},
+            )
+        except Exception as e:
+            logger.exception(
+                f"Error occurred sending notification email: {e}",
+                extra={"group": logging_group},
+            )
+
+    def webhook_action():
+        title = (
+            document.title
+            if isinstance(document, Document)
+            else str(document.original_file)
+        )
+        doc_url = None
+        if isinstance(document, Document):
+            doc_url = f"{settings.PAPERLESS_URL}/documents/{document.pk}/"
+        correspondent = document.correspondent.name if document.correspondent else ""
+        document_type = document.document_type.name if document.document_type else ""
+        owner_username = document.owner.username if document.owner else ""
+        filename = document.original_filename or ""
+        current_filename = document.filename or ""
+        added = timezone.localtime(document.added)
+        created = timezone.localtime(document.created)
+
+        try:
+            data = {}
+            if action.webhook.use_params:
+                try:
+                    for key, value in action.webhook.params.items():
+                        data[key] = parse_w_workflow_placeholders(
+                            value,
+                            correspondent,
+                            document_type,
+                            owner_username,
+                            added,
+                            filename,
+                            current_filename,
+                            created,
+                            title,
+                            doc_url,
+                        )
+                except Exception as e:
+                    logger.error(
+                        f"Error occurred parsing webhook params: {e}",
+                        extra={"group": logging_group},
+                    )
+            else:
+                data = parse_w_workflow_placeholders(
+                    action.webhook.body,
+                    correspondent,
+                    document_type,
+                    owner_username,
+                    added,
+                    filename,
+                    current_filename,
+                    created,
+                    title,
+                    doc_url,
+                )
+            headers = {}
+            if action.webhook.headers:
+                try:
+                    headers = {
+                        str(k): str(v) for k, v in action.webhook.headers.items()
+                    }
+                except Exception as e:
+                    logger.error(
+                        f"Error occurred parsing webhook headers: {e}",
+                        extra={"group": logging_group},
+                    )
+            files = None
+            if action.webhook.include_document:
+                with open(document.source_path, "rb") as f:
+                    files = {
+                        "file": (document.original_filename, f, document.mime_type),
+                    }
+            send_webhook.delay(
+                url=action.webhook.url,
+                data=data,
+                headers=headers,
+                files=files,
+            )
+            logger.debug(
+                f"Webhook to {action.webhook.url} queued",
+                extra={"group": logging_group},
+            )
+        except Exception as e:
+            logger.exception(
+                f"Error occurred sending webhook: {e}",
+                extra={"group": logging_group},
+            )
+
     use_overrides = overrides is not None
     messages = []
 
@@ -886,6 +1061,7 @@ def run_workflows(
             "triggers",
         )
         .order_by("order")
+        .distinct()
     )
 
     for workflow in workflows:
@@ -909,11 +1085,21 @@ def run_workflows(
                     assignment_action()
                 elif action.type == WorkflowAction.WorkflowActionType.REMOVAL:
                     removal_action()
+                elif action.type == WorkflowAction.WorkflowActionType.EMAIL:
+                    email_action()
+                elif action.type == WorkflowAction.WorkflowActionType.WEBHOOK:
+                    webhook_action()
 
             if not use_overrides:
                 # save first before setting tags
                 document.save()
                 document.tags.set(doc_tag_ids)
+
+            WorkflowRun.objects.create(
+                workflow=workflow,
+                type=trigger_type,
+                document=document if not use_overrides else None,
+            )
 
     if use_overrides:
         return overrides, "\n".join(messages)
@@ -938,9 +1124,10 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
         close_old_connections()
 
         task_args = body[0]
-        input_doc, _ = task_args
+        input_doc, overrides = task_args
 
         task_file_name = input_doc.original_file.name
+        user_id = overrides.owner_id if overrides else None
 
         PaperlessTask.objects.create(
             task_id=headers["id"],
@@ -951,6 +1138,7 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
             date_created=timezone.now(),
             date_started=None,
             date_done=None,
+            owner_id=user_id,
         )
     except Exception:  # pragma: no cover
         # Don't let an exception in the signal handlers prevent

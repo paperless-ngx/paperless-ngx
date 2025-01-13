@@ -1,17 +1,17 @@
 import { ParamMap, Params } from '@angular/router'
-import { FilterRule } from '../data/filter-rule'
-import {
-  FilterRuleType,
-  FILTER_RULE_TYPES,
-  FILTER_HAS_CUSTOM_FIELDS_ANY,
-  FILTER_CUSTOM_FIELDS_QUERY,
-  FILTER_HAS_CUSTOM_FIELDS_ALL,
-} from '../data/filter-rule-type'
-import { ListViewState } from '../services/document-list-view.service'
 import {
   CustomFieldQueryLogicalOperator,
   CustomFieldQueryOperator,
 } from '../data/custom-field-query'
+import { FilterRule } from '../data/filter-rule'
+import {
+  FILTER_CUSTOM_FIELDS_QUERY,
+  FILTER_HAS_CUSTOM_FIELDS_ALL,
+  FILTER_HAS_CUSTOM_FIELDS_ANY,
+  FILTER_RULE_TYPES,
+  FilterRuleType,
+} from '../data/filter-rule-type'
+import { ListViewState } from '../services/document-list-view.service'
 
 const SORT_FIELD_PARAMETER = 'sort'
 const SORT_REVERSE_PARAMETER = 'reverse'

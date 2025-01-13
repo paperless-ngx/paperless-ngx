@@ -1,7 +1,4 @@
-$color-mode-type: data;
-
-@import 'bootstrap/scss/mixins/color-mode';
-
+@use "sass:color";
 @mixin paperless-green {
   // base color e.g. #17541f = hsl(128, 57%, 21%)
   --pngx-primary: 128, 57%;
@@ -25,13 +22,14 @@ $color-mode-type: data;
   --pngx-bg-alt: #fff;
   --pngx-bg-darker: var(--bs-gray-100);
   --pngx-bg-alt2: var(--bs-gray-200);
+  --pngx-bg-disabled: #f7f7f7;
   --pngx-focus-alpha: 0.3;
 }
 
 // Dark text colors allow for maintain contrast with theme color changes
 $text-color-light-bg: #212529;
 $text-color-dark-bg: #abb2bf;
-$text-color-dark-bg-accent: lighten($text-color-dark-bg, 10%);
+$text-color-dark-bg-accent: color.adjust($text-color-dark-bg, $lightness: 10%);
 // Taken from bootstrap
 $form-check-input-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#{$text-color-light-bg}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/></svg>");
 $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='#{$text-color-light-bg}'/></svg>");
@@ -83,6 +81,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   --pngx-bg-darker: #101216;
   --bs-tertiary-bg: var(--pngx-bg-darker);
   --pngx-bg-alt: #242529;
+  --pngx-bg-disabled: var(--pngx-bg-alt);
   --pngx-focus-alpha: 0.6;
   --pngx-primary-faded: var(--pngx-primary-darken-15);
   --pngx-primary-text-contrast: var(--bs-body-color);
@@ -203,19 +202,23 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 
   @supports (hanging-punctuation: first) and (font: -apple-system-body) and (-webkit-appearance: none) {
     // Safari does not like the filters on the image, see https://github.com/paperless-ngx/paperless-ngx/pull/8121
-    .doc-img-container {
-      background-color: #ffffff !important;
-    }
+    .document-card:not(.placeholder-glow),
+    .document-card-large:not(.placeholder-glow) {
+      .doc-img-container {
+        transition: none;
+        background-color: #ffffff !important;
+      }
 
-    .doc-img {
-      filter: none !important;
-      box-shadow: inset 0px 0px 0px 10px rgba(0,0,0,1);
-    }
+      .doc-img {
+        filter: none !important;
+        box-shadow: inset 0px 0px 0px 10px rgba(0,0,0,1);
+      }
 
-    .doc-img.inverted {
-      filter: none !important;
-      mix-blend-mode: difference;
-      opacity: 0.95;
+      .doc-img.inverted {
+        filter: none !important;
+        mix-blend-mode: difference;
+        opacity: 0.95;
+      }
     }
   }
 
@@ -327,7 +330,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   }
 }
 
-@include color-mode(dark) {
+[data-bs-theme="dark"] {
   body:not(.primary-light):not(.primary-dark) {
     @include paperless-green-dark-mode;
 
@@ -341,7 +344,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 }
 
 // Temp to not blink with white before angular loads
-@include color-mode(auto) {
+[data-bs-theme="auto"] {
   @media (prefers-color-scheme: dark) {
     body {
       // no custom theme color

@@ -1,8 +1,12 @@
 import { Component, HostListener, ViewChild } from '@angular/core'
-import { NgxFileDropComponent, NgxFileDropEntry } from 'ngx-file-drop'
 import {
-  PermissionsService,
+  NgxFileDropComponent,
+  NgxFileDropEntry,
+  NgxFileDropModule,
+} from 'ngx-file-drop'
+import {
   PermissionAction,
+  PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -13,6 +17,7 @@ import { UploadDocumentsService } from 'src/app/services/upload-documents.servic
   selector: 'pngx-file-drop',
   templateUrl: './file-drop.component.html',
   styleUrls: ['./file-drop.component.scss'],
+  imports: [NgxFileDropModule],
 })
 export class FileDropComponent {
   private fileLeaveTimeoutID: any

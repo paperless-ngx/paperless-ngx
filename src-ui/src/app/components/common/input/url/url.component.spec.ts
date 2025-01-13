@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import {
   FormsModule,
-  ReactiveFormsModule,
   NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
 } from '@angular/forms'
-import { UrlComponent } from './url.component'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { UrlComponent } from './url.component'
 
 describe('TextComponent', () => {
   let component: UrlComponent
@@ -14,12 +14,12 @@ describe('TextComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [UrlComponent],
       providers: [],
       imports: [
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        UrlComponent,
       ],
     }).compileComponents()
 

@@ -1,11 +1,13 @@
-import { cloneFilterRules } from './filter-rules'
 import { FilterRule } from '../data/filter-rule'
 import {
   FILTER_FULLTEXT_QUERY,
   FILTER_HAS_TAGS_ALL,
 } from '../data/filter-rule-type'
-import { isFullTextFilterRule } from './filter-rules'
-import { filterRulesDiffer } from './filter-rules'
+import {
+  cloneFilterRules,
+  filterRulesDiffer,
+  isFullTextFilterRule,
+} from './filter-rules'
 
 const filterRules: FilterRule[] = [
   {

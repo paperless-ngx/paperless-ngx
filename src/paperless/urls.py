@@ -1,6 +1,7 @@
 import os
 
 from allauth.account import views as allauth_account_views
+from allauth.mfa.base import views as allauth_mfa_views
 from allauth.socialaccount import views as allauth_social_account_views
 from allauth.urls import build_provider_urlpatterns
 from django.conf import settings
@@ -10,14 +11,12 @@ from django.contrib.auth.decorators import login_required
 from django.urls import path
 from django.urls import re_path
 from django.utils.translation import gettext_lazy as _
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import RedirectView
 from django.views.static import serve
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
-from documents.views import AcknowledgeTasksView
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
@@ -35,7 +34,6 @@ from documents.views import SelectionDataView
 from documents.views import SharedLinkView
 from documents.views import ShareLinkViewSet
 from documents.views import StatisticsView
-from documents.views import StoragePathTestView
 from documents.views import StoragePathViewSet
 from documents.views import SystemStatusView
 from documents.views import TagViewSet
@@ -54,8 +52,8 @@ from paperless.views import GenerateAuthTokenView
 from paperless.views import GroupViewSet
 from paperless.views import ProfileView
 from paperless.views import SocialAccountProvidersView
+from paperless.views import TOTPView
 from paperless.views import UserViewSet
-from paperless_mail.views import MailAccountTestView
 from paperless_mail.views import MailAccountViewSet
 from paperless_mail.views import MailRuleViewSet
 from paperless_mail.views import OauthCallbackView
@@ -94,71 +92,101 @@ urlpatterns = [
                     ),
                 ),
                 re_path(
-                    "^search/autocomplete/",
-                    SearchAutoCompleteView.as_view(),
-                    name="autocomplete",
-                ),
-                re_path(
                     "^search/",
-                    GlobalSearchView.as_view(),
-                    name="global_search",
-                ),
-                re_path("^statistics/", StatisticsView.as_view(), name="statistics"),
-                re_path(
-                    "^documents/post_document/",
-                    PostDocumentView.as_view(),
-                    name="post_document",
-                ),
-                re_path(
-                    "^documents/bulk_edit/",
-                    BulkEditView.as_view(),
-                    name="bulk_edit",
-                ),
-                re_path(
-                    "^documents/selection_data/",
-                    SelectionDataView.as_view(),
-                    name="selection_data",
+                    include(
+                        [
+                            re_path(
+                                "^$",
+                                GlobalSearchView.as_view(),
+                                name="global_search",
+                            ),
+                            re_path(
+                                "^autocomplete/",
+                                SearchAutoCompleteView.as_view(),
+                                name="autocomplete",
+                            ),
+                        ],
+                    ),
                 ),
                 re_path(
-                    "^documents/bulk_download/",
-                    BulkDownloadView.as_view(),
-                    name="bulk_download",
+                    "^statistics/",
+                    StatisticsView.as_view(),
+                    name="statistics",
+                ),
+                re_path(
+                    "^documents/",
+                    include(
+                        [
+                            re_path(
+                                "^post_document/",
+                                PostDocumentView.as_view(),
+                                name="post_document",
+                            ),
+                            re_path(
+                                "^bulk_edit/",
+                                BulkEditView.as_view(),
+                                name="bulk_edit",
+                            ),
+                            re_path(
+                                "^bulk_download/",
+                                BulkDownloadView.as_view(),
+                                name="bulk_download",
+                            ),
+                            re_path(
+                                "^selection_data/",
+                                SelectionDataView.as_view(),
+                                name="selection_data",
+                            ),
+                        ],
+                    ),
+                ),
+                re_path(
+                    "^bulk_edit_objects/",
+                    BulkEditObjectsView.as_view(),
+                    name="bulk_edit_objects",
                 ),
                 re_path(
                     "^remote_version/",
                     RemoteVersionView.as_view(),
                     name="remoteversion",
                 ),
-                re_path("^ui_settings/", UiSettingsView.as_view(), name="ui_settings"),
                 re_path(
-                    "^acknowledge_tasks/",
-                    AcknowledgeTasksView.as_view(),
-                    name="acknowledge_tasks",
-                ),
-                re_path(
-                    "^mail_accounts/test/",
-                    MailAccountTestView.as_view(),
-                    name="mail_accounts_test",
-                ),
-                path("token/", views.obtain_auth_token),
-                re_path(
-                    "^bulk_edit_objects/",
-                    BulkEditObjectsView.as_view(),
-                    name="bulk_edit_objects",
-                ),
-                path("profile/generate_auth_token/", GenerateAuthTokenView.as_view()),
-                path(
-                    "profile/disconnect_social_account/",
-                    DisconnectSocialAccountView.as_view(),
+                    "^ui_settings/",
+                    UiSettingsView.as_view(),
+                    name="ui_settings",
                 ),
                 path(
-                    "profile/social_account_providers/",
-                    SocialAccountProvidersView.as_view(),
+                    "token/",
+                    views.obtain_auth_token,
                 ),
                 re_path(
                     "^profile/",
-                    ProfileView.as_view(),
-                    name="profile_view",
+                    include(
+                        [
+                            re_path(
+                                "^$",
+                                ProfileView.as_view(),
+                                name="profile_view",
+                            ),
+                            path(
+                                "generate_auth_token/",
+                                GenerateAuthTokenView.as_view(),
+                            ),
+                            path(
+                                "disconnect_social_account/",
+                                DisconnectSocialAccountView.as_view(),
+                            ),
+                            path(
+                                "social_account_providers/",
+                                SocialAccountProvidersView.as_view(),
+                            ),
+                            path(
+                                "totp/",
+                                TOTPView.as_view(),
+                                name="totp_view",
+                            ),
+                        ],
+                    ),
                 ),
                 re_path(
                     "^status/",
@@ -169,11 +197,6 @@ urlpatterns = [
                     "^trash/",
                     TrashView.as_view(),
                     name="trash",
-                ),
-                re_path(
-                    "^storage_paths/test/",
-                    StoragePathTestView.as_view(),
-                    name="storage_paths_test",
                 ),
                 re_path(
                     r"^oauth/callback/",
@@ -210,14 +233,6 @@ urlpatterns = [
                     ),
                 ),
             ],
-        ),
-    ),
-    re_path(
-        r"^push$",
-        csrf_exempt(
-            RedirectView.as_view(
-                url=settings.BASE_URL + "api/documents/post_document/",
-            ),
         ),
     ),
     # Frontend assets TODO: this is pretty bad, but it works.
@@ -296,6 +311,12 @@ urlpatterns = [
                     ),
                 ),
                 *build_provider_urlpatterns(),
+                # mfa, see allauth/mfa/base/urls.py
+                path(
+                    "2fa/authenticate/",
+                    allauth_mfa_views.authenticate,
+                    name="mfa_authenticate",
+                ),
             ],
         ),
     ),

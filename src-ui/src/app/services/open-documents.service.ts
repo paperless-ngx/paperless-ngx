@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { Observable, Subject, of } from 'rxjs'
+import { first } from 'rxjs/operators'
+import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
 import { Document } from '../data/document'
 import { OPEN_DOCUMENT_SERVICE } from '../data/storage-keys'
 import { DocumentService } from './rest/document.service'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
-import { Observable, Subject, of } from 'rxjs'
-import { first } from 'rxjs/operators'
 
 @Injectable({
   providedIn: 'root',

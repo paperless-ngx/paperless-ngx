@@ -1,14 +1,15 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import {
   ComponentFixture,
   fakeAsync,
   TestBed,
   tick,
 } from '@angular/core/testing'
-import {
-  CustomFieldQueriesModel,
-  CustomFieldsQueryDropdownComponent,
-} from './custom-fields-query-dropdown.component'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgSelectModule } from '@ng-select/ng-select'
+import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { of } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
@@ -16,17 +17,16 @@ import {
   CustomFieldQueryLogicalOperator,
   CustomFieldQueryOperatorGroups,
 } from 'src/app/data/custom-field-query'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import {
-  CustomFieldQueryExpression,
   CustomFieldQueryAtom,
   CustomFieldQueryElement,
+  CustomFieldQueryExpression,
 } from 'src/app/utils/custom-field-query-element'
-import { NgSelectModule } from '@ng-select/ng-select'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import {
+  CustomFieldQueriesModel,
+  CustomFieldsQueryDropdownComponent,
+} from './custom-fields-query-dropdown.component'
 
 const customFields = [
   {
@@ -39,7 +39,12 @@ const customFields = [
     id: 2,
     name: 'Test Select Field',
     data_type: CustomFieldDataType.Select,
-    extra_data: { select_options: ['Option 1', 'Option 2'] },
+    extra_data: {
+      select_options: [
+        { label: 'Option 1', id: 'abc-123' },
+        { label: 'Option 2', id: 'def-456' },
+      ],
+    },
   },
 ]
 
@@ -50,13 +55,13 @@ describe('CustomFieldsQueryDropdownComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [CustomFieldsQueryDropdownComponent],
       imports: [
         NgbDropdownModule,
         NgxBootstrapIconsModule.pick(allIcons),
         NgSelectModule,
         FormsModule,
         ReactiveFormsModule,
+        CustomFieldsQueryDropdownComponent,
       ],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
@@ -128,11 +133,19 @@ describe('CustomFieldsQueryDropdownComponent', () => {
       id: 1,
       name: 'Test Field',
       data_type: CustomFieldDataType.Select,
-      extra_data: { select_options: ['Option 1', 'Option 2'] },
+      extra_data: {
+        select_options: [
+          { label: 'Option 1', id: 'abc-123' },
+          { label: 'Option 2', id: 'def-456' },
+        ],
+      },
     }
     component.customFields = [field]
     const options = component.getSelectOptionsForField(1)
-    expect(options).toEqual(['Option 1', 'Option 2'])
+    expect(options).toEqual([
+      { label: 'Option 1', id: 'abc-123' },
+      { label: 'Option 2', id: 'def-456' },
+    ])
 
     // Fallback to empty array if field is not found
     const options2 = component.getSelectOptionsForField(2)

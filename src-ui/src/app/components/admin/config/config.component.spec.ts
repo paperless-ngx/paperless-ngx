@@ -1,24 +1,24 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { ConfigComponent } from './config.component'
-import { ConfigService } from 'src/app/services/config.service'
-import { ToastService } from 'src/app/services/toast.service'
-import { of, throwError } from 'rxjs'
-import { OutputTypeConfig } from 'src/app/data/paperless-config'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { TextComponent } from '../../common/input/text/text.component'
-import { NumberComponent } from '../../common/input/number/number.component'
-import { SwitchComponent } from '../../common/input/switch/switch.component'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-import { SelectComponent } from '../../common/input/select/select.component'
-import { FileComponent } from '../../common/input/file/file.component'
-import { SettingsService } from 'src/app/services/settings.service'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { of, throwError } from 'rxjs'
+import { OutputTypeConfig } from 'src/app/data/paperless-config'
+import { ConfigService } from 'src/app/services/config.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
+import { FileComponent } from '../../common/input/file/file.component'
+import { NumberComponent } from '../../common/input/number/number.component'
+import { SelectComponent } from '../../common/input/select/select.component'
+import { SwitchComponent } from '../../common/input/switch/switch.component'
+import { TextComponent } from '../../common/input/text/text.component'
+import { PageHeaderComponent } from '../../common/page-header/page-header.component'
+import { ConfigComponent } from './config.component'
 
 describe('ConfigComponent', () => {
   let component: ConfigComponent
@@ -29,15 +29,6 @@ describe('ConfigComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [
-        ConfigComponent,
-        TextComponent,
-        SelectComponent,
-        NumberComponent,
-        SwitchComponent,
-        FileComponent,
-        PageHeaderComponent,
-      ],
       imports: [
         BrowserModule,
         NgbModule,
@@ -45,6 +36,13 @@ describe('ConfigComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        ConfigComponent,
+        TextComponent,
+        SelectComponent,
+        NumberComponent,
+        SwitchComponent,
+        FileComponent,
+        PageHeaderComponent,
       ],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),

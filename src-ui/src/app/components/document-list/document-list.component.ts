@@ -1,3 +1,4 @@
+import { AsyncPipe, NgClass, NgTemplateOutlet } from '@angular/common'
 import {
   Component,
   OnDestroy,
@@ -6,43 +7,89 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core'
-import { ActivatedRoute, convertToParamMap, Router } from '@angular/router'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { filter, first, map, Subject, switchMap, takeUntil } from 'rxjs'
-import { FilterRule } from 'src/app/data/filter-rule'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
-  filterRulesDiffer,
-  isFullTextFilterRule,
-} from 'src/app/utils/filter-rules'
-import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
+  ActivatedRoute,
+  convertToParamMap,
+  Router,
+  RouterModule,
+} from '@angular/router'
+import {
+  NgbDropdownModule,
+  NgbModal,
+  NgbPaginationModule,
+} from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
+import { filter, first, map, Subject, switchMap, takeUntil } from 'rxjs'
 import {
   DEFAULT_DISPLAY_FIELDS,
   DisplayField,
   DisplayMode,
   Document,
 } from 'src/app/data/document'
+import { FilterRule } from 'src/app/data/filter-rule'
+import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 import { SavedView } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import {
   SortableDirective,
   SortEvent,
 } from 'src/app/directives/sortable.directive'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
+import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
+import { UsernamePipe } from 'src/app/pipes/username.pipe'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { HotKeyService } from 'src/app/services/hot-key.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import {
+  filterRulesDiffer,
+  isFullTextFilterRule,
+} from 'src/app/utils/filter-rules'
+import { CustomFieldDisplayComponent } from '../common/custom-field-display/custom-field-display.component'
+import { PageHeaderComponent } from '../common/page-header/page-header.component'
+import { PreviewPopupComponent } from '../common/preview-popup/preview-popup.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
+import { BulkEditorComponent } from './bulk-editor/bulk-editor.component'
+import { DocumentCardLargeComponent } from './document-card-large/document-card-large.component'
+import { DocumentCardSmallComponent } from './document-card-small/document-card-small.component'
 import { FilterEditorComponent } from './filter-editor/filter-editor.component'
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component'
-import { HotKeyService } from 'src/app/services/hot-key.service'
 
 @Component({
   selector: 'pngx-document-list',
   templateUrl: './document-list.component.html',
   styleUrls: ['./document-list.component.scss'],
+  imports: [
+    CustomFieldDisplayComponent,
+    PageHeaderComponent,
+    BulkEditorComponent,
+    FilterEditorComponent,
+    DocumentCardSmallComponent,
+    DocumentCardLargeComponent,
+    PreviewPopupComponent,
+    CustomDatePipe,
+    DocumentTitlePipe,
+    IfPermissionsDirective,
+    SortableDirective,
+    UsernamePipe,
+    NgxBootstrapIconsModule,
+    AsyncPipe,
+    FormsModule,
+    ReactiveFormsModule,
+    NgTemplateOutlet,
+    NgbDropdownModule,
+    NgbPaginationModule,
+    NgClass,
+    RouterModule,
+    TourNgBootstrapModule,
+  ],
 })
 export class DocumentListComponent
   extends ComponentWithPermissions
@@ -271,6 +318,30 @@ export class DocumentListComponent
           } else {
             this.openDocumentDetail(this.list.documents[0])
           }
+        }
+      })
+
+    this.hotKeyService
+      .addShortcut({
+        keys: 'control.arrowleft',
+        description: $localize`Previous page`,
+      })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        if (this.list.currentPage > 1) {
+          this.list.currentPage--
+        }
+      })
+
+    this.hotKeyService
+      .addShortcut({
+        keys: 'control.arrowright',
+        description: $localize`Next page`,
+      })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        if (this.list.currentPage < this.list.getLastPage()) {
+          this.list.currentPage++
         }
       })
   }

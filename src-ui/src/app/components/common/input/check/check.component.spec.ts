@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { CheckComponent } from './check.component'
 import {
   FormsModule,
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from '@angular/forms'
+import { CheckComponent } from './check.component'
 
 describe('CheckComponent', () => {
   let component: CheckComponent
@@ -13,9 +13,8 @@ describe('CheckComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [CheckComponent],
       providers: [],
-      imports: [FormsModule, ReactiveFormsModule],
+      imports: [FormsModule, ReactiveFormsModule, CheckComponent],
     }).compileComponents()
 
     fixture = TestBed.createComponent(CheckComponent)
