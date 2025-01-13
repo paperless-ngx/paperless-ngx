@@ -1,5 +1,4 @@
 import datetime
-import hashlib
 import logging
 import os
 import re
@@ -20,11 +19,8 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from multiselectfield import MultiSelectField
 from django_softdelete.models import SoftDeleteModel
-from sympy import false
-
-from documents.utils import generate_unique_name
+from multiselectfield import MultiSelectField
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
@@ -95,15 +91,16 @@ class MatchingModel(ModelWithOwner):
     def __str__(self):
         return self.name
 
+
 class Approval(models.Model):
 
     ALL_STATES = sorted(states.ALL_STATES)
     APPROVAL_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
 
     APPROVAL_ACCESS_TYPE_CHOICES = [
-        ('OWNER', _('Owner')),
-        ('EDIT', _('Edit')),
-        ('VIEW', _('View')),
+        ("OWNER", _("Owner")),
+        ("EDIT", _("Edit")),
+        ("VIEW", _("View")),
     ]
 
     submitted_by = models.ForeignKey(
@@ -120,7 +117,7 @@ class Approval(models.Model):
         verbose_name=_("submitted_by_group"),
     )
 
-    object_pk = models.CharField(_('object ID'), max_length=255, blank=True)
+    object_pk = models.CharField(_("object ID"), max_length=255, blank=True)
 
     ctype = models.ForeignKey(
         ContentType,
@@ -150,7 +147,7 @@ class Approval(models.Model):
         choices=APPROVAL_ACCESS_TYPE_CHOICES,
         verbose_name=_("access type"),
         null=False,
-        blank=True
+        blank=True,
     )
 
     created = models.DateTimeField(_("created"), default=timezone.now, db_index=True)
@@ -188,6 +185,7 @@ class Tag(MatchingModel):
     class Meta(MatchingModel.Meta):
         verbose_name = _("tag")
         verbose_name_plural = _("tags")
+
 
 class FontLanguage(MatchingModel):
     code = models.CharField(_("code"), max_length=20, blank=True, db_index=True)
@@ -229,6 +227,7 @@ class ArchiveFont(MatchingModel):
         verbose_name = _("archive_font")
         verbose_name_plural = _("archive_fonts")
 
+
 class DocumentType(MatchingModel):
     class Meta(MatchingModel.Meta):
         verbose_name = _("document type")
@@ -245,6 +244,7 @@ class StoragePath(MatchingModel):
         verbose_name = _("storage path")
         verbose_name_plural = _("storage paths")
 
+
 class Warehouse(MatchingModel):
 
     WAREHOUSE = "Warehouse"
@@ -256,10 +256,12 @@ class Warehouse(MatchingModel):
         (BOXCASE, _("Boxcase")),
     )
 
-    type = models.CharField(max_length=20, null=True, blank=True,
-                                      choices=TYPE_WAREHOUSE,
-                                      default=WAREHOUSE,)
-    parent_warehouse = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True )
+    type = models.CharField(
+        max_length=20, null=True, blank=True, choices=TYPE_WAREHOUSE, default=WAREHOUSE
+    )
+    parent_warehouse = models.ForeignKey(
+        "self", on_delete=models.CASCADE, null=True, blank=True
+    )
     path = models.TextField(_("path"), null=True, blank=True)
 
     class Meta(MatchingModel.Meta):
@@ -270,8 +272,11 @@ class Warehouse(MatchingModel):
     def __str__(self):
         return self.name
 
+
 class Folder(SoftDeleteModel, MatchingModel):
-    parent_folder = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True )
+    parent_folder = models.ForeignKey(
+        "self", on_delete=models.DO_NOTHING, null=True, blank=True
+    )
     path = models.TextField(_("path"), null=True, blank=True)
     checksum = models.CharField(
         _("checksum"),
@@ -288,20 +293,22 @@ class Folder(SoftDeleteModel, MatchingModel):
         (FOLDER, _("folder")),
         (FILE, _("file")),
     )
-    type = models.CharField(max_length=20,
-                                      choices=TYPE_FOLDER,
-                                      default=FOLDER,)
+    type = models.CharField(max_length=20, choices=TYPE_FOLDER, default=FOLDER)
 
-    created = models.DateTimeField(_("created"), null=True, default=timezone.now, db_index=True)
+    created = models.DateTimeField(
+        _("created"), null=True, default=timezone.now, db_index=True
+    )
 
-    updated = models.DateTimeField(_("updated"), null=True, default=timezone.now, editable=False, db_index=True)
-
+    updated = models.DateTimeField(
+        _("updated"), null=True, default=timezone.now, editable=False, db_index=True
+    )
 
     class Meta(MatchingModel.Meta):
 
-        verbose_name = ("folder")
-        verbose_name_plural = ("folders")
+        verbose_name = "folder"
+        verbose_name_plural = "folders"
         constraints = []
+
     def __str__(self):
         return self.name
 
@@ -321,11 +328,12 @@ class Folder(SoftDeleteModel, MatchingModel):
     #     folder.save()
     #     return folder
 
+
 class DossierForm(MatchingModel):
 
     DOSSIER_TYPE_CHOICES = [
-        ('DOSSIER', _('Dossier')),
-        ('DOCUMENT', _('Document')),
+        ("DOSSIER", _("Dossier")),
+        ("DOCUMENT", _("Document")),
     ]
 
     type = models.CharField(
@@ -334,7 +342,7 @@ class DossierForm(MatchingModel):
         verbose_name=_("access_type"),
         null=False,
         blank=False,
-        default='DOSSIER'
+        default="DOSSIER",
     )
 
     # parent_dossier_form = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='child_dossiers')
@@ -353,6 +361,7 @@ class DossierForm(MatchingModel):
     class Meta(MatchingModel.Meta):
         verbose_name = _("dossier form")
         verbose_name_plural = _("dossiers form")
+
     def __str__(self):
         return self.name
 
@@ -360,9 +369,9 @@ class DossierForm(MatchingModel):
 class Dossier(SoftDeleteModel, MatchingModel):
 
     DOSSIER_TYPE_CHOICES = [
-        ('DOSSIER', _('Dossier')),
-        ('DOCUMENT', _('Document')),
-        ('FILE', _('File')),
+        ("DOSSIER", _("Dossier")),
+        ("DOCUMENT", _("Document")),
+        ("FILE", _("File")),
     ]
 
     type = models.CharField(
@@ -371,12 +380,16 @@ class Dossier(SoftDeleteModel, MatchingModel):
         verbose_name=_("access_type"),
         null=False,
         blank=False,
-        default='DOSSIER'
+        default="DOSSIER",
     )
 
-    parent_dossier = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+    parent_dossier = models.ForeignKey(
+        "self", on_delete=models.CASCADE, null=True, blank=True
+    )
 
-    dossier_form = models.ForeignKey(DossierForm, on_delete=models.CASCADE, null=True, blank=True)
+    dossier_form = models.ForeignKey(
+        DossierForm, on_delete=models.CASCADE, null=True, blank=True
+    )
 
     path = models.TextField(_("path"), null=True, blank=True)
 
@@ -391,6 +404,7 @@ class Dossier(SoftDeleteModel, MatchingModel):
         verbose_name = _("dossier")
         verbose_name_plural = _("dossiers")
         constraints = []
+
     def __str__(self):
         return self.name
 
@@ -1078,6 +1092,7 @@ class ShareLink(models.Model):
     def __str__(self):
         return f"Share Link for {self.document.title}"
 
+
 class CustomField(models.Model):
     """
     Defines the name and type of a custom field
@@ -1173,9 +1188,11 @@ class CustomFieldInstance(models.Model):
         editable=False,
     )
 
-    match_value = models.JSONField(null=True,blank=True)
+    match_value = models.JSONField(null=True, blank=True)
 
-    reference = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True )
+    reference = models.ForeignKey(
+        "self", on_delete=models.SET_NULL, null=True, blank=True
+    )
 
     # Actual data storage
     value_text = models.TextField(null=True)
@@ -1231,6 +1248,7 @@ class CustomFieldInstance(models.Model):
         elif self.field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
             return self.value_document_ids
         raise NotImplementedError(self.field.data_type)
+
 
 if settings.AUDIT_LOG_ENABLED:
     auditlog.register(Document, m2m_fields={"tags"})
@@ -1354,7 +1372,7 @@ class WorkflowTrigger(models.Model):
         choices=APPROVAL_STATE_CHOICES,
         verbose_name=_("approval state"),
         null=True,
-        blank=True
+        blank=True,
     )
 
     filter_has_content_type = models.ForeignKey(
@@ -1366,16 +1384,16 @@ class WorkflowTrigger(models.Model):
     )
 
     APPROVAL_ACCESS_CHOICES = [
-        ('OWNER', _('Owner')),
-        ('EDIT', _('Edit')),
-        ('VIEW', _('View')),
+        ("OWNER", _("Owner")),
+        ("EDIT", _("Edit")),
+        ("VIEW", _("View")),
     ]
     filter_has_access_type = models.CharField(
         max_length=30,
         choices=APPROVAL_ACCESS_CHOICES,
         verbose_name=_("access type"),
         null=True,
-        blank=True
+        blank=True,
     )
 
     class Meta:
@@ -1648,14 +1666,15 @@ class Workflow(models.Model):
 class BackupRecord(ModelWithOwner):
     filename = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
-    restore_at = models.DateTimeField(_("restored_at"), null=True,
-                                      default=timezone.now, editable=False,
-                                      db_index=True)
+    restore_at = models.DateTimeField(
+        _("restored_at"), null=True, blank=True, default=None, editable=False
+    )
     restore_status = models.FloatField(blank=True, default=0)
     backup_status = models.FloatField(blank=True, default=0)
+    is_restore = models.BooleanField(blank=True, default=False)
+    is_backup = models.BooleanField(blank=True, default=False)
     detail = models.JSONField(blank=True, null=True)
     log = models.TextField(blank=True)
-    count = models.IntegerField(blank=True, default=0)
 
     def __str__(self):
         return f"{self.filename} - {self.created_at}"

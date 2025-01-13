@@ -1,14 +1,4 @@
-import { Correspondent } from './correspondent'
-import { Tag } from './tag'
-import { DocumentType } from './document-type'
-import { ArchiveFont } from './archive-font'
-import { Observable } from 'rxjs'
-import { StoragePath } from './storage-path'
-import { Warehouse } from './warehouse'
 import { ObjectWithPermissions } from './object-with-permissions'
-import { DocumentNote } from './document-note'
-import { CustomFieldInstance } from './custom-field-instance'
-import { DocumentApproval } from './document-approval'
 
 
 export interface Backup extends ObjectWithPermissions {
@@ -19,7 +9,11 @@ export interface Backup extends ObjectWithPermissions {
   restore_at: string | null; // ISO 8601 string hoặc null
   restore_status: number;
   backup_status: number;
-  detail: any | null; // JSON field
+  detail: {
+    documents?: number | 0
+    size?: number | 0
+  }
   log: string;
-  count: number;
+  is_backup?: boolean;
+  is_restore?: boolean;
 }

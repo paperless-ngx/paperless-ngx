@@ -1,4 +1,5 @@
 import logging
+import os
 import re
 import shutil
 from os import utime
@@ -112,8 +113,9 @@ def run_subprocess(
 
     return completed_proc
 
+
 def get_content_before_last_number(input_string):
-    match = re.search(r'(.*)/\d+$', input_string)
+    match = re.search(r"(.*)/\d+$", input_string)
     if match:
         return match.group(1)  # Trả về nhóm trước số cuối cùng
     return input_string
@@ -126,3 +128,41 @@ def generate_unique_name(name, existing_names):
         new_name = f"{name}({i})"
         i += 1
     return new_name
+
+
+def check_storage(capacity=None, directory_to_check=None):
+    try:
+
+        if capacity is None:
+            capacity = []
+
+        capacity_total = 0
+        for c in capacity:
+            media_stats = os.statvfs(c)
+            total_size = media_stats.f_blocks * media_stats.f_bsize
+            # Dung lượng còn lại
+            free_size = media_stats.f_bfree * media_stats.f_bsize
+            # Dung lượng đã dùng
+            used_size = total_size - free_size
+            capacity_total += used_size
+        directory_to_check_media_stats = os.statvfs(directory_to_check)
+        directory_to_check_available = (
+            directory_to_check_media_stats.f_frsize
+            * directory_to_check_media_stats.f_bavail
+        )
+        if directory_to_check_available > capacity_total:
+            return True
+        return False
+
+    except Exception as e:
+        logging.error("error check_storage():", e)
+        return False
+
+
+def get_directory_size(directory):
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(directory):
+        for filename in filenames:
+            filepath = os.path.join(dirpath, filename)
+            total_size += os.path.getsize(filepath)
+    return total_size

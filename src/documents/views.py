@@ -6,18 +6,17 @@ import os
 import platform
 import re
 import tempfile
-import time
 import urllib
 import zipfile
-from datetime import datetime, timedelta
-from logging import Logger
+from datetime import datetime
+from datetime import timedelta
 from pathlib import Path
 from time import mktime
-from unicodedata import normalize, category
+from unicodedata import normalize
 from urllib.parse import quote
 from urllib.parse import urlparse
-import pandas as pd
 
+import pandas as pd
 import pathvalidate
 import pytz
 from django.apps import apps
@@ -34,8 +33,9 @@ from django.db.models import Max
 from django.db.models import Q
 from django.db.models import Sum
 from django.db.models import When
-from django.db.models.functions import Length, TruncDate
+from django.db.models.functions import Length
 from django.db.models.functions import Lower
+from django.db.models.functions import TruncDate
 from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
@@ -46,21 +46,20 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.timezone import make_aware
 from django.utils.translation import get_language
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
-from guardian.shortcuts import get_perms, get_users_with_perms, \
-    get_objects_for_user
-from django.utils.translation import gettext_lazy as _
+from guardian.shortcuts import get_objects_for_user
+from guardian.shortcuts import get_users_with_perms
 from langdetect import detect
 from packaging import version as packaging_version
-from pytz import country_timezones
-
 from redis import Redis
-from rest_framework import parsers, status
+from rest_framework import parsers
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 from rest_framework.filters import OrderingFilter
@@ -84,7 +83,6 @@ from documents import index
 from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
-from documents.bulk_edit import set_permissions
 from documents.caching import CACHE_50_MINUTES
 from documents.caching import get_metadata_cache
 from documents.caching import get_suggestion_cache
@@ -100,35 +98,43 @@ from documents.conditionals import preview_last_modified
 from documents.conditionals import suggestions_etag
 from documents.conditionals import suggestions_last_modified
 from documents.conditionals import thumbnail_last_modified
-from documents.consumer import Consumer, ConsumerStatusShortMessage
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
-from documents.filters import CorrespondentFilterSet, DossierFilterSet, \
-    DossierFormFilterSet, ArchiveFontFilterSet, FontLanguageFilterSet, \
-    BackupRecordFilterSet
+from documents.filters import ArchiveFontFilterSet
+from documents.filters import BackupRecordFilterSet
+from documents.filters import CorrespondentFilterSet
 from documents.filters import CustomFieldFilterSet
 from documents.filters import DocumentFilterSet
 from documents.filters import DocumentTypeFilterSet
+from documents.filters import DossierFilterSet
+from documents.filters import DossierFormFilterSet
+from documents.filters import FolderFilterSet
+from documents.filters import FontLanguageFilterSet
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
+from documents.filters import ObjectOwnedPermissionsFilter
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
 from documents.filters import WarehouseFilterSet
-from documents.filters import FolderFilterSet
-from documents.filters import ObjectOwnedPermissionsFilter
-
 from documents.matching import match_correspondents
 from documents.matching import match_document_types
-from documents.matching import match_storage_paths
-from documents.matching import match_warehouses
 from documents.matching import match_folders
+from documents.matching import match_storage_paths
 from documents.matching import match_tags
-from documents.models import Approval, Correspondent, CustomFieldInstance, \
-    Dossier, DossierForm, ArchiveFont, FontLanguage, BackupRecord
+from documents.matching import match_warehouses
+from documents.models import Approval
+from documents.models import ArchiveFont
+from documents.models import BackupRecord
+from documents.models import Correspondent
 from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import Dossier
+from documents.models import DossierForm
+from documents.models import Folder
+from documents.models import FontLanguage
 from documents.models import Note
 from documents.models import PaperlessTask
 from documents.models import SavedView
@@ -136,27 +142,26 @@ from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import UiSettings
+from documents.models import Warehouse
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
-from documents.models import Warehouse
-from documents.models import Folder
-
 from documents.parsers import custom_get_parser_class_for_mime_type
 from documents.parsers import parse_date_generator
-from documents.permissions import PaperlessAdminPermissions, \
-    check_user_can_change_folder, update_view_folder_parent_permissions, \
-    get_groups_with_only_permission, \
-    update_view_warehouse_shelf_boxcase_permissions
+from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessObjectPermissions
+from documents.permissions import check_user_can_change_folder
+from documents.permissions import get_groups_with_only_permission
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
-from documents.serialisers import AcknowledgeTasksViewSerializer, \
-    ApprovalSerializer, ApprovalViewSerializer, DossierFormSerializer, \
-    DossierSerializer, ExportDocumentFromFolderSerializer, \
-    FontLanguageSerializer, ArchiveFontSerializer, TrashSerializer, \
-    BackupRecordSerializer
+from documents.permissions import update_view_folder_parent_permissions
+from documents.permissions import update_view_warehouse_shelf_boxcase_permissions
+from documents.serialisers import AcknowledgeTasksViewSerializer
+from documents.serialisers import ApprovalSerializer
+from documents.serialisers import ApprovalViewSerializer
+from documents.serialisers import ArchiveFontSerializer
+from documents.serialisers import BackupRecordSerializer
 from documents.serialisers import BulkDownloadSerializer
 from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
@@ -165,6 +170,11 @@ from documents.serialisers import CustomFieldSerializer
 from documents.serialisers import DocumentListSerializer
 from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
+from documents.serialisers import DossierFormSerializer
+from documents.serialisers import DossierSerializer
+from documents.serialisers import ExportDocumentFromFolderSerializer
+from documents.serialisers import FolderSerializer
+from documents.serialisers import FontLanguageSerializer
 from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import SavedViewSerializer
 from documents.serialisers import ShareLinkSerializer
@@ -172,17 +182,22 @@ from documents.serialisers import StoragePathSerializer
 from documents.serialisers import TagSerializer
 from documents.serialisers import TagSerializerVersion1
 from documents.serialisers import TasksViewSerializer
+from documents.serialisers import TrashSerializer
 from documents.serialisers import UiSettingsViewSerializer
+from documents.serialisers import WarehouseSerializer
 from documents.serialisers import WorkflowActionSerializer
 from documents.serialisers import WorkflowSerializer
 from documents.serialisers import WorkflowTriggerSerializer
-from documents.serialisers import WarehouseSerializer
-from documents.serialisers import FolderSerializer
-
-from documents.signals import document_updated
 from documents.signals import approval_updated
-from documents.tasks import consume_file, empty_trash, backup_documents, \
-    restore_documents
+from documents.signals import document_updated
+from documents.tasks import backup_documents
+from documents.tasks import consume_file
+from documents.tasks import deleted_backup
+from documents.tasks import empty_trash
+from documents.tasks import restore_documents
+from documents.utils import check_storage
+from documents.utils import generate_unique_name
+from documents.utils import get_directory_size
 from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import GeneralConfig
@@ -363,6 +378,7 @@ class ArchiveFontViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     filterset_class = ArchiveFontFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
+
 class FontLanguageViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = FontLanguage
 
@@ -406,21 +422,27 @@ class DocumentViewSet(
         "title",
         "correspondent__name",
         "document_type__name",
-        "archive_font__name"
-        "created",
+        "archive_font__name" "created",
         "modified",
         "added",
         "archive_serial_number",
         "num_notes",
         "owner",
-        "page_count"
+        "page_count",
     )
 
     def get_queryset(self):
         return (
             Document.objects.distinct()
             .annotate(num_notes=Count("notes"))
-            .select_related("correspondent", "storage_path", "document_type","warehouse", "folder", "owner")
+            .select_related(
+                "correspondent",
+                "storage_path",
+                "document_type",
+                "warehouse",
+                "folder",
+                "owner",
+            )
             .prefetch_related("tags", "custom_fields", "notes")
         )
 
@@ -438,12 +460,12 @@ class DocumentViewSet(
         return super().get_serializer(*args, **kwargs)
 
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
+        partial = kwargs.pop("partial", False)
         instance = self.get_object()
         data = request.data.copy()  # Tạo một bản sao của dữ liệu
         # Loại bỏ trường archive_serial_number khỏi quá trình xác thực
-        if 'archive_serial_number' in data:
-            data.pop('archive_serial_number')
+        if "archive_serial_number" in data:
+            data.pop("archive_serial_number")
 
         serializer = self.get_serializer(instance, data=data, partial=partial)
         serializer.is_valid(raise_exception=True)
@@ -454,6 +476,7 @@ class DocumentViewSet(
         self.update_folder_permisisons(self.get_object(), serializer)
         self.update_dossier_permisisons(self.get_object(), serializer)
         from documents import index
+
         index.add_or_update_document(self.get_object())
 
         document_updated.send(
@@ -465,6 +488,7 @@ class DocumentViewSet(
 
     def destroy(self, request, *args, **kwargs):
         from documents import index
+
         instance = self.get_object()
         folder = instance.folder
         dossier = instance.dossier
@@ -621,9 +645,7 @@ class DocumentViewSet(
             "warehouses": [
                 wh.id for wh in match_warehouses(doc, classifier, request.user)
             ],
-            "folders": [
-                f.id for f in match_folders(doc, classifier, request.user)
-            ],
+            "folders": [f.id for f in match_folders(doc, classifier, request.user)],
             "tags": [t.id for t in match_tags(doc, classifier, request.user)],
             "document_types": [
                 dt.id for dt in match_document_types(doc, classifier, request.user)
@@ -693,9 +715,9 @@ class DocumentViewSet(
             fields = CustomFieldInstance.objects.filter(document=pk)
 
             data = {
-                'Tên file': document.title,
-                'Nội dung': [document.content],
-                'Ngày tạo': [document.created.strftime('%d-%m-%Y')],
+                "Tên file": document.title,
+                "Nội dung": [document.content],
+                "Ngày tạo": [document.created.strftime("%d-%m-%Y")],
             }
 
             for f in fields:
@@ -707,8 +729,12 @@ class DocumentViewSet(
             excel_file_name = f"{document.title}.xlsx"
 
             # Tạo response để trả về file Excel
-            response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-            response['Content-Disposition'] = f'attachment; filename="{excel_file_name}"'
+            response = HttpResponse(
+                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+            response["Content-Disposition"] = (
+                f'attachment; filename="{excel_file_name}"'
+            )
 
             # Ghi DataFrame vào response dưới dạng Excel
             df.to_excel(response, index=False)
@@ -837,7 +863,7 @@ class DocumentViewSet(
             },
         )
 
-    def get_approvals(self, doc:Document):
+    def get_approvals(self, doc: Document):
         approvals = Approval.objects.get(id=doc.pk)
 
         return approvals
@@ -852,7 +878,9 @@ class DocumentViewSet(
                 "view_document",
                 doc,
             ):
-                return HttpResponseForbidden("Insufficient permissions to view approvals")
+                return HttpResponseForbidden(
+                    "Insufficient permissions to view approvals"
+                )
         except Document.DoesNotExist:
             raise Http404
 
@@ -862,7 +890,9 @@ class DocumentViewSet(
             except Exception as e:
                 logger.warning(f"An error occurred retrieving approvals: {e!s}")
                 return Response(
-                    {"error": "Error retrieving approvals, check logs for more detail."},
+                    {
+                        "error": "Error retrieving approvals, check logs for more detail."
+                    },
                 )
         elif request.method == "POST":
             try:
@@ -882,19 +912,25 @@ class DocumentViewSet(
                         object_pk=serializer.validated_data.get("object_pk"),
                         access_type=serializer.validated_data.get("access_type"),
                         ctype=serializer.validated_data.get("ctype"),
-                        submitted_by=serializer.validated_data.get("submitted_by")
+                        submitted_by=serializer.validated_data.get("submitted_by"),
                     )
 
-                    submitted_by_groups = serializer.validated_data.get("submitted_by_group", None)
+                    submitted_by_groups = serializer.validated_data.get(
+                        "submitted_by_group", None
+                    )
                     if submitted_by_groups:
                         existing_approval = existing_approval.filter(
-                            Q(submitted_by_group__in=submitted_by_groups)
+                            Q(submitted_by_group__in=submitted_by_groups),
                         ).exists()
 
                 if existing_approval:
-                    return Response({'status':400,
-                                    'message':'Objects exist'},status=status.HTTP_400_BAD_REQUEST)
-                content_type_id = ContentType.objects.get(app_label="documents",model='document').pk
+                    return Response(
+                        {"status": 400, "message": "Objects exist"},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+                content_type_id = ContentType.objects.get(
+                    app_label="documents", model="document"
+                ).pk
 
                 a = Approval.objects.create(
                     submitted_by=currentUser,
@@ -902,7 +938,9 @@ class DocumentViewSet(
                     ctype_id=content_type_id,
                     access_type="VIEW",
                     expiration=serializer.validated_data.get("expiration"),
-                    submitted_by_group=serializer.validated_data.get("submitted_by_group", None)
+                    submitted_by_group=serializer.validated_data.get(
+                        "submitted_by_group", None
+                    ),
                 )
                 a.save()
                 # If audit log is enabled make an entry in the log
@@ -970,11 +1008,12 @@ class DocumentViewSet(
                 .order_by("-created")
             ]
             return Response(links)
+
     def update_name_folder(self, instance, serializer):
         instance.folder.name = serializer.validated_data.get("title")
         instance.folder.save()
 
-    def update_time_archive_font(self,instance):
+    def update_time_archive_font(self, instance):
         if instance.archive_font is None:
             return
         if instance.archive_font.last_upload is None:
@@ -986,23 +1025,22 @@ class DocumentViewSet(
             instance.archive_font.first_upload = instance.created
         instance.archive_font.save()
 
-
-
     def update_folder_permisisons(self, instance, serializer):
-        folder =  instance.folder
+        folder = instance.folder
         permissions = serializer.validated_data.get("set_permissions")
         owner = serializer.validated_data.get("owner")
         merge = serializer.validated_data.get("merge")
         try:
-            if folder :
+            if folder:
                 # if merge is true, we dont want to remove the owner
                 if "owner" in serializer.validated_data and (
                     not merge or (merge and owner is not None)
                 ):
                     # if merge is true, we dont want to overwrite the owner
-                    qs_owner_update = folder.filter(
-                        owner__isnull=True) if merge else folder
-                    qs_owner_update.owner=owner
+                    qs_owner_update = (
+                        folder.filter(owner__isnull=True) if merge else folder
+                    )
+                    qs_owner_update.owner = owner
                     qs_owner_update.save()
                 if "set_permissions" in serializer.validated_data:
 
@@ -1019,21 +1057,23 @@ class DocumentViewSet(
             return HttpResponseBadRequest(
                 "Error performing bulk permissions edit, check logs for more detail.",
             )
+
     def update_dossier_permisisons(self, instance, serializer):
-        dossier =  instance.dossier
+        dossier = instance.dossier
         permissions = serializer.validated_data.get("set_permissions")
         owner = serializer.validated_data.get("owner")
         merge = serializer.validated_data.get("merge")
         try:
-            if dossier :
+            if dossier:
                 # if merge is true, we dont want to remove the owner
                 if "owner" in serializer.validated_data and (
                     not merge or (merge and owner is not None)
                 ):
                     # if merge is true, we dont want to overwrite the owner
-                    qs_owner_update = dossier.filter(
-                        owner__isnull=True) if merge else dossier
-                    qs_owner_update.owner=owner
+                    qs_owner_update = (
+                        dossier.filter(owner__isnull=True) if merge else dossier
+                    )
+                    qs_owner_update.owner = owner
                     qs_owner_update.save()
                 if "set_permissions" in serializer.validated_data:
 
@@ -1290,7 +1330,7 @@ class PostDocumentView(GenericAPIView):
         )
 
         async_task = consume_file.apply(
-            args=[input_doc, input_doc_overrides]
+            args=[input_doc, input_doc_overrides],
         )
 
         return Response(async_task.id)
@@ -1423,8 +1463,9 @@ class StatisticsView(APIView):
             if user is None
             else get_objects_for_user_owner_aware(user, "documents.view_tag", Tag)
         )
-        untagged_tags_count = tags.annotate(
-            num_docs=Count('documents')).filter(num_docs=0).count()
+        untagged_tags_count = (
+            tags.annotate(num_docs=Count("documents")).filter(num_docs=0).count()
+        )
         correspondent_count = (
             Correspondent.objects.count()
             if user is None
@@ -1437,9 +1478,19 @@ class StatisticsView(APIView):
             )
         )
 
-        document_types = ( DocumentType.objects.all() if user is None else get_objects_for_user_owner_aware(user, "documents.view_documenttype", DocumentType) )
+        document_types = (
+            DocumentType.objects.all()
+            if user is None
+            else get_objects_for_user_owner_aware(
+                user, "documents.view_documenttype", DocumentType
+            )
+        )
 
-        unassigned_document_types_count = document_types.annotate(num_docs=Count('documents')).filter(num_docs=0).count()
+        unassigned_document_types_count = (
+            document_types.annotate(num_docs=Count("documents"))
+            .filter(num_docs=0)
+            .count()
+        )
 
         warehouse_count = (
             Warehouse.objects.count()
@@ -1503,7 +1554,7 @@ class StatisticsView(APIView):
             .get("characters__sum")
         )
 
-        pages_total = documents.aggregate(Sum('page_count')).get("page_count__sum")
+        pages_total = documents.aggregate(Sum("page_count")).get("page_count__sum")
         return Response(
             {
                 "documents_total": documents_total,
@@ -1523,12 +1574,13 @@ class StatisticsView(APIView):
             },
         )
 
+
 class StatisticsCustomView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        to_date = request.query_params.get('to_date')
-        from_date = request.query_params.get('from_date')
+        to_date = request.query_params.get("to_date")
+        from_date = request.query_params.get("from_date")
         label_graph = []
         data_count_page_graph = []
         data_graph = []
@@ -1549,50 +1601,64 @@ class StatisticsCustomView(APIView):
         )
         if from_date and to_date:
             from datetime import datetime
+
             timezone = pytz.UTC
-            from_date = timezone.localize(datetime.strptime(from_date, '%Y-%m-%d'))
-            to_date = timezone.localize(datetime.strptime(to_date, '%Y-%m-%d'))
-            to_date = to_date + timedelta(hours=23, minutes=59, seconds=59,
-                                          microseconds=999999)
+            from_date = timezone.localize(datetime.strptime(from_date, "%Y-%m-%d"))
+            to_date = timezone.localize(datetime.strptime(to_date, "%Y-%m-%d"))
+            to_date = to_date + timedelta(
+                hours=23, minutes=59, seconds=59, microseconds=999999
+            )
             date_value_dict = {}
             current_date = from_date
 
             while current_date <= to_date:
-                date_key = current_date.strftime('%Y-%m-%d')  # Định dạng ngày
-                date_value_dict[date_key] = (0,0)  # Thêm vào dict
+                date_key = current_date.strftime("%Y-%m-%d")  # Định dạng ngày
+                date_value_dict[date_key] = (0, 0)  # Thêm vào dict
                 current_date += timedelta(days=1)
 
-            documents_count_by_day = documents.filter(
-                created__range=(from_date, to_date)).annotate(
-                created_date=TruncDate('created')).values(
-                'created_date').annotate(document_count=Count('id'),total_page_number=Sum('page_count')).order_by(
-                'created_date')
+            documents_count_by_day = (
+                documents.filter(created__range=(from_date, to_date))
+                .annotate(created_date=TruncDate("created"))
+                .values("created_date")
+                .annotate(
+                    document_count=Count("id"), total_page_number=Sum("page_count")
+                )
+                .order_by("created_date")
+            )
             for entry in documents_count_by_day:
-                target_date_str = entry['created_date'].strftime('%Y-%m-%d')
-                if target_date_str  in date_value_dict:
-                    date_value_dict[target_date_str]=(entry['document_count'],entry['total_page_number'])
-            for key,value in date_value_dict.items():
+                target_date_str = entry["created_date"].strftime("%Y-%m-%d")
+                if target_date_str in date_value_dict:
+                    date_value_dict[target_date_str] = (
+                        entry["document_count"],
+                        entry["total_page_number"],
+                    )
+            for key, value in date_value_dict.items():
                 label_graph.append(key)
                 data_graph.append(value[0])
                 data_count_page_graph.append(value[1])
 
-
-
-        top_document_types = (documents.values('document_type__name').annotate(document_count=Count('id')) .order_by('-document_count')[:10])
+        top_document_types = (
+            documents.values("document_type__name")
+            .annotate(document_count=Count("id"))
+            .order_by("-document_count")[:10]
+        )
         for entry in top_document_types:
-            if entry['document_type__name'] is None:
+            if entry["document_type__name"] is None:
                 continue
-            data_document_type_graph.append(entry['document_count'])
-            label_document_type_graph.append(entry['document_type__name'])
+            data_document_type_graph.append(entry["document_count"])
+            label_document_type_graph.append(entry["document_type__name"])
 
-        top_tags = (documents.values('tags__name').annotate(
-            document_count=Count('id')).order_by('-document_count')[:10])
+        top_tags = (
+            documents.values("tags__name")
+            .annotate(document_count=Count("id"))
+            .order_by("-document_count")[:10]
+        )
         for entry in top_tags:
-            if entry['tags__name'] is None:
+            if entry["tags__name"] is None:
                 # entry['tags__name'] = _('Other')
                 continue
-            data_tag_graph.append(entry['document_count'])
-            label_tag_graph.append(entry['tags__name'])
+            data_tag_graph.append(entry["document_count"])
+            label_tag_graph.append(entry["tags__name"])
 
         return Response(
             {
@@ -1650,6 +1716,7 @@ class BulkDownloadView(GenericAPIView):
 
             return response
 
+
 class BulkExportExcelView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = BulkDownloadSerializer
@@ -1669,19 +1736,23 @@ class BulkExportExcelView(GenericAPIView):
             for document in documents:
                 fields = CustomFieldInstance.objects.filter(document=document.pk)
                 row_data = {
-                    'Tên file': document.title,
-                    'Nội dung': document.content,
-                    'Ngày tạo': document.created.strftime('%d-%m-%Y'),
+                    "Tên file": document.title,
+                    "Nội dung": document.content,
+                    "Ngày tạo": document.created.strftime("%d-%m-%Y"),
                 }
                 for f in fields:
                     row_data[f.field.name] = f.value_text
                 data.append(row_data)
 
             df = pd.DataFrame(data)
-            excel_file_name = f"download.xlsx"
+            excel_file_name = "download.xlsx"
             # Tạo response để trả về file Excel
-            response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-            response['Content-Disposition'] = f'attachment; filename="{excel_file_name}"'
+            response = HttpResponse(
+                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+            response["Content-Disposition"] = (
+                f'attachment; filename="{excel_file_name}"'
+            )
 
             df.to_excel(response, index=False)
 
@@ -1689,10 +1760,10 @@ class BulkExportExcelView(GenericAPIView):
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404
 
+
 class BulkExportExcelFromFolderView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = ExportDocumentFromFolderSerializer
-
 
     def post(self, request, format=None):
         serializer = self.get_serializer(data=request.data)
@@ -1702,12 +1773,11 @@ class BulkExportExcelFromFolderView(GenericAPIView):
 
         try:
 
-            folder_ids = Folder.objects.filter(id__in=ids).values_list('id',flat=False)
+            folder_ids = Folder.objects.filter(id__in=ids).values_list("id", flat=False)
             folder_ids = [x[0] for x in folder_ids]
-            if len(ids)==0:
-                folder_ids = Folder.objects.all().values_list('id',flat=False)
+            if len(ids) == 0:
+                folder_ids = Folder.objects.all().values_list("id", flat=False)
                 folder_ids = [x[0] for x in folder_ids]
-
 
             documents = Document.objects.filter(folder__in=ids)
             # fields = CustomFieldInstance.objects.filter(document__in=ids)
@@ -1715,25 +1785,30 @@ class BulkExportExcelFromFolderView(GenericAPIView):
             for document in documents:
                 fields = CustomFieldInstance.objects.filter(document=document.pk)
                 row_data = {
-                    'Tên file': document.title,
-                    'Nội dung': document.content,
-                    'Ngày tạo': document.created.strftime('%d-%m-%Y'),
+                    "Tên file": document.title,
+                    "Nội dung": document.content,
+                    "Ngày tạo": document.created.strftime("%d-%m-%Y"),
                 }
                 for f in fields:
                     row_data[f.field.name] = f.value_text
                 data.append(row_data)
 
             df = pd.DataFrame(data)
-            excel_file_name = f"download.xlsx"
+            excel_file_name = "download.xlsx"
             # Tạo response để trả về file Excel
-            response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-            response['Content-Disposition'] = f'attachment; filename="{excel_file_name}"'
+            response = HttpResponse(
+                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+            response["Content-Disposition"] = (
+                f'attachment; filename="{excel_file_name}"'
+            )
 
             df.to_excel(response, index=False)
 
             return response
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404
+
 
 class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = StoragePath
@@ -1900,26 +1975,41 @@ class TasksViewSet(ReadOnlyModelViewSet):
             queryset = PaperlessTask.objects.filter(task_id=task_id)
         return queryset
 
+
 class ApprovalViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated,)
 
     serializer_class = ApprovalSerializer
     # pagination_class = StandardPagination
     queryset = Approval.objects.all()
+
     def get_queryset(self):
         # TODO: get user -> group -> document ->
         if self.request.user.is_superuser:
             documents_can_change = Document.objects.all()
         else:
-            documents_can_change = get_objects_for_user(self.request.user, 'documents.change_document', with_superuser=False, any_perm=True)
+            documents_can_change = get_objects_for_user(
+                self.request.user,
+                "documents.change_document",
+                with_superuser=False,
+                any_perm=True,
+            )
         document_ids = [x.id for x in documents_can_change]
         # print(document_ids)
-        approvals = Approval.objects.filter(Q(object_pk__in=document_ids) | Q(submitted_by=self.request.user)).order_by("created").reverse()
+        approvals = (
+            Approval.objects.filter(
+                Q(object_pk__in=document_ids) | Q(submitted_by=self.request.user)
+            )
+            .order_by("created")
+            .reverse()
+        )
 
         approvals_ids = []
         for x in approvals:
             approvals_ids.append(x.object_pk)
-        document_ids_queryset = Document.objects.filter(id__in=approvals_ids).values_list('id', flat=True)
+        document_ids_queryset = Document.objects.filter(
+            id__in=approvals_ids
+        ).values_list("id", flat=True)
         document_ids_set = set(document_ids_queryset)
         approval_new = []
         for approval in approvals:
@@ -1930,32 +2020,39 @@ class ApprovalViewSet(ModelViewSet):
 
     model = Approval
 
-
-
     def create(self, request, *args, **kwargs):
         serializer = ApprovalSerializer(data=request.data)
         existing_approval = False
         if serializer.is_valid(raise_exception=True):
-            serializer.validated_data['submitted_by'] = request.user
+            serializer.validated_data["submitted_by"] = request.user
 
             existing_approval = Approval.objects.filter(
                 object_pk=serializer.validated_data.get("object_pk"),
                 access_type=serializer.validated_data.get("access_type"),
                 ctype=serializer.validated_data.get("ctype"),
                 submitted_by=self.request.user,
-                status__in=["SUCCESS", "PENDING"]
+                status__in=["SUCCESS", "PENDING"],
             )
 
-            submitted_by_groups = serializer.validated_data.get("submitted_by_group", None)
-            group_names = ''
+            submitted_by_groups = serializer.validated_data.get(
+                "submitted_by_group", None
+            )
+            group_names = ""
             if submitted_by_groups:
-                existing_approval = existing_approval.filter(
-                    Q(submitted_by_group__in=submitted_by_groups)
-                ).prefetch_related('submitted_by_group').values_list('submitted_by_group__name',flat=True)
-                group_names = ', '.join(group for group in existing_approval)
+                existing_approval = (
+                    existing_approval.filter(
+                        Q(submitted_by_group__in=submitted_by_groups),
+                    )
+                    .prefetch_related("submitted_by_group")
+                    .values_list("submitted_by_group__name", flat=True)
+                )
+                group_names = ", ".join(group for group in existing_approval)
 
             if existing_approval:
-                return Response({'status':400, 'message':f'{group_names} already exists'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"status": 400, "message": f"{group_names} already exists"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -1970,6 +2067,7 @@ class ApprovalViewSet(ModelViewSet):
 
         return response
 
+
 class ApprovalUpdateMutipleView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = ApprovalViewSerializer
@@ -1981,21 +2079,22 @@ class ApprovalUpdateMutipleView(GenericAPIView):
         status = serializer.validated_data.get("status")
 
         try:
-            approvals_match = Approval.objects.filter(id__in=approvals).prefetch_related('submitted_by_group')
+            approvals_match = Approval.objects.filter(
+                id__in=approvals
+            ).prefetch_related("submitted_by_group")
             document_ids = []
             for approval in approvals_match:
                 if self.request.user == approval.submitted_by:
                     return HttpResponseForbidden("Insufficient permissions")
                 document_ids.append(int(approval.object_pk))
-            documents =  Document.objects.filter(id__in=document_ids)
+            documents = Document.objects.filter(id__in=document_ids)
             for document in documents:
-                if not self.request.user.has_perm('change_document', document):
+                if not self.request.user.has_perm("change_document", document):
                     return HttpResponseForbidden("Insufficient permissions")
-
 
             result = approvals_match.update(
                 status=status,
-                modified=timezone.now()
+                modified=timezone.now(),
             )
             for approval in approvals_match:
                 approval_updated.send(
@@ -2005,6 +2104,7 @@ class ApprovalUpdateMutipleView(GenericAPIView):
             return Response({"result": result})
         except Exception:
             return HttpResponseBadRequest()
+
 
 class AcknowledgeTasksView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
@@ -2110,7 +2210,6 @@ class BulkEditObjectsView(PassUserMixin):
         operation = serializer.validated_data.get("operation")
         # parent_folder_id = serializer.validated_data.get("parent_folder")[0]
 
-
         objs = object_class.objects.filter(pk__in=object_ids)
 
         if not user.is_superuser:
@@ -2145,9 +2244,13 @@ class BulkEditObjectsView(PassUserMixin):
                     qs_owner_update.update(owner=owner)
                 #  check owner each object
                 for obj in qs:
-                    if obj.owner == None or user.is_superuser or user.owner == obj.owner :
+                    if (
+                        obj.owner == None
+                        or user.is_superuser
+                        or user.owner == obj.owner
+                    ):
                         continue
-                    elif obj.owner != self.request.user :
+                    elif obj.owner != self.request.user:
                         return HttpResponseForbidden("Insufficient permissions")
 
                 if "permissions" in serializer.validated_data:
@@ -2169,23 +2272,34 @@ class BulkEditObjectsView(PassUserMixin):
         elif operation == "update" and object_type == "folders":
             parent_folder_id = serializer.validated_data.get("parent_folder")
 
-            new_parent_folder = Folder.objects.filter(id=parent_folder_id).first() if parent_folder_id else None
-            parent_folder_obj = Folder.objects.get(pk=parent_folder_id) if parent_folder_id else None
-            folder_list = Folder.objects.filter(id__in = object_ids)
+            new_parent_folder = (
+                Folder.objects.filter(id=parent_folder_id).first()
+                if parent_folder_id
+                else None
+            )
+            parent_folder_obj = (
+                Folder.objects.get(pk=parent_folder_id) if parent_folder_id else None
+            )
+            folder_list = Folder.objects.filter(id__in=object_ids)
             for folder in folder_list:
-                if request.data.get('parent_folder') is None:
+                if request.data.get("parent_folder") is None:
                     pass
-                elif int(request.data['parent_folder']) == folder.id:
+                elif int(request.data["parent_folder"]) == folder.id:
                     return Response(status=status.HTTP_400_BAD_REQUEST)
-                elif 'parent_folder' in request.data:
+                elif "parent_folder" in request.data:
                     if parent_folder_obj.owner != user:
                         return HttpResponseForbidden("Insufficient permissions")
                     if new_parent_folder.path.startswith(folder.path):
-                        return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a folder into one of its child folders.'})
+                        return Response(
+                            status=status.HTTP_400_BAD_REQUEST,
+                            data={
+                                "error": "Cannot move a folder into one of its child folders."
+                            },
+                        )
                     elif new_parent_folder.type == "file":
                         return Response(status=status.HTTP_400_BAD_REQUEST)
                 else:
-                    request.data['parent_folder'] = None
+                    request.data["parent_folder"] = None
 
             for folder in folder_list:
                 # folder.parent_folder = parent_folder_obj
@@ -2205,8 +2319,10 @@ class BulkEditObjectsView(PassUserMixin):
                     else:
                         folder.path = f"{folder.id}"
 
-                    groups = get_groups_with_only_permission(folder,"view_folder")
-                    users = get_users_with_perms(folder, attach_perms=False, with_group_users = False)
+                    groups = get_groups_with_only_permission(folder, "view_folder")
+                    users = get_users_with_perms(
+                        folder, attach_perms=False, with_group_users=False
+                    )
                     # logger.debug("users", users, groups, folder)
                     permissions = {
                         "view": {
@@ -2229,16 +2345,18 @@ class BulkEditObjectsView(PassUserMixin):
         elif operation == "delete" and object_type == "warehouses":
             warehouses_list = Warehouse.objects.filter(id__in=object_ids)
             for warehouse in warehouses_list:
-                if warehouse.owner == self.request.user or warehouse.owner == self.request.user.is_superuser or warehouse.owner == None:
+                if (
+                    warehouse.owner == self.request.user
+                    or warehouse.owner == self.request.user.is_superuser
+                    or warehouse.owner == None
+                ):
                     continue
                 elif warehouse.owner != self.request.user:
-                    return HttpResponseForbidden(
-                        "Insufficient permissions")
+                    return HttpResponseForbidden("Insufficient permissions")
 
             for warehouse in warehouses_list:
                 warehouses = Warehouse.objects.filter(path__startswith=warehouse.path)
                 warehouses.delete()
-
 
             return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -2273,12 +2391,22 @@ class BulkEditObjectsView(PassUserMixin):
 
             return Response(status=status.HTTP_204_NO_CONTENT)
 
+        elif operation == "delete" and object_type == "backup_records":
+            backup_records = BackupRecord.objects.filter(id__in=object_ids)
+            file_paths = []
+            for b in backup_records:
+                file_path = os.path.join(settings.BACKUP_DIR, b.filename)
+                file_paths.append(file_path)
+            task = deleted_backup.delay(file_paths)
+            backup_records.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
         elif operation == "delete":
 
             objs.delete()
 
-
         return Response({"result": "OK"})
+
     def update_child_folder_paths(self, folder):
         child_folders = Folder.objects.filter(parent_folder=folder)
         for child_folder in child_folders:
@@ -2288,6 +2416,7 @@ class BulkEditObjectsView(PassUserMixin):
                 child_folder.path = f"{child_folder.id}"
             child_folder.save()
             self.update_child_folder_paths(child_folder)
+
 
 class WorkflowTriggerViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
@@ -2526,6 +2655,34 @@ class SystemStatusView(PassUserMixin):
             },
         )
 
+
+class SystemStorageStatusView(PassUserMixin):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        if not request.user.has_perm("admin.view_logentry"):
+            return HttpResponseForbidden("Insufficient permissions")
+        media_stats = os.statvfs(settings.MEDIA_ROOT)
+        backup_path = os.path.join(settings.MEDIA_ROOT, "backups/")
+        document_path = os.path.join(settings.MEDIA_ROOT, "documents/")
+
+        documents_size_total = get_directory_size(document_path)
+        backups_size_total = get_directory_size(backup_path)
+        media_size_total = get_directory_size(settings.MEDIA_ROOT)
+        return Response(
+            {
+                "total": media_stats.f_frsize * media_stats.f_blocks,
+                "available": media_stats.f_frsize * media_stats.f_bavail,
+                "used": media_size_total,
+                "backup": backups_size_total,
+                "document": documents_size_total,
+                "another": media_stats.f_frsize * media_stats.f_blocks
+                - media_stats.f_frsize * media_stats.f_bavail
+                - media_size_total,
+            },
+        )
+
+
 class TrashView(ListModelMixin, PassUserMixin):
     permission_classes = (IsAuthenticated,)
     serializer_class = TrashSerializer
@@ -2555,15 +2712,16 @@ class TrashView(ListModelMixin, PassUserMixin):
                 return HttpResponseForbidden("Insufficient permissions")
         action = serializer.validated_data.get("action")
         if action == "restore":
-            deleted_docs = Document.deleted_objects.filter(id__in=doc_ids).select_related('folder', 'dossier')
+            deleted_docs = Document.deleted_objects.filter(
+                id__in=doc_ids
+            ).select_related("folder", "dossier")
             # folders = {doc.folder for doc in deleted_docs}
             # dossiers = {doc.dossier for doc in deleted_docs}
             folder_set = set()
             for doc in deleted_docs:
-                folder_set.update(doc.folder.path.split('/'))
+                folder_set.update(doc.folder.path.split("/"))
             # restore folder
-            folders_restore = Folder.deleted_objects.filter(
-                id__in=list(folder_set))
+            folders_restore = Folder.deleted_objects.filter(id__in=list(folder_set))
             for f in folders_restore:
                 f.restore(strict=False)
             for doc in deleted_docs:
@@ -2579,7 +2737,6 @@ class TrashView(ListModelMixin, PassUserMixin):
                 doc_ids = [doc.id for doc in docs]
             empty_trash(doc_ids=doc_ids)
         return Response({"result": "OK", "doc_ids": doc_ids})
-
 
 
 class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
@@ -2600,25 +2757,23 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     filterset_class = WarehouseFilterSet
     ordering_fields = ("name", "type", "parent_warehouse", "document_count")
 
-
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
 
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            ordering = request.query_params.get('ordering', None)
+            ordering = request.query_params.get("ordering", None)
             # print('ordering',ordering)
-            if ordering == 'document_count':
+            if ordering == "document_count":
                 # print('-document_count')
-                sorted_data = sorted(serializer.data,
-                                     key=lambda x: x['document_count'])
+                sorted_data = sorted(serializer.data, key=lambda x: x["document_count"])
 
-            elif ordering == '-document_count':
+            elif ordering == "-document_count":
                 # print('+document_count')
-                sorted_data = sorted(serializer.data,
-                                     key=lambda x: x['document_count'],
-                                     reverse=True)
+                sorted_data = sorted(
+                    serializer.data, key=lambda x: x["document_count"], reverse=True
+                )
             else:
                 sorted_data = serializer.data
             # print(sorted_data)
@@ -2631,33 +2786,51 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         serializer = WarehouseSerializer(data=request.data)
         parent_warehouse = None
         if serializer.is_valid(raise_exception=True):
-            parent_warehouse = serializer.validated_data.get('parent_warehouse',None)
+            parent_warehouse = serializer.validated_data.get("parent_warehouse", None)
 
-        parent_warehouse = Warehouse.objects.filter(id=parent_warehouse.id if parent_warehouse else None).first()
+        parent_warehouse = Warehouse.objects.filter(
+            id=parent_warehouse.id if parent_warehouse else None
+        ).first()
         # print(parent_warehouse, serializer.validated_data.get("type"))
-        if serializer.validated_data.get("type") == Warehouse.WAREHOUSE and not parent_warehouse:
+        if (
+            serializer.validated_data.get("type") == Warehouse.WAREHOUSE
+            and not parent_warehouse
+        ):
             warehouse = serializer.save(owner=request.user)
             warehouse.path = str(warehouse.id)
             warehouse.save()
-        elif serializer.validated_data.get("type", "") == Warehouse.SHELF and  getattr(parent_warehouse, 'type', "") == Warehouse.WAREHOUSE :
-            warehouse = serializer.save(type=Warehouse.SHELF, parent_warehouse=parent_warehouse,owner=request.user)
+        elif (
+            serializer.validated_data.get("type", "") == Warehouse.SHELF
+            and getattr(parent_warehouse, "type", "") == Warehouse.WAREHOUSE
+        ):
+            warehouse = serializer.save(
+                type=Warehouse.SHELF,
+                parent_warehouse=parent_warehouse,
+                owner=request.user,
+            )
             warehouse.path = f"{parent_warehouse.path}/{warehouse.id}"
             warehouse.save()
-        elif serializer.validated_data.get("type", "") == Warehouse.BOXCASE and  getattr(parent_warehouse, 'type', "") == Warehouse.SHELF :
-            warehouse = serializer.save(type=Warehouse.BOXCASE, parent_warehouse=parent_warehouse,owner=request.user)
+        elif (
+            serializer.validated_data.get("type", "") == Warehouse.BOXCASE
+            and getattr(parent_warehouse, "type", "") == Warehouse.SHELF
+        ):
+            warehouse = serializer.save(
+                type=Warehouse.BOXCASE,
+                parent_warehouse=parent_warehouse,
+                owner=request.user,
+            )
             warehouse.path = f"{parent_warehouse.path}/{warehouse.id}"
             warehouse.save()
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
+        partial = kwargs.pop("partial", False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-
 
         old_parent_warehouse = instance.parent_warehouse
 
@@ -2665,9 +2838,13 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         self.update_shelf_boxcase_permisisons(instance, serializer)
         if old_parent_warehouse != instance.parent_warehouse:
 
-            if instance.type == Warehouse.SHELF and getattr(instance.parent_warehouse, 'type', "") == Warehouse.WAREHOUSE :
-                instance.path = f"{instance.parent_warehouse.path}/{instance.id}"
-            elif instance.type == Warehouse.BOXCASE and  getattr(instance.parent_warehouse, 'type', "") == Warehouse.SHELF :
+            if (
+                instance.type == Warehouse.SHELF
+                and getattr(instance.parent_warehouse, "type", "")
+                == Warehouse.WAREHOUSE
+                or instance.type == Warehouse.BOXCASE
+                and getattr(instance.parent_warehouse, "type", "") == Warehouse.SHELF
+            ):
                 instance.path = f"{instance.parent_warehouse.path}/{instance.id}"
             elif instance.type == Warehouse.WAREHOUSE and not instance.parent_warehouse:
                 instance.path = str(instance.id)
@@ -2675,17 +2852,20 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             instance.save()
 
-            boxcase_warehouses = Warehouse.objects.filter(type=Warehouse.BOXCASE, parent_warehouse=instance)
+            boxcase_warehouses = Warehouse.objects.filter(
+                type=Warehouse.BOXCASE, parent_warehouse=instance
+            )
             for boxcase_warehouse in boxcase_warehouses:
                 boxcase_warehouse.path = f"{instance.path}/{boxcase_warehouse.id}"
                 boxcase_warehouse.save()
-
 
         return Response(serializer.data)
 
     def update_shelf_boxcase_permisisons(self, warehouse, serializer):
         child_shelf_boxcase = Warehouse.objects.filter(path__startswith=warehouse.path)
-        documents_list = Document.objects.select_related("dossier").filter(warehouse__in=child_shelf_boxcase)
+        documents_list = Document.objects.select_related("dossier").filter(
+            warehouse__in=child_shelf_boxcase
+        )
         # documents_list = []
         # for child in child_folders:
         #     if child.type == "file":
@@ -2705,8 +2885,7 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 not merge or (merge and owner is not None)
             ):
                 # if merge is true, we dont want to overwrite the owner
-                qs_owner_update = qs.filter(
-                    owner__isnull=True) if merge else qs
+                qs_owner_update = qs.filter(owner__isnull=True) if merge else qs
                 qs_owner_update.update(owner=owner)
             if "set_permissions" in serializer.validated_data:
                 for obj in qs:
@@ -2727,8 +2906,6 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                         merge=merge,
                     )
 
-
-
         except Exception as e:
             logger.warning(
                 f"An error occurred performing bulk permissions edit: {e!s}",
@@ -2738,11 +2915,10 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             )
 
     def partial_update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', True)
+        partial = kwargs.pop("partial", True)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-
 
         old_parent_warehouse = instance.parent_warehouse
 
@@ -2750,9 +2926,13 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
         if old_parent_warehouse != instance.parent_warehouse:
 
-            if instance.type == Warehouse.SHELF and getattr(instance.parent_warehouse, 'type', "") == Warehouse.WAREHOUSE :
-                instance.path = f"{instance.parent_warehouse.path}/{instance.id}"
-            elif instance.type == Warehouse.BOXCASE and  getattr(instance.parent_warehouse, 'type', "") == Warehouse.SHELF :
+            if (
+                instance.type == Warehouse.SHELF
+                and getattr(instance.parent_warehouse, "type", "")
+                == Warehouse.WAREHOUSE
+                or instance.type == Warehouse.BOXCASE
+                and getattr(instance.parent_warehouse, "type", "") == Warehouse.SHELF
+            ):
                 instance.path = f"{instance.parent_warehouse.path}/{instance.id}"
             elif instance.type == Warehouse.WAREHOUSE and not instance.parent_warehouse:
                 instance.path = str(instance.id)
@@ -2760,11 +2940,12 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             instance.save()
 
-            boxcase_warehouses = Warehouse.objects.filter(type=Warehouse.BOXCASE, parent_warehouse=instance)
+            boxcase_warehouses = Warehouse.objects.filter(
+                type=Warehouse.BOXCASE, parent_warehouse=instance
+            )
             for boxcase_warehouse in boxcase_warehouses:
                 boxcase_warehouse.path = f"{instance.path}/{boxcase_warehouse.id}"
                 boxcase_warehouse.save()
-
 
         return Response(serializer.data)
 
@@ -2782,7 +2963,7 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         if request.method == "GET":
             try:
                 warehouse = Warehouse.objects.get(pk=pk)
-                warehouse_path_ids= warehouse.path.split('/')
+                warehouse_path_ids = warehouse.path.split("/")
                 warehouses = Warehouse.objects.filter(id__in=warehouse_path_ids)
                 warehouse_dict = {}
                 for f in warehouses:
@@ -2791,29 +2972,35 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 for p in warehouse_path_ids:
                     value = warehouse_dict.get(int(p))
                     warehouse_path_list.append(value)
-                warehouse_serializers = WarehouseSerializer(warehouse_path_list,
-                                                       many=True)
-                return Response({"results": warehouse_serializers.data},
-                                status=status.HTTP_200_OK)
+                warehouse_serializers = WarehouseSerializer(
+                    warehouse_path_list, many=True
+                )
+                return Response(
+                    {"results": warehouse_serializers.data}, status=status.HTTP_200_OK
+                )
             except Exception as e:
                 logger.error(f"An error occurred retrieving warehouse: {e!s}")
                 return Response(
                     {
-                        "error": "Error retrieving warehouses, check logs for more detail."},
+                        "error": "Error retrieving warehouses, check logs for more detail."
+                    },
                 )
-
 
 
 class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = Folder
 
-    queryset = Folder.objects.annotate(
-        type_order=Case(
-            When(type='folder', then=0),  # Gán giá trị 0 cho folder
-            When(type='file', then=1),  # Gán giá trị 1 cho file
-            output_field=IntegerField(),
+    queryset = (
+        Folder.objects.annotate(
+            type_order=Case(
+                When(type="folder", then=0),  # Gán giá trị 0 cho folder
+                When(type="file", then=1),  # Gán giá trị 1 cho file
+                output_field=IntegerField(),
+            ),
         )
-    ).order_by('type_order', Lower('name')).prefetch_related('documents')
+        .order_by("type_order", Lower("name"))
+        .prefetch_related("documents")
+    )
 
     serializer_class = FolderSerializer
     pagination_class = StandardPagination
@@ -2832,15 +3019,14 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            ordering = request.query_params.get('ordering', None)
-            if ordering == 'document_count':
-                sorted_data = sorted(serializer.data,
-                                     key=lambda x: x['document_count'])
-            elif ordering == '-document_count':
+            ordering = request.query_params.get("ordering", None)
+            if ordering == "document_count":
+                sorted_data = sorted(serializer.data, key=lambda x: x["document_count"])
+            elif ordering == "-document_count":
 
-                sorted_data = sorted(serializer.data,
-                                     key=lambda x: x['document_count'],
-                                     reverse=True)
+                sorted_data = sorted(
+                    serializer.data, key=lambda x: x["document_count"], reverse=True
+                )
             else:
                 sorted_data = serializer.data
 
@@ -2850,9 +3036,17 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
     def getFolderDoc(self, request):
         currentUser = request.user
-        documents = list(Document.objects.filter(folder=None, owner=currentUser).order_by("-created").values())
-        folders = list(Folder.objects.filter(parent_folder=None, owner=currentUser).order_by("name"))
-        folders_serialisers = FolderSerializer(folders,many=True)
+        documents = list(
+            Document.objects.filter(folder=None, owner=currentUser)
+            .order_by("-created")
+            .values()
+        )
+        folders = list(
+            Folder.objects.filter(parent_folder=None, owner=currentUser).order_by(
+                "name"
+            )
+        )
+        folders_serialisers = FolderSerializer(folders, many=True)
         return {
             "documents": documents,
             "folders": folders_serialisers.data,
@@ -2874,15 +3068,17 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     def bulk_export_excel(self, request, pk=None):
         try:
             folder = Folder.objects.get(pk=pk)
-            list_folders = Folder.objects.filter(path__startswith = folder.path).values_list("id")
+            list_folders = Folder.objects.filter(
+                path__startswith=folder.path
+            ).values_list("id")
             folder_ids = [x[0] for x in list_folders]
-            documents = Document.objects.filter(folder__id__in = folder_ids)
+            documents = Document.objects.filter(folder__id__in=folder_ids)
             data = []
             for document in documents:
                 row_data = {
-                    'Tên file': document.title,
-                    'Nội dung': document.content,
-                    'Ngày tạo': document.created.strftime('%d-%m-%Y'),
+                    "Tên file": document.title,
+                    "Nội dung": document.content,
+                    "Ngày tạo": document.created.strftime("%d-%m-%Y"),
                 }
                 fields = CustomFieldInstance.objects.filter(document=document)
                 for f in fields:
@@ -2890,20 +3086,25 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 data.append(row_data)
 
             df = pd.DataFrame(data)
-            excel_file_name = f"download.xlsx"
-            response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-            response['Content-Disposition'] = f'attachment; filename="{excel_file_name}"'
+            excel_file_name = "download.xlsx"
+            response = HttpResponse(
+                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+            response["Content-Disposition"] = (
+                f'attachment; filename="{excel_file_name}"'
+            )
             df.to_excel(response, index=False)
             return response
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404
+
     @action(methods=["get"], detail=True)
     def folder_path(self, request, pk=None):
         if request.method == "GET":
             try:
                 fol = Folder.objects.get(pk=pk)
-                folder_path = fol.path.split('/')
-                folders = Folder.objects.filter(id__in = folder_path)
+                folder_path = fol.path.split("/")
+                folders = Folder.objects.filter(id__in=folder_path)
                 folders_dict = {}
                 for f in folders:
                     folders_dict[f.id] = f
@@ -2913,18 +3114,25 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                     value = folders_dict.get(int(p))
                     new_folder_path.append(value)
                 folders_serialisers = FolderSerializer(new_folder_path, many=True)
-                return Response({"results":folders_serialisers.data},status=status.HTTP_200_OK)
+                return Response(
+                    {"results": folders_serialisers.data}, status=status.HTTP_200_OK
+                )
             except Exception as e:
                 logger.warning(f"An error occurred retrieving folders: {e!s}")
                 return Response(
                     {"error": "Error retrieving folders, check logs for more detail."},
                 )
 
-
     def getFolderDocById(self, fol):
         currentUser = self.request.user
-        documents = list(Document.objects.filter(folder=fol, owner=currentUser).order_by("-created").values())
-        child_folders = list(Folder.objects.filter(parent_folder=fol, owner=currentUser).order_by("name"))
+        documents = list(
+            Document.objects.filter(folder=fol, owner=currentUser)
+            .order_by("-created")
+            .values()
+        )
+        child_folders = list(
+            Folder.objects.filter(parent_folder=fol, owner=currentUser).order_by("name")
+        )
         folders_serialisers = FolderSerializer(child_folders, many=True)
         return {
             "documents": documents,
@@ -2954,61 +3162,81 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                     {"error": "Error retrieving folders, check logs for more detail."},
                 )
 
-
     def create(self, request, *args, **kwargs):
         # try:
         serializer = FolderSerializer(data=request.data)
         parent_folder = None
         if serializer.is_valid(raise_exception=True):
-            parent_folder = serializer.validated_data.get('parent_folder',None)
+            parent_folder = serializer.validated_data.get("parent_folder", None)
 
-        parent_folder = Folder.objects.filter(id=parent_folder.id if parent_folder else 0).first()
+        parent_folder = Folder.objects.filter(
+            id=parent_folder.id if parent_folder else 0
+        ).first()
 
         if parent_folder == None:
             folder = serializer.save(owner=request.user)
             folder.path = str(folder.id)
-            folder.checksum = hashlib.md5(f'{folder.id}.{folder.name}'.encode()).hexdigest()
+            folder.checksum = hashlib.md5(
+                f"{folder.id}.{folder.name}".encode()
+            ).hexdigest()
             folder.save()
         elif parent_folder:
             user_can_change = check_user_can_change_folder(request.user, parent_folder)
             if not user_can_change:
-                return Response(data={"detail":"You do not have permission to perform this action."},status=status.HTTP_403_FORBIDDEN)
-            folder = serializer.save(parent_folder=parent_folder,owner=request.user)
+                return Response(
+                    data={
+                        "detail": "You do not have permission to perform this action."
+                    },
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+            folder = serializer.save(parent_folder=parent_folder, owner=request.user)
             folder.path = f"{parent_folder.path}/{folder.id}"
-            folder.checksum = hashlib.md5(f'{folder.id}.{folder.name}'.encode()).hexdigest()
+            folder.checksum = hashlib.md5(
+                f"{folder.id}.{folder.name}".encode()
+            ).hexdigest()
             folder.save()
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
+        partial = kwargs.pop("partial", False)
         instance = self.get_object()
-        if request.data.get('parent_folder') is None:
+        if request.data.get("parent_folder") is None:
             pass
-        elif 'parent_folder' in request.data and int(request.data['parent_folder']) == instance.id:
+        elif (
+            "parent_folder" in request.data
+            and int(request.data["parent_folder"]) == instance.id
+        ):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        elif 'parent_folder' in request.data:
-            new_parent_folder = Folder.objects.get(id=int(request.data['parent_folder']))
+        elif "parent_folder" in request.data:
+            new_parent_folder = Folder.objects.get(
+                id=int(request.data["parent_folder"])
+            )
             if new_parent_folder.path.startswith(instance.path):
-                return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a folder into one of its child folders.'})
+                return Response(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    data={
+                        "error": "Cannot move a folder into one of its child folders."
+                    },
+                )
             elif new_parent_folder.type == "file":
                 return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
-            request.data['parent_folder'] = None
+            request.data["parent_folder"] = None
 
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        serializer.validated_data['updated'] = timezone.now()
+        serializer.validated_data["updated"] = timezone.now()
 
         old_parent_folder = instance.parent_folder
 
         self.perform_update(serializer)
         self.update_document_name(instance, serializer)
         # update permission document
-        # update permisson folder child
+        # update permission folder child
         self.update_child_folder_permisisons(instance, serializer)
         if old_parent_folder != instance.parent_folder:
             if instance.parent_folder:
@@ -3020,7 +3248,6 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
             self.update_child_folder_paths(instance)
 
-
         return Response(serializer.data)
 
     def update_document_name(self, instance, serializer):
@@ -3030,24 +3257,32 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         document.title = serializer.validated_data.get("name")
         document.save()
 
-
-
     def partial_update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', True)
+        partial = kwargs.pop("partial", True)
         instance = self.get_object()
-        if request.data.get('parent_folder') is None:
+        if request.data.get("parent_folder") is None:
             pass
-        elif 'parent_folder' in request.data and int(request.data['parent_folder']) == instance.id:
+        elif (
+            "parent_folder" in request.data
+            and int(request.data["parent_folder"]) == instance.id
+        ):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        elif 'parent_folder' in request.data :
-            new_parent_folder = Folder.objects.get(id=int(request.data['parent_folder']))
+        elif "parent_folder" in request.data:
+            new_parent_folder = Folder.objects.get(
+                id=int(request.data["parent_folder"])
+            )
             if new_parent_folder.path.startswith(instance.path):
-                return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Cannot move a folder into one of its child folders.'})
+                return Response(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    data={
+                        "error": "Cannot move a folder into one of its child folders."
+                    },
+                )
             elif new_parent_folder.type == "file":
                 return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
-            request.data['parent_folder'] = None
+            request.data["parent_folder"] = None
 
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
@@ -3077,11 +3312,11 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             child_folder.save()
             self.update_child_folder_paths(child_folder)
 
-
-
     def update_child_folder_permisisons(self, folder, serializer):
         child_folders = Folder.objects.filter(path__startswith=folder.path)
-        documents_list = Document.objects.select_related("dossier").filter(folder__in=child_folders)
+        documents_list = Document.objects.select_related("dossier").filter(
+            folder__in=child_folders
+        )
         # documents_list = []
         # for child in child_folders:
         #     if child.type == "file":
@@ -3101,8 +3336,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 not merge or (merge and owner is not None)
             ):
                 # if merge is true, we dont want to overwrite the owner
-                qs_owner_update = qs.filter(
-                    owner__isnull=True) if merge else qs
+                qs_owner_update = qs.filter(owner__isnull=True) if merge else qs
                 qs_owner_update.update(owner=owner)
             if "set_permissions" in serializer.validated_data:
                 for obj in qs:
@@ -3123,8 +3357,6 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                         merge=merge,
                     )
 
-
-
         except Exception as e:
             logger.warning(
                 f"An error occurred performing bulk permissions edit: {e!s}",
@@ -3132,7 +3364,6 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             return HttpResponseBadRequest(
                 "Error performing bulk permissions edit, check logs for more detail.",
             )
-
 
     def destroy(self, request, pk, *args, **kwargs):
         folder = Folder.objects.get(id=pk)
@@ -3166,7 +3397,7 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = DossierFilterSet
-    ordering_fields = ("name", "type","dossier_form")
+    ordering_fields = ("name", "type", "dossier_form")
 
     def create(self, request, *args, **kwargs):
         # try:
@@ -3174,10 +3405,12 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         parent_dossier = None
         set_permissions = None
         if serializer.is_valid(raise_exception=True):
-            parent_dossier = serializer.validated_data.get('parent_dossier',None)
-            set_permissions = serializer.validated_data.get('set_permissions',None)
+            parent_dossier = serializer.validated_data.get("parent_dossier", None)
+            set_permissions = serializer.validated_data.get("set_permissions", None)
 
-        parent_dossier = Dossier.objects.filter(id=parent_dossier.id if parent_dossier else 0).first()
+        parent_dossier = Dossier.objects.filter(
+            id=parent_dossier.id if parent_dossier else 0
+        ).first()
 
         if parent_dossier == None:
             dossier = serializer.save(owner=request.user)
@@ -3186,10 +3419,10 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             dossier.save()
         elif parent_dossier:
             # dossier = serializer.save(owner=request.user)
-            dossier = serializer.save(parent_dossier=parent_dossier,owner=request.user)
+            dossier = serializer.save(parent_dossier=parent_dossier, owner=request.user)
             dossier.path = f"{parent_dossier.path}/{dossier.id}"
             dossier.save()
-        #   assign permissions to dossier
+            #   assign permissions to dossier
             set_permissions_for_object(
                 permissions=set_permissions,
                 object=dossier,
@@ -3198,7 +3431,7 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update_folder_permisisons(self, folder, serializer):
         permissions = serializer.validated_data.get("set_permissions")
@@ -3212,9 +3445,8 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 not merge or (merge and owner is not None)
             ):
                 # if merge is true, we dont want to overwrite the owner
-                qs_owner_update = qs.filter(
-                    owner__isnull=True) if merge else qs
-                qs_owner_update.owner=owner
+                qs_owner_update = qs.filter(owner__isnull=True) if merge else qs
+                qs_owner_update.owner = owner
                 qs_owner_update.save()
 
             if "set_permissions" in serializer.validated_data:
@@ -3230,6 +3462,7 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             return HttpResponseBadRequest(
                 "Error performing permissions edit, check logs for more detail.",
             )
+
     def update_document_permisisons(self, document, serializer):
         permissions = serializer.validated_data.get("set_permissions")
         owner = serializer.validated_data.get("owner")
@@ -3241,9 +3474,8 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 not merge or (merge and owner is not None)
             ):
                 # if merge is true, we dont want to overwrite the owner
-                qs_owner_update = qs.filter(
-                    owner__isnull=True) if merge else qs
-                qs_owner_update.owner=owner
+                qs_owner_update = qs.filter(owner__isnull=True) if merge else qs
+                qs_owner_update.owner = owner
                 qs_owner_update.save()
 
             if "set_permissions" in serializer.validated_data:
@@ -3261,18 +3493,19 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             )
 
     def update(self, request, *args, **kwargs):
-        serializer = self.get_serializer( data=request.data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=False)
         response = super().update(request, *args, **kwargs)
         instance = self.get_object()
         if instance.type == "FILE":
-            document = Document.objects.select_related('folder').get(dossier=instance.id)
+            document = Document.objects.select_related("folder").get(
+                dossier=instance.id
+            )
             if document:
                 self.update_folder_permisisons(document.folder, serializer)
                 self.update_document_permisisons(document, serializer)
 
         return response
-
 
     # def update(self, request, *args, **kwargs):
     #     partial = kwargs.pop('partial', False)
@@ -3313,8 +3546,8 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         if request.method == "GET":
             try:
                 fol = Dossier.objects.get(pk=pk)
-                dossier_path = fol.path.split('/')
-                dossiers = Dossier.objects.filter(id__in = dossier_path)
+                dossier_path = fol.path.split("/")
+                dossiers = Dossier.objects.filter(id__in=dossier_path)
                 dossiers_dict = {}
                 for f in dossiers:
                     dossiers_dict[f.id] = f
@@ -3324,7 +3557,9 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                     value = dossiers_dict.get(int(p))
                     new_dossier_path.append(value)
                 dossiers_serialisers = DossierSerializer(new_dossier_path, many=True)
-                return Response({"results":dossiers_serialisers.data},status=status.HTTP_200_OK)
+                return Response(
+                    {"results": dossiers_serialisers.data}, status=status.HTTP_200_OK
+                )
             except Exception as e:
                 logger.warning(f"An error occurred retrieving dossiers: {e!s}")
                 return Response(
@@ -3335,7 +3570,11 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         dossier = Dossier.objects.get(id=pk)
         dossiers = Dossier.objects.filter(path__startswith=dossier.path)
         documents = Document.objects.filter(dossier__in=dossiers)
-        folders = Folder.objects.filter(id__in=documents.select_related('folder').all().values_list("folder", flat=True))
+        folders = Folder.objects.filter(
+            id__in=documents.select_related("folder")
+            .all()
+            .values_list("folder", flat=True)
+        )
         folders.delete()
         documents.delete()
         dossiers.delete()
@@ -3375,7 +3614,6 @@ class DossierFormViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 merge=True,
             )
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
 
     # def create(self, request, *args, **kwargs):
     #     # try:
@@ -3489,16 +3727,56 @@ class BackupRecordViewSet(ModelViewSet):
         ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = BackupRecordFilterSet
-    ordering_fields = ("created_at")
+    ordering_fields = "created_at"
 
     def create(self, request, *args, **kwargs):
         try:
-            async_task_backup = backup_documents.apply(
-                args=[]
+
+            backup_exist = BackupRecord.objects.filter(
+                Q(is_backup=True) | Q(is_restore=True)
+            )
+            if backup_exist.count() > 0:
+                return Response(
+                    {"message": _("Backup and restore are in progress")},
+                    status=status.HTTP_409_CONFLICT,
+                )
+            path_document_media = settings.MEDIA_ROOT / "documents"
+
+            if not check_storage([path_document_media], settings.MEDIA_ROOT):
+                return Response(
+                    {"message": _("Insufficient capacity for backup/restore")},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+            used_size = get_directory_size(path_document_media)
+            documents = Document.objects.all()
+            folders = Folder.objects.all()
+            dossiers = Dossier.objects.all()
+            detail = {"documents": documents.count(), "size": used_size}
+            from datetime import datetime
+
+            current_date = datetime.now().strftime("%Y_%m_%d")
+
+            # Tạo thư mục sao lưu theo ngày tháng năm
+            backups_name = (
+                BackupRecord.objects.filter(filename__startswith=current_date)
+                .order_by("filename")
+                .values_list("filename", flat=True)
+            )
+            name = current_date
+            if backups_name.count() > 0:
+                name = generate_unique_name(current_date, backups_name)
+            backup = BackupRecord.objects.create(filename=name, detail=detail)
+            backup.is_backup = True
+            backup.save()
+
+            async_task_backup = backup_documents.delay(
+                backup, documents, folders, dossiers, name
             )
             return Response(async_task_backup.id)
         except Exception as e:
-            raise Http404
+            return Response(
+                {"error": e},
+            )
 
     # def backup(self, request, pk=None):
     #     try:
@@ -3512,15 +3790,35 @@ class BackupRecordViewSet(ModelViewSet):
     @action(methods=["post"], detail=True)
     def restore(self, request, pk=None):
         try:
+            backup_exist = BackupRecord.objects.filter(
+                Q(is_backup=True) | Q(is_restore=True)
+            )
+            if backup_exist.count() > 0:
+                return Response(
+                    {"message": _("Backup and restore are in progress")},
+                    status=status.HTTP_409_CONFLICT,
+                )
             backup = BackupRecord.objects.get(id=pk)
+            path_document_media = settings.MEDIA_ROOT / "documents"
+            backup_root_dir = os.path.join(settings.BACKUP_DIR, backup.filename)
+            if not check_storage(
+                [backup_root_dir, path_document_media], settings.MEDIA_ROOT
+            ):
+                return Response(
+                    {"message": _("Insufficient capacity for backup/restore")},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+
+            backup.is_restore = True
             backup.restore_at = timezone.now()
+            backup.save()
             if request.user is not None and not has_perms_owner_aware(
                 request.user,
                 "view_backup_record",
                 backup,
             ):
                 return HttpResponseForbidden("Insufficient permissions")
-            async_task_restore = restore_documents.apply(args=[backup])
+            async_task_restore = restore_documents.delay(backup)
 
             return Response(async_task_restore.id)
         except (FileNotFoundError, Document.DoesNotExist):

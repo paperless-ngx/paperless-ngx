@@ -29,6 +29,7 @@ export const FILE_STATUS_MESSAGES = {
   save_document: $localize`Saving document...`,
   finished: $localize`Finished.`,
   no_upload_permission_to_folder: $localize`No upload permission to folder.`,
+  the_system_is_backing_up_restore: $localize`The system is backing up/restore`,
 }
 
 export class FileStatus {

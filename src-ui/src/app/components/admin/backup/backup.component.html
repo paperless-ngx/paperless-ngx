@@ -7,16 +7,71 @@
   <button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()" [hidden]="selectedBackups.size === 0">
     <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
   </button>
-  <!--    <button type="button" class="btn btn-sm btn-outline-primary" (click)="restoreAll(selectedBackups)" [disabled]="selectedBackups.size === 0">-->
-  <!--        <i-bs name="arrow-counterclockwise"></i-bs>&nbsp;<ng-container i18n>Restore selected</ng-container>-->
-  <!--    </button>-->
-  <!--    <button type="button" class="btn btn-sm btn-outline-danger" (click)="emptyTrash(selectedBackups)" [disabled]="selectedBackups.size === 0">-->
-  <!--        <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete selected</ng-container>-->
-  <!--    </button>-->
+  <button type="button" class="btn btn-sm btn-outline-primary" (click)="backup()">
+    <i-bs name="save"></i-bs>&nbsp;<ng-container i18n>Backup</ng-container>
+  </button>
+  <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteBackups(selectedBackups)"
+          [disabled]="selectedBackups.size === 0">
+    <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete selected</ng-container>
+  </button>
   <!--    <button type="button" class="btn btn-sm btn-outline-danger" (click)="emptyTrash()" [disabled]="backups.length === 0">-->
   <!--        <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Empty trash</ng-container>-->
   <!--    </button>-->
 </pngx-page-header>
+<div class="modal-body row mb-3">
+  <div class="row row-cols-1 row-cols-md-1 g-1">
+    <div class="col">
+      <div class="card bg-light h-100">
+        <div class="card-header">
+          <h5 class="card-title mb-0" i18n>Storage status</h5>
+        </div>
+        <div class="card-body">
+          <dl class="card-text">
+            <!--            <dt i18n>Media Storage</dt>-->
+            <!--            <dd>-->
+            <!--              <ngb-progressbar style="height: 4px;" class="mt-2 mb-1" type="primary" [max]="100"-->
+            <!--                               [value]="100 - 50"></ngb-progressbar>-->
+            <!--              <span class="small">{{ 50 | filesize }}-->
+            <!--                <ng-container i18n>available</ng-container> ({{ 100 | filesize }}-->
+            <!--                <ng-container i18n>total</ng-container>)</span>-->
+            <!--            </dd>-->
+            <div class="storage-info">
+              <!--              <h3 i18n>Storage status</h3>-->
+              <p i18n>Used <strong>{{ anotherStorage + backupversionStorage + documentStorage  | fileSize }}</strong> /
+                <strong>{{ totalStorage |fileSize }} </strong></p>
+              <div class="progress">
+                <div class="progress-bar bg-danger " role="progressbar" [style.width]="anotherPercentage + '%'"
+                     [attr.aria-valuenow]="anotherPercentage" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress-bar bg-warning" role="progressbar" [style.width]="documentStoragePercentage + '%'"
+                     [attr.aria-valuenow]="documentStoragePercentage" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress-bar bg-dark" role="progressbar"
+                     [style.width]="backupversionStoragePercentage + '%'"
+                     [attr.aria-valuenow]="backupversionStoragePercentage" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress-bar bg-primary opacity-50" role="progressbar"
+                     [style.width]="availableStoragePercentage + '%'"
+                     [attr.aria-valuenow]="availableStoragePercentage" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+              <p><strong>{{ freeStorage| fileSize }} </strong></p>
+              <div class="legend">
+                <span i18n><span class="dot " style="background-color: #ff453a;"></span> {{ anotherStorage|fileSize }}
+                  - {{ anotherPercentage.toFixed() }}% Another</span>
+                <span i18n><span class="dot ms-2"
+                                 style="background-color: #ffcc00;"></span>{{ documentStorage|fileSize }}
+                  - {{ documentStoragePercentage.toFixed() }}% Document</span>
+                <span i18n><span class="dot ms-2"
+                                 style="background-color: #a0a0a0;"></span>{{ backupversionStorage|fileSize }}
+                  - {{ backupversionStoragePercentage.toFixed() }} % Backup versions</span>
+                <span i18n><span class="dot ms-2 bg-primary opacity-50"></span>{{ availableStorage|fileSize }}
+                  - {{ availableStoragePercentage.toFixed() }}% Available</span>
+              </div>
+            </div>
+          </dl>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="row mb-3">
   <ngb-pagination class="col-auto" [pageSize]="25" [collectionSize]="totalBackups" [(page)]="page" [maxSize]="5"
@@ -37,7 +92,7 @@
       <th scope="col" class="fw-normal" i18n>Name</th>
       <th scope="col" class="fw-normal d-none d-sm-table-cell" i18n>Backup at</th>
       <th scope="col" class="fw-normal d-none d-sm-table-cell" i18n>Restore at</th>
-      <th scope="col" class="fw-normal d-none d-sm-table-cell" i18n>Count</th>
+      <th scope="col" class="fw-normal d-none d-sm-table-cell" i18n>Document/Size</th>
       <th scope="col" class="fw-normal d-none d-sm-table-cell" i18n>Result</th>
       <th scope="col" class="fw-normal" i18n>Actions</th>
     </tr>
@@ -69,7 +124,9 @@
           </td>
           <td scope="row" class="d-none d-sm-table-cell" i18n>{{ backup.created_at | customDate:'short' }}</td>
           <td scope="row" class="d-none d-sm-table-cell" i18n>{{ backup.restore_at | customDate:'short' }}</td>
-          <td scope="row" class="d-none d-sm-table-cell" i18n>{{ backup.count }}</td>
+          <td scope="row" class="d-none d-sm-table-cell" i18n>{{ backup.detail.documents }}
+            - {{ backup.detail.size| filesize }}
+          </td>
           <td class="d-none d-lg-table-cell">
             @if (backup.log?.length > 50) {
               <div class="result" (click)="expandBackup(backup); $event.stopPropagation();"
@@ -106,7 +163,7 @@
                 </button>
                 <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
                   <button (click)="restore(backup)" ngbDropdownItem i18n>Restore</button>
-                  <!--                            <button (click)="delete(backup)" ngbDropdownItem i18n>Delete</button>-->
+                  <button (click)="delete(backup)" ngbDropdownItem i18n>Delete</button>
                 </div>
               </div>
             </div>
@@ -115,16 +172,17 @@
                 <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs>&nbsp;<ng-container i18n>Restore
               </ng-container>
               </button>
-              <!--                        <button class="btn btn-sm btn-outline-danger" (click)="delete(backup); $event.stopPropagation();">-->
-              <!--                            <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>-->
-              <!--                        </button>-->
+              <button class="btn btn-sm btn-outline-danger" (click)="delete(backup); $event.stopPropagation();">
+                <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+              </button>
             </div>
           </td>
         </tr>
         <tr>
           <td class="p-0" [class.border-0]="expandedBackup !== backup.id" colspan="5">
             <pre #collapse="ngbCollapse" [ngbCollapse]="expandedBackup !== backup.id" class="small mb-0"><div
-              class="small p-1 p-lg-3 ms-lg-3">{{ backup.log }}</div></pre>
+              class="small p-1 p-lg-3 ms-lg-3">{{ backup.log }}</div>
+            </pre>
           </td>
         </tr>
       }
@@ -136,7 +194,7 @@
   <div class="d-flex mb-2">
     <div>
       <ng-container
-        i18n>{totalBackups, plural, =1 {One backup} other {{{ totalBackups || 0 }} total backup in backups}}</ng-container>
+        i18n>{totalBackups, plural, =1 {One backup} other {{{ totalBackups || 0 }} total backup versions in backup versions}}</ng-container>
       @if (selectedBackups.size > 0) {
         <ng-container i18n>&nbsp;({{ selectedBackups.size }} selected)</ng-container>
         <!--                &nbsp;({{selectedBackups.size}} selected)-->

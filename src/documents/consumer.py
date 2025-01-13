@@ -5,8 +5,8 @@ import tempfile
 import uuid
 from enum import Enum
 from pathlib import Path
-from typing import Optional
 from typing import TYPE_CHECKING
+from typing import Optional
 
 import magic
 from asgiref.sync import async_to_sync
@@ -26,11 +26,13 @@ from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.loggers import LoggingMixin
 from documents.matching import document_matches_workflow
-from documents.models import Correspondent, Dossier
+from documents.models import BackupRecord
+from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import Dossier
 from documents.models import FileInfo
 from documents.models import Folder
 from documents.models import StoragePath
@@ -39,21 +41,21 @@ from documents.models import Warehouse
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
-from documents.parsers import DocumentParser, \
-    custom_get_parser_class_for_mime_type
+from documents.parsers import DocumentParser
 from documents.parsers import ParseError
+from documents.parsers import custom_get_parser_class_for_mime_type
 from documents.parsers import parse_date
-from documents.permissions import set_permissions_for_object, \
-    check_user_can_change_folder
+from documents.permissions import check_user_can_change_folder
+from documents.permissions import set_permissions_for_object
 from documents.plugins.base import AlwaysRunPluginMixin
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import NoCleanupPluginMixin
 from documents.plugins.base import NoSetupPluginMixin
 from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
-from documents.utils import copy_basic_file_stats, \
-    get_content_before_last_number
+from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
+from documents.utils import get_content_before_last_number
 from documents.utils import run_subprocess
 from paperless.models import ApplicationConfiguration
 from paperless_ocr_custom.parsers import RasterisedDocumentCustomParser
@@ -252,7 +254,8 @@ class ConsumerStatusShortMessage(str, Enum):
     SAVE_DOCUMENT = "save_document"
     FINISHED = "finished"
     FAILED = "failed"
-    NO_UPLOAD_PERMISSION_TO_FOLDER="no_upload_permission_to_folder"
+    NO_UPLOAD_PERMISSION_TO_FOLDER = "no_upload_permission_to_folder"
+    THE_SYSTEM_IS_BACKING_UP_RESTORE = "the_system_is_backing_up_restore"
 
 
 class ConsumerFilePhase(str, Enum):
@@ -261,26 +264,36 @@ class ConsumerFilePhase(str, Enum):
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
 
-@shared_task(name='tasks.parse_and_update_data_document')
-def parse_and_update_data_document(working_copy, mime_type,
-                                   dossier_document, document,
-                                   document_parser):
-    """"Parse and update"""
+
+@shared_task(name="tasks.parse_and_update_data_document")
+def parse_and_update_data_document(
+    working_copy, mime_type, dossier_document, document, document_parser
+):
+    """ "Parse and update"""
     document_parser_copy = document_parser.copy()
-    data_ocr_fields = Consumer.parse_document(working_copy, mime_type,
-                                          document_parser_copy)
+    data_ocr_fields = Consumer.parse_document(
+        working_copy, mime_type, document_parser_copy
+    )
 
     Consumer.update_data_document(document, document_parser_copy)
     if data_ocr_fields:
-        Consumer.update_data_dossier(ocr_fields=data_ocr_fields,
-                                 document=document,
-                                 dossier_document=dossier_document)
+        Consumer.update_data_dossier(
+            ocr_fields=data_ocr_fields,
+            document=document,
+            dossier_document=dossier_document,
+        )
+
 
 def get_config_dossier_form(override_dossier_id):
     if override_dossier_id is None:
         return None
-    dossier = Dossier.objects.filter(id=override_dossier_id.id).select_related('dossier_form').first()
+    dossier = (
+        Dossier.objects.filter(id=override_dossier_id.id)
+        .select_related("dossier_form")
+        .first()
+    )
     return dossier.dossier_form
+
 
 class Consumer(LoggingMixin):
     logging_name = "paperless.consumer"
@@ -303,7 +316,7 @@ class Consumer(LoggingMixin):
             "message": message,
             "document_id": document_id,
             "owner_id": self.override_owner_id if self.override_owner_id else None,
-            "folder_id": folder_id
+            "folder_id": folder_id,
         }
         async_to_sync(self.channel_layer.group_send)(
             "status_updates",
@@ -339,6 +352,7 @@ class Consumer(LoggingMixin):
         self.override_custom_field_ids = None
 
         self.channel_layer = get_channel_layer()
+
     def pre_change_folder(self):
         # check folder when uploading documents
         if self.override_owner_id is None:
@@ -380,6 +394,19 @@ class Consumer(LoggingMixin):
                 ConsumerStatusShortMessage.DOCUMENT_ALREADY_EXISTS,
                 f"Not consuming {self.filename}: It is a duplicate of"
                 f" {existing_doc.get().title} (#{existing_doc.get().pk})",
+            )
+
+    def pre_check_backup_restore(self):
+        """
+        check backup/restore doesn't already exist
+        """
+        backup_exist = BackupRecord.objects.filter(
+            Q(is_backup=True) | Q(is_restore=True)
+        )
+        if backup_exist.exists():
+            self._fail(
+                ConsumerStatusShortMessage.THE_SYSTEM_IS_BACKING_UP_RESTORE,
+                f"Not consuming {self.filename}: The system is backing up/restore",
             )
 
     def pre_check_directories(self):
@@ -535,80 +562,98 @@ class Consumer(LoggingMixin):
 
     def parse_document(self, working_copy, mime_type, document_parser_copy):
         if isinstance(document_parser_copy, RasterisedDocumentCustomParser):
-            return  document_parser_copy.parse(working_copy, mime_type,
-                                                    self.filename,
-                                                    get_config_dossier_form(self.override_dossier_id))
+            return document_parser_copy.parse(
+                working_copy,
+                mime_type,
+                self.filename,
+                get_config_dossier_form(self.override_dossier_id),
+            )
         document_parser_copy.parse(working_copy, mime_type, self.filename)
         return None
 
-    def update_data_dossier(self,ocr_fields, document, dossier_document):
-        if ocr_fields[1] == '' and isinstance(ocr_fields[0], list):
-            self.fill_custom_field(document, ocr_fields,
-                                   dossier_document)
+    def update_data_dossier(self, ocr_fields, document, dossier_document):
+        if ocr_fields[1] == "" and isinstance(ocr_fields[0], list):
+            self.fill_custom_field(document, ocr_fields, dossier_document)
 
-        elif ocr_fields[1] is not None and isinstance(ocr_fields[0],
-                                                           list):
+        elif ocr_fields[1] is not None and isinstance(ocr_fields[0], list):
             self.fill_custom_field_default(document, ocr_fields)
 
-    def update_data_document(self,document, document_parser, working_copy):
+    def update_data_document(self, document, document_parser, working_copy):
         document.content = document_parser.get_text()
         # ghi file
         # document.archive_path
-        pass
 
-
-    def fill_custom_field_default(self,document:Document, data_ocr_fields):
+    def fill_custom_field_default(self, document: Document, data_ocr_fields):
         fields = CustomFieldInstance.objects.filter(
-                                    document=document,
-                                )
+            document=document,
+        )
         dict_data = {}
         try:
             if data_ocr_fields is not None:
-                if isinstance(data_ocr_fields[0],list):
+                if isinstance(data_ocr_fields[0], list):
 
                     for r in data_ocr_fields[0][0].get("fields"):
-                        dict_data[r.get("name")] = r.get("values")[0].get("value") if r.get("values") else None
-                    user_args=ApplicationConfiguration.objects.filter().first().user_args
+                        dict_data[r.get("name")] = (
+                            r.get("values")[0].get("value") if r.get("values") else None
+                        )
+                    user_args = (
+                        ApplicationConfiguration.objects.filter().first().user_args
+                    )
                     mapping_field_user_args = []
-                    for f in user_args.get("form_code",[]):
+                    for f in user_args.get("form_code", []):
                         if f.get("name") == data_ocr_fields[1]:
-                            mapping_field_user_args = f.get("mapping",[])
+                            mapping_field_user_args = f.get("mapping", [])
                     map_fields = {}
-                    for key,value in mapping_field_user_args[0].items():
-                        map_fields[key]=dict_data.get(value)
+                    for key, value in mapping_field_user_args[0].items():
+                        map_fields[key] = dict_data.get(value)
                     for f in fields:
-                        f.value_text = map_fields.get(f.field.name,None)
-                    CustomFieldInstance.objects.bulk_update(fields, ['value_text'])
+                        f.value_text = map_fields.get(f.field.name, None)
+                    CustomFieldInstance.objects.bulk_update(fields, ["value_text"])
         except Exception as e:
-            self.log.error("error ocr field",e)
+            self.log.error("error ocr field", e)
 
-    def fill_custom_field(self,document:Document, data_ocr_fields, dossier_file:Dossier):
+    def fill_custom_field(
+        self, document: Document, data_ocr_fields, dossier_file: Dossier
+    ):
         dict_data = {}
         if data_ocr_fields is not None and isinstance(data_ocr_fields[0], list) == True:
-            if len(data_ocr_fields[0])>=1:
+            if len(data_ocr_fields[0]) >= 1:
                 for r in data_ocr_fields[0][0].get("fields"):
 
-                    dict_data[r.get("name")] = r.get("values")[0].get("value") if r.get("values") else None
-                custom_fields = CustomFieldInstance.objects.filter(dossier=document.dossier)
+                    dict_data[r.get("name")] = (
+                        r.get("values")[0].get("value") if r.get("values") else None
+                    )
+                custom_fields = CustomFieldInstance.objects.filter(
+                    dossier=document.dossier
+                )
                 document_dossier_form = self.get_config_dossier_form()
-                custom_fields_form = CustomFieldInstance.objects.filter(dossier_form=document_dossier_form)
+                custom_fields_form = CustomFieldInstance.objects.filter(
+                    dossier_form=document_dossier_form
+                )
                 # map custom_fields to dict for search
                 dict_custom_fields = {}
                 for f in custom_fields:
                     dict_custom_fields[f.field] = f
-                if(custom_fields_form):
+                if custom_fields_form:
                     for r in custom_fields_form:
                         r: CustomFieldInstance
 
                         if dict_custom_fields.get(r.field) is not None:
-                            dict_custom_fields[r.field].value_text=dict_data.get(r.match_value)
+                            dict_custom_fields[r.field].value_text = dict_data.get(
+                                r.match_value
+                            )
                         # self.log.info('gia tri field',r.field)
                         # r.value_text = dict_data.get(r.match_value)
                         # self.log.debug("gia tri value map",r.match_value)
                         # create dossier file
-                        CustomFieldInstance.objects.update_or_create(field=r.field,
-                                                                     document=document,
-                                                                     defaults={"value_text":dict_data.get(r.match_value),"dossier":dossier_file})
+                        CustomFieldInstance.objects.update_or_create(
+                            field=r.field,
+                            document=document,
+                            defaults={
+                                "value_text": dict_data.get(r.match_value),
+                                "dossier": dossier_file,
+                            },
+                        )
 
                 #     for r in custom_fields:
                 #         r: CustomFieldInstance
@@ -621,47 +666,78 @@ class Consumer(LoggingMixin):
                 #         #                                    dossier = dossier_file,
                 #         #                                    document=document)
 
-                CustomFieldInstance.objects.bulk_update(custom_fields, ['value_text'])
+                CustomFieldInstance.objects.bulk_update(custom_fields, ["value_text"])
                 # assign new value to dossier by dossier_form----------------
 
                 # get custom field be assign
-                query_custom_fields_dossier_document_form = CustomFieldInstance.objects.filter(dossier_form=document_dossier_form, reference__isnull=True)
-                dict_custom_fields_dossier_document_form = {obj.field.id: obj for obj in query_custom_fields_dossier_document_form}
-                query_custom_fields_dossier_document = CustomFieldInstance.objects.filter(dossier=document.dossier,reference__isnull=True)
-                dict_custom_fields_dossier_document = {obj.field.id: obj for obj in query_custom_fields_dossier_document}
+                query_custom_fields_dossier_document_form = (
+                    CustomFieldInstance.objects.filter(
+                        dossier_form=document_dossier_form, reference__isnull=True
+                    )
+                )
+                dict_custom_fields_dossier_document_form = {
+                    obj.field.id: obj
+                    for obj in query_custom_fields_dossier_document_form
+                }
+                query_custom_fields_dossier_document = (
+                    CustomFieldInstance.objects.filter(
+                        dossier=document.dossier, reference__isnull=True
+                    )
+                )
+                dict_custom_fields_dossier_document = {
+                    obj.field.id: obj for obj in query_custom_fields_dossier_document
+                }
                 dict_custom_fields_document_reference = {}
                 for field, obj in dict_custom_fields_dossier_document_form.items():
                     if dict_custom_fields_dossier_document.get(field) is not None:
 
-                        dict_custom_fields_document_reference[obj.id]=dict_custom_fields_dossier_document.get(field)
+                        dict_custom_fields_document_reference[obj.id] = (
+                            dict_custom_fields_dossier_document.get(field)
+                        )
 
                 # get dossier_form by document_form
                 lst_id_dossier = dossier_file.path.split("/")
                 lst_id_dossier = [int(num) for num in lst_id_dossier]
-                lst_dossiers = Dossier.objects.filter(id__in=lst_id_dossier,type="DOSSIER")
+                lst_dossiers = Dossier.objects.filter(
+                    id__in=lst_id_dossier, type="DOSSIER"
+                )
                 # dossier_forms = custom_fields = CustomFieldInstance.objects.filter(dossier_form=document_dossier_form)
                 for d in lst_dossiers:
-                    query_custom_fields_dossier_form = CustomFieldInstance.objects.filter(dossier_form=d.dossier_form,reference__isnull=False)
-                    dict_custom_fields_dossier_form = {obj.field.id: obj for obj in query_custom_fields_dossier_form}
-                    query_custom_fields_dossier = CustomFieldInstance.objects.filter(dossier=d,reference__isnull=True)
-                    dict_custom_fields_dossier = {obj.field.id: obj for obj in query_custom_fields_dossier}
+                    query_custom_fields_dossier_form = (
+                        CustomFieldInstance.objects.filter(
+                            dossier_form=d.dossier_form, reference__isnull=False
+                        )
+                    )
+                    dict_custom_fields_dossier_form = {
+                        obj.field.id: obj for obj in query_custom_fields_dossier_form
+                    }
+                    query_custom_fields_dossier = CustomFieldInstance.objects.filter(
+                        dossier=d, reference__isnull=True
+                    )
+                    dict_custom_fields_dossier = {
+                        obj.field.id: obj for obj in query_custom_fields_dossier
+                    }
                     dict_custom_fields_dossier_reference = {}
                     for field, obj in dict_custom_fields_dossier_form.items():
                         if dict_custom_fields_dossier.get(field) is not None:
-                            dict_custom_fields_dossier_reference[obj.reference.id]=dict_custom_fields_dossier.get(field)
+                            dict_custom_fields_dossier_reference[obj.reference.id] = (
+                                dict_custom_fields_dossier.get(field)
+                            )
                         elif dict_custom_fields_dossier.get(field) is None:
-                            CustomFieldInstance.objects.create(field=obj.field,
-                                                           value_text='',
-                                                           dossier = d,
-                                                        )
+                            CustomFieldInstance.objects.create(
+                                field=obj.field,
+                                value_text="",
+                                dossier=d,
+                            )
                     for field, obj in dict_custom_fields_dossier_reference.items():
                         if dict_custom_fields_document_reference.get(field) is not None:
-                            obj:CustomFieldInstance
-                            obj.value_text=dict_custom_fields_document_reference.get(field).value_text
-                    CustomFieldInstance.objects.bulk_update(dict_custom_fields_dossier_reference.values(), ['value_text'])
-
-
-
+                            obj: CustomFieldInstance
+                            obj.value_text = dict_custom_fields_document_reference.get(
+                                field
+                            ).value_text
+                    CustomFieldInstance.objects.bulk_update(
+                        dict_custom_fields_dossier_reference.values(), ["value_text"]
+                    )
 
     def try_consume_file(
         self,
@@ -708,7 +784,6 @@ class Consumer(LoggingMixin):
         self.override_change_groups = override_change_groups
         self.override_custom_field_ids = override_custom_field_ids
 
-
         self._send_progress(
             0,
             100,
@@ -717,6 +792,7 @@ class Consumer(LoggingMixin):
         )
 
         # Make sure that preconditions for consuming the file are met.
+        self.pre_check_backup_restore()
         self.pre_change_folder()
         self.pre_check_file_exists()
         self.pre_check_directories()
@@ -740,8 +816,10 @@ class Consumer(LoggingMixin):
         self.log.debug(f"Detected mime type: {mime_type}")
 
         # Based on the mime type, get the parser for that type
-        parser_class: Optional[type[DocumentParser]] = custom_get_parser_class_for_mime_type(
-            mime_type,
+        parser_class: Optional[type[DocumentParser]] = (
+            custom_get_parser_class_for_mime_type(
+                mime_type,
+            )
         )
         if not parser_class:
             tempdir.cleanup()
@@ -784,7 +862,7 @@ class Consumer(LoggingMixin):
         thumbnail = None
         archive_path = None
         page_count = None
-        data_ocr_fields = (None,None)
+        data_ocr_fields = (None, None)
         try:
             self._send_progress(
                 20,
@@ -828,8 +906,7 @@ class Consumer(LoggingMixin):
                 )
                 date = parse_date(self.filename, text)
             archive_path = self.working_copy
-            page_count = document_parser.get_page_count(self.working_copy,
-                                                        mime_type)
+            page_count = document_parser.get_page_count(self.working_copy, mime_type)
 
         except ParseError as e:
             self._fail(
@@ -874,28 +951,32 @@ class Consumer(LoggingMixin):
                     mime_type=mime_type,
                 )
                 new_file = None
-                self.log.debug("Comsumer", document.folder)
+                self.log.debug("Consumer", document.folder)
 
-                new_file = Folder.objects.create(name=document.title,
-                                                 parent_folder=document.folder,
-                                                 type=Folder.FILE,
-                                                 owner=document.owner,
-                                                 created=document.created,
-                                                 updated=document.modified)
+                new_file = Folder.objects.create(
+                    name=document.title,
+                    parent_folder=document.folder,
+                    type=Folder.FILE,
+                    owner=document.owner,
+                    created=document.created,
+                    updated=document.modified,
+                )
                 new_file.checksum = document.checksum
                 if document.folder:
                     folder_path = get_content_before_last_number(document.folder.path)
                     if document.folder.type == Folder.FILE:
-                        if len(document.folder.path.split('/')) == 1:
+                        if len(document.folder.path.split("/")) == 1:
                             new_file.path = f"{new_file.id}"
                             new_file.parent_folder_id = None
-                        elif len(document.folder.path.split('/')) > 1:
+                        elif len(document.folder.path.split("/")) > 1:
                             new_file.path = f"{folder_path}/{new_file.id}"
-                            new_file.parent_folder_id = int(folder_path.split('/')[-1])
+                            new_file.parent_folder_id = int(folder_path.split("/")[-1])
                     elif document.folder.type == Folder.FOLDER:
                         new_file.path = f"{document.folder.path}/{new_file.id}"
                         # self.log.debug("parent_folder_id___1",folder_path , document.folder.path)
-                        new_file.parent_folder_id = int(document.folder.path.split('/')[-1])
+                        new_file.parent_folder_id = int(
+                            document.folder.path.split("/")[-1]
+                        )
                 else:
                     new_file.path = f"{new_file.id}"
                 new_file.save()
@@ -903,8 +984,7 @@ class Consumer(LoggingMixin):
 
                 dossier = None
                 if document.dossier:
-                    dossier = Dossier.objects.filter(
-                        id=document.dossier.pk).first()
+                    dossier = Dossier.objects.filter(id=document.dossier.pk).first()
                     # update custom field by document_id
                 dossier_form = None
                 if dossier:
@@ -913,7 +993,8 @@ class Consumer(LoggingMixin):
                     name=document.title,
                     parent_dossier=document.dossier,
                     type="FILE",
-                    dossier_form=dossier_form)
+                    dossier_form=dossier_form,
+                )
                 if document.dossier:
                     new_dossier_document.path = f"{document.dossier.path}/{new_file.id}"
                 else:
@@ -929,10 +1010,10 @@ class Consumer(LoggingMixin):
                     logging_group=self.logging_group,
                     classifier=classifier,
                 )
-                 # create file from document
+                # create file from document
                 # self.log.info('gia tri documentt', document.folder)
 
-                document.dossier=new_dossier_document
+                document.dossier = new_dossier_document
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.
                 with FileLock(settings.MEDIA_LOCK):
@@ -976,7 +1057,6 @@ class Consumer(LoggingMixin):
                 # self.log.debug("document.path", document.archive_file, document.archive_path, archive_path)
                 # parse_and_update_data_document.apply_async(args=[document.archive_path, mime_type, new_dossier_document, document, document_parser])
 
-
                 # Delete the file only if it was successfully consumed
                 self.log.debug(f"Deleting file {self.working_copy}")
                 self.original_path.unlink()
@@ -1014,13 +1094,13 @@ class Consumer(LoggingMixin):
             ConsumerFilePhase.SUCCESS,
             ConsumerStatusShortMessage.FINISHED,
             document.id,
-            override_folder_id
-
+            override_folder_id,
         )
 
         from documents.tasks import update_document_archive_file
+
         update_document_archive_file.delay(
-            document_id=document.id
+            document_id=document.id,
         )
 
         # Return the most up to date fields

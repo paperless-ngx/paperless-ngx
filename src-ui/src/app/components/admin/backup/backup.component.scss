@@ -21,6 +21,26 @@ pre {
   height: 0.8rem;
 }
 
+.storage-info {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.legend {
+  font-size: 12px;
+}
+
+.legend .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+
 @media (max-width: 575.98px) {
   .name-col {
     max-width: 150px;

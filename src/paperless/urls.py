@@ -14,17 +14,23 @@ from django.views.static import serve
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
-from documents.models import FontLanguage, BackupRecord
-from documents.views import AcknowledgeTasksView, ApprovalUpdateMutipleView, \
-    ApprovalViewSet, BulkExportExcelFromFolderView, BulkExportExcelView, \
-    DossierFormViewSet, DossierViewSet, StatisticsCustomView, \
-    ArchiveFontViewSet, FontLanguageViewSet, TrashView, BackupRecordViewSet
+from documents.views import AcknowledgeTasksView
+from documents.views import ApprovalUpdateMutipleView
+from documents.views import ApprovalViewSet
+from documents.views import ArchiveFontViewSet
+from documents.views import BackupRecordViewSet
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
+from documents.views import BulkExportExcelFromFolderView
+from documents.views import BulkExportExcelView
 from documents.views import CorrespondentViewSet
 from documents.views import CustomFieldViewSet
 from documents.views import DocumentTypeViewSet
+from documents.views import DossierFormViewSet
+from documents.views import DossierViewSet
+from documents.views import FolderViewSet
+from documents.views import FontLanguageViewSet
 from documents.views import IndexView
 from documents.views import LogViewSet
 from documents.views import PostDocumentView
@@ -34,20 +40,23 @@ from documents.views import SearchAutoCompleteView
 from documents.views import SelectionDataView
 from documents.views import SharedLinkView
 from documents.views import ShareLinkViewSet
+from documents.views import StatisticsCustomView
 from documents.views import StatisticsView
 from documents.views import StoragePathViewSet
 from documents.views import SystemStatusView
+from documents.views import SystemStorageStatusView
 from documents.views import TagViewSet
 from documents.views import TasksViewSet
+from documents.views import TrashView
 from documents.views import UiSettingsView
 from documents.views import UnifiedSearchViewSet
+from documents.views import WarehouseViewSet
 from documents.views import WorkflowActionViewSet
 from documents.views import WorkflowTriggerViewSet
 from documents.views import WorkflowViewSet
-from documents.views import WarehouseViewSet
-from documents.views import FolderViewSet
 from paperless.consumers import StatusConsumer
-from paperless.views import ApplicationConfigurationViewSet, ContentTypeViewSet
+from paperless.views import ApplicationConfigurationViewSet
+from paperless.views import ContentTypeViewSet
 from paperless.views import DisconnectSocialAccountView
 from paperless.views import FaviconView
 from paperless.views import GenerateAuthTokenView
@@ -58,7 +67,6 @@ from paperless.views import UserViewSet
 from paperless_mail.views import MailAccountTestView
 from paperless_mail.views import MailAccountViewSet
 from paperless_mail.views import MailRuleViewSet
-
 
 api_router = DefaultRouter()
 api_router.register(r"correspondents", CorrespondentViewSet)
@@ -93,7 +101,6 @@ api_router.register(r"backup_records", BackupRecordViewSet)
 api_router.register(r"content_types", ContentTypeViewSet, basename="content_types")
 
 urlpatterns = [
-
     re_path(
         r"^api/",
         include(
@@ -111,7 +118,11 @@ urlpatterns = [
                     name="autocomplete",
                 ),
                 re_path("^statistics/", StatisticsView.as_view(), name="statistics"),
-                re_path("^statistics_custom/", StatisticsCustomView.as_view(), name="statistics_custom"),
+                re_path(
+                    "^statistics_custom/",
+                    StatisticsCustomView.as_view(),
+                    name="statistics_custom",
+                ),
                 re_path(
                     "^documents/post_document/",
                     PostDocumentView.as_view(),
@@ -194,6 +205,11 @@ urlpatterns = [
                     name="system_status",
                 ),
                 re_path(
+                    "^status_storage/",
+                    SystemStorageStatusView.as_view(),
+                    name="system_storage_status",
+                ),
+                re_path(
                     "^trash/",
                     TrashView.as_view(),
                     name="trash",
@@ -236,7 +252,7 @@ urlpatterns = [
                 re_path(
                     "^restore/",
                     RedirectView.as_view(
-                        url=settings.BASE_URL + "api/backup_records/restore/"
+                        url=settings.BASE_URL + "api/backup_records/restore/",
                     ),
                     name="restore",
                 ),
