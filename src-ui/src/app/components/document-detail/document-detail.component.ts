@@ -620,7 +620,10 @@ export class DocumentDetailComponent
       .subscribe({
         next: (result) => {
           this.metadata = result
-          if (this.archiveContentRenderType !== ContentRenderType.PDF) {
+          if (
+            this.archiveContentRenderType !== ContentRenderType.PDF ||
+            this.useNativePdfViewer
+          ) {
             this.previewLoaded = true
           }
         },
