@@ -781,13 +781,13 @@ def backup_documents(
             if os.path.isfile(file_path):
                 os.remove(file_path)
 
-        if os.path.exists(settings.ORIGINALS_DIR):
+        if os.path.exists(settings.ARCHIVE_DIR):
             shutil.copytree(
                 src=settings.ARCHIVE_DIR,
                 dst=archive_dir,
                 dirs_exist_ok=True,
             )
-        for filename in path_file_originals_inore:
+        for filename in path_file_archive_inore:
             file_path = os.path.join(archive_dir, filename)
             if os.path.isfile(file_path):
                 os.remove(file_path)
