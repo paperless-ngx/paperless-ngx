@@ -362,7 +362,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">185</context>
+          <context context-type="linenumber">187</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.html</context>
@@ -2414,7 +2414,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">919</context>
+          <context context-type="linenumber">922</context>
         </context-group>
         <target state="translated">删除文档时发生错误。</target>
       </trans-unit>
@@ -2714,19 +2714,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">943</context>
+          <context context-type="linenumber">946</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1250</context>
+          <context context-type="linenumber">1253</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1289</context>
+          <context context-type="linenumber">1292</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1330</context>
+          <context context-type="linenumber">1333</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3378,7 +3378,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">896</context>
+          <context context-type="linenumber">899</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -6831,7 +6831,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1307</context>
+          <context context-type="linenumber">1310</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
@@ -7231,7 +7231,7 @@
         <source>Error retrieving metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">630</context>
+          <context context-type="linenumber">633</context>
         </context-group>
         <target state="translated">获取元数据时发生错误</target>
       </trans-unit>
@@ -7239,7 +7239,7 @@
         <source>Error retrieving suggestions.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">659</context>
+          <context context-type="linenumber">662</context>
         </context-group>
         <target state="translated">获取建议时发生错误。</target>
       </trans-unit>
@@ -7247,11 +7247,11 @@
         <source>Document saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">810</context>
+          <context context-type="linenumber">813</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">824</context>
+          <context context-type="linenumber">827</context>
         </context-group>
         <target state="translated">文档已成功保存。</target>
       </trans-unit>
@@ -7259,11 +7259,11 @@
         <source>Error saving document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">828</context>
+          <context context-type="linenumber">831</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">869</context>
+          <context context-type="linenumber">872</context>
         </context-group>
         <target state="translated">保存文档时发生错误</target>
       </trans-unit>
@@ -7271,7 +7271,7 @@
         <source>Do you really want to move the document &quot;<x id="PH" equiv-text="this.document.title"/>&quot; to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">897</context>
+          <context context-type="linenumber">900</context>
         </context-group>
         <target state="translated">您真的要将文档 "<x id="PH" equiv-text="this.document.title"/>" 移动到回收站吗？</target>
       </trans-unit>
@@ -7279,7 +7279,7 @@
         <source>Documents can be restored prior to permanent deletion.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">898</context>
+          <context context-type="linenumber">901</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7291,7 +7291,7 @@
         <source>Move to trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">900</context>
+          <context context-type="linenumber">903</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7303,7 +7303,7 @@
         <source>Reprocess confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">939</context>
+          <context context-type="linenumber">942</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7315,7 +7315,7 @@
         <source>This operation will permanently recreate the archive file for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">940</context>
+          <context context-type="linenumber">943</context>
         </context-group>
         <target state="translated">此操作将永久重新创建此文档的归档文件。</target>
       </trans-unit>
@@ -7323,7 +7323,7 @@
         <source>The archive file will be re-generated with the current settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">941</context>
+          <context context-type="linenumber">944</context>
         </context-group>
         <target state="translated">归档文件将使用当前设置重新生成。</target>
       </trans-unit>
@@ -7331,7 +7331,7 @@
         <source>Reprocess operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">951</context>
+          <context context-type="linenumber">954</context>
         </context-group>
         <target state="translated">重新处理操作将在后台开始。在操作完成后关闭并重新打开或重新加载此文档以查看新内容。</target>
       </trans-unit>
@@ -7339,7 +7339,7 @@
         <source>Error executing operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">962</context>
+          <context context-type="linenumber">965</context>
         </context-group>
         <target state="translated">执行操作时发生错误</target>
       </trans-unit>
@@ -7347,7 +7347,7 @@
         <source>Page Fit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1035</context>
+          <context context-type="linenumber">1038</context>
         </context-group>
         <target state="translated">适应页面</target>
       </trans-unit>
@@ -7355,7 +7355,7 @@
         <source>Split confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1248</context>
+          <context context-type="linenumber">1251</context>
         </context-group>
         <target state="translated"/>
       </trans-unit>
@@ -7363,7 +7363,7 @@
         <source>This operation will split the selected document(s) into new documents.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1249</context>
+          <context context-type="linenumber">1252</context>
         </context-group>
         <target state="translated"/>
       </trans-unit>
@@ -7371,7 +7371,7 @@
         <source>Split operation will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1265</context>
+          <context context-type="linenumber">1268</context>
         </context-group>
         <target state="translated"/>
       </trans-unit>
@@ -7379,7 +7379,7 @@
         <source>Error executing split operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1274</context>
+          <context context-type="linenumber">1277</context>
         </context-group>
         <target state="translated"/>
       </trans-unit>
@@ -7387,7 +7387,7 @@
         <source>Rotate confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1287</context>
+          <context context-type="linenumber">1290</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7399,7 +7399,7 @@
         <source>This operation will permanently rotate the original version of the current document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1288</context>
+          <context context-type="linenumber">1291</context>
         </context-group>
         <target state="translated"/>
       </trans-unit>
@@ -7407,7 +7407,7 @@
         <source>Rotation will begin in the background. Close and re-open the document after the operation has completed to see the changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1304</context>
+          <context context-type="linenumber">1307</context>
         </context-group>
         <target state="translated"/>
       </trans-unit>
@@ -7415,7 +7415,7 @@
         <source>Error executing rotate operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1316</context>
+          <context context-type="linenumber">1319</context>
         </context-group>
         <target state="translated">执行旋转操作时发生错误</target>
       </trans-unit>
@@ -7423,7 +7423,7 @@
         <source>Delete pages confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1328</context>
+          <context context-type="linenumber">1331</context>
         </context-group>
         <target state="translated"/>
       </trans-unit>
@@ -7431,7 +7431,7 @@
         <source>This operation will permanently delete the selected pages from the original document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1329</context>
+          <context context-type="linenumber">1332</context>
         </context-group>
         <target state="translated"/>
       </trans-unit>
@@ -7439,7 +7439,7 @@
         <source>Delete pages operation will begin in the background. Close and re-open or reload this document after the operation has completed to see the changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1344</context>
+          <context context-type="linenumber">1347</context>
         </context-group>
         <target state="translated"/>
       </trans-unit>
@@ -7447,7 +7447,7 @@
         <source>Error executing delete pages operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1353</context>
+          <context context-type="linenumber">1356</context>
         </context-group>
         <target state="translated">执行删除页面操作时发生错误</target>
       </trans-unit>
@@ -7455,11 +7455,11 @@
         <source>An error occurred loading tiff: <x id="PH" equiv-text="err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1393</context>
+          <context context-type="linenumber">1396</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1397</context>
+          <context context-type="linenumber">1400</context>
         </context-group>
         <target state="translated">加载内容时发生错误： <x id="PH" equiv-text="err.toString()"/></target>
       </trans-unit>
@@ -8079,7 +8079,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">302</context>
+          <context context-type="linenumber">304</context>
         </context-group>
         <target state="translated">选择页面</target>
       </trans-unit>
@@ -8091,7 +8091,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">295</context>
+          <context context-type="linenumber">297</context>
         </context-group>
         <target state="translated">全选</target>
       </trans-unit>
@@ -8379,7 +8379,7 @@
         <source>Reset filters / selection</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">283</context>
+          <context context-type="linenumber">285</context>
         </context-group>
         <target state="translated">重置筛选 / 选择</target>
       </trans-unit>
@@ -8387,7 +8387,7 @@
         <source>Open first [selected] document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">311</context>
+          <context context-type="linenumber">313</context>
         </context-group>
         <target state="translated">打开第一个 [已选中] 文档</target>
       </trans-unit>
@@ -8395,7 +8395,7 @@
         <source>Previous page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">327</context>
+          <context context-type="linenumber">329</context>
         </context-group>
         <target state="translated">上一頁</target>
       </trans-unit>
@@ -8403,7 +8403,7 @@
         <source>Next page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">339</context>
+          <context context-type="linenumber">341</context>
         </context-group>
         <target state="translated">下一頁</target>
       </trans-unit>
@@ -8411,7 +8411,7 @@
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">371</context>
+          <context context-type="linenumber">373</context>
         </context-group>
         <target state="translated">视图<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>保存成功。</target>
       </trans-unit>
@@ -8419,7 +8419,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">414</context>
+          <context context-type="linenumber">416</context>
         </context-group>
         <target state="translated">视图：<x id="PH" equiv-text="savedView.name"/>创建成功。</target>
       </trans-unit>

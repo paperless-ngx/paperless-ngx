@@ -718,11 +718,17 @@ class ConsumerPlugin(
                     f"Error occurred parsing title override '{self.metadata.title}', falling back to original. Exception: {e}",
                 )
 
+        file_for_checksum = (
+            self.unmodified_original
+            if self.unmodified_original is not None
+            else self.working_copy
+        )
+
         document = Document.objects.create(
             title=title[:127],
             content=text,
             mime_type=mime_type,
-            checksum=hashlib.md5(self.working_copy.read_bytes()).hexdigest(),
+            checksum=hashlib.md5(file_for_checksum.read_bytes()).hexdigest(),
             created=create_date,
             modified=create_date,
             storage_type=storage_type,
