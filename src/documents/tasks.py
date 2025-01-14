@@ -283,7 +283,7 @@ def update_document_archive_file(document_id=None):
     mime_type = document.mime_type
 
     parser_class: type[DocumentParser] = custom_get_parser_class_for_mime_type(
-        mime_type
+        mime_type,
     )
 
     if not parser_class:
@@ -316,7 +316,9 @@ def update_document_archive_file(document_id=None):
                 )
             else:
                 parser.parse(
-                    document.source_path, mime_type, document.get_public_filename()
+                    document.source_path,
+                    mime_type,
+                    document.get_public_filename(),
                 )
         # parser.parse(document.source_path, mime_type, document.get_public_filename())
 
@@ -399,7 +401,7 @@ def update_document_field(document_id):
     mime_type = document.mime_type
 
     parser_class: type[DocumentParser] = custom_get_parser_class_for_mime_type(
-        mime_type
+        mime_type,
     )
 
     if not parser_class:
@@ -413,7 +415,9 @@ def update_document_field(document_id):
 
     try:
         data_ocr_fields = parser.parse(
-            document.source_path, mime_type, document.get_public_filename()
+            document.source_path,
+            mime_type,
+            document.get_public_filename(),
         )
 
         if parser.get_archive_path():
@@ -449,7 +453,8 @@ def update_document_field(document_id):
                             for f in fields:
                                 f.value_text = map_fields.get(f.field.name, None)
                             CustomFieldInstance.objects.bulk_update(
-                                fields, ["value_text"]
+                                fields,
+                                ["value_text"],
                             )
                 except Exception:
                     logger.exception(
@@ -610,7 +615,9 @@ def restore_model(file_path, cls, compare_field):
                 f.path = path
                 f.parent_folder_id = None
             cls.global_objects.bulk_update(
-                sub_folder, ["parent_folder", "path"], batch_size=1000
+                sub_folder,
+                ["parent_folder", "path"],
+                batch_size=1000,
             )
 
         obj_deleted = cls.global_objects.filter(id__in=obj_del)
@@ -629,19 +636,26 @@ def restore_documents(backup_record: BackupRecord):
     try:
         with transaction.atomic():
             file_document_backup = os.path.join(
-                backup_root_dir, "documents_backup.json"
+                backup_root_dir,
+                "documents_backup.json",
             )
             file_folder_backup = os.path.join(backup_root_dir, "folders_backup.json")
             file_dossier_backup = os.path.join(backup_root_dir, "dossiers_backup.json")
 
             obj_restore_document = restore_model(
-                file_path=file_document_backup, cls=Document, compare_field="checksum"
+                file_path=file_document_backup,
+                cls=Document,
+                compare_field="checksum",
             )
             obj_restore_folder = restore_model(
-                file_path=file_folder_backup, cls=Folder, compare_field="checksum"
+                file_path=file_folder_backup,
+                cls=Folder,
+                compare_field="checksum",
             )
             obj_restore_dossier = restore_model(
-                file_path=file_dossier_backup, cls=Dossier, compare_field="id"
+                file_path=file_dossier_backup,
+                cls=Dossier,
+                compare_field="id",
             )
 
             Folder.objects.bulk_create(objs=obj_restore_folder, batch_size=1000)
@@ -712,8 +726,22 @@ def restore_documents(backup_record: BackupRecord):
         backup_record.save()
 
 
+def get_name_thumbnail(document: Document):
+    webp_file_name = f"{document.pk:07}.webp"
+    if document.storage_type == document.STORAGE_TYPE_GPG:
+        webp_file_name += ".gpg"
+    return webp_file_name
+
+
 @shared_task()
-def backup_documents(backup: BackupRecord, documents, folders, dossiers, name):
+def backup_documents(
+    backup: BackupRecord,
+    documents,
+    documents_deleted,
+    folders,
+    dossiers,
+    name,
+):
     # Lưu thông tin vào BackupRecord
     backup_dir = settings.BACKUP_DIR
     os.makedirs(backup_dir, exist_ok=True)
@@ -726,17 +754,54 @@ def backup_documents(backup: BackupRecord, documents, folders, dossiers, name):
     archive_dir = os.path.join(backup_root_dir, "archive")
     originals_dir = os.path.join(backup_root_dir, "originals")
     thumbnails_dir = os.path.join(backup_root_dir, "thumbnails")
+    # lấy danh sách file cần xóa
+    path_file_originals_inore = []
+    path_file_archive_inore = []
+    path_file_thumbnails_inore = []
+    for document in documents_deleted:
+        document: Document
+        path_file_originals_inore.append(document.filename)
+        path_file_archive_inore.append(document.archive_filename)
+        path_file_thumbnails_inore.append(get_name_thumbnail(document))
+
     try:
         os.makedirs(archive_dir, exist_ok=True)
         os.makedirs(originals_dir, exist_ok=True)
         os.makedirs(thumbnails_dir, exist_ok=True)
 
         if os.path.exists(settings.ORIGINALS_DIR):
-            shutil.copytree(settings.ORIGINALS_DIR, originals_dir, dirs_exist_ok=True)
+            shutil.copytree(
+                src=settings.ORIGINALS_DIR,
+                dst=originals_dir,
+                dirs_exist_ok=True,
+            )
+        # remove file in trash
+        for filename in path_file_originals_inore:
+            file_path = os.path.join(originals_dir, filename)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+
         if os.path.exists(settings.ORIGINALS_DIR):
-            shutil.copytree(settings.ARCHIVE_DIR, archive_dir, dirs_exist_ok=True)
+            shutil.copytree(
+                src=settings.ARCHIVE_DIR,
+                dst=archive_dir,
+                dirs_exist_ok=True,
+            )
+        for filename in path_file_originals_inore:
+            file_path = os.path.join(archive_dir, filename)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+
         if os.path.exists(settings.THUMBNAIL_DIR):
-            shutil.copytree(settings.THUMBNAIL_DIR, thumbnails_dir, dirs_exist_ok=True)
+            shutil.copytree(
+                src=settings.THUMBNAIL_DIR,
+                dst=thumbnails_dir,
+                dirs_exist_ok=True,
+            )
+        for filename in path_file_thumbnails_inore:
+            file_path = os.path.join(thumbnails_dir, filename)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
 
         # Xuất dữ liệu thành JSON
         with open(backup_document_file_path, "w") as backup_document_file:
