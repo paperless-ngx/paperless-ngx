@@ -943,7 +943,10 @@ def run_workflows(
                 to=action.email.to.split(","),
             )
             if action.email.include_document:
-                email.attach_file(document.source_path)
+                # Something could be renaming the file concurrently so it can't be attached
+                with FileLock(settings.MEDIA_LOCK):
+                    document.refresh_from_db()
+                    email.attach_file(document.source_path)
             n_messages = email.send()
             logger.debug(
                 f"Sent {n_messages} notification email(s) to {action.email.to}",
