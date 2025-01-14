@@ -733,7 +733,7 @@ def get_name_thumbnail(document: Document):
     return webp_file_name
 
 
-@shared_task()
+@shared_task(time_limit=3600)
 def backup_documents(
     backup: BackupRecord,
     documents,
