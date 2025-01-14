@@ -110,6 +110,12 @@ export class WorkflowsComponent
     clone.actions = [
       ...workflow.actions.map((a) => {
         a.id = null
+        if (a.webhook) {
+          a.webhook.id = null
+        }
+        if (a.email) {
+          a.email.id = null
+        }
         return a
       }),
     ]

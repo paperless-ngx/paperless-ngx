@@ -186,6 +186,57 @@ describe('WorkflowsComponent', () => {
     expect(editDialog.dialogMode).toEqual(EditDialogMode.CREATE)
   })
 
+  it('should null ids on copy', () => {
+    const workflow = {
+      id: 1,
+      name: 'Workflow 1',
+      order: 1,
+      enabled: true,
+      triggers: [
+        {
+          id: 1,
+          type: WorkflowTriggerType.Consumption,
+          sources: [DocumentSource.ConsumeFolder],
+          filter_filename: '*',
+        },
+      ],
+      actions: [
+        {
+          id: 1,
+          type: WorkflowActionType.Email,
+          email: {
+            id: 1,
+            subject: 'foo',
+            body: 'bar',
+            to: 'baz',
+            include_document: true,
+          },
+        },
+        {
+          id: 2,
+          type: WorkflowActionType.Webhook,
+          webhook: {
+            id: 2,
+            url: 'foo',
+            use_params: false,
+            params: {},
+            body: 'bar',
+            headers: {},
+            include_document: true,
+          },
+        },
+      ],
+    }
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
+    component.copyWorkflow(workflow)
+    expect(modal).not.toBeUndefined()
+    const editDialog = modal.componentInstance as WorkflowEditDialogComponent
+    expect(editDialog.object.id).toBeNull()
+    expect(editDialog.object.triggers[0].id).toBeNull()
+    expect(editDialog.object.actions[0].id).toBeNull()
+  })
+
   it('should support delete, show notification on error / success', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
