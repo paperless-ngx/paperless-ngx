@@ -2,6 +2,13 @@
 
 ## paperless-ngx 2.14.1
 
+### Bug Fixes
+
+- Fix: prevent error if bulk edit method not in MODIFIED\_FIELD\_BY\_METHOD @shamoon ([#8710](https://github.com/paperless-ngx/paperless-ngx/pull/8710))
+- Fix: include tag component in list view @shamoon ([#8706](https://github.com/paperless-ngx/paperless-ngx/pull/8706))
+- Fix: use unmodified original for checksum if exists @shamoon ([#8693](https://github.com/paperless-ngx/paperless-ngx/pull/8693))
+- Fix: complete load with native PDF viewer @shamoon ([#8699](https://github.com/paperless-ngx/paperless-ngx/pull/8699))
+
 ### All App Changes
 
 <details>
