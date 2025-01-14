@@ -17,7 +17,7 @@
           <context context-type="linenumber">132,136</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="needs-translation"> Slide <x id="INTERPOLATION" equiv-text="ueryList&lt;NgbSli"/> of <x id="INTERPOLATION_1" equiv-text="EventSource = N"/> </target>
+        <target state="translated"> Teil <x id="INTERPOLATION" equiv-text="ueryList&lt;NgbSli"/> von <x id="INTERPOLATION_1" equiv-text="EventSource = N"/> </target>
       </trans-unit>
       <trans-unit id="ngb.carousel.previous" datatype="html" approved="yes">
         <source>Previous</source>
@@ -268,7 +268,7 @@
           <context context-type="sourcefile">node_modules/src/progressbar/progressbar.ts</context>
           <context context-type="linenumber">41,42</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="barConfig);  pu"/></target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="barConfig);  pu"/></target>
       </trans-unit>
       <trans-unit id="3527354815023530656" datatype="html" approved="yes">
         <source>Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</source>
@@ -362,7 +362,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">185</context>
+          <context context-type="linenumber">187</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.html</context>
@@ -444,7 +444,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">176</context>
         </context-group>
-        <target state="translated">Die Startseite kann verwendet werden, um gespeicherte Ansichten (z. B. einen „Posteingang“) anzuzeigen. Ansichten befinden sich unter Verwaltung &gt; Gespeicherte Ansichten, nachdem sie erstellt wurden.</target>
+        <target state="translated">Die Startseite kann verwendet werden um gespeicherte Ansichten, wie 'Posteingang', anzuzeigen. Ansichten befinden sich unter Verwaltung &gt; Gespeicherte Ansichten, nachdem sie erstellt wurden.</target>
       </trans-unit>
       <trans-unit id="9075755296812854717" datatype="html" approved="yes">
         <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
@@ -2414,7 +2414,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">919</context>
+          <context context-type="linenumber">922</context>
         </context-group>
         <target state="final">Fehler beim Löschen des Dokuments</target>
       </trans-unit>
@@ -2714,19 +2714,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">943</context>
+          <context context-type="linenumber">946</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1250</context>
+          <context context-type="linenumber">1253</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1289</context>
+          <context context-type="linenumber">1292</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1330</context>
+          <context context-type="linenumber">1333</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3378,7 +3378,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">896</context>
+          <context context-type="linenumber">899</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -5232,7 +5232,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">341</context>
         </context-group>
-        <target state="translated">Parameter für Webhook-Inhaltverwenden</target>
+        <target state="translated">Parameter für Webhook-Inhalt verwenden</target>
       </trans-unit>
       <trans-unit id="6806149889743731985" datatype="html">
         <source>Webhook params</source>
@@ -6831,7 +6831,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1307</context>
+          <context context-type="linenumber">1310</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
@@ -7231,7 +7231,7 @@
         <source>Error retrieving metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">630</context>
+          <context context-type="linenumber">633</context>
         </context-group>
         <target state="final">Fehler beim Abrufen der Metadaten</target>
       </trans-unit>
@@ -7239,7 +7239,7 @@
         <source>Error retrieving suggestions.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">659</context>
+          <context context-type="linenumber">662</context>
         </context-group>
         <target state="final">Fehler beim Abrufen der Vorschläge.</target>
       </trans-unit>
@@ -7247,11 +7247,11 @@
         <source>Document saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">810</context>
+          <context context-type="linenumber">813</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">824</context>
+          <context context-type="linenumber">827</context>
         </context-group>
         <target state="final">Dokument erfolgreich gespeichert.</target>
       </trans-unit>
@@ -7259,11 +7259,11 @@
         <source>Error saving document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">828</context>
+          <context context-type="linenumber">831</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">869</context>
+          <context context-type="linenumber">872</context>
         </context-group>
         <target state="final">Fehler beim Speichern des Dokuments</target>
       </trans-unit>
@@ -7271,7 +7271,7 @@
         <source>Do you really want to move the document &quot;<x id="PH" equiv-text="this.document.title"/>&quot; to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">897</context>
+          <context context-type="linenumber">900</context>
         </context-group>
         <target state="final">Möchten Sie das Dokument „<x id="PH" equiv-text="this.document.title"/>“ wirklich in den Papierkorb verschieben?</target>
       </trans-unit>
@@ -7279,7 +7279,7 @@
         <source>Documents can be restored prior to permanent deletion.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">898</context>
+          <context context-type="linenumber">901</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7291,7 +7291,7 @@
         <source>Move to trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">900</context>
+          <context context-type="linenumber">903</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7303,7 +7303,7 @@
         <source>Reprocess confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">939</context>
+          <context context-type="linenumber">942</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7315,7 +7315,7 @@
         <source>This operation will permanently recreate the archive file for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">940</context>
+          <context context-type="linenumber">943</context>
         </context-group>
         <target state="final">Dieser Vorgang wird die Archivdatei dieses Dokuments unwiderruflich neu erstellen.</target>
       </trans-unit>
@@ -7323,7 +7323,7 @@
         <source>The archive file will be re-generated with the current settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">941</context>
+          <context context-type="linenumber">944</context>
         </context-group>
         <target state="final">Die Archivdatei wird mit den aktuellen Einstellungen neu generiert.</target>
       </trans-unit>
@@ -7331,7 +7331,7 @@
         <source>Reprocess operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">951</context>
+          <context context-type="linenumber">954</context>
         </context-group>
         <target state="final">Die erneute Verarbeitung wird im Hintergrund gestartet. Schließen und öffnen Sie dieses Dokument nach Abschluss des Vorgangs erneut oder laden Sie es neu, um neue Inhalte anzuzeigen.</target>
       </trans-unit>
@@ -7339,7 +7339,7 @@
         <source>Error executing operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">962</context>
+          <context context-type="linenumber">965</context>
         </context-group>
         <target state="final">Fehler beim Ausführen der Aktion</target>
       </trans-unit>
@@ -7347,7 +7347,7 @@
         <source>Page Fit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1035</context>
+          <context context-type="linenumber">1038</context>
         </context-group>
         <target state="final">Seite einpassen</target>
       </trans-unit>
@@ -7355,7 +7355,7 @@
         <source>Split confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1248</context>
+          <context context-type="linenumber">1251</context>
         </context-group>
         <target state="final">Teilung bestätigen</target>
       </trans-unit>
@@ -7363,7 +7363,7 @@
         <source>This operation will split the selected document(s) into new documents.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1249</context>
+          <context context-type="linenumber">1252</context>
         </context-group>
         <target state="final">Dieser Vorgang wird ausgewählte Dokumente in neue Dokumente aufteilen.</target>
       </trans-unit>
@@ -7371,7 +7371,7 @@
         <source>Split operation will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1265</context>
+          <context context-type="linenumber">1268</context>
         </context-group>
         <target state="final">Teilungsvorgang wird im Hintergrund gestartet.</target>
       </trans-unit>
@@ -7379,7 +7379,7 @@
         <source>Error executing split operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1274</context>
+          <context context-type="linenumber">1277</context>
         </context-group>
         <target state="final">Fehler beim Ausführen des Teilungsvorgangs</target>
       </trans-unit>
@@ -7387,7 +7387,7 @@
         <source>Rotate confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1287</context>
+          <context context-type="linenumber">1290</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7399,7 +7399,7 @@
         <source>This operation will permanently rotate the original version of the current document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1288</context>
+          <context context-type="linenumber">1291</context>
         </context-group>
         <target state="final">Dieser Vorgang wird die Originalversion des aktuellen Dokuments unwiderruflich rotieren.</target>
       </trans-unit>
@@ -7407,7 +7407,7 @@
         <source>Rotation will begin in the background. Close and re-open the document after the operation has completed to see the changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1304</context>
+          <context context-type="linenumber">1307</context>
         </context-group>
         <target state="final">Der Rotationsvorgang wird im Hintergrund gestartet. Schließen und öffnen Sie das Dokument nach Abschluss des Vorgangs erneut, um die Änderungen zu sehen.</target>
       </trans-unit>
@@ -7415,7 +7415,7 @@
         <source>Error executing rotate operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1316</context>
+          <context context-type="linenumber">1319</context>
         </context-group>
         <target state="final">Fehler beim Ausführen des Rotationsvorgangs</target>
       </trans-unit>
@@ -7423,7 +7423,7 @@
         <source>Delete pages confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1328</context>
+          <context context-type="linenumber">1331</context>
         </context-group>
         <target state="final">Seiten löschen bestätigen</target>
       </trans-unit>
@@ -7431,7 +7431,7 @@
         <source>This operation will permanently delete the selected pages from the original document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1329</context>
+          <context context-type="linenumber">1332</context>
         </context-group>
         <target state="final">Dieser Vorgang wird die ausgewählten Seiten unwiderruflich aus dem Originaldokument löschen.</target>
       </trans-unit>
@@ -7439,7 +7439,7 @@
         <source>Delete pages operation will begin in the background. Close and re-open or reload this document after the operation has completed to see the changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1344</context>
+          <context context-type="linenumber">1347</context>
         </context-group>
         <target state="final">Der Vorgang „Seiten löschen“ wird im Hintergrund ausgeführt. Schließen und öffnen Sie dieses Dokument nach Abschluss der Operation erneut oder laden Sie es neu, um neue Inhalte anzuzeigen.</target>
       </trans-unit>
@@ -7447,7 +7447,7 @@
         <source>Error executing delete pages operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1353</context>
+          <context context-type="linenumber">1356</context>
         </context-group>
         <target state="final">Fehler beim Ausführen des Vorgangs „Seiten löschen“</target>
       </trans-unit>
@@ -7455,11 +7455,11 @@
         <source>An error occurred loading tiff: <x id="PH" equiv-text="err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1393</context>
+          <context context-type="linenumber">1396</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1397</context>
+          <context context-type="linenumber">1400</context>
         </context-group>
         <target state="translated">Fehler beim Laden des tiff: <x id="PH" equiv-text="err.toString()"/></target>
       </trans-unit>
@@ -7875,7 +7875,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">882</context>
         </context-group>
-        <target state="needs-translation">Custom fields updated.</target>
+        <target state="translated">Benutzerdefinierte Felder aktualisiert.</target>
       </trans-unit>
       <trans-unit id="3873496751167944011" datatype="html">
         <source>Error updating custom fields.</source>
@@ -7883,7 +7883,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">891</context>
         </context-group>
-        <target state="needs-translation">Error updating custom fields.</target>
+        <target state="translated">Fehler beim Aktualisieren der benutzerdefinierten Felder.</target>
       </trans-unit>
       <trans-unit id="6307402210351946694" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {Set custom fields for 1 document} other {Set custom fields for <x id="INTERPOLATION"/> documents}}</source>
@@ -7891,7 +7891,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component.html</context>
           <context context-type="linenumber">3,7</context>
         </context-group>
-        <target state="translated">{VAR_PLURAL, plural, =1 {Setze Benutzerdefinierte Felder für 1 Dokument} other {Setze Benutzerdefinierte Felder für <x id="INTERPOLATION"/> Dokumente}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {Setze benutzerdefinierte Felder für 1 Dokument} other {Setze benutzerdefinierte Felder für <x id="INTERPOLATION"/> Dokumente}}</target>
       </trans-unit>
       <trans-unit id="8100177157764133131" datatype="html">
         <source>Select custom fields</source>
@@ -8078,7 +8078,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">302</context>
+          <context context-type="linenumber">304</context>
         </context-group>
         <target state="final">Seite auswählen</target>
       </trans-unit>
@@ -8090,7 +8090,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">295</context>
+          <context context-type="linenumber">297</context>
         </context-group>
         <target state="final">Alles auswählen</target>
       </trans-unit>
@@ -8378,7 +8378,7 @@
         <source>Reset filters / selection</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">283</context>
+          <context context-type="linenumber">285</context>
         </context-group>
         <target state="final">Filter / Auswahl zurücksetzen</target>
       </trans-unit>
@@ -8386,7 +8386,7 @@
         <source>Open first [selected] document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">311</context>
+          <context context-type="linenumber">313</context>
         </context-group>
         <target state="final">Erstes [ausgewähltes] Dokument öffnen</target>
       </trans-unit>
@@ -8394,7 +8394,7 @@
         <source>Previous page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">327</context>
+          <context context-type="linenumber">329</context>
         </context-group>
         <target state="final">Vorherige Seite</target>
       </trans-unit>
@@ -8402,7 +8402,7 @@
         <source>Next page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">339</context>
+          <context context-type="linenumber">341</context>
         </context-group>
         <target state="final">Nächste Seite</target>
       </trans-unit>
@@ -8410,7 +8410,7 @@
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">371</context>
+          <context context-type="linenumber">373</context>
         </context-group>
         <target state="final">Ansicht „<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>“ erfolgreich gespeichert.</target>
       </trans-unit>
@@ -8418,7 +8418,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">414</context>
+          <context context-type="linenumber">416</context>
         </context-group>
         <target state="final">Ansicht „<x id="PH" equiv-text="savedView.name"/>“ erfolgreich erstellt.</target>
       </trans-unit>
