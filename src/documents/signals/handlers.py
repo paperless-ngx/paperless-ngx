@@ -1,6 +1,7 @@
 import logging
 import os
 import shutil
+from pathlib import Path
 
 import httpx
 from celery import shared_task
@@ -539,11 +540,19 @@ def add_to_index(sender, document, **kwargs):
     index.add_or_update_document(document)
 
 
-def run_workflows_added(sender, document: Document, logging_group=None, **kwargs):
+def run_workflows_added(
+    sender,
+    document: Document,
+    logging_group=None,
+    original_file=None,
+    **kwargs,
+):
     run_workflows(
-        WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
-        document,
-        logging_group,
+        trigger_type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        document=document,
+        logging_group=logging_group,
+        overrides=None,
+        original_file=original_file,
     )
 
 
@@ -584,6 +593,7 @@ def run_workflows(
     document: Document | ConsumableDocument,
     logging_group=None,
     overrides: DocumentMetadataOverrides | None = None,
+    original_file: Path | None = None,
 ) -> tuple[DocumentMetadataOverrides, str] | None:
     """Run workflows which match a Document (or ConsumableDocument) for a specific trigger type.
 
@@ -946,7 +956,11 @@ def run_workflows(
                 # Something could be renaming the file concurrently so it can't be attached
                 with FileLock(settings.MEDIA_LOCK):
                     document.refresh_from_db()
-                    email.attach_file(document.source_path)
+                    email.attach_file(
+                        original_file
+                        if original_file is not None
+                        else document.source_path,
+                    )
             n_messages = email.send()
             logger.debug(
                 f"Sent {n_messages} notification email(s) to {action.email.to}",
@@ -1023,9 +1037,18 @@ def run_workflows(
                     )
             files = None
             if action.webhook.include_document:
-                with open(document.source_path, "rb") as f:
+                with open(
+                    original_file
+                    if original_file is not None
+                    else document.source_path,
+                    "rb",
+                ) as f:
                     files = {
-                        "file": (document.original_filename, f, document.mime_type),
+                        "file": (
+                            document.original_filename,
+                            f.read(),
+                            document.mime_type,
+                        ),
                     }
             send_webhook.delay(
                 url=action.webhook.url,
