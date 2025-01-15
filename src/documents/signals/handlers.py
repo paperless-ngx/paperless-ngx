@@ -1044,7 +1044,11 @@ def run_workflows(
                     "rb",
                 ) as f:
                     files = {
-                        "file": (document.original_filename, f, document.mime_type),
+                        "file": (
+                            document.original_filename,
+                            f.read(),
+                            document.mime_type,
+                        ),
                     }
             send_webhook.delay(
                 url=action.webhook.url,
