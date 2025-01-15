@@ -561,9 +561,9 @@ def run_workflows_added(
 
 def run_workflows_updated(sender, document: Document, logging_group=None, **kwargs):
     run_workflows(
-        WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
-        document,
-        logging_group,
+        trigger_type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        document=document,
+        logging_group=logging_group,
     )
 
 
