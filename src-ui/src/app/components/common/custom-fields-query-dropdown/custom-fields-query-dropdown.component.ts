@@ -9,7 +9,11 @@ import {
   ViewChildren,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
+import {
+  NgbDatepickerModule,
+  NgbDropdown,
+  NgbDropdownModule,
+} from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first, Subject, takeUntil } from 'rxjs'
@@ -164,6 +168,7 @@ export class CustomFieldQueriesModel {
     ClearableBadgeComponent,
     FormsModule,
     ReactiveFormsModule,
+    NgbDatepickerModule,
     NgTemplateOutlet,
     NgSelectModule,
     NgxBootstrapIconsModule,
