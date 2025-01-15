@@ -11,6 +11,7 @@ from celery.signals import task_failure
 from celery.signals import task_postrun
 from celery.signals import task_prerun
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from django.db import DatabaseError
 from django.db import close_old_connections
@@ -29,9 +30,11 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_unique_filename
+from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
+from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import PaperlessTask
 from documents.models import Tag
@@ -907,21 +910,43 @@ def run_workflows(
             )
             return
 
-        title = (
-            document.title
-            if isinstance(document, Document)
-            else str(document.original_file)
-        )
-        doc_url = None
-        if isinstance(document, Document):
+        if not use_overrides:
+            title = document.title
             doc_url = f"{settings.PAPERLESS_URL}/documents/{document.pk}/"
-        correspondent = document.correspondent.name if document.correspondent else ""
-        document_type = document.document_type.name if document.document_type else ""
-        owner_username = document.owner.username if document.owner else ""
-        filename = document.original_filename or ""
-        current_filename = document.filename or ""
-        added = timezone.localtime(document.added)
-        created = timezone.localtime(document.created)
+            correspondent = (
+                document.correspondent.name if document.correspondent else ""
+            )
+            document_type = (
+                document.document_type.name if document.document_type else ""
+            )
+            owner_username = document.owner.username if document.owner else ""
+            filename = document.original_filename or ""
+            current_filename = document.filename or ""
+            added = timezone.localtime(document.added)
+            created = timezone.localtime(document.created)
+        else:
+            title = overrides.title if overrides.title else str(document.original_file)
+            doc_url = ""
+            correspondent = (
+                Correspondent.objects.filter(pk=overrides.correspondent_id).first()
+                if overrides.correspondent_id
+                else ""
+            )
+            document_type = (
+                DocumentType.objects.filter(pk=overrides.document_type_id).first().name
+                if overrides.document_type_id
+                else ""
+            )
+            owner_username = (
+                User.objects.filter(pk=overrides.owner_id).first().username
+                if overrides.owner_id
+                else ""
+            )
+            filename = document.original_file if document.original_file else ""
+            current_filename = filename
+            added = timezone.localtime(timezone.now())
+            created = timezone.localtime(overrides.created)
+
         subject = parse_w_workflow_placeholders(
             action.email.subject,
             correspondent,
@@ -973,21 +998,42 @@ def run_workflows(
             )
 
     def webhook_action():
-        title = (
-            document.title
-            if isinstance(document, Document)
-            else str(document.original_file)
-        )
-        doc_url = None
-        if isinstance(document, Document):
+        if not use_overrides:
+            title = document.title
             doc_url = f"{settings.PAPERLESS_URL}/documents/{document.pk}/"
-        correspondent = document.correspondent.name if document.correspondent else ""
-        document_type = document.document_type.name if document.document_type else ""
-        owner_username = document.owner.username if document.owner else ""
-        filename = document.original_filename or ""
-        current_filename = document.filename or ""
-        added = timezone.localtime(document.added)
-        created = timezone.localtime(document.created)
+            correspondent = (
+                document.correspondent.name if document.correspondent else ""
+            )
+            document_type = (
+                document.document_type.name if document.document_type else ""
+            )
+            owner_username = document.owner.username if document.owner else ""
+            filename = document.original_filename or ""
+            current_filename = document.filename or ""
+            added = timezone.localtime(document.added)
+            created = timezone.localtime(document.created)
+        else:
+            title = overrides.title if overrides.title else str(document.original_file)
+            doc_url = ""
+            correspondent = (
+                Correspondent.objects.filter(pk=overrides.correspondent_id).first()
+                if overrides.correspondent_id
+                else ""
+            )
+            document_type = (
+                DocumentType.objects.filter(pk=overrides.document_type_id).first().name
+                if overrides.document_type_id
+                else ""
+            )
+            owner_username = (
+                User.objects.filter(pk=overrides.owner_id).first().username
+                if overrides.owner_id
+                else ""
+            )
+            filename = document.original_file if document.original_file else ""
+            current_filename = filename
+            added = timezone.localtime(timezone.now())
+            created = timezone.localtime(overrides.created)
 
         try:
             data = {}

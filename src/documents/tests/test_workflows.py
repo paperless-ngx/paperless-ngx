@@ -2296,6 +2296,64 @@ class TestWorkflows(
         EMAIL_ENABLED=True,
         PAPERLESS_URL="http://localhost:8000",
     )
+    @mock.patch("httpx.post")
+    @mock.patch("django.core.mail.message.EmailMessage.send")
+    def test_workflow_email_consumption_started(self, mock_email_send, mock_post):
+        """
+        GIVEN:
+            - Workflow with email action and consumption trigger
+        WHEN:
+            - Document is consumed
+        THEN:
+            - Email is sent
+        """
+        mock_post.return_value = mock.Mock(
+            status_code=200,
+            json=mock.Mock(return_value={"status": "ok"}),
+        )
+        mock_email_send.return_value = 1
+
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+        )
+        email_action = WorkflowActionEmail.objects.create(
+            subject="Test Notification: {doc_title}",
+            body="Test message: {doc_url}",
+            to="user@example.com",
+            include_document=False,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.EMAIL,
+            email=email_action,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
+
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
+            with self.assertLogs("paperless.matching", level="INFO"):
+                tasks.consume_file(
+                    ConsumableDocument(
+                        source=DocumentSource.ConsumeFolder,
+                        original_file=test_file,
+                    ),
+                    None,
+                )
+
+        mock_email_send.assert_called_once()
+
+    @override_settings(
+        PAPERLESS_URL="http://localhost:8000",
+    )
     @mock.patch("documents.signals.handlers.send_webhook.delay")
     def test_workflow_webhook_action_body(self, mock_post):
         """
@@ -2352,8 +2410,6 @@ class TestWorkflows(
         )
 
     @override_settings(
-        PAPERLESS_EMAIL_HOST="localhost",
-        EMAIL_ENABLED=True,
         PAPERLESS_URL="http://localhost:8000",
     )
     @mock.patch("documents.signals.handlers.send_webhook.delay")
@@ -2415,8 +2471,6 @@ class TestWorkflows(
         )
 
     @override_settings(
-        PAPERLESS_EMAIL_HOST="localhost",
-        EMAIL_ENABLED=True,
         PAPERLESS_URL="http://localhost:8000",
     )
     def test_workflow_webhook_action_fail(self):
@@ -2562,3 +2616,56 @@ class TestWorkflows(
                     "Failed attempt sending webhook to http://paperless-ngx.com"
                 )
                 self.assertIn(expected_str, cm.output[0])
+
+    @mock.patch("documents.signals.handlers.send_webhook.delay")
+    def test_workflow_webhook_action_consumption(self, mock_post):
+        """
+        GIVEN:
+            - Workflow with webhook action and consumption trigger
+        WHEN:
+            - Document is consumed
+        THEN:
+            - Webhook is sent
+        """
+        mock_post.return_value = mock.Mock(
+            status_code=200,
+            json=mock.Mock(return_value={"status": "ok"}),
+        )
+
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+        )
+        webhook_action = WorkflowActionWebhook.objects.create(
+            use_params=False,
+            body="Test message: {doc_url}",
+            url="http://paperless-ngx.com",
+            include_document=False,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.WEBHOOK,
+            webhook=webhook_action,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
+
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
+            with self.assertLogs("paperless.matching", level="INFO"):
+                tasks.consume_file(
+                    ConsumableDocument(
+                        source=DocumentSource.ConsumeFolder,
+                        original_file=test_file,
+                    ),
+                    None,
+                )
+
+        mock_post.assert_called_once()
