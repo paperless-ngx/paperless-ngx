@@ -17,7 +17,7 @@
           <context context-type="linenumber">132,136</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="needs-translation"> Slide <x id="INTERPOLATION" equiv-text="ueryList&lt;NgbSli"/> of <x id="INTERPOLATION_1" equiv-text="EventSource = N"/> </target>
+        <target state="translated"> スライド <x id="INTERPOLATION" equiv-text="ueryList&lt;NgbSli"/> / <x id="INTERPOLATION_1" equiv-text="EventSource = N"/> </target>
       </trans-unit>
       <trans-unit id="ngb.carousel.previous" datatype="html">
         <source>Previous</source>
@@ -268,7 +268,7 @@
           <context context-type="sourcefile">node_modules/src/progressbar/progressbar.ts</context>
           <context context-type="linenumber">41,42</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="barConfig);  pu"/></target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="barConfig);  pu"/></target>
       </trans-unit>
       <trans-unit id="3527354815023530656" datatype="html">
         <source>Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</source>
@@ -2394,7 +2394,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
-          <context context-type="linenumber">131</context>
+          <context context-type="linenumber">137</context>
         </context-group>
         <target state="translated">この操作は取り消すことができません。</target>
       </trans-unit>
@@ -2758,7 +2758,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
-          <context context-type="linenumber">133</context>
+          <context context-type="linenumber">139</context>
         </context-group>
         <target state="translated">続行</target>
       </trans-unit>
@@ -7875,7 +7875,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">882</context>
         </context-group>
-        <target state="needs-translation">Custom fields updated.</target>
+        <target state="translated">カスタムフィールドを更新しました。</target>
       </trans-unit>
       <trans-unit id="3873496751167944011" datatype="html">
         <source>Error updating custom fields.</source>
@@ -7883,7 +7883,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">891</context>
         </context-group>
-        <target state="needs-translation">Error updating custom fields.</target>
+        <target state="translated">カスタムフィールドの更新中にエラーが発生しました。</target>
       </trans-unit>
       <trans-unit id="6307402210351946694" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {Set custom fields for 1 document} other {Set custom fields for <x id="INTERPOLATION"/> documents}}</source>
@@ -8340,7 +8340,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">272,273</context>
         </context-group>
-        <target state="needs-translation">Sort by <x id="INTERPOLATION" equiv-text="{{getDisplayCustomFieldTitle(field_id)}}"/></target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{getDisplayCustomFieldTitle(field_id)}}"/> でソート</target>
       </trans-unit>
       <trans-unit id="2179847500064178686" datatype="html">
         <source>Edit document</source>
@@ -9514,7 +9514,7 @@
         <source>Confirm delete workflow</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
-          <context context-type="linenumber">129</context>
+          <context context-type="linenumber">135</context>
         </context-group>
         <target state="translated">ワークフローを削除しますか？</target>
       </trans-unit>
@@ -9522,7 +9522,7 @@
         <source>This operation will permanently delete this workflow.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
-          <context context-type="linenumber">130</context>
+          <context context-type="linenumber">136</context>
         </context-group>
         <target state="translated">この操作により、このワークフローは完全に削除されます。</target>
       </trans-unit>
@@ -9530,7 +9530,7 @@
         <source>Deleted workflow</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
-          <context context-type="linenumber">139</context>
+          <context context-type="linenumber">145</context>
         </context-group>
         <target state="translated">ワークフローを削除しました</target>
       </trans-unit>
@@ -9538,7 +9538,7 @@
         <source>Error deleting workflow.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
-          <context context-type="linenumber">144</context>
+          <context context-type="linenumber">150</context>
         </context-group>
         <target state="translated">ワークフローの削除に失敗しました</target>
       </trans-unit>
@@ -9546,7 +9546,7 @@
         <source>Enabled workflow</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
-          <context context-type="linenumber">155</context>
+          <context context-type="linenumber">161</context>
         </context-group>
         <target state="translated">有効なワークフロー</target>
       </trans-unit>
@@ -9554,7 +9554,7 @@
         <source>Disabled workflow</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
-          <context context-type="linenumber">156</context>
+          <context context-type="linenumber">162</context>
         </context-group>
         <target state="translated">無効なワークフロー</target>
       </trans-unit>
@@ -9562,7 +9562,7 @@
         <source>Error toggling workflow.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
-          <context context-type="linenumber">162</context>
+          <context context-type="linenumber">168</context>
         </context-group>
         <target state="translated">ワークフローの切り替えエラー。</target>
       </trans-unit>
@@ -10077,7 +10077,7 @@
           <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Last week</target>
+        <target state="translated">先週</target>
       </trans-unit>
       <trans-unit id="2896962543647781653" datatype="html">
         <source>%s weeks ago</source>
@@ -10093,7 +10093,7 @@
           <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Yesterday</target>
+        <target state="translated">昨日</target>
       </trans-unit>
       <trans-unit id="5601594741748068208" datatype="html">
         <source>%s days ago</source>
