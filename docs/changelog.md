@@ -1,5 +1,35 @@
 # Changelog
 
+## paperless-ngx 2.14.2
+
+### Bug Fixes
+
+-   Fix: dont try to parse empty webhook params [@shamoon](https://github.com/shamoon) ([#8742](https://github.com/paperless-ngx/paperless-ngx/pull/8742))
+-   Fix: pass working file to workflows, pickle file bytes [@shamoon](https://github.com/shamoon) ([#8741](https://github.com/paperless-ngx/paperless-ngx/pull/8741))
+-   Fix: use hard delete when bulk editing custom fields [@shamoon](https://github.com/shamoon) ([#8740](https://github.com/paperless-ngx/paperless-ngx/pull/8740))
+-   Fix: Ensure email attachments use the latest document path for attachments [@stumpylog](https://github.com/stumpylog) ([#8737](https://github.com/paperless-ngx/paperless-ngx/pull/8737))
+-   Fix: include tooltip module for custom fields display [@shamoon](https://github.com/shamoon) ([#8739](https://github.com/paperless-ngx/paperless-ngx/pull/8739))
+-   Fix: remove id of webhook/email actions on copy [@shamoon](https://github.com/shamoon) ([#8729](https://github.com/paperless-ngx/paperless-ngx/pull/8729))
+-   Fix: import dnd module for merge confirm dialog [@shamoon](https://github.com/shamoon) ([#8727](https://github.com/paperless-ngx/paperless-ngx/pull/8727))
+
+### Dependencies
+
+-   Chore(deps): Bump django from 5.1.4 to 5.1.5 [@dependabot](https://github.com/dependabot) ([#8738](https://github.com/paperless-ngx/paperless-ngx/pull/8738))
+
+### All App Changes
+
+<details>
+<summary>7 changes</summary>
+
+-   Fix: dont try to parse empty webhook params [@shamoon](https://github.com/shamoon) ([#8742](https://github.com/paperless-ngx/paperless-ngx/pull/8742))
+-   Fix: pass working file to workflows, pickle file bytes [@shamoon](https://github.com/shamoon) ([#8741](https://github.com/paperless-ngx/paperless-ngx/pull/8741))
+-   Fix: use hard delete when bulk editing custom fields [@shamoon](https://github.com/shamoon) ([#8740](https://github.com/paperless-ngx/paperless-ngx/pull/8740))
+-   Fix: Ensure email attachments use the latest document path for attachments [@stumpylog](https://github.com/stumpylog) ([#8737](https://github.com/paperless-ngx/paperless-ngx/pull/8737))
+-   Fix: include tooltip module for custom fields display [@shamoon](https://github.com/shamoon) ([#8739](https://github.com/paperless-ngx/paperless-ngx/pull/8739))
+-   Fix: remove id of webhook/email actions on copy [@shamoon](https://github.com/shamoon) ([#8729](https://github.com/paperless-ngx/paperless-ngx/pull/8729))
+-   Fix: import dnd module for merge confirm dialog [@shamoon](https://github.com/shamoon) ([#8727](https://github.com/paperless-ngx/paperless-ngx/pull/8727))
+</details>
+
 ## paperless-ngx 2.14.1
 
 ### Bug Fixes
