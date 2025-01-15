@@ -16,7 +16,7 @@
 {% block form_content %}
 {% translate "Code" as i18n_code %}
 <div class="form-floating">
-		<input type="code" name="code" id="inputCode" autocomplete="one-time-code" placeholder="{{ i18n_code }}" class="form-control" required>
+		<input type="code" name="code" id="inputCode" autocomplete="one-time-code" placeholder="{{ i18n_code }}" class="form-control" required autofocus>
 		<label for="inputCode">{{ i18n_code }}</label>
 </div>
 <div class="d-grid mt-3">
