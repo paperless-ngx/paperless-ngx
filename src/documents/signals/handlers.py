@@ -992,25 +992,26 @@ def run_workflows(
         try:
             data = {}
             if action.webhook.use_params:
-                try:
-                    for key, value in action.webhook.params.items():
-                        data[key] = parse_w_workflow_placeholders(
-                            value,
-                            correspondent,
-                            document_type,
-                            owner_username,
-                            added,
-                            filename,
-                            current_filename,
-                            created,
-                            title,
-                            doc_url,
+                if action.webhook.params:
+                    try:
+                        for key, value in action.webhook.params.items():
+                            data[key] = parse_w_workflow_placeholders(
+                                value,
+                                correspondent,
+                                document_type,
+                                owner_username,
+                                added,
+                                filename,
+                                current_filename,
+                                created,
+                                title,
+                                doc_url,
+                            )
+                    except Exception as e:
+                        logger.error(
+                            f"Error occurred parsing webhook params: {e}",
+                            extra={"group": logging_group},
                         )
-                except Exception as e:
-                    logger.error(
-                        f"Error occurred parsing webhook params: {e}",
-                        extra={"group": logging_group},
-                    )
             else:
                 data = parse_w_workflow_placeholders(
                     action.webhook.body,
