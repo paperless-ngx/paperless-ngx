@@ -62,10 +62,10 @@ class WorkflowTriggerPlugin(
         Get overrides from matching workflows
         """
         overrides, msg = run_workflows(
-            WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
-            self.input_doc,
-            None,
-            DocumentMetadataOverrides(),
+            trigger_type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            document=self.input_doc,
+            logging_group=None,
+            overrides=DocumentMetadataOverrides(),
         )
         if overrides:
             self.metadata.update(overrides)
