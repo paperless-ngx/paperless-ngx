@@ -180,7 +180,7 @@ def modify_custom_fields(
     CustomFieldInstance.objects.filter(
         document_id__in=affected_docs,
         field_id__in=remove_custom_fields,
-    ).delete()
+    ).hard_delete()
 
     bulk_update_documents.delay(document_ids=affected_docs)
 
