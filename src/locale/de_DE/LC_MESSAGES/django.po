@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-02 23:04-0800\n"
-"PO-Revision-Date: 2025-01-13 21:21\n"
+"PO-Revision-Date: 2025-01-16 04:39\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -838,7 +838,7 @@ msgstr "Die Anzahl der Tage, um den der Zeitplanauslöser verschoben werden soll
 
 #: documents/models.py:1121
 msgid "schedule is recurring"
-msgstr "Zeitplan is wiederkehrend"
+msgstr "Zeitplan wiederholt sich"
 
 #: documents/models.py:1124
 msgid "If the schedule should be recurring."
