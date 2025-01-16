@@ -66,6 +66,7 @@ import {
   FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_HAS_TAGS_ALL,
   FILTER_HAS_TAGS_ANY,
+  FILTER_MIME_TYPE,
   FILTER_OWNER,
   FILTER_OWNER_ANY,
   FILTER_OWNER_DOES_NOT_INCLUDE,
@@ -126,6 +127,7 @@ const TEXT_FILTER_TARGET_ASN = 'asn'
 const TEXT_FILTER_TARGET_FULLTEXT_QUERY = 'fulltext-query'
 const TEXT_FILTER_TARGET_FULLTEXT_MORELIKE = 'fulltext-morelike'
 const TEXT_FILTER_TARGET_CUSTOM_FIELDS = 'custom-fields'
+const TEXT_FILTER_TARGET_MIME_TYPE = 'mime-type'
 
 const TEXT_FILTER_MODIFIER_EQUALS = 'equals'
 const TEXT_FILTER_MODIFIER_NULL = 'is null'
@@ -169,6 +171,7 @@ const DEFAULT_TEXT_FILTER_TARGET_OPTIONS = [
     id: TEXT_FILTER_TARGET_FULLTEXT_QUERY,
     name: $localize`Advanced search`,
   },
+  { id: TEXT_FILTER_TARGET_MIME_TYPE, name: $localize`MIME type` },
 ]
 
 const TEXT_FILTER_TARGET_MORELIKE_OPTION = {
@@ -415,6 +418,10 @@ export class FilterEditorComponent
         case FILTER_CUSTOM_FIELDS_TEXT:
           this._textFilter = rule.value
           this.textFilterTarget = TEXT_FILTER_TARGET_CUSTOM_FIELDS
+          break
+        case FILTER_MIME_TYPE:
+          this.textFilterTarget = TEXT_FILTER_TARGET_MIME_TYPE
+          this._textFilter = rule.value
           break
         case FILTER_FULLTEXT_QUERY:
           let allQueryArgs = rule.value.split(',')
@@ -726,6 +733,15 @@ export class FilterEditorComponent
     ) {
       filterRules.push({
         rule_type: FILTER_CUSTOM_FIELDS_TEXT,
+        value: this._textFilter,
+      })
+    }
+    if (
+      this._textFilter &&
+      this.textFilterTarget == TEXT_FILTER_TARGET_MIME_TYPE
+    ) {
+      filterRules.push({
+        rule_type: FILTER_MIME_TYPE,
         value: this._textFilter,
       })
     }

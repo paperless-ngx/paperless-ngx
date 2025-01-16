@@ -639,6 +639,13 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["id"], doc3.id)
 
+        response = self.client.get(
+            "/api/documents/?mime_type=pdf",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 3)
+
     def test_custom_field_select_filter(self):
         """
         GIVEN:

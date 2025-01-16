@@ -60,6 +60,7 @@ import {
   FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_HAS_TAGS_ALL,
   FILTER_HAS_TAGS_ANY,
+  FILTER_MIME_TYPE,
   FILTER_OWNER,
   FILTER_OWNER_ANY,
   FILTER_OWNER_DOES_NOT_INCLUDE,
@@ -387,6 +388,18 @@ describe('FilterEditorComponent', () => {
     ]
     expect(component.textFilterTarget).toEqual('asn') // TEXT_FILTER_TARGET_ASN
     expect(component.textFilterModifier).toEqual('less') // TEXT_FILTER_MODIFIER_LT
+  }))
+
+  it('should ingest text filter rules for mime type', fakeAsync(() => {
+    expect(component.textFilter).toEqual(null)
+    component.filterRules = [
+      {
+        rule_type: FILTER_MIME_TYPE,
+        value: 'pdf',
+      },
+    ]
+    expect(component.textFilter).toEqual('pdf')
+    expect(component.textFilterTarget).toEqual('mime-type') // TEXT_FILTER_TARGET_MIME_TYPE
   }))
 
   it('should ingest text filter rules for fulltext query', fakeAsync(() => {
@@ -1218,6 +1231,24 @@ describe('FilterEditorComponent', () => {
       {
         rule_type: FILTER_CUSTOM_FIELDS_TEXT,
         value: 'foo',
+      },
+    ])
+  }))
+
+  it('should convert user input to correct filter rules on mime type', fakeAsync(() => {
+    component.textFilterInput.nativeElement.value = 'pdf'
+    component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
+    const textFieldTargetDropdown = fixture.debugElement.queryAll(
+      By.directive(NgbDropdownItem)
+    )[5]
+    textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_MIME_TYPE
+    fixture.detectChanges()
+    tick(400)
+    expect(component.textFilterTarget).toEqual('mime-type')
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_MIME_TYPE,
+        value: 'pdf',
       },
     ])
   }))
