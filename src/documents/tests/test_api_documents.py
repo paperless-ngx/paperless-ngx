@@ -2660,7 +2660,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
 
         self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].attachments[0][0], "archive.pdf")
+        self.assertEqual(mail.outbox[0].attachments[0].get_filename(), "archive.pdf")
 
         self.client.post(
             f"/api/documents/{doc2.pk}/email/",
@@ -2673,7 +2673,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
 
         self.assertEqual(len(mail.outbox), 2)
-        self.assertEqual(mail.outbox[1].attachments[0][0], "test2.pdf")
+        self.assertEqual(mail.outbox[1].attachments[0].get_filename(), "test2.pdf")
 
     @mock.patch("django.core.mail.message.EmailMessage.send", side_effect=Exception)
     def test_email_document_errors(self, mocked_send):
