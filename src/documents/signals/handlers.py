@@ -981,11 +981,7 @@ def run_workflows(
                 # Something could be renaming the file concurrently so it can't be attached
                 with FileLock(settings.MEDIA_LOCK):
                     document.refresh_from_db()
-                    email.attach_file(
-                        original_file
-                        if original_file is not None
-                        else document.source_path,
-                    )
+                    email.attach_file(original_file)
             n_messages = email.send()
             logger.debug(
                 f"Sent {n_messages} notification email(s) to {action.email.to}",
@@ -1085,9 +1081,7 @@ def run_workflows(
             files = None
             if action.webhook.include_document:
                 with open(
-                    original_file
-                    if original_file is not None
-                    else document.source_path,
+                    original_file,
                     "rb",
                 ) as f:
                     files = {
@@ -1114,6 +1108,10 @@ def run_workflows(
             )
 
     use_overrides = overrides is not None
+    if original_file is None:
+        original_file = (
+            document.source_path if not use_overrides else document.original_file
+        )
     messages = []
 
     workflows = (
