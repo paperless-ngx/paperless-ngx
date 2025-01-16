@@ -8,9 +8,6 @@ import tempfile
 import urllib
 import zipfile
 from datetime import datetime
-from email.encoders import encode_base64
-from email.mime.base import MIMEBase
-from email.utils import encode_rfc2231
 from pathlib import Path
 from time import mktime
 from unicodedata import normalize
@@ -21,7 +18,6 @@ import pathvalidate
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
-from django.core.mail import EmailMessage
 from django.db import connections
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
@@ -111,6 +107,7 @@ from documents.filters import ObjectOwnedPermissionsFilter
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
+from documents.mail import send_email
 from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_storage_paths
@@ -1058,36 +1055,17 @@ class DocumentViewSet(
             ):
                 return HttpResponseBadRequest("Invalid email address found")
 
-            email = EmailMessage(
+            send_email(
                 subject=request.data.get("subject"),
                 body=request.data.get("message"),
                 to=addresses,
+                attachment=(
+                    doc.archive_path
+                    if use_archive_version and doc.has_archive_version
+                    else doc.source_path
+                ),
+                attachment_mime_type=doc.mime_type,
             )
-            attachment = (
-                doc.archive_path
-                if use_archive_version and doc.has_archive_version
-                else doc.source_path
-            )
-            with open(attachment, "rb") as f:
-                file_content = f.read()
-
-                main_type, sub_type = (
-                    doc.mime_type.split("/", 1)
-                    if doc.mime_type
-                    else ("application", "octet-stream")
-                )
-                mime_part = MIMEBase(main_type, sub_type)
-                mime_part.set_payload(file_content)
-
-                encode_base64(mime_part)
-
-                mime_part.add_header(
-                    "Content-Disposition",
-                    f'attachment; filename="{encode_rfc2231(str(attachment.name))}"',
-                )
-
-                email.attach(mime_part)
-            email.send()
             logger.debug(
                 f"Sent document {doc.id} via email to {addresses}",
             )
