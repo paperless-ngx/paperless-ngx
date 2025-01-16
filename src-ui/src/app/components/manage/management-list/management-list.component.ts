@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http'
 import {
   Directive,
   OnDestroy,
@@ -152,9 +153,17 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
         }),
         delay(100)
       )
-      .subscribe(() => {
-        this.show = true
-        this.loading = false
+      .subscribe({
+        error: (error: HttpErrorResponse) => {
+          if (error.error?.detail?.includes('Invalid page')) {
+            this.page = 1
+            this.reloadData()
+          }
+        },
+        next: () => {
+          this.show = true
+          this.loading = false
+        },
       })
   }
 
