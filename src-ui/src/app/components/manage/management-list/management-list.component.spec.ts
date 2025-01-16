@@ -1,5 +1,9 @@
 import { DatePipe } from '@angular/common'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import {
+  HttpErrorResponse,
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import {
   ComponentFixture,
@@ -241,6 +245,21 @@ describe('ManagementListComponent', () => {
     const sortable = fixture.debugElement.query(By.directive(SortableDirective))
     sortable.triggerEventHandler('click')
     expect(reloadSpy).toHaveBeenCalled()
+  })
+
+  it('should fall back to first page if error is page is out of range', () => {
+    jest.spyOn(tagService, 'listFiltered').mockReturnValueOnce(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 404,
+            error: { detail: 'Invalid page' },
+          })
+      )
+    )
+    component.page = 2
+    component.reloadData()
+    expect(component.page).toEqual(1)
   })
 
   it('should support toggle all items in view', () => {
