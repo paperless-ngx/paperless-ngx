@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-02 23:04-0800\n"
-"PO-Revision-Date: 2024-12-13 00:33\n"
+"PO-Revision-Date: 2025-01-16 00:30\n"
 "Last-Translator: \n"
 "Language-Team: Lithuanian\n"
 "Language: lt_LT\n"
@@ -31,27 +31,27 @@ msgstr ""
 
 #: documents/filters.py:365
 msgid "Invalid expression list. Must be nonempty."
-msgstr ""
+msgstr "Neteisingas išraiškos sąrašas. Jis turi būti netuščias."
 
 #: documents/filters.py:386
 msgid "Invalid logical operator {op!r}"
-msgstr ""
+msgstr "Neteisingas loginis operatorius {op!r}"
 
 #: documents/filters.py:400
 msgid "Maximum number of query conditions exceeded."
-msgstr ""
+msgstr "Viršytas maksimalus užklausos sąlygų skaičius."
 
 #: documents/filters.py:465
 msgid "{name!r} is not a valid custom field."
-msgstr ""
+msgstr "{name!r} nėra galiojantis pasirinktas laukas."
 
 #: documents/filters.py:502
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr ""
+msgstr "{data_type} nepalaiko užklausos išraiškos {expr!r}."
 
 #: documents/filters.py:610
 msgid "Maximum nesting depth exceeded."
-msgstr ""
+msgstr "Viršytas maksimalus įdėjimo gylis."
 
 #: documents/models.py:41 documents/models.py:801
 msgid "owner"
@@ -192,11 +192,11 @@ msgstr "Kontrolinė suma suarchyvuoto dokumento."
 
 #: documents/models.py:210
 msgid "page count"
-msgstr ""
+msgstr "puslapių skaičius"
 
 #: documents/models.py:217
 msgid "The number of pages of the document."
-msgstr ""
+msgstr "Dokumento puslapių skaičius."
 
 #: documents/models.py:221 documents/models.py:401 documents/models.py:721
 #: documents/models.py:759 documents/models.py:830 documents/models.py:888
@@ -262,135 +262,135 @@ msgstr "derinti"
 
 #: documents/models.py:385
 msgid "information"
-msgstr ""
+msgstr "informacija"
 
 #: documents/models.py:386
 msgid "warning"
-msgstr ""
+msgstr "įspėjimas"
 
 #: documents/models.py:387 paperless_mail/models.py:350
 msgid "error"
-msgstr ""
+msgstr "klaida"
 
 #: documents/models.py:388
 msgid "critical"
-msgstr ""
+msgstr "kritinis"
 
 #: documents/models.py:391
 msgid "group"
-msgstr ""
+msgstr "grupė"
 
 #: documents/models.py:393
 msgid "message"
-msgstr ""
+msgstr "žinutė"
 
 #: documents/models.py:396
 msgid "level"
-msgstr ""
+msgstr "lygis"
 
 #: documents/models.py:405
 msgid "log"
-msgstr ""
+msgstr "žurnalas"
 
 #: documents/models.py:406
 msgid "logs"
-msgstr ""
+msgstr "žurnalai"
 
 #: documents/models.py:414
 msgid "Table"
-msgstr ""
+msgstr "Lentelė"
 
 #: documents/models.py:415
 msgid "Small Cards"
-msgstr ""
+msgstr "Mažos kortelės"
 
 #: documents/models.py:416
 msgid "Large Cards"
-msgstr ""
+msgstr "Didelės kortelės"
 
 #: documents/models.py:419
 msgid "Title"
-msgstr ""
+msgstr "Pavadinimas"
 
 #: documents/models.py:420 documents/models.py:1032
 msgid "Created"
-msgstr ""
+msgstr "Sukurta"
 
 #: documents/models.py:421 documents/models.py:1031
 msgid "Added"
-msgstr ""
+msgstr "Pridėta"
 
 #: documents/models.py:422
 msgid "Tags"
-msgstr ""
+msgstr "Žymos"
 
 #: documents/models.py:423
 msgid "Correspondent"
-msgstr ""
+msgstr "Korespondentas"
 
 #: documents/models.py:424
 msgid "Document Type"
-msgstr ""
+msgstr "Dokumento tipas"
 
 #: documents/models.py:425
 msgid "Storage Path"
-msgstr ""
+msgstr "Saugyklos kelias"
 
 #: documents/models.py:426
 msgid "Note"
-msgstr ""
+msgstr "Pastaba"
 
 #: documents/models.py:427
 msgid "Owner"
-msgstr ""
+msgstr "Savininkas"
 
 #: documents/models.py:428
 msgid "Shared"
-msgstr ""
+msgstr "Bendrinama"
 
 #: documents/models.py:429
 msgid "ASN"
-msgstr ""
+msgstr "ASN"
 
 #: documents/models.py:430
 msgid "Pages"
-msgstr ""
+msgstr "Puslapiai"
 
 #: documents/models.py:436
 msgid "show on dashboard"
-msgstr ""
+msgstr "rodyti valdymo skydelyje"
 
 #: documents/models.py:439
 msgid "show in sidebar"
-msgstr ""
+msgstr "rodyti šoninėje juostoje"
 
 #: documents/models.py:443
 msgid "sort field"
-msgstr ""
+msgstr "rūšiuoti lauką"
 
 #: documents/models.py:448
 msgid "sort reverse"
-msgstr ""
+msgstr "rūšiuoti atvirkščiai"
 
 #: documents/models.py:451
 msgid "View page size"
-msgstr ""
+msgstr "Peržiūros puslapio dydis"
 
 #: documents/models.py:459
 msgid "View display mode"
-msgstr ""
+msgstr "Peržiūros rodymo režimas"
 
 #: documents/models.py:466
 msgid "Document display fields"
-msgstr ""
+msgstr "Dokumento rodymo laukai"
 
 #: documents/models.py:473 documents/models.py:531
 msgid "saved view"
-msgstr ""
+msgstr "išsaugota peržiūra"
 
 #: documents/models.py:474
 msgid "saved views"
-msgstr ""
+msgstr "išsaugotos peržiūros"
 
 #: documents/models.py:482
 msgid "title contains"
