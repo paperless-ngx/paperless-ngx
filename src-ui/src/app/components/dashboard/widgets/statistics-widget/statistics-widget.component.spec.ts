@@ -9,12 +9,14 @@ import { RouterTestingModule } from '@angular/router/testing'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { Subject } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
+import { FILTER_MIME_TYPE } from 'src/app/data/filter-rule-type'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import {
   FileStatus,
   WebsocketStatusService,
 } from 'src/app/services/websocket-status.service'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { environment } from 'src/environments/environment'
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 import { StatisticsWidgetComponent } from './statistics-widget.component'
@@ -24,6 +26,7 @@ describe('StatisticsWidgetComponent', () => {
   let fixture: ComponentFixture<StatisticsWidgetComponent>
   let httpTestingController: HttpTestingController
   let websocketStatusService: WebsocketStatusService
+  let documentListViewService: DocumentListViewService
   const fileStatusSubject = new Subject<FileStatus>()
 
   beforeEach(async () => {
@@ -48,6 +51,7 @@ describe('StatisticsWidgetComponent', () => {
     jest
       .spyOn(websocketStatusService, 'onDocumentConsumptionFinished')
       .mockReturnValue(fileStatusSubject)
+    documentListViewService = TestBed.inject(DocumentListViewService)
     component = fixture.componentInstance
 
     httpTestingController = TestBed.inject(HttpTestingController)
@@ -230,5 +234,26 @@ describe('StatisticsWidgetComponent', () => {
     expect(fixture.nativeElement.textContent.replace(/\s/g, '')).not.toContain(
       'CurrentASN:'
     )
+  })
+
+  it('should support quick filter by mime type', () => {
+    const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
+    component.filterByFileType({
+      mime_type: 'application/pdf',
+      mime_type_count: 160,
+    })
+    expect(qfSpy).toHaveBeenCalledWith([
+      {
+        rule_type: FILTER_MIME_TYPE,
+        value: 'application/pdf',
+      },
+    ])
+
+    qfSpy.mockClear()
+    component.filterByFileType({
+      mime_type: 'Other',
+      mime_type_count: 160,
+    })
+    expect(qfSpy).not.toHaveBeenCalled()
   })
 })
