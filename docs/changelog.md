@@ -1,5 +1,26 @@
 # Changelog
 
+## paperless-ngx 2.14.3
+
+### Bug Fixes
+
+-   Fix: Adds a default 30s timeout for emails, instead of no timeout [@stumpylog](https://github.com/stumpylog) ([#8757](https://github.com/paperless-ngx/paperless-ngx/pull/8757))
+-   Fix: import forms modules for entries component [@shamoon](https://github.com/shamoon) ([#8752](https://github.com/paperless-ngx/paperless-ngx/pull/8752))
+-   Fix: fix email/wh actions on consume started [@shamoon](https://github.com/shamoon) ([#8750](https://github.com/paperless-ngx/paperless-ngx/pull/8750))
+-   Fix: import date picker module in cf query dropdown [@shamoon](https://github.com/shamoon) ([#8749](https://github.com/paperless-ngx/paperless-ngx/pull/8749))
+
+### All App Changes
+
+<details>
+<summary>5 changes</summary>
+
+-   Fix: Adds a default 30s timeout for emails, instead of no timeout [@stumpylog](https://github.com/stumpylog) ([#8757](https://github.com/paperless-ngx/paperless-ngx/pull/8757))
+-   Enhancement: set autofocus on MFA code field [@mxmehl](https://github.com/mxmehl) ([#8756](https://github.com/paperless-ngx/paperless-ngx/pull/8756))
+-   Fix: import forms modules for entries component [@shamoon](https://github.com/shamoon) ([#8752](https://github.com/paperless-ngx/paperless-ngx/pull/8752))
+-   Fix: fix email/wh actions on consume started [@shamoon](https://github.com/shamoon) ([#8750](https://github.com/paperless-ngx/paperless-ngx/pull/8750))
+-   Fix: import date picker module in cf query dropdown [@shamoon](https://github.com/shamoon) ([#8749](https://github.com/paperless-ngx/paperless-ngx/pull/8749))
+</details>
+
 ## paperless-ngx 2.14.2
 
 ### Bug Fixes
