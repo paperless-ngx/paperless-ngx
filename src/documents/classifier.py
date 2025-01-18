@@ -239,6 +239,15 @@ class DocumentClassifier:
             cache.set(CLASSIFIER_HASH_KEY, hasher.hexdigest(), CACHE_50_MINUTES)
             cache.set(CLASSIFIER_VERSION_KEY, self.FORMAT_VERSION, CACHE_50_MINUTES)
             return False
+        logger.debug(
+            f"""Found:
+            Last training: {self.last_doc_change_time}
+            Latest doc change: {latest_doc_change}
+            Last auto type hash: {self.last_auto_type_hash.hex() if self.last_auto_type_hash else None}
+            Current hash: {hasher.digest().hex()}
+            Result: Retraining required
+            """,
+        )
 
         # subtract 1 since -1 (null) is also part of the classes.
 
@@ -251,7 +260,7 @@ class DocumentClassifier:
 
         logger.debug(
             f"{docs_queryset.count()} documents, {num_tags} tag(s), {num_correspondents} correspondent(s), "
-            f"{num_document_types} document type(s). {num_storage_paths} storage path(es)",
+            f"{num_document_types} document type(s). {num_storage_paths} storage path(s)",
         )
 
         from sklearn.feature_extraction.text import CountVectorizer
