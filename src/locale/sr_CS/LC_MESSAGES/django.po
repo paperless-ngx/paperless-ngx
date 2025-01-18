@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-02 23:04-0800\n"
-"PO-Revision-Date: 2024-12-06 00:33\n"
+"PO-Revision-Date: 2025-01-18 00:28\n"
 "Last-Translator: \n"
 "Language-Team: Serbian (Latin)\n"
 "Language: sr_CS\n"
@@ -954,7 +954,7 @@ msgstr "Imejl"
 
 #: documents/models.py:1258
 msgid "Webhook"
-msgstr ""
+msgstr "Veb zakačka"
 
 #: documents/models.py:1262
 msgid "Workflow Action Type"
@@ -1082,7 +1082,7 @@ msgstr "imejl"
 
 #: documents/models.py:1476
 msgid "webhook"
-msgstr ""
+msgstr "veb zakačka"
 
 #: documents/models.py:1480
 msgid "workflow action"
