@@ -1,5 +1,6 @@
 import logging
 
+from allauth.mfa.adapter import get_adapter as get_mfa_adapter
 from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.middleware import PersistentRemoteUserMiddleware
@@ -7,6 +8,7 @@ from django.contrib.auth.models import User
 from django.http import HttpRequest
 from django.utils.deprecation import MiddlewareMixin
 from rest_framework import authentication
+from rest_framework import exceptions
 
 logger = logging.getLogger("paperless.auth")
 
@@ -70,3 +72,14 @@ class PaperlessRemoteUserAuthentication(authentication.RemoteUserAuthentication)
     """
 
     header = settings.HTTP_REMOTE_USER_HEADER_NAME
+
+
+class PaperlessBasicAuthentication(authentication.BasicAuthentication):
+    def authenticate(self, request):
+        user_tuple = super().authenticate(request)
+        user = user_tuple[0] if user_tuple else None
+        mfa_adapter = get_mfa_adapter()
+        if user and mfa_adapter.is_mfa_enabled(user):
+            raise exceptions.AuthenticationFailed("MFA required")
+
+        return user_tuple

@@ -1876,6 +1876,7 @@ class WorkflowActionWebhookSerializer(serializers.ModelSerializer):
             "id",
             "url",
             "use_params",
+            "as_json",
             "params",
             "body",
             "headers",

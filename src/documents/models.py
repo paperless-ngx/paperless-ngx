@@ -1209,6 +1209,11 @@ class WorkflowActionWebhook(models.Model):
         verbose_name=_("use parameters"),
     )
 
+    as_json = models.BooleanField(
+        default=False,
+        verbose_name=_("send as JSON"),
+    )
+
     params = models.JSONField(
         _("webhook parameters"),
         null=True,

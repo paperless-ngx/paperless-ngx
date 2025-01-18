@@ -22,6 +22,8 @@ export interface WorkflowActionWebhook extends ObjectWithId {
 
   use_params?: boolean
 
+  as_json?: boolean
+
   params?: object
 
   body?: string
