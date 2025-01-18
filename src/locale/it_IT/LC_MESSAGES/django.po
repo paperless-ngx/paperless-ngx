@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-02 23:04-0800\n"
-"PO-Revision-Date: 2024-12-03 07:05\n"
+"PO-Revision-Date: 2025-01-18 20:24\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -27,7 +27,7 @@ msgstr "Il valore deve essere un JSON valido."
 
 #: documents/filters.py:355
 msgid "Invalid custom field query expression"
-msgstr "Espressione della query del campo personalizzato non valida"
+msgstr "Campo personalizzato della query non valido"
 
 #: documents/filters.py:365
 msgid "Invalid expression list. Must be nonempty."
@@ -79,7 +79,7 @@ msgstr "Espressione regolare"
 
 #: documents/models.py:63 documents/models.py:1017
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Parola fuzzy"
 
 #: documents/models.py:64
 msgid "Automatic"
@@ -350,11 +350,11 @@ msgstr "Condiviso"
 
 #: documents/models.py:429
 msgid "ASN"
-msgstr ""
+msgstr "ASN"
 
 #: documents/models.py:430
 msgid "Pages"
-msgstr ""
+msgstr "Pagine"
 
 #: documents/models.py:436
 msgid "show on dashboard"
@@ -382,7 +382,7 @@ msgstr ""
 
 #: documents/models.py:466
 msgid "Document display fields"
-msgstr ""
+msgstr "Campi di visualizzazione documento"
 
 #: documents/models.py:473 documents/models.py:531
 msgid "saved view"
@@ -562,7 +562,7 @@ msgstr "non ha un campo personalizzato"
 
 #: documents/models.py:524
 msgid "custom fields query"
-msgstr ""
+msgstr "interrogazione campi personalizzati"
 
 #: documents/models.py:534
 msgid "rule type"
@@ -786,11 +786,11 @@ msgstr "Recupero Posta"
 
 #: documents/models.py:1033
 msgid "Modified"
-msgstr ""
+msgstr "Modificato"
 
 #: documents/models.py:1034
 msgid "Custom Field"
-msgstr ""
+msgstr "Campo personalizzato"
 
 #: documents/models.py:1037
 msgid "Workflow Trigger Type"
@@ -834,7 +834,7 @@ msgstr ""
 
 #: documents/models.py:1116
 msgid "The number of days to offset the schedule trigger by."
-msgstr ""
+msgstr "."
 
 #: documents/models.py:1121
 msgid "schedule is recurring"
@@ -882,23 +882,23 @@ msgstr ""
 
 #: documents/models.py:1175
 msgid "email body"
-msgstr ""
+msgstr "Corpo e-mail"
 
 #: documents/models.py:1178
 msgid "The body (message) of the email, can include some placeholders, see documentation."
-msgstr ""
+msgstr "Il corpo (messaggio) dell'email, può includere alcuni segnaposto, vedi documentazione."
 
 #: documents/models.py:1184
 msgid "emails to"
-msgstr ""
+msgstr "email a"
 
 #: documents/models.py:1187
 msgid "The destination email addresses, comma separated."
-msgstr ""
+msgstr "Gli indirizzi email di destinazione, separati da virgola."
 
 #: documents/models.py:1193
 msgid "include document in email"
-msgstr ""
+msgstr "includi documento nell'email"
 
 #: documents/models.py:1202
 msgid "webhook url"
@@ -910,7 +910,7 @@ msgstr ""
 
 #: documents/models.py:1209
 msgid "use parameters"
-msgstr ""
+msgstr "Usa parametri"
 
 #: documents/models.py:1213
 msgid "webhook parameters"
@@ -1034,7 +1034,7 @@ msgstr "rimuovi tutti i corrispondenti"
 
 #: documents/models.py:1396
 msgid "remove these storage path(s)"
-msgstr ""
+msgstr "rimuovi questo/i percorso/i di archiviazione"
 
 #: documents/models.py:1401
 msgid "remove all storage paths"
@@ -1050,19 +1050,19 @@ msgstr "rimuovi tutti i proprietari"
 
 #: documents/models.py:1420
 msgid "remove view permissions for these users"
-msgstr ""
+msgstr "rimuovi i permessi di visualizzazione per questi utenti"
 
 #: documents/models.py:1427
 msgid "remove view permissions for these groups"
-msgstr ""
+msgstr "rimuovi i permessi di visualizzazione per questi gruppi"
 
 #: documents/models.py:1434
 msgid "remove change permissions for these users"
-msgstr ""
+msgstr "rimuovere i permessi di modifica per questi utenti"
 
 #: documents/models.py:1441
 msgid "remove change permissions for these groups"
-msgstr ""
+msgstr "rimuovere i permessi di modifica per questi gruppi"
 
 #: documents/models.py:1446
 msgid "remove all permissions"
@@ -1070,15 +1070,15 @@ msgstr "rimuovi tutte le autorizzazioni"
 
 #: documents/models.py:1453
 msgid "remove these custom fields"
-msgstr ""
+msgstr "assegna questi campi personalizzati"
 
 #: documents/models.py:1458
 msgid "remove all custom fields"
-msgstr ""
+msgstr "rimuovi tutti i campi personalizzati"
 
 #: documents/models.py:1467
 msgid "email"
-msgstr ""
+msgstr "email"
 
 #: documents/models.py:1476
 msgid "webhook"
@@ -1298,19 +1298,19 @@ msgstr "Ecco qui il link alla documentazione."
 
 #: documents/templates/mfa/authenticate.html:7
 msgid "Paperless-ngx Two-Factor Authentication"
-msgstr ""
+msgstr "Paperless-ngx Autenticazione a Due-Fattori"
 
 #: documents/templates/mfa/authenticate.html:12
 msgid "Your account is protected by two-factor authentication. Please enter an authenticator code:"
-msgstr ""
+msgstr "Il tuo account è protetto da un'autenticazione a due fattori. Inserisci un codice di autenticazione:"
 
 #: documents/templates/mfa/authenticate.html:17
 msgid "Code"
-msgstr ""
+msgstr "Codice"
 
 #: documents/templates/mfa/authenticate.html:24
 msgid "Cancel"
-msgstr ""
+msgstr "Annulla"
 
 #: documents/templates/paperless-ngx/base.html:58
 msgid "Share link was not found."
@@ -1709,7 +1709,7 @@ msgstr "Usa STARTTLS"
 
 #: paperless_mail/models.py:19
 msgid "IMAP"
-msgstr ""
+msgstr "IMAP"
 
 #: paperless_mail/models.py:20
 msgid "Gmail OAuth"
@@ -1757,11 +1757,11 @@ msgstr "Il set di caratteri da usare quando si comunica con il server di posta, 
 
 #: paperless_mail/models.py:60
 msgid "account type"
-msgstr ""
+msgstr "Tipo di account"
 
 #: paperless_mail/models.py:66
 msgid "refresh token"
-msgstr ""
+msgstr "Aggiorna token"
 
 #: paperless_mail/models.py:70
 msgid "The refresh token to use for token authentication e.g. with oauth2."
@@ -1769,7 +1769,7 @@ msgstr ""
 
 #: paperless_mail/models.py:79
 msgid "The expiration date of the refresh token. "
-msgstr ""
+msgstr "La data di scadenza del token di refresh. "
 
 #: paperless_mail/models.py:89
 msgid "mail rule"

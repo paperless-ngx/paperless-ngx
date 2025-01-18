@@ -12,7 +12,6 @@ from celery.signals import task_postrun
 from celery.signals import task_prerun
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.mail import EmailMessage
 from django.db import DatabaseError
 from django.db import close_old_connections
 from django.db import models
@@ -30,6 +29,7 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_unique_filename
+from documents.mail import send_email
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -573,14 +573,29 @@ def run_workflows_updated(sender, document: Document, logging_group=None, **kwar
     max_retries=3,
     throws=(httpx.HTTPError,),
 )
-def send_webhook(url, data, headers, files):
+def send_webhook(
+    url: str,
+    data: str | dict,
+    headers: dict,
+    files: dict,
+    *,
+    as_json: bool = False,
+):
     try:
-        httpx.post(
-            url,
-            data=data,
-            files=files,
-            headers=headers,
-        ).raise_for_status()
+        if as_json:
+            httpx.post(
+                url,
+                json=data,
+                files=files,
+                headers=headers,
+            ).raise_for_status()
+        else:
+            httpx.post(
+                url,
+                data=data,
+                files=files,
+                headers=headers,
+            ).raise_for_status()
         logger.info(
             f"Webhook sent to {url}",
         )
@@ -972,21 +987,13 @@ def run_workflows(
             doc_url,
         )
         try:
-            email = EmailMessage(
+            n_messages = send_email(
                 subject=subject,
                 body=body,
                 to=action.email.to.split(","),
+                attachment=original_file if action.email.include_document else None,
+                attachment_mime_type=document.mime_type,
             )
-            if action.email.include_document:
-                # Something could be renaming the file concurrently so it can't be attached
-                with FileLock(settings.MEDIA_LOCK):
-                    document.refresh_from_db()
-                    email.attach_file(
-                        original_file
-                        if original_file is not None
-                        else document.source_path,
-                    )
-            n_messages = email.send()
             logger.debug(
                 f"Sent {n_messages} notification email(s) to {action.email.to}",
                 extra={"group": logging_group},
@@ -1085,9 +1092,7 @@ def run_workflows(
             files = None
             if action.webhook.include_document:
                 with open(
-                    original_file
-                    if original_file is not None
-                    else document.source_path,
+                    original_file,
                     "rb",
                 ) as f:
                     files = {
@@ -1102,6 +1107,7 @@ def run_workflows(
                 data=data,
                 headers=headers,
                 files=files,
+                as_json=action.webhook.as_json,
             )
             logger.debug(
                 f"Webhook to {action.webhook.url} queued",
@@ -1114,6 +1120,10 @@ def run_workflows(
             )
 
     use_overrides = overrides is not None
+    if original_file is None:
+        original_file = (
+            document.source_path if not use_overrides else document.original_file
+        )
     messages = []
 
     workflows = (

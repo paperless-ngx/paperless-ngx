@@ -48,6 +48,8 @@ from documents.models import Tag
 from documents.models import UiSettings
 from documents.models import Workflow
 from documents.models import WorkflowAction
+from documents.models import WorkflowActionEmail
+from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowTrigger
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
@@ -275,6 +277,8 @@ class Command(CryptMixin, BaseCommand):
             "group_object_permissions": GroupObjectPermission.objects.all(),
             "workflow_triggers": WorkflowTrigger.objects.all(),
             "workflow_actions": WorkflowAction.objects.all(),
+            "workflow_email_actions": WorkflowActionEmail.objects.all(),
+            "workflow_webhook_actions": WorkflowActionWebhook.objects.all(),
             "workflows": Workflow.objects.all(),
             "custom_fields": CustomField.objects.all(),
             "custom_field_instances": CustomFieldInstance.objects.all(),
