@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-02 23:04-0800\n"
-"PO-Revision-Date: 2024-12-03 07:05\n"
+"PO-Revision-Date: 2025-01-17 00:29\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -79,7 +79,7 @@ msgstr "Espressione regolare"
 
 #: documents/models.py:63 documents/models.py:1017
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Parola fuzzy"
 
 #: documents/models.py:64
 msgid "Automatic"
@@ -382,7 +382,7 @@ msgstr ""
 
 #: documents/models.py:466
 msgid "Document display fields"
-msgstr ""
+msgstr "Campi di visualizzazione documento"
 
 #: documents/models.py:473 documents/models.py:531
 msgid "saved view"
@@ -834,7 +834,7 @@ msgstr ""
 
 #: documents/models.py:1116
 msgid "The number of days to offset the schedule trigger by."
-msgstr ""
+msgstr "."
 
 #: documents/models.py:1121
 msgid "schedule is recurring"
