@@ -2669,3 +2669,46 @@ class TestWorkflows(
                 )
 
         mock_post.assert_called_once()
+
+    @mock.patch("httpx.post")
+    def test_send_webhook_data_and_json(self, mock_post):
+        """
+        GIVEN:
+            - Nothing
+        WHEN:
+            - send_webhook is called with data or dict
+        THEN:
+            - data is sent as form-encoded and json, respectively
+        """
+        mock_post.return_value = mock.Mock(
+            status_code=200,
+            json=mock.Mock(return_value={"status": "ok"}),
+        )
+
+        send_webhook(
+            url="http://paperless-ngx.com",
+            data="Test message",
+            headers={},
+            files=None,
+        )
+
+        mock_post.assert_called_once_with(
+            "http://paperless-ngx.com",
+            data="Test message",
+            headers={},
+            files=None,
+        )
+
+        send_webhook(
+            url="http://paperless-ngx.com",
+            data={"message": "Test message"},
+            headers={},
+            files=None,
+        )
+
+        mock_post.assert_called_with(
+            "http://paperless-ngx.com",
+            json={"message": "Test message"},
+            headers={},
+            files=None,
+        )
