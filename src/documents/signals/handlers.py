@@ -573,14 +573,22 @@ def run_workflows_updated(sender, document: Document, logging_group=None, **kwar
     max_retries=3,
     throws=(httpx.HTTPError,),
 )
-def send_webhook(url, data, headers, files):
+def send_webhook(url: str, data: dict | str, headers: dict, files: dict | None):
     try:
-        httpx.post(
-            url,
-            data=data,
-            files=files,
-            headers=headers,
-        ).raise_for_status()
+        if isinstance(data, dict):
+            httpx.post(
+                url,
+                json=data,
+                headers=headers,
+                files=files,
+            ).raise_for_status()
+        else:
+            httpx.post(
+                url,
+                data=data,
+                files=files,
+                headers=headers,
+            ).raise_for_status()
         logger.info(
             f"Webhook sent to {url}",
         )
