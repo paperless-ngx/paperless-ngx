@@ -573,14 +573,29 @@ def run_workflows_updated(sender, document: Document, logging_group=None, **kwar
     max_retries=3,
     throws=(httpx.HTTPError,),
 )
-def send_webhook(url, data, headers, files):
+def send_webhook(
+    url: str,
+    data: str | dict,
+    headers: dict,
+    files: dict,
+    *,
+    as_json: bool = False,
+):
     try:
-        httpx.post(
-            url,
-            data=data,
-            files=files,
-            headers=headers,
-        ).raise_for_status()
+        if as_json:
+            httpx.post(
+                url,
+                json=data,
+                files=files,
+                headers=headers,
+            ).raise_for_status()
+        else:
+            httpx.post(
+                url,
+                data=data,
+                files=files,
+                headers=headers,
+            ).raise_for_status()
         logger.info(
             f"Webhook sent to {url}",
         )
@@ -1092,6 +1107,7 @@ def run_workflows(
                 data=data,
                 headers=headers,
                 files=files,
+                as_json=action.webhook.as_json,
             )
             logger.debug(
                 f"Webhook to {action.webhook.url} queued",
