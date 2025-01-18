@@ -31,6 +31,7 @@
     "ngx-bootstrap-icons": "^1.9.3",
     "ngx-color": "^9.0.0",
     "ngx-cookie-service": "^19.0.0",
+    "ngx-device-detector": "^9.0.0",
     "ngx-file-drop": "^16.0.0",
     "ngx-ui-tour-ng-bootstrap": "^16.0.0",
     "rxjs": "^7.8.1",

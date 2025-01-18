@@ -25,15 +25,20 @@
   </button>
 
   <div class="btn-group">
-    <a [href]="downloadUrl" class="btn btn-sm btn-outline-primary">
-      <i-bs width="1.2em" height="1.2em" name="download"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Download</span>
-    </a>
+    <button (click)="download()" class="btn btn-sm btn-outline-primary" [disabled]="downloading">
+      @if (downloading) {
+        <div class="spinner-border spinner-border-sm" role="status"></div>
+      } @else {
+        <i-bs width="1.2em" height="1.2em" name="download"></i-bs>
+      }
+      <span class="d-none d-lg-inline ps-1" i18n>Download</span>
+    </button>
 
     @if (metadata?.has_archive_version) {
       <div class="btn-group" ngbDropdown role="group">
-        <button class="btn btn-sm btn-outline-primary dropdown-toggle" ngbDropdownToggle></button>
+        <button class="btn btn-sm btn-outline-primary dropdown-toggle" [disabled]="downloading" ngbDropdownToggle></button>
         <div class="dropdown-menu shadow" ngbDropdownMenu>
-          <a ngbDropdownItem [href]="downloadOriginalUrl" i18n>Download original</a>
+          <button ngbDropdownItem (click)="download(true)" [disabled]="downloading" i18n>Download original</button>
         </div>
       </div>
     }
