@@ -251,7 +251,7 @@ class DocumentClassifier:
 
         logger.debug(
             f"{docs_queryset.count()} documents, {num_tags} tag(s), {num_correspondents} correspondent(s), "
-            f"{num_document_types} document type(s). {num_storage_paths} storage path(es)",
+            f"{num_document_types} document type(s). {num_storage_paths} storage path(s)",
         )
 
         from sklearn.feature_extraction.text import CountVectorizer
