@@ -419,6 +419,7 @@ The following workflow action types are available:
 
 -   The URL to send the request to
 -   The request body as text or as key-value pairs, which can include placeholders, see [placeholders](usage.md#workflow-placeholders) below.
+-   Encoding for the request body, either JSON or form data
 -   The request headers as key-value pairs
 
 #### Workflow placeholders
