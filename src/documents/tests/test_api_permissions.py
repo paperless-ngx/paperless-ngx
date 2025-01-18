@@ -1,4 +1,6 @@
+import base64
 import json
+from unittest import mock
 
 from allauth.mfa.models import Authenticator
 from django.contrib.auth.models import Group
@@ -461,6 +463,30 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.assertIn("permissions", results[0])
         self.assertNotIn("user_can_change", results[0])
         self.assertNotIn("is_shared_by_requester", results[0])
+
+    @mock.patch("allauth.mfa.adapter.DefaultMFAAdapter.is_mfa_enabled")
+    def test_basic_auth_mfa_enabled(self, mock_is_mfa_enabled):
+        """
+        GIVEN:
+            - User with MFA enabled
+        WHEN:
+            - API request is made with basic auth
+        THEN:
+            - MFA required error is returned
+        """
+        user1 = User.objects.create_user(username="user1")
+        user1.set_password("password")
+        user1.save()
+
+        mock_is_mfa_enabled.return_value = True
+
+        response = self.client.get(
+            "/api/documents/",
+            HTTP_AUTHORIZATION="Basic " + base64.b64encode(b"user1:password").decode(),
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.data["detail"], "MFA required")
 
 
 class TestApiUser(DirectoriesMixin, APITestCase):
