@@ -11,6 +11,7 @@ from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
 from httpx import HTTPStatusError
+from pytest_httpx import HTTPXMock
 from rest_framework.test import APITestCase
 
 from documents.signals.handlers import run_workflows
@@ -2670,8 +2671,12 @@ class TestWorkflows(
 
         mock_post.assert_called_once()
 
-    @mock.patch("httpx.post")
-    def test_send_webhook_data_and_json(self, mock_post):
+
+class TestWebhookSend:
+    def test_send_webhook_data_and_json(
+        self,
+        httpx_mock: HTTPXMock,
+    ):
         """
         GIVEN:
             - Nothing
@@ -2680,9 +2685,8 @@ class TestWorkflows(
         THEN:
             - data is sent as form-encoded and json, respectively
         """
-        mock_post.return_value = mock.Mock(
-            status_code=200,
-            json=mock.Mock(return_value={"status": "ok"}),
+        httpx_mock.add_response(
+            content=b"ok",
         )
 
         send_webhook(
@@ -2691,24 +2695,17 @@ class TestWorkflows(
             headers={},
             files=None,
         )
+        assert httpx_mock.get_request().content == b"Test message"
+        httpx_mock.reset()
 
-        mock_post.assert_called_once_with(
-            "http://paperless-ngx.com",
-            data="Test message",
-            headers={},
-            files=None,
+        httpx_mock.add_response(
+            json={"status": "ok"},
         )
-
         send_webhook(
             url="http://paperless-ngx.com",
             data={"message": "Test message"},
             headers={},
             files=None,
         )
-
-        mock_post.assert_called_with(
-            "http://paperless-ngx.com",
-            json={"message": "Test message"},
-            headers={},
-            files=None,
-        )
+        assert httpx_mock.get_request().headers["Content-Type"] == "application/json"
+        assert httpx_mock.get_request().content == b'{"message":"Test message"}'
