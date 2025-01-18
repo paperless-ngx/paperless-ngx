@@ -418,7 +418,8 @@ The following workflow action types are available:
 "Webhook" actions send a POST request to a specified URL. You can specify:
 
 -   The URL to send the request to
--   The request body as text or as key-value pairs, which can include placeholders, see [placeholders](usage.md#workflow-placeholders) below.
+-   The request body as text or as key-value pairs, which can include placeholders, see [placeholders](usage.md#workflow-placeholders) below. When
+    using key-value pairs, the request will be sent as a JSON-encoded object, otherwise it will be sent as form-encoded data.
 -   The request headers as key-value pairs
 
 #### Workflow placeholders
