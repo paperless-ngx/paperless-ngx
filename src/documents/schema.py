@@ -15,6 +15,17 @@ class AngularApiAuthenticationOverrideScheme(OpenApiAuthenticationExtension):
         }
 
 
+class PaperelessBasicAuthenticationScheme(OpenApiAuthenticationExtension):
+    target_class = "paperless.auth.PaperlessBasicAuthentication"
+    name = "PaperelessBasicAuthentication"
+
+    def get_security_definition(self, auto_schema):
+        return {
+            "type": "http",
+            "scheme": "basic",
+        }
+
+
 def generate_object_with_permissions_schema(serializer_class):
     return {
         operation: extend_schema(
