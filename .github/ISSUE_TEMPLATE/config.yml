@@ -2,10 +2,10 @@ blank_issues_enabled: false
 contact_links:
   - name: 🤔 Questions and Help
     url: https://github.com/paperless-ngx/paperless-ngx/discussions
-    about: This issue tracker is not for support questions. Please refer to our Discussions.
+    about: General questions or support for using Paperless-ngx.
   - name: 💬 Chat
     url: https://matrix.to/#/#paperlessngx:matrix.org
     about: Want to discuss Paperless-ngx with others? Check out our chat.
   - name: 🚀 Feature Request
     url: https://github.com/paperless-ngx/paperless-ngx/discussions/new?category=feature-requests
-    about: Remember to search for existing feature requests and "up-vote" any you like
+    about: Remember to search for existing feature requests and "up-vote" those that you like.
