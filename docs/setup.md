@@ -36,7 +36,7 @@ account. The script essentially automatically performs the steps described in [D
     !!! note
 
         macOS users will need to install [gnu-sed](https://formulae.brew.sh/formula/gnu-sed) with support
-        for running `sed` as well as [wget](https://formulae.brew.sh/formula/wget).
+        for running as `sed` as well as [wget](https://formulae.brew.sh/formula/wget).
 
 ### Use Docker Compose {#docker}
 
