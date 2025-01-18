@@ -1,5 +1,30 @@
 # Changelog
 
+## paperless-ngx 2.14.4
+
+### Features
+
+-   Enhancement: allow specifying JSON encoding for webhooks [@shamoon](https://github.com/shamoon) ([#8799](https://github.com/paperless-ngx/paperless-ngx/pull/8799))
+-   Change: disable API basic auth if MFA enabled [@shamoon](https://github.com/shamoon) ([#8792](https://github.com/paperless-ngx/paperless-ngx/pull/8792))
+
+### Bug Fixes
+
+-   Fix: Include email and webhook objects in the export [@stumpylog](https://github.com/stumpylog) ([#8790](https://github.com/paperless-ngx/paperless-ngx/pull/8790))
+-   Fix: use MIMEBase for email attachments [@shamoon](https://github.com/shamoon) ([#8762](https://github.com/paperless-ngx/paperless-ngx/pull/8762))
+-   Fix: handle page out of range in mgmt lists after delete [@shamoon](https://github.com/shamoon) ([#8771](https://github.com/paperless-ngx/paperless-ngx/pull/8771))
+
+### All App Changes
+
+<details>
+<summary>5 changes</summary>
+
+-   Enhancement: allow specifying JSON encoding for webhooks [@shamoon](https://github.com/shamoon) ([#8799](https://github.com/paperless-ngx/paperless-ngx/pull/8799))
+-   Change: disable API basic auth if MFA enabled [@shamoon](https://github.com/shamoon) ([#8792](https://github.com/paperless-ngx/paperless-ngx/pull/8792))
+-   Fix: Include email and webhook objects in the export [@stumpylog](https://github.com/stumpylog) ([#8790](https://github.com/paperless-ngx/paperless-ngx/pull/8790))
+-   Fix: use MIMEBase for email attachments [@shamoon](https://github.com/shamoon) ([#8762](https://github.com/paperless-ngx/paperless-ngx/pull/8762))
+-   Fix: handle page out of range in mgmt lists after delete [@shamoon](https://github.com/shamoon) ([#8771](https://github.com/paperless-ngx/paperless-ngx/pull/8771))
+</details>
+
 ## paperless-ngx 2.14.3
 
 ### Bug Fixes
