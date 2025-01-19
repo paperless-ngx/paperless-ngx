@@ -476,7 +476,7 @@ a document with an ASN of 355 would be placed in `somepath/asn-201-400/asn-3xx/T
 /{{ title }}
 ```
 
-For a PDF document, it would result in `pdfs/Title.pdf`, but for a PNG document, the path would be `pngs/Title.pdf`.
+For a PDF document, it would result in `pdfs/Title.pdf`, but for a PNG document, the path would be `pngs/Title.png`.
 
 To use custom fields:
 
