@@ -169,7 +169,8 @@ class DocumentClassifier:
                 tags__is_inbox_tag=True,
             )
             .select_related("document_type", "correspondent", "storage_path")
-            .prefetch_related("tags").order_by("pk")
+            .prefetch_related("tags")
+            .order_by("pk")
         )
 
         # No documents exit to train against
@@ -199,7 +200,11 @@ class DocumentClassifier:
             hasher.update(y.to_bytes(4, "little", signed=True))
             labels_correspondent.append(y)
 
-            tags: list[int] = list(doc.tags.filter(matching_algorithm=MatchingModel.MATCH_AUTO).order_by("pk").values_list("pk", flat=True))
+            tags: list[int] = list(
+                doc.tags.filter(matching_algorithm=MatchingModel.MATCH_AUTO)
+                .order_by("pk")
+                .values_list("pk", flat=True),
+            )
             for tag in tags:
                 hasher.update(tag.to_bytes(4, "little", signed=True))
             labels_tags.append(tags)
@@ -214,11 +219,22 @@ class DocumentClassifier:
         labels_tags_unique = {tag for tags in labels_tags for tag in tags}
 
         num_tags = len(labels_tags_unique)
+        latest_doc_change = docs_queryset.latest("modified").modified
+
+        logger.debug(
+            f"""Found:
+            Last training: {self.last_doc_change_time}
+            Latest doc change: {latest_doc_change}
+            Last auto type hash: {self.last_auto_type_hash.hex() if self.last_auto_type_hash else None}
+            Current hash: {hasher.digest().hex()}
+            Result: Retraining required
+            """,
+        )
 
         # Check if retraining is actually required.
         # A document has been updated since the classifier was trained
         # New auto tags, types, correspondent, storage paths exist
-        latest_doc_change = docs_queryset.latest("modified").modified
+
         if (
             self.last_doc_change_time is not None
             and self.last_doc_change_time >= latest_doc_change
@@ -234,15 +250,6 @@ class DocumentClassifier:
             cache.set(CLASSIFIER_HASH_KEY, hasher.hexdigest(), CACHE_50_MINUTES)
             cache.set(CLASSIFIER_VERSION_KEY, self.FORMAT_VERSION, CACHE_50_MINUTES)
             return False
-        logger.debug(
-            f"""Found:
-            Last training: {self.last_doc_change_time}
-            Latest doc change: {latest_doc_change}
-            Last auto type hash: {self.last_auto_type_hash.hex() if self.last_auto_type_hash else None}
-            Current hash: {hasher.digest().hex()}
-            Result: Retraining required
-            """,
-        )
 
         # subtract 1 since -1 (null) is also part of the classes.
 
