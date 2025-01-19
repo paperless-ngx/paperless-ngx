@@ -11,6 +11,7 @@ from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
 from httpx import HTTPStatusError
+from pytest_httpx import HTTPXMock
 from rest_framework.test import APITestCase
 
 from documents.signals.handlers import run_workflows
@@ -2407,6 +2408,7 @@ class TestWorkflows(
             data=f"Test message: http://localhost:8000/documents/{doc.id}/",
             headers={},
             files=None,
+            as_json=False,
         )
 
     @override_settings(
@@ -2468,6 +2470,7 @@ class TestWorkflows(
             data=f"Test message: http://localhost:8000/documents/{doc.id}/",
             headers={},
             files={"file": ("simple.pdf", mock.ANY, "application/pdf")},
+            as_json=False,
         )
 
     @override_settings(
@@ -2669,3 +2672,43 @@ class TestWorkflows(
                 )
 
         mock_post.assert_called_once()
+
+
+class TestWebhookSend:
+    def test_send_webhook_data_or_json(
+        self,
+        httpx_mock: HTTPXMock,
+    ):
+        """
+        GIVEN:
+            - Nothing
+        WHEN:
+            - send_webhook is called with data or dict
+        THEN:
+            - data is sent as form-encoded and json, respectively
+        """
+        httpx_mock.add_response(
+            content=b"ok",
+        )
+
+        send_webhook(
+            url="http://paperless-ngx.com",
+            data="Test message",
+            headers={},
+            files=None,
+            as_json=False,
+        )
+        assert httpx_mock.get_request().headers.get("Content-Type") is None
+        httpx_mock.reset()
+
+        httpx_mock.add_response(
+            json={"status": "ok"},
+        )
+        send_webhook(
+            url="http://paperless-ngx.com",
+            data={"message": "Test message"},
+            headers={},
+            files=None,
+            as_json=True,
+        )
+        assert httpx_mock.get_request().headers["Content-Type"] == "application/json"
