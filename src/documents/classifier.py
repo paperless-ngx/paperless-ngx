@@ -169,7 +169,7 @@ class DocumentClassifier:
                 tags__is_inbox_tag=True,
             )
             .select_related("document_type", "correspondent", "storage_path")
-            .prefetch_related("tags")
+            .prefetch_related("tags").order_by("pk")
         )
 
         # No documents exit to train against
@@ -199,12 +199,7 @@ class DocumentClassifier:
             hasher.update(y.to_bytes(4, "little", signed=True))
             labels_correspondent.append(y)
 
-            tags: list[int] = sorted(
-                tag.pk
-                for tag in doc.tags.filter(
-                    matching_algorithm=MatchingModel.MATCH_AUTO,
-                )
-            )
+            tags: list[int] = list(doc.tags.filter(matching_algorithm=MatchingModel.MATCH_AUTO).order_by("pk").values_list("pk", flat=True))
             for tag in tags:
                 hasher.update(tag.to_bytes(4, "little", signed=True))
             labels_tags.append(tags)
