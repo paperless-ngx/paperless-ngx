@@ -308,7 +308,7 @@ Paperless provides the following variables for use within filenames:
 -   `{{ tag_list }}`: A comma separated list of all tags assigned to the
     document.
 -   `{{ title }}`: The title of the document.
--   `{{ created }}`: The full date (ISO format) the document was created.
+-   `{{ created }}`: The full date (ISO 8601 format, e.g. `2024-03-14`) the document was created.
 -   `{{ created_year }}`: Year created only, formatted as the year with
     century.
 -   `{{ created_year_short }}`: Year created only, formatted as the year
