@@ -40,6 +40,8 @@ export const SETTINGS_KEYS = {
   APPROVALS_ENABLED: 'general-settings:approvals-enabled',
   FOLDERS_ENABLED: 'general-settings:folders-enabled',
   SLIM_SIDEBAR: 'general-settings:slim-sidebar',
+  GENERAL_CATEGORY_EXPANDED: 'general-settings:general_category_expanded',
+  SPECIFIC_CATEGORY_EXPANDED: 'general-settings:specific_category_expanded',
   UPDATE_CHECKING_ENABLED: 'general-settings:update-checking:enabled',
   UPDATE_CHECKING_BACKEND_SETTING:
     'general-settings:update-checking:backend-setting',
@@ -82,6 +84,16 @@ export const SETTINGS: UiSetting[] = [
   },
   {
     key: SETTINGS_KEYS.SLIM_SIDEBAR,
+    type: 'boolean',
+    default: false,
+  },
+  {
+    key: SETTINGS_KEYS.GENERAL_CATEGORY_EXPANDED,
+    type: 'boolean',
+    default: false,
+  },
+  {
+    key: SETTINGS_KEYS.SPECIFIC_CATEGORY_EXPANDED,
     type: 'boolean',
     default: false,
   },

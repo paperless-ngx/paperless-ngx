@@ -57,16 +57,17 @@ export class AppFrameComponent
   implements OnInit, ComponentCanDeactivate {
   versionString = `${environment.appTitle} ${environment.version}`
   appRemoteVersion: AppRemoteVersion
-  
+
   isMenuCollapsed: boolean = true
 
   slimSidebarAnimating: boolean = false
+  slimGeneralCategoryAnimating: boolean = false
+  slimSpecificCategoryAnimating: boolean = false
 
   searchField = new FormControl('')
   isKhoVatLyExpanded = false;
   isKhoExpanded = false;
   isGiaExpanded = false;
-
   constructor(
     public router: Router,
     private activatedRoute: ActivatedRoute,
@@ -123,6 +124,22 @@ export class AppFrameComponent
     }, 200) // slightly longer than css animation for slim sidebar
   }
 
+  toggleGeneralCategoryExpanded(): void {
+    this.slimGeneralCategoryAnimating = true
+    this.slimGeneralCategoryExpandedEnabled = !this.slimGeneralCategoryExpandedEnabled
+    setTimeout(() => {
+      this.slimGeneralCategoryAnimating = false
+    }, 200) // slightly longer than css animation for slim sidebar
+  }
+
+  toggleSpecificCategoryExpanded(): void {
+    this.slimSpecificCategoryAnimating = true
+    this.slimSpecificCategoryExpandedEnabled = !this.slimSpecificCategoryExpandedEnabled
+    setTimeout(() => {
+      this.slimSpecificCategoryAnimating = false
+    }, 200) // slightly longer than css animation for slim sidebar
+  }
+
   get customAppTitle(): string {
     return this.settingsService.get(SETTINGS_KEYS.APP_TITLE)
   }
@@ -131,8 +148,46 @@ export class AppFrameComponent
     return this.settingsService.get(SETTINGS_KEYS.SLIM_SIDEBAR)
   }
 
+  get slimGeneralCategoryExpandedEnabled(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.GENERAL_CATEGORY_EXPANDED)
+  }
+
+  get slimSpecificCategoryExpandedEnabled(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.SPECIFIC_CATEGORY_EXPANDED)
+  }
+
   set slimSidebarEnabled(enabled: boolean) {
     this.settingsService.set(SETTINGS_KEYS.SLIM_SIDEBAR, enabled)
+    this.settingsService
+      .storeSettings()
+      .pipe(first())
+      .subscribe({
+        error: (error) => {
+          this.toastService.showError(
+            $localize`An error occurred while saving settings.`
+          )
+          console.warn(error)
+        },
+      })
+  }
+
+  set slimGeneralCategoryExpandedEnabled(enabled: boolean) {
+    this.settingsService.set(SETTINGS_KEYS.GENERAL_CATEGORY_EXPANDED, enabled)
+    this.settingsService
+      .storeSettings()
+      .pipe(first())
+      .subscribe({
+        error: (error) => {
+          this.toastService.showError(
+            $localize`An error occurred while saving settings.`
+          )
+          console.warn(error)
+        },
+      })
+  }
+
+  set slimSpecificCategoryExpandedEnabled(enabled: boolean) {
+    this.settingsService.set(SETTINGS_KEYS.SPECIFIC_CATEGORY_EXPANDED, enabled)
     this.settingsService
       .storeSettings()
       .pipe(first())

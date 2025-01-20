@@ -43,6 +43,9 @@
 .sidebar:hover {
   overflow: auto; /* Hiện thanh cuộn khi hover */
 }
+.sidebar::-webkit-scrollbar {
+  display: none; /* Ẩn scrollbar trên các trình duyệt WebKit (Chrome, Safari) */
+}
 @media (max-width: 767.98px) {
   .sidebar {
     top: 3.5rem;
@@ -367,4 +370,8 @@ main {
 
 ::ng-deep .navItemDrag .position-absolute i-bs {
   display: none;
+}
+.rotated {
+  transform: rotate(180deg); /* Xoay 180 độ */
+  transition: transform 0.3s ease; /* Hiệu ứng chuyển động */
 }
