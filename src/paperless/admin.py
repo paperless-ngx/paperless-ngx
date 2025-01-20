@@ -5,6 +5,11 @@ from django.contrib.auth.models import User
 
 
 class PaperlessUserForm(forms.ModelForm):
+    """
+    Custom form for the User model that adds validation to prevent non-superusers
+    from changing the superuser status of a user.
+    """
+
     class Meta:
         model = User
         fields = [
