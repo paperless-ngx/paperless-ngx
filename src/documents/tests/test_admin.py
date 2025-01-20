@@ -75,11 +75,23 @@ class TestPaperlessAdmin(DirectoriesMixin, TestCase):
         super().setUp()
         self.user_admin = PaperlessUserAdmin(model=User, admin_site=AdminSite())
 
+    def test_request_is_passed_to_form(self):
+        user = User.objects.create(username="test", is_superuser=False)
+        non_superuser = User.objects.create(username="requestuser")
+        request = types.SimpleNamespace(user=non_superuser)
+        formType = self.user_admin.get_form(request)
+        form = formType(data={}, instance=user)
+        self.assertEqual(form.request, request)
+
     def test_only_superuser_can_change_superuser(self):
+        superuser = User.objects.create_superuser(username="superuser", password="test")
         non_superuser = User.objects.create(username="requestuser")
         user = User.objects.create(username="test", is_superuser=False)
 
-        data = {"is_superuser": True}
+        data = {
+            "username": "test",
+            "is_superuser": True,
+        }
         form = self.user_admin.form(data, instance=user)
         form.request = types.SimpleNamespace(user=non_superuser)
         self.assertFalse(form.is_valid())
@@ -87,3 +99,8 @@ class TestPaperlessAdmin(DirectoriesMixin, TestCase):
             form.errors.get("__all__"),
             ["Superuser status can only be changed by a superuser"],
         )
+
+        form = self.user_admin.form(data, instance=user)
+        form.request = types.SimpleNamespace(user=superuser)
+        self.assertTrue(form.is_valid())
+        self.assertEqual({}, form.errors)
