@@ -79,66 +79,6 @@ export class BackupComponent
       })
   }
 
-  // delete(document: Document) {
-  //   let modal = this.modalService.open(ConfirmDialogComponent, {
-  //     backdrop: 'static',
-  //   })
-  //   modal.componentInstance.title = $localize`Confirm delete`
-  //   modal.componentInstance.messageBold = $localize`This operation will permanently delete this document.`
-  //   modal.componentInstance.message = $localize`This operation cannot be undone.`
-  //   modal.componentInstance.btnClass = 'btn-danger'
-  //   modal.componentInstance.btnCaption = $localize`Delete`
-  //   modal.componentInstance.confirmClicked
-  //     .pipe(takeUntil(this.unsubscribeNotifier))
-  //     .subscribe(() => {
-  //       modal.componentInstance.buttonsEnabled = false
-  //       this.trashService.emptyTrash([document.id]).subscribe({
-  //         next: () => {
-  //           this.toastService.showInfo($localize`Document deleted`)
-  //           modal.close()
-  //           this.reload()
-  //         },
-  //         error: (err) => {
-  //           this.toastService.showError($localize`Error deleting document`, err)
-  //           modal.close()
-  //         },
-  //       })
-  //     })
-  // }
-
-  // emptyTrash(documents?: Set<number>) {
-  //   let modal = this.modalService.open(ConfirmDialogComponent, {
-  //     backdrop: 'static',
-  //   })
-  //   modal.componentInstance.title = $localize`Confirm delete`
-  //   modal.componentInstance.messageBold = documents
-  //     ? $localize`This operation will permanently delete the selected documents.`
-  //     : $localize`This operation will permanently delete all documents in the trash.`
-  //   modal.componentInstance.message = $localize`This operation cannot be undone.`
-  //   modal.componentInstance.btnClass = 'btn-danger'
-  //   modal.componentInstance.btnCaption = $localize`Delete`
-  //   modal.componentInstance.confirmClicked
-  //     .pipe(takeUntil(this.unsubscribeNotifier))
-  //     .subscribe(() => {
-  //       this.trashService
-  //         .emptyTrash(documents ? Array.from(documents) : null)
-  //         .subscribe({
-  //           next: () => {
-  //             this.toastService.showInfo($localize`Document(s) deleted`)
-  //             this.allToggled = false
-  //             modal.close()
-  //             this.reload()
-  //           },
-  //           error: (err) => {
-  //             this.toastService.showError(
-  //               $localize`Error deleting document(s)`,
-  //               err
-  //             )
-  //             modal.close()
-  //           },
-  //         })
-  //     })
-  // }
 
   loadDataStorageStatus(systemStorageStatus: SystemStorageStatus) {
     this.usedStorage = systemStorageStatus.used
@@ -301,10 +241,4 @@ export class BackupComponent
     this.expandedBackup = this.expandedBackup == backup.id ? undefined : backup.id
   }
 
-  // getDaysTimeAgo(backup: Backup): number {
-  //   const delay = this.settingsService.get(SETTINGS_KEYS.EMPTY_TRASH_DELAY)
-  //   const diff = new Date().getTime() - new Date(backup.created_at).getTime()
-  //   const days = Math.ceil(diff / (1000 * 3600 * 24))
-  //   return delay - days
-  // }
 }
