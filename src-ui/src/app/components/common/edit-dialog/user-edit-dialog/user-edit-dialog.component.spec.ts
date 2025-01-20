@@ -160,4 +160,23 @@ describe('UserEditDialogComponent', () => {
     })
     expect(component.currentUserIsSuperUser).toBeTruthy()
   })
+
+  it('should disable superuser option if current user is not superuser', () => {
+    const control: AbstractControl = component.objectForm.get('is_superuser')
+    permissionsService.initialize([], {
+      id: 99,
+      username: 'user99',
+      is_superuser: false,
+    })
+    component.ngOnInit()
+    expect(control.disabled).toBeTruthy()
+
+    permissionsService.initialize([], {
+      id: 99,
+      username: 'user99',
+      is_superuser: true,
+    })
+    component.ngOnInit()
+    expect(control.disabled).toBeFalsy()
+  })
 })
