@@ -163,6 +163,7 @@ def get_directory_size(directory):
     total_size = 0
     for dirpath, dirnames, filenames in os.walk(directory):
         for filename in filenames:
-            filepath = os.path.join(dirpath, filename)
-            total_size += os.path.getsize(filepath)
+            if os.path.exists(filepath):
+                filepath = os.path.join(dirpath, filename)
+                total_size += os.path.getsize(filepath)
     return total_size
