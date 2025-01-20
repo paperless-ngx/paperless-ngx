@@ -216,10 +216,8 @@
                       ngbPopover="General category" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled"
                       placement="end"
                       container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <div class="row">
-                  <div class="col-sm-10 "><span><i-bs class="me-1" name="journal-bookmark">&nbsp;</i-bs><ng-container
-                    i18n>General category</ng-container></span></div>
-                  <div class="col-sm-2 ">
+                <span><i-bs class="me-1" name="journal-bookmark">&nbsp;</i-bs><ng-container
+                    i18n>General category</ng-container></span>&nbsp;
                     @if (slimGeneralCategoryExpandedEnabled && !slimSidebarEnabled) {
                       <i-bs class="me-1" name="chevron-down"></i-bs>
                     } @else if (!slimGeneralCategoryExpandedEnabled && !slimSidebarEnabled) {
@@ -227,8 +225,7 @@
                     } @else if (slimSidebarEnabled) {
                       <i-bs class="me-1" name="journal-bookmark"></i-bs>
                     }
-                  </div>
-                </div>
+
               </button>
               <ul class="nav flex-column mb-2 ms-2" [hidden]="slimGeneralCategoryExpandedEnabled">
                 <li class="nav-item app-link"
@@ -349,10 +346,8 @@
                       ngbPopover="Specific category" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled"
                       placement="end"
                       container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <div class="row">
-                  <div class="col-sm-10 "><span><i-bs class="me-1" name="journal-text">&nbsp;</i-bs><ng-container
-                    i18n>Specific category</ng-container></span></div>
-                  <div class="col-sm-2 ">
+                  <span><i-bs class="me-1" name="journal-text">&nbsp;</i-bs><ng-container
+                    i18n>Specific category</ng-container>&nbsp;</span>
                     @if (slimSpecificCategoryExpandedEnabled && !slimSidebarEnabled) {
                       <i-bs class="me-1" name="chevron-down"></i-bs>
                     } @else if (!slimSpecificCategoryExpandedEnabled && !slimSidebarEnabled) {
@@ -360,8 +355,8 @@
                     } @else if (slimSidebarEnabled) {
                       <i-bs class="me-1" name="journal-text"></i-bs>
                     }
-                  </div>
-                </div>
+
+
               </button>
               <ul class="nav flex-column mb-2 ms-2" [hidden]="slimSpecificCategoryExpandedEnabled">
                 <li class="nav-item app-link"
