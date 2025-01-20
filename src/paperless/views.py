@@ -109,6 +109,25 @@ class UserViewSet(ModelViewSet):
     filterset_class = UserFilterSet
     ordering_fields = ("username",)
 
+    def create(self, request, *args, **kwargs):
+        if not request.user.is_superuser and request.data.get("is_superuser") is True:
+            return HttpResponseForbidden(
+                "Superuser status can only be granted by a superuser",
+            )
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        user_to_update: User = self.get_object()
+        if (
+            not request.user.is_superuser
+            and request.data.get("is_superuser") is not None
+            and request.data.get("is_superuser") != user_to_update.is_superuser
+        ):
+            return HttpResponseForbidden(
+                "Superuser status can only be changed by a superuser",
+            )
+        return super().update(request, *args, **kwargs)
+
     @action(detail=True, methods=["post"])
     def deactivate_totp(self, request, pk=None):
         request_user = request.user

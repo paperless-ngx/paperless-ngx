@@ -252,7 +252,7 @@ permissions can be granted to limit access to certain parts of the UI (and corre
 
 #### Superusers
 
-Superusers can access all parts of the front and backend application as well as any and all objects.
+Superusers can access all parts of the front and backend application as well as any and all objects. Superuser status can only be granted by another superuser.
 
 #### Admin Status
 
