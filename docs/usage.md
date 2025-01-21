@@ -1,9 +1,9 @@
 # Usage Overview
 
-Paperless is an application that manages your personal documents. With
-the help of a document scanner (see [the scanners wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Scanner-&-Software-Recommendations)),
-paperless transforms your unwieldy physical document binders into a searchable archive
-and provides many utilities for finding and managing your documents.
+Paperless-ngx is an application that manages your personal documents. With
+the (optional) help of a document scanner (see [the scanners wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Scanner-&-Software-Recommendations)), Paperless-ngx transforms your unwieldy
+physical documents into a searchable archive and provides many utilities
+for finding and managing your documents.
 
 ## Terms and definitions
 
@@ -12,10 +12,10 @@ documents:
 
 -   The _consumer_ watches a specified folder and adds all documents in
     that folder to paperless.
--   The _web server_ provides a UI that you use to manage and search for
-    your scanned documents.
+-   The _web server_ (web UI) provides a UI that you use to manage and
+    search documents.
 
-Each document has a couple of fields that you can assign to them:
+Each document has data fields that you can assign to them:
 
 -   A _Document_ is a piece of paper that sometimes contains valuable
     information.
@@ -41,6 +41,53 @@ Each document has a couple of fields that you can assign to them:
 -   The _content_ of a document is the text that was OCR'ed from the
     document. This text is fed into the search engine and is used for
     matching tags, correspondents and document types.
+-   Paperless-ngx also supports _custom fields_ which can be used to
+    store additional metadata about a document.
+
+## The Web UI
+
+The web UI is the primary way to interact with Paperless-ngx. It is a
+single-page application that is built with modern web technologies and
+is designed to be fast and responsive. The web UI includes a robust
+interface for filtering, viewing, searching and editing documents.
+You can also manage tags, correspondents, document types, and other
+settings from the web UI.
+
+The web UI also includes a 'tour' feature that can be accessed from the
+settings page or from the dashboard for new users. The tour highlights
+some of the key features of the web UI and can be useful for new users.
+
+### Dashboard
+
+The dashboard is the first page you see when you log in. By default, it
+does not show any documents, but you can add saved views to the dashboard
+to show documents that match certain criteria. The dashboard also includes
+a button to upload documents to Paperless-ngx but you can also drag and
+drop files anywhere in the app to initiate the consumption process.
+
+### Document List
+
+The document list is the primary way to view and interact with your documents.
+You can filter the list by tags, correspondents, document types, and other
+criteria. You can also edit documents in bulk including assigning tags,
+correspondents, document types, and custom fields. Selecting document(s) from
+the list will allow you to perform the various bulk edit operations. The
+document list also includes a search bar that allows you to search for documents
+by title, ASN, and use advanced search syntax.
+
+### Document Detail
+
+The document detail page shows all the information about a single document.
+You can view the document, edit its metadata, assign tags, correspondents,
+document types, and custom fields. You can also view the document history,
+download the document or share it via a share link.
+
+### Management Lists
+
+Paperless-ngx includes management lists for tags, correspondents, document types
+and more. These areas allow you to view, add, edit, delete and manage permissions
+for these objects. You can also manage saved views, mail accounts, mail rules,
+workflows and more from the management sections.
 
 ## Adding documents to paperless
 
