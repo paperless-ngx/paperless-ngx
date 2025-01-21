@@ -1263,6 +1263,7 @@ file, which are separated by one or multiple barcode pages.
 
     For ease of use, it is suggested to use a standardized separation
     page, e.g. [here](https://www.alliancegroup.co.uk/patch-codes.htm).
+    Per default only [PATCHT](https://www.alliancegroup.co.uk/downloads/patch-code-t.pdf) is recognized as a separator.
 
     If no barcodes are detected in the uploaded file, no page separation
     will happen.
