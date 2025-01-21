@@ -315,8 +315,7 @@ class DocumentClassifier:
         else:
             self.correspondent_classifier = None
             logger.debug(
-                "There are no correspondents. Not training correspondent "
-                "classifier.",
+                "There are no correspondents. Not training correspondent classifier.",
             )
 
         if num_document_types > 0:
@@ -326,8 +325,7 @@ class DocumentClassifier:
         else:
             self.document_type_classifier = None
             logger.debug(
-                "There are no document types. Not training document type "
-                "classifier.",
+                "There are no document types. Not training document type classifier.",
             )
 
         if num_storage_paths > 0:

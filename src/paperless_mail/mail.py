@@ -552,8 +552,7 @@ class MailAccountHandler(LoggingMixin):
                 mailbox_login(M, account)
 
                 self.log.debug(
-                    f"Account {account}: Processing "
-                    f"{account.rules.count()} rule(s)",
+                    f"Account {account}: Processing {account.rules.count()} rule(s)",
                 )
 
                 for rule in account.rules.order_by("order"):
