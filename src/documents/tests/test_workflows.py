@@ -2149,9 +2149,8 @@ class TestWorkflows(
         EMAIL_ENABLED=True,
         PAPERLESS_URL="http://localhost:8000",
     )
-    @mock.patch("httpx.post")
     @mock.patch("django.core.mail.message.EmailMessage.send")
-    def test_workflow_email_include_file(self, mock_email_send, mock_post):
+    def test_workflow_email_include_file(self, mock_email_send):
         """
         GIVEN:
             - Document updated workflow with email action
@@ -2196,6 +2195,24 @@ class TestWorkflows(
         )
 
         run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        mock_email_send.assert_called_once()
+
+        mock_email_send.reset_mock()
+        # test with .eml file
+        test_file2 = shutil.copy(
+            self.SAMPLE_DIR / "eml_with_umlaut.eml",
+            self.dirs.scratch_dir / "eml_with_umlaut.eml",
+        )
+
+        doc2 = Document.objects.create(
+            title="sample eml",
+            checksum="123456",
+            filename=test_file2,
+            mime_type="message/rfc822",
+        )
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc2)
 
         mock_email_send.assert_called_once()
 
