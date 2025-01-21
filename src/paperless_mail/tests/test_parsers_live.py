@@ -129,9 +129,11 @@ class TestParserLive:
         assert thumb.exists()
         assert thumb.is_file()
 
-        assert (
-            self.imagehash(thumb) == self.imagehash(simple_txt_email_thumbnail_file)
-        ), f"Created Thumbnail {thumb} differs from expected file {simple_txt_email_thumbnail_file}"
+        assert self.imagehash(thumb) == self.imagehash(
+            simple_txt_email_thumbnail_file,
+        ), (
+            f"Created Thumbnail {thumb} differs from expected file {simple_txt_email_thumbnail_file}"
+        )
 
     def test_tika_parse_successful(self, mail_parser: MailDocumentParser):
         """
@@ -226,6 +228,6 @@ class TestParserLive:
         # The created pdf is not reproducible. But the converted image should always look the same.
         expected_hash = self.imagehash(html_email_thumbnail_file)
 
-        assert (
-            generated_thumbnail_hash == expected_hash
-        ), f"PDF looks different. Check if {generated_thumbnail} looks weird."
+        assert generated_thumbnail_hash == expected_hash, (
+            f"PDF looks different. Check if {generated_thumbnail} looks weird."
+        )

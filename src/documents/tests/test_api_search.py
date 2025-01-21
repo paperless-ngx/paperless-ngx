@@ -96,7 +96,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
                 doc = Document.objects.create(
                     checksum=str(i),
                     pk=i + 1,
-                    title=f"Document {i+1}",
+                    title=f"Document {i + 1}",
                     content="content",
                 )
                 index.update_document(writer, doc)
@@ -131,7 +131,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
                 doc = Document.objects.create(
                     checksum=str(i),
                     pk=i + 1,
-                    title=f"Document {i+1}",
+                    title=f"Document {i + 1}",
                     content="content",
                 )
                 index.update_document(writer, doc)
@@ -630,8 +630,8 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
                 doc = Document.objects.create(
                     checksum=str(i),
                     pk=i + 1,
-                    title=f"Document {i+1}",
-                    content=f"Things document {i+1}",
+                    title=f"Document {i + 1}",
+                    content=f"Things document {i + 1}",
                 )
                 index.update_document(writer, doc)
 
