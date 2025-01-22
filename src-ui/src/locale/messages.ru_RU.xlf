@@ -1724,7 +1724,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Filter by</target>
+        <target state="translated">Фильтровать по</target>
       </trans-unit>
       <trans-unit id="8953033926734869941" datatype="html" approved="yes">
         <source>Name</source>
@@ -2032,7 +2032,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Result</target>
+        <target state="translated">Результат</target>
       </trans-unit>
       <trans-unit id="5404910960991552159" datatype="html">
         <source>Dismiss selected</source>
@@ -2152,7 +2152,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Remaining</target>
+        <target state="translated">Осталось</target>
       </trans-unit>
       <trans-unit id="7494361412465596264" datatype="html">
         <source><x id="INTERPOLATION" equiv-text="{{ getDaysRemaining(document) }}"/> days</source>
@@ -2440,7 +2440,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">119</context>
         </context-group>
-        <target state="needs-translation">Document(s) deleted</target>
+        <target state="translated">Документ(ы) удален(ы)</target>
       </trans-unit>
       <trans-unit id="6962724852893361467" datatype="html">
         <source>Error deleting document(s)</source>
@@ -2448,7 +2448,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="needs-translation">Error deleting document(s)</target>
+        <target state="translated">Ошибка при удалении документам(ов)</target>
       </trans-unit>
       <trans-unit id="7534569062269274401" datatype="html">
         <source>Document restored</source>
@@ -2472,7 +2472,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">159</context>
         </context-group>
-        <target state="needs-translation">Document(s) restored</target>
+        <target state="translated">Документ(ы) восстановлены</target>
       </trans-unit>
       <trans-unit id="8405416976953346141" datatype="html">
         <source>Error restoring document(s)</source>
@@ -2480,7 +2480,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">165</context>
         </context-group>
-        <target state="needs-translation">Error restoring document(s)</target>
+        <target state="translated">Ошибка при восстановлении документа(ов)</target>
       </trans-unit>
       <trans-unit id="8119815638230251386" datatype="html">
         <source>Users &amp; Groups</source>
@@ -3184,7 +3184,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">62</context>
         </context-group>
-        <target state="needs-translation">Filter documents</target>
+        <target state="translated">Отфильтровать документы</target>
       </trans-unit>
       <trans-unit id="3099741642167775297" datatype="html" approved="yes">
         <source>Download</source>
@@ -3228,7 +3228,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">Documents</target>
+        <target state="translated">Документы</target>
       </trans-unit>
       <trans-unit id="searchResults.saved_views" datatype="html">
         <source>Saved Views</source>
@@ -3244,7 +3244,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="needs-translation">Tags</target>
+        <target state="translated">Теги</target>
       </trans-unit>
       <trans-unit id="searchResults.correspondents" datatype="html">
         <source>Correspondents</source>
@@ -3480,7 +3480,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Delete original documents after successful merge</target>
+        <target state="translated">Удалить оригиналы после успешного объединения</target>
       </trans-unit>
       <trans-unit id="5138283234724909648" datatype="html">
         <source>Note that only PDFs will be included.</source>
@@ -3488,7 +3488,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Note that only PDFs will be included.</target>
+        <target state="translated">Только PDF файлы могут быть добавлены.</target>
       </trans-unit>
       <trans-unit id="8157388568390631653" datatype="html">
         <source>Note that only PDFs will be rotated.</source>
@@ -4240,7 +4240,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="needs-translation">Include only files matching</target>
+        <target state="translated">Включить только соответствующие файлы</target>
       </trans-unit>
       <trans-unit id="7233407036155150477" datatype="html">
         <source>Optional. Wildcards e.g. *.pdf or *invoice* allowed. Can be comma-separated list. Case insensitive.</source>
@@ -4252,7 +4252,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">47</context>
         </context-group>
-        <target state="needs-translation">Optional. Wildcards e.g. *.pdf or *invoice* allowed. Can be comma-separated list. Case insensitive.</target>
+        <target state="translated">Необязательно. Допускается использовать символ подстановки (wildcard), например *.pdf or *invoice*. Может быть список, разделенным через запятую. Нечувствителен к регистру.</target>
       </trans-unit>
       <trans-unit id="1546332577833742677" datatype="html">
         <source>Exclude files matching</source>
@@ -4260,7 +4260,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">47</context>
         </context-group>
-        <target state="needs-translation">Exclude files matching</target>
+        <target state="translated">Исключить соответствующие файлы</target>
       </trans-unit>
       <trans-unit id="9216117865911519658" datatype="html">
         <source>Action</source>
@@ -4276,7 +4276,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">53</context>
         </context-group>
-        <target state="needs-translation">Only performed if the mail is processed.</target>
+        <target state="translated">Выполнять только если письмо обработано.</target>
       </trans-unit>
       <trans-unit id="1261794314435932203" datatype="html">
         <source>Action parameter</source>
@@ -4904,7 +4904,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">143</context>
         </context-group>
-        <target state="needs-translation">Repeat the trigger every n days.</target>
+        <target state="translated">Повторять триггер каждые n дней.</target>
       </trans-unit>
       <trans-unit id="8727727835543352574" datatype="html">
         <source>Trigger for documents that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> filters specified below.</source>
@@ -4992,7 +4992,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">169</context>
         </context-group>
-        <target state="needs-translation">Has any of tags</target>
+        <target state="translated">Содержит любой из тегов</target>
       </trans-unit>
       <trans-unit id="5281365940563983618" datatype="html">
         <source>Has correspondent</source>
