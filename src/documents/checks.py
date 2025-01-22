@@ -32,8 +32,7 @@ def changed_password_check(app_configs, **kwargs):
         if not settings.PASSPHRASE:
             return [
                 Error(
-                    "The database contains encrypted documents but no password "
-                    "is set.",
+                    "The database contains encrypted documents but no password is set.",
                 ),
             ]
 
