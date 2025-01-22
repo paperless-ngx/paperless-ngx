@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-02 23:04-0800\n"
-"PO-Revision-Date: 2024-12-31 00:30\n"
+"PO-Revision-Date: 2025-01-19 00:32\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -374,7 +374,7 @@ msgstr "обратная сортировка"
 
 #: documents/models.py:451
 msgid "View page size"
-msgstr ""
+msgstr "Посмотреть размер страницы"
 
 #: documents/models.py:459
 msgid "View display mode"
