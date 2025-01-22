@@ -1,5 +1,39 @@
 # Changelog
 
+## paperless-ngx 2.14.5
+
+### Features
+
+-   Change: restrict altering and creation of superusers to superusers only [@shamoon](https://github.com/shamoon) ([#8837](https://github.com/paperless-ngx/paperless-ngx/pull/8837))
+
+### Bug Fixes
+
+-   Fix: fix long tag visual wrapping [@shamoon](https://github.com/shamoon) ([#8833](https://github.com/paperless-ngx/paperless-ngx/pull/8833))
+-   Fix: Enforce classifier training ordering to prevent extra training [@stumpylog](https://github.com/stumpylog) ([#8822](https://github.com/paperless-ngx/paperless-ngx/pull/8822))
+-   Fix: import router module to not found component [@shamoon](https://github.com/shamoon) ([#8821](https://github.com/paperless-ngx/paperless-ngx/pull/8821))
+-   Fix: better reflect some mail account / rule permissions in UI [@shamoon](https://github.com/shamoon) ([#8812](https://github.com/paperless-ngx/paperless-ngx/pull/8812))
+
+### Dependencies
+
+-   Chore(deps-dev): Bump undici from 5.28.4 to 5.28.5 in /src-ui @[dependabot[bot]](https://github.com/apps/dependabot) ([#8851](https://github.com/paperless-ngx/paperless-ngx/pull/8851))
+-   Chore(deps-dev): Bump the development group with 2 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#8841](https://github.com/paperless-ngx/paperless-ngx/pull/8841))
+
+### All App Changes
+
+<details>
+<summary>9 changes</summary>
+
+-   Chore(deps-dev): Bump undici from 5.28.4 to 5.28.5 in /src-ui @[dependabot[bot]](https://github.com/apps/dependabot) ([#8851](https://github.com/paperless-ngx/paperless-ngx/pull/8851))
+-   Chore(deps-dev): Bump the development group with 2 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#8841](https://github.com/paperless-ngx/paperless-ngx/pull/8841))
+-   Chore: use simpler method for attaching files to emails [@shamoon](https://github.com/shamoon) ([#8845](https://github.com/paperless-ngx/paperless-ngx/pull/8845))
+-   Change: restrict altering and creation of superusers to superusers only [@shamoon](https://github.com/shamoon) ([#8837](https://github.com/paperless-ngx/paperless-ngx/pull/8837))
+-   Fix: fix long tag visual wrapping [@shamoon](https://github.com/shamoon) ([#8833](https://github.com/paperless-ngx/paperless-ngx/pull/8833))
+-   Change: allow generate auth token without a usable password [@shamoon](https://github.com/shamoon) ([#8824](https://github.com/paperless-ngx/paperless-ngx/pull/8824))
+-   Fix: Enforce classifier training ordering to prevent extra training [@stumpylog](https://github.com/stumpylog) ([#8822](https://github.com/paperless-ngx/paperless-ngx/pull/8822))
+-   Fix: import router module to not found component [@shamoon](https://github.com/shamoon) ([#8821](https://github.com/paperless-ngx/paperless-ngx/pull/8821))
+-   Fix: better reflect some mail account / rule permissions in UI [@shamoon](https://github.com/shamoon) ([#8812](https://github.com/paperless-ngx/paperless-ngx/pull/8812))
+</details>
+
 ## paperless-ngx 2.14.4
 
 ### Features
