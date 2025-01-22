@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-02 23:04-0800\n"
-"PO-Revision-Date: 2025-01-18 20:24\n"
+"PO-Revision-Date: 2025-01-21 00:29\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -31,7 +31,7 @@ msgstr "Campo personalizzato della query non valido"
 
 #: documents/filters.py:365
 msgid "Invalid expression list. Must be nonempty."
-msgstr ""
+msgstr "Elenco delle espressioni non valido. Deve essere non vuoto."
 
 #: documents/filters.py:386
 msgid "Invalid logical operator {op!r}"
@@ -39,7 +39,7 @@ msgstr "Operatore logico non valido {op!r}"
 
 #: documents/filters.py:400
 msgid "Maximum number of query conditions exceeded."
-msgstr ""
+msgstr "Numero massimo delle condizioni della jQuery superato."
 
 #: documents/filters.py:465
 msgid "{name!r} is not a valid custom field."
@@ -47,7 +47,7 @@ msgstr "{name!r} non è un campo personalizzato valido."
 
 #: documents/filters.py:502
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr ""
+msgstr "{data_type} Non supporta la jQuery Expo {Expo!r}."
 
 #: documents/filters.py:610
 msgid "Maximum nesting depth exceeded."
@@ -794,7 +794,7 @@ msgstr "Campo personalizzato"
 
 #: documents/models.py:1037
 msgid "Workflow Trigger Type"
-msgstr ""
+msgstr "Tipo Frigger Del Workshop"
 
 #: documents/models.py:1049
 msgid "filter path"

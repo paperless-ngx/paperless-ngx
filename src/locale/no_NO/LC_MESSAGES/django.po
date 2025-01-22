@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-02 23:04-0800\n"
-"PO-Revision-Date: 2024-12-03 07:05\n"
+"PO-Revision-Date: 2025-01-19 12:10\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -23,7 +23,7 @@ msgstr "Dokumenter"
 
 #: documents/filters.py:336
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "Verdien må være en gyldig JSON."
 
 #: documents/filters.py:355
 msgid "Invalid custom field query expression"
@@ -1149,7 +1149,7 @@ msgstr "Ugyldig variabel oppdaget."
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr ""
+msgstr "Hei fra %(site_name)s!"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format

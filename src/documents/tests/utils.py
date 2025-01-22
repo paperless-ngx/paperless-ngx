@@ -295,9 +295,9 @@ class TestMigrations(TransactionTestCase):
     def setUp(self):
         super().setUp()
 
-        assert (
-            self.migrate_from and self.migrate_to
-        ), f"TestCase '{type(self).__name__}' must define migrate_from and migrate_to properties"
+        assert self.migrate_from and self.migrate_to, (
+            f"TestCase '{type(self).__name__}' must define migrate_from and migrate_to properties"
+        )
         self.migrate_from = [(self.app, self.migrate_from)]
         if self.dependencies is not None:
             self.migrate_from.extend(self.dependencies)

@@ -1,7 +1,5 @@
-from email.encoders import encode_base64
-from email.mime.base import MIMEBase
+from email import message_from_bytes
 from pathlib import Path
-from urllib.parse import quote
 
 from django.conf import settings
 from django.core.mail import EmailMessage
@@ -27,35 +25,14 @@ def send_email(
     if attachment:
         # Something could be renaming the file concurrently so it can't be attached
         with FileLock(settings.MEDIA_LOCK), attachment.open("rb") as f:
-            file_content = f.read()
+            content = f.read()
+            if attachment_mime_type == "message/rfc822":
+                # See https://forum.djangoproject.com/t/using-emailmessage-with-an-attached-email-file-crashes-due-to-non-ascii/37981
+                content = message_from_bytes(f.read())
 
-            main_type, sub_type = (
-                attachment_mime_type.split("/", 1)
-                if attachment_mime_type
-                else ("application", "octet-stream")
+            email.attach(
+                filename=attachment.name,
+                content=content,
+                mimetype=attachment_mime_type,
             )
-            mime_part = MIMEBase(main_type, sub_type)
-            mime_part.set_payload(file_content)
-
-            encode_base64(mime_part)
-
-            # see https://github.com/stumpylog/tika-client/blob/f65a2b792fc3cf15b9b119501bba9bddfac15fcc/src/tika_client/_base.py#L46-L57
-            try:
-                attachment.name.encode("ascii")
-            except UnicodeEncodeError:
-                filename_safed = attachment.name.encode("ascii", "ignore").decode(
-                    "ascii",
-                )
-                filepath_quoted = quote(attachment.name, encoding="utf-8")
-                mime_part.add_header(
-                    "Content-Disposition",
-                    f"attachment; filename={filename_safed}; filename*=UTF-8''{filepath_quoted}",
-                )
-            else:
-                mime_part.add_header(
-                    "Content-Disposition",
-                    f"attachment; filename={attachment.name}",
-                )
-
-            email.attach(mime_part)
     return email.send()

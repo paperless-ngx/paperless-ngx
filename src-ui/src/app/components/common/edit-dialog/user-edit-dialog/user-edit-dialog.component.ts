@@ -60,6 +60,11 @@ export class UserEditDialogComponent
   ngOnInit(): void {
     super.ngOnInit()
     this.onToggleSuperUser()
+    if (!this.currentUserIsSuperUser) {
+      this.objectForm.get('is_superuser').disable()
+    } else {
+      this.objectForm.get('is_superuser').enable()
+    }
   }
 
   getCreateTitle() {

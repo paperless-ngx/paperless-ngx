@@ -1,0 +1,63 @@
+From: =?UTF-8?Q?My_Name=C3=B6er?= <myaddr@volkswagen.de>
+Return-Path: <myaddr@volkswagen.de>
+X-Original-To: rechnung@domain.de
+Delivered-To: rechnung@domain.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=domainb.de; s=default;
+	t=1736973836; bh=bCUrrHd7c5mrvMbK20=;
+	h=Date:To:From:Subject:From;
+	b=QPaQKuzx2adfCr0S18KVgA5x01KXZknaaEpQW49Ock2ghScLAvv3ij8xfzUbZewCT
+	 CuUAYBmCxbN5ygIztJXfgWpl1Cx5FsVQNpdZ/6Ns=
+Received: by mail.domain.de (Postfix, from userid 121)
+	id 407BCE078A; Wed, 15 Jan 2025 21:43:56 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 4.0.0 (2022-12-13) on imail.domain.de
+X-Spam-Level:
+X-Spam-Status: No, score=-3.0 required=1.7 tests=ALL_TRUSTED,BAYES_00,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU autolearn=ham autolearn_force=no
+	version=4.0.0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=domain.de; s=default;
+	t=1736973835; bh=bCUrrHvn+Hd7c5mrvMbK20=;
+	h=Date:To:From:Subject:From;
+	b=AjGxzFALRR0AixC1uRhFuQkb4MoBqju1NInlUzx9w+toniNx3ifgkXpGxiV7+JJsr
+	 Z+jNZxck3D3M05ETYnrGInO+vDlosfFU2WqnZn+E=
+Received: from [192.168.8.154] (unknown [1.1.1.1])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest
+ SHA256)
+	(No client certificate requested)
+	(Authenticated sender: myuser)
+	by mail.domain.de (Postfix) with ESMTPSA id C8BC6DF926
+	for <rechnung@domain.de>; Wed, 15 Jan 2025 21:43:55 +0100 (CET)
+Message-ID: <da0c12c1-58c3-4f3d-ab89-9ae04@domain.de>
+Date: Wed, 15 Jan 2025 21:43:52 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: de-DE
+To: rechnung@domain.de
+Subject: No Umlauts here
+Autocrypt: addr=myaddr@domain.de; keydata=
+ xsDiBEK4/dERBACj7Kn2Skjnyq/Q69FKLSd9WJg/7Ta3aZwWiaizzAnB/avBoN9/NPkVCQbB
+ jeJ8G/uOtYDCgjmxeBNMVM3DOMTu4QfLnl0BoQz811bxiaPqQ6YLRA4MZrawZwerIOS2oSk2
+ FDGKsZvAYCG439QK102XPlSPC7c4/oQ+3fwkeqFpEwCg4XYOfTNzis6CZPgkQqyVrpaYR5kD
+ /j1HIDd1B75eeCb8ifoyWoWHB+cVHR+kEuMw1FMZt7UQ6Pb5nfQTcpEvrH9BTc0GKmTzj1N3
+ ExOPaNaGtsc7FAST+5dYflfL1+WVzsNJWgIp6PoAL1XoCZ6l63/qOrHtnp6l42IO8Rg2lDcc
+ 25YdfiRSlTWuKvleT/okyc6jHioEA/9bUPbpdmUyR5kWRkdRBTjjCipl+o8rSlparnnk+7jh
+ 1cvOHJlNJ/MYP9vcgDGYFIv+38sY4+UuBBoNmSS7yN5yKpT+XIsSgMEvyRPP6lr1GJ76aT2v
+ dIvcozHdC9g+nu6AlKgywdWW3hq5IjqRqnmVQfUN/1dL/D1ZImclEJoZR80lQ2hyaXN0aWFu
+ IFZvZWxrZXIgPGN2b2Vsa2VyQGtuZWJiLmRlPsJ3BBMRCAA3AhsjBgsJCAcDAgQVAggDBBYC
+ AwECHgECF4AWIQQl96acg1HmEUgEtrfRc0hiUBebOwUCXwQmvwAKCRDRc0hiUBebOxeiAJ43
+ bk2DCMuEVho3wRUqEyhNk0/mwQCaA60n1eTn+6bs2WXttTVGkBJGadzOwU0EQrj92RAIAKJz
+ rvwheohL4D327LEpy1AkIjUJotYUt9fPW+MVDSsoyj67HFTRz1WcK51+/8Fi6jedKxmR3hAi
+ GlZRvpsJ2chOuaynMac0Uv42rnSGHcLZf0KxLG+r7HOPSEAnSrbDAhWbuqyV994vCIfG9LDz
+ RDocaUEyJ7M+QV4VGS6Z3PPgxm78kCJ5TGHXRA96ponSptkyfIxvKHBa2TyrhMoLj4TmW4CO
+ SHmQD2e3EVIYlhERdPEQ5DmCljeO19ZopjNOLcAx4eOyguwvjpdeLUQJdaryWo56USWKbrmU
+ VrK4OodWkgcUvaagvey0MkABZkY0RMRKrfMuGb+Vw2nH9OGaRysAAwYH/AxC/+/m+OTA6tmA
+ AXd31vpMNUdVoPjyO+FQ7f8mwXa3SjPZeQLvpA1RfYFdDtSfr16RI8s41xtL12IYZr4nyRG/
+ wYPmM2WvcTUp3vWVizzHSERlarONc7aaCGXghg6Trpbz7+tv2MOpRLMfJd+6kyCz5pRSGeuX
+ z0iIxWSny1+Vc9uGgxyjJ21FFuvYPR8xmjfCGXvsnWLhKxTPNdhIG6/im/1/uTznzlfGUvgx
+ eNuzVphaVSPzP5DBVxJbKZzZYKOydQLx0Z79YF2xCGmz80EsSajpQNMvNYuNQXuH1ogFIP7e
+ PNOoaoakYuLE1YMhWL+AJzYRRevW8k/VLBgsYvbCRgQYEQIABgUCQrj92QAKCRDRc0hiUBeb
+ O/HXAJ0WAbB0sQ0SBVF+2Nlabw4HICAiKwCg4Fe9VjcfR4+ZJqq3Mx1c+IAE65c=
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+
+But here: üöäüäö

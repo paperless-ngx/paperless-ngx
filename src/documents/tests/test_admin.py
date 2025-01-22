@@ -1,4 +1,7 @@
+import types
+
 from django.contrib.admin.sites import AdminSite
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.utils import timezone
 
@@ -6,6 +9,7 @@ from documents import index
 from documents.admin import DocumentAdmin
 from documents.models import Document
 from documents.tests.utils import DirectoriesMixin
+from paperless.admin import PaperlessUserAdmin
 
 
 class TestDocumentAdmin(DirectoriesMixin, TestCase):
@@ -64,3 +68,39 @@ class TestDocumentAdmin(DirectoriesMixin, TestCase):
             created=timezone.make_aware(timezone.datetime(2020, 4, 12)),
         )
         self.assertEqual(self.doc_admin.created_(doc), "2020-04-12")
+
+
+class TestPaperlessAdmin(DirectoriesMixin, TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.user_admin = PaperlessUserAdmin(model=User, admin_site=AdminSite())
+
+    def test_request_is_passed_to_form(self):
+        user = User.objects.create(username="test", is_superuser=False)
+        non_superuser = User.objects.create(username="requestuser")
+        request = types.SimpleNamespace(user=non_superuser)
+        formType = self.user_admin.get_form(request)
+        form = formType(data={}, instance=user)
+        self.assertEqual(form.request, request)
+
+    def test_only_superuser_can_change_superuser(self):
+        superuser = User.objects.create_superuser(username="superuser", password="test")
+        non_superuser = User.objects.create(username="requestuser")
+        user = User.objects.create(username="test", is_superuser=False)
+
+        data = {
+            "username": "test",
+            "is_superuser": True,
+        }
+        form = self.user_admin.form(data, instance=user)
+        form.request = types.SimpleNamespace(user=non_superuser)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors.get("__all__"),
+            ["Superuser status can only be changed by a superuser"],
+        )
+
+        form = self.user_admin.form(data, instance=user)
+        form.request = types.SimpleNamespace(user=superuser)
+        self.assertTrue(form.is_valid())
+        self.assertEqual({}, form.errors)
