@@ -223,8 +223,7 @@ export class DocumentService extends AbstractPaperlessService<Document> {
 
   getPreviewUrl(id: number, original: boolean = false): string {
     let url = new URL(this.getResourceUrl(id, 'preview'))
-    if (this._searchQuery)
-      url.hash = `#search="${this._searchQuery.trim()}"&highlightAll=true`
+    if (this._searchQuery) url.hash = `#search="${this.searchQuery}"`
     if (original) {
       url.searchParams.append('original', 'true')
     }
@@ -310,7 +309,7 @@ export class DocumentService extends AbstractPaperlessService<Document> {
   }
 
   public set searchQuery(query: string) {
-    this._searchQuery = query
+    this._searchQuery = query.trim()
   }
 
   public get searchQuery(): string {
