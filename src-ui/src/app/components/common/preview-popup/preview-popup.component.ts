@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Component, Input, OnDestroy, ViewChild } from '@angular/core'
 import { NgbPopover, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
-import { PdfViewerModule } from 'ng2-pdf-viewer'
+import { PdfViewerComponent, PdfViewerModule } from 'ng2-pdf-viewer'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first, Subject, takeUntil } from 'rxjs'
 import { Document } from 'src/app/data/document'
@@ -57,6 +57,8 @@ export class PreviewPopupComponent implements OnDestroy {
 
   @ViewChild('popover') popover: NgbPopover
 
+  @ViewChild('pdfViewer') pdfViewer: PdfViewerComponent
+
   mouseOnPreview: boolean = false
 
   popoverClass: string = 'shadow popover-preview'
@@ -111,6 +113,17 @@ export class PreviewPopupComponent implements OnDestroy {
       this.requiresPassword = true
     } else {
       this.error = true
+    }
+  }
+
+  onViewerLoaded() {
+    if (this.documentService.searchQuery) {
+      this.pdfViewer.eventBus.dispatch('find', {
+        query: this.documentService.searchQuery,
+        caseSensitive: false,
+        highlightAll: true,
+        phraseSearch: true,
+      })
     }
   }
 

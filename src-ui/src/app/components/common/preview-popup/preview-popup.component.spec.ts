@@ -158,4 +158,24 @@ describe('PreviewPopupComponent', () => {
     jest.advanceTimersByTime(1)
     expect(component.popover.isOpen()).toBeFalsy()
   })
+
+  it('should dispatch find event on viewer loaded if searchQuery set', () => {
+    documentService.searchQuery = 'test'
+    settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, false)
+    component.popover.open()
+    jest.advanceTimersByTime(1000)
+    fixture.detectChanges()
+    // normally setup by pdf-viewer
+    jest.replaceProperty(component.pdfViewer, 'eventBus', {
+      dispatch: jest.fn(),
+    } as any)
+    const dispatchSpy = jest.spyOn(component.pdfViewer.eventBus, 'dispatch')
+    component.onViewerLoaded()
+    expect(dispatchSpy).toHaveBeenCalledWith('find', {
+      query: 'test',
+      caseSensitive: false,
+      highlightAll: true,
+      phraseSearch: true,
+    })
+  })
 })

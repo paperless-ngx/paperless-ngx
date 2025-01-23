@@ -28,7 +28,8 @@
             [original-size]="false"
             [show-borders]="false"
             [show-all]="true"
-            (error)="onError($event)">
+            (text-layer-rendered)="onViewerLoaded()"
+            (error)="onError($event)" #pdfViewer>
           </pdf-viewer>
         }
       }
