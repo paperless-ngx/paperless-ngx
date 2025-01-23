@@ -276,7 +276,7 @@ describe(`DocumentService`, () => {
     service.searchQuery = searchQuery
     let url = service.getPreviewUrl(documents[0].id)
     expect(url).toEqual(
-      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/preview/#search="${searchQuery}"`
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/preview/#search=%22${searchQuery}%22&highlightAll=true`
     )
   })
 
