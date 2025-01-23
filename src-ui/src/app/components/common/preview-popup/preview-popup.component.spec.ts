@@ -170,7 +170,7 @@ describe('PreviewPopupComponent', () => {
       dispatch: jest.fn(),
     } as any)
     const dispatchSpy = jest.spyOn(component.pdfViewer.eventBus, 'dispatch')
-    component.onViewerLoaded()
+    component.onPageRendered()
     expect(dispatchSpy).toHaveBeenCalledWith('find', {
       query: 'test',
       caseSensitive: false,

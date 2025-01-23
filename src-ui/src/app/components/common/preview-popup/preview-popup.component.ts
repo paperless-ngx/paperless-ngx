@@ -116,7 +116,8 @@ export class PreviewPopupComponent implements OnDestroy {
     }
   }
 
-  onViewerLoaded() {
+  onPageRendered() {
+    // Only triggered by the pngx pdf viewer
     if (this.documentService.searchQuery) {
       this.pdfViewer.eventBus.dispatch('find', {
         query: this.documentService.searchQuery,
