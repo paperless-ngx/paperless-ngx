@@ -222,12 +222,12 @@ export class DocumentService extends AbstractPaperlessService<Document> {
   }
 
   getPreviewUrl(id: number, original: boolean = false): string {
-    let url = this.getResourceUrl(id, 'preview')
-    if (this._searchQuery) url += `#search="${this._searchQuery}"`
+    let url = new URL(this.getResourceUrl(id, 'preview'))
+    if (this._searchQuery) url.hash = `#search="${this.searchQuery}"`
     if (original) {
-      url += '?original=true'
+      url.searchParams.append('original', 'true')
     }
-    return url
+    return url.toString()
   }
 
   getThumbUrl(id: number): string {
@@ -309,6 +309,10 @@ export class DocumentService extends AbstractPaperlessService<Document> {
   }
 
   public set searchQuery(query: string) {
-    this._searchQuery = query
+    this._searchQuery = query.trim()
+  }
+
+  public get searchQuery(): string {
+    return this._searchQuery
   }
 }
