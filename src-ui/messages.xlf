@@ -2232,7 +2232,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">922</context>
+          <context context-type="linenumber">924</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7266264608936522311" datatype="html">
@@ -2509,19 +2509,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">946</context>
+          <context context-type="linenumber">948</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1253</context>
+          <context context-type="linenumber">1255</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1292</context>
+          <context context-type="linenumber">1294</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1333</context>
+          <context context-type="linenumber">1335</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3115,7 +3115,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">899</context>
+          <context context-type="linenumber">901</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -6212,7 +6212,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1310</context>
+          <context context-type="linenumber">1312</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
@@ -6602,21 +6602,21 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">872</context>
+          <context context-type="linenumber">874</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8410796510716511826" datatype="html">
         <source>Do you really want to move the document &quot;<x id="PH" equiv-text="this.document.title"/>&quot; to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">900</context>
+          <context context-type="linenumber">902</context>
         </context-group>
       </trans-unit>
       <trans-unit id="282586936710748252" datatype="html">
         <source>Documents can be restored prior to permanent deletion.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">901</context>
+          <context context-type="linenumber">903</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -6627,7 +6627,7 @@
         <source>Move to trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">903</context>
+          <context context-type="linenumber">905</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -6638,7 +6638,7 @@
         <source>Reprocess confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">942</context>
+          <context context-type="linenumber">944</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -6649,70 +6649,70 @@
         <source>This operation will permanently recreate the archive file for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">943</context>
+          <context context-type="linenumber">945</context>
         </context-group>
       </trans-unit>
       <trans-unit id="302054111564709516" datatype="html">
         <source>The archive file will be re-generated with the current settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">944</context>
+          <context context-type="linenumber">946</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1192507664585066165" datatype="html">
         <source>Reprocess operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">954</context>
+          <context context-type="linenumber">956</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4409560272830824468" datatype="html">
         <source>Error executing operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">965</context>
+          <context context-type="linenumber">967</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4458954481601077369" datatype="html">
         <source>Page Fit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1038</context>
+          <context context-type="linenumber">1040</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1217563727923422413" datatype="html">
         <source>Split confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1251</context>
+          <context context-type="linenumber">1253</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2805304563009985503" datatype="html">
         <source>This operation will split the selected document(s) into new documents.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1252</context>
+          <context context-type="linenumber">1254</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4158171846914923744" datatype="html">
         <source>Split operation will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1268</context>
+          <context context-type="linenumber">1270</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3235014591864339926" datatype="html">
         <source>Error executing split operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1277</context>
+          <context context-type="linenumber">1279</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6555329262222566158" datatype="html">
         <source>Rotate confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1290</context>
+          <context context-type="linenumber">1292</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -6723,60 +6723,60 @@
         <source>This operation will permanently rotate the original version of the current document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1291</context>
+          <context context-type="linenumber">1293</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4069543875319587651" datatype="html">
         <source>Rotation will begin in the background. Close and re-open the document after the operation has completed to see the changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1307</context>
+          <context context-type="linenumber">1309</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2962674215361798818" datatype="html">
         <source>Error executing rotate operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1319</context>
+          <context context-type="linenumber">1321</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3539261415918606512" datatype="html">
         <source>Delete pages confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1331</context>
+          <context context-type="linenumber">1333</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5854352498125813866" datatype="html">
         <source>This operation will permanently delete the selected pages from the original document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1332</context>
+          <context context-type="linenumber">1334</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8617528702531167646" datatype="html">
         <source>Delete pages operation will begin in the background. Close and re-open or reload this document after the operation has completed to see the changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1347</context>
+          <context context-type="linenumber">1349</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1249139200486584973" datatype="html">
         <source>Error executing delete pages operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1356</context>
+          <context context-type="linenumber">1358</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6085793215710522488" datatype="html">
         <source>An error occurred loading tiff: <x id="PH" equiv-text="err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1396</context>
+          <context context-type="linenumber">1398</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1400</context>
+          <context context-type="linenumber">1402</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4958946940233632319" datatype="html">
