@@ -24,6 +24,7 @@ import {
   FILTER_DOCUMENT_TYPE,
   FILTER_FULLTEXT_MORELIKE,
   FILTER_HAS_TAGS_ALL,
+  FILTER_OWNER_ANY,
   FILTER_STORAGE_PATH,
 } from 'src/app/data/filter-rule-type'
 import { SavedView } from 'src/app/data/saved-view'
@@ -293,6 +294,15 @@ describe('SavedViewWidgetComponent', () => {
       { rule_type: FILTER_STORAGE_PATH, value: '11' },
     ])
     component.clickStoragePath(11) // coverage
+  })
+
+  it('should navigate via quickfilter on click owner', () => {
+    const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
+    component.clickOwner(11, new MouseEvent('click'))
+    expect(qfSpy).toHaveBeenCalledWith([
+      { rule_type: FILTER_OWNER_ANY, value: '11' },
+    ])
+    component.clickOwner(11) // coverage
   })
 
   it('should navigate via quickfilter on click more like', () => {
