@@ -1,3 +1,5 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import {
   ComponentFixture,
   TestBed,
@@ -51,7 +53,11 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      providers: [FilterPipe],
+      providers: [
+        FilterPipe,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
       imports: [NgxBootstrapIconsModule.pick(allIcons)],
     }).compileComponents()
 

@@ -16,8 +16,8 @@
 
       @if (document && displayFields?.includes(DisplayField.TAGS)) {
         <div class="tags d-flex flex-column text-end position-absolute me-1 fs-6">
-          @for (t of getTagsLimited$() | async; track t) {
-            <pngx-tag [tag]="t" (click)="clickTag.emit(t.id);$event.stopPropagation()" [clickable]="true" linkTitle="Toggle tag filter" i18n-linkTitle></pngx-tag>
+          @for (tagID of tagIDs; track tagID) {
+            <pngx-tag [tagID]="tagID" (click)="clickTag.emit(tagID);$event.stopPropagation()" [clickable]="true" linkTitle="Toggle tag filter" i18n-linkTitle></pngx-tag>
           }
           @if (moreTags) {
             <div>
@@ -40,7 +40,7 @@
       <p class="card-text">
         @if (document) {
           @if (displayFields.includes(DisplayField.CORRESPONDENT) && document.correspondent) {
-            <a title="Toggle correspondent filter" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold btn-link">{{(document.correspondent$ | async)?.name ?? privateName}}</a>
+            <a title="Toggle correspondent filter" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold btn-link">{{document.correspondent | correspondentName | async}}</a>
             @if (displayFields.includes(DisplayField.TITLE)) {:}
           }
           @if (displayFields.includes(DisplayField.TITLE)) {
@@ -59,14 +59,14 @@
             <button type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Toggle document type filter" i18n-title
               (click)="clickDocumentType.emit(document.document_type);$event.stopPropagation()">
               <i-bs width="1em" height="1em" class="me-2 text-muted" name="file-earmark"></i-bs>
-              <small>{{(document.document_type$ | async)?.name ?? privateName}}</small>
+              <small>{{document.document_type | documentTypeName | async}}</small>
             </button>
           }
           @if (displayFields.includes(DisplayField.STORAGE_PATH) && document.storage_path) {
             <button type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Toggle storage path filter" i18n-title
               (click)="clickStoragePath.emit(document.storage_path);$event.stopPropagation()">
               <i-bs width="1em" height="1em" class="me-2 text-muted" name="folder"></i-bs>
-              <small>{{(document.storage_path$ | async)?.name ?? privateName}}</small>
+              <small>{{document.storage_path | storagePathName | async}}</small>
             </button>
           }
           @if (displayFields.includes(DisplayField.CREATED)) {
@@ -116,7 +116,7 @@
           @if (displayFields.includes(DisplayField.OWNER) && document.owner && document.owner !== settingsService.currentUser.id) {
             <div class="ps-0 p-1">
               <i-bs width="1em" height="1em" class="me-2 text-muted" name="person-fill-lock"></i-bs>
-              <small>{{document.owner | username}}</small>
+              <small>{{document.owner | username | async}}</small>
             </div>
           }
           @if (displayFields.includes(DisplayField.SHARED) && document.is_shared_by_requester) {
