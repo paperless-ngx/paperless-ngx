@@ -49,7 +49,7 @@ const CONSUMPTION_SCOPE_OPTIONS = [
     name: $localize`Only process attachments`,
   },
   {
-    id: MailRuleConsumptionScope.Email_Only,
+    id: MailRuleConsumptionScope.EmailOnly,
     name: $localize`Process message as .eml`,
   },
   {
