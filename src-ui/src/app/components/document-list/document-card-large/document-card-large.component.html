@@ -136,7 +136,7 @@
               }
               @if (displayFields.includes(DisplayField.OWNER) && document.owner && document.owner !== settingsService.currentUser.id) {
                 <div class="list-group-item bg-light text-dark p-1 border-0 d-flex align-items-center">
-                  <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="person-fill-lock"></i-bs><small>{{document.owner | username}}</small>
+                  <i-bs width=".9em" height=".9em" class="me-2 text-muted" name="person-fill-lock"></i-bs><small>{{document.owner | username | async}}</small>
                 </div>
               }
               @if (displayFields.includes(DisplayField.SHARED) && document.is_shared_by_requester) {

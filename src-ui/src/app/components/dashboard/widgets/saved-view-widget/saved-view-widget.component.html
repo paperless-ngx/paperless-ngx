@@ -70,7 +70,7 @@
                     }
                     @case (DisplayField.OWNER) {
                       @if (doc.owner) {
-                        <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickOwner(doc.owner, $event)" title="Filter by owner" i18n-title>{{doc.owner | username}}</a>
+                        <a class="btn-link text-dark text-decoration-none" type="button" (click)="clickOwner(doc.owner, $event)" title="Filter by owner" i18n-title>{{doc.owner | username | async}}</a>
                       }
                     }
                     @case (DisplayField.ASN) {

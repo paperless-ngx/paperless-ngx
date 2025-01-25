@@ -38,6 +38,13 @@ describe('UsernamePipe', () => {
   })
 
   it('should transform user id to username', () => {
+    let username
+    const assign = (name) => {
+      username = name
+    }
+
+    pipe.transform(2).subscribe(assign)
+
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}users/?page=1&page_size=100000`
     )
@@ -55,24 +62,44 @@ describe('UsernamePipe', () => {
         },
       ],
     })
-
-    let username = pipe.transform(2)
     expect(username).toEqual('username2')
 
-    username = pipe.transform(3)
+    pipe.transform(3).subscribe(assign)
     expect(username).toEqual('User Name3')
 
-    username = pipe.transform(4)
+    pipe.transform(4).subscribe(assign)
     expect(username).toEqual('')
   })
 
-  it('should show generic label when no users retrieved', () => {
+  it('should show generic label when insufficient permissions', () => {
+    let username
+    const assign = (name) => {
+      username = name
+    }
+    jest
+      .spyOn(permissionsService, 'currentUserCan')
+      .mockImplementation((action, type) => {
+        return false
+      })
+    pipe.transform(4).subscribe(assign)
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}users/?page=1&page_size=100000`
+    )
+
+    expect(username).toEqual('Shared')
+  })
+
+  it('should show empty string when no users retrieved due to error', () => {
+    let username
+    const assign = (name) => {
+      username = name
+    }
+    pipe.transform(4).subscribe(assign)
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}users/?page=1&page_size=100000`
     )
-    req.flush(null)
+    req.error(new ProgressEvent('error'))
 
-    let username = pipe.transform(4)
-    expect(username).toEqual('Shared')
+    expect(username).toEqual('')
   })
 })

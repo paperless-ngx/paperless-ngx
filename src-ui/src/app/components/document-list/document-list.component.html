@@ -318,7 +318,7 @@
                 }
                 @if (activeDisplayFields.includes(DisplayField.OWNER) && permissionService.currentUserCan(PermissionAction.View, PermissionType.User)) {
                   <td>
-                    {{d.owner | username}}
+                    {{d.owner | username | async}}
                   </td>
                 }
                 @if (activeDisplayFields.includes(DisplayField.NOTES) && notesEnabled) {
