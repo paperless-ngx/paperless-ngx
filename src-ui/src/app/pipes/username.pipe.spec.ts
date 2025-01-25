@@ -37,13 +37,10 @@ describe('UsernamePipe', () => {
     httpTestingController.verify()
   })
 
-  it('should transform user id to username', () => {
-    let username
-    const assign = (name) => {
-      username = name
-    }
-
-    pipe.transform(2).subscribe(assign)
+  it('should transform user id to username', (done) => {
+    pipe.transform(2).subscribe((username) => {
+      expect(username).toEqual('username2')
+    })
 
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}users/?page=1&page_size=100000`
@@ -62,44 +59,39 @@ describe('UsernamePipe', () => {
         },
       ],
     })
-    expect(username).toEqual('username2')
+    pipe.transform(3).subscribe((username) => {
+      expect(username).toEqual('User Name3')
+    })
 
-    pipe.transform(3).subscribe(assign)
-    expect(username).toEqual('User Name3')
-
-    pipe.transform(4).subscribe(assign)
-    expect(username).toEqual('')
+    pipe.transform(4).subscribe((username) => {
+      expect(username).toEqual('')
+      done()
+    })
   })
 
-  it('should show generic label when insufficient permissions', () => {
-    let username
-    const assign = (name) => {
-      username = name
-    }
+  it('should show generic label when insufficient permissions', (done) => {
     jest
       .spyOn(permissionsService, 'currentUserCan')
       .mockImplementation((action, type) => {
         return false
       })
-    pipe.transform(4).subscribe(assign)
+    pipe.transform(4).subscribe((username) => {
+      expect(username).toEqual('Shared')
+      done()
+    })
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}users/?page=1&page_size=100000`
     )
-
-    expect(username).toEqual('Shared')
   })
 
-  it('should show empty string when no users retrieved due to error', () => {
-    let username
-    const assign = (name) => {
-      username = name
-    }
-    pipe.transform(4).subscribe(assign)
+  it('should show empty string when no users retrieved due to error', (done) => {
+    pipe.transform(4).subscribe((username) => {
+      expect(username).toEqual('')
+      done()
+    })
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}users/?page=1&page_size=100000`
     )
     req.error(new ProgressEvent('error'))
-
-    expect(username).toEqual('')
   })
 })

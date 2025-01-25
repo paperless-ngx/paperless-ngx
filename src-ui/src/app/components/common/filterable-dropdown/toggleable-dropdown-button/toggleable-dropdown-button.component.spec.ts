@@ -1,3 +1,5 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { Tag } from 'src/app/data/tag'
 import { TagComponent } from '../../tag/tag.component'
@@ -12,7 +14,10 @@ describe('ToggleableDropdownButtonComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      providers: [],
+      providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
       imports: [ToggleableDropdownButtonComponent, TagComponent],
     }).compileComponents()
 

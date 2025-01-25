@@ -37,8 +37,11 @@ import {
   SortableDirective,
   SortEvent,
 } from 'src/app/directives/sortable.directive'
+import { CorrespondentNamePipe } from 'src/app/pipes/correspondent-name.pipe'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
+import { DocumentTypeNamePipe } from 'src/app/pipes/document-type-name.pipe'
+import { StoragePathNamePipe } from 'src/app/pipes/storage-path-name.pipe'
 import { UsernamePipe } from 'src/app/pipes/username.pipe'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
@@ -81,6 +84,9 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
     IfPermissionsDirective,
     SortableDirective,
     UsernamePipe,
+    CorrespondentNamePipe,
+    DocumentTypeNamePipe,
+    StoragePathNamePipe,
     NgxBootstrapIconsModule,
     AsyncPipe,
     FormsModule,

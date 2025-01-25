@@ -295,7 +295,7 @@
                 @if (activeDisplayFields.includes(DisplayField.CORRESPONDENT) && permissionService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
                   <td class="">
                     @if (d.correspondent) {
-                      <a (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent" i18n-title>{{(d.correspondent$ | async)?.name}}</a>
+                      <a (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent" i18n-title>{{d.correspondent | correspondentName | async}}</a>
                     }
                   </td>
                 }
@@ -310,8 +310,8 @@
                       </div>
                     }
                     @if (activeDisplayFields.includes(DisplayField.TAGS)) {
-                      @for (t of d.tags$ | async; track t) {
-                        <pngx-tag [tag]="t" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(t.id);$event.stopPropagation()"></pngx-tag>
+                      @for (tagID of d.tags; track t) {
+                        <pngx-tag [tagID]="tagID" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(tagID);$event.stopPropagation()"></pngx-tag>
                       }
                     }
                   </td>
@@ -335,14 +335,14 @@
                 @if (activeDisplayFields.includes(DisplayField.DOCUMENT_TYPE) && permissionService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
                   <td class="">
                     @if (d.document_type) {
-                      <a (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type" i18n-title>{{(d.document_type$ | async)?.name}}</a>
+                      <a (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type" i18n-title>{{d.document_type | documentTypeName | async}}</a>
                     }
                   </td>
                 }
                 @if (activeDisplayFields.includes(DisplayField.STORAGE_PATH) && permissionService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
                   <td class="">
                     @if (d.storage_path) {
-                      <a (click)="clickStoragePath(d.storage_path);$event.stopPropagation()" title="Filter by storage path" i18n-title>{{(d.storage_path$ | async)?.name}}</a>
+                      <a (click)="clickStoragePath(d.storage_path);$event.stopPropagation()" title="Filter by storage path" i18n-title>{{d.storage_path | storagePathName | async}}</a>
                     }
                   </td>
                 }
