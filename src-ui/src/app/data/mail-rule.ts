@@ -7,7 +7,7 @@ export enum MailFilterAttachmentType {
 
 export enum MailRuleConsumptionScope {
   Attachments = 1,
-  Email_Only = 2,
+  EmailOnly = 2,
   Everything = 3,
 }
 
