@@ -1,11 +1,6 @@
-import { Observable } from 'rxjs'
-import { Correspondent } from './correspondent'
 import { CustomFieldInstance } from './custom-field-instance'
 import { DocumentNote } from './document-note'
-import { DocumentType } from './document-type'
 import { ObjectWithPermissions } from './object-with-permissions'
-import { StoragePath } from './storage-path'
-import { Tag } from './tag'
 
 export enum DisplayMode {
   TABLE = 'table',
@@ -118,23 +113,15 @@ export interface SearchHit {
 }
 
 export interface Document extends ObjectWithPermissions {
-  correspondent$?: Observable<Correspondent>
-
   correspondent?: number
 
-  document_type$?: Observable<DocumentType>
-
   document_type?: number
-
-  storage_path$?: Observable<StoragePath>
 
   storage_path?: number
 
   title?: string
 
   content?: string
-
-  tags$?: Observable<Tag[]>
 
   tags?: number[]
 

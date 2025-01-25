@@ -36,8 +36,11 @@ import {
 } from 'src/app/data/filter-rule-type'
 import { SavedView } from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { CorrespondentNamePipe } from 'src/app/pipes/correspondent-name.pipe'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
+import { DocumentTypeNamePipe } from 'src/app/pipes/document-type-name.pipe'
+import { StoragePathNamePipe } from 'src/app/pipes/storage-path-name.pipe'
 import { UsernamePipe } from 'src/app/pipes/username.pipe'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
@@ -65,6 +68,9 @@ import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
     WidgetFrameComponent,
     IfPermissionsDirective,
     UsernamePipe,
+    CorrespondentNamePipe,
+    DocumentTypeNamePipe,
+    StoragePathNamePipe,
     AsyncPipe,
     DocumentTitlePipe,
     CustomDatePipe,

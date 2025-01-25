@@ -57,21 +57,21 @@ const docs: Document[] = [
     id: 1,
     title: 'Doc1',
     notes: [],
-    tags$: new Subject(),
+    tags: [],
     content: 'document content 1',
   },
   {
     id: 2,
     title: 'Doc2',
     notes: [],
-    tags$: new Subject(),
+    tags: [],
     content: 'document content 2',
   },
   {
     id: 3,
     title: 'Doc3',
     notes: [],
-    tags$: new Subject(),
+    tags: [],
     content: 'document content 3',
   },
 ]
@@ -650,7 +650,6 @@ describe('DocumentListComponent', () => {
       id: i + 1,
       title: `Doc${i + 1}`,
       notes: [],
-      tags$: new Subject(),
       content: `document content ${i + 1}`,
     }))
     jest

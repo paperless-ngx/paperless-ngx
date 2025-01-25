@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
-import { map, tap } from 'rxjs/operators'
+import { map } from 'rxjs/operators'
 import { AuditLogEntry } from 'src/app/data/auditlog-entry'
 import { CustomField } from 'src/app/data/custom-field'
 import {
@@ -22,11 +22,7 @@ import {
 } from '../permissions.service'
 import { SettingsService } from '../settings.service'
 import { AbstractPaperlessService } from './abstract-paperless-service'
-import { CorrespondentService } from './correspondent.service'
 import { CustomFieldsService } from './custom-fields.service'
-import { DocumentTypeService } from './document-type.service'
-import { StoragePathService } from './storage-path.service'
-import { TagService } from './tag.service'
 
 export interface SelectionDataItem {
   id: number
@@ -61,10 +57,6 @@ export class DocumentService extends AbstractPaperlessService<Document> {
 
   constructor(
     http: HttpClient,
-    private correspondentService: CorrespondentService,
-    private documentTypeService: DocumentTypeService,
-    private tagService: TagService,
-    private storagePathService: StoragePathService,
     private permissionsService: PermissionsService,
     private settingsService: SettingsService,
     private customFieldService: CustomFieldsService
@@ -137,54 +129,6 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     ]
   }
 
-  addObservablesToDocument(doc: Document) {
-    if (
-      doc.correspondent &&
-      this.permissionsService.currentUserCan(
-        PermissionAction.View,
-        PermissionType.Correspondent
-      )
-    ) {
-      doc.correspondent$ = this.correspondentService.getCached(
-        doc.correspondent
-      )
-    }
-    if (
-      doc.document_type &&
-      this.permissionsService.currentUserCan(
-        PermissionAction.View,
-        PermissionType.DocumentType
-      )
-    ) {
-      doc.document_type$ = this.documentTypeService.getCached(doc.document_type)
-    }
-    if (
-      doc.tags &&
-      this.permissionsService.currentUserCan(
-        PermissionAction.View,
-        PermissionType.Tag
-      )
-    ) {
-      doc.tags$ = this.tagService
-        .getCachedMany(doc.tags)
-        .pipe(
-          tap((tags) =>
-            tags.sort((tagA, tagB) => tagA.name.localeCompare(tagB.name))
-          )
-        )
-    }
-    if (
-      doc.storage_path &&
-      this.permissionsService.currentUserCan(
-        PermissionAction.View,
-        PermissionType.StoragePath
-      )
-    ) {
-      doc.storage_path$ = this.storagePathService.getCached(doc.storage_path)
-    }
-    return doc
-  }
-
   listFiltered(
     page?: number,
     pageSize?: number,
@@ -199,11 +143,6 @@ export class DocumentService extends AbstractPaperlessService<Document> {
       sortField,
       sortReverse,
       Object.assign(extraParams, queryParamsFromFilterRules(filterRules))
-    ).pipe(
-      map((results) => {
-        results.results.forEach((doc) => this.addObservablesToDocument(doc))
-        return results
-      })
     )
   }
 
