@@ -511,8 +511,11 @@ class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
 
 class CustomFieldSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
+        context = kwargs.get("context")
         self.api_version = int(
-            kwargs.pop("api_version", settings.REST_FRAMEWORK["ALLOWED_VERSIONS"][-1]),
+            context.get("request").version
+            if context.get("request")
+            else settings.REST_FRAMEWORK["ALLOWED_VERSIONS"][-1],
         )
         super().__init__(*args, **kwargs)
 
