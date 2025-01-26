@@ -646,9 +646,25 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
             custom_field.data_type,
         )
 
+        api_version = int(
+            self.context.get("request").version
+            if self.context.get("request")
+            else settings.REST_FRAMEWORK["ALLOWED_VERSIONS"][-1],
+        )
+
         if custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
             # prior to update so we can look for any docs that are going to be removed
             self.reflect_doclinks(document, custom_field, validated_data["value"])
+
+        if (
+            custom_field.data_type == CustomField.FieldDataType.SELECT
+            and api_version < 7
+        ):
+            # Convert the index of the option in the field.extra_data["select_options"] list
+            # to the actual value
+            validated_data["value"] = custom_field.extra_data["select_options"][
+                validated_data["value"]
+            ]["id"]
 
         # Actually update or create the instance, providing the value
         # to fill in the correct attribute based on the type
@@ -660,6 +676,21 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         return instance
 
     def get_value(self, obj: CustomFieldInstance):
+        api_version = int(
+            self.context.get("request").version
+            if self.context.get("request")
+            else settings.REST_FRAMEWORK["ALLOWED_VERSIONS"][-1],
+        )
+        if api_version < 7 and obj.field.data_type == CustomField.FieldDataType.SELECT:
+            # return the index of the option in the field.extra_data["select_options"] list
+            return next(
+                (
+                    idx
+                    for idx, option in enumerate(obj.field.extra_data["select_options"])
+                    if option["id"] == obj.value
+                ),
+                None,
+            )
         return obj.value
 
     def validate(self, data):
@@ -957,6 +988,12 @@ class DocumentSerializer(
             or context.get("request").method == "PUT"
         ):
             kwargs["full_perms"] = True
+
+        self.api_version = int(
+            context.get("request").version
+            if context.get("request")
+            else settings.REST_FRAMEWORK["ALLOWED_VERSIONS"][-1],
+        )
 
         super().__init__(*args, **kwargs)
 
