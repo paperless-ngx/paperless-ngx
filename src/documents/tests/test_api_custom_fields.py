@@ -151,7 +151,6 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
     def test_custom_field_select_unique_ids(self):
         """
         GIVEN:
-            - Nothing
             - Existing custom field
         WHEN:
             - API request to create custom field with select options without id
@@ -172,6 +171,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
                     },
                 },
             ),
+            headers={"Accept": "application/json; version=7"},
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
@@ -197,6 +197,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
                     },
                 },
             ),
+            headers={"Accept": "application/json; version=7"},
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -560,6 +561,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
                     },
                 ],
             },
+            headers={"Accept": "application/json; version=7"},
             format="json",
         )
 
