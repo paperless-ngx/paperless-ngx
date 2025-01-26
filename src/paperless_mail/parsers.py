@@ -231,11 +231,15 @@ class MailDocumentParser(DocumentParser):
     def generate_pdf(
         self,
         mail_message: MailMessage,
-        pdf_layout: MailRule.PdfLayout = MailRule.PdfLayout.TEXT_HTML,
+        pdf_layout: MailRule.PdfLayout | None = None,
     ) -> Path:
         archive_path = Path(self.tempdir) / "merged.pdf"
 
         mail_pdf_file = self.generate_pdf_from_mail(mail_message)
+
+        pdf_layout = (
+            pdf_layout or settings.EMAIL_PARSE_DEFAULT_LAYOUT
+        )  # EMAIL_PARSE_DEFAULT_LAYOUT is a MailRule.PdfLayout
 
         # If no HTML content, create the PDF from the message
         # Otherwise, create 2 PDFs and merge them with Gotenberg

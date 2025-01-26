@@ -198,6 +198,18 @@ Docker, this may be the `environment` key of the webserver or a
 containing the configuration parameters. Be sure to use the correct format
 and watch out for indentation if editing the YAML file.
 
+### Email Parsing
+
+#### [`PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT=<int>`(#PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT) {#PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT}
+
+: The default layout to use for emails that are consumed as documents. Must be one of the integer choices below. Note that mail
+rules can specify this setting, thus this fallback is used for .eml files consumed by other means.
+
+    - `1` = Text, then HTML
+    - `2` = HTML, then text
+    - `3` = HTML only
+    - `4` = Text only
+
 ## Paths and folders
 
 #### [`PAPERLESS_CONSUMPTION_DIR=<path>`](#PAPERLESS_CONSUMPTION_DIR) {#PAPERLESS_CONSUMPTION_DIR}
