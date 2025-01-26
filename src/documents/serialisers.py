@@ -645,25 +645,9 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
             custom_field.data_type,
         )
 
-        api_version = int(
-            self.context.get("request").version
-            if self.context.get("request")
-            else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
-        )
-
         if custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
             # prior to update so we can look for any docs that are going to be removed
             self.reflect_doclinks(document, custom_field, validated_data["value"])
-
-        if (
-            custom_field.data_type == CustomField.FieldDataType.SELECT
-            and api_version < 7
-        ):
-            # Convert the index of the option in the field.extra_data["select_options"] list
-            # to the actual value
-            validated_data["value"] = custom_field.extra_data["select_options"][
-                validated_data["value"]
-            ]["id"]
 
         # Actually update or create the instance, providing the value
         # to fill in the correct attribute based on the type
@@ -702,6 +686,12 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         """
         data = super().validate(data)
         field: CustomField = data["field"]
+        api_version = int(
+            self.context.get("request").version
+            if self.context.get("request")
+            else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
+        )
+
         if "value" in data and data["value"] is not None:
             if (
                 field.data_type == CustomField.FieldDataType.URL
@@ -729,6 +719,14 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
                 MaxLengthValidator(limit_value=128)(data["value"])
             elif field.data_type == CustomField.FieldDataType.SELECT:
                 select_options = field.extra_data["select_options"]
+
+                if api_version < 7:
+                    # Convert the index of the option in the field.extra_data["select_options"]
+                    # list to the options unique id
+                    data["value"] = field.extra_data["select_options"][data["value"]][
+                        "id"
+                    ]
+
                 try:
                     next(
                         option
