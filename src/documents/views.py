@@ -2066,7 +2066,7 @@ class CustomFieldViewSet(ModelViewSet):
         )
 
     def get_serializer(self, *args, **kwargs):
-        kwargs.setdefault("api_version", self.request.version)
+        kwargs.setdefault("context", self.get_serializer_context())
         return super().get_serializer(*args, **kwargs)
 
 
