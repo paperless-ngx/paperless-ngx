@@ -12,10 +12,10 @@ export enum MailRuleConsumptionScope {
 }
 
 export enum MailRulePdfLayout {
-  Text_Html = 1,
-  Html_Text = 2,
-  Html_only = 3,
-  Text_only = 4,
+  TextHtml = 1,
+  HtmlText = 2,
+  HtmlOnly = 3,
+  TextOnly = 4,
 }
 
 export enum MailAction {

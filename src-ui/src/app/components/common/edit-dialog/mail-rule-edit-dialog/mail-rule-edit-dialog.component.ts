@@ -61,19 +61,19 @@ const CONSUMPTION_SCOPE_OPTIONS = [
 
 const PDF_LAYOUT_OPTIONS = [
   {
-    id: MailRulePdfLayout.Text_Html,
+    id: MailRulePdfLayout.TextHtml,
     name: $localize`Text, then HTML`,
   },
   {
-    id: MailRulePdfLayout.Html_Text,
+    id: MailRulePdfLayout.HtmlText,
     name: $localize`HTML, then text`,
   },
   {
-    id: MailRulePdfLayout.Html_only,
+    id: MailRulePdfLayout.HtmlOnly,
     name: $localize`HTML only`,
   },
   {
-    id: MailRulePdfLayout.Text_only,
+    id: MailRulePdfLayout.TextOnly,
     name: $localize`Text only`,
   },
 ]
@@ -204,7 +204,7 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
       filter_attachment_filename_exclude: new FormControl(null),
       maximum_age: new FormControl(null),
       attachment_type: new FormControl(MailFilterAttachmentType.Attachments),
-      pdf_layout: new FormControl(MailRulePdfLayout.Text_Html),
+      pdf_layout: new FormControl(MailRulePdfLayout.TextHtml),
       consumption_scope: new FormControl(MailRuleConsumptionScope.Attachments),
       order: new FormControl(null),
       action: new FormControl(MailAction.MarkRead),

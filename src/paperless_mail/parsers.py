@@ -127,7 +127,7 @@ class MailDocumentParser(DocumentParser):
         document_path: Path,
         mime_type: str,
         file_name=None,
-        mailrule: int | None = None,
+        mailrule_id: int | None = None,
     ):
         """
         Parses the given .eml into formatted text, based on the decoded email.
@@ -187,8 +187,8 @@ class MailDocumentParser(DocumentParser):
             self.date = mail.date
 
         self.log.debug("Creating a PDF from the email")
-        if mailrule:
-            rule = MailRule.objects.get(pk=mailrule)
+        if mailrule_id:
+            rule = MailRule.objects.get(pk=mailrule_id)
             self.archive_path = self.generate_pdf(mail, rule.pdf_layout)
         else:
             self.archive_path = self.generate_pdf(mail)
@@ -266,15 +266,13 @@ class MailDocumentParser(DocumentParser):
                     route.pdf_format(pdf_a_format)
 
                 match pdf_layout:
-                    case MailRule.PdfLayout.TEXT_HTML:
-                        route.merge([mail_pdf_file, pdf_of_html_content])
                     case MailRule.PdfLayout.HTML_TEXT:
                         route.merge([pdf_of_html_content, mail_pdf_file])
                     case MailRule.PdfLayout.HTML_ONLY:
                         route.merge([pdf_of_html_content])
                     case MailRule.PdfLayout.TEXT_ONLY:
                         route.merge([mail_pdf_file])
-                    case _:
+                    case MailRule.PdfLayout.TEXT_HTML | _:
                         route.merge([mail_pdf_file, pdf_of_html_content])
 
                 try:
