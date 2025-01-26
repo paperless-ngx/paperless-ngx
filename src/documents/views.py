@@ -2065,6 +2065,10 @@ class CustomFieldViewSet(ModelViewSet):
             )
         )
 
+    def get_serializer(self, *args, **kwargs):
+        kwargs.setdefault("api_version", self.request.version)
+        return super().get_serializer(*args, **kwargs)
+
 
 class SystemStatusView(PassUserMixin):
     permission_classes = (IsAuthenticated,)

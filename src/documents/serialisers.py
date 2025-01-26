@@ -495,13 +495,35 @@ class StoragePathField(serializers.PrimaryKeyRelatedField):
         return StoragePath.objects.all()
 
 
+class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
+    """
+    Based on https://stackoverflow.com/a/62579804
+    """
+
+    def __init__(self, method_name=None, *args, **kwargs):
+        self.method_name = method_name
+        kwargs["source"] = "*"
+        super(serializers.SerializerMethodField, self).__init__(*args, **kwargs)
+
+    def to_internal_value(self, data):
+        return {self.field_name: data}
+
+
 class CustomFieldSerializer(serializers.ModelSerializer):
+    def __init__(self, *args, **kwargs):
+        self.api_version = int(
+            kwargs.pop("api_version", settings.REST_FRAMEWORK["ALLOWED_VERSIONS"][-1]),
+        )
+        super().__init__(*args, **kwargs)
+
     data_type = serializers.ChoiceField(
         choices=CustomField.FieldDataType,
         read_only=False,
     )
 
     document_count = serializers.IntegerField(read_only=True)
+
+    extra_data = ReadWriteSerializerMethodField(required=False)
 
     class Meta:
         model = CustomField
@@ -544,18 +566,39 @@ class CustomFieldSerializer(serializers.ModelSerializer):
                 or "select_options" not in attrs["extra_data"]
                 or not isinstance(attrs["extra_data"]["select_options"], list)
                 or len(attrs["extra_data"]["select_options"]) == 0
-                or not all(
-                    len(option.get("label", "")) > 0
-                    for option in attrs["extra_data"]["select_options"]
+                or (
+                    # version 6 and below require a list of strings
+                    self.api_version < 7
+                    and not all(
+                        len(option) > 0
+                        for option in attrs["extra_data"]["select_options"]
+                    )
+                )
+                or (
+                    # version 7 and above require a list of objects with labels
+                    self.api_version >= 7
+                    and not all(
+                        len(option.get("label", "")) > 0
+                        for option in attrs["extra_data"]["select_options"]
+                    )
                 )
             ):
                 raise serializers.ValidationError(
                     {"error": "extra_data.select_options must be a valid list"},
                 )
             # labels are valid, generate ids if not present
-            for option in attrs["extra_data"]["select_options"]:
-                if option.get("id") is None:
-                    option["id"] = get_random_string(length=16)
+            if self.api_version < 7:
+                attrs["extra_data"]["select_options"] = [
+                    {
+                        "label": option,
+                        "id": get_random_string(length=16),
+                    }
+                    for option in attrs["extra_data"]["select_options"]
+                ]
+            else:
+                for option in attrs["extra_data"]["select_options"]:
+                    if option.get("id") is None:
+                        option["id"] = get_random_string(length=16)
         elif (
             "data_type" in attrs
             and attrs["data_type"] == CustomField.FieldDataType.MONETARY
@@ -575,19 +618,15 @@ class CustomFieldSerializer(serializers.ModelSerializer):
             )
         return super().validate(attrs)
 
-
-class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
-    """
-    Based on https://stackoverflow.com/a/62579804
-    """
-
-    def __init__(self, method_name=None, *args, **kwargs):
-        self.method_name = method_name
-        kwargs["source"] = "*"
-        super(serializers.SerializerMethodField, self).__init__(*args, **kwargs)
-
-    def to_internal_value(self, data):
-        return {self.field_name: data}
+    def get_extra_data(self, obj):
+        extra_data = obj.extra_data
+        if self.api_version < 7 and obj.data_type == CustomField.FieldDataType.SELECT:
+            # Convert the select options with ids to a list of strings
+            extra_data["select_options"] = [
+                option["label"] for option in extra_data["select_options"]
+            ]
+        field = serializers.JSONField()
+        return field.to_representation(extra_data)
 
 
 class CustomFieldInstanceSerializer(serializers.ModelSerializer):

@@ -341,10 +341,10 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.AcceptHeaderVersioning",
-    "DEFAULT_VERSION": "1",
+    "DEFAULT_VERSION": "7",
     # Make sure these are ordered and that the most recent version appears
     # last
-    "ALLOWED_VERSIONS": ["1", "2", "3", "4", "5", "6"],
+    "ALLOWED_VERSIONS": ["1", "2", "3", "4", "5", "6", "7"],
 }
 
 if DEBUG:

@@ -573,3 +573,8 @@ Initial API version.
 #### Version 6
 
 -   Moved acknowledge tasks endpoint to be under `/api/tasks/acknowledge/`.
+
+#### Version 7
+
+-   The format of select type custom fields has changed to return the options
+    as an array of objects with `id` and `label` fields.
