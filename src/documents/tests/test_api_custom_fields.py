@@ -356,23 +356,22 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             checksum="123",
             mime_type="application/pdf",
         )
-        CustomFieldInstance.objects.create(
-            document=doc,
-            field=custom_field_select,
-            value_select="abc-123",
-        )
 
         resp = self.client.patch(
             f"/api/documents/{doc.id}/",
             headers={"Accept": "application/json; version=6"},
-            data={
-                "custom_fields": [
-                    {"field": custom_field_select.id, "value": 0},
-                ],
-            },
+            data=json.dumps(
+                {
+                    "custom_fields": [
+                        {"field": custom_field_select.id, "value": 1},
+                    ],
+                },
+            ),
+            content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(doc.custom_fields.first().value, "abc-123")
+        doc.refresh_from_db()
+        self.assertEqual(doc.custom_fields.first().value, "def-456")
 
         resp = self.client.get(
             f"/api/documents/{doc.id}/",
@@ -381,7 +380,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         data = resp.json()
-        self.assertEqual(data["custom_fields"][0]["value"], 0)
+        self.assertEqual(data["custom_fields"][0]["value"], 1)
 
     def test_create_custom_field_monetary_validation(self):
         """
@@ -980,6 +979,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
 
         resp = self.client.patch(
             f"/api/documents/{doc.id}/",
+            headers={"Accept": "application/json; version=7"},
             data={
                 "custom_fields": [
                     {"field": custom_field_select.id, "value": "not an option"},
