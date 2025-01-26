@@ -171,7 +171,6 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
                     },
                 },
             ),
-            headers={"Accept": "application/json; version=7"},
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
@@ -197,7 +196,6 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
                     },
                 },
             ),
-            headers={"Accept": "application/json; version=7"},
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -249,7 +247,6 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
 
         resp = self.client.patch(
             f"{self.ENDPOINT}{custom_field_select.id}/",
-            headers={"Accept": "application/json; version=7"},
             data=json.dumps(
                 {
                     "extra_data": {
@@ -562,7 +559,6 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
                     },
                 ],
             },
-            headers={"Accept": "application/json; version=7"},
             format="json",
         )
 
@@ -981,7 +977,6 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
 
         resp = self.client.patch(
             f"/api/documents/{doc.id}/",
-            headers={"Accept": "application/json; version=7"},
             data={
                 "custom_fields": [
                     {"field": custom_field_select.id, "value": "not an option"},
