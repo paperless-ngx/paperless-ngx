@@ -671,7 +671,6 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         """
         data = super().validate(data)
         field: CustomField = data["field"]
-
         if "value" in data and data["value"] is not None:
             if (
                 field.data_type == CustomField.FieldDataType.URL
@@ -699,7 +698,6 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
                 MaxLengthValidator(limit_value=128)(data["value"])
             elif field.data_type == CustomField.FieldDataType.SELECT:
                 select_options = field.extra_data["select_options"]
-
                 try:
                     next(
                         option
@@ -725,16 +723,18 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
 
         return data
 
-    def to_internal_value(self, data):
-        ret = super().to_internal_value(data)
-
-        api_version = int(
+    def get_api_version(self):
+        return int(
             self.context.get("request").version
             if self.context.get("request")
             else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
         )
+
+    def to_internal_value(self, data):
+        ret = super().to_internal_value(data)
+
         if (
-            api_version < 7
+            self.get_api_version() < 7
             and ret.get("field").data_type == CustomField.FieldDataType.SELECT
             and ret.get("value") is not None
         ):
@@ -749,13 +749,8 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
 
-        api_version = int(
-            self.context.get("request").version
-            if self.context.get("request")
-            else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
-        )
         if (
-            api_version < 7
+            self.get_api_version() < 7
             and instance.field.data_type == CustomField.FieldDataType.SELECT
         ):
             # return the index of the option in the field.extra_data["select_options"] list
