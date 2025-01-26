@@ -515,7 +515,7 @@ class CustomFieldSerializer(serializers.ModelSerializer):
         self.api_version = int(
             context.get("request").version
             if context.get("request")
-            else settings.REST_FRAMEWORK["ALLOWED_VERSIONS"][-1],
+            else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
         )
         super().__init__(*args, **kwargs)
 
@@ -628,8 +628,7 @@ class CustomFieldSerializer(serializers.ModelSerializer):
             extra_data["select_options"] = [
                 option["label"] for option in extra_data["select_options"]
             ]
-        field = serializers.JSONField()
-        return field.to_representation(extra_data)
+        return serializers.JSONField().to_representation(extra_data)
 
 
 class CustomFieldInstanceSerializer(serializers.ModelSerializer):
@@ -649,7 +648,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         api_version = int(
             self.context.get("request").version
             if self.context.get("request")
-            else settings.REST_FRAMEWORK["ALLOWED_VERSIONS"][-1],
+            else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
         )
 
         if custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
@@ -679,7 +678,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         api_version = int(
             self.context.get("request").version
             if self.context.get("request")
-            else settings.REST_FRAMEWORK["ALLOWED_VERSIONS"][-1],
+            else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
         )
         if api_version < 7 and obj.field.data_type == CustomField.FieldDataType.SELECT:
             # return the index of the option in the field.extra_data["select_options"] list
@@ -988,12 +987,6 @@ class DocumentSerializer(
             or context.get("request").method == "PUT"
         ):
             kwargs["full_perms"] = True
-
-        self.api_version = int(
-            context.get("request").version
-            if context.get("request")
-            else settings.REST_FRAMEWORK["ALLOWED_VERSIONS"][-1],
-        )
 
         super().__init__(*args, **kwargs)
 
