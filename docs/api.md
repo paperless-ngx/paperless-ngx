@@ -577,4 +577,7 @@ Initial API version.
 #### Version 7
 
 -   The format of select type custom fields has changed to return the options
-    as an array of objects with `id` and `label` fields.
+    as an array of objects with `id` and `label` fields. When creating or
+    updating a custom field value of a document for a select type custom field,
+    the value should be the `id` of the option whereas previously was the index
+    of the option.
