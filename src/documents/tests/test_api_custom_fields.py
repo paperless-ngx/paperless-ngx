@@ -249,7 +249,8 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
 
         resp = self.client.patch(
             f"{self.ENDPOINT}{custom_field_select.id}/",
-            json.dumps(
+            headers={"Accept": "application/json; version=7"},
+            data=json.dumps(
                 {
                     "extra_data": {
                         "select_options": [
