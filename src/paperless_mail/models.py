@@ -116,6 +116,7 @@ class MailRule(document_models.ModelWithOwner):
         EVERYTHING = 2, _("Process all files, including 'inline' attachments.")
 
     class PdfLayout(models.IntegerChoices):
+        DEFAULT = 0, _("System default")
         TEXT_HTML = 1, _("Text, then HTML")
         HTML_TEXT = 2, _("HTML, then text")
         HTML_ONLY = 3, _("HTML only")

@@ -15,12 +15,13 @@ class Migration(migrations.Migration):
             name="pdf_layout",
             field=models.PositiveIntegerField(
                 choices=[
+                    (0, "System default"),
                     (1, "Text, then HTML"),
                     (2, "HTML, then text"),
                     (3, "HTML only"),
                     (4, "Text only"),
                 ],
-                default=1,
+                default=0,
                 verbose_name="pdf layout",
             ),
         ),

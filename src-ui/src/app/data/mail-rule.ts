@@ -12,6 +12,7 @@ export enum MailRuleConsumptionScope {
 }
 
 export enum MailRulePdfLayout {
+  Default = 0,
   TextHtml = 1,
   HtmlText = 2,
   HtmlOnly = 3,
