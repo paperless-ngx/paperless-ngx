@@ -111,6 +111,12 @@ following operations on your documents:
     `PAPERLESS_OCR_SKIP_ARCHIVE_FILE=with_text`. Please read the
     [relevant section in the documentation](configuration.md#ocr).
 
+!!! tip
+
+    If you intend to use automatic tagging, read the below section first.
+    It may prevent you from having to either tag everything manually or
+    loading all your documents again.
+
 !!! note
 
     No matter which options you choose, Paperless will always store the
@@ -254,6 +260,26 @@ Paperless-ngx supports OAuth2 authentication for Gmail and Outlook email account
 Specific instructions for setting up the required 'developer' app with Google or Microsoft are beyond the scope of this documentation, but you can find user-maintained instructions in [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Email-OAuth-App-Setup) or by searching the web.
 
 Once setup, navigating to the email settings page in Paperless-ngx will allow you to add an email account for Gmail or Outlook using OAuth2. After authenticating, you will be presented with the newly-created account where you will need to enter and save your email address. After this, the account will work as any other email account in Paperless-ngx and refreshing tokens will be handled automatically.
+
+### Automatic tagging
+
+As soon as you load a couple of documents you will realize that applying correspondents, document types, tags etc. can be very repetitive and cumbersome. Paperless has several ways to help here. Whenever you create master data like correspondents (called items in the following) you can specify rules when to automatically apply them. You can choose betwen these algorithms:
+
+-   **None: Disable matching** This is the most simple of all algorithms: it does nothing. Essentially Paperless will not associate this item with any document and it is all up to you.
+-   **Any: Document contains any of these words** Add some words, and if a document matches any of the given words the item will be associated with the document. 
+-   **All: Document contain all of these words** Add some words, and if a document contains all the given words the item will be associated with the document. Note the sequence or distribution does not matter.
+-   **Exact: Document contains this string** Add some words, and if a document contains all the given words in exactly that sequence the item will be associated with the document.
+-   **Regular expression: Document matches this regular expression** This is a more powerful algorithm than simple word match. If you are unfamiliar with regular expressions, have a look at [the RegexOne Tutorial](https://www.regexone.com/).
+-   **Fuzzy: Document contains a word similar to this word** If the document matches the given phrase good enough, it will be associated. Paperless uses the [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance) to decide for matches.
+-   **Auto: Learn matching automatically** This is the most powerful yet most complex algorithm. I do not have proof, but from a user perspective Paperless behaves like a [Naive Bayes Classifier](https://en.wikipedia.org/wiki/Naive_Bayes_classifier). In a nutshell, such an algorithm is used to classify text and very common in spam filters. Yet it can do more than just distinguish 'spam' from 'ham'. But it has to be trained.
+
+#### Training paperless for auto-tagging
+
+Load a couple of documents into paperless, create some tags and assign them where you want them to be. That's all there is to be done as paperless will automatically learn from the examples you gave. But where will it apply this knowledge? If you just keep loading more documents, you will have an insecure feeling as it is not visible where which tags are applied, and you will have a hard job finding out what happened. After all, you do not want paperless to touch the documents you already loaded, right?
+
+Create a tag and mark it as INBOX tag. I named mine `INBOX` and colored it bright red, so it is easy to spot. Now for all new documents that I load this tag is applied automatically. Of course once in a while I need to check if the documents have been detected correctly. So I search for all documents with that INBOX tag and check them one by one. If wrong items were associated, correct them and remove the INBOX tag.
+
+While you are doing so, you can actually see how paperless' suggestions are getting closer and closer to your ideas. Meanwhile all I need to fix is the creation date and verify the other choices are to my taste before I remove the INBOX tag. If you want to go any more efficient, you likely have to apply AI.
 
 ### REST API
 
