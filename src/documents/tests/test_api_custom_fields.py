@@ -280,11 +280,12 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
     def test_custom_field_select_old_version(self):
         """
         GIVEN:
-            - Select custom field exists with old version of select options
+            - Nothing
         WHEN:
             - API post request is made for custom fields with api version header < 7
             - API get request is made for custom fields with api version header < 7
         THEN:
+            - The select options are created with unique ids
             - The select options are returned in the old format
         """
         resp = self.client.post(
