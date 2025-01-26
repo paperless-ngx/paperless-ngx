@@ -328,6 +328,60 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             ],
         )
 
+    def test_custom_field_select_value_old_version(self):
+        """
+        GIVEN:
+            - Existing document with custom field select
+        WHEN:
+            - API post request is made to add the field for document with api version header < 7
+            - API get request is made for document with api version header < 7
+        THEN:
+            - The select value is returned in the old format, the index of the option
+        """
+        custom_field_select = CustomField.objects.create(
+            name="Select Field",
+            data_type=CustomField.FieldDataType.SELECT,
+            extra_data={
+                "select_options": [
+                    {"label": "Option 1", "id": "abc-123"},
+                    {"label": "Option 2", "id": "def-456"},
+                ],
+            },
+        )
+
+        doc = Document.objects.create(
+            title="WOW",
+            content="the content",
+            checksum="123",
+            mime_type="application/pdf",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=custom_field_select,
+            value_select="abc-123",
+        )
+
+        resp = self.client.patch(
+            f"/api/documents/{doc.id}/",
+            headers={"Accept": "application/json; version=6"},
+            data={
+                "custom_fields": [
+                    {"field": custom_field_select.id, "value": 0},
+                ],
+            },
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(doc.custom_fields.first().value, "abc-123")
+
+        resp = self.client.get(
+            f"/api/documents/{doc.id}/",
+            headers={"Accept": "application/json; version=6"},
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.json()
+        self.assertEqual(data["custom_fields"][0]["value"], 0)
+
     def test_create_custom_field_monetary_validation(self):
         """
         GIVEN:
