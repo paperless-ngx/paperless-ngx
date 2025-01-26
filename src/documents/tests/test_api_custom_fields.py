@@ -43,10 +43,13 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         ]:
             resp = self.client.post(
                 self.ENDPOINT,
-                data={
-                    "data_type": field_type,
-                    "name": name,
-                },
+                data=json.dumps(
+                    {
+                        "data_type": field_type,
+                        "name": name,
+                    },
+                ),
+                content_type="application/json",
             )
             self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
@@ -271,6 +274,59 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
 
         doc.refresh_from_db()
         self.assertEqual(doc.custom_fields.first().value, None)
+
+    def test_custom_field_select_old_version(self):
+        """
+        GIVEN:
+            - Select custom field exists with old version of select options
+        WHEN:
+            - API post request is made for custom fields with api version header < 7
+            - API get request is made for custom fields with api version header < 7
+        THEN:
+            - The select options are returned in the old format
+        """
+        resp = self.client.post(
+            self.ENDPOINT,
+            headers={"Accept": "application/json; version=6"},
+            data=json.dumps(
+                {
+                    "data_type": "select",
+                    "name": "Select Field",
+                    "extra_data": {
+                        "select_options": [
+                            "Option 1",
+                            "Option 2",
+                        ],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        field = CustomField.objects.get(name="Select Field")
+        self.assertEqual(
+            field.extra_data["select_options"],
+            [
+                {"label": "Option 1", "id": ANY},
+                {"label": "Option 2", "id": ANY},
+            ],
+        )
+
+        resp = self.client.get(
+            f"{self.ENDPOINT}{field.id}/",
+            headers={"Accept": "application/json; version=6"},
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.json()
+        self.assertEqual(
+            data["extra_data"]["select_options"],
+            [
+                "Option 1",
+                "Option 2",
+            ],
+        )
 
     def test_create_custom_field_monetary_validation(self):
         """
