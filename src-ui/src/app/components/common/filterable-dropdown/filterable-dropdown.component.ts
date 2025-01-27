@@ -81,6 +81,18 @@ export class FilterableDropdownSelectionModel {
         this.getNonTemporary(b.id) == ToggleableItemState.NotSelected
       ) {
         return -1
+      } else if (
+        this._documentCounts.length &&
+        this.getDocumentCount(b.id) === 0 &&
+        this.getDocumentCount(a.id) > this.getDocumentCount(b.id)
+      ) {
+        return -1
+      } else if (
+        this._documentCounts.length &&
+        this.getDocumentCount(a.id) === 0 &&
+        this.getDocumentCount(a.id) < this.getDocumentCount(b.id)
+      ) {
+        return 1
       } else {
         return a.name.localeCompare(b.name)
       }
