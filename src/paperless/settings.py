@@ -343,7 +343,7 @@ REST_FRAMEWORK = {
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.AcceptHeaderVersioning",
     "DEFAULT_VERSION": "7",
     # Make sure these are ordered and that the most recent version appears
-    # last
+    # last. See api.md#api-versioning when adding new versions.
     "ALLOWED_VERSIONS": ["1", "2", "3", "4", "5", "6", "7"],
 }
 

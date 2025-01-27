@@ -541,6 +541,12 @@ server, the following procedure should be performed:
 2.  Determine whether the client is compatible with this server based on
     the presence/absence of these headers and their values if present.
 
+### API Version Deprecation Policy
+
+Older API versions are guaranteed to be supported for at least one year
+after the release of a new API version. After that, support for older
+API versions may be (but is not guaranteed to be) dropped.
+
 ### API Changelog
 
 #### Version 1
