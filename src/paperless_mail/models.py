@@ -240,7 +240,7 @@ class MailRule(document_models.ModelWithOwner):
     pdf_layout = models.PositiveIntegerField(
         _("pdf layout"),
         choices=PdfLayout.choices,
-        default=PdfLayout.TEXT_HTML,
+        default=PdfLayout.DEFAULT,
     )
 
     action = models.PositiveIntegerField(
