@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-02 23:04-0800\n"
-"PO-Revision-Date: 2025-01-13 15:32\n"
+"POT-Creation-Date: 2025-01-27 08:19-0800\n"
+"PO-Revision-Date: 2025-01-27 16:20\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -21,37 +21,41 @@ msgstr ""
 msgid "Documents"
 msgstr "Documentos"
 
-#: documents/filters.py:336
+#: documents/filters.py:344
 msgid "Value must be valid JSON."
 msgstr "O valor deve ser um JSON válido."
 
-#: documents/filters.py:355
+#: documents/filters.py:363
 msgid "Invalid custom field query expression"
 msgstr "Expressão de consulta de campo personalizado inválida"
 
-#: documents/filters.py:365
+#: documents/filters.py:373
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Lista de expressões inválida. Deve estar não vazia."
 
-#: documents/filters.py:386
+#: documents/filters.py:394
 msgid "Invalid logical operator {op!r}"
 msgstr "Operador lógico inválido {op!r}"
 
-#: documents/filters.py:400
+#: documents/filters.py:408
 msgid "Maximum number of query conditions exceeded."
 msgstr "Número máximo de condições de consulta excedido."
 
-#: documents/filters.py:465
+#: documents/filters.py:473
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} não é um campo personalizado válido."
 
-#: documents/filters.py:502
+#: documents/filters.py:510
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} não suporta a consulta expr {expr!r}."
 
-#: documents/filters.py:610
+#: documents/filters.py:618
 msgid "Maximum nesting depth exceeded."
 msgstr "Profundidade máxima do aninhamento excedida."
+
+#: documents/filters.py:785
+msgid "Custom field not found"
+msgstr ""
 
 #: documents/models.py:41 documents/models.py:801
 msgid "owner"
@@ -85,7 +89,7 @@ msgstr "Palavra difusa"
 msgid "Automatic"
 msgstr "Automático"
 
-#: documents/models.py:67 documents/models.py:433 documents/models.py:1488
+#: documents/models.py:67 documents/models.py:433 documents/models.py:1493
 #: paperless_mail/models.py:23 paperless_mail/models.py:136
 msgid "name"
 msgstr "nome"
@@ -248,7 +252,7 @@ msgid "The position of this document in your physical document archive."
 msgstr "A posição deste documento no seu arquivamento físico."
 
 #: documents/models.py:295 documents/models.py:732 documents/models.py:786
-#: documents/models.py:1531
+#: documents/models.py:1536
 msgid "document"
 msgstr "documento"
 
@@ -913,219 +917,223 @@ msgstr "A URL de destino para a notificação."
 msgid "use parameters"
 msgstr "utilizar parâmetros"
 
-#: documents/models.py:1213
+#: documents/models.py:1214
+msgid "send as JSON"
+msgstr ""
+
+#: documents/models.py:1218
 msgid "webhook parameters"
 msgstr "parâmetros do gancho web"
 
-#: documents/models.py:1216
+#: documents/models.py:1221
 msgid "The parameters to send with the webhook URL if body not used."
 msgstr "Os parâmetros a enviar com a URL do webhook se o corpo não for usado."
 
-#: documents/models.py:1220
+#: documents/models.py:1225
 msgid "webhook body"
 msgstr "corpo do webhook"
 
-#: documents/models.py:1223
+#: documents/models.py:1228
 msgid "The body to send with the webhook URL if parameters not used."
 msgstr "O corpo a ser enviado com a URL do webhook se os parâmetros não usados."
 
-#: documents/models.py:1227
+#: documents/models.py:1232
 msgid "webhook headers"
 msgstr "cabeçalhos de webhook"
 
-#: documents/models.py:1230
+#: documents/models.py:1235
 msgid "The headers to send with the webhook URL."
 msgstr "Os cabeçalhos a serem enviados com a URL do webhook."
 
-#: documents/models.py:1235
+#: documents/models.py:1240
 msgid "include document in webhook"
 msgstr "incluir documento no e-mail"
 
-#: documents/models.py:1246
+#: documents/models.py:1251
 msgid "Assignment"
 msgstr "Atribuição"
 
-#: documents/models.py:1250
+#: documents/models.py:1255
 msgid "Removal"
 msgstr "Remover"
 
-#: documents/models.py:1254 documents/templates/account/password_reset.html:15
+#: documents/models.py:1259 documents/templates/account/password_reset.html:15
 msgid "Email"
 msgstr "E-mail"
 
-#: documents/models.py:1258
+#: documents/models.py:1263
 msgid "Webhook"
 msgstr "Webhook"
 
-#: documents/models.py:1262
+#: documents/models.py:1267
 msgid "Workflow Action Type"
 msgstr "Ação do tipo Fluxo de Trabalho"
 
-#: documents/models.py:1268
+#: documents/models.py:1273
 msgid "assign title"
 msgstr "atribuir título"
 
-#: documents/models.py:1273
+#: documents/models.py:1278
 msgid "Assign a document title, can include some placeholders, see documentation."
 msgstr "Atribuir um título de documento, pode incluir alguns espaços reservados, consulta a documentação."
 
-#: documents/models.py:1282 paperless_mail/models.py:261
+#: documents/models.py:1287 paperless_mail/models.py:261
 msgid "assign this tag"
 msgstr "atribuir esta etiqueta"
 
-#: documents/models.py:1291 paperless_mail/models.py:269
+#: documents/models.py:1296 paperless_mail/models.py:269
 msgid "assign this document type"
 msgstr "atribuir este tipo de documento"
 
-#: documents/models.py:1300 paperless_mail/models.py:283
+#: documents/models.py:1305 paperless_mail/models.py:283
 msgid "assign this correspondent"
 msgstr "atribuir este correspondente"
 
-#: documents/models.py:1309
+#: documents/models.py:1314
 msgid "assign this storage path"
 msgstr "atribuir este caminho de armazenamento"
 
-#: documents/models.py:1318
+#: documents/models.py:1323
 msgid "assign this owner"
 msgstr "atribuir este proprietário"
 
-#: documents/models.py:1325
+#: documents/models.py:1330
 msgid "grant view permissions to these users"
 msgstr "Conceder permissões de visualização para esses usuários"
 
-#: documents/models.py:1332
+#: documents/models.py:1337
 msgid "grant view permissions to these groups"
 msgstr "Conceda permissões de visualização a estes grupos"
 
-#: documents/models.py:1339
+#: documents/models.py:1344
 msgid "grant change permissions to these users"
 msgstr "Conceder permissões de mudança a estes usuários"
 
-#: documents/models.py:1346
+#: documents/models.py:1351
 msgid "grant change permissions to these groups"
 msgstr "Conceder permissões de mudança para esses grupos"
 
-#: documents/models.py:1353
+#: documents/models.py:1358
 msgid "assign these custom fields"
 msgstr "atribuir estes campos personalizados"
 
-#: documents/models.py:1360
+#: documents/models.py:1365
 msgid "remove these tag(s)"
 msgstr "Remova essas etiquetas"
 
-#: documents/models.py:1365
+#: documents/models.py:1370
 msgid "remove all tags"
 msgstr "Remova todas as etiquetas"
 
-#: documents/models.py:1372
+#: documents/models.py:1377
 msgid "remove these document type(s)"
 msgstr "Remova estes tipos de documentos"
 
-#: documents/models.py:1377
+#: documents/models.py:1382
 msgid "remove all document types"
 msgstr "Remova todos os tipos de documentos"
 
-#: documents/models.py:1384
+#: documents/models.py:1389
 msgid "remove these correspondent(s)"
 msgstr "Remova estas correspondências"
 
-#: documents/models.py:1389
+#: documents/models.py:1394
 msgid "remove all correspondents"
 msgstr "Remover todas as correspondências"
 
-#: documents/models.py:1396
+#: documents/models.py:1401
 msgid "remove these storage path(s)"
 msgstr "Remova estes  caminhos de armazenamento"
 
-#: documents/models.py:1401
+#: documents/models.py:1406
 msgid "remove all storage paths"
 msgstr "Remova todos os caminhos de armazenamento"
 
-#: documents/models.py:1408
+#: documents/models.py:1413
 msgid "remove these owner(s)"
 msgstr "Remover este(s) proprietário(s)"
 
-#: documents/models.py:1413
+#: documents/models.py:1418
 msgid "remove all owners"
 msgstr "Remover todos os proprietários"
 
-#: documents/models.py:1420
+#: documents/models.py:1425
 msgid "remove view permissions for these users"
 msgstr "Remover permissão de visualização para esses usuários"
 
-#: documents/models.py:1427
+#: documents/models.py:1432
 msgid "remove view permissions for these groups"
 msgstr "Remover permissões de visualização para estes grupos"
 
-#: documents/models.py:1434
+#: documents/models.py:1439
 msgid "remove change permissions for these users"
 msgstr "Remover permissões de alteração para esses usuários"
 
-#: documents/models.py:1441
+#: documents/models.py:1446
 msgid "remove change permissions for these groups"
 msgstr "Remover permissões de alteração para esses grupos"
 
-#: documents/models.py:1446
+#: documents/models.py:1451
 msgid "remove all permissions"
 msgstr "Remover todas as permissões"
 
-#: documents/models.py:1453
+#: documents/models.py:1458
 msgid "remove these custom fields"
 msgstr "Remover esses campos personalizados"
 
-#: documents/models.py:1458
+#: documents/models.py:1463
 msgid "remove all custom fields"
 msgstr "Remover todos os campos personalizados"
 
-#: documents/models.py:1467
+#: documents/models.py:1472
 msgid "email"
 msgstr "e-mail"
 
-#: documents/models.py:1476
+#: documents/models.py:1481
 msgid "webhook"
 msgstr "webhook"
 
-#: documents/models.py:1480
+#: documents/models.py:1485
 msgid "workflow action"
 msgstr "Ação de Fluxo de Trabalho"
 
-#: documents/models.py:1481
+#: documents/models.py:1486
 msgid "workflow actions"
 msgstr "Ações de Fluxo de Trabalho"
 
-#: documents/models.py:1490 paperless_mail/models.py:138
+#: documents/models.py:1495 paperless_mail/models.py:138
 msgid "order"
 msgstr "ordem"
 
-#: documents/models.py:1496
+#: documents/models.py:1501
 msgid "triggers"
 msgstr "gatilhos"
 
-#: documents/models.py:1503
+#: documents/models.py:1508
 msgid "actions"
 msgstr "ações"
 
-#: documents/models.py:1506 paperless_mail/models.py:147
+#: documents/models.py:1511 paperless_mail/models.py:147
 msgid "enabled"
 msgstr "Habilitado"
 
-#: documents/models.py:1517
+#: documents/models.py:1522
 msgid "workflow"
 msgstr "fluxo de trabalho"
 
-#: documents/models.py:1521
+#: documents/models.py:1526
 msgid "workflow trigger type"
 msgstr "tipo de gatilho de fluxo de trabalho"
 
-#: documents/models.py:1535
+#: documents/models.py:1540
 msgid "date run"
 msgstr "corrida de data"
 
-#: documents/models.py:1541
+#: documents/models.py:1546
 msgid "workflow run"
 msgstr "execução do fluxo de trabalho"
 
-#: documents/models.py:1542
+#: documents/models.py:1547
 msgid "workflow runs"
 msgstr "execução de fluxo de trabalho"
 
@@ -1138,12 +1146,12 @@ msgstr "Expressão regular inválida: %(error)s"
 msgid "Invalid color."
 msgstr "Cor inválida."
 
-#: documents/serialisers.py:1452
+#: documents/serialisers.py:1559
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Tipo de arquivo %(type)s não suportado"
 
-#: documents/serialisers.py:1541
+#: documents/serialisers.py:1648
 msgid "Invalid variable detected."
 msgstr "Variável inválida detectada."
 
