@@ -1,7 +1,7 @@
 import json
+import types
 from collections.abc import Callable
 from datetime import date
-from unittest.mock import Mock
 from urllib.parse import quote
 
 from django.contrib.auth.models import User
@@ -149,7 +149,12 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
             document,
             data=data,
             partial=True,
-            context={"request": Mock()},
+            context={
+                "request": types.SimpleNamespace(
+                    method="GET",
+                    version="7",
+                ),
+            },
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
