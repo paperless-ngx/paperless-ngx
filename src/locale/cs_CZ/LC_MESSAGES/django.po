@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-02 23:04-0800\n"
-"PO-Revision-Date: 2025-01-13 21:21\n"
+"POT-Creation-Date: 2025-01-27 08:19-0800\n"
+"PO-Revision-Date: 2025-01-27 16:20\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -21,37 +21,41 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumenty"
 
-#: documents/filters.py:336
+#: documents/filters.py:344
 msgid "Value must be valid JSON."
 msgstr "Hodnota musí být platný JSON."
 
-#: documents/filters.py:355
+#: documents/filters.py:363
 msgid "Invalid custom field query expression"
 msgstr "Neplatný výraz dotazu na vlastní pole"
 
-#: documents/filters.py:365
+#: documents/filters.py:373
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Neplatný seznam výrazů. Nesmí být prázdný."
 
-#: documents/filters.py:386
+#: documents/filters.py:394
 msgid "Invalid logical operator {op!r}"
 msgstr "Neplatný logický operátor {op!r}"
 
-#: documents/filters.py:400
+#: documents/filters.py:408
 msgid "Maximum number of query conditions exceeded."
 msgstr "Překročen maximální počet podmínek dotazu."
 
-#: documents/filters.py:465
+#: documents/filters.py:473
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} není platné vlastní pole."
 
-#: documents/filters.py:502
+#: documents/filters.py:510
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} nepodporuje výraz dotazu {expr!r}."
 
-#: documents/filters.py:610
+#: documents/filters.py:618
 msgid "Maximum nesting depth exceeded."
 msgstr "Překročena maximální hloubka větvení."
+
+#: documents/filters.py:785
+msgid "Custom field not found"
+msgstr ""
 
 #: documents/models.py:41 documents/models.py:801
 msgid "owner"
@@ -85,7 +89,7 @@ msgstr "Nejasné slovo"
 msgid "Automatic"
 msgstr "Automaticky"
 
-#: documents/models.py:67 documents/models.py:433 documents/models.py:1488
+#: documents/models.py:67 documents/models.py:433 documents/models.py:1493
 #: paperless_mail/models.py:23 paperless_mail/models.py:136
 msgid "name"
 msgstr "název"
@@ -248,7 +252,7 @@ msgid "The position of this document in your physical document archive."
 msgstr "Pozice tohoto dokumentu ve vašem fyzickém archivu dokumentů."
 
 #: documents/models.py:295 documents/models.py:732 documents/models.py:786
-#: documents/models.py:1531
+#: documents/models.py:1536
 msgid "document"
 msgstr "dokument"
 
@@ -912,219 +916,223 @@ msgstr "Cílová URL pro oznámení."
 msgid "use parameters"
 msgstr "použít parametry"
 
-#: documents/models.py:1213
+#: documents/models.py:1214
+msgid "send as JSON"
+msgstr ""
+
+#: documents/models.py:1218
 msgid "webhook parameters"
 msgstr "parametry webhooku"
 
-#: documents/models.py:1216
+#: documents/models.py:1221
 msgid "The parameters to send with the webhook URL if body not used."
 msgstr "Parametry pro odeslání s URL webhooku, pokud není použito tělo."
 
-#: documents/models.py:1220
+#: documents/models.py:1225
 msgid "webhook body"
 msgstr "tělo webhooku"
 
-#: documents/models.py:1223
+#: documents/models.py:1228
 msgid "The body to send with the webhook URL if parameters not used."
 msgstr "Tělo pro odeslání s URL webhooku, pokud nejsou použity parametry."
 
-#: documents/models.py:1227
+#: documents/models.py:1232
 msgid "webhook headers"
 msgstr "hlavičky webhooku"
 
-#: documents/models.py:1230
+#: documents/models.py:1235
 msgid "The headers to send with the webhook URL."
 msgstr "Záhlaví pro odeslání s URL webhooku."
 
-#: documents/models.py:1235
+#: documents/models.py:1240
 msgid "include document in webhook"
 msgstr "zahrnout dokument ve webhooku"
 
-#: documents/models.py:1246
+#: documents/models.py:1251
 msgid "Assignment"
 msgstr "Přiřazení"
 
-#: documents/models.py:1250
+#: documents/models.py:1255
 msgid "Removal"
 msgstr "Odstranění"
 
-#: documents/models.py:1254 documents/templates/account/password_reset.html:15
+#: documents/models.py:1259 documents/templates/account/password_reset.html:15
 msgid "Email"
 msgstr "E-mail"
 
-#: documents/models.py:1258
+#: documents/models.py:1263
 msgid "Webhook"
 msgstr "Webhook"
 
-#: documents/models.py:1262
+#: documents/models.py:1267
 msgid "Workflow Action Type"
 msgstr "Typ akce pracovního postupu"
 
-#: documents/models.py:1268
+#: documents/models.py:1273
 msgid "assign title"
 msgstr "přiřadit název"
 
-#: documents/models.py:1273
+#: documents/models.py:1278
 msgid "Assign a document title, can include some placeholders, see documentation."
 msgstr "Přiřadit název dokumentu, může zahrnovat některé zástupné znaky, viz dokumentace."
 
-#: documents/models.py:1282 paperless_mail/models.py:261
+#: documents/models.py:1287 paperless_mail/models.py:261
 msgid "assign this tag"
 msgstr "přiřadit tento tag"
 
-#: documents/models.py:1291 paperless_mail/models.py:269
+#: documents/models.py:1296 paperless_mail/models.py:269
 msgid "assign this document type"
 msgstr "přiřadit tento typ dokumentu"
 
-#: documents/models.py:1300 paperless_mail/models.py:283
+#: documents/models.py:1305 paperless_mail/models.py:283
 msgid "assign this correspondent"
 msgstr "přiřadit tohoto korespondenta"
 
-#: documents/models.py:1309
+#: documents/models.py:1314
 msgid "assign this storage path"
 msgstr "přiřadit tuto cestu k úložišti"
 
-#: documents/models.py:1318
+#: documents/models.py:1323
 msgid "assign this owner"
 msgstr "přiřadit tohoto vlastníka"
 
-#: documents/models.py:1325
+#: documents/models.py:1330
 msgid "grant view permissions to these users"
 msgstr "udělit oprávnění k zobrazení těmto uživatelům"
 
-#: documents/models.py:1332
+#: documents/models.py:1337
 msgid "grant view permissions to these groups"
 msgstr "udělit oprávnění k zobrazení těmto skupinám"
 
-#: documents/models.py:1339
+#: documents/models.py:1344
 msgid "grant change permissions to these users"
 msgstr "udělit oprávnění ke změně těmto uživatelům"
 
-#: documents/models.py:1346
+#: documents/models.py:1351
 msgid "grant change permissions to these groups"
 msgstr "udělit oprávnění ke změně těmto skupinám"
 
-#: documents/models.py:1353
+#: documents/models.py:1358
 msgid "assign these custom fields"
 msgstr "přiřadit tato vlastní pole"
 
-#: documents/models.py:1360
+#: documents/models.py:1365
 msgid "remove these tag(s)"
 msgstr "odstranit tyto štítky"
 
-#: documents/models.py:1365
+#: documents/models.py:1370
 msgid "remove all tags"
 msgstr "odstranit všechny štítky"
 
-#: documents/models.py:1372
+#: documents/models.py:1377
 msgid "remove these document type(s)"
 msgstr "odstranit tyto typy dokumentů"
 
-#: documents/models.py:1377
+#: documents/models.py:1382
 msgid "remove all document types"
 msgstr "odstranit všechny typy dokumentů"
 
-#: documents/models.py:1384
+#: documents/models.py:1389
 msgid "remove these correspondent(s)"
 msgstr "odstranit tyto korespondenty"
 
-#: documents/models.py:1389
+#: documents/models.py:1394
 msgid "remove all correspondents"
 msgstr "odstranit všechny korespondenty"
 
-#: documents/models.py:1396
+#: documents/models.py:1401
 msgid "remove these storage path(s)"
 msgstr "odstranit tyto cesty k úložišti"
 
-#: documents/models.py:1401
+#: documents/models.py:1406
 msgid "remove all storage paths"
 msgstr "odstranit všechny cesty k úložišti"
 
-#: documents/models.py:1408
+#: documents/models.py:1413
 msgid "remove these owner(s)"
 msgstr "odstranit tyto vlastníky"
 
-#: documents/models.py:1413
+#: documents/models.py:1418
 msgid "remove all owners"
 msgstr "odstranit všechny vlastníky"
 
-#: documents/models.py:1420
+#: documents/models.py:1425
 msgid "remove view permissions for these users"
 msgstr "odstranit oprávnění k zobrazení pro tyto uživatele"
 
-#: documents/models.py:1427
+#: documents/models.py:1432
 msgid "remove view permissions for these groups"
 msgstr "odstranit oprávnění k zobrazení pro tyto skupiny"
 
-#: documents/models.py:1434
+#: documents/models.py:1439
 msgid "remove change permissions for these users"
 msgstr "odstranit oprávnění ke změně pro tyto uživatele"
 
-#: documents/models.py:1441
+#: documents/models.py:1446
 msgid "remove change permissions for these groups"
 msgstr "odstranit oprávnění ke změně pro tyto skupiny"
 
-#: documents/models.py:1446
+#: documents/models.py:1451
 msgid "remove all permissions"
 msgstr "odstranit všechna oprávnění"
 
-#: documents/models.py:1453
+#: documents/models.py:1458
 msgid "remove these custom fields"
 msgstr "odstranit tato vlastní pole"
 
-#: documents/models.py:1458
+#: documents/models.py:1463
 msgid "remove all custom fields"
 msgstr "odstranit všechna vlastní pole"
 
-#: documents/models.py:1467
+#: documents/models.py:1472
 msgid "email"
 msgstr "e-mail"
 
-#: documents/models.py:1476
+#: documents/models.py:1481
 msgid "webhook"
 msgstr "webhook"
 
-#: documents/models.py:1480
+#: documents/models.py:1485
 msgid "workflow action"
 msgstr "akce pracovního postupu"
 
-#: documents/models.py:1481
+#: documents/models.py:1486
 msgid "workflow actions"
 msgstr "akce pracovního postupu"
 
-#: documents/models.py:1490 paperless_mail/models.py:138
+#: documents/models.py:1495 paperless_mail/models.py:138
 msgid "order"
 msgstr "pořadí"
 
-#: documents/models.py:1496
+#: documents/models.py:1501
 msgid "triggers"
 msgstr "spouštěče"
 
-#: documents/models.py:1503
+#: documents/models.py:1508
 msgid "actions"
 msgstr "akce"
 
-#: documents/models.py:1506 paperless_mail/models.py:147
+#: documents/models.py:1511 paperless_mail/models.py:147
 msgid "enabled"
 msgstr "povoleno"
 
-#: documents/models.py:1517
+#: documents/models.py:1522
 msgid "workflow"
 msgstr "pracovní postup"
 
-#: documents/models.py:1521
+#: documents/models.py:1526
 msgid "workflow trigger type"
 msgstr "typ spouštěče pracovního postupu"
 
-#: documents/models.py:1535
+#: documents/models.py:1540
 msgid "date run"
 msgstr "spouštění data"
 
-#: documents/models.py:1541
+#: documents/models.py:1546
 msgid "workflow run"
 msgstr "spuštění pracovního postupu"
 
-#: documents/models.py:1542
+#: documents/models.py:1547
 msgid "workflow runs"
 msgstr "spuštění pracovních postupů"
 
@@ -1137,12 +1145,12 @@ msgstr "Neplatný regulární výraz: %(error)s"
 msgid "Invalid color."
 msgstr "Neplatná barva."
 
-#: documents/serialisers.py:1452
+#: documents/serialisers.py:1559
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Typ souboru %(type)s není podporován"
 
-#: documents/serialisers.py:1541
+#: documents/serialisers.py:1648
 msgid "Invalid variable detected."
 msgstr "Zjištěna neplatná proměnná."
 
