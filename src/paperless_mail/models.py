@@ -115,6 +115,13 @@ class MailRule(document_models.ModelWithOwner):
         ATTACHMENTS_ONLY = 1, _("Only process attachments.")
         EVERYTHING = 2, _("Process all files, including 'inline' attachments.")
 
+    class PdfLayout(models.IntegerChoices):
+        DEFAULT = 0, _("System default")
+        TEXT_HTML = 1, _("Text, then HTML")
+        HTML_TEXT = 2, _("HTML, then text")
+        HTML_ONLY = 3, _("HTML only")
+        TEXT_ONLY = 4, _("Text only")
+
     class MailAction(models.IntegerChoices):
         DELETE = 1, _("Delete")
         MOVE = 2, _("Move to specified folder")
@@ -228,6 +235,12 @@ class MailRule(document_models.ModelWithOwner):
         _("consumption scope"),
         choices=ConsumptionScope.choices,
         default=ConsumptionScope.ATTACHMENTS_ONLY,
+    )
+
+    pdf_layout = models.PositiveIntegerField(
+        _("pdf layout"),
+        choices=PdfLayout.choices,
+        default=PdfLayout.DEFAULT,
     )
 
     action = models.PositiveIntegerField(

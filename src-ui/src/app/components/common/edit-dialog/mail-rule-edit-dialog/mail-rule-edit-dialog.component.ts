@@ -18,6 +18,7 @@ import {
   MailMetadataTitleOption,
   MailRule,
   MailRuleConsumptionScope,
+  MailRulePdfLayout,
 } from 'src/app/data/mail-rule'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
@@ -55,6 +56,29 @@ const CONSUMPTION_SCOPE_OPTIONS = [
   {
     id: MailRuleConsumptionScope.Everything,
     name: $localize`Process message as .eml and attachments separately`,
+  },
+]
+
+const PDF_LAYOUT_OPTIONS = [
+  {
+    id: MailRulePdfLayout.Default,
+    name: $localize`System default`,
+  },
+  {
+    id: MailRulePdfLayout.TextHtml,
+    name: $localize`Text, then HTML`,
+  },
+  {
+    id: MailRulePdfLayout.HtmlText,
+    name: $localize`HTML, then text`,
+  },
+  {
+    id: MailRulePdfLayout.HtmlOnly,
+    name: $localize`HTML only`,
+  },
+  {
+    id: MailRulePdfLayout.TextOnly,
+    name: $localize`Text only`,
   },
 ]
 
@@ -184,6 +208,7 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
       filter_attachment_filename_exclude: new FormControl(null),
       maximum_age: new FormControl(null),
       attachment_type: new FormControl(MailFilterAttachmentType.Attachments),
+      pdf_layout: new FormControl(MailRulePdfLayout.Default),
       consumption_scope: new FormControl(MailRuleConsumptionScope.Attachments),
       order: new FormControl(null),
       action: new FormControl(MailAction.MarkRead),
@@ -231,5 +256,9 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
 
   get consumptionScopeOptions() {
     return CONSUMPTION_SCOPE_OPTIONS
+  }
+
+  get pdfLayoutOptions() {
+    return PDF_LAYOUT_OPTIONS
   }
 }

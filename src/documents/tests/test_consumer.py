@@ -21,6 +21,7 @@ from guardian.core import ObjectPermissionChecker
 
 from documents.consumer import ConsumerError
 from documents.data_models import DocumentMetadataOverrides
+from documents.data_models import DocumentSource
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import Document
@@ -35,6 +36,8 @@ from documents.tasks import sanity_check
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import GetConsumerMixin
+from paperless_mail.models import MailRule
+from paperless_mail.parsers import MailDocumentParser
 
 
 class TestAttributes(UnittestTestCase):
@@ -243,6 +246,8 @@ def fake_magic_from_file(file, mime=False):
             return "image/png"
         elif os.path.splitext(file)[1] == ".webp":
             return "image/webp"
+        elif os.path.splitext(file)[1] == ".eml":
+            return "message/rfc822"
         else:
             return "unknown"
     else:
@@ -974,6 +979,59 @@ class TestConsumer(
 
             self.assertEqual(command[0], "qpdf")
             self.assertEqual(command[1], "--replace-input")
+
+    @mock.patch("paperless_mail.models.MailRule.objects.get")
+    @mock.patch("paperless_mail.parsers.MailDocumentParser.parse")
+    @mock.patch("documents.parsers.document_consumer_declaration.send")
+    def test_mail_parser_receives_mailrule(
+        self,
+        mock_consumer_declaration_send: mock.Mock,
+        mock_mail_parser_parse: mock.Mock,
+        mock_mailrule_get: mock.Mock,
+    ):
+        """
+        GIVEN:
+            - A mail document from a mail rule
+        WHEN:
+            - The consumer is run
+        THEN:
+            - The mail parser should receive the mail rule
+        """
+        mock_consumer_declaration_send.return_value = [
+            (
+                None,
+                {
+                    "parser": MailDocumentParser,
+                    "mime_types": {"message/rfc822": ".eml"},
+                    "weight": 0,
+                },
+            ),
+        ]
+        mock_mailrule_get.return_value = mock.Mock(
+            pdf_layout=MailRule.PdfLayout.HTML_ONLY,
+        )
+        with self.get_consumer(
+            filepath=(
+                Path(__file__).parent.parent.parent
+                / Path("paperless_mail")
+                / Path("tests")
+                / Path("samples")
+            ).resolve()
+            / "html.eml",
+            source=DocumentSource.MailFetch,
+            mailrule_id=1,
+        ) as consumer:
+            # fails because no gotenberg
+            with self.assertRaises(
+                ConsumerError,
+            ):
+                consumer.run()
+                mock_mail_parser_parse.assert_called_once_with(
+                    consumer.working_copy,
+                    "message/rfc822",
+                    file_name="sample.pdf",
+                    mailrule=mock_mailrule_get.return_value,
+                )
 
 
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)

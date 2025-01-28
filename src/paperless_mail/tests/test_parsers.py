@@ -1,6 +1,7 @@
 import datetime
 import logging
 from pathlib import Path
+from unittest import mock
 
 import httpx
 import pytest
@@ -662,3 +663,67 @@ class TestParser:
         request = httpx_mock.get_request()
 
         assert str(request.url) == "http://localhost:3000/forms/chromium/convert/html"
+
+    @pytest.mark.httpx_mock(can_send_already_matched_responses=True)
+    @mock.patch("gotenberg_client._merge.MergeRoute.merge")
+    @mock.patch("paperless_mail.models.MailRule.objects.get")
+    def test_generate_pdf_layout_options(
+        self,
+        mock_mailrule_get: mock.Mock,
+        mock_merge_route: mock.Mock,
+        httpx_mock: HTTPXMock,
+        mail_parser: MailDocumentParser,
+        html_email_file: Path,
+        html_email_pdf_file: Path,
+    ):
+        """
+        GIVEN:
+            - Email message
+        WHEN:
+            - Email is parsed with different layout options
+        THEN:
+            - Gotenberg is called with the correct layout option
+        """
+        httpx_mock.add_response(
+            url="http://localhost:9998/tika/text",
+            method="PUT",
+            json={
+                "Content-Type": "text/html",
+                "X-TIKA:Parsed-By": [],
+                "X-TIKA:content": "This is some Tika HTML text",
+            },
+        )
+        httpx_mock.add_response(
+            url="http://localhost:3000/forms/chromium/convert/html",
+            method="POST",
+            content=html_email_pdf_file.read_bytes(),
+        )
+        httpx_mock.add_response(
+            url="http://localhost:3000/forms/pdfengines/merge",
+            method="POST",
+            content=b"Pretend merged PDF content",
+        )
+
+        def test_layout_option(layout_option, expected_calls, expected_pdf_names):
+            mock_mailrule_get.return_value = mock.Mock(pdf_layout=layout_option)
+            mail_parser.parse(
+                document_path=html_email_file,
+                mime_type="message/rfc822",
+                mailrule_id=1,
+            )
+            args, _ = mock_merge_route.call_args
+            assert len(args[0]) == expected_calls
+            for i, pdf in enumerate(expected_pdf_names):
+                assert args[0][i].name == pdf
+
+        # 1 = MailRule.PdfLayout.TEXT_HTML
+        test_layout_option(1, 2, ["email_as_pdf.pdf", "html.pdf"])
+
+        # 2 = MailRule.PdfLayout.HTML_TEXT
+        test_layout_option(2, 2, ["html.pdf", "email_as_pdf.pdf"])
+
+        # 3 = MailRule.PdfLayout.HTML_ONLY
+        test_layout_option(3, 1, ["html.pdf"])
+
+        # 4 = MailRule.PdfLayout.TEXT_ONLY
+        test_layout_option(4, 1, ["email_as_pdf.pdf"])
