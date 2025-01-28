@@ -2,12 +2,6 @@
 
 ## paperless-ngx 2.14.6
 
-### Features
-
--   Chore: Upgrades dependencies and hook versions [@stumpylog](https://github.com/stumpylog) ([#8895](https://github.com/paperless-ngx/paperless-ngx/pull/8895))
--   Fix: force set document not dirty before close after save [@shamoon](https://github.com/shamoon) ([#8888](https://github.com/paperless-ngx/paperless-ngx/pull/8888))
--   Fixhancement: restore search highlighting and add for built-in viewer [@shamoon](https://github.com/shamoon) ([#8885](https://github.com/paperless-ngx/paperless-ngx/pull/8885))
-
 ### Bug Fixes
 
 -   Fix: backwards-compatible versioned API response for custom field select fields, update default API version [@shamoon](https://github.com/shamoon) ([#8912](https://github.com/paperless-ngx/paperless-ngx/pull/8912))
