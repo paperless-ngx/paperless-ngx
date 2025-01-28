@@ -169,7 +169,9 @@ export class TasksComponent
 
   dismissAndGo(task: PaperlessTask) {
     this.dismissTask(task)
-    this.router.navigate(['documents', task.related_document])
+    this.router.navigate(['documents', task.related_document, 'details'], {
+      state: { previousUrl: this.router.url },
+    })
   }
 
   expandTask(task: PaperlessTask) {

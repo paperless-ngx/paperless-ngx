@@ -254,6 +254,7 @@ export class DocumentDetailComponent
 
   DocumentDetailNavIDs = DocumentDetailNavIDs
   activeNavID: number
+  previousUrl: string
 
   constructor(
     private documentsService: DocumentService,
@@ -275,6 +276,9 @@ export class DocumentDetailComponent
     private hotKeyService: HotKeyService
   ) {
     super()
+
+    let previousUrl = router.getCurrentNavigation()?.extras?.state?.previousUrl
+    this.previousUrl = previousUrl ? previousUrl : '/'
   }
 
   titleKeyUp(event) {
@@ -889,7 +893,7 @@ export class DocumentDetailComponent
             this.documentListViewService.activeSavedViewId,
           ])
         } else {
-          this.router.navigate(['documents'])
+          this.router.navigateByUrl(this.previousUrl)
         }
       })
   }

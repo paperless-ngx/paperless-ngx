@@ -7,7 +7,7 @@ import {
   Output,
   ViewChild,
 } from '@angular/core'
-import { RouterModule } from '@angular/router'
+import { Router, RouterModule } from '@angular/router'
 import {
   NgbProgressbarModule,
   NgbTooltipModule,
@@ -67,7 +67,8 @@ export class DocumentCardSmallComponent
 
   constructor(
     private documentService: DocumentService,
-    public settingsService: SettingsService
+    public settingsService: SettingsService,
+    private router: Router
   ) {
     super()
   }
@@ -121,6 +122,12 @@ export class DocumentCardSmallComponent
 
   getDownloadUrl() {
     return this.documentService.getDownloadUrl(this.document.id)
+  }
+
+  openDocumentDetail(documentId) {
+    this.router.navigate(['/documents', documentId, 'details'], {
+      state: { previousUrl: this.router.url },
+    })
   }
 
   get tagIDs() {
