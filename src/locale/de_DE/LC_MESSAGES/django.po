@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-27 08:19-0800\n"
-"PO-Revision-Date: 2025-01-27 16:20\n"
+"PO-Revision-Date: 2025-01-28 00:30\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -55,7 +55,7 @@ msgstr "Maximale Verschachtelungstiefe überschritten."
 
 #: documents/filters.py:785
 msgid "Custom field not found"
-msgstr ""
+msgstr "Benutzerdefiniertes Feld nicht gefunden"
 
 #: documents/models.py:41 documents/models.py:801
 msgid "owner"
@@ -918,7 +918,7 @@ msgstr "verwende Parameter"
 
 #: documents/models.py:1214
 msgid "send as JSON"
-msgstr ""
+msgstr "als JSON senden"
 
 #: documents/models.py:1218
 msgid "webhook parameters"
