@@ -16,7 +16,7 @@
 ### All App Changes
 
 <details>
-<summary>9 changes</summary>
+<summary>10 changes</summary>
 
 -   Fix: backwards-compatible versioned API response for custom field select fields, update default API version [@shamoon](https://github.com/shamoon) ([#8912](https://github.com/paperless-ngx/paperless-ngx/pull/8912))
 -   Tweak: place items with 0 documents at bottom of filterable list, retain alphabetical [@shamoon](https://github.com/shamoon) ([#8924](https://github.com/paperless-ngx/paperless-ngx/pull/8924))
