@@ -1,5 +1,35 @@
 # Changelog
 
+## paperless-ngx 2.14.6
+
+### Bug Fixes
+
+-   Fix: backwards-compatible versioned API response for custom field select fields, update default API version [@shamoon](https://github.com/shamoon) ([#8912](https://github.com/paperless-ngx/paperless-ngx/pull/8912))
+-   Tweak: place items with 0 documents at bottom of filterable list, retain alphabetical [@shamoon](https://github.com/shamoon) ([#8924](https://github.com/paperless-ngx/paperless-ngx/pull/8924))
+-   Fix: set larger page size for abstract service getFew [@shamoon](https://github.com/shamoon) ([#8920](https://github.com/paperless-ngx/paperless-ngx/pull/8920))
+-   Fix/refactor: remove doc observables, fix username async [@shamoon](https://github.com/shamoon) ([#8908](https://github.com/paperless-ngx/paperless-ngx/pull/8908))
+-   Fix: include missing fields for saved view widgets [@shamoon](https://github.com/shamoon) ([#8905](https://github.com/paperless-ngx/paperless-ngx/pull/8905))
+-   Fix: force set document not dirty before close after save [@shamoon](https://github.com/shamoon) ([#8888](https://github.com/paperless-ngx/paperless-ngx/pull/8888))
+-   Fixhancement: restore search highlighting and add for built-in viewer [@shamoon](https://github.com/shamoon) ([#8885](https://github.com/paperless-ngx/paperless-ngx/pull/8885))
+-   Fix: resolve cpu usage due to incorrect interval use [@shamoon](https://github.com/shamoon) ([#8884](https://github.com/paperless-ngx/paperless-ngx/pull/8884))
+
+### All App Changes
+
+<details>
+<summary>10 changes</summary>
+
+-   Fix: backwards-compatible versioned API response for custom field select fields, update default API version [@shamoon](https://github.com/shamoon) ([#8912](https://github.com/paperless-ngx/paperless-ngx/pull/8912))
+-   Tweak: place items with 0 documents at bottom of filterable list, retain alphabetical [@shamoon](https://github.com/shamoon) ([#8924](https://github.com/paperless-ngx/paperless-ngx/pull/8924))
+-   Fix: set larger page size for abstract service getFew [@shamoon](https://github.com/shamoon) ([#8920](https://github.com/paperless-ngx/paperless-ngx/pull/8920))
+-   Fix/refactor: remove doc observables, fix username async [@shamoon](https://github.com/shamoon) ([#8908](https://github.com/paperless-ngx/paperless-ngx/pull/8908))
+-   Fix: include missing fields for saved view widgets [@shamoon](https://github.com/shamoon) ([#8905](https://github.com/paperless-ngx/paperless-ngx/pull/8905))
+-   Chore: Upgrades dependencies and hook versions [@stumpylog](https://github.com/stumpylog) ([#8895](https://github.com/paperless-ngx/paperless-ngx/pull/8895))
+-   Fix: force set document not dirty before close after save [@shamoon](https://github.com/shamoon) ([#8888](https://github.com/paperless-ngx/paperless-ngx/pull/8888))
+-   Change: Revert dropdown sorting by doc count [@shamoon](https://github.com/shamoon) ([#8887](https://github.com/paperless-ngx/paperless-ngx/pull/8887))
+-   Fixhancement: restore search highlighting and add for built-in viewer [@shamoon](https://github.com/shamoon) ([#8885](https://github.com/paperless-ngx/paperless-ngx/pull/8885))
+-   Fix: resolve cpu usage due to incorrect interval use [@shamoon](https://github.com/shamoon) ([#8884](https://github.com/paperless-ngx/paperless-ngx/pull/8884))
+</details>
+
 ## paperless-ngx 2.14.5
 
 ### Features
