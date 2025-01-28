@@ -1,0 +1,20 @@
+#!/command/with-contenv /usr/bin/bash
+# shellcheck shell=bash
+
+declare -r log_prefix="[init-superuser]"
+
+if [[ -n "${PAPERLESS_ADMIN_USER}" ]]; then
+	echo "${log_prefix} Creating superuser..."
+	cd "${PAPERLESS_SRC_DIR}"
+
+	if [[ -n "${USER_IS_NON_ROOT}" ]]; then
+		python3 manage.py manage_superuser
+	else
+		s6-setuidgid paperless python3 manage.py manage_superuser
+	fi
+
+	echo "${log_prefix} Superuser creation done"
+
+else
+	echo "${log_prefix} Not creating superuser"
+fi

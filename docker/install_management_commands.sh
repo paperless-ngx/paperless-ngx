@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Run this script to generate the management commands again (for example if a new command is create or the template is updated)
+
 set -eu
 
 for command in decrypt_documents \
@@ -19,6 +21,6 @@ for command in decrypt_documents \
 	prune_audit_logs;
 do
 	echo "installing $command..."
-	sed "s/management_command/$command/g" management_script.sh > /usr/local/bin/$command
-	chmod +x /usr/local/bin/$command
+	sed "s/management_command/$command/g" management_script.sh >"$PWD/rootfs/usr/local/bin/$command"
+	chmod +x "$PWD/rootfs/usr/local/bin/$command"
 done

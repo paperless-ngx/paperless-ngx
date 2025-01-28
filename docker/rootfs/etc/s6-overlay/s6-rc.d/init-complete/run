@@ -1,0 +1,8 @@
+#!/command/with-contenv /usr/bin/bash
+# shellcheck shell=bash
+declare -r log_prefix="[init-complete]"
+declare -r end_time=$(date +%s)
+declare -r start_time=${PAPERLESS_START_TIME_S}
+
+echo "${log_prefix} paperless-ngx docker container init completed in $(($end_time-$start_time)) seconds"
+echo "${log_prefix} Starting services"

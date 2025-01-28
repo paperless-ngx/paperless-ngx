@@ -1,0 +1,14 @@
+#!/command/with-contenv /usr/bin/bash
+# shellcheck shell=bash
+
+declare -r log_prefix="[init-redis-wait]"
+
+echo "${log_prefix} Waiting for Redis to report ready"
+
+# We use a Python script to send the Redis ping
+# instead of installing redis-tools just for 1 thing
+if ! python3 /usr/local/bin/wait-for-redis.py; then
+	exit 1
+else
+	echo "${log_prefix} Redis ready"
+fi
