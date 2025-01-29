@@ -3,6 +3,7 @@ import json
 from unittest import mock
 
 from allauth.mfa.models import Authenticator
+from allauth.mfa.totp.internal import auth as totp_auth
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -487,6 +488,71 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(response.data["detail"], "MFA required")
+
+    @mock.patch("allauth.mfa.totp.internal.auth.TOTP.validate_code")
+    def test_get_token_mfa_enabled(self, mock_validate_code):
+        """
+        GIVEN:
+            - User with MFA enabled
+        WHEN:
+            - API request is made to obtain an auth token
+        THEN:
+            - MFA code is required
+        """
+        user1 = User.objects.create_user(username="user1")
+        user1.set_password("password")
+        user1.save()
+
+        response = self.client.post(
+            "/api/token/",
+            data={
+                "username": "user1",
+                "password": "password",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        secret = totp_auth.generate_totp_secret()
+        totp_auth.TOTP.activate(
+            user1,
+            secret,
+        )
+
+        # no code
+        response = self.client.post(
+            "/api/token/",
+            data={
+                "username": "user1",
+                "password": "password",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["non_field_errors"][0], "MFA code is required")
+
+        # invalid code
+        mock_validate_code.return_value = False
+        response = self.client.post(
+            "/api/token/",
+            data={
+                "username": "user1",
+                "password": "password",
+                "code": "123456",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["non_field_errors"][0], "Invalid MFA code")
+
+        # valid code
+        mock_validate_code.return_value = True
+        response = self.client.post(
+            "/api/token/",
+            data={
+                "username": "user1",
+                "password": "password",
+                "code": "123456",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
 class TestApiUser(DirectoriesMixin, APITestCase):
