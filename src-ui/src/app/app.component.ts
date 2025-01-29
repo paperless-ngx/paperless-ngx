@@ -5,6 +5,7 @@ import { first, Subscription } from 'rxjs'
 import { ToastsComponent } from './components/common/toasts/toasts.component'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { SETTINGS_KEYS } from './data/ui-settings'
+import { ComponentRouterService } from './services/component-router.service'
 import { ConsumerStatusService } from './services/consumer-status.service'
 import { HotKeyService } from './services/hot-key.service'
 import {
@@ -41,7 +42,8 @@ export class AppComponent implements OnInit, OnDestroy {
     public tourService: TourService,
     private renderer: Renderer2,
     private permissionsService: PermissionsService,
-    private hotKeyService: HotKeyService
+    private hotKeyService: HotKeyService,
+    private componentRouterService: ComponentRouterService
   ) {
     let anyWindow = window as any
     anyWindow.pdfWorkerSrc = 'assets/js/pdf.worker.min.mjs'

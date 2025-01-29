@@ -45,6 +45,7 @@ import { Tag } from 'src/app/data/tag'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
+import { ComponentRouterService } from 'src/app/services/component-router.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
@@ -127,6 +128,7 @@ describe('DocumentDetailComponent', () => {
   let settingsService: SettingsService
   let customFieldsService: CustomFieldsService
   let httpTestingController: HttpTestingController
+  let componentRouterService: ComponentRouterService
 
   let currentUserCan = true
   let currentUserHasObjectPermissions = true
@@ -264,6 +266,7 @@ describe('DocumentDetailComponent', () => {
     customFieldsService = TestBed.inject(CustomFieldsService)
     fixture = TestBed.createComponent(DocumentDetailComponent)
     httpTestingController = TestBed.inject(HttpTestingController)
+    componentRouterService = TestBed.inject(ComponentRouterService)
     component = fixture.componentInstance
   })
 
@@ -566,6 +569,16 @@ describe('DocumentDetailComponent', () => {
     const navigateSpy = jest.spyOn(router, 'navigate')
     component.close()
     expect(navigateSpy).toHaveBeenCalledWith(['documents'])
+  })
+
+  it('should allow close and navigate to the last view if available', () => {
+    initNormally()
+    jest
+      .spyOn(componentRouterService, 'getComponentURLBefore')
+      .mockReturnValue('dashboard')
+    const navigateSpy = jest.spyOn(router, 'navigate')
+    component.close()
+    expect(navigateSpy).toHaveBeenCalledWith(['dashboard'])
   })
 
   it('should allow close and navigate to documents by default', () => {
