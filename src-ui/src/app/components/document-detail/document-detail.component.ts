@@ -59,6 +59,7 @@ import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { FileSizePipe } from 'src/app/pipes/file-size.pipe'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
+import { ComponentRouterService } from 'src/app/services/component-router.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { HotKeyService } from 'src/app/services/hot-key.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
@@ -272,7 +273,8 @@ export class DocumentDetailComponent
     private userService: UserService,
     private customFieldsService: CustomFieldsService,
     private http: HttpClient,
-    private hotKeyService: HotKeyService
+    private hotKeyService: HotKeyService,
+    private componentRouterService: ComponentRouterService
   ) {
     super()
   }
@@ -887,6 +889,10 @@ export class DocumentDetailComponent
           this.router.navigate([
             'view',
             this.documentListViewService.activeSavedViewId,
+          ])
+        } else if (this.componentRouterService.getComponentURLBefore()) {
+          this.router.navigate([
+            this.componentRouterService.getComponentURLBefore(),
           ])
         } else {
           this.router.navigate(['documents'])
