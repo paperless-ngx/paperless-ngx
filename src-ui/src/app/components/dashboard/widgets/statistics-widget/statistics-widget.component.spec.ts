@@ -253,6 +253,7 @@ describe('StatisticsWidgetComponent', () => {
     component.filterByFileType({
       mime_type: 'Other',
       mime_type_count: 160,
+      is_other: true,
     })
     expect(qfSpy).not.toHaveBeenCalled()
   })

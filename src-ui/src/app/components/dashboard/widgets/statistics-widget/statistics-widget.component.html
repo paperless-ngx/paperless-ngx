@@ -71,7 +71,7 @@
           <div class="d-flex flex-wrap align-items-start">
             @for (filetype of statistics?.document_file_type_counts; track filetype; let i = $index) {
               <div class="d-flex">
-                <div class="text-nowrap me-2" [class.cursor-pointer]="filetype.mime_type !== 'Other'" (click)="filterByFileType(filetype)">
+                <div class="text-nowrap me-2" [class.cursor-pointer]="!filetype.is_other" (click)="filterByFileType(filetype)">
                   <span class="badge rounded-pill bg-primary d-inline-block p-0 me-1" [style.opacity]="getItemOpacity(i)"></span>
                   <small class="text-nowrap"><span class="fw-bold">{{ getFileTypeExtension(filetype) }}</span>&nbsp;<span class="text-muted">({{getFileTypePercent(filetype) | number: '1.0-1'}}%)</span></small>
                 </div>

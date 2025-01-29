@@ -32,6 +32,7 @@ export interface Statistics {
 interface DocumentFileType {
   mime_type: string
   mime_type_count: number
+  is_other?: boolean
 }
 
 @Component({
@@ -80,6 +81,7 @@ export class StatisticsWidgetComponent
             statistics.document_file_type_counts.slice(0, fileTypeMax)
           statistics.document_file_type_counts.push({
             mime_type: $localize`Other`,
+            is_other: true,
             mime_type_count: others.reduce(
               (currentValue, documentFileType) =>
                 documentFileType.mime_type_count + currentValue,
@@ -137,7 +139,7 @@ export class StatisticsWidgetComponent
   }
 
   filterByFileType(filetype: DocumentFileType) {
-    if (filetype.mime_type === 'Other') return
+    if (filetype.is_other) return
     this.documentListViewService.quickFilter([
       {
         rule_type: FILTER_MIME_TYPE,
