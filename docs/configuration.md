@@ -581,6 +581,12 @@ system. See the corresponding
 
     Defaults to 'https'
 
+#### [`PAPERLESS_OIDC_REDIRECT_URI=<string>`](#PAPERLESS_OIDC_REDIRECT_URI) {#PAPERLESS_OIDC_REDIRECT_URI}
+
+: The redirect URI which will be passed to the OAuth callback.
+
+    : Defaults to ''.
+
 #### [`PAPERLESS_ACCOUNT_EMAIL_VERIFICATION=<string>`](#PAPERLESS_ACCOUNT_EMAIL_VERIFICATION) {#PAPERLESS_ACCOUNT_EMAIL_VERIFICATION}
 
 : Determines whether email addresses are verified during signup (as performed by Django allauth). See the relevant

@@ -77,8 +77,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         Returns the default URL to redirect to after successfully
         connecting a social account.
         """
-        url = reverse("base")
-        return url
+        return getattr(settings, 'OIDC_REDIRECT_URI', '') or reverse("base")
 
     def populate_user(self, request, sociallogin, data):
         """

@@ -457,6 +457,8 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv(
     "https",
 )
 
+OIDC_REDIRECT_URI: Final[str] = os.getenv("PAPERLESS_OIDC_REDIRECT_URI", "")
+
 ACCOUNT_ADAPTER = "paperless.adapter.CustomAccountAdapter"
 ACCOUNT_ALLOW_SIGNUPS = __get_boolean("PAPERLESS_ACCOUNT_ALLOW_SIGNUPS")
 
