@@ -8,7 +8,7 @@ class AngularApiAuthenticationOverrideScheme(OpenApiAuthenticationExtension):
     target_class = "paperless.auth.AngularApiAuthenticationOverride"
     name = "AngularApiAuthenticationOverride"
 
-    def get_security_definition(self, auto_schema):
+    def get_security_definition(self, auto_schema):  # pragma: no cover
         return {
             "type": "http",
             "scheme": "basic",
