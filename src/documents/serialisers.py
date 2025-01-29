@@ -580,7 +580,7 @@ class CustomFieldSerializer(serializers.ModelSerializer):
         context = kwargs.get("context")
         self.api_version = int(
             context.get("request").version
-            if context.get("request")
+            if context and context.get("request")
             else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
         )
         super().__init__(*args, **kwargs)
