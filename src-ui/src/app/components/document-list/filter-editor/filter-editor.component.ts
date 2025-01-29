@@ -167,11 +167,11 @@ const DEFAULT_TEXT_FILTER_TARGET_OPTIONS = [
     id: TEXT_FILTER_TARGET_CUSTOM_FIELDS,
     name: $localize`Custom fields`,
   },
+  { id: TEXT_FILTER_TARGET_MIME_TYPE, name: $localize`File type` },
   {
     id: TEXT_FILTER_TARGET_FULLTEXT_QUERY,
     name: $localize`Advanced search`,
   },
-  { id: TEXT_FILTER_TARGET_MIME_TYPE, name: $localize`MIME type` },
 ]
 
 const TEXT_FILTER_TARGET_MORELIKE_OPTION = {

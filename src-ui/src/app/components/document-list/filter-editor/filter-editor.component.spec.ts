@@ -1240,7 +1240,7 @@ describe('FilterEditorComponent', () => {
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdownItem)
-    )[5]
+    )[4]
     textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_MIME_TYPE
     fixture.detectChanges()
     tick(400)
@@ -1258,7 +1258,7 @@ describe('FilterEditorComponent', () => {
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdownItem)
-    )[4]
+    )[5]
     textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_ASN
     fixture.detectChanges()
     tick(400)
@@ -1625,7 +1625,7 @@ describe('FilterEditorComponent', () => {
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdownItem)
-    )[4]
+    )[5]
     textFieldTargetDropdown.triggerEventHandler('click')
     fixture.detectChanges()
     tick(400)
