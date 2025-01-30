@@ -268,7 +268,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         )
         cf3 = CustomField.objects.create(
             name="cf3",
-            data_type=CustomField.FieldDataType.STRING,
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
         )
         CustomFieldInstance.objects.create(
             document=self.doc2,
@@ -282,9 +282,14 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             document=self.doc2,
             field=cf3,
         )
+        doc3: Document = Document.objects.create(
+            title="doc3",
+            content="content",
+            checksum="D3",
+        )
         bulk_edit.modify_custom_fields(
             [self.doc1.id, self.doc2.id],
-            add_custom_fields={cf2.id: None, cf3.id: "value"},
+            add_custom_fields={cf2.id: None, cf3.id: [doc3.id]},
             remove_custom_fields=[cf.id],
         )
 
@@ -301,7 +306,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         )
         self.assertEqual(
             self.doc1.custom_fields.get(field=cf3).value,
-            "value",
+            [doc3.id],
         )
         self.assertEqual(
             self.doc2.custom_fields.count(),
@@ -309,7 +314,13 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         )
         self.assertEqual(
             self.doc2.custom_fields.get(field=cf3).value,
-            "value",
+            [doc3.id],
+        )
+        # assert reflect document link
+        doc3.refresh_from_db()
+        self.assertEqual(
+            doc3.custom_fields.first().value,
+            [self.doc2.id, self.doc1.id],
         )
 
         self.async_task.assert_called_once()
