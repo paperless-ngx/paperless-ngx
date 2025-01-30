@@ -2791,7 +2791,6 @@
                 "sha256:fbd5b253ad0f8823c5c104feaaa19acab95c217cb924b012d55ff339c42b3583",
                 "sha256:fd3f175f7b57cfbdea56afdb5335eaebaadeebc06e20a087d9aa3f99637c4aa5"
             ],
-            "markers": "platform_machine == 'x86_64'",
             "version": "==2.3.0"
         }
     },
