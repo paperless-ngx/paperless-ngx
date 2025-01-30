@@ -1073,8 +1073,6 @@ or hidden folders some tools use to store data.
     If you have problems that your Barcodes/QR-Codes are not detected
     (especially with bad scan quality and/or small codes), try the other one.
 
-    zxing is not available on all platforms.
-
 #### [`PAPERLESS_PRE_CONSUME_SCRIPT=<filename>`](#PAPERLESS_PRE_CONSUME_SCRIPT) {#PAPERLESS_PRE_CONSUME_SCRIPT}
 
 : After some initial validation, Paperless can trigger an arbitrary
