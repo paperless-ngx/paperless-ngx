@@ -16,7 +16,6 @@ from django.core.validators import DecimalValidator
 from django.core.validators import MaxLengthValidator
 from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
-from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
@@ -647,7 +646,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
 
         if custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
             # prior to update so we can look for any docs that are going to be removed
-            self.reflect_doclinks(document, custom_field, validated_data["value"])
+            bulk_edit.reflect_doclinks(document, custom_field, validated_data["value"])
 
         # Actually update or create the instance, providing the value
         # to fill in the correct attribute based on the type
@@ -767,89 +766,6 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
 
         return ret
 
-    def reflect_doclinks(
-        self,
-        document: Document,
-        field: CustomField,
-        target_doc_ids: list[int],
-    ):
-        """
-        Add or remove 'symmetrical' links to `document` on all `target_doc_ids`
-        """
-
-        if target_doc_ids is None:
-            target_doc_ids = []
-
-        # Check if any documents are going to be removed from the current list of links and remove the symmetrical links
-        current_field_instance = CustomFieldInstance.objects.filter(
-            field=field,
-            document=document,
-        ).first()
-        if (
-            current_field_instance is not None
-            and current_field_instance.value is not None
-        ):
-            for doc_id in current_field_instance.value:
-                if doc_id not in target_doc_ids:
-                    self.remove_doclink(document, field, doc_id)
-
-        # Create an instance if target doc doesn't have this field or append it to an existing one
-        existing_custom_field_instances = {
-            custom_field.document_id: custom_field
-            for custom_field in CustomFieldInstance.objects.filter(
-                field=field,
-                document_id__in=target_doc_ids,
-            )
-        }
-        custom_field_instances_to_create = []
-        custom_field_instances_to_update = []
-        for target_doc_id in target_doc_ids:
-            target_doc_field_instance = existing_custom_field_instances.get(
-                target_doc_id,
-            )
-            if target_doc_field_instance is None:
-                custom_field_instances_to_create.append(
-                    CustomFieldInstance(
-                        document_id=target_doc_id,
-                        field=field,
-                        value_document_ids=[document.id],
-                    ),
-                )
-            elif target_doc_field_instance.value is None:
-                target_doc_field_instance.value_document_ids = [document.id]
-                custom_field_instances_to_update.append(target_doc_field_instance)
-            elif document.id not in target_doc_field_instance.value:
-                target_doc_field_instance.value_document_ids.append(document.id)
-                custom_field_instances_to_update.append(target_doc_field_instance)
-
-        CustomFieldInstance.objects.bulk_create(custom_field_instances_to_create)
-        CustomFieldInstance.objects.bulk_update(
-            custom_field_instances_to_update,
-            ["value_document_ids"],
-        )
-        Document.objects.filter(id__in=target_doc_ids).update(modified=timezone.now())
-
-    @staticmethod
-    def remove_doclink(
-        document: Document,
-        field: CustomField,
-        target_doc_id: int,
-    ):
-        """
-        Removes a 'symmetrical' link to `document` from the target document's existing custom field instance
-        """
-        target_doc_field_instance = CustomFieldInstance.objects.filter(
-            document_id=target_doc_id,
-            field=field,
-        ).first()
-        if (
-            target_doc_field_instance is not None
-            and document.id in target_doc_field_instance.value
-        ):
-            target_doc_field_instance.value.remove(document.id)
-            target_doc_field_instance.save()
-        Document.objects.filter(id=target_doc_id).update(modified=timezone.now())
-
     class Meta:
         model = CustomFieldInstance
         fields = [
@@ -951,7 +867,7 @@ class DocumentSerializer(
                 ):
                     # Doc link field is being removed entirely
                     for doc_id in custom_field_instance.value:
-                        CustomFieldInstanceSerializer.remove_doclink(
+                        bulk_edit.remove_doclink(
                             instance,
                             custom_field_instance.field,
                             doc_id,
