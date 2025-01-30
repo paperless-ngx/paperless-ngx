@@ -312,7 +312,6 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             [self.doc3.id],
         )
         # assert reflect document link
-        self.doc3.refresh_from_db()
         self.assertEqual(
             self.doc3.custom_fields.first().value,
             [self.doc2.id, self.doc1.id],
@@ -328,7 +327,6 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             add_custom_fields={},
             remove_custom_fields=[cf3.id],
         )
-        self.doc1.refresh_from_db()
         self.assertNotIn(
             self.doc3.id,
             self.doc1.custom_fields.filter(field=cf3).first().value,
