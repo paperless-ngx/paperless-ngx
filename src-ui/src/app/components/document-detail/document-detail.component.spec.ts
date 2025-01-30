@@ -24,6 +24,7 @@ import {
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { DeviceDetectorService } from 'ngx-device-detector'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import { Correspondent } from 'src/app/data/correspondent'
@@ -127,6 +128,7 @@ describe('DocumentDetailComponent', () => {
   let documentListViewService: DocumentListViewService
   let settingsService: SettingsService
   let customFieldsService: CustomFieldsService
+  let deviceDetectorService: DeviceDetectorService
   let httpTestingController: HttpTestingController
   let componentRouterService: ComponentRouterService
 
@@ -264,6 +266,7 @@ describe('DocumentDetailComponent', () => {
     settingsService = TestBed.inject(SettingsService)
     settingsService.currentUser = { id: 1 }
     customFieldsService = TestBed.inject(CustomFieldsService)
+    deviceDetectorService = TestBed.inject(DeviceDetectorService)
     fixture = TestBed.createComponent(DocumentDetailComponent)
     httpTestingController = TestBed.inject(HttpTestingController)
     componentRouterService = TestBed.inject(ComponentRouterService)
@@ -1267,5 +1270,39 @@ describe('DocumentDetailComponent', () => {
       .expectOne(component.previewUrl)
       .error(new ErrorEvent('failed'))
     expect(component.tiffError).not.toBeUndefined()
+  })
+
+  it('should support download using share sheet on mobile, direct download otherwise', () => {
+    const shareSpy = jest.spyOn(navigator, 'share')
+    const createSpy = jest.spyOn(document, 'createElement')
+    const urlRevokeSpy = jest.spyOn(URL, 'revokeObjectURL')
+    initNormally()
+
+    // Mobile
+    jest.spyOn(deviceDetectorService, 'isDesktop').mockReturnValue(false)
+    component.download()
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}documents/${doc.id}/download/`)
+      .error(new ProgressEvent('failed'))
+    expect(shareSpy).not.toHaveBeenCalled()
+
+    component.download(true)
+    httpTestingController
+      .expectOne(
+        `${environment.apiBaseUrl}documents/${doc.id}/download/?original=true`
+      )
+      .flush(new ArrayBuffer(100))
+    expect(shareSpy).toHaveBeenCalled()
+
+    // Desktop
+    shareSpy.mockClear()
+    jest.spyOn(deviceDetectorService, 'isDesktop').mockReturnValue(true)
+    component.download()
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}documents/${doc.id}/download/`)
+      .flush(new ArrayBuffer(100))
+    expect(shareSpy).not.toHaveBeenCalled()
+    expect(createSpy).toHaveBeenCalledWith('a')
+    expect(urlRevokeSpy).toHaveBeenCalled()
   })
 })
