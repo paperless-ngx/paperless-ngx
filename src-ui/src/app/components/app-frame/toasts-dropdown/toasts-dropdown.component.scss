@@ -1,0 +1,22 @@
+.dropdown-menu {
+  width: var(--pngx-toast-max-width);
+}
+
+.dropdown-menu .scroll-list {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.dropdown-toggle::after {
+  display: none;
+}
+
+.dropdown-item {
+  white-space: initial;
+}
+
+@media screen and (max-width: 400px) {
+  :host ::ng-deep .dropdown-menu-end {
+    right: -3rem;
+  }
+}
