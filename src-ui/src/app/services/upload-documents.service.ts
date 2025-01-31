@@ -17,7 +17,15 @@ export class UploadDocumentsService {
   constructor(
     private documentService: DocumentService,
     private consumerStatusService: ConsumerStatusService
-  ) {}
+  ) {
+    setTimeout(() => {
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          this.uploadFile(new File([], `sample-${i}.txt`))
+        }, Math.random() * 5000)
+      }
+    }, 1000)
+  }
 
   onNgxFileDrop(files: NgxFileDropEntry[]) {
     for (const droppedFile of files) {

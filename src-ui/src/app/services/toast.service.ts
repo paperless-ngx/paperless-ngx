@@ -21,7 +21,15 @@ export interface Toast {
   providedIn: 'root',
 })
 export class ToastService {
-  constructor() {}
+  constructor() {
+    setTimeout(() => {
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          this.showInfo(`Sample toast ${i}`)
+        }, Math.random() * 5000)
+      }
+    }, 1000)
+  }
 
   private toasts: Toast[] = []
 
