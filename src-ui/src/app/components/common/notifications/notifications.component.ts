@@ -1,5 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard'
-import { DecimalPipe, NgClass, NgTemplateOutlet } from '@angular/common'
+import { DecimalPipe, NgTemplateOutlet } from '@angular/common'
 import {
   Component,
   OnDestroy,
@@ -16,7 +16,7 @@ import {
   NgbToastModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { Subscription, interval, take } from 'rxjs'
+import { Subject, interval, take, takeUntil } from 'rxjs'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import {
@@ -30,6 +30,10 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
 
 const MAX_ALERTS = 5
 
+export enum Placement {
+  Top = 'top',
+  Bottom = 'bottom',
+}
 @Component({
   selector: 'pngx-notifications',
   templateUrl: './notifications.component.html',
@@ -38,7 +42,6 @@ const MAX_ALERTS = 5
     IfPermissionsDirective,
     DecimalPipe,
     RouterModule,
-    NgClass,
     NgTemplateOutlet,
     NgbAlertModule,
     NgbCollapseModule,
@@ -51,6 +54,8 @@ export class NotificationsComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy
 {
+  Placement = Placement
+
   constructor(
     public toastService: ToastService,
     private clipboard: Clipboard,
@@ -60,7 +65,7 @@ export class NotificationsComponent
     super()
   }
 
-  private subscription: Subscription
+  private unsubscribeNotifier: Subject<any> = new Subject()
 
   public toasts: Toast[] = []
 
@@ -70,23 +75,38 @@ export class NotificationsComponent
 
   public alertsExpanded = false
 
+  public placement: string = Placement.Bottom
+
   @ViewChildren(NgbAlert) alerts: QueryList<NgbAlert>
 
   ngOnDestroy(): void {
-    this.subscription?.unsubscribe()
+    this.unsubscribeNotifier.next(this)
   }
 
   ngOnInit(): void {
-    this.subscription = this.toastService.getToasts().subscribe((toasts) => {
-      this.toasts = toasts
-      this.toasts.forEach((t) => {
-        if (typeof t.error === 'string') {
-          try {
-            t.error = JSON.parse(t.error)
-          } catch (e) {}
-        }
+    this.toastService
+      .getToasts()
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((toasts) => {
+        this.toasts = toasts
+        this.toasts.forEach((t) => {
+          if (typeof t.error === 'string') {
+            try {
+              t.error = JSON.parse(t.error)
+            } catch (e) {}
+          }
+        })
       })
-    })
+    this.settingsService.settingsSaved
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        this.placement = this.settingsService.get(
+          SETTINGS_KEYS.NOTIFICATIONS_PLACEMENT
+        )
+      })
+    this.placement = this.settingsService.get(
+      SETTINGS_KEYS.NOTIFICATIONS_PLACEMENT
+    )
   }
 
   onShow(toast: Toast) {

@@ -1,5 +1,7 @@
-<div class="fixed-bottom p-2 p-md-4 d-flex justify-content-end pe-none max-vh100-40" [ngClass]="slimSidebarEnabled ? 'col-slim' : 'offset-md-3 offset-lg-2'">
-  <div class="col col-lg-4 col-xl-3 ps-0 pe-0 ps-lg-3 pe-lg-0 pe-auto overflow-y-scroll">
+<div class="p-2 p-md-4 d-flex justify-content-end pe-none vh-100 fixed-top"
+[class.col-slim]="slimSidebarEnabled"
+[class.offset-md-3.offset-lg-2]="!slimSidebarEnabled">
+  <div class="col col-lg-4 col-xl-3 ps-0 pe-0 ps-lg-3 pe-lg-0 pe-auto overflow-y-scroll d-flex flex-column" [class.justify-content-end]="placement === Placement.Bottom" [class.justify-content-start]="placement === Placement.Top">
     @for (toast of toasts; track toast) {
       <ngb-toast
         [autohide]="true" [delay]="toast.delay"
@@ -57,7 +59,7 @@
       </ngb-toast>
     }
     @if (getStatus().length > 0) {
-      <div class="card shadow-sm consumer-status-card">
+      <div class="card shadow-sm consumer-status-card" [class.mt-auto]="placement === Placement.Top">
         <div class="card-body">
           <div class="row">
             <div class="col d-flex justify-content-between align-items-center">

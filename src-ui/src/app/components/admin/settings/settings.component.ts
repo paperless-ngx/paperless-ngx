@@ -61,6 +61,7 @@ import { ColorComponent } from '../../common/input/color/color.component'
 import { PermissionsGroupComponent } from '../../common/input/permissions/permissions-group/permissions-group.component'
 import { PermissionsUserComponent } from '../../common/input/permissions/permissions-user/permissions-user.component'
 import { SelectComponent } from '../../common/input/select/select.component'
+import { Placement } from '../../common/notifications/notifications.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
@@ -134,6 +135,7 @@ export class SettingsComponent
     notificationsConsumerSuccess: new FormControl(null),
     notificationsConsumerFailed: new FormControl(null),
     notificationsConsumerSuppressOnDashboard: new FormControl(null),
+    notificationsPlacement: new FormControl(null),
 
     savedViewsWarnOnUnsavedChange: new FormControl(null),
   })
@@ -294,6 +296,9 @@ export class SettingsComponent
       ),
       notificationsConsumerSuppressOnDashboard: this.settings.get(
         SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD
+      ),
+      notificationsPlacement: this.settings.get(
+        SETTINGS_KEYS.NOTIFICATIONS_PLACEMENT
       ),
       savedViewsWarnOnUnsavedChange: this.settings.get(
         SETTINGS_KEYS.SAVED_VIEWS_WARN_ON_UNSAVED_CHANGE
@@ -460,6 +465,10 @@ export class SettingsComponent
       this.settingsForm.value.notificationsConsumerSuppressOnDashboard
     )
     this.settings.set(
+      SETTINGS_KEYS.NOTIFICATIONS_PLACEMENT,
+      this.settingsForm.value.notificationsPlacement
+    )
+    this.settings.set(
       SETTINGS_KEYS.NOTES_ENABLED,
       this.settingsForm.value.notesEnabled
     )
@@ -546,6 +555,10 @@ export class SettingsComponent
 
   get dateLocaleOptions(): LanguageOption[] {
     return [systemDateFormat].concat(this.settings.getDateLocaleOptions())
+  }
+
+  get notificationPlacementOptions(): Placement[] {
+    return [Placement.Top, Placement.Bottom]
   }
 
   get today() {

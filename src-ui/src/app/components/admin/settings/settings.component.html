@@ -337,6 +337,7 @@
             <pngx-input-check i18n-title title="Show notifications when document processing completes successfully" formControlName="notificationsConsumerSuccess"></pngx-input-check>
             <pngx-input-check i18n-title title="Show notifications when document processing fails" formControlName="notificationsConsumerFailed"></pngx-input-check>
             <pngx-input-check i18n-title title="Suppress notifications on dashboard" formControlName="notificationsConsumerSuppressOnDashboard" i18n-hint hint="This will suppress all messages about document processing status on the dashboard."></pngx-input-check>
+            <pngx-select i18n-title title="Notifications placement" formControlName="notificationsPlacement" [items]="notificationPlacementOptions"></pngx-select>
           </div>
         </div>
 
