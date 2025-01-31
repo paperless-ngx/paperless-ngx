@@ -178,12 +178,27 @@ def modify_custom_fields(
                 field_id=field_id,
                 defaults=defaults,
             )
-            if (
-                custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK
-                and value
-            ):
+            if custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
                 doc = Document.objects.get(id=doc_id)
                 reflect_doclinks(doc, custom_field, value)
+
+    # For doc link fields that are being removed, remove symmetrical links
+    for doclink_being_removed_instance in CustomFieldInstance.objects.filter(
+        document_id__in=affected_docs,
+        field__id__in=remove_custom_fields,
+        field__data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        value_document_ids__isnull=False,
+    ):
+        for target_doc_id in doclink_being_removed_instance.value:
+            remove_doclink(
+                document=Document.objects.get(
+                    id=doclink_being_removed_instance.document.id,
+                ),
+                field=doclink_being_removed_instance.field,
+                target_doc_id=target_doc_id,
+            )
+
+    # Finally, remove the custom fields
     CustomFieldInstance.objects.filter(
         document_id__in=affected_docs,
         field_id__in=remove_custom_fields,
