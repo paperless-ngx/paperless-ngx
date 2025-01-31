@@ -1,4 +1,3 @@
-import { Placement } from '../components/common/notifications/notifications.component'
 import { User } from './user'
 
 export interface UiSettings {
@@ -44,7 +43,6 @@ export const SETTINGS_KEYS = {
     'general-settings:notifications:consumer-failed',
   NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD:
     'general-settings:notifications:consumer-suppress-on-dashboard',
-  NOTIFICATIONS_PLACEMENT: 'general-settings:notifications:placement',
   NOTES_ENABLED: 'general-settings:notes-enabled',
   AUDITLOG_ENABLED: 'general-settings:auditlog-enabled',
   SLIM_SIDEBAR: 'general-settings:slim-sidebar',
@@ -155,11 +153,6 @@ export const SETTINGS: UiSetting[] = [
     key: SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD,
     type: 'boolean',
     default: true,
-  },
-  {
-    key: SETTINGS_KEYS.NOTIFICATIONS_PLACEMENT,
-    type: 'string',
-    default: Placement.Bottom,
   },
   {
     key: SETTINGS_KEYS.NOTES_ENABLED,
