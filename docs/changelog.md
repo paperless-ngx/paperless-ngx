@@ -1,5 +1,7 @@
 # Changelog
 
+## paperless-ngx 2.14.7
+
 ## paperless-ngx 2.14.6
 
 ### Bug Fixes
