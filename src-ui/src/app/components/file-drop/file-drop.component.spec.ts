@@ -14,7 +14,7 @@ import { PermissionsService } from 'src/app/services/permissions.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
-import { ToastsComponent } from '../common/toasts/toasts.component'
+import { NotificationsComponent } from '../common/notifications/notifications.component'
 import { FileDropComponent } from './file-drop.component'
 
 describe('FileDropComponent', () => {
@@ -27,7 +27,7 @@ describe('FileDropComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [NgxFileDropModule, FileDropComponent, ToastsComponent],
+      imports: [NgxFileDropModule, FileDropComponent, NotificationsComponent],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),

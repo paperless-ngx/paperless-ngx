@@ -26,6 +26,10 @@
   --pngx-focus-alpha: 0.3;
 }
 
+.toast {
+  --bs-toast-max-width: auto;
+}
+
 // Dark text colors allow for maintain contrast with theme color changes
 $text-color-light-bg: #212529;
 $text-color-dark-bg: #abb2bf;

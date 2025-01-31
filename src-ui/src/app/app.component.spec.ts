@@ -14,7 +14,7 @@ import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { Subject } from 'rxjs'
 import { routes } from './app-routing.module'
 import { AppComponent } from './app.component'
-import { ToastsComponent } from './components/common/toasts/toasts.component'
+import { NotificationsComponent } from './components/common/notifications/notifications.component'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
 import { PermissionsGuard } from './guards/permissions.guard'
@@ -46,7 +46,7 @@ describe('AppComponent', () => {
         NgxFileDropModule,
         NgbModalModule,
         AppComponent,
-        ToastsComponent,
+        NotificationsComponent,
         FileDropComponent,
         NgxBootstrapIconsModule.pick(allIcons),
       ],

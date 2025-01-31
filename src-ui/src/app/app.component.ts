@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core'
 import { Router, RouterOutlet } from '@angular/router'
 import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { first, Subscription } from 'rxjs'
-import { ToastsComponent } from './components/common/toasts/toasts.component'
+import { NotificationsComponent } from './components/common/notifications/notifications.component'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { SETTINGS_KEYS } from './data/ui-settings'
 import { ComponentRouterService } from './services/component-router.service'
@@ -23,7 +23,7 @@ import { ToastService } from './services/toast.service'
   styleUrls: ['./app.component.scss'],
   imports: [
     FileDropComponent,
-    ToastsComponent,
+    NotificationsComponent,
     TourNgBootstrapModule,
     RouterOutlet,
   ],
