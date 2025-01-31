@@ -7,7 +7,7 @@ import {
   QueryList,
   ViewChildren,
 } from '@angular/core'
-import { RouterModule } from '@angular/router'
+import { Router, RouterModule } from '@angular/router'
 import {
   NgbAlert,
   NgbAlertModule,
@@ -55,9 +55,15 @@ export class NotificationsComponent
     public toastService: ToastService,
     private clipboard: Clipboard,
     private consumerStatusService: ConsumerStatusService,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private router: Router
   ) {
     super()
+    this.router.events.subscribe(() => {
+      if (!this.onDashboard) {
+        this.consumerStatusService.dismissCompleted()
+      }
+    })
   }
 
   private subscription: Subscription
@@ -126,6 +132,10 @@ export class NotificationsComponent
     let text: string = error.error?.detail ?? error.error ?? ''
     if (typeof text === 'object') text = JSON.stringify(text)
     return `${text.slice(0, 200)}${text.length > 200 ? '...' : ''}`
+  }
+
+  get onDashboard(): boolean {
+    return this.router.url == '/dashboard'
   }
 
   getStatus() {
