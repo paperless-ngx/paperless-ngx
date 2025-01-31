@@ -28,7 +28,7 @@ export class ToastService {
   private toastsSubject: Subject<Toast[]> = new Subject()
 
   show(toast: Toast) {
-    this.toasts.push(toast)
+    this.toasts.unshift(toast)
     this.toastsSubject.next(this.toasts)
   }
 
