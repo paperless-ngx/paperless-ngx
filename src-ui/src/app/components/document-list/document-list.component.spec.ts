@@ -135,6 +135,17 @@ describe('DocumentListComponent', () => {
     expect(reloadSpy).toHaveBeenCalled()
   })
 
+  it('should reload on document deleted', () => {
+    const reloadSpy = jest.spyOn(documentListService, 'reload')
+    const documentDeletedSubject = new Subject<boolean>()
+    jest
+      .spyOn(consumerStatusService, 'onDocumentDeleted')
+      .mockReturnValue(documentDeletedSubject)
+    fixture.detectChanges()
+    documentDeletedSubject.next(true)
+    expect(reloadSpy).toHaveBeenCalled()
+  })
+
   it('should show score sort fields on fulltext queries', () => {
     documentListService.filterRules = [
       {
