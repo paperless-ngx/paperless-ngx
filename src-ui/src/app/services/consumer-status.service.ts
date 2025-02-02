@@ -95,6 +95,7 @@ export class ConsumerStatusService {
   private documentDetectedSubject = new Subject<FileStatus>()
   private documentConsumptionFinishedSubject = new Subject<FileStatus>()
   private documentConsumptionFailedSubject = new Subject<FileStatus>()
+  private documentDeletedSubject = new Subject<boolean>()
 
   private get(taskId: string, filename?: string) {
     let status =
@@ -147,6 +148,11 @@ export class ConsumerStatusService {
     )
     this.statusWebSocket.onmessage = (ev) => {
       let statusMessage: WebsocketConsumerStatusMessage = JSON.parse(ev['data'])
+      let isDelete = statusMessage.status === 'DELETED'
+      if (isDelete) {
+        this.documentDeletedSubject.next(true)
+        return
+      }
 
       // fallback if backend didn't restrict message
       if (
@@ -249,5 +255,9 @@ export class ConsumerStatusService {
 
   onDocumentDetected() {
     return this.documentDetectedSubject
+  }
+
+  onDocumentDeleted() {
+    return this.documentDeletedSubject
   }
 }

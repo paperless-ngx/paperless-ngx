@@ -13,6 +13,7 @@ class ProgressStatusOptions(str, enum.Enum):
     WORKING = "WORKING"
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
+    DELETED = "DELETED"
 
 
 class ProgressManager:
@@ -21,7 +22,7 @@ class ProgressManager:
     of the open/close of the layer to ensure messages go out and everything is cleaned up
     """
 
-    def __init__(self, filename: str, task_id: str | None = None) -> None:
+    def __init__(self, filename: str | None = None, task_id: str | None = None) -> None:
         self.filename = filename
         self._channel: RedisPubSubChannelLayer | None = None
         self.task_id = task_id

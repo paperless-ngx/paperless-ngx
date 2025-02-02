@@ -323,4 +323,21 @@ describe('ConsumerStatusService', () => {
       1
     )
   })
+
+  it('should trigger deleted subject on document deleted', () => {
+    let deleted = false
+    consumerStatusService.onDocumentDeleted().subscribe(() => {
+      deleted = true
+    })
+
+    consumerStatusService.connect()
+    server.send({
+      current_progress: 1,
+      max_progress: 1,
+      status: 'DELETED',
+    })
+
+    consumerStatusService.disconnect()
+    expect(deleted).toBeTruthy()
+  })
 })

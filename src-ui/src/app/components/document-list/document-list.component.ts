@@ -241,6 +241,10 @@ export class DocumentListComponent
         this.list.reload()
       })
 
+    this.consumerStatusService.onDocumentDeleted().subscribe(() => {
+      this.list.reload()
+    })
+
     this.route.paramMap
       .pipe(
         filter((params) => params.has('id')), // only on saved view e.g. /view/id
