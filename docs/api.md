@@ -1,7 +1,7 @@
 # The REST API
 
 Paperless makes use of the [Django REST
-Framework](https://django-rest-framework.org/) standard API interface. It
+Framework](https://www.django-rest-framework.org/) standard API interface. It
 provides a browsable API for most of its endpoints, which you can
 inspect at `http://<paperless-host>:<port>/api/`. This also documents
 most of the available filters and ordering fields.
