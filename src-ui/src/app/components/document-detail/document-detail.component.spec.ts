@@ -454,7 +454,9 @@ describe('DocumentDetailComponent', () => {
     component.save(true)
     expect(updateSpy).toHaveBeenCalled()
     expect(closeSpy).toHaveBeenCalled()
-    expect(toastSpy).toHaveBeenCalledWith('Document saved successfully.')
+    expect(toastSpy).toHaveBeenCalledWith(
+      'Document "Doc 3" saved successfully.'
+    )
   })
 
   it('should support save without close and show success toast', () => {
@@ -467,7 +469,9 @@ describe('DocumentDetailComponent', () => {
     component.save()
     expect(updateSpy).toHaveBeenCalled()
     expect(closeSpy).not.toHaveBeenCalled()
-    expect(toastSpy).toHaveBeenCalledWith('Document saved successfully.')
+    expect(toastSpy).toHaveBeenCalledWith(
+      'Document "Doc 3" saved successfully.'
+    )
   })
 
   it('should show toast error on save if error occurs', () => {
@@ -482,7 +486,10 @@ describe('DocumentDetailComponent', () => {
     component.save()
     expect(updateSpy).toHaveBeenCalled()
     expect(closeSpy).not.toHaveBeenCalled()
-    expect(toastSpy).toHaveBeenCalledWith('Error saving document', error)
+    expect(toastSpy).toHaveBeenCalledWith(
+      'Error saving document "Doc 3"',
+      error
+    )
   })
 
   it('should show error toast on save but close if user can no longer edit', () => {
@@ -498,7 +505,9 @@ describe('DocumentDetailComponent', () => {
     component.save(true)
     expect(updateSpy).toHaveBeenCalled()
     expect(closeSpy).toHaveBeenCalled()
-    expect(toastSpy).toHaveBeenCalledWith('Document saved successfully.')
+    expect(toastSpy).toHaveBeenCalledWith(
+      'Document "Doc 3" saved successfully.'
+    )
   })
 
   it('should allow save and next', () => {

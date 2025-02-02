@@ -808,7 +808,9 @@ export class DocumentDetailComponent
           this.store.next(newValues)
           this.openDocumentService.setDirty(this.document, false)
           this.openDocumentService.save()
-          this.toastService.showInfo($localize`Document saved successfully.`)
+          this.toastService.showInfo(
+            $localize`Document "${newValues.title}" saved successfully.`
+          )
           this.networkActive = false
           this.error = null
           if (close) {
@@ -822,11 +824,16 @@ export class DocumentDetailComponent
         error: (error) => {
           this.networkActive = false
           if (!this.userCanEdit) {
-            this.toastService.showInfo($localize`Document saved successfully.`)
+            this.toastService.showInfo(
+              $localize`Document "${this.document.title}" saved successfully.`
+            )
             close && this.close()
           } else {
             this.error = error.error
-            this.toastService.showError($localize`Error saving document`, error)
+            this.toastService.showError(
+              $localize`Error saving document "${this.document.title}"`,
+              error
+            )
           }
         },
       })
@@ -955,7 +962,7 @@ export class DocumentDetailComponent
         .subscribe({
           next: () => {
             this.toastService.showInfo(
-              $localize`Reprocess operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.`
+              $localize`Reprocess operation for "${this.document.title}" will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.`
             )
             if (modal) {
               modal.close()
@@ -1315,7 +1322,7 @@ export class DocumentDetailComponent
           .subscribe({
             next: () => {
               this.toastService.showInfo(
-                $localize`Split operation will begin in the background.`
+                $localize`Split operation for "${this.document.title}" will begin in the background.`
               )
               modal.close()
             },
@@ -1354,7 +1361,7 @@ export class DocumentDetailComponent
           .subscribe({
             next: () => {
               this.toastService.show({
-                content: $localize`Rotation will begin in the background. Close and re-open the document after the operation has completed to see the changes.`,
+                content: $localize`Rotation of "${this.document.title}" will begin in the background. Close and re-open the document after the operation has completed to see the changes.`,
                 delay: 8000,
                 action: this.close.bind(this),
                 actionName: $localize`Close`,
@@ -1394,7 +1401,7 @@ export class DocumentDetailComponent
           .subscribe({
             next: () => {
               this.toastService.showInfo(
-                $localize`Delete pages operation will begin in the background. Close and re-open or reload this document after the operation has completed to see the changes.`
+                $localize`Delete pages operation for "${this.document.title}" will begin in the background. Close and re-open or reload this document after the operation has completed to see the changes.`
               )
               modal.close()
             },

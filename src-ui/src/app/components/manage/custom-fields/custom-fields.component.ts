@@ -108,13 +108,16 @@ export class CustomFieldsComponent
       this.customFieldsService.delete(field).subscribe({
         next: () => {
           modal.close()
-          this.toastService.showInfo($localize`Deleted field`)
+          this.toastService.showInfo($localize`Deleted field "${field.name}"`)
           this.customFieldsService.clearCache()
           this.settingsService.initializeDisplayFields()
           this.reload()
         },
         error: (e) => {
-          this.toastService.showError($localize`Error deleting field.`, e)
+          this.toastService.showError(
+            $localize`Error deleting field "${field.name}".`,
+            e
+          )
         },
       })
     })
