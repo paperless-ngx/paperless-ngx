@@ -73,35 +73,37 @@
             </td>
           }
           <td scope="row">
-            <div class="btn-group d-block d-sm-none">
-              <div ngbDropdown container="body" class="d-inline-block">
-                <button type="button" class="btn btn-link" id="actionsMenuMobile" (click)="$event.stopPropagation()" ngbDropdownToggle>
-                  <i-bs name="three-dots-vertical"></i-bs>
-                </button>
-                <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
-                  <button (click)="openEditDialog(object)" *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }" ngbDropdownItem i18n>Edit</button>
-                  <button class="text-danger" (click)="openDeleteDialog(object)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }" ngbDropdownItem i18n>Delete</button>
-                  @if (object.document_count > 0) {
-                    <button (click)="filterDocuments(object)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }" ngbDropdownItem i18n>Filter Documents ({{ object.document_count }})</button>
-                  }
+            <div class="btn-toolbar gap-2">
+              <div class="btn-group d-block d-sm-none">
+                <div ngbDropdown container="body" class="d-inline-block">
+                  <button type="button" class="btn btn-link" id="actionsMenuMobile" (click)="$event.stopPropagation()" ngbDropdownToggle>
+                    <i-bs name="three-dots-vertical"></i-bs>
+                  </button>
+                  <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
+                    <button (click)="openEditDialog(object)" *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }" ngbDropdownItem i18n>Edit</button>
+                    <button class="text-danger" (click)="openDeleteDialog(object)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }" ngbDropdownItem i18n>Delete</button>
+                    @if (object.document_count > 0) {
+                      <button (click)="filterDocuments(object)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }" ngbDropdownItem i18n>Filter Documents ({{ object.document_count }})</button>
+                    }
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="btn-group d-none d-sm-inline-block">
-              <button class="btn btn-sm btn-outline-secondary" (click)="openEditDialog(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }" [disabled]="!userCanEdit(object)">
-                <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
-              </button>
-              <button class="btn btn-sm btn-outline-danger" (click)="openDeleteDialog(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }" [disabled]="!userCanDelete(object)">
-                <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
-              </button>
-            </div>
-            @if (object.document_count > 0) {
-              <div class="btn-group d-none d-sm-inline-block ms-2">
-                <button class="btn btn-sm btn-outline-secondary" (click)="filterDocuments(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
-                  <i-bs width="1em" height="1em" name="filter"></i-bs>&nbsp;<ng-container i18n>Documents</ng-container><span class="badge bg-light text-secondary ms-2">{{ object.document_count }}</span>
+              <div class="btn-group d-none d-sm-inline-block">
+                <button class="btn btn-sm btn-outline-secondary" (click)="openEditDialog(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }" [disabled]="!userCanEdit(object)">
+                  <i-bs width="1em" height="1em" name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit</ng-container>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" (click)="openDeleteDialog(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }" [disabled]="!userCanDelete(object)">
+                  <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
                 </button>
               </div>
-            }
+              @if (object.document_count > 0) {
+                <div class="btn-group d-none d-sm-inline-block">
+                  <button class="btn btn-sm btn-outline-secondary" (click)="filterDocuments(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+                    <i-bs width="1em" height="1em" name="filter"></i-bs>&nbsp;<ng-container i18n>Documents</ng-container><span class="badge bg-light text-secondary ms-2">{{ object.document_count }}</span>
+                  </button>
+                </div>
+              }
+            </div>
           </td>
         </tr>
       }
