@@ -148,8 +148,9 @@ export class ConsumerStatusService {
     )
     this.statusWebSocket.onmessage = (ev) => {
       let statusMessage: WebsocketConsumerStatusMessage = JSON.parse(ev['data'])
-      let isDelete = statusMessage.status === 'DELETED'
-      if (isDelete) {
+
+      // special case for documents deletion
+      if (statusMessage.status === 'DELETED') {
         this.documentDeletedSubject.next(true)
         return
       }
