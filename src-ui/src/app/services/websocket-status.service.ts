@@ -162,15 +162,12 @@ export class WebsocketStatusService {
       } = JSON.parse(ev.data)
 
       switch (type) {
-        case WebsocketStatusType.STATUS_UPDATE:
-          this.handleProgressUpdate(messageData as WebsocketProgressMessage)
-          break
-
         case WebsocketStatusType.DOCUMENTS_DELETED:
           this.documentDeletedSubject.next(true)
           break
 
-        default:
+        case WebsocketStatusType.STATUS_UPDATE:
+          this.handleProgressUpdate(messageData as WebsocketProgressMessage)
           break
       }
     }
