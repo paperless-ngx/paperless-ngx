@@ -124,7 +124,7 @@ enum ContentRenderType {
   TIFF = 'tiff',
 }
 
-enum ZoomSetting {
+export enum ZoomSetting {
   PageFit = 'page-fit',
   PageWidth = 'page-width',
   Quarter = '.25',
@@ -328,6 +328,7 @@ export class DocumentDetailComponent
   }
 
   ngOnInit(): void {
+    this.setZoom(this.settings.get(SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING))
     this.documentForm.valueChanges
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
@@ -1072,14 +1073,13 @@ export class DocumentDetailComponent
     }
   }
 
-  onZoomSelect(event: Event) {
-    const setting = (event.target as HTMLSelectElement)?.value as ZoomSetting
-    if (ZoomSetting.PageFit === setting) {
-      this.previewZoomSetting = ZoomSetting.One
+  setZoom(setting: ZoomSetting) {
+    if (ZoomSetting.PageFit === setting || ZoomSetting.PageWidth === setting) {
       this.previewZoomScale = setting
+      this.previewZoomSetting = ZoomSetting.One
     } else {
-      this.previewZoomScale = ZoomSetting.PageWidth
       this.previewZoomSetting = setting
+      this.previewZoomScale = ZoomSetting.PageWidth
     }
   }
 
@@ -1087,6 +1087,14 @@ export class DocumentDetailComponent
     return Object.values(ZoomSetting).filter(
       (setting) => setting !== ZoomSetting.PageWidth
     )
+  }
+
+  isZoomSelected(setting: ZoomSetting): boolean {
+    if (this.previewZoomScale === ZoomSetting.PageFit) {
+      return setting === ZoomSetting.PageFit
+    }
+
+    return this.previewZoomSetting === setting
   }
 
   getZoomSettingTitle(setting: ZoomSetting): string {
