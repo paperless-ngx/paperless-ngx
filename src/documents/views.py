@@ -2175,9 +2175,10 @@ class SystemStatusView(PassUserMixin):
             classifier_status = "OK"
             classifier_last_trained = (
                 make_aware(
-                    datetime.fromtimestamp(settings.MODEL_FILE.stat().st_mtime),
+                    datetime.fromtimestamp(classifier.get_last_checked()),
                 )
                 if settings.MODEL_FILE.exists()
+                and classifier.get_last_checked() is not None
                 else None
             )
         except Exception as e:

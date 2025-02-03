@@ -1,5 +1,4 @@
 import logging
-import os
 import pickle
 import re
 import time
@@ -143,6 +142,19 @@ class DocumentClassifier:
                 ):
                     raise IncompatibleClassifierVersionError("sklearn version update")
 
+    def set_last_checked(self) -> None:
+        # save a timestamp of the last time we checked for retraining to a file
+        with Path(settings.MODEL_FILE.with_suffix(".last_checked")).open("w") as f:
+            f.write(str(time.time()))
+
+    def get_last_checked(self) -> float | None:
+        # load the timestamp of the last time we checked for retraining
+        try:
+            with Path(settings.MODEL_FILE.with_suffix(".last_checked")).open("r") as f:
+                return float(f.read())
+        except FileNotFoundError:  # pragma: no cover
+            return None
+
     def save(self) -> None:
         target_file: Path = settings.MODEL_FILE
         target_file_temp: Path = target_file.with_suffix(".pickle.part")
@@ -163,6 +175,7 @@ class DocumentClassifier:
             pickle.dump(self.storage_path_classifier, f)
 
         target_file_temp.rename(target_file)
+        self.set_last_checked()
 
     def train(self) -> bool:
         # Get non-inbox documents
@@ -231,9 +244,7 @@ class DocumentClassifier:
             and self.last_doc_change_time >= latest_doc_change
         ) and self.last_auto_type_hash == hasher.digest():
             logger.info("No updates since last training")
-            # Update the modification time of the file to mark it as fresh
-            new_mtime = time.time()
-            os.utime(settings.MODEL_FILE, (new_mtime, new_mtime))
+            self.set_last_checked()
             # Set the classifier information into the cache
             # Caching for 50 minutes, so slightly less than the normal retrain time
             cache.set(
