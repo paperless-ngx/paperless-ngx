@@ -2185,7 +2185,22 @@ class SystemStatusView(PassUserMixin):
                 )
                 .first()
             )
-            classifier_last_trained = result.date_done if result else None
+            classifier_last_auto_trained = result.date_done if result else None
+            classifier_last_modified = (
+                make_aware(
+                    datetime.fromtimestamp(settings.MODEL_FILE.stat().st_mtime),
+                )
+                if settings.MODEL_FILE.exists()
+                else None
+            )
+            classifier_last_trained = (
+                max(
+                    classifier_last_auto_trained,
+                    classifier_last_modified,
+                )
+                if classifier_last_auto_trained and classifier_last_modified
+                else classifier_last_auto_trained or classifier_last_modified
+            )
         except Exception as e:
             if classifier_status is None:
                 classifier_status = "ERROR"
