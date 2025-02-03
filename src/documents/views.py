@@ -15,7 +15,6 @@ from urllib.parse import quote
 from urllib.parse import urlparse
 
 import pathvalidate
-from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
@@ -2174,32 +2173,12 @@ class SystemStatusView(PassUserMixin):
                     classifier_status = "WARNING"
                     raise FileNotFoundError(classifier_error)
             classifier_status = "OK"
-            task_result_model = apps.get_model("django_celery_results", "taskresult")
-            result = (
-                task_result_model.objects.filter(
-                    task_name="documents.tasks.train_classifier",
-                    status="SUCCESS",
-                )
-                .order_by(
-                    "-date_done",
-                )
-                .first()
-            )
-            classifier_last_auto_trained = result.date_done if result else None
-            classifier_last_modified = (
+            classifier_last_trained = (
                 make_aware(
                     datetime.fromtimestamp(settings.MODEL_FILE.stat().st_mtime),
                 )
                 if settings.MODEL_FILE.exists()
                 else None
-            )
-            classifier_last_trained = (
-                max(
-                    classifier_last_auto_trained,
-                    classifier_last_modified,
-                )
-                if classifier_last_auto_trained and classifier_last_modified
-                else classifier_last_auto_trained or classifier_last_modified
             )
         except Exception as e:
             if classifier_status is None:

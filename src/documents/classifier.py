@@ -1,6 +1,8 @@
 import logging
+import os
 import pickle
 import re
+import time
 import warnings
 from collections.abc import Iterator
 from hashlib import sha256
@@ -229,6 +231,9 @@ class DocumentClassifier:
             and self.last_doc_change_time >= latest_doc_change
         ) and self.last_auto_type_hash == hasher.digest():
             logger.info("No updates since last training")
+            # Update the modification time of the file to mark it as fresh
+            new_mtime = time.time()
+            os.utime(settings.MODEL_FILE, (new_mtime, new_mtime))
             # Set the classifier information into the cache
             # Caching for 50 minutes, so slightly less than the normal retrain time
             cache.set(
