@@ -40,7 +40,7 @@ export class ToastComponent {
     const delay = toast.delay - 500 // for fade animation
 
     interval(refreshInterval)
-      .pipe(take(delay / refreshInterval))
+      .pipe(take(Math.round(delay / refreshInterval)))
       .subscribe((count) => {
         toast.delayRemaining = Math.max(
           0,
