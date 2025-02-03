@@ -162,7 +162,7 @@ class SocialAccountSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(allow_null=False)
+    email = serializers.EmailField(allow_blank=True, required=False)
     password = ObfuscatedUserPasswordField(required=False, allow_null=False)
     auth_token = serializers.SlugRelatedField(read_only=True, slug_field="key")
     social_accounts = SocialAccountSerializer(
