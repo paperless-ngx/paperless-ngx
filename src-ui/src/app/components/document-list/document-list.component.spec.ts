@@ -38,16 +38,16 @@ import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { UsernamePipe } from 'src/app/pipes/username.pipe'
-import {
-  ConsumerStatusService,
-  FileStatus,
-} from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import {
+  FileStatus,
+  WebsocketStatusService,
+} from 'src/app/services/websocket-status.service'
 import { DocumentCardLargeComponent } from './document-card-large/document-card-large.component'
 import { DocumentCardSmallComponent } from './document-card-small/document-card-small.component'
 import { DocumentListComponent } from './document-list.component'
@@ -81,7 +81,7 @@ describe('DocumentListComponent', () => {
   let fixture: ComponentFixture<DocumentListComponent>
   let documentListService: DocumentListViewService
   let documentService: DocumentService
-  let consumerStatusService: ConsumerStatusService
+  let websocketStatusService: WebsocketStatusService
   let savedViewService: SavedViewService
   let router: Router
   let activatedRoute: ActivatedRoute
@@ -112,7 +112,7 @@ describe('DocumentListComponent', () => {
 
     documentListService = TestBed.inject(DocumentListViewService)
     documentService = TestBed.inject(DocumentService)
-    consumerStatusService = TestBed.inject(ConsumerStatusService)
+    websocketStatusService = TestBed.inject(WebsocketStatusService)
     savedViewService = TestBed.inject(SavedViewService)
     router = TestBed.inject(Router)
     activatedRoute = TestBed.inject(ActivatedRoute)
@@ -128,7 +128,7 @@ describe('DocumentListComponent', () => {
     const reloadSpy = jest.spyOn(documentListService, 'reload')
     const fileStatusSubject = new Subject<FileStatus>()
     jest
-      .spyOn(consumerStatusService, 'onDocumentConsumptionFinished')
+      .spyOn(websocketStatusService, 'onDocumentConsumptionFinished')
       .mockReturnValue(fileStatusSubject)
     fixture.detectChanges()
     fileStatusSubject.next(new FileStatus())
@@ -139,7 +139,7 @@ describe('DocumentListComponent', () => {
     const reloadSpy = jest.spyOn(documentListService, 'reload')
     const documentDeletedSubject = new Subject<boolean>()
     jest
-      .spyOn(consumerStatusService, 'onDocumentDeleted')
+      .spyOn(websocketStatusService, 'onDocumentDeleted')
       .mockReturnValue(documentDeletedSubject)
     fixture.detectChanges()
     documentDeletedSubject.next(true)

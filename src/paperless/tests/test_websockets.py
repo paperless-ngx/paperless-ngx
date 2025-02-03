@@ -40,12 +40,12 @@ class TestWebSockets(TestCase):
         connected, subprotocol = await communicator.connect()
         self.assertTrue(connected)
 
-        message = {"task_id": "test"}
+        message = {"type": "status_update", "data": {"task_id": "test"}}
 
         channel_layer = get_channel_layer()
         await channel_layer.group_send(
             "status_updates",
-            {"type": "status_update", "data": message},
+            message,
         )
 
         response = await communicator.receive_json_from()

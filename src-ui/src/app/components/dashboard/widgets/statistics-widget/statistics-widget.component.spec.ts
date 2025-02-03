@@ -12,9 +12,9 @@ import { routes } from 'src/app/app-routing.module'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import {
-  ConsumerStatusService,
   FileStatus,
-} from 'src/app/services/consumer-status.service'
+  WebsocketStatusService,
+} from 'src/app/services/websocket-status.service'
 import { environment } from 'src/environments/environment'
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 import { StatisticsWidgetComponent } from './statistics-widget.component'
@@ -23,7 +23,7 @@ describe('StatisticsWidgetComponent', () => {
   let component: StatisticsWidgetComponent
   let fixture: ComponentFixture<StatisticsWidgetComponent>
   let httpTestingController: HttpTestingController
-  let consumerStatusService: ConsumerStatusService
+  let websocketStatusService: WebsocketStatusService
   const fileStatusSubject = new Subject<FileStatus>()
 
   beforeEach(async () => {
@@ -44,9 +44,9 @@ describe('StatisticsWidgetComponent', () => {
     }).compileComponents()
 
     fixture = TestBed.createComponent(StatisticsWidgetComponent)
-    consumerStatusService = TestBed.inject(ConsumerStatusService)
+    websocketStatusService = TestBed.inject(WebsocketStatusService)
     jest
-      .spyOn(consumerStatusService, 'onDocumentConsumptionFinished')
+      .spyOn(websocketStatusService, 'onDocumentConsumptionFinished')
       .mockReturnValue(fileStatusSubject)
     component = fixture.componentInstance
 

@@ -1,8 +1,14 @@
 import { Injectable } from '@angular/core'
 import { Subject } from 'rxjs'
 import { environment } from 'src/environments/environment'
-import { WebsocketConsumerStatusMessage } from '../data/websocket-consumer-status-message'
+import { WebsocketDocumentsDeletedMessage } from '../data/websocket-documents-deleted-message'
+import { WebsocketProgressMessage } from '../data/websocket-progress-message'
 import { SettingsService } from './settings.service'
+
+export enum WebsocketStatusType {
+  STATUS_UPDATE = 'status_update',
+  DOCUMENTS_DELETED = 'documents_deleted',
+}
 
 // see ProgressStatusOptions in src/documents/plugins/helpers.py
 export enum FileStatusPhase {
@@ -85,7 +91,7 @@ export class FileStatus {
 @Injectable({
   providedIn: 'root',
 })
-export class ConsumerStatusService {
+export class WebsocketStatusService {
   constructor(private settingsService: SettingsService) {}
 
   private statusWebSocket: WebSocket
@@ -146,66 +152,75 @@ export class ConsumerStatusService {
     this.statusWebSocket = new WebSocket(
       `${environment.webSocketProtocol}//${environment.webSocketHost}${environment.webSocketBaseUrl}status/`
     )
-    this.statusWebSocket.onmessage = (ev) => {
-      let statusMessage: WebsocketConsumerStatusMessage = JSON.parse(ev['data'])
+    this.statusWebSocket.onmessage = (ev: MessageEvent) => {
+      const {
+        type,
+        data: messageData,
+      }: {
+        type: WebsocketStatusType
+        data: WebsocketProgressMessage | WebsocketDocumentsDeletedMessage
+      } = JSON.parse(ev.data)
 
-      // special case for documents deletion
-      if (statusMessage.status === 'DELETED') {
-        this.documentDeletedSubject.next(true)
-        return
-      }
-
-      // fallback if backend didn't restrict message
-      if (
-        statusMessage.owner_id &&
-        statusMessage.owner_id !== this.settingsService.currentUser?.id &&
-        !this.settingsService.currentUser?.is_superuser
-      ) {
-        return
-      }
-
-      let statusMessageGet = this.get(
-        statusMessage.task_id,
-        statusMessage.filename
-      )
-      let status = statusMessageGet.status
-      let created = statusMessageGet.created
-
-      status.updateProgress(
-        FileStatusPhase.WORKING,
-        statusMessage.current_progress,
-        statusMessage.max_progress
-      )
-      if (
-        statusMessage.message &&
-        statusMessage.message in FILE_STATUS_MESSAGES
-      ) {
-        status.message = FILE_STATUS_MESSAGES[statusMessage.message]
-      } else if (statusMessage.message) {
-        status.message = statusMessage.message
-      }
-      status.documentId = statusMessage.document_id
-
-      if (statusMessage.status in FileStatusPhase) {
-        status.phase = FileStatusPhase[statusMessage.status]
-      }
-
-      switch (status.phase) {
-        case FileStatusPhase.STARTED:
-          if (created) this.documentDetectedSubject.next(status)
+      switch (type) {
+        case WebsocketStatusType.STATUS_UPDATE:
+          this.handleProgressUpdate(messageData as WebsocketProgressMessage)
           break
 
-        case FileStatusPhase.SUCCESS:
-          this.documentConsumptionFinishedSubject.next(status)
-          break
-
-        case FileStatusPhase.FAILED:
-          this.documentConsumptionFailedSubject.next(status)
+        case WebsocketStatusType.DOCUMENTS_DELETED:
+          this.documentDeletedSubject.next(true)
           break
 
         default:
           break
       }
+    }
+  }
+
+  handleProgressUpdate(messageData: WebsocketProgressMessage) {
+    // fallback if backend didn't restrict message
+    if (
+      messageData.owner_id &&
+      messageData.owner_id !== this.settingsService.currentUser?.id &&
+      !this.settingsService.currentUser?.is_superuser
+    ) {
+      return
+    }
+
+    let statusMessageGet = this.get(messageData.task_id, messageData.filename)
+    let status = statusMessageGet.status
+    let created = statusMessageGet.created
+
+    status.updateProgress(
+      FileStatusPhase.WORKING,
+      messageData.current_progress,
+      messageData.max_progress
+    )
+    if (messageData.message && messageData.message in FILE_STATUS_MESSAGES) {
+      status.message = FILE_STATUS_MESSAGES[messageData.message]
+    } else if (messageData.message) {
+      status.message = messageData.message
+    }
+    status.documentId = messageData.document_id
+
+    if (messageData.status in FileStatusPhase) {
+      status.phase = FileStatusPhase[messageData.status]
+    }
+
+    switch (status.phase) {
+      case FileStatusPhase.STARTED:
+        if (created) this.documentDetectedSubject.next(status)
+        break
+
+      case FileStatusPhase.SUCCESS:
+        this.documentConsumptionFinishedSubject.next(status)
+        break
+
+      case FileStatusPhase.FAILED:
+        this.documentConsumptionFailedSubject.next(status)
+        break
+
+      default:
+        break
     }
   }
 

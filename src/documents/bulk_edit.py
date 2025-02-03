@@ -24,8 +24,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.permissions import set_permissions_for_object
-from documents.plugins.helpers import ProgressManager
-from documents.plugins.helpers import ProgressStatusOptions
+from documents.plugins.helpers import DocumentsStatusManager
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
 from documents.tasks import update_document_content_maybe_archive_file
@@ -222,13 +221,8 @@ def delete(doc_ids: list[int]) -> Literal["OK"]:
             for id in doc_ids:
                 index.remove_document_by_id(writer, id)
 
-        status_mgr = ProgressManager()
-        status_mgr.send_progress(
-            status=ProgressStatusOptions.DELETED,
-            message="Documents deleted",
-            current_progress=1,
-            max_progress=1,
-        )
+        status_mgr = DocumentsStatusManager()
+        status_mgr.send_documents_deleted(doc_ids)
     except Exception as e:
         if "Data too long for column" in str(e):
             logger.warning(
