@@ -63,6 +63,7 @@ import { PermissionsUserComponent } from '../../common/input/permissions/permiss
 import { SelectComponent } from '../../common/input/select/select.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { SystemStatusDialogComponent } from '../../common/system-status-dialog/system-status-dialog.component'
+import { ZoomSetting } from '../../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
 enum SettingsNavIDs {
@@ -125,6 +126,7 @@ export class SettingsComponent
     defaultPermsEditUsers: new FormControl(null),
     defaultPermsEditGroups: new FormControl(null),
     useNativePdfViewer: new FormControl(null),
+    pdfViewerDefaultZoom: new FormControl(null),
     documentEditingRemoveInboxTags: new FormControl(null),
     documentEditingOverlayThumbnail: new FormControl(null),
     searchDbOnly: new FormControl(null),
@@ -153,6 +155,8 @@ export class SettingsComponent
   public systemStatus: SystemStatus
 
   public readonly GlobalSearchType = GlobalSearchType
+
+  public readonly ZoomSetting = ZoomSetting
 
   get systemStatusHasErrors(): boolean {
     return (
@@ -275,6 +279,9 @@ export class SettingsComponent
       themeColor: this.settings.get(SETTINGS_KEYS.THEME_COLOR),
       useNativePdfViewer: this.settings.get(
         SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER
+      ),
+      pdfViewerDefaultZoom: this.settings.get(
+        SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING
       ),
       displayLanguage: this.settings.getLanguage(),
       dateLocale: this.settings.get(SETTINGS_KEYS.DATE_LOCALE),
@@ -434,6 +441,10 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER,
       this.settingsForm.value.useNativePdfViewer
+    )
+    this.settings.set(
+      SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING,
+      this.settingsForm.value.pdfViewerDefaultZoom
     )
     this.settings.set(
       SETTINGS_KEYS.DATE_LOCALE,
