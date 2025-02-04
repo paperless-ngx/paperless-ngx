@@ -581,6 +581,7 @@ def send_webhook(
     *,
     as_json: bool = False,
 ):
+    error = None
     try:
         if as_json:
             httpx.post(
@@ -599,11 +600,26 @@ def send_webhook(
         logger.info(
             f"Webhook sent to {url}",
         )
+    except httpx.RequestError as exc:
+        logger.error(
+            f"Webhook received RequestError with request {exc.request!r}.",
+        )
+        error = exc
+    except httpx.HTTPStatusError as exc:
+        logger.error(
+            f"Webhook received HTTPStatusError with response {exc.response!r} while requesting {exc.request!r}.",
+        )
+        error = exc
     except Exception as e:
         logger.error(
-            f"Failed attempt sending webhook to {url}: {e}",
+            f"Webhook received Exception {e!r}",
         )
-        raise e
+        error = e
+    if error:
+        logger.debug(
+            f"Failed attempt sending webhook. Webhook called with: {url!r}, {data!r}, {headers!r}, {files!r}",
+        )
+        raise error
 
 
 def run_workflows(
