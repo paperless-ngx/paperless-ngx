@@ -2677,7 +2677,6 @@ class SystemStorageStatusView(PassUserMixin):
         media_stats = os.statvfs(settings.MEDIA_ROOT)
         backup_path = os.path.join(settings.MEDIA_ROOT, "backups/")
         document_path = os.path.join(settings.MEDIA_ROOT, "documents/")
-
         documents_size_total = get_directory_size(document_path)
         backups_size_total = get_directory_size(backup_path)
         media_size_total = get_directory_size(settings.MEDIA_ROOT)
