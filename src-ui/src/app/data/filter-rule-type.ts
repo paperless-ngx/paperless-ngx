@@ -36,6 +36,11 @@ export const FILTER_CREATED_DAY = 12
 export const FILTER_ADDED_BEFORE = 13
 export const FILTER_ADDED_AFTER = 14
 
+export const FILTER_CREATED_TO = 43
+export const FILTER_CREATED_FROM = 44
+export const FILTER_ADDED_TO = 45
+export const FILTER_ADDED_FROM = 46
+
 export const FILTER_MODIFIED_BEFORE = 15
 export const FILTER_MODIFIED_AFTER = 16
 
@@ -180,6 +185,18 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     multi: false,
   },
   {
+    id: FILTER_CREATED_TO,
+    filtervar: 'created__date__lte',
+    datatype: 'date',
+    multi: false,
+  },
+  {
+    id: FILTER_CREATED_FROM,
+    filtervar: 'created__date__gte',
+    datatype: 'date',
+    multi: false,
+  },
+  {
     id: FILTER_CREATED_YEAR,
     filtervar: 'created__year',
     datatype: 'number',
@@ -207,6 +224,18 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
     id: FILTER_ADDED_AFTER,
     filtervar: 'added__date__gt',
+    datatype: 'date',
+    multi: false,
+  },
+  {
+    id: FILTER_ADDED_TO,
+    filtervar: 'added__date__lte',
+    datatype: 'date',
+    multi: false,
+  },
+  {
+    id: FILTER_ADDED_FROM,
+    filtervar: 'added__date__gte',
     datatype: 'date',
     multi: false,
   },
