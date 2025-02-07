@@ -33,14 +33,14 @@ import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
-import {
-  ConsumerStatusService,
-  FileStatus,
-} from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import {
+  FileStatus,
+  WebsocketStatusService,
+} from 'src/app/services/websocket-status.service'
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 import { SavedViewWidgetComponent } from './saved-view-widget.component'
 
@@ -112,7 +112,7 @@ describe('SavedViewWidgetComponent', () => {
   let component: SavedViewWidgetComponent
   let fixture: ComponentFixture<SavedViewWidgetComponent>
   let documentService: DocumentService
-  let consumerStatusService: ConsumerStatusService
+  let websocketStatusService: WebsocketStatusService
   let documentListViewService: DocumentListViewService
   let router: Router
 
@@ -176,7 +176,7 @@ describe('SavedViewWidgetComponent', () => {
     }).compileComponents()
 
     documentService = TestBed.inject(DocumentService)
-    consumerStatusService = TestBed.inject(ConsumerStatusService)
+    websocketStatusService = TestBed.inject(WebsocketStatusService)
     documentListViewService = TestBed.inject(DocumentListViewService)
     router = TestBed.inject(Router)
     fixture = TestBed.createComponent(SavedViewWidgetComponent)
@@ -235,7 +235,7 @@ describe('SavedViewWidgetComponent', () => {
   it('should reload on document consumption finished', () => {
     const fileStatusSubject = new Subject<FileStatus>()
     jest
-      .spyOn(consumerStatusService, 'onDocumentConsumptionFinished')
+      .spyOn(websocketStatusService, 'onDocumentConsumptionFinished')
       .mockReturnValue(fileStatusSubject)
     const reloadSpy = jest.spyOn(component, 'reload')
     component.ngOnInit()
