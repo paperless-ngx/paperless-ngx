@@ -43,11 +43,66 @@ RUN set -eux \
   && echo "Generating requirement.txt" \
     && pipenv requirements > requirements.txt
 
+# Stage: s6-overlay-base
+# Purpose: Installs s6-overlay and rootfs
+# Comments:
+#  - Don't leave anything extra in here either
+FROM docker.io/python:3.12-slim-bookworm AS s6-overlay-base
+
+WORKDIR /usr/src/s6
+
+# https://github.com/just-containers/s6-overlay#customizing-s6-overlay-behaviour
+ENV \
+    S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
+    S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0 \
+    S6_VERBOSITY=1 \
+    PATH=/command:$PATH
+
+# Buildx provided, must be defined to use though
+ARG TARGETARCH
+ARG TARGETVARIANT
+# Lock this version
+ARG S6_OVERLAY_VERSION=3.2.0.2
+
+ARG S6_BUILD_TIME_PKGS="curl \
+                        xz-utils"
+
+RUN set -eux \
+    && echo "Installing build time packages" \
+      && apt-get update \
+      && apt-get install --yes --quiet --no-install-recommends ${S6_BUILD_TIME_PKGS} \
+    && echo "Determining arch" \
+      && S6_ARCH="" \
+      && if [ "${TARGETARCH}${TARGETVARIANT}" = "amd64" ]; then S6_ARCH="x86_64"; \
+      elif [ "${TARGETARCH}${TARGETVARIANT}" = "arm64" ]; then S6_ARCH="aarch64"; fi\
+      && if [ -z "${S6_ARCH}" ]; then { echo "Error: Not able to determine arch"; exit 1; }; fi \
+    && echo "Installing s6-overlay for ${S6_ARCH}" \
+      && curl --fail --silent --no-progress-meter --show-error --location --remote-name-all --parallel --parallel-max 4 \
+        "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz" \
+        "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz.sha256" \
+        "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${S6_ARCH}.tar.xz" \
+        "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${S6_ARCH}.tar.xz.sha256" \
+      && echo "Validating s6-archive checksums" \
+        && sha256sum --check ./*.sha256 \
+      && echo "Unpacking archives" \
+        && tar --directory / -Jxpf s6-overlay-noarch.tar.xz \
+        && tar --directory / -Jxpf s6-overlay-${S6_ARCH}.tar.xz \
+      && echo "Removing downloaded archives" \
+        && rm ./*.tar.xz \
+        && rm ./*.sha256 \
+    && echo "Cleaning up image" \
+      && apt-get --yes purge ${S6_BUILD_TIME_PKGS} \
+      && apt-get --yes autoremove --purge \
+      && rm -rf /var/lib/apt/lists/*
+
+# Copy our service defs and filesystem
+COPY ./docker/rootfs /
+
 # Stage: main-app
 # Purpose: The final image
 # Comments:
 #  - Don't leave anything extra in here
-FROM docker.io/python:3.12-slim-bookworm AS main-app
+FROM s6-overlay-base AS main-app
 
 LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
 LABEL org.opencontainers.image.documentation="https://docs.paperless-ngx.com/"
@@ -143,64 +198,23 @@ RUN set -eux \
         && dpkg --install ./ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
       && echo "Installing jbig2enc" \
         && dpkg --install ./jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
+      && echo "Configuring imagemagick" \
+        && cp /etc/ImageMagick-6/paperless-policy.xml /etc/ImageMagick-6/policy.xml \
       && echo "Cleaning up image layer" \
         && rm --force --verbose *.deb \
-    && rm --recursive --force --verbose /var/lib/apt/lists/* \
-  && echo "Installing supervisor" \
-    && python3 -m pip install --default-timeout=1000 --upgrade --no-cache-dir supervisor==4.2.5
+    && rm --recursive --force --verbose /var/lib/apt/lists/*
 
 # Copy gunicorn config
 # Changes very infrequently
 WORKDIR /usr/src/paperless/
 
-COPY gunicorn.conf.py .
-
-# setup docker-specific things
-# These change sometimes, but rarely
-WORKDIR /usr/src/paperless/src/docker/
-
-COPY [ \
-  "docker/imagemagick-policy.xml", \
-  "docker/supervisord.conf", \
-  "docker/docker-entrypoint.sh", \
-  "docker/docker-prepare.sh", \
-  "docker/paperless_cmd.sh", \
-  "docker/wait-for-redis.py", \
-  "docker/env-from-file.sh", \
-  "docker/management_script.sh", \
-  "docker/flower-conditional.sh", \
-  "docker/install_management_commands.sh", \
-  "/usr/src/paperless/src/docker/" \
-]
-
-RUN set -eux \
-  && echo "Configuring ImageMagick" \
-    && mv imagemagick-policy.xml /etc/ImageMagick-6/policy.xml \
-  && echo "Configuring supervisord" \
-    && mkdir /var/log/supervisord /var/run/supervisord \
-    && mv supervisord.conf /etc/supervisord.conf \
-  && echo "Setting up Docker scripts" \
-    && mv docker-entrypoint.sh /sbin/docker-entrypoint.sh \
-    && chmod 755 /sbin/docker-entrypoint.sh \
-    && mv docker-prepare.sh /sbin/docker-prepare.sh \
-    && chmod 755 /sbin/docker-prepare.sh \
-    && mv wait-for-redis.py /sbin/wait-for-redis.py \
-    && chmod 755 /sbin/wait-for-redis.py \
-    && mv env-from-file.sh /sbin/env-from-file.sh \
-    && chmod 755 /sbin/env-from-file.sh \
-    && mv paperless_cmd.sh /usr/local/bin/paperless_cmd.sh \
-    && chmod 755 /usr/local/bin/paperless_cmd.sh \
-    && mv flower-conditional.sh /usr/local/bin/flower-conditional.sh \
-    && chmod 755 /usr/local/bin/flower-conditional.sh \
-  && echo "Installing management commands" \
-    && chmod +x install_management_commands.sh \
-    && ./install_management_commands.sh
+COPY --chown=1000:1000 gunicorn.conf.py /usr/src/paperless/gunicorn.conf.py
 
 WORKDIR /usr/src/paperless/src/
 
 # Python dependencies
 # Change pretty frequently
-COPY --from=pipenv-base /usr/src/pipenv/requirements.txt ./
+COPY --chown=1000:1000 --from=pipenv-base /usr/src/pipenv/requirements.txt ./
 
 # Packages needed only for building a few quick Python
 # dependencies
@@ -222,7 +236,7 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
   && echo "Installing build system packages" \
     && apt-get update \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
-    && python3 -m pip install --no-cache-dir --upgrade wheel \
+    && python3 -m pip install --upgrade wheel \
   && echo "Installing Python requirements" \
     && curl --fail --silent --no-progress-meter --show-error --location --remote-name-all --parallel --parallel-max 4 \
       https://github.com/paperless-ngx/builder/releases/download/psycopg-${PSYCOPG_VERSION}/psycopg_c-${PSYCOPG_VERSION}-cp312-cp312-linux_x86_64.whl \
@@ -267,18 +281,16 @@ RUN set -eux \
   && echo "Adjusting all permissions" \
     && chown --from root:root --changes --recursive paperless:paperless /usr/src/paperless \
   && echo "Collecting static files" \
-    && gosu paperless python3 manage.py collectstatic --clear --no-input --link \
-    && gosu paperless python3 manage.py compilemessages
+    && s6-setuidgid paperless python3 manage.py collectstatic --clear --no-input --link \
+    && s6-setuidgid paperless python3 manage.py compilemessages
 
 VOLUME ["/usr/src/paperless/data", \
         "/usr/src/paperless/media", \
         "/usr/src/paperless/consume", \
         "/usr/src/paperless/export"]
 
-ENTRYPOINT ["/sbin/docker-entrypoint.sh"]
+ENTRYPOINT ["/init"]
 
 EXPOSE 8000
-
-CMD ["/usr/local/bin/paperless_cmd.sh"]
 
 HEALTHCHECK --interval=30s --timeout=10s --retries=5 CMD [ "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000" ]

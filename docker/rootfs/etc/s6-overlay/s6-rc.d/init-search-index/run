@@ -1,0 +1,28 @@
+#!/command/with-contenv /usr/bin/bash
+# shellcheck shell=bash
+
+declare -r log_prefix="[init-index]"
+
+declare -r index_version=9
+declare -r data_dir="${PAPERLESS_DATA_DIR:-/usr/src/paperless/data}"
+declare -r index_version_file="${data_dir}/.index_version"
+
+update_index () {
+	echo "${log_prefix} Search index out of date. Updating..."
+	cd "${PAPERLESS_SRC_DIR}"
+	if [[ -n "${USER_IS_NON_ROOT}" ]]; then
+		python3 manage.py document_index reindex --no-progress-bar
+		echo ${index_version} | tee "${index_version_file}" > /dev/null
+	else
+		s6-setuidgid paperless python3 manage.py document_index reindex --no-progress-bar
+		echo ${index_version} | s6-setuidgid paperless tee "${index_version_file}" > /dev/null
+	fi
+}
+
+if [[ (! -f "${index_version_file}") ]]; then
+	echo "${log_prefix} No index version file found"
+	update_index
+elif [[ $(<"${index_version_file}") != "$index_version" ]]; then
+	echo "${log_prefix} index version updated"
+	update_index
+fi
