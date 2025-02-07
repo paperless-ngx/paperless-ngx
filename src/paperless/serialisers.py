@@ -1,11 +1,14 @@
 import logging
 
 from allauth.mfa.adapter import get_adapter as get_mfa_adapter
+from allauth.mfa.models import Authenticator
+from allauth.mfa.totp.internal.auth import TOTP
 from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 from paperless.models import ApplicationConfiguration
 
@@ -22,6 +25,36 @@ class ObfuscatedUserPasswordField(serializers.Field):
 
     def to_internal_value(self, data):
         return data
+
+
+class PaperlessAuthTokenSerializer(AuthTokenSerializer):
+    code = serializers.CharField(
+        label="MFA Code",
+        write_only=True,
+        required=False,
+    )
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        user = attrs.get("user")
+        code = attrs.get("code")
+        mfa_adapter = get_mfa_adapter()
+        if mfa_adapter.is_mfa_enabled(user):
+            if not code:
+                raise serializers.ValidationError(
+                    "MFA code is required",
+                )
+            authenticator = Authenticator.objects.get(
+                user=user,
+                type=Authenticator.Type.TOTP,
+            )
+            if not TOTP(instance=authenticator).validate_code(
+                code,
+            ):
+                raise serializers.ValidationError(
+                    "Invalid MFA code",
+                )
+        return attrs
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -129,7 +162,7 @@ class SocialAccountSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(allow_null=False)
+    email = serializers.EmailField(allow_blank=True, required=False)
     password = ObfuscatedUserPasswordField(required=False, allow_null=False)
     auth_token = serializers.SlugRelatedField(read_only=True, slug_field="key")
     social_accounts = SocialAccountSerializer(

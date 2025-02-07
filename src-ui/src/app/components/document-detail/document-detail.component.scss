@@ -85,5 +85,8 @@ textarea.rtl {
 
   > img {
     filter: blur(1px);
+    max-width: 100%;
+    object-fit: contain;
+    object-position: top;
   }
 }

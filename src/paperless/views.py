@@ -19,6 +19,7 @@ from django.http import HttpResponseNotFound
 from django.views.generic import View
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import GenericAPIView
@@ -35,8 +36,13 @@ from paperless.filters import UserFilterSet
 from paperless.models import ApplicationConfiguration
 from paperless.serialisers import ApplicationConfigurationSerializer
 from paperless.serialisers import GroupSerializer
+from paperless.serialisers import PaperlessAuthTokenSerializer
 from paperless.serialisers import ProfileSerializer
 from paperless.serialisers import UserSerializer
+
+
+class PaperlessObtainAuthTokenView(ObtainAuthToken):
+    serializer_class = PaperlessAuthTokenSerializer
 
 
 class StandardPagination(PageNumberPagination):
@@ -142,7 +148,7 @@ class UserViewSet(ModelViewSet):
         ).first()
         if authenticator is not None:
             delete_and_cleanup(request, authenticator)
-            return Response(True)
+            return Response(data=True)
         else:
             return HttpResponseNotFound("TOTP not found")
 
@@ -256,7 +262,7 @@ class TOTPView(GenericAPIView):
         ).first()
         if authenticator is not None:
             delete_and_cleanup(request, authenticator)
-            return Response(True)
+            return Response(data=True)
         else:
             return HttpResponseNotFound("TOTP not found")
 

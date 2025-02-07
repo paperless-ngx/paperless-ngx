@@ -1,0 +1,56 @@
+<ngb-toast
+    [autohide]="autohide"
+    [delay]="toast.delay"
+    [class]="toast.classname"
+    [class.mb-2]="true"
+    (shown)="onShown(toast)"
+    (hidden)="hidden.emit(toast)">
+        @if (autohide) {
+            <ngb-progressbar class="position-absolute h-100 w-100 top-90 start-0 bottom-0 end-0 pe-none" type="dark" [max]="toast.delay" [value]="toast.delayRemaining"></ngb-progressbar>
+            <span class="visually-hidden">{{ toast.delayRemaining / 1000 | number: '1.0-0' }} seconds</span>
+        }
+        <div class="d-flex align-items-top">
+        @if (!toast.error) {
+            <i-bs width="0.9em" height="0.9em" name="info-circle"></i-bs>
+        }
+        @if (toast.error) {
+            <i-bs width="0.9em" height="0.9em" name="exclamation-triangle"></i-bs>
+        }
+        <div>
+            <p class="ms-2 mb-0">{{toast.content}}</p>
+            @if (toast.error) {
+            <details class="ms-2">
+                <div class="mt-2 ms-n4 me-n2 small">
+                @if (isDetailedError(toast.error)) {
+                    <dl class="row mb-0">
+                    <dt class="col-sm-3 fw-normal text-end">URL</dt>
+                    <dd class="col-sm-9">{{ toast.error.url }}</dd>
+                    <dt class="col-sm-3 fw-normal text-end" i18n>Status</dt>
+                    <dd class="col-sm-9">{{ toast.error.status }} <em>{{ toast.error.statusText }}</em></dd>
+                    <dt class="col-sm-3 fw-normal text-end" i18n>Error</dt>
+                    <dd class="col-sm-9">{{ getErrorText(toast.error) }}</dd>
+                    </dl>
+                }
+                <div class="row">
+                    <div class="col offset-sm-3">
+                    <button class="btn btn-sm btn-outline-dark" (click)="copyError(toast.error)">
+                        @if (!copied) {
+                        <i-bs name="clipboard"></i-bs>&nbsp;
+                        }
+                        @if (copied) {
+                        <i-bs name="clipboard-check"></i-bs>&nbsp;
+                        }
+                        <ng-container i18n>Copy Raw Error</ng-container>
+                    </button>
+                    </div>
+                </div>
+                </div>
+            </details>
+            }
+            @if (toast.action) {
+            <p class="mb-0 mt-2"><button class="btn btn-sm btn-outline-secondary" (click)="close.emit(toast); toast.action()">{{toast.actionName}}</button></p>
+            }
+        </div>
+        <button type="button" class="btn-close ms-auto flex-shrink-0" data-bs-dismiss="toast" aria-label="Close" (click)="close.emit(toast);"></button>
+    </div>
+</ngb-toast>

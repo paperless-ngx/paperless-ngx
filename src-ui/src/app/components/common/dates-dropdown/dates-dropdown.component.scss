@@ -41,3 +41,9 @@
     }
   }
 }
+
+.btn-group-xs {
+  > .btn {
+    border-radius: 0.15rem;
+  }
+}

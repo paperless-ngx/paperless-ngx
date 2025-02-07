@@ -250,8 +250,8 @@ main {
   }
 }
 
-.dropdown.show .dropdown-toggle,
-.dropdown-toggle:hover {
+:host ::ng-deep .dropdown.show .dropdown-toggle,
+:host ::ng-deep .dropdown-toggle:hover {
   opacity: 0.7;
 }
 

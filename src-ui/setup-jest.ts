@@ -100,6 +100,15 @@ Object.defineProperty(navigator, 'clipboard', {
   },
 })
 Object.defineProperty(navigator, 'canShare', { value: () => true })
+if (!navigator.share) {
+  Object.defineProperty(navigator, 'share', { value: jest.fn() })
+}
+if (!URL.createObjectURL) {
+  Object.defineProperty(window.URL, 'createObjectURL', { value: jest.fn() })
+}
+if (!URL.revokeObjectURL) {
+  Object.defineProperty(window.URL, 'revokeObjectURL', { value: jest.fn() })
+}
 Object.defineProperty(window, 'ResizeObserver', { value: mock() })
 Object.defineProperty(window, 'location', {
   configurable: true,

@@ -94,11 +94,11 @@
         <pngx-dates-dropdown class="flex-fill fade" [class.show]="show"
           title="Dates" i18n-title
           (datesSet)="updateRules()"
-          [(createdDateBefore)]="dateCreatedBefore"
-          [(createdDateAfter)]="dateCreatedAfter"
+          [(createdDateTo)]="dateCreatedTo"
+          [(createdDateFrom)]="dateCreatedFrom"
           [(createdRelativeDate)]="dateCreatedRelativeDate"
-          [(addedDateBefore)]="dateAddedBefore"
-          [(addedDateAfter)]="dateAddedAfter"
+          [(addedDateTo)]="dateAddedTo"
+          [(addedDateFrom)]="dateAddedFrom"
           [(addedRelativeDate)]="dateAddedRelativeDate">
         </pngx-dates-dropdown>
         <pngx-permissions-filter-dropdown class="flex-fill fade" [class.show]="show"

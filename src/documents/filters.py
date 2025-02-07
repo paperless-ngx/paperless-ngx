@@ -41,7 +41,19 @@ from documents.models import Tag
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
 INT_KWARGS = ["exact", "gt", "gte", "lt", "lte", "isnull"]
-DATE_KWARGS = ["year", "month", "day", "date__gt", "gt", "date__lt", "lt"]
+DATE_KWARGS = [
+    "year",
+    "month",
+    "day",
+    "date__gt",
+    "date__gte",
+    "gt",
+    "gte",
+    "date__lt",
+    "date__lte",
+    "lt",
+    "lte",
+]
 
 CUSTOM_FIELD_QUERY_MAX_DEPTH = 10
 CUSTOM_FIELD_QUERY_MAX_ATOMS = 20
@@ -85,7 +97,7 @@ class StoragePathFilterSet(FilterSet):
 
 
 class ObjectFilter(Filter):
-    def __init__(self, exclude=False, in_list=False, field_name=""):
+    def __init__(self, *, exclude=False, in_list=False, field_name=""):
         super().__init__()
         self.exclude = exclude
         self.in_list = in_list

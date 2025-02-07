@@ -42,7 +42,6 @@ import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { DocumentTypeNamePipe } from 'src/app/pipes/document-type-name.pipe'
 import { StoragePathNamePipe } from 'src/app/pipes/storage-path-name.pipe'
 import { UsernamePipe } from 'src/app/pipes/username.pipe'
-import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
@@ -53,6 +52,7 @@ import {
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 
 @Component({
@@ -94,7 +94,7 @@ export class SavedViewWidgetComponent
     private documentService: DocumentService,
     private router: Router,
     private list: DocumentListViewService,
-    private consumerStatusService: ConsumerStatusService,
+    private websocketStatusService: WebsocketStatusService,
     public openDocumentsService: OpenDocumentsService,
     public documentListViewService: DocumentListViewService,
     public permissionsService: PermissionsService,
@@ -124,7 +124,7 @@ export class SavedViewWidgetComponent
   ngOnInit(): void {
     this.reload()
     this.displayMode = this.savedView.display_mode ?? DisplayMode.TABLE
-    this.consumerStatusService
+    this.websocketStatusService
       .onDocumentConsumptionFinished()
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {

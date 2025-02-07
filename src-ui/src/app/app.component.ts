@@ -5,7 +5,7 @@ import { first, Subscription } from 'rxjs'
 import { ToastsComponent } from './components/common/toasts/toasts.component'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { SETTINGS_KEYS } from './data/ui-settings'
-import { ConsumerStatusService } from './services/consumer-status.service'
+import { ComponentRouterService } from './services/component-router.service'
 import { HotKeyService } from './services/hot-key.service'
 import {
   PermissionAction,
@@ -15,6 +15,7 @@ import {
 import { SettingsService } from './services/settings.service'
 import { TasksService } from './services/tasks.service'
 import { ToastService } from './services/toast.service'
+import { WebsocketStatusService } from './services/websocket-status.service'
 
 @Component({
   selector: 'pngx-root',
@@ -34,14 +35,15 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(
     private settings: SettingsService,
-    private consumerStatusService: ConsumerStatusService,
+    private websocketStatusService: WebsocketStatusService,
     private toastService: ToastService,
     private router: Router,
     private tasksService: TasksService,
     public tourService: TourService,
     private renderer: Renderer2,
     private permissionsService: PermissionsService,
-    private hotKeyService: HotKeyService
+    private hotKeyService: HotKeyService,
+    private componentRouterService: ComponentRouterService
   ) {
     let anyWindow = window as any
     anyWindow.pdfWorkerSrc = 'assets/js/pdf.worker.min.mjs'
@@ -49,7 +51,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.consumerStatusService.disconnect()
+    this.websocketStatusService.disconnect()
     if (this.successSubscription) {
       this.successSubscription.unsubscribe()
     }
@@ -74,9 +76,9 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.consumerStatusService.connect()
+    this.websocketStatusService.connect()
 
-    this.successSubscription = this.consumerStatusService
+    this.successSubscription = this.websocketStatusService
       .onDocumentConsumptionFinished()
       .subscribe((status) => {
         this.tasksService.reload()
@@ -106,7 +108,7 @@ export class AppComponent implements OnInit, OnDestroy {
         }
       })
 
-    this.failedSubscription = this.consumerStatusService
+    this.failedSubscription = this.websocketStatusService
       .onDocumentConsumptionFailed()
       .subscribe((status) => {
         this.tasksService.reload()
@@ -119,7 +121,7 @@ export class AppComponent implements OnInit, OnDestroy {
         }
       })
 
-    this.newDocumentSubscription = this.consumerStatusService
+    this.newDocumentSubscription = this.websocketStatusService
       .onDocumentDetected()
       .subscribe((status) => {
         this.tasksService.reload()

@@ -1,4 +1,4 @@
-export interface WebsocketConsumerStatusMessage {
+export interface WebsocketProgressMessage {
   filename?: string
   task_id?: string
   current_progress?: number

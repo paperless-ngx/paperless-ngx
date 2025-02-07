@@ -1,0 +1,20 @@
+::ng-deep .toast-body {
+    position: relative;
+}
+
+::ng-deep .toast.error {
+    border-color: hsla(350, 79%, 40%, 0.4); // bg-danger
+}
+
+::ng-deep .toast.error .toast-body {
+    background-color: hsla(350, 79%, 40%, 0.8); // bg-danger
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+    border-bottom-left-radius: inherit;
+    border-bottom-right-radius: inherit;
+}
+
+.progress {
+    background-color: var(--pngx-primary);
+    opacity: .07;
+}

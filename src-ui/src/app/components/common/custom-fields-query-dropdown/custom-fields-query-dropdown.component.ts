@@ -241,6 +241,8 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
 
   customFields: CustomField[] = []
 
+  public readonly today: string = new Date().toISOString().split('T')[0]
+
   constructor(protected customFieldsService: CustomFieldsService) {
     super()
     this.selectionModel = new CustomFieldQueriesModel()

@@ -127,32 +127,21 @@ RUN set -eux \
     && apt-get update \
     && apt-get install --yes --quiet --no-install-recommends ${RUNTIME_PACKAGES} \
     && echo "Installing pre-built updates" \
+      && curl --fail --silent --no-progress-meter --show-error --location --remote-name-all --parallel --parallel-max 4 \
+        https://github.com/paperless-ngx/builder/releases/download/qpdf-${QPDF_VERSION}/libqpdf29_${QPDF_VERSION}-1_${TARGETARCH}.deb \
+        https://github.com/paperless-ngx/builder/releases/download/qpdf-${QPDF_VERSION}/qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
+        https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
+        https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
+        https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
+        https://github.com/paperless-ngx/builder/releases/download/jbig2enc-${JBIG2ENC_VERSION}/jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
       && echo "Installing qpdf ${QPDF_VERSION}" \
-        && curl --fail --silent --show-error --location \
-          --output libqpdf29_${QPDF_VERSION}-1_${TARGETARCH}.deb \
-          https://github.com/paperless-ngx/builder/releases/download/qpdf-${QPDF_VERSION}/libqpdf29_${QPDF_VERSION}-1_${TARGETARCH}.deb \
-        && curl --fail --silent --show-error --location \
-          --output qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
-          https://github.com/paperless-ngx/builder/releases/download/qpdf-${QPDF_VERSION}/qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
         && dpkg --install ./libqpdf29_${QPDF_VERSION}-1_${TARGETARCH}.deb \
         && dpkg --install ./qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
       && echo "Installing Ghostscript ${GS_VERSION}" \
-        && curl --fail --silent --show-error --location \
-          --output libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
-        && curl --fail --silent --show-error --location \
-          --output ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
-        && curl --fail --silent --show-error --location \
-          --output libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
         && dpkg --install ./libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
         && dpkg --install ./libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
         && dpkg --install ./ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
       && echo "Installing jbig2enc" \
-        && curl --fail --silent --show-error --location \
-          --output jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
-          https://github.com/paperless-ngx/builder/releases/download/jbig2enc-${JBIG2ENC_VERSION}/jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
         && dpkg --install ./jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
       && echo "Cleaning up image layer" \
         && rm --force --verbose *.deb \
@@ -232,12 +221,11 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
     && python3 -m pip install --no-cache-dir --upgrade wheel \
   && echo "Installing Python requirements" \
-    && curl --fail --silent --show-error --location \
-    --output psycopg_c-3.2.4-cp312-cp312-linux_x86_64.whl \
-    https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.4/psycopg_c-3.2.4-cp312-cp312-linux_x86_64.whl \
-    && curl --fail --silent --show-error --location \
-    --output psycopg_c-3.2.4-cp312-cp312-linux_aarch64.whl  \
-    https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.4/psycopg_c-3.2.4-cp312-cp312-linux_aarch64.whl \
+    && curl --fail --silent --no-progress-meter --show-error --location --remote-name-all --parallel --parallel-max 4 \
+      https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.4/psycopg_c-3.2.4-cp312-cp312-linux_x86_64.whl \
+      https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.4/psycopg_c-3.2.4-cp312-cp312-linux_aarch64.whl \
+      https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_aarch64.whl \
+      https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_x86_64.whl \
     && python3 -m pip install --default-timeout=1000 --find-links . --requirement requirements.txt \
   && echo "Installing NLTK data" \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" snowball_data \
