@@ -1185,3 +1185,11 @@ if DEBUG:  # pragma: no cover
 # Soft Delete                                                                 #
 ###############################################################################
 EMPTY_TRASH_DELAY = max(__get_int("PAPERLESS_EMPTY_TRASH_DELAY", 30), 1)
+
+###############################################################################
+# Ocr config                                                                 #
+###############################################################################
+API_LOGIN_OCR = os.getenv("API_LOGIN_OCR", "")
+API_REFRESH_OCR = os.getenv("API_REFRESH_OCR", "")
+API_OCR_BY_FILE_ID = os.getenv("API_OCR_BY_FILE_ID", "")
+API_UPLOAD_FILE_OCR = os.getenv("API_UPLOAD_FILE_OCR", "")

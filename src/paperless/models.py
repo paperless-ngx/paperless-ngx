@@ -175,6 +175,20 @@ class ApplicationConfiguration(AbstractSingletonModel):
         max_length=48,
     )
 
+    username_ocr = models.CharField(
+        verbose_name=_("Username ocr"),
+        null=True,
+        blank=True,
+        max_length=48,
+    )
+
+    password_ocr = models.CharField(
+        verbose_name=_("Password ocr"),
+        null=True,
+        blank=True,
+        max_length=75,
+    )
+
     app_logo = models.FileField(
         verbose_name=_("Application logo"),
         null=True,

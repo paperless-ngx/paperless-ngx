@@ -15,6 +15,7 @@ from PIL import Image
 from PyPDF2 import PdfReader
 from PyPDF2.errors import PdfReadError
 from django.conf import settings
+from django.core.cache import cache, caches
 from pdf2image import convert_from_path
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.utils import ImageReader
@@ -235,7 +236,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                                                max_retries=2,
                                                delay=5,
                                                timeout=20,
-                                               status_code_fail=[401])
+                                               status_code_fail=[401,400])
         if token == False:
             token = self.login_ocr(username_ocr, password_ocr, api_login_ocr)
         return token
@@ -308,12 +309,12 @@ class RasterisedDocumentCustomParser(DocumentParser):
         data_ocr_fields = None
         form_code = ""
         app_config = ApplicationConfiguration.objects.filter().first()
-        username_ocr = args.get("username_ocr", '')
-        password_ocr = args.get("password_ocr", '')
-        api_login_ocr = args.get("api_login_ocr", '')
-        api_refresh_ocr = args.get("api_refresh_ocr", '')
-        refresh_token_ocr = args.get("refresh_token_ocr", '')
-        api_upload_file_ocr = args.get("api_upload_file_ocr", '')
+        username_ocr = app_config.username_ocr
+        password_ocr = app_config.password_ocr
+        api_login_ocr = settings.API_LOGIN_OCR
+        api_refresh_ocr = settings.API_REFRESH_OCR
+        refresh_token_ocr = cache.get("refresh_token_ocr", '')
+        api_upload_file_ocr = settings.API_UPLOAD_FILE_OCR
         # count page number
         page_count = 1
         try:
@@ -326,7 +327,8 @@ class RasterisedDocumentCustomParser(DocumentParser):
         try:
 
             app_config: ApplicationConfiguration | None
-            access_token_ocr = args.get("access_token_ocr", 'None')
+            # access_token_ocr = args.get("access_token_ocr", 'None')
+            access_token_ocr = cache.get('access_token_ocr','')
 
             # login API custom-field
             if len(args) == 0 and args.get('form_code') == '':
@@ -360,22 +362,17 @@ class RasterisedDocumentCustomParser(DocumentParser):
                     api_login_ocr=api_login_ocr,
                     refresh_token_ocr=refresh_token_ocr,
                     api_refresh_ocr=api_refresh_ocr)
-
                 if token is not None and token.get('access', '') != '' and token.get('refresh_token', '') != '':
-                    args["access_token_ocr"] = token['access']
-                    app_config.user_args["access_token_ocr"] = token['access']
-                    args["refresh_token_ocr"] = token['refresh']
-                    app_config.user_args["refresh_token_ocr"] = token[
-                        'refresh']
+                    cache.set("access_token_ocr",token['access'],86400)
+                    cache.set("refresh_token_ocr",token['refresh'],86400)
 
                 elif token is not None and token.get('access','') != '' and token.get('refresh_token', '') == '':
-                    args["access_token_ocr"] = token['access']
-                    app_config.user_args["access_token_ocr"] = token['access']
+                    cache.set("access_token_ocr",token['access'],86400)
 
                 else:
                     raise Exception(
                         "Cannot get access token and refresh token")
-                app_config.save()
+                # app_config.save()
 
                 headers = {
                     'Authorization': f"Bearer {args.get('access_token_ocr')}"
@@ -400,7 +397,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
 
                 # ocr by file_id --------------------------
                 params = {'file_id': get_file_id}
-                url_ocr_pdf_by_fileid = args.get("api_ocr_by_file_id", None)
+                url_ocr_pdf_by_fileid = settings.API_OCR_BY_FILE_ID
                 data_ocr_general = self.call_ocr_api_with_retries("GET",
                                                                   url_ocr_pdf_by_fileid,
                                                                   headers,
@@ -413,8 +410,8 @@ class RasterisedDocumentCustomParser(DocumentParser):
 
                 if data_ocr_general is not None:
                     data_ocr = data_ocr_general.get('response', None)
-                    enable_ocr_field = args.get("enable_ocr_field", False)
-                    url_ocr_pdf_custom_field_by_fileid = args.get(
+                    enable_ocr_field = cache.get("enable_ocr_field", False)
+                    url_ocr_pdf_custom_field_by_fileid = cache.get(
                         "api_ocr_field", False)
                     if not enable_ocr_field and not url_ocr_pdf_custom_field_by_fileid:
                         return (data_ocr, data_ocr_fields, form_code)

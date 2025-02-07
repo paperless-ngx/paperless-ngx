@@ -255,7 +255,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">115</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
@@ -1382,6 +1382,10 @@
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+          <context context-type="linenumber">211</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="8831459317888986184" datatype="html">
         <source>Delete selected</source>
@@ -1547,7 +1551,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">106</context>
+          <context context-type="linenumber">105</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
@@ -1570,11 +1574,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">140</context>
+          <context context-type="linenumber">139</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">175</context>
+          <context context-type="linenumber">174</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
@@ -1803,29 +1807,33 @@
         <source>Confirm restore</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">101</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6524887362180496344" datatype="html">
         <source>Please note that all changes after the restore will be lost. Are you sure you want to proceed?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">103</context>
+          <context context-type="linenumber">102</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5641451190833696892" datatype="html">
         <source>This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">104</context>
+          <context context-type="linenumber">103</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">138</context>
+          <context context-type="linenumber">137</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">173</context>
+          <context context-type="linenumber">172</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+          <context context-type="linenumber">209</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
@@ -1892,7 +1900,7 @@
         <source>Document restored</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">114</context>
+          <context context-type="linenumber">113</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
@@ -1903,7 +1911,7 @@
         <source>Error restoring document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">125</context>
+          <context context-type="linenumber">124</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
@@ -1914,11 +1922,11 @@
         <source>Confirm delete</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">136</context>
+          <context context-type="linenumber">135</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">169</context>
+          <context context-type="linenumber">168</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
@@ -1961,63 +1969,77 @@
         <source>This operation will permanently delete this backup version.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">137</context>
+          <context context-type="linenumber">136</context>
         </context-group>
       </trans-unit>
       <trans-unit id="261483532591755754" datatype="html">
         <source>Backup version deleted</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">153</context>
+          <context context-type="linenumber">152</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7200418682978768865" datatype="html">
         <source>Error deleting backup version</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">158</context>
+          <context context-type="linenumber">157</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6554806464139125441" datatype="html">
         <source>This operation will permanently delete the selected backup versions.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">171</context>
+          <context context-type="linenumber">170</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5968945172550919914" datatype="html">
         <source>This operation will permanently delete all backup versions in the trash.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">172</context>
+          <context context-type="linenumber">171</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1336925933444477292" datatype="html">
         <source>Backup version(s) deleted</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">188</context>
+          <context context-type="linenumber">187</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8635578338061592053" datatype="html">
         <source>Error deleting backup version(s)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">194</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6820604913111817788" datatype="html">
+        <source>Confirm backup</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+          <context context-type="linenumber">207</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8552536929802279034" datatype="html">
+        <source>This operation will backup document and folder.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
+          <context context-type="linenumber">208</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5717767335699055842" datatype="html">
         <source>Document(s) backed up</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">208</context>
+          <context context-type="linenumber">218</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7613292396226571070" datatype="html">
         <source>Error backup document(s)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-          <context context-type="linenumber">214</context>
+          <context context-type="linenumber">224</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9063918187161876141" datatype="html">
@@ -10443,18 +10465,32 @@
           <context context-type="linenumber">171</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="2580168214963307924" datatype="html">
+        <source>Username OCR</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">178</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8266220028196883502" datatype="html">
+        <source>Password OCR</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">185</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="7106327322456204362" datatype="html">
         <source>Application Logo</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">178</context>
+          <context context-type="linenumber">192</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2684743776608068095" datatype="html">
         <source>Application Title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">185</context>
+          <context context-type="linenumber">199</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5948496158474272829" datatype="html">
