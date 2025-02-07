@@ -152,7 +152,7 @@ def custom_get_parser_class_for_mime_type(mime_type: str) -> Optional[type["Docu
     application_configuration = ApplicationConfiguration.objects.filter().first()
     best_parser = sorted(options, key=lambda _: _["weight"], reverse=True)[0]
     if len(best_parser)>1:
-        if application_configuration.enable_ocr==False or application_configuration.user_args.get('username_ocr',None)==None or application_configuration.user_args.get('password_ocr',None)==None:
+        if application_configuration.enable_ocr==False or application_configuration.username_ocr==None or application_configuration.password_ocr==None:
             best_parser = sorted(options, key=lambda _: _["weight"], reverse=True)[1]
     # Return the parser with the highest weight.
     return best_parser["parser"]
