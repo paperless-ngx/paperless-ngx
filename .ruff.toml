@@ -76,8 +76,12 @@ ignore = ["DJ001", "SIM105", "RUF012"]
 "src/paperless_tesseract/tests/test_parser.py" = ["RUF001", "PTH"]  # TODO PTH Enable & remove
 "src/paperless_tika/tests/test_live_tika.py" = ["PTH"]  # TODO Enable & remove
 "src/paperless_tika/tests/test_tika_parser.py" = ["PTH"]  # TODO Enable & remove
+# Testing
 "*/tests/*.py" = ["E501", "SIM117"]
+# Migrations
 "*/migrations/*.py" = ["E501", "SIM", "T201"]
+# Docker specific
+"docker/rootfs/usr/local/bin/wait-for-redis.py" = ["INP001", "T201"]
 
 [lint.isort]
 force-single-line = true
