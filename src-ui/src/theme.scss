@@ -24,6 +24,10 @@
   --pngx-bg-alt2: var(--bs-gray-200);
   --pngx-bg-disabled: #f7f7f7;
   --pngx-focus-alpha: 0.3;
+  --pngx-toast-max-width: 360px;
+  @media screen and (min-width: 1024px) {
+    --pngx-toast-max-width: 450px;
+  }
 }
 
 // Dark text colors allow for maintain contrast with theme color changes

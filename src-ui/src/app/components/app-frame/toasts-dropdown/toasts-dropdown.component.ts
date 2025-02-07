@@ -1,43 +1,42 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import {
-  NgbAccordionModule,
+  NgbDropdownModule,
   NgbProgressbarModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subscription } from 'rxjs'
 import { Toast, ToastService } from 'src/app/services/toast.service'
-import { ToastComponent } from '../toast/toast.component'
+import { ToastComponent } from '../../common/toast/toast.component'
 
 @Component({
-  selector: 'pngx-toasts',
-  templateUrl: './toasts.component.html',
-  styleUrls: ['./toasts.component.scss'],
+  selector: 'pngx-toasts-dropdown',
+  templateUrl: './toasts-dropdown.component.html',
+  styleUrls: ['./toasts-dropdown.component.scss'],
   imports: [
     ToastComponent,
-    NgbAccordionModule,
+    NgbDropdownModule,
     NgbProgressbarModule,
     NgxBootstrapIconsModule,
   ],
 })
-export class ToastsComponent implements OnInit, OnDestroy {
+export class ToastsDropdownComponent implements OnInit, OnDestroy {
   constructor(public toastService: ToastService) {}
 
   private subscription: Subscription
 
-  public toasts: Toast[] = [] // array to force change detection
+  public toasts: Toast[] = []
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe()
   }
 
   ngOnInit(): void {
-    this.subscription = this.toastService.showToast.subscribe((toast) => {
-      this.toasts = toast ? [toast] : []
+    this.subscription = this.toastService.getToasts().subscribe((toasts) => {
+      this.toasts = [...toasts]
     })
   }
 
-  closeToast() {
-    this.toastService.closeToast(this.toasts[0])
-    this.toasts = []
+  onOpenChange(open: boolean): void {
+    this.toastService.suppressPopupToasts = open
   }
 }
