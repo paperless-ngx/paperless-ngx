@@ -8528,8 +8528,8 @@
           <context context-type="linenumber">183</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="2541368547549828690" datatype="html">
-        <source>Successfully updated <x id="PH" equiv-text="this.typeName"/>.</source>
+      <trans-unit id="4835942264662718903" datatype="html">
+        <source>Successfully updated <x id="PH" equiv-text="this.typeName"/> &quot;<x id="PH_1" equiv-text="object.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">198</context>
