@@ -64,8 +64,6 @@ ARG TARGETARCH
 ARG JBIG2ENC_VERSION=0.29
 ARG QPDF_VERSION=11.9.0
 ARG GS_VERSION=10.03.1
-ARG ZXING_VERSION=2.3.0
-ARG PSYCOPG_VERSION=3.2.4
 
 # Set Python environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -215,6 +213,9 @@ ARG BUILD_PACKAGES="\
   default-libmysqlclient-dev \
   pkg-config"
 
+ARG ZXING_VERSION=2.3.0
+ARG PSYCOPG_VERSION=3.2.4
+
 # hadolint ignore=DL3042
 RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
   set -eux \
@@ -224,8 +225,10 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
     && python3 -m pip install --no-cache-dir --upgrade wheel \
   && echo "Installing Python requirements" \
     && curl --fail --silent --no-progress-meter --show-error --location --remote-name-all --parallel --parallel-max 4 \
-      https://github.com/paperless-ngx/builder/releases/download/psycopg-${PSYCOPG_VERSION}/psycopg_c-${PSYCOPG_VERSION}-cp312-cp312-linux_${TARGETARCH}.whl \
-      https://github.com/paperless-ngx/builder/releases/download/zxing-${ZXING_VERSION}/zxing_cpp-${ZXING_VERSION}-cp312-cp312-linux_${TARGETARCH}.whl \
+      https://github.com/paperless-ngx/builder/releases/download/psycopg-${PSYCOPG_VERSION}/psycopg_c-${PSYCOPG_VERSION}-cp312-cp312-linux_x86_64.whl \
+      https://github.com/paperless-ngx/builder/releases/download/psycopg-${PSYCOPG_VERSION}/psycopg_c-${PSYCOPG_VERSION}-cp312-cp312-linux_aarch64.whl \
+      https://github.com/paperless-ngx/builder/releases/download/zxing-${ZXING_VERSION}/zxing_cpp-${ZXING_VERSION}-cp312-cp312-linux_aarch64.whl \
+      https://github.com/paperless-ngx/builder/releases/download/zxing-${ZXING_VERSION}/zxing_cpp-${ZXING_VERSION}-cp312-cp312-linux_x86_64.whl \
     && python3 -m pip install --default-timeout=1000 --find-links . --requirement requirements.txt \
   && echo "Installing NLTK data" \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" snowball_data \
