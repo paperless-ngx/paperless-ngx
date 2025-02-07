@@ -62,7 +62,7 @@ export const FILTER_HAS_ANY_CUSTOM_FIELDS = 41
 
 export const FILTER_CUSTOM_FIELDS_QUERY = 42
 
-export const FILTER_MIME_TYPE = 43
+export const FILTER_MIME_TYPE = 47
 
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
