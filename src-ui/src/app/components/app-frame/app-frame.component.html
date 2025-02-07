@@ -30,12 +30,13 @@
     </div>
   </div>
   <ul ngbNav class="order-sm-3">
+    <pngx-toasts-dropdown></pngx-toasts-dropdown>
     <li ngbDropdown class="nav-item dropdown">
-      <button class="btn border-0" id="userDropdown" ngbDropdownToggle>
-        <span class="small me-2 d-none d-sm-inline">
+      <button class="btn ps-1 border-0" id="userDropdown" ngbDropdownToggle>
+        <i-bs width="1.3em" height="1.3em" name="person-circle"></i-bs>
+        <span class="small ms-2 d-none d-sm-inline">
           {{this.settingsService.displayName}}
         </span>
-        <i-bs width="1.3em" height="1.3em" name="person-circle"></i-bs>
       </button>
       <div ngbDropdownMenu class="dropdown-menu-end shadow me-2" aria-labelledby="userDropdown">
         <div class="d-sm-none">
