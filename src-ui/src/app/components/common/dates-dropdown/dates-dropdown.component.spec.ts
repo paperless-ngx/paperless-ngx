@@ -61,7 +61,7 @@ describe('DatesDropdownComponent', () => {
 
   it('should support date input, emit change', fakeAsync(() => {
     let result: string
-    component.createdDateAfterChange.subscribe((date) => (result = date))
+    component.createdDateFromChange.subscribe((date) => (result = date))
     const input: HTMLInputElement = fixture.nativeElement.querySelector('input')
     input.value = '5/30/2023'
     input.dispatchEvent(new Event('change'))
@@ -83,68 +83,68 @@ describe('DatesDropdownComponent', () => {
     let result: DateSelection
     component.datesSet.subscribe((date) => (result = date))
     component.setCreatedRelativeDate(null)
-    component.setCreatedRelativeDate(RelativeDate.LAST_7_DAYS)
+    component.setCreatedRelativeDate(RelativeDate.WITHIN_1_WEEK)
     component.setAddedRelativeDate(null)
-    component.setAddedRelativeDate(RelativeDate.LAST_7_DAYS)
+    component.setAddedRelativeDate(RelativeDate.WITHIN_1_WEEK)
     tick(500)
     expect(result).toEqual({
-      createdAfter: null,
-      createdBefore: null,
-      createdRelativeDateID: RelativeDate.LAST_7_DAYS,
-      addedAfter: null,
-      addedBefore: null,
-      addedRelativeDateID: RelativeDate.LAST_7_DAYS,
+      createdFrom: null,
+      createdTo: null,
+      createdRelativeDateID: RelativeDate.WITHIN_1_WEEK,
+      addedFrom: null,
+      addedTo: null,
+      addedRelativeDateID: RelativeDate.WITHIN_1_WEEK,
     })
   }))
 
   it('should support report if active', () => {
-    component.createdRelativeDate = RelativeDate.LAST_7_DAYS
+    component.createdRelativeDate = RelativeDate.WITHIN_1_WEEK
     expect(component.isActive).toBeTruthy()
     component.createdRelativeDate = null
-    component.createdDateAfter = '2023-05-30'
+    component.createdDateFrom = '2023-05-30'
     expect(component.isActive).toBeTruthy()
-    component.createdDateAfter = null
-    component.createdDateBefore = '2023-05-30'
+    component.createdDateFrom = null
+    component.createdDateTo = '2023-05-30'
     expect(component.isActive).toBeTruthy()
-    component.createdDateBefore = null
+    component.createdDateTo = null
 
-    component.addedRelativeDate = RelativeDate.LAST_7_DAYS
+    component.addedRelativeDate = RelativeDate.WITHIN_1_WEEK
     expect(component.isActive).toBeTruthy()
     component.addedRelativeDate = null
-    component.addedDateAfter = '2023-05-30'
+    component.addedDateFrom = '2023-05-30'
     expect(component.isActive).toBeTruthy()
-    component.addedDateAfter = null
-    component.addedDateBefore = '2023-05-30'
+    component.addedDateFrom = null
+    component.addedDateTo = '2023-05-30'
     expect(component.isActive).toBeTruthy()
-    component.addedDateBefore = null
+    component.addedDateTo = null
 
     expect(component.isActive).toBeFalsy()
   })
 
   it('should support reset', () => {
-    component.createdDateAfter = '2023-05-30'
+    component.createdDateFrom = '2023-05-30'
     component.reset()
-    expect(component.createdDateAfter).toBeNull()
+    expect(component.createdDateFrom).toBeNull()
   })
 
-  it('should support clearAfter', () => {
-    component.createdDateAfter = '2023-05-30'
-    component.clearCreatedAfter()
-    expect(component.createdDateAfter).toBeNull()
+  it('should support clearFrom', () => {
+    component.createdDateFrom = '2023-05-30'
+    component.clearCreatedFrom()
+    expect(component.createdDateFrom).toBeNull()
 
-    component.addedDateAfter = '2023-05-30'
-    component.clearAddedAfter()
-    expect(component.addedDateAfter).toBeNull()
+    component.addedDateFrom = '2023-05-30'
+    component.clearAddedFrom()
+    expect(component.addedDateFrom).toBeNull()
   })
 
-  it('should support clearBefore', () => {
-    component.createdDateBefore = '2023-05-30'
-    component.clearCreatedBefore()
-    expect(component.createdDateBefore).toBeNull()
+  it('should support clearTo', () => {
+    component.createdDateTo = '2023-05-30'
+    component.clearCreatedTo()
+    expect(component.createdDateTo).toBeNull()
 
-    component.addedDateBefore = '2023-05-30'
-    component.clearAddedBefore()
-    expect(component.addedDateBefore).toBeNull()
+    component.addedDateTo = '2023-05-30'
+    component.clearAddedTo()
+    expect(component.addedDateTo).toBeNull()
   })
 
   it('should limit keyboard events', () => {
