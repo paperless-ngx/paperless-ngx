@@ -586,6 +586,19 @@ system. See the corresponding
 
     Defaults to False
 
+#### [`PAPERLESS_ACCOUNT_DEFAULT_GROUPS=<comma-separated-list>`](#PAPERLESS_ACCOUNT_DEFAULT_GROUPS) {#PAPERLESS_ACCOUNT_DEFAULT_GROUPS}
+
+: A list of group names that users will be added to when they sign up for a new account. Groups listed here must already exist.
+
+    Defaults to None
+
+#### [`PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS=<comma-separated-list>`](#PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS) {#PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS}
+
+: A list of group names that users who signup via social accounts will be added to upon signup. Groups lsited here must already exist.
+If both the [PAPERLESS_ACCOUNT_DEFAULT_GROUPS](#PAPERLESS_ACCOUNT_DEFAULT_GROUPS) setting and this setting are used, the user will be added to both sets of groups.
+
+    Defaults to None
+
 #### [`PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL=<string>`](#PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL) {#PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL}
 
 : The protocol used when generating URLs, e.g. login callback URLs. See the corresponding
