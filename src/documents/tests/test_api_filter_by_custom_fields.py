@@ -165,6 +165,7 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
         self,
         query: list,
         reference_predicate: Callable[[DocumentWrapper], bool],
+        *,
         match_nothing_ok=False,
     ):
         """
