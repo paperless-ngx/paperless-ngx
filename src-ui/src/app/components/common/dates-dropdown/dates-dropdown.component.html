@@ -41,10 +41,16 @@
             <div class="input-group input-group-sm small ps-1 pe-2">
               <span class="input-group-text w-25 small text-muted" i18n>From</span>
               <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
-                maxlength="10" [(ngModel)]="createdDateFrom" ngbDatepicker #createdDateFromPicker="ngbDatepicker">
+                maxlength="10" [(ngModel)]="createdDateFrom" ngbDatepicker #createdDateFromPicker="ngbDatepicker" [footerTemplate]="createdFromFooterTemplate">
               <button class="btn btn-outline-secondary" (click)="createdDateFromPicker.toggle()" type="button">
                 <i-bs width="1em" height="1em" name="calendar"></i-bs>
               </button>
+              <ng-template #createdFromFooterTemplate>
+                <div class="btn-group-xs border-top p-2 d-flex">
+                  <button class="btn btn-primary" (click)="createdDateFrom = today; onChangeDebounce()" i18n>Today</button>
+                  <button class="btn btn-secondary ms-auto" (click)="createdDateFromPicker.close()" i18n>Close</button>
+                </div>
+              </ng-template>
             </div>
 
           </div>
@@ -61,10 +67,16 @@
             <div class="input-group input-group-sm small ps-1 pe-2">
               <span class="input-group-text w-25 small text-muted" i18n>To</span>
               <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
-                maxlength="10" [(ngModel)]="createdDateTo" ngbDatepicker #createdDateToPicker="ngbDatepicker">
+                maxlength="10" [(ngModel)]="createdDateTo" ngbDatepicker #createdDateToPicker="ngbDatepicker" [footerTemplate]="createdToFooterTemplate">
               <button class="btn btn-outline-secondary" (click)="createdDateToPicker.toggle()" type="button">
                 <i-bs width="1em" height="1em" name="calendar"></i-bs>
               </button>
+              <ng-template #createdToFooterTemplate>
+                <div class="btn-group-xs border-top p-2 d-flex">
+                  <button class="btn btn-primary" (click)="createdDateTo = today; onChangeDebounce()" i18n>Today</button>
+                  <button class="btn btn-secondary ms-auto" (click)="createdDateToPicker.close()" i18n>Close</button>
+                </div>
+              </ng-template>
             </div>
 
           </div>
@@ -105,10 +117,16 @@
             <div class="input-group input-group-sm small ps-1 pe-2">
               <span class="input-group-text w-25 small text-muted" i18n>From</span>
               <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
-                maxlength="10" [(ngModel)]="addedDateFrom" ngbDatepicker #addedDateFromPicker="ngbDatepicker">
+                maxlength="10" [(ngModel)]="addedDateFrom" ngbDatepicker #addedDateFromPicker="ngbDatepicker" [footerTemplate]="addedFromFooterTemplate">
               <button class="btn btn-outline-secondary" (click)="addedDateFromPicker.toggle()" type="button">
                 <i-bs width="1em" height="1em" name="calendar"></i-bs>
               </button>
+              <ng-template #addedFromFooterTemplate>
+                <div class="btn-group-xs border-top p-2 d-flex">
+                  <button class="btn btn-primary" (click)="addedDateFrom = today; onChangeDebounce()" i18n>Today</button>
+                  <button class="btn btn-secondary ms-auto" (click)="addedDateFromPicker.close()" i18n>Close</button>
+                </div>
+              </ng-template>
             </div>
 
           </div>
@@ -125,10 +143,16 @@
             <div class="input-group input-group-sm small ps-1 pe-2">
               <span class="input-group-text w-25 small text-muted" i18n>To</span>
               <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
-                maxlength="10" [(ngModel)]="addedDateTo" ngbDatepicker #addedDateToPicker="ngbDatepicker">
+                maxlength="10" [(ngModel)]="addedDateTo" ngbDatepicker #addedDateToPicker="ngbDatepicker" [footerTemplate]="addedToFooterTemplate">
               <button class="btn btn-outline-secondary" (click)="addedDateToPicker.toggle()" type="button">
                 <i-bs width="1em" height="1em" name="calendar"></i-bs>
               </button>
+              <ng-template #addedToFooterTemplate>
+                <div class="btn-group-xs border-top p-2 d-flex">
+                  <button class="btn btn-primary" (click)="addedDateTo = today; onChangeDebounce()" i18n>Today</button>
+                  <button class="btn btn-secondary ms-auto" (click)="addedDateToPicker.close()" i18n>Close</button>
+                </div>
+              </ng-template>
             </div>
 
           </div>

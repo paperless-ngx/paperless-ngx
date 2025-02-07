@@ -133,6 +133,8 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
   @Input()
   disabled: boolean = false
 
+  public readonly today: string = new Date().toISOString().split('T')[0]
+
   get isActive(): boolean {
     return (
       this.createdRelativeDate !== null ||
