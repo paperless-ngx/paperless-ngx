@@ -174,6 +174,20 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     category: ConfigCategory.OCR,
   },
   {
+    key: 'username_ocr',
+    title: $localize`Username OCR`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_OCR_USER_ARGS',
+    category: ConfigCategory.OCR,
+  },
+  {
+    key: 'password_ocr',
+    title: $localize`Password OCR`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_OCR_USER_ARGS',
+    category: ConfigCategory.OCR,
+  },
+  {
     key: 'app_logo',
     title: $localize`Application Logo`,
     type: ConfigOptionType.File,
