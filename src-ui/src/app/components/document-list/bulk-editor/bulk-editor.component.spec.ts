@@ -1039,6 +1039,7 @@ describe('BulkEditorComponent', () => {
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     ) // listAllFilteredIds
+    expect(documentListViewService.selected.size).toEqual(0)
   })
 
   it('should support bulk download with archive, originals or both and file formatting', () => {

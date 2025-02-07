@@ -41,4 +41,10 @@ class StatusConsumer(WebsocketConsumer):
             self.close()
         else:
             if self._is_owner_or_unowned(event["data"]):
-                self.send(json.dumps(event["data"]))
+                self.send(json.dumps(event))
+
+    def documents_deleted(self, event):
+        if not self._authenticated():
+            self.close()
+        else:
+            self.send(json.dumps(event))

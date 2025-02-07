@@ -62,7 +62,10 @@ import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
-import { DocumentDetailComponent } from './document-detail.component'
+import {
+  DocumentDetailComponent,
+  ZoomSetting,
+} from './document-detail.component'
 
 const doc: Document = {
   id: 3,
@@ -753,7 +756,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should support zoom controls', () => {
     initNormally()
-    component.onZoomSelect({ target: { value: '1' } } as any) // from select
+    component.setZoom(ZoomSetting.One) // from select
     expect(component.previewZoomSetting).toEqual('1')
     component.increaseZoom()
     expect(component.previewZoomSetting).toEqual('1.5')
@@ -761,23 +764,36 @@ describe('DocumentDetailComponent', () => {
     expect(component.previewZoomSetting).toEqual('2')
     component.decreaseZoom()
     expect(component.previewZoomSetting).toEqual('1.5')
-    component.onZoomSelect({ target: { value: '1' } } as any) // from select
+    component.setZoom(ZoomSetting.One) // from select
     component.decreaseZoom()
     expect(component.previewZoomSetting).toEqual('.75')
 
-    component.onZoomSelect({ target: { value: 'page-fit' } } as any) // from select
+    component.setZoom(ZoomSetting.PageFit) // from select
     expect(component.previewZoomScale).toEqual('page-fit')
     expect(component.previewZoomSetting).toEqual('1')
     component.increaseZoom()
     expect(component.previewZoomSetting).toEqual('1.5')
     expect(component.previewZoomScale).toEqual('page-width')
 
-    component.onZoomSelect({ target: { value: 'page-fit' } } as any) // from select
+    component.setZoom(ZoomSetting.PageFit) // from select
     expect(component.previewZoomScale).toEqual('page-fit')
     expect(component.previewZoomSetting).toEqual('1')
     component.decreaseZoom()
     expect(component.previewZoomSetting).toEqual('.5')
     expect(component.previewZoomScale).toEqual('page-width')
+  })
+
+  it('should select correct zoom setting in dropdown', () => {
+    initNormally()
+    component.setZoom(ZoomSetting.PageFit)
+    expect(component.isZoomSelected(ZoomSetting.PageFit)).toBeTruthy()
+    expect(component.isZoomSelected(ZoomSetting.One)).toBeFalsy()
+    component.setZoom(ZoomSetting.PageWidth)
+    expect(component.isZoomSelected(ZoomSetting.One)).toBeTruthy()
+    expect(component.isZoomSelected(ZoomSetting.PageFit)).toBeFalsy()
+    component.setZoom(ZoomSetting.Quarter)
+    expect(component.isZoomSelected(ZoomSetting.Quarter)).toBeTruthy()
+    expect(component.isZoomSelected(ZoomSetting.PageFit)).toBeFalsy()
   })
 
   it('should support updating notes dynamically', () => {

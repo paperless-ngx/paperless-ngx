@@ -8,8 +8,8 @@ import { first, Subject, Subscription, takeUntil } from 'rxjs'
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
 import { FILTER_HAS_TAGS_ANY } from 'src/app/data/filter-rule-type'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { environment } from 'src/environments/environment'
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 
@@ -51,7 +51,7 @@ export class StatisticsWidgetComponent
 
   constructor(
     private http: HttpClient,
-    private consumerStatusService: ConsumerStatusService,
+    private websocketConnectionService: WebsocketStatusService,
     private documentListViewService: DocumentListViewService
   ) {
     super()
@@ -109,7 +109,7 @@ export class StatisticsWidgetComponent
 
   ngOnInit(): void {
     this.reload()
-    this.subscription = this.consumerStatusService
+    this.subscription = this.websocketConnectionService
       .onDocumentConsumptionFinished()
       .subscribe(() => {
         this.reload()
