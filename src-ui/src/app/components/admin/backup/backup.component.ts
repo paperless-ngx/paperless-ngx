@@ -43,7 +43,6 @@ export class BackupComponent
   public availableStorage: number = 0
 
 
-
   constructor(
     private backupService: BackupService,
     private toastService: ToastService,
@@ -109,22 +108,22 @@ export class BackupComponent
       .subscribe(() => {
         modal.componentInstance.buttonsEnabled = false
         this.backupService.restore(backup.id).subscribe({
-      next: () => {
-        this.toastService.show({
-          content: $localize`Document restored`,
-          delay: 5000,
-          actionName: $localize`Open document`,
-          action: () => {
-            this.router.navigate(['documents'])
+          next: () => {
+            this.toastService.show({
+              content: $localize`Document restored`,
+              delay: 5000,
+              actionName: $localize`Open document`,
+              action: () => {
+                this.router.navigate(['documents'])
+              },
+            })
+            modal.close()
+            this.reload()
           },
-        })
-        modal.close()
-        this.reload()
-      },
-      error: (err) => {
-        this.toastService.showError($localize`Error restoring document`, err)
-        modal.close()
-      },
+          error: (err) => {
+            this.toastService.showError($localize`Error restoring document`, err)
+            modal.close()
+          },
         })
       })
   }
@@ -202,19 +201,31 @@ export class BackupComponent
   }
 
   backup() {
-    this.backupService.backup()
-      .subscribe({
-        next: () => {
-          this.toastService.showInfo($localize`Document(s) backed up`)
-          this.allToggled = false
-          this.reload()
-        },
-        error: (err) => {
-          this.toastService.showError(
-            $localize`Error backup document(s)`,
-            err,
-          )
-        },
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Confirm backup`
+    modal.componentInstance.messageBold = $localize`This operation will backup document and folder.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-warning'
+    modal.componentInstance.btnCaption = $localize`Backup`
+    modal.componentInstance.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        this.backupService.backup()
+          .subscribe({
+            next: () => {
+              this.toastService.showInfo($localize`Document(s) backed up`)
+              this.allToggled = false
+              this.reload()
+            },
+            error: (err) => {
+              this.toastService.showError(
+                $localize`Error backup document(s)`,
+                err,
+              )
+            },
+          })
       })
   }
 
