@@ -229,7 +229,7 @@ export class MailComponent
       },
       error: (e) => {
         this.toastService.showError(
-          $localize`Error processing mail account "${account.name}")`,
+          $localize`Error processing mail account "${account.name}"`,
           e
         )
       },
