@@ -12,11 +12,11 @@ import { routes } from 'src/app/app-routing.module'
 import { FILTER_MIME_TYPE } from 'src/app/data/filter-rule-type'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
   FileStatus,
   WebsocketStatusService,
 } from 'src/app/services/websocket-status.service'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { environment } from 'src/environments/environment'
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 import { StatisticsWidgetComponent } from './statistics-widget.component'
