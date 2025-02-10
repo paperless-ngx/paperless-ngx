@@ -62,6 +62,7 @@ class Migration(migrations.Migration):
                     (44, "created from"),
                     (45, "added to"),
                     (46, "added from"),
+                    (47, "mime type is"),
                 ],
                 verbose_name="rule type",
             ),

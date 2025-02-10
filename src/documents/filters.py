@@ -215,6 +215,14 @@ class CustomFieldsFilter(Filter):
             return qs
 
 
+class MimeTypeFilter(Filter):
+    def filter(self, qs, value):
+        if value:
+            return qs.filter(mime_type__icontains=value)
+        else:
+            return qs
+
+
 class SelectField(serializers.CharField):
     def __init__(self, custom_field: CustomField):
         self._options = custom_field.extra_data["select_options"]
@@ -709,6 +717,8 @@ class DocumentFilterSet(FilterSet):
     custom_field_query = CustomFieldQueryFilter("custom_field_query")
 
     shared_by__id = SharedByUser()
+
+    mime_type = MimeTypeFilter()
 
     class Meta:
         model = Document
