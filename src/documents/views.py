@@ -1559,6 +1559,9 @@ class StatisticsView(APIView):
             .get("characters__sum")
         )
 
+        request_count = (
+            PaperlessTask.objects.aggregate(Sum("api_call_count"))["api_call_count__sum"] or 0        )
+
         pages_total = documents.aggregate(Sum("page_count")).get("page_count__sum")
         return Response(
             {
@@ -1568,6 +1571,7 @@ class StatisticsView(APIView):
                 "inbox_tag": inbox_tag.first().pk if inbox_tag.exists() else None,
                 "document_file_type_counts": document_file_type_counts,
                 "character_count": character_count,
+                "request_count": request_count,
                 "tag_count": len(tags),
                 "untagged_tags_count": untagged_tags_count,
                 "correspondent_count": correspondent_count,
