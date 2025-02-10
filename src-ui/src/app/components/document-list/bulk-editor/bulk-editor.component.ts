@@ -268,6 +268,9 @@ export class BulkEditorComponent
       .pipe(first())
       .subscribe({
         next: () => {
+          if (args['delete_originals']) {
+            this.list.selected.clear()
+          }
           this.list.reload()
           this.list.reduceSelectionToFilter()
           this.list.selected.forEach((id) => {

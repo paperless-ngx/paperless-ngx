@@ -134,7 +134,7 @@ describe('UsersAndGroupsComponent', () => {
     deleteSpy.mockReturnValueOnce(of(true))
     deleteDialog.confirm()
     expect(listAllSpy).toHaveBeenCalled()
-    expect(toastInfoSpy).toHaveBeenCalledWith('Deleted user')
+    expect(toastInfoSpy).toHaveBeenCalledWith('Deleted user "user1"')
   })
 
   it('should logout current user if password changed, after delay', fakeAsync(() => {
@@ -178,7 +178,7 @@ describe('UsersAndGroupsComponent', () => {
     completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    component.deleteGroup(users[0])
+    component.deleteGroup(groups[0])
     const deleteDialog = modal.componentInstance as ConfirmDialogComponent
     const deleteSpy = jest.spyOn(groupService, 'delete')
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
@@ -192,7 +192,7 @@ describe('UsersAndGroupsComponent', () => {
     deleteSpy.mockReturnValueOnce(of(true))
     deleteDialog.confirm()
     expect(listAllSpy).toHaveBeenCalled()
-    expect(toastInfoSpy).toHaveBeenCalledWith('Deleted group')
+    expect(toastInfoSpy).toHaveBeenCalledWith('Deleted group "group1"')
   })
 
   it('should get group name', () => {

@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core'
 import { ActivationStart, Event, Router } from '@angular/router'
 import { filter } from 'rxjs'
 
+const EXCLUDE_COMPONENTS = ['AppFrameComponent']
+
 @Injectable({
   providedIn: 'root',
 })
@@ -15,7 +17,8 @@ export class ComponentRouterService {
       .subscribe((event: ActivationStart) => {
         if (
           this.componentHistory[this.componentHistory.length - 1] !==
-          event.snapshot.component.name
+            event.snapshot.component.name &&
+          !EXCLUDE_COMPONENTS.includes(event.snapshot.component.name)
         ) {
           this.history.push(event.snapshot.url.toString())
           this.componentHistory.push(event.snapshot.component.name)

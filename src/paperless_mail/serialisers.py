@@ -96,6 +96,7 @@ class MailRuleSerializer(OwnedObjectSerializer):
             "order",
             "attachment_type",
             "consumption_scope",
+            "pdf_layout",
             "owner",
             "user_can_change",
             "permissions",

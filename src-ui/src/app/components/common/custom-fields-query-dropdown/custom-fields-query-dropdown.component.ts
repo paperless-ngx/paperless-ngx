@@ -37,6 +37,7 @@ import {
 import { popperOptionsReenablePreventOverflow } from 'src/app/utils/popper-options'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
+import { DocumentLinkComponent } from '../input/document-link/document-link.component'
 
 export class CustomFieldQueriesModel {
   public queries: CustomFieldQueryElement[] = []
@@ -167,6 +168,7 @@ export class CustomFieldQueriesModel {
   imports: [
     ClearableBadgeComponent,
     FormsModule,
+    DocumentLinkComponent,
     ReactiveFormsModule,
     NgbDatepickerModule,
     NgTemplateOutlet,
@@ -240,6 +242,8 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
   selectionModelChange = new EventEmitter<CustomFieldQueriesModel>()
 
   customFields: CustomField[] = []
+
+  public readonly today: string = new Date().toISOString().split('T')[0]
 
   constructor(protected customFieldsService: CustomFieldsService) {
     super()

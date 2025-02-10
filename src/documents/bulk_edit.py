@@ -12,6 +12,7 @@ from celery import shared_task
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.utils import timezone
 
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
@@ -23,6 +24,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.permissions import set_permissions_for_object
+from documents.plugins.helpers import DocumentsStatusManager
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
 from documents.tasks import update_document_content_maybe_archive_file
@@ -177,6 +179,27 @@ def modify_custom_fields(
                 field_id=field_id,
                 defaults=defaults,
             )
+            if custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
+                doc = Document.objects.get(id=doc_id)
+                reflect_doclinks(doc, custom_field, value)
+
+    # For doc link fields that are being removed, remove symmetrical links
+    for doclink_being_removed_instance in CustomFieldInstance.objects.filter(
+        document_id__in=affected_docs,
+        field__id__in=remove_custom_fields,
+        field__data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        value_document_ids__isnull=False,
+    ):
+        for target_doc_id in doclink_being_removed_instance.value:
+            remove_doclink(
+                document=Document.objects.get(
+                    id=doclink_being_removed_instance.document.id,
+                ),
+                field=doclink_being_removed_instance.field,
+                target_doc_id=target_doc_id,
+            )
+
+    # Finally, remove the custom fields
     CustomFieldInstance.objects.filter(
         document_id__in=affected_docs,
         field_id__in=remove_custom_fields,
@@ -197,6 +220,9 @@ def delete(doc_ids: list[int]) -> Literal["OK"]:
         with index.open_index_writer() as writer:
             for id in doc_ids:
                 index.remove_document_by_id(writer, id)
+
+        status_mgr = DocumentsStatusManager()
+        status_mgr.send_documents_deleted(doc_ids)
     except Exception as e:
         if "Data too long for column" in str(e):
             logger.warning(
@@ -219,6 +245,7 @@ def reprocess(doc_ids: list[int]) -> Literal["OK"]:
 def set_permissions(
     doc_ids: list[int],
     set_permissions,
+    *,
     owner=None,
     merge=False,
 ) -> Literal["OK"]:
@@ -283,6 +310,7 @@ def rotate(doc_ids: list[int], degrees: int) -> Literal["OK"]:
 
 def merge(
     doc_ids: list[int],
+    *,
     metadata_document_id: int | None = None,
     delete_originals: bool = False,
     user: User | None = None,
@@ -361,6 +389,7 @@ def merge(
 def split(
     doc_ids: list[int],
     pages: list[list[int]],
+    *,
     delete_originals: bool = False,
     user: User | None = None,
 ) -> Literal["OK"]:
@@ -447,3 +476,87 @@ def delete_pages(doc_ids: list[int], pages: list[int]) -> Literal["OK"]:
         logger.exception(f"Error deleting pages from document {doc.id}: {e}")
 
     return "OK"
+
+
+def reflect_doclinks(
+    document: Document,
+    field: CustomField,
+    target_doc_ids: list[int],
+):
+    """
+    Add or remove 'symmetrical' links to `document` on all `target_doc_ids`
+    """
+
+    if target_doc_ids is None:
+        target_doc_ids = []
+
+    # Check if any documents are going to be removed from the current list of links and remove the symmetrical links
+    current_field_instance = CustomFieldInstance.objects.filter(
+        field=field,
+        document=document,
+    ).first()
+    if current_field_instance is not None and current_field_instance.value is not None:
+        for doc_id in current_field_instance.value:
+            if doc_id not in target_doc_ids:
+                remove_doclink(
+                    document=document,
+                    field=field,
+                    target_doc_id=doc_id,
+                )
+
+    # Create an instance if target doc doesn't have this field or append it to an existing one
+    existing_custom_field_instances = {
+        custom_field.document_id: custom_field
+        for custom_field in CustomFieldInstance.objects.filter(
+            field=field,
+            document_id__in=target_doc_ids,
+        )
+    }
+    custom_field_instances_to_create = []
+    custom_field_instances_to_update = []
+    for target_doc_id in target_doc_ids:
+        target_doc_field_instance = existing_custom_field_instances.get(
+            target_doc_id,
+        )
+        if target_doc_field_instance is None:
+            custom_field_instances_to_create.append(
+                CustomFieldInstance(
+                    document_id=target_doc_id,
+                    field=field,
+                    value_document_ids=[document.id],
+                ),
+            )
+        elif target_doc_field_instance.value is None:
+            target_doc_field_instance.value_document_ids = [document.id]
+            custom_field_instances_to_update.append(target_doc_field_instance)
+        elif document.id not in target_doc_field_instance.value:
+            target_doc_field_instance.value_document_ids.append(document.id)
+            custom_field_instances_to_update.append(target_doc_field_instance)
+
+    CustomFieldInstance.objects.bulk_create(custom_field_instances_to_create)
+    CustomFieldInstance.objects.bulk_update(
+        custom_field_instances_to_update,
+        ["value_document_ids"],
+    )
+    Document.objects.filter(id__in=target_doc_ids).update(modified=timezone.now())
+
+
+def remove_doclink(
+    document: Document,
+    field: CustomField,
+    target_doc_id: int,
+):
+    """
+    Removes a 'symmetrical' link to `document` from the target document's existing custom field instance
+    """
+    target_doc_field_instance = CustomFieldInstance.objects.filter(
+        document_id=target_doc_id,
+        field=field,
+    ).first()
+    if (
+        target_doc_field_instance is not None
+        and document.id in target_doc_field_instance.value
+    ):
+        target_doc_field_instance.value.remove(document.id)
+        target_doc_field_instance.save()
+    Document.objects.filter(id=target_doc_id).update(modified=timezone.now())

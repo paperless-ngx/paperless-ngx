@@ -38,6 +38,8 @@ import { FilterRule } from 'src/app/data/filter-rule'
 import {
   FILTER_ADDED_AFTER,
   FILTER_ADDED_BEFORE,
+  FILTER_ADDED_FROM,
+  FILTER_ADDED_TO,
   FILTER_ASN,
   FILTER_ASN_GT,
   FILTER_ASN_ISNULL,
@@ -45,6 +47,8 @@ import {
   FILTER_CORRESPONDENT,
   FILTER_CREATED_AFTER,
   FILTER_CREATED_BEFORE,
+  FILTER_CREATED_FROM,
+  FILTER_CREATED_TO,
   FILTER_CUSTOM_FIELDS_QUERY,
   FILTER_CUSTOM_FIELDS_TEXT,
   FILTER_DOCUMENT_TYPE,
@@ -62,6 +66,7 @@ import {
   FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_HAS_TAGS_ALL,
   FILTER_HAS_TAGS_ANY,
+  FILTER_MIME_TYPE,
   FILTER_OWNER,
   FILTER_OWNER_ANY,
   FILTER_OWNER_DOES_NOT_INCLUDE,
@@ -122,6 +127,7 @@ const TEXT_FILTER_TARGET_ASN = 'asn'
 const TEXT_FILTER_TARGET_FULLTEXT_QUERY = 'fulltext-query'
 const TEXT_FILTER_TARGET_FULLTEXT_MORELIKE = 'fulltext-morelike'
 const TEXT_FILTER_TARGET_CUSTOM_FIELDS = 'custom-fields'
+const TEXT_FILTER_TARGET_MIME_TYPE = 'mime-type'
 
 const TEXT_FILTER_MODIFIER_EQUALS = 'equals'
 const TEXT_FILTER_MODIFIER_NULL = 'is null'
@@ -133,19 +139,19 @@ const RELATIVE_DATE_QUERY_REGEXP_CREATED = /created:\[([^\]]+)\]/g
 const RELATIVE_DATE_QUERY_REGEXP_ADDED = /added:\[([^\]]+)\]/g
 const RELATIVE_DATE_QUERYSTRINGS = [
   {
-    relativeDate: RelativeDate.LAST_7_DAYS,
+    relativeDate: RelativeDate.WITHIN_1_WEEK,
     dateQuery: '-1 week to now',
   },
   {
-    relativeDate: RelativeDate.LAST_MONTH,
+    relativeDate: RelativeDate.WITHIN_1_MONTH,
     dateQuery: '-1 month to now',
   },
   {
-    relativeDate: RelativeDate.LAST_3_MONTHS,
+    relativeDate: RelativeDate.WITHIN_3_MONTHS,
     dateQuery: '-3 month to now',
   },
   {
-    relativeDate: RelativeDate.LAST_YEAR,
+    relativeDate: RelativeDate.WITHIN_1_YEAR,
     dateQuery: '-1 year to now',
   },
 ]
@@ -161,6 +167,7 @@ const DEFAULT_TEXT_FILTER_TARGET_OPTIONS = [
     id: TEXT_FILTER_TARGET_CUSTOM_FIELDS,
     name: $localize`Custom fields`,
   },
+  { id: TEXT_FILTER_TARGET_MIME_TYPE, name: $localize`File type` },
   {
     id: TEXT_FILTER_TARGET_FULLTEXT_QUERY,
     name: $localize`Advanced search`,
@@ -349,10 +356,10 @@ export class FilterEditorComponent
   storagePathSelectionModel = new FilterableDropdownSelectionModel()
   customFieldQueriesModel = new CustomFieldQueriesModel()
 
-  dateCreatedBefore: string
-  dateCreatedAfter: string
-  dateAddedBefore: string
-  dateAddedAfter: string
+  dateCreatedTo: string
+  dateCreatedFrom: string
+  dateAddedTo: string
+  dateAddedFrom: string
   dateCreatedRelativeDate: RelativeDate
   dateAddedRelativeDate: RelativeDate
 
@@ -385,10 +392,10 @@ export class FilterEditorComponent
     this.customFieldQueriesModel.clear(false)
     this._textFilter = null
     this._moreLikeId = null
-    this.dateAddedBefore = null
-    this.dateAddedAfter = null
-    this.dateCreatedBefore = null
-    this.dateCreatedAfter = null
+    this.dateAddedTo = null
+    this.dateAddedFrom = null
+    this.dateCreatedTo = null
+    this.dateCreatedFrom = null
     this.dateCreatedRelativeDate = null
     this.dateAddedRelativeDate = null
     this.textFilterModifier = TEXT_FILTER_MODIFIER_EQUALS
@@ -411,6 +418,10 @@ export class FilterEditorComponent
         case FILTER_CUSTOM_FIELDS_TEXT:
           this._textFilter = rule.value
           this.textFilterTarget = TEXT_FILTER_TARGET_CUSTOM_FIELDS
+          break
+        case FILTER_MIME_TYPE:
+          this.textFilterTarget = TEXT_FILTER_TARGET_MIME_TYPE
+          this._textFilter = rule.value
           break
         case FILTER_FULLTEXT_QUERY:
           let allQueryArgs = rule.value.split(',')
@@ -458,16 +469,40 @@ export class FilterEditorComponent
           })
           break
         case FILTER_CREATED_AFTER:
-          this.dateCreatedAfter = rule.value
+          // Old rules require adjusting date by a day
+          const createdAfter = new Date(rule.value)
+          createdAfter.setDate(createdAfter.getDate() + 1)
+          this.dateCreatedFrom = createdAfter.toISOString().split('T')[0]
           break
         case FILTER_CREATED_BEFORE:
-          this.dateCreatedBefore = rule.value
+          // Old rules require adjusting date by a day
+          const createdBefore = new Date(rule.value)
+          createdBefore.setDate(createdBefore.getDate() - 1)
+          this.dateCreatedTo = createdBefore.toISOString().split('T')[0]
           break
         case FILTER_ADDED_AFTER:
-          this.dateAddedAfter = rule.value
+          // Old rules require adjusting date by a day
+          const addedAfter = new Date(rule.value)
+          addedAfter.setDate(addedAfter.getDate() + 1)
+          this.dateAddedFrom = addedAfter.toISOString().split('T')[0]
           break
         case FILTER_ADDED_BEFORE:
-          this.dateAddedBefore = rule.value
+          // Old rules require adjusting date by a day
+          const addedBefore = new Date(rule.value)
+          addedBefore.setDate(addedBefore.getDate() - 1)
+          this.dateAddedTo = addedBefore.toISOString().split('T')[0]
+          break
+        case FILTER_CREATED_FROM:
+          this.dateCreatedFrom = rule.value
+          break
+        case FILTER_CREATED_TO:
+          this.dateCreatedTo = rule.value
+          break
+        case FILTER_ADDED_FROM:
+          this.dateAddedFrom = rule.value
+          break
+        case FILTER_ADDED_TO:
+          this.dateAddedTo = rule.value
           break
         case FILTER_HAS_TAGS_ALL:
           this.tagSelectionModel.logicalOperator = LogicalOperator.And
@@ -703,6 +738,15 @@ export class FilterEditorComponent
     }
     if (
       this._textFilter &&
+      this.textFilterTarget == TEXT_FILTER_TARGET_MIME_TYPE
+    ) {
+      filterRules.push({
+        rule_type: FILTER_MIME_TYPE,
+        value: this._textFilter,
+      })
+    }
+    if (
+      this._textFilter &&
       this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_QUERY
     ) {
       filterRules.push({
@@ -814,28 +858,28 @@ export class FilterEditorComponent
         value: JSON.stringify(queries[0]),
       })
     }
-    if (this.dateCreatedBefore) {
+    if (this.dateCreatedTo) {
       filterRules.push({
-        rule_type: FILTER_CREATED_BEFORE,
-        value: this.dateCreatedBefore,
+        rule_type: FILTER_CREATED_TO,
+        value: this.dateCreatedTo,
       })
     }
-    if (this.dateCreatedAfter) {
+    if (this.dateCreatedFrom) {
       filterRules.push({
-        rule_type: FILTER_CREATED_AFTER,
-        value: this.dateCreatedAfter,
+        rule_type: FILTER_CREATED_FROM,
+        value: this.dateCreatedFrom,
       })
     }
-    if (this.dateAddedBefore) {
+    if (this.dateAddedTo) {
       filterRules.push({
-        rule_type: FILTER_ADDED_BEFORE,
-        value: this.dateAddedBefore,
+        rule_type: FILTER_ADDED_TO,
+        value: this.dateAddedTo,
       })
     }
-    if (this.dateAddedAfter) {
+    if (this.dateAddedFrom) {
       filterRules.push({
-        rule_type: FILTER_ADDED_AFTER,
-        value: this.dateAddedAfter,
+        rule_type: FILTER_ADDED_FROM,
+        value: this.dateAddedFrom,
       })
     }
     if (

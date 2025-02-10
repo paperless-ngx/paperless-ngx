@@ -42,7 +42,19 @@ from documents.models import Tag
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
 INT_KWARGS = ["exact", "gt", "gte", "lt", "lte", "isnull"]
-DATE_KWARGS = ["year", "month", "day", "date__gt", "gt", "date__lt", "lt"]
+DATE_KWARGS = [
+    "year",
+    "month",
+    "day",
+    "date__gt",
+    "date__gte",
+    "gt",
+    "gte",
+    "date__lt",
+    "date__lte",
+    "lt",
+    "lte",
+]
 
 CUSTOM_FIELD_QUERY_MAX_DEPTH = 10
 CUSTOM_FIELD_QUERY_MAX_ATOMS = 20
@@ -86,7 +98,7 @@ class StoragePathFilterSet(FilterSet):
 
 
 class ObjectFilter(Filter):
-    def __init__(self, exclude=False, in_list=False, field_name=""):
+    def __init__(self, *, exclude=False, in_list=False, field_name=""):
         super().__init__()
         self.exclude = exclude
         self.in_list = in_list
@@ -204,6 +216,14 @@ class CustomFieldsFilter(Filter):
                 | qs.filter(custom_fields__value_document_ids__icontains=value)
                 | qs.filter(custom_fields__value_select__in=option_ids)
             )
+        else:
+            return qs
+
+
+class MimeTypeFilter(Filter):
+    def filter(self, qs, value):
+        if value:
+            return qs.filter(mime_type__icontains=value)
         else:
             return qs
 
@@ -703,6 +723,8 @@ class DocumentFilterSet(FilterSet):
     custom_field_query = CustomFieldQueryFilter("custom_field_query")
 
     shared_by__id = SharedByUser()
+
+    mime_type = MimeTypeFilter()
 
     class Meta:
         model = Document

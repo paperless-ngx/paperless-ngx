@@ -32,6 +32,8 @@ import { DocumentType } from 'src/app/data/document-type'
 import {
   FILTER_ADDED_AFTER,
   FILTER_ADDED_BEFORE,
+  FILTER_ADDED_FROM,
+  FILTER_ADDED_TO,
   FILTER_ASN,
   FILTER_ASN_GT,
   FILTER_ASN_ISNULL,
@@ -39,6 +41,8 @@ import {
   FILTER_CORRESPONDENT,
   FILTER_CREATED_AFTER,
   FILTER_CREATED_BEFORE,
+  FILTER_CREATED_FROM,
+  FILTER_CREATED_TO,
   FILTER_CUSTOM_FIELDS_QUERY,
   FILTER_CUSTOM_FIELDS_TEXT,
   FILTER_DOCUMENT_TYPE,
@@ -56,6 +60,7 @@ import {
   FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_HAS_TAGS_ALL,
   FILTER_HAS_TAGS_ANY,
+  FILTER_MIME_TYPE,
   FILTER_OWNER,
   FILTER_OWNER_ANY,
   FILTER_OWNER_DOES_NOT_INCLUDE,
@@ -385,6 +390,18 @@ describe('FilterEditorComponent', () => {
     expect(component.textFilterModifier).toEqual('less') // TEXT_FILTER_MODIFIER_LT
   }))
 
+  it('should ingest text filter rules for mime type', fakeAsync(() => {
+    expect(component.textFilter).toEqual(null)
+    component.filterRules = [
+      {
+        rule_type: FILTER_MIME_TYPE,
+        value: 'pdf',
+      },
+    ]
+    expect(component.textFilter).toEqual('pdf')
+    expect(component.textFilterTarget).toEqual('mime-type') // TEXT_FILTER_TARGET_MIME_TYPE
+  }))
+
   it('should ingest text filter rules for fulltext query', fakeAsync(() => {
     expect(component.textFilter).toEqual(null)
     component.filterRules = [
@@ -465,48 +482,92 @@ describe('FilterEditorComponent', () => {
     ])
   }))
 
-  it('should ingest filter rules for date created after', fakeAsync(() => {
-    expect(component.dateCreatedAfter).toBeNull()
+  it('should ingest filter rules for date created after and adjust date by 1 day', fakeAsync(() => {
+    expect(component.dateCreatedFrom).toBeNull()
     component.filterRules = [
       {
         rule_type: FILTER_CREATED_AFTER,
         value: '2023-05-14',
       },
     ]
-    expect(component.dateCreatedAfter).toEqual('2023-05-14')
+    expect(component.dateCreatedFrom).toEqual('2023-05-15')
   }))
 
-  it('should ingest filter rules for date created before', fakeAsync(() => {
-    expect(component.dateCreatedBefore).toBeNull()
+  it('should ingest filter rules for date created from', fakeAsync(() => {
+    expect(component.dateCreatedFrom).toBeNull()
+    component.filterRules = [
+      {
+        rule_type: FILTER_CREATED_FROM,
+        value: '2023-05-14',
+      },
+    ]
+    expect(component.dateCreatedFrom).toEqual('2023-05-14')
+  }))
+
+  it('should ingest filter rules for date created before and adjust date by 1 day', fakeAsync(() => {
+    expect(component.dateCreatedTo).toBeNull()
     component.filterRules = [
       {
         rule_type: FILTER_CREATED_BEFORE,
         value: '2023-05-14',
       },
     ]
-    expect(component.dateCreatedBefore).toEqual('2023-05-14')
+    expect(component.dateCreatedTo).toEqual('2023-05-13')
   }))
 
-  it('should ingest filter rules for date added after', fakeAsync(() => {
-    expect(component.dateAddedAfter).toBeNull()
+  it('should ingest filter rules for date created to', fakeAsync(() => {
+    expect(component.dateCreatedTo).toBeNull()
+    component.filterRules = [
+      {
+        rule_type: FILTER_CREATED_TO,
+        value: '2023-05-14',
+      },
+    ]
+    expect(component.dateCreatedTo).toEqual('2023-05-14')
+  }))
+
+  it('should ingest filter rules for date added after and adjust date by 1 day', fakeAsync(() => {
+    expect(component.dateAddedFrom).toBeNull()
     component.filterRules = [
       {
         rule_type: FILTER_ADDED_AFTER,
         value: '2023-05-14',
       },
     ]
-    expect(component.dateAddedAfter).toEqual('2023-05-14')
+    expect(component.dateAddedFrom).toEqual('2023-05-15')
   }))
 
-  it('should ingest filter rules for date added before', fakeAsync(() => {
-    expect(component.dateAddedBefore).toBeNull()
+  it('should ingest filter rules for date added from', fakeAsync(() => {
+    expect(component.dateAddedFrom).toBeNull()
+    component.filterRules = [
+      {
+        rule_type: FILTER_ADDED_FROM,
+        value: '2023-05-14',
+      },
+    ]
+    expect(component.dateAddedFrom).toEqual('2023-05-14')
+  }))
+
+  it('should ingest filter rules for date added before and adjust date by 1 day', fakeAsync(() => {
+    expect(component.dateAddedTo).toBeNull()
     component.filterRules = [
       {
         rule_type: FILTER_ADDED_BEFORE,
         value: '2023-05-14',
       },
     ]
-    expect(component.dateAddedBefore).toEqual('2023-05-14')
+    expect(component.dateAddedTo).toEqual('2023-05-13')
+  }))
+
+  it('should ingest filter rules for date added to', fakeAsync(() => {
+    expect(component.dateAddedTo).toBeNull()
+    component.filterRules = [
+      {
+        rule_type: FILTER_ADDED_TO,
+        value: '2023-05-14',
+      },
+    ]
+    expect(component.dateAddedTo).toEqual('2023-05-14')
   }))
 
   it('should ingest filter rules for has all tags', fakeAsync(() => {
@@ -1174,12 +1235,30 @@ describe('FilterEditorComponent', () => {
     ])
   }))
 
+  it('should convert user input to correct filter rules on mime type', fakeAsync(() => {
+    component.textFilterInput.nativeElement.value = 'pdf'
+    component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
+    const textFieldTargetDropdown = fixture.debugElement.queryAll(
+      By.directive(NgbDropdownItem)
+    )[4]
+    textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_MIME_TYPE
+    fixture.detectChanges()
+    tick(400)
+    expect(component.textFilterTarget).toEqual('mime-type')
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_MIME_TYPE,
+        value: 'pdf',
+      },
+    ])
+  }))
+
   it('should convert user input to correct filter rules on full text query', fakeAsync(() => {
     component.textFilterInput.nativeElement.value = 'foo'
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdownItem)
-    )[4]
+    )[5]
     textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_ASN
     fixture.detectChanges()
     tick(400)
@@ -1464,7 +1543,7 @@ describe('FilterEditorComponent', () => {
     ])
   }))
 
-  it('should convert user input to correct filter rules on date created after', fakeAsync(() => {
+  it('should convert user input to correct filter rules on date created from', fakeAsync(() => {
     const dateCreatedDropdown = fixture.debugElement.queryAll(
       By.directive(DatesDropdownComponent)
     )[0]
@@ -1473,18 +1552,18 @@ describe('FilterEditorComponent', () => {
     dateCreatedAfter.nativeElement.value = '05/14/2023'
     // dateCreatedAfter.triggerEventHandler('change')
     // TODO: why isn't ngModel triggering this on change?
-    component.dateCreatedAfter = '2023-05-14'
+    component.dateCreatedFrom = '2023-05-14'
     fixture.detectChanges()
     tick(400)
     expect(component.filterRules).toEqual([
       {
-        rule_type: FILTER_CREATED_AFTER,
+        rule_type: FILTER_CREATED_FROM,
         value: '2023-05-14',
       },
     ])
   }))
 
-  it('should convert user input to correct filter rules on date created before', fakeAsync(() => {
+  it('should convert user input to correct filter rules on date created to', fakeAsync(() => {
     const dateCreatedDropdown = fixture.debugElement.queryAll(
       By.directive(DatesDropdownComponent)
     )[0]
@@ -1493,12 +1572,12 @@ describe('FilterEditorComponent', () => {
     dateCreatedBefore.nativeElement.value = '05/14/2023'
     // dateCreatedBefore.triggerEventHandler('change')
     // TODO: why isn't ngModel triggering this on change?
-    component.dateCreatedBefore = '2023-05-14'
+    component.dateCreatedTo = '2023-05-14'
     fixture.detectChanges()
     tick(400)
     expect(component.filterRules).toEqual([
       {
-        rule_type: FILTER_CREATED_BEFORE,
+        rule_type: FILTER_CREATED_TO,
         value: '2023-05-14',
       },
     ])
@@ -1546,7 +1625,7 @@ describe('FilterEditorComponent', () => {
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdownItem)
-    )[4]
+    )[5]
     textFieldTargetDropdown.triggerEventHandler('click')
     fixture.detectChanges()
     tick(400)
@@ -1578,12 +1657,12 @@ describe('FilterEditorComponent', () => {
     dateAddedAfter.nativeElement.value = '05/14/2023'
     // dateAddedAfter.triggerEventHandler('change')
     // TODO: why isn't ngModel triggering this on change?
-    component.dateAddedAfter = '2023-05-14'
+    component.dateAddedFrom = '2023-05-14'
     fixture.detectChanges()
     tick(400)
     expect(component.filterRules).toEqual([
       {
-        rule_type: FILTER_ADDED_AFTER,
+        rule_type: FILTER_ADDED_FROM,
         value: '2023-05-14',
       },
     ])
@@ -1598,12 +1677,12 @@ describe('FilterEditorComponent', () => {
     dateAddedBefore.nativeElement.value = '05/14/2023'
     // dateAddedBefore.triggerEventHandler('change')
     // TODO: why isn't ngModel triggering this on change?
-    component.dateAddedBefore = '2023-05-14'
+    component.dateAddedTo = '2023-05-14'
     fixture.detectChanges()
     tick(400)
     expect(component.filterRules).toEqual([
       {
-        rule_type: FILTER_ADDED_BEFORE,
+        rule_type: FILTER_ADDED_TO,
         value: '2023-05-14',
       },
     ])

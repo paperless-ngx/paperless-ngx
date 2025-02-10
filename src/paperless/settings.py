@@ -1051,6 +1051,11 @@ CONVERT_MEMORY_LIMIT = os.getenv("PAPERLESS_CONVERT_MEMORY_LIMIT")
 
 GS_BINARY = os.getenv("PAPERLESS_GS_BINARY", "gs")
 
+# Fallback layout for .eml consumption
+EMAIL_PARSE_DEFAULT_LAYOUT = __get_int(
+    "PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT",
+    1,  # MailRule.PdfLayout.TEXT_HTML but that can't be imported here
+)
 
 # Pre-2.x versions of Paperless stored your documents locally with GPG
 # encryption, but that is no longer the default.  This behaviour is still

@@ -340,11 +340,16 @@ class GetConsumerMixin:
         filepath: Path,
         overrides: DocumentMetadataOverrides | None = None,
         source: DocumentSource = DocumentSource.ConsumeFolder,
+        mailrule_id: int | None = None,
     ) -> Generator[ConsumerPlugin, None, None]:
         # Store this for verification
         self.status = DummyProgressManager(filepath.name, None)
         reader = ConsumerPlugin(
-            ConsumableDocument(source, original_file=filepath),
+            ConsumableDocument(
+                source,
+                original_file=filepath,
+                mailrule_id=mailrule_id or None,
+            ),
             overrides or DocumentMetadataOverrides(),
             self.status,  # type: ignore
             self.dirs.scratch_dir,

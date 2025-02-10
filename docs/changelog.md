@@ -1,5 +1,28 @@
 # Changelog
 
+## paperless-ngx 2.14.7
+
+### Features
+
+-   Enhancement: require totp code for obtain auth token by [@shamoon](https://github.com/shamoon) [#8936](https://github.com/paperless-ngx/paperless-ngx/pull/8936)
+
+### Bug Fixes
+
+-   Enhancement: require totp code for obtain auth token by [@shamoon](https://github.com/shamoon) [#8936](https://github.com/paperless-ngx/paperless-ngx/pull/8936)
+-   Fix: reflect doc links in bulk modify custom fields by [@shamoon](https://github.com/shamoon) [#8962](https://github.com/paperless-ngx/paperless-ngx/pull/8962)
+-   Fix: also ensure symmetric doc link removal on bulk edit by [@shamoon](https://github.com/shamoon) [#8963](https://github.com/paperless-ngx/paperless-ngx/pull/8963)
+
+### All App Changes
+
+<details>
+<summary>4 changes</summary>
+
+-   Chore(deps-dev): Bump ruff from 0.9.2 to 0.9.3 in the development group by @[dependabot[bot]](https://github.com/apps/dependabot) [#8928](https://github.com/paperless-ngx/paperless-ngx/pull/8928)
+-   Enhancement: require totp code for obtain auth token by [@shamoon](https://github.com/shamoon) [#8936](https://github.com/paperless-ngx/paperless-ngx/pull/8936)
+-   Fix: reflect doc links in bulk modify custom fields by [@shamoon](https://github.com/shamoon) [#8962](https://github.com/paperless-ngx/paperless-ngx/pull/8962)
+-   Fix: also ensure symmetric doc link removal on bulk edit by [@shamoon](https://github.com/shamoon) [#8963](https://github.com/paperless-ngx/paperless-ngx/pull/8963)
+</details>
+
 ## paperless-ngx 2.14.6
 
 ### Bug Fixes

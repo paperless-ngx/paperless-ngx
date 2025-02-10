@@ -15,7 +15,6 @@ from urllib.parse import quote
 from urllib.parse import urlparse
 
 import pathvalidate
-from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
@@ -1991,7 +1990,7 @@ class BulkDownloadView(GenericAPIView):
             strategy_class = ArchiveOnlyStrategy
 
         with zipfile.ZipFile(temp.name, "w", compression) as zipf:
-            strategy = strategy_class(zipf, follow_filename_format)
+            strategy = strategy_class(zipf, follow_formatting=follow_filename_format)
             for document in documents:
                 strategy.add_document(document)
 
@@ -2291,7 +2290,7 @@ class SharedLinkView(View):
         )
 
 
-def serve_file(doc: Document, use_archive: bool, disposition: str):
+def serve_file(*, doc: Document, use_archive: bool, disposition: str):
     if use_archive:
         file_handle = doc.archive_file
         filename = doc.get_public_filename(archive=True)
@@ -2675,18 +2674,14 @@ class SystemStatusView(PassUserMixin):
                     classifier_status = "WARNING"
                     raise FileNotFoundError(classifier_error)
             classifier_status = "OK"
-            task_result_model = apps.get_model("django_celery_results", "taskresult")
-            result = (
-                task_result_model.objects.filter(
-                    task_name="documents.tasks.train_classifier",
-                    status="SUCCESS",
+            classifier_last_trained = (
+                make_aware(
+                    datetime.fromtimestamp(classifier.get_last_checked()),
                 )
-                .order_by(
-                    "-date_done",
-                )
-                .first()
+                if settings.MODEL_FILE.exists()
+                and classifier.get_last_checked() is not None
+                else None
             )
-            classifier_last_trained = result.date_done if result else None
         except Exception as e:
             if classifier_status is None:
                 classifier_status = "ERROR"
