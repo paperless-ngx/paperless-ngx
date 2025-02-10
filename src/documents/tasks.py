@@ -22,7 +22,6 @@ from django.db.models.signals import post_save
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from filelock import FileLock
-from torch.nn.utils.rnn import bind
 from whoosh.writing import AsyncWriter
 
 from documents import index
