@@ -29,10 +29,17 @@
     <input class="form-control" placeholder="yyyy-mm-dd"
       [(ngModel)]="atom.value"
       ngbDatepicker
-      #d="ngbDatepicker" />
+      #d="ngbDatepicker"
+      [footerTemplate]="datePickerFooterTemplate" />
     <button class="btn btn-sm btn-outline-secondary rounded-end" (click)="d.toggle()" type="button">
       <i-bs name="calendar-event"></i-bs>
     </button>
+    <ng-template #datePickerFooterTemplate>
+      <div class="btn-group-xs border-top p-2 d-flex">
+        <button type="button" class="btn btn-primary" (click)="atom.value = today; d.close()" i18n>Today</button>
+        <button type="button" class="btn btn-secondary ms-auto" (click)="d.close()" i18n>Close</button>
+      </div>
+    </ng-template>
   } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Float || getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Integer) {
     <input class="w-25 form-control rounded-end" type="number" [(ngModel)]="atom.value" [disabled]="disabled">
   } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Boolean) {
