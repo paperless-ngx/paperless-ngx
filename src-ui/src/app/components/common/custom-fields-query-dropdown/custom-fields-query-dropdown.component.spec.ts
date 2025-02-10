@@ -114,6 +114,9 @@ describe('CustomFieldsQueryDropdownComponent', () => {
           CustomFieldQueryOperatorGroups.Basic
         ],
         ...CUSTOM_FIELD_QUERY_OPERATORS_BY_GROUP[
+          CustomFieldQueryOperatorGroups.Exact
+        ],
+        ...CUSTOM_FIELD_QUERY_OPERATORS_BY_GROUP[
           CustomFieldQueryOperatorGroups.String
         ],
       ].length

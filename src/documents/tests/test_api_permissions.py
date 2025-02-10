@@ -88,14 +88,14 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         )
 
     def test_api_version_no_auth(self):
-        response = self.client.get("/api/")
+        response = self.client.get("/api/documents/")
         self.assertNotIn("X-Api-Version", response)
         self.assertNotIn("X-Version", response)
 
     def test_api_version_with_auth(self):
         user = User.objects.create_superuser(username="test")
         self.client.force_authenticate(user)
-        response = self.client.get("/api/")
+        response = self.client.get("/api/documents/")
         self.assertIn("X-Api-Version", response)
         self.assertIn("X-Version", response)
 

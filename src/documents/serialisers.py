@@ -19,6 +19,7 @@ from django.core.validators import integer_validator
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
+from drf_spectacular.utils import extend_schema_field
 from drf_writable_nested.serializers import NestedUpdateMixin
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import get_users_with_perms
@@ -86,7 +87,7 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 class MatchingModelSerializer(serializers.ModelSerializer):
     document_count = serializers.IntegerField(read_only=True)
 
-    def get_slug(self, obj):
+    def get_slug(self, obj) -> str:
         return slugify(obj.name)
 
     slug = SerializerMethodField()
@@ -179,7 +180,45 @@ class SerializerWithPerms(serializers.Serializer):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
         self.full_perms = kwargs.pop("full_perms", False)
+        self.all_fields = kwargs.pop("all_fields", False)
         super().__init__(*args, **kwargs)
+
+
+@extend_schema_field(
+    field={
+        "type": "object",
+        "properties": {
+            "view": {
+                "type": "object",
+                "properties": {
+                    "users": {
+                        "type": "array",
+                        "items": {"type": "integer"},
+                    },
+                    "groups": {
+                        "type": "array",
+                        "items": {"type": "integer"},
+                    },
+                },
+            },
+            "change": {
+                "type": "object",
+                "properties": {
+                    "users": {
+                        "type": "array",
+                        "items": {"type": "integer"},
+                    },
+                    "groups": {
+                        "type": "array",
+                        "items": {"type": "integer"},
+                    },
+                },
+            },
+        },
+    },
+)
+class SetPermissionsSerializer(serializers.DictField):
+    pass
 
 
 class OwnedObjectSerializer(
@@ -190,16 +229,50 @@ class OwnedObjectSerializer(
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        try:
-            if self.full_perms:
-                self.fields.pop("user_can_change")
-                self.fields.pop("is_shared_by_requester")
-            else:
-                self.fields.pop("permissions")
-        except KeyError:
-            pass
+        if not self.all_fields:
+            try:
+                if self.full_perms:
+                    self.fields.pop("user_can_change")
+                    self.fields.pop("is_shared_by_requester")
+                else:
+                    self.fields.pop("permissions")
+            except KeyError:
+                pass
 
-    def get_permissions(self, obj):
+    @extend_schema_field(
+        field={
+            "type": "object",
+            "properties": {
+                "view": {
+                    "type": "object",
+                    "properties": {
+                        "users": {
+                            "type": "array",
+                            "items": {"type": "integer"},
+                        },
+                        "groups": {
+                            "type": "array",
+                            "items": {"type": "integer"},
+                        },
+                    },
+                },
+                "change": {
+                    "type": "object",
+                    "properties": {
+                        "users": {
+                            "type": "array",
+                            "items": {"type": "integer"},
+                        },
+                        "groups": {
+                            "type": "array",
+                            "items": {"type": "integer"},
+                        },
+                    },
+                },
+            },
+        },
+    )
+    def get_permissions(self, obj) -> dict:
         view_codename = f"view_{obj.__class__.__name__.lower()}"
         change_codename = f"change_{obj.__class__.__name__.lower()}"
 
@@ -228,7 +301,7 @@ class OwnedObjectSerializer(
             },
         }
 
-    def get_user_can_change(self, obj):
+    def get_user_can_change(self, obj) -> bool:
         checker = ObjectPermissionChecker(self.user) if self.user is not None else None
         return (
             obj.owner is None
@@ -271,7 +344,7 @@ class OwnedObjectSerializer(
 
         return set(user_permission_pks) | set(group_permission_pks)
 
-    def get_is_shared_by_requester(self, obj: Document):
+    def get_is_shared_by_requester(self, obj: Document) -> bool:
         # First check the context to see if `shared_object_pks` is set by the parent.
         shared_object_pks = self.context.get("shared_object_pks")
         # If not just check if the current object is shared.
@@ -283,7 +356,7 @@ class OwnedObjectSerializer(
     user_can_change = SerializerMethodField(read_only=True)
     is_shared_by_requester = SerializerMethodField(read_only=True)
 
-    set_permissions = serializers.DictField(
+    set_permissions = SetPermissionsSerializer(
         label="Set permissions",
         allow_empty=True,
         required=False,
@@ -380,7 +453,7 @@ class DocumentTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         )
 
 
-class ColorField(serializers.Field):
+class DeprecatedColors:
     COLOURS = (
         (1, "#a6cee3"),
         (2, "#1f78b4"),
@@ -397,14 +470,21 @@ class ColorField(serializers.Field):
         (13, "#cccccc"),
     )
 
+
+@extend_schema_field(
+    serializers.ChoiceField(
+        choices=DeprecatedColors.COLOURS,
+    ),
+)
+class ColorField(serializers.Field):
     def to_internal_value(self, data):
-        for id, color in self.COLOURS:
+        for id, color in DeprecatedColors.COLOURS:
             if id == data:
                 return color
         raise serializers.ValidationError
 
     def to_representation(self, value):
-        for id, color in self.COLOURS:
+        for id, color in DeprecatedColors.COLOURS:
             if color == value:
                 return id
         return 1
@@ -433,7 +513,7 @@ class TagSerializerVersion1(MatchingModelSerializer, OwnedObjectSerializer):
 
 
 class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
-    def get_text_color(self, obj):
+    def get_text_color(self, obj) -> str:
         try:
             h = obj.color.lstrip("#")
             rgb = tuple(int(h[i : i + 2], 16) / 256 for i in (0, 2, 4))
@@ -499,7 +579,7 @@ class CustomFieldSerializer(serializers.ModelSerializer):
         context = kwargs.get("context")
         self.api_version = int(
             context.get("request").version
-            if context.get("request")
+            if context and context.get("request")
             else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
         )
         super().__init__(*args, **kwargs)
@@ -657,7 +737,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         )
         return instance
 
-    def get_value(self, obj: CustomFieldInstance):
+    def get_value(self, obj: CustomFieldInstance) -> str | int | float | dict | None:
         return obj.value
 
     def validate(self, data):
@@ -808,13 +888,13 @@ class DocumentSerializer(
         required=False,
     )
 
-    def get_page_count(self, obj):
+    def get_page_count(self, obj) -> int | None:
         return obj.page_count
 
-    def get_original_file_name(self, obj):
+    def get_original_file_name(self, obj) -> str | None:
         return obj.original_filename
 
-    def get_archived_file_name(self, obj):
+    def get_archived_file_name(self, obj) -> str | None:
         if obj.has_archive_version:
             return obj.get_public_filename(archive=True)
         else:
@@ -911,7 +991,7 @@ class DocumentSerializer(
 
         # return full permissions if we're doing a PATCH or PUT
         context = kwargs.get("context")
-        if (
+        if context is not None and (
             context.get("request").method == "PATCH"
             or context.get("request").method == "PUT"
         ):
@@ -921,7 +1001,6 @@ class DocumentSerializer(
 
     class Meta:
         model = Document
-        depth = 1
         fields = (
             "id",
             "correspondent",
@@ -1606,7 +1685,6 @@ class UiSettingsViewSerializer(serializers.ModelSerializer):
 class TasksViewSerializer(OwnedObjectSerializer):
     class Meta:
         model = PaperlessTask
-        depth = 1
         fields = (
             "id",
             "task_id",
@@ -1623,7 +1701,7 @@ class TasksViewSerializer(OwnedObjectSerializer):
 
     type = serializers.SerializerMethodField()
 
-    def get_type(self, obj):
+    def get_type(self, obj) -> str:
         # just file tasks, for now
         return "file"
 
@@ -1631,7 +1709,7 @@ class TasksViewSerializer(OwnedObjectSerializer):
     created_doc_re = re.compile(r"New document id (\d+) created")
     duplicate_doc_re = re.compile(r"It is a duplicate of .* \(#(\d+)\)")
 
-    def get_related_document(self, obj):
+    def get_related_document(self, obj) -> str | None:
         result = None
         re = None
         match obj.status:

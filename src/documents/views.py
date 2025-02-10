@@ -48,10 +48,16 @@ from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter
+from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema_view
+from drf_spectacular.utils import inline_serializer
 from langdetect import detect
 from packaging import version as packaging_version
 from redis import Redis
 from rest_framework import parsers
+from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 from rest_framework.filters import OrderingFilter
@@ -63,7 +69,6 @@ from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.mixins import UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ReadOnlyModelViewSet
@@ -127,6 +132,7 @@ from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
+from documents.schema import generate_object_with_permissions_schema
 from documents.serialisers import AcknowledgeTasksViewSerializer
 from documents.serialisers import BulkDownloadSerializer
 from documents.serialisers import BulkEditObjectsSerializer
@@ -256,6 +262,7 @@ class PermissionsAwareDocumentCountMixin(PassUserMixin):
         )
 
 
+@extend_schema_view(**generate_object_with_permissions_schema(CorrespondentSerializer))
 class CorrespondentViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = Correspondent
 
@@ -292,6 +299,7 @@ class CorrespondentViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         return super().retrieve(request, *args, **kwargs)
 
 
+@extend_schema_view(**generate_object_with_permissions_schema(TagSerializer))
 class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = Tag
 
@@ -316,6 +324,7 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
 
 
+@extend_schema_view(**generate_object_with_permissions_schema(DocumentTypeSerializer))
 class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = DocumentType
 
@@ -333,6 +342,177 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
 
+@extend_schema_view(
+    retrieve=extend_schema(
+        description="Retrieve a single document",
+        responses={
+            200: DocumentSerializer(all_fields=True),
+            400: None,
+        },
+        parameters=[
+            OpenApiParameter(
+                name="full_perms",
+                type=OpenApiTypes.BOOL,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
+                name="fields",
+                type=OpenApiTypes.STR,
+                many=True,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
+    ),
+    download=extend_schema(
+        description="Download the document",
+        parameters=[
+            OpenApiParameter(
+                name="original",
+                type=OpenApiTypes.BOOL,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
+        responses={200: OpenApiTypes.BINARY},
+    ),
+    history=extend_schema(
+        description="View the document history",
+        responses={
+            200: inline_serializer(
+                name="LogEntry",
+                many=True,
+                fields={
+                    "id": serializers.IntegerField(),
+                    "timestamp": serializers.DateTimeField(),
+                    "action": serializers.CharField(),
+                    "changes": serializers.DictField(),
+                    "actor": inline_serializer(
+                        name="Actor",
+                        fields={
+                            "id": serializers.IntegerField(),
+                            "username": serializers.CharField(),
+                        },
+                    ),
+                },
+            ),
+            400: None,
+            403: None,
+            404: None,
+        },
+    ),
+    metadata=extend_schema(
+        description="View the document metadata",
+        responses={
+            200: inline_serializer(
+                name="Metadata",
+                fields={
+                    "original_checksum": serializers.CharField(),
+                    "original_size": serializers.IntegerField(),
+                    "original_mime_type": serializers.CharField(),
+                    "media_filename": serializers.CharField(),
+                    "has_archive_version": serializers.BooleanField(),
+                    "original_metadata": serializers.DictField(),
+                    "archive_checksum": serializers.CharField(),
+                    "archive_media_filename": serializers.CharField(),
+                    "original_filename": serializers.CharField(),
+                    "archive_size": serializers.IntegerField(),
+                    "archive_metadata": serializers.DictField(),
+                    "lang": serializers.CharField(),
+                },
+            ),
+            400: None,
+            403: None,
+            404: None,
+        },
+    ),
+    notes=extend_schema(
+        description="View, add, or delete notes for the document",
+        responses={
+            200: {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "id": {"type": "integer"},
+                        "note": {"type": "string"},
+                        "created": {"type": "string", "format": "date-time"},
+                        "user": {
+                            "type": "object",
+                            "properties": {
+                                "id": {"type": "integer"},
+                                "username": {"type": "string"},
+                                "first_name": {"type": "string"},
+                                "last_name": {"type": "string"},
+                            },
+                        },
+                    },
+                },
+            },
+            400: None,
+            403: None,
+            404: None,
+        },
+    ),
+    suggestions=extend_schema(
+        description="View suggestions for the document",
+        responses={
+            200: inline_serializer(
+                name="Suggestions",
+                fields={
+                    "correspondents": serializers.ListField(
+                        child=serializers.IntegerField(),
+                    ),
+                    "tags": serializers.ListField(child=serializers.IntegerField()),
+                    "document_types": serializers.ListField(
+                        child=serializers.IntegerField(),
+                    ),
+                    "storage_paths": serializers.ListField(
+                        child=serializers.IntegerField(),
+                    ),
+                    "dates": serializers.ListField(child=serializers.CharField()),
+                },
+            ),
+            400: None,
+            403: None,
+            404: None,
+        },
+    ),
+    thumb=extend_schema(
+        description="View the document thumbnail",
+        responses={200: OpenApiTypes.BINARY},
+    ),
+    preview=extend_schema(
+        description="View the document preview",
+        responses={200: OpenApiTypes.BINARY},
+    ),
+    share_links=extend_schema(
+        operation_id="document_share_links",
+        description="View share links for the document",
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+            ),
+        ],
+        responses={
+            200: {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "id": {"type": "integer"},
+                        "created": {"type": "string", "format": "date-time"},
+                        "expiration": {"type": "string", "format": "date-time"},
+                        "slug": {"type": "string"},
+                    },
+                },
+            },
+            400: None,
+            403: None,
+            404: None,
+        },
+    ),
+)
 class DocumentViewSet(
     PassUserMixin,
     RetrieveModelMixin,
@@ -466,7 +646,7 @@ class DocumentViewSet(
         else:
             return None
 
-    @action(methods=["get"], detail=True)
+    @action(methods=["get"], detail=True, filter_backends=[])
     @method_decorator(cache_control(no_cache=True))
     @method_decorator(
         condition(etag_func=metadata_etag, last_modified_func=metadata_last_modified),
@@ -525,7 +705,7 @@ class DocumentViewSet(
 
         return Response(meta)
 
-    @action(methods=["get"], detail=True)
+    @action(methods=["get"], detail=True, filter_backends=[])
     @method_decorator(cache_control(no_cache=True))
     @method_decorator(
         condition(
@@ -576,7 +756,7 @@ class DocumentViewSet(
 
         return Response(resp_data)
 
-    @action(methods=["get"], detail=True)
+    @action(methods=["get"], detail=True, filter_backends=[])
     @method_decorator(cache_control(no_cache=True))
     @method_decorator(
         condition(etag_func=preview_etag, last_modified_func=preview_last_modified),
@@ -588,7 +768,7 @@ class DocumentViewSet(
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404
 
-    @action(methods=["get"], detail=True)
+    @action(methods=["get"], detail=True, filter_backends=[])
     @method_decorator(cache_control(no_cache=True))
     @method_decorator(last_modified(thumbnail_last_modified))
     def thumb(self, request, pk=None):
@@ -647,6 +827,7 @@ class DocumentViewSet(
         methods=["get", "post", "delete"],
         detail=True,
         permission_classes=[PaperlessNotePermissions],
+        filter_backends=[],
     )
     def notes(self, request, pk=None):
         currentUser = request.user
@@ -754,7 +935,7 @@ class DocumentViewSet(
             },
         )
 
-    @action(methods=["get"], detail=True)
+    @action(methods=["get"], detail=True, filter_backends=[])
     def share_links(self, request, pk=None):
         currentUser = request.user
         try:
@@ -772,21 +953,16 @@ class DocumentViewSet(
 
         if request.method == "GET":
             now = timezone.now()
-            links = [
-                {
-                    "id": c.pk,
-                    "created": c.created,
-                    "expiration": c.expiration,
-                    "slug": c.slug,
-                }
-                for c in ShareLink.objects.filter(document=doc)
+            links = (
+                ShareLink.objects.filter(document=doc)
                 .only("pk", "created", "expiration", "slug")
                 .exclude(expiration__lt=now)
                 .order_by("-created")
-            ]
-            return Response(links)
+            )
+            serializer = ShareLinkSerializer(links, many=True)
+            return Response(serializer.data)
 
-    @action(methods=["get"], detail=True, name="Audit Trail")
+    @action(methods=["get"], detail=True, name="Audit Trail", filter_backends=[])
     def history(self, request, pk=None):
         if not settings.AUDIT_LOG_ENABLED:
             return HttpResponseBadRequest("Audit log is disabled")
@@ -848,6 +1024,26 @@ class DocumentViewSet(
         return Response(sorted(entries, key=lambda x: x["timestamp"], reverse=True))
 
 
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="full_perms",
+                type=OpenApiTypes.BOOL,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
+                name="fields",
+                type=OpenApiTypes.STR,
+                many=True,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
+        responses={
+            200: DocumentSerializer(many=True, all_fields=True),
+        },
+    ),
+)
 class UnifiedSearchViewSet(DocumentViewSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -915,6 +1111,33 @@ class UnifiedSearchViewSet(DocumentViewSet):
         return Response(max_asn + 1)
 
 
+@extend_schema_view(
+    list=extend_schema(
+        description="Logs view",
+        responses={
+            (200, "application/json"): serializers.ListSerializer(
+                child=serializers.CharField(),
+            ),
+        },
+    ),
+    retrieve=extend_schema(
+        description="Single log view",
+        operation_id="retrieve_log",
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+            ),
+        ],
+        responses={
+            (200, "application/json"): serializers.ListSerializer(
+                child=serializers.CharField(),
+            ),
+            (404, "application/json"): None,
+        },
+    ),
+)
 class LogViewSet(ViewSet):
     permission_classes = (IsAuthenticated, PaperlessAdminPermissions)
 
@@ -923,11 +1146,12 @@ class LogViewSet(ViewSet):
     def get_log_filename(self, log):
         return os.path.join(settings.LOGGING_DIR, f"{log}.log")
 
-    def retrieve(self, request, pk=None, *args, **kwargs):
-        if pk not in self.log_files:
+    def retrieve(self, request, *args, **kwargs):
+        log_file = kwargs.get("pk")
+        if log_file not in self.log_files:
             raise Http404
 
-        filename = self.get_log_filename(pk)
+        filename = self.get_log_filename(log_file)
 
         if not os.path.isfile(filename):
             raise Http404
@@ -964,6 +1188,24 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin):
         serializer.save(owner=self.request.user)
 
 
+@extend_schema_view(
+    post=extend_schema(
+        operation_id="bulk_edit",
+        description="Perform a bulk edit operation on a list of documents",
+        external_docs={
+            "description": "Further documentation",
+            "url": "https://docs.paperless-ngx.com/api/#bulk-editing",
+        },
+        responses={
+            200: inline_serializer(
+                name="BulkEditDocumentsResult",
+                fields={
+                    "result": serializers.CharField(),
+                },
+            ),
+        },
+    ),
+)
 class BulkEditView(PassUserMixin):
     MODIFIED_FIELD_BY_METHOD = {
         "set_correspondent": "correspondent",
@@ -1113,6 +1355,18 @@ class BulkEditView(PassUserMixin):
             )
 
 
+@extend_schema_view(
+    post=extend_schema(
+        description="Upload a document via the API",
+        external_docs={
+            "description": "Further documentation",
+            "url": "https://docs.paperless-ngx.com/api/#file-uploads",
+        },
+        responses={
+            (200, "application/json"): OpenApiTypes.STR,
+        },
+    ),
+)
 class PostDocumentView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = PostDocumentSerializer
@@ -1169,6 +1423,63 @@ class PostDocumentView(GenericAPIView):
         return Response(async_task.id)
 
 
+@extend_schema_view(
+    post=extend_schema(
+        description="Get selection data for the selected documents",
+        responses={
+            (200, "application/json"): inline_serializer(
+                name="SelectionData",
+                fields={
+                    "selected_correspondents": serializers.ListSerializer(
+                        child=inline_serializer(
+                            name="CorrespondentCounts",
+                            fields={
+                                "id": serializers.IntegerField(),
+                                "document_count": serializers.IntegerField(),
+                            },
+                        ),
+                    ),
+                    "selected_tags": serializers.ListSerializer(
+                        child=inline_serializer(
+                            name="TagCounts",
+                            fields={
+                                "id": serializers.IntegerField(),
+                                "document_count": serializers.IntegerField(),
+                            },
+                        ),
+                    ),
+                    "selected_document_types": serializers.ListSerializer(
+                        child=inline_serializer(
+                            name="DocumentTypeCounts",
+                            fields={
+                                "id": serializers.IntegerField(),
+                                "document_count": serializers.IntegerField(),
+                            },
+                        ),
+                    ),
+                    "selected_storage_paths": serializers.ListSerializer(
+                        child=inline_serializer(
+                            name="StoragePathCounts",
+                            fields={
+                                "id": serializers.IntegerField(),
+                                "document_count": serializers.IntegerField(),
+                            },
+                        ),
+                    ),
+                    "selected_custom_fields": serializers.ListSerializer(
+                        child=inline_serializer(
+                            name="CustomFieldCounts",
+                            fields={
+                                "id": serializers.IntegerField(),
+                                "document_count": serializers.IntegerField(),
+                            },
+                        ),
+                    ),
+                },
+            ),
+        },
+    ),
+)
 class SelectionDataView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = DocumentListSerializer
@@ -1242,7 +1553,31 @@ class SelectionDataView(GenericAPIView):
         return r
 
 
-class SearchAutoCompleteView(APIView):
+@extend_schema_view(
+    get=extend_schema(
+        description="Get a list of all available tags",
+        parameters=[
+            OpenApiParameter(
+                name="term",
+                required=False,
+                type=str,
+                description="Term to search for",
+            ),
+            OpenApiParameter(
+                name="limit",
+                required=False,
+                type=int,
+                description="Number of completions to return",
+            ),
+        ],
+        responses={
+            (200, "application/json"): serializers.ListSerializer(
+                child=serializers.CharField(),
+            ),
+        },
+    ),
+)
+class SearchAutoCompleteView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
@@ -1274,6 +1609,45 @@ class SearchAutoCompleteView(APIView):
         )
 
 
+@extend_schema_view(
+    get=extend_schema(
+        description="Global search",
+        parameters=[
+            OpenApiParameter(
+                name="query",
+                required=True,
+                type=str,
+                description="Query to search for",
+            ),
+            OpenApiParameter(
+                name="db_only",
+                required=False,
+                type=bool,
+                description="Search only the database",
+            ),
+        ],
+        responses={
+            (200, "application/json"): inline_serializer(
+                name="SearchResult",
+                fields={
+                    "total": serializers.IntegerField(),
+                    "documents": DocumentSerializer(many=True),
+                    "saved_views": SavedViewSerializer(many=True),
+                    "tags": TagSerializer(many=True),
+                    "correspondents": CorrespondentSerializer(many=True),
+                    "document_types": DocumentTypeSerializer(many=True),
+                    "storage_paths": StoragePathSerializer(many=True),
+                    "users": UserSerializer(many=True),
+                    "groups": GroupSerializer(many=True),
+                    "mail_rules": MailRuleSerializer(many=True),
+                    "mail_accounts": MailAccountSerializer(many=True),
+                    "workflows": WorkflowSerializer(many=True),
+                    "custom_fields": CustomFieldSerializer(many=True),
+                },
+            ),
+        },
+    ),
+)
 class GlobalSearchView(PassUserMixin):
     permission_classes = (IsAuthenticated,)
     serializer_class = SearchResultSerializer
@@ -1469,7 +1843,15 @@ class GlobalSearchView(PassUserMixin):
         )
 
 
-class StatisticsView(APIView):
+@extend_schema_view(
+    get=extend_schema(
+        description="Get statistics for the current user",
+        responses={
+            (200, "application/json"): OpenApiTypes.OBJECT,
+        },
+    ),
+)
+class StatisticsView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
@@ -1623,6 +2005,7 @@ class BulkDownloadView(GenericAPIView):
             return response
 
 
+@extend_schema_view(**generate_object_with_permissions_schema(StoragePathSerializer))
 class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = StoragePath
 
@@ -1762,6 +2145,14 @@ class UiSettingsView(GenericAPIView):
         )
 
 
+@extend_schema_view(
+    get=extend_schema(
+        description="Get the current version of the Paperless-NGX server",
+        responses={
+            (200, "application/json"): OpenApiTypes.OBJECT,
+        },
+    ),
+)
 class RemoteVersionView(GenericAPIView):
     def get(self, request, format=None):
         remote_version = "0.0.0"
@@ -1802,6 +2193,33 @@ class RemoteVersionView(GenericAPIView):
         )
 
 
+@extend_schema_view(
+    acknowledge=extend_schema(
+        operation_id="acknowledge_tasks",
+        description="Acknowledge a list of tasks",
+        request={
+            "application/json": {
+                "type": "object",
+                "properties": {
+                    "tasks": {
+                        "type": "array",
+                        "items": {"type": "integer"},
+                    },
+                },
+                "required": ["tasks"],
+            },
+        },
+        responses={
+            (200, "application/json"): inline_serializer(
+                name="AcknowledgeTasks",
+                fields={
+                    "result": serializers.IntegerField(),
+                },
+            ),
+            (400, "application/json"): None,
+        },
+    ),
+)
 class TasksViewSet(ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     serializer_class = TasksViewSerializer
@@ -1907,6 +2325,24 @@ def serve_file(*, doc: Document, use_archive: bool, disposition: str):
     return response
 
 
+@extend_schema_view(
+    post=extend_schema(
+        operation_id="bulk_edit_objects",
+        description="Perform a bulk edit operation on a list of objects",
+        external_docs={
+            "description": "Further documentation",
+            "url": "https://docs.paperless-ngx.com/api/#objects",
+        },
+        responses={
+            200: inline_serializer(
+                name="BulkEditResult",
+                fields={
+                    "result": serializers.CharField(),
+                },
+            ),
+        },
+    ),
+)
 class BulkEditObjectsView(PassUserMixin):
     permission_classes = (IsAuthenticated,)
     serializer_class = BulkEditObjectsSerializer
@@ -2065,6 +2501,71 @@ class CustomFieldViewSet(ModelViewSet):
         )
 
 
+@extend_schema_view(
+    get=extend_schema(
+        description="Get the current system status of the Paperless-NGX server",
+        responses={
+            (200, "application/json"): inline_serializer(
+                name="SystemStatus",
+                fields={
+                    "pngx_version": serializers.CharField(),
+                    "server_os": serializers.CharField(),
+                    "install_type": serializers.CharField(),
+                    "storage": inline_serializer(
+                        name="Storage",
+                        fields={
+                            "total": serializers.IntegerField(),
+                            "available": serializers.IntegerField(),
+                        },
+                    ),
+                    "database": inline_serializer(
+                        name="Database",
+                        fields={
+                            "type": serializers.CharField(),
+                            "url": serializers.CharField(),
+                            "status": serializers.CharField(),
+                            "error": serializers.CharField(),
+                            "migration_status": inline_serializer(
+                                name="MigrationStatus",
+                                fields={
+                                    "latest_migration": serializers.CharField(),
+                                    "unapplied_migrations": serializers.ListSerializer(
+                                        child=serializers.CharField(),
+                                    ),
+                                },
+                            ),
+                        },
+                    ),
+                    "tasks": inline_serializer(
+                        name="Tasks",
+                        fields={
+                            "redis_url": serializers.CharField(),
+                            "redis_status": serializers.CharField(),
+                            "redis_error": serializers.CharField(),
+                            "celery_status": serializers.CharField(),
+                        },
+                    ),
+                    "index": inline_serializer(
+                        name="Index",
+                        fields={
+                            "status": serializers.CharField(),
+                            "error": serializers.CharField(),
+                            "last_modified": serializers.DateTimeField(),
+                        },
+                    ),
+                    "classifier": inline_serializer(
+                        name="Classifier",
+                        fields={
+                            "status": serializers.CharField(),
+                            "error": serializers.CharField(),
+                            "last_trained": serializers.DateTimeField(),
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+)
 class SystemStatusView(PassUserMixin):
     permission_classes = (IsAuthenticated,)
 
