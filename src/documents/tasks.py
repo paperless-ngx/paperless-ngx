@@ -2,6 +2,7 @@ import hashlib
 import logging
 import os
 import shutil
+import traceback
 import uuid
 from datetime import timedelta
 from pathlib import Path
@@ -818,7 +819,7 @@ def backup_documents(
 
     except Exception as e:
         shutil.rmtree(backup_root_dir)
-        backup.log = e
+        backup.log = traceback.format_exc()
     finally:
         backup.is_backup = False
         backup.save()
