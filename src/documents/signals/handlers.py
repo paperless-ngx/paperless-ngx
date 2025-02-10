@@ -1098,6 +1098,7 @@ def task_postrun_handler(
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-postrun
     """
+    api_call_count = getattr(task.request, "api_call_count",0)
     try:
         close_old_connections()
         task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
@@ -1105,6 +1106,7 @@ def task_postrun_handler(
             task_instance.status = state
             task_instance.result = retval
             task_instance.date_done = timezone.now()
+            task_instance.api_call_count = api_call_count
             task_instance.save()
     except Exception:  # pragma: no cover
         # Don't let an exception in the signal handlers prevent

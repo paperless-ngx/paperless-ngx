@@ -21,6 +21,7 @@ from django.db.models.signals import post_save
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from filelock import FileLock
+from torch.nn.utils.rnn import bind
 from whoosh.writing import AsyncWriter
 
 from documents import index
@@ -38,7 +39,7 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
-from documents.models import BackupRecord
+from documents.models import BackupRecord, PaperlessTask
 from documents.models import Correspondent
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -272,8 +273,8 @@ def bulk_update_documents(document_ids):
             index.update_document(writer, doc)
 
 
-@shared_task
-def update_document_archive_file(document_id=None):
+@shared_task(bind=True)
+def update_document_archive_file(self, document_id=None):
     """
     Re-creates the archive file of a document, including new OCR content and thumbnail
     """
@@ -321,6 +322,9 @@ def update_document_archive_file(document_id=None):
                     document.get_public_filename(),
                 )
         # parser.parse(document.source_path, mime_type, document.get_public_filename())
+
+        # update count request
+        self.request.api_call_count=parser.get_api_call_count()
 
         thumbnail = parser.get_thumbnail(
             document.source_path,
@@ -380,7 +384,6 @@ def update_document_archive_file(document_id=None):
                 index.update_document(writer, document)
 
             clear_document_caches(document.pk)
-
     except Exception as ex:
         logger.exception(
             f"Error while parsing document {document} (ID: {document_id} ex: {ex}) ",

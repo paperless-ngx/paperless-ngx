@@ -155,6 +155,9 @@ class RasterisedDocumentCustomParser(DocumentParser):
                 f"Error while getting DPI from image {image}: {e}")
             return None
 
+    def get_api_call_count(self):
+        return self.api_call_count
+
     def calculate_a4_dpi(self, image) -> Optional[int]:
         try:
             with Image.open(image) as im:
@@ -413,6 +416,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                     enable_ocr_field = cache.get("enable_ocr_field", False)
                     url_ocr_pdf_custom_field_by_fileid = cache.get(
                         "api_ocr_field", False)
+                    self.api_call_count+=1
                     if not enable_ocr_field and not url_ocr_pdf_custom_field_by_fileid:
                         return (data_ocr, data_ocr_fields, form_code)
                     # peeling field

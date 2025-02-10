@@ -367,6 +367,7 @@ class DocumentParser(LoggingMixin):
         self.text = None
         self.date: Optional[datetime.datetime] = None
         self.progress_callback = progress_callback
+        self.api_call_count = 0
 
     def progress(self, current_progress, max_progress):
         if self.progress_callback:
@@ -420,3 +421,6 @@ class DocumentParser(LoggingMixin):
 
     def get_page_count(self, document_path, mime_type):
         return None
+
+    def get_api_call_count(self):
+        return self.api_call_count

@@ -989,6 +989,18 @@ class PaperlessTask(models.Model):
         ),
     )
 
+    api_call_count = models.IntegerField(
+        null=True,
+        default=0,
+        verbose_name=_("API call count"),
+        help_text=_(
+            "API call count"
+        )
+    )
+
+
+
+
     def __str__(self) -> str:
         return f"Task {self.task_id}"
 
