@@ -217,6 +217,7 @@ export class BackupComponent
             next: () => {
               this.toastService.showInfo($localize`Document(s) backed up`)
               this.allToggled = false
+              modal.close()
               this.reload()
             },
             error: (err) => {
