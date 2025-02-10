@@ -528,6 +528,11 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 
     text_color = serializers.SerializerMethodField()
 
+    children = SerializerMethodField()
+
+    def get_children(self, obj):
+        return TagSerializer(obj.children.all(), many=True).data
+
     class Meta:
         model = Tag
         fields = (
@@ -545,6 +550,8 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "permissions",
             "user_can_change",
             "set_permissions",
+            "parent",
+            "children",
         )
 
     def validate_color(self, color):
@@ -952,6 +959,23 @@ class DocumentSerializer(
                             custom_field_instance.field,
                             doc_id,
                         )
+        if "tags" in validated_data:
+            # add all parent tags
+            all_ancestor_tags = set(validated_data["tags"])
+            for tag in validated_data["tags"]:
+                all_ancestor_tags.update(tag.get_all_ancestors())
+            validated_data["tags"] = list(all_ancestor_tags)
+            # remove any children for parents that are being removed
+            tag_parents_being_removed = [
+                tag
+                for tag in instance.tags.all()
+                if tag not in validated_data["tags"] and tag.children.count() > 0
+            ]
+            validated_data["tags"] = [
+                tag
+                for tag in validated_data["tags"]
+                if tag not in tag_parents_being_removed
+            ]
         if validated_data.get("remove_inbox_tags"):
             tag_ids_being_added = (
                 [

@@ -7,7 +7,7 @@
       <div class="input-group flex-nowrap">
         <ng-select #tagSelect name="tags" [items]="tags" bindLabel="name" bindValue="id" [(ngModel)]="value"
           [disabled]="disabled"
-          [multiple]="true"
+          [multiple]="multiple"
           [closeOnSelect]="false"
           [clearSearchOnAdd]="true"
           [hideSelected]="tags.length > 0"

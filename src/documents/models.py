@@ -12,6 +12,7 @@ from celery import states
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -113,9 +114,37 @@ class Tag(MatchingModel):
         ),
     )
 
+    parent = models.ForeignKey(
+        "self",
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="children",
+        verbose_name=_("parent"),
+    )
+
     class Meta(MatchingModel.Meta):
         verbose_name = _("tag")
         verbose_name_plural = _("tags")
+
+    def get_all_descendants(self):
+        descendants = []
+        for child in self.children.all():
+            descendants.append(child)
+            descendants.extend(child.get_all_descendants())
+        return descendants
+
+    def get_all_ancestors(self):
+        ancestors = []
+        if self.parent:
+            ancestors.append(self.parent)
+            ancestors.extend(self.parent.get_all_ancestors())
+        return ancestors
+
+    def clean(self):
+        if self.parent == self:
+            raise ValidationError("Cannot set itself as parent.")
+        return super().clean()
 
 
 class DocumentType(MatchingModel):
@@ -377,6 +406,12 @@ class Document(SoftDeleteModel, ModelWithOwner):
     @property
     def created_date(self):
         return timezone.localdate(self.created)
+
+    def add_nested_tags(self, tags):
+        for tag in tags:
+            self.tags.add(tag)
+            if tag.parent:
+                self.add_nested_tags([tag.parent])
 
 
 class Log(models.Model):

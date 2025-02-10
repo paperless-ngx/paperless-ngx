@@ -1,4 +1,4 @@
-import { NgClass, TitleCasePipe } from '@angular/common'
+import { NgClass, NgTemplateOutlet, TitleCasePipe } from '@angular/common'
 import { Component } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
@@ -36,6 +36,7 @@ import { ManagementListComponent } from '../management-list/management-list.comp
     FormsModule,
     ReactiveFormsModule,
     NgClass,
+    NgTemplateOutlet,
     NgbDropdownModule,
     NgbPaginationModule,
     NgxBootstrapIconsModule,
@@ -75,5 +76,9 @@ export class TagListComponent extends ManagementListComponent<Tag> {
 
   getDeleteMessage(object: Tag) {
     return $localize`Do you really want to delete the tag "${object.name}"?`
+  }
+
+  filterData(data: Tag[]) {
+    return data.filter((tag) => !tag.parent)
   }
 }

@@ -99,6 +99,9 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   @Input()
   horizontal: boolean = false
 
+  @Input()
+  multiple: boolean = true
+
   @Output()
   filterDocuments = new EventEmitter<Tag[]>()
 

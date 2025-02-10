@@ -131,6 +131,10 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     this.reloadData()
   }
 
+  protected filterData(data: T[]): T[] {
+    return data
+  }
+
   reloadData(extraParams: { [key: string]: any } = null) {
     this.loading = true
     this.clearSelection()
@@ -147,7 +151,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
       .pipe(
         takeUntil(this.unsubscribeNotifier),
         tap((c) => {
-          this.data = c.results
+          this.data = this.filterData(c.results)
           this.collectionSize = c.count
         }),
         delay(100)

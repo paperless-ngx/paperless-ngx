@@ -248,7 +248,7 @@ def set_tags(
             extra={"group": logging_group},
         )
 
-        document.tags.add(*relevant_tags)
+        document.add_nested_tags(relevant_tags)
 
 
 def set_storage_path(
