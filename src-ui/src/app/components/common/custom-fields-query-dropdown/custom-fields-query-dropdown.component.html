@@ -29,17 +29,10 @@
     <input class="form-control" placeholder="yyyy-mm-dd"
       [(ngModel)]="atom.value"
       ngbDatepicker
-      #d="ngbDatepicker"
-      [footerTemplate]="datePickerFooterTemplate" />
+      #d="ngbDatepicker" />
     <button class="btn btn-sm btn-outline-secondary rounded-end" (click)="d.toggle()" type="button">
       <i-bs name="calendar-event"></i-bs>
     </button>
-    <ng-template #datePickerFooterTemplate>
-      <div class="btn-group-xs border-top p-2 d-flex">
-        <button type="button" class="btn btn-primary" (click)="atom.value = today; d.close()" i18n>Today</button>
-        <button type="button" class="btn btn-secondary ms-auto" (click)="d.close()" i18n>Close</button>
-      </div>
-    </ng-template>
   } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Float || getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Integer) {
     <input class="w-25 form-control rounded-end" type="number" [(ngModel)]="atom.value" [disabled]="disabled">
   } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Boolean) {
@@ -57,6 +50,8 @@
       [disabled]="disabled"
       (mousedown)="$event.stopImmediatePropagation()"
     ></ng-select>
+  } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.DocumentLink) {
+    <pngx-input-document-link [(ngModel)]="atom.value" class="w-25 form-select doc-link-select p-0" placeholder="Search docs..." i18n-placeholder [minimal]="true"></pngx-input-document-link>
   } @else {
     <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="atom.value" [disabled]="disabled">
   }
