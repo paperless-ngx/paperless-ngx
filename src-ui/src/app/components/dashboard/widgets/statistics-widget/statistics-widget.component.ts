@@ -15,6 +15,7 @@ export interface Statistics {
   inbox_tag?: number
   document_file_type_counts?: DocumentFileType[]
   character_count?: number
+  request_count?: number
   tag_count?: number
   untagged_tags_count?: number
   correspondent_count?: number
