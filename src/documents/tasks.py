@@ -781,6 +781,8 @@ def backup_documents(
             )
         # remove file in trash
         for filename in path_file_originals_inore:
+            if filename is None:
+                continue
             file_path = os.path.join(originals_dir, filename)
             if os.path.isfile(file_path):
                 os.remove(file_path)
@@ -792,6 +794,8 @@ def backup_documents(
                 dirs_exist_ok=True,
             )
         for filename in path_file_archive_inore:
+            if filename is None:
+                continue
             file_path = os.path.join(archive_dir, filename)
             if os.path.isfile(file_path):
                 os.remove(file_path)
@@ -803,6 +807,8 @@ def backup_documents(
                 dirs_exist_ok=True,
             )
         for filename in path_file_thumbnails_inore:
+            if filename is None:
+                continue
             file_path = os.path.join(thumbnails_dir, filename)
             if os.path.isfile(file_path):
                 os.remove(file_path)
