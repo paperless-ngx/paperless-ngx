@@ -181,6 +181,7 @@ import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
 import localeZh from '@angular/common/locales/zh'
+import localeZhTw from '@angular/common/locales/zh-TW'
 import { CorrespondentNamePipe } from './app/pipes/correspondent-name.pipe'
 import { DocumentTypeNamePipe } from './app/pipes/document-type-name.pipe'
 import { StoragePathNamePipe } from './app/pipes/storage-path-name.pipe'
@@ -217,6 +218,7 @@ registerLocaleData(localeSv)
 registerLocaleData(localeTr)
 registerLocaleData(localeUk)
 registerLocaleData(localeZh)
+registerLocaleData(localeZhTw)
 
 function initializeApp(settings: SettingsService) {
   return () => {

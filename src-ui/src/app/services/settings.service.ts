@@ -244,6 +244,12 @@ const LANGUAGE_OPTIONS = [
     englishName: 'Chinese Simplified',
     dateInputFormat: 'yyyy-mm-dd',
   },
+  {
+    code: 'zh-tw',
+    name: $localize`Chinese Traditional`,
+    englishName: 'Chinese Traditional',
+    dateInputFormat: 'yyyy/mm/dd',
+  },
 ]
 
 const ISO_LANGUAGE_OPTION: LanguageOption = {
