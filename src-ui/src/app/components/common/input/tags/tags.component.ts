@@ -129,10 +129,37 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
     let index = this.value.indexOf(id)
     if (index > -1) {
+      const tag = this.getTag(id)
+
+      // remove tag
       let oldValue = this.value
       oldValue.splice(index, 1)
+
+      // remove children
+      oldValue = this.removeChildren(oldValue, tag)
+
       this.value = [...oldValue]
       this.onChange(this.value)
+    }
+  }
+
+  private removeChildren(tagIDs: number[], tag: Tag) {
+    if (tag.children.length > 0) {
+      const childIDs = tag.children.map((child) => child.id)
+      tagIDs = tagIDs.filter((id) => !childIDs.includes(id))
+    }
+    for (const child of tag.children) {
+      tagIDs = this.removeChildren(tagIDs, child)
+    }
+    return tagIDs
+  }
+
+  public onAdd(tag: Tag) {
+    if (tag.parent) {
+      // add all parents recursively
+      const parent = this.getTag(tag.parent)
+      this.value = [...this.value, parent.id]
+      this.onAdd(parent)
     }
   }
 

@@ -14,6 +14,7 @@
           [addTag]="allowCreate ? createTagRef : false"
           addTagText="Add tag"
           i18n-addTagText
+          (add)="onAdd($event)"
           (change)="onChange(value)">
 
           <ng-template ng-label-tmp let-item="item">
