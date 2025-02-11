@@ -11,26 +11,16 @@ tbody tr:last-child td {
     min-height: 0;
 }
 
-.depth-0 {
-    padding-left: 0;
-}
+td.name-cell {
+    padding-left: calc(calc(var(--depth) - 1) * 1.1rem);
 
-.depth-1 {
-    padding-left: 20px;
-}
-
-.depth-2 {
-    padding-left: 40px;
-}
-
-.depth-3 {
-    padding-left: 60px;
-}
-
-.depth-4 {
-    padding-left: 80px;
-}
-
-.depth-5 {
-    padding-left: 100px;
+    .indicator {
+        display: inline-block;
+        width: .8rem;
+        height: .8rem;
+        border-left: 1px solid var(--bs-secondary);
+        border-bottom: 1px solid var(--bs-secondary);
+        margin-right: .25rem;
+        margin-left: .5rem;
+    }
 }

@@ -83,7 +83,10 @@
         <label class="form-check-label" for="{{typeName}}{{object.id}}"></label>
       </div>
     </td>
-    <td scope="row" class="depth-{{depth}}">
+    <td scope="row" class="name-cell" style="--depth: {{depth}}">
+      @if (depth > 0) {
+        <div class="indicator"></div>
+      }
       <button class="btn btn-link ms-0 ps-0 text-start" (click)="userCanEdit(object) ? openEditDialog(object) : null; $event.stopPropagation()">{{ object.name }}</button>
     </td>
     <td scope="row" class="d-none d-sm-table-cell">{{ getMatching(object) }}</td>
