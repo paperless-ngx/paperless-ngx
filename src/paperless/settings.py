@@ -510,6 +510,8 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = not ACCOUNT_SESSION_REMEMBER
 SESSION_COOKIE_AGE = int(
     os.getenv("PAPERLESS_SESSION_COOKIE_AGE", 60 * 60 * 24 * 7 * 3),
 )
+# https://docs.djangoproject.com/en/5.1/ref/settings/#std-setting-SESSION_ENGINE
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
 if AUTO_LOGIN_USERNAME:
     _index = MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware")
