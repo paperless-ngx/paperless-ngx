@@ -116,7 +116,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG TARGETARCH
 
 # Can be workflow provided, defaults set for manual building
-ARG JBIG2ENC_VERSION=0.29
+ARG JBIG2ENC_VERSION=0.30
 ARG QPDF_VERSION=11.9.0
 ARG GS_VERSION=10.03.1
 
