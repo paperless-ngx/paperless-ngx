@@ -1178,6 +1178,8 @@ def run_workflows(
                     webhook_action()
 
             if not use_overrides:
+                # limit title to 128 characters
+                document.title = document.title[:128]
                 # save first before setting tags
                 document.save()
                 document.tags.set(doc_tag_ids)
