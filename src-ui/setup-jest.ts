@@ -40,6 +40,7 @@ import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
 import localeZh from '@angular/common/locales/zh'
+import localeZhHant from '@angular/common/locales/zh-Hant'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -73,6 +74,7 @@ registerLocaleData(localeSv)
 registerLocaleData(localeTr)
 registerLocaleData(localeUk)
 registerLocaleData(localeZh)
+registerLocaleData(localeZhHant)
 
 /* global mocks for jsdom */
 const mock = () => {
