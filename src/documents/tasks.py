@@ -347,7 +347,7 @@ def update_document_archive_file(self, document_id=None):
                 oldDocument = Document.objects.get(pk=document.pk)
                 Document.objects.filter(pk=document.pk).update(
                     archive_checksum=checksum,
-                    content=parser.get_text(),
+                    content=parser.get_text() or '',
                     archive_filename=document.archive_filename,
                 )
                 newDocument = Document.objects.get(pk=document.pk)

@@ -951,7 +951,7 @@ class Consumer(LoggingMixin):
                     mime_type=mime_type,
                 )
                 new_file = None
-                self.log.debug("Consumer", document.folder)
+                # self.log.debug("Consumer", document.folder)
 
                 new_file = Folder.objects.create(
                     name=document.title,

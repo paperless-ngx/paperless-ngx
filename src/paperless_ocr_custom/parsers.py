@@ -378,11 +378,12 @@ class RasterisedDocumentCustomParser(DocumentParser):
                 # app_config.save()
 
                 headers = {
-                    'Authorization': f"Bearer {args.get('access_token_ocr')}"
+                    'Authorization': f"Bearer {cache.get('access_token_ocr','')}"
                 }
                 pdf_data = None
                 with open(path_file, 'rb') as file:
                     pdf_data = file.read()
+
                 payload = {'title': (str(path_file).split("/")[-1]),
                            'folder': '1',
                            'extract': '1'}
@@ -651,6 +652,8 @@ class RasterisedDocumentCustomParser(DocumentParser):
                               width=float(page_width),
                               height=float(page_height))
                 can.showPage()
+            # can.save()
+            # can._filename='/home/otxtan/project/tc-edoc/media/archive-fallback.pdf'
             can.save()
 
     def ocr_img_or_pdf(self, document_path, mime_type, dossier_form, sidecar,
@@ -894,10 +897,10 @@ class RasterisedDocumentCustomParser(DocumentParser):
         )
         data_ocr, data_ocr_fields, form_code = None, None, ''
         try:
-            self.log.debug(f"Calling OCRmyPDF with args: {args}")
+            self.log.debug(f"Calling OCRmyPDF with args: {args} ")
             # ocrmypdf.ocr(**args)
-            data_ocr, data_ocr_fields, form_code = self.ocr_img_or_pdf(
-                document_path, mime_type, dossier_form, **args)
+            # data_ocr, data_ocr_fields, form_code = self.ocr_img_or_pdf(
+            #     document_path, mime_type, dossier_form, **args)
             if self.settings.skip_archive_file != ArchiveFileChoices.ALWAYS:
                 self.archive_path = archive_path
 
@@ -947,13 +950,13 @@ class RasterisedDocumentCustomParser(DocumentParser):
             )
 
             try:
-                self.log.debug(f"Fallback: Calling OCRmyPDF with args: {args}")
+                self.log.debug(f"Fallback: Calling OCRmyPDF with args: {args} {archive_path_fallback}")
                 # ocrmypdf.ocr(**args)
                 data_ocr, data_ocr_fields, form_code = self.ocr_img_or_pdf(
                     document_path, mime_type, dossier_form, **args)
                 # Don't return the archived file here, since this file
                 # is bigger and blurry due to --force-ocr.
-
+                self.archive_path = archive_path_fallback
                 self.text = self.extract_text(
                     sidecar_file_fallback,
                     archive_path_fallback,
