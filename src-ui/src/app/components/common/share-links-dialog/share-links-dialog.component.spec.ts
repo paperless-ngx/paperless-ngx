@@ -11,17 +11,18 @@ import {
   tick,
 } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { FileVersion, ShareLink } from 'src/app/data/share-link'
 import { ShareLinkService } from 'src/app/services/rest/share-link.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
-import { ShareLinksDropdownComponent } from './share-links-dropdown.component'
+import { ShareLinksDialogComponent } from './share-links-dialog.component'
 
-describe('ShareLinksDropdownComponent', () => {
-  let component: ShareLinksDropdownComponent
-  let fixture: ComponentFixture<ShareLinksDropdownComponent>
+describe('ShareLinksDialogComponent', () => {
+  let component: ShareLinksDialogComponent
+  let fixture: ComponentFixture<ShareLinksDialogComponent>
   let shareLinkService: ShareLinkService
   let toastService: ToastService
   let httpController: HttpTestingController
@@ -30,16 +31,17 @@ describe('ShareLinksDropdownComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        ShareLinksDropdownComponent,
+        ShareLinksDialogComponent,
         NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
+        NgbActiveModal,
       ],
     })
 
-    fixture = TestBed.createComponent(ShareLinksDropdownComponent)
+    fixture = TestBed.createComponent(ShareLinksDialogComponent)
     shareLinkService = TestBed.inject(ShareLinkService)
     toastService = TestBed.inject(ToastService)
     httpController = TestBed.inject(HttpTestingController)
@@ -231,5 +233,12 @@ describe('ShareLinksDropdownComponent', () => {
         'ng-reflect-is-disabled'
       ]
     ).toBeTruthy()
+  })
+
+  it('should support close', () => {
+    const activeModal = TestBed.inject(NgbActiveModal)
+    const closeSpy = jest.spyOn(activeModal, 'close')
+    component.close()
+    expect(closeSpy).toHaveBeenCalled()
   })
 })
