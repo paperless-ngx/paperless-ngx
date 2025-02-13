@@ -8,7 +8,6 @@ import { of, throwError } from 'rxjs'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
-import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { EmailDocumentDialogComponent } from './email-document-dialog.component'
 
@@ -38,12 +37,6 @@ describe('EmailDocumentDialogComponent', () => {
     toastService = TestBed.inject(ToastService)
     component = fixture.componentInstance
     fixture.detectChanges()
-  })
-
-  it('should get email enabled status from settings', () => {
-    const settingsService = TestBed.inject(SettingsService)
-    jest.spyOn(settingsService, 'get').mockReturnValue(true)
-    expect(component.emailEnabled).toBeTruthy()
   })
 
   it('should set hasArchiveVersion and useArchiveVersion', () => {

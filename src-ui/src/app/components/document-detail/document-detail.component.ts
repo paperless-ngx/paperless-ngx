@@ -1433,6 +1433,10 @@ export class DocumentDetailComponent
       !!this.document?.archived_file_name
   }
 
+  get emailEnabled(): boolean {
+    return this.settings.get(SETTINGS_KEYS.EMAIL_ENABLED)
+  }
+
   public openEmailDocument() {
     const modal = this.modalService.open(EmailDocumentDialogComponent, {
       backdrop: 'static',
