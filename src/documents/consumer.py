@@ -577,6 +577,7 @@ class ConsumerPlugin(
                     original_file=self.unmodified_original
                     if self.unmodified_original
                     else self.working_copy,
+                    skip_auto_tagging=self.metadata.skip_auto_tagging,
                 )
 
                 # After everything is in the database, copy the files into

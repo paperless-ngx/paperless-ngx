@@ -1536,6 +1536,13 @@ class PostDocumentSerializer(serializers.Serializer):
         required=False,
     )
 
+    skip_auto_tagging = serializers.BooleanField(
+        label="Skip auto tagging",
+        default=False,
+        write_only=True,
+        required=False,
+    )
+
     def validate_document(self, document):
         document_data = document.file.read()
         mime_type = magic.from_buffer(document_data, mime=True)

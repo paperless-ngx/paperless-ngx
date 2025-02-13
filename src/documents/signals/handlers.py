@@ -206,8 +206,12 @@ def set_tags(
     base_url=None,
     stdout=None,
     style_func=None,
+    skip_auto_tagging=False,
     **kwargs,
 ):
+    if skip_auto_tagging:
+        return
+
     if replace:
         Document.tags.through.objects.filter(document=document).exclude(
             Q(tag__is_inbox_tag=True),

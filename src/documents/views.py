@@ -1385,6 +1385,7 @@ class PostDocumentView(GenericAPIView):
         created = serializer.validated_data.get("created")
         archive_serial_number = serializer.validated_data.get("archive_serial_number")
         custom_field_ids = serializer.validated_data.get("custom_fields")
+        skip_auto_tagging = serializer.validated_data.get("skip_auto_tagging")
 
         t = int(mktime(datetime.now().timetuple()))
 
@@ -1413,6 +1414,7 @@ class PostDocumentView(GenericAPIView):
             asn=archive_serial_number,
             owner_id=request.user.id,
             custom_field_ids=custom_field_ids,
+            skip_auto_tagging=skip_auto_tagging,
         )
 
         async_task = consume_file.delay(

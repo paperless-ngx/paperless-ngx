@@ -854,6 +854,37 @@ class TestConsumer(
 
         self._assert_first_last_send_progress()
 
+    @mock.patch("documents.consumer.load_classifier")
+    def testClassifyDocumentWithSkippedTags(self, m):
+        correspondent = Correspondent.objects.create(
+            name="test",
+            matching_algorithm=Correspondent.MATCH_AUTO,
+        )
+        dtype = DocumentType.objects.create(
+            name="test",
+            matching_algorithm=DocumentType.MATCH_AUTO,
+        )
+        t1 = Tag.objects.create(name="t1", matching_algorithm=Tag.MATCH_AUTO)
+        t2 = Tag.objects.create(name="t2", matching_algorithm=Tag.MATCH_AUTO)
+
+        m.return_value = MagicMock()
+        m.return_value.predict_correspondent.return_value = correspondent.pk
+        m.return_value.predict_document_type.return_value = dtype.pk
+        m.return_value.predict_tags.return_value = [t2.pk]
+
+        overrides = DocumentMetadataOverrides(tag_ids=[t1.pk], skip_auto_tagging=True)
+        with self.get_consumer(self.get_test_file(), overrides) as consumer:
+            consumer.run()
+
+            document = Document.objects.first()
+
+        self.assertEqual(document.correspondent, correspondent)
+        self.assertEqual(document.document_type, dtype)
+        self.assertIn(t1, document.tags.all())
+        self.assertNotIn(t2, document.tags.all())
+
+        self._assert_first_last_send_progress()
+
     @override_settings(CONSUMER_DELETE_DUPLICATES=True)
     def test_delete_duplicate(self):
         dst = self.get_test_file()
