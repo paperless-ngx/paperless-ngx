@@ -91,9 +91,11 @@
       <button ngbDropdownItem (click)="openShareLinks()" [disabled]="!userCanEdit || !userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }">
         <i-bs name="link"></i-bs>&nbsp;<span i18n>Share Links</span>
       </button>
-      <button ngbDropdownItem (click)="openEmailDocument()" [disabled]="!userCanEdit || !userIsOwner">
-        <i-bs name="envelope"></i-bs>&nbsp;<span i18n>Email</span>
-      </button>
+      @if (emailEnabled) {
+        <button ngbDropdownItem (click)="openEmailDocument()" [disabled]="!userCanEdit || !userIsOwner">
+          <i-bs name="envelope"></i-bs>&nbsp;<span i18n>Email</span>
+        </button>
+      }
     </div>
   </div>
 

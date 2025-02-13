@@ -2,9 +2,7 @@ import { Component, Input } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { DocumentService } from 'src/app/services/rest/document.service'
-import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
@@ -39,15 +37,10 @@ export class EmailDocumentDialogComponent extends LoadingComponentWithPermission
   public emailSubject: string = ''
   public emailMessage: string = ''
 
-  get emailEnabled(): boolean {
-    return this.settingsService.get(SETTINGS_KEYS.EMAIL_ENABLED)
-  }
-
   constructor(
     private activeModal: NgbActiveModal,
     private documentService: DocumentService,
-    private toastService: ToastService,
-    private settingsService: SettingsService
+    private toastService: ToastService
   ) {
     super()
     this.loading = false
