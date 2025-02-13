@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -9,20 +9,17 @@ import { ToastService } from 'src/app/services/toast.service'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
-  selector: 'pngx-email-document-dropdown',
-  imports: [FormsModule, NgbDropdownModule, NgxBootstrapIconsModule],
-  templateUrl: './email-document-dropdown.component.html',
-  styleUrl: './email-document-dropdown.component.scss',
+  selector: 'pngx-email-document-dialog',
+  templateUrl: './email-document-dialog.component.html',
+  styleUrl: './email-document-dialog.component.scss',
+  imports: [FormsModule, NgxBootstrapIconsModule],
 })
-export class EmailDocumentDropdownComponent extends LoadingComponentWithPermissions {
+export class EmailDocumentDialogComponent extends LoadingComponentWithPermissions {
   @Input()
   title = $localize`Email Document`
 
   @Input()
   documentId: number
-
-  @Input()
-  disabled: boolean = false
 
   private _hasArchiveVersion: boolean = true
 
@@ -47,6 +44,7 @@ export class EmailDocumentDropdownComponent extends LoadingComponentWithPermissi
   }
 
   constructor(
+    private activeModal: NgbActiveModal,
     private documentService: DocumentService,
     private toastService: ToastService,
     private settingsService: SettingsService
@@ -78,5 +76,9 @@ export class EmailDocumentDropdownComponent extends LoadingComponentWithPermissi
           this.toastService.showError($localize`Error emailing document`, e)
         },
       })
+  }
+
+  public close() {
+    this.activeModal.close()
   }
 }

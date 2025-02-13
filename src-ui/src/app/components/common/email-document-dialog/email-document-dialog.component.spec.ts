@@ -2,17 +2,19 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { EmailDocumentDropdownComponent } from './email-document-dropdown.component'
+import { EmailDocumentDialogComponent } from './email-document-dialog.component'
 
-describe('EmailDocumentDropdownComponent', () => {
-  let component: EmailDocumentDropdownComponent
-  let fixture: ComponentFixture<EmailDocumentDropdownComponent>
+describe('EmailDocumentDialogComponent', () => {
+  let component: EmailDocumentDialogComponent
+  let fixture: ComponentFixture<EmailDocumentDialogComponent>
   let documentService: DocumentService
   let permissionsService: PermissionsService
   let toastService: ToastService
@@ -20,21 +22,35 @@ describe('EmailDocumentDropdownComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        EmailDocumentDropdownComponent,
+        EmailDocumentDialogComponent,
         IfPermissionsDirective,
         NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
+        NgbActiveModal,
       ],
     }).compileComponents()
 
-    fixture = TestBed.createComponent(EmailDocumentDropdownComponent)
+    fixture = TestBed.createComponent(EmailDocumentDialogComponent)
     documentService = TestBed.inject(DocumentService)
     toastService = TestBed.inject(ToastService)
     component = fixture.componentInstance
     fixture.detectChanges()
+  })
+
+  it('should get email enabled status from settings', () => {
+    const settingsService = TestBed.inject(SettingsService)
+    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+    expect(component.emailEnabled).toBeTruthy()
+  })
+
+  it('should set hasArchiveVersion and useArchiveVersion', () => {
+    expect(component.hasArchiveVersion).toBeTruthy()
+    component.hasArchiveVersion = false
+    expect(component.hasArchiveVersion).toBeFalsy()
+    expect(component.useArchiveVersion).toBeFalsy()
   })
 
   it('should support sending document via email, showing error if needed', () => {
@@ -52,5 +68,12 @@ describe('EmailDocumentDropdownComponent', () => {
     jest.spyOn(documentService, 'emailDocument').mockReturnValue(of(true))
     component.emailDocument()
     expect(toastSuccessSpy).toHaveBeenCalled()
+  })
+
+  it('should close the dialog', () => {
+    const activeModal = TestBed.inject(NgbActiveModal)
+    const closeSpy = jest.spyOn(activeModal, 'close')
+    component.close()
+    expect(closeSpy).toHaveBeenCalled()
   })
 })
