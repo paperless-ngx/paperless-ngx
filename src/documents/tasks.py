@@ -128,7 +128,7 @@ def train_classifier(*, scheduled=True):
 
     except Exception as e:
         logger.warning("Classifier error: " + str(e))
-        task.status = states.FAILED
+        task.status = states.FAILURE
         task.result = str(e)
 
 
