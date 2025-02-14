@@ -650,6 +650,11 @@ class PaperlessTask(ModelWithOwner):
     ALL_STATES = sorted(states.ALL_STATES)
     TASK_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
 
+    class TaskType(models.TextChoices):
+        FILE = ("file", _("File Task"))
+        SCHEDULED_TASK = ("scheduled_task", _("Scheduled Task"))
+        MANUAL_TASK = ("manual_task", _("Manual Task"))
+
     task_id = models.CharField(
         max_length=255,
         unique=True,
@@ -684,24 +689,28 @@ class PaperlessTask(ModelWithOwner):
         verbose_name=_("Task State"),
         help_text=_("Current state of the task being run"),
     )
+
     date_created = models.DateTimeField(
         null=True,
         default=timezone.now,
         verbose_name=_("Created DateTime"),
         help_text=_("Datetime field when the task result was created in UTC"),
     )
+
     date_started = models.DateTimeField(
         null=True,
         default=None,
         verbose_name=_("Started DateTime"),
         help_text=_("Datetime field when the task was started in UTC"),
     )
+
     date_done = models.DateTimeField(
         null=True,
         default=None,
         verbose_name=_("Completed DateTime"),
         help_text=_("Datetime field when the task was completed in UTC"),
     )
+
     result = models.TextField(
         null=True,
         default=None,
@@ -709,6 +718,14 @@ class PaperlessTask(ModelWithOwner):
         help_text=_(
             "The data returned by the task",
         ),
+    )
+
+    type = models.CharField(
+        max_length=30,
+        choices=TaskType.choices,
+        default=TaskType.FILE,
+        verbose_name=_("Task Type"),
+        help_text=_("The type of task that was run"),
     )
 
     def __str__(self) -> str:
