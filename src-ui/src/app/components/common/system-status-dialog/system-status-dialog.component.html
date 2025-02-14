@@ -1,5 +1,5 @@
 <div class="modal-header">
-  <h5 class="modal-title" id="modal-basic-title" i18n>System Status</h5>
+  <h6 class="modal-title" id="modal-basic-title" i18n>System Status</h6>
   <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
 </div>
 <div class="modal-body">
@@ -11,11 +11,11 @@
       </div>
     </div>
   } @else {
-    <div class="row row-cols-1 row-cols-md-3 g-3">
-      <div class="col">
+    <div class="row row-cols-1 row-cols-md-4 g-3">
+      <div class="col-4">
         <div class="card bg-light h-100">
           <div class="card-header">
-            <h5 class="card-title mb-0" i18n>Environment</h5>
+            <h6 class="card-title mb-0" i18n>Environment</h6>
           </div>
           <div class="card-body">
             <dl class="card-text">
@@ -38,7 +38,7 @@
       <div class="col">
         <div class="card bg-light h-100">
           <div class="card-header">
-            <h5 class="card-title mb-0" i18n>Database</h5>
+            <h6 class="card-title mb-0" i18n>Database</h6>
           </div>
           <div class="card-body">
             <dl class="card-text">
@@ -80,7 +80,7 @@
       <div class="col">
         <div class="card bg-light h-100">
           <div class="card-header">
-            <h5 class="card-title mb-0" i18n>Health</h5>
+            <h6 class="card-title mb-0" i18n>Tasks Queue</h6>
           </div>
           <div class="card-body">
             <dl class="card-text">
@@ -102,6 +102,18 @@
                   <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
                 }
               </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card bg-light h-100">
+          <div class="card-header">
+            <h6 class="card-title mb-0" i18n>Health</h6>
+          </div>
+          <div class="card-body">
+            <dl class="card-text">
               <dt i18n>Search Index</dt>
               <dd class="d-flex align-items-center">
                 {{status.tasks.index_status}}
