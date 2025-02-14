@@ -42,6 +42,9 @@ const status: SystemStatus = {
     classifier_status: SystemStatusItemStatus.OK,
     classifier_last_trained: new Date().toISOString(),
     classifier_error: null,
+    sanity_check_status: SystemStatusItemStatus.OK,
+    sanity_check_last_run: new Date().toISOString(),
+    sanity_check_error: null,
   },
 }
 

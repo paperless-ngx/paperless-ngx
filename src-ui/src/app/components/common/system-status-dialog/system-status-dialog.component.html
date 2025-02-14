@@ -138,6 +138,22 @@
               <ng-template #classifierStatus>
                 <h6><ng-container i18n>Last Trained</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.classifier_last_trained | customDate:'medium'}}</span>
               </ng-template>
+              <dt i18n>Sanity Checker</dt>
+              <dd class="d-flex align-items-center">
+                {{status.tasks.sanity_check_status}}
+                @if (status.tasks.sanity_check_status === 'OK') {
+                  @if (isStale(status.tasks.sanity_check_last_run)) {
+                    <i-bs name="exclamation-triangle-fill" class="text-warning ms-2 lh-1" [ngbPopover]="sanityCheckerStatus" triggers="mouseenter:mouseleave"></i-bs>
+                  } @else {
+                    <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1" [ngbPopover]="sanityCheckerStatus" triggers="mouseenter:mouseleave"></i-bs>
+                  }
+                } @else {
+                  <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1" ngbPopover="{{status.tasks.sanity_check_error}}" triggers="mouseenter:mouseleave"></i-bs>
+                }
+              </dd>
+              <ng-template #sanityCheckerStatus>
+                <h6><ng-container i18n>Last Run</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.sanity_check_last_run | customDate:'medium'}}</span>
+              </ng-template>
             </dl>
           </div>
         </div>
