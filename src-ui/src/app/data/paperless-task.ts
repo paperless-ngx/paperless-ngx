@@ -1,8 +1,9 @@
 import { ObjectWithId } from './object-with-id'
 
 export enum PaperlessTaskType {
-  // just file tasks, for now
   File = 'file',
+  ScheduledTask = 'scheduled_task',
+  ManualTask = 'manual_task',
 }
 
 export enum PaperlessTaskStatus {

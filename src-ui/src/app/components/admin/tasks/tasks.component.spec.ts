@@ -155,7 +155,7 @@ describe('TasksComponent', () => {
     jest.useFakeTimers()
     fixture.detectChanges()
     httpTestingController
-      .expectOne(`${environment.apiBaseUrl}tasks/`)
+      .expectOne(`${environment.apiBaseUrl}tasks/?type=file`)
       .flush(tasks)
   })
 
