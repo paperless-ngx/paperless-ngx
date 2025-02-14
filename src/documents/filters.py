@@ -772,6 +772,11 @@ class ShareLinkFilterSet(FilterSet):
 
 
 class PaperlessTaskFilterSet(FilterSet):
+    acknowledged = BooleanFilter(
+        label="Acknowledged",
+        field_name="acknowledged",
+    )
+
     class Meta:
         model = PaperlessTask
         fields = {

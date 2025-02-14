@@ -1708,20 +1708,21 @@ class TasksViewSerializer(OwnedObjectSerializer):
     def get_related_document(self, obj) -> str | None:
         result = None
         re = None
-        match obj.status:
-            case states.SUCCESS:
-                re = self.created_doc_re
-            case states.FAILURE:
-                re = (
-                    self.duplicate_doc_re
-                    if "existing document is in the trash" not in obj.result
-                    else None
-                )
-        if re is not None:
-            try:
-                result = re.search(obj.result).group(1)
-            except Exception:
-                pass
+        if obj.result:
+            match obj.status:
+                case states.SUCCESS:
+                    re = self.created_doc_re
+                case states.FAILURE:
+                    re = (
+                        self.duplicate_doc_re
+                        if "existing document is in the trash" not in obj.result
+                        else None
+                    )
+            if re is not None:
+                try:
+                    result = re.search(obj.result).group(1)
+                except Exception:
+                    pass
 
         return result
 
