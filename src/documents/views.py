@@ -2666,15 +2666,12 @@ class SystemStatusView(PassUserMixin):
             .order_by("-date_done")
             .first()
         )
-
-        classifier_status = (
-            "OK"
-            if last_trained_task is not None
-            and last_trained_task.status == states.SUCCESS
-            else "ERROR"
-        )
+        classifier_status = "OK"
         classifier_error = None
-        if last_trained_task and last_trained_task.status == states.FAILURE:
+        if last_trained_task is None:
+            classifier_status = "WARNING"
+        elif last_trained_task and last_trained_task.status == states.FAILURE:
+            classifier_status = "ERROR"
             classifier_error = last_trained_task.result
         classifier_last_trained = (
             last_trained_task.date_done if last_trained_task else None
@@ -2687,15 +2684,12 @@ class SystemStatusView(PassUserMixin):
             .order_by("-date_done")
             .first()
         )
-
-        sanity_check_status = (
-            "OK"
-            if last_sanity_check is not None
-            and last_sanity_check.status == states.SUCCESS
-            else "ERROR"
-        )
+        sanity_check_status = "OK"
         sanity_check_error = None
-        if last_sanity_check and last_sanity_check.status == states.FAILURE:
+        if last_sanity_check is None:
+            sanity_check_status = "WARNING"
+        elif last_sanity_check and last_sanity_check.status == states.FAILURE:
+            sanity_check_status = "ERROR"
             sanity_check_error = last_sanity_check.result
         sanity_check_last_run = (
             last_sanity_check.date_done if last_sanity_check else None
