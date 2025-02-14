@@ -82,7 +82,7 @@ def train_classifier(*, scheduled=True):
         if scheduled
         else PaperlessTask.TaskType.MANUAL_TASK,
         task_id=uuid.uuid4(),
-        task_name="train_classifier",
+        task_name=PaperlessTask.TaskName.TRAIN_CLASSIFIER,
         status=states.STARTED,
         date_created=timezone.now(),
         date_started=timezone.now(),

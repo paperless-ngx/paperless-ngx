@@ -54,10 +54,10 @@ export class TasksService {
     this.loading = true
 
     this.http
-      .get<PaperlessTask[]>(`${this.baseUrl}tasks/?type=file`)
+      .get<PaperlessTask[]>(`${this.baseUrl}tasks/?task_name=consume_file`)
       .pipe(takeUntil(this.unsubscribeNotifer), first())
       .subscribe((r) => {
-        this.fileTasks = r.filter((t) => t.type == PaperlessTaskType.File) // they're all File tasks, for now
+        this.fileTasks = r.filter((t) => t.type == PaperlessTaskType.Auto)
         this.loading = false
       })
   }

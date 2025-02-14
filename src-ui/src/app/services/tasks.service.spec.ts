@@ -5,7 +5,11 @@ import {
 } from '@angular/common/http/testing'
 import { TestBed } from '@angular/core/testing'
 import { environment } from 'src/environments/environment'
-import { PaperlessTaskStatus, PaperlessTaskType } from '../data/paperless-task'
+import {
+  PaperlessTaskName,
+  PaperlessTaskStatus,
+  PaperlessTaskType,
+} from '../data/paperless-task'
 import { TasksService } from './tasks.service'
 
 describe('TasksService', () => {
@@ -33,7 +37,7 @@ describe('TasksService', () => {
   it('calls tasks api endpoint on reload', () => {
     tasksService.reload()
     const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}tasks/?type=file`
+      `${environment.apiBaseUrl}tasks/?task_name=consume_file`
     )
     expect(req.request.method).toEqual('GET')
   })
@@ -42,7 +46,7 @@ describe('TasksService', () => {
     tasksService.loading = true
     tasksService.reload()
     httpTestingController.expectNone(
-      `${environment.apiBaseUrl}tasks/?type=file`
+      `${environment.apiBaseUrl}tasks/?task_name=consume_file`
     )
   })
 
@@ -58,7 +62,7 @@ describe('TasksService', () => {
     req.flush([])
     // reload is then called
     httpTestingController
-      .expectOne(`${environment.apiBaseUrl}tasks/?type=file`)
+      .expectOne(`${environment.apiBaseUrl}tasks/?task_name=consume_file`)
       .flush([])
   })
 
@@ -66,7 +70,8 @@ describe('TasksService', () => {
     expect(tasksService.total).toEqual(0)
     const mockTasks = [
       {
-        type: PaperlessTaskType.File,
+        type: PaperlessTaskType.Auto,
+        task_name: PaperlessTaskName.ConsumeFile,
         status: PaperlessTaskStatus.Complete,
         acknowledged: false,
         task_id: '1234',
@@ -74,7 +79,8 @@ describe('TasksService', () => {
         date_created: new Date(),
       },
       {
-        type: PaperlessTaskType.File,
+        type: PaperlessTaskType.Auto,
+        task_name: PaperlessTaskName.ConsumeFile,
         status: PaperlessTaskStatus.Failed,
         acknowledged: false,
         task_id: '1235',
@@ -82,7 +88,8 @@ describe('TasksService', () => {
         date_created: new Date(),
       },
       {
-        type: PaperlessTaskType.File,
+        type: PaperlessTaskType.Auto,
+        task_name: PaperlessTaskName.ConsumeFile,
         status: PaperlessTaskStatus.Pending,
         acknowledged: false,
         task_id: '1236',
@@ -90,7 +97,8 @@ describe('TasksService', () => {
         date_created: new Date(),
       },
       {
-        type: PaperlessTaskType.File,
+        type: PaperlessTaskType.Auto,
+        task_name: PaperlessTaskName.ConsumeFile,
         status: PaperlessTaskStatus.Started,
         acknowledged: false,
         task_id: '1237',
@@ -98,7 +106,8 @@ describe('TasksService', () => {
         date_created: new Date(),
       },
       {
-        type: PaperlessTaskType.File,
+        type: PaperlessTaskType.Auto,
+        task_name: PaperlessTaskName.ConsumeFile,
         status: PaperlessTaskStatus.Complete,
         acknowledged: false,
         task_id: '1238',
@@ -110,7 +119,7 @@ describe('TasksService', () => {
     tasksService.reload()
 
     const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}tasks/?type=file`
+      `${environment.apiBaseUrl}tasks/?task_name=consume_file`
     )
 
     req.flush(mockTasks)

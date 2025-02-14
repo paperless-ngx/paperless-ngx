@@ -67,7 +67,7 @@ def check_sanity(*, progress=False, scheduled=True) -> SanityCheckMessages:
         type=PaperlessTask.TaskType.SCHEDULED_TASK
         if scheduled
         else PaperlessTask.TaskType.MANUAL_TASK,
-        task_name="check_sanity",
+        task_name=PaperlessTask.TaskName.CHECK_SANITY,
         status=states.STARTED,
         date_created=timezone.now(),
         date_started=timezone.now(),
