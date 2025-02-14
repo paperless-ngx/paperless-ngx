@@ -62,13 +62,13 @@ class SanityCheckFailedException(Exception):
 
 
 def check_sanity(*, progress=False, scheduled=True) -> SanityCheckMessages:
-    task = PaperlessTask.objects.create(
+    paperless_task = PaperlessTask.objects.create(
         task_id=uuid.uuid4(),
         type=PaperlessTask.TaskType.SCHEDULED_TASK
         if scheduled
         else PaperlessTask.TaskType.MANUAL_TASK,
         task_name="check_sanity",
-        status=PaperlessTask.TASK_STATE_CHOICES.STARTED,
+        status=states.STARTED,
         date_created=timezone.now(),
         date_started=timezone.now(),
     )
@@ -156,8 +156,11 @@ def check_sanity(*, progress=False, scheduled=True) -> SanityCheckMessages:
     for extra_file in present_files:
         messages.warning(None, f"Orphaned file in media dir: {extra_file}")
 
-    task.status = states.SUCCESS if not messages.has_error else states.FAILED
+    paperless_task.status = states.SUCCESS if not messages.has_error else states.FAILURE
     # result is concatenated messages
-    task.result = str(messages)
-    task.date_done = timezone.now()
+    paperless_task.result = f"{len(messages)} issues found."
+    if messages.has_error:
+        paperless_task.result += " Check logs for details."
+    paperless_task.date_done = timezone.now()
+    paperless_task.save(update_fields=["status", "result", "date_done"])
     return messages

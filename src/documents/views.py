@@ -2568,6 +2568,14 @@ class CustomFieldViewSet(ModelViewSet):
                             "last_trained": serializers.DateTimeField(),
                         },
                     ),
+                    "sanity_check": inline_serializer(
+                        name="SanityCheck",
+                        fields={
+                            "status": serializers.CharField(),
+                            "error": serializers.CharField(),
+                            "last_run": serializers.DateTimeField(),
+                        },
+                    ),
                 },
             ),
         },
@@ -2672,6 +2680,27 @@ class SystemStatusView(PassUserMixin):
             last_trained_task.date_done if last_trained_task else None
         )
 
+        last_sanity_check = (
+            PaperlessTask.objects.filter(
+                task_name__icontains="check_sanity",
+            )
+            .order_by("-date_done")
+            .first()
+        )
+
+        sanity_check_status = (
+            "OK"
+            if last_sanity_check is not None
+            and last_sanity_check.status == states.SUCCESS
+            else "ERROR"
+        )
+        sanity_check_error = None
+        if last_sanity_check.status == states.FAILURE:
+            sanity_check_error = last_sanity_check.result
+        sanity_check_last_run = (
+            last_sanity_check.date_done if last_sanity_check else None
+        )
+
         return Response(
             {
                 "pngx_version": current_version,
@@ -2704,6 +2733,9 @@ class SystemStatusView(PassUserMixin):
                     "classifier_status": classifier_status,
                     "classifier_last_trained": classifier_last_trained,
                     "classifier_error": classifier_error,
+                    "sanity_check_status": sanity_check_status,
+                    "sanity_check_last_run": sanity_check_last_run,
+                    "sanity_check_error": sanity_check_error,
                 },
             },
         )
