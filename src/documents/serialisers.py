@@ -1689,6 +1689,7 @@ class TasksViewSerializer(OwnedObjectSerializer):
         fields = (
             "id",
             "task_id",
+            "task_name",
             "task_file_name",
             "date_created",
             "date_done",

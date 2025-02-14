@@ -201,7 +201,7 @@ class TestSystemStatus(APITestCase):
         PaperlessTask.objects.create(
             type=PaperlessTask.TaskType.SCHEDULED_TASK,
             status=states.SUCCESS,
-            task_name="train_classifier",
+            task_name=PaperlessTask.TaskName.TRAIN_CLASSIFIER,
         )
         self.client.force_login(self.user)
         response = self.client.get(self.ENDPOINT)
@@ -238,7 +238,7 @@ class TestSystemStatus(APITestCase):
         PaperlessTask.objects.create(
             type=PaperlessTask.TaskType.SCHEDULED_TASK,
             status=states.FAILURE,
-            task_name="train_classifier",
+            task_name=PaperlessTask.TaskName.TRAIN_CLASSIFIER,
             result="Classifier training failed",
         )
         self.client.force_login(self.user)
@@ -262,7 +262,7 @@ class TestSystemStatus(APITestCase):
         PaperlessTask.objects.create(
             type=PaperlessTask.TaskType.SCHEDULED_TASK,
             status=states.SUCCESS,
-            task_name="check_sanity",
+            task_name=PaperlessTask.TaskName.CHECK_SANITY,
         )
         self.client.force_login(self.user)
         response = self.client.get(self.ENDPOINT)
@@ -299,7 +299,7 @@ class TestSystemStatus(APITestCase):
         PaperlessTask.objects.create(
             type=PaperlessTask.TaskType.SCHEDULED_TASK,
             status=states.FAILURE,
-            task_name="check_sanity",
+            task_name=PaperlessTask.TaskName.CHECK_SANITY,
             result="5 issues found.",
         )
         self.client.force_login(self.user)

@@ -2668,7 +2668,7 @@ class SystemStatusView(PassUserMixin):
 
         last_trained_task = (
             PaperlessTask.objects.filter(
-                task_name__icontains="train_classifier",
+                task_name=PaperlessTask.TaskName.TRAIN_CLASSIFIER,
             )
             .order_by("-date_done")
             .first()
@@ -2687,7 +2687,7 @@ class SystemStatusView(PassUserMixin):
 
         last_sanity_check = (
             PaperlessTask.objects.filter(
-                task_name__icontains="check_sanity",
+                task_name=PaperlessTask.TaskName.CHECK_SANITY,
             )
             .order_by("-date_done")
             .first()

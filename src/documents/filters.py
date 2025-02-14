@@ -776,6 +776,7 @@ class PaperlessTaskFilterSet(FilterSet):
         model = PaperlessTask
         fields = {
             "type": ["exact"],
+            "task_name": ["exact"],
             "status": ["exact"],
         }
 

@@ -651,9 +651,14 @@ class PaperlessTask(ModelWithOwner):
     TASK_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
 
     class TaskType(models.TextChoices):
-        FILE = ("file", _("File Task"))
+        AUTO = ("auto_task", _("Auto Task"))
         SCHEDULED_TASK = ("scheduled_task", _("Scheduled Task"))
         MANUAL_TASK = ("manual_task", _("Manual Task"))
+
+    class TaskName(models.TextChoices):
+        CONSUME_FILE = ("consume_file", _("Consume File"))
+        TRAIN_CLASSIFIER = ("train_classifier", _("Train Classifier"))
+        CHECK_SANITY = ("check_sanity", _("Check Sanity"))
 
     task_id = models.CharField(
         max_length=255,
@@ -678,8 +683,9 @@ class PaperlessTask(ModelWithOwner):
     task_name = models.CharField(
         null=True,
         max_length=255,
+        choices=TaskName.choices,
         verbose_name=_("Task Name"),
-        help_text=_("Name of the Task which was run"),
+        help_text=_("Name of the task that was run"),
     )
 
     status = models.CharField(
@@ -723,7 +729,7 @@ class PaperlessTask(ModelWithOwner):
     type = models.CharField(
         max_length=30,
         choices=TaskType.choices,
-        default=TaskType.FILE,
+        default=TaskType.AUTO,
         verbose_name=_("Task Type"),
         help_text=_("The type of task that was run"),
     )

@@ -246,7 +246,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         PaperlessTask.objects.create(
             task_id=str(uuid.uuid4()),
             task_file_name="test.pdf",
-            task_name="documents.tasks.some_task",
+            task_name=PaperlessTask.TaskName.CONSUME_FILE,
             status=celery.states.SUCCESS,
         )
 
@@ -272,7 +272,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         PaperlessTask.objects.create(
             task_id=str(uuid.uuid4()),
             task_file_name="anothertest.pdf",
-            task_name="documents.tasks.some_task",
+            task_name=PaperlessTask.TaskName.CONSUME_FILE,
             status=celery.states.SUCCESS,
         )
 
