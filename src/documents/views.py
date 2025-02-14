@@ -2674,7 +2674,7 @@ class SystemStatusView(PassUserMixin):
             else "ERROR"
         )
         classifier_error = None
-        if last_trained_task.status == states.FAILURE:
+        if last_trained_task and last_trained_task.status == states.FAILURE:
             classifier_error = last_trained_task.result
         classifier_last_trained = (
             last_trained_task.date_done if last_trained_task else None
@@ -2695,7 +2695,7 @@ class SystemStatusView(PassUserMixin):
             else "ERROR"
         )
         sanity_check_error = None
-        if last_sanity_check.status == states.FAILURE:
+        if last_sanity_check and last_sanity_check.status == states.FAILURE:
             sanity_check_error = last_sanity_check.result
         sanity_check_last_run = (
             last_sanity_check.date_done if last_sanity_check else None
