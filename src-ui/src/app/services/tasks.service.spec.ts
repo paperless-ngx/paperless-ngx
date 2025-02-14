@@ -37,7 +37,7 @@ describe('TasksService', () => {
   it('calls tasks api endpoint on reload', () => {
     tasksService.reload()
     const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}tasks/?task_name=consume_file`
+      `${environment.apiBaseUrl}tasks/?task_name=consume_file&acknowledged=false`
     )
     expect(req.request.method).toEqual('GET')
   })
@@ -46,7 +46,7 @@ describe('TasksService', () => {
     tasksService.loading = true
     tasksService.reload()
     httpTestingController.expectNone(
-      `${environment.apiBaseUrl}tasks/?task_name=consume_file`
+      `${environment.apiBaseUrl}tasks/?task_name=consume_file&acknowledged=false`
     )
   })
 
@@ -62,7 +62,9 @@ describe('TasksService', () => {
     req.flush([])
     // reload is then called
     httpTestingController
-      .expectOne(`${environment.apiBaseUrl}tasks/?task_name=consume_file`)
+      .expectOne(
+        `${environment.apiBaseUrl}tasks/?task_name=consume_file&acknowledged=false`
+      )
       .flush([])
   })
 
@@ -119,7 +121,7 @@ describe('TasksService', () => {
     tasksService.reload()
 
     const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}tasks/?task_name=consume_file`
+      `${environment.apiBaseUrl}tasks/?task_name=consume_file&acknowledged=false`
     )
 
     req.flush(mockTasks)

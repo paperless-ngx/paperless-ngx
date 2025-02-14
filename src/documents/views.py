@@ -2233,13 +2233,7 @@ class TasksViewSet(ReadOnlyModelViewSet):
     filterset_class = PaperlessTaskFilterSet
 
     def get_queryset(self):
-        queryset = (
-            PaperlessTask.objects.filter(
-                acknowledged=False,
-            )
-            .order_by("date_created")
-            .reverse()
-        )
+        queryset = PaperlessTask.objects.all().order_by("date_created").reverse()
         task_id = self.request.query_params.get("task_id")
         if task_id is not None:
             queryset = PaperlessTask.objects.filter(task_id=task_id)
