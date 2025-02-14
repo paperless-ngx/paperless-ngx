@@ -303,6 +303,8 @@ describe('SettingsComponent', () => {
         redis_error:
           'Error 61 connecting to localhost:6379. Connection refused.',
         celery_status: SystemStatusItemStatus.ERROR,
+        celery_url: 'celery@localhost',
+        celery_error: 'Error connecting to celery@localhost',
         index_status: SystemStatusItemStatus.OK,
         index_last_modified: new Date().toISOString(),
         index_error: null,
