@@ -378,12 +378,12 @@ class RasterisedDocumentParser(DocumentParser):
             sidecar_file,
         )
 
+        if self.settings.skip_archive_file != ArchiveFileChoices.ALWAYS:
+            self.archive_path = archive_path        
+        
         try:
             self.log.debug(f"Calling OCRmyPDF with args: {args}")
             ocrmypdf.ocr(**args)
-
-            if self.settings.skip_archive_file != ArchiveFileChoices.ALWAYS:
-                self.archive_path = archive_path
 
             self.text = self.extract_text(sidecar_file, archive_path)
 
