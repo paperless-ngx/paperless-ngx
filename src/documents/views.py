@@ -2636,13 +2636,20 @@ class SystemStatusView(PassUserMixin):
                 )
                 redis_error = "Error connecting to redis, check logs for more detail."
 
+        celery_error = None
+        celery_url = None
         try:
             celery_ping = celery_app.control.inspect().ping()
-            first_worker_ping = celery_ping[next(iter(celery_ping.keys()))]
+            celery_url = next(iter(celery_ping.keys()))
+            first_worker_ping = celery_ping[celery_url]
             if first_worker_ping["ok"] == "pong":
                 celery_active = "OK"
-        except Exception:
+        except Exception as e:
             celery_active = "ERROR"
+            logger.exception(
+                f"System status detected a possible problem while connecting to celery: {e}",
+            )
+            celery_error = "Error connecting to celery, check logs for more detail."
 
         index_error = None
         try:
@@ -2723,6 +2730,8 @@ class SystemStatusView(PassUserMixin):
                     "redis_status": redis_status,
                     "redis_error": redis_error,
                     "celery_status": celery_active,
+                    "celery_url": celery_url,
+                    "celery_error": celery_error,
                     "index_status": index_status,
                     "index_last_modified": index_last_modified,
                     "index_error": index_error,
