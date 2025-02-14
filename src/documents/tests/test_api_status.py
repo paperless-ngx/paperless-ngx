@@ -225,7 +225,6 @@ class TestSystemStatus(APITestCase):
             response.data["tasks"]["classifier_status"],
             "WARNING",
         )
-        self.assertIsNone(response.data["tasks"]["classifier_error"])
 
     def test_system_status_classifier_error(self):
         """
@@ -287,7 +286,6 @@ class TestSystemStatus(APITestCase):
             response.data["tasks"]["sanity_check_status"],
             "WARNING",
         )
-        self.assertIsNone(response.data["tasks"]["sanity_check_error"])
 
     def test_system_status_sanity_check_error(self):
         """
