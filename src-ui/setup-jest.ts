@@ -120,3 +120,20 @@ Object.defineProperty(window, 'location', {
 HTMLCanvasElement.prototype.getContext = <
   typeof HTMLCanvasElement.prototype.getContext
 >jest.fn()
+
+// pdfjs
+jest.mock('pdfjs-dist', () => ({
+  getDocument: jest.fn(() => ({
+    promise: Promise.resolve({ numPages: 3 }),
+  })),
+  GlobalWorkerOptions: { workerSrc: '' },
+  VerbosityLevel: { ERRORS: 0 },
+  globalThis: {
+    pdfjsLib: {
+      GlobalWorkerOptions: {
+        workerSrc: '',
+      },
+    },
+  },
+}))
+jest.mock('pdfjs-dist/web/pdf_viewer', () => ({}))
