@@ -211,7 +211,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
     def test_api_modify_tags_not_provided(self, m):
         """
         GIVEN:
-            - API data to modify tags is missing modify_tags field
+            - API data to modify tags is missing remove_tags field
         WHEN:
             - API to edit tags is called
         THEN:
