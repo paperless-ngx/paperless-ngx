@@ -117,14 +117,14 @@ def train_classifier(*, scheduled=True):
                 f"Saving updated classifier model to {settings.MODEL_FILE}...",
             )
             classifier.save()
-            task.status = states.SUCCESS
             task.result = "Training completed successfully"
         else:
             logger.debug("Training data unchanged.")
-            task.status = states.SUCCESS
             task.result = "Training data unchanged"
 
-        task.save(update_fields=["status", "result"])
+        task.status = states.SUCCESS
+        task.date_done = timezone.now()
+        task.save(update_fields=["status", "result", "date_done"])
 
     except Exception as e:
         logger.warning("Classifier error: " + str(e))

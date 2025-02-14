@@ -15,7 +15,7 @@ from urllib.parse import quote
 from urllib.parse import urlparse
 
 import pathvalidate
-from django.apps import apps
+from celery import states
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
@@ -2651,59 +2651,26 @@ class SystemStatusView(PassUserMixin):
             )
             index_last_modified = None
 
+        last_trained_task = (
+            PaperlessTask.objects.filter(
+                task_name__icontains="train_classifier",
+            )
+            .order_by("-date_done")
+            .first()
+        )
+
+        classifier_status = (
+            "OK"
+            if last_trained_task is not None
+            and last_trained_task.status == states.SUCCESS
+            else "ERROR"
+        )
         classifier_error = None
-        classifier_status = None
-        try:
-            classifier = load_classifier(raise_exception=True)
-            if classifier is None:
-                # Make sure classifier should exist
-                docs_queryset = Document.objects.exclude(
-                    tags__is_inbox_tag=True,
-                )
-                if (
-                    docs_queryset.count() > 0
-                    and (
-                        Tag.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
-                        or DocumentType.objects.filter(
-                            matching_algorithm=Tag.MATCH_AUTO,
-                        ).exists()
-                        or Correspondent.objects.filter(
-                            matching_algorithm=Tag.MATCH_AUTO,
-                        ).exists()
-                        or StoragePath.objects.filter(
-                            matching_algorithm=Tag.MATCH_AUTO,
-                        ).exists()
-                    )
-                    and not settings.MODEL_FILE.exists()
-                ):
-                    # if classifier file doesn't exist just classify as a warning
-                    classifier_error = "Classifier file does not exist (yet). Re-training may be pending."
-                    classifier_status = "WARNING"
-                    raise FileNotFoundError(classifier_error)
-            classifier_status = "OK"
-            task_result_model = apps.get_model("django_celery_results", "taskresult")
-            result = (
-                task_result_model.objects.filter(
-                    task_name="documents.tasks.train_classifier",
-                    status="SUCCESS",
-                )
-                .order_by(
-                    "-date_done",
-                )
-                .first()
-            )
-            classifier_last_trained = result.date_done if result else None
-        except Exception as e:
-            if classifier_status is None:
-                classifier_status = "ERROR"
-            classifier_last_trained = None
-            if classifier_error is None:
-                classifier_error = (
-                    "Unable to load classifier, check logs for more detail."
-                )
-            logger.exception(
-                f"System status detected a possible problem while loading the classifier: {e}",
-            )
+        if last_trained_task.status == states.FAILURE:
+            classifier_error = last_trained_task.result
+        classifier_last_trained = (
+            last_trained_task.date_done if last_trained_task else None
+        )
 
         return Response(
             {
