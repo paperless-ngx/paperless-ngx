@@ -209,6 +209,24 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.data["tasks"]["classifier_status"], "OK")
         self.assertIsNone(response.data["tasks"]["classifier_error"])
 
+    def test_system_status_classifier_warning(self):
+        """
+        GIVEN:
+            - No classifier task is found
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains a WARNING classifier status
+        """
+        self.client.force_login(self.user)
+        response = self.client.get(self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data["tasks"]["classifier_status"],
+            "WARNING",
+        )
+        self.assertIsNone(response.data["tasks"]["classifier_error"])
+
     def test_system_status_classifier_error(self):
         """
         GIVEN:
@@ -251,6 +269,24 @@ class TestSystemStatus(APITestCase):
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["tasks"]["sanity_check_status"], "OK")
+        self.assertIsNone(response.data["tasks"]["sanity_check_error"])
+
+    def test_system_status_sanity_check_warning(self):
+        """
+        GIVEN:
+            - No sanity check task is found
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains a WARNING sanity check status
+        """
+        self.client.force_login(self.user)
+        response = self.client.get(self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data["tasks"]["sanity_check_status"],
+            "WARNING",
+        )
         self.assertIsNone(response.data["tasks"]["sanity_check_error"])
 
     def test_system_status_sanity_check_error(self):
