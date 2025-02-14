@@ -130,7 +130,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        response = self.client.get(self.ENDPOINT)
+        response = self.client.get(self.ENDPOINT + "?acknowledged=false")
         self.assertEqual(len(response.data), 0)
 
     def test_tasks_owner_aware(self):
