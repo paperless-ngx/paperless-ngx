@@ -35,6 +35,7 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Log
+from documents.models import PaperlessTask
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
@@ -767,6 +768,15 @@ class ShareLinkFilterSet(FilterSet):
         fields = {
             "created": DATE_KWARGS,
             "expiration": DATE_KWARGS,
+        }
+
+
+class PaperlessTaskFilterSet(FilterSet):
+    class Meta:
+        model = PaperlessTask
+        fields = {
+            "type": ["exact"],
+            "status": ["exact"],
         }
 
 

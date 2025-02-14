@@ -103,6 +103,7 @@ from documents.filters import DocumentsOrderingFilter
 from documents.filters import DocumentTypeFilterSet
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
 from documents.filters import ObjectOwnedPermissionsFilter
+from documents.filters import PaperlessTaskFilterSet
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
@@ -2223,7 +2224,12 @@ class RemoteVersionView(GenericAPIView):
 class TasksViewSet(ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     serializer_class = TasksViewSerializer
-    filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    filterset_class = PaperlessTaskFilterSet
 
     def get_queryset(self):
         queryset = (

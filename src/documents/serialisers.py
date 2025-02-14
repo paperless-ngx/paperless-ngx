@@ -1700,12 +1700,6 @@ class TasksViewSerializer(OwnedObjectSerializer):
             "owner",
         )
 
-    type = serializers.SerializerMethodField()
-
-    def get_type(self, obj) -> str:
-        # just file tasks, for now
-        return "file"
-
     related_document = serializers.SerializerMethodField()
     created_doc_re = re.compile(r"New document id (\d+) created")
     duplicate_doc_re = re.compile(r"It is a duplicate of .* \(#(\d+)\)")
