@@ -2670,6 +2670,7 @@ class SystemStatusView(PassUserMixin):
         classifier_error = None
         if last_trained_task is None:
             classifier_status = "WARNING"
+            classifier_error = "No classifier training tasks found"
         elif last_trained_task and last_trained_task.status == states.FAILURE:
             classifier_status = "ERROR"
             classifier_error = last_trained_task.result
@@ -2688,6 +2689,7 @@ class SystemStatusView(PassUserMixin):
         sanity_check_error = None
         if last_sanity_check is None:
             sanity_check_status = "WARNING"
+            sanity_check_error = "No sanity check tasks found"
         elif last_sanity_check and last_sanity_check.status == states.FAILURE:
             sanity_check_status = "ERROR"
             sanity_check_error = last_sanity_check.result
