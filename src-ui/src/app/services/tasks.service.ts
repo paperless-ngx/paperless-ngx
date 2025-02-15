@@ -4,8 +4,8 @@ import { Subject } from 'rxjs'
 import { first, takeUntil } from 'rxjs/operators'
 import {
   PaperlessTask,
+  PaperlessTaskName,
   PaperlessTaskStatus,
-  PaperlessTaskType,
 } from 'src/app/data/paperless-task'
 import { environment } from 'src/environments/environment'
 
@@ -59,7 +59,9 @@ export class TasksService {
       )
       .pipe(takeUntil(this.unsubscribeNotifer), first())
       .subscribe((r) => {
-        this.fileTasks = r.filter((t) => t.type == PaperlessTaskType.Auto)
+        this.fileTasks = r.filter(
+          (t) => t.task_name == PaperlessTaskName.ConsumeFile
+        )
         this.loading = false
       })
   }
