@@ -525,19 +525,21 @@ def check_paths_and_prune_custom_fields(sender, instance: CustomField, **kwargs)
     """
     if (
         instance.data_type == CustomField.FieldDataType.SELECT
+        and instance.fields.count() > 0
+        and instance.extra_data
     ):  # Only select fields, for now
+        select_options = {
+            option["id"]: option["label"]
+            for option in instance.extra_data.get("select_options", [])
+        }
+
         for cf_instance in instance.fields.all():
-            options = instance.extra_data.get("select_options", [])
-            try:
-                next(
-                    option["label"]
-                    for option in options
-                    if option["id"] == cf_instance.value
-                )
-            except StopIteration:
-                # The value of this custom field instance is not in the select options anymore
+            # Check if the current value is still a valid option
+            if cf_instance.value not in select_options:
                 cf_instance.value_select = None
-                cf_instance.save()
+                cf_instance.save(update_fields=["value_select"])
+
+            # Update the filename and move files if necessary
             update_filename_and_move_files(sender, cf_instance)
 
 
