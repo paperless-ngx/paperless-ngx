@@ -1949,6 +1949,10 @@ class WorkflowActionEmailSerializer(serializers.ModelSerializer):
 class WorkflowActionWebhookSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(allow_null=True, required=False)
 
+    def validate_url(self, url):
+        uri_validator(url)
+        return url
+
     class Meta:
         model = WorkflowActionWebhook
         fields = [
