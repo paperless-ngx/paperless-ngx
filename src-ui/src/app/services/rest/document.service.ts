@@ -62,6 +62,10 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     private customFieldService: CustomFieldsService
   ) {
     super(http, 'documents')
+    this.reload()
+  }
+
+  public reload() {
     if (
       this.permissionsService.currentUserCan(
         PermissionAction.View,

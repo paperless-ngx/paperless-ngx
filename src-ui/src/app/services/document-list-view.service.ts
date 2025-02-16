@@ -306,6 +306,18 @@ export class DocumentListViewService {
             // this happens when applying a filter: the current page might not be available anymore due to the reduced result set.
             activeListViewState.currentPage = 1
             this.reload()
+          } else if (
+            activeListViewState.sortField.indexOf('custom_field') === 0
+          ) {
+            const field = this.settings.allDisplayFields.find(
+              (f) => f.id === activeListViewState.sortField
+            )
+            if (!field) {
+              // e.g. field was deleted
+              this.sortField = 'created'
+            } else {
+              this.error = error.error
+            }
           } else {
             this.selectionData = null
             let errorMessage
