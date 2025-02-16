@@ -598,30 +598,35 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         THEN:
             - Correct HTTP response
         """
-        response = self.client.post(
-            self.ENDPOINT,
-            json.dumps(
-                {
-                    "name": "Workflow 2",
-                    "order": 1,
-                    "triggers": [
-                        {
-                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
-                            "sources": [DocumentSource.ApiUpload],
-                            "filter_filename": "*",
-                        },
-                    ],
-                    "actions": [
-                        {
-                            "type": WorkflowAction.WorkflowActionType.WEBHOOK,
-                            "webhook": {
-                                "url": "https://examplewithouttld:3000/path",
-                                "include_document": False,
+
+        for url, expected_resp_code in [
+            ("https://examplewithouttld:3000/path", status.HTTP_201_CREATED),
+            ("file:///etc/passwd/path", status.HTTP_400_BAD_REQUEST),
+        ]:
+            response = self.client.post(
+                self.ENDPOINT,
+                json.dumps(
+                    {
+                        "name": "Workflow 2",
+                        "order": 1,
+                        "triggers": [
+                            {
+                                "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                                "sources": [DocumentSource.ApiUpload],
+                                "filter_filename": "*",
                             },
-                        },
-                    ],
-                },
-            ),
-            content_type="application/json",
-        )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+                        ],
+                        "actions": [
+                            {
+                                "type": WorkflowAction.WorkflowActionType.WEBHOOK,
+                                "webhook": {
+                                    "url": url,
+                                    "include_document": False,
+                                },
+                            },
+                        ],
+                    },
+                ),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, expected_resp_code)
