@@ -307,7 +307,7 @@ export class DocumentListViewService {
             activeListViewState.currentPage = 1
             this.reload()
           } else if (
-            activeListViewState.sortField.indexOf('custom_field') === 0 && 
+            activeListViewState.sortField.indexOf('custom_field') === 0 &&
             this.settings.allDisplayFields.find(
               (f) => f.id === activeListViewState.sortField
             ) === undefined
