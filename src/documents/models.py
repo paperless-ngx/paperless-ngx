@@ -1203,9 +1203,12 @@ class WorkflowActionEmail(models.Model):
 
 
 class WorkflowActionWebhook(models.Model):
-    url = models.URLField(
+    # We dont use the built-in URLField because it is not flexible enough
+    # validation is handled in the serializer
+    url = models.CharField(
         _("webhook url"),
         null=False,
+        max_length=256,
         help_text=_("The destination URL for the notification."),
     )
 

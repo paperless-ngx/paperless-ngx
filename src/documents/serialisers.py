@@ -58,6 +58,7 @@ from documents.permissions import set_permissions_for_object
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.templating.utils import convert_format_str_to_template_format
 from documents.validators import uri_validator
+from documents.validators import url_validator
 
 logger = logging.getLogger("paperless.serializers")
 
@@ -1948,6 +1949,10 @@ class WorkflowActionEmailSerializer(serializers.ModelSerializer):
 
 class WorkflowActionWebhookSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(allow_null=True, required=False)
+
+    def validate_url(self, url):
+        url_validator(url)
+        return url
 
     class Meta:
         model = WorkflowActionWebhook
