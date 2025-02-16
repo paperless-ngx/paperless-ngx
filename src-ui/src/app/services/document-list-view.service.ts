@@ -307,17 +307,11 @@ export class DocumentListViewService {
             activeListViewState.currentPage = 1
             this.reload()
           } else if (
-            activeListViewState.sortField.indexOf('custom_field') === 0
-          ) {
-            const field = this.settings.allDisplayFields.find(
+            activeListViewState.sortField.indexOf('custom_field') === 0 && this.settings.allDisplayFields.find(
               (f) => f.id === activeListViewState.sortField
-            )
-            if (!field) {
+            ) === undefined) {
               // e.g. field was deleted
               this.sortField = 'created'
-            } else {
-              this.error = error.error
-            }
           } else {
             this.selectionData = null
             let errorMessage
