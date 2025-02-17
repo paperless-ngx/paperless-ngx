@@ -4,6 +4,11 @@ from django.db import migrations
 from django.db import models
 
 
+def make_existing_tasks_consume_auto(apps, schema_editor):
+    PaperlessTask = apps.get_model("documents", "PaperlessTask")
+    PaperlessTask.objects.all().update(type="auto_task", task_name="consume_file")
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ("documents", "1062_alter_savedviewfilterrule_rule_type"),
@@ -39,6 +44,10 @@ class Migration(migrations.Migration):
                 null=True,
                 verbose_name="Task Name",
             ),
+        ),
+        migrations.RunPython(
+            make_existing_tasks_consume_auto,
+            migrations.RunPython.noop,
         ),
         migrations.AlterField(
             model_name="workflowactionwebhook",
