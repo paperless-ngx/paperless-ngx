@@ -1815,6 +1815,19 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+        # empty display fields treated as none
+        response = self.client.patch(
+            f"/api/saved_views/{v1.id}/",
+            {
+                "display_fields": [],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        v1.refresh_from_db()
+        self.assertEqual(v1.display_fields, None)
+
     def test_saved_view_display_customfields(self):
         """
         GIVEN:
