@@ -87,8 +87,11 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
     return super.create(o).pipe(tap(() => this.reload()))
   }
 
-  update(o: SavedView) {
-    return super.update(o).pipe(tap(() => this.reload()))
+  patch(o: SavedView): Observable<SavedView> {
+    if (o.display_fields?.length === 0) {
+      o.display_fields = null
+    }
+    return super.patch(o)
   }
 
   patchMany(objects: SavedView[]): Observable<SavedView[]> {

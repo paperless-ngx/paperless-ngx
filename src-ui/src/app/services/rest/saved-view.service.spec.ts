@@ -114,6 +114,25 @@ describe(`Additional service tests for SavedViewService`, () => {
     ])
   })
 
+  it('should treat empty display_fields as null', () => {
+    subscription = service
+      .patch({
+        id: 1,
+        name: 'Saved View',
+        show_on_dashboard: true,
+        show_in_sidebar: true,
+        sort_field: 'name',
+        sort_reverse: true,
+        filter_rules: [],
+        display_fields: [],
+      })
+      .subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/1/`
+    )
+    expect(req.request.body.display_fields).toBeNull()
+  })
+
   beforeEach(() => {
     // Dont need to setup again
 
