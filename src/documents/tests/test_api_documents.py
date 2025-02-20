@@ -38,6 +38,7 @@ from documents.models import SavedView
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import WorkflowTrigger
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DocumentConsumeDelayMixin
 
@@ -1361,6 +1362,30 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(input_doc.original_file.name, "simple.pdf")
         self.assertEqual(overrides.filename, "simple.pdf")
         self.assertEqual(overrides.custom_field_ids, [custom_field.id])
+
+    def test_upload_with_webui_source(self):
+        """
+        GIVEN: A document with a source file
+        WHEN: Upload the document with 'from_webui' flag
+        THEN: Consume is called with the source set as WebUI
+        """
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
+
+        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {"document": f, "from_webui": True},
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.consume_file_mock.assert_called_once()
+
+        input_doc, overrides = self.get_last_consume_delay_call_args()
+
+        self.assertEqual(input_doc.source, WorkflowTrigger.DocumentSourceChoices.WEB_UI)
 
     def test_upload_invalid_pdf(self):
         """
