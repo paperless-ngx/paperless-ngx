@@ -81,7 +81,24 @@
     (added)="addField($event)">
   </pngx-custom-fields-dropdown>
 
-  <pngx-share-links-dropdown [documentId]="documentId" [hasArchiveVersion]="!!document?.archived_file_name" [disabled]="!userCanEdit && !userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }"></pngx-share-links-dropdown>
+
+  <div class="ms-auto" ngbDropdown>
+    <button class="btn btn-sm btn-outline-primary" id="sendDropdown" ngbDropdownToggle>
+      <i-bs name="send"></i-bs>
+      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Send</ng-container></div>
+    </button>
+    <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
+      <button ngbDropdownItem (click)="openShareLinks()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }">
+        <i-bs name="link"></i-bs>&nbsp;<span i18n>Share Links</span>
+      </button>
+      @if (emailEnabled) {
+        <button ngbDropdownItem (click)="openEmailDocument()">
+          <i-bs name="envelope"></i-bs>&nbsp;<span i18n>Email</span>
+        </button>
+      }
+    </div>
+  </div>
+
 </pngx-page-header>
 
 <div class="row">

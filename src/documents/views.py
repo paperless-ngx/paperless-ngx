@@ -37,6 +37,7 @@ from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
+from django.http import HttpResponseServerError
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -106,6 +107,7 @@ from documents.filters import ObjectOwnedPermissionsFilter
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
+from documents.mail import send_email
 from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_storage_paths
@@ -1023,6 +1025,57 @@ class DocumentViewSet(
 
         return Response(sorted(entries, key=lambda x: x["timestamp"], reverse=True))
 
+    @action(methods=["post"], detail=True)
+    def email(self, request, pk=None):
+        try:
+            doc = Document.objects.select_related("owner").get(pk=pk)
+            if request.user is not None and not has_perms_owner_aware(
+                request.user,
+                "view_document",
+                doc,
+            ):
+                return HttpResponseForbidden("Insufficient permissions")
+        except Document.DoesNotExist:
+            raise Http404
+
+        try:
+            if (
+                "addresses" not in request.data
+                or "subject" not in request.data
+                or "message" not in request.data
+            ):
+                return HttpResponseBadRequest("Missing required fields")
+
+            use_archive_version = request.data.get("use_archive_version", True)
+
+            addresses = request.data.get("addresses").split(",")
+            if not all(
+                re.match(r"[^@]+@[^@]+\.[^@]+", address.strip())
+                for address in addresses
+            ):
+                return HttpResponseBadRequest("Invalid email address found")
+
+            send_email(
+                subject=request.data.get("subject"),
+                body=request.data.get("message"),
+                to=addresses,
+                attachment=(
+                    doc.archive_path
+                    if use_archive_version and doc.has_archive_version
+                    else doc.source_path
+                ),
+                attachment_mime_type=doc.mime_type,
+            )
+            logger.debug(
+                f"Sent document {doc.id} via email to {addresses}",
+            )
+            return Response({"message": "Email sent"})
+        except Exception as e:
+            logger.warning(f"An error occurred emailing document: {e!s}")
+            return HttpResponseServerError(
+                "Error emailing document, check logs for more detail.",
+            )
+
 
 @extend_schema_view(
     list=extend_schema(
@@ -1385,6 +1438,7 @@ class PostDocumentView(GenericAPIView):
         created = serializer.validated_data.get("created")
         archive_serial_number = serializer.validated_data.get("archive_serial_number")
         custom_field_ids = serializer.validated_data.get("custom_fields")
+        from_webui = serializer.validated_data.get("from_webui")
 
         t = int(mktime(datetime.now().timetuple()))
 
@@ -1399,7 +1453,7 @@ class PostDocumentView(GenericAPIView):
         os.utime(temp_file_path, times=(t, t))
 
         input_doc = ConsumableDocument(
-            source=DocumentSource.ApiUpload,
+            source=DocumentSource.WebUI if from_webui else DocumentSource.ApiUpload,
             original_file=temp_file_path,
         )
         input_doc_overrides = DocumentMetadataOverrides(

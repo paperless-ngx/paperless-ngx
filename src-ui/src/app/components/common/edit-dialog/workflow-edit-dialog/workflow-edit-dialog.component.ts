@@ -71,6 +71,10 @@ export const DOCUMENT_SOURCE_OPTIONS = [
     id: DocumentSource.MailFetch,
     name: $localize`Mail Fetch`,
   },
+  {
+    id: DocumentSource.WebUI,
+    name: $localize`Web UI`,
+  },
 ]
 
 export const SCHEDULE_DATE_FIELD_OPTIONS = [

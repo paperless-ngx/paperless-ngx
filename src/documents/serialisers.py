@@ -1546,6 +1546,12 @@ class PostDocumentSerializer(serializers.Serializer):
         required=False,
     )
 
+    from_webui = serializers.BooleanField(
+        label="Documents are from Paperless-ngx WebUI",
+        write_only=True,
+        required=False,
+    )
+
     def validate_document(self, document):
         document_data = document.file.read()
         mime_type = magic.from_buffer(document_data, mime=True)
