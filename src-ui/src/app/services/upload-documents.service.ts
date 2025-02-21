@@ -37,6 +37,7 @@ export class UploadDocumentsService {
   private uploadFile(file: File) {
     let formData = new FormData()
     formData.append('document', file, file.name)
+    formData.append('from_webui', 'true')
     let status = this.websocketStatusService.newFileUpload(file.name)
 
     status.message = $localize`Connecting...`
