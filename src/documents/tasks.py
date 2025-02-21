@@ -360,7 +360,7 @@ def empty_trash(doc_ids=None):
     )
 
     try:
-        deleted_document_ids = documents.values_list("id", flat=True)
+        deleted_document_ids = list(documents.values_list("id", flat=True))
         # Temporarily connect the cleanup handler
         models.signals.post_delete.connect(cleanup_document_deletion, sender=Document)
         documents.delete()  # this is effectively a hard delete

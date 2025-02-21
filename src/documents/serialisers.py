@@ -1147,6 +1147,15 @@ class SavedViewSerializer(OwnedObjectSerializer):
         if "user" in validated_data:
             # backwards compatibility
             validated_data["owner"] = validated_data.pop("user")
+        if (
+            "display_fields" in validated_data
+            and isinstance(
+                validated_data["display_fields"],
+                list,
+            )
+            and len(validated_data["display_fields"]) == 0
+        ):
+            validated_data["display_fields"] = None
         super().update(instance, validated_data)
         if rules_data is not None:
             SavedViewFilterRule.objects.filter(saved_view=instance).delete()
@@ -1533,6 +1542,12 @@ class PostDocumentSerializer(serializers.Serializer):
         many=True,
         queryset=CustomField.objects.all(),
         label="Custom fields",
+        write_only=True,
+        required=False,
+    )
+
+    from_webui = serializers.BooleanField(
+        label="Documents are from Paperless-ngx WebUI",
         write_only=True,
         required=False,
     )

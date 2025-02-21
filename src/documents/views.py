@@ -1387,6 +1387,7 @@ class PostDocumentView(GenericAPIView):
         created = serializer.validated_data.get("created")
         archive_serial_number = serializer.validated_data.get("archive_serial_number")
         custom_field_ids = serializer.validated_data.get("custom_fields")
+        from_webui = serializer.validated_data.get("from_webui")
 
         t = int(mktime(datetime.now().timetuple()))
 
@@ -1401,7 +1402,7 @@ class PostDocumentView(GenericAPIView):
         os.utime(temp_file_path, times=(t, t))
 
         input_doc = ConsumableDocument(
-            source=DocumentSource.ApiUpload,
+            source=DocumentSource.WebUI if from_webui else DocumentSource.ApiUpload,
             original_file=temp_file_path,
         )
         input_doc_overrides = DocumentMetadataOverrides(

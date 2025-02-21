@@ -145,7 +145,10 @@ export class SavedViewWidgetComponent
         })
     }
 
-    if (this.savedView.display_fields) {
+    if (
+      this.savedView.display_fields &&
+      this.savedView.display_fields.length > 0
+    ) {
       this.displayFields = this.savedView.display_fields
     }
 

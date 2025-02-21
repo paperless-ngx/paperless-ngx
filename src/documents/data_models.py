@@ -144,6 +144,7 @@ class DocumentSource(IntEnum):
     ConsumeFolder = 1
     ApiUpload = 2
     MailFetch = 3
+    WebUI = 4
 
 
 @dataclasses.dataclass

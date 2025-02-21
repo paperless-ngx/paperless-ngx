@@ -4,6 +4,7 @@ export enum DocumentSource {
   ConsumeFolder = 1,
   ApiUpload = 2,
   MailFetch = 3,
+  WebUI = 4,
 }
 
 export enum WorkflowTriggerType {
