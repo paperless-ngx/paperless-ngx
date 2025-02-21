@@ -123,13 +123,13 @@ RUN set -eux \
 WORKDIR /usr/src/paperless/src/docker/
 
 COPY [ \
-  "docker/imagemagick-policy.xml", \
+  "docker/rootfs/etc/ImageMagick-6/paperless-policy.xml", \
   "./" \
 ]
 
 RUN set -eux \
   && echo "Configuring ImageMagick" \
-    && mv imagemagick-policy.xml /etc/ImageMagick-6/policy.xml
+    && mv paperless-policy.xml /etc/ImageMagick-6/policy.xml
 
 # Packages needed only for building a few quick Python
 # dependencies
