@@ -1031,6 +1031,7 @@ class WorkflowTrigger(models.Model):
         CONSUME_FOLDER = DocumentSource.ConsumeFolder.value, _("Consume Folder")
         API_UPLOAD = DocumentSource.ApiUpload.value, _("Api Upload")
         MAIL_FETCH = DocumentSource.MailFetch.value, _("Mail Fetch")
+        WEB_UI = DocumentSource.WebUI.value, _("Web UI")
 
     class ScheduleDateField(models.TextChoices):
         ADDED = "added", _("Added")
@@ -1045,9 +1046,9 @@ class WorkflowTrigger(models.Model):
     )
 
     sources = MultiSelectField(
-        max_length=5,
+        max_length=7,
         choices=DocumentSourceChoices.choices,
-        default=f"{DocumentSource.ConsumeFolder},{DocumentSource.ApiUpload},{DocumentSource.MailFetch}",
+        default=f"{DocumentSource.ConsumeFolder},{DocumentSource.ApiUpload},{DocumentSource.MailFetch},{DocumentSource.WebUI}",
     )
 
     filter_path = models.CharField(
