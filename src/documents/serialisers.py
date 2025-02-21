@@ -20,6 +20,7 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
+from django_elasticsearch_dsl_drf.serializers import DocumentSerializer as DocumentElasticSearchSerializer
 from drf_writable_nested.serializers import NestedUpdateMixin
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import get_users_with_perms
@@ -60,6 +61,7 @@ from documents.permissions import get_groups_with_only_permission
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.validators import uri_validator
+from .documents import DocumentDocument
 
 logger = logging.getLogger("paperless.api")
 
@@ -735,7 +737,22 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
             "reference",
             "dossier_document",
         ]
+class DocumentDocumentSerializer(DocumentElasticSearchSerializer):
+    highlight = serializers.SerializerMethodField()
+    score = serializers.SerializerMethodField()
+    class Meta:
+        document = DocumentDocument
+        fields = "__all__"
 
+    def get_highlight(self, obj):
+        if hasattr(obj.meta, 'highlight'):
+            return obj.meta.highlight.__dict__['_d_']
+        return {}
+
+    def get_score(self, obj):
+        if hasattr(obj.meta, 'score'):
+            return obj.meta.score
+        return None
 
 class DocumentSerializer(
     OwnedObjectSerializer,

@@ -5,12 +5,15 @@ from collections import Counter
 from contextlib import contextmanager
 from datetime import datetime
 from datetime import timezone
+from http.client import responses
 from shutil import rmtree
 from typing import Optional
 
 from dateutil.parser import isoparse
 from django.conf import settings
+from django.contrib.admin.templatetags.admin_list import results
 from django.utils import timezone as django_timezone
+from elasticsearch_dsl import Search
 from guardian.shortcuts import get_users_with_perms
 from whoosh import classify
 from whoosh import highlight
@@ -370,7 +373,6 @@ class DelayedQuery:
         )
         page.results.fragmenter = highlight.ContextFragmenter(surround=50)
         page.results.formatter = HtmlFormatter(tagname="span", between=" ... ")
-
         if not self.first_score and len(page.results) > 0 and sortedby is None:
             self.first_score = page.results[0].score
 
@@ -385,7 +387,7 @@ class DelayedQuery:
         )
 
         self.saved_results[item.start] = page
-
+        # print(page.__dict__)
         return page
 
 
@@ -427,13 +429,123 @@ class DelayedFullTextQuery(DelayedQuery):
             ),
         )
         q = qp.parse(q_str)
-
         corrected = self.searcher.correct_query(q, q_str)
         if corrected.query != q:
             corrected.query = corrected.string
-
+        # print('q, mask', q)
         return q, None
 
+class DelayedElasticSearch(DelayedQuery):
+    def _get_query(self):
+        return None, None
+
+    # def get_docs(self, doc):
+
+
+    def __getitem__(self, item):
+        if item.start in self.saved_results:
+            return self.saved_results[item.start]
+
+        q, mask = self._get_query()
+        sortedby, reverse = self._get_query_sortedby()
+        pagenum = math.floor(item.start / self.page_size) + 1
+        pagelen = self.page_size
+        response = convert_elastic_search(self.query_params["query"], pagenum , pagelen)
+        doc_ids = [d.pk for d in response]
+        start = datetime.now()
+
+        docs = Document.objects.select_related(
+                "correspondent",
+                "storage_path",
+                "document_type",
+                "warehouse",
+                "folder",
+                "owner",
+            ).prefetch_related("tags", "custom_fields", "notes").filter(id__in=doc_ids)
+        # print('time:',datetime.now() -start)
+
+
+        all_doc_ids = get_all_docs_elastic_search(self.query_params["query"])
+        page: ResultsPage = ResultsPage(response, pagenum, pagelen)
+        # page: ResultsPage = self.searcher.search_page(
+        #     q,
+        #     mask=mask,
+        #     filter=self._get_query_filter(),
+        #     pagenum=math.floor(item.start / self.page_size) + 1,
+        #     pagelen=self.page_size,
+        #     sortedby=sortedby,
+        #     reverse=reverse,
+        # )
+        page.results.fragmenter = highlight.ContextFragmenter(surround=50)
+        page.results.formatter = HtmlFormatter(tagname="span", between=" ... ")
+
+        page.results.doc = all_doc_ids
+        # print(page.results.doc.__class__, all_doc_ids)
+        if not self.first_score and len(page.results) > 0 and sortedby is None:
+            self.first_score = page.results[0].score
+        # page.results.top_n = list(
+        #     map(
+        #         lambda hit: (
+        #             (hit[0] / self.first_score) if self.first_score else None,
+        #             hit[1],
+        #         ),
+        #         page.results.top_n,
+        #     ),
+        # )
+        # print(page.results)
+        page.total = len(all_doc_ids)
+        # print(page.total)
+
+        self.saved_results[item.start] = page
+        return page
+def get_all_docs_elastic_search(content):
+    s = Search(
+        index='document_index')  # Thay 'your_index_name' bằng tên chỉ mục của bạn
+    s = s.query('multi_match', query=content,
+                fields=['title', 'content'])
+    s = s.source(['_id'])
+    response = s.scan()
+    # for d in response:
+    #     print(d.meta.id.__class__)
+    doc_ids = {int(doc.meta.id) for doc in response}
+    # print(doc_ids.__class__)
+    return doc_ids
+
+
+def convert_elastic_search(content, page_number=1, page_size=10):
+    s = Search(
+        index='document_index')  # Thay 'your_index_name' bằng tên chỉ mục của bạn
+    s = s.query('multi_match', query=content,
+                fields=['title', 'content'])
+    s = s.highlight('content', fragment_size=100, number_of_fragments=5, pre_tags=['<span class="match">'],
+                    post_tags=['</span>'])
+    s = s[page_number*page_size-page_size:page_number*page_size]
+    dict_doc_meta = {}
+    lst_doc_ids = []
+    # response = s.scan()
+    response = s.execute()
+    # print(response)
+    # for hit in response:
+    #     dict_doc_meta[hit.meta.id] = {'meta': hit.meta, 'object': None}
+    #     lst_doc_ids.append(hit.meta.id)
+    #
+    # # get list docs
+    #
+    # docs = Document.objects.select_related(
+    #             "correspondent",
+    #             "storage_path",
+    #             "document_type",
+    #             "warehouse",
+    #             "folder",
+    #             "owner",
+    #         ).prefetch_related("tags", "custom_fields", "notes").filter(id__in=lst_doc_ids)
+    # start = datetime.now()
+    # for d in docs:
+    #     dict_doc_meta.get(str(d.id))['object'] = d
+    #     # print('dict',dict_doc_meta.get(str(d.id)))
+    # print('count time', datetime.now()-start)
+    # return dict_doc_meta
+    return response
 
 class DelayedMoreLikeThisQuery(DelayedQuery):
     def _get_query(self):
@@ -452,7 +564,6 @@ class DelayedMoreLikeThisQuery(DelayedQuery):
             [query.Term("content", word, boost=weight) for word, weight in kts],
         )
         mask = {docnum}
-
         return q, mask
 
 

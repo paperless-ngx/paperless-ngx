@@ -52,16 +52,21 @@ class StandardPagination(PageNumberPagination):
     def get_all_result_ids(self):
         ids = []
         if hasattr(self.page.paginator.object_list, "saved_results"):
+            # print('test',self.page.paginator.object_list.saved_results[0].results.fields)
             results_page = self.page.paginator.object_list.saved_results[0]
             if results_page is not None:
-                for i in range(len(results_page.results.docs())):
-                    try:
-                        fields = results_page.results.fields(i)
-                        if "id" in fields:
-                            ids.append(fields["id"])
-                    except Exception:
-                        pass
+                if not hasattr(results_page.results, 'docs'):
+                    ids = results_page.results.doc
+                else:
+                    for i in range(len(results_page.results.docs())):
+                        try:
+                            fields = results_page.results.fields(i)
+                            if "id" in fields:
+                                ids.append(fields["id"])
+                        except Exception:
+                            pass
         else:
+            # print('noi dung',self.page.paginator.__dict__)
             ids = self.page.paginator.object_list.values_list("pk", flat=True)
         return ids
 

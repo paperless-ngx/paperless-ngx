@@ -14,7 +14,7 @@ from django.views.static import serve
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
-from documents.views import AcknowledgeTasksView
+from documents.views import AcknowledgeTasksView, DocumentElasticSearch
 from documents.views import ApprovalUpdateMutipleView
 from documents.views import ApprovalViewSet
 from documents.views import ArchiveFontViewSet
@@ -74,6 +74,7 @@ api_router.register(r"document_types", DocumentTypeViewSet)
 api_router.register(r"archive_fonts", ArchiveFontViewSet)
 api_router.register(r"font_languages", FontLanguageViewSet)
 api_router.register(r"documents", UnifiedSearchViewSet)
+api_router.register(r"elastic_searchs", DocumentElasticSearch, basename="elastic_searchs")
 api_router.register(r"logs", LogViewSet, basename="logs")
 api_router.register(r"tags", TagViewSet)
 api_router.register(r"saved_views", SavedViewViewSet)
@@ -117,6 +118,11 @@ urlpatterns = [
                     SearchAutoCompleteView.as_view(),
                     name="autocomplete",
                 ),
+                # re_path(
+                #     "^elastic_search/",
+                #     DocumentElasticSearch.as_view({"get":"list"}),
+                #     name="document_elastic_search",
+                # ),
                 re_path("^statistics/", StatisticsView.as_view(), name="statistics"),
                 re_path(
                     "^statistics_custom/",
