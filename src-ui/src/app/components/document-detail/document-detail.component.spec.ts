@@ -1330,4 +1330,18 @@ describe('DocumentDetailComponent', () => {
     expect(createSpy).toHaveBeenCalledWith('a')
     expect(urlRevokeSpy).toHaveBeenCalled()
   })
+
+  it('should get email enabled status from settings', () => {
+    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+    expect(component.emailEnabled).toBeTruthy()
+  })
+
+  it('should support open share links and email modals', () => {
+    const modalSpy = jest.spyOn(modalService, 'open')
+    initNormally()
+    component.openShareLinks()
+    expect(modalSpy).toHaveBeenCalled()
+    component.openEmailDocument()
+    expect(modalSpy).toHaveBeenCalled()
+  })
 })
