@@ -1,3 +1,4 @@
+import logging
 from urllib.parse import quote
 
 from allauth.account.adapter import DefaultAccountAdapter
@@ -8,6 +9,8 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.forms import ValidationError
 from django.urls import reverse
+
+logger = logging.getLogger("paperless.auth")
 
 
 class CustomAccountAdapter(DefaultAccountAdapter):
@@ -72,6 +75,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         group_names: list[str] = settings.ACCOUNT_DEFAULT_GROUPS
         if len(group_names) > 0:
             groups = Group.objects.filter(name__in=group_names)
+            logger.debug(f"Adding default groups to user `{user}`: {group_names}")
             user.groups.add(*groups)
             user.save()
         return user
@@ -105,6 +109,9 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         group_names: list[str] = settings.SOCIAL_ACCOUNT_DEFAULT_GROUPS
         if len(group_names) > 0:
             groups = Group.objects.filter(name__in=group_names)
+            logger.debug(
+                f"Adding default social groups to user `{user}`: {group_names}",
+            )
             user.groups.add(*groups)
             user.save()
         return user
