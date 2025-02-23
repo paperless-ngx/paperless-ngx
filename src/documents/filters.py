@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import functools
 import inspect
 import json
 import operator
-from collections.abc import Callable
 from contextlib import contextmanager
+from typing import TYPE_CHECKING
 
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Case
@@ -38,6 +40,9 @@ from documents.models import Log
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]

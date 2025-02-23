@@ -1,22 +1,22 @@
+from __future__ import annotations
+
 import logging
 import pickle
 import re
 import time
 import warnings
-from collections.abc import Iterator
 from hashlib import sha256
 from pathlib import Path
 from typing import TYPE_CHECKING
-from typing import Optional
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from datetime import datetime
 
     from numpy import ndarray
 
 from django.conf import settings
 from django.core.cache import cache
-from sklearn.exceptions import InconsistentVersionWarning
 
 from documents.caching import CACHE_50_MINUTES
 from documents.caching import CLASSIFIER_HASH_KEY
@@ -38,7 +38,7 @@ class ClassifierModelCorruptError(Exception):
     pass
 
 
-def load_classifier(*, raise_exception: bool = False) -> Optional["DocumentClassifier"]:
+def load_classifier(*, raise_exception: bool = False) -> DocumentClassifier | None:
     if not settings.MODEL_FILE.is_file():
         logger.debug(
             "Document classification model does not exist (yet), not "
@@ -103,6 +103,8 @@ class DocumentClassifier:
         self._stop_words = None
 
     def load(self) -> None:
+        from sklearn.exceptions import InconsistentVersionWarning
+
         # Catch warnings for processing
         with warnings.catch_warnings(record=True) as w:
             with Path(settings.MODEL_FILE).open("rb") as f:
