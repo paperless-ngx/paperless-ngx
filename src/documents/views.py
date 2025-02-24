@@ -1194,7 +1194,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
 class LogViewSet(ViewSet):
     permission_classes = (IsAuthenticated, PaperlessAdminPermissions)
 
-    log_files = ["paperless", "mail"]
+    log_files = ["paperless", "mail", "celery"]
 
     def get_log_filename(self, log):
         return os.path.join(settings.LOGGING_DIR, f"{log}.log")
