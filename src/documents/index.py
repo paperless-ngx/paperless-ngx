@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import math
 from collections import Counter
@@ -5,10 +7,10 @@ from contextlib import contextmanager
 from datetime import datetime
 from datetime import timezone
 from shutil import rmtree
+from typing import TYPE_CHECKING
 from typing import Literal
 
 from django.conf import settings
-from django.db.models import QuerySet
 from django.utils import timezone as django_timezone
 from guardian.shortcuts import get_users_with_perms
 from whoosh import classify
@@ -32,10 +34,7 @@ from whoosh.qparser import QueryParser
 from whoosh.qparser.dateparse import DateParserPlugin
 from whoosh.qparser.dateparse import English
 from whoosh.qparser.plugins import FieldsPlugin
-from whoosh.reading import IndexReader
 from whoosh.scoring import TF_IDF
-from whoosh.searching import ResultsPage
-from whoosh.searching import Searcher
 from whoosh.util.times import timespan
 from whoosh.writing import AsyncWriter
 
@@ -43,6 +42,12 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import Note
 from documents.models import User
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
+    from whoosh.reading import IndexReader
+    from whoosh.searching import ResultsPage
+    from whoosh.searching import Searcher
 
 logger = logging.getLogger("paperless.index")
 

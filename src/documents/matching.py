@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import logging
 import re
 from fnmatch import fnmatch
+from typing import TYPE_CHECKING
 
-from documents.classifier import DocumentClassifier
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
 from documents.models import Correspondent
@@ -14,6 +16,9 @@ from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
+
+if TYPE_CHECKING:
+    from documents.classifier import DocumentClassifier
 
 logger = logging.getLogger("paperless.matching")
 
