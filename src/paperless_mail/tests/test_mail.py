@@ -1692,6 +1692,39 @@ class TestTasks(TestCase):
         result = tasks.process_mail_accounts(account_ids=[account_b.id])
         self.assertIn("No new", result)
 
+    @mock.patch("paperless_mail.tasks.MailAccountHandler.handle_mail_account")
+    def test_rule_with_stop_processing(self, m):
+        """
+        GIVEN:
+            - Mail account with a rule with stop_processing=True
+        WHEN:
+            - Mail account is processed
+        THEN:
+            - Should only process the first rule
+        """
+        m.side_effect = lambda account: 6
+
+        account = MailAccount.objects.create(
+            name="A",
+            imap_server="A",
+            username="A",
+            password="A",
+        )
+        MailRule.objects.create(
+            name="A",
+            account=account,
+            stop_processing=True,
+        )
+        MailRule.objects.create(
+            name="B",
+            account=account,
+        )
+
+        result = tasks.process_mail_accounts()
+
+        self.assertEqual(m.call_count, 1)
+        self.assertIn("Added 6", result)
+
 
 class TestMailAccountTestView(APITestCase):
     def setUp(self) -> None:

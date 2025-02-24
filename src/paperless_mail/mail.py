@@ -575,6 +575,11 @@ class MailAccountHandler(LoggingMixin):
                             rule,
                             supports_gmail_labels=supports_gmail_labels,
                         )
+                        if total_processed_files > 0 and rule.stop_processing:
+                            self.log.debug(
+                                f"Rule {rule}: Stopping processing rules due to stop_processing flag",
+                            )
+                            break
                     except Exception as e:
                         self.log.exception(
                             f"Rule {rule}: Error while processing rule: {e}",
