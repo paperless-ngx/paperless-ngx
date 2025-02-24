@@ -320,7 +320,9 @@ many workers attempting to access the database simultaneously.
 Consider changing to the PostgreSQL database if you will be processing
 many documents at once often. Otherwise, try tweaking the
 [`PAPERLESS_DB_TIMEOUT`](configuration.md#PAPERLESS_DB_TIMEOUT) setting to allow more time for the database to
-unlock. This may have minor performance implications.
+unlock. Additionally, you can change your SQLite database to use ["Write-Ahead Logging"](https://sqlite.org/wal.html).
+These changes may have minor performance implications but can help
+prevent database locking issues.
 
 ## gunicorn fails to start with "is not a valid port number"
 
