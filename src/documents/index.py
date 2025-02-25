@@ -1,9 +1,10 @@
 import logging
 import math
 import os
+import re
 from collections import Counter
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timedelta
 from datetime import timezone
 from http.client import responses
 from shutil import rmtree
@@ -13,7 +14,9 @@ from dateutil.parser import isoparse
 from django.conf import settings
 from django.contrib.admin.templatetags.admin_list import results
 from django.utils import timezone as django_timezone
-from elasticsearch_dsl import Search
+from django_extensions.jobs import monthly
+from elasticsearch import Elasticsearch
+from elasticsearch_dsl import Search, Q
 from guardian.shortcuts import get_users_with_perms
 from whoosh import classify
 from whoosh import highlight
@@ -40,7 +43,7 @@ from whoosh.searching import Searcher
 from whoosh.util.times import timespan
 from whoosh.writing import AsyncWriter
 
-from documents.models import CustomFieldInstance
+from documents.models import CustomFieldInstance, Warehouse
 from documents.models import Document
 from documents.models import Note
 from documents.models import User
@@ -214,7 +217,10 @@ def remove_document_from_index(document: Document):
 class DelayedQuery:
     param_map = {
         "correspondent": ("correspondent", ["id", "id__in", "id__none", "isnull"]),
+        "archive_font": ("archive_font", ["id", "id__in", "id__none", "isnull"]),
         "warehouse": ("warehouse", ["id", "id__in", "id__none", "isnull"]),
+        "warehouse_w": ("warehouse", ["id", "id__in", "id__none", "isnull"]),
+        "warehouse_s": ("warehouse", ["id", "id__in", "id__none", "isnull"]),
         "folder": ("folder", ["id", "id__in", "id__none", "isnull"]),
         "document_type": ("type", ["id", "id__in", "id__none", "isnull"]),
         "storage_path": ("path", ["id", "id__in", "id__none", "isnull"]),
@@ -350,6 +356,7 @@ class DelayedQuery:
         self.saved_results = dict()
         self.first_score = None
         self.user = user
+        self.es = Elasticsearch()
 
     def __len__(self):
         page = self[0:1]
@@ -387,7 +394,6 @@ class DelayedQuery:
         )
 
         self.saved_results[item.start] = page
-        # print(page.__dict__)
         return page
 
 
@@ -432,27 +438,227 @@ class DelayedFullTextQuery(DelayedQuery):
         corrected = self.searcher.correct_query(q, q_str)
         if corrected.query != q:
             corrected.query = corrected.string
-        # print('q, mask', q)
         return q, None
 
 class DelayedElasticSearch(DelayedQuery):
+    def _get_query_sortedby(self):
+        if "ordering" not in self.query_params:
+            return None, False
+
+        field: str = self.query_params["ordering"]
+
+        sort_fields_map = {
+            "created": "created",
+            "modified": "modified",
+            "added": "added",
+            "title": "title_keyword",
+            "correspondent__name": "correspondent",
+            "document_type__name": "type_keyword",
+            "warehouse__name": "warehouse",
+            "archive_serial_number": "asn",
+            "num_notes": "num_notes",
+            "owner": "owner_keyword",
+            "page_count": "page_count",
+            "score": "score"
+        }
+
+        if field.startswith("-"):
+            field = field[1:]
+            reverse = True
+        else:
+            reverse = False
+
+        if field not in sort_fields_map:
+            return None, False
+        else:
+            return sort_fields_map[field], reverse
+
     def _get_query(self):
-        return None, None
+        q_str = self.query_params.get("query", "")
+        # Tìm vị trí bắt đầu của "created" và cắt chuỗi
+        cleaned_string = q_str
+        if "created:" in q_str:
+            cleaned_string = q_str[
+                             :q_str.index("created:")].rstrip(',')
+        elif "added:" in q_str:
+            cleaned_string = q_str[
+                             :q_str.index("added:")].rstrip(',')
+        query = Q("multi_match", query=cleaned_string, fields=[
+            "content",
+            "title",
+            "correspondent",
+            "tag",
+            "type",
+            "notes",
+            "custom_fields",
+        ])
 
-    # def get_docs(self, doc):
 
+        return query  # Chỉ trả về một truy vấn
+
+    def _get_query_filter(self):
+        criterias = []
+        q_str = self.query_params.get("query", "")
+        added = re.search(r'added:\[(.*?)\]', q_str)
+        created = re.search(r'created:\[(.*?)\]', q_str)
+        map_created = {'-1 week to now': "now-1w/w", '-1 month to now': "now-1M/M", '-3 month to now': "now-3M/M", '-1 year to now': "now-1y/y",}
+        if added is not None:
+
+            criterias.append(Q("range", **{'added': {"lt": "now/d"}}))
+            criterias.append(Q("range", **{'added': {"gt": map_created[added.group(1)]}}))
+        if created is not None:
+            criterias.append(Q("range", **{'created': {"lt": "now/d"}}))
+            criterias.append(Q("range", **{'created': {"gt": map_created[created.group(1)]}}))
+
+        for key, value in self.query_params.items():
+            if key == "is_tagged":
+                criterias.append(Q("term", has_tag=self.evalBoolean(value)))
+                continue
+
+            if "__" not in key:
+                continue
+
+            param, query_filter = key.split("__", 1)
+            try:
+                field, supported_query_filters = self.param_map[param]
+            except KeyError:
+                continue
+
+            if query_filter not in supported_query_filters:
+                continue
+
+            if query_filter == "id":
+                if param == "shared_by":
+                    criterias.append(Q("term", is_shared=True))
+                    criterias.append(Q("term", owner_id=value))
+                else:
+                    criterias.append(Q("term", **{f"{field}_id": value}))
+            elif query_filter == "id__in":
+                if field in {"warehouse"}:
+                    warehouses = Warehouse.objects.filter(id__in=value.split(","))
+                    in_filter = [Q("prefix", **{'warehouse_path': object.path}) for
+                                 object in warehouses]
+                    criterias.append(Q("bool", should=in_filter))
+                    continue
+                elif field in {"tag"}:
+                    in_filter = [Q("term", **{f"tags.id": int(object_id)}) for
+                                 object_id in value.split(",")]
+                    criterias.append(Q("bool", should=in_filter))
+                    continue
+                in_filter = [Q("term", **{f"{field}_id": object_id}) for object_id in value.split(",")]
+                criterias.append(Q("bool", should=in_filter))
+            elif query_filter == "id__none":
+                if field in {"warehouse"}:
+                    warehouses = Warehouse.objects.filter(id__in=value.split(","))
+                    in_filter = [Q("prefix", **{'warehouse_path': object.path}) for
+                                 object in warehouses]
+                    criterias.append(
+                        Q("bool", must_not=Q("bool", should=in_filter))
+                    )
+                    continue
+                for object_id in value.split(","):
+                    criterias.append(Q("bool", must_not=Q("term", **{f"{field}_id": object_id})))
+            elif query_filter == "isnull":
+                criterias.append(Q("term", **{f"has_{field}": not self.evalBoolean(value)}))
+            elif query_filter == "id__all":
+                if field in {"tag"}:
+                    in_filter = [Q("term", **{'tags.id': object_id}) for
+                                 object_id in value.split(",")]
+                    criterias.append(
+                        Q("bool", must=in_filter)
+                        # Thay đổi từ 'should' thành 'must'
+                    )
+                    continue
+                for object_id in value.split(","):
+                    criterias.append(Q("term", **{f"{field}_id": object_id}))
+            elif query_filter == "date__lt":
+                criterias.append(Q("range", **{field: {"lt": isoparse(value)}}))
+            elif query_filter == "date__gt":
+                criterias.append(Q("range", **{field: {"gt": isoparse(value)}}))
+            elif query_filter == "icontains":
+                criterias.append(Q("match", **{field: value}))
+            elif query_filter == "istartswith":
+                criterias.append(Q("prefix", **{field: value}))
+
+        user_criterias = get_permissions_criterias_elastic_search(user=self.user)
+
+        if criterias:
+            if user_criterias:
+                criterias.append(Q("bool", should=user_criterias))
+            return Q("bool", must=criterias)
+        else:
+            return Q("bool", should=user_criterias) if user_criterias else None
+
+    def get_combined_query(self):
+        base_query = self._get_query()  # Lấy truy vấn cơ bản
+        filter_query = self._get_query_filter()  # Lấy truy vấn lọc
+
+        # Lấy trường và chiều sắp xếp
+        sort_field, reverse = self._get_query_sortedby()
+
+        # Tạo danh sách sắp xếp
+        sort_order = {sort_field: {
+            "order": "desc" if reverse else "asc"}} if sort_field else None
+
+        # Khởi tạo truy vấn bool
+        if filter_query:
+            combined_query = Q("bool", must=[base_query, filter_query])
+        else:
+            combined_query = base_query
+
+        # Thêm phần sắp xếp vào truy vấn cuối cùng
+        query_body = {
+            "query": combined_query.to_dict(),
+            "sort": [sort_order] if sort_order else []
+        }
+
+        return query_body
+
+    def search_pagination(self, content, page_number, page_size):
+        s = Search(
+            index='document_index')  # Thay 'your_index_name' bằng tên chỉ mục của bạn
+
+
+        query_combined = self.get_combined_query()
+        s = s.query(query_combined['query'])  # Chỉ lấy phần query
+        s = s.sort(*query_combined.get('sort', []))  # Thêm phần sắp xếp nếu có
+
+        s = s.highlight('content', fragment_size=300, number_of_fragments=5,
+                        pre_tags=['<span class="match">'],
+                        post_tags=['</span>'])
+        s = s.source(['id'])
+        s = s[page_number * page_size - page_size:page_number * page_size]
+        response = s.execute()
+        return response
+
+    def search_get_all(self):
+        s = Search(
+            index='document_index')  # Thay 'your_index_name' bằng tên chỉ mục của bạn
+
+
+        query_combined = self.get_combined_query()
+        s = s.query(query_combined['query'])  # Chỉ lấy phần query
+        s = s.source(['id'])
+        response = s.scan()
+        doc_ids = {int(doc.meta.id) for doc in response}
+        return doc_ids
 
     def __getitem__(self, item):
         if item.start in self.saved_results:
             return self.saved_results[item.start]
 
-        q, mask = self._get_query()
+        # q, mask = self._get_query()
         sortedby, reverse = self._get_query_sortedby()
-        pagenum = math.floor(item.start / self.page_size) + 1
-        pagelen = self.page_size
-        response = convert_elastic_search(self.query_params["query"], pagenum , pagelen)
-        doc_ids = [d.pk for d in response]
+
+        # print('ket qua',self.get_combined_query())
+        page_num = math.floor(item.start / self.page_size) + 1
+        page_len = self.page_size
         start = datetime.now()
+        # response = convert_elastic_search(self.query_params["query"], page_num , page_len)
+        response = self.search_pagination(self.query_params["query"], page_num , page_len)
+
+        # print('tim____:',datetime.now() -start)
+        doc_ids = [int(d.meta.id) for d in response]
 
         docs = Document.objects.select_related(
                 "correspondent",
@@ -461,12 +667,19 @@ class DelayedElasticSearch(DelayedQuery):
                 "warehouse",
                 "folder",
                 "owner",
-            ).prefetch_related("tags", "custom_fields", "notes").filter(id__in=doc_ids)
-        # print('time:',datetime.now() -start)
+            ).prefetch_related("tags", "custom_fields", "notes").filter(id__in=doc_ids).defer('content')
+        # map docs to dict
+        dict_docs = dict()
+        for d in docs:
+            dict_docs[d.id]=d
 
+        # mapping docs to response
+        for r in response:
+            r.doc_obj = dict_docs[int(r.meta.id)]
 
-        all_doc_ids = get_all_docs_elastic_search(self.query_params["query"])
-        page: ResultsPage = ResultsPage(response, pagenum, pagelen)
+        all_doc_ids = self.search_get_all()
+        page: ResultsPage = ResultsPage(response, page_num, page_len)
+        # filter = self._get_query_filter()
         # page: ResultsPage = self.searcher.search_page(
         #     q,
         #     mask=mask,
@@ -480,9 +693,8 @@ class DelayedElasticSearch(DelayedQuery):
         page.results.formatter = HtmlFormatter(tagname="span", between=" ... ")
 
         page.results.doc = all_doc_ids
-        # print(page.results.doc.__class__, all_doc_ids)
         if not self.first_score and len(page.results) > 0 and sortedby is None:
-            self.first_score = page.results[0].score
+            self.first_score = getattr(page.results[0].meta, 'score')
         # page.results.top_n = list(
         #     map(
         #         lambda hit: (
@@ -494,7 +706,7 @@ class DelayedElasticSearch(DelayedQuery):
         # )
         # print(page.results)
         page.total = len(all_doc_ids)
-        # print(page.total)
+
 
         self.saved_results[item.start] = page
         return page
@@ -503,12 +715,9 @@ def get_all_docs_elastic_search(content):
         index='document_index')  # Thay 'your_index_name' bằng tên chỉ mục của bạn
     s = s.query('multi_match', query=content,
                 fields=['title', 'content'])
-    s = s.source(['_id'])
+    s = s.source(['id'])
     response = s.scan()
-    # for d in response:
-    #     print(d.meta.id.__class__)
     doc_ids = {int(doc.meta.id) for doc in response}
-    # print(doc_ids.__class__)
     return doc_ids
 
 
@@ -517,34 +726,11 @@ def convert_elastic_search(content, page_number=1, page_size=10):
         index='document_index')  # Thay 'your_index_name' bằng tên chỉ mục của bạn
     s = s.query('multi_match', query=content,
                 fields=['title', 'content'])
-    s = s.highlight('content', fragment_size=100, number_of_fragments=5, pre_tags=['<span class="match">'],
+    s = s.highlight('content', fragment_size=300, number_of_fragments=5, pre_tags=['<span class="match">'],
                     post_tags=['</span>'])
+    s = s.source(['id'])
     s = s[page_number*page_size-page_size:page_number*page_size]
-    dict_doc_meta = {}
-    lst_doc_ids = []
-    # response = s.scan()
     response = s.execute()
-    # print(response)
-    # for hit in response:
-    #     dict_doc_meta[hit.meta.id] = {'meta': hit.meta, 'object': None}
-    #     lst_doc_ids.append(hit.meta.id)
-    #
-    # # get list docs
-    #
-    # docs = Document.objects.select_related(
-    #             "correspondent",
-    #             "storage_path",
-    #             "document_type",
-    #             "warehouse",
-    #             "folder",
-    #             "owner",
-    #         ).prefetch_related("tags", "custom_fields", "notes").filter(id__in=lst_doc_ids)
-    # start = datetime.now()
-    # for d in docs:
-    #     dict_doc_meta.get(str(d.id))['object'] = d
-    #     # print('dict',dict_doc_meta.get(str(d.id)))
-    # print('count time', datetime.now()-start)
-    # return dict_doc_meta
     return response
 
 class DelayedMoreLikeThisQuery(DelayedQuery):
@@ -619,3 +805,17 @@ def get_permissions_criterias(user: Optional[User] = None):
         #     )
         user_criterias = []
     return user_criterias
+
+
+def get_permissions_criterias_elastic_search(user: Optional[User] = None):
+    user_criterias = [Q("term", field="has_owner", value=False)]
+
+    if user is not None:
+        if user.is_superuser:  # Superuser có thể xem tất cả tài liệu
+            user_criterias = []
+        # else:
+        #     # Nếu không phải superuser, thêm điều kiện cho owner_id và viewer_id
+        #     user_criterias.append(Q("term", "owner_id", user.id))
+        #     user_criterias.append(Q("term", "viewer_id", str(user.id)))
+
+    return Q("bool", should=user_criterias) if user_criterias else None

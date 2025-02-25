@@ -1231,44 +1231,36 @@ class SearchResultSerializer(DocumentSerializer, PassUserMixin):
             ),
             "rank": instance.rank,
         }
-        print(r)
         return r
 
 class SearchResultElasticSearchSerializer(DocumentSerializer, PassUserMixin):
 
     def to_representation(self, instance):
-        # print('instance',instance)
+        # print('instance',instance.doc_obj.__dict__)
+        if getattr(instance, 'doc_obj', None)==None:
+            return None
+        instance.doc_obj.content = ""
         doc = (
-            Document.objects.select_related(
-                "correspondent",
-                "storage_path",
-                "document_type",
-                "warehouse",
-                "folder",
-                "owner",
-            )
-            .prefetch_related("tags", "custom_fields", "notes")
-            .get(id=instance["id"])
+            instance.doc_obj
         )
 
         notes = ",".join(
             [str(c.note) for c in doc.notes.all()],
         )
         r = super().to_representation(doc)
-        highlight = None
+        highlight_content = None
+        highlight_note = None
         if hasattr(instance.meta,'highlight'):
-
-            highlight = instance.meta.highlight.content[0]
-        # print(instance.meta.highlight.content[0].__class__)
+            highlight_content = instance.meta.highlight.content[0]
+            # highlight_note = instance.meta.highlight.note[0]
         r["__search_hit__"] = {
             "score": instance.meta.score,
-            "highlights": highlight,
+            "highlights": highlight_content,
             "note_highlights": (
-                None
+                notes if doc else None
             ),
             "rank": None,
         }
-        # print(r.__class__, r)
         return r
 
 class UnifiedSearchViewSet(DocumentViewSet):

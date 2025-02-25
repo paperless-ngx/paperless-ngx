@@ -1202,10 +1202,10 @@ API_UPLOAD_FILE_OCR = os.getenv("API_UPLOAD_FILE_OCR", "")
 
 ELASTICSEARCH_DSL = {
     'default': {
-        'hosts': 'localhost:9200',  # Địa chỉ của Elasticsearch
+        'hosts': os.getenv("ELASTIC_SEARCH_HOST", ""),  # Địa chỉ của Elasticsearch
         'http_auth': (os.getenv("ELASTIC_SEARCH_USERNAME", "elastic"), os.getenv("ELASTIC_SEARCH_PASSWORD", "")),  # Thông tin xác thực (nếu có)
-        'use_ssl': True,              # Nếu sử dụng SSL
-        'verify_certs': True,         # Kiểm tra chứng chỉ
+        'use_ssl': False,              # Nếu sử dụng SSL
+        'verify_certs': False,         # Kiểm tra chứng chỉ
         'ca_certs': os.getenv("ELASTIC_SEARCH_CA", ""),  # Đường dẫn đến chứng chỉ CA
     },
 }
