@@ -325,6 +325,8 @@ describe('SettingsComponent', () => {
     component['systemStatus'].database.status = SystemStatusItemStatus.OK
     component['systemStatus'].tasks.redis_status = SystemStatusItemStatus.OK
     component['systemStatus'].tasks.celery_status = SystemStatusItemStatus.OK
+    component['systemStatus'].tasks.sanity_check_status =
+      SystemStatusItemStatus.OK
     expect(component.systemStatusHasErrors).toBeFalsy()
   })
 
