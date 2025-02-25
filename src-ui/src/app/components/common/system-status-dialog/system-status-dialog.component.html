@@ -46,14 +46,14 @@
               <dd>{{status.database.type}}</dd>
               <dt i18n>Status</dt>
               <dd>
-                <div class="badge text-uppercase bg-info text-dark" [ngbPopover]="databaseStatus" triggers="mouseenter:mouseleave">
+                <button class="btn btn-sm btn-dark text-uppercase small" [ngbPopover]="databaseStatus" triggers="click mouseenter:mouseleave">
                   {{status.database.status}}
                   @if (status.database.status === 'OK') {
                     <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
                   } @else {
                     <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
                   }
-                </div>
+                </button>
                 <ng-template #databaseStatus>
                   @if (status.database.status === 'OK') {
                     {{status.database.url}}
@@ -64,7 +64,7 @@
               </dd>
               <dt i18n>Migration Status</dt>
               <dd>
-                <div class="badge text-uppercase bg-info text-dark" [ngbPopover]="migrationStatus" triggers="mouseenter:mouseleave">
+                <button class="btn btn-sm btn-dark text-uppercase small" [ngbPopover]="migrationStatus" triggers="click mouseenter:mouseleave">
                   @if (status.database.migration_status.unapplied_migrations.length === 0) {
                     <ng-container i18n>Up to date</ng-container><i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
                   } @else {
@@ -81,7 +81,7 @@
                       </ul>
                     }
                   </ng-template>
-                </div>
+                </button>
               </dd>
             </dl>
           </div>
@@ -97,14 +97,14 @@
             <dl class="card-text">
               <dt i18n>Redis Status</dt>
               <dd>
-                <div class="badge text-uppercase bg-info text-dark" [ngbPopover]="redisStatus" triggers="mouseenter:mouseleave">
+                <button class="btn btn-sm btn-dark text-uppercase small" [ngbPopover]="redisStatus" triggers="click mouseenter:mouseleave">
                   {{status.tasks.redis_status}}
                   @if (status.tasks.redis_status === 'OK') {
                     <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
                   } @else {
                     <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
                   }
-                </div>
+                </button>
                 <ng-template #redisStatus>
                   @if (status.tasks.redis_status === 'OK') {
                     {{status.tasks.redis_url}}
@@ -115,14 +115,14 @@
               </dd>
               <dt i18n>Celery Status</dt>
               <dd>
-                <div class="badge text-uppercase bg-info text-dark" [ngbPopover]="celeryStatus" triggers="mouseenter:mouseleave">
+                <button class="btn btn-sm btn-dark text-uppercase small" [ngbPopover]="celeryStatus" triggers="click mouseenter:mouseleave">
                   {{status.tasks.celery_status}}
                   @if (status.tasks.celery_status === 'OK') {
                     <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
                   } @else {
                     <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
                   }
-                </div>
+                </button>
                 <ng-template #celeryStatus>
                   @if (status.tasks.celery_status === 'OK') {
                     {{status.tasks.celery_url}}
@@ -145,7 +145,7 @@
             <dl class="card-text">
               <dt i18n>Search Index</dt>
               <dd class="d-flex align-items-center">
-                <div class="badge text-uppercase bg-info text-dark" [ngbPopover]="indexStatus" triggers="mouseenter:mouseleave">
+                <button class="btn btn-sm btn-dark text-uppercase small" [ngbPopover]="indexStatus" triggers="click mouseenter:mouseleave">
                   {{status.tasks.index_status}}
                   @if (status.tasks.index_status === 'OK') {
                     @if (isStale(status.tasks.index_last_modified)) {
@@ -156,15 +156,15 @@
                   } @else {
                     <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
                   }
-                </div>
+                </button>
                 @if (currentUserIsSuperUser) {
                   @if (isRunning(PaperlessTaskName.IndexOptimize)) {
                     <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
                   } @else {
-                    <div class="badge cursor-pointer bg-info btn-outline-secondary ms-2" (click)="runTask(PaperlessTaskName.IndexOptimize)">
+                    <button class="btn btn-sm btn-dark small ms-2" (click)="runTask(PaperlessTaskName.IndexOptimize)">
                       <i-bs name="play-fill"></i-bs>&nbsp;
                       <ng-container i18n>Run Task</ng-container>
-                    </div>
+                    </button>
                   }
                 }
               </dd>
@@ -177,7 +177,7 @@
               </ng-template>
               <dt i18n>Classifier</dt>
               <dd class="d-flex align-items-center">
-                <div class="badge text-uppercase bg-info text-dark" [ngbPopover]="classifierStatus" triggers="mouseenter:mouseleave">
+                <button class="btn btn-sm btn-dark text-uppercase small" [ngbPopover]="classifierStatus" triggers="click mouseenter:mouseleave">
                   {{status.tasks.classifier_status}}
                   @if (status.tasks.classifier_status === 'OK') {
                     @if (isStale(status.tasks.classifier_last_trained)) {
@@ -190,15 +190,15 @@
                     [class.text-danger]="status.tasks.classifier_status === SystemStatusItemStatus.ERROR"
                     [class.text-warning]="status.tasks.classifier_status === SystemStatusItemStatus.WARNING"></i-bs>
                   }
-                </div>
+                </button>
                 @if (currentUserIsSuperUser) {
                   @if (isRunning(PaperlessTaskName.TrainClassifier)) {
                     <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
                   } @else {
-                    <div class="badge cursor-pointer bg-info btn-outline-secondary ms-2" (click)="runTask(PaperlessTaskName.TrainClassifier)">
+                    <button class="btn btn-sm btn-dark small ms-2" (click)="runTask(PaperlessTaskName.TrainClassifier)">
                       <i-bs name="play-fill"></i-bs>&nbsp;
                       <ng-container i18n>Run Task</ng-container>
-                    </div>
+                    </button>
                   }
                 }
               </dd>
@@ -211,7 +211,7 @@
               </ng-template>
               <dt i18n>Sanity Checker</dt>
               <dd class="d-flex align-items-center">
-                <div class="badge text-uppercase bg-info text-dark" [ngbPopover]="sanityCheckerStatus" triggers="mouseenter:mouseleave">
+                <button class="btn btn-sm btn-dark text-uppercase small" [ngbPopover]="sanityCheckerStatus" triggers="click mouseenter:mouseleave">
                   {{status.tasks.sanity_check_status}}
                   @if (status.tasks.sanity_check_status === 'OK') {
                     @if (isStale(status.tasks.sanity_check_last_run)) {
@@ -224,15 +224,15 @@
                     [class.text-danger]="status.tasks.sanity_check_status === SystemStatusItemStatus.ERROR"
                     [class.text-warning]="status.tasks.sanity_check_status === SystemStatusItemStatus.WARNING"></i-bs>
                   }
-                </div>
+                </button>
                 @if (currentUserIsSuperUser) {
                   @if (isRunning(PaperlessTaskName.SanityCheck)) {
                     <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
                   } @else {
-                    <div class="badge cursor-pointer bg-info btn-outline-secondary ms-2" (click)="runTask(PaperlessTaskName.SanityCheck)">
+                    <button class="btn btn-sm btn-dark small ms-2" (click)="runTask(PaperlessTaskName.SanityCheck)">
                       <i-bs name="play-fill"></i-bs>&nbsp;
                       <ng-container i18n>Run Task</ng-container>
-                    </div>
+                    </button>
                   }
                 }
               </dd>
@@ -251,7 +251,7 @@
   }
 </div>
 <div class="modal-footer">
-  <button class="btn btn-sm btn-outline-secondary" (click)="copy()">
+  <button class="btn btn-sm btn-dark btn btn-sm btn-dark btn-outline-secondary" (click)="copy()">
     @if (!copied) {
       <i-bs name="clipboard-fill"></i-bs>&nbsp;
     }
