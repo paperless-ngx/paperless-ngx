@@ -1911,7 +1911,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             ],
         )
 
-        # Custom field not found
+        # Custom field not found, removed from list
         response = self.client.patch(
             f"/api/saved_views/{v1.id}/",
             {
@@ -1923,7 +1923,9 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             },
             format="json",
         )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        v1.refresh_from_db()
+        self.assertNotIn(SavedView.DisplayFields.CUSTOM_FIELD % 99, v1.display_fields)
 
     def test_get_logs(self):
         log_data = "test\ntest2\n"
