@@ -767,6 +767,8 @@ canvas.hiddenCanvasElement {
 }
 
 .document-card {
+  overflow: hidden;
+
   .card-footer i-bs svg {
     vertical-align: middle;
   }
