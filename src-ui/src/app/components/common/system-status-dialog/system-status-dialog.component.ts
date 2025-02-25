@@ -49,7 +49,7 @@ export class SystemStatusDialogComponent {
   constructor(
     public activeModal: NgbActiveModal,
     private clipboard: Clipboard,
-    private statusService: SystemStatusService,
+    private systemStatusService: SystemStatusService,
     private tasksService: TasksService,
     private toastService: ToastService,
     private permissionsService: PermissionsService
@@ -83,7 +83,7 @@ export class SystemStatusDialogComponent {
     this.tasksService.run(taskName).subscribe({
       next: () => {
         this.runningTasks.delete(taskName)
-        this.statusService.get().subscribe({
+        this.systemStatusService.get().subscribe({
           next: (status) => {
             this.status = status
           },

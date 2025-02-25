@@ -9,11 +9,16 @@ import {
 } from '@angular/core/testing'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { of, throwError } from 'rxjs'
+import { PaperlessTaskName } from 'src/app/data/paperless-task'
 import {
   InstallType,
   SystemStatus,
   SystemStatusItemStatus,
 } from 'src/app/data/system-status'
+import { SystemStatusService } from 'src/app/services/system-status.service'
+import { TasksService } from 'src/app/services/tasks.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { SystemStatusDialogComponent } from './system-status-dialog.component'
 
 const status: SystemStatus = {
@@ -54,6 +59,9 @@ describe('SystemStatusDialogComponent', () => {
   let component: SystemStatusDialogComponent
   let fixture: ComponentFixture<SystemStatusDialogComponent>
   let clipboard: Clipboard
+  let tasksService: TasksService
+  let systemStatusService: SystemStatusService
+  let toastService: ToastService
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -72,6 +80,9 @@ describe('SystemStatusDialogComponent', () => {
     component = fixture.componentInstance
     component.status = status
     clipboard = TestBed.inject(Clipboard)
+    tasksService = TestBed.inject(TasksService)
+    systemStatusService = TestBed.inject(SystemStatusService)
+    toastService = TestBed.inject(ToastService)
     fixture.detectChanges()
   })
 
@@ -97,5 +108,38 @@ describe('SystemStatusDialogComponent', () => {
     date.setHours(date.getHours() - 25)
     expect(component.isStale(date.toISOString())).toBeTruthy()
     expect(component.isStale(date.toISOString(), 26)).toBeFalsy()
+  })
+
+  it('should check if task is running', () => {
+    component.runTask(PaperlessTaskName.IndexOptimize)
+    expect(component.isRunning(PaperlessTaskName.IndexOptimize)).toBeTruthy()
+    expect(component.isRunning(PaperlessTaskName.SanityCheck)).toBeFalsy()
+  })
+
+  it('should support running tasks, refresh status and show toasts', () => {
+    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const getStatusSpy = jest.spyOn(systemStatusService, 'get')
+    const runSpy = jest.spyOn(tasksService, 'run')
+
+    // fail first
+    runSpy.mockReturnValue(throwError(() => new Error('error')))
+    component.runTask(PaperlessTaskName.IndexOptimize)
+    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskName.IndexOptimize)
+    expect(toastErrorSpy).toHaveBeenCalledWith(
+      `Failed to start task ${PaperlessTaskName.IndexOptimize}, see the logs for more details`,
+      expect.any(Error)
+    )
+
+    // succeed
+    runSpy.mockReturnValue(of({}))
+    getStatusSpy.mockReturnValue(of(status))
+    component.runTask(PaperlessTaskName.IndexOptimize)
+    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskName.IndexOptimize)
+
+    expect(getStatusSpy).toHaveBeenCalled()
+    expect(toastSpy).toHaveBeenCalledWith(
+      `Task ${PaperlessTaskName.IndexOptimize} started`
+    )
   })
 })
