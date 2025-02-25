@@ -91,10 +91,6 @@ ARG RUNTIME_PACKAGES="\
   tesseract-ocr \
   tesseract-ocr-vie \
   tesseract-ocr-eng \
-  tesseract-ocr-deu \
-  tesseract-ocr-fra \
-  tesseract-ocr-ita \
-  tesseract-ocr-spa \
   unpaper \
   pngquant \
   jbig2dec \
@@ -224,7 +220,7 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
     && python3 -m pip install --no-cache-dir --upgrade wheel \
   && echo "Installing Python requirements" \
-    && python3 -m pip install --default-timeout=1000 --requirement requirements.txt \
+    && python3 -m pip install --default-timeout=1000 --no-cache-dir --requirement requirements.txt \
   && echo "Installing NLTK data" \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" snowball_data \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" stopwords \
