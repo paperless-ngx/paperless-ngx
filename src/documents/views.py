@@ -38,6 +38,7 @@ from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
+from django.http import HttpResponseServerError
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -145,6 +146,7 @@ from documents.serialisers import DocumentListSerializer
 from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
 from documents.serialisers import PostDocumentSerializer
+from documents.serialisers import RunTaskViewSerializer
 from documents.serialisers import SavedViewSerializer
 from documents.serialisers import SearchResultSerializer
 from documents.serialisers import ShareLinkSerializer
@@ -161,6 +163,9 @@ from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_updated
 from documents.tasks import consume_file
 from documents.tasks import empty_trash
+from documents.tasks import index_optimize
+from documents.tasks import sanity_check
+from documents.tasks import train_classifier
 from documents.templating.filepath import validate_filepath_template_and_render
 from paperless import version
 from paperless.celery import app as celery_app
@@ -2233,6 +2238,18 @@ class TasksViewSet(ReadOnlyModelViewSet):
     )
     filterset_class = PaperlessTaskFilterSet
 
+    TASK_AND_ARGS_BY_NAME = {
+        PaperlessTask.TaskName.INDEX_OPTIMIZE: (index_optimize, {}),
+        PaperlessTask.TaskName.TRAIN_CLASSIFIER: (
+            train_classifier,
+            {"scheduled": False},
+        ),
+        PaperlessTask.TaskName.CHECK_SANITY: (
+            sanity_check,
+            {"scheduled": False, "raise_on_error": False},
+        ),
+    }
+
     def get_queryset(self):
         queryset = PaperlessTask.objects.all().order_by("-date_created")
         task_id = self.request.query_params.get("task_id")
@@ -2256,6 +2273,25 @@ class TasksViewSet(ReadOnlyModelViewSet):
             return Response({"result": result})
         except Exception:
             return HttpResponseBadRequest()
+
+    @action(methods=["post"], detail=False)
+    def run(self, request):
+        serializer = RunTaskViewSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        task_name = serializer.validated_data.get("task_name")
+
+        if not request.user.is_superuser:
+            return HttpResponseForbidden("Insufficient permissions")
+
+        try:
+            task_func, task_args = self.TASK_AND_ARGS_BY_NAME[task_name]
+            result = task_func(**task_args)
+            return Response({"result": result})
+        except Exception as e:
+            logger.warning(f"An error occurred running task: {e!s}")
+            return HttpResponseServerError(
+                "Error running task, check logs for more detail.",
+            )
 
 
 class ShareLinkViewSet(ModelViewSet, PassUserMixin):

@@ -201,13 +201,16 @@ def consume_file(
 
 
 @shared_task
-def sanity_check():
-    messages = sanity_checker.check_sanity()
+def sanity_check(*, scheduled=True, raise_on_error=True):
+    messages = sanity_checker.check_sanity(scheduled=scheduled)
 
     messages.log_messages()
 
     if messages.has_error:
-        raise SanityCheckFailedException("Sanity check failed with errors. See log.")
+        message = "Sanity check exited with errors. See log."
+        if raise_on_error:
+            raise SanityCheckFailedException(message)
+        return message
     elif messages.has_warning:
         return "Sanity check exited with warnings. See log."
     elif len(messages) > 0:

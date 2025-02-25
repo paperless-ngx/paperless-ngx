@@ -10,6 +10,7 @@ export enum PaperlessTaskName {
   ConsumeFile = 'consume_file',
   TrainClassifier = 'train_classifier',
   SanityCheck = 'check_sanity',
+  IndexOptimize = 'index_optimize',
 }
 
 export enum PaperlessTaskStatus {

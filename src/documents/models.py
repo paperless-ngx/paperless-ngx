@@ -659,6 +659,7 @@ class PaperlessTask(ModelWithOwner):
         CONSUME_FILE = ("consume_file", _("Consume File"))
         TRAIN_CLASSIFIER = ("train_classifier", _("Train Classifier"))
         CHECK_SANITY = ("check_sanity", _("Check Sanity"))
+        INDEX_OPTIMIZE = ("index_optimize", _("Index Optimize"))
 
     task_id = models.CharField(
         max_length=255,

@@ -1742,6 +1742,14 @@ class TasksViewSerializer(OwnedObjectSerializer):
         return result
 
 
+class RunTaskViewSerializer(serializers.Serializer):
+    task_name = serializers.ChoiceField(
+        choices=PaperlessTask.TaskName.choices,
+        label="Task Name",
+        write_only=True,
+    )
+
+
 class AcknowledgeTasksViewSerializer(serializers.Serializer):
     tasks = serializers.ListField(
         required=True,

@@ -132,4 +132,19 @@ describe('TasksService', () => {
     expect(tasksService.queuedFileTasks).toHaveLength(1)
     expect(tasksService.startedFileTasks).toHaveLength(1)
   })
+
+  it('supports running tasks', () => {
+    tasksService.run(PaperlessTaskName.SanityCheck).subscribe((res) => {
+      expect(res).toEqual({
+        result: 'success',
+      })
+    })
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}tasks/run/`
+    )
+    expect(req.request.method).toEqual('POST')
+    req.flush({
+      result: 'success',
+    })
+  })
 })

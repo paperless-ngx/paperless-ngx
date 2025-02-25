@@ -144,7 +144,7 @@
           <div class="card-body">
             <dl class="card-text">
               <dt i18n>Search Index</dt>
-              <dd>
+              <dd class="d-flex align-items-center">
                 <div class="badge text-uppercase bg-info text-dark" [ngbPopover]="indexStatus" triggers="mouseenter:mouseleave">
                   {{status.tasks.index_status}}
                   @if (status.tasks.index_status === 'OK') {
@@ -157,6 +157,16 @@
                     <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
                   }
                 </div>
+                @if (currentUserIsSuperUser) {
+                  @if (isRunning(PaperlessTaskName.IndexOptimize)) {
+                    <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
+                  } @else {
+                    <div class="badge cursor-pointer bg-info btn-outline-secondary ms-2" (click)="runTask(PaperlessTaskName.IndexOptimize)">
+                      <i-bs name="play-fill"></i-bs>&nbsp;
+                      <ng-container i18n>Run Task</ng-container>
+                    </div>
+                  }
+                }
               </dd>
               <ng-template #indexStatus>
                 @if (status.tasks.index_status === 'OK') {
@@ -166,7 +176,7 @@
                 }
               </ng-template>
               <dt i18n>Classifier</dt>
-              <dd>
+              <dd class="d-flex align-items-center">
                 <div class="badge text-uppercase bg-info text-dark" [ngbPopover]="classifierStatus" triggers="mouseenter:mouseleave">
                   {{status.tasks.classifier_status}}
                   @if (status.tasks.classifier_status === 'OK') {
@@ -181,6 +191,16 @@
                     [class.text-warning]="status.tasks.classifier_status === SystemStatusItemStatus.WARNING"></i-bs>
                   }
                 </div>
+                @if (currentUserIsSuperUser) {
+                  @if (isRunning(PaperlessTaskName.TrainClassifier)) {
+                    <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
+                  } @else {
+                    <div class="badge cursor-pointer bg-info btn-outline-secondary ms-2" (click)="runTask(PaperlessTaskName.TrainClassifier)">
+                      <i-bs name="play-fill"></i-bs>&nbsp;
+                      <ng-container i18n>Run Task</ng-container>
+                    </div>
+                  }
+                }
               </dd>
               <ng-template #classifierStatus>
                 @if (status.tasks.classifier_status === 'OK') {
@@ -190,7 +210,7 @@
                 }
               </ng-template>
               <dt i18n>Sanity Checker</dt>
-              <dd>
+              <dd class="d-flex align-items-center">
                 <div class="badge text-uppercase bg-info text-dark" [ngbPopover]="sanityCheckerStatus" triggers="mouseenter:mouseleave">
                   {{status.tasks.sanity_check_status}}
                   @if (status.tasks.sanity_check_status === 'OK') {
@@ -205,6 +225,16 @@
                     [class.text-warning]="status.tasks.sanity_check_status === SystemStatusItemStatus.WARNING"></i-bs>
                   }
                 </div>
+                @if (currentUserIsSuperUser) {
+                  @if (isRunning(PaperlessTaskName.SanityCheck)) {
+                    <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
+                  } @else {
+                    <div class="badge cursor-pointer bg-info btn-outline-secondary ms-2" (click)="runTask(PaperlessTaskName.SanityCheck)">
+                      <i-bs name="play-fill"></i-bs>&nbsp;
+                      <ng-container i18n>Run Task</ng-container>
+                    </div>
+                  }
+                }
               </dd>
               <ng-template #sanityCheckerStatus>
                 @if (status.tasks.sanity_check_status === 'OK') {

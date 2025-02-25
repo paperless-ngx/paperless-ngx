@@ -50,6 +50,7 @@ class Migration(migrations.Migration):
                     ("consume_file", "Consume File"),
                     ("train_classifier", "Train Classifier"),
                     ("check_sanity", "Check Sanity"),
+                    ("index_optimize", "Index Optimize"),
                 ],
                 help_text="Name of the task that was run",
                 max_length=255,
