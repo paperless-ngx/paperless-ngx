@@ -1199,7 +1199,7 @@ API_UPLOAD_FILE_OCR = os.getenv("API_UPLOAD_FILE_OCR", "")
 ###############################################################################
 # Elastic search                                                              #
 ###############################################################################
-
+ELASTIC_SEARCH_DOCUMENT_INDEX=os.getenv("ELASTIC_SEARCH_DOCUMENT_INDEX", "document_index")
 ELASTICSEARCH_DSL = {
     'default': {
         'hosts': os.getenv("ELASTIC_SEARCH_HOST", ""),  # Địa chỉ của Elasticsearch

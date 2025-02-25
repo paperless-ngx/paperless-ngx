@@ -870,7 +870,7 @@ class Consumer(LoggingMixin):
                 ConsumerFilePhase.WORKING,
                 ConsumerStatusShortMessage.PARSING_DOCUMENT,
             )
-            enable_ocr = ApplicationConfiguration.objects.filter().first().enable_ocr
+            # enable_ocr = ApplicationConfiguration.objects.filter().first().enable_ocr
             # if enable_ocr:
             #     self.log.debug(f"Parsing {self.filename}...")
             #

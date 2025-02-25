@@ -126,7 +126,6 @@ from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
 from documents.filters import WarehouseFilterSet
-from documents.index import convert_elastic_search
 from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_folders

@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
 
+from documents.index import delete_document_index
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -89,18 +90,23 @@ class DocumentAdmin(GuardedModelAdmin):
     created_.short_description = "Created"
 
     def delete_queryset(self, request, queryset):
-        from documents import index
+        for o in queryset:
+            delete_document_index(doc=o)
 
-        with index.open_index_writer() as writer:
-            for o in queryset:
-                index.remove_document(writer, o)
+        # from documents import index
+        #
+        # with index.open_index_writer() as writer:
+        #     for o in queryset:
+        #         index.remove_document(writer, o)
 
         super().delete_queryset(request, queryset)
 
     def delete_model(self, request, obj):
-        from documents import index
-
-        index.remove_document_from_index(obj)
+        delete_document_index(doc=obj)
+        # delete model index
+        # from documents import index
+        #
+        # index.remove_document_from_index(obj)
         super().delete_model(request, obj)
 
     def save_model(self, request, obj, form, change):

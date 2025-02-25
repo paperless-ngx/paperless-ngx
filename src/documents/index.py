@@ -43,10 +43,12 @@ from whoosh.searching import Searcher
 from whoosh.util.times import timespan
 from whoosh.writing import AsyncWriter
 
+from documents.documents import DocumentDocument
 from documents.models import CustomFieldInstance, Warehouse
 from documents.models import Document
 from documents.models import Note
 from documents.models import User
+from paperless.settings import ELASTIC_SEARCH_DOCUMENT_INDEX
 
 logger = logging.getLogger("paperless.index")
 
@@ -130,6 +132,14 @@ def open_index_searcher() -> Searcher:
     finally:
         searcher.close()
 
+def update_index_document(doc: Document):
+    DocumentDocument().update_document(doc)
+
+def delete_document_index(doc: Document = None, id: int=None):
+    if doc is not None:
+        id = doc.id
+    DocumentDocument().delete(id=str(id))
+
 
 def update_document(writer: AsyncWriter, doc: Document):
     tags = ",".join([t.name for t in doc.tags.all()])
@@ -197,7 +207,8 @@ def update_document(writer: AsyncWriter, doc: Document):
 
 
 def remove_document(writer: AsyncWriter, doc: Document):
-    remove_document_by_id(writer, doc.pk)
+    # remove_document_by_id(writer, doc.pk)
+    delete_document_index(doc=doc)
 
 
 def remove_document_by_id(writer: AsyncWriter, doc_id):
@@ -205,13 +216,14 @@ def remove_document_by_id(writer: AsyncWriter, doc_id):
 
 
 def add_or_update_document(document: Document):
-    with open_index_writer() as writer:
-        update_document(writer, document)
+    # with open_index_writer() as writer:
+    # update_document(writer, document)
+    update_index_document(document)
 
 
 def remove_document_from_index(document: Document):
-    with open_index_writer() as writer:
-        remove_document(writer, document)
+    # with open_index_writer() as writer:
+    remove_document(None, document)
 
 
 class DelayedQuery:
@@ -451,13 +463,13 @@ class DelayedElasticSearch(DelayedQuery):
             "created": "created",
             "modified": "modified",
             "added": "added",
-            "title": "title_keyword",
+            "title": "title",
             "correspondent__name": "correspondent",
-            "document_type__name": "type_keyword",
+            "document_type__name": "type",
             "warehouse__name": "warehouse",
             "archive_serial_number": "asn",
             "num_notes": "num_notes",
-            "owner": "owner_keyword",
+            "owner": "owner",
             "page_count": "page_count",
             "score": "score"
         }
@@ -562,7 +574,7 @@ class DelayedElasticSearch(DelayedQuery):
                 criterias.append(Q("term", **{f"has_{field}": not self.evalBoolean(value)}))
             elif query_filter == "id__all":
                 if field in {"tag"}:
-                    in_filter = [Q("term", **{'tags.id': object_id}) for
+                    in_filter = [Q("term", **{'tag_id': int(object_id)}) for
                                  object_id in value.split(",")]
                     criterias.append(
                         Q("bool", must=in_filter)
@@ -616,7 +628,7 @@ class DelayedElasticSearch(DelayedQuery):
 
     def search_pagination(self, content, page_number, page_size):
         s = Search(
-            index='document_index')  # Thay 'your_index_name' bằng tên chỉ mục của bạn
+            index=ELASTIC_SEARCH_DOCUMENT_INDEX)  # Thay 'your_index_name' bằng tên chỉ mục của bạn
 
 
         query_combined = self.get_combined_query()
@@ -633,9 +645,7 @@ class DelayedElasticSearch(DelayedQuery):
 
     def search_get_all(self):
         s = Search(
-            index='document_index')  # Thay 'your_index_name' bằng tên chỉ mục của bạn
-
-
+            index=ELASTIC_SEARCH_DOCUMENT_INDEX)  # Thay 'your_index_name' bằng tên chỉ mục của bạn
         query_combined = self.get_combined_query()
         s = s.query(query_combined['query'])  # Chỉ lấy phần query
         s = s.source(['id'])
@@ -650,7 +660,7 @@ class DelayedElasticSearch(DelayedQuery):
         # q, mask = self._get_query()
         sortedby, reverse = self._get_query_sortedby()
 
-        # print('ket qua',self.get_combined_query())
+        print('ket qua',self.get_combined_query())
         page_num = math.floor(item.start / self.page_size) + 1
         page_len = self.page_size
         start = datetime.now()
@@ -710,28 +720,7 @@ class DelayedElasticSearch(DelayedQuery):
 
         self.saved_results[item.start] = page
         return page
-def get_all_docs_elastic_search(content):
-    s = Search(
-        index='document_index')  # Thay 'your_index_name' bằng tên chỉ mục của bạn
-    s = s.query('multi_match', query=content,
-                fields=['title', 'content'])
-    s = s.source(['id'])
-    response = s.scan()
-    doc_ids = {int(doc.meta.id) for doc in response}
-    return doc_ids
 
-
-def convert_elastic_search(content, page_number=1, page_size=10):
-    s = Search(
-        index='document_index')  # Thay 'your_index_name' bằng tên chỉ mục của bạn
-    s = s.query('multi_match', query=content,
-                fields=['title', 'content'])
-    s = s.highlight('content', fragment_size=300, number_of_fragments=5, pre_tags=['<span class="match">'],
-                    post_tags=['</span>'])
-    s = s.source(['id'])
-    s = s[page_number*page_size-page_size:page_number*page_size]
-    response = s.execute()
-    return response
 
 class DelayedMoreLikeThisQuery(DelayedQuery):
     def _get_query(self):

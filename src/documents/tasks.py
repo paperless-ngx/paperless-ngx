@@ -39,6 +39,7 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
+from documents.index import update_index_document
 from documents.models import BackupRecord, PaperlessTask
 from documents.models import Correspondent
 from documents.models import CustomFieldInstance
@@ -101,12 +102,13 @@ def index_optimize():
 def index_reindex(progress_bar_disable=False):
     documents = Document.objects.all()
 
-    ix = index.open_index(recreate=True)
-
-    with AsyncWriter(ix) as writer:
-        for document in tqdm.tqdm(documents, disable=progress_bar_disable):
-            index.update_document(writer, document)
-
+    # ix = index.open_index(recreate=True)
+    #
+    # with AsyncWriter(ix) as writer:
+    #     for document in tqdm.tqdm(documents, disable=progress_bar_disable):
+    #         index.update_document(writer, document)
+    for document in tqdm.tqdm(documents, disable=progress_bar_disable):
+        update_index_document(document)
 
 @shared_task
 def train_classifier():
@@ -257,7 +259,7 @@ def sanity_check():
 def bulk_update_documents(document_ids):
     documents = Document.objects.filter(id__in=document_ids)
 
-    ix = index.open_index()
+    # ix = index.open_index()
 
     for doc in documents:
         clear_document_caches(doc.pk)
@@ -268,9 +270,11 @@ def bulk_update_documents(document_ids):
         )
         post_save.send(Document, instance=doc, created=False)
 
-    with AsyncWriter(ix) as writer:
-        for doc in documents:
-            index.update_document(writer, doc)
+    # with AsyncWriter(ix) as writer:
+        # for doc in documents:
+        #     index.update_document(writer, doc)
+    for doc in documents:
+        update_index_document(doc)
 
 
 @shared_task(bind=True)
@@ -380,8 +384,9 @@ def update_document_archive_file(self, document_id=None):
                     shutil.move(parser.get_archive_path(), document.archive_path)
                     shutil.move(thumbnail, document.thumbnail_path)
 
-            with index.open_index_writer() as writer:
-                index.update_document(writer, document)
+            # with index.open_index_writer() as writer:
+            #     index.update_document(writer, document)
+            update_index_document(document)
 
             clear_document_caches(document.pk)
     except Exception as ex:
