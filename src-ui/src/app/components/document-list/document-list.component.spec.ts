@@ -376,7 +376,7 @@ describe('DocumentListComponent', () => {
     expect(documentListService.selected.size).toEqual(3)
   })
 
-  it('should support saving an edited view', () => {
+  it('should support saving a view', () => {
     const view: SavedView = {
       id: 10,
       name: 'Saved View 10',
@@ -411,6 +411,30 @@ describe('DocumentListComponent', () => {
     expect(savedViewServicePatch).toHaveBeenCalledWith(modifiedView)
     expect(toastSpy).toHaveBeenCalledWith(
       `View "${view.name}" saved successfully.`
+    )
+  })
+
+  it('should handle error on view saving', () => {
+    component.list.activateSavedView({
+      id: 10,
+      name: 'Saved View 10',
+      sort_field: 'added',
+      sort_reverse: true,
+      filter_rules: [
+        {
+          rule_type: FILTER_HAS_TAGS_ANY,
+          value: '20',
+        },
+      ],
+    })
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    jest
+      .spyOn(savedViewService, 'patch')
+      .mockReturnValueOnce(throwError(() => new Error('Error saving view')))
+    component.saveViewConfig()
+    expect(toastErrorSpy).toHaveBeenCalledWith(
+      'Failed to save view "Saved View 10".',
+      expect.any(Error)
     )
   })
 

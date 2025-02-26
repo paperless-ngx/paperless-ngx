@@ -17,6 +17,7 @@ import { DocumentListViewService } from 'src/app/services/document-list-view.ser
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
@@ -50,7 +51,8 @@ export class CustomFieldsComponent
     private toastService: ToastService,
     private documentListViewService: DocumentListViewService,
     private settingsService: SettingsService,
-    private documentService: DocumentService
+    private documentService: DocumentService,
+    private savedViewService: SavedViewService
   ) {
     super()
   }
@@ -115,6 +117,7 @@ export class CustomFieldsComponent
           this.customFieldsService.clearCache()
           this.settingsService.initializeDisplayFields()
           this.documentService.reload()
+          this.savedViewService.reload()
           this.reload()
         },
         error: (e) => {
