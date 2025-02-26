@@ -567,7 +567,7 @@ class DocumentViewSet(
     GenericViewSet,
 ):
     model = Document
-    queryset = Document.objects.annotate(num_notes=Count("notes"))
+    queryset = Document.objects.all()
     serializer_class = DocumentSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
@@ -596,7 +596,8 @@ class DocumentViewSet(
 
     def get_queryset(self):
         return (
-            Document.objects.distinct()
+            Document.objects.filter(head_version__isnull=True)
+            .distinct()
             .order_by("-created")
             .annotate(num_notes=Count("notes"))
             .select_related("correspondent", "storage_path", "document_type", "owner")

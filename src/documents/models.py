@@ -313,6 +313,15 @@ class Document(SoftDeleteModel, ModelWithOwner):
         ),
     )
 
+    head_version = models.ForeignKey(
+        "self",
+        blank=True,
+        null=True,
+        related_name="versions",
+        on_delete=models.CASCADE,
+        verbose_name=_("head version of document"),
+    )
+
     class Meta:
         ordering = ("-created",)
         verbose_name = _("document")
