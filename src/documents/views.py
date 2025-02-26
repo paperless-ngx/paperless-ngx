@@ -1,11 +1,9 @@
 import itertools
-import json
 import logging
 import os
 import platform
 import re
 import tempfile
-import urllib
 import zipfile
 from datetime import datetime
 from pathlib import Path
@@ -14,6 +12,7 @@ from unicodedata import normalize
 from urllib.parse import quote
 from urllib.parse import urlparse
 
+import httpx
 import pathvalidate
 from celery import states
 from django.conf import settings
@@ -2219,24 +2218,21 @@ class RemoteVersionView(GenericAPIView):
         is_greater_than_current = False
         current_version = packaging_version.parse(version.__full_version_str__)
         try:
-            req = urllib.request.Request(
-                "https://api.github.com/repos/paperless-ngx/"
-                "paperless-ngx/releases/latest",
+            resp = httpx.get(
+                "https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest",
+                headers={"Accept": "application/json"},
             )
-            # Ensure a JSON response
-            req.add_header("Accept", "application/json")
-
-            with urllib.request.urlopen(req) as response:
-                remote = response.read().decode("utf8")
+            resp.raise_for_status()
             try:
-                remote_json = json.loads(remote)
-                remote_version = remote_json["tag_name"]
+                data = resp.json()
+                logger.info(data)
+                remote_version = data["tag_name"]
                 # Some early tags used ngx-x.y.z
                 remote_version = remote_version.removeprefix("ngx-")
             except ValueError:
                 logger.debug("An error occurred parsing remote version json")
-        except urllib.error.URLError:
-            logger.debug("An error occurred checking for available updates")
+        except httpx.HTTPError:
+            logger.exception("An error occurred checking for available updates")
 
         is_greater_than_current = (
             packaging_version.parse(
@@ -2244,6 +2240,9 @@ class RemoteVersionView(GenericAPIView):
             )
             > current_version
         )
+        logger.info(remote_version)
+        logger.info(current_version)
+        logger.info(is_greater_than_current)
 
         return Response(
             {

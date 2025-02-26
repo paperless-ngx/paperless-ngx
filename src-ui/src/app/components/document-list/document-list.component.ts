@@ -377,12 +377,20 @@ export class DocumentListComponent
       this.savedViewService
         .patch(savedView)
         .pipe(first())
-        .subscribe((view) => {
-          this.unmodifiedSavedView = view
-          this.toastService.showInfo(
-            $localize`View "${this.list.activeSavedViewTitle}" saved successfully.`
-          )
-          this.unmodifiedFilterRules = this.list.filterRules
+        .subscribe({
+          next: (view) => {
+            this.unmodifiedSavedView = view
+            this.toastService.showInfo(
+              $localize`View "${this.list.activeSavedViewTitle}" saved successfully.`
+            )
+            this.unmodifiedFilterRules = this.list.filterRules
+          },
+          error: (err) => {
+            this.toastService.showError(
+              $localize`Failed to save view "${this.list.activeSavedViewTitle}".`,
+              err
+            )
+          },
         })
     }
   }

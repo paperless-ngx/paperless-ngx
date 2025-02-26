@@ -36,6 +36,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import PaperlessTask
+from documents.models import SavedView
 from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
@@ -547,6 +548,33 @@ def check_paths_and_prune_custom_fields(sender, instance: CustomField, **kwargs)
 
             # Update the filename and move files if necessary
             update_filename_and_move_files(sender, cf_instance)
+
+
+@receiver(models.signals.post_delete, sender=CustomField)
+def cleanup_custom_field_deletion(sender, instance: CustomField, **kwargs):
+    """
+    When a custom field is deleted, ensure no saved views reference it.
+    """
+    field_identifier = SavedView.DisplayFields.CUSTOM_FIELD % instance.pk
+    # remove field from display_fields of all saved views
+    for view in SavedView.objects.filter(display_fields__isnull=False).distinct():
+        if field_identifier in view.display_fields:
+            logger.debug(
+                f"Removing custom field {instance} from view {view}",
+            )
+            view.display_fields.remove(field_identifier)
+            view.save()
+
+    # remove from sort_field of all saved views
+    views_with_sort_updated = SavedView.objects.filter(
+        sort_field=field_identifier,
+    ).update(
+        sort_field=SavedView.DisplayFields.CREATED,
+    )
+    if views_with_sort_updated > 0:
+        logger.debug(
+            f"Removing custom field {instance} from sort field of {views_with_sort_updated} views",
+        )
 
 
 def add_to_index(sender, document, **kwargs):
