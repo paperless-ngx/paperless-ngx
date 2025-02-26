@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import logging
 import os
 import shutil
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import httpx
 from celery import shared_task
@@ -23,9 +25,6 @@ from guardian.shortcuts import remove_perm
 
 from documents import matching
 from documents.caching import clear_document_caches
-from documents.classifier import DocumentClassifier
-from documents.data_models import ConsumableDocument
-from documents.data_models import DocumentMetadataOverrides
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_unique_filename
@@ -45,6 +44,13 @@ from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.templating.workflows import parse_w_workflow_placeholders
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from documents.classifier import DocumentClassifier
+    from documents.data_models import ConsumableDocument
+    from documents.data_models import DocumentMetadataOverrides
 
 logger = logging.getLogger("paperless.handlers")
 

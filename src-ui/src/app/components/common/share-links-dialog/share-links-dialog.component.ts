@@ -1,7 +1,7 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { Component, Input, OnInit } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first } from 'rxjs'
 import { FileVersion, ShareLink } from 'src/app/data/share-link'
@@ -10,17 +10,12 @@ import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 
 @Component({
-  selector: 'pngx-share-links-dropdown',
-  templateUrl: './share-links-dropdown.component.html',
-  styleUrls: ['./share-links-dropdown.component.scss'],
-  imports: [
-    FormsModule,
-    ReactiveFormsModule,
-    NgbDropdownModule,
-    NgxBootstrapIconsModule,
-  ],
+  selector: 'pngx-share-links-dialog',
+  templateUrl: './share-links-dialog.component.html',
+  styleUrls: ['./share-links-dialog.component.scss'],
+  imports: [FormsModule, ReactiveFormsModule, NgxBootstrapIconsModule],
 })
-export class ShareLinksDropdownComponent implements OnInit {
+export class ShareLinksDialogComponent implements OnInit {
   EXPIRATION_OPTIONS = [
     { label: $localize`1 day`, value: 1 },
     { label: $localize`7 days`, value: 7 },
@@ -40,9 +35,6 @@ export class ShareLinksDropdownComponent implements OnInit {
       this.refresh()
     }
   }
-
-  @Input()
-  disabled: boolean = false
 
   private _hasArchiveVersion: boolean = true
 
@@ -67,6 +59,7 @@ export class ShareLinksDropdownComponent implements OnInit {
   useArchiveVersion: boolean = true
 
   constructor(
+    private activeModal: NgbActiveModal,
     private shareLinkService: ShareLinkService,
     private toastService: ToastService,
     private clipboard: Clipboard
@@ -168,5 +161,9 @@ export class ShareLinksDropdownComponent implements OnInit {
           this.toastService.showError($localize`Error creating link`, 10000, e)
         },
       })
+  }
+
+  close() {
+    this.activeModal.close()
   }
 }

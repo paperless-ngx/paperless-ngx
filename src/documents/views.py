@@ -109,6 +109,7 @@ from documents.filters import PaperlessTaskFilterSet
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
+from documents.mail import send_email
 from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_storage_paths
@@ -1030,6 +1031,57 @@ class DocumentViewSet(
 
         return Response(sorted(entries, key=lambda x: x["timestamp"], reverse=True))
 
+    @action(methods=["post"], detail=True)
+    def email(self, request, pk=None):
+        try:
+            doc = Document.objects.select_related("owner").get(pk=pk)
+            if request.user is not None and not has_perms_owner_aware(
+                request.user,
+                "view_document",
+                doc,
+            ):
+                return HttpResponseForbidden("Insufficient permissions")
+        except Document.DoesNotExist:
+            raise Http404
+
+        try:
+            if (
+                "addresses" not in request.data
+                or "subject" not in request.data
+                or "message" not in request.data
+            ):
+                return HttpResponseBadRequest("Missing required fields")
+
+            use_archive_version = request.data.get("use_archive_version", True)
+
+            addresses = request.data.get("addresses").split(",")
+            if not all(
+                re.match(r"[^@]+@[^@]+\.[^@]+", address.strip())
+                for address in addresses
+            ):
+                return HttpResponseBadRequest("Invalid email address found")
+
+            send_email(
+                subject=request.data.get("subject"),
+                body=request.data.get("message"),
+                to=addresses,
+                attachment=(
+                    doc.archive_path
+                    if use_archive_version and doc.has_archive_version
+                    else doc.source_path
+                ),
+                attachment_mime_type=doc.mime_type,
+            )
+            logger.debug(
+                f"Sent document {doc.id} via email to {addresses}",
+            )
+            return Response({"message": "Email sent"})
+        except Exception as e:
+            logger.warning(f"An error occurred emailing document: {e!s}")
+            return HttpResponseServerError(
+                "Error emailing document, check logs for more detail.",
+            )
+
 
 @extend_schema_view(
     list=extend_schema(
@@ -1148,7 +1200,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
 class LogViewSet(ViewSet):
     permission_classes = (IsAuthenticated, PaperlessAdminPermissions)
 
-    log_files = ["paperless", "mail"]
+    log_files = ["paperless", "mail", "celery"]
 
     def get_log_filename(self, log):
         return os.path.join(settings.LOGGING_DIR, f"{log}.log")

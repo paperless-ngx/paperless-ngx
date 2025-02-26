@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import datetime
 import logging
 import math
 import re
 import zoneinfo
-from collections.abc import Iterable
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import magic
 from celery import states
@@ -31,6 +33,7 @@ from rest_framework.fields import SerializerMethodField
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.context import set_actor
+
 
 from documents import bulk_edit
 from documents.data_models import DocumentSource
@@ -59,6 +62,9 @@ from documents.templating.filepath import validate_filepath_template_and_render
 from documents.templating.utils import convert_format_str_to_template_format
 from documents.validators import uri_validator
 from documents.validators import url_validator
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 logger = logging.getLogger("paperless.serializers")
 
@@ -1130,9 +1136,8 @@ class SavedViewSerializer(OwnedObjectSerializer):
                 ):  # i.e. check for 'custom_field_' prefix
                     field_id = int(re.search(r"\d+", field)[0])
                     if not CustomField.objects.filter(id=field_id).exists():
-                        raise serializers.ValidationError(
-                            f"Invalid field: {field}",
-                        )
+                        # In case the field was deleted, just remove from the list
+                        attrs["display_fields"].remove(field)
                 elif field not in SavedView.DisplayFields.values:
                     raise serializers.ValidationError(
                         f"Invalid field: {field}",

@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import hashlib
 import itertools
 import logging
 import tempfile
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Literal
 
 from celery import chain
@@ -10,7 +13,6 @@ from celery import chord
 from celery import group
 from celery import shared_task
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.db.models import Q
 from django.utils import timezone
 
@@ -28,6 +30,9 @@ from documents.plugins.helpers import DocumentsStatusManager
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
 from documents.tasks import update_document_content_maybe_archive_file
+
+if TYPE_CHECKING:
+    from django.contrib.auth.models import User
 
 logger: logging.Logger = logging.getLogger("paperless.bulk_edit")
 

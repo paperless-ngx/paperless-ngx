@@ -26,7 +26,7 @@ extend-select = [
   "T20",   # https://docs.astral.sh/ruff/rules/#flake8-print-t20
   "SIM",   # https://docs.astral.sh/ruff/rules/#flake8-simplify-sim
   "TID",   # https://docs.astral.sh/ruff/rules/#flake8-tidy-imports-tid
-  "TCH",   # https://docs.astral.sh/ruff/rules/#flake8-type-checking-tch
+  "TC",   # https://docs.astral.sh/ruff/rules/#flake8-type-checking-tc
   "PLC",   # https://docs.astral.sh/ruff/rules/#pylint-pl
   "PLE",   # https://docs.astral.sh/ruff/rules/#pylint-pl
   "RUF",   # https://docs.astral.sh/ruff/rules/#ruff-specific-rules-ruf
