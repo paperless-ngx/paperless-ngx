@@ -45,6 +45,7 @@ from django.utils.timezone import make_aware
 from django.utils.translation import get_language
 from django.views import View
 from django.views.decorators.cache import cache_control
+from django.views.decorators.cache import cache_page
 from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
@@ -2208,6 +2209,7 @@ class UiSettingsView(GenericAPIView):
     ),
 )
 class RemoteVersionView(GenericAPIView):
+    @method_decorator(cache_page(60 * 60 * 4))
     def get(self, request, format=None):
         remote_version = "0.0.0"
         is_greater_than_current = False
