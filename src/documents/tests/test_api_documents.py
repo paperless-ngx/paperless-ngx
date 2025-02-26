@@ -1911,7 +1911,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             ],
         )
 
-        # Custom field not found, removed from list
+        # Custom field not found
         response = self.client.patch(
             f"/api/saved_views/{v1.id}/",
             {
@@ -1923,9 +1923,43 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             },
             format="json",
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        v1.refresh_from_db()
-        self.assertNotIn(SavedView.DisplayFields.CUSTOM_FIELD % 99, v1.display_fields)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_saved_view_cleanup_after_custom_field_deletion(self):
+        """
+        GIVEN:
+            - Saved view with custom field in display fields and as sort field
+        WHEN:
+            - Custom field is deleted
+        THEN:
+            - Custom field is removed from display fields and sort field
+        """
+        custom_field = CustomField.objects.create(
+            name="stringfield",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+
+        view = SavedView.objects.create(
+            owner=self.user,
+            name="test",
+            sort_field=SavedView.DisplayFields.CUSTOM_FIELD % custom_field.id,
+            show_on_dashboard=True,
+            show_in_sidebar=True,
+            display_fields=[
+                SavedView.DisplayFields.TITLE,
+                SavedView.DisplayFields.CREATED,
+                SavedView.DisplayFields.CUSTOM_FIELD % custom_field.id,
+            ],
+        )
+
+        custom_field.delete()
+
+        view.refresh_from_db()
+        self.assertEqual(view.sort_field, SavedView.DisplayFields.CREATED)
+        self.assertEqual(
+            view.display_fields,
+            [str(SavedView.DisplayFields.TITLE), str(SavedView.DisplayFields.CREATED)],
+        )
 
     def test_get_logs(self):
         log_data = "test\ntest2\n"
