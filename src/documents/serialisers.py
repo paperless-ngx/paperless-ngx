@@ -1136,8 +1136,9 @@ class SavedViewSerializer(OwnedObjectSerializer):
                 ):  # i.e. check for 'custom_field_' prefix
                     field_id = int(re.search(r"\d+", field)[0])
                     if not CustomField.objects.filter(id=field_id).exists():
-                        # In case the field was deleted, just remove from the list
-                        attrs["display_fields"].remove(field)
+                        raise serializers.ValidationError(
+                            f"Invalid field: {field}",
+                        )
                 elif field not in SavedView.DisplayFields.values:
                     raise serializers.ValidationError(
                         f"Invalid field: {field}",
