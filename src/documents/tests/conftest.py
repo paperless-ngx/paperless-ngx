@@ -20,7 +20,7 @@ def rest_api_client():
 
 
 @pytest.fixture
-def rest_api_authenticated_client(rest_api_client: APIClient):
+def authenticated_rest_api_client(rest_api_client: APIClient):
     """
     The basic DRF ApiClient which has been authenticated
     """
