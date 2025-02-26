@@ -2229,10 +2229,10 @@ class RemoteVersionView(GenericAPIView):
                 remote_version = data["tag_name"]
                 # Some early tags used ngx-x.y.z
                 remote_version = remote_version.removeprefix("ngx-")
-            except ValueError:
-                logger.debug("An error occurred parsing remote version json")
-        except httpx.HTTPError:
-            logger.exception("An error occurred checking for available updates")
+            except ValueError as e:
+                logger.debug(f"An error occurred parsing remote version json: {e}")
+        except httpx.HTTPError as e:
+            logger.debug(f"An error occurred checking for available updates: {e}")
 
         is_greater_than_current = (
             packaging_version.parse(
@@ -2240,9 +2240,6 @@ class RemoteVersionView(GenericAPIView):
             )
             > current_version
         )
-        logger.info(remote_version)
-        logger.info(current_version)
-        logger.info(is_greater_than_current)
 
         return Response(
             {
