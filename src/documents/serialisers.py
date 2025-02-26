@@ -1710,6 +1710,7 @@ class TasksViewSerializer(OwnedObjectSerializer):
         fields = (
             "id",
             "task_id",
+            "task_name",
             "task_file_name",
             "date_created",
             "date_done",
@@ -1721,12 +1722,6 @@ class TasksViewSerializer(OwnedObjectSerializer):
             "owner",
         )
 
-    type = serializers.SerializerMethodField()
-
-    def get_type(self, obj) -> str:
-        # just file tasks, for now
-        return "file"
-
     related_document = serializers.SerializerMethodField()
     created_doc_re = re.compile(r"New document id (\d+) created")
     duplicate_doc_re = re.compile(r"It is a duplicate of .* \(#(\d+)\)")
@@ -1734,22 +1729,31 @@ class TasksViewSerializer(OwnedObjectSerializer):
     def get_related_document(self, obj) -> str | None:
         result = None
         re = None
-        match obj.status:
-            case states.SUCCESS:
-                re = self.created_doc_re
-            case states.FAILURE:
-                re = (
-                    self.duplicate_doc_re
-                    if "existing document is in the trash" not in obj.result
-                    else None
-                )
-        if re is not None:
-            try:
-                result = re.search(obj.result).group(1)
-            except Exception:
-                pass
+        if obj.result:
+            match obj.status:
+                case states.SUCCESS:
+                    re = self.created_doc_re
+                case states.FAILURE:
+                    re = (
+                        self.duplicate_doc_re
+                        if "existing document is in the trash" not in obj.result
+                        else None
+                    )
+            if re is not None:
+                try:
+                    result = re.search(obj.result).group(1)
+                except Exception:
+                    pass
 
         return result
+
+
+class RunTaskViewSerializer(serializers.Serializer):
+    task_name = serializers.ChoiceField(
+        choices=PaperlessTask.TaskName.choices,
+        label="Task Name",
+        write_only=True,
+    )
 
 
 class AcknowledgeTasksViewSerializer(serializers.Serializer):

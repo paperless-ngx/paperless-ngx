@@ -119,6 +119,19 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
         m.assert_called_once()
 
     @mock.patch("documents.tasks.sanity_checker.check_sanity")
+    def test_sanity_check_error_no_raise(self, m):
+        messages = SanityCheckMessages()
+        messages.error(None, "Some error")
+        m.return_value = messages
+        # No exception should be raised
+        result = tasks.sanity_check(raise_on_error=False)
+        self.assertEqual(
+            result,
+            "Sanity check exited with errors. See log.",
+        )
+        m.assert_called_once()
+
+    @mock.patch("documents.tasks.sanity_checker.check_sanity")
     def test_sanity_check_warning(self, m):
         messages = SanityCheckMessages()
         messages.warning(None, "Some warning")

@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { Subject } from 'rxjs'
+import { Observable, Subject } from 'rxjs'
 import { first, takeUntil } from 'rxjs/operators'
 import {
   PaperlessTask,
+  PaperlessTaskName,
   PaperlessTaskStatus,
-  PaperlessTaskType,
 } from 'src/app/data/paperless-task'
 import { environment } from 'src/environments/environment'
 
@@ -14,6 +14,7 @@ import { environment } from 'src/environments/environment'
 })
 export class TasksService {
   private baseUrl: string = environment.apiBaseUrl
+  private endpoint: string = 'tasks'
 
   public loading: boolean
 
@@ -54,10 +55,14 @@ export class TasksService {
     this.loading = true
 
     this.http
-      .get<PaperlessTask[]>(`${this.baseUrl}tasks/`)
+      .get<PaperlessTask[]>(
+        `${this.baseUrl}${this.endpoint}/?task_name=consume_file&acknowledged=false`
+      )
       .pipe(takeUntil(this.unsubscribeNotifer), first())
       .subscribe((r) => {
-        this.fileTasks = r.filter((t) => t.type == PaperlessTaskType.File) // they're all File tasks, for now
+        this.fileTasks = r.filter(
+          (t) => t.task_name == PaperlessTaskName.ConsumeFile
+        )
         this.loading = false
       })
   }
@@ -75,5 +80,14 @@ export class TasksService {
 
   public cancelPending(): void {
     this.unsubscribeNotifer.next(true)
+  }
+
+  public run(taskName: PaperlessTaskName): Observable<any> {
+    return this.http.post<any>(
+      `${environment.apiBaseUrl}${this.endpoint}/run/`,
+      {
+        task_name: taskName,
+      }
+    )
   }
 }
