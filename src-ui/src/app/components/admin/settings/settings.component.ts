@@ -164,7 +164,10 @@ export class SettingsComponent
       this.systemStatus.tasks.redis_status === SystemStatusItemStatus.ERROR ||
       this.systemStatus.tasks.celery_status === SystemStatusItemStatus.ERROR ||
       this.systemStatus.tasks.index_status === SystemStatusItemStatus.ERROR ||
-      this.systemStatus.tasks.classifier_status === SystemStatusItemStatus.ERROR
+      this.systemStatus.tasks.classifier_status ===
+        SystemStatusItemStatus.ERROR ||
+      this.systemStatus.tasks.sanity_check_status ===
+        SystemStatusItemStatus.ERROR
     )
   }
 
