@@ -302,6 +302,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_elasticsearch_dsl",
+    "django_elasticsearch_dsl_drf",
     "corsheaders",
     "django_extensions",
     "paperless",
@@ -1193,3 +1195,17 @@ API_LOGIN_OCR = os.getenv("API_LOGIN_OCR", "")
 API_REFRESH_OCR = os.getenv("API_REFRESH_OCR", "")
 API_OCR_BY_FILE_ID = os.getenv("API_OCR_BY_FILE_ID", "")
 API_UPLOAD_FILE_OCR = os.getenv("API_UPLOAD_FILE_OCR", "")
+
+###############################################################################
+# Elastic search                                                              #
+###############################################################################
+ELASTIC_SEARCH_DOCUMENT_INDEX=os.getenv("ELASTIC_SEARCH_DOCUMENT_INDEX", "document_index")
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': os.getenv("ELASTIC_SEARCH_HOST", ""),  # Địa chỉ của Elasticsearch
+        'http_auth': (os.getenv("ELASTIC_SEARCH_USERNAME", ""), os.getenv("ELASTIC_SEARCH_PASSWORD", "")),  # Thông tin xác thực (nếu có)
+        'use_ssl': False,              # Nếu sử dụng SSL
+        'verify_certs': False,         # Kiểm tra chứng chỉ
+        'ca_certs': os.getenv("ELASTIC_SEARCH_CA", ""),  # Đường dẫn đến chứng chỉ CA
+    },
+}

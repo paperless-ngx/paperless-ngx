@@ -6,6 +6,7 @@ import os
 import platform
 import re
 import tempfile
+import traceback
 import urllib
 import zipfile
 from datetime import datetime
@@ -52,6 +53,7 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
+from django_elasticsearch_dsl_drf.pagination import LimitOffsetPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from guardian.shortcuts import get_objects_for_user
 from guardian.shortcuts import get_users_with_perms
@@ -101,6 +103,7 @@ from documents.conditionals import thumbnail_last_modified
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
+from documents.documents import DocumentDocument
 from documents.filters import ArchiveFontFilterSet
 from documents.filters import BackupRecordFilterSet
 from documents.filters import CorrespondentFilterSet
@@ -156,8 +159,10 @@ from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.permissions import update_view_folder_parent_permissions
-from documents.permissions import update_view_warehouse_shelf_boxcase_permissions
-from documents.serialisers import AcknowledgeTasksViewSerializer
+from documents.permissions import \
+    update_view_warehouse_shelf_boxcase_permissions
+from documents.serialisers import AcknowledgeTasksViewSerializer, \
+    DocumentDocumentSerializer
 from documents.serialisers import ApprovalSerializer
 from documents.serialisers import ApprovalViewSerializer
 from documents.serialisers import ArchiveFontSerializer
@@ -394,6 +399,89 @@ class FontLanguageViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     )
     filterset_class = FontLanguageFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
+
+from django_elasticsearch_dsl_drf.viewsets import (
+    BaseDocumentViewSet,
+)
+
+from django_elasticsearch_dsl_drf.filter_backends import (
+    FilteringFilterBackend,
+    HighlightBackend,
+    OrderingFilterBackend,
+    SearchFilterBackend,
+)
+
+
+
+from django_elasticsearch_dsl_drf.constants import (
+    LOOKUP_QUERY_IN,
+)
+
+
+class DocumentElasticSearch(BaseDocumentViewSet):
+    document = DocumentDocument
+    serializer_class = DocumentDocumentSerializer
+    pagination_class = LimitOffsetPagination
+
+    filter_backends = [
+        FilteringFilterBackend,
+        OrderingFilterBackend,
+        SearchFilterBackend,
+        HighlightBackend,
+    ]
+
+    lookup_field = 'id'
+
+    # Xác định các trường tìm kiếm
+    search_fields = ('title', 'content')
+
+    # Lọc theo các trường
+    filter_fields = {
+        # 'id': {
+        #     'field': 'id',
+        #     'lookups': [
+        #         LOOKUP_FILTER_RANGE,
+        #         LOOKUP_QUERY_IN,
+        #         LOOKUP_QUERY_GT,
+        #         LOOKUP_QUERY_GTE,
+        #         LOOKUP_QUERY_LT,
+        #         LOOKUP_QUERY_LTE,
+        #         LOOKUP_FILTER_TERMS,
+        #     ],
+        # },
+        'title': 'title.raw',  # Bạn có thể vẫn giữ title nếu cần
+        'content': 'content.raw',  # Đảm bảo trường này được hỗ trợ
+        'folder': {
+            'field': 'folder',  # Trường trong Elasticsearch
+            'lookups': [
+                LOOKUP_QUERY_IN,  # Tìm kiếm trong danh sách ID
+                # Bạn có thể thêm các lookups khác nếu cần
+            ],
+        },
+    }
+
+    # Các trường highlight
+    highlight_fields = {
+        'title': {
+                'options': {
+                    'pre_tags': ["<b>"],
+                    'post_tags': ["</b>"]
+                },
+            'enabled': True,
+        },'content': {
+                'options': {
+                    'pre_tags': ["<b>"],
+                    'post_tags': ["</b>"]
+                },
+            'enabled': True,
+        },
+    }
+
+    ordering = ('id',)  # Sửa lại để sử dụng tuple
+    ordering_fields = {
+        'id': 'id',
+    }
+
 
 
 class DocumentViewSet(
@@ -1097,6 +1185,8 @@ class DocumentViewSet(
 
 class SearchResultSerializer(DocumentSerializer, PassUserMixin):
     def to_representation(self, instance):
+        # print(instance)
+
         doc = (
             Document.objects.select_related(
                 "correspondent",
@@ -1114,16 +1204,44 @@ class SearchResultSerializer(DocumentSerializer, PassUserMixin):
         )
         r = super().to_representation(doc)
         r["__search_hit__"] = {
-            "score": instance.score,
+            # "score": instance.score,
             "highlights": instance.highlights("content", text=doc.content),
             "note_highlights": (
                 instance.highlights("notes", text=notes) if doc else None
             ),
             "rank": instance.rank,
         }
-
         return r
 
+class SearchResultElasticSearchSerializer(DocumentSerializer, PassUserMixin):
+
+    def to_representation(self, instance):
+        # print('instance',instance.doc_obj.__dict__)
+        if getattr(instance, 'doc_obj', None)==None:
+            return None
+        instance.doc_obj.content = ""
+        doc = (
+            instance.doc_obj
+        )
+
+        notes = ",".join(
+            [str(c.note) for c in doc.notes.all()],
+        )
+        r = super().to_representation(doc)
+        highlight_content = None
+        highlight_note = None
+        if hasattr(instance.meta,'highlight'):
+            highlight_content = instance.meta.highlight.content[0]
+            # highlight_note = instance.meta.highlight.note[0]
+        r["__search_hit__"] = {
+            "score": instance.meta.score,
+            "highlights": highlight_content,
+            "note_highlights": (
+                notes if doc else None
+            ),
+            "rank": None,
+        }
+        return r
 
 class UnifiedSearchViewSet(DocumentViewSet):
     def __init__(self, *args, **kwargs):
@@ -1132,7 +1250,8 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
     def get_serializer_class(self):
         if self._is_search_request():
-            return SearchResultSerializer
+            # return SearchResultSerializer
+            return SearchResultElasticSearchSerializer
         else:
             return DocumentSerializer
 
@@ -1142,17 +1261,21 @@ class UnifiedSearchViewSet(DocumentViewSet):
             or "more_like_id" in self.request.query_params
         )
 
+
     def filter_queryset(self, queryset):
         if self._is_search_request():
+            # docs=convert_elastic_search(self.request.query_params.get('query'),1 , self.paginator.get_page_size(self.request))
+            # return docs
             from documents import index
-
             if "query" in self.request.query_params:
-                query_class = index.DelayedFullTextQuery
+                # query_class = index.DelayedFullTextQuery
+                query_class = index.DelayedElasticSearch
             elif "more_like_id" in self.request.query_params:
-                query_class = index.DelayedMoreLikeThisQuery
+                # query_class = index.DelayedMoreLikeThisQuery
+                query_class = index.DelayedElasticSearchLikeMore
+
             else:
                 raise ValueError
-
             return query_class(
                 self.searcher,
                 self.request.query_params,
@@ -1164,20 +1287,23 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
     def list(self, request, *args, **kwargs):
         if self._is_search_request():
-            from documents import index
+            # from documents import index
 
             try:
                 with index.open_index_searcher() as s:
                     self.searcher = s
                     return super().list(request)
+                # return super().list(request)
             except NotFound:
                 raise
             except Exception as e:
+                traceback.print_exc()
                 logger.warning(f"An error occurred listing search results: {e!s}")
                 return HttpResponseBadRequest(
                     "Error listing search results, check logs for more detail.",
                 )
         else:
+            # print('da vào list', request.__dict__)
             return super().list(request)
 
     @action(detail=False, methods=["GET"], name="Get Next ASN")

@@ -21,6 +21,8 @@ django-soft-delete = "*"
 django-apscheduler = "0.6.2"
 djangorestframework = "==3.14.0"
 djangorestframework-guardian = "*"
+django-elasticsearch-dsl="7.4"
+django-elasticsearch-dsl-drf="0.22.5"
 drf-writable-nested = "*"
 bleach = "*"
 celery = {extras = ["redis"], version = "*"}
