@@ -1234,7 +1234,7 @@ class SearchResultElasticSearchSerializer(DocumentSerializer, PassUserMixin):
             highlight_content = instance.meta.highlight.content[0]
             # highlight_note = instance.meta.highlight.note[0]
         r["__search_hit__"] = {
-            "score": instance.meta.score,
+            "score": None,
             "highlights": highlight_content,
             "note_highlights": (
                 notes if doc else None

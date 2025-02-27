@@ -386,7 +386,7 @@ def update_document_archive_file(self, document_id=None):
 
             # with index.open_index_writer() as writer:
             #     index.update_document(writer, document)
-            update_index_document(document)
+            update_index_document(newDocument)
 
             clear_document_caches(document.pk)
     except Exception as ex:
