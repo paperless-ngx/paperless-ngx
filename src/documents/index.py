@@ -463,7 +463,7 @@ class DelayedElasticSearch(DelayedQuery):
             "created": "created",
             "modified": "modified",
             "added": "added",
-            "title": "title",
+            "title": "title_keyword",
             "correspondent__name": "correspondent",
             "document_type__name": "type",
             "warehouse__name": "warehouse",
@@ -515,7 +515,6 @@ class DelayedElasticSearch(DelayedQuery):
         created = re.search(r'created:\[(.*?)\]', q_str)
         map_created = {'-1 week to now': "now-1w/w", '-1 month to now': "now-1M/M", '-3 month to now': "now-3M/M", '-1 year to now': "now-1y/y",}
         if added is not None:
-
             criterias.append(Q("range", **{'added': {"lt": "now/d"}}))
             criterias.append(Q("range", **{'added': {"gt": map_created[added.group(1)]}}))
         if created is not None:
@@ -635,7 +634,7 @@ class DelayedElasticSearch(DelayedQuery):
         s = s.query(query_combined['query'])  # Chỉ lấy phần query
         s = s.sort(*query_combined.get('sort', []))  # Thêm phần sắp xếp nếu có
 
-        s = s.highlight('content', fragment_size=300, number_of_fragments=5,
+        s = s.highlight('content', fragment_size=500, number_of_fragments=1,
                         pre_tags=['<span class="match">'],
                         post_tags=['</span>'])
         s = s.source(['id'])
@@ -660,12 +659,172 @@ class DelayedElasticSearch(DelayedQuery):
         # q, mask = self._get_query()
         sortedby, reverse = self._get_query_sortedby()
 
-        print('ket qua',self.get_combined_query())
+        page_num = math.floor(item.start / self.page_size) + 1
+        page_len = self.page_size
+        # response = convert_elastic_search(self.query_params["query"], page_num , page_len)
+        response = self.search_pagination(self.query_params["query"], page_num , page_len)
+
+        # print('tim____:',datetime.now() -start)
+        doc_ids = [int(d.meta.id) for d in response]
+
+        # print('ket qua',self.get_combined_query())
+        # start = datetime.now()
+        docs = Document.objects.select_related(
+                # "correspondent",
+                # "storage_path",
+                "document_type",
+                "warehouse",
+                # "folder",
+                "owner",
+            ).prefetch_related("tags", "custom_fields", "notes").filter(id__in=doc_ids).defer('content',
+                'owner__password',  # Bỏ qua trường password
+                'owner__is_staff',   # Bỏ qua trường is_staff
+                'owner__is_active',  # Bỏ qua trường is_active
+                'owner__date_joined' # Bỏ qua trường date_joined
+            )
+
+
+        # print('time',datetime.now()-start)
+        # map docs to dict
+        dict_docs = dict()
+        for d in docs:
+            dict_docs[d.id]=d
+
+        # mapping docs to response
+        for r in response:
+            r.doc_obj = dict_docs[int(r.meta.id)]
+
+        all_doc_ids = self.search_get_all()
+        page: ResultsPage = ResultsPage(response, page_num, page_len)
+        # filter = self._get_query_filter()
+        # page: ResultsPage = self.searcher.search_page(
+        #     q,
+        #     mask=mask,
+        #     filter=self._get_query_filter(),
+        #     pagenum=math.floor(item.start / self.page_size) + 1,
+        #     pagelen=self.page_size,
+        #     sortedby=sortedby,
+        #     reverse=reverse,
+        # )
+        page.results.fragmenter = highlight.ContextFragmenter(surround=50)
+        page.results.formatter = HtmlFormatter(tagname="span", between=" ... ")
+
+        page.results.doc = all_doc_ids
+        if not self.first_score and len(page.results) > 0 and sortedby is None:
+            self.first_score = getattr(page.results[0].meta, 'score')
+        # page.results.top_n = list(
+        #     map(
+        #         lambda hit: (
+        #             (hit[0] / self.first_score) if self.first_score else None,
+        #             hit[1],
+        #         ),
+        #         page.results.top_n,
+        #     ),
+        # )
+        # print(page.results)
+        page.total = len(all_doc_ids)
+
+
+        self.saved_results[item.start] = page
+        return page
+
+class DelayedElasticSearchLikeMore(DelayedElasticSearch):
+
+
+    def _get_query(self):
+        q_str = self.query_params.get("more_like_id", "")
+        # Tìm vị trí bắt đầu của "created" và cắt chuỗi
+        cleaned_string = q_str
+        if "created:" in q_str:
+            cleaned_string = q_str[
+                             :q_str.index("created:")].rstrip(',')
+        elif "added:" in q_str:
+            cleaned_string = q_str[
+                             :q_str.index("added:")].rstrip(',')
+
+        query = Q(
+            "more_like_this",
+            fields=[
+                "content",
+                "title",
+                "correspondent",
+                "tag",
+                "type",
+                "notes",
+                "custom_fields",
+            ],
+            like={"_index": ELASTIC_SEARCH_DOCUMENT_INDEX,
+                  "_id": str(cleaned_string)},
+        )
+
+        return query  # Chỉ trả về một truy vấn
+
+
+    def get_combined_query(self):
+        base_query = self._get_query()  # Lấy truy vấn cơ bản
+        filter_query = self._get_query_filter()  # Lấy truy vấn lọc
+
+        # Lấy trường và chiều sắp xếp
+        sort_field, reverse = self._get_query_sortedby()
+
+        # Tạo danh sách sắp xếp
+        sort_order = {sort_field: {
+            "order": "desc" if reverse else "asc"}} if sort_field else None
+
+        # Khởi tạo truy vấn bool
+        if filter_query:
+            combined_query = Q("bool", must=[base_query, filter_query])
+        else:
+            combined_query = base_query
+
+        # Thêm phần sắp xếp vào truy vấn cuối cùng
+        query_body = {
+            "query": combined_query.to_dict(),
+            "sort": [sort_order] if sort_order else []
+        }
+
+        return query_body
+
+    def search_pagination(self, content, page_number, page_size):
+        s = Search(
+            index=ELASTIC_SEARCH_DOCUMENT_INDEX)  # Thay 'your_index_name' bằng tên chỉ mục của bạn
+
+
+        query_combined = self.get_combined_query()
+        s = s.query(query_combined['query'])  # Chỉ lấy phần query
+        s = s.sort(*query_combined.get('sort', []))  # Thêm phần sắp xếp nếu có
+
+        s = s.highlight('content', fragment_size=500, number_of_fragments=1,
+                        pre_tags=['<span class="match">'],
+                        post_tags=['</span>'])
+        s = s.source(['id'])
+        s = s[page_number * page_size - page_size:page_number * page_size]
+        response = s.execute()
+        return response
+
+    def search_get_all(self):
+        s = Search(
+            index=ELASTIC_SEARCH_DOCUMENT_INDEX)  # Thay 'your_index_name' bằng tên chỉ mục của bạn
+        query_combined = self.get_combined_query()
+        s = s.query(query_combined['query'])  # Chỉ lấy phần query
+        s = s.source(['id'])
+        response = s.scan()
+        doc_ids = {int(doc.meta.id) for doc in response}
+        return doc_ids
+
+    def __getitem__(self, item):
+        if item.start in self.saved_results:
+            return self.saved_results[item.start]
+
+        # q, mask = self._get_query()
+        sortedby, reverse = self._get_query_sortedby()
+
+        # print('ket qua',self.get_combined_query())
         page_num = math.floor(item.start / self.page_size) + 1
         page_len = self.page_size
         start = datetime.now()
         # response = convert_elastic_search(self.query_params["query"], page_num , page_len)
-        response = self.search_pagination(self.query_params["query"], page_num , page_len)
+        response = self.search_pagination(self.query_params["more_like_id"], page_num , page_len)
 
         # print('tim____:',datetime.now() -start)
         doc_ids = [int(d.meta.id) for d in response]

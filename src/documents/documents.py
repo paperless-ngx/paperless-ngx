@@ -12,7 +12,8 @@ from .models import Document as DocumentModel, Note, CustomFieldInstance
 @registry.register_document
 class DocumentDocument(Document):
     # id = fields.KeywordField(attr='id')
-    title = fields.KeywordField(attr='title')
+    title = fields.TextField(attr='title')
+    title_keyword = fields.KeywordField(attr='title')
     content = fields.TextField(attr='content')
     asn = fields.KeywordField(attr='archive_serial_number')
     correspondent = fields.TextField(attr='correspondent.name')
@@ -22,9 +23,11 @@ class DocumentDocument(Document):
     tag_id = fields.ListField(fields.IntegerField())
     has_tag = fields.BooleanField(attr='len(tags) > 0')
     type = fields.KeywordField(attr='document_type.name')
+    type_keyword = fields.KeywordField(attr='document_type.name')
     type_id = fields.IntegerField(attr='document_type.id')
     has_type = fields.BooleanField(attr='document_type is not None')
-    warehouse = fields.KeywordField(attr='warehouse.name')
+    warehouse = fields.TextField(attr='warehouse.name')
+    warehouse_keyword = fields.KeywordField(attr='warehouse.name')
     warehouse_path = fields.KeywordField(attr='warehouse.path')
     warehouse_id = fields.IntegerField(attr='warehouse.id')
     has_warehouse = fields.BooleanField(attr='warehouse is not None')

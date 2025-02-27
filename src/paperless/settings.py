@@ -1203,7 +1203,7 @@ ELASTIC_SEARCH_DOCUMENT_INDEX=os.getenv("ELASTIC_SEARCH_DOCUMENT_INDEX", "docume
 ELASTICSEARCH_DSL = {
     'default': {
         'hosts': os.getenv("ELASTIC_SEARCH_HOST", ""),  # Địa chỉ của Elasticsearch
-        'http_auth': (os.getenv("ELASTIC_SEARCH_USERNAME", "elastic"), os.getenv("ELASTIC_SEARCH_PASSWORD", "")),  # Thông tin xác thực (nếu có)
+        'http_auth': (os.getenv("ELASTIC_SEARCH_USERNAME", ""), os.getenv("ELASTIC_SEARCH_PASSWORD", "")),  # Thông tin xác thực (nếu có)
         'use_ssl': False,              # Nếu sử dụng SSL
         'verify_certs': False,         # Kiểm tra chứng chỉ
         'ca_certs': os.getenv("ELASTIC_SEARCH_CA", ""),  # Đường dẫn đến chứng chỉ CA

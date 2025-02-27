@@ -12,7 +12,6 @@ import zipfile
 from datetime import datetime
 from datetime import timedelta
 from pathlib import Path
-from re import search
 from time import mktime
 from unicodedata import normalize
 from urllib.parse import quote
@@ -55,16 +54,11 @@ from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
 from django_elasticsearch_dsl_drf.pagination import LimitOffsetPagination
-from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet as DocumentElasticSearchViewSet
 from django_filters.rest_framework import DjangoFilterBackend
-from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Search
 from guardian.shortcuts import get_objects_for_user
 from guardian.shortcuts import get_users_with_perms
 from langdetect import detect
-from oauthlib.uri_validate import query
 from packaging import version as packaging_version
-from pygments import highlight
 from redis import Redis
 from rest_framework import parsers
 from rest_framework import status
@@ -165,7 +159,8 @@ from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.permissions import update_view_folder_parent_permissions
-from documents.permissions import update_view_warehouse_shelf_boxcase_permissions
+from documents.permissions import \
+    update_view_warehouse_shelf_boxcase_permissions
 from documents.serialisers import AcknowledgeTasksViewSerializer, \
     DocumentDocumentSerializer
 from documents.serialisers import ApprovalSerializer
@@ -410,30 +405,16 @@ from django_elasticsearch_dsl_drf.viewsets import (
 )
 
 from django_elasticsearch_dsl_drf.filter_backends import (
-    DefaultOrderingFilterBackend,
-    FacetedSearchFilterBackend,
     FilteringFilterBackend,
     HighlightBackend,
-    IdsFilterBackend,
     OrderingFilterBackend,
-    PostFilterFilteringFilterBackend,
     SearchFilterBackend,
 )
 
 
 
 from django_elasticsearch_dsl_drf.constants import (
-    LOOKUP_FILTER_PREFIX,
-    LOOKUP_FILTER_RANGE,
-    LOOKUP_FILTER_TERMS,
-    LOOKUP_FILTER_WILDCARD,
-    LOOKUP_QUERY_EXCLUDE,
-    LOOKUP_QUERY_GT,
-    LOOKUP_QUERY_GTE,
     LOOKUP_QUERY_IN,
-    LOOKUP_QUERY_ISNULL,
-    LOOKUP_QUERY_LT,
-    LOOKUP_QUERY_LTE,
 )
 
 
@@ -1282,28 +1263,6 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
 
     def filter_queryset(self, queryset):
-        # s = Search(index='document_index')  # Thay 'your_index_name' bằng tên chỉ mục của bạn
-        # s = s.query('multi_match',query='Trần Minh Đức', fields=['title', 'content'])
-        # s = s.highlight('content', fragment_size=50)
-        # response = s.scan()
-        # docs = convert_elastic_search()
-        # for d in docs:
-        #     print(d.meta)
-        # print(response,self.paginator.get_page_size(self.request))
-        # In kết quả tìm kiếm với highlight
-        # for hit in response:
-        #     print(hit.__dict__)
-        #     # print(f'Title: {hit.title}')  # Nếu có trường title
-        #     # print(f'Title: {hit.content}')  # Nếu có trường title
-        #     for fragment in hit.meta.highlight.content:
-        #         print(f'Highlighted Content: {fragment}')
-        # query_test = DocumentDocument.search().query("match", content='Trần Minh Đức')
-        # for d in query_test.to_queryset():
-        #     print('document:___________',d.__dict__)
-        # print('query_test',query_test.to_queryset())
-        # print('query_return',self.request,queryset)
-
-
         if self._is_search_request():
             # docs=convert_elastic_search(self.request.query_params.get('query'),1 , self.paginator.get_page_size(self.request))
             # return docs
@@ -1312,7 +1271,9 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 # query_class = index.DelayedFullTextQuery
                 query_class = index.DelayedElasticSearch
             elif "more_like_id" in self.request.query_params:
-                query_class = index.DelayedMoreLikeThisQuery
+                # query_class = index.DelayedMoreLikeThisQuery
+                query_class = index.DelayedElasticSearchLikeMore
+
             else:
                 raise ValueError
             return query_class(
