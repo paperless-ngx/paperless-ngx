@@ -2225,7 +2225,6 @@ class RemoteVersionView(GenericAPIView):
             resp.raise_for_status()
             try:
                 data = resp.json()
-                logger.info(data)
                 remote_version = data["tag_name"]
                 # Some early tags used ngx-x.y.z
                 remote_version = remote_version.removeprefix("ngx-")
