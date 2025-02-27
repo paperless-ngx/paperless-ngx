@@ -358,7 +358,6 @@ class Consumer(LoggingMixin):
         if self.override_owner_id is None:
             return
         folder = Folder.objects.filter(id=self.override_folder_id).first()
-        # print('gia tri user_id',user_id)
         user = User.objects.get(id=self.override_owner_id)
         if folder:
             user_can_change = check_user_can_change_folder(user, folder)
@@ -386,7 +385,7 @@ class Consumer(LoggingMixin):
             checksum = hashlib.md5(f.read()).hexdigest()
         existing_doc = Document.objects.filter(
             Q(checksum=checksum) | Q(archive_checksum=checksum),
-        )
+        ).defer('content')
         if existing_doc.exists():
             if settings.CONSUMER_DELETE_DUPLICATES:
                 os.unlink(self.original_path)
@@ -402,7 +401,7 @@ class Consumer(LoggingMixin):
         """
         backup_exist = BackupRecord.objects.filter(
             Q(is_backup=True) | Q(is_restore=True)
-        )
+        ).only('id')
         if backup_exist.exists():
             self._fail(
                 ConsumerStatusShortMessage.THE_SYSTEM_IS_BACKING_UP_RESTORE,
@@ -803,7 +802,7 @@ class Consumer(LoggingMixin):
 
         # For the actual work, copy the file into a tempdir
         tempdir = tempfile.TemporaryDirectory(
-            prefix="paperless-ngx",
+            prefix="edoc-ngx",
             dir=settings.SCRATCH_DIR,
         )
         self.working_copy = Path(tempdir.name) / Path(self.filename)

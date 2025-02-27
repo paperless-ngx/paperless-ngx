@@ -283,7 +283,7 @@ def update_document_archive_file(self, document_id=None):
     Re-creates the archive file of a document, including new OCR content and thumbnail
     """
 
-    document = Document.objects.get(id=document_id)
+    document = Document.objects.defer('content').get(id=document_id)
 
     mime_type = document.mime_type
 
@@ -301,7 +301,7 @@ def update_document_archive_file(self, document_id=None):
     parser: DocumentParser = parser_class(logging_group=uuid.uuid4())
 
     try:
-        enable_ocr = ApplicationConfiguration.objects.filter().first().enable_ocr
+        enable_ocr = ApplicationConfiguration.objects.all().first().enable_ocr
         if enable_ocr:
             # self.log.debug(f"Parsing {self.filename}...")
 
