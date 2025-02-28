@@ -729,15 +729,15 @@ export class FilterEditorComponent
         value: this._textFilter,
       })
     }
-    if (
-      this._textFilter &&
-      this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_QUERY
-    ) {
-      filterRules.push({
-        rule_type: FILTER_FULLTEXT_QUERY,
-        value: this._textFilter,
-      })
-    }
+    // if (
+    //   this._textFilter &&
+    //   this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_QUERY
+    // ) {
+    //   filterRules.push({
+    //     rule_type: FILTER_FULLTEXT_QUERY,
+    //     value: this._textFilter,
+    //   })
+    // }
     if (
       this._moreLikeId &&
       this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_MORELIKE
