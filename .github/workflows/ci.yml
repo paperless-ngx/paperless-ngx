@@ -534,7 +534,7 @@ jobs:
                           LICENSE \
                           README.md \
                           paperless.conf.example \
-                          gunicorn.conf.py
+                          webserver.py
           do
             cp --verbose ${file_name} dist/paperless-ngx/
           done
