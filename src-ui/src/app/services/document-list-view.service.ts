@@ -18,6 +18,7 @@ import {
   SelectionData,
 } from './rest/document.service'
 import { SettingsService } from './settings.service'
+import { save } from 'ngx-bootstrap-icons'
 
 /**
  * Captures the current state of the list view.
@@ -113,6 +114,9 @@ export class DocumentListViewService {
             delete savedState[k]
           }
         })
+        // delete savedState['sortReverse']
+        // delete savedState['sortField']
+        // console.log('da vao', savedState)
         //only use restored state attributes instead of defaults if they are not null
         let newState = Object.assign(this.defaultListViewState(), savedState)
         this.listViewStates.set(null, newState)
@@ -128,8 +132,8 @@ export class DocumentListViewService {
       documents: [],
       currentPage: 1,
       collectionSize: null,
-      sortField: 'created',
-      sortReverse: true,
+      sortField: null,
+      sortReverse: null,
       filterRules: [],
       selected: new Set<number>(),
     }

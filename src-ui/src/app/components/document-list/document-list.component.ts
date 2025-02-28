@@ -116,6 +116,11 @@ export class DocumentListComponent
   }
 
   setSortField(field: string) {
+    if(this.list.sortField === field)
+    {
+      this.list.sortField = null
+      return
+    }
     this.list.sortField = field
   }
 
@@ -310,6 +315,8 @@ export class DocumentListComponent
   }
 
   resetFilters() {
+    this.setSortField(null)
+    this.list.sortReverse=null
     this.filterEditor.resetSelected()
   }
 }
