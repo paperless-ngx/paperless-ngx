@@ -999,7 +999,7 @@
                <context context-type="sourcefile">src/app/components/document-approvals/document-approvals.component.html</context>
                <context context-type="linenumber">8</context>
             </context-group>
-            <target state="translated">Hết hạn</target>
+            <target state="translated">Thời hạn</target>
          </trans-unit>
          <trans-unit id="1398864539052015092" datatype="html">
             <source>Approve at</source>
@@ -2537,7 +2537,7 @@
             <source>Error backup document(s)</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/backup/backup.component.ts</context>
-               <context context-type="linenumber">224</context>
+               <context context-type="linenumber">225</context>
             </context-group>
             <target state="translated">Lỗi sao lưu tài liệu</target>
          </trans-unit>
@@ -7111,8 +7111,7 @@
                <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
                <context context-type="linenumber">17</context>
             </context-group>
-            <target state="translated">Any</target>
-         </trans-unit>
+         Bất kỳ</trans-unit>
          <trans-unit id="6381578200008167206" datatype="html">
             <source>Include</source>
             <context-group purpose="location">
@@ -8939,7 +8938,7 @@
                <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
                <context context-type="linenumber">50</context>
             </context-group>
-            <target state="translated">Nhiều hơn</target>
+            <target state="translated">Tương tự</target>
          </trans-unit>
          <trans-unit id="2434944824726929798" datatype="html">
             <source>Split</source>
@@ -10713,7 +10712,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-               <context context-type="linenumber">209</context>
+               <context context-type="linenumber">214</context>
             </context-group>
             <target state="translated">
                Đã lưu khung nhìn "
@@ -10729,7 +10728,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-               <context context-type="linenumber">249</context>
+               <context context-type="linenumber">254</context>
             </context-group>
             <target state="translated">
                Xem "
@@ -13223,15 +13222,6 @@
                <context context-type="linenumber">37</context>
             </context-group>
             <target state="translated">Đã chỉnh sửa</target>
-         </trans-unit>
-         <trans-unit id="4460262093225954455" datatype="html">
-            <source>Search score</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
-               <context context-type="linenumber">46</context>
-            </context-group>
-            <note priority="1" from="description">Score is a value returned by the full text search engine and specifies how well a result matches the given query</note>
-            <target state="translated">Điểm số tìm kiếm</target>
          </trans-unit>
          <trans-unit id="1206520795340730278" datatype="html">
             <source>English (US)</source>
