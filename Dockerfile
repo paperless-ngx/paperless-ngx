@@ -39,7 +39,6 @@ ENV \
     S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
     S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0 \
     S6_VERBOSITY=1 \
-    UV_LINK_MODE=copy \
     PATH=/command:$PATH
 
 # Buildx provided, must be defined to use though
@@ -86,7 +85,7 @@ COPY ./docker/rootfs /
 # Purpose: The final image
 # Comments:
 #  - Don't leave anything extra in here
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS main-app
+FROM s6-overlay-base AS main-app
 
 LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
 LABEL org.opencontainers.image.documentation="https://docs.paperless-ngx.com/"
@@ -110,6 +109,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     # Ignore warning from Whitenoise
     PYTHONWARNINGS="ignore:::django.http.response:517" \
     PNGX_CONTAINERIZED=1 \
+    UV_LINK_MODE=copy \
     PATH="/usr/src/paperless/src/.venv/bin:$PATH"
 
 #
@@ -227,6 +227,7 @@ RUN --mount=type=cache,target=/root/.cache/uv,id=pip-cache \
       https://github.com/paperless-ngx/builder/releases/download/zxing-${ZXING_VERSION}/zxing_cpp-${ZXING_VERSION}-cp312-cp312-linux_aarch64.whl \
       https://github.com/paperless-ngx/builder/releases/download/zxing-${ZXING_VERSION}/zxing_cpp-${ZXING_VERSION}-cp312-cp312-linux_x86_64.whl \
     && uv sync --no-progress --frozen --no-dev --no-python-downloads --python-preference system --find-links . \
+    && chown -R 1000:1000 .venv \
   && echo "Installing NLTK data" \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" snowball_data \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" stopwords \
