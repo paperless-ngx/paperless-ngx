@@ -64,17 +64,17 @@ jobs:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
       -
-        name: Install dependencies
+        name: Install Python dependencies
         run: |
-          uv sync --python ${{ steps.setup-python.outputs.python-version }} --dev --frozen
-      -
-        name: List installed Python dependencies
-        run: |
-          uv pip list
+          uv sync --python ${{ steps.setup-python.outputs.python-version }} --only-group docs --frozen
       -
         name: Make documentation
         run: |
-          uv run --python ${{ steps.setup-python.outputs.python-version }} mkdocs build --config-file ./mkdocs.yml
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --only-group docs \
+            --frozen \
+            mkdocs build --config-file ./mkdocs.yml
       -
         name: Deploy documentation
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -82,7 +82,11 @@ jobs:
           echo "docs.paperless-ngx.com" > "${{ github.workspace }}/docs/CNAME"
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          uv run --python ${{ steps.setup-python.outputs.python-version }} mkdocs gh-deploy --force --no-history
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --only-group docs \
+            --frozen \
+            mkdocs gh-deploy --force --no-history
       -
         name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -133,7 +137,10 @@ jobs:
       -
         name: Install Python dependencies
         run: |
-          uv sync --python ${{ steps.setup-python.outputs.python-version }} --dev --frozen
+          uv sync \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --group test \
+            --frozen
       -
         name: List installed Python dependencies
         run: |
@@ -148,7 +155,11 @@ jobs:
           PAPERLESS_MAIL_TEST_PASSWD: ${{ secrets.TEST_MAIL_PASSWD }}
         run: |
           cd src/
-          uv run --python ${{ steps.setup-python.outputs.python-version }} pytest -ra
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --group test \
+            --frozen \
+            pytest -ra
       -
         name: Upload coverage
         if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION }}
@@ -504,12 +515,18 @@ jobs:
         name: Compile messages
         run: |
           cd src/
-          uv run --python ${{ steps.setup-python.outputs.python-version }} manage.py compilemessages
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --no-dev \
+            manage.py compilemessages
       -
         name: Collect static files
         run: |
           cd src/
-          uv run --python ${{ steps.setup-python.outputs.python-version }} manage.py collectstatic --no-input
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --no-dev \
+            manage.py collectstatic --no-input
       -
         name: Move files
         run: |
@@ -653,7 +670,10 @@ jobs:
           CURRENT_CHANGELOG=`tail --lines +2 changelog.md`
           echo -e "$CURRENT_CHANGELOG" >> changelog-new.md
           mv changelog-new.md changelog.md
-          uv run --python ${{ steps.setup-python.outputs.python-version }} pre-commit run --files changelog.md || true
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --only-group lint \
+            pre-commit run --files changelog.md || true
           git config --global user.name "github-actions"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -am "Changelog ${{ needs.publish-release.outputs.version }} - GHA"
