@@ -49,9 +49,9 @@
 }
 
 .consumer-status-list {
-  max-height: calc(100vh - 315px); // e.g. below the upload button, mobile
+  max-height: calc(100vh - 312px); // e.g. below the upload button, mobile
 
   @media screen and (min-width: 768px) {
-    max-height: calc(100vh - 200px); // e.g. below the upload button
+    max-height: calc(100vh - 208px); // e.g. below the upload button
   }
 }
