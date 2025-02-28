@@ -1723,10 +1723,11 @@ class StatisticsCustomView(APIView):
         label_document_type_graph = []
         data_tag_graph = []
         label_tag_graph = []
+        data_date_request_count_graph = []
         user = request.user if request.user is not None else None
 
         documents = (
-            Document.objects.all()
+            Document.objects.all().defer('content')
             if user is None
             else get_objects_for_user_owner_aware(
                 user,
@@ -1747,11 +1748,13 @@ class StatisticsCustomView(APIView):
                 microseconds=999999,
             )
             date_value_dict = {}
+            date_request_number_dict = dict()
             current_date = from_date
 
             while current_date <= to_date:
                 date_key = current_date.strftime("%Y-%m-%d")  # Định dạng ngày
                 date_value_dict[date_key] = (0, 0)  # Thêm vào dict
+                date_request_number_dict[date_key] = 0
                 current_date += timedelta(days=1)
 
             documents_count_by_day = (
@@ -1764,6 +1767,26 @@ class StatisticsCustomView(APIView):
                 )
                 .order_by("created_date")
             )
+
+            request_count = (
+                PaperlessTask.objects.filter(date_done__range=(from_date, to_date))
+                .annotate(date_done_date=TruncDate("date_done"))
+                .values("date_done_date")
+                .annotate(
+                    # document_count=Count("id"),
+                    api_call_count=Sum("api_call_count"),
+                )
+                .order_by("date_done_date")
+            )
+
+            print(request_count)
+            for entry in request_count:
+                target_date_str = entry["date_done_date"].strftime("%Y-%m-%d")
+                if target_date_str in date_request_number_dict:
+                    date_request_number_dict[target_date_str] = entry["api_call_count"]
+            for key, value in date_request_number_dict.items():
+                data_date_request_count_graph.append(value)
+
             for entry in documents_count_by_day:
                 target_date_str = entry["created_date"].strftime("%Y-%m-%d")
                 if target_date_str in date_value_dict:
@@ -1799,10 +1822,13 @@ class StatisticsCustomView(APIView):
             data_tag_graph.append(entry["document_count"])
             label_tag_graph.append(entry["tags__name"])
 
+
+
         return Response(
             {
                 "labels_graph": label_graph,
                 "data_count_page_graph": data_count_page_graph,
+                'data_date_request_count_graph': data_date_request_count_graph,
                 "data_graph": data_graph,
                 "labels_document_type_pie_graph": label_document_type_graph,
                 "data_document_type_pie_graph": data_document_type_graph,

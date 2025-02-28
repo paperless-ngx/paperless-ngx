@@ -18,6 +18,7 @@ export interface Statistics {
   labels_graph?: []
   data_graph?: []
   data_count_page_graph?: []
+  data_date_request_count_graph?: []
   data_document_type_pie_graph?: []
   labels_document_type_pie_graph?: []
   data_tags_pie_graph?: []
@@ -50,12 +51,14 @@ export class StatisticsCustomWidgetComponent
   calendar = inject(NgbCalendar)
   public documentCountChart: any
   public pageCountChart: any
+  public pageRequestChart: any
   public documentTypePieChart: any
   public tagsPieChart: any
   statistics: Statistics = {}
   data_graph: []
   labels_graph: []
   data_count_page_graph: []
+  data_date_request_count_graph: []
   data_document_type_pie_graph: []
   labels_document_type_pie_graph: []
   data_tags_pie_graph: []
@@ -130,6 +133,57 @@ export class StatisticsCustomWidgetComponent
           datasets: [{
             label: $localize`Pages`,
             data: this.data_count_page_graph,
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.2)',
+            ],
+            borderColor: [
+              'rgb(255, 99, 132)',
+            ],
+            borderWidth: 1,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          aspectRatio: 2.5,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                // Tùy chỉnh định dạng nhãn để hiển thị số nguyên
+                callback: function(value, index, values) {
+                  if (Number.isInteger(value)) {
+                    return value
+                  }
+                  return null
+                },
+              },
+            },
+          },
+          plugins: {
+          datalabels: {
+            display: false,
+            // color: 'white',
+          },
+        },
+        },
+      },
+    )
+  }
+
+
+  createCountRequestBarChart() {
+    if (this.pageRequestChart) {
+      this.pageRequestChart.destroy()
+    }
+    this.pageRequestChart = new Chart('CountRequestChart',
+      {
+        type: 'bar',
+        data: {
+          labels: this.labels_graph,
+          datasets: [{
+            label: $localize`Requests`,
+            data: this.data_date_request_count_graph,
             backgroundColor: [
               'rgba(255, 99, 132, 0.2)',
             ],
@@ -299,6 +353,7 @@ export class StatisticsCustomWidgetComponent
       this.statistics = statistics
       this.data_graph = statistics.data_graph
       this.data_count_page_graph = statistics.data_count_page_graph
+      this.data_date_request_count_graph = statistics.data_date_request_count_graph
       this.labels_graph = statistics.labels_graph
       this.data_document_type_pie_graph = statistics.data_document_type_pie_graph
       this.labels_document_type_pie_graph = statistics.labels_document_type_pie_graph
@@ -306,6 +361,7 @@ export class StatisticsCustomWidgetComponent
       this.labels_tags_pie_graph = statistics.labels_tags_pie_graph
       this.createDocumentCountBarChart()
       this.createCountPageBarChart()
+      this.createCountRequestBarChart()
       this.createDocumentTypePieChart()
       this.createTagsPieChart()
     })
