@@ -36,7 +36,6 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
-from documents.models import Log
 from documents.models import PaperlessTask
 from documents.models import ShareLink
 from documents.models import StoragePath
@@ -759,12 +758,6 @@ class DocumentFilterSet(FilterSet):
             "owner__id": ID_KWARGS,
             "custom_fields": ["icontains"],
         }
-
-
-class LogFilterSet(FilterSet):
-    class Meta:
-        model = Log
-        fields = {"level": INT_KWARGS, "created": DATE_KWARGS, "group": ID_KWARGS}
 
 
 class ShareLinkFilterSet(FilterSet):
