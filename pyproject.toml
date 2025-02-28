@@ -73,7 +73,15 @@ optional-dependencies.webserver = [
 
 [dependency-groups]
 
-test = [
+dev = [
+  { "include-group" = "docs" },
+  { "include-group" = "testing" },
+  { "include-group" = "typing" },
+  { "include-group" = "lint" },
+  "deptry>=0.15.0",
+]
+
+testing = [
   "factory-boy~=3.3.1",
   "pytest~=8.3.3",
   "pytest-cov~=6.0.0",
@@ -97,6 +105,23 @@ lint = [
 docs = [
   "mkdocs-material~=9.6.4",
   "mkdocs-glightbox~=0.4.0",
+]
+
+typing = [
+  "mypy",
+  "django-filter-stubs",
+  "types-python-dateutil",
+  "djangorestframework-stubs[compatible-mypy]",
+  "celery-types",
+  "django-stubs[compatible-mypy]",
+  "types-dateparser",
+  "types-bleach",
+  "types-redis",
+  "types-tqdm",
+  "types-Markdown",
+  "types-Pygments",
+  "types-colorama",
+  "types-setuptools",
 ]
 
 [tool.uv]
