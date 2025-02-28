@@ -63,6 +63,7 @@ jobs:
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
+          cache-suffix: "docs"
       -
         name: Install Python dependencies
         run: |
