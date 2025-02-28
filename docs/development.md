@@ -344,17 +344,7 @@ If you want to build the documentation locally, this is how you do it:
 1.  Build the documentation
 
     ```bash
-<<<<<<< HEAD
-    pipenv install --dev
-    ```
-
-2.  Build the documentation
-
-    ```bash
-    mkdocs build --config-file mkdocs.yml
-=======
     $ uv run mkdocs build --config-file mkdocs.yml
->>>>>>> a1d6df0dc (Further purging of pipenv)
     ```
 
     _alternatively..._
