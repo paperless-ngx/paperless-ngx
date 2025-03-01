@@ -215,18 +215,19 @@ ARG ZXING_VERSION=2.3.0
 ARG PSYCOPG_VERSION=3.2.4
 
 # hadolint ignore=DL3042
-RUN --mount=type=cache,target=/root/.cache/uv,id=pip-cache \
-  set -eux \
+RUN set -eux \
   && echo "Installing build system packages" \
     && apt-get update \
-    && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
-  && echo "Installing Python requirements" \
+    && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES}
+RUN echo "Installing Python requirements" \
     && curl --fail --silent --no-progress-meter --show-error --location --remote-name-all --parallel --parallel-max 4 \
       https://github.com/paperless-ngx/builder/releases/download/psycopg-${PSYCOPG_VERSION}/psycopg_c-${PSYCOPG_VERSION}-cp312-cp312-linux_x86_64.whl \
       https://github.com/paperless-ngx/builder/releases/download/psycopg-${PSYCOPG_VERSION}/psycopg_c-${PSYCOPG_VERSION}-cp312-cp312-linux_aarch64.whl \
       https://github.com/paperless-ngx/builder/releases/download/zxing-${ZXING_VERSION}/zxing_cpp-${ZXING_VERSION}-cp312-cp312-linux_aarch64.whl \
       https://github.com/paperless-ngx/builder/releases/download/zxing-${ZXING_VERSION}/zxing_cpp-${ZXING_VERSION}-cp312-cp312-linux_x86_64.whl \
-    && uv sync --no-progress --frozen --no-dev --no-python-downloads --python-preference system --find-links . \
+    && ls -ahl . \
+    && uv lock --find-links ./ \
+    && uv sync --verbose --frozen --no-dev --no-python-downloads --python-preference system --find-links ./ --no-build-package zxing-cpp --no-build-package psycopg-c \
     && chown -R 1000:1000 .venv \
   && echo "Installing NLTK data" \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" snowball_data \
