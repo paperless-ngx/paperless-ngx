@@ -2017,7 +2017,8 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
             "assign_view_groups",
             "assign_change_users",
             "assign_change_groups",
-            "assign_custom_fields_w_values",
+            "assign_custom_fields",
+            "assign_custom_fields_values",
             "remove_all_tags",
             "remove_tags",
             "remove_all_correspondents",
@@ -2135,6 +2136,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
                 assign_view_groups = action.pop("assign_view_groups", None)
                 assign_change_users = action.pop("assign_change_users", None)
                 assign_change_groups = action.pop("assign_change_groups", None)
+                assign_custom_fields = action.pop("assign_custom_fields", None)
                 remove_tags = action.pop("remove_tags", None)
                 remove_correspondents = action.pop("remove_correspondents", None)
                 remove_document_types = action.pop("remove_document_types", None)
@@ -2184,6 +2186,8 @@ class WorkflowSerializer(serializers.ModelSerializer):
                     action_instance.assign_change_users.set(assign_change_users)
                 if assign_change_groups is not None:
                     action_instance.assign_change_groups.set(assign_change_groups)
+                if assign_custom_fields is not None:
+                    action_instance.assign_custom_fields.set(assign_custom_fields)
                 if remove_tags is not None:
                     action_instance.remove_tags.set(remove_tags)
                 if remove_correspondents is not None:

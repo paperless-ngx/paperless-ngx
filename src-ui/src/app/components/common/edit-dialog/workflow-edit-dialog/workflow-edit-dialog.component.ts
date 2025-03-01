@@ -16,7 +16,7 @@ import { NgbAccordionModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
-import { CustomField } from 'src/app/data/custom-field'
+import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentType } from 'src/app/data/document-type'
 import { MailRule } from 'src/app/data/mail-rule'
 import {
@@ -38,6 +38,7 @@ import {
   WorkflowTriggerType,
 } from 'src/app/data/workflow-trigger'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
@@ -46,7 +47,7 @@ import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ConfirmButtonComponent } from '../../confirm-button/confirm-button.component'
 import { CheckComponent } from '../../input/check/check.component'
-import { CustomFieldsSelectComponent } from '../../input/custom-fields-select/custom-fields-select.component'
+import { CustomFieldsValuesComponent } from '../../input/custom-fields-values/custom-fields-values.component'
 import { EntriesComponent } from '../../input/entries/entries.component'
 import { NumberComponent } from '../../input/number/number.component'
 import { PermissionsGroupComponent } from '../../input/permissions/permissions-group/permissions-group.component'
@@ -148,10 +149,10 @@ const TRIGGER_MATCHING_ALGORITHMS = MATCHING_ALGORITHMS.filter(
     SwitchComponent,
     NumberComponent,
     TextComponent,
-    CustomFieldsSelectComponent,
     SelectComponent,
     TextAreaComponent,
     TagsComponent,
+    CustomFieldsValuesComponent,
     PermissionsGroupComponent,
     PermissionsUserComponent,
     ConfirmButtonComponent,
@@ -169,12 +170,14 @@ export class WorkflowEditDialogComponent
 {
   public WorkflowTriggerType = WorkflowTriggerType
   public WorkflowActionType = WorkflowActionType
+  public CustomFieldDataType = CustomFieldDataType
 
   templates: Workflow[]
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
   storagePaths: StoragePath[]
   mailRules: MailRule[]
+  customFields: CustomField[]
   dateCustomFields: CustomField[]
 
   expandedItem: number = null
@@ -189,7 +192,8 @@ export class WorkflowEditDialogComponent
     storagePathService: StoragePathService,
     mailRuleService: MailRuleService,
     userService: UserService,
-    settingsService: SettingsService
+    settingsService: SettingsService,
+    customFieldsService: CustomFieldsService
   ) {
     super(service, activeModal, userService, settingsService)
 
@@ -212,6 +216,16 @@ export class WorkflowEditDialogComponent
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.mailRules = result.results))
+
+    customFieldsService
+      .listAll()
+      .pipe(first())
+      .subscribe((result) => {
+        this.customFields = result.results
+        this.dateCustomFields = this.customFields?.filter(
+          (f) => f.data_type === CustomFieldDataType.Date
+        )
+      })
   }
 
   getCreateTitle() {
@@ -252,8 +266,6 @@ export class WorkflowEditDialogComponent
   }
 
   private checkRemovalActionFields(formWorkflow: Workflow) {
-    console.log('checkRemovalActionFields', formWorkflow)
-
     formWorkflow.actions
       .filter((action) => action.type === WorkflowActionType.Removal)
       .forEach((action, i) => {
@@ -429,8 +441,9 @@ export class WorkflowEditDialogComponent
         assign_view_groups: new FormControl(action.assign_view_groups),
         assign_change_users: new FormControl(action.assign_change_users),
         assign_change_groups: new FormControl(action.assign_change_groups),
-        assign_custom_fields_w_values: new FormControl(
-          action.assign_custom_fields_w_values
+        assign_custom_fields: new FormControl(action.assign_custom_fields),
+        assign_custom_fields_values: new FormControl(
+          action.assign_custom_fields_values
         ),
         remove_tags: new FormControl(action.remove_tags),
         remove_all_tags: new FormControl(action.remove_all_tags),
@@ -557,7 +570,8 @@ export class WorkflowEditDialogComponent
       assign_view_groups: [],
       assign_change_users: [],
       assign_change_groups: [],
-      assign_custom_fields_w_values: [],
+      assign_custom_fields: [],
+      assign_custom_fields_values: {},
       remove_tags: [],
       remove_all_tags: false,
       remove_document_types: [],
@@ -635,5 +649,9 @@ export class WorkflowEditDialogComponent
         }
       })
     super.save()
+  }
+
+  public getCustomField(id: number): CustomField {
+    return this.customFields.find((field) => field.id === id)
   }
 }
