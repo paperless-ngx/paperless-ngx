@@ -1,4 +1,4 @@
-import { Component, forwardRef } from '@angular/core'
+import { Component, forwardRef, Input } from '@angular/core'
 import {
   FormsModule,
   NG_VALUE_ACCESSOR,
@@ -23,13 +23,13 @@ import { UrlComponent } from '../url/url.component'
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => CustomFieldsSelectComponent),
+      useExisting: forwardRef(() => CustomFieldsValuesComponent),
       multi: true,
     },
   ],
-  selector: 'pngx-input-custom-fields-select',
-  templateUrl: './custom-fields-select.component.html',
-  styleUrls: ['./custom-fields-select.component.scss'],
+  selector: 'pngx-input-custom-fields-values',
+  templateUrl: './custom-fields-values.component.html',
+  styleUrl: './custom-fields-values.component.scss',
   imports: [
     TextComponent,
     DateComponent,
@@ -46,7 +46,7 @@ import { UrlComponent } from '../url/url.component'
     NgxBootstrapIconsModule,
   ],
 })
-export class CustomFieldsSelectComponent extends AbstractInputComponent<Object> {
+export class CustomFieldsValuesComponent extends AbstractInputComponent<Object> {
   public CustomFieldDataType = CustomFieldDataType
 
   constructor(customFieldsService: CustomFieldsService) {
@@ -56,9 +56,11 @@ export class CustomFieldsSelectComponent extends AbstractInputComponent<Object> 
     })
   }
 
-  fields: CustomField[]
+  private fields: CustomField[]
 
-  _selectedFields: number[]
+  private _selectedFields: number[]
+
+  @Input()
   set selectedFields(newFields: number[]) {
     this._selectedFields = newFields
     // map the selected fields to an object with field_id as key and value as value
@@ -68,18 +70,9 @@ export class CustomFieldsSelectComponent extends AbstractInputComponent<Object> 
     }, {})
     this.onChange(this.value)
   }
+
   get selectedFields(): number[] {
     return this._selectedFields
-  }
-
-  writeValue(newValue: Object): void {
-    // value will be a json object with field_id as key and value as value
-    this._selectedFields = newValue
-      ? this.fields
-          .filter((field) => field.id in newValue)
-          .map((field) => field.id)
-      : []
-    super.writeValue(newValue)
   }
 
   public getCustomField(id: number): CustomField {

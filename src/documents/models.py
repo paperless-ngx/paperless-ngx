@@ -1264,13 +1264,21 @@ class WorkflowAction(models.Model):
         verbose_name=_("grant change permissions to these groups"),
     )
 
-    assign_custom_fields_w_values = models.JSONField(
+    assign_custom_fields = models.ManyToManyField(
         CustomField,
         blank=True,
+        related_name="+",
+        verbose_name=_("assign these custom fields"),
+    )
+
+    assign_custom_fields_values = models.JSONField(
+        _("custom field values"),
         null=True,
+        blank=True,
         help_text=_(
-            "assign these custom fields, with optional values",
+            "Optional values to assign to the custom fields.",
         ),
+        default={},
     )
 
     remove_tags = models.ManyToManyField(
