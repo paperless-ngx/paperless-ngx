@@ -1002,29 +1002,37 @@ def run_workflows(
             added = timezone.localtime(timezone.now())
             created = timezone.localtime(overrides.created)
 
-        subject = parse_w_workflow_placeholders(
-            action.email.subject,
-            correspondent,
-            document_type,
-            owner_username,
-            added,
-            filename,
-            current_filename,
-            created,
-            title,
-            doc_url,
+        subject = (
+            parse_w_workflow_placeholders(
+                action.email.subject,
+                correspondent,
+                document_type,
+                owner_username,
+                added,
+                filename,
+                current_filename,
+                created,
+                title,
+                doc_url,
+            )
+            if action.email.subject
+            else ""
         )
-        body = parse_w_workflow_placeholders(
-            action.email.body,
-            correspondent,
-            document_type,
-            owner_username,
-            added,
-            filename,
-            current_filename,
-            created,
-            title,
-            doc_url,
+        body = (
+            parse_w_workflow_placeholders(
+                action.email.body,
+                correspondent,
+                document_type,
+                owner_username,
+                added,
+                filename,
+                current_filename,
+                created,
+                title,
+                doc_url,
+            )
+            if action.email.body
+            else ""
         )
         try:
             n_messages = send_email(
@@ -1105,7 +1113,7 @@ def run_workflows(
                             f"Error occurred parsing webhook params: {e}",
                             extra={"group": logging_group},
                         )
-            else:
+            elif action.webhook.body:
                 data = parse_w_workflow_placeholders(
                     action.webhook.body,
                     correspondent,
