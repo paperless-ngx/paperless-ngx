@@ -576,6 +576,8 @@ def cleanup_custom_field_deletion(sender, instance: CustomField, **kwargs):
             f"Removing custom field {instance} from sort field of {views_with_sort_updated} views",
         )
 
+    # Remove from workflow actions
+
 
 def add_to_index(sender, document, **kwargs):
     from documents import index
