@@ -1362,7 +1362,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.assertEqual(input_doc.original_file.name, "simple.pdf")
         self.assertEqual(overrides.filename, "simple.pdf")
-        self.assertEqual(overrides.custom_field_ids, [custom_field.id])
+        self.assertEqual(overrides.custom_fields, {custom_field.id: None})
 
     def test_upload_with_webui_source(self):
         """

@@ -769,26 +769,29 @@ def run_workflows(
                     ),
                 )
 
-        if action.assign_custom_fields.exists():
+        if action.assign_custom_fields_w_values:
             if not use_overrides:
-                for field in action.assign_custom_fields.all():
+                for field_id in action.assign_custom_fields_w_values:
                     if not CustomFieldInstance.objects.filter(
-                        field=field,
+                        field_id=field_id,
                         document=document,
                     ).exists():
                         # can be triggered on existing docs, so only add the field if it doesn't already exist
-                        CustomFieldInstance.objects.create(
-                            field=field,
-                            document=document,
+                        field = CustomField.objects.get(pk=field_id)
+                        value_field_name = CustomFieldInstance.get_value_field_name(
+                            data_type=field.data_type,
                         )
+                        args = {
+                            "field": field,
+                            "document": document,
+                            value_field_name: action.assign_custom_fields_w_values[
+                                field_id
+                            ],
+                        }
+                        CustomFieldInstance.objects.create(**args)
             else:
-                overrides.custom_field_ids = list(
-                    set(
-                        (overrides.custom_field_ids or [])
-                        + list(
-                            action.assign_custom_fields.values_list("pk", flat=True),
-                        ),
-                    ),
+                overrides.custom_fields.update(
+                    action.assign_custom_fields_w_values,
                 )
 
     def removal_action():
@@ -946,18 +949,18 @@ def run_workflows(
             if not use_overrides:
                 CustomFieldInstance.objects.filter(document=document).delete()
             else:
-                overrides.custom_field_ids = None
+                overrides.custom_fields = None
         elif action.remove_custom_fields.exists():
             if not use_overrides:
                 CustomFieldInstance.objects.filter(
                     field__in=action.remove_custom_fields.all(),
                     document=document,
                 ).delete()
-            elif overrides.custom_field_ids:
+            elif overrides.custom_fields:
                 for field in action.remove_custom_fields.filter(
-                    pk__in=overrides.custom_field_ids,
+                    pk__in=overrides.custom_fields.keys(),
                 ):
-                    overrides.custom_field_ids.remove(field.pk)
+                    overrides.custom_fields.pop(field.pk, None)
 
     def email_action():
         if not settings.EMAIL_ENABLED:

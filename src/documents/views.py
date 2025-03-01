@@ -1471,7 +1471,7 @@ class PostDocumentView(GenericAPIView):
             created=created,
             asn=archive_serial_number,
             owner_id=request.user.id,
-            custom_field_ids=custom_field_ids,
+            custom_fields={cf_id: None for cf_id in custom_field_ids},  # for now
         )
 
         async_task = consume_file.delay(
