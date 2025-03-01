@@ -654,4 +654,12 @@ export class WorkflowEditDialogComponent
   public getCustomField(id: number): CustomField {
     return this.customFields.find((field) => field.id === id)
   }
+
+  public removeSelectedCustomField(fieldId: number, group: FormGroup) {
+    group
+      .get('assign_custom_fields')
+      .setValue(
+        group.get('assign_custom_fields').value.filter((id) => id !== fieldId)
+      )
+  }
 }
