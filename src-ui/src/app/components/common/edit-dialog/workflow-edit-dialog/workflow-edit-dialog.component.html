@@ -189,7 +189,11 @@
             <pngx-input-select i18n-title title="Assign correspondent" [items]="correspondents" [allowNull]="true" formControlName="assign_correspondent"></pngx-input-select>
             <pngx-input-select i18n-title title="Assign storage path" [items]="storagePaths" [allowNull]="true" formControlName="assign_storage_path"></pngx-input-select>
             <pngx-input-select i18n-title title="Assign custom fields" multiple="true" [items]="customFields" [allowNull]="true" formControlName="assign_custom_fields"></pngx-input-select>
-            <pngx-input-custom-fields-values i18n-title title="Assign custom field values" [selectedFields]="formGroup.get('assign_custom_fields').value" formControlName="assign_custom_fields_values"></pngx-input-custom-fields-values>
+            <pngx-input-custom-fields-values
+              i18n-title title="Assign custom field values"
+              formControlName="assign_custom_fields_values"
+              [selectedFields]="formGroup.get('assign_custom_fields').value"
+              (removeSelectedField)="removeSelectedCustomField($event, formGroup)"></pngx-input-custom-fields-values>
           </div>
           <div class="col">
             <pngx-input-select i18n-title title="Assign owner" [items]="users" bindLabel="username" formControlName="assign_owner" [allowNull]="true"></pngx-input-select>

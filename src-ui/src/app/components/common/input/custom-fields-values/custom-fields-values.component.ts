@@ -1,4 +1,10 @@
-import { Component, forwardRef, Input } from '@angular/core'
+import {
+  Component,
+  EventEmitter,
+  forwardRef,
+  Input,
+  Output,
+} from '@angular/core'
 import {
   FormsModule,
   NG_VALUE_ACCESSOR,
@@ -75,11 +81,10 @@ export class CustomFieldsValuesComponent extends AbstractInputComponent<Object> 
     return this._selectedFields
   }
 
+  @Output()
+  public removeSelectedField: EventEmitter<number> = new EventEmitter<number>()
+
   public getCustomField(id: number): CustomField {
     return this.fields.find((field) => field.id === id)
-  }
-
-  public removeField(fieldId: number): void {
-    this.selectedFields = this.selectedFields.filter((id) => id !== fieldId)
   }
 }
