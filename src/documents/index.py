@@ -899,7 +899,20 @@ class DelayedMoreLikeThisQuery(DelayedQuery):
         )
         mask = {docnum}
         return q, mask
-
+def autocomplete_elastic_search(query):
+    s = Search(index=settings.ELASTIC_SEARCH_DOCUMENT_INDEX)
+    if query:
+        # s.suggest('song-suggest',
+        #           text='ne',
+        #           completion={
+        #               'field': 'suggest',
+        #               'size': 5,
+        #               'skip_duplicates': True
+        #           })
+        s = s.suggest('suggest', query.lower(), completion ={'field': 'suggest', 'skip_duplicates': True, 'size':10})
+        s = s.source(['id'])
+        response = s.execute()
+        return [s.text for s in response.suggest.suggest[0].options]
 
 def autocomplete(
     ix: FileIndex,

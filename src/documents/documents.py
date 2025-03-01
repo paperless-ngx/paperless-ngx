@@ -1,3 +1,4 @@
+import re
 from dataclasses import field
 
 from django.contrib.sitemaps.views import index
@@ -14,6 +15,7 @@ class DocumentDocument(Document):
     # id = fields.KeywordField(attr='id')
     title = fields.TextField(attr='title')
     title_keyword = fields.KeywordField(attr='title')
+    suggest = fields.CompletionField()
     content = fields.TextField(attr='content')
     asn = fields.KeywordField(attr='archive_serial_number')
     correspondent = fields.TextField(attr='correspondent.name')
@@ -71,6 +73,11 @@ class DocumentDocument(Document):
 
     def prepare_tag_id(self, instance):
         return [tag.id for tag in instance.tags.all()]
+
+    def prepare_suggest(self, instance):
+        return {
+            "input": re.split(r'[\n\t\r\b\s]+|[^\w]+', instance.content.lower())
+        }
 
     def prepare_notes(self, instance):
         return [str(c.note) for c in Note.objects.filter(document=instance)]

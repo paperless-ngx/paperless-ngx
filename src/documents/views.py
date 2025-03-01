@@ -120,6 +120,7 @@ from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
 from documents.filters import WarehouseFilterSet
+from documents.index import autocomplete_elastic_search
 from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_folders
@@ -1544,32 +1545,33 @@ class SearchAutoCompleteView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        user = self.request.user if hasattr(self.request, "user") else None
-
-        if "term" in request.query_params:
-            term = request.query_params["term"]
-        else:
-            return HttpResponseBadRequest("Term required")
-
-        if "limit" in request.query_params:
-            limit = int(request.query_params["limit"])
-            if limit <= 0:
-                return HttpResponseBadRequest("Invalid limit")
-        else:
-            limit = 10
-
-        from documents import index
-
-        ix = index.open_index()
-
-        return Response(
-            index.autocomplete(
-                ix,
-                term,
-                limit,
-                user,
-            ),
-        )
+        result = autocomplete_elastic_search(request.query_params["term"])
+        return Response(result)
+        # user = self.request.user if hasattr(self.request, "user") else None
+        # if "term" in request.query_params:
+        #     term = request.query_params["term"]
+        # else:
+        #     return HttpResponseBadRequest("Term required")
+        #
+        # if "limit" in request.query_params:
+        #     limit = int(request.query_params["limit"])
+        #     if limit <= 0:
+        #         return HttpResponseBadRequest("Invalid limit")
+        # else:
+        #     limit = 10
+        #
+        # from documents import index
+        #
+        # ix = index.open_index()
+        #
+        # return Response(
+        #     index.autocomplete(
+        #         ix,
+        #         term,
+        #         limit,
+        #         user,
+        #     ),
+        # )
 
 
 class StatisticsView(APIView):
