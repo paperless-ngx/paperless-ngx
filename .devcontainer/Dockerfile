@@ -83,7 +83,7 @@ RUN set -eux \
     && apt-get update \
     && apt-get install --yes --quiet ${PYTHON_PACKAGES}
 
-COPY --from=ghcr.io/astral-sh/uv:0.4 /uv /bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.6 /uv /bin/uv
 
 RUN set -eux \
   && echo "Installing pre-built updates" \
