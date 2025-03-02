@@ -110,7 +110,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONWARNINGS="ignore:::django.http.response:517" \
     PNGX_CONTAINERIZED=1 \
     # https://docs.astral.sh/uv/reference/settings/#link-mode
-    UV_LINK_MODE=copy
+    UV_LINK_MODE=copy \
+    UV_CACHE_DIR=/cache/uv/
 
 #
 # Begin installation and configuration
@@ -212,7 +213,7 @@ ARG BUILD_PACKAGES="\
   pkg-config"
 
 # hadolint ignore=DL3042
-RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
+RUN --mount=type=cache,target=${UV_CACHE_DIR},id=python-cache \
   set -eux \
   && echo "Installing build system packages" \
     && apt-get update \

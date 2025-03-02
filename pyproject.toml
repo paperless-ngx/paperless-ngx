@@ -49,6 +49,8 @@ dependencies = [
   "ocrmypdf~=16.9.0",
   "pathvalidate~=3.2.3",
   "pdf2image~=1.17.0",
+  "psycopg[c]==3.2.4",
+  # Direct dependency for proper resolution of the pre-build wheels
   "psycopg-c==3.2.4",
   "python-dateutil~=2.9.0",
   "python-dotenv~=1.0.1",
@@ -69,6 +71,7 @@ dependencies = [
 ]
 
 # TODO: Move certain things to groups and then utilize that further
+# This will allow testing to not install a webserver, mysql, etc
 
 [dependency-groups]
 
@@ -129,6 +132,7 @@ environments = [
 ]
 
 [tool.uv.sources]
+# Markers are chosen to select these almost exclusively when building the Docker image
 psycopg-c = [
   { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.4/psycopg_c-3.2.4-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
   { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.4/psycopg_c-3.2.4-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
