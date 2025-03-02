@@ -807,15 +807,16 @@ class ConsumerPlugin(
             set_permissions_for_object(permissions=permissions, object=document)
 
         if self.metadata.custom_fields:
-            for field_id in self.metadata.custom_fields:
-                field = CustomField.objects.get(pk=field_id)
+            for field in CustomField.objects.filter(
+                id__in=self.metadata.custom_fields.keys(),
+            ).distinct():
                 value_field_name = CustomFieldInstance.get_value_field_name(
                     data_type=field.data_type,
                 )
                 args = {
                     "field": field,
                     "document": document,
-                    value_field_name: self.metadata.custom_fields[field_id],
+                    value_field_name: self.metadata.custom_fields.get(field.id, None),
                 }
                 CustomFieldInstance.objects.create(**args)  # adds to document
 
