@@ -49,7 +49,7 @@ dependencies = [
   "ocrmypdf~=16.9.0",
   "pathvalidate~=3.2.3",
   "pdf2image~=1.17.0",
-  "psycopg[c]==3.2.4",
+  "psycopg-c==3.2.4",
   "python-dateutil~=2.9.0",
   "python-dotenv~=1.0.1",
   "python-gnupg~=0.5.4",
@@ -126,4 +126,10 @@ package = false
 environments = [
   "sys_platform == 'darwin'",
   "sys_platform == 'linux'",
+]
+
+[tool.uv.sources]
+psycopg-c = [
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.4/psycopg_c-3.2.4-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.4/psycopg_c-3.2.4-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
 ]
