@@ -170,7 +170,6 @@ export class WorkflowEditDialogComponent
 {
   public WorkflowTriggerType = WorkflowTriggerType
   public WorkflowActionType = WorkflowActionType
-  public CustomFieldDataType = CustomFieldDataType
 
   templates: Workflow[]
   correspondents: Correspondent[]
