@@ -63,17 +63,17 @@ jobs:
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
-          cache-suffix: "docs-${{ env.DEFAULT_PYTHON_VERSION }}"
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       -
         name: Install Python dependencies
         run: |
-          uv sync --python ${{ steps.setup-python.outputs.python-version }} --only-group docs --frozen
+          uv sync --python ${{ steps.setup-python.outputs.python-version }} --dev --frozen
       -
         name: Make documentation
         run: |
           uv run \
             --python ${{ steps.setup-python.outputs.python-version }} \
-            --only-group docs \
+            --dev \
             --frozen \
             mkdocs build --config-file ./mkdocs.yml
       -
@@ -85,7 +85,7 @@ jobs:
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
           uv run \
             --python ${{ steps.setup-python.outputs.python-version }} \
-            --only-group docs \
+            --dev \
             --frozen \
             mkdocs gh-deploy --force --no-history
       -
@@ -126,7 +126,7 @@ jobs:
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
-          cache-suffix: "tests-${{ matrix.python-version }}"
+          python-version: ${{ steps.setup-python.outputs.python-version }}
       -
         name: Install system dependencies
         run: |
@@ -159,7 +159,7 @@ jobs:
           cd src/
           uv run \
             --python ${{ steps.setup-python.outputs.python-version }} \
-            --group testing \
+            --dev \
             --frozen \
             pytest -ra
       -
@@ -481,13 +481,14 @@ jobs:
         id: setup-python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+          python-version:
       -
         name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       -
         name: Install Python dependencies
         run: |
@@ -657,6 +658,7 @@ jobs:
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       -
         name: Append Changelog to docs
         id: append-Changelog
@@ -674,7 +676,7 @@ jobs:
           mv changelog-new.md changelog.md
           uv run \
             --python ${{ steps.setup-python.outputs.python-version }} \
-            --only-group lint \
+            --dev \
             pre-commit run --files changelog.md || true
           git config --global user.name "github-actions"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
