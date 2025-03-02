@@ -2,7 +2,12 @@ import { CdkDragDrop } from '@angular/cdk/drag-drop'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of } from 'rxjs'
@@ -368,5 +373,20 @@ describe('WorkflowEditDialogComponent', () => {
     component.save()
     expect(component.objectForm.get('actions').value[0].email).toBeNull()
     expect(component.objectForm.get('actions').value[0].webhook).toBeNull()
+  })
+
+  it('should remove selected custom field from the form group', () => {
+    const formGroup = new FormGroup({
+      assign_custom_fields: new FormControl([1, 2, 3]),
+    })
+
+    component.removeSelectedCustomField(2, formGroup)
+    expect(formGroup.get('assign_custom_fields').value).toEqual([1, 3])
+
+    component.removeSelectedCustomField(1, formGroup)
+    expect(formGroup.get('assign_custom_fields').value).toEqual([3])
+
+    component.removeSelectedCustomField(3, formGroup)
+    expect(formGroup.get('assign_custom_fields').value).toEqual([])
   })
 })
