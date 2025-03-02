@@ -38,6 +38,7 @@ dependencies = [
   "filelock~=3.17.0",
   "flower~=2.0.1",
   "gotenberg-client~=0.9.0",
+  "granian~=1.7.6",
   "httpx-oauth~=0.16",
   "imap-tools~=1.10.0",
   "inotifyrecursive~=0.3",
@@ -67,18 +68,14 @@ dependencies = [
   "zxing-cpp~=2.3.0",
 ]
 
-optional-dependencies.webserver = [
-  "granian~=1.7.6",
-]
+# TODO: Move certain things to groups and then utilize that further
 
 [dependency-groups]
 
 dev = [
   { "include-group" = "docs" },
   { "include-group" = "testing" },
-  { "include-group" = "typing" },
   { "include-group" = "lint" },
-  "deptry>=0.15.0",
 ]
 
 testing = [
