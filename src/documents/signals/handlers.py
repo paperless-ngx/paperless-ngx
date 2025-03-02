@@ -576,8 +576,6 @@ def cleanup_custom_field_deletion(sender, instance: CustomField, **kwargs):
             f"Removing custom field {instance} from sort field of {views_with_sort_updated} views",
         )
 
-    # Remove from workflow actions
-
 
 def add_to_index(sender, document, **kwargs):
     from documents import index
@@ -772,29 +770,38 @@ def run_workflows(
         if action.assign_custom_fields.exists():
             if not use_overrides:
                 for field in action.assign_custom_fields.all():
-                    if not CustomFieldInstance.objects.filter(
+                    value_field_name = CustomFieldInstance.get_value_field_name(
+                        data_type=field.data_type,
+                    )
+                    args = {
+                        value_field_name: action.assign_custom_fields_values.get(
+                            str(field.pk),
+                            None,
+                        ),
+                    }
+                    # for some reason update_or_create doesn't work here
+                    instance = CustomFieldInstance.objects.filter(
                         field=field,
                         document=document,
-                    ).exists():
-                        # can be triggered on existing docs, so only add the field if it doesn't already exist
-                        value_field_name = CustomFieldInstance.get_value_field_name(
-                            data_type=field.data_type,
+                    ).first()
+                    if instance:
+                        setattr(instance, value_field_name, args[value_field_name])
+                        instance.save()
+                    else:
+                        CustomFieldInstance.objects.create(
+                            **args,
+                            field=field,
+                            document=document,
                         )
-                        args = {
-                            "field": field,
-                            "document": document,
-                            value_field_name: action.assign_custom_fields_values.get(
-                                field.pk,
-                                None,
-                            ),
-                        }
-                        CustomFieldInstance.objects.create(**args)
             else:
                 if overrides.custom_fields is None:
                     overrides.custom_fields = {}
                 overrides.custom_fields.update(
                     {
-                        field.pk: action.assign_custom_fields_values.get(field.pk, None)
+                        field.pk: action.assign_custom_fields_values.get(
+                            str(field.pk),
+                            None,
+                        )
                         for field in action.assign_custom_fields.all()
                     },
                 )
