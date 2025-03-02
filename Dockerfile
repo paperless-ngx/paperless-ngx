@@ -106,11 +106,11 @@ ARG GS_VERSION=10.03.1
 # Set Python environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    # Ignore warning from Whitenoise
+    # Ignore warning from Whitenoise about async iterators
     PYTHONWARNINGS="ignore:::django.http.response:517" \
     PNGX_CONTAINERIZED=1 \
-    UV_LINK_MODE=copy \
-    PATH="/usr/src/paperless/src/.venv/bin:$PATH"
+    # https://docs.astral.sh/uv/reference/settings/#link-mode
+    UV_LINK_MODE=copy
 
 #
 # Begin installation and configuration
@@ -211,22 +211,13 @@ ARG BUILD_PACKAGES="\
   default-libmysqlclient-dev \
   pkg-config"
 
-ARG ZXING_VERSION=2.3.0
-ARG PSYCOPG_VERSION=3.2.4
-
-RUN set -eux \
+# hadolint ignore=DL3042
+RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
+  set -eux \
   && echo "Installing build system packages" \
     && apt-get update \
-    && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES}
-# hadolint ignore=DL3042
-RUN echo "Installing Python requirements" \
-    && curl --fail --silent --no-progress-meter --show-error --location --remote-name-all --parallel --parallel-max 4 \
-      https://github.com/paperless-ngx/builder/releases/download/psycopg-${PSYCOPG_VERSION}/psycopg_c-${PSYCOPG_VERSION}-cp312-cp312-linux_x86_64.whl \
-      https://github.com/paperless-ngx/builder/releases/download/psycopg-${PSYCOPG_VERSION}/psycopg_c-${PSYCOPG_VERSION}-cp312-cp312-linux_aarch64.whl \
-      https://github.com/paperless-ngx/builder/releases/download/zxing-${ZXING_VERSION}/zxing_cpp-${ZXING_VERSION}-cp312-cp312-linux_aarch64.whl \
-      https://github.com/paperless-ngx/builder/releases/download/zxing-${ZXING_VERSION}/zxing_cpp-${ZXING_VERSION}-cp312-cp312-linux_x86_64.whl \
-    && ls -ahl . \
-    && pip install ./psycopg_c-${PSYCOPG_VERSION}-cp312-cp312-linux_x86_64.whl \
+    && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
+  && echo "Installing Python requirements" \
     && uv export --quiet --no-dev --format requirements-txt --output-file requirements.txt \
     && uv pip install --system --no-python-downloads --python-preference system --requirements requirements.txt \
   && echo "Installing NLTK data" \

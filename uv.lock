@@ -1897,7 +1897,9 @@ dependencies = [
     { name = "watchdog", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "whitenoise", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "whoosh", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
-    { name = "zxing-cpp", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "zxing-cpp", version = "2.3.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version != '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux') or (python_full_version != '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux') or (platform_machine != 'aarch64' and platform_machine != 'x86_64' and sys_platform == 'linux') or sys_platform == 'darwin'" },
+    { name = "zxing-cpp", version = "2.3.0", source = { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_aarch64.whl" }, marker = "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux'" },
+    { name = "zxing-cpp", version = "2.3.0", source = { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_x86_64.whl" }, marker = "python_full_version == '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux'" },
 ]
 
 [package.dev-dependencies]
@@ -2016,7 +2018,9 @@ requires-dist = [
     { name = "watchdog", specifier = "~=6.0" },
     { name = "whitenoise", specifier = "~=6.9" },
     { name = "whoosh", specifier = "~=2.7" },
-    { name = "zxing-cpp", specifier = "~=2.3.0" },
+    { name = "zxing-cpp", marker = "(python_full_version != '3.12.*' and platform_machine == 'aarch64') or (python_full_version != '3.12.*' and platform_machine == 'x86_64') or (platform_machine != 'aarch64' and platform_machine != 'x86_64') or sys_platform != 'linux'", specifier = "~=2.3.0" },
+    { name = "zxing-cpp", marker = "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux'", url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_aarch64.whl" },
+    { name = "zxing-cpp", marker = "python_full_version == '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux'", url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_x86_64.whl" },
 ]
 
 [package.metadata.requires-dev]
@@ -3823,6 +3827,10 @@ wheels = [
 name = "zxing-cpp"
 version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "sys_platform == 'darwin'",
+    "(python_full_version != '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux') or (python_full_version != '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux') or (platform_machine != 'aarch64' and platform_machine != 'x86_64' and sys_platform == 'linux')",
+]
 sdist = { url = "https://files.pythonhosted.org/packages/d9/f2/b781bf6119abe665069777e3c0f154752cf924fe8a55fca027243abbc555/zxing_cpp-2.3.0.tar.gz", hash = "sha256:3babedb67a4c15c9de2c2b4c42d70af83a6c85780c1b2d9803ac64c6ae69f14e", size = 1172666 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/31/93/3e830a3dd44a9f7d11219883bc6f131ca68da2a5ad48690d9645e19c3b55/zxing_cpp-2.3.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:4e1ffcdd8e44a344cbf32bb0435e1fbe67241337c0a0f22452c2b8f7c16dc75e", size = 1694502 },
@@ -3837,4 +3845,26 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/3d/46/ef7c69bea44a7c64d4a740679dd18c59616d610fb468c057d8bfbda5f063/zxing_cpp-2.3.0-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:3da0fbf0d93ef85663def561e8f7880447970710ea6b1768dfc05550a9ee3e00", size = 1698948 },
     { url = "https://files.pythonhosted.org/packages/49/2e/8ed22a7b3743a8aa6a588366e34c44056d118ea7614b6bdbc44817ab4a7f/zxing_cpp-2.3.0-cp313-cp313-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:a0b36f3be2e6d928bea9bd529f173ef41092061f0f46d27f591c87486f9a7366", size = 992070 },
     { url = "https://files.pythonhosted.org/packages/ce/5e/5784ad14f8514e4321f3a828dccc00ebcf70202f6ef967174d26bcb65568/zxing_cpp-2.3.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:7ba641ca5a0f19b97d7bc6a0212e61dab267a2b1a52a84946d02bdcd859ec318", size = 984869 },
+]
+
+[[package]]
+name = "zxing-cpp"
+version = "2.3.0"
+source = { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_aarch64.whl" }
+resolution-markers = [
+    "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+]
+wheels = [
+    { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_aarch64.whl", hash = "sha256:b7b36a2e4112dff882b85e633b8a932f572debc5607f12d50a9df575c2292f6a" },
+]
+
+[[package]]
+name = "zxing-cpp"
+version = "2.3.0"
+source = { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_x86_64.whl" }
+resolution-markers = [
+    "python_full_version == '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux'",
+]
+wheels = [
+    { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_x86_64.whl", hash = "sha256:12ab08ffed947504ef01c103576c738725f3c1044ddc5b2b1fa524e664d94117" },
 ]
