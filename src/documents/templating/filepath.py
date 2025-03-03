@@ -8,6 +8,7 @@ from pathlib import PurePath
 import pathvalidate
 from django.utils import timezone
 from django.utils.dateparse import parse_date
+from django.utils.text import slugify as django_slugify
 from jinja2 import StrictUndefined
 from jinja2 import Template
 from jinja2 import TemplateSyntaxError
@@ -99,6 +100,8 @@ def format_datetime(value: str | datetime, format: str) -> str:
 
 
 _template_environment.filters["datetime"] = format_datetime
+
+_template_environment.filters["slugify"] = django_slugify
 
 
 def create_dummy_document():
