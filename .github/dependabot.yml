@@ -1,6 +1,8 @@
 # https://docs.github.com/en/code-security/supply-chain-security/keeping-your-dependencies-updated-automatically/configuration-options-for-dependency-updates#package-ecosystem
 
 version: 2
+# Required for uv support for now
+enable-beta-ecosystems: true
 updates:
 
   # Enable version updates for npm
@@ -34,9 +36,8 @@ updates:
           - "eslint"
 
   # Enable version updates for Python
-  - package-ecosystem: "pip"
+  - package-ecosystem: "uv"
     target-branch: "dev"
-    # Look for a `Pipfile` in the `root` directory
     directory: "/"
     # Check for updates once a week
     schedule:
@@ -53,6 +54,7 @@ updates:
           - "*pytest*"
           - "ruff"
           - "mkdocs-material"
+          - "pre-commit*"
       django:
         patterns:
           - "*django*"

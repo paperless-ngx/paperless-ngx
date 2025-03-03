@@ -60,7 +60,7 @@ first-time setup.
 
       Every command is executed directly from the root folder of the project unless specified otherwise.
 
-1.  Install prerequisites + pipenv as mentioned in
+1.  Install prerequisites + [uv](https://github.com/astral-sh/uv) as mentioned in
     [Bare metal route](setup.md#bare_metal).
 
 2.  Copy `paperless.conf.example` to `paperless.conf` and enable debug
@@ -75,17 +75,13 @@ first-time setup.
 4.  Install the Python dependencies:
 
     ```bash
-    pipenv install --dev
+    $ uv sync --dev
     ```
-
-    !!! note
-
-        Using a virtual environment is highly recommended. You can spawn one via `pipenv shell`.
 
 5.  Install pre-commit hooks:
 
     ```bash
-    pre-commit install
+    $ uv run pre-commit install
     ```
 
 6.  Apply migrations and create a superuser for your development instance:
@@ -93,8 +89,8 @@ first-time setup.
     ```bash
     # src/
 
-    python3 manage.py migrate
-    python3 manage.py createsuperuser
+    $ uv run manage.py migrate
+    $ uv run manage.py createsuperuser
     ```
 
 7.  You can now either ...
@@ -163,6 +159,19 @@ $ ng build --configuration production
       cases, its just not possible to make some lines fit, especially
       complicated IF cases. Append `# noqa: E501` to disable this check
       for certain lines.
+
+### Package Management
+
+Paperless uses `uv` to manage packages and virtual environments for both development and production.
+To accomplish some common tasks using `uv`, follow the shortcuts below:
+
+To upgrade all locked packages to the latest allowed versions: `uv lock --upgrade`
+
+To upgrade a single locked package: `uv lock --upgrade-package <package>`
+
+To add a new package: `uv add <package>`
+
+To add a new development package `uv add --dev <package>`
 
 ## Front end development
 
@@ -332,27 +341,21 @@ LANGUAGES = [
 The documentation is built using material-mkdocs, see their [documentation](https://squidfunk.github.io/mkdocs-material/reference/).
 If you want to build the documentation locally, this is how you do it:
 
-1.  Have an active pipenv shell (`pipenv shell`) and install Python dependencies:
+1.  Build the documentation
 
     ```bash
-    pipenv install --dev
-    ```
-
-2.  Build the documentation
-
-    ```bash
-    mkdocs build --config-file mkdocs.yml
+    $ uv run mkdocs build --config-file mkdocs.yml
     ```
 
     _alternatively..._
 
-3.  Serve the documentation. This will spin up a
+2.  Serve the documentation. This will spin up a
     copy of the documentation at http://127.0.0.1:8000
     that will automatically refresh every time you change
     something.
 
     ```bash
-    mkdocs serve
+    $ uv run mkdocs serve
     ```
 
 ## Building the Docker image

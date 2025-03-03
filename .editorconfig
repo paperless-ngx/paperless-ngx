@@ -27,9 +27,6 @@ indent_style = space
 [*.md]
 indent_style = space
 
-[Pipfile.lock]
-indent_style = space
-
 # Tests don't get a line width restriction.  It's still a good idea to follow
 # the 79 character rule, but in the interests of clarity, tests often need to
 # violate it.
