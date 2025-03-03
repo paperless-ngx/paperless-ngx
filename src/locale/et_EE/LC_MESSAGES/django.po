@@ -3,23 +3,23 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-02-25 11:07-0800\n"
-"PO-Revision-Date: 2025-02-26 22:13\n"
+"PO-Revision-Date: 2025-02-27 12:12\n"
 "Last-Translator: \n"
-"Language-Team: Malay\n"
-"Language: ms_MY\n"
+"Language-Team: Estonian\n"
+"Language: et_EE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Crowdin-Project: paperless-ngx\n"
 "X-Crowdin-Project-ID: 500308\n"
-"X-Crowdin-Language: ms\n"
+"X-Crowdin-Language: et\n"
 "X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
 "X-Crowdin-File-ID: 14\n"
 
 #: documents/apps.py:8
 msgid "Documents"
-msgstr "Dokumen"
+msgstr ""
 
 #: documents/filters.py:370
 msgid "Value must be valid JSON."
@@ -59,64 +59,64 @@ msgstr ""
 
 #: documents/models.py:41 documents/models.py:830
 msgid "owner"
-msgstr "pemilik"
+msgstr ""
 
 #: documents/models.py:58 documents/models.py:1041
 msgid "None"
-msgstr "Tiada"
+msgstr ""
 
 #: documents/models.py:59 documents/models.py:1042
 msgid "Any word"
-msgstr "Sebarang perkataan"
+msgstr ""
 
 #: documents/models.py:60 documents/models.py:1043
 msgid "All words"
-msgstr "Semua perkataan"
+msgstr ""
 
 #: documents/models.py:61 documents/models.py:1044
 msgid "Exact match"
-msgstr "Padanan tepat"
+msgstr ""
 
 #: documents/models.py:62 documents/models.py:1045
 msgid "Regular expression"
-msgstr "Ekspresi biasa"
+msgstr ""
 
 #: documents/models.py:63 documents/models.py:1046
 msgid "Fuzzy word"
-msgstr "Perkataan samar"
+msgstr ""
 
 #: documents/models.py:64
 msgid "Automatic"
-msgstr "Automatik"
+msgstr ""
 
 #: documents/models.py:67 documents/models.py:433 documents/models.py:1526
 #: paperless_mail/models.py:23 paperless_mail/models.py:143
 msgid "name"
-msgstr "nama"
+msgstr ""
 
 #: documents/models.py:69 documents/models.py:1110
 msgid "match"
-msgstr "padanan"
+msgstr ""
 
 #: documents/models.py:72 documents/models.py:1113
 msgid "matching algorithm"
-msgstr "algoritma pemadanan"
+msgstr ""
 
 #: documents/models.py:77 documents/models.py:1118
 msgid "is insensitive"
-msgstr "tidak sensitif"
+msgstr ""
 
 #: documents/models.py:100 documents/models.py:151
 msgid "correspondent"
-msgstr "pengirim"
+msgstr ""
 
 #: documents/models.py:101
 msgid "correspondents"
-msgstr "pengirim"
+msgstr ""
 
 #: documents/models.py:105
 msgid "color"
-msgstr "warna"
+msgstr ""
 
 #: documents/models.py:108
 msgid "is inbox tag"
@@ -128,19 +128,19 @@ msgstr ""
 
 #: documents/models.py:117
 msgid "tag"
-msgstr "tag"
+msgstr ""
 
 #: documents/models.py:118 documents/models.py:189
 msgid "tags"
-msgstr "tag"
+msgstr ""
 
 #: documents/models.py:123 documents/models.py:171
 msgid "document type"
-msgstr "jenis dokumen"
+msgstr ""
 
 #: documents/models.py:124
 msgid "document types"
-msgstr "jenis dokumen"
+msgstr ""
 
 #: documents/models.py:129
 msgid "path"
@@ -164,11 +164,11 @@ msgstr ""
 
 #: documents/models.py:163
 msgid "title"
-msgstr "tajuk"
+msgstr ""
 
 #: documents/models.py:175 documents/models.py:744
 msgid "content"
-msgstr "kandungan"
+msgstr ""
 
 #: documents/models.py:178
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
@@ -209,7 +209,7 @@ msgstr ""
 
 #: documents/models.py:224
 msgid "modified"
-msgstr "diubah"
+msgstr ""
 
 #: documents/models.py:231
 msgid "storage type"
@@ -217,11 +217,11 @@ msgstr ""
 
 #: documents/models.py:239
 msgid "added"
-msgstr "ditambah"
+msgstr ""
 
 #: documents/models.py:246
 msgid "filename"
-msgstr "nama fail"
+msgstr ""
 
 #: documents/models.py:252
 msgid "Current filename in storage"
@@ -229,7 +229,7 @@ msgstr ""
 
 #: documents/models.py:256
 msgid "archive filename"
-msgstr "arkib nama fail"
+msgstr ""
 
 #: documents/models.py:262
 msgid "Current archive filename in storage"
@@ -237,15 +237,15 @@ msgstr ""
 
 #: documents/models.py:266
 msgid "original filename"
-msgstr "nama fail asal"
+msgstr ""
 
 #: documents/models.py:272
 msgid "The original name of the file when it was uploaded"
-msgstr "Nama fail asal ketika dimuat naik"
+msgstr ""
 
 #: documents/models.py:279
 msgid "archive serial number"
-msgstr "arkib nombor siri"
+msgstr ""
 
 #: documents/models.py:289
 msgid "The position of this document in your physical document archive."
@@ -254,51 +254,51 @@ msgstr ""
 #: documents/models.py:295 documents/models.py:761 documents/models.py:815
 #: documents/models.py:1569
 msgid "document"
-msgstr "dokumen"
+msgstr ""
 
 #: documents/models.py:296
 msgid "documents"
-msgstr "dokumen"
+msgstr ""
 
 #: documents/models.py:384
 msgid "debug"
-msgstr "nyahpepijat"
+msgstr ""
 
 #: documents/models.py:385
 msgid "information"
-msgstr "maklumat"
+msgstr ""
 
 #: documents/models.py:386
 msgid "warning"
-msgstr "amaran"
+msgstr ""
 
 #: documents/models.py:387 paperless_mail/models.py:363
 msgid "error"
-msgstr "ralat"
+msgstr ""
 
 #: documents/models.py:388
 msgid "critical"
-msgstr "kritikal"
+msgstr ""
 
 #: documents/models.py:391
 msgid "group"
-msgstr "kumpulan"
+msgstr ""
 
 #: documents/models.py:393
 msgid "message"
-msgstr "mesej"
+msgstr ""
 
 #: documents/models.py:396
 msgid "level"
-msgstr "tahap"
+msgstr ""
 
 #: documents/models.py:405
 msgid "log"
-msgstr "log"
+msgstr ""
 
 #: documents/models.py:406
 msgid "logs"
-msgstr "log"
+msgstr ""
 
 #: documents/models.py:414
 msgid "Table"
@@ -322,15 +322,15 @@ msgstr ""
 
 #: documents/models.py:421 documents/models.py:1061
 msgid "Added"
-msgstr "Ditambah"
+msgstr ""
 
 #: documents/models.py:422
 msgid "Tags"
-msgstr "Tag"
+msgstr ""
 
 #: documents/models.py:423
 msgid "Correspondent"
-msgstr "Pengirim"
+msgstr ""
 
 #: documents/models.py:424
 msgid "Document Type"
@@ -450,31 +450,31 @@ msgstr ""
 
 #: documents/models.py:495
 msgid "added before"
-msgstr "ditambah sebelum"
+msgstr ""
 
 #: documents/models.py:496
 msgid "added after"
-msgstr "ditambah selepas"
+msgstr ""
 
 #: documents/models.py:497
 msgid "modified before"
-msgstr "diubah sebelum"
+msgstr ""
 
 #: documents/models.py:498
 msgid "modified after"
-msgstr "diubah selepas"
+msgstr ""
 
 #: documents/models.py:499
 msgid "does not have tag"
-msgstr "tidak mempunyai tag"
+msgstr ""
 
 #: documents/models.py:500
 msgid "does not have ASN"
-msgstr "tidak mempunyai ASN"
+msgstr ""
 
 #: documents/models.py:501
 msgid "title or content contains"
-msgstr "tajuk atau kandungan mengandungi"
+msgstr ""
 
 #: documents/models.py:502
 msgid "fulltext query"
@@ -490,11 +490,11 @@ msgstr ""
 
 #: documents/models.py:505
 msgid "ASN greater than"
-msgstr "ASN lebih besar daripada"
+msgstr ""
 
 #: documents/models.py:506
 msgid "ASN less than"
-msgstr "ASN kurang daripada"
+msgstr ""
 
 #: documents/models.py:507
 msgid "storage path is"
@@ -502,19 +502,19 @@ msgstr ""
 
 #: documents/models.py:508
 msgid "has correspondent in"
-msgstr "mempunyai pengirim dalam"
+msgstr ""
 
 #: documents/models.py:509
 msgid "does not have correspondent in"
-msgstr "tidak mempunyai pengirim dalam"
+msgstr ""
 
 #: documents/models.py:510
 msgid "has document type in"
-msgstr "mempunyai jenis dokumen dalam"
+msgstr ""
 
 #: documents/models.py:511
 msgid "does not have document type in"
-msgstr "tidak mempunyai jenis dokumen dalam"
+msgstr ""
 
 #: documents/models.py:512
 msgid "has storage path in"
@@ -534,7 +534,7 @@ msgstr ""
 
 #: documents/models.py:516
 msgid "does not have owner"
-msgstr "tidak mempunyai pemilik"
+msgstr ""
 
 #: documents/models.py:517
 msgid "does not have owner in"
@@ -542,27 +542,27 @@ msgstr ""
 
 #: documents/models.py:518
 msgid "has custom field value"
-msgstr "mempunyai nilai medan tersuai"
+msgstr ""
 
 #: documents/models.py:519
 msgid "is shared by me"
-msgstr "dikongsi oleh saya"
+msgstr ""
 
 #: documents/models.py:520
 msgid "has custom fields"
-msgstr "mempunyai medan tersuai"
+msgstr ""
 
 #: documents/models.py:521
 msgid "has custom field in"
-msgstr "mempunyai medan tersuai dalam"
+msgstr ""
 
 #: documents/models.py:522
 msgid "does not have custom field in"
-msgstr "mempunyai medan tersuai dalam"
+msgstr ""
 
 #: documents/models.py:523
 msgid "does not have custom field"
-msgstr "mempunyai medan tersuai"
+msgstr ""
 
 #: documents/models.py:524
 msgid "custom fields query"
@@ -590,19 +590,19 @@ msgstr ""
 
 #: documents/models.py:539
 msgid "rule type"
-msgstr "jenis syarat"
+msgstr ""
 
 #: documents/models.py:541
 msgid "value"
-msgstr "nilai"
+msgstr ""
 
 #: documents/models.py:544
 msgid "filter rule"
-msgstr "syarat tapisan"
+msgstr ""
 
 #: documents/models.py:545
 msgid "filter rules"
-msgstr "syarat tapisan"
+msgstr ""
 
 #: documents/models.py:654
 msgid "Auto Task"
@@ -634,7 +634,7 @@ msgstr ""
 
 #: documents/models.py:667
 msgid "Task ID"
-msgstr "ID Tugasan"
+msgstr ""
 
 #: documents/models.py:668
 msgid "Celery ID for the Task that was run"
@@ -642,7 +642,7 @@ msgstr ""
 
 #: documents/models.py:673
 msgid "Acknowledged"
-msgstr "Diakui"
+msgstr ""
 
 #: documents/models.py:674
 msgid "If the task is acknowledged via the frontend or API"
@@ -714,43 +714,43 @@ msgstr ""
 
 #: documents/models.py:746
 msgid "Note for the document"
-msgstr "Nota untuk dokumen"
+msgstr ""
 
 #: documents/models.py:770
 msgid "user"
-msgstr "pengguna"
+msgstr ""
 
 #: documents/models.py:775
 msgid "note"
-msgstr "nota"
+msgstr ""
 
 #: documents/models.py:776
 msgid "notes"
-msgstr "nota"
+msgstr ""
 
 #: documents/models.py:784
 msgid "Archive"
-msgstr "Arkib"
+msgstr ""
 
 #: documents/models.py:785
 msgid "Original"
-msgstr "Asal"
+msgstr ""
 
 #: documents/models.py:796 paperless_mail/models.py:75
 msgid "expiration"
-msgstr "tamat tempoh"
+msgstr ""
 
 #: documents/models.py:803
 msgid "slug"
-msgstr "slug"
+msgstr ""
 
 #: documents/models.py:835
 msgid "share link"
-msgstr "kongsi pautan"
+msgstr ""
 
 #: documents/models.py:836
 msgid "share links"
-msgstr "kongsi pautan"
+msgstr ""
 
 #: documents/models.py:848
 msgid "String"
@@ -758,19 +758,19 @@ msgstr ""
 
 #: documents/models.py:849
 msgid "URL"
-msgstr "URL"
+msgstr ""
 
 #: documents/models.py:850
 msgid "Date"
-msgstr "Tarikh"
+msgstr ""
 
 #: documents/models.py:851
 msgid "Boolean"
-msgstr "Boolean"
+msgstr ""
 
 #: documents/models.py:852
 msgid "Integer"
-msgstr "Nombor bulat"
+msgstr ""
 
 #: documents/models.py:853
 msgid "Float"
@@ -786,15 +786,15 @@ msgstr ""
 
 #: documents/models.py:856
 msgid "Select"
-msgstr "Pilih"
+msgstr ""
 
 #: documents/models.py:868
 msgid "data type"
-msgstr "jenis data"
+msgstr ""
 
 #: documents/models.py:875
 msgid "extra data"
-msgstr "data tambahan"
+msgstr ""
 
 #: documents/models.py:879
 msgid "Extra data for the custom field, such as select options"
