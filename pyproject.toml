@@ -73,6 +73,15 @@ dependencies = [
 # TODO: Move certain things to groups and then utilize that further
 # This will allow testing to not install a webserver, mysql, etc
 
+[tool.pytest.ini_options]
+pythonpath = [
+  "src",
+]
+DJANGO_SETTINGS_MODULE = "paperless.settings"
+testpaths = [
+  "src",
+]
+
 [dependency-groups]
 
 dev = [
@@ -125,7 +134,7 @@ typing = [
 ]
 
 [tool.uv]
-required-version = ">=0.5.0"
+#required-version = ">=0.5.0"
 package = false
 environments = [
   "sys_platform == 'darwin'",
