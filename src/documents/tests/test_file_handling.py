@@ -1517,3 +1517,63 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
                 generate_filename(doc_a),
                 "2024-10-01/Some Title.pdf",
             )
+
+    def test_slugify_filter(self):
+        """
+        GIVEN:
+            - Filename format with slugify filter
+        WHEN:
+            - Filepath for a document with this format is called
+        THEN:
+            - The slugify filter properly converts strings to URL-friendly slugs
+        """
+        doc = Document.objects.create(
+            title="Some Title! With @ Special # Characters",
+            created=timezone.make_aware(datetime.datetime(2020, 6, 25, 7, 36, 51, 153)),
+            added=timezone.make_aware(datetime.datetime(2024, 10, 1, 7, 36, 51, 153)),
+            mime_type="application/pdf",
+            pk=2,
+            checksum="2",
+            archive_serial_number=25,
+        )
+
+        with override_settings(
+            FILENAME_FORMAT="{{ title | slugify }}",
+        ):
+            self.assertEqual(
+                generate_filename(doc),
+                "some-title-with-special-characters.pdf",
+            )
+
+        # Test with correspondent name containing spaces and special chars
+        doc.correspondent = Correspondent.objects.create(
+            name="John's @ Office / Workplace",
+        )
+        doc.save()
+
+        with override_settings(
+            FILENAME_FORMAT="{{ correspondent | slugify }}/{{ title | slugify }}",
+        ):
+            self.assertEqual(
+                generate_filename(doc),
+                "johns-office-workplace/some-title-with-special-characters.pdf",
+            )
+
+        # Test with custom fields
+        cf = CustomField.objects.create(
+            name="Location",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=cf,
+            value_text="Brussels @ Belgium!",
+        )
+
+        with override_settings(
+            FILENAME_FORMAT="{{ custom_fields | get_cf_value('Location') | slugify }}/{{ title | slugify }}",
+        ):
+            self.assertEqual(
+                generate_filename(doc),
+                "brussels-belgium/some-title-with-special-characters.pdf",
+            )
