@@ -1,7 +1,7 @@
 [project]
 name = "paperless-ngx"
 version = "0.1.0"
-description = "Add your description here"
+description = "A community-supported supercharged version of paperless: scan, index and archive all your physical documents"
 readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [
@@ -125,7 +125,7 @@ typing = [
 ]
 
 [tool.uv]
-required-version = ">=0.5.0"
+required-version = ">=0.5.14"
 package = false
 environments = [
   "sys_platform == 'darwin'",

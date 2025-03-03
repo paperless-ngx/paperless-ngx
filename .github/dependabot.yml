@@ -65,6 +65,10 @@ updates:
         update-types:
           - "minor"
           - "patch"
+      pre-built:
+        patterns:
+          - psycopg*
+          - zxing-cpp
 
   # Enable updates for GitHub Actions
   - package-ecosystem: "github-actions"
