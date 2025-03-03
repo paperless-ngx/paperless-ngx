@@ -128,7 +128,7 @@ RUN set -eux \
   && echo "Configuring ImageMagick" \
     && mv paperless-policy.xml /etc/ImageMagick-6/policy.xml
 
-COPY --from=ghcr.io/astral-sh/uv:0.4 /uv /bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.6 /uv /bin/uv
 
 # Packages needed only for building a few quick Python
 # dependencies
