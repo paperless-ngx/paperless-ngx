@@ -6,6 +6,7 @@ from collections import Counter
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 from datetime import timezone
+from distutils.command.clean import clean
 from http.client import responses
 from shutil import rmtree
 from typing import Optional
@@ -495,18 +496,29 @@ class DelayedElasticSearch(DelayedQuery):
         elif "added:" in q_str:
             cleaned_string = q_str[
                              :q_str.index("added:")].rstrip(',')
-        query = Q("multi_match", query=cleaned_string, fields=[
+        exact_matches = re.findall(r'"(.*?)"', q_str)
+
+        # Loại bỏ các chuỗi trong dấu ngoặc kép để tạo thành cleaned_string
+        cleaned_string = re.sub(r'"(.*?)"', '', q_str).strip()
+        exact_queries = [Q("match_phrase", content=match) for match in
+                         exact_matches]
+        cleaned_string = cleaned_string.replace('"', '')
+        normal_query  = Q("multi_match", query=cleaned_string, fields=[
             "content",
             "title",
-            "correspondent",
+            # "correspondent",
             "tag",
             "type",
             "notes",
             "custom_fields",
         ])
+        if cleaned_string == '':
+            normal_query = []
+        else:
+            normal_query = [normal_query]
 
-
-        return query  # Chỉ trả về một truy vấn
+        final_query = Q("bool", must=exact_queries + normal_query)
+        return final_query  # Chỉ trả về một truy vấn
 
     def _get_query_filter(self):
         criterias = []
