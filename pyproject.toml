@@ -125,6 +125,7 @@ typing = [
 ]
 
 [tool.uv]
+required-version = ">=0.5.0"
 package = false
 environments = [
   "sys_platform == 'darwin'",
