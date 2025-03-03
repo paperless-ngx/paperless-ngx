@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-25 11:07-0800\n"
+"POT-Creation-Date: 2025-03-01 21:03-0800\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr ""
 
-#: documents/filters.py:370
+#: documents/filters.py:375
 msgid "Value must be valid JSON."
 msgstr ""
 
-#: documents/filters.py:389
+#: documents/filters.py:394
 msgid "Invalid custom field query expression"
 msgstr ""
 
-#: documents/filters.py:399
+#: documents/filters.py:404
 msgid "Invalid expression list. Must be nonempty."
 msgstr ""
 
-#: documents/filters.py:420
+#: documents/filters.py:425
 msgid "Invalid logical operator {op!r}"
 msgstr ""
 
-#: documents/filters.py:434
+#: documents/filters.py:439
 msgid "Maximum number of query conditions exceeded."
 msgstr ""
 
-#: documents/filters.py:499
+#: documents/filters.py:504
 msgid "{name!r} is not a valid custom field."
 msgstr ""
 
-#: documents/filters.py:536
+#: documents/filters.py:541
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr ""
 
-#: documents/filters.py:644
+#: documents/filters.py:649
 msgid "Maximum nesting depth exceeded."
 msgstr ""
 
-#: documents/filters.py:829
+#: documents/filters.py:834
 msgid "Custom field not found"
 msgstr ""
 
@@ -89,7 +89,7 @@ msgstr ""
 msgid "Automatic"
 msgstr ""
 
-#: documents/models.py:67 documents/models.py:433 documents/models.py:1526
+#: documents/models.py:67 documents/models.py:433 documents/models.py:1536
 #: paperless_mail/models.py:23 paperless_mail/models.py:143
 msgid "name"
 msgstr ""
@@ -256,7 +256,7 @@ msgid "The position of this document in your physical document archive."
 msgstr ""
 
 #: documents/models.py:295 documents/models.py:761 documents/models.py:815
-#: documents/models.py:1569
+#: documents/models.py:1579
 msgid "document"
 msgstr ""
 
@@ -1088,141 +1088,149 @@ msgstr ""
 msgid "assign these custom fields"
 msgstr ""
 
-#: documents/models.py:1398
+#: documents/models.py:1395
+msgid "custom field values"
+msgstr ""
+
+#: documents/models.py:1399
+msgid "Optional values to assign to the custom fields."
+msgstr ""
+
+#: documents/models.py:1408
 msgid "remove these tag(s)"
 msgstr ""
 
-#: documents/models.py:1403
+#: documents/models.py:1413
 msgid "remove all tags"
 msgstr ""
 
-#: documents/models.py:1410
+#: documents/models.py:1420
 msgid "remove these document type(s)"
 msgstr ""
 
-#: documents/models.py:1415
+#: documents/models.py:1425
 msgid "remove all document types"
 msgstr ""
 
-#: documents/models.py:1422
+#: documents/models.py:1432
 msgid "remove these correspondent(s)"
 msgstr ""
 
-#: documents/models.py:1427
+#: documents/models.py:1437
 msgid "remove all correspondents"
 msgstr ""
 
-#: documents/models.py:1434
+#: documents/models.py:1444
 msgid "remove these storage path(s)"
 msgstr ""
 
-#: documents/models.py:1439
+#: documents/models.py:1449
 msgid "remove all storage paths"
 msgstr ""
 
-#: documents/models.py:1446
+#: documents/models.py:1456
 msgid "remove these owner(s)"
 msgstr ""
 
-#: documents/models.py:1451
+#: documents/models.py:1461
 msgid "remove all owners"
 msgstr ""
 
-#: documents/models.py:1458
+#: documents/models.py:1468
 msgid "remove view permissions for these users"
 msgstr ""
 
-#: documents/models.py:1465
+#: documents/models.py:1475
 msgid "remove view permissions for these groups"
 msgstr ""
 
-#: documents/models.py:1472
+#: documents/models.py:1482
 msgid "remove change permissions for these users"
 msgstr ""
 
-#: documents/models.py:1479
+#: documents/models.py:1489
 msgid "remove change permissions for these groups"
 msgstr ""
 
-#: documents/models.py:1484
+#: documents/models.py:1494
 msgid "remove all permissions"
 msgstr ""
 
-#: documents/models.py:1491
+#: documents/models.py:1501
 msgid "remove these custom fields"
 msgstr ""
 
-#: documents/models.py:1496
+#: documents/models.py:1506
 msgid "remove all custom fields"
 msgstr ""
 
-#: documents/models.py:1505
+#: documents/models.py:1515
 msgid "email"
 msgstr ""
 
-#: documents/models.py:1514
+#: documents/models.py:1524
 msgid "webhook"
 msgstr ""
 
-#: documents/models.py:1518
+#: documents/models.py:1528
 msgid "workflow action"
 msgstr ""
 
-#: documents/models.py:1519
+#: documents/models.py:1529
 msgid "workflow actions"
 msgstr ""
 
-#: documents/models.py:1528 paperless_mail/models.py:145
+#: documents/models.py:1538 paperless_mail/models.py:145
 msgid "order"
 msgstr ""
 
-#: documents/models.py:1534
+#: documents/models.py:1544
 msgid "triggers"
 msgstr ""
 
-#: documents/models.py:1541
+#: documents/models.py:1551
 msgid "actions"
 msgstr ""
 
-#: documents/models.py:1544 paperless_mail/models.py:154
+#: documents/models.py:1554 paperless_mail/models.py:154
 msgid "enabled"
 msgstr ""
 
-#: documents/models.py:1555
+#: documents/models.py:1565
 msgid "workflow"
 msgstr ""
 
-#: documents/models.py:1559
+#: documents/models.py:1569
 msgid "workflow trigger type"
 msgstr ""
 
-#: documents/models.py:1573
+#: documents/models.py:1583
 msgid "date run"
 msgstr ""
 
-#: documents/models.py:1579
+#: documents/models.py:1589
 msgid "workflow run"
 msgstr ""
 
-#: documents/models.py:1580
+#: documents/models.py:1590
 msgid "workflow runs"
 msgstr ""
 
-#: documents/serialisers.py:128
+#: documents/serialisers.py:134
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr ""
 
-#: documents/serialisers.py:554
+#: documents/serialisers.py:560
 msgid "Invalid color."
 msgstr ""
 
-#: documents/serialisers.py:1570
+#: documents/serialisers.py:1576
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:1659
+#: documents/serialisers.py:1665
 msgid "Invalid variable detected."
 msgstr ""
 
@@ -1463,7 +1471,7 @@ msgstr ""
 msgid "Unable to parse URI {value}"
 msgstr ""
 
-#: paperless/apps.py:10
+#: paperless/apps.py:11
 msgid "Paperless"
 msgstr ""
 
@@ -1611,139 +1619,139 @@ msgstr ""
 msgid "paperless application settings"
 msgstr ""
 
-#: paperless/settings.py:721
+#: paperless/settings.py:724
 msgid "English (US)"
 msgstr ""
 
-#: paperless/settings.py:722
+#: paperless/settings.py:725
 msgid "Arabic"
 msgstr ""
 
-#: paperless/settings.py:723
+#: paperless/settings.py:726
 msgid "Afrikaans"
 msgstr ""
 
-#: paperless/settings.py:724
+#: paperless/settings.py:727
 msgid "Belarusian"
 msgstr ""
 
-#: paperless/settings.py:725
+#: paperless/settings.py:728
 msgid "Bulgarian"
 msgstr ""
 
-#: paperless/settings.py:726
+#: paperless/settings.py:729
 msgid "Catalan"
 msgstr ""
 
-#: paperless/settings.py:727
+#: paperless/settings.py:730
 msgid "Czech"
 msgstr ""
 
-#: paperless/settings.py:728
+#: paperless/settings.py:731
 msgid "Danish"
 msgstr ""
 
-#: paperless/settings.py:729
+#: paperless/settings.py:732
 msgid "German"
 msgstr ""
 
-#: paperless/settings.py:730
+#: paperless/settings.py:733
 msgid "Greek"
 msgstr ""
 
-#: paperless/settings.py:731
+#: paperless/settings.py:734
 msgid "English (GB)"
 msgstr ""
 
-#: paperless/settings.py:732
+#: paperless/settings.py:735
 msgid "Spanish"
 msgstr ""
 
-#: paperless/settings.py:733
+#: paperless/settings.py:736
 msgid "Finnish"
 msgstr ""
 
-#: paperless/settings.py:734
+#: paperless/settings.py:737
 msgid "French"
 msgstr ""
 
-#: paperless/settings.py:735
+#: paperless/settings.py:738
 msgid "Hungarian"
 msgstr ""
 
-#: paperless/settings.py:736
+#: paperless/settings.py:739
 msgid "Italian"
 msgstr ""
 
-#: paperless/settings.py:737
+#: paperless/settings.py:740
 msgid "Japanese"
 msgstr ""
 
-#: paperless/settings.py:738
+#: paperless/settings.py:741
 msgid "Korean"
 msgstr ""
 
-#: paperless/settings.py:739
+#: paperless/settings.py:742
 msgid "Luxembourgish"
 msgstr ""
 
-#: paperless/settings.py:740
+#: paperless/settings.py:743
 msgid "Norwegian"
 msgstr ""
 
-#: paperless/settings.py:741
+#: paperless/settings.py:744
 msgid "Dutch"
 msgstr ""
 
-#: paperless/settings.py:742
+#: paperless/settings.py:745
 msgid "Polish"
 msgstr ""
 
-#: paperless/settings.py:743
+#: paperless/settings.py:746
 msgid "Portuguese (Brazil)"
 msgstr ""
 
-#: paperless/settings.py:744
+#: paperless/settings.py:747
 msgid "Portuguese"
 msgstr ""
 
-#: paperless/settings.py:745
+#: paperless/settings.py:748
 msgid "Romanian"
 msgstr ""
 
-#: paperless/settings.py:746
+#: paperless/settings.py:749
 msgid "Russian"
 msgstr ""
 
-#: paperless/settings.py:747
+#: paperless/settings.py:750
 msgid "Slovak"
 msgstr ""
 
-#: paperless/settings.py:748
+#: paperless/settings.py:751
 msgid "Slovenian"
 msgstr ""
 
-#: paperless/settings.py:749
+#: paperless/settings.py:752
 msgid "Serbian"
 msgstr ""
 
-#: paperless/settings.py:750
+#: paperless/settings.py:753
 msgid "Swedish"
 msgstr ""
 
-#: paperless/settings.py:751
+#: paperless/settings.py:754
 msgid "Turkish"
 msgstr ""
 
-#: paperless/settings.py:752
+#: paperless/settings.py:755
 msgid "Ukrainian"
 msgstr ""
 
-#: paperless/settings.py:753
+#: paperless/settings.py:756
 msgid "Chinese Simplified"
 msgstr ""
 
-#: paperless/settings.py:754
+#: paperless/settings.py:757
 msgid "Chinese Traditional"
 msgstr ""
 

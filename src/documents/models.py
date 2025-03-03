@@ -1391,6 +1391,16 @@ class WorkflowAction(models.Model):
         verbose_name=_("assign these custom fields"),
     )
 
+    assign_custom_fields_values = models.JSONField(
+        _("custom field values"),
+        null=True,
+        blank=True,
+        help_text=_(
+            "Optional values to assign to the custom fields.",
+        ),
+        default={},
+    )
+
     remove_tags = models.ManyToManyField(
         Tag,
         blank=True,
