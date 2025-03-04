@@ -120,7 +120,8 @@ from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
 from documents.filters import WarehouseFilterSet
-from documents.index import autocomplete_elastic_search
+from documents.index import autocomplete_elastic_search, \
+    autocomplete_string_elastic_search
 from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_folders
@@ -1545,7 +1546,8 @@ class SearchAutoCompleteView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        result = autocomplete_elastic_search(request.query_params["term"])
+        # result = autocomplete_elastic_search(request.query_params["term"])
+        result = autocomplete_string_elastic_search(request.query_params["term"])
         return Response(result)
         # user = self.request.user if hasattr(self.request, "user") else None
         # if "term" in request.query_params:

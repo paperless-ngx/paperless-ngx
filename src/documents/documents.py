@@ -16,7 +16,10 @@ class DocumentDocument(Document):
     title = fields.TextField(attr='title')
     title_keyword = fields.KeywordField(attr='title')
     suggest = fields.CompletionField()
-    content = fields.TextField(attr='content')
+    content = fields.TextField(
+        analyzer="standard"  # Sử dụng analyzer cho tiếng Việt
+    )
+    suggest_content = fields.CompletionField()
     asn = fields.KeywordField(attr='archive_serial_number')
     correspondent = fields.TextField(attr='correspondent.name')
     correspondent_id = fields.IntegerField(attr='correspondent.id')
@@ -60,10 +63,46 @@ class DocumentDocument(Document):
 
     class Index:
         name = ELASTIC_SEARCH_DOCUMENT_INDEX
+        settings = {
+            'number_of_shards': 5,  # Phân đoạn cho dữ liệu lớn
+            'number_of_replicas': 1,
+
+        }
 
     class Django:
         model = DocumentModel
         fields = []
+
+    def prepare_suggest_content(self, instance):
+        # Trích xuất các cụm từ từ content để dùng cho gợi ý
+        from underthesea import text_normalize, word_tokenize
+
+        content = instance.content
+        if not content or not isinstance(content, str):
+            return []
+
+        # Chuẩn hóa và tách từ
+        normalized_text = text_normalize(content.lower())
+        tokens = word_tokenize(normalized_text)
+
+        # Tạo danh sách cụm từ (bigram và trigram) với trọng số
+        phrases = []
+        weights = {}
+        for i in range(len(tokens) - 1):
+            phrase2 = ' '.join(tokens[i:i + 2])  # Bigram
+            phrases.append(phrase2)
+            weights[phrase2] = weights.get(phrase2,
+                                           0) + 1  # Tăng trọng số nếu lặp lại
+
+            if i < len(tokens) - 2:
+                phrase3 = ' '.join(tokens[i:i + 3])  # Trigram
+                phrases.append(phrase3)
+                weights[phrase3] = weights.get(phrase3, 0) + 1
+
+        # Loại bỏ trùng lặp và sắp xếp theo trọng số
+        unique_phrases = list(set(phrases))
+        return [{"input": phrase, "weight": weights[phrase]} for phrase in
+                unique_phrases if weights[phrase] > 1]
 
     def prepare_tags(self, instance):
         return [tag.name for tag in instance.tags.all()]
@@ -95,6 +134,7 @@ class DocumentDocument(Document):
         # document_data['id'] = doc.id or None
         document_data['title'] = doc.title or None
         document_data['content'] = doc.content or None
+        document_data['suggest_content'] = cls.prepare_suggest_content(doc)
         document_data['asn'] = doc.archive_serial_number or None
         document_data['correspondent'] = doc.correspondent.name if doc.correspondent else None
         document_data['correspondent_id'] = doc.correspondent.id if doc.correspondent else None

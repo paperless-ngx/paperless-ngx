@@ -926,6 +926,29 @@ def autocomplete_elastic_search(query):
         response = s.execute()
         return [s.text for s in response.suggest.suggest[0].options]
 
+def autocomplete_string_elastic_search(query):
+    s = Search(index=settings.ELASTIC_SEARCH_DOCUMENT_INDEX)
+    if query:
+        # s.suggest('song-suggest',
+        #           text='ne',
+        #           completion={
+        #               'field': 'suggest',
+        #               'size': 5,
+        #               'skip_duplicates': True
+        #           })
+        s = s.suggest(
+            "phrase_suggest",
+            text = query,
+            completion={
+                "field": "suggest_content",
+                "size": 10,
+                "skip_duplicates": True
+            }
+        )
+        s = s.source(['id'])
+        response = s.execute()
+        return [s.text for s in response.suggest.phrase_suggest[0].options]
+
 def autocomplete(
     ix: FileIndex,
     term: str,
