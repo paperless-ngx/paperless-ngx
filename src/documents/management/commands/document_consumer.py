@@ -354,6 +354,6 @@ class Command(BaseCommand):
             except KeyboardInterrupt:
                 logger.info("Received SIGINT, stopping inotify")
                 finished = True
-
-        inotify.rm_watch(descriptor)
-        inotify.close()
+            finally:
+                inotify.rm_watch(descriptor)
+                inotify.close()
