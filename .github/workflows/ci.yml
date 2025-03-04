@@ -304,8 +304,8 @@ jobs:
         name: Download frontend test results
         uses: actions/download-artifact@v4
         with:
-          name: junit-report-*
           path: src-ui/junit/
+          pattern: junit-report-*
           merge-multiple: true
       -
         name: Upload frontend coverage to Codecov
