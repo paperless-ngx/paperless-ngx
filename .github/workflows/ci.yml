@@ -245,6 +245,8 @@ jobs:
         run: cd src-ui && npm run lint
       -
         name: Run Jest unit tests
+        env:
+          JEST_JUNIT_OUTPUT_FILE: junit-report-${{ matrix.shard-index }}.xml
         run: cd src-ui && npm run test -- --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
       -
         name: Upload Jest coverage
@@ -257,7 +259,7 @@ jobs:
             src-ui/coverage/lcov.info
             src-ui/coverage/clover.xml
           retention-days: 7
-          if-no-files-found: warn
+          if-no-files-found: error
       -
         name: Run Playwright e2e tests
         run: cd src-ui && npx playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
@@ -269,6 +271,16 @@ jobs:
           name: playwright-report-${{ matrix.shard-index }}
           path: src-ui/playwright-report
           retention-days: 7
+          if-no-files-found: error
+      -
+        name: Upload frontend test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-report-${{ matrix.shard-index }}
+          path: src-ui/junit-report-${{ matrix.shard-index }}.xml
+          retention-days: 7
+          if-no-files-found: error
 
   tests-coverage-upload:
     name: "Upload to Codecov"
@@ -293,6 +305,13 @@ jobs:
           pattern: playwright-report-*
           merge-multiple: true
       -
+        name: Download frontend test results
+        uses: actions/download-artifact@v4
+        with:
+          path: src-ui/junit/
+          pattern: junit-report-*
+          merge-multiple: true
+      -
         name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
@@ -302,6 +321,14 @@ jobs:
           directory: src-ui/coverage/
           # dont include backend coverage files here
           files: '!coverage.xml'
+      -
+        name: Upload frontend test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: frontend
+          directory: src-ui/junit/
       -
         name: Download backend coverage
         uses: actions/download-artifact@v4
@@ -318,7 +345,7 @@ jobs:
           flags: backend
           directory: src/
       -
-        name: Upload test results to Codecov
+        name: Upload backend test results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/test-results-action@v1
         with:
