@@ -269,6 +269,14 @@ jobs:
           name: playwright-report-${{ matrix.shard-index }}
           path: src-ui/playwright-report
           retention-days: 7
+      -
+        name: Upload frontend test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit.xml
+          path: src-ui/
+          retention-days: 7
 
   tests-coverage-upload:
     name: "Upload to Codecov"
@@ -292,6 +300,12 @@ jobs:
           path: src-ui/coverage/
           pattern: playwright-report-*
           merge-multiple: true
+      -
+        name: Download frontend test results
+        uses: actions/download-artifact@v4
+        with:
+          path: src-ui/
+          name: junit.xml
       -
         name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v5
