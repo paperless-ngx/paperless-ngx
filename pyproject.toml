@@ -42,20 +42,15 @@ dependencies = [
   "filelock~=3.17.0",
   "flower~=2.0.1",
   "gotenberg-client~=0.9.0",
-  "granian~=1.7.6",
   "httpx-oauth~=0.16",
   "imap-tools~=1.10.0",
   "inotifyrecursive~=0.3",
   "jinja2~=3.1.5",
   "langdetect~=1.0.9",
-  "mysqlclient~=2.2.7",
   "nltk~=3.9.1",
   "ocrmypdf~=16.9.0",
   "pathvalidate~=3.2.3",
   "pdf2image~=1.17.0",
-  "psycopg[c]==3.2.4",
-  # Direct dependency for proper resolution of the pre-build wheels
-  "psycopg-c==3.2.4",
   "python-dateutil~=2.9.0",
   "python-dotenv~=1.0.1",
   "python-gnupg~=0.5.4",
@@ -72,6 +67,18 @@ dependencies = [
   "whitenoise~=6.9",
   "whoosh~=2.7",
   "zxing-cpp~=2.3.0",
+]
+
+optional-dependencies.mariadb = [
+  "mysqlclient~=2.2.7",
+]
+optional-dependencies.postgres = [
+  "psycopg[c]==3.2.4",
+  # Direct dependency for proper resolution of the pre-built wheels
+  "psycopg-c==3.2.4",
+]
+optional-dependencies.webserver = [
+  "granian~=1.7.6",
 ]
 
 [dependency-groups]
