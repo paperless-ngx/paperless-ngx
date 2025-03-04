@@ -13,12 +13,12 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { NotificationService } from 'src/app/services/notification.service'
 import {
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
 import { TagService } from 'src/app/services/rest/tag.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { ManagementListComponent } from '../management-list/management-list.component'
@@ -45,7 +45,7 @@ export class TagListComponent extends ManagementListComponent<Tag> {
   constructor(
     tagService: TagService,
     modalService: NgbModal,
-    toastService: ToastService,
+    notificationService: NotificationService,
     documentListViewService: DocumentListViewService,
     permissionsService: PermissionsService
   ) {
@@ -53,7 +53,7 @@ export class TagListComponent extends ManagementListComponent<Tag> {
       tagService,
       modalService,
       TagEditDialogComponent,
-      toastService,
+      notificationService,
       documentListViewService,
       permissionsService,
       FILTER_HAS_TAGS_ALL,

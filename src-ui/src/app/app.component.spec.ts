@@ -14,14 +14,17 @@ import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { Subject } from 'rxjs'
 import { routes } from './app-routing.module'
 import { AppComponent } from './app.component'
-import { ToastsComponent } from './components/common/toasts/toasts.component'
+import { NotificationListComponent } from './components/common/notification-list/notification-list.component'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
 import { PermissionsGuard } from './guards/permissions.guard'
 import { HotKeyService } from './services/hot-key.service'
+import {
+  Notification,
+  NotificationService,
+} from './services/notification.service'
 import { PermissionsService } from './services/permissions.service'
 import { SettingsService } from './services/settings.service'
-import { Toast, ToastService } from './services/toast.service'
 import {
   FileStatus,
   WebsocketStatusService,
@@ -33,7 +36,7 @@ describe('AppComponent', () => {
   let tourService: TourService
   let websocketStatusService: WebsocketStatusService
   let permissionsService: PermissionsService
-  let toastService: ToastService
+  let notificationService: NotificationService
   let router: Router
   let settingsService: SettingsService
   let hotKeyService: HotKeyService
@@ -46,7 +49,7 @@ describe('AppComponent', () => {
         NgxFileDropModule,
         NgbModalModule,
         AppComponent,
-        ToastsComponent,
+        NotificationListComponent,
         FileDropComponent,
         NgxBootstrapIconsModule.pick(allIcons),
       ],
@@ -62,7 +65,7 @@ describe('AppComponent', () => {
     websocketStatusService = TestBed.inject(WebsocketStatusService)
     permissionsService = TestBed.inject(PermissionsService)
     settingsService = TestBed.inject(SettingsService)
-    toastService = TestBed.inject(ToastService)
+    notificationService = TestBed.inject(NotificationService)
     router = TestBed.inject(Router)
     hotKeyService = TestBed.inject(HotKeyService)
     fixture = TestBed.createComponent(AppComponent)
@@ -82,12 +85,14 @@ describe('AppComponent', () => {
     expect(document.body.classList).not.toContain('tour-active')
   }))
 
-  it('should display toast on document consumed with link if user has access', () => {
+  it('should display notification on document consumed with link if user has access', () => {
     const navigateSpy = jest.spyOn(router, 'navigate')
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
-    let toast: Toast
-    toastService.getToasts().subscribe((toasts) => (toast = toasts[0]))
-    const toastSpy = jest.spyOn(toastService, 'show')
+    let notification: Notification
+    notificationService
+      .getNotifications()
+      .subscribe((notifications) => (notification = notifications[0]))
+    const notificationSpy = jest.spyOn(notificationService, 'show')
     const fileStatusSubject = new Subject<FileStatus>()
     jest
       .spyOn(websocketStatusService, 'onDocumentConsumptionFinished')
@@ -96,63 +101,65 @@ describe('AppComponent', () => {
     const status = new FileStatus()
     status.documentId = 1
     fileStatusSubject.next(status)
-    expect(toastSpy).toHaveBeenCalled()
-    expect(toast.action).not.toBeUndefined()
-    toast.action()
+    expect(notificationSpy).toHaveBeenCalled()
+    expect(notification.action).not.toBeUndefined()
+    notification.action()
     expect(navigateSpy).toHaveBeenCalledWith(['documents', status.documentId])
   })
 
-  it('should display toast on document consumed without link if user does not have access', () => {
+  it('should display notification on document consumed without link if user does not have access', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(false)
-    let toast: Toast
-    toastService.getToasts().subscribe((toasts) => (toast = toasts[0]))
-    const toastSpy = jest.spyOn(toastService, 'show')
+    let notification: Notification
+    notificationService
+      .getNotifications()
+      .subscribe((notifications) => (notification = notifications[0]))
+    const notificationSpy = jest.spyOn(notificationService, 'show')
     const fileStatusSubject = new Subject<FileStatus>()
     jest
       .spyOn(websocketStatusService, 'onDocumentConsumptionFinished')
       .mockReturnValue(fileStatusSubject)
     component.ngOnInit()
     fileStatusSubject.next(new FileStatus())
-    expect(toastSpy).toHaveBeenCalled()
-    expect(toast.action).toBeUndefined()
+    expect(notificationSpy).toHaveBeenCalled()
+    expect(notification.action).toBeUndefined()
   })
 
-  it('should display toast on document added', () => {
+  it('should display notification on document added', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
-    const toastSpy = jest.spyOn(toastService, 'show')
+    const notificationSpy = jest.spyOn(notificationService, 'show')
     const fileStatusSubject = new Subject<FileStatus>()
     jest
       .spyOn(websocketStatusService, 'onDocumentDetected')
       .mockReturnValue(fileStatusSubject)
     component.ngOnInit()
     fileStatusSubject.next(new FileStatus())
-    expect(toastSpy).toHaveBeenCalled()
+    expect(notificationSpy).toHaveBeenCalled()
   })
 
   it('should suppress dashboard notifications if set', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     jest.spyOn(settingsService, 'get').mockReturnValue(true)
     jest.spyOn(router, 'url', 'get').mockReturnValue('/dashboard')
-    const toastSpy = jest.spyOn(toastService, 'show')
+    const notificationSpy = jest.spyOn(notificationService, 'show')
     const fileStatusSubject = new Subject<FileStatus>()
     jest
       .spyOn(websocketStatusService, 'onDocumentDetected')
       .mockReturnValue(fileStatusSubject)
     component.ngOnInit()
     fileStatusSubject.next(new FileStatus())
-    expect(toastSpy).not.toHaveBeenCalled()
+    expect(notificationSpy).not.toHaveBeenCalled()
   })
 
-  it('should display toast on document failed', () => {
+  it('should display notification on document failed', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
-    const toastSpy = jest.spyOn(toastService, 'showError')
+    const notificationSpy = jest.spyOn(notificationService, 'showError')
     const fileStatusSubject = new Subject<FileStatus>()
     jest
       .spyOn(websocketStatusService, 'onDocumentConsumptionFailed')
       .mockReturnValue(fileStatusSubject)
     component.ngOnInit()
     fileStatusSubject.next(new FileStatus())
-    expect(toastSpy).toHaveBeenCalled()
+    expect(notificationSpy).toHaveBeenCalled()
   })
 
   it('should support hotkeys', () => {

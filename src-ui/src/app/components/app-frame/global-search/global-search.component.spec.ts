@@ -28,10 +28,10 @@ import {
 } from 'src/app/data/filter-rule-type'
 import { GlobalSearchType, SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { NotificationService } from 'src/app/services/notification.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SearchService } from 'src/app/services/rest/search.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
@@ -133,7 +133,7 @@ describe('GlobalSearchComponent', () => {
   let modalService: NgbModal
   let documentService: DocumentService
   let documentListViewService: DocumentListViewService
-  let toastService: ToastService
+  let notificationService: NotificationService
   let settingsService: SettingsService
 
   beforeEach(async () => {
@@ -157,7 +157,7 @@ describe('GlobalSearchComponent', () => {
     modalService = TestBed.inject(NgbModal)
     documentService = TestBed.inject(DocumentService)
     documentListViewService = TestBed.inject(DocumentListViewService)
-    toastService = TestBed.inject(ToastService)
+    notificationService = TestBed.inject(NotificationService)
     settingsService = TestBed.inject(SettingsService)
 
     fixture = TestBed.createComponent(GlobalSearchComponent)
@@ -397,16 +397,16 @@ describe('GlobalSearchComponent', () => {
     })
 
     const editDialog = modal.componentInstance as CustomFieldEditDialogComponent
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
 
     // fail first
     editDialog.failed.emit({ error: 'error creating item' })
-    expect(toastErrorSpy).toHaveBeenCalled()
+    expect(notificationErrorSpy).toHaveBeenCalled()
 
     // succeed
     editDialog.succeeded.emit(true)
-    expect(toastInfoSpy).toHaveBeenCalled()
+    expect(notificationInfoSpy).toHaveBeenCalled()
   })
 
   it('should support secondary action', () => {
@@ -448,16 +448,16 @@ describe('GlobalSearchComponent', () => {
     })
 
     const editDialog = modal.componentInstance as CustomFieldEditDialogComponent
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
 
     // fail first
     editDialog.failed.emit({ error: 'error creating item' })
-    expect(toastErrorSpy).toHaveBeenCalled()
+    expect(notificationErrorSpy).toHaveBeenCalled()
 
     // succeed
     editDialog.succeeded.emit(true)
-    expect(toastInfoSpy).toHaveBeenCalled()
+    expect(notificationInfoSpy).toHaveBeenCalled()
   })
 
   it('should support reset', () => {

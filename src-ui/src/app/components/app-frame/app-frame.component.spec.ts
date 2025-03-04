@@ -26,13 +26,13 @@ import {
   DjangoMessageLevel,
   DjangoMessagesService,
 } from 'src/app/services/django-messages.service'
+import { NotificationService } from 'src/app/services/notification.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { RemoteVersionService } from 'src/app/services/rest/remote-version.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SearchService } from 'src/app/services/rest/search.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
@@ -86,7 +86,7 @@ describe('AppFrameComponent', () => {
   let settingsService: SettingsService
   let permissionsService: PermissionsService
   let remoteVersionService: RemoteVersionService
-  let toastService: ToastService
+  let notificationService: NotificationService
   let messagesService: DjangoMessagesService
   let openDocumentsService: OpenDocumentsService
   let router: Router
@@ -126,7 +126,7 @@ describe('AppFrameComponent', () => {
         PermissionsService,
         RemoteVersionService,
         IfPermissionsDirective,
-        ToastService,
+        NotificationService,
         DjangoMessagesService,
         OpenDocumentsService,
         SearchService,
@@ -157,7 +157,7 @@ describe('AppFrameComponent', () => {
     const savedViewService = TestBed.inject(SavedViewService)
     permissionsService = TestBed.inject(PermissionsService)
     remoteVersionService = TestBed.inject(RemoteVersionService)
-    toastService = TestBed.inject(ToastService)
+    notificationService = TestBed.inject(NotificationService)
     messagesService = TestBed.inject(DjangoMessagesService)
     openDocumentsService = TestBed.inject(OpenDocumentsService)
     modalService = TestBed.inject(NgbModal)
@@ -216,7 +216,7 @@ describe('AppFrameComponent', () => {
 
   it('should show error on toggle update checking if store settings fails', () => {
     jest.spyOn(console, 'warn').mockImplementation(() => {})
-    const toastSpy = jest.spyOn(toastService, 'showError')
+    const notificationSpy = jest.spyOn(notificationService, 'showError')
     settingsService.set(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED, false)
     component.setUpdateChecking(true)
     httpTestingController
@@ -225,7 +225,7 @@ describe('AppFrameComponent', () => {
         status: 500,
         statusText: 'error',
       })
-    expect(toastSpy).toHaveBeenCalled()
+    expect(notificationSpy).toHaveBeenCalled()
   })
 
   it('should support toggling slim sidebar and saving', fakeAsync(() => {
@@ -245,7 +245,7 @@ describe('AppFrameComponent', () => {
 
   it('should show error on toggle slim sidebar if store settings fails', () => {
     jest.spyOn(console, 'warn').mockImplementation(() => {})
-    const toastSpy = jest.spyOn(toastService, 'showError')
+    const notificationSpy = jest.spyOn(notificationService, 'showError')
     component.toggleSlimSidebar()
     httpTestingController
       .expectOne(`${environment.apiBaseUrl}ui_settings/`)
@@ -253,7 +253,7 @@ describe('AppFrameComponent', () => {
         status: 500,
         statusText: 'error',
       })
-    expect(toastSpy).toHaveBeenCalled()
+    expect(notificationSpy).toHaveBeenCalled()
   })
 
   it('should support collapsible menu', () => {
@@ -305,7 +305,7 @@ describe('AppFrameComponent', () => {
 
   it('should update saved view sorting on drag + drop, show info', () => {
     const settingsSpy = jest.spyOn(settingsService, 'updateSidebarViewsSort')
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationSpy = jest.spyOn(notificationService, 'showInfo')
     jest.spyOn(settingsService, 'storeSettings').mockReturnValue(of(true))
     component.onDrop({ previousIndex: 0, currentIndex: 1 } as CdkDragDrop<
       SavedView[]
@@ -315,7 +315,7 @@ describe('AppFrameComponent', () => {
       saved_views[0],
       saved_views[3],
     ])
-    expect(toastSpy).toHaveBeenCalled()
+    expect(notificationSpy).toHaveBeenCalled()
   })
 
   it('should update saved view sorting on drag + drop, show error', () => {
@@ -326,14 +326,14 @@ describe('AppFrameComponent', () => {
     fixture = TestBed.createComponent(AppFrameComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
-    const toastSpy = jest.spyOn(toastService, 'showError')
+    const notificationSpy = jest.spyOn(notificationService, 'showError')
     jest
       .spyOn(settingsService, 'storeSettings')
       .mockReturnValue(throwError(() => new Error('unable to save')))
     component.onDrop({ previousIndex: 0, currentIndex: 2 } as CdkDragDrop<
       SavedView[]
     >)
-    expect(toastSpy).toHaveBeenCalled()
+    expect(notificationSpy).toHaveBeenCalled()
   })
 
   it('should support edit profile', () => {
@@ -345,9 +345,9 @@ describe('AppFrameComponent', () => {
     })
   })
 
-  it('should show toasts for django messages', () => {
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+  it('should show notifications for django messages', () => {
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
     jest.spyOn(messagesService, 'get').mockReturnValue([
       { level: DjangoMessageLevel.WARNING, message: 'Test warning' },
       { level: DjangoMessageLevel.ERROR, message: 'Test error' },
@@ -356,7 +356,7 @@ describe('AppFrameComponent', () => {
       { level: DjangoMessageLevel.DEBUG, message: 'Test debug' },
     ])
     component.ngOnInit()
-    expect(toastErrorSpy).toHaveBeenCalledTimes(2)
-    expect(toastInfoSpy).toHaveBeenCalledTimes(3)
+    expect(notificationErrorSpy).toHaveBeenCalledTimes(2)
+    expect(notificationInfoSpy).toHaveBeenCalledTimes(3)
   })
 })

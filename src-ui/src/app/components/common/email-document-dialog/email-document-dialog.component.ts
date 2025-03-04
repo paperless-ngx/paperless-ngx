@@ -2,8 +2,8 @@ import { Component, Input } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { NotificationService } from 'src/app/services/notification.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 @Component({
@@ -40,7 +40,7 @@ export class EmailDocumentDialogComponent extends LoadingComponentWithPermission
   constructor(
     private activeModal: NgbActiveModal,
     private documentService: DocumentService,
-    private toastService: ToastService
+    private notificationService: NotificationService
   ) {
     super()
     this.loading = false
@@ -62,11 +62,14 @@ export class EmailDocumentDialogComponent extends LoadingComponentWithPermission
           this.emailAddress = ''
           this.emailSubject = ''
           this.emailMessage = ''
-          this.toastService.showInfo($localize`Email sent`)
+          this.notificationService.showInfo($localize`Email sent`)
         },
         error: (e) => {
           this.loading = false
-          this.toastService.showError($localize`Error emailing document`, e)
+          this.notificationService.showError(
+            $localize`Error emailing document`,
+            e
+          )
         },
       })
   }

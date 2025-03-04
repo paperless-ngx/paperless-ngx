@@ -39,11 +39,11 @@ import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { UsernamePipe } from 'src/app/pipes/username.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { NotificationService } from 'src/app/services/notification.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { ToastService } from 'src/app/services/toast.service'
 import {
   FileStatus,
   WebsocketStatusService,
@@ -85,7 +85,7 @@ describe('DocumentListComponent', () => {
   let savedViewService: SavedViewService
   let router: Router
   let activatedRoute: ActivatedRoute
-  let toastService: ToastService
+  let notificationService: NotificationService
   let modalService: NgbModal
   let settingsService: SettingsService
   let permissionService: PermissionsService
@@ -116,7 +116,7 @@ describe('DocumentListComponent', () => {
     savedViewService = TestBed.inject(SavedViewService)
     router = TestBed.inject(Router)
     activatedRoute = TestBed.inject(ActivatedRoute)
-    toastService = TestBed.inject(ToastService)
+    notificationService = TestBed.inject(NotificationService)
     modalService = TestBed.inject(NgbModal)
     settingsService = TestBed.inject(SettingsService)
     permissionService = TestBed.inject(PermissionsService)
@@ -405,11 +405,11 @@ describe('DocumentListComponent', () => {
     delete modifiedView.name
     const savedViewServicePatch = jest.spyOn(savedViewService, 'patch')
     savedViewServicePatch.mockReturnValue(of(modifiedView))
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationSpy = jest.spyOn(notificationService, 'showInfo')
 
     component.saveViewConfig()
     expect(savedViewServicePatch).toHaveBeenCalledWith(modifiedView)
-    expect(toastSpy).toHaveBeenCalledWith(
+    expect(notificationSpy).toHaveBeenCalledWith(
       `View "${view.name}" saved successfully.`
     )
   })
@@ -427,12 +427,12 @@ describe('DocumentListComponent', () => {
         },
       ],
     })
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
     jest
       .spyOn(savedViewService, 'patch')
       .mockReturnValueOnce(throwError(() => new Error('Error saving view')))
     component.saveViewConfig()
-    expect(toastErrorSpy).toHaveBeenCalledWith(
+    expect(notificationErrorSpy).toHaveBeenCalledWith(
       'Failed to save view "Saved View 10".',
       expect.any(Error)
     )
@@ -467,7 +467,7 @@ describe('DocumentListComponent', () => {
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationSpy = jest.spyOn(notificationService, 'showInfo')
     const savedViewServiceCreate = jest.spyOn(savedViewService, 'create')
     savedViewServiceCreate.mockReturnValueOnce(of(modifiedView))
     component.saveViewConfigAs()
@@ -480,7 +480,7 @@ describe('DocumentListComponent', () => {
     })
     expect(savedViewServiceCreate).toHaveBeenCalled()
     expect(modalSpy).toHaveBeenCalled()
-    expect(toastSpy).toHaveBeenCalled()
+    expect(notificationSpy).toHaveBeenCalled()
     expect(modalCloseSpy).toHaveBeenCalled()
   })
 

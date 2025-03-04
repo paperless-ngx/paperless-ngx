@@ -31,6 +31,7 @@ import { GlobalSearchType, SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { HotKeyService } from 'src/app/services/hot-key.service'
+import { NotificationService } from 'src/app/services/notification.service'
 import {
   PermissionAction,
   PermissionsService,
@@ -41,7 +42,6 @@ import {
   SearchService,
 } from 'src/app/services/rest/search.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { paramsFromViewState } from 'src/app/utils/query-params'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
@@ -97,7 +97,7 @@ export class GlobalSearchComponent implements OnInit {
     private documentService: DocumentService,
     private documentListViewService: DocumentListViewService,
     private permissionsService: PermissionsService,
-    private toastService: ToastService,
+    private notificationService: NotificationService,
     private hotkeyService: HotKeyService,
     private settingsService: SettingsService
   ) {
@@ -206,10 +206,15 @@ export class GlobalSearchComponent implements OnInit {
       modalRef.componentInstance.dialogMode = EditDialogMode.EDIT
       modalRef.componentInstance.object = object
       modalRef.componentInstance.succeeded.subscribe(() => {
-        this.toastService.showInfo($localize`Successfully updated object.`)
+        this.notificationService.showInfo(
+          $localize`Successfully updated object.`
+        )
       })
       modalRef.componentInstance.failed.subscribe((e) => {
-        this.toastService.showError($localize`Error occurred saving object.`, e)
+        this.notificationService.showError(
+          $localize`Error occurred saving object.`,
+          e
+        )
       })
     }
   }
@@ -244,10 +249,15 @@ export class GlobalSearchComponent implements OnInit {
       modalRef.componentInstance.dialogMode = EditDialogMode.EDIT
       modalRef.componentInstance.object = object
       modalRef.componentInstance.succeeded.subscribe(() => {
-        this.toastService.showInfo($localize`Successfully updated object.`)
+        this.notificationService.showInfo(
+          $localize`Successfully updated object.`
+        )
       })
       modalRef.componentInstance.failed.subscribe((e) => {
-        this.toastService.showError($localize`Error occurred saving object.`, e)
+        this.notificationService.showError(
+          $localize`Error occurred saving object.`,
+          e
+        )
       })
     }
   }

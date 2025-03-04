@@ -11,6 +11,7 @@ import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { NotificationService } from 'src/app/services/notification.service'
 import {
   PermissionAction,
   PermissionsService,
@@ -19,7 +20,6 @@ import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperle
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
@@ -71,7 +71,7 @@ export class MailComponent
   constructor(
     public mailAccountService: MailAccountService,
     public mailRuleService: MailRuleService,
-    private toastService: ToastService,
+    private notificationService: NotificationService,
     private modalService: NgbModal,
     public permissionsService: PermissionsService,
     private settingsService: SettingsService,
@@ -104,7 +104,7 @@ export class MailComponent
           this.showAccounts = true
         },
         error: (e) => {
-          this.toastService.showError(
+          this.notificationService.showError(
             $localize`Error retrieving mail accounts`,
             e
           )
@@ -127,7 +127,10 @@ export class MailComponent
           this.showRules = true
         },
         error: (e) => {
-          this.toastService.showError($localize`Error retrieving mail rules`, e)
+          this.notificationService.showError(
+            $localize`Error retrieving mail rules`,
+            e
+          )
         },
       })
 
@@ -135,7 +138,9 @@ export class MailComponent
       if (params.get('oauth_success')) {
         const success = params.get('oauth_success') === '1'
         if (success) {
-          this.toastService.showInfo($localize`OAuth2 authentication success`)
+          this.notificationService.showInfo(
+            $localize`OAuth2 authentication success`
+          )
           this.oAuthAccountId = parseInt(params.get('account_id'))
           if (this.mailAccounts.length > 0) {
             this.editMailAccount(
@@ -145,7 +150,7 @@ export class MailComponent
             )
           }
         } else {
-          this.toastService.showError(
+          this.notificationService.showError(
             $localize`OAuth2 authentication failed, see logs for details`
           )
         }
@@ -169,7 +174,7 @@ export class MailComponent
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((newMailAccount) => {
-        this.toastService.showInfo(
+        this.notificationService.showInfo(
           $localize`Saved account "${newMailAccount.name}".`
         )
         this.mailAccountService.clearCache()
@@ -182,7 +187,7 @@ export class MailComponent
     modal.componentInstance.failed
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((e) => {
-        this.toastService.showError($localize`Error saving account.`, e)
+        this.notificationService.showError($localize`Error saving account.`, e)
       })
   }
 
@@ -200,7 +205,7 @@ export class MailComponent
       this.mailAccountService.delete(account).subscribe({
         next: () => {
           modal.close()
-          this.toastService.showInfo(
+          this.notificationService.showInfo(
             $localize`Deleted mail account "${account.name}"`
           )
           this.mailAccountService.clearCache()
@@ -211,7 +216,7 @@ export class MailComponent
             })
         },
         error: (e) => {
-          this.toastService.showError(
+          this.notificationService.showError(
             $localize`Error deleting mail account "${account.name}".`,
             e
           )
@@ -223,12 +228,12 @@ export class MailComponent
   processAccount(account: MailAccount) {
     this.mailAccountService.processAccount(account).subscribe({
       next: () => {
-        this.toastService.showInfo(
+        this.notificationService.showInfo(
           $localize`Processing mail account "${account.name}"`
         )
       },
       error: (e) => {
-        this.toastService.showError(
+        this.notificationService.showError(
           $localize`Error processing mail account "${account.name}"`,
           e
         )
@@ -247,7 +252,9 @@ export class MailComponent
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((newMailRule) => {
-        this.toastService.showInfo($localize`Saved rule "${newMailRule.name}".`)
+        this.notificationService.showInfo(
+          $localize`Saved rule "${newMailRule.name}".`
+        )
         this.mailRuleService.clearCache()
         this.mailRuleService
           .listAll(null, null, { full_perms: true })
@@ -258,7 +265,7 @@ export class MailComponent
     modal.componentInstance.failed
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((e) => {
-        this.toastService.showError($localize`Error saving rule.`, e)
+        this.notificationService.showError($localize`Error saving rule.`, e)
       })
   }
 
@@ -272,14 +279,14 @@ export class MailComponent
   onMailRuleEnableToggled(rule: MailRule) {
     this.mailRuleService.patch(rule).subscribe({
       next: () => {
-        this.toastService.showInfo(
+        this.notificationService.showInfo(
           rule.enabled
             ? $localize`Rule "${rule.name}" enabled.`
             : $localize`Rule "${rule.name}" disabled.`
         )
       },
       error: (e) => {
-        this.toastService.showError(
+        this.notificationService.showError(
           $localize`Error toggling rule "${rule.name}".`,
           e
         )
@@ -301,7 +308,7 @@ export class MailComponent
       this.mailRuleService.delete(rule).subscribe({
         next: () => {
           modal.close()
-          this.toastService.showInfo(
+          this.notificationService.showInfo(
             $localize`Deleted mail rule "${rule.name}"`
           )
           this.mailRuleService.clearCache()
@@ -312,7 +319,7 @@ export class MailComponent
             })
         },
         error: (e) => {
-          this.toastService.showError(
+          this.notificationService.showError(
             $localize`Error deleting mail rule "${rule.name}".`,
             e
           )
@@ -337,11 +344,11 @@ export class MailComponent
         object['set_permissions'] = permissions['set_permissions']
         service.patch(object).subscribe({
           next: () => {
-            this.toastService.showInfo($localize`Permissions updated`)
+            this.notificationService.showInfo($localize`Permissions updated`)
             modal.close()
           },
           error: (e) => {
-            this.toastService.showError(
+            this.notificationService.showError(
               $localize`Error updating permissions`,
               e
             )

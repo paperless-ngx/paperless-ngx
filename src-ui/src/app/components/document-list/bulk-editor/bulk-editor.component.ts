@@ -23,6 +23,7 @@ import { Tag } from 'src/app/data/tag'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { NotificationService } from 'src/app/services/notification.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
   PermissionAction,
@@ -39,7 +40,6 @@ import {
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
 import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
@@ -113,7 +113,7 @@ export class BulkEditorComponent
     private modalService: NgbModal,
     private openDocumentService: OpenDocumentsService,
     private settings: SettingsService,
-    private toastService: ToastService,
+    private notificationService: NotificationService,
     private storagePathService: StoragePathService,
     private customFieldService: CustomFieldsService,
     private permissionService: PermissionsService
@@ -284,7 +284,7 @@ export class BulkEditorComponent
           if (modal) {
             modal.componentInstance.buttonsEnabled = true
           }
-          this.toastService.showError(
+          this.notificationService.showError(
             $localize`Error executing bulk operation`,
             error
           )
@@ -859,7 +859,7 @@ export class BulkEditorComponent
         }
         mergeDialog.buttonsEnabled = false
         this.executeBulkOperation(modal, 'merge', args, mergeDialog.documentIDs)
-        this.toastService.showInfo(
+        this.notificationService.showInfo(
           $localize`Merged document will be queued for consumption.`
         )
       })
@@ -882,7 +882,7 @@ export class BulkEditorComponent
 
     dialog.documents = Array.from(this.list.selected)
     dialog.succeeded.subscribe((result) => {
-      this.toastService.showInfo($localize`Custom fields updated.`)
+      this.notificationService.showInfo($localize`Custom fields updated.`)
       this.list.reload()
       this.list.reduceSelectionToFilter()
       this.list.selected.forEach((id) => {
@@ -890,7 +890,7 @@ export class BulkEditorComponent
       })
     })
     dialog.failed.subscribe((error) => {
-      this.toastService.showError(
+      this.notificationService.showError(
         $localize`Error updating custom fields.`,
         error
       )

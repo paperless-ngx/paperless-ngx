@@ -9,10 +9,10 @@ import { of, throwError } from 'rxjs'
 import { DocumentNote } from 'src/app/data/document-note'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
+import { NotificationService } from 'src/app/services/notification.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { DocumentNotesService } from 'src/app/services/rest/document-notes.service'
 import { UserService } from 'src/app/services/rest/user.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { DocumentNotesComponent } from './document-notes.component'
 
 const notes: DocumentNote[] = [
@@ -52,7 +52,7 @@ describe('DocumentNotesComponent', () => {
   let component: DocumentNotesComponent
   let fixture: ComponentFixture<DocumentNotesComponent>
   let notesService: DocumentNotesService
-  let toastService: ToastService
+  let notificationService: NotificationService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -103,7 +103,7 @@ describe('DocumentNotesComponent', () => {
     }).compileComponents()
 
     notesService = TestBed.inject(DocumentNotesService)
-    toastService = TestBed.inject(ToastService)
+    notificationService = TestBed.inject(NotificationService)
     fixture = TestBed.createComponent(DocumentNotesComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
@@ -162,11 +162,11 @@ describe('DocumentNotesComponent', () => {
     fixture.detectChanges()
     const addSpy = jest.spyOn(notesService, 'addNote')
     addSpy.mockReturnValueOnce(throwError(() => new Error('error saving note')))
-    const toastsSpy = jest.spyOn(toastService, 'showError')
+    const notificationsSpy = jest.spyOn(notificationService, 'showError')
     const addButton = fixture.debugElement.query(By.css('button'))
     addButton.triggerEventHandler('click')
     expect(addSpy).toHaveBeenCalledWith(12, note)
-    expect(toastsSpy).toHaveBeenCalled()
+    expect(notificationsSpy).toHaveBeenCalled()
 
     addSpy.mockReturnValueOnce(
       of([...notes, { id: 31, note, user: { id: 1 } }])
@@ -194,7 +194,7 @@ describe('DocumentNotesComponent', () => {
     fixture.detectChanges()
     const deleteButton = fixture.debugElement.queryAll(By.css('button'))[1] // 0 is add button
     const deleteSpy = jest.spyOn(notesService, 'deleteNote')
-    const toastsSpy = jest.spyOn(toastService, 'showError')
+    const toastsSpy = jest.spyOn(notificationService, 'showError')
     deleteSpy.mockReturnValueOnce(
       throwError(() => new Error('error deleting note'))
     )

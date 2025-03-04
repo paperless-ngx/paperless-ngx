@@ -13,12 +13,12 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { NotificationService } from 'src/app/services/notification.service'
 import {
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { ManagementListComponent } from '../management-list/management-list.component'
@@ -45,7 +45,7 @@ export class CorrespondentListComponent extends ManagementListComponent<Correspo
   constructor(
     correspondentsService: CorrespondentService,
     modalService: NgbModal,
-    toastService: ToastService,
+    notificationService: NotificationService,
     documentListViewService: DocumentListViewService,
     permissionsService: PermissionsService,
     private datePipe: CustomDatePipe
@@ -54,7 +54,7 @@ export class CorrespondentListComponent extends ManagementListComponent<Correspo
       correspondentsService,
       modalService,
       CorrespondentEditDialogComponent,
-      toastService,
+      notificationService,
       documentListViewService,
       permissionsService,
       FILTER_HAS_CORRESPONDENT_ANY,

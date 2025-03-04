@@ -10,10 +10,10 @@ import { of, throwError } from 'rxjs'
 import { SavedView } from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
+import { NotificationService } from 'src/app/services/notification.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
 import { CheckComponent } from '../../common/input/check/check.component'
 import { DragDropSelectComponent } from '../../common/input/drag-drop-select/drag-drop-select.component'
@@ -32,7 +32,7 @@ describe('SavedViewsComponent', () => {
   let component: SavedViewsComponent
   let fixture: ComponentFixture<SavedViewsComponent>
   let savedViewService: SavedViewService
-  let toastService: ToastService
+  let notificationService: NotificationService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -77,7 +77,7 @@ describe('SavedViewsComponent', () => {
     }).compileComponents()
 
     savedViewService = TestBed.inject(SavedViewService)
-    toastService = TestBed.inject(ToastService)
+    notificationService = TestBed.inject(NotificationService)
     fixture = TestBed.createComponent(SavedViewsComponent)
     component = fixture.componentInstance
 
@@ -93,8 +93,8 @@ describe('SavedViewsComponent', () => {
   })
 
   it('should support save saved views, show error', () => {
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastSpy = jest.spyOn(toastService, 'show')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const notificationSpy = jest.spyOn(notificationService, 'show')
     const savedViewPatchSpy = jest.spyOn(savedViewService, 'patchMany')
 
     const toggle = fixture.debugElement.query(
@@ -108,16 +108,16 @@ describe('SavedViewsComponent', () => {
       throwError(() => new Error('unable to save saved views'))
     )
     component.save()
-    expect(toastErrorSpy).toHaveBeenCalled()
+    expect(notificationErrorSpy).toHaveBeenCalled()
     expect(savedViewPatchSpy).toHaveBeenCalled()
-    toastSpy.mockClear()
-    toastErrorSpy.mockClear()
+    notificationSpy.mockClear()
+    notificationErrorSpy.mockClear()
     savedViewPatchSpy.mockClear()
 
     // succeed saved views
     savedViewPatchSpy.mockReturnValueOnce(of(savedViews as SavedView[]))
     component.save()
-    expect(toastErrorSpy).not.toHaveBeenCalled()
+    expect(notificationErrorSpy).not.toHaveBeenCalled()
     expect(savedViewPatchSpy).toHaveBeenCalled()
   })
 
@@ -150,12 +150,12 @@ describe('SavedViewsComponent', () => {
   })
 
   it('should support delete saved view', () => {
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationSpy = jest.spyOn(notificationService, 'showInfo')
     const deleteSpy = jest.spyOn(savedViewService, 'delete')
     deleteSpy.mockReturnValue(of(true))
     component.deleteSavedView(savedViews[0] as SavedView)
     expect(deleteSpy).toHaveBeenCalled()
-    expect(toastSpy).toHaveBeenCalledWith(
+    expect(notificationSpy).toHaveBeenCalledWith(
       `Saved view "${savedViews[0].name}" deleted.`
     )
   })

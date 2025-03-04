@@ -6,9 +6,9 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { NotificationService } from 'src/app/services/notification.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { EmailDocumentDialogComponent } from './email-document-dialog.component'
 
 describe('EmailDocumentDialogComponent', () => {
@@ -16,7 +16,7 @@ describe('EmailDocumentDialogComponent', () => {
   let fixture: ComponentFixture<EmailDocumentDialogComponent>
   let documentService: DocumentService
   let permissionsService: PermissionsService
-  let toastService: ToastService
+  let notificationService: NotificationService
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -34,7 +34,7 @@ describe('EmailDocumentDialogComponent', () => {
 
     fixture = TestBed.createComponent(EmailDocumentDialogComponent)
     documentService = TestBed.inject(DocumentService)
-    toastService = TestBed.inject(ToastService)
+    notificationService = TestBed.inject(NotificationService)
     component = fixture.componentInstance
     fixture.detectChanges()
   })
@@ -47,8 +47,8 @@ describe('EmailDocumentDialogComponent', () => {
   })
 
   it('should support sending document via email, showing error if needed', () => {
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastSuccessSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const notificationSuccessSpy = jest.spyOn(notificationService, 'showInfo')
     component.emailAddress = 'hello@paperless-ngx.com'
     component.emailSubject = 'Hello'
     component.emailMessage = 'World'
@@ -56,11 +56,11 @@ describe('EmailDocumentDialogComponent', () => {
       .spyOn(documentService, 'emailDocument')
       .mockReturnValue(throwError(() => new Error('Unable to email document')))
     component.emailDocument()
-    expect(toastErrorSpy).toHaveBeenCalled()
+    expect(notificationErrorSpy).toHaveBeenCalled()
 
     jest.spyOn(documentService, 'emailDocument').mockReturnValue(of(true))
     component.emailDocument()
-    expect(toastSuccessSpy).toHaveBeenCalled()
+    expect(notificationSuccessSpy).toHaveBeenCalled()
   })
 
   it('should close the dialog', () => {

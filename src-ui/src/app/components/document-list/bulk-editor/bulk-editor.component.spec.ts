@@ -16,6 +16,7 @@ import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
 import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { NotificationService } from 'src/app/services/notification.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
@@ -29,7 +30,6 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
@@ -64,7 +64,7 @@ describe('BulkEditorComponent', () => {
   let permissionsService: PermissionsService
   let documentListViewService: DocumentListViewService
   let documentService: DocumentService
-  let toastService: ToastService
+  let notificationService: NotificationService
   let modalService: NgbModal
   let tagService: TagService
   let correspondentsService: CorrespondentService
@@ -160,7 +160,7 @@ describe('BulkEditorComponent', () => {
     permissionsService = TestBed.inject(PermissionsService)
     documentListViewService = TestBed.inject(DocumentListViewService)
     documentService = TestBed.inject(DocumentService)
-    toastService = TestBed.inject(ToastService)
+    notificationService = TestBed.inject(NotificationService)
     modalService = TestBed.inject(NgbModal)
     tagService = TestBed.inject(TagService)
     correspondentsService = TestBed.inject(CorrespondentService)
@@ -884,7 +884,7 @@ describe('BulkEditorComponent', () => {
     expect(button.nativeElement.disabled).toBeTruthy()
   })
 
-  it('should show a warning toast on bulk edit error', () => {
+  it('should show a warning notification on bulk edit error', () => {
     jest
       .spyOn(documentService, 'bulkEdit')
       .mockReturnValue(
@@ -902,12 +902,12 @@ describe('BulkEditorComponent', () => {
       .mockReturnValue(true)
     component.showConfirmationDialogs = false
     fixture.detectChanges()
-    const toastSpy = jest.spyOn(toastService, 'showError')
+    const notificationSpy = jest.spyOn(notificationService, 'showError')
     component.setTags({
       itemsToAdd: [{ id: 0 }],
       itemsToRemove: [],
     })
-    expect(toastSpy).toHaveBeenCalled()
+    expect(notificationSpy).toHaveBeenCalled()
   })
 
   it('should support redo ocr', () => {
@@ -1391,8 +1391,14 @@ describe('BulkEditorComponent', () => {
       .spyOn(documentListViewService, 'selected', 'get')
       .mockReturnValue(new Set([3, 4]))
     fixture.detectChanges()
-    const toastServiceShowInfoSpy = jest.spyOn(toastService, 'showInfo')
-    const toastServiceShowErrorSpy = jest.spyOn(toastService, 'showError')
+    const notificationServiceShowInfoSpy = jest.spyOn(
+      notificationService,
+      'showInfo'
+    )
+    const notificationServiceShowErrorSpy = jest.spyOn(
+      notificationService,
+      'showError'
+    )
     const listReloadSpy = jest.spyOn(documentListViewService, 'reload')
 
     component.customFields = [
@@ -1410,11 +1416,11 @@ describe('BulkEditorComponent', () => {
     expect(modal.componentInstance.documents).toEqual([3, 4])
 
     modal.componentInstance.failed.emit()
-    expect(toastServiceShowErrorSpy).toHaveBeenCalled()
+    expect(notificationServiceShowErrorSpy).toHaveBeenCalled()
     expect(listReloadSpy).not.toHaveBeenCalled()
 
     modal.componentInstance.succeeded.emit()
-    expect(toastServiceShowInfoSpy).toHaveBeenCalled()
+    expect(notificationServiceShowInfoSpy).toHaveBeenCalled()
     expect(listReloadSpy).toHaveBeenCalled()
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`

@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing'
 import { ActivatedRoute, RouterState } from '@angular/router'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
+import { NotificationService } from '../services/notification.service'
 import {
   PermissionAction,
   PermissionType,
   PermissionsService,
 } from '../services/permissions.service'
-import { ToastService } from '../services/toast.service'
 import { PermissionsGuard } from './permissions.guard'
 
 describe('PermissionsGuard', () => {
@@ -15,7 +15,7 @@ describe('PermissionsGuard', () => {
   let route: ActivatedRoute
   let routerState: RouterState
   let tourService: TourService
-  let toastService: ToastService
+  let notificationService: NotificationService
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -44,13 +44,13 @@ describe('PermissionsGuard', () => {
           },
         },
         TourService,
-        ToastService,
+        NotificationService,
       ],
     })
 
     permissionsService = TestBed.inject(PermissionsService)
     tourService = TestBed.inject(TourService)
-    toastService = TestBed.inject(ToastService)
+    notificationService = TestBed.inject(NotificationService)
     guard = TestBed.inject(PermissionsGuard)
     route = TestBed.inject(ActivatedRoute)
     routerState = TestBed.inject(RouterState)
@@ -88,11 +88,11 @@ describe('PermissionsGuard', () => {
       })
     jest.spyOn(tourService, 'getStatus').mockImplementation(() => 2)
 
-    const toastSpy = jest.spyOn(toastService, 'showError')
+    const notificationSpy = jest.spyOn(notificationService, 'showError')
 
     const canActivate = guard.canActivate(route.snapshot, routerState.snapshot)
 
     expect(canActivate).toHaveProperty('root') // returns UrlTree
-    expect(toastSpy).toHaveBeenCalled()
+    expect(notificationSpy).toHaveBeenCalled()
   })
 })

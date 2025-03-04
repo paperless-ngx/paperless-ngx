@@ -10,9 +10,9 @@ import { DocumentNote } from 'src/app/data/document-note'
 import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
+import { NotificationService } from 'src/app/services/notification.service'
 import { DocumentNotesService } from 'src/app/services/rest/document-notes.service'
 import { UserService } from 'src/app/services/rest/user.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 
 @Component({
@@ -50,7 +50,7 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
 
   constructor(
     private notesService: DocumentNotesService,
-    private toastService: ToastService,
+    private notificationService: NotificationService,
     private usersService: UserService
   ) {
     super()
@@ -78,7 +78,7 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
       },
       error: (e) => {
         this.networkActive = false
-        this.toastService.showError($localize`Error saving note`, e)
+        this.notificationService.showError($localize`Error saving note`, e)
       },
     })
   }
@@ -92,7 +92,7 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
       },
       error: (e) => {
         this.networkActive = false
-        this.toastService.showError($localize`Error deleting note`, e)
+        this.notificationService.showError($localize`Error deleting note`, e)
       },
     })
   }

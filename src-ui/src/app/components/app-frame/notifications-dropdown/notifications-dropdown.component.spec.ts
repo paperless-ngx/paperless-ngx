@@ -9,10 +9,13 @@ import {
 } from '@angular/core/testing'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject } from 'rxjs'
-import { Toast, ToastService } from 'src/app/services/toast.service'
-import { ToastsDropdownComponent } from './toasts-dropdown.component'
+import {
+  Notification,
+  NotificationService,
+} from 'src/app/services/notification.service'
+import { NotificationsDropdownComponent } from './notifications-dropdown.component'
 
-const toasts = [
+const notifications = [
   {
     id: 'abc-123',
     content: 'foo bar',
@@ -38,16 +41,16 @@ const toasts = [
   },
 ]
 
-describe('ToastsDropdownComponent', () => {
-  let component: ToastsDropdownComponent
-  let fixture: ComponentFixture<ToastsDropdownComponent>
-  let toastService: ToastService
-  let toastsSubject: Subject<Toast[]> = new Subject()
+describe('NotificationsDropdownComponent', () => {
+  let component: NotificationsDropdownComponent
+  let fixture: ComponentFixture<NotificationsDropdownComponent>
+  let notificationService: NotificationService
+  let notificationsSubject: Subject<Notification[]> = new Subject()
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
       imports: [
-        ToastsDropdownComponent,
+        NotificationsDropdownComponent,
         NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
@@ -56,24 +59,26 @@ describe('ToastsDropdownComponent', () => {
       ],
     }).compileComponents()
 
-    fixture = TestBed.createComponent(ToastsDropdownComponent)
-    toastService = TestBed.inject(ToastService)
-    jest.spyOn(toastService, 'getToasts').mockReturnValue(toastsSubject)
+    fixture = TestBed.createComponent(NotificationsDropdownComponent)
+    notificationService = TestBed.inject(NotificationService)
+    jest
+      .spyOn(notificationService, 'getNotifications')
+      .mockReturnValue(notificationsSubject)
 
     component = fixture.componentInstance
 
     fixture.detectChanges()
   })
 
-  it('should call getToasts and return toasts', fakeAsync(() => {
-    const spy = jest.spyOn(toastService, 'getToasts')
+  it('should call getNotifications and return notifications', fakeAsync(() => {
+    const spy = jest.spyOn(notificationService, 'getNotifications')
 
     component.ngOnInit()
-    toastsSubject.next(toasts)
+    notificationsSubject.next(notifications)
     fixture.detectChanges()
 
     expect(spy).toHaveBeenCalled()
-    expect(component.toasts).toContainEqual({
+    expect(component.notifications).toContainEqual({
       id: 'abc-123',
       content: 'foo bar',
       delay: 5000,
@@ -84,9 +89,9 @@ describe('ToastsDropdownComponent', () => {
     discardPeriodicTasks()
   }))
 
-  it('should show a toast', fakeAsync(() => {
+  it('should show a notification', fakeAsync(() => {
     component.ngOnInit()
-    toastsSubject.next(toasts)
+    notificationsSubject.next(notifications)
     fixture.detectChanges()
 
     expect(fixture.nativeElement.textContent).toContain('foo bar')
@@ -96,12 +101,16 @@ describe('ToastsDropdownComponent', () => {
     discardPeriodicTasks()
   }))
 
-  it('should toggle suppressPopupToasts', fakeAsync((finish) => {
+  it('should toggle suppressPopupNotifications', fakeAsync((finish) => {
     component.ngOnInit()
     fixture.detectChanges()
-    toastsSubject.next(toasts)
+    notificationsSubject.next(notifications)
 
-    const spy = jest.spyOn(toastService, 'suppressPopupToasts', 'set')
+    const spy = jest.spyOn(
+      notificationService,
+      'suppressPopupNotifications',
+      'set'
+    )
     component.onOpenChange(true)
     expect(spy).toHaveBeenCalledWith(true)
 

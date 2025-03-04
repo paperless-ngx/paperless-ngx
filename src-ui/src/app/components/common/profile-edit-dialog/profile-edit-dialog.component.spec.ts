@@ -16,8 +16,8 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
+import { NotificationService } from 'src/app/services/notification.service'
 import { ProfileService } from 'src/app/services/profile.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmButtonComponent } from '../confirm-button/confirm-button.component'
 import { PasswordComponent } from '../input/password/password.component'
 import { TextComponent } from '../input/text/text.component'
@@ -44,7 +44,7 @@ describe('ProfileEditDialogComponent', () => {
   let component: ProfileEditDialogComponent
   let fixture: ComponentFixture<ProfileEditDialogComponent>
   let profileService: ProfileService
-  let toastService: ToastService
+  let notificationService: NotificationService
   let clipboard: Clipboard
 
   beforeEach(() => {
@@ -64,7 +64,7 @@ describe('ProfileEditDialogComponent', () => {
       providers: [NgbActiveModal, provideHttpClient(withInterceptorsFromDi())],
     })
     profileService = TestBed.inject(ProfileService)
-    toastService = TestBed.inject(ToastService)
+    notificationService = TestBed.inject(NotificationService)
     clipboard = TestBed.inject(Clipboard)
     fixture = TestBed.createComponent(ProfileEditDialogComponent)
     component = fixture.componentInstance
@@ -94,13 +94,13 @@ describe('ProfileEditDialogComponent', () => {
       auth_token: profile.auth_token,
     }
     const updateSpy = jest.spyOn(profileService, 'update')
-    const errorSpy = jest.spyOn(toastService, 'showError')
+    const errorSpy = jest.spyOn(notificationService, 'showError')
     updateSpy.mockReturnValueOnce(throwError(() => new Error('failed to save')))
     component.save()
     expect(errorSpy).toHaveBeenCalled()
 
     updateSpy.mockClear()
-    const infoSpy = jest.spyOn(toastService, 'showInfo')
+    const infoSpy = jest.spyOn(notificationService, 'showInfo')
     component.form.patchValue(newProfile)
     updateSpy.mockReturnValueOnce(of(newProfile))
     component.save()
@@ -239,7 +239,7 @@ describe('ProfileEditDialogComponent', () => {
     getSpy.mockReturnValue(of(profile))
 
     const generateSpy = jest.spyOn(profileService, 'generateAuthToken')
-    const errorSpy = jest.spyOn(toastService, 'showError')
+    const errorSpy = jest.spyOn(notificationService, 'showError')
     generateSpy.mockReturnValueOnce(
       throwError(() => new Error('failed to generate'))
     )
@@ -275,7 +275,7 @@ describe('ProfileEditDialogComponent', () => {
     getSpy.mockImplementation(() => of(profile))
     component.ngOnInit()
 
-    const errorSpy = jest.spyOn(toastService, 'showError')
+    const errorSpy = jest.spyOn(notificationService, 'showError')
 
     expect(component.socialAccounts).toContainEqual(socialAccount)
 
@@ -300,13 +300,13 @@ describe('ProfileEditDialogComponent', () => {
       secret: 'secret',
     }
     const getSpy = jest.spyOn(profileService, 'getTotpSettings')
-    const toastSpy = jest.spyOn(toastService, 'showError')
+    const notificationSpy = jest.spyOn(notificationService, 'showError')
     getSpy.mockReturnValueOnce(
       throwError(() => new Error('failed to get settings'))
     )
     component.gettotpSettings()
     expect(getSpy).toHaveBeenCalled()
-    expect(toastSpy).toHaveBeenCalled()
+    expect(notificationSpy).toHaveBeenCalled()
 
     getSpy.mockReturnValue(of(settings))
     component.gettotpSettings()
@@ -316,8 +316,8 @@ describe('ProfileEditDialogComponent', () => {
 
   it('should activate totp', () => {
     const activateSpy = jest.spyOn(profileService, 'activateTotp')
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
     const error = new Error('failed to activate totp')
     activateSpy.mockReturnValueOnce(throwError(() => error))
     component.totpSettings = {
@@ -331,38 +331,44 @@ describe('ProfileEditDialogComponent', () => {
       component.totpSettings.secret,
       component.form.get('totp_code').value
     )
-    expect(toastErrorSpy).toHaveBeenCalled()
+    expect(notificationErrorSpy).toHaveBeenCalled()
 
     activateSpy.mockReturnValueOnce(of({ success: false, recovery_codes: [] }))
     component.activateTotp()
-    expect(toastErrorSpy).toHaveBeenCalledWith('Error activating TOTP', error)
+    expect(notificationErrorSpy).toHaveBeenCalledWith(
+      'Error activating TOTP',
+      error
+    )
 
     activateSpy.mockReturnValueOnce(
       of({ success: true, recovery_codes: ['1', '2', '3'] })
     )
     component.activateTotp()
-    expect(toastInfoSpy).toHaveBeenCalled()
+    expect(notificationInfoSpy).toHaveBeenCalled()
     expect(component.isTotpEnabled).toBeTruthy()
     expect(component.recoveryCodes).toEqual(['1', '2', '3'])
   })
 
   it('should deactivate totp', () => {
     const deactivateSpy = jest.spyOn(profileService, 'deactivateTotp')
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
     const error = new Error('failed to deactivate totp')
     deactivateSpy.mockReturnValueOnce(throwError(() => error))
     component.deactivateTotp()
     expect(deactivateSpy).toHaveBeenCalled()
-    expect(toastErrorSpy).toHaveBeenCalled()
+    expect(notificationErrorSpy).toHaveBeenCalled()
 
     deactivateSpy.mockReturnValueOnce(of(false))
     component.deactivateTotp()
-    expect(toastErrorSpy).toHaveBeenCalledWith('Error deactivating TOTP', error)
+    expect(notificationErrorSpy).toHaveBeenCalledWith(
+      'Error deactivating TOTP',
+      error
+    )
 
     deactivateSpy.mockReturnValueOnce(of(true))
     component.deactivateTotp()
-    expect(toastInfoSpy).toHaveBeenCalled()
+    expect(notificationInfoSpy).toHaveBeenCalled()
     expect(component.isTotpEnabled).toBeFalsy()
   })
 

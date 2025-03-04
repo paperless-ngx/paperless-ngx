@@ -14,13 +14,13 @@ import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first, takeUntil } from 'rxjs'
 import { CustomField, DATA_TYPE_LABELS } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
+import { NotificationService } from 'src/app/services/notification.service'
 import {
   PermissionAction,
   PermissionType,
   PermissionsService,
 } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 
@@ -78,7 +78,7 @@ export class CustomFieldsDropdownComponent extends LoadingComponentWithPermissio
   constructor(
     private customFieldsService: CustomFieldsService,
     private modalService: NgbModal,
-    private toastService: ToastService,
+    private notificationService: NotificationService,
     private permissionsService: PermissionsService
   ) {
     super()
@@ -123,7 +123,9 @@ export class CustomFieldsDropdownComponent extends LoadingComponentWithPermissio
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((newField) => {
-        this.toastService.showInfo($localize`Saved field "${newField.name}".`)
+        this.notificationService.showInfo(
+          $localize`Saved field "${newField.name}".`
+        )
         this.customFieldsService.clearCache()
         this.getFields()
         this.created.emit(newField)
@@ -132,7 +134,7 @@ export class CustomFieldsDropdownComponent extends LoadingComponentWithPermissio
     modal.componentInstance.failed
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((e) => {
-        this.toastService.showError($localize`Error saving field.`, e)
+        this.notificationService.showError($localize`Error saving field.`, e)
       })
   }
 

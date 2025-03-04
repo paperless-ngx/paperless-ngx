@@ -24,11 +24,11 @@
   --pngx-bg-alt2: var(--bs-gray-200); // #e9ecef
   --pngx-bg-disabled: #f7f7f7;
   --pngx-focus-alpha: 0.3;
-  --pngx-toast-max-width: 360px;
+  --pngx-notification-max-width: 360px;
   --bs-info: var(--pngx-bg-alt2);
   --bs-info-rgb: 233, 236, 239;
   @media screen and (min-width: 1024px) {
-    --pngx-toast-max-width: 450px;
+    --pngx-notification-max-width: 450px;
   }
 }
 

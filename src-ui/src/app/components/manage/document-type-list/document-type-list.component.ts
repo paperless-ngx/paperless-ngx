@@ -12,12 +12,12 @@ import { FILTER_HAS_DOCUMENT_TYPE_ANY } from 'src/app/data/filter-rule-type'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { NotificationService } from 'src/app/services/notification.service'
 import {
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { ManagementListComponent } from '../management-list/management-list.component'
@@ -43,7 +43,7 @@ export class DocumentTypeListComponent extends ManagementListComponent<DocumentT
   constructor(
     documentTypeService: DocumentTypeService,
     modalService: NgbModal,
-    toastService: ToastService,
+    notificationService: NotificationService,
     documentListViewService: DocumentListViewService,
     permissionsService: PermissionsService
   ) {
@@ -51,7 +51,7 @@ export class DocumentTypeListComponent extends ManagementListComponent<DocumentT
       documentTypeService,
       modalService,
       DocumentTypeEditDialogComponent,
-      toastService,
+      notificationService,
       documentListViewService,
       permissionsService,
       FILTER_HAS_DOCUMENT_TYPE_ANY,

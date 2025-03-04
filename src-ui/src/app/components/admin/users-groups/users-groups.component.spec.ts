@@ -14,11 +14,11 @@ import { Group } from 'src/app/data/group'
 import { User } from 'src/app/data/user'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
+import { NotificationService } from 'src/app/services/notification.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { GroupEditDialogComponent } from '../../common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
 import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
@@ -38,7 +38,7 @@ describe('UsersAndGroupsComponent', () => {
   let fixture: ComponentFixture<UsersAndGroupsComponent>
   let settingsService: SettingsService
   let modalService: NgbModal
-  let toastService: ToastService
+  let notificationService: NotificationService
   let userService: UserService
   let permissionsService: PermissionsService
   let groupService: GroupService
@@ -59,7 +59,7 @@ describe('UsersAndGroupsComponent', () => {
     settingsService.currentUser = users[0]
     userService = TestBed.inject(UserService)
     modalService = TestBed.inject(NgbModal)
-    toastService = TestBed.inject(ToastService)
+    notificationService = TestBed.inject(NotificationService)
     permissionsService = TestBed.inject(PermissionsService)
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     jest
@@ -104,13 +104,13 @@ describe('UsersAndGroupsComponent', () => {
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
     component.editUser(users[0])
     const editDialog = modal.componentInstance as UserEditDialogComponent
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
     editDialog.failed.emit()
-    expect(toastErrorSpy).toBeCalled()
+    expect(notificationErrorSpy).toBeCalled()
     settingsService.currentUser = users[1] // simulate logged in as different user
     editDialog.succeeded.emit(users[0])
-    expect(toastInfoSpy).toHaveBeenCalledWith(
+    expect(notificationInfoSpy).toHaveBeenCalledWith(
       `Saved user "${users[0].username}".`
     )
     component.editUser()
@@ -123,18 +123,18 @@ describe('UsersAndGroupsComponent', () => {
     component.deleteUser(users[0])
     const deleteDialog = modal.componentInstance as ConfirmDialogComponent
     const deleteSpy = jest.spyOn(userService, 'delete')
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
     const listAllSpy = jest.spyOn(userService, 'listAll')
     deleteSpy.mockReturnValueOnce(
       throwError(() => new Error('error deleting user'))
     )
     deleteDialog.confirm()
-    expect(toastErrorSpy).toBeCalled()
+    expect(notificationErrorSpy).toBeCalled()
     deleteSpy.mockReturnValueOnce(of(true))
     deleteDialog.confirm()
     expect(listAllSpy).toHaveBeenCalled()
-    expect(toastInfoSpy).toHaveBeenCalledWith('Deleted user "user1"')
+    expect(notificationInfoSpy).toHaveBeenCalledWith('Deleted user "user1"')
   })
 
   it('should logout current user if password changed, after delay', fakeAsync(() => {
@@ -163,12 +163,12 @@ describe('UsersAndGroupsComponent', () => {
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
     component.editGroup(groups[0])
     const editDialog = modal.componentInstance as GroupEditDialogComponent
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
     editDialog.failed.emit()
-    expect(toastErrorSpy).toBeCalled()
+    expect(notificationErrorSpy).toBeCalled()
     editDialog.succeeded.emit(groups[0])
-    expect(toastInfoSpy).toHaveBeenCalledWith(
+    expect(notificationInfoSpy).toHaveBeenCalledWith(
       `Saved group "${groups[0].name}".`
     )
     component.editGroup()
@@ -181,18 +181,18 @@ describe('UsersAndGroupsComponent', () => {
     component.deleteGroup(groups[0])
     const deleteDialog = modal.componentInstance as ConfirmDialogComponent
     const deleteSpy = jest.spyOn(groupService, 'delete')
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
     const listAllSpy = jest.spyOn(groupService, 'listAll')
     deleteSpy.mockReturnValueOnce(
       throwError(() => new Error('error deleting group'))
     )
     deleteDialog.confirm()
-    expect(toastErrorSpy).toBeCalled()
+    expect(notificationErrorSpy).toBeCalled()
     deleteSpy.mockReturnValueOnce(of(true))
     deleteDialog.confirm()
     expect(listAllSpy).toHaveBeenCalled()
-    expect(toastInfoSpy).toHaveBeenCalledWith('Deleted group "group1"')
+    expect(notificationInfoSpy).toHaveBeenCalledWith('Deleted group "group1"')
   })
 
   it('should get group name', () => {
@@ -202,7 +202,7 @@ describe('UsersAndGroupsComponent', () => {
   })
 
   it('should show errors on load if load users failure', () => {
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
     jest
       .spyOn(userService, 'listAll')
       .mockImplementation(() =>
@@ -210,11 +210,11 @@ describe('UsersAndGroupsComponent', () => {
       )
     completeSetup(userService)
     fixture.detectChanges()
-    expect(toastErrorSpy).toBeCalled()
+    expect(notificationErrorSpy).toBeCalled()
   })
 
   it('should show errors on load if load groups failure', () => {
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
     jest
       .spyOn(groupService, 'listAll')
       .mockImplementation(() =>
@@ -222,6 +222,6 @@ describe('UsersAndGroupsComponent', () => {
       )
     completeSetup(groupService)
     fixture.detectChanges()
-    expect(toastErrorSpy).toBeCalled()
+    expect(notificationErrorSpy).toBeCalled()
   })
 })

@@ -48,6 +48,7 @@ import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { ComponentRouterService } from 'src/app/services/component-router.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { NotificationService } from 'src/app/services/notification.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
@@ -58,7 +59,6 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
@@ -127,7 +127,7 @@ describe('DocumentDetailComponent', () => {
   let documentService: DocumentService
   let openDocumentsService: OpenDocumentsService
   let modalService: NgbModal
-  let toastService: ToastService
+  let notificationService: NotificationService
   let documentListViewService: DocumentListViewService
   let settingsService: SettingsService
   let customFieldsService: CustomFieldsService
@@ -264,7 +264,7 @@ describe('DocumentDetailComponent', () => {
     openDocumentsService = TestBed.inject(OpenDocumentsService)
     documentService = TestBed.inject(DocumentService)
     modalService = TestBed.inject(NgbModal)
-    toastService = TestBed.inject(ToastService)
+    notificationService = TestBed.inject(NotificationService)
     documentListViewService = TestBed.inject(DocumentListViewService)
     settingsService = TestBed.inject(SettingsService)
     settingsService.currentUser = { id: 1 }
@@ -447,68 +447,68 @@ describe('DocumentDetailComponent', () => {
     expect(navigateSpy).toHaveBeenCalledWith(['404'], { replaceUrl: true })
   })
 
-  it('should support save, close and show success toast', () => {
+  it('should support save, close and show success notification', () => {
     initNormally()
     component.title = 'Foo Bar'
     const closeSpy = jest.spyOn(component, 'close')
     const updateSpy = jest.spyOn(documentService, 'update')
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationSpy = jest.spyOn(notificationService, 'showInfo')
     updateSpy.mockImplementation((o) => of(doc))
     component.save(true)
     expect(updateSpy).toHaveBeenCalled()
     expect(closeSpy).toHaveBeenCalled()
-    expect(toastSpy).toHaveBeenCalledWith(
+    expect(notificationSpy).toHaveBeenCalledWith(
       'Document "Doc 3" saved successfully.'
     )
   })
 
-  it('should support save without close and show success toast', () => {
+  it('should support save without close and show success notification', () => {
     initNormally()
     component.title = 'Foo Bar'
     const closeSpy = jest.spyOn(component, 'close')
     const updateSpy = jest.spyOn(documentService, 'update')
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationSpy = jest.spyOn(notificationService, 'showInfo')
     updateSpy.mockImplementation((o) => of(doc))
     component.save()
     expect(updateSpy).toHaveBeenCalled()
     expect(closeSpy).not.toHaveBeenCalled()
-    expect(toastSpy).toHaveBeenCalledWith(
+    expect(notificationSpy).toHaveBeenCalledWith(
       'Document "Doc 3" saved successfully.'
     )
   })
 
-  it('should show toast error on save if error occurs', () => {
+  it('should show notification error on save if error occurs', () => {
     currentUserHasObjectPermissions = true
     initNormally()
     component.title = 'Foo Bar'
     const closeSpy = jest.spyOn(component, 'close')
     const updateSpy = jest.spyOn(documentService, 'update')
-    const toastSpy = jest.spyOn(toastService, 'showError')
+    const notificationSpy = jest.spyOn(notificationService, 'showError')
     const error = new Error('failed to save')
     updateSpy.mockImplementation(() => throwError(() => error))
     component.save()
     expect(updateSpy).toHaveBeenCalled()
     expect(closeSpy).not.toHaveBeenCalled()
-    expect(toastSpy).toHaveBeenCalledWith(
+    expect(notificationSpy).toHaveBeenCalledWith(
       'Error saving document "Doc 3"',
       error
     )
   })
 
-  it('should show error toast on save but close if user can no longer edit', () => {
+  it('should show error notification on save but close if user can no longer edit', () => {
     currentUserHasObjectPermissions = false
     initNormally()
     component.title = 'Foo Bar'
     const closeSpy = jest.spyOn(component, 'close')
     const updateSpy = jest.spyOn(documentService, 'update')
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationSpy = jest.spyOn(notificationService, 'showInfo')
     updateSpy.mockImplementation(() =>
       throwError(() => new Error('failed to save'))
     )
     component.save(true)
     expect(updateSpy).toHaveBeenCalled()
     expect(closeSpy).toHaveBeenCalled()
-    expect(toastSpy).toHaveBeenCalledWith(
+    expect(notificationSpy).toHaveBeenCalledWith(
       'Document "Doc 3" saved successfully.'
     )
   })
@@ -531,19 +531,19 @@ describe('DocumentDetailComponent', () => {
     expect
   })
 
-  it('should show toast error on save & next if error occurs', () => {
+  it('should show notification error on save & next if error occurs', () => {
     currentUserHasObjectPermissions = true
     initNormally()
     component.title = 'Foo Bar'
     const closeSpy = jest.spyOn(component, 'close')
     const updateSpy = jest.spyOn(documentService, 'update')
-    const toastSpy = jest.spyOn(toastService, 'showError')
+    const notificationSpy = jest.spyOn(notificationService, 'showError')
     const error = new Error('failed to save')
     updateSpy.mockImplementation(() => throwError(() => error))
     component.saveEditNext()
     expect(updateSpy).toHaveBeenCalled()
     expect(closeSpy).not.toHaveBeenCalled()
-    expect(toastSpy).toHaveBeenCalledWith('Error saving document', error)
+    expect(notificationSpy).toHaveBeenCalledWith('Error saving document', error)
   })
 
   it('should show save button and save & close or save & next', () => {
@@ -668,13 +668,13 @@ describe('DocumentDetailComponent', () => {
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationSpy = jest.spyOn(notificationService, 'showInfo')
     component.reprocess()
     const modalCloseSpy = jest.spyOn(openModal, 'close')
     openModal.componentInstance.confirmClicked.next()
     expect(bulkEditSpy).toHaveBeenCalledWith([doc.id], 'reprocess', {})
     expect(modalSpy).toHaveBeenCalled()
-    expect(toastSpy).toHaveBeenCalled()
+    expect(notificationSpy).toHaveBeenCalled()
     expect(modalCloseSpy).toHaveBeenCalled()
   })
 
@@ -683,12 +683,12 @@ describe('DocumentDetailComponent', () => {
     const bulkEditSpy = jest.spyOn(documentService, 'bulkEdit')
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
-    const toastSpy = jest.spyOn(toastService, 'showError')
+    const notificationSpy = jest.spyOn(notificationService, 'showError')
     component.reprocess()
     const modalCloseSpy = jest.spyOn(openModal, 'close')
     bulkEditSpy.mockReturnValue(throwError(() => new Error('error occurred')))
     openModal.componentInstance.confirmClicked.next()
-    expect(toastSpy).toHaveBeenCalled()
+    expect(notificationSpy).toHaveBeenCalled()
     expect(modalCloseSpy).not.toHaveBeenCalled()
   })
 
@@ -942,9 +942,12 @@ describe('DocumentDetailComponent', () => {
     jest
       .spyOn(documentService, 'getMetadata')
       .mockReturnValue(throwError(() => error))
-    const toastSpy = jest.spyOn(toastService, 'showError')
+    const notificationSpy = jest.spyOn(notificationService, 'showError')
     initNormally()
-    expect(toastSpy).toHaveBeenCalledWith('Error retrieving metadata', error)
+    expect(notificationSpy).toHaveBeenCalledWith(
+      'Error retrieving metadata',
+      error
+    )
   })
 
   it('should display custom fields', () => {
@@ -1028,7 +1031,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should show error if needed for get suggestions', () => {
     const suggestionsSpy = jest.spyOn(documentService, 'getSuggestions')
-    const errorSpy = jest.spyOn(toastService, 'showError')
+    const errorSpy = jest.spyOn(notificationService, 'showError')
     suggestionsSpy.mockImplementationOnce(() =>
       throwError(() => new Error('failed to get suggestions'))
     )

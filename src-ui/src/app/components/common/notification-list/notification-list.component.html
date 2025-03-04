@@ -1,0 +1,3 @@
+@for (notification of notifications; track notification.id) {
+  <pngx-notification [notification]="notification" [autohide]="true" (close)="closeNotification()"></pngx-notification>
+}

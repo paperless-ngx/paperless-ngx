@@ -12,7 +12,7 @@ import {
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
-import { ToastService } from 'src/app/services/toast.service'
+import { NotificationService } from 'src/app/services/notification.service'
 import { TrashService } from 'src/app/services/trash.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
@@ -38,7 +38,7 @@ describe('TrashComponent', () => {
   let fixture: ComponentFixture<TrashComponent>
   let trashService: TrashService
   let modalService: NgbModal
-  let toastService: ToastService
+  let notificationService: NotificationService
   let router: Router
 
   beforeEach(async () => {
@@ -60,7 +60,7 @@ describe('TrashComponent', () => {
     fixture = TestBed.createComponent(TrashComponent)
     trashService = TestBed.inject(TrashService)
     modalService = TestBed.inject(NgbModal)
-    toastService = TestBed.inject(ToastService)
+    notificationService = TestBed.inject(NotificationService)
     router = TestBed.inject(Router)
     component = fixture.componentInstance
     fixture.detectChanges()
@@ -88,13 +88,13 @@ describe('TrashComponent', () => {
     modalService.activeInstances.subscribe((instances) => {
       modal = instances[0]
     })
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
 
     // fail first
     trashSpy.mockReturnValue(throwError(() => 'Error'))
     component.delete(documentsInTrash[0])
     modal.componentInstance.confirmClicked.next()
-    expect(toastErrorSpy).toHaveBeenCalled()
+    expect(notificationErrorSpy).toHaveBeenCalled()
 
     trashSpy.mockReturnValue(of('OK'))
     component.delete(documentsInTrash[0])
@@ -109,13 +109,13 @@ describe('TrashComponent', () => {
     modalService.activeInstances.subscribe((instances) => {
       modal = instances[instances.length - 1]
     })
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
 
     // fail first
     trashSpy.mockReturnValue(throwError(() => 'Error'))
     component.emptyTrash()
     modal.componentInstance.confirmClicked.next()
-    expect(toastErrorSpy).toHaveBeenCalled()
+    expect(notificationErrorSpy).toHaveBeenCalled()
 
     trashSpy.mockReturnValue(of('OK'))
     component.emptyTrash()
@@ -131,12 +131,12 @@ describe('TrashComponent', () => {
   it('should support restore document, show error if needed', () => {
     const restoreSpy = jest.spyOn(trashService, 'restoreDocuments')
     const reloadSpy = jest.spyOn(component, 'reload')
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
 
     // fail first
     restoreSpy.mockReturnValue(throwError(() => 'Error'))
     component.restore(documentsInTrash[0])
-    expect(toastErrorSpy).toHaveBeenCalled()
+    expect(notificationErrorSpy).toHaveBeenCalled()
     expect(reloadSpy).not.toHaveBeenCalled()
 
     restoreSpy.mockReturnValue(of('OK'))
@@ -148,12 +148,12 @@ describe('TrashComponent', () => {
   it('should support restore all documents, show error if needed', () => {
     const restoreSpy = jest.spyOn(trashService, 'restoreDocuments')
     const reloadSpy = jest.spyOn(component, 'reload')
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
 
     // fail first
     restoreSpy.mockReturnValue(throwError(() => 'Error'))
     component.restoreAll()
-    expect(toastErrorSpy).toHaveBeenCalled()
+    expect(notificationErrorSpy).toHaveBeenCalled()
     expect(reloadSpy).not.toHaveBeenCalled()
 
     restoreSpy.mockReturnValue(of('OK'))
@@ -167,7 +167,7 @@ describe('TrashComponent', () => {
   it('should offer link to restored document', () => {
     let toasts
     const navigateSpy = jest.spyOn(router, 'navigate')
-    toastService.getToasts().subscribe((allToasts) => {
+    notificationService.getNotifications().subscribe((allToasts) => {
       toasts = [...allToasts]
     })
     jest.spyOn(trashService, 'restoreDocuments').mockReturnValue(of('OK'))

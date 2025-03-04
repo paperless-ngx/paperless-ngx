@@ -24,11 +24,11 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
+import { NotificationService } from 'src/app/services/notification.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
@@ -63,7 +63,7 @@ describe('MailComponent', () => {
   let mailAccountService: MailAccountService
   let mailRuleService: MailRuleService
   let modalService: NgbModal
-  let toastService: ToastService
+  let notificationService: NotificationService
   let permissionsService: PermissionsService
   let activatedRoute: ActivatedRoute
   let settingsService: SettingsService
@@ -111,7 +111,7 @@ describe('MailComponent', () => {
     mailAccountService = TestBed.inject(MailAccountService)
     mailRuleService = TestBed.inject(MailRuleService)
     modalService = TestBed.inject(NgbModal)
-    toastService = TestBed.inject(ToastService)
+    notificationService = TestBed.inject(NotificationService)
     permissionsService = TestBed.inject(PermissionsService)
     activatedRoute = TestBed.inject(ActivatedRoute)
     settingsService = TestBed.inject(SettingsService)
@@ -157,25 +157,25 @@ describe('MailComponent', () => {
   }
 
   it('should show errors on load if load mailAccounts failure', () => {
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
     jest
       .spyOn(mailAccountService, 'listAll')
       .mockImplementation(() =>
         throwError(() => new Error('failed to load mail accounts'))
       )
     completeSetup(mailAccountService)
-    expect(toastErrorSpy).toBeCalled()
+    expect(notificationErrorSpy).toBeCalled()
   })
 
   it('should show errors on load if load mailRules failure', () => {
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
     jest
       .spyOn(mailRuleService, 'listAll')
       .mockImplementation(() =>
         throwError(() => new Error('failed to load mail rules'))
       )
     completeSetup(mailRuleService)
-    expect(toastErrorSpy).toBeCalled()
+    expect(notificationErrorSpy).toBeCalled()
   })
 
   it('should support edit / create mail account, show error if needed', () => {
@@ -184,12 +184,12 @@ describe('MailComponent', () => {
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
     component.editMailAccount(mailAccounts[0] as MailAccount)
     let editDialog = modal.componentInstance as MailAccountEditDialogComponent
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
     editDialog.failed.emit()
-    expect(toastErrorSpy).toBeCalled()
+    expect(notificationErrorSpy).toBeCalled()
     editDialog.succeeded.emit(mailAccounts[0])
-    expect(toastInfoSpy).toHaveBeenCalledWith(
+    expect(notificationInfoSpy).toHaveBeenCalledWith(
       `Saved account "${mailAccounts[0].name}".`
     )
     editDialog.cancel()
@@ -203,35 +203,37 @@ describe('MailComponent', () => {
     component.deleteMailAccount(mailAccounts[0] as MailAccount)
     const deleteDialog = modal.componentInstance as ConfirmDialogComponent
     const deleteSpy = jest.spyOn(mailAccountService, 'delete')
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
     const listAllSpy = jest.spyOn(mailAccountService, 'listAll')
     deleteSpy.mockReturnValueOnce(
       throwError(() => new Error('error deleting mail account'))
     )
     deleteDialog.confirm()
-    expect(toastErrorSpy).toBeCalled()
+    expect(notificationErrorSpy).toBeCalled()
     deleteSpy.mockReturnValueOnce(of(true))
     deleteDialog.confirm()
     expect(listAllSpy).toHaveBeenCalled()
-    expect(toastInfoSpy).toHaveBeenCalledWith('Deleted mail account "account1"')
+    expect(notificationInfoSpy).toHaveBeenCalledWith(
+      'Deleted mail account "account1"'
+    )
   })
 
   it('should support process mail account, show error if needed', () => {
     completeSetup()
     const processSpy = jest.spyOn(mailAccountService, 'processAccount')
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
     component.processAccount(mailAccounts[0] as MailAccount)
     expect(processSpy).toHaveBeenCalled()
     processSpy.mockReturnValueOnce(
       throwError(() => new Error('error processing mail account'))
     )
     component.processAccount(mailAccounts[0] as MailAccount)
-    expect(toastErrorSpy).toHaveBeenCalled()
+    expect(notificationErrorSpy).toHaveBeenCalled()
     processSpy.mockReturnValueOnce(of(true))
     component.processAccount(mailAccounts[0] as MailAccount)
-    expect(toastInfoSpy).toHaveBeenCalledWith(
+    expect(notificationInfoSpy).toHaveBeenCalledWith(
       'Processing mail account "account1"'
     )
   })
@@ -242,12 +244,12 @@ describe('MailComponent', () => {
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
     component.editMailRule(mailRules[0] as MailRule)
     const editDialog = modal.componentInstance as MailRuleEditDialogComponent
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
     editDialog.failed.emit()
-    expect(toastErrorSpy).toBeCalled()
+    expect(notificationErrorSpy).toBeCalled()
     editDialog.succeeded.emit(mailRules[0])
-    expect(toastInfoSpy).toHaveBeenCalledWith(
+    expect(notificationInfoSpy).toHaveBeenCalledWith(
       `Saved rule "${mailRules[0].name}".`
     )
     editDialog.cancel()
@@ -272,18 +274,20 @@ describe('MailComponent', () => {
     component.deleteMailRule(mailRules[0] as MailRule)
     const deleteDialog = modal.componentInstance as ConfirmDialogComponent
     const deleteSpy = jest.spyOn(mailRuleService, 'delete')
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
     const listAllSpy = jest.spyOn(mailRuleService, 'listAll')
     deleteSpy.mockReturnValueOnce(
       throwError(() => new Error('error deleting mail rule "rule1"'))
     )
     deleteDialog.confirm()
-    expect(toastErrorSpy).toBeCalled()
+    expect(notificationErrorSpy).toBeCalled()
     deleteSpy.mockReturnValueOnce(of(true))
     deleteDialog.confirm()
     expect(listAllSpy).toHaveBeenCalled()
-    expect(toastInfoSpy).toHaveBeenCalledWith('Deleted mail rule "rule1"')
+    expect(notificationInfoSpy).toHaveBeenCalledWith(
+      'Deleted mail rule "rule1"'
+    )
   })
 
   it('should support edit permissions on mail rule objects', () => {
@@ -303,8 +307,8 @@ describe('MailComponent', () => {
     }
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
     const rulePatchSpy = jest.spyOn(mailRuleService, 'patch')
     component.editPermissions(mailRules[0] as MailRule)
     expect(modal).not.toBeUndefined()
@@ -316,10 +320,10 @@ describe('MailComponent', () => {
     )
     dialog.confirmClicked.emit({ permissions: perms, merge: true })
     expect(rulePatchSpy).toHaveBeenCalled()
-    expect(toastErrorSpy).toHaveBeenCalled()
+    expect(notificationErrorSpy).toHaveBeenCalled()
     rulePatchSpy.mockReturnValueOnce(of(mailRules[0] as MailRule))
     dialog.confirmClicked.emit({ permissions: perms, merge: true })
-    expect(toastInfoSpy).toHaveBeenCalledWith('Permissions updated')
+    expect(notificationInfoSpy).toHaveBeenCalledWith('Permissions updated')
 
     modalService.dismissAll()
   })
@@ -356,15 +360,15 @@ describe('MailComponent', () => {
     const toggleInput = fixture.debugElement.query(
       By.css('input[type="checkbox"]')
     )
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
     // fail first
     patchSpy.mockReturnValueOnce(
       throwError(() => new Error('Error getting config'))
     )
     toggleInput.nativeElement.click()
     expect(patchSpy).toHaveBeenCalled()
-    expect(toastErrorSpy).toHaveBeenCalled()
+    expect(notificationErrorSpy).toHaveBeenCalled()
     // succeed second
     patchSpy.mockReturnValueOnce(of(mailRules[0] as MailRule))
     toggleInput.nativeElement.click()
@@ -373,7 +377,7 @@ describe('MailComponent', () => {
     )
     toggleInput.nativeElement.click()
     expect(patchSpy).toHaveBeenCalled()
-    expect(toastInfoSpy).toHaveBeenCalled()
+    expect(notificationInfoSpy).toHaveBeenCalled()
   })
 
   it('should show success message when oauth account is connected', () => {
@@ -381,9 +385,9 @@ describe('MailComponent', () => {
     jest
       .spyOn(activatedRoute, 'queryParamMap', 'get')
       .mockReturnValue(of(convertToParamMap(queryParams)))
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
     completeSetup()
-    expect(toastInfoSpy).toHaveBeenCalled()
+    expect(notificationInfoSpy).toHaveBeenCalled()
   })
 
   it('should show error message when oauth account connect fails', () => {
@@ -391,9 +395,9 @@ describe('MailComponent', () => {
     jest
       .spyOn(activatedRoute, 'queryParamMap', 'get')
       .mockReturnValue(of(convertToParamMap(queryParams)))
-    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
     completeSetup()
-    expect(toastErrorSpy).toHaveBeenCalled()
+    expect(notificationErrorSpy).toHaveBeenCalled()
   })
 
   it('should open account edit dialog if oauth account is connected', () => {
