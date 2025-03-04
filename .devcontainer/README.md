@@ -85,7 +85,7 @@ Once the DevContainer is up and running, perform the following steps:
 
 You can start and debug backend services either as debugging sessions via `launch.json` or as tasks.
 
-#### Using `launch.json`:
+#### Using `launch.json`
 
 1. Press `F5` or go to the **Run and Debug** view in VSCode.
 2. Select the desired configuration:
@@ -93,7 +93,7 @@ You can start and debug backend services either as debugging sessions via `launc
    - `Document Consumer`
    - `Celery`
 
-#### Using Tasks:
+#### Using Tasks
 
 1. Open the command palette:
    - **Windows/Linux**: `Ctrl+Shift+P`
