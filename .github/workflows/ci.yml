@@ -14,9 +14,7 @@ on:
       - 'translations**'
 
 env:
-  # This is the version of pipenv all the steps will use
-  # If changing this, change Dockerfile
-  DEFAULT_PIP_ENV_VERSION: "2024.4.1"
+  DEFAULT_UV_VERSION: "0.6.x"
   # This is the default version of Python to use in most steps which aren't specific
   DEFAULT_PYTHON_VERSION: "3.11"
 
@@ -59,24 +57,25 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
-          cache: "pipenv"
-          cache-dependency-path: 'Pipfile.lock'
       -
-        name: Install pipenv
-        run: |
-          pip install --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }}
+        name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
+          enable-cache: true
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       -
-        name: Install dependencies
+        name: Install Python dependencies
         run: |
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} sync --dev
-      -
-        name: List installed Python dependencies
-        run: |
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run pip list
+          uv sync --python ${{ steps.setup-python.outputs.python-version }} --dev --frozen
       -
         name: Make documentation
         run: |
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run mkdocs build --config-file ./mkdocs.yml
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --dev \
+            --frozen \
+            mkdocs build --config-file ./mkdocs.yml
       -
         name: Deploy documentation
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -84,7 +83,11 @@ jobs:
           echo "docs.paperless-ngx.com" > "${{ github.workspace }}/docs/CNAME"
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run mkdocs gh-deploy --force --no-history
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --dev \
+            --frozen \
+            mkdocs gh-deploy --force --no-history
       -
         name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -117,12 +120,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "${{ matrix.python-version }}"
-          cache: "pipenv"
-          cache-dependency-path: 'Pipfile.lock'
       -
-        name: Install pipenv
-        run: |
-          pip install --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }}
+        name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
+          enable-cache: true
+          python-version: ${{ steps.setup-python.outputs.python-version }}
       -
         name: Install system dependencies
         run: |
@@ -135,12 +139,14 @@ jobs:
       -
         name: Install Python dependencies
         run: |
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run python --version
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} sync --dev
+          uv sync \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --group testing \
+            --frozen
       -
         name: List installed Python dependencies
         run: |
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run pip list
+          uv pip list
       -
         name: Tests
         env:
@@ -151,7 +157,11 @@ jobs:
           PAPERLESS_MAIL_TEST_PASSWD: ${{ secrets.TEST_MAIL_PASSWD }}
         run: |
           cd src/
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run pytest -ra
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --dev \
+            --frozen \
+            pytest -ra
       -
         name: Upload coverage
         if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION }}
@@ -472,16 +482,17 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
-          cache: "pipenv"
-          cache-dependency-path: 'Pipfile.lock'
       -
-        name: Install pipenv + tools
-        run: |
-          pip install --upgrade --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }} setuptools wheel
+        name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
+          enable-cache: true
+          python-version: ${{ steps.setup-python.outputs.python-version }}
       -
         name: Install Python dependencies
         run: |
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} sync --dev
+          uv sync --python ${{ steps.setup-python.outputs.python-version }} --dev --frozen
       -
         name: Install system dependencies
         run: |
@@ -502,17 +513,21 @@ jobs:
       -
         name: Generate requirements file
         run: |
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} requirements > requirements.txt
+           uv export --quiet --no-dev --format requirements-txt --output-file requirements.txt
       -
         name: Compile messages
         run: |
           cd src/
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run python3 manage.py compilemessages
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            manage.py compilemessages
       -
         name: Collect static files
         run: |
           cd src/
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run python3 manage.py collectstatic --no-input
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            manage.py collectstatic --no-input
       -
         name: Move files
         run: |
@@ -528,8 +543,8 @@ jobs:
           for file_name in .dockerignore \
                           .env \
                           Dockerfile \
-                          Pipfile \
-                          Pipfile.lock \
+                          pyproject.toml \
+                          uv.lock \
                           requirements.txt \
                           LICENSE \
                           README.md \
@@ -631,15 +646,17 @@ jobs:
           ref: main
       -
         name: Set up Python
+        id: setup-python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
-          cache: "pipenv"
-          cache-dependency-path: 'Pipfile.lock'
       -
-        name: Install pipenv + tools
-        run: |
-          pip install --upgrade --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }} setuptools wheel
+        name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
+          enable-cache: true
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       -
         name: Append Changelog to docs
         id: append-Changelog
@@ -655,7 +672,10 @@ jobs:
           CURRENT_CHANGELOG=`tail --lines +2 changelog.md`
           echo -e "$CURRENT_CHANGELOG" >> changelog-new.md
           mv changelog-new.md changelog.md
-          pipenv run pre-commit run --files changelog.md || true
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --dev \
+            pre-commit run --files changelog.md || true
           git config --global user.name "github-actions"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -am "Changelog ${{ needs.publish-release.outputs.version }} - GHA"

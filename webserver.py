@@ -6,7 +6,7 @@ if __name__ == "__main__":
 
     Granian(
         "paperless.asgi:application",
-        interface=Interfaces.ASGI,
+        interface=Interfaces.ASGINL,
         address=os.getenv("GRANIAN_HOST") or os.getenv("PAPERLESS_BIND_ADDR", "::"),
         port=int(os.getenv("GRANIAN_PORT") or os.getenv("PAPERLESS_PORT") or 8000),
         workers=int(
