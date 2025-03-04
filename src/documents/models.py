@@ -1,5 +1,4 @@
 import datetime
-import logging
 import os
 import re
 from collections import OrderedDict
@@ -377,36 +376,6 @@ class Document(SoftDeleteModel, ModelWithOwner):
     @property
     def created_date(self):
         return timezone.localdate(self.created)
-
-
-class Log(models.Model):
-    LEVELS = (
-        (logging.DEBUG, _("debug")),
-        (logging.INFO, _("information")),
-        (logging.WARNING, _("warning")),
-        (logging.ERROR, _("error")),
-        (logging.CRITICAL, _("critical")),
-    )
-
-    group = models.UUIDField(_("group"), blank=True, null=True)
-
-    message = models.TextField(_("message"))
-
-    level = models.PositiveIntegerField(
-        _("level"),
-        choices=LEVELS,
-        default=logging.INFO,
-    )
-
-    created = models.DateTimeField(_("created"), auto_now_add=True)
-
-    class Meta:
-        ordering = ("-created",)
-        verbose_name = _("log")
-        verbose_name_plural = _("logs")
-
-    def __str__(self):
-        return self.message
 
 
 class SavedView(ModelWithOwner):
