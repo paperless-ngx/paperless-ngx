@@ -27,7 +27,7 @@ export class ToastComponent {
 
   @Output() hidden: EventEmitter<Toast> = new EventEmitter<Toast>()
 
-  @Output() close: EventEmitter<Toast> = new EventEmitter<Toast>()
+  @Output() closed: EventEmitter<Toast> = new EventEmitter<Toast>()
 
   public copied: boolean = false
 
