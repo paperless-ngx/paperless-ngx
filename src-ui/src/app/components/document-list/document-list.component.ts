@@ -45,11 +45,11 @@ import { StoragePathNamePipe } from 'src/app/pipes/storage-path-name.pipe'
 import { UsernamePipe } from 'src/app/pipes/username.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { HotKeyService } from 'src/app/services/hot-key.service'
-import { NotificationService } from 'src/app/services/notification.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import {
   filterRulesDiffer,
@@ -111,7 +111,7 @@ export class DocumentListComponent
     public savedViewService: SavedViewService,
     public route: ActivatedRoute,
     private router: Router,
-    private notificationService: NotificationService,
+    private toastService: ToastService,
     private modalService: NgbModal,
     private websocketStatusService: WebsocketStatusService,
     public openDocumentsService: OpenDocumentsService,
@@ -380,13 +380,13 @@ export class DocumentListComponent
         .subscribe({
           next: (view) => {
             this.unmodifiedSavedView = view
-            this.notificationService.showInfo(
+            this.toastService.showInfo(
               $localize`View "${this.list.activeSavedViewTitle}" saved successfully.`
             )
             this.unmodifiedFilterRules = this.list.filterRules
           },
           error: (err) => {
-            this.notificationService.showError(
+            this.toastService.showError(
               $localize`Failed to save view "${this.list.activeSavedViewTitle}".`,
               err
             )
@@ -430,7 +430,7 @@ export class DocumentListComponent
         .subscribe({
           next: () => {
             modal.close()
-            this.notificationService.showInfo(
+            this.toastService.showInfo(
               $localize`View "${savedView.name}" created successfully.`
             )
           },

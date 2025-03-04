@@ -44,10 +44,6 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
-  Notification,
-  NotificationService,
-} from 'src/app/services/notification.service'
-import {
   PermissionAction,
   PermissionType,
   PermissionsService,
@@ -59,6 +55,7 @@ import {
   SettingsService,
 } from 'src/app/services/settings.service'
 import { SystemStatusService } from 'src/app/services/system-status.service'
+import { Toast, ToastService } from 'src/app/services/toast.service'
 import { CheckComponent } from '../../common/input/check/check.component'
 import { ColorComponent } from '../../common/input/color/color.component'
 import { PermissionsGroupComponent } from '../../common/input/permissions/permissions-group/permissions-group.component'
@@ -184,7 +181,7 @@ export class SettingsComponent
 
   constructor(
     private documentListViewService: DocumentListViewService,
-    private notificationService: NotificationService,
+    private toastService: ToastService,
     private settings: SettingsService,
     @Inject(LOCALE_ID) public currentLocale: string,
     private viewportScroller: ViewportScroller,
@@ -220,10 +217,7 @@ export class SettingsComponent
             this.users = r.results
           },
           error: (e) => {
-            this.notificationService.showError(
-              $localize`Error retrieving users`,
-              e
-            )
+            this.toastService.showError($localize`Error retrieving users`, e)
           },
         })
     }
@@ -242,10 +236,7 @@ export class SettingsComponent
             this.groups = r.results
           },
           error: (e) => {
-            this.notificationService.showError(
-              $localize`Error retrieving groups`,
-              e
-            )
+            this.toastService.showError($localize`Error retrieving groups`, e)
           },
         })
     }
@@ -540,7 +531,7 @@ export class SettingsComponent
           this.store.next(this.settingsForm.value)
           this.settings.updateAppearanceSettings()
           this.settings.initializeDisplayFields()
-          let savedToast: Notification = {
+          let savedToast: Toast = {
             content: $localize`Settings were saved successfully.`,
             delay: 5000,
           }
@@ -552,10 +543,10 @@ export class SettingsComponent
             }
           }
 
-          this.notificationService.show(savedToast)
+          this.toastService.show(savedToast)
         },
         error: (error) => {
-          this.notificationService.showError(
+          this.toastService.showError(
             $localize`An error occurred while saving settings.`,
             error
           )

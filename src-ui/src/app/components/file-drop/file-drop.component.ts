@@ -4,13 +4,13 @@ import {
   NgxFileDropEntry,
   NgxFileDropModule,
 } from 'ngx-file-drop'
-import { NotificationService } from 'src/app/services/notification.service'
 import {
   PermissionAction,
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
 
 @Component({
@@ -26,7 +26,7 @@ export class FileDropComponent {
 
   constructor(
     private settings: SettingsService,
-    private notificationService: NotificationService,
+    private toastService: ToastService,
     private uploadDocumentsService: UploadDocumentsService,
     private permissionsService: PermissionsService
   ) {}
@@ -90,7 +90,7 @@ export class FileDropComponent {
   public dropped(files: NgxFileDropEntry[]) {
     this.uploadDocumentsService.onNgxFileDrop(files)
     if (files.length > 0)
-      this.notificationService.showInfo($localize`Initiating upload...`, 3000)
+      this.toastService.showInfo($localize`Initiating upload...`, 3000)
   }
 
   @HostListener('window:blur', ['$event']) public onWindowBlur() {

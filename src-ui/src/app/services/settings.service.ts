@@ -26,13 +26,13 @@ import {
   UiSettings,
 } from '../data/ui-settings'
 import { User } from '../data/user'
-import { NotificationService } from './notification.service'
 import {
   PermissionAction,
   PermissionsService,
   PermissionType,
 } from './permissions.service'
 import { CustomFieldsService } from './rest/custom-fields.service'
+import { ToastService } from './toast.service'
 
 export interface LanguageOption {
   code: string
@@ -294,7 +294,7 @@ export class SettingsService {
     private meta: Meta,
     @Inject(LOCALE_ID) private localeId: string,
     protected http: HttpClient,
-    private notificationService: NotificationService,
+    private toastService: ToastService,
     private permissionsService: PermissionsService,
     private customFieldsService: CustomFieldsService
   ) {
@@ -307,7 +307,7 @@ export class SettingsService {
       first(),
       catchError((error) => {
         setTimeout(() => {
-          this.notificationService.showError('Error loading settings', error)
+          this.toastService.showError('Error loading settings', error)
         }, 500)
         return of({
           settings: {
@@ -601,7 +601,7 @@ export class SettingsService {
           this.cookieService.get(this.getLanguageCookieName())
         )
       } catch (error) {
-        this.notificationService.showError(errorMessage)
+        this.toastService.showError(errorMessage)
         console.log(error)
       }
 
@@ -610,10 +610,10 @@ export class SettingsService {
         .subscribe({
           next: () => {
             this.updateAppearanceSettings()
-            this.notificationService.showInfo(successMessage)
+            this.toastService.showInfo(successMessage)
           },
           error: (e) => {
-            this.notificationService.showError(errorMessage)
+            this.toastService.showError(errorMessage)
             console.log(e)
           },
         })
@@ -633,7 +633,7 @@ export class SettingsService {
         .pipe(first())
         .subscribe({
           error: (e) => {
-            this.notificationService.showError(
+            this.toastService.showError(
               'Error migrating update checking setting'
             )
             console.log(e)
@@ -663,7 +663,7 @@ export class SettingsService {
       this.storeSettings()
         .pipe(first())
         .subscribe(() => {
-          this.notificationService.showInfo(
+          this.toastService.showInfo(
             $localize`You can restart the tour from the settings page.`
           )
         })

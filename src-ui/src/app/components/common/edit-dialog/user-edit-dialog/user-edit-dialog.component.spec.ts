@@ -12,11 +12,11 @@ import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { NotificationService } from 'src/app/services/notification.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { PasswordComponent } from '../../input/password/password.component'
 import { PermissionsFormComponent } from '../../input/permissions/permissions-form/permissions-form.component'
 import { SelectComponent } from '../../input/select/select.component'
@@ -29,7 +29,7 @@ describe('UserEditDialogComponent', () => {
   let component: UserEditDialogComponent
   let settingsService: SettingsService
   let permissionsService: PermissionsService
-  let notificationService: NotificationService
+  let toastService: ToastService
   let fixture: ComponentFixture<UserEditDialogComponent>
 
   beforeEach(async () => {
@@ -75,7 +75,7 @@ describe('UserEditDialogComponent', () => {
     settingsService = TestBed.inject(SettingsService)
     settingsService.currentUser = { id: 99, username: 'user99' }
     permissionsService = TestBed.inject(PermissionsService)
-    notificationService = TestBed.inject(NotificationService)
+    toastService = TestBed.inject(ToastService)
     component = fixture.componentInstance
 
     fixture.detectChanges()
@@ -133,22 +133,22 @@ describe('UserEditDialogComponent', () => {
       component['service'] as UserService,
       'deactivateTotp'
     )
-    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
-    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     deactivateSpy.mockReturnValueOnce(throwError(() => new Error('error')))
     component.deactivateTotp()
     expect(deactivateSpy).toHaveBeenCalled()
-    expect(notificationErrorSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
 
     deactivateSpy.mockReturnValueOnce(of(false))
     component.deactivateTotp()
     expect(deactivateSpy).toHaveBeenCalled()
-    expect(notificationErrorSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
 
     deactivateSpy.mockReturnValueOnce(of(true))
     component.deactivateTotp()
     expect(deactivateSpy).toHaveBeenCalled()
-    expect(notificationInfoSpy).toHaveBeenCalled()
+    expect(toastInfoSpy).toHaveBeenCalled()
   })
 
   it('should check superuser status of current user', () => {

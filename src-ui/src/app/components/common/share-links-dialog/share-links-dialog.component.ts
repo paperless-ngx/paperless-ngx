@@ -5,8 +5,8 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first } from 'rxjs'
 import { FileVersion, ShareLink } from 'src/app/data/share-link'
-import { NotificationService } from 'src/app/services/notification.service'
 import { ShareLinkService } from 'src/app/services/rest/share-link.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 
 @Component({
@@ -61,7 +61,7 @@ export class ShareLinksDialogComponent implements OnInit {
   constructor(
     private activeModal: NgbActiveModal,
     private shareLinkService: ShareLinkService,
-    private notificationService: NotificationService,
+    private toastService: ToastService,
     private clipboard: Clipboard
   ) {}
 
@@ -81,7 +81,7 @@ export class ShareLinksDialogComponent implements OnInit {
           this.shareLinks = results
         },
         error: (e) => {
-          this.notificationService.showError(
+          this.toastService.showError(
             $localize`Error retrieving links`,
             10000,
             e
@@ -130,11 +130,7 @@ export class ShareLinksDialogComponent implements OnInit {
         this.refresh()
       },
       error: (e) => {
-        this.notificationService.showError(
-          $localize`Error deleting link`,
-          10000,
-          e
-        )
+        this.toastService.showError($localize`Error deleting link`, 10000, e)
       },
     })
   }
@@ -162,11 +158,7 @@ export class ShareLinksDialogComponent implements OnInit {
         },
         error: (e) => {
           this.loading = false
-          this.notificationService.showError(
-            $localize`Error creating link`,
-            10000,
-            e
-          )
+          this.toastService.showError($localize`Error creating link`, 10000, e)
         },
       })
   }

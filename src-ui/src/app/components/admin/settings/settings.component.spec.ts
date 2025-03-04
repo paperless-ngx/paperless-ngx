@@ -29,15 +29,12 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
-import {
-  Notification,
-  NotificationService,
-} from 'src/app/services/notification.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { SystemStatusService } from 'src/app/services/system-status.service'
+import { Toast, ToastService } from 'src/app/services/toast.service'
 import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { CheckComponent } from '../../common/input/check/check.component'
@@ -69,7 +66,7 @@ describe('SettingsComponent', () => {
   let settingsService: SettingsService
   let activatedRoute: ActivatedRoute
   let viewportScroller: ViewportScroller
-  let notificationService: NotificationService
+  let toastService: ToastService
   let userService: UserService
   let permissionsService: PermissionsService
   let groupService: GroupService
@@ -118,7 +115,7 @@ describe('SettingsComponent', () => {
     router = TestBed.inject(Router)
     activatedRoute = TestBed.inject(ActivatedRoute)
     viewportScroller = TestBed.inject(ViewportScroller)
-    notificationService = TestBed.inject(NotificationService)
+    toastService = TestBed.inject(ToastService)
     settingsService = TestBed.inject(SettingsService)
     settingsService.currentUser = users[0]
     userService = TestBed.inject(UserService)
@@ -197,8 +194,8 @@ describe('SettingsComponent', () => {
 
   it('should support save local settings updating appearance settings and calling API, show error', () => {
     completeSetup()
-    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
-    const notificationSpy = jest.spyOn(notificationService, 'show')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastSpy = jest.spyOn(toastService, 'show')
     const storeSpy = jest.spyOn(settingsService, 'storeSettings')
     const appearanceSettingsSpy = jest.spyOn(
       settingsService,
@@ -212,7 +209,7 @@ describe('SettingsComponent', () => {
     )
     component.saveSettings()
 
-    expect(notificationErrorSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     expect(storeSpy).toHaveBeenCalled()
     expect(appearanceSettingsSpy).not.toHaveBeenCalled()
     expect(setSpy).toHaveBeenCalledTimes(29)
@@ -220,14 +217,14 @@ describe('SettingsComponent', () => {
     // succeed
     storeSpy.mockReturnValueOnce(of(true))
     component.saveSettings()
-    expect(notificationSpy).toHaveBeenCalled()
+    expect(toastSpy).toHaveBeenCalled()
     expect(appearanceSettingsSpy).toHaveBeenCalled()
   })
 
   it('should offer reload if settings changes require', () => {
     completeSetup()
-    let toast: Notification
-    notificationService.getNotifications().subscribe((t) => (toast = t[0]))
+    let toast: Toast
+    toastService.getToasts().subscribe((t) => (toast = t[0]))
     component.initialize(true) // reset
     component.store.getValue()['displayLanguage'] = 'en-US'
     component.store.getValue()['updateCheckingEnabled'] = false
@@ -261,7 +258,7 @@ describe('SettingsComponent', () => {
   })
 
   it('should show errors on load if load users failure', () => {
-    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
     jest
       .spyOn(userService, 'listAll')
       .mockImplementation(() =>
@@ -269,11 +266,11 @@ describe('SettingsComponent', () => {
       )
     completeSetup(userService)
     fixture.detectChanges()
-    expect(notificationErrorSpy).toBeCalled()
+    expect(toastErrorSpy).toBeCalled()
   })
 
   it('should show errors on load if load groups failure', () => {
-    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
     jest
       .spyOn(groupService, 'listAll')
       .mockImplementation(() =>
@@ -281,7 +278,7 @@ describe('SettingsComponent', () => {
       )
     completeSetup(groupService)
     fixture.detectChanges()
-    expect(notificationErrorSpy).toBeCalled()
+    expect(toastErrorSpy).toBeCalled()
   })
 
   it('should load system status on initialize, show errors if needed', () => {

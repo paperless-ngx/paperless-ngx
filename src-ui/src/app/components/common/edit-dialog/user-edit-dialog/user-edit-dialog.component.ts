@@ -10,11 +10,11 @@ import { first } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Group } from 'src/app/data/group'
 import { User } from 'src/app/data/user'
-import { NotificationService } from 'src/app/services/notification.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { PasswordComponent } from '../../input/password/password.component'
 import { SelectComponent } from '../../input/select/select.component'
 import { TextComponent } from '../../input/text/text.component'
@@ -46,7 +46,7 @@ export class UserEditDialogComponent
     activeModal: NgbActiveModal,
     groupsService: GroupService,
     settingsService: SettingsService,
-    private notificationService: NotificationService,
+    private toastService: ToastService,
     private permissionsService: PermissionsService
   ) {
     super(service, activeModal, service, settingsService)
@@ -128,20 +128,15 @@ export class UserEditDialogComponent
         next: (result) => {
           this.totpLoading = false
           if (result) {
-            this.notificationService.showInfo($localize`Totp deactivated`)
+            this.toastService.showInfo($localize`Totp deactivated`)
             this.object.is_mfa_enabled = false
           } else {
-            this.notificationService.showError(
-              $localize`Totp deactivation failed`
-            )
+            this.toastService.showError($localize`Totp deactivation failed`)
           }
         },
         error: (e) => {
           this.totpLoading = false
-          this.notificationService.showError(
-            $localize`Totp deactivation failed`,
-            e
-          )
+          this.toastService.showError($localize`Totp deactivation failed`, e)
         },
       })
   }

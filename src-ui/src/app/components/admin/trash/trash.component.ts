@@ -10,8 +10,8 @@ import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { delay, takeUntil, tap } from 'rxjs'
 import { Document } from 'src/app/data/document'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { NotificationService } from 'src/app/services/notification.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { TrashService } from 'src/app/services/trash.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
@@ -44,7 +44,7 @@ export class TrashComponent
 
   constructor(
     private trashService: TrashService,
-    private notificationService: NotificationService,
+    private toastService: ToastService,
     private modalService: NgbModal,
     private settingsService: SettingsService,
     private router: Router
@@ -86,14 +86,14 @@ export class TrashComponent
         modal.componentInstance.buttonsEnabled = false
         this.trashService.emptyTrash([document.id]).subscribe({
           next: () => {
-            this.notificationService.showInfo(
+            this.toastService.showInfo(
               $localize`Document "${document.title}" deleted`
             )
             modal.close()
             this.reload()
           },
           error: (err) => {
-            this.notificationService.showError(
+            this.toastService.showError(
               $localize`Error deleting document "${document.title}"`,
               err
             )
@@ -121,13 +121,13 @@ export class TrashComponent
           .emptyTrash(documents ? Array.from(documents) : null)
           .subscribe({
             next: () => {
-              this.notificationService.showInfo($localize`Document(s) deleted`)
+              this.toastService.showInfo($localize`Document(s) deleted`)
               this.allToggled = false
               modal.close()
               this.reload()
             },
             error: (err) => {
-              this.notificationService.showError(
+              this.toastService.showError(
                 $localize`Error deleting document(s)`,
                 err
               )
@@ -140,7 +140,7 @@ export class TrashComponent
   restore(document: Document) {
     this.trashService.restoreDocuments([document.id]).subscribe({
       next: () => {
-        this.notificationService.show({
+        this.toastService.show({
           content: $localize`Document "${document.title}" restored`,
           delay: 5000,
           actionName: $localize`Open document`,
@@ -151,7 +151,7 @@ export class TrashComponent
         this.reload()
       },
       error: (err) => {
-        this.notificationService.showError(
+        this.toastService.showError(
           $localize`Error restoring document "${document.title}"`,
           err
         )
@@ -164,12 +164,12 @@ export class TrashComponent
       .restoreDocuments(documents ? Array.from(documents) : null)
       .subscribe({
         next: () => {
-          this.notificationService.showInfo($localize`Document(s) restored`)
+          this.toastService.showInfo($localize`Document(s) restored`)
           this.allToggled = false
           this.reload()
         },
         error: (err) => {
-          this.notificationService.showError(
+          this.toastService.showError(
             $localize`Error restoring document(s)`,
             err
           )

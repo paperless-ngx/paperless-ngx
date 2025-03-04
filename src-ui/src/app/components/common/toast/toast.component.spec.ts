@@ -9,15 +9,15 @@ import {
 
 import { Clipboard } from '@angular/cdk/clipboard'
 import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { NotificationComponent } from './notification.component'
+import { ToastComponent } from './toast.component'
 
-const notification1 = {
+const toast1 = {
   content: 'Error 1 content',
   delay: 5000,
   error: 'Error 1 string',
 }
 
-const notification2 = {
+const toast2 = {
   content: 'Error 2 content',
   delay: 5000,
   error: {
@@ -29,17 +29,17 @@ const notification2 = {
   },
 }
 
-describe('NotificationComponent', () => {
-  let component: NotificationComponent
-  let fixture: ComponentFixture<NotificationComponent>
+describe('ToastComponent', () => {
+  let component: ToastComponent
+  let fixture: ComponentFixture<ToastComponent>
   let clipboard: Clipboard
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NotificationComponent, NgxBootstrapIconsModule.pick(allIcons)],
+      imports: [ToastComponent, NgxBootstrapIconsModule.pick(allIcons)],
     }).compileComponents()
 
-    fixture = TestBed.createComponent(NotificationComponent)
+    fixture = TestBed.createComponent(ToastComponent)
     clipboard = TestBed.inject(Clipboard)
     component = fixture.componentInstance
   })
@@ -48,18 +48,18 @@ describe('NotificationComponent', () => {
     expect(component).toBeTruthy()
   })
 
-  it('should countdown notification', fakeAsync(() => {
-    component.notification = notification2
+  it('should countdown toast', fakeAsync(() => {
+    component.toast = toast2
     fixture.detectChanges()
-    component.onShown(notification2)
+    component.onShown(toast2)
     tick(5000)
-    expect(component.notification.delayRemaining).toEqual(0)
+    expect(component.toast.delayRemaining).toEqual(0)
     flush()
     discardPeriodicTasks()
   }))
 
-  it('should show an error if given with notification', fakeAsync(() => {
-    component.notification = notification1
+  it('should show an error if given with toast', fakeAsync(() => {
+    component.toast = toast1
     fixture.detectChanges()
 
     expect(fixture.nativeElement.querySelector('details')).not.toBeNull()
@@ -70,7 +70,7 @@ describe('NotificationComponent', () => {
   }))
 
   it('should show error details, support copy', fakeAsync(() => {
-    component.notification = notification2
+    component.toast = toast2
     fixture.detectChanges()
 
     expect(fixture.nativeElement.querySelector('details')).not.toBeNull()
@@ -79,7 +79,7 @@ describe('NotificationComponent', () => {
     )
 
     const copySpy = jest.spyOn(clipboard, 'copy')
-    component.copyError(notification2.error)
+    component.copyError(toast2.error)
     expect(copySpy).toHaveBeenCalled()
 
     flush()
@@ -87,7 +87,7 @@ describe('NotificationComponent', () => {
   }))
 
   it('should parse error text, add ellipsis', () => {
-    expect(component.getErrorText(notification2.error)).toEqual(
+    expect(component.getErrorText(toast2.error)).toEqual(
       'Error 2 message details'
     )
     expect(component.getErrorText({ error: 'Error string no detail' })).toEqual(

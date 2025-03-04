@@ -16,9 +16,9 @@ import {
   SystemStatus,
   SystemStatusItemStatus,
 } from 'src/app/data/system-status'
-import { NotificationService } from 'src/app/services/notification.service'
 import { SystemStatusService } from 'src/app/services/system-status.service'
 import { TasksService } from 'src/app/services/tasks.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { SystemStatusDialogComponent } from './system-status-dialog.component'
 
 const status: SystemStatus = {
@@ -61,7 +61,7 @@ describe('SystemStatusDialogComponent', () => {
   let clipboard: Clipboard
   let tasksService: TasksService
   let systemStatusService: SystemStatusService
-  let notificationService: NotificationService
+  let toastService: ToastService
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -82,7 +82,7 @@ describe('SystemStatusDialogComponent', () => {
     clipboard = TestBed.inject(Clipboard)
     tasksService = TestBed.inject(TasksService)
     systemStatusService = TestBed.inject(SystemStatusService)
-    notificationService = TestBed.inject(NotificationService)
+    toastService = TestBed.inject(ToastService)
     fixture.detectChanges()
   })
 
@@ -116,9 +116,9 @@ describe('SystemStatusDialogComponent', () => {
     expect(component.isRunning(PaperlessTaskName.SanityCheck)).toBeFalsy()
   })
 
-  it('should support running tasks, refresh status and show notifications', () => {
-    const notificationSpy = jest.spyOn(notificationService, 'showInfo')
-    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+  it('should support running tasks, refresh status and show toasts', () => {
+    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const getStatusSpy = jest.spyOn(systemStatusService, 'get')
     const runSpy = jest.spyOn(tasksService, 'run')
 
@@ -126,7 +126,7 @@ describe('SystemStatusDialogComponent', () => {
     runSpy.mockReturnValue(throwError(() => new Error('error')))
     component.runTask(PaperlessTaskName.IndexOptimize)
     expect(runSpy).toHaveBeenCalledWith(PaperlessTaskName.IndexOptimize)
-    expect(notificationErrorSpy).toHaveBeenCalledWith(
+    expect(toastErrorSpy).toHaveBeenCalledWith(
       `Failed to start task ${PaperlessTaskName.IndexOptimize}, see the logs for more details`,
       expect.any(Error)
     )
@@ -138,7 +138,7 @@ describe('SystemStatusDialogComponent', () => {
     expect(runSpy).toHaveBeenCalledWith(PaperlessTaskName.IndexOptimize)
 
     expect(getStatusSpy).toHaveBeenCalled()
-    expect(notificationSpy).toHaveBeenCalledWith(
+    expect(toastSpy).toHaveBeenCalledWith(
       `Task ${PaperlessTaskName.IndexOptimize} started`
     )
   })

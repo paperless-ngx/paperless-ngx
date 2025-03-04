@@ -11,9 +11,9 @@ import { BehaviorSubject, Observable, takeUntil } from 'rxjs'
 import { DisplayMode } from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { NotificationService } from 'src/app/services/notification.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
 import { DragDropSelectComponent } from '../../common/input/drag-drop-select/drag-drop-select.component'
 import { NumberComponent } from '../../common/input/number/number.component'
@@ -58,7 +58,7 @@ export class SavedViewsComponent
   constructor(
     private savedViewService: SavedViewService,
     private settings: SettingsService,
-    private notificationService: NotificationService
+    private toastService: ToastService
   ) {
     super()
     this.settings.organizingSidebarSavedViews = true
@@ -129,7 +129,7 @@ export class SavedViewsComponent
     this.savedViewService.delete(savedView).subscribe(() => {
       this.savedViewsGroup.removeControl(savedView.id.toString())
       this.savedViews.splice(this.savedViews.indexOf(savedView), 1)
-      this.notificationService.showInfo(
+      this.toastService.showInfo(
         $localize`Saved view "${savedView.name}" deleted.`
       )
       this.savedViewService.clearCache()
@@ -155,13 +155,11 @@ export class SavedViewsComponent
     if (changed.length) {
       this.savedViewService.patchMany(changed).subscribe({
         next: () => {
-          this.notificationService.showInfo(
-            $localize`Views saved successfully.`
-          )
+          this.toastService.showInfo($localize`Views saved successfully.`)
           this.store.next(this.savedViewsForm.value)
         },
         error: (error) => {
-          this.notificationService.showError(
+          this.toastService.showError(
             $localize`Error while saving views.`,
             error
           )

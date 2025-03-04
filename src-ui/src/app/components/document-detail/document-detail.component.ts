@@ -63,7 +63,6 @@ import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { ComponentRouterService } from 'src/app/services/component-router.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { HotKeyService } from 'src/app/services/hot-key.service'
-import { NotificationService } from 'src/app/services/notification.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
   PermissionAction,
@@ -77,6 +76,7 @@ import { DocumentService } from 'src/app/services/rest/document.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
@@ -268,7 +268,7 @@ export class DocumentDetailComponent
     private openDocumentService: OpenDocumentsService,
     private documentListViewService: DocumentListViewService,
     private documentTitlePipe: DocumentTitlePipe,
-    private notificationService: NotificationService,
+    private toastService: ToastService,
     private settings: SettingsService,
     private storagePathService: StoragePathService,
     private permissionsService: PermissionsService,
@@ -628,7 +628,7 @@ export class DocumentDetailComponent
         },
         error: (error) => {
           this.metadata = {} // allow display to fallback to <object> tag
-          this.notificationService.showError(
+          this.toastService.showError(
             $localize`Error retrieving metadata`,
             error
           )
@@ -657,7 +657,7 @@ export class DocumentDetailComponent
           },
           error: (error) => {
             this.suggestions = null
-            this.notificationService.showError(
+            this.toastService.showError(
               $localize`Error retrieving suggestions.`,
               error
             )
@@ -809,7 +809,7 @@ export class DocumentDetailComponent
           this.store.next(newValues)
           this.openDocumentService.setDirty(this.document, false)
           this.openDocumentService.save()
-          this.notificationService.showInfo(
+          this.toastService.showInfo(
             $localize`Document "${newValues.title}" saved successfully.`
           )
           this.networkActive = false
@@ -825,13 +825,13 @@ export class DocumentDetailComponent
         error: (error) => {
           this.networkActive = false
           if (!this.userCanEdit) {
-            this.notificationService.showInfo(
+            this.toastService.showInfo(
               $localize`Document "${this.document.title}" saved successfully.`
             )
             close && this.close()
           } else {
             this.error = error.error
-            this.notificationService.showError(
+            this.toastService.showError(
               $localize`Error saving document "${this.document.title}"`,
               error
             )
@@ -877,10 +877,7 @@ export class DocumentDetailComponent
         error: (error) => {
           this.networkActive = false
           this.error = error.error
-          this.notificationService.showError(
-            $localize`Error saving document`,
-            error
-          )
+          this.toastService.showError($localize`Error saving document`, error)
         },
       })
   }
@@ -934,10 +931,7 @@ export class DocumentDetailComponent
           this.close()
         },
         error: (error) => {
-          this.notificationService.showError(
-            $localize`Error deleting document`,
-            error
-          )
+          this.toastService.showError($localize`Error deleting document`, error)
           modal.componentInstance.buttonsEnabled = true
           this.subscribeModalDelete(modal)
         },
@@ -968,7 +962,7 @@ export class DocumentDetailComponent
         .bulkEdit([this.document.id], 'reprocess', {})
         .subscribe({
           next: () => {
-            this.notificationService.showInfo(
+            this.toastService.showInfo(
               $localize`Reprocess operation for "${this.document.title}" will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.`
             )
             if (modal) {
@@ -979,7 +973,7 @@ export class DocumentDetailComponent
             if (modal) {
               modal.componentInstance.buttonsEnabled = true
             }
-            this.notificationService.showError(
+            this.toastService.showError(
               $localize`Error executing operation`,
               error
             )
@@ -1026,7 +1020,7 @@ export class DocumentDetailComponent
       },
       error: (error) => {
         this.downloading = false
-        this.notificationService.showError(
+        this.toastService.showError(
           $localize`Error downloading document`,
           error
         )
@@ -1335,7 +1329,7 @@ export class DocumentDetailComponent
           .pipe(first(), takeUntil(this.unsubscribeNotifier))
           .subscribe({
             next: () => {
-              this.notificationService.showInfo(
+              this.toastService.showInfo(
                 $localize`Split operation for "${this.document.title}" will begin in the background.`
               )
               modal.close()
@@ -1344,7 +1338,7 @@ export class DocumentDetailComponent
               if (modal) {
                 modal.componentInstance.buttonsEnabled = true
               }
-              this.notificationService.showError(
+              this.toastService.showError(
                 $localize`Error executing split operation`,
                 error
               )
@@ -1374,7 +1368,7 @@ export class DocumentDetailComponent
           .pipe(first(), takeUntil(this.unsubscribeNotifier))
           .subscribe({
             next: () => {
-              this.notificationService.show({
+              this.toastService.show({
                 content: $localize`Rotation of "${this.document.title}" will begin in the background. Close and re-open the document after the operation has completed to see the changes.`,
                 delay: 8000,
                 action: this.close.bind(this),
@@ -1386,7 +1380,7 @@ export class DocumentDetailComponent
               if (modal) {
                 modal.componentInstance.buttonsEnabled = true
               }
-              this.notificationService.showError(
+              this.toastService.showError(
                 $localize`Error executing rotate operation`,
                 error
               )
@@ -1414,7 +1408,7 @@ export class DocumentDetailComponent
           .pipe(first(), takeUntil(this.unsubscribeNotifier))
           .subscribe({
             next: () => {
-              this.notificationService.showInfo(
+              this.toastService.showInfo(
                 $localize`Delete pages operation for "${this.document.title}" will begin in the background. Close and re-open or reload this document after the operation has completed to see the changes.`
               )
               modal.close()
@@ -1423,7 +1417,7 @@ export class DocumentDetailComponent
               if (modal) {
                 modal.componentInstance.buttonsEnabled = true
               }
-              this.notificationService.showError(
+              this.toastService.showError(
                 $localize`Error executing delete pages operation`,
                 error
               )

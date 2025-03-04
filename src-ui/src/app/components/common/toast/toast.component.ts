@@ -7,43 +7,42 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { interval, take } from 'rxjs'
-import { Notification } from 'src/app/services/notification.service'
+import { Toast } from 'src/app/services/toast.service'
 
 @Component({
-  selector: 'pngx-notification',
+  selector: 'pngx-toast',
   imports: [
     DecimalPipe,
     NgbToastModule,
     NgbProgressbarModule,
     NgxBootstrapIconsModule,
   ],
-  templateUrl: './notification.component.html',
-  styleUrl: './notification.component.scss',
+  templateUrl: './toast.component.html',
+  styleUrl: './toast.component.scss',
 })
-export class NotificationComponent {
-  @Input() notification: Notification
+export class ToastComponent {
+  @Input() toast: Toast
 
   @Input() autohide: boolean = true
 
-  @Output() hidden: EventEmitter<Notification> =
-    new EventEmitter<Notification>()
+  @Output() hidden: EventEmitter<Toast> = new EventEmitter<Toast>()
 
-  @Output() close: EventEmitter<Notification> = new EventEmitter<Notification>()
+  @Output() close: EventEmitter<Toast> = new EventEmitter<Toast>()
 
   public copied: boolean = false
 
   constructor(private clipboard: Clipboard) {}
 
-  onShown(notification: Notification) {
+  onShown(toast: Toast) {
     if (!this.autohide) return
 
     const refreshInterval = 150
-    const delay = notification.delay - 500 // for fade animation
+    const delay = toast.delay - 500 // for fade animation
 
     interval(refreshInterval)
       .pipe(take(Math.round(delay / refreshInterval)))
       .subscribe((count) => {
-        notification.delayRemaining = Math.max(
+        toast.delayRemaining = Math.max(
           0,
           delay - refreshInterval * (count + 1)
         )

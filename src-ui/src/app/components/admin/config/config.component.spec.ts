@@ -10,8 +10,8 @@ import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { OutputTypeConfig } from 'src/app/data/paperless-config'
 import { ConfigService } from 'src/app/services/config.service'
-import { NotificationService } from 'src/app/services/notification.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { FileComponent } from '../../common/input/file/file.component'
 import { NumberComponent } from '../../common/input/number/number.component'
 import { SelectComponent } from '../../common/input/select/select.component'
@@ -24,7 +24,7 @@ describe('ConfigComponent', () => {
   let component: ConfigComponent
   let fixture: ComponentFixture<ConfigComponent>
   let configService: ConfigService
-  let notificationService: NotificationService
+  let toastService: ToastService
   let settingService: SettingsService
 
   beforeEach(async () => {
@@ -51,7 +51,7 @@ describe('ConfigComponent', () => {
     }).compileComponents()
 
     configService = TestBed.inject(ConfigService)
-    notificationService = TestBed.inject(NotificationService)
+    toastService = TestBed.inject(ToastService)
     settingService = TestBed.inject(SettingsService)
     fixture = TestBed.createComponent(ConfigComponent)
     component = fixture.componentInstance
@@ -60,7 +60,7 @@ describe('ConfigComponent', () => {
 
   it('should load config on init, show error if necessary', () => {
     const getSpy = jest.spyOn(configService, 'getConfig')
-    const errorSpy = jest.spyOn(notificationService, 'showError')
+    const errorSpy = jest.spyOn(toastService, 'showError')
     getSpy.mockReturnValueOnce(
       throwError(() => new Error('Error getting config'))
     )
@@ -78,7 +78,7 @@ describe('ConfigComponent', () => {
 
   it('should save config, show error if necessary', () => {
     const saveSpy = jest.spyOn(configService, 'saveConfig')
-    const errorSpy = jest.spyOn(notificationService, 'showError')
+    const errorSpy = jest.spyOn(toastService, 'showError')
     saveSpy.mockReturnValueOnce(
       throwError(() => new Error('Error saving config'))
     )
@@ -112,7 +112,7 @@ describe('ConfigComponent', () => {
 
   it('should upload file, show error if necessary', () => {
     const uploadSpy = jest.spyOn(configService, 'uploadFile')
-    const errorSpy = jest.spyOn(notificationService, 'showError')
+    const errorSpy = jest.spyOn(toastService, 'showError')
     uploadSpy.mockReturnValueOnce(
       throwError(() => new Error('Error uploading file'))
     )

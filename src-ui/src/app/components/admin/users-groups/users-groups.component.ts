@@ -5,11 +5,11 @@ import { Subject, first, takeUntil } from 'rxjs'
 import { Group } from 'src/app/data/group'
 import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { NotificationService } from 'src/app/services/notification.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { GroupEditDialogComponent } from '../../common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
@@ -39,7 +39,7 @@ export class UsersAndGroupsComponent
   constructor(
     private usersService: UserService,
     private groupsService: GroupService,
-    private notificationService: NotificationService,
+    private toastService: ToastService,
     private modalService: NgbModal,
     public permissionsService: PermissionsService,
     private settings: SettingsService
@@ -56,10 +56,7 @@ export class UsersAndGroupsComponent
           this.users = r.results
         },
         error: (e) => {
-          this.notificationService.showError(
-            $localize`Error retrieving users`,
-            e
-          )
+          this.toastService.showError($localize`Error retrieving users`, e)
         },
       })
 
@@ -71,10 +68,7 @@ export class UsersAndGroupsComponent
           this.groups = r.results
         },
         error: (e) => {
-          this.notificationService.showError(
-            $localize`Error retrieving groups`,
-            e
-          )
+          this.toastService.showError($localize`Error retrieving groups`, e)
         },
       })
   }
@@ -99,14 +93,14 @@ export class UsersAndGroupsComponent
           newUser.id === this.settings.currentUser.id &&
           (modal.componentInstance as UserEditDialogComponent).passwordIsSet
         ) {
-          this.notificationService.showInfo(
+          this.toastService.showInfo(
             $localize`Password has been changed, you will be logged out momentarily.`
           )
           setTimeout(() => {
             window.location.href = `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
           }, 2500)
         } else {
-          this.notificationService.showInfo(
+          this.toastService.showInfo(
             $localize`Saved user "${newUser.username}".`
           )
           this.usersService.listAll().subscribe((r) => {
@@ -117,7 +111,7 @@ export class UsersAndGroupsComponent
     modal.componentInstance.failed
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((e) => {
-        this.notificationService.showError($localize`Error saving user.`, e)
+        this.toastService.showError($localize`Error saving user.`, e)
       })
   }
 
@@ -135,15 +129,13 @@ export class UsersAndGroupsComponent
       this.usersService.delete(user).subscribe({
         next: () => {
           modal.close()
-          this.notificationService.showInfo(
-            $localize`Deleted user "${user.username}"`
-          )
+          this.toastService.showInfo($localize`Deleted user "${user.username}"`)
           this.usersService.listAll().subscribe((r) => {
             this.users = r.results
           })
         },
         error: (e) => {
-          this.notificationService.showError(
+          this.toastService.showError(
             $localize`Error deleting user "${user.username}".`,
             e
           )
@@ -164,9 +156,7 @@ export class UsersAndGroupsComponent
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((newGroup) => {
-        this.notificationService.showInfo(
-          $localize`Saved group "${newGroup.name}".`
-        )
+        this.toastService.showInfo($localize`Saved group "${newGroup.name}".`)
         this.groupsService.listAll().subscribe((r) => {
           this.groups = r.results
         })
@@ -174,7 +164,7 @@ export class UsersAndGroupsComponent
     modal.componentInstance.failed
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((e) => {
-        this.notificationService.showError($localize`Error saving group.`, e)
+        this.toastService.showError($localize`Error saving group.`, e)
       })
   }
 
@@ -192,15 +182,13 @@ export class UsersAndGroupsComponent
       this.groupsService.delete(group).subscribe({
         next: () => {
           modal.close()
-          this.notificationService.showInfo(
-            $localize`Deleted group "${group.name}"`
-          )
+          this.toastService.showInfo($localize`Deleted group "${group.name}"`)
           this.groupsService.listAll().subscribe((r) => {
             this.groups = r.results
           })
         },
         error: (e) => {
-          this.notificationService.showError(
+          this.toastService.showError(
             $localize`Error deleting group "${group.name}".`,
             e
           )

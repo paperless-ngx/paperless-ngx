@@ -25,8 +25,8 @@ import {
   PaperlessConfigOptions,
 } from 'src/app/data/paperless-config'
 import { ConfigService } from 'src/app/services/config.service'
-import { NotificationService } from 'src/app/services/notification.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { FileComponent } from '../../common/input/file/file.component'
 import { NumberComponent } from '../../common/input/number/number.component'
 import { SelectComponent } from '../../common/input/select/select.component'
@@ -79,7 +79,7 @@ export class ConfigComponent
 
   constructor(
     private configService: ConfigService,
-    private notificationService: NotificationService,
+    private toastService: ToastService,
     private settingsService: SettingsService
   ) {
     super()
@@ -100,10 +100,7 @@ export class ConfigComponent
         },
         error: (e) => {
           this.loading = false
-          this.notificationService.showError(
-            $localize`Error retrieving config`,
-            e
-          )
+          this.toastService.showError($localize`Error retrieving config`, e)
         },
       })
 
@@ -173,11 +170,11 @@ export class ConfigComponent
           this.initialize(config)
           this.store.next(config)
           this.settingsService.initializeSettings().subscribe()
-          this.notificationService.showInfo($localize`Configuration updated`)
+          this.toastService.showInfo($localize`Configuration updated`)
         },
         error: (e) => {
           this.loading = false
-          this.notificationService.showError(
+          this.toastService.showError(
             $localize`An error occurred updating configuration`,
             e
           )
@@ -200,13 +197,11 @@ export class ConfigComponent
           this.initialize(config)
           this.store.next(config)
           this.settingsService.initializeSettings().subscribe()
-          this.notificationService.showInfo(
-            $localize`File successfully updated`
-          )
+          this.toastService.showInfo($localize`File successfully updated`)
         },
         error: (e) => {
           this.loading = false
-          this.notificationService.showError(
+          this.toastService.showError(
             $localize`An error occurred uploading file`,
             e
           )

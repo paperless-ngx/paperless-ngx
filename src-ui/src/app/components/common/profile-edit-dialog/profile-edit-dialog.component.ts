@@ -19,8 +19,8 @@ import {
   TotpSettings,
 } from 'src/app/data/user-profile'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
-import { NotificationService } from 'src/app/services/notification.service'
 import { ProfileService } from 'src/app/services/profile.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 import { ConfirmButtonComponent } from '../confirm-button/confirm-button.component'
 import { PasswordComponent } from '../input/password/password.component'
@@ -86,7 +86,7 @@ export class ProfileEditDialogComponent
   constructor(
     private profileService: ProfileService,
     public activeModal: NgbActiveModal,
-    private notificationService: NotificationService,
+    private toastService: ToastService,
     private clipboard: Clipboard
   ) {
     super()
@@ -192,11 +192,9 @@ export class ProfileEditDialogComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: () => {
-          this.notificationService.showInfo(
-            $localize`Profile updated successfully`
-          )
+          this.toastService.showInfo($localize`Profile updated successfully`)
           if (passwordChanged) {
-            this.notificationService.showInfo(
+            this.toastService.showInfo(
               $localize`Password has been changed, you will be logged out momentarily.`
             )
             setTimeout(() => {
@@ -206,10 +204,7 @@ export class ProfileEditDialogComponent
           this.activeModal.close()
         },
         error: (error) => {
-          this.notificationService.showError(
-            $localize`Error saving profile`,
-            error
-          )
+          this.toastService.showError($localize`Error saving profile`, error)
           this.networkActive = false
         },
       })
@@ -225,7 +220,7 @@ export class ProfileEditDialogComponent
         this.form.patchValue({ auth_token: token })
       },
       error: (error) => {
-        this.notificationService.showError(
+        this.toastService.showError(
           $localize`Error generating auth token`,
           error
         )
@@ -250,7 +245,7 @@ export class ProfileEditDialogComponent
           this.socialAccounts = this.socialAccounts.filter((a) => a.id != id)
         },
         error: (error) => {
-          this.notificationService.showError(
+          this.toastService.showError(
             $localize`Error disconnecting social account`,
             error
           )
@@ -269,7 +264,7 @@ export class ProfileEditDialogComponent
           this.totpSettings = totpSettings
         },
         error: (error) => {
-          this.notificationService.showError(
+          this.toastService.showError(
             $localize`Error fetching TOTP settings`,
             error
           )
@@ -291,20 +286,15 @@ export class ProfileEditDialogComponent
           this.recoveryCodes = activationResponse.recovery_codes
           this.form.get('totp_code').enable()
           if (activationResponse.success) {
-            this.notificationService.showInfo(
-              $localize`TOTP activated successfully`
-            )
+            this.toastService.showInfo($localize`TOTP activated successfully`)
           } else {
-            this.notificationService.showError($localize`Error activating TOTP`)
+            this.toastService.showError($localize`Error activating TOTP`)
           }
         },
         error: (error) => {
           this.totpLoading = false
           this.form.get('totp_code').enable()
-          this.notificationService.showError(
-            $localize`Error activating TOTP`,
-            error
-          )
+          this.toastService.showError($localize`Error activating TOTP`, error)
         },
       })
   }
@@ -320,21 +310,14 @@ export class ProfileEditDialogComponent
           this.isTotpEnabled = !success
           this.recoveryCodes = null
           if (success) {
-            this.notificationService.showInfo(
-              $localize`TOTP deactivated successfully`
-            )
+            this.toastService.showInfo($localize`TOTP deactivated successfully`)
           } else {
-            this.notificationService.showError(
-              $localize`Error deactivating TOTP`
-            )
+            this.toastService.showError($localize`Error deactivating TOTP`)
           }
         },
         error: (error) => {
           this.totpLoading = false
-          this.notificationService.showError(
-            $localize`Error deactivating TOTP`,
-            error
-          )
+          this.toastService.showError($localize`Error deactivating TOTP`, error)
         },
       })
   }

@@ -1,7 +1,7 @@
 
 <li ngbDropdown class="nav-item" (openChange)="onOpenChange($event)">
-  @if (notifications.length) {
-    <span class="badge rounded-pill z-3 pe-none bg-secondary me-2 position-absolute top-0 left-0">{{ notifications.length }}</span>
+  @if (toasts.length) {
+    <span class="badge rounded-pill z-3 pe-none bg-secondary me-2 position-absolute top-0 left-0">{{ toasts.length }}</span>
   }
   <button class="btn border-0" id="notificationsDropdown" ngbDropdownToggle>
     <i-bs width="1.3em" height="1.3em" name="bell"></i-bs>
@@ -11,17 +11,17 @@
       <h6 i18n>Notifications</h6>
       <div class="btn-group ms-auto">
         <button class="btn btn-sm btn-outline-secondary mb-2 ms-auto"
-          (click)="notificationService.clearNotifications()"
-          [disabled]="notifications.length === 0"
+          (click)="toastService.clearToasts()"
+          [disabled]="toasts.length === 0"
           i18n>Clear All</button>
       </div>
     </div>
-    @if (notifications.length === 0) {
+    @if (toasts.length === 0) {
       <p class="text-center mb-0 small text-muted"><em i18n>No notifications</em></p>
     }
     <div class="scroll-list">
-      @for (notification of notifications; track notification.id) {
-        <pngx-notification [autohide]="false" [notification]="notification" (hidden)="onHidden(notification)" (close)="notificationService.closeNotification(notification)"></pngx-notification>
+      @for (toast of toasts; track toast.id) {
+        <pngx-toast [autohide]="false" [toast]="toast" (hidden)="onHidden(toast)" (close)="toastService.closeToast(toast)"></pngx-toast>
       }
       </div>
   </div>

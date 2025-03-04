@@ -18,9 +18,9 @@ import { NgSelectModule } from '@ng-select/ng-select'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
-import { NotificationService } from 'src/app/services/notification.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { SelectComponent } from '../input/select/select.component'
 import { CustomFieldsDropdownComponent } from './custom-fields-dropdown.component'
@@ -42,7 +42,7 @@ describe('CustomFieldsDropdownComponent', () => {
   let component: CustomFieldsDropdownComponent
   let fixture: ComponentFixture<CustomFieldsDropdownComponent>
   let customFieldService: CustomFieldsService
-  let notificationService: NotificationService
+  let toastService: ToastService
   let modalService: NgbModal
   let settingsService: SettingsService
 
@@ -64,7 +64,7 @@ describe('CustomFieldsDropdownComponent', () => {
       ],
     })
     customFieldService = TestBed.inject(CustomFieldsService)
-    notificationService = TestBed.inject(NotificationService)
+    toastService = TestBed.inject(ToastService)
     modalService = TestBed.inject(NgbModal)
     jest.spyOn(customFieldService, 'listAll').mockReturnValue(
       of({
@@ -113,8 +113,8 @@ describe('CustomFieldsDropdownComponent', () => {
   it('should support creating field, show error if necessary, then add', fakeAsync(() => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
-    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
-    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const getFieldsSpy = jest.spyOn(
       CustomFieldsDropdownComponent.prototype as any,
       'getFields'
@@ -129,13 +129,13 @@ describe('CustomFieldsDropdownComponent', () => {
 
     // fail first
     editDialog.failed.emit({ error: 'error creating field' })
-    expect(notificationErrorSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     expect(getFieldsSpy).not.toHaveBeenCalled()
 
     // succeed
     editDialog.succeeded.emit(fields[0])
     tick(100)
-    expect(notificationInfoSpy).toHaveBeenCalled()
+    expect(toastInfoSpy).toHaveBeenCalled()
     expect(getFieldsSpy).toHaveBeenCalled()
     expect(addFieldSpy).toHaveBeenCalled()
   }))

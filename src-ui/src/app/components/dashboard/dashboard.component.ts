@@ -9,9 +9,9 @@ import { Component } from '@angular/core'
 import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { SavedView } from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { NotificationService } from 'src/app/services/notification.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { LogoComponent } from '../common/logo/logo.component'
 import { PageHeaderComponent } from '../common/page-header/page-header.component'
@@ -43,7 +43,7 @@ export class DashboardComponent extends ComponentWithPermissions {
     public settingsService: SettingsService,
     public savedViewService: SavedViewService,
     private tourService: TourService,
-    private notificationService: NotificationService
+    private toastService: ToastService
   ) {
     super()
 
@@ -87,13 +87,10 @@ export class DashboardComponent extends ComponentWithPermissions {
       .updateDashboardViewsSort(this.dashboardViews)
       .subscribe({
         next: () => {
-          this.notificationService.showInfo($localize`Dashboard updated`)
+          this.toastService.showInfo($localize`Dashboard updated`)
         },
         error: (e) => {
-          this.notificationService.showError(
-            $localize`Error updating dashboard`,
-            e
-          )
+          this.toastService.showError($localize`Error updating dashboard`, e)
         },
       })
   }

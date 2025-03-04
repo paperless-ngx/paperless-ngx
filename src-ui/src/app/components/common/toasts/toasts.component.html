@@ -1,0 +1,3 @@
+@for (toast of toasts; track toast.id) {
+  <pngx-toast [toast]="toast" [autohide]="true" (close)="closeToast()"></pngx-toast>
+}

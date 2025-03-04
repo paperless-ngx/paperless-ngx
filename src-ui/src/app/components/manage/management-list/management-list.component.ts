@@ -27,7 +27,6 @@ import {
   SortEvent,
 } from 'src/app/directives/sortable.directive'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { NotificationService } from 'src/app/services/notification.service'
 import {
   PermissionAction,
   PermissionsService,
@@ -37,6 +36,7 @@ import {
   AbstractNameFilterService,
   BulkEditObjectOperation,
 } from 'src/app/services/rest/abstract-name-filter-service'
+import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
@@ -63,7 +63,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     protected service: AbstractNameFilterService<T>,
     private modalService: NgbModal,
     private editDialogComponent: any,
-    private notificationService: NotificationService,
+    private toastService: ToastService,
     private documentListViewService: DocumentListViewService,
     private permissionsService: PermissionsService,
     protected filterRuleType: number,
@@ -173,12 +173,12 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     activeModal.componentInstance.dialogMode = EditDialogMode.CREATE
     activeModal.componentInstance.succeeded.subscribe(() => {
       this.reloadData()
-      this.notificationService.showInfo(
+      this.toastService.showInfo(
         $localize`Successfully created ${this.typeName}.`
       )
     })
     activeModal.componentInstance.failed.subscribe((e) => {
-      this.notificationService.showError(
+      this.toastService.showError(
         $localize`Error occurred while creating ${this.typeName}.`,
         e
       )
@@ -193,12 +193,12 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     activeModal.componentInstance.dialogMode = EditDialogMode.EDIT
     activeModal.componentInstance.succeeded.subscribe(() => {
       this.reloadData()
-      this.notificationService.showInfo(
+      this.toastService.showInfo(
         $localize`Successfully updated ${this.typeName} "${object.name}".`
       )
     })
     activeModal.componentInstance.failed.subscribe((e) => {
-      this.notificationService.showError(
+      this.toastService.showError(
         $localize`Error occurred while saving ${this.typeName}.`,
         e
       )
@@ -234,7 +234,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
           },
           error: (error) => {
             activeModal.componentInstance.buttonsEnabled = true
-            this.notificationService.showError(
+            this.toastService.showError(
               $localize`Error while deleting element`,
               error
             )
@@ -313,14 +313,14 @@ export abstract class ManagementListComponent<T extends MatchingModel>
           .subscribe({
             next: () => {
               modal.close()
-              this.notificationService.showInfo(
+              this.toastService.showInfo(
                 $localize`Permissions updated successfully`
               )
               this.reloadData()
             },
             error: (error) => {
               modal.componentInstance.buttonsEnabled = true
-              this.notificationService.showError(
+              this.toastService.showError(
                 $localize`Error updating permissions`,
                 error
               )
@@ -349,14 +349,12 @@ export abstract class ManagementListComponent<T extends MatchingModel>
         .subscribe({
           next: () => {
             modal.close()
-            this.notificationService.showInfo(
-              $localize`Objects deleted successfully`
-            )
+            this.toastService.showInfo($localize`Objects deleted successfully`)
             this.reloadData()
           },
           error: (error) => {
             modal.componentInstance.buttonsEnabled = true
-            this.notificationService.showError(
+            this.toastService.showError(
               $localize`Error deleting objects`,
               error
             )

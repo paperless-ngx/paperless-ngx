@@ -2,12 +2,11 @@ import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core'
 import { Router, RouterOutlet } from '@angular/router'
 import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { first, Subscription } from 'rxjs'
-import { NotificationListComponent } from './components/common/notification-list/notification-list.component'
+import { ToastsComponent } from './components/common/toasts/toasts.component'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { SETTINGS_KEYS } from './data/ui-settings'
 import { ComponentRouterService } from './services/component-router.service'
 import { HotKeyService } from './services/hot-key.service'
-import { NotificationService } from './services/notification.service'
 import {
   PermissionAction,
   PermissionsService,
@@ -15,6 +14,7 @@ import {
 } from './services/permissions.service'
 import { SettingsService } from './services/settings.service'
 import { TasksService } from './services/tasks.service'
+import { ToastService } from './services/toast.service'
 import { WebsocketStatusService } from './services/websocket-status.service'
 
 @Component({
@@ -23,7 +23,7 @@ import { WebsocketStatusService } from './services/websocket-status.service'
   styleUrls: ['./app.component.scss'],
   imports: [
     FileDropComponent,
-    NotificationListComponent,
+    ToastsComponent,
     TourNgBootstrapModule,
     RouterOutlet,
   ],
@@ -36,7 +36,7 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     private settings: SettingsService,
     private websocketStatusService: WebsocketStatusService,
-    private notificationService: NotificationService,
+    private toastService: ToastService,
     private router: Router,
     private tasksService: TasksService,
     public tourService: TourService,
@@ -91,7 +91,7 @@ export class AppComponent implements OnInit, OnDestroy {
               PermissionType.Document
             )
           ) {
-            this.notificationService.show({
+            this.toastService.show({
               content: $localize`Document ${status.filename} was added to Paperless-ngx.`,
               delay: 10000,
               actionName: $localize`Open document`,
@@ -100,7 +100,7 @@ export class AppComponent implements OnInit, OnDestroy {
               },
             })
           } else {
-            this.notificationService.show({
+            this.toastService.show({
               content: $localize`Document ${status.filename} was added to Paperless-ngx.`,
               delay: 10000,
             })
@@ -115,7 +115,7 @@ export class AppComponent implements OnInit, OnDestroy {
         if (
           this.showNotification(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED)
         ) {
-          this.notificationService.showError(
+          this.toastService.showError(
             $localize`Could not add ${status.filename}\: ${status.message}`
           )
         }
@@ -130,7 +130,7 @@ export class AppComponent implements OnInit, OnDestroy {
             SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT
           )
         ) {
-          this.notificationService.show({
+          this.toastService.show({
             content: $localize`Document ${status.filename} is being processed by Paperless-ngx.`,
             delay: 5000,
           })

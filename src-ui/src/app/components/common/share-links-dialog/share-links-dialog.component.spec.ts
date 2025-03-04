@@ -15,8 +15,8 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { FileVersion, ShareLink } from 'src/app/data/share-link'
-import { NotificationService } from 'src/app/services/notification.service'
 import { ShareLinkService } from 'src/app/services/rest/share-link.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ShareLinksDialogComponent } from './share-links-dialog.component'
 
@@ -24,7 +24,7 @@ describe('ShareLinksDialogComponent', () => {
   let component: ShareLinksDialogComponent
   let fixture: ComponentFixture<ShareLinksDialogComponent>
   let shareLinkService: ShareLinkService
-  let notificationService: NotificationService
+  let toastService: ToastService
   let httpController: HttpTestingController
   let clipboard: Clipboard
 
@@ -43,7 +43,7 @@ describe('ShareLinksDialogComponent', () => {
 
     fixture = TestBed.createComponent(ShareLinksDialogComponent)
     shareLinkService = TestBed.inject(ShareLinkService)
-    notificationService = TestBed.inject(NotificationService)
+    toastService = TestBed.inject(ToastService)
     httpController = TestBed.inject(HttpTestingController)
     clipboard = TestBed.inject(Clipboard)
 
@@ -89,7 +89,7 @@ describe('ShareLinksDialogComponent', () => {
   })
 
   it('should show error on refresh if needed', () => {
-    const notificationSpy = jest.spyOn(notificationService, 'showError')
+    const toastSpy = jest.spyOn(toastService, 'showError')
     jest
       .spyOn(shareLinkService, 'getLinksForDocument')
       .mockReturnValueOnce(throwError(() => new Error('Unable to get links')))
@@ -97,7 +97,7 @@ describe('ShareLinksDialogComponent', () => {
 
     component.ngOnInit()
     fixture.detectChanges()
-    expect(notificationSpy).toHaveBeenCalled()
+    expect(toastSpy).toHaveBeenCalled()
   })
 
   it('should support link creation then refresh & copy url', fakeAsync(() => {
@@ -138,7 +138,7 @@ describe('ShareLinksDialogComponent', () => {
     const expiration = new Date()
     expiration.setDate(expiration.getDate() + 7)
 
-    const notificationSpy = jest.spyOn(notificationService, 'showError')
+    const toastSpy = jest.spyOn(toastService, 'showError')
 
     component.createLink()
 
@@ -150,7 +150,7 @@ describe('ShareLinksDialogComponent', () => {
       )
     fixture.detectChanges()
 
-    expect(notificationSpy).toHaveBeenCalled()
+    expect(toastSpy).toHaveBeenCalled()
   })
 
   it('should support delete links & refresh', () => {
@@ -165,13 +165,13 @@ describe('ShareLinksDialogComponent', () => {
   })
 
   it('should show error on delete if needed', () => {
-    const notificationSpy = jest.spyOn(notificationService, 'showError')
+    const toastSpy = jest.spyOn(toastService, 'showError')
     jest
       .spyOn(shareLinkService, 'delete')
       .mockReturnValueOnce(throwError(() => new Error('Unable to delete link')))
     component.delete(null)
     fixture.detectChanges()
-    expect(notificationSpy).toHaveBeenCalled()
+    expect(toastSpy).toHaveBeenCalled()
   })
 
   it('should format days remaining', () => {

@@ -13,12 +13,12 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { NotificationService } from 'src/app/services/notification.service'
 import {
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { ManagementListComponent } from '../management-list/management-list.component'
@@ -45,7 +45,7 @@ export class StoragePathListComponent extends ManagementListComponent<StoragePat
   constructor(
     directoryService: StoragePathService,
     modalService: NgbModal,
-    notificationService: NotificationService,
+    toastService: ToastService,
     documentListViewService: DocumentListViewService,
     permissionsService: PermissionsService
   ) {
@@ -53,7 +53,7 @@ export class StoragePathListComponent extends ManagementListComponent<StoragePat
       directoryService,
       modalService,
       StoragePathEditDialogComponent,
-      notificationService,
+      toastService,
       documentListViewService,
       permissionsService,
       FILTER_HAS_STORAGE_PATH_ANY,

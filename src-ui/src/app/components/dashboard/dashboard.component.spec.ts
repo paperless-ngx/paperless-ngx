@@ -12,10 +12,10 @@ import { SavedView } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
-import { NotificationService } from 'src/app/services/notification.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { LogoComponent } from '../common/logo/logo.component'
 import { PageHeaderComponent } from '../common/page-header/page-header.component'
 import { DashboardComponent } from './dashboard.component'
@@ -68,7 +68,7 @@ describe('DashboardComponent', () => {
   let fixture: ComponentFixture<DashboardComponent>
   let settingsService: SettingsService
   let tourService: TourService
-  let notificationService: NotificationService
+  let toastService: ToastService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -121,7 +121,7 @@ describe('DashboardComponent', () => {
       if (key === SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER) return [0, 2, 3]
     })
     tourService = TestBed.inject(TourService)
-    notificationService = TestBed.inject(NotificationService)
+    toastService = TestBed.inject(ToastService)
     fixture = TestBed.createComponent(DashboardComponent)
     component = fixture.componentInstance
 
@@ -166,7 +166,7 @@ describe('DashboardComponent', () => {
 
   it('should update saved view sorting on drag + drop, show info', () => {
     const settingsSpy = jest.spyOn(settingsService, 'updateDashboardViewsSort')
-    const notificationSpy = jest.spyOn(notificationService, 'showInfo')
+    const toastSpy = jest.spyOn(toastService, 'showInfo')
     jest.spyOn(settingsService, 'storeSettings').mockReturnValue(of(true))
     component.onDrop({ previousIndex: 0, currentIndex: 1 } as CdkDragDrop<
       SavedView[]
@@ -176,7 +176,7 @@ describe('DashboardComponent', () => {
       saved_views[0],
       saved_views[3],
     ])
-    expect(notificationSpy).toHaveBeenCalled()
+    expect(toastSpy).toHaveBeenCalled()
   })
 
   it('should update saved view sorting on drag + drop, show error', () => {
@@ -187,13 +187,13 @@ describe('DashboardComponent', () => {
     fixture = TestBed.createComponent(DashboardComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
-    const notificationSpy = jest.spyOn(notificationService, 'showError')
+    const toastSpy = jest.spyOn(toastService, 'showError')
     jest
       .spyOn(settingsService, 'storeSettings')
       .mockReturnValue(throwError(() => new Error('unable to save')))
     component.onDrop({ previousIndex: 0, currentIndex: 2 } as CdkDragDrop<
       SavedView[]
     >)
-    expect(notificationSpy).toHaveBeenCalled()
+    expect(toastSpy).toHaveBeenCalled()
   })
 })

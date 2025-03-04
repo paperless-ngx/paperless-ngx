@@ -14,10 +14,10 @@ import { CustomFieldDataType } from '../data/custom-field'
 import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
 import { SavedView } from '../data/saved-view'
 import { SETTINGS_KEYS, UiSettings } from '../data/ui-settings'
-import { NotificationService } from './notification.service'
 import { PermissionsService } from './permissions.service'
 import { CustomFieldsService } from './rest/custom-fields.service'
 import { SettingsService } from './settings.service'
+import { ToastService } from './toast.service'
 
 const customFields = [
   {
@@ -41,7 +41,7 @@ describe('SettingsService', () => {
   let customFieldsService: CustomFieldsService
   let permissionService: PermissionsService
   let subscription: Subscription
-  let notificationService: NotificationService
+  let toastService: ToastService
 
   const ui_settings: UiSettings = {
     user: {
@@ -105,7 +105,7 @@ describe('SettingsService', () => {
     customFieldsService = TestBed.inject(CustomFieldsService)
     permissionService = TestBed.inject(PermissionsService)
     settingsService = TestBed.inject(SettingsService)
-    notificationService = TestBed.inject(NotificationService)
+    toastService = TestBed.inject(ToastService)
     // Normally done in app initializer
     settingsService.initializeSettings().subscribe()
   })
@@ -122,8 +122,8 @@ describe('SettingsService', () => {
     expect(req.request.method).toEqual('GET')
   })
 
-  it('should catch error and show notification on retrieve ui_settings error', fakeAsync(() => {
-    const notificationSpy = jest.spyOn(notificationService, 'showError')
+  it('should catch error and show toast on retrieve ui_settings error', fakeAsync(() => {
+    const toastSpy = jest.spyOn(toastService, 'showError')
     httpTestingController
       .expectOne(`${environment.apiBaseUrl}ui_settings/`)
       .flush(
@@ -131,7 +131,7 @@ describe('SettingsService', () => {
         { status: 403, statusText: 'Forbidden' }
       )
     tick(500)
-    expect(notificationSpy).toHaveBeenCalled()
+    expect(toastSpy).toHaveBeenCalled()
   }))
 
   it('calls ui_settings api endpoint with POST on store', () => {

@@ -29,7 +29,6 @@ import {
   DjangoMessageLevel,
   DjangoMessagesService,
 } from 'src/app/services/django-messages.service'
-import { NotificationService } from 'src/app/services/notification.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
   PermissionAction,
@@ -43,12 +42,13 @@ import {
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { TasksService } from 'src/app/services/tasks.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { GlobalSearchComponent } from './global-search/global-search.component'
-import { NotificationsDropdownComponent } from './notifications-dropdown/notifications-dropdown.component'
+import { ToastsDropdownComponent } from './toasts-dropdown/toasts-dropdown.component'
 
 @Component({
   selector: 'pngx-app-frame',
@@ -58,7 +58,7 @@ import { NotificationsDropdownComponent } from './notifications-dropdown/notific
     GlobalSearchComponent,
     DocumentTitlePipe,
     IfPermissionsDirective,
-    NotificationsDropdownComponent,
+    ToastsDropdownComponent,
     RouterModule,
     NgClass,
     NgbDropdownModule,
@@ -89,7 +89,7 @@ export class AppFrameComponent
     private remoteVersionService: RemoteVersionService,
     public settingsService: SettingsService,
     public tasksService: TasksService,
-    private readonly notificationService: NotificationService,
+    private readonly toastService: ToastService,
     private modalService: NgbModal,
     public permissionsService: PermissionsService,
     private djangoMessagesService: DjangoMessagesService
@@ -123,12 +123,12 @@ export class AppFrameComponent
       switch (message.level) {
         case DjangoMessageLevel.ERROR:
         case DjangoMessageLevel.WARNING:
-          this.notificationService.showError(message.message)
+          this.toastService.showError(message.message)
           break
         case DjangoMessageLevel.SUCCESS:
         case DjangoMessageLevel.INFO:
         case DjangoMessageLevel.DEBUG:
-          this.notificationService.showInfo(message.message)
+          this.toastService.showInfo(message.message)
           break
       }
     })
@@ -157,7 +157,7 @@ export class AppFrameComponent
       .pipe(first())
       .subscribe({
         error: (error) => {
-          this.notificationService.showError(
+          this.toastService.showError(
             $localize`An error occurred while saving settings.`
           )
           console.warn(error)
@@ -242,13 +242,10 @@ export class AppFrameComponent
 
     this.settingsService.updateSidebarViewsSort(sidebarViews).subscribe({
       next: () => {
-        this.notificationService.showInfo($localize`Sidebar views updated`)
+        this.toastService.showInfo($localize`Sidebar views updated`)
       },
       error: (e) => {
-        this.notificationService.showError(
-          $localize`Error updating sidebar views`,
-          e
-        )
+        this.toastService.showError($localize`Error updating sidebar views`, e)
       },
     })
   }
@@ -268,7 +265,7 @@ export class AppFrameComponent
       .pipe(first())
       .subscribe({
         error: (error) => {
-          this.notificationService.showError(
+          this.toastService.showError(
             $localize`An error occurred while saving update checking settings.`
           )
           console.warn(error)

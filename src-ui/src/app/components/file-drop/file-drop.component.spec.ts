@@ -10,28 +10,24 @@ import {
 } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { NgxFileDropEntry, NgxFileDropModule } from 'ngx-file-drop'
-import { NotificationService } from 'src/app/services/notification.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
-import { NotificationListComponent } from '../common/notification-list/notification-list.component'
+import { ToastsComponent } from '../common/toasts/toasts.component'
 import { FileDropComponent } from './file-drop.component'
 
 describe('FileDropComponent', () => {
   let component: FileDropComponent
   let fixture: ComponentFixture<FileDropComponent>
   let permissionsService: PermissionsService
-  let notificationService: NotificationService
+  let toastService: ToastService
   let settingsService: SettingsService
   let uploadDocumentsService: UploadDocumentsService
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        NgxFileDropModule,
-        FileDropComponent,
-        NotificationListComponent,
-      ],
+      imports: [NgxFileDropModule, FileDropComponent, ToastsComponent],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
@@ -40,7 +36,7 @@ describe('FileDropComponent', () => {
 
     permissionsService = TestBed.inject(PermissionsService)
     settingsService = TestBed.inject(SettingsService)
-    notificationService = TestBed.inject(NotificationService)
+    toastService = TestBed.inject(ToastService)
     uploadDocumentsService = TestBed.inject(UploadDocumentsService)
 
     fixture = TestBed.createComponent(FileDropComponent)
@@ -105,7 +101,7 @@ describe('FileDropComponent', () => {
     fixture.detectChanges()
     expect(dropzone.classes['hide']).toBeTruthy()
     // drop
-    const notificationSpy = jest.spyOn(notificationService, 'show')
+    const toastSpy = jest.spyOn(toastService, 'show')
     const uploadSpy = jest.spyOn(
       UploadDocumentsService.prototype as any,
       'uploadFile'
@@ -139,7 +135,7 @@ describe('FileDropComponent', () => {
       } as unknown as NgxFileDropEntry,
     ])
     tick(3000)
-    expect(notificationSpy).toHaveBeenCalled()
+    expect(toastSpy).toHaveBeenCalled()
     expect(uploadSpy).toHaveBeenCalled()
     discardPeriodicTasks()
   }))

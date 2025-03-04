@@ -14,12 +14,12 @@ import {
 import { FILTER_CUSTOM_FIELDS_QUERY } from 'src/app/data/filter-rule-type'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { NotificationService } from 'src/app/services/notification.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
@@ -48,7 +48,7 @@ export class CustomFieldsComponent
     private customFieldsService: CustomFieldsService,
     public permissionsService: PermissionsService,
     private modalService: NgbModal,
-    private notificationService: NotificationService,
+    private toastService: ToastService,
     private documentListViewService: DocumentListViewService,
     private settingsService: SettingsService,
     private documentService: DocumentService,
@@ -86,9 +86,7 @@ export class CustomFieldsComponent
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((newField) => {
-        this.notificationService.showInfo(
-          $localize`Saved field "${newField.name}".`
-        )
+        this.toastService.showInfo($localize`Saved field "${newField.name}".`)
         this.customFieldsService.clearCache()
         this.settingsService.initializeDisplayFields()
         this.documentService.reload()
@@ -97,7 +95,7 @@ export class CustomFieldsComponent
     modal.componentInstance.failed
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((e) => {
-        this.notificationService.showError($localize`Error saving field.`, e)
+        this.toastService.showError($localize`Error saving field.`, e)
       })
   }
 
@@ -115,9 +113,7 @@ export class CustomFieldsComponent
       this.customFieldsService.delete(field).subscribe({
         next: () => {
           modal.close()
-          this.notificationService.showInfo(
-            $localize`Deleted field "${field.name}"`
-          )
+          this.toastService.showInfo($localize`Deleted field "${field.name}"`)
           this.customFieldsService.clearCache()
           this.settingsService.initializeDisplayFields()
           this.documentService.reload()
@@ -125,7 +121,7 @@ export class CustomFieldsComponent
           this.reload()
         },
         error: (e) => {
-          this.notificationService.showError(
+          this.toastService.showError(
             $localize`Error deleting field "${field.name}".`,
             e
           )

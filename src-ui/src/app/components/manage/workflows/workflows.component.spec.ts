@@ -19,9 +19,9 @@ import {
   WorkflowTriggerType,
 } from 'src/app/data/workflow-trigger'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { NotificationService } from 'src/app/services/notification.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { WorkflowService } from 'src/app/services/rest/workflow.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
@@ -77,7 +77,7 @@ describe('WorkflowsComponent', () => {
   let fixture: ComponentFixture<WorkflowsComponent>
   let workflowService: WorkflowService
   let modalService: NgbModal
-  let notificationService: NotificationService
+  let toastService: ToastService
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -116,7 +116,7 @@ describe('WorkflowsComponent', () => {
       })
     )
     modalService = TestBed.inject(NgbModal)
-    notificationService = TestBed.inject(NotificationService)
+    toastService = TestBed.inject(ToastService)
     jest.useFakeTimers()
     fixture = TestBed.createComponent(WorkflowsComponent)
     component = fixture.componentInstance
@@ -127,8 +127,8 @@ describe('WorkflowsComponent', () => {
   it('should support create, show notification on error / success', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
-    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
-    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reload')
 
     const createButton = fixture.debugElement.queryAll(By.css('button'))[1]
@@ -139,20 +139,20 @@ describe('WorkflowsComponent', () => {
 
     // fail first
     editDialog.failed.emit({ error: 'error creating item' })
-    expect(notificationErrorSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     expect(reloadSpy).not.toHaveBeenCalled()
 
     // succeed
     editDialog.succeeded.emit(workflows[0])
-    expect(notificationInfoSpy).toHaveBeenCalled()
+    expect(toastInfoSpy).toHaveBeenCalled()
     expect(reloadSpy).toHaveBeenCalled()
   })
 
   it('should support edit, show notification on error / success', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
-    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
-    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reload')
 
     const editButton = fixture.debugElement.queryAll(By.css('button'))[2]
@@ -164,12 +164,12 @@ describe('WorkflowsComponent', () => {
 
     // fail first
     editDialog.failed.emit({ error: 'error editing item' })
-    expect(notificationErrorSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     expect(reloadSpy).not.toHaveBeenCalled()
 
     // succeed
     editDialog.succeeded.emit(workflows[0])
-    expect(notificationInfoSpy).toHaveBeenCalled()
+    expect(toastInfoSpy).toHaveBeenCalled()
     expect(reloadSpy).toHaveBeenCalled()
   })
 
@@ -240,7 +240,7 @@ describe('WorkflowsComponent', () => {
   it('should support delete, show notification on error / success', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
-    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const deleteSpy = jest.spyOn(workflowService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reload')
 
@@ -253,7 +253,7 @@ describe('WorkflowsComponent', () => {
     // fail first
     deleteSpy.mockReturnValueOnce(throwError(() => new Error('error deleting')))
     editDialog.confirmClicked.emit()
-    expect(notificationErrorSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     expect(reloadSpy).not.toHaveBeenCalled()
 
     // succeed
@@ -267,21 +267,21 @@ describe('WorkflowsComponent', () => {
     const toggleInput = fixture.debugElement.query(
       By.css('input[type="checkbox"]')
     )
-    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
-    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     // fail first
     patchSpy.mockReturnValueOnce(
       throwError(() => new Error('Error getting config'))
     )
     toggleInput.nativeElement.click()
     expect(patchSpy).toHaveBeenCalled()
-    expect(notificationErrorSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     // succeed second
     patchSpy.mockReturnValueOnce(of(workflows[0]))
     toggleInput.nativeElement.click()
     patchSpy.mockReturnValueOnce(of({ ...workflows[0], enabled: false }))
     toggleInput.nativeElement.click()
     expect(patchSpy).toHaveBeenCalled()
-    expect(notificationInfoSpy).toHaveBeenCalled()
+    expect(toastInfoSpy).toHaveBeenCalled()
   })
 })

@@ -1,7 +1,7 @@
 :host {
   position: fixed;
   top: 0;
-  right: calc(50% - (var(--pngx-notification-max-width) / 2));
+  right: calc(50% - (var(--pngx-toast-max-width) / 2));
   margin: 0.3em;
   z-index: 1200;
 }

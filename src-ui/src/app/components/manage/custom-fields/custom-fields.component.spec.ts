@@ -21,10 +21,10 @@ import {
 import { FILTER_CUSTOM_FIELDS_QUERY } from 'src/app/data/filter-rule-type'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { NotificationService } from 'src/app/services/notification.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
@@ -48,7 +48,7 @@ describe('CustomFieldsComponent', () => {
   let fixture: ComponentFixture<CustomFieldsComponent>
   let customFieldsService: CustomFieldsService
   let modalService: NgbModal
-  let notificationService: NotificationService
+  let toastService: ToastService
   let listViewService: DocumentListViewService
   let settingsService: SettingsService
 
@@ -89,7 +89,7 @@ describe('CustomFieldsComponent', () => {
       })
     )
     modalService = TestBed.inject(NgbModal)
-    notificationService = TestBed.inject(NotificationService)
+    toastService = TestBed.inject(ToastService)
     listViewService = TestBed.inject(DocumentListViewService)
     settingsService = TestBed.inject(SettingsService)
     settingsService.currentUser = { id: 0, username: 'test' }
@@ -104,8 +104,8 @@ describe('CustomFieldsComponent', () => {
   it('should support create, show notification on error / success', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
-    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
-    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reload')
 
     const createButton = fixture.debugElement.queryAll(By.css('button'))[1]
@@ -116,12 +116,12 @@ describe('CustomFieldsComponent', () => {
 
     // fail first
     editDialog.failed.emit({ error: 'error creating item' })
-    expect(notificationErrorSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     expect(reloadSpy).not.toHaveBeenCalled()
 
     // succeed
     editDialog.succeeded.emit(fields[0])
-    expect(notificationInfoSpy).toHaveBeenCalled()
+    expect(toastInfoSpy).toHaveBeenCalled()
     expect(reloadSpy).toHaveBeenCalled()
     jest.advanceTimersByTime(100)
   })
@@ -129,8 +129,8 @@ describe('CustomFieldsComponent', () => {
   it('should support edit, show notification on error / success', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
-    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
-    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reload')
 
     const editButton = fixture.debugElement.queryAll(By.css('button'))[2]
@@ -142,19 +142,19 @@ describe('CustomFieldsComponent', () => {
 
     // fail first
     editDialog.failed.emit({ error: 'error editing item' })
-    expect(notificationErrorSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     expect(reloadSpy).not.toHaveBeenCalled()
 
     // succeed
     editDialog.succeeded.emit(fields[0])
-    expect(notificationInfoSpy).toHaveBeenCalled()
+    expect(toastInfoSpy).toHaveBeenCalled()
     expect(reloadSpy).toHaveBeenCalled()
   })
 
   it('should support delete, show notification on error / success', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
-    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const deleteSpy = jest.spyOn(customFieldsService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reload')
 
@@ -167,7 +167,7 @@ describe('CustomFieldsComponent', () => {
     // fail first
     deleteSpy.mockReturnValueOnce(throwError(() => new Error('error deleting')))
     editDialog.confirmClicked.emit()
-    expect(notificationErrorSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     expect(reloadSpy).not.toHaveBeenCalled()
 
     // succeed

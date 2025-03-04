@@ -35,13 +35,13 @@ import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { NotificationService } from 'src/app/services/notification.service'
 import {
   PermissionAction,
   PermissionsService,
 } from 'src/app/services/permissions.service'
 import { BulkEditObjectOperation } from 'src/app/services/rest/abstract-name-filter-service'
 import { TagService } from 'src/app/services/rest/tag.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogComponent } from '../../common/edit-dialog/edit-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
@@ -76,7 +76,7 @@ describe('ManagementListComponent', () => {
   let fixture: ComponentFixture<ManagementListComponent<Tag>>
   let tagService: TagService
   let modalService: NgbModal
-  let notificationService: NotificationService
+  let toastService: ToastService
   let documentListViewService: DocumentListViewService
   let permissionsService: PermissionsService
 
@@ -129,7 +129,7 @@ describe('ManagementListComponent', () => {
       .spyOn(permissionsService, 'currentUserOwnsObject')
       .mockReturnValue(true)
     modalService = TestBed.inject(NgbModal)
-    notificationService = TestBed.inject(NotificationService)
+    toastService = TestBed.inject(ToastService)
     documentListViewService = TestBed.inject(DocumentListViewService)
     fixture = TestBed.createComponent(TagListComponent)
     component = fixture.componentInstance
@@ -160,8 +160,8 @@ describe('ManagementListComponent', () => {
   it('should support create, show notification on error / success', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
-    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
-    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
     const createButton = fixture.debugElement.queryAll(By.css('button'))[3]
@@ -172,20 +172,20 @@ describe('ManagementListComponent', () => {
 
     // fail first
     editDialog.failed.emit({ error: 'error creating item' })
-    expect(notificationErrorSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     expect(reloadSpy).not.toHaveBeenCalled()
 
     // succeed
     editDialog.succeeded.emit()
-    expect(notificationInfoSpy).toHaveBeenCalled()
+    expect(toastInfoSpy).toHaveBeenCalled()
     expect(reloadSpy).toHaveBeenCalled()
   })
 
   it('should support edit, show notification on error / success', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
-    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
-    const notificationInfoSpy = jest.spyOn(notificationService, 'showInfo')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
     const editButton = fixture.debugElement.queryAll(By.css('button'))[6]
@@ -197,19 +197,19 @@ describe('ManagementListComponent', () => {
 
     // fail first
     editDialog.failed.emit({ error: 'error editing item' })
-    expect(notificationErrorSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     expect(reloadSpy).not.toHaveBeenCalled()
 
     // succeed
     editDialog.succeeded.emit()
-    expect(notificationInfoSpy).toHaveBeenCalled()
+    expect(toastInfoSpy).toHaveBeenCalled()
     expect(reloadSpy).toHaveBeenCalled()
   })
 
   it('should support delete, show notification on error / success', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
-    const notificationErrorSpy = jest.spyOn(notificationService, 'showError')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const deleteSpy = jest.spyOn(tagService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
@@ -222,7 +222,7 @@ describe('ManagementListComponent', () => {
     // fail first
     deleteSpy.mockReturnValueOnce(throwError(() => new Error('error deleting')))
     editDialog.confirmClicked.emit()
-    expect(notificationErrorSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     expect(reloadSpy).not.toHaveBeenCalled()
 
     // succeed
@@ -293,22 +293,22 @@ describe('ManagementListComponent', () => {
     bulkEditPermsSpy.mockReturnValueOnce(
       throwError(() => new Error('error setting permissions'))
     )
-    const errornotificationSpy = jest.spyOn(notificationService, 'showError')
+    const errorToastSpy = jest.spyOn(toastService, 'showError')
     modal.componentInstance.confirmClicked.emit({
       permissions: {},
       merge: true,
     })
     expect(bulkEditPermsSpy).toHaveBeenCalled()
-    expect(errornotificationSpy).toHaveBeenCalled()
+    expect(errorToastSpy).toHaveBeenCalled()
 
-    const successnotificationSpy = jest.spyOn(notificationService, 'showInfo')
+    const successToastSpy = jest.spyOn(toastService, 'showInfo')
     bulkEditPermsSpy.mockReturnValueOnce(of('OK'))
     modal.componentInstance.confirmClicked.emit({
       permissions: {},
       merge: true,
     })
     expect(bulkEditPermsSpy).toHaveBeenCalled()
-    expect(successnotificationSpy).toHaveBeenCalled()
+    expect(successToastSpy).toHaveBeenCalled()
   })
 
   it('should support bulk delete objects', () => {
@@ -327,19 +327,19 @@ describe('ManagementListComponent', () => {
     bulkEditSpy.mockReturnValueOnce(
       throwError(() => new Error('error setting permissions'))
     )
-    const errornotificationSpy = jest.spyOn(notificationService, 'showError')
+    const errorToastSpy = jest.spyOn(toastService, 'showError')
     modal.componentInstance.confirmClicked.emit(null)
     expect(bulkEditSpy).toHaveBeenCalledWith(
       Array.from(selected),
       BulkEditObjectOperation.Delete
     )
-    expect(errornotificationSpy).toHaveBeenCalled()
+    expect(errorToastSpy).toHaveBeenCalled()
 
-    const successnotificationSpy = jest.spyOn(notificationService, 'showInfo')
+    const successToastSpy = jest.spyOn(toastService, 'showInfo')
     bulkEditSpy.mockReturnValueOnce(of('OK'))
     modal.componentInstance.confirmClicked.emit(null)
     expect(bulkEditSpy).toHaveBeenCalled()
-    expect(successnotificationSpy).toHaveBeenCalled()
+    expect(successToastSpy).toHaveBeenCalled()
   })
 
   it('should disallow bulk permissions or delete objects if no global perms', () => {

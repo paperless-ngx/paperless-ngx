@@ -5,9 +5,9 @@ import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { delay, takeUntil, tap } from 'rxjs'
 import { Workflow } from 'src/app/data/workflow'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { NotificationService } from 'src/app/services/notification.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { WorkflowService } from 'src/app/services/rest/workflow.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import {
@@ -40,7 +40,7 @@ export class WorkflowsComponent
     private workflowService: WorkflowService,
     public permissionsService: PermissionsService,
     private modalService: NgbModal,
-    private notificationService: NotificationService
+    private toastService: ToastService
   ) {
     super()
   }
@@ -90,7 +90,7 @@ export class WorkflowsComponent
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((newWorkflow) => {
-        this.notificationService.showInfo(
+        this.toastService.showInfo(
           $localize`Saved workflow "${newWorkflow.name}".`
         )
         this.workflowService.clearCache()
@@ -99,7 +99,7 @@ export class WorkflowsComponent
     modal.componentInstance.failed
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((e) => {
-        this.notificationService.showError($localize`Error saving workflow.`, e)
+        this.toastService.showError($localize`Error saving workflow.`, e)
       })
   }
 
@@ -142,14 +142,14 @@ export class WorkflowsComponent
       this.workflowService.delete(workflow).subscribe({
         next: () => {
           modal.close()
-          this.notificationService.showInfo(
+          this.toastService.showInfo(
             $localize`Deleted workflow "${workflow.name}".`
           )
           this.workflowService.clearCache()
           this.reload()
         },
         error: (e) => {
-          this.notificationService.showError(
+          this.toastService.showError(
             $localize`Error deleting workflow "${workflow.name}".`,
             e
           )
@@ -161,7 +161,7 @@ export class WorkflowsComponent
   toggleWorkflowEnabled(workflow: Workflow) {
     this.workflowService.patch(workflow).subscribe({
       next: () => {
-        this.notificationService.showInfo(
+        this.toastService.showInfo(
           workflow.enabled
             ? $localize`Enabled workflow "${workflow.name}"`
             : $localize`Disabled workflow "${workflow.name}"`
@@ -170,7 +170,7 @@ export class WorkflowsComponent
         this.reload()
       },
       error: (e) => {
-        this.notificationService.showError(
+        this.toastService.showError(
           $localize`Error toggling workflow "${workflow.name}".`,
           e
         )
