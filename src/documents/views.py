@@ -1783,7 +1783,6 @@ class StatisticsCustomView(APIView):
                 .order_by("date_done_date")
             )
 
-            print(request_count)
             for entry in request_count:
                 target_date_str = entry["date_done_date"].strftime("%Y-%m-%d")
                 if target_date_str in date_request_number_dict:
