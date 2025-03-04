@@ -632,7 +632,7 @@ def send_webhook(
         else:
             httpx.post(
                 url,
-                data=data,
+                content=data,
                 files=files,
                 headers=headers,
             ).raise_for_status()
