@@ -12,4 +12,13 @@ module.exports = {
     '^src/(.*)': '<rootDir>/src/$1',
   },
   workerIdleMemoryLimit: '512MB',
+  reporters: [
+    'default',
+    [
+      'jest-junit',
+      {
+        classNameTemplate: '{filepath}/{classname}: {title}',
+      },
+    ],
+  ],
 }
