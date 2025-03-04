@@ -156,21 +156,20 @@ jobs:
           PAPERLESS_MAIL_TEST_USER: ${{ secrets.TEST_MAIL_USER }}
           PAPERLESS_MAIL_TEST_PASSWD: ${{ secrets.TEST_MAIL_PASSWD }}
         run: |
-          cd src/
           uv run \
             --python ${{ steps.setup-python.outputs.python-version }} \
             --dev \
             --frozen \
-            pytest -ra
+            pytest
       -
         name: Upload coverage
         if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION }}
         uses: actions/upload-artifact@v4
         with:
           name: backend-coverage-report
-          path: src/coverage.xml
+          path: coverage.xml
           retention-days: 7
-          if-no-files-found: warn
+          if-no-files-found: error
       -
         name: Stop containers
         if: always()
