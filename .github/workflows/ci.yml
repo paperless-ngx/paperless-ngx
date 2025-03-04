@@ -245,6 +245,8 @@ jobs:
         run: cd src-ui && npm run lint
       -
         name: Run Jest unit tests
+        env:
+          JEST_JUNIT_OUTPUT_FILE: junit-report-${{ matrix.shard-index }}.xml
         run: cd src-ui && npm run test -- --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
       -
         name: Upload Jest coverage
@@ -257,11 +259,9 @@ jobs:
             src-ui/coverage/lcov.info
             src-ui/coverage/clover.xml
           retention-days: 7
-          if-no-files-found: warn
+          if-no-files-found: error
       -
         name: Run Playwright e2e tests
-        env:
-          JEST_JUNIT_OUTPUT_FILE: junit-report-${{ matrix.shard-index }}.xml
         run: cd src-ui && npx playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
       -
         name: Upload Playwright test results
@@ -271,6 +271,7 @@ jobs:
           name: playwright-report-${{ matrix.shard-index }}
           path: src-ui/playwright-report
           retention-days: 7
+          if-no-files-found: error
       -
         name: Upload frontend test results
         if: always()
@@ -279,6 +280,7 @@ jobs:
           name: junit-report-${{ matrix.shard-index }}
           path: src-ui/junit-report-${{ matrix.shard-index }}.xml
           retention-days: 7
+          if-no-files-found: error
 
   tests-coverage-upload:
     name: "Upload to Codecov"
