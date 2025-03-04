@@ -261,7 +261,7 @@ jobs:
       -
         name: Run Playwright e2e tests
         env:
-          JEST_JUNIT_OUTPUT_FILE: src-ui/junit-report-${{ matrix.shard-index }}.xml
+          JEST_JUNIT_OUTPUT_FILE: junit-report-${{ matrix.shard-index }}.xml
         run: cd src-ui && npx playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
       -
         name: Upload Playwright test results
