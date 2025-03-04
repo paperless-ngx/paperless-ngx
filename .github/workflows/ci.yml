@@ -167,9 +167,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backend-coverage-report
-          path: src/coverage.xml
+          path: coverage.xml
           retention-days: 7
-          if-no-files-found: warn
+          if-no-files-found: error
       -
         name: Stop containers
         if: always()
