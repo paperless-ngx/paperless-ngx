@@ -260,6 +260,8 @@ jobs:
           if-no-files-found: warn
       -
         name: Run Playwright e2e tests
+        env:
+          JEST_JUNIT_OUTPUT_FILE: src-ui/junit-report-${{ matrix.shard-index }}.xml
         run: cd src-ui && npx playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
       -
         name: Upload Playwright test results
@@ -274,8 +276,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: junit-report-${{ matrix.shard-index }}.xml
-          path: src-ui/junit.xml
+          name: junit-report-${{ matrix.shard-index }}
+          path: src-ui/junit-report-${{ matrix.shard-index }}.xml
           retention-days: 7
 
   tests-coverage-upload:
