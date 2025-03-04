@@ -205,9 +205,6 @@ COPY --chown=1000:1000 ["pyproject.toml", "uv.lock", "/usr/src/paperless/src/"]
 # dependencies
 ARG BUILD_PACKAGES="\
   build-essential \
-  git \
-  # https://www.psycopg.org/docs/install.html#prerequisites
-  libpq-dev \
   # https://github.com/PyMySQL/mysqlclient#linux
   default-libmysqlclient-dev \
   pkg-config"
@@ -219,7 +216,7 @@ RUN --mount=type=cache,target=${UV_CACHE_DIR},id=python-cache \
     && apt-get update \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
   && echo "Installing Python requirements" \
-    && uv export --quiet --no-dev --format requirements-txt --output-file requirements.txt \
+    && uv export --quiet --no-dev --all-extras --format requirements-txt --output-file requirements.txt \
     && uv pip install --system --no-python-downloads --python-preference system --requirements requirements.txt \
   && echo "Installing NLTK data" \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" snowball_data \
