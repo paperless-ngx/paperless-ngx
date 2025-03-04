@@ -336,6 +336,8 @@ addopts = [
   "--maxprocesses=16",
   "--quiet",
   "--durations=50",
+  "--junitxml=junit.xml",
+  "-o junit_family=legacy",
 ]
 norecursedirs = [ "src/locale/", ".venv/", "src-ui/" ]
 

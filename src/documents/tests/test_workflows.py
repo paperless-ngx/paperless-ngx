@@ -2603,7 +2603,7 @@ class TestWorkflows(
 
             mock_post.assert_called_once_with(
                 "http://paperless-ngx.com",
-                data="Test message",
+                content="Test message",
                 headers={},
                 files=None,
             )

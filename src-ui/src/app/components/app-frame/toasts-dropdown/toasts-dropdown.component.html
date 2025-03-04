@@ -21,7 +21,7 @@
     }
     <div class="scroll-list">
       @for (toast of toasts; track toast.id) {
-        <pngx-toast [autohide]="false" [toast]="toast" (hidden)="onHidden(toast)" (close)="toastService.closeToast(toast)"></pngx-toast>
+        <pngx-toast [autohide]="false" [toast]="toast" (hidden)="onHidden(toast)" (closed)="toastService.closeToast(toast)"></pngx-toast>
       }
       </div>
   </div>

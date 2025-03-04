@@ -167,7 +167,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backend-coverage-report
-          path: coverage.xml
+          path: |
+            coverage.xml
+            junit.xml
           retention-days: 7
           if-no-files-found: error
       -
@@ -313,6 +315,14 @@ jobs:
           # not required for public repos, but intermittently fails otherwise
           token: ${{ secrets.CODECOV_TOKEN }}
           # future expansion
+          flags: backend
+          directory: src/
+      -
+        name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           flags: backend
           directory: src/
       -
