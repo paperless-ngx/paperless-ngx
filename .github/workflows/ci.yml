@@ -156,12 +156,11 @@ jobs:
           PAPERLESS_MAIL_TEST_USER: ${{ secrets.TEST_MAIL_USER }}
           PAPERLESS_MAIL_TEST_PASSWD: ${{ secrets.TEST_MAIL_PASSWD }}
         run: |
-          cd src/
           uv run \
             --python ${{ steps.setup-python.outputs.python-version }} \
             --dev \
             --frozen \
-            pytest -ra
+            pytest
       -
         name: Upload coverage
         if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION }}

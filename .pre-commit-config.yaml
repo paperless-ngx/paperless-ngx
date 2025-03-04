@@ -55,7 +55,7 @@ repos:
       - id: ruff
       - id: ruff-format
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: "2.0.4"
+    rev: "v2.5.1"
     hooks:
       - id: pyproject-fmt
   # Dockerfile hooks

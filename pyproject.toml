@@ -9,7 +9,11 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
 ]
+# TODO: Move certain things to groups and then utilize that further
+# This will allow testing to not install a webserver, mysql, etc
+
 dependencies = [
   "bleach~=6.2.0",
   "celery[redis]~=5.4.0",
@@ -70,9 +74,6 @@ dependencies = [
   "zxing-cpp~=2.3.0",
 ]
 
-# TODO: Move certain things to groups and then utilize that further
-# This will allow testing to not install a webserver, mysql, etc
-
 [dependency-groups]
 
 dev = [
@@ -81,19 +82,24 @@ dev = [
   { "include-group" = "lint" },
 ]
 
+docs = [
+  "mkdocs-glightbox~=0.4.0",
+  "mkdocs-material~=9.6.4",
+]
+
 testing = [
+  "daphne",
   "factory-boy~=3.3.1",
+  "imagehash",
   "pytest~=8.3.3",
   "pytest-cov~=6.0.0",
   "pytest-django~=4.10.0",
-  "pytest-httpx",
   "pytest-env",
-  "pytest-sugar",
-  "pytest-xdist",
+  "pytest-httpx",
   "pytest-mock",
   "pytest-rerunfailures",
-  "imagehash",
-  "daphne",
+  "pytest-sugar",
+  "pytest-xdist",
 ]
 
 lint = [
@@ -102,27 +108,266 @@ lint = [
   "ruff~=0.9.9",
 ]
 
-docs = [
-  "mkdocs-material~=9.6.4",
-  "mkdocs-glightbox~=0.4.0",
+typing = [
+  "celery-types",
+  "django-filter-stubs",
+  "django-stubs[compatible-mypy]",
+  "djangorestframework-stubs[compatible-mypy]",
+  "mypy",
+  "types-bleach",
+  "types-colorama",
+  "types-dateparser",
+  "types-markdown",
+  "types-pygments",
+  "types-python-dateutil",
+  "types-redis",
+  "types-setuptools",
+  "types-tqdm",
 ]
 
-typing = [
-  "mypy",
-  "django-filter-stubs",
-  "types-python-dateutil",
-  "djangorestframework-stubs[compatible-mypy]",
-  "celery-types",
-  "django-stubs[compatible-mypy]",
-  "types-dateparser",
-  "types-bleach",
-  "types-redis",
-  "types-tqdm",
-  "types-Markdown",
-  "types-Pygments",
-  "types-colorama",
-  "types-setuptools",
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+src = [
+  "src",
 ]
+respect-gitignore = true
+# https://docs.astral.sh/ruff/settings/
+fix = true
+show-fixes = true
+
+output-format = "grouped"
+# https://docs.astral.sh/ruff/rules/
+lint.extend-select = [
+  "COM",  # https://docs.astral.sh/ruff/rules/#flake8-commas-com
+  "DJ",   # https://docs.astral.sh/ruff/rules/#flake8-django-dj
+  "EXE",  # https://docs.astral.sh/ruff/rules/#flake8-executable-exe
+  "FBT",  # https://docs.astral.sh/ruff/rules/#flake8-boolean-trap-fbt
+  "FLY",  # https://docs.astral.sh/ruff/rules/#flynt-fly
+  "G201", # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
+  "I",    # https://docs.astral.sh/ruff/rules/#isort-i
+  "ICN",  # https://docs.astral.sh/ruff/rules/#flake8-import-conventions-icn
+  "INP",  # https://docs.astral.sh/ruff/rules/#flake8-no-pep420-inp
+  "ISC",  # https://docs.astral.sh/ruff/rules/#flake8-implicit-str-concat-isc
+  "PIE",  # https://docs.astral.sh/ruff/rules/#flake8-pie-pie
+  "PLC",  # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PLE",  # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PTH",  # https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
+  "Q",    # https://docs.astral.sh/ruff/rules/#flake8-quotes-q
+  "RSE",  # https://docs.astral.sh/ruff/rules/#flake8-raise-rse
+  "RUF",  # https://docs.astral.sh/ruff/rules/#ruff-specific-rules-ruf
+  "SIM",  # https://docs.astral.sh/ruff/rules/#flake8-simplify-sim
+  "T20",  # https://docs.astral.sh/ruff/rules/#flake8-print-t20
+  "TC",   # https://docs.astral.sh/ruff/rules/#flake8-type-checking-tc
+  "TID",  # https://docs.astral.sh/ruff/rules/#flake8-tidy-imports-tid
+  "UP",   # https://docs.astral.sh/ruff/rules/#pyupgrade-up
+  "W",    # https://docs.astral.sh/ruff/rules/#pycodestyle-e-w
+]
+lint.ignore = [
+  "DJ001",
+  "RUF012",
+  "SIM105",
+]
+# Migrations
+lint.per-file-ignores."*/migrations/*.py" = [
+  "E501",
+  "SIM",
+  "T201",
+]
+# Testing
+lint.per-file-ignores."*/tests/*.py" = [
+  "E501",
+  "SIM117",
+]
+lint.per-file-ignores.".github/scripts/*.py" = [
+  "E501",
+  "INP001",
+  "SIM117",
+]
+# Docker specific
+lint.per-file-ignores."docker/rootfs/usr/local/bin/wait-for-redis.py" = [
+  "INP001",
+  "T201",
+]
+lint.per-file-ignores."docker/wait-for-redis.py" = [
+  "INP001",
+  "T201",
+]
+lint.per-file-ignores."src/documents/file_handling.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/management/commands/document_consumer.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/management/commands/document_exporter.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/migrations/0012_auto_20160305_0040.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/migrations/0014_document_checksum.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/migrations/1003_mime_types.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/migrations/1012_fix_archive_files.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/models.py" = [
+  "PTH",
+  "SIM115",
+] # TODO PTH Enable & remove
+lint.per-file-ignores."src/documents/parsers.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/signals/handlers.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/tasks.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/tests/test_api_app_config.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/tests/test_classifier.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/tests/test_consumer.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/tests/test_file_handling.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/tests/test_management.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/tests/test_management_consumer.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/tests/test_management_exporter.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/tests/test_management_thumbnails.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/tests/test_migration_archive_files.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/tests/test_migration_document_pages_count.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/tests/test_migration_mime_type.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/tests/test_sanity_check.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/tests/test_tasks.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/tests/test_views.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/documents/views.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/paperless/checks.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/paperless/settings.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/paperless/tests/test_checks.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/paperless/urls.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/paperless/views.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/paperless_mail/mail.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/paperless_mail/preprocessor.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/paperless_tesseract/parsers.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/paperless_tesseract/tests/test_parser.py" = [
+  "PTH",
+  "RUF001",
+] # TODO PTH Enable & remove
+lint.per-file-ignores."src/paperless_tika/tests/test_live_tika.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.per-file-ignores."src/paperless_tika/tests/test_tika_parser.py" = [
+  "PTH",
+] # TODO Enable & remove
+lint.isort.force-single-line = true
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+pythonpath = [
+  "src",
+]
+testpaths = [
+  "src/documents/tests/",
+  "src/paperless/tests/",
+  "src/paperless_mail/tests/",
+  "src/paperless_tesseract/tests/",
+  "src/paperless_tika/tests",
+]
+addopts = [
+  "--pythonwarnings=all",
+  "--cov",
+  "--cov-report=html",
+  "--cov-report=xml",
+  "--numprocesses=auto",
+  "--maxprocesses=16",
+  "--quiet",
+  "--durations=50",
+]
+norecursedirs = [ "src/locale/", ".venv/", "src-ui/" ]
+
+DJANGO_SETTINGS_MODULE = "paperless.settings"
+
+[tool.pytest_env]
+PAPERLESS_DISABLE_DBHANDLER = "true"
+PAPERLESS_CACHE_BACKEND = "django.core.cache.backends.locmem.LocMemCache"
+
+[tool.coverage.run]
+source = [
+  "src/",
+]
+omit = [
+  "*/tests/*",
+  "manage.py",
+  "paperless/wsgi.py",
+  "paperless/auth.py",
+]
+
+[tool.coverage.report]
+exclude_also = [
+  "if settings.AUDIT_LOG_ENABLED:",
+  "if AUDIT_LOG_ENABLED:",
+  "if TYPE_CHECKING:",
+]
+
+[tool.mypy]
+plugins = [
+  "mypy_django_plugin.main",
+  "mypy_drf_plugin.main",
+  "numpy.typing.mypy_plugin",
+]
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
 
 [tool.uv]
 required-version = ">=0.5.14"
@@ -142,3 +387,6 @@ zxing-cpp = [
   { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
   { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
 ]
+
+[tool.django-stubs]
+django_settings_module = "paperless.settings"
