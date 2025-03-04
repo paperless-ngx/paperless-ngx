@@ -205,9 +205,6 @@ COPY --chown=1000:1000 ["pyproject.toml", "uv.lock", "/usr/src/paperless/src/"]
 # dependencies
 ARG BUILD_PACKAGES="\
   build-essential \
-  git \
-  # https://www.psycopg.org/docs/install.html#prerequisites
-  libpq-dev \
   # https://github.com/PyMySQL/mysqlclient#linux
   default-libmysqlclient-dev \
   pkg-config"
