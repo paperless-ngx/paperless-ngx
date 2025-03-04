@@ -522,7 +522,7 @@ jobs:
       -
         name: Generate requirements file
         run: |
-           uv export --quiet --no-dev --format requirements-txt --output-file requirements.txt
+           uv export --quiet --no-dev --all-extras --format requirements-txt --output-file requirements.txt
       -
         name: Compile messages
         run: |
