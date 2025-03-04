@@ -380,6 +380,12 @@ are released, dependency support is confirmed, etc.
         dependencies.  This is an alternative to the above and may require adjusting
         the example scripts to utilize the virtual environment paths
 
+    !!! tip
+
+        If you use modern Python tooling, such as `uv`, installation will not include
+        dependencies for Postgres or Mariadb.  You can select those extras with `--extra <EXTRA>`
+        or all with `--all-extras`
+
 9.  Go to `/opt/paperless/src`, and execute the following commands:
 
     ```bash
