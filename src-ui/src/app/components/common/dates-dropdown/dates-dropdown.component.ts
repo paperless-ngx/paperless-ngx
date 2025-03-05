@@ -202,8 +202,6 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
   }
 
   onSetCreatedRelativeDate(rd: { id: number; name: string; date: number }) {
-    console.log(rd)
-
     // createdRelativeDate is set by ngModel
     this.createdDateTo = null
     this.createdDateFrom = null
@@ -211,8 +209,6 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
   }
 
   onSetAddedRelativeDate(rd: { id: number; name: string; date: number }) {
-    console.log(rd)
-
     // addedRelativeDate is set by ngModel
     this.addedDateTo = null
     this.addedDateFrom = null
