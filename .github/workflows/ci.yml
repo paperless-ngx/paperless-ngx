@@ -288,7 +288,7 @@ jobs:
           retention-days: 7
 
   tests-data-upload:
-    name: "Upload test status to Codecov"
+    name: "Upload tests data to Codecov"
     runs-on: ubuntu-24.04
     if: >-
       always() &&
@@ -316,7 +316,7 @@ jobs:
           flags: frontend
           directory: src-ui/junit/
       -
-        name: Download backend coverage
+        name: Download backend test results
         uses: actions/download-artifact@v4
         with:
           name: backend-test-results
@@ -362,7 +362,6 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          # future expansion
           flags: backend
           directory: src/
       # Bundle analysis
