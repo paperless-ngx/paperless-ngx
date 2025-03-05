@@ -2023,6 +2023,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
             "assign_change_users",
             "assign_change_groups",
             "assign_custom_fields",
+            "assign_custom_fields_values",
             "remove_all_tags",
             "remove_tags",
             "remove_all_correspondents",
