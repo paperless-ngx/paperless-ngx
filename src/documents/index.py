@@ -503,19 +503,26 @@ class DelayedElasticSearch(DelayedQuery):
         exact_queries = [Q("match_phrase", content=match) for match in
                          exact_matches]
         cleaned_string = cleaned_string.replace('"', '')
-        normal_query  = Q("multi_match", query=cleaned_string, fields=[
-            "content",
-            "title",
-            # "correspondent",
-            "tag",
-            "type",
-            "notes",
-            "custom_fields",
-        ])
-        if cleaned_string == '':
-            normal_query = []
-        else:
-            normal_query = [normal_query]
+        normal_query = []
+
+        if cleaned_string:
+            normal_query = [
+                Q("multi_match",
+                  type="phrase",
+                  query=cleaned_string,
+                  fields=["content^3", "title^2", "tag^1.5", "type^1",
+                          "notes^0.5", "custom_fields^1"],
+                  boost=5,
+                  slop=1
+                  )
+                | Q("multi_match",
+                    query=cleaned_string,
+                    fields=["content^3", "title^2", "tag^1.5", "type^1",
+                            "notes^0.5", "custom_fields^1"],
+                    boost=1,
+                    minimum_should_match="85%"
+                    )
+            ]
 
         final_query = Q("bool", must=exact_queries + normal_query)
         return final_query  # Chỉ trả về một truy vấn
@@ -623,11 +630,10 @@ class DelayedElasticSearch(DelayedQuery):
         sort_order = {sort_field: {
             "order": "desc" if reverse else "asc"}} if sort_field else None
 
+        combined_query = base_query
         # Khởi tạo truy vấn bool
         if filter_query:
             combined_query = Q("bool", must=[base_query, filter_query])
-        else:
-            combined_query = base_query
 
         # Thêm phần sắp xếp vào truy vấn cuối cùng
         query_body = {

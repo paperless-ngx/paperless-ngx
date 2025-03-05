@@ -12,7 +12,7 @@ from .models import Document as DocumentModel, Note, CustomFieldInstance
 
 @registry.register_document
 class DocumentDocument(Document):
-    # id = fields.KeywordField(attr='id')
+    id = fields.IntegerField(attr='id')
     title = fields.TextField(attr='title')
     title_keyword = fields.KeywordField(attr='title')
     suggest = fields.CompletionField()
@@ -65,7 +65,7 @@ class DocumentDocument(Document):
         name = ELASTIC_SEARCH_DOCUMENT_INDEX
         settings = {
             'number_of_shards': 5,  # Phân đoạn cho dữ liệu lớn
-            'number_of_replicas': 1,
+            'number_of_replicas': 2,
 
         }
 
@@ -75,15 +75,15 @@ class DocumentDocument(Document):
 
     def prepare_suggest_content(self, instance):
         # Trích xuất các cụm từ từ content để dùng cho gợi ý
-        from underthesea import text_normalize, word_tokenize
 
         content = instance.content
         if not content or not isinstance(content, str):
             return []
 
         # Chuẩn hóa và tách từ
-        normalized_text = text_normalize(content.lower())
-        tokens = word_tokenize(normalized_text)
+        # normalized_text = text_normalize(content.lower())
+        # tokens = word_tokenize(normalized_text)
+        tokens = re.split(r'[\n\t\r\b\s]+|[^\w]+', instance.content.lower())
 
         # Tạo danh sách cụm từ (bigram và trigram) với trọng số
         phrases = []
@@ -134,7 +134,7 @@ class DocumentDocument(Document):
         # document_data['id'] = doc.id or None
         document_data['title'] = doc.title or None
         document_data['content'] = doc.content or None
-        document_data['suggest_content'] = cls.prepare_suggest_content(doc)
+        document_data['suggest_content'] = cls().prepare_suggest_content(instance=doc)
         document_data['asn'] = doc.archive_serial_number or None
         document_data['correspondent'] = doc.correspondent.name if doc.correspondent else None
         document_data['correspondent_id'] = doc.correspondent.id if doc.correspondent else None
