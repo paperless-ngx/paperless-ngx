@@ -87,9 +87,9 @@ test('date filtering', async ({ page }) => {
   await page.getByRole('option', { name: 'Within 3 months' }).click()
   await expect(page.locator('pngx-document-list')).toHaveText(/one document/i)
   await page
-    .locator(
-      'div:nth-child(2) > .list-group .input-group .ng-select-container > .ng-arrow-wrapper'
-    )
+    .getByRole('menuitem', { name: 'Relative dates' })
+    .locator('span')
+    .first()
     .click()
   await page.getByRole('option', { name: 'Within 3 months' }).click()
   await page.getByLabel('Dates selected').locator('button').first().click()
