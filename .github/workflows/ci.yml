@@ -162,8 +162,8 @@ jobs:
             --frozen \
             pytest
       -
-        name: Upload test results artifact
-        if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION }}
+        name: Upload test results
+        if: ${{ always() && matrix.python-version == env.DEFAULT_PYTHON_VERSION }}
         uses: actions/upload-artifact@v4
         with:
           name: backend-test-results
@@ -171,13 +171,14 @@ jobs:
           retention-days: 7
           if-no-files-found: error
       -
-        name: Upload coverage artifact
+        name: Upload test coverage
         if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION }}
         uses: actions/upload-artifact@v4
         with:
           name: backend-coverage-report
           path: coverage.xml
           retention-days: 7
+          if-no-files-found: error
       -
         name: Stop containers
         if: always()
@@ -185,7 +186,7 @@ jobs:
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml logs
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml down
 
-  install-frontend-depedendencies:
+  install-frontend-dependencies:
     name: "Install Frontend Dependencies"
     runs-on: ubuntu-24.04
     needs:
@@ -220,7 +221,7 @@ jobs:
     name: "Frontend Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     runs-on: ubuntu-24.04
     needs:
-      - install-frontend-depedendencies
+      - install-frontend-dependencies
     strategy:
       fail-fast: false
       matrix:
@@ -286,14 +287,17 @@ jobs:
           path: src-ui/junit-report-${{ matrix.shard-index }}.xml
           retention-days: 7
 
-  tests-upload:
-    name: "Upload test results to Codecov"
+  tests-data-upload:
+    name: "Upload test status to Codecov"
     runs-on: ubuntu-24.04
     if: ${{ !cancelled() }}
     needs:
       - tests-backend
       - tests-frontend
     steps:
+      -
+        uses: actions/checkout@v4
+      # Results
       -
         name: Download frontend test results
         uses: actions/download-artifact@v4
@@ -310,28 +314,20 @@ jobs:
           flags: frontend
           directory: src-ui/junit/
       -
-        name: Download backend test results
+        name: Download backend coverage
         uses: actions/download-artifact@v4
         with:
           name: backend-test-results
           path: src/
       -
         name: Upload backend test results to Codecov
+
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: backend
           directory: src/
-
-  tests-coverage-upload:
-    name: "Upload coverage to Codecov"
-    runs-on: ubuntu-24.04
-    needs:
-      - tests-backend
-      - tests-frontend
-    steps:
-      -
-        uses: actions/checkout@v4
+      # Coverage
       -
         name: Download frontend jest coverage
         uses: actions/download-artifact@v4
@@ -349,7 +345,6 @@ jobs:
         name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          # not required for public repos, but intermittently fails otherwise
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: frontend
           directory: src-ui/coverage/
@@ -365,11 +360,11 @@ jobs:
         name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          # not required for public repos, but intermittently fails otherwise
           token: ${{ secrets.CODECOV_TOKEN }}
           # future expansion
           flags: backend
           directory: src/
+      # Bundle analysis
       -
         name: Use Node.js 20
         uses: actions/setup-node@v4
