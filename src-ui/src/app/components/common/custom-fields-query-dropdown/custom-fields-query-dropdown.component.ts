@@ -34,7 +34,7 @@ import {
   CustomFieldQueryElement,
   CustomFieldQueryExpression,
 } from 'src/app/utils/custom-field-query-element'
-import { popperOptionsReenablePreventOverflow } from 'src/app/utils/popper-options'
+import { pngxPopperOptions } from 'src/app/utils/popper-options'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
 import { DocumentLinkComponent } from '../input/document-link/document-link.component'
@@ -183,7 +183,7 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
   public CustomFieldDataType = CustomFieldDataType
   public CUSTOM_FIELD_QUERY_MAX_DEPTH = CUSTOM_FIELD_QUERY_MAX_DEPTH
   public CUSTOM_FIELD_QUERY_MAX_ATOMS = CUSTOM_FIELD_QUERY_MAX_ATOMS
-  public popperOptions = popperOptionsReenablePreventOverflow
+  public popperOptions = pngxPopperOptions
 
   @Input()
   title: string
