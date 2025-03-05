@@ -162,8 +162,8 @@ jobs:
             --frozen \
             pytest
       -
-        name: Upload test results
-        if: ${{ always() && matrix.python-version == env.DEFAULT_PYTHON_VERSION }}
+        name: Upload backend test results
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: backend-test-results
@@ -171,7 +171,7 @@ jobs:
           retention-days: 7
           if-no-files-found: error
       -
-        name: Upload test coverage
+        name: Upload backend test coverage
         if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION }}
         uses: actions/upload-artifact@v4
         with:
