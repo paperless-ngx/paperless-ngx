@@ -166,12 +166,18 @@ jobs:
         if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION }}
         uses: actions/upload-artifact@v4
         with:
-          name: backend-coverage-report
-          path: |
-            coverage.xml
-            junit.xml
+          name: backend-test-results
+          path: junit.xml
           retention-days: 7
           if-no-files-found: error
+      -
+        name: Upload coverage artifact
+        if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-report
+          path: coverage.xml
+          retention-days: 7
       -
         name: Stop containers
         if: always()
@@ -303,6 +309,12 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: frontend
           directory: src-ui/junit/
+      -
+        name: Download backend test results
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-test-results
+          path: src/
       -
         name: Upload backend test results to Codecov
         uses: codecov/test-results-action@v1
