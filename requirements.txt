@@ -131,4 +131,3 @@ python-decouple==3.8
 django-soft-delete==1.0.16
 django-elasticsearch-dsl==7.4
 django-elasticsearch-dsl-drf==0.22.5
-underthesea==6.8.4

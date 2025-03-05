@@ -1,7 +1,5 @@
 import re
-from dataclasses import field
 
-from django.contrib.sitemaps.views import index
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
 from guardian.shortcuts import get_users_with_perms

@@ -64,7 +64,7 @@ requests = "2.32.2"
 pandas = "2.2.2"
 openpyxl = "3.1.5"
 python-decouple= "3.8"
-underthesea="6.8.4"
+
 
 [dev-packages]
 # Linting

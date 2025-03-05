@@ -16,6 +16,23 @@ RUN set -eux \
 RUN set -eux \
   && ./node_modules/.bin/ng build --configuration production
 
+# Stage: pipenv-base
+# Purpose: Generates a requirements.txt file for building
+# Comments:
+#  - pipenv dependencies are not left in the final image
+#  - pipenv can't touch the final image somehow
+FROM --platform=$BUILDPLATFORM docker.io/python:3.11-alpine as pipenv-base
+
+WORKDIR /usr/src/pipenv
+
+COPY Pipfile* ./
+
+RUN set -eux \
+  && echo "Installing pipenv" \
+    && python3 -m pip install --no-cache-dir --upgrade pipenv==2023.12.1 \
+  && echo "Generating requirement.txt" \
+    && pipenv requirements > requirements.txt
+
 # Stage: main-app
 # Purpose: The final image
 # Comments:
@@ -181,8 +198,8 @@ RUN set -eux \
 WORKDIR /usr/src/paperless/src/
 
 # Python dependencies
-# Use pre-existing requirements.txt from source
-COPY requirements.txt ./
+# Change pretty frequently
+COPY --from=pipenv-base /usr/src/pipenv/requirements.txt ./
 
 # Packages needed only for building a few quick Python
 # dependencies
@@ -203,7 +220,7 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
     && python3 -m pip install --no-cache-dir --upgrade wheel \
   && echo "Installing Python requirements" \
-    && python3 -m pip install --default-timeout=1000 --no-cache-dir -r requirements.txt \
+    && python3 -m pip install --default-timeout=1000 --no-cache-dir --requirement requirements.txt \
   && echo "Installing NLTK data" \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" snowball_data \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" stopwords \
