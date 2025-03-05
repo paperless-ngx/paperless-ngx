@@ -271,7 +271,7 @@ jobs:
         name: Run Playwright e2e tests
         run: cd src-ui && npx playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
       -
-        name: Upload Playwright test results
+        name: Upload Playwright test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -336,7 +336,7 @@ jobs:
           path: src-ui/coverage/
           pattern: jest-coverage-report-*
       -
-        name: Download frontend playwright coverage
+        name: Download Playwright test reports
         uses: actions/download-artifact@v4
         with:
           path: src-ui/coverage/
