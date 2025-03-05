@@ -160,14 +160,14 @@ jobs:
             --python ${{ steps.setup-python.outputs.python-version }} \
             --dev \
             --frozen \
-            pytest
+            pytest --junitxml=junit-${{ steps.setup-python.outputs.python-version }}.xml
       -
         name: Upload backend test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: backend-test-results
-          path: junit.xml
+          path: junit-${{ steps.setup-python.outputs.python-version }}.xml
           retention-days: 7
           if-no-files-found: error
       -
