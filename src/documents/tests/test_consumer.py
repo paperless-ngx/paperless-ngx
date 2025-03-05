@@ -408,7 +408,9 @@ class TestConsumer(
 
         with self.get_consumer(
             self.get_test_file(),
-            DocumentMetadataOverrides(custom_field_ids=[cf1.id, cf3.id]),
+            DocumentMetadataOverrides(
+                custom_fields={cf1.id: "value1", cf3.id: "http://example.com"},
+            ),
         ) as consumer:
             consumer.run()
 
@@ -420,6 +422,11 @@ class TestConsumer(
         self.assertIn(cf1, fields_used)
         self.assertNotIn(cf2, fields_used)
         self.assertIn(cf3, fields_used)
+        self.assertEqual(document.custom_fields.get(field=cf1).value, "value1")
+        self.assertEqual(
+            document.custom_fields.get(field=cf3).value,
+            "http://example.com",
+        )
         self._assert_first_last_send_progress()
 
     def testOverrideAsn(self):
