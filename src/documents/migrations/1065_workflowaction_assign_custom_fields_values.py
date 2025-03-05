@@ -6,7 +6,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "1063_paperlesstask_type_alter_paperlesstask_task_name_and_more"),
+        ("documents", "1064_delete_log"),
     ]
 
     operations = [
