@@ -336,7 +336,9 @@ def merge(
         try:
             doc_path = (
                 doc.archive_path
-                if archive_fallback and doc.mime_type != "application/pdf"
+                if archive_fallback
+                and doc.mime_type != "application/pdf"
+                and doc.has_archive_version
                 else doc.source_path
             )
             with pikepdf.open(str(doc_path)) as pdf:
