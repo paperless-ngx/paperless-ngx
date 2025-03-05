@@ -166,7 +166,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: backend-test-results
+          name: backend-test-results-${{ steps.setup-python.outputs.python-version }}
           path: junit-${{ steps.setup-python.outputs.python-version }}.xml
           retention-days: 7
           if-no-files-found: error
@@ -319,8 +319,9 @@ jobs:
         name: Download backend test results
         uses: actions/download-artifact@v4
         with:
-          name: backend-test-results
           path: src/
+          pattern: backend-test-results-*
+          merge-multiple: true
       -
         name: Upload backend test results to Codecov
         uses: codecov/test-results-action@v1
