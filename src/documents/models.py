@@ -1278,7 +1278,7 @@ class WorkflowAction(models.Model):
         help_text=_(
             "Optional values to assign to the custom fields.",
         ),
-        default={},
+        default=dict,
     )
 
     remove_tags = models.ManyToManyField(

@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
                 help_text="Optional values to assign to the custom fields.",
                 null=True,
                 verbose_name="custom field values",
-                default={},
+                default=dict,
             ),
         ),
     ]
