@@ -19,7 +19,7 @@ import { debounceTime } from 'rxjs/operators'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
-import { popperOptionsReenablePreventOverflow } from 'src/app/utils/popper-options'
+import { pngxPopperOptions } from 'src/app/utils/popper-options'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
 
 export interface DateSelection {
@@ -55,7 +55,7 @@ export enum RelativeDate {
   ],
 })
 export class DatesDropdownComponent implements OnInit, OnDestroy {
-  public popperOptions = popperOptionsReenablePreventOverflow
+  public popperOptions = pngxPopperOptions
 
   constructor(settings: SettingsService) {
     this.datePlaceHolder = settings.getLocalizedDateInputFormat()
