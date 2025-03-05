@@ -290,7 +290,6 @@ jobs:
   tests-data-upload:
     name: "Upload test status to Codecov"
     runs-on: ubuntu-24.04
-    if: ${{ !cancelled() }}
     needs:
       - tests-backend
       - tests-frontend
@@ -307,7 +306,6 @@ jobs:
           merge-multiple: true
       -
         name: Upload frontend test results to Codecov
-        if: ${{ !cancelled() }}
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -321,7 +319,6 @@ jobs:
           path: src/
       -
         name: Upload backend test results to Codecov
-
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
