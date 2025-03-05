@@ -1,4 +1,4 @@
-import { NgClass } from '@angular/common'
+import { NgClass, NgTemplateOutlet } from '@angular/common'
 import {
   Component,
   EventEmitter,
@@ -13,6 +13,7 @@ import {
   NgbDatepickerModule,
   NgbDropdownModule,
 } from '@ng-bootstrap/ng-bootstrap'
+import { NgSelectModule } from '@ng-select/ng-select'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, Subscription } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
@@ -32,10 +33,10 @@ export interface DateSelection {
 }
 
 export enum RelativeDate {
-  WITHIN_1_WEEK = 0,
-  WITHIN_1_MONTH = 1,
-  WITHIN_3_MONTHS = 2,
-  WITHIN_1_YEAR = 3,
+  WITHIN_1_WEEK = 1,
+  WITHIN_1_MONTH = 2,
+  WITHIN_3_MONTHS = 3,
+  WITHIN_1_YEAR = 4,
 }
 
 @Component({
@@ -49,9 +50,11 @@ export enum RelativeDate {
     NgxBootstrapIconsModule,
     NgbDatepickerModule,
     NgbDropdownModule,
+    NgSelectModule,
     FormsModule,
     ReactiveFormsModule,
     NgClass,
+    NgTemplateOutlet,
   ],
 })
 export class DatesDropdownComponent implements OnInit, OnDestroy {
@@ -88,38 +91,38 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
 
   // created
   @Input()
-  createdDateTo: string
+  createdDateTo: string = null
 
   @Output()
   createdDateToChange = new EventEmitter<string>()
 
   @Input()
-  createdDateFrom: string
+  createdDateFrom: string = null
 
   @Output()
   createdDateFromChange = new EventEmitter<string>()
 
   @Input()
-  createdRelativeDate: RelativeDate
+  createdRelativeDate: RelativeDate = null
 
   @Output()
   createdRelativeDateChange = new EventEmitter<number>()
 
   // added
   @Input()
-  addedDateTo: string
+  addedDateTo: string = null
 
   @Output()
   addedDateToChange = new EventEmitter<string>()
 
   @Input()
-  addedDateFrom: string
+  addedDateFrom: string = null
 
   @Output()
   addedDateFromChange = new EventEmitter<string>()
 
   @Input()
-  addedRelativeDate: RelativeDate
+  addedRelativeDate: RelativeDate = null
 
   @Output()
   addedRelativeDateChange = new EventEmitter<number>()
@@ -172,17 +175,17 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
     this.onChange()
   }
 
-  setCreatedRelativeDate(rd: RelativeDate) {
+  onSetCreatedRelativeDate(rd: { id: number; name: string; date: number }) {
+    // createdRelativeDate is set by ngModel
     this.createdDateTo = null
     this.createdDateFrom = null
-    this.createdRelativeDate = this.createdRelativeDate == rd ? null : rd
     this.onChange()
   }
 
-  setAddedRelativeDate(rd: RelativeDate) {
+  onSetAddedRelativeDate(rd: { id: number; name: string; date: number }) {
+    // addedRelativeDate is set by ngModel
     this.addedDateTo = null
     this.addedDateFrom = null
-    this.addedRelativeDate = this.addedRelativeDate == rd ? null : rd
     this.onChange()
   }
 
@@ -224,6 +227,11 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
     this.onChange()
   }
 
+  clearCreatedRelativeDate() {
+    this.createdRelativeDate = null
+    this.onChange()
+  }
+
   clearAddedTo() {
     this.addedDateTo = null
     this.onChange()
@@ -231,6 +239,11 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
 
   clearAddedFrom() {
     this.addedDateFrom = null
+    this.onChange()
+  }
+
+  clearAddedRelativeDate() {
+    this.addedRelativeDate = null
     this.onChange()
   }
 

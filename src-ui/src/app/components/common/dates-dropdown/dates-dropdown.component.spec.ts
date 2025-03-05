@@ -82,10 +82,12 @@ describe('DatesDropdownComponent', () => {
   it('should support relative dates', fakeAsync(() => {
     let result: DateSelection
     component.datesSet.subscribe((date) => (result = date))
-    component.setCreatedRelativeDate(null)
-    component.setCreatedRelativeDate(RelativeDate.WITHIN_1_WEEK)
-    component.setAddedRelativeDate(null)
-    component.setAddedRelativeDate(RelativeDate.WITHIN_1_WEEK)
+    component.createdRelativeDate = RelativeDate.WITHIN_1_WEEK // normally set by ngModel binding in dropdown
+    component.onSetCreatedRelativeDate({
+      id: RelativeDate.WITHIN_1_WEEK,
+    } as any)
+    component.addedRelativeDate = RelativeDate.WITHIN_1_WEEK // normally set by ngModel binding in dropdown
+    component.onSetAddedRelativeDate({ id: RelativeDate.WITHIN_1_WEEK } as any)
     tick(500)
     expect(result).toEqual({
       createdFrom: null,
@@ -147,8 +149,19 @@ describe('DatesDropdownComponent', () => {
     expect(component.addedDateTo).toBeNull()
   })
 
+  it('should support clearRelativeDate', () => {
+    component.createdRelativeDate = RelativeDate.WITHIN_1_WEEK
+    component.clearCreatedRelativeDate()
+    expect(component.createdRelativeDate).toBeNull()
+
+    component.addedRelativeDate = RelativeDate.WITHIN_1_WEEK
+    component.clearAddedRelativeDate()
+    expect(component.addedRelativeDate).toBeNull()
+  })
+
   it('should limit keyboard events', () => {
-    const input: HTMLInputElement = fixture.nativeElement.querySelector('input')
+    const input: HTMLInputElement =
+      fixture.nativeElement.querySelector('input.form-control')
     let event: KeyboardEvent = new KeyboardEvent('keypress', {
       key: '9',
     })
@@ -163,4 +176,19 @@ describe('DatesDropdownComponent', () => {
     input.dispatchEvent(event)
     expect(eventSpy).toHaveBeenCalled()
   })
+
+  it('should support debounce', fakeAsync(() => {
+    let result: DateSelection
+    component.datesSet.subscribe((date) => (result = date))
+    component.onChangeDebounce()
+    tick(500)
+    expect(result).toEqual({
+      createdFrom: null,
+      createdTo: null,
+      createdRelativeDateID: null,
+      addedFrom: null,
+      addedTo: null,
+      addedRelativeDateID: null,
+    })
+  }))
 })
