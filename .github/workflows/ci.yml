@@ -162,7 +162,7 @@ jobs:
             --frozen \
             pytest
       -
-        name: Upload coverage artifact
+        name: Upload test results artifact
         if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION }}
         uses: actions/upload-artifact@v4
         with:
