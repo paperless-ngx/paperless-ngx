@@ -358,7 +358,7 @@ jobs:
           name: backend-coverage-report
           path: src/
       -
-        name: Upload coverage to Codecov
+        name: Upload backend coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
