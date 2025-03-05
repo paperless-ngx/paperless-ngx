@@ -290,6 +290,10 @@ jobs:
   tests-data-upload:
     name: "Upload test status to Codecov"
     runs-on: ubuntu-24.04
+    if: >-
+      always() &&
+      (needs.tests-backend.result == 'failure' || needs.tests-backend.result == 'success') &&
+      (needs.tests-frontend.result == 'failure' || needs.tests-frontend.result == 'success')
     needs:
       - tests-backend
       - tests-frontend
