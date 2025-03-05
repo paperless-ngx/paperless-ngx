@@ -75,7 +75,7 @@ first-time setup.
 4.  Install the Python dependencies:
 
     ```bash
-    $ uv sync --dev
+    $ uv sync --group dev
     ```
 
 5.  Install pre-commit hooks:
