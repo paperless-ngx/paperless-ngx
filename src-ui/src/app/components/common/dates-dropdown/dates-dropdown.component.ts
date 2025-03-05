@@ -1,4 +1,4 @@
-import { NgClass, NgTemplateOutlet } from '@angular/common'
+import { NgClass } from '@angular/common'
 import {
   Component,
   EventEmitter,
@@ -37,6 +37,10 @@ export enum RelativeDate {
   WITHIN_1_MONTH = 2,
   WITHIN_3_MONTHS = 3,
   WITHIN_1_YEAR = 4,
+  THIS_YEAR = 5,
+  THIS_MONTH = 6,
+  TODAY = 7,
+  YESTERDAY = 8,
 }
 
 @Component({
@@ -54,7 +58,6 @@ export enum RelativeDate {
     FormsModule,
     ReactiveFormsModule,
     NgClass,
-    NgTemplateOutlet,
   ],
 })
 export class DatesDropdownComponent implements OnInit, OnDestroy {
@@ -84,6 +87,26 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
       id: RelativeDate.WITHIN_1_YEAR,
       name: $localize`Within 1 year`,
       date: new Date().setFullYear(new Date().getFullYear() - 1),
+    },
+    {
+      id: RelativeDate.THIS_YEAR,
+      name: $localize`This year`,
+      date: new Date('1/1/' + new Date().getFullYear()),
+    },
+    {
+      id: RelativeDate.THIS_MONTH,
+      name: $localize`This month`,
+      date: new Date().setDate(1),
+    },
+    {
+      id: RelativeDate.TODAY,
+      name: $localize`Today`,
+      date: new Date().setHours(0, 0, 0, 0),
+    },
+    {
+      id: RelativeDate.YESTERDAY,
+      name: $localize`Yesterday`,
+      date: new Date().setDate(new Date().getDate() - 1),
     },
   ]
 
@@ -176,6 +199,8 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
   }
 
   onSetCreatedRelativeDate(rd: { id: number; name: string; date: number }) {
+    console.log(rd)
+
     // createdRelativeDate is set by ngModel
     this.createdDateTo = null
     this.createdDateFrom = null
@@ -183,6 +208,8 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
   }
 
   onSetAddedRelativeDate(rd: { id: number; name: string; date: number }) {
+    console.log(rd)
+
     // addedRelativeDate is set by ngModel
     this.addedDateTo = null
     this.addedDateFrom = null
