@@ -1040,6 +1040,27 @@ describe('BulkEditorComponent', () => {
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     ) // listAllFilteredIds
     expect(documentListViewService.selected.size).toEqual(0)
+
+    // Test with archiveFallback enabled
+    modal.componentInstance.deleteOriginals = false
+    modal.componentInstance.archiveFallback = true
+    modal.componentInstance.confirm()
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.flush(true)
+    expect(req.request.body).toEqual({
+      documents: [3, 4],
+      method: 'merge',
+      parameters: { metadata_document_id: 3, archive_fallback: true },
+    })
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
+    ) // list reload
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
+    ) // listAllFilteredIds
+    expect(documentListViewService.selected.size).toEqual(0)
   })
 
   it('should support bulk download with archive, originals or both and file formatting', () => {
