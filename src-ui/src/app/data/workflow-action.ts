@@ -58,6 +58,8 @@ export interface WorkflowAction extends ObjectWithId {
 
   assign_custom_fields?: number[] // [CustomField.id]
 
+  assign_custom_fields_values?: object
+
   remove_tags?: number[] // Tag.id
 
   remove_all_tags?: boolean
