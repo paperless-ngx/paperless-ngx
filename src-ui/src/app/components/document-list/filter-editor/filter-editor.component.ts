@@ -135,24 +135,44 @@ const TEXT_FILTER_MODIFIER_NOTNULL = 'not null'
 const TEXT_FILTER_MODIFIER_GT = 'greater'
 const TEXT_FILTER_MODIFIER_LT = 'less'
 
-const RELATIVE_DATE_QUERY_REGEXP_CREATED = /created:\[([^\]]+)\]/g
-const RELATIVE_DATE_QUERY_REGEXP_ADDED = /added:\[([^\]]+)\]/g
+const RELATIVE_DATE_QUERY_REGEXP_CREATED = /created:[\["]([^\]]+)[\]"]/g
+const RELATIVE_DATE_QUERY_REGEXP_ADDED = /added:[\["]([^\]]+)[\]"]/g
 const RELATIVE_DATE_QUERYSTRINGS = [
   {
     relativeDate: RelativeDate.WITHIN_1_WEEK,
     dateQuery: '-1 week to now',
+    isRange: true,
   },
   {
     relativeDate: RelativeDate.WITHIN_1_MONTH,
     dateQuery: '-1 month to now',
+    isRange: true,
   },
   {
     relativeDate: RelativeDate.WITHIN_3_MONTHS,
     dateQuery: '-3 month to now',
+    isRange: true,
   },
   {
     relativeDate: RelativeDate.WITHIN_1_YEAR,
     dateQuery: '-1 year to now',
+    isRange: true,
+  },
+  {
+    relativeDate: RelativeDate.THIS_YEAR,
+    dateQuery: 'this year',
+  },
+  {
+    relativeDate: RelativeDate.THIS_MONTH,
+    dateQuery: 'this month',
+  },
+  {
+    relativeDate: RelativeDate.TODAY,
+    dateQuery: 'today',
+  },
+  {
+    relativeDate: RelativeDate.YESTERDAY,
+    dateQuery: 'yesterday',
   },
 ]
 
@@ -907,12 +927,11 @@ export class FilterEditorComponent
 
       let existingRuleArgs = existingRule?.value.split(',')
       if (this.dateCreatedRelativeDate !== null) {
+        const rd = RELATIVE_DATE_QUERYSTRINGS.find(
+          (qS) => qS.relativeDate == this.dateCreatedRelativeDate
+        )
         queryArgs.push(
-          `created:[${
-            RELATIVE_DATE_QUERYSTRINGS.find(
-              (qS) => qS.relativeDate == this.dateCreatedRelativeDate
-            ).dateQuery
-          }]`
+          `created:${rd.isRange ? `[${rd.dateQuery}]` : `"${rd.dateQuery}"`}`
         )
         if (existingRule) {
           queryArgs = existingRuleArgs
@@ -921,12 +940,11 @@ export class FilterEditorComponent
         }
       }
       if (this.dateAddedRelativeDate !== null) {
+        const rd = RELATIVE_DATE_QUERYSTRINGS.find(
+          (qS) => qS.relativeDate == this.dateAddedRelativeDate
+        )
         queryArgs.push(
-          `added:[${
-            RELATIVE_DATE_QUERYSTRINGS.find(
-              (qS) => qS.relativeDate == this.dateAddedRelativeDate
-            ).dateQuery
-          }]`
+          `added:${rd.isRange ? `[${rd.dateQuery}]` : `"${rd.dateQuery}"`}`
         )
         if (existingRule) {
           queryArgs = existingRuleArgs

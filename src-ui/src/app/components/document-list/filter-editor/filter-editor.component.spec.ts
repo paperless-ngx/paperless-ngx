@@ -96,7 +96,10 @@ import {
 import { environment } from 'src/environments/environment'
 import { ClearableBadgeComponent } from '../../common/clearable-badge/clearable-badge.component'
 import { CustomFieldsQueryDropdownComponent } from '../../common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
-import { DatesDropdownComponent } from '../../common/dates-dropdown/dates-dropdown.component'
+import {
+  DatesDropdownComponent,
+  RelativeDate,
+} from '../../common/dates-dropdown/dates-dropdown.component'
 import {
   FilterableDropdownComponent,
   Intersection,
@@ -422,7 +425,7 @@ describe('FilterEditorComponent', () => {
         value: 'created:[-1 week to now]',
       },
     ]
-    expect(component.dateCreatedRelativeDate).toEqual(0) // RELATIVE_DATE_QUERYSTRINGS['-1 week to now']
+    expect(component.dateCreatedRelativeDate).toEqual(1) // RELATIVE_DATE_QUERYSTRINGS['-1 week to now']
     expect(component.textFilter).toBeNull()
   }))
 
@@ -434,7 +437,7 @@ describe('FilterEditorComponent', () => {
         value: 'added:[-1 week to now]',
       },
     ]
-    expect(component.dateAddedRelativeDate).toEqual(0) // RELATIVE_DATE_QUERYSTRINGS['-1 week to now']
+    expect(component.dateAddedRelativeDate).toEqual(1) // RELATIVE_DATE_QUERYSTRINGS['-1 week to now']
     expect(component.textFilter).toBeNull()
   }))
 
@@ -1587,10 +1590,8 @@ describe('FilterEditorComponent', () => {
     const dateCreatedDropdown = fixture.debugElement.queryAll(
       By.directive(DatesDropdownComponent)
     )[0]
-    const dateCreatedBeforeRelativeButton = dateCreatedDropdown.queryAll(
-      By.css('button')
-    )[1]
-    dateCreatedBeforeRelativeButton.triggerEventHandler('click')
+    component.dateCreatedRelativeDate = RelativeDate.WITHIN_1_WEEK
+    dateCreatedDropdown.triggerEventHandler('datesSet')
     fixture.detectChanges()
     tick(400)
     expect(component.filterRules).toEqual([
@@ -1606,10 +1607,8 @@ describe('FilterEditorComponent', () => {
     const dateCreatedDropdown = fixture.debugElement.queryAll(
       By.directive(DatesDropdownComponent)
     )[0]
-    const dateCreatedBeforeRelativeButton = dateCreatedDropdown.queryAll(
-      By.css('button')
-    )[1]
-    dateCreatedBeforeRelativeButton.triggerEventHandler('click')
+    component.dateCreatedRelativeDate = RelativeDate.WITHIN_1_WEEK
+    dateCreatedDropdown.triggerEventHandler('datesSet')
     fixture.detectChanges()
     tick(400)
     expect(component.filterRules).toEqual([
@@ -1692,16 +1691,14 @@ describe('FilterEditorComponent', () => {
     const datesDropdown = fixture.debugElement.query(
       By.directive(DatesDropdownComponent)
     )
-    const dateCreatedBeforeRelativeButton = datesDropdown.queryAll(
-      By.css('button')
-    )[1]
-    dateCreatedBeforeRelativeButton.triggerEventHandler('click')
+    component.dateAddedRelativeDate = RelativeDate.WITHIN_1_WEEK
+    datesDropdown.triggerEventHandler('datesSet')
     fixture.detectChanges()
     tick(400)
     expect(component.filterRules).toEqual([
       {
         rule_type: FILTER_FULLTEXT_QUERY,
-        value: 'created:[-1 week to now]',
+        value: 'added:[-1 week to now]',
       },
     ])
   }))
@@ -1711,16 +1708,14 @@ describe('FilterEditorComponent', () => {
     const datesDropdown = fixture.debugElement.query(
       By.directive(DatesDropdownComponent)
     )
-    const dateCreatedBeforeRelativeButton = datesDropdown.queryAll(
-      By.css('button')
-    )[1]
-    dateCreatedBeforeRelativeButton.triggerEventHandler('click')
+    component.dateAddedRelativeDate = RelativeDate.WITHIN_1_WEEK
+    datesDropdown.triggerEventHandler('datesSet')
     fixture.detectChanges()
     tick(400)
     expect(component.filterRules).toEqual([
       {
         rule_type: FILTER_FULLTEXT_QUERY,
-        value: 'foo,created:[-1 week to now]',
+        value: 'foo,added:[-1 week to now]',
       },
     ])
   }))
