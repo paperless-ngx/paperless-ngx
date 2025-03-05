@@ -318,6 +318,7 @@ def merge(
     *,
     metadata_document_id: int | None = None,
     delete_originals: bool = False,
+    archive_fallback: bool = False,
     user: User | None = None,
 ) -> Literal["OK"]:
     logger.info(
@@ -333,7 +334,12 @@ def merge(
     for doc_id in doc_ids:
         doc = qs.get(id=doc_id)
         try:
-            with pikepdf.open(str(doc.source_path)) as pdf:
+            doc_path = (
+                doc.archive_path
+                if archive_fallback and doc.mime_type != "application/pdf"
+                else doc.source_path
+            )
+            with pikepdf.open(str(doc_path)) as pdf:
                 version = max(version, pdf.pdf_version)
                 merged_pdf.pages.extend(pdf.pages)
             affected_docs.append(doc.id)
@@ -349,7 +355,7 @@ def merge(
         Path(
             tempfile.mkdtemp(dir=settings.SCRATCH_DIR),
         )
-        / f"{'_'.join([str(doc_id) for doc_id in doc_ids])[:100]}_merged.pdf"
+        / f"{'_'.join([str(doc_id) for doc_id in affected_docs])[:100]}_merged.pdf"
     )
     merged_pdf.remove_unreferenced_resources()
     merged_pdf.save(filepath, min_version=version)
