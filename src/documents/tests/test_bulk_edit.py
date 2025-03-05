@@ -514,12 +514,23 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             Path(__file__).parent / "samples" / "simple.jpg",
             img_doc,
         )
+        img_doc_archive = self.dirs.archive_dir / "sample_image.pdf"
+        shutil.copy(
+            Path(__file__).parent
+            / "samples"
+            / "documents"
+            / "originals"
+            / "0000001.pdf",
+            img_doc_archive,
+        )
         self.img_doc = Document.objects.create(
             checksum="D",
             title="D",
             filename=img_doc,
             mime_type="image/jpeg",
         )
+        self.img_doc.archive_filename = img_doc_archive
+        self.img_doc.save()
 
     @mock.patch("documents.tasks.consume_file.s")
     def test_merge(self, mock_consume_file):
@@ -603,6 +614,32 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertEqual(
             delete_documents_args[0],
             doc_ids,
+        )
+
+    @mock.patch("documents.tasks.consume_file.s")
+    def test_merge_with_archive_fallback(self, mock_consume_file):
+        """
+        GIVEN:
+            - Existing documents
+        WHEN:
+            - Merge action is called with 2 documents, one of which is an image and archive_fallback is set to True
+        THEN:
+            - Image document should be included
+        """
+        doc_ids = [self.doc2.id, self.img_doc.id]
+
+        result = bulk_edit.merge(doc_ids, archive_fallback=True)
+        self.assertEqual(result, "OK")
+
+        expected_filename = (
+            f"{'_'.join([str(doc_id) for doc_id in doc_ids])[:100]}_merged.pdf"
+        )
+
+        mock_consume_file.assert_called()
+        consume_file_args, _ = mock_consume_file.call_args
+        self.assertEqual(
+            Path(consume_file_args[0].original_file).name,
+            expected_filename,
         )
 
     @mock.patch("documents.tasks.consume_file.delay")

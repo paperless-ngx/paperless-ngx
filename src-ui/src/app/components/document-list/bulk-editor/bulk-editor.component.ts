@@ -857,6 +857,9 @@ export class BulkEditorComponent
         if (mergeDialog.deleteOriginals) {
           args['delete_originals'] = true
         }
+        if (mergeDialog.archiveFallback) {
+          args['archive_fallback'] = true
+        }
         mergeDialog.buttonsEnabled = false
         this.executeBulkOperation(modal, 'merge', args, mergeDialog.documentIDs)
         this.toastService.showInfo(
