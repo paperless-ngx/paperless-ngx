@@ -1446,6 +1446,11 @@ class BulkEditSerializer(
                 raise serializers.ValidationError("delete_originals must be a boolean")
         else:
             parameters["delete_originals"] = False
+        if "archive_fallback" in parameters:
+            if not isinstance(parameters["archive_fallback"], bool):
+                raise serializers.ValidationError("archive_fallback must be a boolean")
+        else:
+            parameters["archive_fallback"] = False
 
     def validate(self, attrs):
         method = attrs["method"]
@@ -2018,6 +2023,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
             "assign_change_users",
             "assign_change_groups",
             "assign_custom_fields",
+            "assign_custom_fields_values",
             "remove_all_tags",
             "remove_tags",
             "remove_all_correspondents",

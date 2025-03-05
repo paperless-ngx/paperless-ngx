@@ -28,6 +28,7 @@ from documents.caching import CACHE_50_MINUTES
 from documents.caching import CLASSIFIER_HASH_KEY
 from documents.caching import CLASSIFIER_MODIFIED_KEY
 from documents.caching import CLASSIFIER_VERSION_KEY
+from documents.data_models import DocumentSource
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -39,7 +40,10 @@ from documents.models import SavedView
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Workflow
+from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
+from documents.signals.handlers import run_workflows
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DocumentConsumeDelayMixin
 
@@ -1362,7 +1366,69 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.assertEqual(input_doc.original_file.name, "simple.pdf")
         self.assertEqual(overrides.filename, "simple.pdf")
-        self.assertEqual(overrides.custom_field_ids, [custom_field.id])
+        self.assertEqual(overrides.custom_fields, {custom_field.id: None})
+
+    def test_upload_with_custom_fields_and_workflow(self):
+        """
+        GIVEN: A document with a source file
+        WHEN: Upload the document with custom fields and a workflow
+        THEN: Metadata is set correctly, mimicking what happens in the real consumer plugin
+        """
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
+
+        cf = CustomField.objects.create(
+            name="stringfield",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        cf2 = CustomField.objects.create(
+            name="intfield",
+            data_type=CustomField.FieldDataType.INT,
+        )
+
+        trigger1 = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
+        )
+        action1 = WorkflowAction.objects.create(
+            assign_title="Doc title",
+        )
+        action1.assign_custom_fields.add(cf2)
+        action1.assign_custom_fields_values = {cf2.id: 123}
+        action1.save()
+
+        w1 = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w1.triggers.add(trigger1)
+        w1.actions.add(action1)
+        w1.save()
+
+        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {
+                    "document": f,
+                    "custom_fields": [cf.id],
+                },
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.consume_file_mock.assert_called_once()
+
+        input_doc, overrides = self.get_last_consume_delay_call_args()
+
+        new_overrides, msg = run_workflows(
+            trigger_type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            document=input_doc,
+            logging_group=None,
+            overrides=overrides,
+        )
+        overrides.update(new_overrides)
+        self.assertEqual(overrides.custom_fields, {cf.id: None, cf2.id: 123})
 
     def test_upload_with_webui_source(self):
         """

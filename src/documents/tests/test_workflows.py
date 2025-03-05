@@ -133,6 +133,9 @@ class TestWorkflows(
         action.assign_change_groups.add(self.group1.pk)
         action.assign_custom_fields.add(self.cf1.pk)
         action.assign_custom_fields.add(self.cf2.pk)
+        action.assign_custom_fields_values = {
+            self.cf2.pk: 42,
+        }
         action.save()
         w = Workflow.objects.create(
             name="Workflow 1",
@@ -208,6 +211,10 @@ class TestWorkflows(
                 self.assertEqual(
                     list(document.custom_fields.all().values_list("field", flat=True)),
                     [self.cf1.pk, self.cf2.pk],
+                )
+                self.assertEqual(
+                    document.custom_fields.get(field=self.cf2.pk).value,
+                    42,
                 )
 
         info = cm.output[0]
@@ -1215,11 +1222,11 @@ class TestWorkflows(
     def test_document_updated_workflow_existing_custom_field(self):
         """
         GIVEN:
-            - Existing workflow with UPDATED trigger and action that adds a custom field
+            - Existing workflow with UPDATED trigger and action that assigns a custom field with a value
         WHEN:
             - Document is updated that already contains the field
         THEN:
-            - Document update succeeds without trying to re-create the field
+            - Document update succeeds and updates the field
         """
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
@@ -1227,6 +1234,8 @@ class TestWorkflows(
         )
         action = WorkflowAction.objects.create()
         action.assign_custom_fields.add(self.cf1)
+        action.assign_custom_fields_values = {self.cf1.pk: "new value"}
+        action.save()
         w = Workflow.objects.create(
             name="Workflow 1",
             order=0,
@@ -1250,6 +1259,9 @@ class TestWorkflows(
             {"document_type": self.dt.id},
             format="json",
         )
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.custom_fields.get(field=self.cf1).value, "new value")
 
     def test_document_updated_workflow_merge_permissions(self):
         """

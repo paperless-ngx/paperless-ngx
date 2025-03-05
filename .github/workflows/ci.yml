@@ -271,7 +271,6 @@ jobs:
           name: playwright-report-${{ matrix.shard-index }}
           path: src-ui/playwright-report
           retention-days: 7
-          if-no-files-found: error
       -
         name: Upload frontend test results
         if: always()
@@ -280,7 +279,6 @@ jobs:
           name: junit-report-${{ matrix.shard-index }}
           path: src-ui/junit-report-${{ matrix.shard-index }}.xml
           retention-days: 7
-          if-no-files-found: error
 
   tests-coverage-upload:
     name: "Upload to Codecov"

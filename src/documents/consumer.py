@@ -806,13 +806,19 @@ class ConsumerPlugin(
             }
             set_permissions_for_object(permissions=permissions, object=document)
 
-        if self.metadata.custom_field_ids:
-            for field_id in self.metadata.custom_field_ids:
-                field = CustomField.objects.get(pk=field_id)
-                CustomFieldInstance.objects.create(
-                    field=field,
-                    document=document,
-                )  # adds to document
+        if self.metadata.custom_fields:
+            for field in CustomField.objects.filter(
+                id__in=self.metadata.custom_fields.keys(),
+            ).distinct():
+                value_field_name = CustomFieldInstance.get_value_field_name(
+                    data_type=field.data_type,
+                )
+                args = {
+                    "field": field,
+                    "document": document,
+                    value_field_name: self.metadata.custom_fields.get(field.id, None),
+                }
+                CustomFieldInstance.objects.create(**args)  # adds to document
 
     def _write(self, storage_type, source, target):
         with (
