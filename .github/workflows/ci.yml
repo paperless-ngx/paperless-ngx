@@ -283,6 +283,7 @@ jobs:
   tests-coverage-upload:
     name: "Upload to Codecov"
     runs-on: ubuntu-24.04
+    if: ${{ !cancelled() }}
     needs:
       - tests-backend
       - tests-frontend
@@ -344,7 +345,6 @@ jobs:
           directory: src/
       -
         name: Upload backend test results to Codecov
-        if: ${{ !cancelled() }}
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
