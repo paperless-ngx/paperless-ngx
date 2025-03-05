@@ -17,7 +17,7 @@ import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { HotKeyService } from 'src/app/services/hot-key.service'
 import { SelectionDataItem } from 'src/app/services/rest/document.service'
-import { popperOptionsReenablePreventOverflow } from 'src/app/utils/popper-options'
+import { pngxPopperOptions } from 'src/app/utils/popper-options'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
 import {
@@ -380,7 +380,7 @@ export class FilterableDropdownComponent
   @ViewChild('dropdown') dropdown: NgbDropdown
   @ViewChild('buttonItems') buttonItems: ElementRef
 
-  public popperOptions = popperOptionsReenablePreventOverflow
+  public popperOptions = pngxPopperOptions
 
   filterText: string
 
