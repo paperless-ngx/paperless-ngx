@@ -386,7 +386,7 @@ jobs:
         name: Build frontend and upload analysis
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        run: cd src-ui && ng build --configuration=production
+        run: cd src-ui && pnpm run build --configuration=production
 
   build-docker-image:
     name: Build Docker image for ${{ github.ref_name }}
