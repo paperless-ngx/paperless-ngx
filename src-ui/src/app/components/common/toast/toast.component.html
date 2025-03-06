@@ -48,7 +48,7 @@
             </details>
             }
             @if (toast.action) {
-            <p class="mb-0 mt-2"><button class="btn btn-sm btn-outline-secondary" (click)="close.emit(toast); toast.action()">{{toast.actionName}}</button></p>
+            <p class="mb-0 mt-2"><button class="btn btn-sm btn-outline-secondary" (click)="closed.emit(toast); toast.action()">{{toast.actionName}}</button></p>
             }
         </div>
         <button type="button" class="btn-close ms-auto flex-shrink-0" data-bs-dismiss="toast" aria-label="Close" (click)="closed.emit(toast);"></button>
