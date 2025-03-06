@@ -203,7 +203,7 @@ jobs:
         with:
           path: |
             ~/.pnpm-store
-            ~/.cache
+            ~/.cache/ms-playwright
           key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
       -
         name: Install dependencies
@@ -244,7 +244,7 @@ jobs:
         with:
           path: |
             ~/.pnpm-store
-            ~/.cache
+            ~/.cache/ms-playwright
           key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
       - name: Re-link Angular cli
         run: cd src-ui && pnpm link @angular/cli
@@ -270,7 +270,7 @@ jobs:
           if-no-files-found: error
       -
         name: Run Playwright e2e tests
-        run: cd src-ui && pnpm exec playwright install --with-deps && pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
+        run: cd src-ui && pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
       -
         name: Upload Playwright test results
         if: always()
@@ -377,7 +377,7 @@ jobs:
         with:
           path: |
             ~/.pnpm-store
-            ~/.cache
+            ~/.cache/ms-playwright
           key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
       -
         name: Re-link Angular cli
