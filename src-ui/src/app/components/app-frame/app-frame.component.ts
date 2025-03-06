@@ -272,6 +272,7 @@ export class AppFrameComponent
 
   search() {
     this.closeMenu()
+    this.list.currentPage = 1
     this.list.quickFilter([
       {
         rule_type: FILTER_FULLTEXT_QUERY,
