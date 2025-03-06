@@ -278,10 +278,15 @@ urlpatterns = [
         include(
             [
                 # see allauth/account/urls.py
-                # login, logout, signup
+                # login, logout, signup, account_inactive
                 path("login/", allauth_account_views.login, name="account_login"),
                 path("logout/", allauth_account_views.logout, name="account_logout"),
                 path("signup/", allauth_account_views.signup, name="account_signup"),
+                path(
+                    "account_inactive/",
+                    allauth_account_views.account_inactive,
+                    name="account_inactive",
+                ),
                 # password reset
                 path(
                     "password/",
