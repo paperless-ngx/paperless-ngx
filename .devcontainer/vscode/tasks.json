@@ -33,7 +33,7 @@
 			"label": "Start: Frontend Angular",
 			"description": "Start the Frontend Angular Dev Server",
 			"type": "shell",
-			"command": "npm start",
+			"command": "pnpm start",
 			"isBackground": true,
 			"options": {
 				"cwd": "${workspaceFolder}/src-ui"
@@ -173,8 +173,8 @@
 		},
 		{
 			"label": "Maintenance: Install Frontend Dependencies",
-			"description": "Install frontend (npm) dependencies",
-			"type": "npm",
+			"description": "Install frontend (pnpm) dependencies",
+			"type": "pnpm",
 			"script": "install",
 			"path": "src-ui",
 			"group": "clean",
@@ -185,7 +185,7 @@
 			"description": "Clean install frontend dependencies and build the frontend for production",
 			"label": "Maintenance: Compile frontend for production",
 			"type": "shell",
-			"command": "npm ci && ./node_modules/.bin/ng build --configuration production",
+			"command": "pnpm install && ./node_modules/.bin/ng build --configuration production",
 			"group": "none",
 			"presentation": {
 				"echo": true,

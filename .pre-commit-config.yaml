@@ -32,7 +32,7 @@ repos:
     rev: v2.4.0
     hooks:
       - id: codespell
-        exclude: "(^src-ui/src/locale/)|(^src-ui/e2e/)|(^src/paperless_mail/tests/samples/)"
+        exclude: "(^src-ui/src/locale/)|(^src-ui/pnpm-lock.yaml)|(^src-ui/e2e/)|(^src/paperless_mail/tests/samples/)"
         exclude_types:
           - pofile
           - json

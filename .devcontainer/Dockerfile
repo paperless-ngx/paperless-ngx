@@ -149,7 +149,7 @@ RUN --mount=type=cache,target=/root/.cache/uv,id=pip-cache \
     && apt-get install --yes --quiet ${BUILD_PACKAGES}
 
 RUN set -eux \
-  && npm update npm -g
+  && npm update -g pnpm
 
 # add users, setup scripts
 # Mount the compiled frontend to expected location

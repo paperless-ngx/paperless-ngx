@@ -4,15 +4,15 @@
 # Stage: compile-frontend
 # Purpose: Compiles the frontend
 # Notes:
-#  - Does NPM stuff with Typescript and such
+#  - Does PNPM stuff with Typescript and such
 FROM --platform=$BUILDPLATFORM docker.io/node:20-bookworm-slim AS compile-frontend
 
 COPY ./src-ui /src/src-ui
 
 WORKDIR /src/src-ui
 RUN set -eux \
-  && npm update npm -g \
-  && npm ci
+  && npm update -g pnpm \
+  && pnpm install
 
 ARG PNGX_TAG_VERSION=
 # Add the tag to the environment file if its a tagged dev build

@@ -5,8 +5,8 @@ version: 2
 enable-beta-ecosystems: true
 updates:
 
-  # Enable version updates for npm
-  - package-ecosystem: "npm"
+  # Enable version updates for pnpm
+  - package-ecosystem: "pnpm"
     target-branch: "dev"
     # Look for `package.json` and `lock` files in the `/src-ui` directory
     directory: "/src-ui"

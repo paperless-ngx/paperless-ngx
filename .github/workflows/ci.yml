@@ -186,25 +186,29 @@ jobs:
       - pre-commit
     steps:
       - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
       -
         name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          cache: 'npm'
-          cache-dependency-path: 'src-ui/package-lock.json'
+          cache: 'pnpm'
+          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
         id: cache-frontend-deps
         uses: actions/cache@v4
         with:
           path: |
-            ~/.npm
+            ~/.pnpm-store
             ~/.cache
-          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
+          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
       -
         name: Install dependencies
         if: steps.cache-frontend-deps.outputs.cache-hit != 'true'
-        run: cd src-ui && npm ci
+        run: cd src-ui && pnpm install
       -
         name: Install Playwright
         if: steps.cache-frontend-deps.outputs.cache-hit != 'true'
@@ -223,31 +227,35 @@ jobs:
         shard-count: [4]
     steps:
       - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
       -
         name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          cache: 'npm'
-          cache-dependency-path: 'src-ui/package-lock.json'
+          cache: 'pnpm'
+          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
         id: cache-frontend-deps
         uses: actions/cache@v4
         with:
           path: |
-            ~/.npm
+            ~/.pnpm-store
             ~/.cache
           key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
       - name: Re-link Angular cli
-        run: cd src-ui && npm link @angular/cli
+        run: cd src-ui && pnpm link @angular/cli
       -
         name: Linting checks
-        run: cd src-ui && npm run lint
+        run: cd src-ui && pnpm run lint
       -
         name: Run Jest unit tests
         env:
           JEST_JUNIT_OUTPUT_FILE: junit-report-${{ matrix.shard-index }}.xml
-        run: cd src-ui && npm run test -- --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
+        run: cd src-ui && pnpm run test --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
       -
         name: Upload Jest coverage
         if: always()
@@ -351,24 +359,29 @@ jobs:
           flags: backend
           directory: src/
       -
+        name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      -
         name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          cache: 'npm'
-          cache-dependency-path: 'src-ui/package-lock.json'
+          cache: 'pnpm'
+          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       -
         name: Cache frontend dependencies
         id: cache-frontend-deps
         uses: actions/cache@v4
         with:
           path: |
-            ~/.npm
+            ~/.pnpm-store
             ~/.cache
           key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
       -
         name: Re-link Angular cli
-        run: cd src-ui && npm link @angular/cli
+        run: cd src-ui && pnpm link @angular/cli
       -
         name: Build frontend and upload analysis
         env:
