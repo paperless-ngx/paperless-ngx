@@ -212,7 +212,7 @@ jobs:
       -
         name: Install Playwright
         if: steps.cache-frontend-deps.outputs.cache-hit != 'true'
-        run: cd src-ui && npx playwright install --with-deps
+        run: cd src-ui && pnpm playwright install --with-deps
 
   tests-frontend:
     name: "Frontend Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
