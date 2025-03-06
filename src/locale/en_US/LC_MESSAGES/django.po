@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-06 14:43-0800\n"
+"POT-Creation-Date: 2025-03-06 14:46-0800\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1194,6 +1194,22 @@ msgstr ""
 msgid "Invalid variable detected."
 msgstr ""
 
+#: documents/templates/account/account_inactive.html:5
+msgid "Paperless-ngx account inactive"
+msgstr ""
+
+#: documents/templates/account/account_inactive.html:9
+msgid "Account inactve."
+msgstr ""
+
+#: documents/templates/account/account_inactive.html:14
+msgid "This account is inactive."
+msgstr ""
+
+#: documents/templates/account/account_inactive.html:16
+msgid "Return to login"
+msgstr ""
+
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
@@ -1698,7 +1714,7 @@ msgstr ""
 msgid "Chinese Traditional"
 msgstr ""
 
-#: paperless/urls.py:369
+#: paperless/urls.py:374
 msgid "Paperless-ngx administration"
 msgstr ""
 
