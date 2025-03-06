@@ -4,6 +4,7 @@ import zoneinfo
 from pathlib import Path
 from unittest import mock
 
+import pytest
 from django.test import TestCase
 from django.test import override_settings
 from django.utils import timezone
@@ -84,6 +85,17 @@ class TestDocument(TestCase):
             created=timezone.datetime(2020, 12, 25, tzinfo=zoneinfo.ZoneInfo("UTC")),
         )
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test.pdf")
+
+    def test_shorter_file_name_for_archive(self):
+        doc = Document(
+            mime_type="application/pdf",
+            title="This file has a very long filename that will exceed filename limits on some obscure filesystems, such as eCryptfs which accepts up to 143 characters",
+            created=timezone.datetime(2025, 3, 7, tzinfo=zoneinfo.ZoneInfo("UTC")),
+        )
+        self.assertEqual(len(doc.get_public_filename()), 163)
+        self.assertLessEqual(len(doc.get_public_filename(basename_max_length=120)), 143)
+        with pytest.raises(ValueError):
+            doc.get_public_filename(basename_max_length=19)
 
     @override_settings(
         TIME_ZONE="Europe/Berlin",

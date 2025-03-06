@@ -332,11 +332,26 @@ class Document(SoftDeleteModel, ModelWithOwner):
     def archive_file(self):
         return Path(self.archive_path).open("rb")
 
-    def get_public_filename(self, *, archive=False, counter=0, suffix=None) -> str:
+    def get_public_filename(
+        self,
+        *,
+        archive=False,
+        counter=0,
+        suffix=None,
+        basename_max_length=None,
+    ) -> str:
         """
         Returns a sanitized filename for the document, not including any paths.
         """
+        if basename_max_length and basename_max_length < 20:
+            raise ValueError(
+                f"The base name length limit ({basename_max_length}) should be at least 20 characters",
+            )
+
         result = str(self)
+
+        if basename_max_length:
+            result = result[:basename_max_length]
 
         if counter:
             result += f"_{counter:02}"

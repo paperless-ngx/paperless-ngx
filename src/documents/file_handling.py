@@ -96,7 +96,13 @@ def generate_filename(
     counter=0,
     append_gpg=True,
     archive_filename=False,
+    basename_max_length=None,
 ):
+    if basename_max_length and basename_max_length < 20:
+        raise ValueError(
+            f"The base name length limit ({basename_max_length}) should be at least 20 characters",
+        )
+
     path = ""
 
     def format_filename(document: Document, template_str: str) -> str | None:
@@ -135,6 +141,8 @@ def generate_filename(
     # If we have one, render it
     if filename_format is not None:
         path = format_filename(doc, filename_format)
+        if basename_max_length:
+            path = path[:basename_max_length]
 
     counter_str = f"_{counter:02}" if counter else ""
     filetype_str = ".pdf" if archive_filename else doc.file_type

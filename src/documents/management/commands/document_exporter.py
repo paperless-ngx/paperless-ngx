@@ -427,9 +427,13 @@ class Command(CryptMixin, BaseCommand):
                     document,
                     counter=filename_counter,
                     append_gpg=False,
+                    basename_max_length=120,
                 )
             else:
-                base_name = document.get_public_filename(counter=filename_counter)
+                base_name = document.get_public_filename(
+                    counter=filename_counter,
+                    basename_max_length=120,
+                )
 
             if base_name not in self.exported_files:
                 self.exported_files.add(base_name)

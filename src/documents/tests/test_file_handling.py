@@ -5,6 +5,7 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
+import pytest
 from auditlog.context import disable_auditlog
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -1129,6 +1130,20 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
 
         self.assertEqual(generate_filename(owned_doc), "user1/The Title.pdf")
         self.assertEqual(generate_filename(no_owner_doc), "none/does matter.pdf")
+
+    @override_settings(
+        FILENAME_FORMAT="{title}",
+    )
+    def test_generate_shorted_file_name(self):
+        doc = Document.objects.create(
+            mime_type="application/pdf",
+            title="This file has a very long filename that will exceed filename limits on some obscure filesystems, such as eCryptfs which accepts up to 143 characters",
+            checksum="3",
+        )
+        self.assertEqual(len(generate_filename(doc)), 152)
+        self.assertLessEqual(len(generate_filename(doc, basename_max_length=120)), 143)
+        with pytest.raises(ValueError):
+            generate_filename(doc, basename_max_length=19)
 
     @override_settings(
         FILENAME_FORMAT="{original_name}",

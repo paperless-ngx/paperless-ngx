@@ -324,9 +324,11 @@ must be provided to import. If this value is lost, the export cannot be imported
 
 !!! warning
 
-    If exporting with the file name format, there may be errors due to
-    your operating system's maximum path lengths.  Try adjusting the export
-    target or consider not using the filename format.
+    Some operating systems, particularly those using encrypted filesystems
+    (e.g., some Synology and QNAP NAS devices), impose strict limits
+    on file name lengths (143 characters).
+    To ensure compatibility, file names may be truncated to fit within this limit,
+    meaning the configured filename format may not be fully respected.
 
 ### Document importer {#importer}
 
