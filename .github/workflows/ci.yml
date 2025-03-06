@@ -270,7 +270,7 @@ jobs:
           if-no-files-found: error
       -
         name: Run Playwright e2e tests
-        run: cd src-ui && npx playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
+        run: cd src-ui && pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
       -
         name: Upload Playwright test results
         if: always()
