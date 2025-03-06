@@ -227,25 +227,7 @@ lint.per-file-ignores."src/documents/tests/test_consumer.py" = [
 lint.per-file-ignores."src/documents/tests/test_file_handling.py" = [
   "PTH",
 ] # TODO Enable & remove
-lint.per-file-ignores."src/documents/tests/test_management.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/documents/tests/test_management_consumer.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/documents/tests/test_management_exporter.py" = [
-  "PTH",
-] # TODO Enable & remove
 lint.per-file-ignores."src/documents/tests/test_migration_archive_files.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/documents/tests/test_migration_document_pages_count.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/documents/tests/test_migration_mime_type.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/documents/tests/test_sanity_check.py" = [
   "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/views.py" = [
