@@ -203,7 +203,7 @@ jobs:
         with:
           path: |
             ~/.pnpm-store
-            ~/.cache/ms-playwright
+            ~/.cache
           key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
       -
         name: Install dependencies
@@ -244,8 +244,8 @@ jobs:
         with:
           path: |
             ~/.pnpm-store
-            ~/.cache/ms-playwright
-          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
+            ~/.cache
+          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
       - name: Re-link Angular cli
         run: cd src-ui && pnpm link @angular/cli
       -
@@ -377,7 +377,7 @@ jobs:
         with:
           path: |
             ~/.pnpm-store
-            ~/.cache/ms-playwright
+            ~/.cache
           key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
       -
         name: Re-link Angular cli
