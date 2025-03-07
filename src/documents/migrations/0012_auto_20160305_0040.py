@@ -61,7 +61,7 @@ def move_documents_and_create_thumbnails(apps, schema_editor):
         ),
     )
 
-    Path(settings.SCRATCH_DIR).mkdir(parents=True, exists_ok=True)
+    Path(settings.SCRATCH_DIR).mkdir(parents=True, exist_ok=True)
 
     for f in sorted(documents):
         if not f.endswith("gpg"):
