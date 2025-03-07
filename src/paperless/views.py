@@ -32,6 +32,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from documents.index import DelayedQuery
 from documents.permissions import PaperlessObjectPermissions
 from paperless.filters import GroupFilterSet
 from paperless.filters import UserFilterSet
@@ -66,19 +67,17 @@ class StandardPagination(PageNumberPagination):
         )
 
     def get_all_result_ids(self):
-        ids = []
-        if hasattr(self.page.paginator.object_list, "saved_results"):
-            results_page = self.page.paginator.object_list.saved_results[0]
-            if results_page is not None:
-                for doc_num in results_page.results.docs():
-                    try:
-                        fields = results_page.results.searcher.ixreader.stored_fields(
-                            doc_num,
-                        )
-                        if "id" in fields:
-                            ids.append(fields["id"])
-                    except Exception:
-                        pass
+        query = self.page.paginator.object_list
+        if isinstance(query, DelayedQuery):
+            try:
+                ids = [
+                    query.searcher.ixreader.stored_fields(
+                        doc_num,
+                    )["id"]
+                    for doc_num in query.saved_results.get(0).results.docs()
+                ]
+            except Exception:
+                pass
         else:
             ids = self.page.paginator.object_list.values_list("pk", flat=True)
         return ids
