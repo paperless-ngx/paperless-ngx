@@ -160,72 +160,28 @@ jobs:
             --python ${{ steps.setup-python.outputs.python-version }} \
             --dev \
             --frozen \
-            pytest --junitxml=junit-${{ steps.setup-python.outputs.python-version }}.xml
+            pytest
       -
-        name: Upload backend test results
+        name: Upload backend test results to Codecov
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: codecov/test-results-action@v1
         with:
-          name: backend-test-results-${{ steps.setup-python.outputs.python-version }}
-          path: junit-${{ steps.setup-python.outputs.python-version }}.xml
-          retention-days: 7
-          if-no-files-found: error
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: ${{ matrix.python-version }}
+          files: junit.xml
       -
-        name: Upload backend test coverage
-        if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION }}
-        uses: actions/upload-artifact@v4
+        name: Upload backend coverage to Codecov
+        uses: codecov/codecov-action@v5
         with:
-          name: backend-coverage-report
-          path: coverage.xml
-          retention-days: 7
-          if-no-files-found: error
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: ${{ matrix.python-version }}
+          files: coverage.xml
       -
         name: Stop containers
         if: always()
         run: |
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml logs
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml down
-
-  backend-tests-data-upload:
-    name: "Upload backend tests data to Codecov"
-    runs-on: ubuntu-24.04
-    if: >-
-      always() &&
-      (needs.tests-backend.result == 'failure' || needs.tests-backend.result == 'success')
-    needs:
-      - tests-backend
-    steps:
-      -
-        uses: actions/checkout@v4
-      # Results
-      -
-        name: Download backend test results artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: src/
-          pattern: backend-test-results-*
-          merge-multiple: true
-      -
-        name: Upload backend test results to Codecov
-        uses: codecov/test-results-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          flags: backend
-          directory: src/
-      # Coverage
-      -
-        name: Download backend coverage artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-coverage-report
-          path: src/
-      -
-        name: Upload backend coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          flags: backend
-          directory: src/
 
   install-frontend-dependencies:
     name: "Install Frontend Dependencies"
@@ -303,14 +259,12 @@ jobs:
         if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          flags: frontend
           directory: src-ui/
       -
         name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          flags: frontend
           directory: src-ui/coverage/
 
   frontend-bundle-analysis:
