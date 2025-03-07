@@ -259,12 +259,14 @@ jobs:
         if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          flags: node-${{ matrix.node-version }}
           directory: src-ui/
       -
         name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          flags: node-${{ matrix.node-version }}
           directory: src-ui/coverage/
 
   frontend-bundle-analysis:
