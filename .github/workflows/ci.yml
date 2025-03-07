@@ -308,8 +308,7 @@ jobs:
     runs-on: ubuntu-24.04
     if: >-
       always() &&
-      (needs.tests-backend.result == 'failure' || needs.tests-backend.result == 'success') &&
-      (needs.tests-frontend.result == 'failure' || needs.tests-frontend.result == 'success')
+      (needs.tests-backend.result == 'failure' || needs.tests-backend.result == 'success')
     needs:
       - tests-backend
     steps:
@@ -317,7 +316,7 @@ jobs:
         uses: actions/checkout@v4
       # Results
       -
-        name: Download backend test results
+        name: Download backend test results artifacts
         uses: actions/download-artifact@v4
         with:
           path: src/
@@ -332,7 +331,7 @@ jobs:
           directory: src/
       # Coverage
       -
-        name: Download backend coverage
+        name: Download backend coverage artifacts
         uses: actions/download-artifact@v4
         with:
           name: backend-coverage-report
