@@ -12,6 +12,8 @@ COPY ./src-ui /src/src-ui
 WORKDIR /src/src-ui
 RUN set -eux \
   && npm update -g pnpm \
+  && npm install -g corepack@latest \
+  && corepack enable \
   && pnpm install
 
 ARG PNGX_TAG_VERSION=
