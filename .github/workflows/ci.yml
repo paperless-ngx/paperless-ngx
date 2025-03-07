@@ -252,62 +252,7 @@ jobs:
         run: cd src-ui && npm run lint
       -
         name: Run Jest unit tests
-        env:
-          JEST_JUNIT_OUTPUT_FILE: junit-report-${{ matrix.shard-index }}.xml
         run: cd src-ui && npm run test -- --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
-      -
-        name: Upload Jest coverage
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: jest-coverage-report-${{ matrix.shard-index }}
-          path: |
-            src-ui/coverage/coverage-final.json
-            src-ui/coverage/lcov.info
-            src-ui/coverage/clover.xml
-          retention-days: 7
-          if-no-files-found: error
-      -
-        name: Run Playwright e2e tests
-        run: cd src-ui && npx playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
-      -
-        name: Upload Playwright test reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report-${{ matrix.shard-index }}
-          path: src-ui/playwright-report
-          retention-days: 7
-      -
-        name: Upload frontend test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: junit-report-${{ matrix.shard-index }}
-          path: src-ui/junit-report-${{ matrix.shard-index }}.xml
-          retention-days: 7
-
-  tests-data-upload:
-    name: "Upload tests data to Codecov"
-    runs-on: ubuntu-24.04
-    if: >-
-      always() &&
-      (needs.tests-backend.result == 'failure' || needs.tests-backend.result == 'success') &&
-      (needs.tests-frontend.result == 'failure' || needs.tests-frontend.result == 'success')
-    needs:
-      - tests-backend
-      - tests-frontend
-    steps:
-      -
-        uses: actions/checkout@v4
-      # Results
-      -
-        name: Download frontend test results
-        uses: actions/download-artifact@v4
-        with:
-          path: src-ui/junit/
-          pattern: junit-report-*
-          merge-multiple: true
       -
         name: Upload frontend test results to Codecov
         uses: codecov/test-results-action@v1
@@ -316,56 +261,23 @@ jobs:
           flags: frontend
           directory: src-ui/junit/
       -
-        name: Download backend test results
-        uses: actions/download-artifact@v4
-        with:
-          path: src/
-          pattern: backend-test-results-*
-          merge-multiple: true
-      -
-        name: Upload backend test results to Codecov
-        uses: codecov/test-results-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          flags: backend
-          directory: src/
-      # Coverage
-      -
-        name: Download frontend jest coverage
-        uses: actions/download-artifact@v4
-        with:
-          path: src-ui/coverage/
-          pattern: jest-coverage-report-*
-      -
-        name: Download Playwright test reports
-        uses: actions/download-artifact@v4
-        with:
-          path: src-ui/coverage/
-          pattern: playwright-report-*
-          merge-multiple: true
-      -
         name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: frontend
           directory: src-ui/coverage/
-          # dont include backend coverage files here
-          files: '!coverage.xml'
       -
-        name: Download backend coverage
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-coverage-report
-          path: src/
-      -
-        name: Upload backend coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          flags: backend
-          directory: src/
-      # Bundle analysis
+        name: Run Playwright e2e tests
+        run: cd src-ui && npx playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
+
+  frontend-bundle-analysis:
+    name: "Frontend Bundle Analysis"
+    runs-on: ubuntu-24.04
+    needs:
+      - tests-frontend
+    steps:
+      - uses: actions/checkout@v4
       -
         name: Use Node.js 20
         uses: actions/setup-node@v4
@@ -390,6 +302,48 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: cd src-ui && ng build --configuration=production
+
+  tests-data-upload:
+    name: "Upload tests data to Codecov"
+    runs-on: ubuntu-24.04
+    if: >-
+      always() &&
+      (needs.tests-backend.result == 'failure' || needs.tests-backend.result == 'success') &&
+      (needs.tests-frontend.result == 'failure' || needs.tests-frontend.result == 'success')
+    needs:
+      - tests-backend
+    steps:
+      -
+        uses: actions/checkout@v4
+      # Results
+      -
+        name: Download backend test results
+        uses: actions/download-artifact@v4
+        with:
+          path: src/
+          pattern: backend-test-results-*
+          merge-multiple: true
+      -
+        name: Upload backend test results to Codecov
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: backend
+          directory: src/
+      # Coverage
+      -
+        name: Download backend coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-coverage-report
+          path: src/
+      -
+        name: Upload backend coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: backend
+          directory: src/
 
   build-docker-image:
     name: Build Docker image for ${{ github.ref_name }}
