@@ -259,7 +259,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: frontend
-          directory: src-ui/junit/
+          directory: src-ui/
       -
         name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v5
@@ -303,8 +303,8 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: cd src-ui && ng build --configuration=production
 
-  tests-data-upload:
-    name: "Upload tests data to Codecov"
+  backend-tests-data-upload:
+    name: "Upload backend tests data to Codecov"
     runs-on: ubuntu-24.04
     if: >-
       always() &&
