@@ -186,6 +186,47 @@ jobs:
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml logs
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml down
 
+  backend-tests-data-upload:
+    name: "Upload backend tests data to Codecov"
+    runs-on: ubuntu-24.04
+    if: >-
+      always() &&
+      (needs.tests-backend.result == 'failure' || needs.tests-backend.result == 'success')
+    needs:
+      - tests-backend
+    steps:
+      -
+        uses: actions/checkout@v4
+      # Results
+      -
+        name: Download backend test results artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: src/
+          pattern: backend-test-results-*
+          merge-multiple: true
+      -
+        name: Upload backend test results to Codecov
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: backend
+          directory: src/
+      # Coverage
+      -
+        name: Download backend coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-coverage-report
+          path: src/
+      -
+        name: Upload backend coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: backend
+          directory: src/
+
   install-frontend-dependencies:
     name: "Install Frontend Dependencies"
     runs-on: ubuntu-24.04
@@ -303,47 +344,6 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: cd src-ui && ng build --configuration=production
-
-  backend-tests-data-upload:
-    name: "Upload backend tests data to Codecov"
-    runs-on: ubuntu-24.04
-    if: >-
-      always() &&
-      (needs.tests-backend.result == 'failure' || needs.tests-backend.result == 'success')
-    needs:
-      - tests-backend
-    steps:
-      -
-        uses: actions/checkout@v4
-      # Results
-      -
-        name: Download backend test results artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: src/
-          pattern: backend-test-results-*
-          merge-multiple: true
-      -
-        name: Upload backend test results to Codecov
-        uses: codecov/test-results-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          flags: backend
-          directory: src/
-      # Coverage
-      -
-        name: Download backend coverage artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-coverage-report
-          path: src/
-      -
-        name: Upload backend coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          flags: backend
-          directory: src/
 
   build-docker-image:
     name: Build Docker image for ${{ github.ref_name }}
