@@ -70,9 +70,11 @@ class StandardPagination(PageNumberPagination):
         if hasattr(self.page.paginator.object_list, "saved_results"):
             results_page = self.page.paginator.object_list.saved_results[0]
             if results_page is not None:
-                for i in range(len(results_page.results.docs())):
+                for doc_num in results_page.results.docs():
                     try:
-                        fields = results_page.results.fields(i)
+                        fields = results_page.results.searcher.ixreader.stored_fields(
+                            doc_num,
+                        )
                         if "id" in fields:
                             ids.append(fields["id"])
                     except Exception:
