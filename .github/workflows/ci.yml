@@ -254,8 +254,12 @@ jobs:
         name: Run Jest unit tests
         run: cd src-ui && npm run test -- --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
       -
+        name: Run Playwright e2e tests
+        run: cd src-ui && npx playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
+      -
         name: Upload frontend test results to Codecov
         uses: codecov/test-results-action@v1
+        if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: frontend
@@ -267,9 +271,6 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: frontend
           directory: src-ui/coverage/
-      -
-        name: Run Playwright e2e tests
-        run: cd src-ui && npx playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
 
   frontend-bundle-analysis:
     name: "Frontend Bundle Analysis"
