@@ -695,6 +695,9 @@ def _parse_db_settings() -> dict:
         # Leave room for future extensibility
         if os.getenv("PAPERLESS_DBENGINE") == "mariadb":
             engine = "django.db.backends.mysql"
+            # Django does not natively support connection pooling for MariaDB.
+            # However, since MariaDB uses threads instead of forks, establishing connections is significantly faster
+            # compared to PostgreSQL, so the lack of pooling has a limited performance impact.
             options = {
                 "read_default_file": "/etc/mysql/my.cnf",
                 "charset": "utf8mb4",
@@ -708,7 +711,16 @@ def _parse_db_settings() -> dict:
 
         else:  # Default to PostgresDB
             engine = "django.db.backends.postgresql"
+            # Enable connection pooling.
+            # A small pool size is sufficient as long as Paperless-ngx isn't heavily multithreaded or async.
+            # Ensure PostgreSQL's max_connections setting is greater than:
+            # (Paperless workers + Celery workers) * max_size, plus a safety margin (e.g. +10).
             options = {
+                "pool": {
+                    "min_size": 1,
+                    "max_size": 4,
+                    "num_workers": 2,
+                },
                 "sslmode": os.getenv("PAPERLESS_DBSSLMODE", "prefer"),
                 "sslrootcert": os.getenv("PAPERLESS_DBSSLROOTCERT", None),
                 "sslcert": os.getenv("PAPERLESS_DBSSLCERT", None),

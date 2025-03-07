@@ -778,7 +778,11 @@ class DocumentViewSet(
 
     @action(methods=["get"], detail=True, filter_backends=[])
     @method_decorator(
-        cache_control(private=True, max_age=3600, max_stale=3600 * 24 * 180),
+        cache_control(
+            private=True,
+            max_age=3600,
+            stale_while_revalidate=3600 * 24 * 180,
+        ),
     )
     @method_decorator(last_modified(thumbnail_last_modified))
     def thumb(self, request, pk=None):
