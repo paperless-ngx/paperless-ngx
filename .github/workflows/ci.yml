@@ -167,14 +167,14 @@ jobs:
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          flags: python-${{ matrix.python-version }}
+          flags: backend-python-${{ matrix.python-version }}
           files: junit.xml
       -
         name: Upload backend coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          flags: python-${{ matrix.python-version }}
+          flags: backend-python-${{ matrix.python-version }}
           files: coverage.xml
       -
         name: Stop containers
@@ -259,14 +259,14 @@ jobs:
         if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          flags: node-${{ matrix.node-version }}
+          flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/
       -
         name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          flags: node-${{ matrix.node-version }}
+          flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/coverage/
 
   frontend-bundle-analysis:
