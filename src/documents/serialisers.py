@@ -43,6 +43,7 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
+from documents.models import Note
 from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
@@ -861,6 +862,12 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         ]
 
 
+class NotesField(serializers.ModelSerializer):
+    class Meta:
+        model = Note
+        fields = ["note", "created", "user"]
+
+
 class DocumentSerializer(
     OwnedObjectSerializer,
     NestedUpdateMixin,
@@ -875,6 +882,8 @@ class DocumentSerializer(
     archived_file_name = SerializerMethodField()
     created_date = serializers.DateField(required=False)
     page_count = SerializerMethodField()
+
+    notes = NotesField(many=True, required=False)
 
     custom_fields = CustomFieldInstanceSerializer(
         many=True,

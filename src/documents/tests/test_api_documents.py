@@ -2170,8 +2170,10 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         GIVEN:
             - A document with a single note
         WHEN:
+            - API request for document
             - API request for document notes is made
         THEN:
+            - Note is included in the document response
             - The associated note is returned
         """
         doc = Document.objects.create(
@@ -2184,6 +2186,17 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             document=doc,
             user=self.user,
         )
+
+        response = self.client.get(
+            f"/api/documents/{doc.pk}/",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        resp_data = response.json()
+        self.assertEqual(len(resp_data["notes"]), 1)
+        self.assertEqual(resp_data["notes"][0]["note"], note.note)
 
         response = self.client.get(
             f"/api/documents/{doc.pk}/notes/",
