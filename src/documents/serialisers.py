@@ -873,7 +873,8 @@ class NotesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Note
-        fields = ["note", "created", "user"]
+        fields = ["id", "note", "created", "user"]
+        ordering = ["-created"]
 
 
 class DocumentSerializer(

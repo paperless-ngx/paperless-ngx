@@ -803,33 +803,6 @@ class DocumentViewSet(
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404
 
-    def getNotes(self, doc):
-        return [
-            {
-                "id": c.pk,
-                "note": c.note,
-                "created": c.created,
-                "user": {
-                    "id": c.user.id,
-                    "username": c.user.username,
-                    "first_name": c.user.first_name,
-                    "last_name": c.user.last_name,
-                },
-            }
-            for c in Note.objects.select_related("user")
-            .only(
-                "pk",
-                "note",
-                "created",
-                "user__id",
-                "user__username",
-                "user__first_name",
-                "user__last_name",
-            )
-            .filter(document=doc)
-            .order_by("-created")
-        ]
-
     @action(
         methods=["get", "post", "delete"],
         detail=True,
@@ -854,9 +827,11 @@ class DocumentViewSet(
         except Document.DoesNotExist:
             raise Http404
 
+        serializer = self.get_serializer(doc)
+
         if request.method == "GET":
             try:
-                notes = self.getNotes(doc)
+                notes = serializer.to_representation(doc).get("notes")
                 return Response(notes)
             except Exception as e:
                 logger.warning(f"An error occurred retrieving notes: {e!s}")
@@ -897,7 +872,7 @@ class DocumentViewSet(
 
                 index.add_or_update_document(doc)
 
-                notes = self.getNotes(doc)
+                notes = serializer.to_representation(doc).get("notes")
 
                 return Response(notes)
             except Exception as e:
@@ -934,7 +909,9 @@ class DocumentViewSet(
 
             index.add_or_update_document(doc)
 
-            return Response(self.getNotes(doc))
+            notes = serializer.to_representation(doc).get("notes")
+
+            return Response(notes)
 
         return Response(
             {
