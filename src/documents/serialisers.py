@@ -862,14 +862,15 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
         ]
 
 
-class UserSerializer(serializers.ModelSerializer):
+class BasicUserSerializer(serializers.ModelSerializer):
+    # Different than paperless.serializers.UserSerializer
     class Meta:
         model = User
         fields = ["id", "username", "first_name", "last_name"]
 
 
 class NotesSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = BasicUserSerializer()
 
     class Meta:
         model = Note
