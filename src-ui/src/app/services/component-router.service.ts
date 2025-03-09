@@ -17,11 +17,11 @@ export class ComponentRouterService {
       .subscribe((event: ActivationStart) => {
         if (
           this.componentHistory[this.componentHistory.length - 1] !==
-            event.snapshot.component.name &&
-          !EXCLUDE_COMPONENTS.includes(event.snapshot.component.name)
+            event.snapshot.data.componentName &&
+          !EXCLUDE_COMPONENTS.includes(event.snapshot.data.componentName)
         ) {
           this.history.push(event.snapshot.url.toString())
-          this.componentHistory.push(event.snapshot.component.name)
+          this.componentHistory.push(event.snapshot.data.componentName)
         } else {
           // Update the URL of the current component in case the same component was loaded via a different URL
           this.history[this.history.length - 1] = event.snapshot.url.toString()
