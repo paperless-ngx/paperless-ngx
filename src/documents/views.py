@@ -654,7 +654,7 @@ class DocumentViewSet(
             return None
 
     @action(methods=["get"], detail=True, filter_backends=[])
-    @method_decorator(cache_control(no_cache=True))
+    @method_decorator(cache_control(private=True, max_age=5, max_stale=60))
     @method_decorator(
         condition(etag_func=metadata_etag, last_modified_func=metadata_last_modified),
     )
@@ -714,7 +714,7 @@ class DocumentViewSet(
         return Response(meta)
 
     @action(methods=["get"], detail=True, filter_backends=[])
-    @method_decorator(cache_control(no_cache=True))
+    @method_decorator(cache_control(private=True, max_age=600, max_stale=3600 * 24))
     @method_decorator(
         condition(
             etag_func=suggestions_etag,
@@ -765,7 +765,7 @@ class DocumentViewSet(
         return Response(resp_data)
 
     @action(methods=["get"], detail=True, filter_backends=[])
-    @method_decorator(cache_control(no_cache=True))
+    @method_decorator(cache_control(private=True, max_age=60, max_stale=3600 * 24 * 31))
     @method_decorator(
         condition(etag_func=preview_etag, last_modified_func=preview_last_modified),
     )
@@ -777,7 +777,9 @@ class DocumentViewSet(
             raise Http404
 
     @action(methods=["get"], detail=True, filter_backends=[])
-    @method_decorator(cache_control(no_cache=True))
+    @method_decorator(
+        cache_control(private=True, max_age=3600, max_stale=3600 * 24 * 180),
+    )
     @method_decorator(last_modified(thumbnail_last_modified))
     def thumb(self, request, pk=None):
         try:
@@ -1894,6 +1896,7 @@ class GlobalSearchView(PassUserMixin):
 class StatisticsView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
+    @method_decorator(cache_control(max_age=60, max_stale=600))
     def get(self, request, format=None):
         user = request.user if request.user is not None else None
 
