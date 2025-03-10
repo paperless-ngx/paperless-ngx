@@ -106,7 +106,7 @@ updates:
       include: "scope"
 
   # Update Docker Compose files in docker/compose directory
-  - package-ecosystem: "docker"
+  - package-ecosystem: "docker-compose"
     directory: "/docker/compose/"
     schedule:
       interval: "weekly"
