@@ -1199,7 +1199,7 @@ msgid "Paperless-ngx account inactive"
 msgstr ""
 
 #: documents/templates/account/account_inactive.html:9
-msgid "Account inactve."
+msgid "Account inactive."
 msgstr ""
 
 #: documents/templates/account/account_inactive.html:14
