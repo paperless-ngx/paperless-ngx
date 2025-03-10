@@ -79,7 +79,7 @@ RUN set -eux \
       && rm -rf /var/lib/apt/lists/*
 
 # Copy our service defs and filesystem
-COPY ./docker/rootfs /
+COPY --link ./docker/rootfs /
 
 # Stage: main-app
 # Purpose: The final image
@@ -190,12 +190,7 @@ RUN set -eux \
         && rm --force --verbose *.deb \
     && rm --recursive --force --verbose /var/lib/apt/lists/*
 
-# Copy webserver config
-# Changes very infrequently
 WORKDIR /usr/src/paperless/
-COPY --chown=1000:1000 webserver.py /usr/src/paperless/webserver.py
-
-WORKDIR /usr/src/paperless/src/
 
 # Python dependencies
 # Change pretty frequently
