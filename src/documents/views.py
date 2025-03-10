@@ -2545,7 +2545,7 @@ class BulkEditObjectsView(PassUserMixin):
                 documents = Document.objects.filter(folder__in=folders).defer('content').select_related('dossier')
                 dossier_ids = []
                 for d in documents:
-                    if d.dossier is not None:
+                    if d.dossier:
                         dossier_ids.append(d.dossier.id)
                 documents.delete()
                 Dossier.objects.filter(id__in=dossier_ids).delete()
@@ -3552,7 +3552,8 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         documents = Document.objects.filter(folder__in=folders).defer('content')
         dossier_ids = []
         for d in documents:
-            dossier_ids.append(d.dossier.id)
+            if d.dossier:
+                dossier_ids.append(d.dossier.id)
 
         dossier = Dossier.objects.filter(id__in=dossier_ids)
         documents.delete()
