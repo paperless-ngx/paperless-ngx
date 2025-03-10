@@ -89,3 +89,50 @@ updates:
           - "major"
           - "minor"
           - "patch"
+
+  # Update Dockerfile in root directory
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "paperless-ngx/ci-cd"
+    labels:
+      - "ci-cd"
+      - "dependencies"
+    commit-message:
+      prefix: "docker"
+      include: "scope"
+
+  # Update Docker Compose files in docker/compose directory
+  - package-ecosystem: "docker"
+    directory: "/docker/compose/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "paperless-ngx/ci-cd"
+    labels:
+      - "ci-cd"
+      - "dependencies"
+    commit-message:
+      prefix: "docker-compose"
+      include: "scope"
+    groups:
+      # Individual groups for each image
+      gotenberg:
+        patterns:
+          - "docker.io/gotenberg/gotenberg*"
+      tika:
+        patterns:
+          - "docker.io/apache/tika*"
+      redis:
+        patterns:
+          - "docker.io/library/redis*"
+      mariadb:
+        patterns:
+          - "docker.io/library/mariadb*"
+      postgres:
+        patterns:
+          - "docker.io/library/postgres*"
