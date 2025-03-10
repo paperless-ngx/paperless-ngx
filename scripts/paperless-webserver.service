@@ -16,11 +16,11 @@ Environment=GRANIAN_WORKERS=1
 
 ExecStart=/bin/sh -c '\
   # Host: GRANIAN_HOST -> PAPERLESS_BIND_ADDR -> default \
-  [ -z "$GRANIAN_HOST" ] && [ -n "$PAPERLESS_BIND_ADDR" ] && export GRANIAN_HOST=$PAPERLESS_BIND_ADDR; \
+  [ -n "$PAPERLESS_BIND_ADDR" ] && export GRANIAN_HOST=$PAPERLESS_BIND_ADDR; \
   # Port: GRANIAN_PORT -> PAPERLESS_PORT -> default \
-  [ -z "$GRANIAN_PORT" ] && [ -n "$PAPERLESS_PORT" ] && export GRANIAN_PORT=$PAPERLESS_PORT; \
+  [ -n "$PAPERLESS_PORT" ] && export GRANIAN_PORT=$PAPERLESS_PORT; \
   # Workers: GRANIAN_WORKERS -> PAPERLESS_WEBSERVER_WORKERS -> default \
-  [ -z "$GRANIAN_WORKERS" ] && [ -n "$PAPERLESS_WEBSERVER_WORKERS" ] && export GRANIAN_WORKERS=$PAPERLESS_WEBSERVER_WORKERS; \
+  [ -n "$PAPERLESS_WEBSERVER_WORKERS" ] && export GRANIAN_WORKERS=$PAPERLESS_WEBSERVER_WORKERS; \
   # URL path prefix: only set if PAPERLESS_FORCE_SCRIPT_NAME exists \
   [ -n "$PAPERLESS_FORCE_SCRIPT_NAME" ] && export GRANIAN_URL_PATH_PREFIX=$PAPERLESS_FORCE_SCRIPT_NAME; \
   exec granian --interface asginl --ws "paperless.asgi:application"'
