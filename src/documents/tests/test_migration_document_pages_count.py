@@ -4,6 +4,7 @@ from pathlib import Path
 
 from django.conf import settings
 
+from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import TestMigrations
 
 
@@ -14,7 +15,7 @@ def source_path_before(self):
     return os.path.join(settings.ORIGINALS_DIR, fname)
 
 
-class TestMigrateDocumentPageCount(TestMigrations):
+class TestMigrateDocumentPageCount(DirectoriesMixin, TestMigrations):
     migrate_from = "1052_document_transaction_id"
     migrate_to = "1053_document_page_count"
 
