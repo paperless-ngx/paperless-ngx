@@ -190,7 +190,7 @@ RUN set -eux \
         && rm --force --verbose *.deb \
     && rm --recursive --force --verbose /var/lib/apt/lists/*
 
-WORKDIR /usr/src/paperless/
+WORKDIR /usr/src/paperless/src/
 
 # Python dependencies
 # Change pretty frequently
