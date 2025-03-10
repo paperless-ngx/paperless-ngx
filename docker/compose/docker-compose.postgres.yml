@@ -34,7 +34,7 @@ services:
       - redisdata:/data
 
   db:
-    image: docker.io/library/postgres:16
+    image: docker.io/library/postgres:17
     restart: unless-stopped
     volumes:
       - pgdata:/var/lib/postgresql/data
