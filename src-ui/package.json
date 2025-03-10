@@ -60,7 +60,7 @@
     "@typescript-eslint/eslint-plugin": "^8.26.0",
     "@typescript-eslint/parser": "^8.26.0",
     "@typescript-eslint/utils": "^8.0.0",
-    "eslint": "^9.21.0",
+    "eslint": "^9.22.0",
     "jest": "29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "jest-junit": "^16.0.0",
