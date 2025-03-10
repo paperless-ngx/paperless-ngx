@@ -365,11 +365,12 @@ class RasterisedDocumentCustomParser(DocumentParser):
                     api_login_ocr=api_login_ocr,
                     refresh_token_ocr=refresh_token_ocr,
                     api_refresh_ocr=api_refresh_ocr)
-                if token is not None and token.get('access', '') != '' and token.get('refresh_token', '') != '':
+                token = token.get('data', None)
+                if token is not None and token.get('access', '') != '' and token.get('refresh', '') != '':
                     cache.set("access_token_ocr",token['access'],86400)
                     cache.set("refresh_token_ocr",token['refresh'],86400)
 
-                elif token is not None and token.get('access','') != '' and token.get('refresh_token', '') == '':
+                elif token is not None and token.get('access','') != '' and token.get('refresh', '') == '':
                     cache.set("access_token_ocr",token['access'],86400)
 
                 else:
