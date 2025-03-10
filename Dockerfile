@@ -79,7 +79,7 @@ RUN set -eux \
       && rm -rf /var/lib/apt/lists/*
 
 # Copy our service defs and filesystem
-COPY --link ./docker/rootfs /
+COPY ./docker/rootfs /
 
 # Stage: main-app
 # Purpose: The final image
