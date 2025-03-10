@@ -73,9 +73,9 @@ optional-dependencies.mariadb = [
   "mysqlclient~=2.2.7",
 ]
 optional-dependencies.postgres = [
-  "psycopg[c]==3.2.4",
+  "psycopg[c]==3.2.5",
   # Direct dependency for proper resolution of the pre-built wheels
-  "psycopg-c==3.2.4",
+  "psycopg-c==3.2.5",
 ]
 optional-dependencies.webserver = [
   "granian~=1.7.6",
