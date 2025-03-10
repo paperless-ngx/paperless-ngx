@@ -5,7 +5,7 @@
 # Purpose: Compiles the frontend
 # Notes:
 #  - Does NPM stuff with Typescript and such
-FROM --platform=$BUILDPLATFORM docker.io/node:20-bookworm-slim AS compile-frontend
+FROM --platform=$BUILDPLATFORM docker.io/node:23-bookworm-slim AS compile-frontend
 
 COPY ./src-ui /src/src-ui
 
