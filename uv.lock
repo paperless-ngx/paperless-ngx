@@ -880,14 +880,14 @@ wheels = [
 
 [[package]]
 name = "drf-spectacular-sidecar"
-version = "2025.2.1"
+version = "2025.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7e/4c/6c945509d578f04d19eee2ffeb25bc37e6aeb9713688a87fc4f3b02bc32b/drf_spectacular_sidecar-2025.2.1.tar.gz", hash = "sha256:ca9507c5fe708680d6b8eda96928f3cf3ffc07e8d67678778bcd2e80f9f2baae", size = 2390256 }
+sdist = { url = "https://files.pythonhosted.org/packages/80/5c/85671ba50957e0ab45e2828ca713cd7b5d0d237c398936c1b45bd0286b72/drf_spectacular_sidecar-2025.3.1.tar.gz", hash = "sha256:7425940a409fb68a46c9b024eb504098fab5b4d73d12573efcaef048445d678f", size = 2401986 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/eb/8a/b66f58e92c5752bbc241bb04ce76d2bf92c676af4cb8b94edac3a0e0c701/drf_spectacular_sidecar-2025.2.1-py3-none-any.whl", hash = "sha256:674e1336810c7cf117442300b5c213c4fee1e984ba48689502c947a6ecd25d0c", size = 2409274 },
+    { url = "https://files.pythonhosted.org/packages/5e/09/7382eb93a09f33fac72a8af1fc986f43681d15dd5fda750b238a8aace0e8/drf_spectacular_sidecar-2025.3.1-py3-none-any.whl", hash = "sha256:6b9c96204c8e45a06c39928dad704b18536d3253b61591c478540b63db6bdcea", size = 2422301 },
 ]
 
 [[package]]
@@ -1994,7 +1994,7 @@ requires-dist = [
     { name = "djangorestframework", specifier = "~=3.15" },
     { name = "djangorestframework-guardian", specifier = "~=0.3.0" },
     { name = "drf-spectacular", specifier = "~=0.28" },
-    { name = "drf-spectacular-sidecar", specifier = "~=2025.2.1" },
+    { name = "drf-spectacular-sidecar", specifier = "~=2025.3.1" },
     { name = "drf-writable-nested", specifier = "~=0.7.1" },
     { name = "filelock", specifier = "~=3.17.0" },
     { name = "flower", specifier = "~=2.0.1" },
