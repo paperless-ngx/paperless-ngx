@@ -1310,7 +1310,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
     @action(detail=False, methods=["GET"], name="Get Next ASN")
     def next_asn(self, request, *args, **kwargs):
-        max_asn = Document.objects.aggregate(
+        max_asn = Document.objects.defer('content').aggregate(
             Max("archive_serial_number", default=0),
         ).get(
             "archive_serial_number__max",
@@ -1382,7 +1382,7 @@ class BulkEditView(PassUserMixin):
         documents = serializer.validated_data.get("documents")
 
         if not user.is_superuser:
-            document_objs = Document.objects.filter(pk__in=documents)
+            document_objs = Document.objects.filter(pk__in=documents).defer('content')
             has_perms = (
                 all((doc.owner == user or doc.owner is None) for doc in document_objs)
                 if method
@@ -1583,7 +1583,7 @@ class StatisticsView(APIView):
         user = request.user if request.user is not None else None
 
         documents = (
-            Document.objects.all().annotate()
+            Document.objects.all().defer('content').annotate()
             if user is None
             else get_objects_for_user_owner_aware(
                 user,
@@ -1872,7 +1872,7 @@ class BulkDownloadView(GenericAPIView):
         with zipfile.ZipFile(temp.name, "w", compression) as zipf:
             strategy = strategy_class(zipf, follow_filename_format)
             for id in ids:
-                doc = Document.objects.get(id=id)
+                doc = Document.objects.get(id=id).defer('content')
                 strategy.add_document(doc)
 
         with open(temp.name, "rb") as f:
@@ -2154,7 +2154,7 @@ class ApprovalViewSet(ModelViewSet):
     def get_queryset(self):
         # TODO: get user -> group -> document ->
         if self.request.user.is_superuser:
-            documents_can_change = Document.objects.all()
+            documents_can_change = Document.objects.all().defer('content')
         else:
             documents_can_change = get_objects_for_user(
                 self.request.user,
@@ -2177,7 +2177,7 @@ class ApprovalViewSet(ModelViewSet):
             approvals_ids.append(x.object_pk)
         document_ids_queryset = Document.objects.filter(
             id__in=approvals_ids,
-        ).values_list("id", flat=True)
+        ).defer('content').values_list("id", flat=True)
         document_ids_set = set(document_ids_queryset)
         approval_new = []
         for approval in approvals:
@@ -2256,7 +2256,7 @@ class ApprovalUpdateMutipleView(GenericAPIView):
                 if self.request.user == approval.submitted_by:
                     return HttpResponseForbidden("Insufficient permissions")
                 document_ids.append(int(approval.object_pk))
-            documents = Document.objects.filter(id__in=document_ids)
+            documents = Document.objects.filter(id__in=document_ids).defer('content')
             for document in documents:
                 if not self.request.user.has_perm("change_document", document):
                     return HttpResponseForbidden("Insufficient permissions")
@@ -2542,11 +2542,11 @@ class BulkEditObjectsView(PassUserMixin):
 
             for f in folder_list:
                 folders = Folder.objects.filter(path__startswith=f.path)
-                documents = Document.objects.filter(folder__in=folders)
+                documents = Document.objects.filter(folder__in=folders).defer('content').select_related('dossier')
                 dossier_ids = []
                 for d in documents:
-                    dossier_ids.append(d.dossier.id)
-                documents.delete()
+                    if d.dossier is not None:
+                        dossier_ids.append(d.dossier.id)
                 documents.delete()
                 Dossier.objects.filter(id__in=dossier_ids).delete()
                 folders.delete()
@@ -2556,7 +2556,7 @@ class BulkEditObjectsView(PassUserMixin):
             for dossier_id in object_ids:
                 dossier = Dossier.objects.get(id=int(dossier_id))
                 dossiers = Dossier.objects.filter(path__startswith=dossier.path)
-                documents = Document.objects.filter(dossier__in=dossier)
+                documents = Document.objects.filter(dossier__in=dossier).defer('content')
                 documents.delete()
                 dossiers.delete()
 
@@ -2736,7 +2736,7 @@ class SystemStatusView(PassUserMixin):
             classifier = load_classifier()
             if classifier is None:
                 # Make sure classifier should exist
-                docs_queryset = Document.objects.exclude(
+                docs_queryset = Document.objects.defer('content').exclude(
                     tags__is_inbox_tag=True,
                 )
                 if (
@@ -3038,7 +3038,7 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         child_shelf_boxcase = Warehouse.objects.filter(path__startswith=warehouse.path)
         documents_list = Document.objects.select_related("dossier").filter(
             warehouse__in=child_shelf_boxcase,
-        )
+        ).defer('content')
         # documents_list = []
         # for child in child_folders:
         #     if child.type == "file":
@@ -3549,7 +3549,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     def destroy(self, request, pk, *args, **kwargs):
         folder = Folder.objects.get(id=pk)
         folders = Folder.objects.filter(path__startswith=folder.path)
-        documents = Document.objects.filter(folder__in=folders)
+        documents = Document.objects.filter(folder__in=folders).defer('content')
         dossier_ids = []
         for d in documents:
             dossier_ids.append(d.dossier.id)
@@ -3930,8 +3930,8 @@ class BackupRecordViewSet(ModelViewSet):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
             used_size = get_directory_size(path_document_media)
-            documents = Document.objects.all()
-            documents_deleted = Document.deleted_objects.all()
+            documents = Document.objects.all().defer("content")
+            documents_deleted = Document.deleted_objects.all().defer("content")
             folders = Folder.objects.all()
             dossiers = Dossier.objects.all()
             detail = {"documents": documents.count(), "size": used_size}
