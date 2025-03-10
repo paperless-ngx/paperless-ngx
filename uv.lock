@@ -1803,7 +1803,7 @@ wheels = [
 
 [[package]]
 name = "ocrmypdf"
-version = "16.9.0"
+version = "16.10.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "deprecation", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -1816,9 +1816,9 @@ dependencies = [
     { name = "pluggy", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "rich", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a8/07/d8810415b98718a39b1161720acd925b6ef15743227012809f6da9d3b7bc/ocrmypdf-16.9.0.tar.gz", hash = "sha256:d000a2294cd1478d4bbfe15df5172327f77f4139bb5307404bc53be9bd81f039", size = 6804849 }
+sdist = { url = "https://files.pythonhosted.org/packages/07/cf/d207aea8442a8e5a63b16faae89af2b9e3474d8d5925a5ea8c4f10f73fa9/ocrmypdf-16.10.0.tar.gz", hash = "sha256:d5b907a7b92951f1f3617f0f5ca002d866143d94fd168546a70e51756bf6412e", size = 6809110 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/12/69/e40431c5410eaf0c55588d0d256e27ee32af7622cb7116ac99a2e868bd2f/ocrmypdf-16.9.0-py3-none-any.whl", hash = "sha256:33fec95450727b0d9482ee3851e45dd0219ff8d52a14fd45a8d3d0c71875584e", size = 161863 },
+    { url = "https://files.pythonhosted.org/packages/33/47/10058f54f593f5e618a6796fc3e8dc3e19536128f832e2d3d6e4943e9834/ocrmypdf-16.10.0-py3-none-any.whl", hash = "sha256:5093b9b058e7278b17c0b0978eb5175063b7a5511e3b9068257ece063d91ce8f", size = 162336 },
 ]
 
 [[package]]
@@ -2007,7 +2007,7 @@ requires-dist = [
     { name = "langdetect", specifier = "~=1.0.9" },
     { name = "mysqlclient", marker = "extra == 'mariadb'", specifier = "~=2.2.7" },
     { name = "nltk", specifier = "~=3.9.1" },
-    { name = "ocrmypdf", specifier = "~=16.9.0" },
+    { name = "ocrmypdf", specifier = "~=16.10.0" },
     { name = "pathvalidate", specifier = "~=3.2.3" },
     { name = "pdf2image", specifier = "~=1.17.0" },
     { name = "psycopg", extras = ["c"], marker = "extra == 'postgres'", specifier = "==3.2.5" },
