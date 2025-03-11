@@ -140,7 +140,7 @@ To build the front end once use this command:
 ```bash
 # src-ui/
 
-$ npm install
+$ pnpm install
 $ ng build --configuration production
 ```
 
@@ -176,7 +176,7 @@ To add a new development package `uv add --dev <package>`
 ## Front end development
 
 The front end is built using AngularJS. In order to get started, you need Node.js (version 14.15+) and
-`npm`.
+`pnpm`.
 
 !!! note
 
@@ -185,7 +185,7 @@ The front end is built using AngularJS. In order to get started, you need Node.j
 1.  Install the Angular CLI. You might need sudo privileges to perform this command:
 
     ```bash
-    npm install -g @angular/cli
+    pnpm install -g @angular/cli
     ```
 
 2.  Make sure that it's on your path.
@@ -193,7 +193,7 @@ The front end is built using AngularJS. In order to get started, you need Node.j
 3.  Install all necessary modules:
 
     ```bash
-    npm install
+    pnpm install
     ```
 
 4.  You can launch a development server by running:
