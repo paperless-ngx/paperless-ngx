@@ -521,8 +521,7 @@ jobs:
                           requirements.txt \
                           LICENSE \
                           README.md \
-                          paperless.conf.example \
-                          webserver.py
+                          paperless.conf.example
           do
             cp --verbose ${file_name} dist/paperless-ngx/
           done

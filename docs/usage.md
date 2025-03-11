@@ -837,7 +837,7 @@ Paperless-ngx consists of the following components:
 
     ```shell-session
     cd /path/to/paperless/src/
-    python3 webserver.py
+    granian --interface asginl --ws "paperless.asgi:application"
     ```
 
     or by any other means such as Apache `mod_wsgi`.
