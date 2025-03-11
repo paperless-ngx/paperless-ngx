@@ -825,6 +825,8 @@ LOGGING = {
         "ocrmypdf": {"handlers": ["file_paperless"], "level": "INFO"},
         "celery": {"handlers": ["file_celery"], "level": "DEBUG"},
         "kombu": {"handlers": ["file_celery"], "level": "DEBUG"},
+        "_granian": {"handlers": ["file_paperless"], "level": "DEBUG"},
+        "granian.access": {"handlers": ["file_paperless"], "level": "DEBUG"},
     },
 }
 
