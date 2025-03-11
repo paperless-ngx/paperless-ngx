@@ -162,16 +162,20 @@ jobs:
             --frozen \
             pytest
       -
-        name: Upload coverage
-        if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION }}
-        uses: actions/upload-artifact@v4
+        name: Upload backend test results to Codecov
+        if: always()
+        uses: codecov/test-results-action@v1
         with:
-          name: backend-coverage-report
-          path: |
-            coverage.xml
-            junit.xml
-          retention-days: 7
-          if-no-files-found: error
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: backend-python-${{ matrix.python-version }}
+          files: junit.xml
+      -
+        name: Upload backend coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: backend-python-${{ matrix.python-version }}
+          files: coverage.xml
       -
         name: Stop containers
         if: always()
@@ -179,7 +183,7 @@ jobs:
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml logs
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml down
 
-  install-frontend-depedendencies:
+  install-frontend-dependencies:
     name: "Install Frontend Dependencies"
     runs-on: ubuntu-24.04
     needs:
@@ -218,7 +222,7 @@ jobs:
     name: "Frontend Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     runs-on: ubuntu-24.04
     needs:
-      - install-frontend-depedendencies
+      - install-frontend-dependencies
     strategy:
       fail-fast: false
       matrix:
@@ -253,111 +257,33 @@ jobs:
         run: cd src-ui && pnpm run lint
       -
         name: Run Jest unit tests
-        env:
-          JEST_JUNIT_OUTPUT_FILE: junit-report-${{ matrix.shard-index }}.xml
         run: cd src-ui && pnpm run test --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
-      -
-        name: Upload Jest coverage
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: jest-coverage-report-${{ matrix.shard-index }}
-          path: |
-            src-ui/coverage/coverage-final.json
-            src-ui/coverage/lcov.info
-            src-ui/coverage/clover.xml
-          retention-days: 7
-          if-no-files-found: error
       -
         name: Run Playwright e2e tests
         run: cd src-ui && pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
       -
-        name: Upload Playwright test results
+        name: Upload frontend test results to Codecov
+        uses: codecov/test-results-action@v1
         if: always()
-        uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-${{ matrix.shard-index }}
-          path: src-ui/playwright-report
-          retention-days: 7
-      -
-        name: Upload frontend test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: junit-report-${{ matrix.shard-index }}
-          path: src-ui/junit-report-${{ matrix.shard-index }}.xml
-          retention-days: 7
-
-  tests-coverage-upload:
-    name: "Upload to Codecov"
-    runs-on: ubuntu-24.04
-    needs:
-      - tests-backend
-      - tests-frontend
-    steps:
-      -
-        uses: actions/checkout@v4
-      -
-        name: Download frontend jest coverage
-        uses: actions/download-artifact@v4
-        with:
-          path: src-ui/coverage/
-          pattern: jest-coverage-report-*
-      -
-        name: Download frontend playwright coverage
-        uses: actions/download-artifact@v4
-        with:
-          path: src-ui/coverage/
-          pattern: playwright-report-*
-          merge-multiple: true
-      -
-        name: Download frontend test results
-        uses: actions/download-artifact@v4
-        with:
-          path: src-ui/junit/
-          pattern: junit-report-*
-          merge-multiple: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: frontend-node-${{ matrix.node-version }}
+          directory: src-ui/
       -
         name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          # not required for public repos, but intermittently fails otherwise
           token: ${{ secrets.CODECOV_TOKEN }}
-          flags: frontend
+          flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/coverage/
-          # dont include backend coverage files here
-          files: '!coverage.xml'
-      -
-        name: Upload frontend test results to Codecov
-        if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          flags: frontend
-          directory: src-ui/junit/
-      -
-        name: Download backend coverage
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-coverage-report
-          path: src/
-      -
-        name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          # not required for public repos, but intermittently fails otherwise
-          token: ${{ secrets.CODECOV_TOKEN }}
-          # future expansion
-          flags: backend
-          directory: src/
-      -
-        name: Upload backend test results to Codecov
-        if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          flags: backend
-          directory: src/
+
+  frontend-bundle-analysis:
+    name: "Frontend Bundle Analysis"
+    runs-on: ubuntu-24.04
+    needs:
+      - tests-frontend
+    steps:
+      - uses: actions/checkout@v4
       -
         name: Install pnpm
         uses: pnpm/action-setup@v4

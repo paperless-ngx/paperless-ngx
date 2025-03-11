@@ -37,7 +37,7 @@ dependencies = [
   "djangorestframework~=3.15",
   "djangorestframework-guardian~=0.3.0",
   "drf-spectacular~=0.28",
-  "drf-spectacular-sidecar~=2025.2.1",
+  "drf-spectacular-sidecar~=2025.3.1",
   "drf-writable-nested~=0.7.1",
   "filelock~=3.17.0",
   "flower~=2.0.1",
@@ -48,7 +48,7 @@ dependencies = [
   "jinja2~=3.1.5",
   "langdetect~=1.0.9",
   "nltk~=3.9.1",
-  "ocrmypdf~=16.9.0",
+  "ocrmypdf~=16.10.0",
   "pathvalidate~=3.2.3",
   "pdf2image~=1.17.0",
   "python-dateutil~=2.9.0",
@@ -73,9 +73,9 @@ optional-dependencies.mariadb = [
   "mysqlclient~=2.2.7",
 ]
 optional-dependencies.postgres = [
-  "psycopg[c]==3.2.4",
+  "psycopg[c]==3.2.5",
   # Direct dependency for proper resolution of the pre-built wheels
-  "psycopg-c==3.2.4",
+  "psycopg-c==3.2.5",
 ]
 optional-dependencies.webserver = [
   "granian~=1.7.6",
@@ -343,8 +343,8 @@ environments = [
 [tool.uv.sources]
 # Markers are chosen to select these almost exclusively when building the Docker image
 psycopg-c = [
-  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.4/psycopg_c-3.2.4-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
-  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.4/psycopg_c-3.2.4-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.5/psycopg_c-3.2.5-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.5/psycopg_c-3.2.5-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
 ]
 zxing-cpp = [
   { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
