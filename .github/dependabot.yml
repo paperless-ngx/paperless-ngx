@@ -9,7 +9,7 @@ updates:
   # Enable version updates for pnpm
   - package-ecosystem: "npm"
     target-branch: "dev"
-    # Look for `pnpm-lock.yml` and `lock` files in the `/src-ui` directory
+    # Look for `pnpm-lock.yaml` and `lock` files in the `/src-ui` directory
     directory: "/src-ui"
     open-pull-requests-limit: 10
     schedule:
