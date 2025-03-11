@@ -310,7 +310,7 @@
                       </div>
                     }
                     @if (activeDisplayFields.includes(DisplayField.TAGS)) {
-                      @for (tagID of d.tags; track t) {
+                      @for (tagID of d.tags; track tagID) {
                         <pngx-tag [tagID]="tagID" class="ms-1 fs-6" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(tagID);$event.stopPropagation()"></pngx-tag>
                       }
                     }
