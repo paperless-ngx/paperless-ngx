@@ -207,7 +207,7 @@ The front end is built using AngularJS. In order to get started, you need Node.j
     restart it.
 
     By default, the development server is available on `http://localhost:4200/` and is configured to access the API at
-    `http://localhost:8000/api/`, which is the default of the backend. If you enabled `DEBUG` on the back end, several security overrides for allowed hosts, CORS and X-Frame-Options are in place so that the front end behaves exactly as in production.
+    `http://localhost:8000/api/`, which is the default of the backend. If you enabled `DEBUG` on the back end, several security overrides for allowed hosts and CORS are in place so that the front end behaves exactly as in production.
 
 ### Testing and code style
 
