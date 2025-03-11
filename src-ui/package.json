@@ -2,6 +2,7 @@
   "name": "paperless-ui",
   "version": "0.0.0",
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
@@ -70,6 +71,15 @@
     "prettier-plugin-organize-imports": "^4.1.0",
     "ts-node": "~10.9.1",
     "typescript": "^5.5.4"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "canvas",
+      "esbuild",
+      "lmdb",
+      "msgpackr-extract"
+    ]
   },
   "typings": "./src/typings.d.ts"
 }
