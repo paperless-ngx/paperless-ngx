@@ -274,6 +274,8 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
           this.fieldSelects.first?.focus()
         }, 0)
       }
+    } else if (!this.selectionModel.isValid()) {
+      this.selectionModel.clear()
     }
   }
 

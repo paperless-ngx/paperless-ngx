@@ -93,6 +93,13 @@ describe('CustomFieldsQueryDropdownComponent', () => {
     expect(component.selectionModel.queries.length).toBe(1)
   })
 
+  it('should clear on close if model is invalid', () => {
+    component.selectionModel.clear()
+    component.selectionModel.addExpression()
+    component.onOpenChange(false)
+    expect(component.selectionModel.isEmpty()).toBeTruthy()
+  })
+
   it('should support reset the selection model', () => {
     component.selectionModel.addExpression()
     component.reset()
