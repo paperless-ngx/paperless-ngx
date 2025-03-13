@@ -10,6 +10,8 @@ from django.contrib.auth.models import User
 from django.forms import ValidationError
 from django.urls import reverse
 
+from paperless.signals import handle_social_account_updated
+
 logger = logging.getLogger("paperless.auth")
 
 
@@ -114,4 +116,5 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             )
             user.groups.add(*groups)
             user.save()
+        handle_social_account_updated(None, request, sociallogin)
         return user
