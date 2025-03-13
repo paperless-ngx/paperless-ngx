@@ -321,22 +321,6 @@ class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         )
 
 
-class DocumentTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
-    class Meta:
-        model = DocumentType
-        fields = (
-            "id",
-            "slug",
-            "name",
-            "match",
-            "matching_algorithm",
-            "is_insensitive",
-            "document_count",
-            "owner",
-            "permissions",
-            "user_can_change",
-            "set_permissions",
-        )
 
 
 class ArchiveFontSerializer(MatchingModelSerializer, OwnedObjectSerializer):
@@ -507,6 +491,31 @@ class ArchiveFontField(serializers.PrimaryKeyRelatedField):
 class StoragePathField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         return StoragePath.objects.all()
+
+class CustomFieldField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        return CustomField.objects.all()
+
+class DocumentTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+    custom_fields = CustomFieldField(many=True)
+    map_key = serializers.CharField(allow_blank=True, required=False)
+    class Meta:
+        model = DocumentType
+        fields = (
+            "id",
+            "slug",
+            "name",
+            "match",
+            "matching_algorithm",
+            "is_insensitive",
+            "custom_fields",
+            "map_key",
+            "document_count",
+            "owner",
+            "permissions",
+            "user_can_change",
+            "set_permissions",
+        )
 
 
 class CustomFieldSerializer(serializers.ModelSerializer):
