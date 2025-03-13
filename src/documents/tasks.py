@@ -57,7 +57,7 @@ from documents.plugins.base import ProgressManager
 from documents.plugins.base import StopConsumeTaskError
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
-from documents.signals import document_updated
+from documents.signals import document_updated, document_consumption_finished
 from documents.signals.handlers import cleanup_document_deletion
 from paperless.models import ApplicationConfiguration
 from paperless_ocr_custom.parsers import RasterisedDocumentCustomParser
@@ -282,9 +282,7 @@ def update_document_archive_file(self, document_id=None):
     """
     Re-creates the archive file of a document, including new OCR content and thumbnail
     """
-
     document = Document.objects.defer('content').get(id=document_id)
-
     mime_type = document.mime_type
 
     parser_class: type[DocumentParser] = custom_get_parser_class_for_mime_type(
@@ -387,6 +385,13 @@ def update_document_archive_file(self, document_id=None):
             # with index.open_index_writer() as writer:
             #     index.update_document(writer, document)
             update_index_document(newDocument)
+            classifier = load_classifier()
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=document,
+                logging_group=uuid.uuid4(),
+                classifier=classifier,
+            )
 
             clear_document_caches(document.pk)
     except Exception as ex:
