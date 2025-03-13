@@ -55,6 +55,7 @@ from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
 from django_elasticsearch_dsl_drf.pagination import LimitOffsetPagination
 from django_filters.rest_framework import DjangoFilterBackend
+from elasticsearch_dsl.serializer import serializer
 from guardian.shortcuts import get_objects_for_user
 from guardian.shortcuts import get_users_with_perms
 from langdetect import detect
@@ -71,7 +72,7 @@ from rest_framework.mixins import DestroyModelMixin
 from rest_framework.mixins import ListModelMixin
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.mixins import UpdateModelMixin
-from rest_framework.permissions import DjangoModelPermissions
+from rest_framework.permissions import DjangoModelPermissions, AllowAny
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -164,7 +165,7 @@ from documents.permissions import update_view_folder_parent_permissions
 from documents.permissions import \
     update_view_warehouse_shelf_boxcase_permissions
 from documents.serialisers import AcknowledgeTasksViewSerializer, \
-    DocumentDocumentSerializer
+    DocumentDocumentSerializer, WebhookSerializer
 from documents.serialisers import ApprovalSerializer
 from documents.serialisers import ApprovalViewSerializer
 from documents.serialisers import ArchiveFontSerializer
@@ -2908,6 +2909,16 @@ class TrashView(ListModelMixin, PassUserMixin):
             empty_trash(doc_ids=doc_ids)
         return Response({"result": "OK", "doc_ids": doc_ids})
 
+
+
+
+class Webhook(APIView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        data = self.request.data
+        logger.info(f"========= test_callback: {data}")
+        return Response(data)
 
 class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = Warehouse

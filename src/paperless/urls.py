@@ -1,4 +1,5 @@
 import os
+from os.path import basename
 
 from django.conf import settings
 from django.conf.urls import include
@@ -14,7 +15,8 @@ from django.views.static import serve
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
-from documents.views import AcknowledgeTasksView, DocumentElasticSearch
+from documents.views import AcknowledgeTasksView, DocumentElasticSearch, \
+    Webhook
 from documents.views import ApprovalUpdateMutipleView
 from documents.views import ApprovalViewSet
 from documents.views import ArchiveFontViewSet
@@ -118,6 +120,7 @@ urlpatterns = [
                     SearchAutoCompleteView.as_view(),
                     name="autocomplete",
                 ),
+                re_path("^webhook_update_field/", StatisticsView.as_view(), name="statistics"),
                 # re_path(
                 #     "^elastic_search/",
                 #     DocumentElasticSearch.as_view({"get":"list"}),

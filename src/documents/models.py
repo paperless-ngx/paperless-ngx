@@ -2,6 +2,7 @@ import datetime
 import logging
 import os
 import re
+import unicodedata
 from collections import OrderedDict
 from pathlib import Path
 from typing import Final
@@ -228,10 +229,6 @@ class ArchiveFont(MatchingModel):
         verbose_name_plural = _("archive_fonts")
 
 
-class DocumentType(MatchingModel):
-    class Meta(MatchingModel.Meta):
-        verbose_name = _("document type")
-        verbose_name_plural = _("document types")
 
 
 class StoragePath(MatchingModel):
@@ -409,303 +406,7 @@ class Dossier(SoftDeleteModel, MatchingModel):
         return self.name
 
 
-class Document(SoftDeleteModel, ModelWithOwner):
-    STORAGE_TYPE_UNENCRYPTED = "unencrypted"
-    STORAGE_TYPE_GPG = "gpg"
-    STORAGE_TYPES = (
-        (STORAGE_TYPE_UNENCRYPTED, _("Unencrypted")),
-        (STORAGE_TYPE_GPG, _("Encrypted with GNU Privacy Guard")),
-    )
 
-    correspondent = models.ForeignKey(
-        Correspondent,
-        blank=True,
-        null=True,
-        related_name="documents",
-        on_delete=models.SET_NULL,
-        verbose_name=_("correspondent"),
-    )
-
-    storage_path = models.ForeignKey(
-        StoragePath,
-        blank=True,
-        null=True,
-        related_name="documents",
-        on_delete=models.SET_NULL,
-        verbose_name=_("storage path"),
-    )
-
-    folder = models.ForeignKey(
-        Folder,
-        blank=True,
-        null=True,
-        related_name="documents",
-        on_delete=models.DO_NOTHING,
-        verbose_name=_("folder"),
-    )
-
-    dossier = models.ForeignKey(
-        Dossier,
-        blank=True,
-        null=True,
-        related_name="documents",
-        on_delete=models.DO_NOTHING,
-        verbose_name=_("dossier"),
-    )
-
-    dossier_form = models.ForeignKey(
-        DossierForm,
-        blank=True,
-        null=True,
-        related_name="documents",
-        on_delete=models.SET_NULL,
-        verbose_name=_("dossier forms"),
-    )
-
-    warehouse = models.ForeignKey(
-        Warehouse,
-        blank=True,
-        null=True,
-        related_name="documents",
-        on_delete=models.SET_NULL,
-        verbose_name=_("warehouse"),
-    )
-
-    title = models.CharField(_("title"), max_length=128, blank=True, db_index=True)
-
-    document_type = models.ForeignKey(
-        DocumentType,
-        blank=True,
-        null=True,
-        related_name="documents",
-        on_delete=models.SET_NULL,
-        verbose_name=_("document type"),
-    )
-
-    content = models.TextField(
-        _("content"),
-        blank=True,
-        help_text=_(
-            "The raw, text-only data of the document. This field is "
-            "primarily used for searching.",
-        ),
-    )
-
-    mime_type = models.CharField(_("mime type"), max_length=256, editable=False)
-
-    tags = models.ManyToManyField(
-        Tag,
-        related_name="documents",
-        blank=True,
-        verbose_name=_("tags"),
-    )
-
-    archive_font = models.ForeignKey(
-        ArchiveFont,
-        blank=True,
-        null=True,
-        related_name="documents",
-        on_delete=models.SET_NULL,
-        verbose_name=_("archive fonts"),
-    )
-
-    font_language = models.ForeignKey(
-        FontLanguage,
-        blank=True,
-        null=True,
-        related_name="documents",
-        on_delete=models.SET_NULL,
-        verbose_name=_("font languages"),
-    )
-
-    checksum = models.CharField(
-        _("checksum"),
-        max_length=32,
-        editable=False,
-        unique=True,
-        help_text=_("The checksum of the original document."),
-    )
-
-    archive_checksum = models.CharField(
-        _("archive checksum"),
-        max_length=32,
-        editable=False,
-        blank=True,
-        null=True,
-        help_text=_("The checksum of the archived document."),
-    )
-
-    created = models.DateTimeField(_("created"), default=timezone.now, db_index=True)
-
-    modified = models.DateTimeField(
-        _("modified"),
-        auto_now=True,
-        editable=False,
-        db_index=True,
-    )
-
-    storage_type = models.CharField(
-        _("storage type"),
-        max_length=11,
-        choices=STORAGE_TYPES,
-        default=STORAGE_TYPE_UNENCRYPTED,
-        editable=False,
-    )
-
-    added = models.DateTimeField(
-        _("added"),
-        default=timezone.now,
-        editable=False,
-        db_index=True,
-    )
-
-    filename = models.FilePathField(
-        _("filename"),
-        max_length=1024,
-        editable=False,
-        default=None,
-        unique=True,
-        null=True,
-        help_text=_("Current filename in storage"),
-    )
-
-    page_count = models.PositiveIntegerField(
-        _("page count"),
-        blank=False,
-        null=True,
-        unique=False,
-        db_index=False,
-        validators=[MinValueValidator(1)],
-        help_text=_(
-            "The number of pages of the document.",
-        ),
-    )
-
-    archive_filename = models.FilePathField(
-        _("archive filename"),
-        max_length=1024,
-        editable=False,
-        default=None,
-        unique=True,
-        null=True,
-        help_text=_("Current archive filename in storage"),
-    )
-
-    original_filename = models.CharField(
-        _("original filename"),
-        max_length=1024,
-        editable=False,
-        default=None,
-        unique=False,
-        null=True,
-        help_text=_("The original name of the file when it was uploaded"),
-    )
-
-    ARCHIVE_SERIAL_NUMBER_MIN: Final[int] = 0
-    ARCHIVE_SERIAL_NUMBER_MAX: Final[int] = 0xFF_FF_FF_FF
-
-    archive_serial_number = models.PositiveIntegerField(
-        _("archive serial number"),
-        blank=True,
-        null=True,
-        unique=True,
-        db_index=True,
-        validators=[
-            MaxValueValidator(ARCHIVE_SERIAL_NUMBER_MAX),
-            MinValueValidator(ARCHIVE_SERIAL_NUMBER_MIN),
-        ],
-        help_text=_(
-            "The position of this document in your physical document archive.",
-        ),
-    )
-
-    class Meta:
-        ordering = ("-created",)
-        verbose_name = _("document")
-        verbose_name_plural = _("documents")
-
-    def __str__(self) -> str:
-        # Convert UTC database time to local time
-        created = datetime.date.isoformat(timezone.localdate(self.created))
-
-        res = f"{created}"
-
-        if self.correspondent:
-            res += f" {self.correspondent}"
-        if self.title:
-            res += f" {self.title}"
-        return res
-
-    @property
-    def source_path(self) -> Path:
-        if self.filename:
-            fname = str(self.filename)
-        else:
-            fname = f"{self.pk:07}{self.file_type}"
-            if self.storage_type == self.STORAGE_TYPE_GPG:
-                fname += ".gpg"  # pragma: no cover
-
-        return (settings.ORIGINALS_DIR / Path(fname)).resolve()
-
-    @property
-    def source_file(self):
-        return open(self.source_path, "rb")
-
-    @property
-    def has_archive_version(self) -> bool:
-        return self.archive_filename is not None
-
-    @property
-    def archive_path(self) -> Optional[Path]:
-        if self.has_archive_version:
-            return (settings.ARCHIVE_DIR / Path(str(self.archive_filename))).resolve()
-        else:
-            return None
-
-    @property
-    def archive_file(self):
-        return open(self.archive_path, "rb")
-
-    def get_public_filename(self, archive=False, counter=0, suffix=None) -> str:
-        """
-        Returns a sanitized filename for the document, not including any paths.
-        """
-        result = str(self)
-
-        if counter:
-            result += f"_{counter:02}"
-
-        if suffix:
-            result += suffix
-
-        if archive:
-            result += ".pdf"
-        else:
-            result += self.file_type
-
-        return pathvalidate.sanitize_filename(result, replacement_text="-")
-
-    @property
-    def file_type(self):
-        return get_default_file_extension(self.mime_type)
-
-    @property
-    def thumbnail_path(self) -> Path:
-        webp_file_name = f"{self.pk:07}.webp"
-        if self.storage_type == self.STORAGE_TYPE_GPG:
-            webp_file_name += ".gpg"
-
-        webp_file_path = settings.THUMBNAIL_DIR / Path(webp_file_name)
-
-        return webp_file_path.resolve()
-
-    @property
-    def thumbnail_file(self):
-        return open(self.thumbnail_path, "rb")
-
-    @property
-    def created_date(self):
-        return timezone.localdate(self.created)
 
 
 class Log(models.Model):
@@ -1005,44 +706,381 @@ class PaperlessTask(models.Model):
         return f"Task {self.task_id}"
 
 
-class Note(models.Model):
-    note = models.TextField(
-        _("content"),
-        blank=True,
-        help_text=_("Note for the document"),
-    )
+
+
+
+
+class CustomField(models.Model):
+    """
+    Defines the name and type of a custom field
+    """
+
+    class FieldDataType(models.TextChoices):
+        STRING = ("string", _("String"))
+        URL = ("url", _("URL"))
+        DATE = ("date", _("Date"))
+        BOOL = ("boolean"), _("Boolean")
+        INT = ("integer", _("Integer"))
+        FLOAT = ("float", _("Float"))
+        MONETARY = ("monetary", _("Monetary"))
+        DOCUMENTLINK = ("documentlink", _("Document Link"))
 
     created = models.DateTimeField(
         _("created"),
         default=timezone.now,
         db_index=True,
+        editable=False,
     )
 
-    document = models.ForeignKey(
-        Document,
-        blank=True,
-        null=True,
-        related_name="notes",
-        on_delete=models.CASCADE,
-        verbose_name=_("document"),
-    )
+    name = models.CharField(max_length=128)
 
-    user = models.ForeignKey(
-        User,
-        blank=True,
-        null=True,
-        related_name="notes",
-        on_delete=models.SET_NULL,
-        verbose_name=_("user"),
+    data_type = models.CharField(
+        _("data type"),
+        max_length=50,
+        choices=FieldDataType.choices,
+        editable=False,
     )
 
     class Meta:
         ordering = ("created",)
-        verbose_name = _("note")
-        verbose_name_plural = _("notes")
+        verbose_name = _("custom field")
+        verbose_name_plural = _("custom fields")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name"],
+                name="%(app_label)s_%(class)s_unique_name",
+            ),
+        ]
 
-    def __str__(self):
-        return self.note
+    def __str__(self) -> str:
+        return f"{self.name} : {self.data_type}"
+
+
+
+class DocumentType(MatchingModel):
+    map_key = models.CharField(
+        _("map_key"),
+        max_length=100,
+        editable=False,
+        # unique=True,
+        null=True,
+        blank=True,
+    )
+
+    custom_fields = models.ManyToManyField(
+        CustomField,
+        related_name="document_types",
+        blank=True,
+        verbose_name=_("tags"),
+    )
+    class Meta(MatchingModel.Meta):
+        verbose_name = _("document type")
+        verbose_name_plural = _("document types")
+
+class Document(SoftDeleteModel, ModelWithOwner):
+    STORAGE_TYPE_UNENCRYPTED = "unencrypted"
+    STORAGE_TYPE_GPG = "gpg"
+    STORAGE_TYPES = (
+        (STORAGE_TYPE_UNENCRYPTED, _("Unencrypted")),
+        (STORAGE_TYPE_GPG, _("Encrypted with GNU Privacy Guard")),
+    )
+
+    correspondent = models.ForeignKey(
+        Correspondent,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL,
+        verbose_name=_("correspondent"),
+    )
+
+    storage_path = models.ForeignKey(
+        StoragePath,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL,
+        verbose_name=_("storage path"),
+    )
+
+    folder = models.ForeignKey(
+        Folder,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.DO_NOTHING,
+        verbose_name=_("folder"),
+    )
+
+    dossier = models.ForeignKey(
+        Dossier,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.DO_NOTHING,
+        verbose_name=_("dossier"),
+    )
+
+    dossier_form = models.ForeignKey(
+        DossierForm,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL,
+        verbose_name=_("dossier forms"),
+    )
+
+    warehouse = models.ForeignKey(
+        Warehouse,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL,
+        verbose_name=_("warehouse"),
+    )
+
+    title = models.CharField(_("title"), max_length=128, blank=True, db_index=True)
+
+    document_type = models.ForeignKey(
+        DocumentType,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL,
+        verbose_name=_("document type"),
+    )
+
+    content = models.TextField(
+        _("content"),
+        blank=True,
+        help_text=_(
+            "The raw, text-only data of the document. This field is "
+            "primarily used for searching.",
+        ),
+    )
+
+    mime_type = models.CharField(_("mime type"), max_length=256, editable=False)
+
+    tags = models.ManyToManyField(
+        Tag,
+        related_name="documents",
+        blank=True,
+        verbose_name=_("tags"),
+    )
+
+    archive_font = models.ForeignKey(
+        ArchiveFont,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL,
+        verbose_name=_("archive fonts"),
+    )
+
+    font_language = models.ForeignKey(
+        FontLanguage,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL,
+        verbose_name=_("font languages"),
+    )
+
+    checksum = models.CharField(
+        _("checksum"),
+        max_length=32,
+        editable=False,
+        unique=True,
+        help_text=_("The checksum of the original document."),
+    )
+
+    file_id = models.CharField(
+        _("file_id"),
+        max_length=100,
+        editable=False,
+        default=''
+    )
+
+    archive_checksum = models.CharField(
+        _("archive checksum"),
+        max_length=32,
+        editable=False,
+        blank=True,
+        null=True,
+        help_text=_("The checksum of the archived document."),
+    )
+
+    created = models.DateTimeField(_("created"), default=timezone.now, db_index=True)
+
+    modified = models.DateTimeField(
+        _("modified"),
+        auto_now=True,
+        editable=False,
+        db_index=True,
+    )
+
+    storage_type = models.CharField(
+        _("storage type"),
+        max_length=11,
+        choices=STORAGE_TYPES,
+        default=STORAGE_TYPE_UNENCRYPTED,
+        editable=False,
+    )
+
+    added = models.DateTimeField(
+        _("added"),
+        default=timezone.now,
+        editable=False,
+        db_index=True,
+    )
+
+    filename = models.FilePathField(
+        _("filename"),
+        max_length=1024,
+        editable=False,
+        default=None,
+        unique=True,
+        null=True,
+        help_text=_("Current filename in storage"),
+    )
+
+    page_count = models.PositiveIntegerField(
+        _("page count"),
+        blank=False,
+        null=True,
+        unique=False,
+        db_index=False,
+        validators=[MinValueValidator(1)],
+        help_text=_(
+            "The number of pages of the document.",
+        ),
+    )
+
+    archive_filename = models.FilePathField(
+        _("archive filename"),
+        max_length=1024,
+        editable=False,
+        default=None,
+        unique=True,
+        null=True,
+        help_text=_("Current archive filename in storage"),
+    )
+
+    original_filename = models.CharField(
+        _("original filename"),
+        max_length=1024,
+        editable=False,
+        default=None,
+        unique=False,
+        null=True,
+        help_text=_("The original name of the file when it was uploaded"),
+    )
+
+    ARCHIVE_SERIAL_NUMBER_MIN: Final[int] = 0
+    ARCHIVE_SERIAL_NUMBER_MAX: Final[int] = 0xFF_FF_FF_FF
+
+    archive_serial_number = models.PositiveIntegerField(
+        _("archive serial number"),
+        blank=True,
+        null=True,
+        unique=True,
+        db_index=True,
+        validators=[
+            MaxValueValidator(ARCHIVE_SERIAL_NUMBER_MAX),
+            MinValueValidator(ARCHIVE_SERIAL_NUMBER_MIN),
+        ],
+        help_text=_(
+            "The position of this document in your physical document archive.",
+        ),
+    )
+
+    class Meta:
+        ordering = ("-created",)
+        verbose_name = _("document")
+        verbose_name_plural = _("documents")
+
+    def __str__(self) -> str:
+        # Convert UTC database time to local time
+        created = datetime.date.isoformat(timezone.localdate(self.created))
+
+        res = f"{created}"
+
+        if self.correspondent:
+            res += f" {self.correspondent}"
+        if self.title:
+            res += f" {self.title}"
+        return res
+
+    @property
+    def source_path(self) -> Path:
+        if self.filename:
+            fname = str(self.filename)
+        else:
+            fname = f"{self.pk:07}{self.file_type}"
+            if self.storage_type == self.STORAGE_TYPE_GPG:
+                fname += ".gpg"  # pragma: no cover
+
+        return (settings.ORIGINALS_DIR / Path(fname)).resolve()
+
+    @property
+    def source_file(self):
+        return open(self.source_path, "rb")
+
+    @property
+    def has_archive_version(self) -> bool:
+        return self.archive_filename is not None
+
+    @property
+    def archive_path(self) -> Optional[Path]:
+        if self.has_archive_version:
+            return (settings.ARCHIVE_DIR / Path(str(self.archive_filename))).resolve()
+        else:
+            return None
+
+    @property
+    def archive_file(self):
+        return open(self.archive_path, "rb")
+
+    def get_public_filename(self, archive=False, counter=0, suffix=None) -> str:
+        """
+        Returns a sanitized filename for the document, not including any paths.
+        """
+        result = str(self)
+
+        if counter:
+            result += f"_{counter:02}"
+
+        if suffix:
+            result += suffix
+
+        if archive:
+            result += ".pdf"
+        else:
+            result += self.file_type
+
+        return pathvalidate.sanitize_filename(result, replacement_text="-")
+
+    @property
+    def file_type(self):
+        return get_default_file_extension(self.mime_type)
+
+    @property
+    def thumbnail_path(self) -> Path:
+        webp_file_name = f"{self.pk:07}.webp"
+        if self.storage_type == self.STORAGE_TYPE_GPG:
+            webp_file_name += ".gpg"
+
+        webp_file_path = settings.THUMBNAIL_DIR / Path(webp_file_name)
+
+        return webp_file_path.resolve()
+
+    @property
+    def thumbnail_file(self):
+        return open(self.thumbnail_path, "rb")
+
+    @property
+    def created_date(self):
+        return timezone.localdate(self.created)
 
 
 class ShareLink(models.Model):
@@ -1105,50 +1143,45 @@ class ShareLink(models.Model):
         return f"Share Link for {self.document.title}"
 
 
-class CustomField(models.Model):
-    """
-    Defines the name and type of a custom field
-    """
 
-    class FieldDataType(models.TextChoices):
-        STRING = ("string", _("String"))
-        URL = ("url", _("URL"))
-        DATE = ("date", _("Date"))
-        BOOL = ("boolean"), _("Boolean")
-        INT = ("integer", _("Integer"))
-        FLOAT = ("float", _("Float"))
-        MONETARY = ("monetary", _("Monetary"))
-        DOCUMENTLINK = ("documentlink", _("Document Link"))
+class Note(models.Model):
+    note = models.TextField(
+        _("content"),
+        blank=True,
+        help_text=_("Note for the document"),
+    )
 
     created = models.DateTimeField(
         _("created"),
         default=timezone.now,
         db_index=True,
-        editable=False,
     )
 
-    name = models.CharField(max_length=128)
+    document = models.ForeignKey(
+        Document,
+        blank=True,
+        null=True,
+        related_name="notes",
+        on_delete=models.CASCADE,
+        verbose_name=_("document"),
+    )
 
-    data_type = models.CharField(
-        _("data type"),
-        max_length=50,
-        choices=FieldDataType.choices,
-        editable=False,
+    user = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        related_name="notes",
+        on_delete=models.SET_NULL,
+        verbose_name=_("user"),
     )
 
     class Meta:
         ordering = ("created",)
-        verbose_name = _("custom field")
-        verbose_name_plural = _("custom fields")
-        constraints = [
-            models.UniqueConstraint(
-                fields=["name"],
-                name="%(app_label)s_%(class)s_unique_name",
-            ),
-        ]
+        verbose_name = _("note")
+        verbose_name_plural = _("notes")
 
-    def __str__(self) -> str:
-        return f"{self.name} : {self.data_type}"
+    def __str__(self):
+        return self.note
 
 
 class CustomFieldInstance(models.Model):

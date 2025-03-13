@@ -753,6 +753,9 @@ class DocumentDocumentSerializer(DocumentElasticSearchSerializer):
         if hasattr(obj.meta, 'score'):
             return obj.meta.score
         return None
+class WebhookSerializer(serializers.Serializer):
+    class Meta:
+        fields = '__all__'
 
 class DocumentSerializer(
     OwnedObjectSerializer,
