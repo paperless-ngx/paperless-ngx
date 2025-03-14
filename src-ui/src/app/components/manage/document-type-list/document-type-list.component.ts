@@ -11,10 +11,13 @@ import { DocumentTypeService } from 'src/app/services/rest/document-type.service
 import { ToastService } from 'src/app/services/toast.service'
 import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
 import { ManagementListComponent } from '../management-list/management-list.component'
+import { first } from 'rxjs'
+import { CustomFieldsService } from '../../../services/rest/custom-fields.service'
+import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 
 @Component({
   selector: 'pngx-document-type-list',
-  templateUrl: './../management-list/management-list.component.html',
+  templateUrl: './../document-type-list/document-type-list.component.html',
   styleUrls: ['./../management-list/management-list.component.scss'],
 })
 export class DocumentTypeListComponent extends ManagementListComponent<DocumentType> {
@@ -23,7 +26,8 @@ export class DocumentTypeListComponent extends ManagementListComponent<DocumentT
     modalService: NgbModal,
     toastService: ToastService,
     documentListViewService: DocumentListViewService,
-    permissionsService: PermissionsService
+    permissionsService: PermissionsService,
+    customFieldsService: CustomFieldsService,
   ) {
     super(
       documentTypeService,
@@ -38,8 +42,28 @@ export class DocumentTypeListComponent extends ManagementListComponent<DocumentT
       PermissionType.DocumentType,
       []
     )
-  }
 
+
+  }
+  openEditDialog(object: DocumentType) {
+    var activeModal = super.getModalService().open(super.getEditDialogComponent(), {
+      backdrop: 'static',
+    })
+    activeModal.componentInstance.object = object
+    activeModal.componentInstance.dialogMode = EditDialogMode.EDIT
+    activeModal.componentInstance.succeeded.subscribe(() => {
+      this.reloadData()
+      super.getToastService().showInfo(
+        $localize`Successfully updated ${this.typeName}.`,
+      )
+    })
+    activeModal.componentInstance.failed.subscribe((e) => {
+      super.getToastService().showError(
+        $localize`Error occurred while saving ${this.typeName}.`,
+        e,
+      )
+    })
+  }
   getDeleteMessage(object: DocumentType) {
     return $localize`Do you really want to delete the document type "${object.name}"?`
   }

@@ -15,6 +15,7 @@
   <li class="list-group-item">
     <div class="row">
       <div class="col" i18n>Name</div>
+      <div class="col" i18n>Code</div>
       <div class="col" i18n>Data Type</div>
       <div class="col" i18n>Actions</div>
     </div>
@@ -24,6 +25,7 @@
     <li class="list-group-item">
       <div class="row">
         <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editField(field)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.CustomField)">{{field.name}}</button></div>
+        <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editField(field)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.CustomField)">{{field.code}}</button></div>
         <div class="col d-flex align-items-center">{{getDataType(field)}}</div>
         <div class="col">
           <div class="btn-group">

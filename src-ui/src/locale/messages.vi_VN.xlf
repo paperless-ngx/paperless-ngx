@@ -556,15 +556,15 @@
                <context context-type="linenumber">19</context>
             </context-group>
             <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
+               <context context-type="linenumber">3</context>
+            </context-group>
+            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
                <context context-type="linenumber">24</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/font-language-list/font-language-list.component.html</context>
-               <context context-type="linenumber">3</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
                <context context-type="linenumber">3</context>
             </context-group>
             <context-group purpose="location">
@@ -700,6 +700,10 @@
                <context context-type="linenumber">108</context>
             </context-group>
             <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
+               <context context-type="linenumber">51</context>
+            </context-group>
+            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
                <context context-type="linenumber">166</context>
             </context-group>
@@ -710,10 +714,6 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
                <context context-type="linenumber">101</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">51</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -868,6 +868,14 @@
                <context context-type="linenumber">17</context>
             </context-group>
             <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
+               <context context-type="linenumber">20</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
+               <context context-type="linenumber">37</context>
+            </context-group>
+            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
                <context context-type="linenumber">113</context>
             </context-group>
@@ -898,14 +906,6 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
                <context context-type="linenumber">20</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">20</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">37</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -1105,7 +1105,11 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.html</context>
-               <context context-type="linenumber">19</context>
+               <context context-type="linenumber">20</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
+               <context context-type="linenumber">43</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
@@ -1122,10 +1126,6 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
                <context context-type="linenumber">66</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">43</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -1430,15 +1430,15 @@
                <context context-type="linenumber">255</context>
             </context-group>
             <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
+               <context context-type="linenumber">112</context>
+            </context-group>
+            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
                <context context-type="linenumber">325</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/font-language-list/font-language-list.component.html</context>
-               <context context-type="linenumber">112</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
                <context context-type="linenumber">112</context>
             </context-group>
             <context-group purpose="location">
@@ -2156,7 +2156,19 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.html</context>
-               <context context-type="linenumber">34</context>
+               <context context-type="linenumber">36</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
+               <context context-type="linenumber">9</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
+               <context context-type="linenumber">84</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
+               <context context-type="linenumber">96</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
@@ -2200,10 +2212,6 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">9</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
                <context context-type="linenumber">84</context>
             </context-group>
             <context-group purpose="location">
@@ -2213,14 +2221,6 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
                <context context-type="linenumber">84</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">84</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">96</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -2617,7 +2617,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
-               <context context-type="linenumber">19</context>
+               <context context-type="linenumber">20</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-shelf-edit-dialog/custom-shelf-edit-dialog.component.html</context>
@@ -2625,7 +2625,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component.html</context>
-               <context context-type="linenumber">30</context>
+               <context context-type="linenumber">31</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/dossier-edit-dialog/dossier-edit-dialog.component.html</context>
@@ -3118,6 +3118,10 @@
                <context context-type="linenumber">38</context>
             </context-group>
             <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
+               <context context-type="linenumber">6</context>
+            </context-group>
+            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/font-language-list/font-language-list.component.html</context>
                <context context-type="linenumber">6</context>
             </context-group>
@@ -3128,10 +3132,6 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
                <context context-type="linenumber">81</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">6</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -4037,7 +4037,15 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.html</context>
-               <context context-type="linenumber">31</context>
+               <context context-type="linenumber">33</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
+               <context context-type="linenumber">83</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
+               <context context-type="linenumber">93</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
@@ -4070,14 +4078,6 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
                <context context-type="linenumber">83</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">83</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">93</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -4410,7 +4410,7 @@
                <context context-type="linenumber">222</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
                <context context-type="linenumber">90</context>
             </context-group>
             <context-group purpose="location">
@@ -4735,7 +4735,7 @@
             <source>Sidebar views updated</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-               <context context-type="linenumber">339</context>
+               <context context-type="linenumber">340</context>
             </context-group>
             <target state="translated">Sidebar views updated</target>
          </trans-unit>
@@ -4743,7 +4743,7 @@
             <source>Error updating sidebar views</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-               <context context-type="linenumber">342</context>
+               <context context-type="linenumber">343</context>
             </context-group>
             <target state="translated">Error updating sidebar views</target>
          </trans-unit>
@@ -4751,7 +4751,7 @@
             <source>An error occurred while saving update checking settings.</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-               <context context-type="linenumber">363</context>
+               <context context-type="linenumber">364</context>
             </context-group>
             <target state="translated">An error occurred while saving update checking settings.</target>
          </trans-unit>
@@ -4859,7 +4859,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
-               <context context-type="linenumber">18</context>
+               <context context-type="linenumber">19</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-shelf-edit-dialog/custom-shelf-edit-dialog.component.html</context>
@@ -4867,7 +4867,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component.html</context>
-               <context context-type="linenumber">29</context>
+               <context context-type="linenumber">30</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/dossier-edit-dialog/dossier-edit-dialog.component.html</context>
@@ -5413,7 +5413,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component.html</context>
-               <context context-type="linenumber">16</context>
+               <context context-type="linenumber">17</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/font-language-edit-dialog/font-language-edit-dialog.component.html</context>
@@ -5449,7 +5449,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component.html</context>
-               <context context-type="linenumber">19</context>
+               <context context-type="linenumber">20</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/font-language-edit-dialog/font-language-edit-dialog.component.html</context>
@@ -5529,7 +5529,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component.html</context>
-               <context context-type="linenumber">14</context>
+               <context context-type="linenumber">15</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component.html</context>
@@ -5557,11 +5557,23 @@
             </context-group>
             <target state="translated">Sửa biên tập viên</target>
          </trans-unit>
+         <trans-unit id="8186013988289067040" datatype="html">
+            <source>Code</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
+               <context context-type="linenumber">12</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.html</context>
+               <context context-type="linenumber">18</context>
+            </context-group>
+            <target state="translated">Khóa</target>
+         </trans-unit>
          <trans-unit id="4894226280476434291" datatype="html">
             <source>Data type</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
-               <context context-type="linenumber">12</context>
+               <context context-type="linenumber">13</context>
             </context-group>
             <target state="translated">Kiểu dữ liệu</target>
          </trans-unit>
@@ -5569,7 +5581,7 @@
             <source>Data type cannot be changed after a field is created</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
-               <context context-type="linenumber">14</context>
+               <context context-type="linenumber">15</context>
             </context-group>
             <target state="translated">Loại dữ liệu không thể thay đổi sau khi trường được tạo</target>
          </trans-unit>
@@ -5637,11 +5649,23 @@
             </context-group>
             <target state="translated">Chỉnh sửa giá kệ</target>
          </trans-unit>
+         <trans-unit id="9149498548977462220" datatype="html">
+            <source>Custom fields</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component.html</context>
+               <context context-type="linenumber">14</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+               <context context-type="linenumber">135</context>
+            </context-group>
+            <target state="translated">Trường tùy chỉnh</target>
+         </trans-unit>
          <trans-unit id="6672809941092516947" datatype="html">
             <source>Create new document type</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component.ts</context>
-               <context context-type="linenumber">27</context>
+               <context context-type="linenumber">36</context>
             </context-group>
             <target state="translated">Tạo loại tài liệu mới</target>
          </trans-unit>
@@ -5649,7 +5673,7 @@
             <source>Edit document type</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component.ts</context>
-               <context context-type="linenumber">31</context>
+               <context context-type="linenumber">40</context>
             </context-group>
             <target state="translated">Cập nhật loại tài liệu</target>
          </trans-unit>
@@ -7126,7 +7150,7 @@
                <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
                <context context-type="linenumber">27</context>
             </context-group>
-            <target state="translated">Loại trừ</target>
+            <target state="translated">Không chứa</target>
          </trans-unit>
          <trans-unit id="5674286808255988565" datatype="html">
             <source>Create</source>
@@ -7155,15 +7179,15 @@
                <context context-type="linenumber">52</context>
             </context-group>
             <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
+               <context context-type="linenumber">12</context>
+            </context-group>
+            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
                <context context-type="linenumber">70</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/font-language-list/font-language-list.component.html</context>
-               <context context-type="linenumber">12</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
                <context context-type="linenumber">12</context>
             </context-group>
             <context-group purpose="location">
@@ -10778,14 +10802,6 @@
             </context-group>
             <target state="translated">Tiêu đề &amp; nội dung</target>
          </trans-unit>
-         <trans-unit id="9149498548977462220" datatype="html">
-            <source>Custom fields</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-               <context context-type="linenumber">135</context>
-            </context-group>
-            <target state="translated">Trường tùy chỉnh</target>
-         </trans-unit>
          <trans-unit id="1010505078885609376" datatype="html">
             <source>Advanced search</source>
             <context-group purpose="location">
@@ -11168,15 +11184,15 @@
                <context context-type="linenumber">73</context>
             </context-group>
             <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
+               <context context-type="linenumber">19</context>
+            </context-group>
+            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
                <context context-type="linenumber">111</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/font-language-list/font-language-list.component.html</context>
-               <context context-type="linenumber">19</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
                <context context-type="linenumber">19</context>
             </context-group>
             <context-group purpose="location">
@@ -11352,15 +11368,15 @@
                <context context-type="linenumber">252</context>
             </context-group>
             <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
+               <context context-type="linenumber">110</context>
+            </context-group>
+            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
                <context context-type="linenumber">322</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/font-language-list/font-language-list.component.html</context>
-               <context context-type="linenumber">110</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
                <context context-type="linenumber">110</context>
             </context-group>
             <context-group purpose="location">
@@ -11664,6 +11680,10 @@
                <context context-type="linenumber">274</context>
             </context-group>
             <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
+               <context context-type="linenumber">57</context>
+            </context-group>
+            <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
                <context context-type="linenumber">186</context>
             </context-group>
@@ -11686,6 +11706,10 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-dossier-list/custom-dossier-list.component.ts</context>
                <context context-type="linenumber">279</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
+               <context context-type="linenumber">62</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
@@ -11844,7 +11868,7 @@
                <context context-type="linenumber">96</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
                <context context-type="linenumber">39</context>
             </context-group>
             <context-group purpose="location">
@@ -11868,7 +11892,7 @@
                <context context-type="linenumber">214</context>
             </context-group>
             <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
                <context context-type="linenumber">82</context>
             </context-group>
             <context-group purpose="location">
@@ -11905,7 +11929,7 @@
             <source>Data Type</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.html</context>
-               <context context-type="linenumber">18</context>
+               <context context-type="linenumber">19</context>
             </context-group>
             <target state="translated">Kiểu dữ liệu</target>
          </trans-unit>
@@ -11913,7 +11937,7 @@
             <source>No fields defined.</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.html</context>
-               <context context-type="linenumber">42</context>
+               <context context-type="linenumber">44</context>
             </context-group>
             <target state="translated">Không có trường nào được xác định</target>
          </trans-unit>
@@ -11949,11 +11973,31 @@
             </context-group>
             <target state="translated">Lỗi xóa trường</target>
          </trans-unit>
+         <trans-unit id="1383365546483928780" datatype="html">
+            <source>Matching</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
+               <context context-type="linenumber">38</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
+               <context context-type="linenumber">38</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
+               <context context-type="linenumber">38</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
+               <context context-type="linenumber">38</context>
+            </context-group>
+            <target state="translated">Thuật toán phân loại</target>
+         </trans-unit>
          <trans-unit id="8084492669582894778" datatype="html">
             <source>document type</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
-               <context context-type="linenumber">36</context>
+               <context context-type="linenumber">40</context>
             </context-group>
             <target state="translated">loại tài liệu</target>
          </trans-unit>
@@ -11961,7 +12005,7 @@
             <source>document types</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
-               <context context-type="linenumber">37</context>
+               <context context-type="linenumber">41</context>
             </context-group>
             <target state="translated">loại tài liệu</target>
          </trans-unit>
@@ -11973,7 +12017,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
-               <context context-type="linenumber">44</context>
+               <context context-type="linenumber">68</context>
             </context-group>
             <target state="translated">
                Bạn có thực sự muốn xóa loại tài liệu "
@@ -12409,26 +12453,6 @@
             </context-group>
             <target state="translated">Đã cập nhật quyền</target>
          </trans-unit>
-         <trans-unit id="1383365546483928780" datatype="html">
-            <source>Matching</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">38</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">38</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">38</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
-               <context context-type="linenumber">38</context>
-            </context-group>
-            <target state="translated">Thuật toán phân loại</target>
-         </trans-unit>
          <trans-unit id="3217819268541951032" datatype="html">
             <source>shelf</source>
             <context-group purpose="location">
@@ -12731,7 +12755,7 @@
                <context context-type="sourcefile">src/app/data/matching-model.ts</context>
                <context context-type="linenumber">20</context>
             </context-group>
-            <target state="translated">Bất kỳ từ nào</target>
+            <target state="translated">Từ bất kỳ</target>
          </trans-unit>
          <trans-unit id="7517655726614958140" datatype="html">
             <source>Any: Document contains any of these words (space separated)</source>
