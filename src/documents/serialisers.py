@@ -160,24 +160,24 @@ class SetPermissionsMixin:
 
     def validate_set_permissions(self, set_permissions=None):
         permissions_dict = {
-            "view": {
-                "users": User.objects.none(),
-                "groups": Group.objects.none(),
-            },
-            "change": {
-                "users": User.objects.none(),
-                "groups": Group.objects.none(),
-            },
+            "view": {},
+            "change": {},
         }
         if set_permissions is not None:
-            for action, _ in permissions_dict.items():
+            for action in ["view", "change"]:
                 if action in set_permissions:
-                    users = set_permissions[action]["users"]
-                    permissions_dict[action]["users"] = self._validate_user_ids(users)
-                    groups = set_permissions[action]["groups"]
-                    permissions_dict[action]["groups"] = self._validate_group_ids(
-                        groups,
-                    )
+                    if "users" in set_permissions[action]:
+                        users = set_permissions[action]["users"]
+                        permissions_dict[action]["users"] = self._validate_user_ids(
+                            users,
+                        )
+                    if "groups" in set_permissions[action]:
+                        groups = set_permissions[action]["groups"]
+                        permissions_dict[action]["groups"] = self._validate_group_ids(
+                            groups,
+                        )
+                else:
+                    del permissions_dict[action]
         return permissions_dict
 
     def _set_permissions(self, permissions, object):

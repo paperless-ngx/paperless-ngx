@@ -1162,7 +1162,7 @@ def run_workflows(
                 ) as f:
                     files = {
                         "file": (
-                            document.original_filename,
+                            filename,
                             f.read(),
                             document.mime_type,
                         ),
