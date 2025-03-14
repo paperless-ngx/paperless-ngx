@@ -50,7 +50,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
     """
 
     logging_name = "edoc.parsing.pdf"
-
+    file_id = None
     def get_settings(self) -> OcrConfig:
         """
         This parser uses the OCR configuration settings to parse documents
@@ -70,6 +70,9 @@ class RasterisedDocumentCustomParser(DocumentParser):
                     f"Unable to determine PDF page count {document_path}: {e}",
                 )
         return page_count
+
+    def get_file_id(self):
+        return str(self.file_id) if self.file_id else None
 
     def extract_metadata(self, document_path, mime_type):
         result = []
@@ -395,6 +398,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
 
             if response_upload.status_code == 201:
                 get_file_id = response_upload.json().get('id', '')
+                self.file_id = get_file_id
 
                 # else :
                 #     # logging.error('upload file: ', response_upload.status_code)

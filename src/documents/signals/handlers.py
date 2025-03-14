@@ -31,7 +31,7 @@ from documents.consumer import parse_doc_title_w_placeholders
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_unique_filename
-from documents.models import Approval, CustomFieldInstance
+from documents.models import Approval, CustomFieldInstance, DocumentType
 from documents.models import Document
 from documents.models import MatchingModel
 from documents.models import PaperlessTask
@@ -253,6 +253,7 @@ def set_document_type(
     style_func=None,
     **kwargs,
 ):
+    logger.info(f"set_document_type document: {document}")
     if document.document_type and not replace:
         return
 
@@ -293,7 +294,31 @@ def set_document_type(
             )
 
             document.document_type = selected
+            # set custom fields from document type to document
+            set_custom_fields_from_document_type_to_document(selected, document)
+            # call api update data to update custom fields
+
             document.save(update_fields=("document_type",))
+
+def set_custom_fields_from_document_type_to_document(document_type, document):
+    logger.info(f"set_custom_fields_from_document_type_to_document document_type: {document_type} to document: {document}")
+    custom_field_document_type = DocumentType.objects.prefetch_related("custom_fields").get(pk=document_type.pk)
+    custom_fields_exist = CustomFieldInstance.objects.filter(document=document)
+    custom_fields_exist_dict = {
+        f.field.pk
+        for f in custom_fields_exist
+    }
+
+    fields_to_create = [
+        CustomFieldInstance(field=field, document=document)
+        for field in custom_field_document_type.custom_fields.all()
+        if field.pk not in custom_fields_exist_dict
+    ]
+
+    CustomFieldInstance.objects.bulk_create(fields_to_create)
+    from documents.tasks import update_value_customfield_to_document
+    update_value_customfield_to_document.delay(document_id=document.pk)
+    logger.info("created custom fields in document")
 
 
 def set_tags(

@@ -498,7 +498,7 @@ class CustomFieldField(serializers.PrimaryKeyRelatedField):
 
 class DocumentTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     custom_fields = CustomFieldField(many=True)
-    map_key = serializers.CharField(allow_blank=True, required=False)
+    code = serializers.CharField(allow_blank=True, allow_null=True,required=False)
     class Meta:
         model = DocumentType
         fields = (
@@ -509,7 +509,7 @@ class DocumentTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "matching_algorithm",
             "is_insensitive",
             "custom_fields",
-            "map_key",
+            "code",
             "document_count",
             "owner",
             "permissions",
@@ -523,12 +523,14 @@ class CustomFieldSerializer(serializers.ModelSerializer):
         choices=CustomField.FieldDataType,
         read_only=False,
     )
+    code = serializers.CharField(allow_blank=True, allow_null=True,required=False)
 
     class Meta:
         model = CustomField
         fields = [
             "id",
             "name",
+            "code",
             "data_type",
         ]
 

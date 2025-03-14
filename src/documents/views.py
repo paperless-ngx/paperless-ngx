@@ -24,7 +24,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.db import connections
+from django.db import connections, transaction
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.models import Case
@@ -50,12 +50,12 @@ from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.cache import cache_control
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
 from django_elasticsearch_dsl_drf.pagination import LimitOffsetPagination
 from django_filters.rest_framework import DjangoFilterBackend
-from elasticsearch_dsl.serializer import serializer
 from guardian.shortcuts import get_objects_for_user
 from guardian.shortcuts import get_users_with_perms
 from langdetect import detect
@@ -2910,15 +2910,40 @@ class TrashView(ListModelMixin, PassUserMixin):
         return Response({"result": "OK", "doc_ids": doc_ids})
 
 
+class WebhookViewSet(ViewSet):
+    permission_classes = [AllowAny]
+
+    @action(detail=True, methods=['post'], url_path='peel-field', permission_classes=[AllowAny])
+    def peel_field(self, request, pk=None):
+        """
+        Nhận dữ liệu từ POST /api/peel-field/<document_id>/
+        """
+        data = request.data
+        field_values = data['field_category'][0]['field_data'][0][
+            'field_value']
+        dict_field_values = dict()
+        for field in field_values:
+            dict_field_values[field['code']] = field['value']
+
+        custom_field_instances = CustomFieldInstance.objects.select_related("field").filter(
+            document_id=pk)
+        updated_instances = []
+
+        for i in custom_field_instances:
+            if i.field.code in dict_field_values:
+                i.value_text = dict_field_values[i.field.code]
+                updated_instances.append(i)
+
+        # Cập nhật tất cả các bản ghi đã thay đổi
+        if updated_instances:
+            with transaction.atomic():
+                CustomFieldInstance.objects.bulk_update(updated_instances,
+                                                        ['value_text'])
+
+        logger.info(f"📦 Webhook called with document_id={pk}, data={data}")
+        return Response({"message": "Received", "document_id": pk, "data": data})
 
 
-class Webhook(APIView):
-    permission_classes = (AllowAny,)
-
-    def post(self, request):
-        data = self.request.data
-        logger.info(f"========= test_callback: {data}")
-        return Response(data)
 
 class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = Warehouse

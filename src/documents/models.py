@@ -733,6 +733,7 @@ class CustomField(models.Model):
     )
 
     name = models.CharField(max_length=128)
+    code = models.CharField(max_length=128, blank=True, null=True)
 
     data_type = models.CharField(
         _("data type"),
@@ -758,8 +759,8 @@ class CustomField(models.Model):
 
 
 class DocumentType(MatchingModel):
-    map_key = models.CharField(
-        _("map_key"),
+    code = models.CharField(
+        _("code"),
         max_length=100,
         editable=False,
         # unique=True,
