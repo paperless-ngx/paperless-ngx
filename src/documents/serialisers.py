@@ -226,7 +226,11 @@ class SerializerWithPerms(serializers.Serializer):
     },
 )
 class SetPermissionsSerializer(serializers.DictField):
-    pass
+    def validate_empty_values(self, data: dict | None):
+        if data is fields.empty or (data is not None and len(data) == 0):
+            # allow empty but skip the field to prevent overwriting permissions
+            raise fields.SkipField
+        return super().validate_empty_values(data)
 
 
 class OwnedObjectSerializer(
