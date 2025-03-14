@@ -270,7 +270,7 @@ The following methods are supported:
 -   `remove_tag`
     -   Requires `parameters`: `{ "tag": TAG_ID }`
 -   `modify_tags`
-    -   Requires `parameters`: `{ "add_tags": [LIST_OF_TAG_IDS] }` and / or `{ "remove_tags": [LIST_OF_TAG_IDS] }`
+    -   Requires `parameters`: `{ "add_tags": [LIST_OF_TAG_IDS] }` and `{ "remove_tags": [LIST_OF_TAG_IDS] }`
 -   `delete`
     -   No `parameters` required
 -   `reprocess`
