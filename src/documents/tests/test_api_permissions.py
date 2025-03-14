@@ -395,6 +395,52 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.assertTrue(checker.has_perm("view_document", doc))
         self.assertIn("view_document", get_perms(group1, doc))
 
+    def test_patch_doesnt_remove_permissions(self):
+        """
+        GIVEN:
+            - existing document with permissions set
+        WHEN:
+            - PATCH API request to update doc that is not json
+        THEN:
+            - Object permissions are not removed
+        """
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document",
+        )
+        user1 = User.objects.create_superuser(username="user1")
+        user2 = User.objects.create(username="user2")
+        group1 = Group.objects.create(name="group1")
+        doc.owner = user1
+        doc.save()
+
+        assign_perm("view_document", user2, doc)
+        assign_perm("change_document", user2, doc)
+        assign_perm("view_document", group1, doc)
+        assign_perm("change_document", group1, doc)
+
+        self.client.force_authenticate(user1)
+
+        response = self.client.patch(
+            f"/api/documents/{doc.id}/",
+            {
+                "archive_serial_number": "123",
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        doc = Document.objects.get(pk=doc.id)
+
+        self.assertEqual(doc.owner, user1)
+        from guardian.core import ObjectPermissionChecker
+
+        checker = ObjectPermissionChecker(user2)
+        self.assertTrue(checker.has_perm("view_document", doc))
+        self.assertIn("view_document", get_perms(group1, doc))
+        self.assertTrue(checker.has_perm("change_document", doc))
+        self.assertIn("change_document", get_perms(group1, doc))
+
     def test_dynamic_permissions_fields(self):
         user1 = User.objects.create_user(username="user1")
         user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
