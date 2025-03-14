@@ -6810,7 +6810,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="translated">Consell: les vistes desades es poden crear des de <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink="&quot;/documents&quot;&gt;"/>la llista de documents<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></target>
+        <target state="translated">Consell: les vistes desades es poden crear des de <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/documents&quot;&gt;"/>la llista de documents<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></target>
       </trans-unit>
       <trans-unit id="6581372518205328477" datatype="html">
         <source>Hello <x id="PH" equiv-text="this.settingsService.displayName"/>, welcome to <x id="PH_1" equiv-text="environment.appTitle"/></source>
