@@ -15,7 +15,7 @@ from django.contrib.admin.models import ADDITION
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.db import DatabaseError
+from django.db import DatabaseError, transaction
 from django.db import close_old_connections
 from django.db import models
 from django.db.models import Q
@@ -295,31 +295,39 @@ def set_document_type(
 
             document.document_type = selected
             # set custom fields from document type to document
-            set_custom_fields_from_document_type_to_document(selected, document)
+            bulk_set_custom_fields_from_document_type_to_document(selected.id, [document.id], True)
             # call api update data to update custom fields
 
             document.save(update_fields=("document_type",))
 
-def set_custom_fields_from_document_type_to_document(document_type, document):
-    logger.info(f"set_custom_fields_from_document_type_to_document document_type: {document_type} to document: {document}")
-    custom_field_document_type = DocumentType.objects.prefetch_related("custom_fields").get(pk=document_type.pk)
-    custom_fields_exist = CustomFieldInstance.objects.filter(document=document)
-    custom_fields_exist_dict = {
-        f.field.pk
+def bulk_set_custom_fields_from_document_type_to_document(document_type_id, document_ids, peel):
+    logger.info(f"set_custom_fields_from_document_type_to_document document_type: {document_type_id} to document: {document_ids}")
+    custom_fields_document_type = DocumentType.objects.prefetch_related("custom_fields").get(pk=document_type_id)
+    custom_fields_exist = CustomFieldInstance.objects.filter(document__in=document_ids)
+    custom_fields_exist_set = {
+        f'{f.field.pk}_{f.document.pk}'
         for f in custom_fields_exist
     }
+    custom_fields_insert = []
+    try:
+        with transaction.atomic():
+            for f in custom_fields_document_type.custom_fields.all():
+                for d in document_ids:
+                    if f'{f.pk}_{d}' not in custom_fields_exist_set:
+                        custom_fields_insert.append(
+                            CustomFieldInstance(field_id=f.pk, document_id=d))
 
-    fields_to_create = [
-        CustomFieldInstance(field=field, document=document)
-        for field in custom_field_document_type.custom_fields.all()
-        if field.pk not in custom_fields_exist_dict
-    ]
+            CustomFieldInstance.objects.bulk_create(custom_fields_insert)
 
-    CustomFieldInstance.objects.bulk_create(fields_to_create)
+    except Exception as e:
+        print(f"Có lỗi xảy ra: {e}")
+
+
     from documents.tasks import update_value_customfield_to_document
-    update_value_customfield_to_document.delay(document_id=document.pk)
+    if peel:
+        for document in document_ids:
+            update_value_customfield_to_document(document_id=document)
     logger.info("created custom fields in document")
-
 
 def set_tags(
     sender,

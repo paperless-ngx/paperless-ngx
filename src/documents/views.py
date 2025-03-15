@@ -198,7 +198,9 @@ from documents.serialisers import WorkflowSerializer
 from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import approval_updated
 from documents.signals import document_updated
-from documents.tasks import backup_documents
+
+from documents.tasks import backup_documents, \
+    bulk_update_custom_field_form_document_type_to_document
 from documents.tasks import consume_file
 from documents.tasks import deleted_backup
 from documents.tasks import empty_trash
@@ -561,6 +563,15 @@ class DocumentViewSet(
         serializer = self.get_serializer(instance, data=data, partial=partial)
         serializer.is_valid(raise_exception=True)
         response = super().update(request, *args, **kwargs)
+        document_type = serializer.validated_data.get("document_type")
+        update_document_field = True
+        if document_type and  instance.document_type:
+            if document_type.id == instance.document_type.id:
+                update_document_field = False
+        elif document_type is None:
+            update_document_field = False
+        if update_document_field:
+            bulk_update_custom_field_form_document_type_to_document.delay( [instance.id], document_type.id, True)
         # logger.debug(response)
         self.update_time_archive_font(self.get_object())
         self.update_name_folder(self.get_object(), serializer)
@@ -572,7 +583,7 @@ class DocumentViewSet(
 
         document_updated.send(
             sender=self.__class__,
-            document=self.get_object(),
+            document=self.get_object()
         )
 
         return response
@@ -2919,28 +2930,33 @@ class WebhookViewSet(ViewSet):
         Nhận dữ liệu từ POST /api/peel-field/<document_id>/
         """
         data = request.data
-        field_values = data['field_category'][0]['field_data'][0][
-            'field_value']
-        dict_field_values = dict()
-        for field in field_values:
-            dict_field_values[field['code']] = field['value']
+        logger.info(f"Webhook called with document_id={pk}, data={data}")
+        field_values = data.get('field_category',[])
 
-        custom_field_instances = CustomFieldInstance.objects.select_related("field").filter(
-            document_id=pk)
-        updated_instances = []
+        if len(field_values):
+            field_values[0].get('field_data',[])[0].get(
+                'field_value')
+        if not field_values:
+            dict_field_values = dict()
+            for field in field_values:
+                dict_field_values[field['code']] = field['value']
 
-        for i in custom_field_instances:
-            if i.field.code in dict_field_values:
-                i.value_text = dict_field_values[i.field.code]
-                updated_instances.append(i)
+            custom_field_instances = CustomFieldInstance.objects.select_related("field").filter(
+                document_id=pk)
+            updated_instances = []
 
-        # Cập nhật tất cả các bản ghi đã thay đổi
-        if updated_instances:
-            with transaction.atomic():
-                CustomFieldInstance.objects.bulk_update(updated_instances,
-                                                        ['value_text'])
+            for i in custom_field_instances:
+                if i.field.code in dict_field_values:
+                    i.value_text = dict_field_values[i.field.code]
+                    updated_instances.append(i)
 
-        logger.info(f"📦 Webhook called with document_id={pk}, data={data}")
+            # Cập nhật tất cả các bản ghi đã thay đổi
+            if updated_instances:
+                with transaction.atomic():
+                    CustomFieldInstance.objects.bulk_update(updated_instances,
+                                                            ['value_text'])
+
+
         return Response({"message": "Received", "document_id": pk, "data": data})
 
 

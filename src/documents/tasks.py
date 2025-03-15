@@ -60,7 +60,7 @@ from documents.plugins.base import StopConsumeTaskError
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated, document_consumption_finished
-from documents.signals.handlers import cleanup_document_deletion
+from documents.signals.handlers import cleanup_document_deletion, bulk_set_custom_fields_from_document_type_to_document
 from paperless.models import ApplicationConfiguration
 from paperless_ocr_custom.parsers import RasterisedDocumentCustomParser
 
@@ -277,6 +277,13 @@ def bulk_update_documents(document_ids):
         #     index.update_document(writer, doc)
     for doc in documents:
         update_index_document(doc)
+
+
+@shared_task
+def bulk_update_custom_field_form_document_type_to_document(document_ids, document_type_id, peel):
+    bulk_set_custom_fields_from_document_type_to_document(document_type_id,
+                                                     document_ids, peel)
+
 
 
 @shared_task(bind=True)

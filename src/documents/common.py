@@ -148,9 +148,9 @@ def upload_file(path_document, callback_url, api_upload_file_ocr, username_ocr,
                 return None
 
             headers = {
-                'Authorization': f"Bearer {cache.get('access_token_ocr', '')}"
+                'Authorization': f"Bearer {token['access']}"
             }
-            pdf_data = None
+
             with open(path_document, 'rb') as file:
                 pdf_data = file.read()
 
@@ -165,6 +165,7 @@ def upload_file(path_document, callback_url, api_upload_file_ocr, username_ocr,
                                                     -1],
                                                 pdf_data)},
                                             headers=headers)
+            print("response_upload", response_upload)
 
         if response_upload.status_code == 201:
             # get_file_id = response_upload.json().get('id', '')
