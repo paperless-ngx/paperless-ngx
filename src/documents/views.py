@@ -2931,12 +2931,12 @@ class WebhookViewSet(ViewSet):
         """
         data = request.data
         logger.info(f"Webhook called with document_id={pk}, data={data}")
-        field_values = data.get('field_category',[])
+        field_values = data.get('extract_data',[])
 
-        if len(field_values):
-            field_values[0].get('field_data',[])[0].get(
-                'field_value')
-        if not field_values:
+        if len(field_values)>0:
+            field_values=field_values[0]['field_category'][0]['field_data'][0]['field_value']
+        logger.info(f"field_values={field_values}")
+        if field_values:
             dict_field_values = dict()
             for field in field_values:
                 dict_field_values[field['code']] = field['value']
