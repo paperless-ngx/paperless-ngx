@@ -870,7 +870,7 @@ class BasicUserSerializer(serializers.ModelSerializer):
 
 
 class NotesSerializer(serializers.ModelSerializer):
-    user = BasicUserSerializer()
+    user = BasicUserSerializer(read_only=True)
 
     class Meta:
         model = Note
@@ -893,7 +893,7 @@ class DocumentSerializer(
     created_date = serializers.DateField(required=False)
     page_count = SerializerMethodField()
 
-    notes = NotesSerializer(many=True, required=False)
+    notes = NotesSerializer(many=True, required=False, read_only=True)
 
     custom_fields = CustomFieldInstanceSerializer(
         many=True,
