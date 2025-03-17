@@ -85,7 +85,7 @@ search_index() {
 
 	if [[ (! -f "${index_version_file}") || $(<"${index_version_file}") != "$index_version" ]]; then
 		echo "Search index out of date. Updating..."
-		python3 manage.py search_index --rebuild -f
+		python3 manage.py document_index_elasticsearch reindex --no-progress-bar
 		echo ${index_version} | tee "${index_version_file}" >/dev/null
 	fi
 }

@@ -38,6 +38,7 @@ from documents.consumer import WorkflowTriggerPlugin
 from documents.consumer import get_config_dossier_form
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
+from documents.documents import DocumentDocument
 from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
@@ -100,6 +101,26 @@ def index_optimize():
     writer = AsyncWriter(ix)
     writer.commit(optimize=True)
 
+@shared_task
+def index_optimize_elasticsearch(progress_bar_disable=False):
+    documents = Document.objects.filter(indexed = False).select_related(
+        'correspondent',
+        'document_type',
+        'warehouse',
+        'archive_font',
+        'folder',
+        'storage_path',
+        'owner'
+    ).prefetch_related(
+        'tags',
+        'custom_fields',
+        'notes'
+    )
+
+    print("documents total", documents.count())
+    for document in tqdm.tqdm(documents, disable=progress_bar_disable):
+        DocumentDocument().update_document(document)
+    documents.update(indexed=True)
 
 def index_reindex(progress_bar_disable=False):
     documents = Document.objects.all()
@@ -110,7 +131,28 @@ def index_reindex(progress_bar_disable=False):
     #     for document in tqdm.tqdm(documents, disable=progress_bar_disable):
     #         index.update_document(writer, document)
     for document in tqdm.tqdm(documents, disable=progress_bar_disable):
+        DocumentDocument().update_document(document)
+
+def index_reindex_elasticsearch(progress_bar_disable=False):
+    documents = Document.objects.select_related(
+        'correspondent',
+        'document_type',
+        'warehouse',
+        'archive_font',
+        'folder',
+        'storage_path',
+        'owner'
+    ).prefetch_related(
+        'tags',
+        'custom_fields',
+        'notes'
+    )
+
+    print("documents total", documents.count())
+    for document in tqdm.tqdm(documents, disable=progress_bar_disable):
         update_index_document(document)
+    documents.update(indexed=True)
+
 
 @shared_task
 def train_classifier():

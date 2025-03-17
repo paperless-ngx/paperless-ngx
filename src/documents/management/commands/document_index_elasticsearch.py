@@ -1,24 +1,26 @@
 from django.core.management import BaseCommand
-from django.db import transaction
+from elasticsearch import Elasticsearch
 
 from documents.management.commands.mixins import ProgressBarMixin
-from documents.models import Document
-from documents.tasks import index_optimize
-from documents.tasks import index_reindex
+from documents.tasks import index_reindex_elasticsearch, \
+    index_optimize_elasticsearch
+from paperless.settings import ELASTIC_SEARCH_DOCUMENT_INDEX, \
+    ELASTIC_SEARCH_HOST
 
 
 class Command(ProgressBarMixin, BaseCommand):
     help = "Manages the document index elastic search."
 
     def add_arguments(self, parser):
-        parser.add_argument("command", choices=["reindex", "optimize"])
+        parser.add_argument("command", choices=["reindex"])
         self.add_argument_progress_bar_mixin(parser)
 
     def handle(self, *args, **options):
         self.handle_progress_bar_mixin(**options)
-        documents = Document.objects.all().select_related()
-        with transaction.atomic():
-            if options["command"] == "reindex":
-                index_reindex(progress_bar_disable=self.no_progress_bar)
-            elif options["command"] == "optimize":
-                index_optimize()
+        if Elasticsearch(ELASTIC_SEARCH_HOST).indices.exists(index=ELASTIC_SEARCH_DOCUMENT_INDEX):
+            print(f"Index '{ELASTIC_SEARCH_DOCUMENT_INDEX}' exists.")
+            index_optimize_elasticsearch(self.use_progress_bar)
+        else:
+            print(f"Index '{ELASTIC_SEARCH_DOCUMENT_INDEX}' does not exist.")
+            index_reindex_elasticsearch(
+                progress_bar_disable=self.no_progress_bar)

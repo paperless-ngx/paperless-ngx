@@ -902,6 +902,8 @@ class Document(SoftDeleteModel, ModelWithOwner):
         default=''
     )
 
+    indexed = models.BooleanField(blank=True, null=True, default=True)
+
     archive_checksum = models.CharField(
         _("archive checksum"),
         max_length=32,
