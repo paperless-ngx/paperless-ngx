@@ -818,18 +818,21 @@ export class FilterEditorComponent
           })
         })
     }
-    if (this.correspondentSelectionModel.isNoneSelected()) {
+    if (
+      this.correspondentSelectionModel.isNoneSelected() &&
+      this.correspondentSelectionModel.intersection == Intersection.Include
+    ) {
+      filterRules.push({ rule_type: FILTER_CORRESPONDENT, value: null })
+    } else {
       if (
+        this.correspondentSelectionModel.isNoneSelected() &&
         this.correspondentSelectionModel.intersection == Intersection.Exclude
       ) {
         filterRules.push({
           rule_type: FILTER_CORRESPONDENT,
           value: NEGATIVE_NULL_FILTER_VALUE.toString(),
         })
-      } else {
-        filterRules.push({ rule_type: FILTER_CORRESPONDENT, value: null })
       }
-    } else {
       this.correspondentSelectionModel
         .getSelectedItems()
         .forEach((correspondent) => {
@@ -847,18 +850,21 @@ export class FilterEditorComponent
           })
         })
     }
-    if (this.documentTypeSelectionModel.isNoneSelected()) {
+    if (
+      this.documentTypeSelectionModel.isNoneSelected() &&
+      this.documentTypeSelectionModel.intersection === Intersection.Include
+    ) {
+      filterRules.push({ rule_type: FILTER_DOCUMENT_TYPE, value: null })
+    } else {
       if (
+        this.documentTypeSelectionModel.isNoneSelected() &&
         this.documentTypeSelectionModel.intersection == Intersection.Exclude
       ) {
         filterRules.push({
           rule_type: FILTER_DOCUMENT_TYPE,
           value: NEGATIVE_NULL_FILTER_VALUE.toString(),
         })
-      } else {
-        filterRules.push({ rule_type: FILTER_DOCUMENT_TYPE, value: null })
       }
-    } else {
       this.documentTypeSelectionModel
         .getSelectedItems()
         .forEach((documentType) => {
@@ -876,16 +882,21 @@ export class FilterEditorComponent
           })
         })
     }
-    if (this.storagePathSelectionModel.isNoneSelected()) {
-      if (this.storagePathSelectionModel.intersection == Intersection.Exclude) {
+    if (
+      this.storagePathSelectionModel.isNoneSelected() &&
+      this.storagePathSelectionModel.intersection == Intersection.Include
+    ) {
+      filterRules.push({ rule_type: FILTER_STORAGE_PATH, value: null })
+    } else {
+      if (
+        this.storagePathSelectionModel.isNoneSelected() &&
+        this.storagePathSelectionModel.intersection == Intersection.Exclude
+      ) {
         filterRules.push({
           rule_type: FILTER_STORAGE_PATH,
           value: NEGATIVE_NULL_FILTER_VALUE.toString(),
         })
-      } else {
-        filterRules.push({ rule_type: FILTER_STORAGE_PATH, value: null })
       }
-    } else {
       this.storagePathSelectionModel
         .getSelectedItems()
         .forEach((storagePath) => {
