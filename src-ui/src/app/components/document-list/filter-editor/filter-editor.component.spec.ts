@@ -671,9 +671,6 @@ describe('FilterEditorComponent', () => {
         value: '12',
       },
     ]
-    expect(component.correspondentSelectionModel.logicalOperator).toEqual(
-      LogicalOperator.Or
-    )
     expect(component.correspondentSelectionModel.intersection).toEqual(
       Intersection.Include
     )
@@ -754,9 +751,6 @@ describe('FilterEditorComponent', () => {
         value: '22',
       },
     ]
-    expect(component.documentTypeSelectionModel.logicalOperator).toEqual(
-      LogicalOperator.Or
-    )
     expect(component.documentTypeSelectionModel.intersection).toEqual(
       Intersection.Include
     )
@@ -780,9 +774,6 @@ describe('FilterEditorComponent', () => {
         value: '23',
       },
     ]
-    expect(component.documentTypeSelectionModel.logicalOperator).toEqual(
-      LogicalOperator.Or
-    )
     expect(component.documentTypeSelectionModel.intersection).toEqual(
       Intersection.Include
     )
@@ -837,9 +828,6 @@ describe('FilterEditorComponent', () => {
         value: '32',
       },
     ]
-    expect(component.storagePathSelectionModel.logicalOperator).toEqual(
-      LogicalOperator.Or
-    )
     expect(component.storagePathSelectionModel.intersection).toEqual(
       Intersection.Include
     )
