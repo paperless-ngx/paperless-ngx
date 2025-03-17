@@ -870,6 +870,7 @@ export class FilterEditorComponent
         })
       this.correspondentSelectionModel
         .getExcludedItems()
+        .filter((correspondent) => correspondent.id > 0)
         .forEach((correspondent) => {
           filterRules.push({
             rule_type: FILTER_DOES_NOT_HAVE_CORRESPONDENT,
@@ -902,6 +903,7 @@ export class FilterEditorComponent
         })
       this.documentTypeSelectionModel
         .getExcludedItems()
+        .filter((documentType) => documentType.id > 0)
         .forEach((documentType) => {
           filterRules.push({
             rule_type: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
@@ -934,6 +936,7 @@ export class FilterEditorComponent
         })
       this.storagePathSelectionModel
         .getExcludedItems()
+        .filter((storagePath) => storagePath.id > 0)
         .forEach((storagePath) => {
           filterRules.push({
             rule_type: FILTER_DOES_NOT_HAVE_STORAGE_PATH,
