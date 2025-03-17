@@ -892,7 +892,7 @@ wheels = [
 
 [[package]]
 name = "drf-writable-nested"
-version = "0.7.1"
+version = "0.7.2"
 source = { registry = "https://pypi.org/simple" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a0/1e/b27f416a1706a0403076cb3216402c2a66017a0194a52e8c4753635ddc83/drf_writable_nested-0.7.1-py3-none-any.whl", hash = "sha256:d8ddc606dc349e56373810842965712a5789e6a5ca7704729d15429b95f8f2ee", size = 10559 },
@@ -954,7 +954,7 @@ wheels = [
 
 [[package]]
 name = "filelock"
-version = "3.17.0"
+version = "3.18.0"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/dc/9c/0b15fb47b464e1b663b1acd1253a062aa5feecb07d4e597daea542ebd2b5/filelock-3.17.0.tar.gz", hash = "sha256:ee4e77401ef576ebb38cd7f13b9b28893194acc20a8e68e18730ba9c0e54660e", size = 18027 }
 wheels = [
@@ -1329,7 +1329,7 @@ wheels = [
 
 [[package]]
 name = "jinja2"
-version = "3.1.5"
+version = "3.1.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markupsafe", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -2768,7 +2768,7 @@ wheels = [
 
 [[package]]
 name = "rapidfuzz"
-version = "3.12.1"
+version = "3.12.2"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/c9/df/c300ead8c2962f54ad87872e6372a6836f0181a7f20b433c987bd106bfce/rapidfuzz-3.12.1.tar.gz", hash = "sha256:6a98bbca18b4a37adddf2d8201856441c26e9c981d8895491b5bc857b5f780eb", size = 57907552 }
 wheels = [
