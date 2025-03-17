@@ -75,6 +75,7 @@ import {
   FILTER_STORAGE_PATH,
   FILTER_TITLE,
   FILTER_TITLE_CONTENT,
+  NEGATIVE_NULL_FILTER_VALUE,
 } from 'src/app/data/filter-rule-type'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
@@ -551,6 +552,16 @@ export class FilterEditorComponent
           )
           break
         case FILTER_CORRESPONDENT:
+          this.correspondentSelectionModel.intersection =
+            rule.value == NEGATIVE_NULL_FILTER_VALUE.toString()
+              ? Intersection.Exclude
+              : Intersection.Include
+          this.correspondentSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Selected,
+            false
+          )
+          break
         case FILTER_HAS_CORRESPONDENT_ANY:
           this.correspondentSelectionModel.logicalOperator = LogicalOperator.Or
           this.correspondentSelectionModel.intersection = Intersection.Include
@@ -810,7 +821,16 @@ export class FilterEditorComponent
         })
     }
     if (this.correspondentSelectionModel.isNoneSelected()) {
-      filterRules.push({ rule_type: FILTER_CORRESPONDENT, value: null })
+      if (
+        this.correspondentSelectionModel.intersection == Intersection.Exclude
+      ) {
+        filterRules.push({
+          rule_type: FILTER_CORRESPONDENT,
+          value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+        })
+      } else {
+        filterRules.push({ rule_type: FILTER_CORRESPONDENT, value: null })
+      }
     } else {
       this.correspondentSelectionModel
         .getSelectedItems()

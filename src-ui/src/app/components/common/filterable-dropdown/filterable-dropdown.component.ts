@@ -12,6 +12,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, filter, takeUntil } from 'rxjs'
+import { NEGATIVE_NULL_FILTER_VALUE } from 'src/app/data/filter-rule-type'
 import { MatchingModel } from 'src/app/data/matching-model'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { FilterPipe } from 'src/app/pipes/filter.pipe'
@@ -129,6 +130,8 @@ export class FilterableDropdownSelectionModel {
   }
 
   toggle(id: number, fireEvent = true) {
+    console.log('toggling', id)
+
     let state = this.temporarySelectionStates.get(id)
     if (
       state == undefined ||
@@ -241,6 +244,8 @@ export class FilterableDropdownSelectionModel {
   }
 
   set intersection(intersection: Intersection) {
+    console.log('setting intersection', intersection)
+
     this.temporaryIntersection = intersection
   }
 
@@ -304,9 +309,20 @@ export class FilterableDropdownSelectionModel {
   }
 
   isNoneSelected() {
+    console.log(this.intersection)
+
+    console.log(
+      this.selectionSize(),
+      this.get(null),
+      this.get(NEGATIVE_NULL_FILTER_VALUE)
+    )
+
     return (
-      this.selectionSize() == 1 &&
-      this.get(null) == ToggleableItemState.Selected
+      (this.selectionSize() == 1 &&
+        this.get(null) == ToggleableItemState.Selected) ||
+      (this.selectionSize() > 1 &&
+        this.get(NEGATIVE_NULL_FILTER_VALUE) == ToggleableItemState.Selected &&
+        this.intersection == Intersection.Exclude)
     )
   }
 
@@ -390,7 +406,10 @@ export class FilterableDropdownComponent
       this._selectionModel.items = Array.from(items)
       this._selectionModel.items.unshift({
         name: $localize`:Filter drop down element to filter for documents with no correspondent/type/tag assigned:Not assigned`,
-        id: null,
+        id:
+          this.selectionModel.intersection === Intersection.Include
+            ? null
+            : NEGATIVE_NULL_FILTER_VALUE,
       })
     }
   }
@@ -484,7 +503,7 @@ export class FilterableDropdownComponent
     return this.manyToOne
       ? this.selectionModel.selectionSize() > 1 &&
           this.selectionModel.getExcludedItems().length == 0
-      : !this.selectionModel.isNoneSelected()
+      : true
   }
 
   get name(): string {
