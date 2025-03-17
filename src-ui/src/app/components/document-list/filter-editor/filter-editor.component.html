@@ -40,7 +40,6 @@
           filterPlaceholder="Filter tags" i18n-filterPlaceholder
           [(selectionModel)]="tagSelectionModel"
           (selectionModelChange)="updateRules()"
-          [items]="tags"
           (opened)="onTagsDropdownOpen()"
           [documentCounts]="tagDocumentCounts"
           [allowSelectNone]="true"
@@ -52,7 +51,6 @@
           filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
           [(selectionModel)]="correspondentSelectionModel"
           (selectionModelChange)="updateRules()"
-          [items]="correspondents"
           (opened)="onCorrespondentDropdownOpen()"
           [documentCounts]="correspondentDocumentCounts"
           [allowSelectNone]="true"
@@ -64,7 +62,6 @@
             filterPlaceholder="Filter document types" i18n-filterPlaceholder
             [(selectionModel)]="documentTypeSelectionModel"
             (selectionModelChange)="updateRules()"
-            [items]="documentTypes"
             (opened)="onDocumentTypeDropdownOpen()"
             [documentCounts]="documentTypeDocumentCounts"
             [allowSelectNone]="true"
@@ -76,7 +73,6 @@
           filterPlaceholder="Filter storage paths" i18n-filterPlaceholder
           [(selectionModel)]="storagePathSelectionModel"
           (selectionModelChange)="updateRules()"
-          [items]="storagePaths"
           (opened)="onStoragePathDropdownOpen()"
           [documentCounts]="storagePathDocumentCounts"
           [allowSelectNone]="true"
