@@ -35,49 +35,48 @@
   <div class="col-auto">
     <div class="d-flex flex-wrap gap-3">
       <div class="d-flex flex-wrap gap-2">
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Tag) && tags.length > 0) {
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Tag) && tagSelectionModel.items.length > 0) {
           <pngx-filterable-dropdown class="flex-fill fade" [class.show]="show" title="Tags" icon="tag-fill" i18n-title
           filterPlaceholder="Filter tags" i18n-filterPlaceholder
-          [items]="tags"
-          [manyToOne]="true"
           [(selectionModel)]="tagSelectionModel"
           (selectionModelChange)="updateRules()"
+          [items]="tags"
           (opened)="onTagsDropdownOpen()"
           [documentCounts]="tagDocumentCounts"
           [allowSelectNone]="true"
           [disabled]="disabled"
           shortcutKey="t"></pngx-filterable-dropdown>
         }
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Correspondent) && correspondents.length > 0) {
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Correspondent) && correspondentSelectionModel.items.length > 0) {
           <pngx-filterable-dropdown class="flex-fill fade" [class.show]="show" title="Correspondent" icon="person-fill" i18n-title
           filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
-          [items]="correspondents"
           [(selectionModel)]="correspondentSelectionModel"
           (selectionModelChange)="updateRules()"
+          [items]="correspondents"
           (opened)="onCorrespondentDropdownOpen()"
           [documentCounts]="correspondentDocumentCounts"
           [allowSelectNone]="true"
           [disabled]="disabled"
           shortcutKey="y"></pngx-filterable-dropdown>
         }
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.DocumentType) && documentTypes.length > 0) {
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.DocumentType) && documentTypeSelectionModel.items.length > 0) {
             <pngx-filterable-dropdown class="flex-fill fade" [class.show]="show" title="Document type" icon="file-earmark-fill" i18n-title
             filterPlaceholder="Filter document types" i18n-filterPlaceholder
-            [items]="documentTypes"
             [(selectionModel)]="documentTypeSelectionModel"
             (selectionModelChange)="updateRules()"
+            [items]="documentTypes"
             (opened)="onDocumentTypeDropdownOpen()"
             [documentCounts]="documentTypeDocumentCounts"
             [allowSelectNone]="true"
             [disabled]="disabled"
             shortcutKey="u"></pngx-filterable-dropdown>
         }
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.StoragePath) && storagePaths.length > 0) {
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.StoragePath) && storagePathSelectionModel.items.length > 0) {
           <pngx-filterable-dropdown class="flex-fill fade" [class.show]="show" title="Storage path" icon="folder-fill" i18n-title
           filterPlaceholder="Filter storage paths" i18n-filterPlaceholder
-          [items]="storagePaths"
           [(selectionModel)]="storagePathSelectionModel"
           (selectionModelChange)="updateRules()"
+          [items]="storagePaths"
           (opened)="onStoragePathDropdownOpen()"
           [documentCounts]="storagePathDocumentCounts"
           [allowSelectNone]="true"

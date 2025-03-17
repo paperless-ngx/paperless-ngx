@@ -62,8 +62,22 @@ export class FilterableDropdownSelectionModel {
   }
 
   set items(items: MatchingModel[]) {
-    this._items = items
-    this.sortItems()
+    if (items) {
+      this._items = Array.from(items)
+      this._items.unshift({
+        name: $localize`:Filter drop down element to filter for documents with no correspondent/type/tag assigned:Not assigned`,
+        id:
+          this.intersection === Intersection.Include
+            ? null
+            : NEGATIVE_NULL_FILTER_VALUE,
+      })
+      this.sortItems()
+    }
+  }
+
+  constructor(manyToOne: boolean = false, singleSelect: boolean = false) {
+    this.manyToOne = manyToOne
+    this.singleSelect = singleSelect
   }
 
   private sortItems() {
@@ -249,7 +263,18 @@ export class FilterableDropdownSelectionModel {
     this.temporaryIntersection = intersection
   }
 
+  private checkForNullItem() {
+    console.log('checkForNullItem', this.items)
+
+    if (this.temporaryIntersection === Intersection.Exclude) {
+      this.temporarySelectionStates.delete(null)
+      this.items.shift()
+    }
+  }
+
   toggleIntersection() {
+    console.log('toggleIntersection')
+
     if (this.temporarySelectionStates.size === 0) return
     let newState =
       this.intersection == Intersection.Include
@@ -400,28 +425,13 @@ export class FilterableDropdownComponent
 
   filterText: string
 
-  @Input()
-  set items(items: MatchingModel[]) {
-    if (items) {
-      this._selectionModel.items = Array.from(items)
-      this._selectionModel.items.unshift({
-        name: $localize`:Filter drop down element to filter for documents with no correspondent/type/tag assigned:Not assigned`,
-        id:
-          this.selectionModel.intersection === Intersection.Include
-            ? null
-            : NEGATIVE_NULL_FILTER_VALUE,
-      })
-    }
-  }
+  _selectionModel: FilterableDropdownSelectionModel
 
   get items(): MatchingModel[] {
     return this._selectionModel.items
   }
 
-  _selectionModel: FilterableDropdownSelectionModel =
-    new FilterableDropdownSelectionModel()
-
-  @Input()
+  @Input({ required: true })
   set selectionModel(model: FilterableDropdownSelectionModel) {
     if (this.selectionModel) {
       this.selectionModel.changed.complete()
@@ -441,11 +451,6 @@ export class FilterableDropdownComponent
 
   @Output()
   selectionModelChange = new EventEmitter<FilterableDropdownSelectionModel>()
-
-  @Input()
-  set manyToOne(manyToOne: boolean) {
-    this.selectionModel.manyToOne = manyToOne
-  }
 
   get manyToOne() {
     return this.selectionModel.manyToOne

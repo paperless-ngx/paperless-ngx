@@ -26,14 +26,12 @@ import {
   switchMap,
   takeUntil,
 } from 'rxjs/operators'
-import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField } from 'src/app/data/custom-field'
 import {
   CustomFieldQueryLogicalOperator,
   CustomFieldQueryOperator,
 } from 'src/app/data/custom-field-query'
 import { Document } from 'src/app/data/document'
-import { DocumentType } from 'src/app/data/document-type'
 import { FilterRule } from 'src/app/data/filter-rule'
 import {
   FILTER_ADDED_AFTER,
@@ -77,8 +75,6 @@ import {
   FILTER_TITLE_CONTENT,
   NEGATIVE_NULL_FILTER_VALUE,
 } from 'src/app/data/filter-rule-type'
-import { StoragePath } from 'src/app/data/storage-path'
-import { Tag } from 'src/app/data/tag'
 import {
   PermissionAction,
   PermissionType,
@@ -252,7 +248,9 @@ export class FilterEditorComponent
         case FILTER_HAS_CORRESPONDENT_ANY:
           if (rule.value) {
             return $localize`Correspondent: ${
-              this.correspondents.find((c) => c.id == +rule.value)?.name
+              this.correspondentSelectionModel.items.find(
+                (c) => c.id == +rule.value
+              )?.name
             }`
           } else {
             return $localize`Without correspondent`
@@ -262,7 +260,9 @@ export class FilterEditorComponent
         case FILTER_HAS_DOCUMENT_TYPE_ANY:
           if (rule.value) {
             return $localize`Document type: ${
-              this.documentTypes.find((dt) => dt.id == +rule.value)?.name
+              this.documentTypeSelectionModel.items.find(
+                (dt) => dt.id == +rule.value
+              )?.name
             }`
           } else {
             return $localize`Without document type`
@@ -272,7 +272,9 @@ export class FilterEditorComponent
         case FILTER_HAS_STORAGE_PATH_ANY:
           if (rule.value) {
             return $localize`Storage path: ${
-              this.storagePaths.find((sp) => sp.id == +rule.value)?.name
+              this.storagePathSelectionModel.items.find(
+                (sp) => sp.id == +rule.value
+              )?.name
             }`
           } else {
             return $localize`Without storage path`
@@ -280,7 +282,7 @@ export class FilterEditorComponent
 
         case FILTER_HAS_TAGS_ALL:
           return $localize`Tag: ${
-            this.tags.find((t) => t.id == +rule.value)?.name
+            this.tagSelectionModel.items.find((t) => t.id == +rule.value)?.name
           }`
 
         case FILTER_HAS_ANY_TAG:
@@ -327,10 +329,6 @@ export class FilterEditorComponent
   @ViewChild('textFilterInput')
   textFilterInput: ElementRef
 
-  tags: Tag[] = []
-  correspondents: Correspondent[] = []
-  documentTypes: DocumentType[] = []
-  storagePaths: StoragePath[] = []
   customFields: CustomField[] = []
 
   tagDocumentCounts: SelectionDataItem[]
@@ -371,7 +369,7 @@ export class FilterEditorComponent
     )
   }
 
-  tagSelectionModel = new FilterableDropdownSelectionModel()
+  tagSelectionModel = new FilterableDropdownSelectionModel(true)
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
   storagePathSelectionModel = new FilterableDropdownSelectionModel()
@@ -1082,7 +1080,7 @@ export class FilterEditorComponent
     ) {
       this.loadingCountTotal++
       this.tagService.listAll().subscribe((result) => {
-        this.tags = result.results
+        this.tagSelectionModel.items = result.results
         this.maybeCompleteLoading()
       })
     }
@@ -1094,7 +1092,7 @@ export class FilterEditorComponent
     ) {
       this.loadingCountTotal++
       this.correspondentService.listAll().subscribe((result) => {
-        this.correspondents = result.results
+        this.correspondentSelectionModel.items = result.results
         this.maybeCompleteLoading()
       })
     }
@@ -1106,7 +1104,7 @@ export class FilterEditorComponent
     ) {
       this.loadingCountTotal++
       this.documentTypeService.listAll().subscribe((result) => {
-        this.documentTypes = result.results
+        this.documentTypeSelectionModel.items = result.results
         this.maybeCompleteLoading()
       })
     }
@@ -1118,7 +1116,7 @@ export class FilterEditorComponent
     ) {
       this.loadingCountTotal++
       this.storagePathService.listAll().subscribe((result) => {
-        this.storagePaths = result.results
+        this.storagePathSelectionModel.items = result.results
         this.maybeCompleteLoading()
       })
     }
