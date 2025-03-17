@@ -70,10 +70,17 @@ export class FilterableDropdownSelectionModel {
   }
 
   private setNullItem() {
+    if (this.manyToOne && this.logicalOperator === LogicalOperator.Or) {
+      if (this._items[0]?.id === null) {
+        this._items.shift()
+      }
+      return
+    }
+
     const item = {
       name: $localize`:Filter drop down element to filter for documents with no correspondent/type/tag assigned:Not assigned`,
       id:
-        this.intersection === Intersection.Include
+        this.manyToOne || this.intersection === Intersection.Include
           ? null
           : NEGATIVE_NULL_FILTER_VALUE,
     }
@@ -265,6 +272,7 @@ export class FilterableDropdownSelectionModel {
 
   set logicalOperator(operator: LogicalOperator) {
     this.temporaryLogicalOperator = operator
+    this.setNullItem()
   }
 
   toggleOperator() {
