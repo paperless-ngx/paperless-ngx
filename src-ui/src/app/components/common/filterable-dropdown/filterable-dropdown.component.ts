@@ -64,14 +64,27 @@ export class FilterableDropdownSelectionModel {
   set items(items: MatchingModel[]) {
     if (items) {
       this._items = Array.from(items)
-      this._items.unshift({
-        name: $localize`:Filter drop down element to filter for documents with no correspondent/type/tag assigned:Not assigned`,
-        id:
-          this.intersection === Intersection.Include
-            ? null
-            : NEGATIVE_NULL_FILTER_VALUE,
-      })
       this.sortItems()
+      this.setNullItem()
+    }
+  }
+
+  private setNullItem() {
+    const item = {
+      name: $localize`:Filter drop down element to filter for documents with no correspondent/type/tag assigned:Not assigned`,
+      id:
+        this.intersection === Intersection.Include
+          ? null
+          : NEGATIVE_NULL_FILTER_VALUE,
+    }
+
+    if (
+      this._items[0]?.id === null ||
+      this._items[0]?.id === NEGATIVE_NULL_FILTER_VALUE
+    ) {
+      this._items[0] = item
+    } else if (this._items) {
+      this._items.unshift(item)
     }
   }
 
@@ -144,8 +157,6 @@ export class FilterableDropdownSelectionModel {
   }
 
   toggle(id: number, fireEvent = true) {
-    console.log('toggling', id)
-
     let state = this.temporarySelectionStates.get(id)
     if (
       state == undefined ||
@@ -258,31 +269,30 @@ export class FilterableDropdownSelectionModel {
   }
 
   set intersection(intersection: Intersection) {
-    console.log('setting intersection', intersection)
-
     this.temporaryIntersection = intersection
-  }
-
-  private checkForNullItem() {
-    console.log('checkForNullItem', this.items)
-
-    if (this.temporaryIntersection === Intersection.Exclude) {
-      this.temporarySelectionStates.delete(null)
-      this.items.shift()
-    }
+    this.setNullItem()
   }
 
   toggleIntersection() {
-    console.log('toggleIntersection')
-
     if (this.temporarySelectionStates.size === 0) return
     let newState =
       this.intersection == Intersection.Include
         ? ToggleableItemState.Selected
         : ToggleableItemState.Excluded
+
     this.temporarySelectionStates.forEach((state, key) => {
-      this.temporarySelectionStates.set(key, newState)
+      if (key === null && this.intersection === Intersection.Exclude) {
+        this.temporarySelectionStates.set(NEGATIVE_NULL_FILTER_VALUE, newState)
+      } else if (
+        key === NEGATIVE_NULL_FILTER_VALUE &&
+        this.intersection === Intersection.Include
+      ) {
+        this.temporarySelectionStates.set(null, newState)
+      } else {
+        this.temporarySelectionStates.set(key, newState)
+      }
     })
+
     this.changed.next(this)
   }
 
@@ -334,20 +344,11 @@ export class FilterableDropdownSelectionModel {
   }
 
   isNoneSelected() {
-    console.log(this.intersection)
-
-    console.log(
-      this.selectionSize(),
-      this.get(null),
-      this.get(NEGATIVE_NULL_FILTER_VALUE)
-    )
-
     return (
       (this.selectionSize() == 1 &&
         this.get(null) == ToggleableItemState.Selected) ||
-      (this.selectionSize() > 1 &&
-        this.get(NEGATIVE_NULL_FILTER_VALUE) == ToggleableItemState.Selected &&
-        this.intersection == Intersection.Exclude)
+      (this.intersection == Intersection.Exclude &&
+        this.get(NEGATIVE_NULL_FILTER_VALUE) == ToggleableItemState.Excluded)
     )
   }
 

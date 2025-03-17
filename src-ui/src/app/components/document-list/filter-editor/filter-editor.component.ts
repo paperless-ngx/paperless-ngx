@@ -848,7 +848,16 @@ export class FilterEditorComponent
         })
     }
     if (this.documentTypeSelectionModel.isNoneSelected()) {
-      filterRules.push({ rule_type: FILTER_DOCUMENT_TYPE, value: null })
+      if (
+        this.documentTypeSelectionModel.intersection == Intersection.Exclude
+      ) {
+        filterRules.push({
+          rule_type: FILTER_DOCUMENT_TYPE,
+          value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+        })
+      } else {
+        filterRules.push({ rule_type: FILTER_DOCUMENT_TYPE, value: null })
+      }
     } else {
       this.documentTypeSelectionModel
         .getSelectedItems()
@@ -868,7 +877,14 @@ export class FilterEditorComponent
         })
     }
     if (this.storagePathSelectionModel.isNoneSelected()) {
-      filterRules.push({ rule_type: FILTER_STORAGE_PATH, value: null })
+      if (this.storagePathSelectionModel.intersection == Intersection.Exclude) {
+        filterRules.push({
+          rule_type: FILTER_STORAGE_PATH,
+          value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+        })
+      } else {
+        filterRules.push({ rule_type: FILTER_STORAGE_PATH, value: null })
+      }
     } else {
       this.storagePathSelectionModel
         .getSelectedItems()
