@@ -2,6 +2,7 @@ import hashlib
 import logging
 import os
 import shutil
+import socket
 import traceback
 import uuid
 from datetime import timedelta
@@ -30,6 +31,7 @@ from documents.barcodes import BarcodePlugin
 from documents.caching import clear_document_caches
 from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
+from documents.common import peel_field
 from documents.consumer import Consumer
 from documents.consumer import ConsumerError
 from documents.consumer import WorkflowTriggerPlugin
@@ -57,8 +59,8 @@ from documents.plugins.base import ProgressManager
 from documents.plugins.base import StopConsumeTaskError
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
-from documents.signals import document_updated
-from documents.signals.handlers import cleanup_document_deletion
+from documents.signals import document_updated, document_consumption_finished
+from documents.signals.handlers import cleanup_document_deletion, bulk_set_custom_fields_from_document_type_to_document
 from paperless.models import ApplicationConfiguration
 from paperless_ocr_custom.parsers import RasterisedDocumentCustomParser
 
@@ -277,14 +279,19 @@ def bulk_update_documents(document_ids):
         update_index_document(doc)
 
 
+@shared_task
+def bulk_update_custom_field_form_document_type_to_document(document_ids, document_type_id, peel):
+    bulk_set_custom_fields_from_document_type_to_document(document_type_id,
+                                                     document_ids, peel)
+
+
+
 @shared_task(bind=True)
 def update_document_archive_file(self, document_id=None):
     """
     Re-creates the archive file of a document, including new OCR content and thumbnail
     """
-
     document = Document.objects.defer('content').get(id=document_id)
-
     mime_type = document.mime_type
 
     parser_class: type[DocumentParser] = custom_get_parser_class_for_mime_type(
@@ -353,6 +360,7 @@ def update_document_archive_file(self, document_id=None):
                     archive_checksum=checksum,
                     content=parser.get_text() or '',
                     archive_filename=document.archive_filename,
+                    # file_id = parser.get_file_id()
                 )
                 newDocument = Document.objects.get(pk=document.pk)
                 if settings.AUDIT_LOG_ENABLED:
@@ -387,8 +395,87 @@ def update_document_archive_file(self, document_id=None):
             # with index.open_index_writer() as writer:
             #     index.update_document(writer, document)
             update_index_document(newDocument)
+            classifier = load_classifier()
+
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=document,
+                logging_group=uuid.uuid4(),
+                classifier=classifier,
+            )
+            logger.info("Document consumption finished------------")
 
             clear_document_caches(document.pk)
+    except Exception as ex:
+        logger.exception(
+            f"Error while parsing document {document} (ID: {document_id} ex: {ex}) ",
+        )
+        return f"Error while parsing document {document} (ID: {document_id} ex: {ex}) "
+    finally:
+        parser.cleanup()
+    return f"Success. New document id {document.pk} created"
+
+@shared_task(bind=True)
+def update_value_customfield_to_document(self, document_id=None):
+    """
+    update value custom field to document
+    """
+    document = Document.objects.defer('content').get(id=document_id)
+    mime_type = document.mime_type
+
+    parser_class: type[DocumentParser] = custom_get_parser_class_for_mime_type(
+        mime_type,
+    )
+
+    if not parser_class:
+        logger.error(
+            f"No parser found for mime type {mime_type}, cannot "
+            f"archive document {document} (ID: {document_id})",
+        )
+        return
+
+    parser: DocumentParser = parser_class(logging_group=uuid.uuid4())
+
+    try:
+        enable_ocr = ApplicationConfiguration.objects.all().first().enable_ocr
+        if enable_ocr:
+            # update count request
+            self.request.api_call_count=parser.get_api_call_count()
+            if document.archive_path:
+                with transaction.atomic():
+                    callback_url=""
+                    try:
+                        callback_url = settings.CSRF_TRUSTED_ORIGINS[0]
+                    except (AttributeError, IndexError):
+                        # fallback nếu CSRF_TRUSTED_ORIGINS không tồn tại hoặc rỗng
+                        hostname = socket.gethostname()
+                        ip_address = socket.gethostbyname(hostname)
+                        callback_url = f"http://{ip_address}"
+                    callback_url = f"{callback_url}/api/peel-field/{document.id}/peel-field/"
+                    logger.info("callback url", callback_url)
+                    peel_field(document.archive_path, callback_url)
+                    if settings.AUDIT_LOG_ENABLED:
+                        LogEntry.objects.log_create(
+                            instance=document,
+                            changes=json.dumps(
+                                {
+                                    # "content": [document.content],
+                                    "archive_checksum": [
+                                        document.archive_checksum,
+                                    ],
+                                    "archive_filename": [
+                                        document.archive_filename,
+                                    ],
+                                },
+                            ),
+                            additional_data=json.dumps(
+                                {
+                                    "reason": "Peel value of custom field called",
+                                },
+                            ),
+                            action=LogEntry.Action.UPDATE,
+                        )
+                    logger.info(f"Peel value of custom field success")
     except Exception as ex:
         logger.exception(
             f"Error while parsing document {document} (ID: {document_id} ex: {ex}) ",

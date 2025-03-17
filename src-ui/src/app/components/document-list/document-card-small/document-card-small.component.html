@@ -118,10 +118,12 @@
             <ng-template #previewContent>
               <pngx-preview-popup [document]="document"></pngx-preview-popup>
             </ng-template>
+            @if (document.user_can_change){
             <a [href]="getDownloadUrl()" class="btn btn-sm btn-outline-secondary" title="Download" i18n-title
-              (click)="$event.stopPropagation()">
+              (click)="$event.stopPropagation()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
               <i-bs name="download"></i-bs>
             </a>
+            }
           }
           @else if (document.exploit==2) {
             <button class="btn btn-sm btn-outline-secondary" type="button" (click)="editField()">
@@ -134,7 +136,7 @@
             </button>
           }
 
-          
+
         </div>
       </div>
     </div>

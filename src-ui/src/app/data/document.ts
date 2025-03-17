@@ -92,4 +92,6 @@ export interface Document extends ObjectWithPermissions {
   remove_inbox_tags?: boolean
 
   exploit?: number
+
+  user_can_change?: boolean
 }

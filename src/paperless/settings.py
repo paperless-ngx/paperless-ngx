@@ -179,28 +179,27 @@ def _parse_beat_schedule() -> dict:
         {
             "name": "Train the classifier",
             "env_key": "PAPERLESS_TRAIN_TASK_CRON",
-            # Default hourly at 5 minutes past the hour
-            "env_default": "5 */1 * * *",
+            "env_default": "0 2 * * *",  # 2:00 sáng mỗi ngày
             "task": "documents.tasks.train_classifier",
             "options": {
-                # 1 minute before default schedule sends again
-                "expires": 59.0
-                * 60.0,
+                "expires": 3600.0,
+                # Tùy chọn: hết hạn sau 1 tiếng nếu chưa được thực thi
             },
         },
-        {
-            "name": "Optimize the index",
-            "env_key": "PAPERLESS_INDEX_TASK_CRON",
-            # Default daily at midnight
-            "env_default": "0 0 * * *",
-            "task": "documents.tasks.index_optimize",
-            "options": {
-                # 1 hour before default schedule sends again
-                "expires": 23.0
-                * 60.0
-                * 60.0,
-            },
-        },
+
+        # {
+        #     "name": "Optimize the index",
+        #     "env_key": "PAPERLESS_INDEX_TASK_CRON",
+        #     # Default daily at midnight
+        #     "env_default": "0 0 * * *",
+        #     "task": "documents.tasks.index_optimize",
+        #     "options": {
+        #         # 1 hour before default schedule sends again
+        #         "expires": 23.0
+        #         * 60.0
+        #         * 60.0,
+        #     },
+        # },
         {
             "name": "Perform sanity check",
             "env_key": "PAPERLESS_SANITY_TASK_CRON",

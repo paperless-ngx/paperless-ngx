@@ -151,6 +151,8 @@ export class DocumentDetailComponent
   warehouses: Warehouse[]
   shelfs: Warehouse[]
   boxcases: Warehouse[]
+  canDownload: boolean = false
+
 
 
   documentForm: FormGroup = new FormGroup({
@@ -334,6 +336,14 @@ export class DocumentDetailComponent
       //   .subscribe((result) => {this.boxcases = result.results;        console.log('gia tri Shelf',this.boxcases)
       //   })
 
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.Change,
+        PermissionType.Document
+      )
+    ) {
+      this.canDownload=false
     }
     if (
       this.permissionsService.currentUserCan(

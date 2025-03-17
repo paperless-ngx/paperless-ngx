@@ -24,7 +24,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.db import connections
+from django.db import connections, transaction
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.models import Case
@@ -50,6 +50,7 @@ from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.cache import cache_control
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
@@ -71,7 +72,7 @@ from rest_framework.mixins import DestroyModelMixin
 from rest_framework.mixins import ListModelMixin
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.mixins import UpdateModelMixin
-from rest_framework.permissions import DjangoModelPermissions
+from rest_framework.permissions import DjangoModelPermissions, AllowAny
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -164,7 +165,7 @@ from documents.permissions import update_view_folder_parent_permissions
 from documents.permissions import \
     update_view_warehouse_shelf_boxcase_permissions
 from documents.serialisers import AcknowledgeTasksViewSerializer, \
-    DocumentDocumentSerializer
+    DocumentDocumentSerializer, WebhookSerializer
 from documents.serialisers import ApprovalSerializer
 from documents.serialisers import ApprovalViewSerializer
 from documents.serialisers import ArchiveFontSerializer
@@ -197,7 +198,9 @@ from documents.serialisers import WorkflowSerializer
 from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import approval_updated
 from documents.signals import document_updated
-from documents.tasks import backup_documents
+
+from documents.tasks import backup_documents, \
+    bulk_update_custom_field_form_document_type_to_document
 from documents.tasks import consume_file
 from documents.tasks import deleted_backup
 from documents.tasks import empty_trash
@@ -560,6 +563,15 @@ class DocumentViewSet(
         serializer = self.get_serializer(instance, data=data, partial=partial)
         serializer.is_valid(raise_exception=True)
         response = super().update(request, *args, **kwargs)
+        document_type = serializer.validated_data.get("document_type")
+        update_document_field = True
+        if document_type and  instance.document_type:
+            if document_type.id == instance.document_type.id:
+                update_document_field = False
+        elif document_type is None:
+            update_document_field = False
+        if update_document_field:
+            bulk_update_custom_field_form_document_type_to_document.delay( [instance.id], document_type.id, True)
         # logger.debug(response)
         self.update_time_archive_font(self.get_object())
         self.update_name_folder(self.get_object(), serializer)
@@ -571,7 +583,7 @@ class DocumentViewSet(
 
         document_updated.send(
             sender=self.__class__,
-            document=self.get_object(),
+            document=self.get_object()
         )
 
         return response
@@ -2545,7 +2557,7 @@ class BulkEditObjectsView(PassUserMixin):
                 documents = Document.objects.filter(folder__in=folders).defer('content').select_related('dossier')
                 dossier_ids = []
                 for d in documents:
-                    if d.dossier is not None:
+                    if d.dossier:
                         dossier_ids.append(d.dossier.id)
                 documents.delete()
                 Dossier.objects.filter(id__in=dossier_ids).delete()
@@ -2907,6 +2919,46 @@ class TrashView(ListModelMixin, PassUserMixin):
                 doc_ids = [doc.id for doc in docs]
             empty_trash(doc_ids=doc_ids)
         return Response({"result": "OK", "doc_ids": doc_ids})
+
+
+class WebhookViewSet(ViewSet):
+    permission_classes = [AllowAny]
+
+    @action(detail=True, methods=['post'], url_path='peel-field', permission_classes=[AllowAny])
+    def peel_field(self, request, pk=None):
+        """
+        Nhận dữ liệu từ POST /api/peel-field/<document_id>/
+        """
+        data = request.data
+        logger.info(f"Webhook called with document_id={pk}, data={data}")
+        field_values = data.get('extract_data',[])
+
+        if len(field_values)>0:
+            field_values=field_values[0]['field_category'][0]['field_data'][0]['field_value']
+        logger.info(f"field_values={field_values}")
+        if field_values:
+            dict_field_values = dict()
+            for field in field_values:
+                dict_field_values[field['code']] = field['value']
+
+            custom_field_instances = CustomFieldInstance.objects.select_related("field").filter(
+                document_id=pk)
+            updated_instances = []
+
+            for i in custom_field_instances:
+                if i.field.code in dict_field_values:
+                    i.value_text = dict_field_values[i.field.code]
+                    updated_instances.append(i)
+
+            # Cập nhật tất cả các bản ghi đã thay đổi
+            if updated_instances:
+                with transaction.atomic():
+                    CustomFieldInstance.objects.bulk_update(updated_instances,
+                                                            ['value_text'])
+
+
+        return Response({"message": "Received", "document_id": pk, "data": data})
+
 
 
 class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
@@ -3552,7 +3604,8 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         documents = Document.objects.filter(folder__in=folders).defer('content')
         dossier_ids = []
         for d in documents:
-            dossier_ids.append(d.dossier.id)
+            if d.dossier:
+                dossier_ids.append(d.dossier.id)
 
         dossier = Dossier.objects.filter(id__in=dossier_ids)
         documents.delete()

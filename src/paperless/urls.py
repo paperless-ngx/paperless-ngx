@@ -1,4 +1,5 @@
 import os
+from os.path import basename
 
 from django.conf import settings
 from django.conf.urls import include
@@ -14,7 +15,7 @@ from django.views.static import serve
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
-from documents.views import AcknowledgeTasksView, DocumentElasticSearch
+from documents.views import AcknowledgeTasksView, DocumentElasticSearch, WebhookViewSet
 from documents.views import ApprovalUpdateMutipleView
 from documents.views import ApprovalViewSet
 from documents.views import ArchiveFontViewSet
@@ -97,7 +98,7 @@ api_router.register(r"folders", FolderViewSet)
 api_router.register(r"dossiers", DossierViewSet)
 api_router.register(r"dossier_forms", DossierFormViewSet)
 api_router.register(r"backup_records", BackupRecordViewSet)
-
+api_router.register(r'peel-field', WebhookViewSet, basename='webhook')
 # api_router.register(r"approvals", ApprovalViewSet)
 api_router.register(r"content_types", ContentTypeViewSet, basename="content_types")
 

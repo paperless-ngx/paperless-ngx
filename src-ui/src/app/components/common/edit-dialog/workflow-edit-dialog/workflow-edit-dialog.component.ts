@@ -196,7 +196,7 @@ export class WorkflowEditDialogComponent
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.customFields = result.results))
-    
+
     groupService
       .listAll()
       .pipe(first())

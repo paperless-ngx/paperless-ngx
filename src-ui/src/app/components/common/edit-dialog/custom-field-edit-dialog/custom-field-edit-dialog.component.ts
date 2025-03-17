@@ -42,6 +42,7 @@ export class CustomFieldEditDialogComponent
   getForm(): FormGroup {
     return new FormGroup({
       name: new FormControl(null),
+      code: new FormControl(null),
       data_type: new FormControl(null),
     })
   }

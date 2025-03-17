@@ -415,6 +415,9 @@ class DocumentParser(LoggingMixin):
     def get_text(self):
         return self.text
 
+    def get_file_id(self):
+        return None
+
     def get_date(self) -> Optional[datetime.datetime]:
         return self.date
 

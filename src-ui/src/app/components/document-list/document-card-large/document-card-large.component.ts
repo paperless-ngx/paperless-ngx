@@ -17,6 +17,7 @@ import { ApprovalEditDialogComponent } from '../../common/edit-dialog/approval-e
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { Subject, takeUntil } from 'rxjs'
 import { ToastService } from 'src/app/services/toast.service'
+import { PermissionsService } from '../../../services/permissions.service'
 
 @Component({
   selector: 'pngx-document-card-large',
@@ -29,7 +30,8 @@ export class DocumentCardLargeComponent extends ComponentWithPermissions {
     private documentService: DocumentService,
     public settingsService: SettingsService,
     private modalService: NgbModal,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private permissionsService: PermissionsService,
   ) {
     super()
   }

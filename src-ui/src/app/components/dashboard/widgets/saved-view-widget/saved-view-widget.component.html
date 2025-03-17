@@ -52,7 +52,7 @@
                 <ng-template #previewContent>
                   <pngx-preview-popup [document]="doc" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()"></pngx-preview-popup>
                 </ng-template>
-                <a [href]="getDownloadUrl(doc)" class="btn px-4 btn-dark border-dark-subtle" title="Download" i18n-title (click)="$event.stopPropagation()">
+                <a [href]="getDownloadUrl(doc)" class="btn px-4 btn-dark border-dark-subtle" title="Download" i18n-title (click)="$event.stopPropagation()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
                   <i-bs width="0.8em" height="0.8em" name="download"></i-bs>
                 </a>
               </div>

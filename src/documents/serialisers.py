@@ -321,22 +321,6 @@ class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         )
 
 
-class DocumentTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
-    class Meta:
-        model = DocumentType
-        fields = (
-            "id",
-            "slug",
-            "name",
-            "match",
-            "matching_algorithm",
-            "is_insensitive",
-            "document_count",
-            "owner",
-            "permissions",
-            "user_can_change",
-            "set_permissions",
-        )
 
 
 class ArchiveFontSerializer(MatchingModelSerializer, OwnedObjectSerializer):
@@ -508,18 +492,45 @@ class StoragePathField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         return StoragePath.objects.all()
 
+class CustomFieldField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        return CustomField.objects.all()
+
+class DocumentTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+    custom_fields = CustomFieldField(many=True)
+    code = serializers.CharField(allow_blank=True, allow_null=True,required=False)
+    class Meta:
+        model = DocumentType
+        fields = (
+            "id",
+            "slug",
+            "name",
+            "match",
+            "matching_algorithm",
+            "is_insensitive",
+            "custom_fields",
+            "code",
+            "document_count",
+            "owner",
+            "permissions",
+            "user_can_change",
+            "set_permissions",
+        )
+
 
 class CustomFieldSerializer(serializers.ModelSerializer):
     data_type = serializers.ChoiceField(
         choices=CustomField.FieldDataType,
         read_only=False,
     )
+    code = serializers.CharField(allow_blank=True, allow_null=True,required=False)
 
     class Meta:
         model = CustomField
         fields = [
             "id",
             "name",
+            "code",
             "data_type",
         ]
 
@@ -753,6 +764,9 @@ class DocumentDocumentSerializer(DocumentElasticSearchSerializer):
         if hasattr(obj.meta, 'score'):
             return obj.meta.score
         return None
+class WebhookSerializer(serializers.Serializer):
+    class Meta:
+        fields = '__all__'
 
 class DocumentSerializer(
     OwnedObjectSerializer,
