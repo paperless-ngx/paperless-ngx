@@ -88,9 +88,8 @@ export class FilterableDropdownSelectionModel {
     }
   }
 
-  constructor(manyToOne: boolean = false, singleSelect: boolean = false) {
+  constructor(manyToOne: boolean = false) {
     this.manyToOne = manyToOne
-    this.singleSelect = singleSelect
   }
 
   private sortItems() {
