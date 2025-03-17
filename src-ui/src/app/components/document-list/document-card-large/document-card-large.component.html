@@ -62,9 +62,11 @@
               <ng-template #previewContent>
                 <pngx-preview-popup [document]="document"></pngx-preview-popup>
               </ng-template>
-              <a class="btn btn-sm btn-outline-secondary" [href]="getDownloadUrl()">
+              @if (document.user_can_change){
+                <a class="btn btn-sm btn-outline-secondary" [href]="getDownloadUrl()" >
                 <i-bs name="download"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>Download</span>
                 </a>
+              }
             }
             @else if (document.exploit==2) {
               <button class="btn btn-sm btn-outline-secondary" type="button" (click)="editField()">
