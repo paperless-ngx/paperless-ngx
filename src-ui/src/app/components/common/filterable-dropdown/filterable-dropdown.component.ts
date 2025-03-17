@@ -95,9 +95,17 @@ export class FilterableDropdownSelectionModel {
 
   private sortItems() {
     this._items.sort((a, b) => {
-      if (a.id == null && b.id != null) {
+      if (
+        (a.id == null && b.id != null) ||
+        (a.id == NEGATIVE_NULL_FILTER_VALUE &&
+          b.id != NEGATIVE_NULL_FILTER_VALUE)
+      ) {
         return -1
-      } else if (a.id != null && b.id == null) {
+      } else if (
+        (a.id != null && b.id == null) ||
+        (a.id != NEGATIVE_NULL_FILTER_VALUE &&
+          b.id == NEGATIVE_NULL_FILTER_VALUE)
+      ) {
         return 1
       } else if (
         this.getNonTemporary(a.id) == ToggleableItemState.NotSelected &&

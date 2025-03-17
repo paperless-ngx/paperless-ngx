@@ -556,7 +556,10 @@ export class FilterEditorComponent
               : Intersection.Include
           this.correspondentSelectionModel.set(
             rule.value ? +rule.value : null,
-            ToggleableItemState.Selected,
+            this.correspondentSelectionModel.intersection ==
+              Intersection.Include
+              ? ToggleableItemState.Selected
+              : ToggleableItemState.Excluded,
             false
           )
           break
@@ -578,6 +581,18 @@ export class FilterEditorComponent
           )
           break
         case FILTER_DOCUMENT_TYPE:
+          this.documentTypeSelectionModel.intersection =
+            rule.value == NEGATIVE_NULL_FILTER_VALUE.toString()
+              ? Intersection.Exclude
+              : Intersection.Include
+          this.documentTypeSelectionModel.set(
+            rule.value ? +rule.value : null,
+            this.documentTypeSelectionModel.intersection == Intersection.Include
+              ? ToggleableItemState.Selected
+              : ToggleableItemState.Excluded,
+            false
+          )
+          break
         case FILTER_HAS_DOCUMENT_TYPE_ANY:
           this.documentTypeSelectionModel.logicalOperator = LogicalOperator.Or
           this.documentTypeSelectionModel.intersection = Intersection.Include
@@ -596,6 +611,18 @@ export class FilterEditorComponent
           )
           break
         case FILTER_STORAGE_PATH:
+          this.storagePathSelectionModel.intersection =
+            rule.value == NEGATIVE_NULL_FILTER_VALUE.toString()
+              ? Intersection.Exclude
+              : Intersection.Include
+          this.storagePathSelectionModel.set(
+            rule.value ? +rule.value : null,
+            this.storagePathSelectionModel.intersection == Intersection.Include
+              ? ToggleableItemState.Selected
+              : ToggleableItemState.Excluded,
+            false
+          )
+          break
         case FILTER_HAS_STORAGE_PATH_ANY:
           this.storagePathSelectionModel.logicalOperator = LogicalOperator.Or
           this.storagePathSelectionModel.intersection = Intersection.Include
