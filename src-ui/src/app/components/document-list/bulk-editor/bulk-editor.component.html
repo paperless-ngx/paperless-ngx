@@ -76,10 +76,8 @@
           @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.CustomField)) {
             <pngx-filterable-dropdown title="Custom fields" icon="ui-radios" i18n-title
               filterPlaceholder="Filter custom fields" i18n-filterPlaceholder
-              [items]="customFields"
               [disabled]="!userCanEditAll"
               [editing]="true"
-              [manyToOne]="true"
               [applyOnClose]="applyOnClose"
               [createRef]="createCustomField.bind(this)"
               (opened)="openCustomFieldsDropdown()"

@@ -71,13 +71,11 @@ export class BulkEditorComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy
 {
-  customFields: CustomField[]
-
   tagSelectionModel = new FilterableDropdownSelectionModel(true)
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
   storagePathsSelectionModel = new FilterableDropdownSelectionModel()
-  customFieldsSelectionModel = new FilterableDropdownSelectionModel()
+  customFieldsSelectionModel = new FilterableDropdownSelectionModel(true)
   tagDocumentCounts: SelectionDataItem[]
   correspondentDocumentCounts: SelectionDataItem[]
   documentTypeDocumentCounts: SelectionDataItem[]
@@ -218,7 +216,9 @@ export class BulkEditorComponent
       this.customFieldService
         .listAll()
         .pipe(first())
-        .subscribe((result) => (this.customFields = result.results))
+        .subscribe(
+          (result) => (this.customFieldsSelectionModel.items = result.results)
+        )
     }
 
     this.downloadForm
@@ -735,7 +735,7 @@ export class BulkEditorComponent
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(({ newCustomField, customFields }) => {
-        this.customFields = customFields.results
+        this.customFieldsSelectionModel.items = customFields.results
         this.customFieldsSelectionModel.toggle(newCustomField.id)
       })
   }
@@ -873,7 +873,9 @@ export class BulkEditorComponent
     })
     const dialog =
       modal.componentInstance as CustomFieldsBulkEditDialogComponent
-    dialog.customFields = this.customFields
+    dialog.customFields = (
+      this.customFieldsSelectionModel.items as CustomField[]
+    ).filter((f) => f.id !== null)
     dialog.fieldsToAddIds = changedCustomFields.itemsToAdd.map(
       (item) => item.id
     )
