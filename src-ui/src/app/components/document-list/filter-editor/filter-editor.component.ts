@@ -26,14 +26,12 @@ import {
   switchMap,
   takeUntil,
 } from 'rxjs/operators'
-import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField } from 'src/app/data/custom-field'
 import {
   CustomFieldQueryLogicalOperator,
   CustomFieldQueryOperator,
 } from 'src/app/data/custom-field-query'
 import { Document } from 'src/app/data/document'
-import { DocumentType } from 'src/app/data/document-type'
 import { FilterRule } from 'src/app/data/filter-rule'
 import {
   FILTER_ADDED_AFTER,
@@ -75,9 +73,8 @@ import {
   FILTER_STORAGE_PATH,
   FILTER_TITLE,
   FILTER_TITLE_CONTENT,
+  NEGATIVE_NULL_FILTER_VALUE,
 } from 'src/app/data/filter-rule-type'
-import { StoragePath } from 'src/app/data/storage-path'
-import { Tag } from 'src/app/data/tag'
 import {
   PermissionAction,
   PermissionType,
@@ -251,7 +248,9 @@ export class FilterEditorComponent
         case FILTER_HAS_CORRESPONDENT_ANY:
           if (rule.value) {
             return $localize`Correspondent: ${
-              this.correspondents.find((c) => c.id == +rule.value)?.name
+              this.correspondentSelectionModel.items.find(
+                (c) => c.id == +rule.value
+              )?.name
             }`
           } else {
             return $localize`Without correspondent`
@@ -261,7 +260,9 @@ export class FilterEditorComponent
         case FILTER_HAS_DOCUMENT_TYPE_ANY:
           if (rule.value) {
             return $localize`Document type: ${
-              this.documentTypes.find((dt) => dt.id == +rule.value)?.name
+              this.documentTypeSelectionModel.items.find(
+                (dt) => dt.id == +rule.value
+              )?.name
             }`
           } else {
             return $localize`Without document type`
@@ -271,7 +272,9 @@ export class FilterEditorComponent
         case FILTER_HAS_STORAGE_PATH_ANY:
           if (rule.value) {
             return $localize`Storage path: ${
-              this.storagePaths.find((sp) => sp.id == +rule.value)?.name
+              this.storagePathSelectionModel.items.find(
+                (sp) => sp.id == +rule.value
+              )?.name
             }`
           } else {
             return $localize`Without storage path`
@@ -279,7 +282,7 @@ export class FilterEditorComponent
 
         case FILTER_HAS_TAGS_ALL:
           return $localize`Tag: ${
-            this.tags.find((t) => t.id == +rule.value)?.name
+            this.tagSelectionModel.items.find((t) => t.id == +rule.value)?.name
           }`
 
         case FILTER_HAS_ANY_TAG:
@@ -326,10 +329,6 @@ export class FilterEditorComponent
   @ViewChild('textFilterInput')
   textFilterInput: ElementRef
 
-  tags: Tag[] = []
-  correspondents: Correspondent[] = []
-  documentTypes: DocumentType[] = []
-  storagePaths: StoragePath[] = []
   customFields: CustomField[] = []
 
   tagDocumentCounts: SelectionDataItem[]
@@ -370,7 +369,7 @@ export class FilterEditorComponent
     )
   }
 
-  tagSelectionModel = new FilterableDropdownSelectionModel()
+  tagSelectionModel = new FilterableDropdownSelectionModel(true)
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
   storagePathSelectionModel = new FilterableDropdownSelectionModel()
@@ -551,6 +550,19 @@ export class FilterEditorComponent
           )
           break
         case FILTER_CORRESPONDENT:
+          this.correspondentSelectionModel.intersection =
+            rule.value == NEGATIVE_NULL_FILTER_VALUE.toString()
+              ? Intersection.Exclude
+              : Intersection.Include
+          this.correspondentSelectionModel.set(
+            rule.value ? +rule.value : null,
+            this.correspondentSelectionModel.intersection ==
+              Intersection.Include
+              ? ToggleableItemState.Selected
+              : ToggleableItemState.Excluded,
+            false
+          )
+          break
         case FILTER_HAS_CORRESPONDENT_ANY:
           this.correspondentSelectionModel.logicalOperator = LogicalOperator.Or
           this.correspondentSelectionModel.intersection = Intersection.Include
@@ -569,6 +581,18 @@ export class FilterEditorComponent
           )
           break
         case FILTER_DOCUMENT_TYPE:
+          this.documentTypeSelectionModel.intersection =
+            rule.value == NEGATIVE_NULL_FILTER_VALUE.toString()
+              ? Intersection.Exclude
+              : Intersection.Include
+          this.documentTypeSelectionModel.set(
+            rule.value ? +rule.value : null,
+            this.documentTypeSelectionModel.intersection == Intersection.Include
+              ? ToggleableItemState.Selected
+              : ToggleableItemState.Excluded,
+            false
+          )
+          break
         case FILTER_HAS_DOCUMENT_TYPE_ANY:
           this.documentTypeSelectionModel.logicalOperator = LogicalOperator.Or
           this.documentTypeSelectionModel.intersection = Intersection.Include
@@ -587,6 +611,18 @@ export class FilterEditorComponent
           )
           break
         case FILTER_STORAGE_PATH:
+          this.storagePathSelectionModel.intersection =
+            rule.value == NEGATIVE_NULL_FILTER_VALUE.toString()
+              ? Intersection.Exclude
+              : Intersection.Include
+          this.storagePathSelectionModel.set(
+            rule.value ? +rule.value : null,
+            this.storagePathSelectionModel.intersection == Intersection.Include
+              ? ToggleableItemState.Selected
+              : ToggleableItemState.Excluded,
+            false
+          )
+          break
         case FILTER_HAS_STORAGE_PATH_ANY:
           this.storagePathSelectionModel.logicalOperator = LogicalOperator.Or
           this.storagePathSelectionModel.intersection = Intersection.Include
@@ -809,9 +845,21 @@ export class FilterEditorComponent
           })
         })
     }
-    if (this.correspondentSelectionModel.isNoneSelected()) {
+    if (
+      this.correspondentSelectionModel.isNoneSelected() &&
+      this.correspondentSelectionModel.intersection == Intersection.Include
+    ) {
       filterRules.push({ rule_type: FILTER_CORRESPONDENT, value: null })
     } else {
+      if (
+        this.correspondentSelectionModel.isNoneSelected() &&
+        this.correspondentSelectionModel.intersection == Intersection.Exclude
+      ) {
+        filterRules.push({
+          rule_type: FILTER_CORRESPONDENT,
+          value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+        })
+      }
       this.correspondentSelectionModel
         .getSelectedItems()
         .forEach((correspondent) => {
@@ -822,6 +870,7 @@ export class FilterEditorComponent
         })
       this.correspondentSelectionModel
         .getExcludedItems()
+        .filter((correspondent) => correspondent.id > 0)
         .forEach((correspondent) => {
           filterRules.push({
             rule_type: FILTER_DOES_NOT_HAVE_CORRESPONDENT,
@@ -829,9 +878,21 @@ export class FilterEditorComponent
           })
         })
     }
-    if (this.documentTypeSelectionModel.isNoneSelected()) {
+    if (
+      this.documentTypeSelectionModel.isNoneSelected() &&
+      this.documentTypeSelectionModel.intersection === Intersection.Include
+    ) {
       filterRules.push({ rule_type: FILTER_DOCUMENT_TYPE, value: null })
     } else {
+      if (
+        this.documentTypeSelectionModel.isNoneSelected() &&
+        this.documentTypeSelectionModel.intersection == Intersection.Exclude
+      ) {
+        filterRules.push({
+          rule_type: FILTER_DOCUMENT_TYPE,
+          value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+        })
+      }
       this.documentTypeSelectionModel
         .getSelectedItems()
         .forEach((documentType) => {
@@ -842,6 +903,7 @@ export class FilterEditorComponent
         })
       this.documentTypeSelectionModel
         .getExcludedItems()
+        .filter((documentType) => documentType.id > 0)
         .forEach((documentType) => {
           filterRules.push({
             rule_type: FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
@@ -849,9 +911,21 @@ export class FilterEditorComponent
           })
         })
     }
-    if (this.storagePathSelectionModel.isNoneSelected()) {
+    if (
+      this.storagePathSelectionModel.isNoneSelected() &&
+      this.storagePathSelectionModel.intersection == Intersection.Include
+    ) {
       filterRules.push({ rule_type: FILTER_STORAGE_PATH, value: null })
     } else {
+      if (
+        this.storagePathSelectionModel.isNoneSelected() &&
+        this.storagePathSelectionModel.intersection == Intersection.Exclude
+      ) {
+        filterRules.push({
+          rule_type: FILTER_STORAGE_PATH,
+          value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+        })
+      }
       this.storagePathSelectionModel
         .getSelectedItems()
         .forEach((storagePath) => {
@@ -862,6 +936,7 @@ export class FilterEditorComponent
         })
       this.storagePathSelectionModel
         .getExcludedItems()
+        .filter((storagePath) => storagePath.id > 0)
         .forEach((storagePath) => {
           filterRules.push({
             rule_type: FILTER_DOES_NOT_HAVE_STORAGE_PATH,
@@ -1062,7 +1137,7 @@ export class FilterEditorComponent
     ) {
       this.loadingCountTotal++
       this.tagService.listAll().subscribe((result) => {
-        this.tags = result.results
+        this.tagSelectionModel.items = result.results
         this.maybeCompleteLoading()
       })
     }
@@ -1074,7 +1149,7 @@ export class FilterEditorComponent
     ) {
       this.loadingCountTotal++
       this.correspondentService.listAll().subscribe((result) => {
-        this.correspondents = result.results
+        this.correspondentSelectionModel.items = result.results
         this.maybeCompleteLoading()
       })
     }
@@ -1086,7 +1161,7 @@ export class FilterEditorComponent
     ) {
       this.loadingCountTotal++
       this.documentTypeService.listAll().subscribe((result) => {
-        this.documentTypes = result.results
+        this.documentTypeSelectionModel.items = result.results
         this.maybeCompleteLoading()
       })
     }
@@ -1098,7 +1173,7 @@ export class FilterEditorComponent
     ) {
       this.loadingCountTotal++
       this.storagePathService.listAll().subscribe((result) => {
-        this.storagePaths = result.results
+        this.storagePathSelectionModel.items = result.results
         this.maybeCompleteLoading()
       })
     }

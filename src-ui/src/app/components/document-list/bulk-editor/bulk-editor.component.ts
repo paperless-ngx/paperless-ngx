@@ -14,12 +14,8 @@ import { saveAs } from 'file-saver'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first, map, Subject, switchMap, takeUntil } from 'rxjs'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
-import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField } from 'src/app/data/custom-field'
-import { DocumentType } from 'src/app/data/document-type'
 import { MatchingModel } from 'src/app/data/matching-model'
-import { StoragePath } from 'src/app/data/storage-path'
-import { Tag } from 'src/app/data/tag'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
@@ -75,17 +71,11 @@ export class BulkEditorComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy
 {
-  tags: Tag[]
-  correspondents: Correspondent[]
-  documentTypes: DocumentType[]
-  storagePaths: StoragePath[]
-  customFields: CustomField[]
-
-  tagSelectionModel = new FilterableDropdownSelectionModel()
+  tagSelectionModel = new FilterableDropdownSelectionModel(true)
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
   storagePathsSelectionModel = new FilterableDropdownSelectionModel()
-  customFieldsSelectionModel = new FilterableDropdownSelectionModel()
+  customFieldsSelectionModel = new FilterableDropdownSelectionModel(true)
   tagDocumentCounts: SelectionDataItem[]
   correspondentDocumentCounts: SelectionDataItem[]
   documentTypeDocumentCounts: SelectionDataItem[]
@@ -176,7 +166,7 @@ export class BulkEditorComponent
       this.tagService
         .listAll()
         .pipe(first())
-        .subscribe((result) => (this.tags = result.results))
+        .subscribe((result) => (this.tagSelectionModel.items = result.results))
     }
     if (
       this.permissionService.currentUserCan(
@@ -187,7 +177,9 @@ export class BulkEditorComponent
       this.correspondentService
         .listAll()
         .pipe(first())
-        .subscribe((result) => (this.correspondents = result.results))
+        .subscribe(
+          (result) => (this.correspondentSelectionModel.items = result.results)
+        )
     }
     if (
       this.permissionService.currentUserCan(
@@ -198,7 +190,9 @@ export class BulkEditorComponent
       this.documentTypeService
         .listAll()
         .pipe(first())
-        .subscribe((result) => (this.documentTypes = result.results))
+        .subscribe(
+          (result) => (this.documentTypeSelectionModel.items = result.results)
+        )
     }
     if (
       this.permissionService.currentUserCan(
@@ -209,7 +203,9 @@ export class BulkEditorComponent
       this.storagePathService
         .listAll()
         .pipe(first())
-        .subscribe((result) => (this.storagePaths = result.results))
+        .subscribe(
+          (result) => (this.storagePathsSelectionModel.items = result.results)
+        )
     }
     if (
       this.permissionService.currentUserCan(
@@ -220,7 +216,9 @@ export class BulkEditorComponent
       this.customFieldService
         .listAll()
         .pipe(first())
-        .subscribe((result) => (this.customFields = result.results))
+        .subscribe(
+          (result) => (this.customFieldsSelectionModel.items = result.results)
+        )
     }
 
     this.downloadForm
@@ -651,7 +649,7 @@ export class BulkEditorComponent
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(({ newTag, tags }) => {
-        this.tags = tags.results
+        this.tagSelectionModel.items = tags.results
         this.tagSelectionModel.toggle(newTag.id)
       })
   }
@@ -674,7 +672,7 @@ export class BulkEditorComponent
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(({ newCorrespondent, correspondents }) => {
-        this.correspondents = correspondents.results
+        this.correspondentSelectionModel.items = correspondents.results
         this.correspondentSelectionModel.toggle(newCorrespondent.id)
       })
   }
@@ -695,7 +693,7 @@ export class BulkEditorComponent
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(({ newDocumentType, documentTypes }) => {
-        this.documentTypes = documentTypes.results
+        this.documentTypeSelectionModel.items = documentTypes.results
         this.documentTypeSelectionModel.toggle(newDocumentType.id)
       })
   }
@@ -716,7 +714,7 @@ export class BulkEditorComponent
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(({ newStoragePath, storagePaths }) => {
-        this.storagePaths = storagePaths.results
+        this.storagePathsSelectionModel.items = storagePaths.results
         this.storagePathsSelectionModel.toggle(newStoragePath.id)
       })
   }
@@ -737,7 +735,7 @@ export class BulkEditorComponent
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(({ newCustomField, customFields }) => {
-        this.customFields = customFields.results
+        this.customFieldsSelectionModel.items = customFields.results
         this.customFieldsSelectionModel.toggle(newCustomField.id)
       })
   }
@@ -875,7 +873,9 @@ export class BulkEditorComponent
     })
     const dialog =
       modal.componentInstance as CustomFieldsBulkEditDialogComponent
-    dialog.customFields = this.customFields
+    dialog.customFields = (
+      this.customFieldsSelectionModel.items as CustomField[]
+    ).filter((f) => f.id !== null)
     dialog.fieldsToAddIds = changedCustomFields.itemsToAdd.map(
       (item) => item.id
     )
