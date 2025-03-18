@@ -7,6 +7,7 @@ import {
   tick,
 } from '@angular/core/testing'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { NEGATIVE_NULL_FILTER_VALUE } from 'src/app/data/filter-rule-type'
 import {
   DEFAULT_MATCHING_ALGORITHM,
   MATCH_ALL,
@@ -41,6 +42,11 @@ const items: Tag[] = [
 
 const nullItem = {
   id: null,
+  name: 'Not assigned',
+}
+
+const negativeNullItem = {
+  id: NEGATIVE_NULL_FILTER_VALUE,
   name: 'Not assigned',
 }
 
@@ -482,6 +488,24 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     expect(changedResult.getExcludedItems()).toEqual(items)
   }))
 
+  it('should update null item selection on toggleIntersection', () => {
+    component.selectionModel.items = items
+    component.selectionModel = selectionModel
+    component.selectionModel.intersection = Intersection.Include
+    console.log(component.selectionModel.items[0])
+    component.selectionModel.set(null, ToggleableItemState.Selected)
+    component.selectionModel.intersection = Intersection.Exclude
+    component.selectionModel.toggleIntersection()
+    console.log(component.selectionModel)
+    expect(component.selectionModel.getExcludedItems()).toEqual([
+      negativeNullItem,
+    ])
+
+    component.selectionModel.intersection = Intersection.Include
+    component.selectionModel.toggleIntersection()
+    expect(component.selectionModel.getSelectedItems()).toEqual([nullItem])
+  })
+
   it('selection model should sort items by state', () => {
     component.selectionModel = selectionModel
     component.selectionModel.items = items.concat([{ id: 3, name: 'Item3' }])
@@ -494,6 +518,20 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       { id: 3, name: 'Item3' },
       items[0],
     ])
+
+    selectionModel.intersection = Intersection.Exclude
+    selectionModel.toggleIntersection()
+    selectionModel.apply()
+    expect(selectionModel.items).toEqual([
+      negativeNullItem,
+      items[1],
+      { id: 3, name: 'Item3' },
+      items[0],
+    ])
+
+    // coverage
+    selectionModel.items = selectionModel.items.reverse()
+    selectionModel.apply()
   })
 
   it('selection model should sort items by state and document counts = 0, if set', () => {

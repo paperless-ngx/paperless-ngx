@@ -69,6 +69,7 @@ import {
   FILTER_STORAGE_PATH,
   FILTER_TITLE,
   FILTER_TITLE_CONTENT,
+  NEGATIVE_NULL_FILTER_VALUE,
 } from 'src/app/data/filter-rule-type'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
@@ -678,6 +679,19 @@ describe('FilterEditorComponent', () => {
       correspondents[0],
     ])
     component.toggleCorrespondent(12) // coverage
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_CORRESPONDENT,
+        value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+      },
+    ]
+    expect(component.correspondentSelectionModel.intersection).toEqual(
+      Intersection.Exclude
+    )
+    expect(component.correspondentSelectionModel.getExcludedItems()).toEqual([
+      { id: NEGATIVE_NULL_FILTER_VALUE, name: 'Not assigned' },
+    ])
   }))
 
   it('should ingest filter rules for has any of correspondents', fakeAsync(() => {
@@ -758,6 +772,19 @@ describe('FilterEditorComponent', () => {
       document_types[0],
     ])
     component.toggleDocumentType(22) // coverage
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_DOCUMENT_TYPE,
+        value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+      },
+    ]
+    expect(component.documentTypeSelectionModel.intersection).toEqual(
+      Intersection.Exclude
+    )
+    expect(component.documentTypeSelectionModel.getExcludedItems()).toEqual([
+      { id: NEGATIVE_NULL_FILTER_VALUE, name: 'Not assigned' },
+    ])
   }))
 
   it('should ingest filter rules for has any of document types', fakeAsync(() => {
@@ -835,6 +862,19 @@ describe('FilterEditorComponent', () => {
       storage_paths[0],
     ])
     component.toggleStoragePath(32) // coverage
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_STORAGE_PATH,
+        value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+      },
+    ]
+    expect(component.storagePathSelectionModel.intersection).toEqual(
+      Intersection.Exclude
+    )
+    expect(component.storagePathSelectionModel.getExcludedItems()).toEqual([
+      { id: NEGATIVE_NULL_FILTER_VALUE, name: 'Not assigned' },
+    ])
   }))
 
   it('should ingest filter rules for has any of storage paths', fakeAsync(() => {
@@ -1386,6 +1426,19 @@ describe('FilterEditorComponent', () => {
         value: null,
       },
     ])
+
+    const excludeButton = correspondentsFilterableDropdown.queryAll(
+      By.css('input[value=exclude]')
+    )[0]
+    excludeButton.nativeElement.checked = true
+    excludeButton.triggerEventHandler('change')
+    fixture.detectChanges()
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_CORRESPONDENT,
+        value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+      },
+    ])
   }))
 
   it('should convert user input to correct filter rules on document type selections', fakeAsync(() => {
@@ -1443,6 +1496,19 @@ describe('FilterEditorComponent', () => {
         value: null,
       },
     ])
+
+    const excludeButton = docTypesFilterableDropdown.queryAll(
+      By.css('input[value=exclude]')
+    )[0]
+    excludeButton.nativeElement.checked = true
+    excludeButton.triggerEventHandler('change')
+    fixture.detectChanges()
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_DOCUMENT_TYPE,
+        value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+      },
+    ])
   }))
 
   it('should convert user input to correct filter rules on storage path selections', fakeAsync(() => {
@@ -1498,6 +1564,19 @@ describe('FilterEditorComponent', () => {
       {
         rule_type: FILTER_STORAGE_PATH,
         value: null,
+      },
+    ])
+
+    const excludeButton = storagePathsFilterableDropdown.queryAll(
+      By.css('input[value=exclude]')
+    )[0]
+    excludeButton.nativeElement.checked = true
+    excludeButton.triggerEventHandler('change')
+    fixture.detectChanges()
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_STORAGE_PATH,
+        value: NEGATIVE_NULL_FILTER_VALUE.toString(),
       },
     ])
   }))
