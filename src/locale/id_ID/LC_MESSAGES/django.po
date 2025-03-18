@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-11 13:33-0700\n"
-"PO-Revision-Date: 2025-03-11 20:35\n"
+"PO-Revision-Date: 2025-03-18 00:32\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -274,51 +274,51 @@ msgstr "Kartu Besar"
 
 #: documents/models.py:384
 msgid "Title"
-msgstr ""
+msgstr "Judul"
 
 #: documents/models.py:385 documents/models.py:942
 msgid "Created"
-msgstr ""
+msgstr "Dibuat"
 
 #: documents/models.py:386 documents/models.py:941
 msgid "Added"
-msgstr ""
+msgstr "Ditambahkan"
 
 #: documents/models.py:387
 msgid "Tags"
-msgstr ""
+msgstr "Label"
 
 #: documents/models.py:388
 msgid "Correspondent"
-msgstr ""
+msgstr "Koresponden"
 
 #: documents/models.py:389
 msgid "Document Type"
-msgstr ""
+msgstr "Tipe Dokumen"
 
 #: documents/models.py:390
 msgid "Storage Path"
-msgstr ""
+msgstr "Lokasi Penyimpanan"
 
 #: documents/models.py:391
 msgid "Note"
-msgstr ""
+msgstr "Catatan"
 
 #: documents/models.py:392
 msgid "Owner"
-msgstr ""
+msgstr "Pemilik"
 
 #: documents/models.py:393
 msgid "Shared"
-msgstr ""
+msgstr "Dibagikan"
 
 #: documents/models.py:394
 msgid "ASN"
-msgstr ""
+msgstr "ASN"
 
 #: documents/models.py:395
 msgid "Pages"
-msgstr ""
+msgstr "Halaman"
 
 #: documents/models.py:401
 msgid "show on dashboard"
@@ -526,7 +526,7 @@ msgstr "tidak memiliki area khusus"
 
 #: documents/models.py:489
 msgid "custom fields query"
-msgstr ""
+msgstr "kueri bidang khusus"
 
 #: documents/models.py:490
 msgid "created to"
@@ -566,15 +566,15 @@ msgstr "saring aturan"
 
 #: documents/models.py:534
 msgid "Auto Task"
-msgstr ""
+msgstr "Tugas Otomatis"
 
 #: documents/models.py:535
 msgid "Scheduled Task"
-msgstr ""
+msgstr "Tugas Terjadwal"
 
 #: documents/models.py:536
 msgid "Manual Task"
-msgstr ""
+msgstr "Tugas Manual"
 
 #: documents/models.py:539
 msgid "Consume File"
@@ -666,7 +666,7 @@ msgstr "Data yang dikembalikan dari tugas"
 
 #: documents/models.py:614
 msgid "Task Type"
-msgstr ""
+msgstr "Tipe Tugas"
 
 #: documents/models.py:615
 msgid "The type of task that was run"
@@ -746,7 +746,7 @@ msgstr "Tautan Dokumen"
 
 #: documents/models.py:736
 msgid "Select"
-msgstr ""
+msgstr "Pilih"
 
 #: documents/models.py:748
 msgid "data type"
@@ -754,7 +754,7 @@ msgstr "jenis data"
 
 #: documents/models.py:755
 msgid "extra data"
-msgstr ""
+msgstr "data ekstra"
 
 #: documents/models.py:759
 msgid "Extra data for the custom field, such as select options"
@@ -790,7 +790,7 @@ msgstr "Dokumen diperbarui"
 
 #: documents/models.py:932
 msgid "Scheduled"
-msgstr ""
+msgstr "Dijadwalkan"
 
 #: documents/models.py:935
 msgid "Consume Folder"
@@ -806,15 +806,15 @@ msgstr "Pengambilan Surat"
 
 #: documents/models.py:938
 msgid "Web UI"
-msgstr ""
+msgstr "Antarmuka Web"
 
 #: documents/models.py:943
 msgid "Modified"
-msgstr ""
+msgstr "Dimodifikasi"
 
 #: documents/models.py:944
 msgid "Custom Field"
-msgstr ""
+msgstr "Kolom Khusus"
 
 #: documents/models.py:947
 msgid "Workflow Trigger Type"
@@ -982,7 +982,7 @@ msgstr "Surel"
 
 #: documents/models.py:1176
 msgid "Webhook"
-msgstr ""
+msgstr "Webhook"
 
 #: documents/models.py:1180
 msgid "Workflow Action Type"
@@ -1114,11 +1114,11 @@ msgstr "hapus semua kolom khusus"
 
 #: documents/models.py:1395
 msgid "email"
-msgstr ""
+msgstr "surel"
 
 #: documents/models.py:1404
 msgid "webhook"
-msgstr ""
+msgstr "webhook"
 
 #: documents/models.py:1408
 msgid "workflow action"
@@ -1146,7 +1146,7 @@ msgstr "diaktifkan"
 
 #: documents/models.py:1445
 msgid "workflow"
-msgstr ""
+msgstr "alur kerja"
 
 #: documents/models.py:1449
 msgid "workflow trigger type"
@@ -1188,15 +1188,15 @@ msgstr ""
 
 #: documents/templates/account/account_inactive.html:9
 msgid "Account inactive."
-msgstr ""
+msgstr "Akun tidak aktif."
 
 #: documents/templates/account/account_inactive.html:14
 msgid "This account is inactive."
-msgstr ""
+msgstr "Akun ini tidak aktif."
 
 #: documents/templates/account/account_inactive.html:16
 msgid "Return to login"
-msgstr ""
+msgstr "Kembali ke halaman masuk"
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
@@ -1358,11 +1358,11 @@ msgstr ""
 
 #: documents/templates/mfa/authenticate.html:17
 msgid "Code"
-msgstr ""
+msgstr "Kode"
 
 #: documents/templates/mfa/authenticate.html:24
 msgid "Cancel"
-msgstr ""
+msgstr "Batal"
 
 #: documents/templates/paperless-ngx/base.html:58
 msgid "Share link was not found."
@@ -1470,7 +1470,7 @@ msgstr ""
 
 #: paperless/models.py:62
 msgid "none"
-msgstr ""
+msgstr "tidak ada"
 
 #: paperless/models.py:70
 msgid "LeaveColorUnchanged"
@@ -1486,7 +1486,7 @@ msgstr ""
 
 #: paperless/models.py:73
 msgid "Gray"
-msgstr ""
+msgstr "Abu-abu"
 
 #: paperless/models.py:74
 msgid "CMYK"
@@ -1566,7 +1566,7 @@ msgstr "Arab"
 
 #: paperless/settings.py:725
 msgid "Afrikaans"
-msgstr ""
+msgstr "Bahasa Afrika"
 
 #: paperless/settings.py:726
 msgid "Belarusian"
@@ -1574,7 +1574,7 @@ msgstr "Belarusia"
 
 #: paperless/settings.py:727
 msgid "Bulgarian"
-msgstr ""
+msgstr "Bahasa Bulgaria"
 
 #: paperless/settings.py:728
 msgid "Catalan"
@@ -1622,11 +1622,11 @@ msgstr "Italia"
 
 #: paperless/settings.py:739
 msgid "Japanese"
-msgstr ""
+msgstr "Bahasa Jepang"
 
 #: paperless/settings.py:740
 msgid "Korean"
-msgstr ""
+msgstr "Bahasa Korea"
 
 #: paperless/settings.py:741
 msgid "Luxembourgish"
