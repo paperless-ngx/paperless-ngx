@@ -3239,7 +3239,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = FolderFilterSet
-    ordering_fields = ("name", "path", "parent_folder", "document_count")
+    ordering_fields = ("name", "path", "parent_folder", "document_count", "type")
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())

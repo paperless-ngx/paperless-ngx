@@ -461,6 +461,7 @@ class FolderFilterSet(FilterSet):
             "parent_folder__id": ID_KWARGS,
             "path": CHAR_KWARGS,
             "parent_folder": ["isnull"],
+            "type": CHAR_KWARGS
         }
 
 class CustomParentDossierIDFilter(NumberFilter):

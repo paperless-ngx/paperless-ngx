@@ -81,18 +81,20 @@ export class FileTreeWidgetComponent extends ComponentWithPermissions
   }
 
   getNode(object: Folder, event) {
-
-    this.folderService.listFolderFiltered(
-      1,
-      null,
-      null,
-      true,
-      object.id,
-      null,
-      true,
-    ).subscribe((c) => {
+    this.folderService.listFilteredCustom(1,null, null, {"parent_folder__id": object.id, "type__iexact": "folder"},true, null, true ).subscribe((c)=>{
       this.renderNode(c, object, event)
     })
+    // this.folderService.listFolderFiltered(
+    //   1,
+    //   null,
+    //   null,
+    //   true,
+    //   object.id,
+    //   null,
+    //   true,
+    // ).subscribe((c) => {
+    //   this.renderNode(c, object, event)
+    // })
 
   }
 
@@ -109,14 +111,19 @@ export class FileTreeWidgetComponent extends ComponentWithPermissions
 
   viewMore() {
     this.pageNumber=this.pageNumber+1
-    this.folderService.listFolderFiltered(
-      this.pageNumber,
-      null,
-      null,
-      true,
-      this.nodeId,
-      null,
-      true,
+    // this.folderService.listFolderFiltered(
+    //   this.pageNumber,
+    //   null,
+    //   null,
+    //   true,
+    //   this.nodeId,
+    //   null,
+    //   true,
+    // ).subscribe((c) => {
+    //   this.data = this.data.concat(c.results)
+    //
+    // })
+    this.folderService.listFilteredCustom(this.pageNumber,null, null, {"parent_folder__id": this.nodeId, "type__iexact": "folder"},true, null, true
     ).subscribe((c) => {
       this.data = this.data.concat(c.results)
 
@@ -126,14 +133,8 @@ export class FileTreeWidgetComponent extends ComponentWithPermissions
 
   reload() {
     if (this.nodeId == 0) {
-      this.folderService.listFolderFiltered(
-        this.pageNumber,
-        null,
-        null,
-        true,
-        null,
-        null,
-        true,
+      this.folderService.listFilteredCustom(
+        this.pageNumber, null, null, {"parent_folder__isnull": true, "type__iexact": "folder"}, true, null, true
       ).subscribe((c) => {
         if (this.pageNumber > 1) {
           this.data = this.data.concat(c.results)

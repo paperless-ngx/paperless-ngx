@@ -74,6 +74,8 @@ export abstract class AbstractNameFilterService<T extends ObjectWithId,> extends
     return this.list(page, pageSize, sortField, sortReverse, params)
   }
 
+
+
   listDossierFiltered(page?: number,
     pageSize?: number,
     sortField?: string,
