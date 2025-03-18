@@ -329,6 +329,7 @@ export class FilterableDropdownSelectionModel {
     this.temporarySelectionStates.clear()
     this.temporaryLogicalOperator = this._logicalOperator = LogicalOperator.And
     this.temporaryIntersection = this._intersection = Intersection.Include
+    this.setNullItem()
     if (fireEvent) {
       this.changed.next(this)
     }
