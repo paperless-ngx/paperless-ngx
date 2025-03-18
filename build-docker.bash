@@ -33,4 +33,4 @@ echo "🔢 Current version: $current_version"
 echo "🚀 New version: $new_version"
 
 docker build --file Dockerfile --tag ${IMAGE_NAME}:${new_version} --progress plain .
-docker push otxtan/tc-edoc:${new_version}
+docker push ${IMAGE_NAME}:${new_version}
