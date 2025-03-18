@@ -10,6 +10,7 @@ import {
   FILTER_HAS_CUSTOM_FIELDS_ANY,
   FILTER_RULE_TYPES,
   FilterRuleType,
+  NEGATIVE_NULL_FILTER_VALUE,
 } from '../data/filter-rule-type'
 import { ListViewState } from '../services/document-list-view.service'
 
@@ -113,6 +114,10 @@ export function filterRulesFromQueryParams(
           rt.isnull_filtervar == filterQueryParamName
       )
       const isNullRuleType = rule_type.isnull_filtervar == filterQueryParamName
+      const nullRuleValue =
+        queryParams.get(filterQueryParamName) == '1'
+          ? null
+          : NEGATIVE_NULL_FILTER_VALUE.toString()
       const valueURIComponent: string = queryParams.get(filterQueryParamName)
       const filterQueryParamValues: string[] = rule_type.multi
         ? valueURIComponent.split(',')
@@ -125,7 +130,7 @@ export function filterRulesFromQueryParams(
             val = val.replace('1', 'true').replace('0', 'false')
           return {
             rule_type: rule_type.id,
-            value: isNullRuleType ? null : val,
+            value: isNullRuleType ? nullRuleValue : val,
           }
         })
       )
@@ -143,6 +148,11 @@ export function queryParamsFromFilterRules(filterRules: FilterRule[]): Params {
       let ruleType = FILTER_RULE_TYPES.find((t) => t.id == rule.rule_type)
       if (ruleType.isnull_filtervar && rule.value == null) {
         params[ruleType.isnull_filtervar] = 1
+      } else if (
+        ruleType.isnull_filtervar &&
+        rule.value == NEGATIVE_NULL_FILTER_VALUE.toString()
+      ) {
+        params[ruleType.isnull_filtervar] = 0
       } else if (ruleType.multi) {
         params[ruleType.filtervar] = params[ruleType.filtervar]
           ? params[ruleType.filtervar] + ',' + rule.value

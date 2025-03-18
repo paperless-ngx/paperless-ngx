@@ -8,6 +8,7 @@ import {
   FILTER_HAS_CUSTOM_FIELDS_ALL,
   FILTER_HAS_CUSTOM_FIELDS_ANY,
   FILTER_HAS_TAGS_ALL,
+  NEGATIVE_NULL_FILTER_VALUE,
 } from '../data/filter-rule-type'
 import {
   filterRulesFromQueryParams,
@@ -95,6 +96,16 @@ describe('QueryParams Utils', () => {
     ])
     expect(params).toEqual({
       correspondent__isnull: 1,
+    })
+
+    params = queryParamsFromFilterRules([
+      {
+        rule_type: FILTER_CORRESPONDENT,
+        value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+      },
+    ])
+    expect(params).toEqual({
+      correspondent__isnull: 0,
     })
 
     params = queryParamsFromFilterRules([

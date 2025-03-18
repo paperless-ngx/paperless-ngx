@@ -1,5 +1,7 @@
 import { DataType } from './datatype'
 
+export const NEGATIVE_NULL_FILTER_VALUE = -1
+
 // These correspond to src/documents/models.py and changes here require a DB migration (and vice versa)
 export const FILTER_TITLE = 0
 export const FILTER_CONTENT = 1
