@@ -46,9 +46,9 @@
 
         <div class="d-flex flex-column flex-md-row align-items-md-center">
           <div class="btn-group">
-            <a class="btn btn-sm btn-outline-secondary" (click)="clickMoreLike.emit()">
-              <i-bs name="diagram-3"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>More like this</span>
-            </a>
+<!--            <a class="btn btn-sm btn-outline-secondary" (click)="clickMoreLike.emit()">-->
+<!--              <i-bs name="diagram-3"></i-bs>&nbsp;<span class="d-none d-md-inline" i18n>More like this</span>-->
+<!--            </a>-->
             @if (document.exploit==1) {
 
               <a routerLink="/documents/{{document.id}}" class="btn btn-sm btn-outline-secondary" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">

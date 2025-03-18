@@ -129,7 +129,7 @@ const DEFAULT_TEXT_FILTER_TARGET_OPTIONS = [
     id: TEXT_FILTER_TARGET_TITLE_CONTENT,
     name: $localize`Title & content`,
   },
-  { id: TEXT_FILTER_TARGET_ASN, name: $localize`ASN` },
+  // { id: TEXT_FILTER_TARGET_ASN, name: $localize`ASN` },
   {
     id: TEXT_FILTER_TARGET_CUSTOM_FIELDS,
     name: $localize`Custom fields`,
