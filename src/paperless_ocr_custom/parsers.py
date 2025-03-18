@@ -563,7 +563,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
         font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                  'fonts', 'arial-font/arial.ttf')
         with open(sidecar, "w") as txt_sidecar:
-            txt_sidecar.write(data.get("content", ""))
+            txt_sidecar.write(data.get("content_formated", ""))
         if self.is_image(mime_type):
             img = Image.open(input_path)
             width, height = img.size
