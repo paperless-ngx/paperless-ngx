@@ -149,9 +149,11 @@ def index_reindex_elasticsearch(progress_bar_disable=False):
     )
 
     print("documents total", documents.count())
+    DocumentDocument.init()
     for document in tqdm.tqdm(documents, disable=progress_bar_disable):
         update_index_document(document)
     documents.update(indexed=True)
+
 
 
 @shared_task

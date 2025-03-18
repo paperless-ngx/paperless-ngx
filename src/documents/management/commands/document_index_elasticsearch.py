@@ -23,4 +23,4 @@ class Command(ProgressBarMixin, BaseCommand):
         else:
             print(f"Index '{ELASTIC_SEARCH_DOCUMENT_INDEX}' does not exist.")
             index_reindex_elasticsearch(
-                progress_bar_disable=self.no_progress_bar)
+                progress_bar_disable=self.use_progress_bar)
