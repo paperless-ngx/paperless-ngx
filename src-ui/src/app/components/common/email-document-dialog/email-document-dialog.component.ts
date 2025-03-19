@@ -62,6 +62,7 @@ export class EmailDocumentDialogComponent extends LoadingComponentWithPermission
           this.emailAddress = ''
           this.emailSubject = ''
           this.emailMessage = ''
+          this.close()
           this.toastService.showInfo($localize`Email sent`)
         },
         error: (e) => {
