@@ -951,8 +951,8 @@ class Consumer(LoggingMixin):
                 )
                 if (application_config.enable_compress):
                     compress_pdf(self.original_path, self.working_copy, int(application_config.quality_compress))
-                copy_file_with_basic_stats(self.working_copy,
-                                           self.original_path)
+                    copy_file_with_basic_stats(self.working_copy,
+                                               self.original_path)
                 new_file = None
                 # self.log.debug("Consumer", document.folder)
 
