@@ -62,6 +62,32 @@ services:
     # Overrides default command so things don't shut down after the process ends.
     command: /bin/sh -c "chown -R paperless:paperless /usr/src/paperless/paperless-ngx/src/documents/static/frontend && chown -R paperless:paperless /usr/src/paperless/paperless-ngx/.ruff_cache && while sleep 1000; do :; done"
 
+  docjarvis:
+    build:
+      context: /Users/joschka/Library/CloudStorage/OneDrive-Personal/Code/projects/chatgpt-retrieval-plugin/
+    ports:
+      - "4321:4321"
+    restart: unless-stopped
+    volumes:
+      - //Users/joschka/Library/CloudStorage/OneDrive-Personal/Code/projects/paperflow-ai/export:/documents
+    env_file: /Users/joschka/Library/CloudStorage/OneDrive-Personal/Code/projects/chatgpt-retrieval-plugin/.env
+    depends_on:
+      - docjarvis_redis
+
+  docjarvis_redis:
+    image: redis/redis-stack-server:latest
+    volumes:
+        - redisdata_embeddings:/data
+    command: redis-stack-server --port 6378 --protected-mode no
+    ports:
+      - "6378:6378"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-h", "localhost", "-p", "6378", "ping"]
+      interval: 2s
+      timeout: 1m30s
+      retries: 5
+      start_period: 5s
+
   gotenberg:
     image: docker.io/gotenberg/gotenberg:7.10
     restart: unless-stopped
@@ -81,4 +107,5 @@ volumes:
   data:
   media:
   redisdata:
+  redisdata_embeddings:
   pipenv:
