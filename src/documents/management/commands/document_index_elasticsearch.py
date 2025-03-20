@@ -18,9 +18,7 @@ class Command(ProgressBarMixin, BaseCommand):
     def handle(self, *args, **options):
         self.handle_progress_bar_mixin(**options)
         if Elasticsearch(ELASTIC_SEARCH_HOST).indices.exists(index=ELASTIC_SEARCH_DOCUMENT_INDEX):
-            print(f"Index '{ELASTIC_SEARCH_DOCUMENT_INDEX}' exists.")
             index_optimize_elasticsearch(self.use_progress_bar)
         else:
-            print(f"Index '{ELASTIC_SEARCH_DOCUMENT_INDEX}' does not exist.")
             index_reindex_elasticsearch(
                 progress_bar_disable=self.use_progress_bar)
