@@ -14,9 +14,6 @@ on:
       - 'translations**'
 
 env:
-  # This is the version of pipenv all the steps will use
-  # If changing this, change Dockerfile
-  DEFAULT_PIP_ENV_VERSION: "2024.4.1"
   # This is the default version of Python to use in most steps which aren't specific
   DEFAULT_PYTHON_VERSION: "3.11"
 
@@ -59,24 +56,24 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
-          cache: "pipenv"
-          cache-dependency-path: 'Pipfile.lock'
+          cache: "pip"
+          cache-dependency-path: 'pyproject.toml'
       -
-        name: Install pipenv
+        name: Install uv
         run: |
-          pip install --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }}
+          pip install --user uv
       -
         name: Install dependencies
         run: |
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} sync --dev
+          uv pip install -e ".[dev]"
       -
         name: List installed Python dependencies
         run: |
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run pip list
+          pip list
       -
         name: Make documentation
         run: |
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run mkdocs build --config-file ./mkdocs.yml
+          mkdocs build --config-file ./mkdocs.yml
       -
         name: Deploy documentation
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -84,7 +81,7 @@ jobs:
           echo "docs.paperless-ngx.com" > "${{ github.workspace }}/docs/CNAME"
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run mkdocs gh-deploy --force --no-history
+          mkdocs gh-deploy --force --no-history
       -
         name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -117,12 +114,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "${{ matrix.python-version }}"
-          cache: "pipenv"
-          cache-dependency-path: 'Pipfile.lock'
+          cache: "pip"
+          cache-dependency-path: 'pyproject.toml'
       -
-        name: Install pipenv
+        name: Install uv
         run: |
-          pip install --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }}
+          pip install --user uv
       -
         name: Install system dependencies
         run: |
@@ -135,12 +132,12 @@ jobs:
       -
         name: Install Python dependencies
         run: |
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run python --version
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} sync --dev
+          python --version
+          uv pip install -e ".[dev,typing]"
       -
         name: List installed Python dependencies
         run: |
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run pip list
+          pip list
       -
         name: Tests
         env:
@@ -151,7 +148,7 @@ jobs:
           PAPERLESS_MAIL_TEST_PASSWD: ${{ secrets.TEST_MAIL_PASSWD }}
         run: |
           cd src/
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run pytest -ra
+          pytest -ra
       -
         name: Upload coverage
         if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION }}
@@ -472,16 +469,16 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
-          cache: "pipenv"
-          cache-dependency-path: 'Pipfile.lock'
+          cache: "pip"
+          cache-dependency-path: 'pyproject.toml'
       -
-        name: Install pipenv + tools
+        name: Install uv
         run: |
-          pip install --upgrade --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }} setuptools wheel
+          pip install --user uv
       -
-        name: Install Python dependencies
+        name: Install dependencies
         run: |
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} sync --dev
+          uv pip install -e ".[dev]"
       -
         name: Install system dependencies
         run: |
@@ -502,17 +499,19 @@ jobs:
       -
         name: Generate requirements file
         run: |
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} requirements > requirements.txt
+          uv pip list > requirements.txt
       -
         name: Compile messages
         run: |
           cd src/
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run python3 manage.py compilemessages
+          uv pip install -e ".[dev]"
+          python3 manage.py compilemessages
       -
         name: Collect static files
         run: |
           cd src/
-          pipenv --python ${{ steps.setup-python.outputs.python-version }} run python3 manage.py collectstatic --no-input
+          uv pip install -e ".[dev]"
+          python3 manage.py collectstatic --no-input
       -
         name: Move files
         run: |
@@ -528,9 +527,7 @@ jobs:
           for file_name in .dockerignore \
                           .env \
                           Dockerfile \
-                          Pipfile \
-                          Pipfile.lock \
-                          requirements.txt \
+                          pyproject.toml \
                           LICENSE \
                           README.md \
                           paperless.conf.example \
@@ -634,12 +631,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
-          cache: "pipenv"
-          cache-dependency-path: 'Pipfile.lock'
+          cache: "pip"
+          cache-dependency-path: 'pyproject.toml'
       -
-        name: Install pipenv + tools
+        name: Install uv
         run: |
-          pip install --upgrade --user pipenv==${{ env.DEFAULT_PIP_ENV_VERSION }} setuptools wheel
+          pip install --user uv
       -
         name: Append Changelog to docs
         id: append-Changelog
@@ -655,7 +652,8 @@ jobs:
           CURRENT_CHANGELOG=`tail --lines +2 changelog.md`
           echo -e "$CURRENT_CHANGELOG" >> changelog-new.md
           mv changelog-new.md changelog.md
-          pipenv run pre-commit run --files changelog.md || true
+          uv pip install -e ".[dev]"
+          pre-commit run --files changelog.md || true
           git config --global user.name "github-actions"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -am "Changelog ${{ needs.publish-release.outputs.version }} - GHA"

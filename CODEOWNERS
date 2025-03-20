@@ -1,9 +1,11 @@
-/.github/workflows/ @paperless-ngx/ci-cd
-/docker/ @paperless-ngx/ci-cd
-/scripts/ @paperless-ngx/ci-cd
+# Default code owners
+* @paperless-ngx/core
 
-/src-ui/ @paperless-ngx/frontend
-
-/src/ @paperless-ngx/backend
-Pipfile* @paperless-ngx/backend
+# Backend team has more knowledge over the Python code and Docker setup
 *.py @paperless-ngx/backend
+pyproject.toml @paperless-ngx/backend
+requirements.txt @paperless-ngx/backend
+docker/ @paperless-ngx/backend
+
+# Frontend team has more knowledge about the Angular/Web stuff
+src-ui/ @paperless-ngx/frontend
