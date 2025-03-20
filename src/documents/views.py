@@ -12,6 +12,7 @@ import zipfile
 from datetime import datetime
 from datetime import timedelta
 from pathlib import Path
+from tabnanny import check
 from time import mktime
 from unicodedata import normalize
 from urllib.parse import quote
@@ -205,14 +206,16 @@ from documents.tasks import consume_file
 from documents.tasks import deleted_backup
 from documents.tasks import empty_trash
 from documents.tasks import restore_documents
-from documents.utils import check_storage
+from documents.utils import check_storage, compress_pdf
 from documents.utils import generate_unique_name
 from documents.utils import get_directory_size
 from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import GeneralConfig
 from paperless.db import GnuPG
+from paperless.models import ApplicationConfiguration
 from paperless.views import StandardPagination
+from paperless.wsgi import application
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -1448,12 +1451,22 @@ class PostDocumentView(GenericAPIView):
         temp_file_path = Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR)) / Path(
             pathvalidate.sanitize_filename(doc_name),
         )
-        temp_file_path.write_bytes(doc_data)
+        temp_file_path_compress = Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR)) / Path(
+            pathvalidate.sanitize_filename(doc_name),
+        )
 
-        os.utime(temp_file_path, times=(t, t))
+        temp_file_path.write_bytes(doc_data)
+        application_config = ApplicationConfiguration.objects.all().first()
+
+        if (application_config.enable_compress):
+            compress_pdf(temp_file_path, temp_file_path_compress,
+                         int(application_config.quality_compress))
+
+
+        os.utime(temp_file_path_compress, times=(t, t))
         input_doc = ConsumableDocument(
             source=DocumentSource.ApiUpload,
-            original_file=temp_file_path,
+            original_file=temp_file_path_compress,
         )
         # print('dossier_id',dossier_id)
         input_doc_overrides = DocumentMetadataOverrides(
@@ -1470,6 +1483,7 @@ class PostDocumentView(GenericAPIView):
             asn=archive_serial_number,
             owner_id=request.user.id,
             custom_field_ids=custom_field_ids,
+            checksum=hashlib.md5(temp_file_path.read_bytes()).hexdigest()
         )
 
         async_task = consume_file.apply(

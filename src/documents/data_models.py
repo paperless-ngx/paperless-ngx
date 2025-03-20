@@ -16,7 +16,7 @@ class DocumentMetadataOverrides:
     be set from content or matching.  All fields default to None,
     meaning no override is happening
     """
-   
+
     filename: Optional[str] = None
     title: Optional[str] = None
     correspondent_id: Optional[int] = None
@@ -34,6 +34,7 @@ class DocumentMetadataOverrides:
     change_users: Optional[list[int]] = None
     change_groups: Optional[list[int]] = None
     custom_field_ids: Optional[list[int]] = None
+    checksum: Optional[str] = None
 
     def update(self, other: "DocumentMetadataOverrides") -> "DocumentMetadataOverrides":
         """
@@ -45,6 +46,8 @@ class DocumentMetadataOverrides:
         # only if empty
         if other.title is not None:
             self.title = other.title
+        if other.checksum is not None:
+            self.title = other.checksum
         if other.correspondent_id is not None:
             self.correspondent_id = other.correspondent_id
         if other.document_type_id is not None:

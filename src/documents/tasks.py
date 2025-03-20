@@ -274,6 +274,7 @@ def consume_file(
         override_change_groups=overrides.change_groups,
         override_custom_field_ids=overrides.custom_field_ids,
         task_id=self.request.id,
+        override_checksum=overrides.checksum
     )
 
     if document:
