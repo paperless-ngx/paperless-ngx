@@ -710,7 +710,8 @@ class DelayedElasticSearch(DelayedQuery):
 
         # mapping docs to response
         for r in response:
-            r.doc_obj = dict_docs[int(r.meta.id)]
+            if dict_docs.get(int(r.meta.id), None):
+                r.doc_obj = dict_docs[int(r.meta.id)]
 
         all_doc_ids = self.search_get_all()
         page: ResultsPage = ResultsPage(response, page_num, page_len)

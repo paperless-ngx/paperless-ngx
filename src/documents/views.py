@@ -1459,14 +1459,17 @@ class PostDocumentView(GenericAPIView):
         application_config = ApplicationConfiguration.objects.all().first()
 
         if (application_config.enable_compress):
-            compress_pdf(temp_file_path, temp_file_path_compress,
+            temp_file_path_compress.write_bytes(doc_data)
+            compress_pdf(temp_file_path_compress, temp_file_path,
                          int(application_config.quality_compress))
+            temp_file_path_compress.unlink()
 
 
-        os.utime(temp_file_path_compress, times=(t, t))
+
+        os.utime(temp_file_path, times=(t, t))
         input_doc = ConsumableDocument(
             source=DocumentSource.ApiUpload,
-            original_file=temp_file_path_compress,
+            original_file=temp_file_path,
         )
         # print('dossier_id',dossier_id)
         input_doc_overrides = DocumentMetadataOverrides(
