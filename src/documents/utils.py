@@ -1,3 +1,4 @@
+import io
 import logging
 import os
 import re
@@ -11,6 +12,7 @@ from typing import Union
 
 from django.conf import settings
 from PIL import Image
+from pdf2image.pdf2image import convert_from_path
 
 
 def _coerce_to_path(
@@ -167,3 +169,28 @@ def get_directory_size(directory):
             if os.path.exists(filepath):
                 total_size += os.path.getsize(filepath)
     return total_size
+
+
+def compress_pdf(input_pdf_path, output_pdf_path, quality=100):
+    # Convert PDF to a list of images
+    pages = convert_from_path(input_pdf_path)
+
+    # Create a list to hold the compressed images
+    compressed_images = []
+
+    # Iterate through each page
+    for page in pages:
+        page_image = page.convert("RGB")
+
+        # Compress the page image
+        file_bytes = io.BytesIO()
+        page_image.save(file_bytes, format='JPEG', quality=quality, optimize=True)
+        file_bytes.seek(0)
+        compressed_images.append(Image.open(file_bytes))
+
+    # Save the compressed images as a new PDF
+    compressed_images[0].save(output_pdf_path, save_all=True, append_images=compressed_images[1:])
+
+    # Close the BytesIO objects
+    for img in compressed_images:
+        img.close()

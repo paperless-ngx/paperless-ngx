@@ -4693,10 +4693,6 @@
                <context context-type="sourcefile">src/app/components/common/edit-dialog/archive-font-edit-dialog/archive-font-edit-dialog.component.html</context>
                <context context-type="linenumber">17</context>
             </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-               <context context-type="linenumber">90</context>
-            </context-group>
             <target state="translated">Ngôn ngữ</target>
          </trans-unit>
          <trans-unit id="1055686627716339120" datatype="html">
@@ -8461,10 +8457,6 @@
                <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component.ts</context>
                <context context-type="linenumber">134</context>
             </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-               <context context-type="linenumber">97</context>
-            </context-group>
             <target state="translated">Trang</target>
          </trans-unit>
          <trans-unit id="2398407606701767789" datatype="html">
@@ -8970,18 +8962,6 @@
                <context context-type="linenumber">137</context>
             </context-group>
             <target state="translated">OCR lại</target>
-         </trans-unit>
-         <trans-unit id="1418444397960583910" datatype="html">
-            <source>More like this</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-               <context context-type="linenumber">60</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-               <context context-type="linenumber">50</context>
-            </context-group>
-            <target state="translated">Tương tự</target>
          </trans-unit>
          <trans-unit id="2434944824726929798" datatype="html">
             <source>Split</source>
@@ -10640,10 +10620,6 @@
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
                <context context-type="linenumber">143</context>
-            </context-group>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-               <context context-type="linenumber">132</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
@@ -12854,107 +12830,43 @@
             </context-group>
             <target state="translated">Cài đặt OCR</target>
          </trans-unit>
+         <trans-unit id="6264430177495072932" datatype="html">
+            <source>Compress Settings</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+               <context context-type="linenumber">52</context>
+            </context-group>
+            <target state="translated">Cài đặt nén</target>
+         </trans-unit>
          <trans-unit id="8676248813204017585" datatype="html">
             <source>Enable Ocr</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-               <context context-type="linenumber">75</context>
+               <context context-type="linenumber">76</context>
             </context-group>
             <target state="translated">Bật/Tắt Ocr</target>
          </trans-unit>
-         <trans-unit id="1313137480169642057" datatype="html">
-            <source>Output Type</source>
+         <trans-unit id="4829958431017494183" datatype="html">
+            <source>Enable Compress</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-               <context context-type="linenumber">82</context>
+               <context context-type="linenumber">83</context>
             </context-group>
-            <target state="translated">Loại đầu ra</target>
+            <target state="translated">Tắt/Bật nén</target>
          </trans-unit>
-         <trans-unit id="1713271461473302108" datatype="html">
-            <source>Mode</source>
+         <trans-unit id="1593985023200898946" datatype="html">
+            <source>Quanlity compress</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-               <context context-type="linenumber">104</context>
+               <context context-type="linenumber">98</context>
             </context-group>
-            <target state="translated">Cách thức</target>
-         </trans-unit>
-         <trans-unit id="6114528299376689399" datatype="html">
-            <source>Skip Archive File</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-               <context context-type="linenumber">112</context>
-            </context-group>
-            <target state="translated">Bỏ qua tập tin lưu trữ</target>
-         </trans-unit>
-         <trans-unit id="1115402553541327390" datatype="html">
-            <source>Image DPI</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-               <context context-type="linenumber">120</context>
-            </context-group>
-            <target state="translated">Độ phân giải ảnh</target>
-         </trans-unit>
-         <trans-unit id="6352596107300820129" datatype="html">
-            <source>Clean</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-               <context context-type="linenumber">127</context>
-            </context-group>
-            <target state="translated">Làm sạch</target>
-         </trans-unit>
-         <trans-unit id="725308589819024010" datatype="html">
-            <source>Deskew</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-               <context context-type="linenumber">135</context>
-            </context-group>
-            <target state="translated">Nghiêng</target>
-         </trans-unit>
-         <trans-unit id="6256076128297775802" datatype="html">
-            <source>Rotate Pages</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-               <context context-type="linenumber">142</context>
-            </context-group>
-            <target state="translated">Xoay trang</target>
-         </trans-unit>
-         <trans-unit id="8527188778859256947" datatype="html">
-            <source>Rotate Pages Threshold</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-               <context context-type="linenumber">149</context>
-            </context-group>
-            <target state="translated">Ngưỡng xoay trang</target>
-         </trans-unit>
-         <trans-unit id="3762131309176747817" datatype="html">
-            <source>Max Image Pixels</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-               <context context-type="linenumber">156</context>
-            </context-group>
-            <target state="translated">Số điểm ảnh tối đa</target>
-         </trans-unit>
-         <trans-unit id="7846583355792281769" datatype="html">
-            <source>Color Conversion Strategy</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-               <context context-type="linenumber">163</context>
-            </context-group>
-            <target state="translated">Chiến lược chuyển đổi màu sắc</target>
-         </trans-unit>
-         <trans-unit id="4696480417479207939" datatype="html">
-            <source>OCR Arguments</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-               <context context-type="linenumber">171</context>
-            </context-group>
-            <target state="translated">Đối số OCR</target>
+            <target state="translated">Chất lượng nén(0-100)</target>
          </trans-unit>
          <trans-unit id="2580168214963307924" datatype="html">
             <source>Username OCR</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-               <context context-type="linenumber">178</context>
+               <context context-type="linenumber">193</context>
             </context-group>
             <target state="translated">Tài khoản OCR</target>
          </trans-unit>
@@ -12962,7 +12874,7 @@
             <source>Password OCR</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-               <context context-type="linenumber">185</context>
+               <context context-type="linenumber">200</context>
             </context-group>
             <target state="translated">Mật khẩu OCR</target>
          </trans-unit>
@@ -12970,7 +12882,7 @@
             <source>Application Logo</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-               <context context-type="linenumber">192</context>
+               <context context-type="linenumber">207</context>
             </context-group>
             <target state="translated">Logo ứng dụng</target>
          </trans-unit>
@@ -12978,7 +12890,7 @@
             <source>Application Title</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-               <context context-type="linenumber">199</context>
+               <context context-type="linenumber">214</context>
             </context-group>
             <target state="translated">Tiêu đề ứng dụng</target>
          </trans-unit>

@@ -53,7 +53,7 @@ from documents.plugins.base import NoCleanupPluginMixin
 from documents.plugins.base import NoSetupPluginMixin
 from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
-from documents.utils import copy_basic_file_stats
+from documents.utils import copy_basic_file_stats, compress_pdf
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import get_content_before_last_number
 from documents.utils import run_subprocess
@@ -869,6 +869,7 @@ class Consumer(LoggingMixin):
                 ConsumerFilePhase.WORKING,
                 ConsumerStatusShortMessage.PARSING_DOCUMENT,
             )
+            application_config = ApplicationConfiguration.objects.all().first()
             # enable_ocr = ApplicationConfiguration.objects.filter().first().enable_ocr
             # if enable_ocr:
             #     self.log.debug(f"Parsing {self.filename}...")
@@ -906,7 +907,6 @@ class Consumer(LoggingMixin):
                 date = parse_date(self.filename, text)
             archive_path = self.working_copy
             page_count = document_parser.get_page_count(self.working_copy, mime_type)
-
         except ParseError as e:
             self._fail(
                 str(e),
@@ -949,6 +949,10 @@ class Consumer(LoggingMixin):
                     page_count=page_count,
                     mime_type=mime_type,
                 )
+                if (application_config.enable_compress):
+                    compress_pdf(self.original_path, self.working_copy, int(application_config.quality_compress))
+                copy_file_with_basic_stats(self.working_copy,
+                                           self.original_path)
                 new_file = None
                 # self.log.debug("Consumer", document.folder)
 
@@ -1070,6 +1074,7 @@ class Consumer(LoggingMixin):
                 if os.path.isfile(shadow_file):
                     self.log.debug(f"Deleting file {shadow_file}")
                     os.unlink(shadow_file)
+            # For the actual work, copy the file into a tempdir
 
         except Exception as e:
             self._fail(

@@ -136,6 +136,16 @@ class ApplicationConfiguration(AbstractSingletonModel):
     )
     enable_ocr = models.BooleanField(verbose_name=_("Enables ocr"), null=True, default=False)
 
+
+    enable_compress = models.BooleanField(verbose_name=_("Enables compress"), null=True,
+                                     default=False)
+
+    quality_compress = models.FloatField(
+        verbose_name=_("sets quanlity compression"),
+        null=True,
+        validators=[MinValueValidator(0.0)],
+    )
+
     deskew = models.BooleanField(verbose_name=_("Enables deskew"), null=True)
 
     rotate_pages = models.BooleanField(
