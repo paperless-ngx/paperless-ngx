@@ -1,6 +1,7 @@
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
+import path from 'node:path'
 
-const REQUESTS_HAR = 'e2e/permissions/requests/api-global-permissions.har'
+const REQUESTS_HAR = path.join(__dirname, 'requests/api-global-permissions.har')
 
 test('should not allow user to edit settings', async ({ page }) => {
   await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })

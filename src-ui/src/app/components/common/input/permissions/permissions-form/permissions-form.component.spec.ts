@@ -1,17 +1,17 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import {
   FormsModule,
-  ReactiveFormsModule,
   NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
 } from '@angular/forms'
-import { PermissionsFormComponent } from './permissions-form.component'
-import { SelectComponent } from '../../select/select.component'
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgSelectModule } from '@ng-select/ng-select'
+import { SelectComponent } from '../../select/select.component'
 import { PermissionsGroupComponent } from '../permissions-group/permissions-group.component'
 import { PermissionsUserComponent } from '../permissions-user/permissions-user.component'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { NgSelectModule } from '@ng-select/ng-select'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { PermissionsFormComponent } from './permissions-form.component'
 
 describe('PermissionsFormComponent', () => {
   let component: PermissionsFormComponent
@@ -19,17 +19,15 @@ describe('PermissionsFormComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        PermissionsFormComponent,
-        SelectComponent,
-        PermissionsGroupComponent,
-        PermissionsUserComponent,
-      ],
       imports: [
         FormsModule,
         ReactiveFormsModule,
         NgbAccordionModule,
         NgSelectModule,
+        PermissionsFormComponent,
+        SelectComponent,
+        PermissionsGroupComponent,
+        PermissionsUserComponent,
       ],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
@@ -65,5 +63,12 @@ describe('PermissionsFormComponent', () => {
         change: { users: [], groups: [] },
       },
     })
+  })
+
+  it('should disable form on disabled state change', () => {
+    component.setDisabledState(false)
+    expect(component.form.disabled).toBeFalsy()
+    component.setDisabledState(true)
+    expect(component.form.disabled).toBeTruthy()
   })
 })

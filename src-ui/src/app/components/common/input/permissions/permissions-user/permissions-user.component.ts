@@ -1,5 +1,10 @@
-import { Component, forwardRef, Input, OnInit } from '@angular/core'
-import { NG_VALUE_ACCESSOR } from '@angular/forms'
+import { Component, forwardRef } from '@angular/core'
+import {
+  FormsModule,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
+} from '@angular/forms'
+import { NgSelectComponent } from '@ng-select/ng-select'
 import { first } from 'rxjs/operators'
 import { User } from 'src/app/data/user'
 import { UserService } from 'src/app/services/rest/user.service'
@@ -17,6 +22,7 @@ import { AbstractInputComponent } from '../../abstract-input'
   selector: 'pngx-permissions-user',
   templateUrl: './permissions-user.component.html',
   styleUrls: ['./permissions-user.component.scss'],
+  imports: [NgSelectComponent, FormsModule, ReactiveFormsModule],
 })
 export class PermissionsUserComponent extends AbstractInputComponent<User[]> {
   users: User[]

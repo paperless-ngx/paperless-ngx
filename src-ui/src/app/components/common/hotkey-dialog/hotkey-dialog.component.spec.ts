@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { HotkeyDialogComponent } from './hotkey-dialog.component'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { HotkeyDialogComponent } from './hotkey-dialog.component'
 
 describe('HotkeyDialogComponent', () => {
   let component: HotkeyDialogComponent
@@ -9,7 +9,7 @@ describe('HotkeyDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [HotkeyDialogComponent],
+      imports: [HotkeyDialogComponent],
       providers: [NgbActiveModal],
     }).compileComponents()
 
@@ -29,7 +29,7 @@ describe('HotkeyDialogComponent', () => {
   })
 
   it('should format keys', () => {
-    expect(component.formatKey('control.a')).toEqual('&#8963; + a') // ⌃ + a
-    expect(component.formatKey('control.a', true)).toEqual('&#8984; + a') // ⌘ + a
+    expect(component.formatKey('control.a')).toEqual('&#8963; a') // ⌃ + a
+    expect(component.formatKey('control.a', true)).toEqual('&#8984; a') // ⌘ + a
   })
 })

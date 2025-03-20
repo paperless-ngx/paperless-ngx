@@ -1,9 +1,9 @@
 import hashlib
 import itertools
 import logging
-import os
 import tempfile
-from typing import Optional
+from pathlib import Path
+from typing import Literal
 
 from celery import chain
 from celery import chord
@@ -12,11 +12,13 @@ from celery import shared_task
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.utils import timezone
 
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.models import Correspondent
+from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
@@ -24,12 +26,15 @@ from documents.models import StoragePath
 from documents.permissions import set_permissions_for_object
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
-from documents.tasks import update_document_archive_file
+from documents.tasks import update_document_content_maybe_archive_file
 
-logger = logging.getLogger("paperless.bulk_edit")
+logger: logging.Logger = logging.getLogger("paperless.bulk_edit")
 
 
-def set_correspondent(doc_ids: list[int], correspondent):
+def set_correspondent(
+    doc_ids: list[int],
+    correspondent: Correspondent,
+) -> Literal["OK"]:
     if correspondent:
         correspondent = Correspondent.objects.only("pk").get(id=correspondent)
 
@@ -46,7 +51,7 @@ def set_correspondent(doc_ids: list[int], correspondent):
     return "OK"
 
 
-def set_storage_path(doc_ids: list[int], storage_path):
+def set_storage_path(doc_ids: list[int], storage_path: StoragePath) -> Literal["OK"]:
     if storage_path:
         storage_path = StoragePath.objects.only("pk").get(id=storage_path)
 
@@ -67,7 +72,7 @@ def set_storage_path(doc_ids: list[int], storage_path):
     return "OK"
 
 
-def set_document_type(doc_ids: list[int], document_type):
+def set_document_type(doc_ids: list[int], document_type: DocumentType) -> Literal["OK"]:
     if document_type:
         document_type = DocumentType.objects.only("pk").get(id=document_type)
 
@@ -84,7 +89,7 @@ def set_document_type(doc_ids: list[int], document_type):
     return "OK"
 
 
-def add_tag(doc_ids: list[int], tag: int):
+def add_tag(doc_ids: list[int], tag: int) -> Literal["OK"]:
     qs = Document.objects.filter(Q(id__in=doc_ids) & ~Q(tags__id=tag)).only("pk")
     affected_docs = list(qs.values_list("pk", flat=True))
 
@@ -99,7 +104,7 @@ def add_tag(doc_ids: list[int], tag: int):
     return "OK"
 
 
-def remove_tag(doc_ids: list[int], tag: int):
+def remove_tag(doc_ids: list[int], tag: int) -> Literal["OK"]:
     qs = Document.objects.filter(Q(id__in=doc_ids) & Q(tags__id=tag)).only("pk")
     affected_docs = list(qs.values_list("pk", flat=True))
 
@@ -114,7 +119,11 @@ def remove_tag(doc_ids: list[int], tag: int):
     return "OK"
 
 
-def modify_tags(doc_ids: list[int], add_tags: list[int], remove_tags: list[int]):
+def modify_tags(
+    doc_ids: list[int],
+    add_tags: list[int],
+    remove_tags: list[int],
+) -> Literal["OK"]:
     qs = Document.objects.filter(id__in=doc_ids).only("pk")
     affected_docs = list(qs.values_list("pk", flat=True))
 
@@ -138,20 +147,62 @@ def modify_tags(doc_ids: list[int], add_tags: list[int], remove_tags: list[int])
     return "OK"
 
 
-def modify_custom_fields(doc_ids: list[int], add_custom_fields, remove_custom_fields):
+def modify_custom_fields(
+    doc_ids: list[int],
+    add_custom_fields: list[int] | dict,
+    remove_custom_fields: list[int],
+) -> Literal["OK"]:
     qs = Document.objects.filter(id__in=doc_ids).only("pk")
     affected_docs = list(qs.values_list("pk", flat=True))
+    # Ensure add_custom_fields is a list of tuples, supports old API
+    add_custom_fields = (
+        add_custom_fields.items()
+        if isinstance(add_custom_fields, dict)
+        else [(field, None) for field in add_custom_fields]
+    )
 
-    for field in add_custom_fields:
+    custom_fields = CustomField.objects.filter(
+        id__in=[int(field) for field, _ in add_custom_fields],
+    ).distinct()
+    for field_id, value in add_custom_fields:
         for doc_id in affected_docs:
+            defaults = {}
+            custom_field = custom_fields.get(id=field_id)
+            if custom_field:
+                value_field = CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+                    custom_field.data_type
+                ]
+                defaults[value_field] = value
             CustomFieldInstance.objects.update_or_create(
                 document_id=doc_id,
-                field_id=field,
+                field_id=field_id,
+                defaults=defaults,
             )
+            if custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
+                doc = Document.objects.get(id=doc_id)
+                reflect_doclinks(doc, custom_field, value)
+
+    # For doc link fields that are being removed, remove symmetrical links
+    for doclink_being_removed_instance in CustomFieldInstance.objects.filter(
+        document_id__in=affected_docs,
+        field__id__in=remove_custom_fields,
+        field__data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        value_document_ids__isnull=False,
+    ):
+        for target_doc_id in doclink_being_removed_instance.value:
+            remove_doclink(
+                document=Document.objects.get(
+                    id=doclink_being_removed_instance.document.id,
+                ),
+                field=doclink_being_removed_instance.field,
+                target_doc_id=target_doc_id,
+            )
+
+    # Finally, remove the custom fields
     CustomFieldInstance.objects.filter(
         document_id__in=affected_docs,
         field_id__in=remove_custom_fields,
-    ).delete()
+    ).hard_delete()
 
     bulk_update_documents.delay(document_ids=affected_docs)
 
@@ -159,28 +210,40 @@ def modify_custom_fields(doc_ids: list[int], add_custom_fields, remove_custom_fi
 
 
 @shared_task
-def delete(doc_ids: list[int]):
-    Document.objects.filter(id__in=doc_ids).delete()
+def delete(doc_ids: list[int]) -> Literal["OK"]:
+    try:
+        Document.objects.filter(id__in=doc_ids).delete()
 
-    from documents import index
+        from documents import index
 
-    with index.open_index_writer() as writer:
-        for id in doc_ids:
-            index.remove_document_by_id(writer, id)
+        with index.open_index_writer() as writer:
+            for id in doc_ids:
+                index.remove_document_by_id(writer, id)
+    except Exception as e:
+        if "Data too long for column" in str(e):
+            logger.warning(
+                "Detected a possible incompatible database column. See https://docs.paperless-ngx.com/troubleshooting/#convert-uuid-field",
+            )
+        logger.error(f"Error deleting documents: {e!s}")
 
     return "OK"
 
 
-def reprocess(doc_ids: list[int]):
+def reprocess(doc_ids: list[int]) -> Literal["OK"]:
     for document_id in doc_ids:
-        update_document_archive_file.delay(
+        update_document_content_maybe_archive_file.delay(
             document_id=document_id,
         )
 
     return "OK"
 
 
-def set_permissions(doc_ids: list[int], set_permissions, owner=None, merge=False):
+def set_permissions(
+    doc_ids: list[int],
+    set_permissions,
+    owner=None,
+    merge=False,
+) -> Literal["OK"]:
     qs = Document.objects.filter(id__in=doc_ids).select_related("owner")
 
     if merge:
@@ -199,12 +262,12 @@ def set_permissions(doc_ids: list[int], set_permissions, owner=None, merge=False
     return "OK"
 
 
-def rotate(doc_ids: list[int], degrees: int):
+def rotate(doc_ids: list[int], degrees: int) -> Literal["OK"]:
     logger.info(
         f"Attempting to rotate {len(doc_ids)} documents by {degrees} degrees.",
     )
     qs = Document.objects.filter(id__in=doc_ids)
-    affected_docs = []
+    affected_docs: list[int] = []
     import pikepdf
 
     rotate_tasks = []
@@ -222,7 +285,7 @@ def rotate(doc_ids: list[int], degrees: int):
                 doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
                 doc.save()
                 rotate_tasks.append(
-                    update_document_archive_file.s(
+                    update_document_content_maybe_archive_file.s(
                         document_id=doc.id,
                     ),
                 )
@@ -242,19 +305,19 @@ def rotate(doc_ids: list[int], degrees: int):
 
 def merge(
     doc_ids: list[int],
-    metadata_document_id: Optional[int] = None,
+    metadata_document_id: int | None = None,
     delete_originals: bool = False,
-    user: User = None,
-):
+    user: User | None = None,
+) -> Literal["OK"]:
     logger.info(
         f"Attempting to merge {len(doc_ids)} documents into a single document.",
     )
     qs = Document.objects.filter(id__in=doc_ids)
-    affected_docs = []
+    affected_docs: list[int] = []
     import pikepdf
 
     merged_pdf = pikepdf.new()
-    version = merged_pdf.pdf_version
+    version: str = merged_pdf.pdf_version
     # use doc_ids to preserve order
     for doc_id in doc_ids:
         doc = qs.get(id=doc_id)
@@ -271,9 +334,11 @@ def merge(
         logger.warning("No documents were merged")
         return "OK"
 
-    filepath = os.path.join(
-        tempfile.mkdtemp(dir=settings.SCRATCH_DIR),
-        f"{'_'.join([str(doc_id) for doc_id in doc_ids])[:100]}_merged.pdf",
+    filepath = (
+        Path(
+            tempfile.mkdtemp(dir=settings.SCRATCH_DIR),
+        )
+        / f"{'_'.join([str(doc_id) for doc_id in doc_ids])[:100]}_merged.pdf"
     )
     merged_pdf.remove_unreferenced_resources()
     merged_pdf.save(filepath, min_version=version)
@@ -282,8 +347,12 @@ def merge(
     if metadata_document_id:
         metadata_document = qs.get(id=metadata_document_id)
         if metadata_document is not None:
-            overrides = DocumentMetadataOverrides.from_document(metadata_document)
+            overrides: DocumentMetadataOverrides = (
+                DocumentMetadataOverrides.from_document(metadata_document)
+            )
             overrides.title = metadata_document.title + " (merged)"
+        else:
+            overrides = DocumentMetadataOverrides()
     else:
         overrides = DocumentMetadataOverrides()
 
@@ -315,8 +384,8 @@ def split(
     doc_ids: list[int],
     pages: list[list[int]],
     delete_originals: bool = False,
-    user: User = None,
-):
+    user: User | None = None,
+) -> Literal["OK"]:
     logger.info(
         f"Attempting to split document {doc_ids[0]} into {len(pages)} documents",
     )
@@ -328,18 +397,22 @@ def split(
     try:
         with pikepdf.open(doc.source_path) as pdf:
             for idx, split_doc in enumerate(pages):
-                dst = pikepdf.new()
+                dst: pikepdf.Pdf = pikepdf.new()
                 for page in split_doc:
                     dst.pages.append(pdf.pages[page - 1])
-                filepath = os.path.join(
-                    tempfile.mkdtemp(dir=settings.SCRATCH_DIR),
-                    f"{doc.id}_{split_doc[0]}-{split_doc[-1]}.pdf",
+                filepath: Path = (
+                    Path(
+                        tempfile.mkdtemp(dir=settings.SCRATCH_DIR),
+                    )
+                    / f"{doc.id}_{split_doc[0]}-{split_doc[-1]}.pdf"
                 )
                 dst.remove_unreferenced_resources()
                 dst.save(filepath)
                 dst.close()
 
-                overrides = DocumentMetadataOverrides().from_document(doc)
+                overrides: DocumentMetadataOverrides = (
+                    DocumentMetadataOverrides().from_document(doc)
+                )
                 overrides.title = f"{doc.title} (split {idx + 1})"
                 if user is not None:
                     overrides.owner_id = user.id
@@ -370,7 +443,7 @@ def split(
     return "OK"
 
 
-def delete_pages(doc_ids: list[int], pages: list[int]):
+def delete_pages(doc_ids: list[int], pages: list[int]) -> Literal["OK"]:
     logger.info(
         f"Attempting to delete pages {pages} from {len(doc_ids)} documents",
     )
@@ -387,10 +460,96 @@ def delete_pages(doc_ids: list[int], pages: list[int]):
             pdf.remove_unreferenced_resources()
             pdf.save()
             doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
+            if doc.page_count is not None:
+                doc.page_count = doc.page_count - len(pages)
             doc.save()
-            update_document_archive_file.delay(document_id=doc.id)
+            update_document_content_maybe_archive_file.delay(document_id=doc.id)
             logger.info(f"Deleted pages {pages} from document {doc.id}")
     except Exception as e:
         logger.exception(f"Error deleting pages from document {doc.id}: {e}")
 
     return "OK"
+
+
+def reflect_doclinks(
+    document: Document,
+    field: CustomField,
+    target_doc_ids: list[int],
+):
+    """
+    Add or remove 'symmetrical' links to `document` on all `target_doc_ids`
+    """
+
+    if target_doc_ids is None:
+        target_doc_ids = []
+
+    # Check if any documents are going to be removed from the current list of links and remove the symmetrical links
+    current_field_instance = CustomFieldInstance.objects.filter(
+        field=field,
+        document=document,
+    ).first()
+    if current_field_instance is not None and current_field_instance.value is not None:
+        for doc_id in current_field_instance.value:
+            if doc_id not in target_doc_ids:
+                remove_doclink(
+                    document=document,
+                    field=field,
+                    target_doc_id=doc_id,
+                )
+
+    # Create an instance if target doc doesn't have this field or append it to an existing one
+    existing_custom_field_instances = {
+        custom_field.document_id: custom_field
+        for custom_field in CustomFieldInstance.objects.filter(
+            field=field,
+            document_id__in=target_doc_ids,
+        )
+    }
+    custom_field_instances_to_create = []
+    custom_field_instances_to_update = []
+    for target_doc_id in target_doc_ids:
+        target_doc_field_instance = existing_custom_field_instances.get(
+            target_doc_id,
+        )
+        if target_doc_field_instance is None:
+            custom_field_instances_to_create.append(
+                CustomFieldInstance(
+                    document_id=target_doc_id,
+                    field=field,
+                    value_document_ids=[document.id],
+                ),
+            )
+        elif target_doc_field_instance.value is None:
+            target_doc_field_instance.value_document_ids = [document.id]
+            custom_field_instances_to_update.append(target_doc_field_instance)
+        elif document.id not in target_doc_field_instance.value:
+            target_doc_field_instance.value_document_ids.append(document.id)
+            custom_field_instances_to_update.append(target_doc_field_instance)
+
+    CustomFieldInstance.objects.bulk_create(custom_field_instances_to_create)
+    CustomFieldInstance.objects.bulk_update(
+        custom_field_instances_to_update,
+        ["value_document_ids"],
+    )
+    Document.objects.filter(id__in=target_doc_ids).update(modified=timezone.now())
+
+
+def remove_doclink(
+    document: Document,
+    field: CustomField,
+    target_doc_id: int,
+):
+    """
+    Removes a 'symmetrical' link to `document` from the target document's existing custom field instance
+    """
+    target_doc_field_instance = CustomFieldInstance.objects.filter(
+        document_id=target_doc_id,
+        field=field,
+    ).first()
+    if (
+        target_doc_field_instance is not None
+        and document.id in target_doc_field_instance.value
+    ):
+        target_doc_field_instance.value.remove(document.id)
+        target_doc_field_instance.save()
+    Document.objects.filter(id=target_doc_id).update(modified=timezone.now())

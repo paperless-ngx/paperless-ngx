@@ -1,6 +1,6 @@
 <pngx-page-header [title]="getTitle()">
 
-  <div ngbDropdown class="d-flex">
+  <div ngbDropdown class="btn-group flex-fill">
     <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
       <i-bs name="text-indent-left"></i-bs>
       <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Select</ng-container></div>
@@ -11,7 +11,7 @@
       <button ngbDropdownItem (click)="list.selectAll()" i18n>Select all</button>
     </div>
   </div>
-  <div ngbDropdown class="d-flex">
+  <div ngbDropdown class="btn-group flex-fill">
     <button class="btn btn-sm btn-outline-primary" id="dropdownDisplayFields" ngbDropdownToggle>
       <i-bs name="card-heading"></i-bs>
       <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Show</ng-container></div>
@@ -43,7 +43,10 @@
   </div>
 
   <div ngbDropdown class="btn-group flex-fill">
-    <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle i18n>Sort</button>
+    <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle>
+      <i-bs name="arrow-down-up"></i-bs>
+      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Sort</ng-container></div>
+    </button>
     <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow dropdown-menu-right">
       <div class="w-100 d-flex pb-2 mb-1 border-bottom">
         <input type="radio" class="btn-check" [value]="false" [(ngModel)]="listSortReverse" id="listSortReverseFalse">
@@ -67,7 +70,8 @@
 
   <div class="btn-group flex-fill" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }" ngbDropdown role="group">
     <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" tourAnchor="tour.documents-views" ngbDropdownToggle>
-      <ng-container i18n>Views</ng-container>
+      <i-bs class="me-1" name="window-stack"></i-bs>
+      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Views</ng-container></div>
       @if (savedViewIsModified) {
         <div class="position-absolute top-0 start-100 p-2 translate-middle badge bg-secondary border border-light rounded-circle">
           <span class="visually-hidden">selected</span>
@@ -90,6 +94,7 @@
         }
       </div>
       <button ngbDropdownItem (click)="saveViewConfigAs()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.SavedView }" i18n>Save as...</button>
+      <a ngbDropdownItem routerLink="/savedviews" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }" i18n>All saved views</a>
     </div>
   </div>
 
@@ -140,7 +145,7 @@
   } @else {
     @if (list.displayMode === DisplayMode.LARGE_CARDS) {
       <div>
-        @for (d of list.documents; track trackByDocumentId($index, d)) {
+        @for (d of list.documents; track d.id) {
           <pngx-document-card-large
             [selected]="list.isSelected(d)"
             (toggleSelected)="toggleSelected(d, $event)"
@@ -160,105 +165,121 @@
       <div class="table-responsive">
         <table class="table table-sm align-middle border shadow-sm">
           <thead>
-            <th></th>
-            @if (activeDisplayFields.includes(DisplayField.ASN)) {
-              <th class="cursor-pointer"
-                pngxSortable="archive_serial_number"
-                title="Sort by ASN" i18n-title
-                [currentSortField]="list.sortField"
-                [currentSortReverse]="list.sortReverse"
-                (sort)="onSort($event)"
-                i18n>ASN</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.CORRESPONDENT) && permissionService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
-              <th class="cursor-pointer"
-                pngxSortable="correspondent__name"
-                title="Sort by correspondent" i18n-title
-                [currentSortField]="list.sortField"
-                [currentSortReverse]="list.sortReverse"
-                (sort)="onSort($event)"
-                i18n>Correspondent</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.TITLE)) {
-              <th class="cursor-pointer"
-                pngxSortable="title"
-                title="Sort by title" i18n-title
-                [currentSortField]="list.sortField"
-                [currentSortReverse]="list.sortReverse"
-                (sort)="onSort($event)"
-                style="min-width: 150px;"
-                i18n>Title</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.TAGS) && !activeDisplayFields.includes(DisplayField.TITLE)) {
-              <th i18n>Tags</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.OWNER) && permissionService.currentUserCan(PermissionAction.View, PermissionType.User)) {
-              <th class="cursor-pointer"
-                pngxSortable="owner"
-                title="Sort by owner" i18n-title
-                [currentSortField]="list.sortField"
-                [currentSortReverse]="list.sortReverse"
-                (sort)="onSort($event)"
-                i18n>Owner</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.NOTES) && notesEnabled) {
-              <th class="cursor-pointer"
-                pngxSortable="num_notes"
-                title="Sort by notes" i18n-title
-                [currentSortField]="list.sortField"
-                [currentSortReverse]="list.sortReverse"
-                (sort)="onSort($event)"
-                i18n>Notes</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.DOCUMENT_TYPE) && permissionService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
-              <th class="cursor-pointer"
-                pngxSortable="document_type__name"
-                title="Sort by document type" i18n-title
-                [currentSortField]="list.sortField"
-                [currentSortReverse]="list.sortReverse"
-                (sort)="onSort($event)"
-                i18n>Document type</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.STORAGE_PATH) && permissionService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
-              <th class="cursor-pointer"
-                pngxSortable="storage_path__name"
-                title="Sort by storage path" i18n-title
-                [currentSortField]="list.sortField"
-                [currentSortReverse]="list.sortReverse"
-                (sort)="onSort($event)"
-                i18n>Storage path</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.CREATED)) {
-              <th class="cursor-pointer"
-                pngxSortable="created"
-                title="Sort by created date" i18n-title
-                [currentSortField]="list.sortField"
-                [currentSortReverse]="list.sortReverse"
-                (sort)="onSort($event)"
-                i18n>Created</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.ADDED)) {
-              <th class="cursor-pointer"
-                pngxSortable="added"
-                title="Sort by added date" i18n-title
-                [currentSortField]="list.sortField"
-                [currentSortReverse]="list.sortReverse"
-                (sort)="onSort($event)"
-                i18n>Added</th>
-            }
-            @if (activeDisplayFields.includes(DisplayField.SHARED)) {
-              <th i18n>
-                Shared
-              </th>
-            }
-            @for (field of activeDisplayCustomFields; track field) {
-              <th>
-                {{getDisplayCustomFieldTitle(field)}}
-              </th>
-            }
+            <tr>
+              <th></th>
+              @if (activeDisplayFields.includes(DisplayField.ASN)) {
+                <th class="cursor-pointer"
+                  pngxSortable="archive_serial_number"
+                  title="Sort by ASN" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)"
+                  i18n>ASN</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.CORRESPONDENT) && permissionService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
+                <th class="cursor-pointer"
+                  pngxSortable="correspondent__name"
+                  title="Sort by correspondent" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)"
+                  i18n>Correspondent</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.TITLE)) {
+                <th class="cursor-pointer"
+                  pngxSortable="title"
+                  title="Sort by title" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)"
+                  style="min-width: 150px;"
+                  i18n>Title</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.TAGS) && !activeDisplayFields.includes(DisplayField.TITLE)) {
+                <th i18n>Tags</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.OWNER) && permissionService.currentUserCan(PermissionAction.View, PermissionType.User)) {
+                <th class="cursor-pointer"
+                  pngxSortable="owner"
+                  title="Sort by owner" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)"
+                  i18n>Owner</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.NOTES) && notesEnabled) {
+                <th class="cursor-pointer"
+                  pngxSortable="num_notes"
+                  title="Sort by notes" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)"
+                  i18n>Notes</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.DOCUMENT_TYPE) && permissionService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
+                <th class="cursor-pointer"
+                  pngxSortable="document_type__name"
+                  title="Sort by document type" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)"
+                  i18n>Document type</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.STORAGE_PATH) && permissionService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
+                <th class="cursor-pointer"
+                  pngxSortable="storage_path__name"
+                  title="Sort by storage path" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)"
+                  i18n>Storage path</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.CREATED)) {
+                <th class="cursor-pointer"
+                  pngxSortable="created"
+                  title="Sort by created date" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)"
+                  i18n>Created</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.ADDED)) {
+                <th class="cursor-pointer"
+                  pngxSortable="added"
+                  title="Sort by added date" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)"
+                  i18n>Added</th>
+              }
+              @if (activeDisplayFields.includes(DisplayField.PAGE_COUNT)) {
+                  <th class="cursor-pointer"
+                    pngxSortable="page_count"
+                    title="Sort by number of pages" i18n-title
+                    [currentSortField]="list.sortField"
+                    [currentSortReverse]="list.sortReverse"
+                    (sort)="onSort($event)"
+                    i18n>Pages</th>
+                }
+              @if (activeDisplayFields.includes(DisplayField.SHARED)) {
+                <th i18n>
+                  Shared
+                </th>
+              }
+              @for (field_id of activeDisplayCustomFields; track field_id) {
+                <th class="cursor-pointer"
+                  pngxSortable="{{field_id}}"
+                  title="Sort by {{getDisplayCustomFieldTitle(field_id)}}" i18n-title
+                  [currentSortField]="list.sortField"
+                  [currentSortReverse]="list.sortReverse"
+                  (sort)="onSort($event)">
+                  {{getDisplayCustomFieldTitle(field_id)}}
+                </th>
+              }
+            </tr>
           </thead>
           <tbody>
-            @for (d of list.documents; track trackByDocumentId($index, d)) {
+            @for (d of list.documents; track d.id) {
               <tr (click)="toggleSelected(d, $event); $event.stopPropagation();" (dblclick)="openDocumentDetail(d)" [ngClass]="list.isSelected(d) ? 'table-row-selected' : ''">
                 <td>
                   <div class="form-check">
@@ -274,25 +295,30 @@
                 @if (activeDisplayFields.includes(DisplayField.CORRESPONDENT) && permissionService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
                   <td class="">
                     @if (d.correspondent) {
-                      <a (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent" i18n-title>{{(d.correspondent$ | async)?.name}}</a>
+                      <a (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent" i18n-title>{{d.correspondent | correspondentName | async}}</a>
                     }
                   </td>
                 }
                 @if (activeDisplayFields.includes(DisplayField.TITLE) || activeDisplayFields.includes(DisplayField.TAGS)) {
                   <td width="30%">
                     @if (activeDisplayFields.includes(DisplayField.TITLE)) {
-                      <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
+                      <div class="d-inline-block" (mouseleave)="popupPreview.close()">
+                        <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
+                        <pngx-preview-popup [document]="d" linkClasses="btn btn-sm btn-link text-secondary" linkTitle="Preview document" (click)="$event.stopPropagation()" i18n-linkTitle #popupPreview>
+                          <i-bs name="eye"></i-bs>
+                        </pngx-preview-popup>
+                      </div>
                     }
                     @if (activeDisplayFields.includes(DisplayField.TAGS)) {
-                      @for (t of d.tags$ | async; track t) {
-                        <pngx-tag [tag]="t" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(t.id);$event.stopPropagation()"></pngx-tag>
+                      @for (tagID of d.tags; track t) {
+                        <pngx-tag [tagID]="tagID" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(tagID);$event.stopPropagation()"></pngx-tag>
                       }
                     }
                   </td>
                 }
                 @if (activeDisplayFields.includes(DisplayField.OWNER) && permissionService.currentUserCan(PermissionAction.View, PermissionType.User)) {
                   <td>
-                    {{d.owner | username}}
+                    {{d.owner | username | async}}
                   </td>
                 }
                 @if (activeDisplayFields.includes(DisplayField.NOTES) && notesEnabled) {
@@ -309,14 +335,14 @@
                 @if (activeDisplayFields.includes(DisplayField.DOCUMENT_TYPE) && permissionService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
                   <td class="">
                     @if (d.document_type) {
-                      <a (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type" i18n-title>{{(d.document_type$ | async)?.name}}</a>
+                      <a (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type" i18n-title>{{d.document_type | documentTypeName | async}}</a>
                     }
                   </td>
                 }
                 @if (activeDisplayFields.includes(DisplayField.STORAGE_PATH) && permissionService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
                   <td class="">
                     @if (d.storage_path) {
-                      <a (click)="clickStoragePath(d.storage_path);$event.stopPropagation()" title="Filter by storage path" i18n-title>{{(d.storage_path$ | async)?.name}}</a>
+                      <a (click)="clickStoragePath(d.storage_path);$event.stopPropagation()" title="Filter by storage path" i18n-title>{{d.storage_path | storagePathName | async}}</a>
                     }
                   </td>
                 }
@@ -328,6 +354,11 @@
                 @if (activeDisplayFields.includes(DisplayField.ADDED)) {
                   <td>
                     {{d.added | customDate}}
+                  </td>
+                }
+                @if (activeDisplayFields.includes(DisplayField.PAGE_COUNT)) {
+                  <td>
+                      {{ d.page_count }}
                   </td>
                 }
                 @if (activeDisplayFields.includes(DisplayField.SHARED)) {
@@ -348,7 +379,7 @@
     }
     @if (list.displayMode === DisplayMode.SMALL_CARDS) {
       <div class="row row-cols-paperless-cards">
-        @for (d of list.documents; track trackByDocumentId($index, d)) {
+        @for (d of list.documents; track d.id) {
           <pngx-document-card-small class="p-0"
             [selected]="list.isSelected(d)"
             (toggleSelected)="toggleSelected(d, $event)"

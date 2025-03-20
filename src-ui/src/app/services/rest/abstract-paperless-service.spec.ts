@@ -1,12 +1,12 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
-import { AbstractPaperlessService } from './abstract-paperless-service'
-import { Subscription } from 'rxjs'
 import { TestBed } from '@angular/core/testing'
+import { Subscription } from 'rxjs'
 import { environment } from 'src/environments/environment'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { AbstractPaperlessService } from './abstract-paperless-service'
 
 let httpTestingController: HttpTestingController
 let service: AbstractPaperlessService<any>
@@ -101,13 +101,13 @@ export const commonAbstractPaperlessServiceTests = (endpoint, ServiceClass) => {
     test('should call appropriate api endpoint for get a few objects', () => {
       subscription = service.getFew([1, 2, 3]).subscribe()
       const req = httpTestingController.expectOne(
-        `${environment.apiBaseUrl}${endpoint}/?id__in=1,2,3&ordering=-id`
+        `${environment.apiBaseUrl}${endpoint}/?id__in=1,2,3&ordering=-id&page_size=1000`
       )
       expect(req.request.method).toEqual('GET')
       req.flush([])
       subscription = service.getFew([4, 5, 6], { foo: 'bar' }).subscribe()
       const req2 = httpTestingController.expectOne(
-        `${environment.apiBaseUrl}${endpoint}/?id__in=4,5,6&ordering=-id&foo=bar`
+        `${environment.apiBaseUrl}${endpoint}/?id__in=4,5,6&ordering=-id&page_size=1000&foo=bar`
       )
       expect(req2.request.method).toEqual('GET')
       req2.flush([])

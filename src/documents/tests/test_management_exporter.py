@@ -8,6 +8,9 @@ from pathlib import Path
 from unittest import mock
 from zipfile import ZipFile
 
+from allauth.socialaccount.models import SocialAccount
+from allauth.socialaccount.models import SocialApp
+from allauth.socialaccount.models import SocialToken
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
@@ -150,6 +153,7 @@ class TestExportImport(
         *,
         use_filename_format=False,
         compare_checksums=False,
+        compare_json=False,
         delete=False,
         no_archive=False,
         no_thumbnail=False,
@@ -162,6 +166,8 @@ class TestExportImport(
             args += ["--use-filename-format"]
         if compare_checksums:
             args += ["--compare-checksums"]
+        if compare_json:
+            args += ["--compare-json"]
         if delete:
             args += ["--delete"]
         if no_archive:
@@ -336,6 +342,10 @@ class TestExportImport(
 
         self.assertNotEqual(st_mtime_1, st_mtime_2)
         self.assertNotEqual(st_mtime_2, st_mtime_3)
+
+        self._do_export(compare_json=True)
+        st_mtime_4 = os.stat(os.path.join(self.target, "manifest.json")).st_mtime
+        self.assertEqual(st_mtime_3, st_mtime_4)
 
     def test_update_export_changed_checksum(self):
         shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
@@ -874,6 +884,23 @@ class TestCryptExportImport(
             password="mypassword",
         )
 
+        app = SocialApp.objects.create(
+            provider="test",
+            name="test",
+            client_id="test",
+        )
+        account = SocialAccount.objects.create(
+            user=User.objects.first(),
+            provider="test",
+            uid="test",
+        )
+        SocialToken.objects.create(
+            app=app,
+            account=account,
+            token="test",
+            token_secret="test",
+        )
+
         call_command(
             "document_exporter",
             "--no-progress-bar",
@@ -911,6 +938,9 @@ class TestCryptExportImport(
 
         self.assertIsNotNone(account)
         self.assertEqual(account.password, "mypassword")
+
+        social_token = SocialToken.objects.first()
+        self.assertIsNotNone(social_token)
 
     def test_import_crypt_no_passphrase(self):
         """
@@ -971,10 +1001,6 @@ class TestCryptExportImport(
         )
         stdout.seek(0)
         self.assertIn(
-            (
-                "You have configured mail accounts, "
-                "but no passphrase was given. "
-                "Passwords will be in plaintext"
-            ),
+            ("No passphrase was given, sensitive fields will be in plaintext"),
             stdout.read(),
         )

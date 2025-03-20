@@ -1,5 +1,9 @@
+import base64
 import json
+from unittest import mock
 
+from allauth.mfa.models import Authenticator
+from allauth.mfa.totp.internal import auth as totp_auth
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -461,6 +465,95 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.assertNotIn("user_can_change", results[0])
         self.assertNotIn("is_shared_by_requester", results[0])
 
+    @mock.patch("allauth.mfa.adapter.DefaultMFAAdapter.is_mfa_enabled")
+    def test_basic_auth_mfa_enabled(self, mock_is_mfa_enabled):
+        """
+        GIVEN:
+            - User with MFA enabled
+        WHEN:
+            - API request is made with basic auth
+        THEN:
+            - MFA required error is returned
+        """
+        user1 = User.objects.create_user(username="user1")
+        user1.set_password("password")
+        user1.save()
+
+        mock_is_mfa_enabled.return_value = True
+
+        response = self.client.get(
+            "/api/documents/",
+            HTTP_AUTHORIZATION="Basic " + base64.b64encode(b"user1:password").decode(),
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.data["detail"], "MFA required")
+
+    @mock.patch("allauth.mfa.totp.internal.auth.TOTP.validate_code")
+    def test_get_token_mfa_enabled(self, mock_validate_code):
+        """
+        GIVEN:
+            - User with MFA enabled
+        WHEN:
+            - API request is made to obtain an auth token
+        THEN:
+            - MFA code is required
+        """
+        user1 = User.objects.create_user(username="user1")
+        user1.set_password("password")
+        user1.save()
+
+        response = self.client.post(
+            "/api/token/",
+            data={
+                "username": "user1",
+                "password": "password",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        secret = totp_auth.generate_totp_secret()
+        totp_auth.TOTP.activate(
+            user1,
+            secret,
+        )
+
+        # no code
+        response = self.client.post(
+            "/api/token/",
+            data={
+                "username": "user1",
+                "password": "password",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["non_field_errors"][0], "MFA code is required")
+
+        # invalid code
+        mock_validate_code.return_value = False
+        response = self.client.post(
+            "/api/token/",
+            data={
+                "username": "user1",
+                "password": "password",
+                "code": "123456",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["non_field_errors"][0], "Invalid MFA code")
+
+        # valid code
+        mock_validate_code.return_value = True
+        response = self.client.post(
+            "/api/token/",
+            data={
+                "username": "user1",
+                "password": "password",
+                "code": "123456",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
 
 class TestApiUser(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/users/"
@@ -600,6 +693,133 @@ class TestApiUser(DirectoriesMixin, APITestCase):
         returned_user2 = User.objects.get(pk=user1.pk)
         self.assertEqual(returned_user2.first_name, "Updated Name 2")
         self.assertNotEqual(returned_user2.password, initial_password)
+
+    def test_deactivate_totp(self):
+        """
+        GIVEN:
+            - Existing user account with TOTP enabled
+        WHEN:
+            - API request by a superuser is made to deactivate TOTP
+            - API request by a regular user is made to deactivate TOTP
+        THEN:
+            - TOTP is deactivated, if exists
+            - Regular user is forbidden from deactivating TOTP
+        """
+
+        user1 = User.objects.create(
+            username="testuser",
+            password="test",
+            first_name="Test",
+            last_name="User",
+        )
+        Authenticator.objects.create(
+            user=user1,
+            type=Authenticator.Type.TOTP,
+            data={},
+        )
+
+        response = self.client.post(
+            f"{self.ENDPOINT}{user1.pk}/deactivate_totp/",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Authenticator.objects.filter(user=user1).count(), 0)
+
+        # fail if already deactivated
+        response = self.client.post(
+            f"{self.ENDPOINT}{user1.pk}/deactivate_totp/",
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        regular_user = User.objects.create_user(username="regular_user")
+        regular_user.user_permissions.add(
+            *Permission.objects.all(),
+        )
+        self.client.force_authenticate(regular_user)
+        Authenticator.objects.create(
+            user=user1,
+            type=Authenticator.Type.TOTP,
+            data={},
+        )
+
+        response = self.client.post(
+            f"{self.ENDPOINT}{user1.pk}/deactivate_totp/",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_only_superusers_can_create_or_alter_superuser_status(self):
+        """
+        GIVEN:
+            - Existing user account
+        WHEN:
+            - API request is made to add a user account with superuser status
+            - API request is made to change superuser status
+        THEN:
+            - Only superusers can change superuser status
+        """
+
+        user1 = User.objects.create_user(username="user1")
+        user1.user_permissions.add(*Permission.objects.all())
+        user2 = User.objects.create_superuser(username="user2")
+
+        self.client.force_authenticate(user1)
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{user1.pk}/",
+            json.dumps(
+                {
+                    "is_superuser": True,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        response = self.client.post(
+            f"{self.ENDPOINT}",
+            json.dumps(
+                {
+                    "username": "user3",
+                    "is_superuser": True,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        self.client.force_authenticate(user2)
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{user1.pk}/",
+            json.dumps(
+                {
+                    "is_superuser": True,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        returned_user1 = User.objects.get(pk=user1.pk)
+        self.assertEqual(returned_user1.is_superuser, True)
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{user1.pk}/",
+            json.dumps(
+                {
+                    "is_superuser": False,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        returned_user1 = User.objects.get(pk=user1.pk)
+        self.assertEqual(returned_user1.is_superuser, False)
 
 
 class TestApiGroup(DirectoriesMixin, APITestCase):

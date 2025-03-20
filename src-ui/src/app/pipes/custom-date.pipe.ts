@@ -11,22 +11,22 @@ const FORMAT_TO_ISO_FORMAT = {
 
 const INTERVALS = {
   year: {
-    label: $localize`%s year ago`,
+    label: $localize`Last year`,
     labelPlural: $localize`%s years ago`,
     interval: 31536000,
   },
   month: {
-    label: $localize`%s month ago`,
+    label: $localize`Last month`,
     labelPlural: $localize`%s months ago`,
     interval: 2592000,
   },
   week: {
-    label: $localize`%s week ago`,
+    label: $localize`Last week`,
     labelPlural: $localize`%s weeks ago`,
     interval: 604800,
   },
   day: {
-    label: $localize`%s day ago`,
+    label: $localize`Yesterday`,
     labelPlural: $localize`%s days ago`,
     interval: 86400,
   },

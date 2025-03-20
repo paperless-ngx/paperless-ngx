@@ -1,7 +1,12 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { TagComponent } from './tag.component'
-import { Tag } from 'src/app/data/tag'
 import { By } from '@angular/platform-browser'
+import { of } from 'rxjs'
+import { Tag } from 'src/app/data/tag'
+import { PermissionsService } from 'src/app/services/permissions.service'
+import { TagService } from 'src/app/services/rest/tag.service'
+import { TagComponent } from './tag.component'
 
 const tag: Tag = {
   id: 1,
@@ -12,14 +17,20 @@ const tag: Tag = {
 describe('TagComponent', () => {
   let component: TagComponent
   let fixture: ComponentFixture<TagComponent>
+  let permissionsService: PermissionsService
+  let tagService: TagService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [TagComponent],
-      providers: [],
-      imports: [],
+      providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
+      imports: [TagComponent],
     }).compileComponents()
 
+    permissionsService = TestBed.inject(PermissionsService)
+    tagService = TestBed.inject(TagService)
     fixture = TestBed.createComponent(TagComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
@@ -47,5 +58,14 @@ describe('TagComponent', () => {
     component.clickable = true
     fixture.detectChanges()
     expect(fixture.debugElement.query(By.css('a.badge'))).not.toBeNull()
+  })
+
+  it('should support retrieving tag by ID', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    const getCachedSpy = jest.spyOn(tagService, 'getCached')
+    getCachedSpy.mockReturnValue(of(tag))
+    component.tagID = 1
+    expect(getCachedSpy).toHaveBeenCalledWith(1)
+    expect(component.tag).toEqual(tag)
   })
 })

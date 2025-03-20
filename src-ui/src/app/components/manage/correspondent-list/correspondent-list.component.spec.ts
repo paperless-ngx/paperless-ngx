@@ -1,16 +1,16 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { CorrespondentListComponent } from './correspondent-list.component'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { DatePipe } from '@angular/common'
-import { SortableDirective } from 'src/app/directives/sortable.directive'
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
-import { of } from 'rxjs'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { of } from 'rxjs'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { SortableDirective } from 'src/app/directives/sortable.directive'
+import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { PageHeaderComponent } from '../../common/page-header/page-header.component'
+import { CorrespondentListComponent } from './correspondent-list.component'
 
 describe('CorrespondentListComponent', () => {
   let component: CorrespondentListComponent
@@ -19,17 +19,15 @@ describe('CorrespondentListComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        CorrespondentListComponent,
-        SortableDirective,
-        PageHeaderComponent,
-        IfPermissionsDirective,
-      ],
       imports: [
         NgbPaginationModule,
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        CorrespondentListComponent,
+        SortableDirective,
+        PageHeaderComponent,
+        IfPermissionsDirective,
       ],
       providers: [
         DatePipe,
@@ -77,13 +75,18 @@ describe('CorrespondentListComponent', () => {
   it('should support very old date strings', () => {
     jest.spyOn(correspondentsService, 'listFiltered').mockReturnValue(
       of({
-        count: 1,
-        all: [1],
+        count: 2,
+        all: [1, 2],
         results: [
           {
             id: 1,
             name: 'Correspondent1',
             last_correspondence: '1832-12-31T15:32:54-07:52:58',
+          },
+          {
+            id: 2,
+            name: 'Correspondent2',
+            last_correspondence: '1901-07-01T00:00:00+00:09:21',
           },
         ],
       })

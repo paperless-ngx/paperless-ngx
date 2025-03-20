@@ -1,0 +1,43 @@
+.dropdown-menu {
+  width: 370px;
+  @media(min-width: 768px) {
+    width: 600px;
+  }
+}
+
+:host ::ng-deep .ng-select-container {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  height: 100% !important;
+}
+
+:host ::ng-deep .rounded-end .ng-select-container {
+  border-top-right-radius: var(--bs-border-radius) !important;
+  border-bottom-right-radius: var(--bs-border-radius) !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+:host ::ng-deep .ng-select {
+  max-width: 100px;
+  min-width: 35%;
+  font-size: 14px;
+}
+
+:host ::ng-deep .doc-link-select {
+  padding-top: 0 !important;
+  border-top-right-radius: var(--bs-border-radius) !important;
+  border-bottom-right-radius: var(--bs-border-radius) !important;
+  background-image: none !important;
+
+  .ng-select-container,
+  .ng-select.ng-select-opened > .ng-select-container {
+    border: none !important;
+    min-height: 34px !important;
+    background: none !important;
+  }
+  .ng-select {
+    max-width: 200px;
+    min-width: 140px;
+  }
+}

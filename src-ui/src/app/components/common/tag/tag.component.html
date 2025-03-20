@@ -1,4 +1,4 @@
-@if (tag !== undefined) {
+@if (tag) {
   @if (!clickable) {
     <span class="badge" [style.background]="tag.color" [style.color]="tag.text_color">{{tag.name}}</span>
   }

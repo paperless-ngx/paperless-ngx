@@ -1,6 +1,7 @@
 import uuid
 
 import celery
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -11,7 +12,6 @@ from documents.tests.utils import DirectoriesMixin
 
 class TestTasks(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/tasks/"
-    ENDPOINT_ACKNOWLEDGE = "/api/acknowledge_tasks/"
 
     def setUp(self):
         super().setUp()
@@ -125,13 +125,59 @@ class TestTasks(DirectoriesMixin, APITestCase):
         self.assertEqual(len(response.data), 1)
 
         response = self.client.post(
-            self.ENDPOINT_ACKNOWLEDGE,
+            self.ENDPOINT + "acknowledge/",
             {"tasks": [task.id]},
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(len(response.data), 0)
+
+    def test_tasks_owner_aware(self):
+        """
+        GIVEN:
+            - Existing PaperlessTasks with owner and with no owner
+        WHEN:
+            - API call is made to get tasks
+        THEN:
+            - Only tasks with no owner or request user are returned
+        """
+
+        regular_user = User.objects.create_user(username="test")
+        regular_user.user_permissions.add(*Permission.objects.all())
+        self.client.logout()
+        self.client.force_authenticate(user=regular_user)
+
+        task1 = PaperlessTask.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_file_name="task_one.pdf",
+            owner=self.user,
+        )
+
+        task2 = PaperlessTask.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_file_name="task_two.pdf",
+        )
+
+        task3 = PaperlessTask.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_file_name="task_three.pdf",
+            owner=regular_user,
+        )
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]["task_id"], task3.task_id)
+        self.assertEqual(response.data[1]["task_id"], task2.task_id)
+
+        acknowledge_response = self.client.post(
+            self.ENDPOINT + "acknowledge/",
+            {"tasks": [task1.id, task2.id, task3.id]},
+        )
+        self.assertEqual(acknowledge_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(acknowledge_response.data, {"result": 2})
 
     def test_task_result_no_error(self):
         """
@@ -238,3 +284,28 @@ class TestTasks(DirectoriesMixin, APITestCase):
         returned_data = response.data[0]
 
         self.assertEqual(returned_data["task_file_name"], "anothertest.pdf")
+
+    def test_task_result_failed_duplicate_includes_related_doc(self):
+        """
+        GIVEN:
+            - A celery task failed with a duplicate error
+        WHEN:
+            - API call is made to get tasks
+        THEN:
+            - The returned data includes a related document link
+        """
+        PaperlessTask.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_file_name="task_one.pdf",
+            status=celery.states.FAILURE,
+            result="Not consuming task_one.pdf: It is a duplicate of task_one_existing.pdf (#1234).",
+        )
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+        returned_data = response.data[0]
+
+        self.assertEqual(returned_data["related_document"], "1234")

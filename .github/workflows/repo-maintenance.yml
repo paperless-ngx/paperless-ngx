@@ -16,7 +16,8 @@ concurrency:
 jobs:
   stale:
     name: 'Stale'
-    runs-on: ubuntu-latest
+    if: github.repository_owner == 'paperless-ngx'
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/stale@v9
         with:
@@ -31,7 +32,8 @@ jobs:
             for your contributions. See our [contributing guidelines](https://github.com/paperless-ngx/paperless-ngx/blob/dev/CONTRIBUTING.md#automatic-repository-maintenance) for more details.
   lock-threads:
     name: 'Lock Old Threads'
-    runs-on: ubuntu-latest
+    if: github.repository_owner == 'paperless-ngx'
+    runs-on: ubuntu-24.04
     steps:
       - uses: dessant/lock-threads@v5
         with:
@@ -56,7 +58,8 @@ jobs:
             See our [contributing guidelines](https://github.com/paperless-ngx/paperless-ngx/blob/dev/CONTRIBUTING.md#automatic-repository-maintenance) for more details.
   close-answered-discussions:
     name: 'Close Answered Discussions'
-    runs-on: ubuntu-latest
+    if: github.repository_owner == 'paperless-ngx'
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/github-script@v7
         with:
@@ -112,7 +115,8 @@ jobs:
             }
   close-outdated-discussions:
     name: 'Close Outdated Discussions'
-    runs-on: ubuntu-latest
+    if: github.repository_owner == 'paperless-ngx'
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/github-script@v7
         with:
@@ -203,7 +207,8 @@ jobs:
             }
   close-unsupported-feature-requests:
     name: 'Close Unsupported Feature Requests'
-    runs-on: ubuntu-latest
+    if: github.repository_owner == 'paperless-ngx'
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/github-script@v7
         with:
@@ -212,15 +217,20 @@ jobs:
               return new Promise(resolve => setTimeout(resolve, ms));
             }
 
+            const CUTOFF_MAX_COUNT = 80;
             const CUTOFF_1_DAYS = 180;
             const CUTOFF_1_COUNT = 5;
             const CUTOFF_2_DAYS = 365;
-            const CUTOFF_2_COUNT = 10;
+            const CUTOFF_2_COUNT = 20;
+            const CUTOFF_3_DAYS = 730;
+            const CUTOFF_3_COUNT = 40;
 
             const cutoff1Date = new Date();
             cutoff1Date.setDate(cutoff1Date.getDate() - CUTOFF_1_DAYS);
             const cutoff2Date = new Date();
             cutoff2Date.setDate(cutoff2Date.getDate() - CUTOFF_2_DAYS);
+            const cutoff3Date = new Date();
+            cutoff3Date.setDate(cutoff3Date.getDate() - CUTOFF_3_DAYS);
 
             const query = `query(
                 $owner:String!,
@@ -250,9 +260,12 @@ jobs:
             const result = await github.graphql(query, variables);
 
             for (const discussion of result.repository.discussions.nodes) {
-              const discussionDate = new Date(discussion.updatedAt);
-              if ((discussionDate < cutoff1Date && discussion.upvoteCount < CUTOFF_1_COUNT) ||
-                  (discussionDate < cutoff2Date && discussion.upvoteCount < CUTOFF_2_COUNT)) {
+              const discussionUpdatedDate = new Date(discussion.updatedAt);
+              const discussionCreatedDate = new Date(discussion.createdAt);
+              if ((discussionUpdatedDate < cutoff1Date && discussion.upvoteCount < CUTOFF_MAX_COUNT) ||
+                  (discussionCreatedDate < cutoff1Date && discussion.upvoteCount < CUTOFF_1_COUNT) ||
+                  (discussionCreatedDate < cutoff2Date && discussion.upvoteCount < CUTOFF_2_COUNT) ||
+                  (discussionCreatedDate < cutoff3Date && discussion.upvoteCount < CUTOFF_3_COUNT)) {
                 console.log(`Closing discussion #${discussion.number} (${discussion.id}), last updated at ${discussion.updatedAt} with votes ${discussion.upvoteCount}`);
                 const addCommentMutation = `mutation($discussion:ID!, $body:String!) {
                   addDiscussionComment(input:{discussionId:$discussion, body:$body}) {

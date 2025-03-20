@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { combineLatest, Observable } from 'rxjs'
 import { tap } from 'rxjs/operators'
 import { MailRule } from 'src/app/data/mail-rule'
 import { AbstractPaperlessService } from './abstract-paperless-service'
@@ -35,12 +34,6 @@ export class MailRuleService extends AbstractPaperlessService<MailRule> {
 
   update(o: MailRule) {
     return super.update(o).pipe(tap(() => this.reload()))
-  }
-
-  patchMany(objects: MailRule[]): Observable<MailRule[]> {
-    return combineLatest(objects.map((o) => super.patch(o))).pipe(
-      tap(() => this.reload())
-    )
   }
 
   delete(o: MailRule) {

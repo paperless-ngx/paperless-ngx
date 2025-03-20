@@ -4,27 +4,27 @@
 
 Check for the following issues:
 
-- Ensure that the directory you're putting your documents in is the
-  folder paperless is watching. With docker, this setting is performed
-  in the `docker-compose.yml` file. Without Docker, look at the
-  `CONSUMPTION_DIR` setting. Don't adjust this setting if you're
-  using docker.
+-   Ensure that the directory you're putting your documents in is the
+    folder paperless is watching. With docker, this setting is performed
+    in the `docker-compose.yml` file. Without Docker, look at the
+    `CONSUMPTION_DIR` setting. Don't adjust this setting if you're
+    using docker.
 
-- Ensure that redis is up and running. Paperless does its task
-  processing asynchronously, and for documents to arrive at the task
-  processor, it needs redis to run.
+-   Ensure that redis is up and running. Paperless does its task
+    processing asynchronously, and for documents to arrive at the task
+    processor, it needs redis to run.
 
-- Ensure that the task processor is running. Docker does this
-  automatically. Manually invoke the task processor by executing
+-   Ensure that the task processor is running. Docker does this
+    automatically. Manually invoke the task processor by executing
 
-  ```shell-session
-  $ celery --app paperless worker
-  ```
+    ```shell-session
+    celery --app paperless worker
+    ```
 
-- Look at the output of paperless and inspect it for any errors.
+-   Look at the output of paperless and inspect it for any errors.
 
-- Go to the admin interface, and check if there are failed tasks. If
-  so, the tasks will contain an error message.
+-   Go to the admin interface, and check if there are failed tasks. If
+    so, the tasks will contain an error message.
 
 ## Consumer warns `OCR for XX failed`
 
@@ -78,12 +78,12 @@ Ensure that `chown` is possible on these directories.
 This indicates that the Auto matching algorithm found no documents to
 learn from. This may have two reasons:
 
-- You don't use the Auto matching algorithm: The error can be safely
-  ignored in this case.
-- You are using the Auto matching algorithm: The classifier explicitly
-  excludes documents with Inbox tags. Verify that there are documents
-  in your archive without inbox tags. The algorithm will only learn
-  from documents not in your inbox.
+-   You don't use the Auto matching algorithm: The error can be safely
+    ignored in this case.
+-   You are using the Auto matching algorithm: The classifier explicitly
+    excludes documents with Inbox tags. Verify that there are documents
+    in your archive without inbox tags. The algorithm will only learn
+    from documents not in your inbox.
 
 ## UserWarning in sklearn on every single document
 
@@ -127,10 +127,10 @@ change in the `docker-compose.yml` file:
 # The gotenberg chromium route is used to convert .eml files. We do not
 # want to allow external content like tracking pixels or even javascript.
 command:
-  - 'gotenberg'
-  - '--chromium-disable-javascript=true'
-  - '--chromium-allow-list=file:///tmp/.*'
-  - '--api-timeout=60'
+    - 'gotenberg'
+    - '--chromium-disable-javascript=true'
+    - '--chromium-allow-list=file:///tmp/.*'
+    - '--api-timeout=60'
 ```
 
 ## Permission denied errors in the consumption directory
@@ -144,7 +144,7 @@ The following error occurred while consuming document.pdf: [Errno 13] Permission
 This happens when paperless does not have permission to delete files
 inside the consumption directory. Ensure that `USERMAP_UID` and
 `USERMAP_GID` are set to the user id and group id you use on the host
-operating system, if these are different from `1000`. See [Docker setup](setup.md#docker_hub).
+operating system, if these are different from `1000`. See [Docker setup](setup.md#docker).
 
 Also ensure that you are able to read and write to the consumption
 directory on the host.
@@ -320,7 +320,9 @@ many workers attempting to access the database simultaneously.
 Consider changing to the PostgreSQL database if you will be processing
 many documents at once often. Otherwise, try tweaking the
 [`PAPERLESS_DB_TIMEOUT`](configuration.md#PAPERLESS_DB_TIMEOUT) setting to allow more time for the database to
-unlock. This may have minor performance implications.
+unlock. Additionally, you can change your SQLite database to use ["Write-Ahead Logging"](https://sqlite.org/wal.html).
+These changes may have minor performance implications but can help
+prevent database locking issues.
 
 ## gunicorn fails to start with "is not a valid port number"
 
@@ -352,6 +354,20 @@ This is intentional as the output archive file may differ in unexpected or undes
 ways from the original. As the logs indicate, if you encounter this error you can set
 `PAPERLESS_OCR_USER_ARGS: '{"continue_on_soft_render_error": true}'` to try to 'force'
 processing documents with this issue.
+
+## Logs show "possible incompatible database column" when deleting documents {#convert-uuid-field}
+
+You may see errors when deleting documents like:
+
+```
+Data too long for column 'transaction_id' at row 1
+```
+
+This error can occur in installations which have upgraded from a version of Paperless-ngx that used Django 4 (Paperless-ngx versions prior to v2.13.0) with a MariaDB/MySQL database. Due to the backawards-incompatible change in Django 5, the column "documents_document.transaction_id" will need to be re-created, which can be done with a one-time run of the following management command:
+
+```shell-session
+$ python3 manage.py convert_mariadb_uuid
+```
 
 ## Platform-Specific Deployment Troubleshooting
 

@@ -1,5 +1,40 @@
-// bs options
-$enable-negative-margins: true;
+@use "sass:meta";
+// bs variables
+$grid-gutter-width: 1.5rem;
+$border-radius: .375rem;
+$btn-border-width: var(--bs-border-width);
+
+$form-file-button-bg: var(--bs-body-bg);
+$form-file-button-hover-bg: var(--pngx-bg-alt);
+
+@import "node_modules/bootstrap/dist/css/bootstrap.css";
+@include meta.load-css("theme");
+@import "~@ng-select/ng-select/themes/default.theme.css";
+@include meta.load-css("print");
+
+// re-created bootstrap styles
+.mt-n2 {
+  margin-top: -0.5rem;
+}
+.me-n2 {
+  margin-right: -0.5rem;
+}
+.me-n3 {
+  margin-right: -1rem;
+}
+.mb-n2 {
+  margin-bottom: -0.5rem;
+}
+.ms-n1 {
+  margin-left: -0.25rem;
+}
+.ms-n2 {
+  margin-left: -0.5rem;
+}
+.my-n2 {
+  margin-top: -0.5rem;
+  margin-bottom: -0.5rem;
+}
 
 $grid-breakpoints: (
   xs: 0,
@@ -11,17 +46,27 @@ $grid-breakpoints: (
   xxxl: 2400px
 );
 
-$form-file-button-bg: var(--bs-body-bg);
-$form-file-button-hover-bg: var(--pngx-bg-alt);
+:root {
+  @each $name, $value in $grid-breakpoints {
+    --bs-breakpoint-#{$name}: #{$value};
+  }
+}
 
-@import "node_modules/bootstrap/scss/bootstrap";
-@import "theme";
-@import "~@ng-select/ng-select/themes/default.theme.css";
-@import "print";
+@media (min-width: 2400px) {
+  .col-xxxl-1 {
+    flex: 0 0 auto;
+    width: 8.33333333%;
+  }
+  .col-xxxl-11 {
+    flex: 0 0 auto;
+    width:91.66666667%
+  }
+}
 
 // Paperless-ngx styles
 body {
-  font-size: 0.875rem;
+  --pngx-body-font-size: 0.875rem;
+  font-size: var(--pngx-body-font-size);
   height: 100vh;
 }
 
@@ -365,8 +410,12 @@ textarea,
 }
 
 .form-control:disabled, .form-control[readonly] {
-  background-color: var(--pngx-bg-alt);
+  background-color: var(--pngx-bg-disabled);
   cursor: not-allowed;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 
 ul.pagination {
@@ -485,9 +534,23 @@ ul.pagination {
 
 .doc-img-container {
   border: none !important;
-  border-top-left-radius: .25rem;
-  border-top-right-radius: .25rem;
   overflow: hidden;
+
+  .doc-img {
+    overflow: visible;
+  }
+}
+
+.card-selected {
+  border-color:var(--bs-primary);
+
+  .document-card-check {
+    display: block !important;
+  }
+
+  .doc-img-container {
+    background-color: var(--pngx-primary-faded);
+  }
 }
 
 table.table {
@@ -543,11 +606,6 @@ table.table {
     border-color: var(--bs-border-color);
     color: var(--bs-body-color);
   }
-}
-
-.popover-hidden .popover {
-    opacity: 0;
-    pointer-events: none;
 }
 
 // Tour
@@ -649,12 +707,20 @@ code {
   filter: invert(0.5) saturate(0);
 }
 
+.accordion-button {
+  font-size: var(--pngx-body-font-size);
+}
+
 .me-1px {
   margin-right: 1px !important;
 }
 
 .cdk-drag-placeholder {
   opacity: .5;
+}
+
+.whitespace-preserve {
+  white-space: preserve;
 }
 
 /* Animate items as they're being sorted. */
@@ -678,5 +744,52 @@ code {
       opacity: 1;
       pointer-events: initial;
     }
+  }
+}
+
+// pdfjs
+canvas.hiddenCanvasElement {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: -1;
+  height: 0;
+  width: 0;
+}
+
+// bs icons
+.btn-sm i-bs svg {
+  vertical-align: text-bottom;
+}
+
+.document-card {
+  .card-footer i-bs svg {
+    vertical-align: middle;
+  }
+}
+
+// fixes for buttons in preview popup
+.btn-group pngx-preview-popup:not(:last-child) {
+  // Prevent double borders when buttons are next to each other
+  > .btn {
+    margin-left: calc(#{$btn-border-width} * -1);
+  }
+  > .btn {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+.btn-group pngx-preview-popup:not(:first-child) {
+  > .btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+.btn-group pngx-preview-popup {
+  position: relative;
+  flex: 1 1 auto;
+
+  > .btn {
+    display: block;
   }
 }

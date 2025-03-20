@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
-import { AbstractInputComponent } from './abstract-input'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { AbstractInputComponent } from './abstract-input'
 
 @Component({
   template: `
@@ -18,6 +18,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
       />
     </div>
   `,
+  imports: [FormsModule, ReactiveFormsModule],
 })
 class TestComponent extends AbstractInputComponent<string> {
   constructor() {
@@ -31,9 +32,8 @@ describe(`AbstractInputComponent`, () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [TestComponent],
       providers: [],
-      imports: [FormsModule, ReactiveFormsModule],
+      imports: [FormsModule, ReactiveFormsModule, TestComponent],
     }).compileComponents()
 
     fixture = TestBed.createComponent(TestComponent)

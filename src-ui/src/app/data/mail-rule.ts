@@ -7,7 +7,7 @@ export enum MailFilterAttachmentType {
 
 export enum MailRuleConsumptionScope {
   Attachments = 1,
-  Email_Only = 2,
+  EmailOnly = 2,
   Everything = 3,
 }
 
@@ -38,6 +38,8 @@ export interface MailRule extends ObjectWithPermissions {
   account: number // PaperlessMailAccount.id
 
   order: number
+
+  enabled: boolean
 
   folder: string
 

@@ -1,3 +1,4 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -5,8 +6,8 @@ import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of } from 'rxjs'
 import {
-  MailMetadataCorrespondentOption,
   MailAction,
+  MailMetadataCorrespondentOption,
 } from 'src/app/data/mail-rule'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -19,11 +20,11 @@ import { CheckComponent } from '../../input/check/check.component'
 import { NumberComponent } from '../../input/number/number.component'
 import { PermissionsFormComponent } from '../../input/permissions/permissions-form/permissions-form.component'
 import { SelectComponent } from '../../input/select/select.component'
+import { SwitchComponent } from '../../input/switch/switch.component'
 import { TagsComponent } from '../../input/tags/tags.component'
 import { TextComponent } from '../../input/text/text.component'
 import { EditDialogMode } from '../edit-dialog.component'
 import { MailRuleEditDialogComponent } from './mail-rule-edit-dialog.component'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('MailRuleEditDialogComponent', () => {
   let component: MailRuleEditDialogComponent
@@ -32,7 +33,11 @@ describe('MailRuleEditDialogComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        NgbModule,
         MailRuleEditDialogComponent,
         IfPermissionsDirective,
         IfOwnerDirective,
@@ -43,8 +48,8 @@ describe('MailRuleEditDialogComponent', () => {
         TagsComponent,
         SafeHtmlPipe,
         CheckComponent,
+        SwitchComponent,
       ],
-      imports: [FormsModule, ReactiveFormsModule, NgSelectModule, NgbModule],
       providers: [
         NgbActiveModal,
         {

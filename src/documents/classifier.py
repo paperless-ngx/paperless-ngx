@@ -1,16 +1,17 @@
 import logging
-import os
 import pickle
 import re
 import warnings
 from collections.abc import Iterator
 from hashlib import sha256
+from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Optional
 
 if TYPE_CHECKING:
     from datetime import datetime
-    from pathlib import Path
+
+    from numpy import ndarray
 
 from django.conf import settings
 from django.core.cache import cache
@@ -28,7 +29,7 @@ logger = logging.getLogger("paperless.classifier")
 
 class IncompatibleClassifierVersionError(Exception):
     def __init__(self, message: str, *args: object) -> None:
-        self.message = message
+        self.message: str = message
         super().__init__(*args)
 
 
@@ -36,8 +37,8 @@ class ClassifierModelCorruptError(Exception):
     pass
 
 
-def load_classifier() -> Optional["DocumentClassifier"]:
-    if not os.path.isfile(settings.MODEL_FILE):
+def load_classifier(*, raise_exception: bool = False) -> Optional["DocumentClassifier"]:
+    if not settings.MODEL_FILE.is_file():
         logger.debug(
             "Document classification model does not exist (yet), not "
             "performing automatic matching.",
@@ -50,22 +51,30 @@ def load_classifier() -> Optional["DocumentClassifier"]:
 
     except IncompatibleClassifierVersionError as e:
         logger.info(f"Classifier version incompatible: {e.message}, will re-train")
-        os.unlink(settings.MODEL_FILE)
+        Path(settings.MODEL_FILE).unlink()
         classifier = None
-    except ClassifierModelCorruptError:
+        if raise_exception:
+            raise e
+    except ClassifierModelCorruptError as e:
         # there's something wrong with the model file.
         logger.exception(
             "Unrecoverable error while loading document "
             "classification model, deleting model file.",
         )
-        os.unlink(settings.MODEL_FILE)
+        Path(settings.MODEL_FILE).unlink
         classifier = None
-    except OSError:
+        if raise_exception:
+            raise e
+    except OSError as e:
         logger.exception("IO error while loading document classification model")
         classifier = None
-    except Exception:  # pragma: no cover
+        if raise_exception:
+            raise e
+    except Exception as e:  # pragma: no cover
         logger.exception("Unknown error while loading document classification model")
         classifier = None
+        if raise_exception:
+            raise e
 
     return classifier
 
@@ -76,11 +85,11 @@ class DocumentClassifier:
     # v9 - Changed from hashing to time/ids for re-train check
     FORMAT_VERSION = 9
 
-    def __init__(self):
+    def __init__(self) -> None:
         # last time a document changed and therefore training might be required
-        self.last_doc_change_time: Optional[datetime] = None
+        self.last_doc_change_time: datetime | None = None
         # Hash of primary keys of AUTO matching values last used in training
-        self.last_auto_type_hash: Optional[bytes] = None
+        self.last_auto_type_hash: bytes | None = None
 
         self.data_vectorizer = None
         self.tags_binarizer = None
@@ -95,7 +104,7 @@ class DocumentClassifier:
     def load(self) -> None:
         # Catch warnings for processing
         with warnings.catch_warnings(record=True) as w:
-            with open(settings.MODEL_FILE, "rb") as f:
+            with Path(settings.MODEL_FILE).open("rb") as f:
                 schema_version = pickle.load(f)
 
                 if schema_version != self.FORMAT_VERSION:
@@ -132,11 +141,11 @@ class DocumentClassifier:
                 ):
                     raise IncompatibleClassifierVersionError("sklearn version update")
 
-    def save(self):
+    def save(self) -> None:
         target_file: Path = settings.MODEL_FILE
-        target_file_temp = target_file.with_suffix(".pickle.part")
+        target_file_temp: Path = target_file.with_suffix(".pickle.part")
 
-        with open(target_file_temp, "wb") as f:
+        with target_file_temp.open("wb") as f:
             pickle.dump(self.FORMAT_VERSION, f)
 
             pickle.dump(self.last_doc_change_time, f)
@@ -153,7 +162,7 @@ class DocumentClassifier:
 
         target_file_temp.rename(target_file)
 
-    def train(self):
+    def train(self) -> bool:
         # Get non-inbox documents
         docs_queryset = (
             Document.objects.exclude(
@@ -161,6 +170,7 @@ class DocumentClassifier:
             )
             .select_related("document_type", "correspondent", "storage_path")
             .prefetch_related("tags")
+            .order_by("pk")
         )
 
         # No documents exit to train against
@@ -190,11 +200,10 @@ class DocumentClassifier:
             hasher.update(y.to_bytes(4, "little", signed=True))
             labels_correspondent.append(y)
 
-            tags = sorted(
-                tag.pk
-                for tag in doc.tags.filter(
-                    matching_algorithm=MatchingModel.MATCH_AUTO,
-                )
+            tags: list[int] = list(
+                doc.tags.filter(matching_algorithm=MatchingModel.MATCH_AUTO)
+                .order_by("pk")
+                .values_list("pk", flat=True),
             )
             for tag in tags:
                 hasher.update(tag.to_bytes(4, "little", signed=True))
@@ -236,13 +245,13 @@ class DocumentClassifier:
         # union with {-1} accounts for cases where all documents have
         # correspondents and types assigned, so -1 isn't part of labels_x, which
         # it usually is.
-        num_correspondents = len(set(labels_correspondent) | {-1}) - 1
-        num_document_types = len(set(labels_document_type) | {-1}) - 1
-        num_storage_paths = len(set(labels_storage_path) | {-1}) - 1
+        num_correspondents: int = len(set(labels_correspondent) | {-1}) - 1
+        num_document_types: int = len(set(labels_document_type) | {-1}) - 1
+        num_storage_paths: int = len(set(labels_storage_path) | {-1}) - 1
 
         logger.debug(
             f"{docs_queryset.count()} documents, {num_tags} tag(s), {num_correspondents} correspondent(s), "
-            f"{num_document_types} document type(s). {num_storage_paths} storage path(es)",
+            f"{num_document_types} document type(s). {num_storage_paths} storage path(s)",
         )
 
         from sklearn.feature_extraction.text import CountVectorizer
@@ -266,7 +275,9 @@ class DocumentClassifier:
             min_df=0.01,
         )
 
-        data_vectorized = self.data_vectorizer.fit_transform(content_generator())
+        data_vectorized: ndarray = self.data_vectorizer.fit_transform(
+            content_generator(),
+        )
 
         # See the notes here:
         # https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html
@@ -284,7 +295,7 @@ class DocumentClassifier:
                     label[0] if len(label) == 1 else -1 for label in labels_tags
                 ]
                 self.tags_binarizer = LabelBinarizer()
-                labels_tags_vectorized = self.tags_binarizer.fit_transform(
+                labels_tags_vectorized: ndarray = self.tags_binarizer.fit_transform(
                     labels_tags,
                 ).ravel()
             else:
@@ -304,8 +315,7 @@ class DocumentClassifier:
         else:
             self.correspondent_classifier = None
             logger.debug(
-                "There are no correspondents. Not training correspondent "
-                "classifier.",
+                "There are no correspondents. Not training correspondent classifier.",
             )
 
         if num_document_types > 0:
@@ -315,8 +325,7 @@ class DocumentClassifier:
         else:
             self.document_type_classifier = None
             logger.debug(
-                "There are no document types. Not training document type "
-                "classifier.",
+                "There are no document types. Not training document type classifier.",
             )
 
         if num_storage_paths > 0:
@@ -408,7 +417,7 @@ class DocumentClassifier:
 
         return content
 
-    def predict_correspondent(self, content: str) -> Optional[int]:
+    def predict_correspondent(self, content: str) -> int | None:
         if self.correspondent_classifier:
             X = self.data_vectorizer.transform([self.preprocess_content(content)])
             correspondent_id = self.correspondent_classifier.predict(X)
@@ -419,7 +428,7 @@ class DocumentClassifier:
         else:
             return None
 
-    def predict_document_type(self, content: str) -> Optional[int]:
+    def predict_document_type(self, content: str) -> int | None:
         if self.document_type_classifier:
             X = self.data_vectorizer.transform([self.preprocess_content(content)])
             document_type_id = self.document_type_classifier.predict(X)
@@ -451,7 +460,7 @@ class DocumentClassifier:
         else:
             return []
 
-    def predict_storage_path(self, content: str) -> Optional[int]:
+    def predict_storage_path(self, content: str) -> int | None:
         if self.storage_path_classifier:
             X = self.data_vectorizer.transform([self.preprocess_content(content)])
             storage_path_id = self.storage_path_classifier.predict(X)

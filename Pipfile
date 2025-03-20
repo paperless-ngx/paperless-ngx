@@ -7,8 +7,8 @@ name = "pypi"
 dateparser = "~=1.2"
 # WARNING: django does not use semver.
 #          Only patch versions are guaranteed to not introduce breaking changes.
-django = "~=4.2.15"
-django-allauth = {extras = ["socialaccount"], version = "*"}
+django = "~=5.1.5"
+django-allauth = {extras = ["mfa", "socialaccount"], version = "*"}
 django-auditlog = "*"
 django-celery-results = "*"
 django-compression-middleware = "*"
@@ -18,24 +18,26 @@ django-filter = "~=24.3"
 django-guardian = "*"
 django-multiselectfield = "*"
 django-soft-delete = "*"
-djangorestframework = "==3.15.2"
+djangorestframework = "~=3.15.2"
 djangorestframework-guardian = "*"
 drf-writable-nested = "*"
 bleach = "*"
 celery = {extras = ["redis"], version = "*"}
-channels = "~=4.1"
+channels = "~=4.2"
 channels-redis = "*"
 concurrent-log-handler = "*"
 filelock = "*"
 flower = "*"
 gotenberg-client = "*"
 gunicorn = "*"
+httpx-oauth = "*"
 imap-tools = "*"
 inotifyrecursive = "~=0.3"
+jinja2 = "~=3.1"
 langdetect = "*"
 mysqlclient = "*"
 nltk = "*"
-ocrmypdf = "~=15.4"
+ocrmypdf = "~=16.8"
 pathvalidate = "*"
 pdf2image = "*"
 psycopg = {version = "*", extras = ["c"]}
@@ -47,23 +49,24 @@ python-magic = "*"
 pyzbar = "*"
 rapidfuzz = "*"
 redis = {extras = ["hiredis"], version = "*"}
-scikit-learn = "~=1.5"
+scikit-learn = "~=1.6"
 setproctitle = "*"
 tika-client = "*"
 tqdm = "*"
 # See https://github.com/paperless-ngx/paperless-ngx/issues/5494
 uvicorn = {extras = ["standard"], version = "==0.25.0"}
-watchdog = "~=4.0"
-whitenoise = "~=6.7"
+watchdog = "~=6.0"
+whitenoise = "~=6.8"
 whoosh = "~=2.7"
 zxing-cpp = {version = "*", platform_machine = "== 'x86_64'"}
+
 
 [dev-packages]
 # Linting
 pre-commit = "*"
 ruff = "*"
-# Testing
 factory-boy = "*"
+# Testing
 pytest = "*"
 pytest-cov = "*"
 pytest-django = "*"

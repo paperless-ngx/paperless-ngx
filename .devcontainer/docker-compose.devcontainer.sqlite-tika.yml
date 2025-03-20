@@ -27,7 +27,7 @@ services:
     image: docker.io/library/redis:7
     restart: unless-stopped
     volumes:
-      - redisdata:/data
+      - ./redisdata:/data
 
   # No ports need to be exposed; the VSCode DevContainer plugin manages them.
   paperless-development:
@@ -43,14 +43,16 @@ services:
     volumes:
       - ..:/usr/src/paperless/paperless-ngx:delegated
       - ../.devcontainer/vscode:/usr/src/paperless/paperless-ngx/.vscode:delegated # VSCode config files
-      - pipenv:/usr/src/paperless/paperless-ngx/.venv # Pipenv environment persisted in volume
+      - pipenv:/usr/src/paperless/paperless-ngx/.venv
       - /usr/src/paperless/paperless-ngx/src/documents/static/frontend # Static frontend files exist only in container
       - /usr/src/paperless/paperless-ngx/src/.pytest_cache
       - /usr/src/paperless/paperless-ngx/.ruff_cache
       - /usr/src/paperless/paperless-ngx/htmlcov
       - /usr/src/paperless/paperless-ngx/.coverage
-      - data:/usr/src/paperless/paperless-ngx/data
-      - media:/usr/src/paperless/paperless-ngx/media
+      - ./data:/usr/src/paperless/paperless-ngx/data
+      - ./media:/usr/src/paperless/paperless-ngx/media
+      - ./consume:/usr/src/paperless/paperless-ngx/consume
+      - ~/.gitconfig:/usr/src/paperless/.gitconfig:ro
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_TIKA_ENABLED: 1
@@ -104,8 +106,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  data:
-  media:
-  redisdata:
   redisdata_embeddings:
   pipenv:

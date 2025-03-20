@@ -1,6 +1,13 @@
-import { Component, Input } from '@angular/core'
+import { HttpClient } from '@angular/common/http'
+import { Component, Input, OnDestroy, ViewChild } from '@angular/core'
+import { NgbPopover, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
+import { PdfViewerComponent, PdfViewerModule } from 'ng2-pdf-viewer'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { first, Subject, takeUntil } from 'rxjs'
 import { Document } from 'src/app/data/document'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
+import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
 
@@ -8,14 +15,53 @@ import { SettingsService } from 'src/app/services/settings.service'
   selector: 'pngx-preview-popup',
   templateUrl: './preview-popup.component.html',
   styleUrls: ['./preview-popup.component.scss'],
+  imports: [
+    NgbPopoverModule,
+    DocumentTitlePipe,
+    PdfViewerModule,
+    SafeUrlPipe,
+    NgxBootstrapIconsModule,
+  ],
 })
-export class PreviewPopupComponent {
+export class PreviewPopupComponent implements OnDestroy {
+  private _document: Document
   @Input()
-  document: Document
+  set document(document: Document) {
+    this._document = document
+    this.init()
+  }
+
+  get document(): Document {
+    return this._document
+  }
+
+  @Input()
+  link: string
+
+  @Input()
+  linkClasses: string = 'btn btn-sm btn-outline-secondary'
+
+  @Input()
+  linkTarget: string = '_blank'
+
+  @Input()
+  linkTitle: string = $localize`Open preview`
+
+  unsubscribeNotifier: Subject<any> = new Subject()
 
   error = false
 
   requiresPassword: boolean = false
+
+  previewText: string
+
+  @ViewChild('popover') popover: NgbPopover
+
+  @ViewChild('pdfViewer') pdfViewer: PdfViewerComponent
+
+  mouseOnPreview: boolean = false
+
+  popoverClass: string = 'shadow popover-preview'
 
   get renderAsObject(): boolean {
     return (this.isPdf && this.useNativePdfViewer) || !this.isPdf
@@ -30,17 +76,37 @@ export class PreviewPopupComponent {
   }
 
   get isPdf(): boolean {
-    // We dont have time to retrieve metadata, make a best guess by file name
     return (
-      this.document?.original_file_name?.endsWith('.pdf') ||
-      this.document?.archived_file_name?.endsWith('.pdf')
+      this.document?.archived_file_name?.length > 0 ||
+      this.document?.mime_type?.includes('pdf')
     )
   }
 
   constructor(
     private settingsService: SettingsService,
-    private documentService: DocumentService
+    private documentService: DocumentService,
+    private http: HttpClient
   ) {}
+
+  ngOnDestroy(): void {
+    this.unsubscribeNotifier.next(this)
+  }
+
+  init() {
+    if (this.document.mime_type?.includes('text')) {
+      this.http
+        .get(this.previewURL, { responseType: 'text' })
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .subscribe({
+          next: (res) => {
+            this.previewText = res.toString()
+          },
+          error: (err) => {
+            this.error = err
+          },
+        })
+    }
+  }
 
   onError(event: any) {
     if (event.name == 'PasswordException') {
@@ -48,5 +114,51 @@ export class PreviewPopupComponent {
     } else {
       this.error = true
     }
+  }
+
+  onPageRendered() {
+    // Only triggered by the pngx pdf viewer
+    if (this.documentService.searchQuery) {
+      this.pdfViewer.eventBus.dispatch('find', {
+        query: this.documentService.searchQuery,
+        caseSensitive: false,
+        highlightAll: true,
+        phraseSearch: true,
+      })
+    }
+  }
+
+  get previewUrl() {
+    return this.documentService.getPreviewUrl(this.document.id)
+  }
+
+  mouseEnterPreview() {
+    this.mouseOnPreview = true
+    if (!this.popover.isOpen()) {
+      // we're going to open but hide to pre-load content during hover delay
+      this.popover.open()
+      this.popoverClass = 'shadow popover-preview pe-none opacity-0'
+      setTimeout(() => {
+        if (this.mouseOnPreview) {
+          // show popover
+          this.popoverClass = this.popoverClass.replace('pe-none opacity-0', '')
+        } else {
+          this.popover.close(true)
+        }
+      }, 600)
+    }
+  }
+
+  mouseLeavePreview() {
+    this.mouseOnPreview = false
+  }
+
+  public close(immediate: boolean = false) {
+    setTimeout(
+      () => {
+        if (!this.mouseOnPreview) this.popover.close()
+      },
+      immediate ? 0 : 300
+    )
   }
 }

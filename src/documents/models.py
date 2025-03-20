@@ -5,7 +5,6 @@ import re
 from collections import OrderedDict
 from pathlib import Path
 from typing import Final
-from typing import Optional
 
 import dateutil.parser
 import pathvalidate
@@ -23,6 +22,9 @@ from multiselectfield import MultiSelectField
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
 
+from django.db.models import Case
+from django.db.models.functions import Cast
+from django.db.models.functions import Substr
 from django_softdelete.models import SoftDeleteModel
 
 from documents.data_models import DocumentSource
@@ -123,9 +125,8 @@ class DocumentType(MatchingModel):
 
 
 class StoragePath(MatchingModel):
-    path = models.CharField(
+    path = models.TextField(
         _("path"),
-        max_length=512,
     )
 
     class Meta(MatchingModel.Meta):
@@ -203,6 +204,18 @@ class Document(SoftDeleteModel, ModelWithOwner):
         blank=True,
         null=True,
         help_text=_("The checksum of the archived document."),
+    )
+
+    page_count = models.PositiveIntegerField(
+        _("page count"),
+        blank=False,
+        null=True,
+        unique=False,
+        db_index=False,
+        validators=[MinValueValidator(1)],
+        help_text=_(
+            "The number of pages of the document.",
+        ),
     )
 
     created = models.DateTimeField(_("created"), default=timezone.now, db_index=True)
@@ -314,7 +327,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
         return self.archive_filename is not None
 
     @property
-    def archive_path(self) -> Optional[Path]:
+    def archive_path(self) -> Path | None:
         if self.has_archive_version:
             return (settings.ARCHIVE_DIR / Path(str(self.archive_filename))).resolve()
         else:
@@ -414,6 +427,7 @@ class SavedView(ModelWithOwner):
         OWNER = ("owner", _("Owner"))
         SHARED = ("shared", _("Shared"))
         ASN = ("asn", _("ASN"))
+        PAGE_COUNT = ("pagecount", _("Pages"))
         CUSTOM_FIELD = ("custom_field_%d", ("Custom Field"))
 
     name = models.CharField(_("name"), max_length=128)
@@ -507,6 +521,7 @@ class SavedViewFilterRule(models.Model):
         (39, _("has custom field in")),
         (40, _("does not have custom field in")),
         (41, _("does not have custom field")),
+        (42, _("custom fields query")),
     ]
 
     saved_view = models.ForeignKey(
@@ -626,7 +641,7 @@ class UiSettings(models.Model):
         return self.user.username
 
 
-class PaperlessTask(models.Model):
+class PaperlessTask(ModelWithOwner):
     ALL_STATES = sorted(states.ALL_STATES)
     TASK_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
 
@@ -695,7 +710,7 @@ class PaperlessTask(models.Model):
         return f"Task {self.task_id}"
 
 
-class Note(models.Model):
+class Note(SoftDeleteModel):
     note = models.TextField(
         _("content"),
         blank=True,
@@ -735,7 +750,7 @@ class Note(models.Model):
         return self.note
 
 
-class ShareLink(models.Model):
+class ShareLink(SoftDeleteModel):
     class FileVersion(models.TextChoices):
         ARCHIVE = ("archive", _("Archive"))
         ORIGINAL = ("original", _("Original"))
@@ -851,11 +866,23 @@ class CustomField(models.Model):
         return f"{self.name} : {self.data_type}"
 
 
-class CustomFieldInstance(models.Model):
+class CustomFieldInstance(SoftDeleteModel):
     """
     A single instance of a field, attached to a CustomField for the name and type
     and attached to a single Document to be metadata for it
     """
+
+    TYPE_TO_DATA_STORE_NAME_MAP = {
+        CustomField.FieldDataType.STRING: "value_text",
+        CustomField.FieldDataType.URL: "value_url",
+        CustomField.FieldDataType.DATE: "value_date",
+        CustomField.FieldDataType.BOOL: "value_bool",
+        CustomField.FieldDataType.INT: "value_int",
+        CustomField.FieldDataType.FLOAT: "value_float",
+        CustomField.FieldDataType.MONETARY: "value_monetary",
+        CustomField.FieldDataType.DOCUMENTLINK: "value_document_ids",
+        CustomField.FieldDataType.SELECT: "value_select",
+    }
 
     created = models.DateTimeField(
         _("created"),
@@ -897,9 +924,30 @@ class CustomFieldInstance(models.Model):
 
     value_monetary = models.CharField(null=True, max_length=128)
 
+    value_monetary_amount = models.GeneratedField(
+        expression=Case(
+            # If the value starts with a number and no currency symbol, use the whole string
+            models.When(
+                value_monetary__regex=r"^\d+",
+                then=Cast(
+                    Substr("value_monetary", 1),
+                    output_field=models.DecimalField(decimal_places=2, max_digits=65),
+                ),
+            ),
+            # If the value starts with a 3-char currency symbol, use the rest of the string
+            default=Cast(
+                Substr("value_monetary", 4),
+                output_field=models.DecimalField(decimal_places=2, max_digits=65),
+            ),
+            output_field=models.DecimalField(decimal_places=2, max_digits=65),
+        ),
+        output_field=models.DecimalField(decimal_places=2, max_digits=65),
+        db_persist=True,
+    )
+
     value_document_ids = models.JSONField(null=True)
 
-    value_select = models.PositiveSmallIntegerField(null=True)
+    value_select = models.CharField(null=True, max_length=16)
 
     class Meta:
         ordering = ("created",)
@@ -914,7 +962,11 @@ class CustomFieldInstance(models.Model):
 
     def __str__(self) -> str:
         value = (
-            self.field.extra_data["select_options"][self.value_select]
+            next(
+                option.get("label")
+                for option in self.field.extra_data["select_options"]
+                if option.get("id") == self.value_select
+            )
             if (
                 self.field.data_type == CustomField.FieldDataType.SELECT
                 and self.value_select is not None
@@ -923,31 +975,21 @@ class CustomFieldInstance(models.Model):
         )
         return str(self.field.name) + f" : {value}"
 
+    @classmethod
+    def get_value_field_name(cls, data_type: CustomField.FieldDataType):
+        try:
+            return cls.TYPE_TO_DATA_STORE_NAME_MAP[data_type]
+        except KeyError:  # pragma: no cover
+            raise NotImplementedError(data_type)
+
     @property
     def value(self):
         """
         Based on the data type, access the actual value the instance stores
         A little shorthand/quick way to get what is actually here
         """
-        if self.field.data_type == CustomField.FieldDataType.STRING:
-            return self.value_text
-        elif self.field.data_type == CustomField.FieldDataType.URL:
-            return self.value_url
-        elif self.field.data_type == CustomField.FieldDataType.DATE:
-            return self.value_date
-        elif self.field.data_type == CustomField.FieldDataType.BOOL:
-            return self.value_bool
-        elif self.field.data_type == CustomField.FieldDataType.INT:
-            return self.value_int
-        elif self.field.data_type == CustomField.FieldDataType.FLOAT:
-            return self.value_float
-        elif self.field.data_type == CustomField.FieldDataType.MONETARY:
-            return self.value_monetary
-        elif self.field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
-            return self.value_document_ids
-        elif self.field.data_type == CustomField.FieldDataType.SELECT:
-            return self.value_select
-        raise NotImplementedError(self.field.data_type)
+        value_field_name = self.get_value_field_name(self.field.data_type)
+        return getattr(self, value_field_name)
 
 
 if settings.AUDIT_LOG_ENABLED:
@@ -978,11 +1020,18 @@ class WorkflowTrigger(models.Model):
         CONSUMPTION = 1, _("Consumption Started")
         DOCUMENT_ADDED = 2, _("Document Added")
         DOCUMENT_UPDATED = 3, _("Document Updated")
+        SCHEDULED = 4, _("Scheduled")
 
     class DocumentSourceChoices(models.IntegerChoices):
         CONSUME_FOLDER = DocumentSource.ConsumeFolder.value, _("Consume Folder")
         API_UPLOAD = DocumentSource.ApiUpload.value, _("Api Upload")
         MAIL_FETCH = DocumentSource.MailFetch.value, _("Mail Fetch")
+
+    class ScheduleDateField(models.TextChoices):
+        ADDED = "added", _("Added")
+        CREATED = "created", _("Created")
+        MODIFIED = "modified", _("Modified")
+        CUSTOM_FIELD = "custom_field", _("Custom Field")
 
     type = models.PositiveIntegerField(
         _("Workflow Trigger Type"),
@@ -1060,12 +1109,139 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has this correspondent"),
     )
 
+    schedule_offset_days = models.PositiveIntegerField(
+        _("schedule offset days"),
+        default=0,
+        help_text=_(
+            "The number of days to offset the schedule trigger by.",
+        ),
+    )
+
+    schedule_is_recurring = models.BooleanField(
+        _("schedule is recurring"),
+        default=False,
+        help_text=_(
+            "If the schedule should be recurring.",
+        ),
+    )
+
+    schedule_recurring_interval_days = models.PositiveIntegerField(
+        _("schedule recurring delay in days"),
+        default=1,
+        validators=[MinValueValidator(1)],
+        help_text=_(
+            "The number of days between recurring schedule triggers.",
+        ),
+    )
+
+    schedule_date_field = models.CharField(
+        _("schedule date field"),
+        max_length=20,
+        choices=ScheduleDateField.choices,
+        default=ScheduleDateField.ADDED,
+        help_text=_(
+            "The field to check for a schedule trigger.",
+        ),
+    )
+
+    schedule_date_custom_field = models.ForeignKey(
+        CustomField,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("schedule date custom field"),
+    )
+
     class Meta:
         verbose_name = _("workflow trigger")
         verbose_name_plural = _("workflow triggers")
 
     def __str__(self):
         return f"WorkflowTrigger {self.pk}"
+
+
+class WorkflowActionEmail(models.Model):
+    subject = models.CharField(
+        _("email subject"),
+        max_length=256,
+        null=False,
+        help_text=_(
+            "The subject of the email, can include some placeholders, "
+            "see documentation.",
+        ),
+    )
+
+    body = models.TextField(
+        _("email body"),
+        null=False,
+        help_text=_(
+            "The body (message) of the email, can include some placeholders, "
+            "see documentation.",
+        ),
+    )
+
+    to = models.TextField(
+        _("emails to"),
+        null=False,
+        help_text=_(
+            "The destination email addresses, comma separated.",
+        ),
+    )
+
+    include_document = models.BooleanField(
+        default=False,
+        verbose_name=_("include document in email"),
+    )
+
+    def __str__(self):
+        return f"Workflow Email Action {self.pk}"
+
+
+class WorkflowActionWebhook(models.Model):
+    url = models.URLField(
+        _("webhook url"),
+        null=False,
+        help_text=_("The destination URL for the notification."),
+    )
+
+    use_params = models.BooleanField(
+        default=True,
+        verbose_name=_("use parameters"),
+    )
+
+    as_json = models.BooleanField(
+        default=False,
+        verbose_name=_("send as JSON"),
+    )
+
+    params = models.JSONField(
+        _("webhook parameters"),
+        null=True,
+        blank=True,
+        help_text=_("The parameters to send with the webhook URL if body not used."),
+    )
+
+    body = models.TextField(
+        _("webhook body"),
+        null=True,
+        blank=True,
+        help_text=_("The body to send with the webhook URL if parameters not used."),
+    )
+
+    headers = models.JSONField(
+        _("webhook headers"),
+        null=True,
+        blank=True,
+        help_text=_("The headers to send with the webhook URL."),
+    )
+
+    include_document = models.BooleanField(
+        default=False,
+        verbose_name=_("include document in webhook"),
+    )
+
+    def __str__(self):
+        return f"Workflow Webhook Action {self.pk}"
 
 
 class WorkflowAction(models.Model):
@@ -1077,6 +1253,14 @@ class WorkflowAction(models.Model):
         REMOVAL = (
             2,
             _("Removal"),
+        )
+        EMAIL = (
+            3,
+            _("Email"),
+        )
+        WEBHOOK = (
+            4,
+            _("Webhook"),
         )
 
     type = models.PositiveIntegerField(
@@ -1279,6 +1463,24 @@ class WorkflowAction(models.Model):
         verbose_name=_("remove all custom fields"),
     )
 
+    email = models.ForeignKey(
+        WorkflowActionEmail,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="action",
+        verbose_name=_("email"),
+    )
+
+    webhook = models.ForeignKey(
+        WorkflowActionWebhook,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="action",
+        verbose_name=_("webhook"),
+    )
+
     class Meta:
         verbose_name = _("workflow action")
         verbose_name_plural = _("workflow actions")
@@ -1310,3 +1512,39 @@ class Workflow(models.Model):
 
     def __str__(self):
         return f"Workflow: {self.name}"
+
+
+class WorkflowRun(models.Model):
+    workflow = models.ForeignKey(
+        Workflow,
+        on_delete=models.CASCADE,
+        related_name="runs",
+        verbose_name=_("workflow"),
+    )
+
+    type = models.PositiveIntegerField(
+        _("workflow trigger type"),
+        choices=WorkflowTrigger.WorkflowTriggerType.choices,
+        null=True,
+    )
+
+    document = models.ForeignKey(
+        Document,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="workflow_runs",
+        verbose_name=_("document"),
+    )
+
+    run_at = models.DateTimeField(
+        _("date run"),
+        default=timezone.now,
+        db_index=True,
+    )
+
+    class Meta:
+        verbose_name = _("workflow run")
+        verbose_name_plural = _("workflow runs")
+
+    def __str__(self):
+        return f"WorkflowRun of {self.workflow} at {self.run_at} on {self.document}"

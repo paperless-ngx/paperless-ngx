@@ -1,30 +1,31 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import {
   ComponentFixture,
-  TestBed,
   fakeAsync,
+  TestBed,
   tick,
 } from '@angular/core/testing'
 import { Router, RouterModule } from '@angular/router'
-import { TourService, TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap'
+import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { NgxFileDropModule } from 'ngx-file-drop'
+import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { Subject } from 'rxjs'
 import { routes } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { ToastsComponent } from './components/common/toasts/toasts.component'
+import { FileDropComponent } from './components/file-drop/file-drop.component'
+import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
+import { PermissionsGuard } from './guards/permissions.guard'
 import {
   ConsumerStatusService,
   FileStatus,
 } from './services/consumer-status.service'
-import { PermissionsService } from './services/permissions.service'
-import { ToastService, Toast } from './services/toast.service'
-import { SettingsService } from './services/settings.service'
-import { FileDropComponent } from './components/file-drop/file-drop.component'
-import { NgxFileDropModule } from 'ngx-file-drop'
-import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap'
 import { HotKeyService } from './services/hot-key.service'
-import { PermissionsGuard } from './guards/permissions.guard'
-import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { PermissionsService } from './services/permissions.service'
+import { SettingsService } from './services/settings.service'
+import { Toast, ToastService } from './services/toast.service'
 
 describe('AppComponent', () => {
   let component: AppComponent
@@ -39,12 +40,15 @@ describe('AppComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [AppComponent, ToastsComponent, FileDropComponent],
       imports: [
         TourNgBootstrapModule,
         RouterModule.forRoot(routes),
         NgxFileDropModule,
         NgbModalModule,
+        AppComponent,
+        ToastsComponent,
+        FileDropComponent,
+        NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
         PermissionsGuard,

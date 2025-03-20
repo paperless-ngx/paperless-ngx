@@ -1,22 +1,41 @@
-import { Component } from '@angular/core'
-import { SavedViewService } from 'src/app/services/rest/saved-view.service'
-import { SettingsService } from 'src/app/services/settings.service'
-import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
-import { TourService } from 'ngx-ui-tour-ng-bootstrap'
-import { SavedView } from 'src/app/data/saved-view'
-import { ToastService } from 'src/app/services/toast.service'
 import {
   CdkDragDrop,
   CdkDragEnd,
   CdkDragStart,
+  DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
+import { Component } from '@angular/core'
+import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
+import { SavedView } from 'src/app/data/saved-view'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { SavedViewService } from 'src/app/services/rest/saved-view.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
+import { LogoComponent } from '../common/logo/logo.component'
+import { PageHeaderComponent } from '../common/page-header/page-header.component'
+import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
+import { SavedViewWidgetComponent } from './widgets/saved-view-widget/saved-view-widget.component'
+import { StatisticsWidgetComponent } from './widgets/statistics-widget/statistics-widget.component'
+import { UploadFileWidgetComponent } from './widgets/upload-file-widget/upload-file-widget.component'
+import { WelcomeWidgetComponent } from './widgets/welcome-widget/welcome-widget.component'
 
 @Component({
   selector: 'pngx-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
+  imports: [
+    LogoComponent,
+    PageHeaderComponent,
+    SavedViewWidgetComponent,
+    StatisticsWidgetComponent,
+    UploadFileWidgetComponent,
+    WelcomeWidgetComponent,
+    IfPermissionsDirective,
+    DragDropModule,
+    TourNgBootstrapModule,
+  ],
 })
 export class DashboardComponent extends ComponentWithPermissions {
   public dashboardViews: SavedView[] = []

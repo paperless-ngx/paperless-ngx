@@ -3,7 +3,7 @@ import re
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from pdf2image import convert_from_path
@@ -21,6 +21,9 @@ from documents.plugins.helpers import ProgressStatusOptions
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import maybe_override_pixel_limit
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logging.getLogger("paperless.barcodes")
 
@@ -62,7 +65,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
           - Barcode support is enabled and the mime type is supported
         """
         if settings.CONSUMER_BARCODE_TIFF_SUPPORT:
-            supported_mimes = {"application/pdf", "image/tiff"}
+            supported_mimes: set[str] = {"application/pdf", "image/tiff"}
         else:
             supported_mimes = {"application/pdf"}
 
@@ -72,16 +75,16 @@ class BarcodePlugin(ConsumeTaskPlugin):
             or settings.CONSUMER_ENABLE_TAG_BARCODE
         ) and self.input_doc.mime_type in supported_mimes
 
-    def setup(self):
+    def setup(self) -> None:
         self.temp_dir = tempfile.TemporaryDirectory(
             dir=self.base_tmp_dir,
             prefix="barcode",
         )
-        self.pdf_file = self.input_doc.original_file
+        self.pdf_file: Path = self.input_doc.original_file
         self._tiff_conversion_done = False
         self.barcodes: list[Barcode] = []
 
-    def run(self) -> Optional[str]:
+    def run(self) -> None:
         # Some operations may use PIL, override pixel setting if needed
         maybe_override_pixel_limit()
 
@@ -159,7 +162,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
     def cleanup(self) -> None:
         self.temp_dir.cleanup()
 
-    def convert_from_tiff_to_pdf(self):
+    def convert_from_tiff_to_pdf(self) -> None:
         """
         May convert a TIFF image into a PDF, if the input is a TIFF and
         the TIFF has not been made into a PDF
@@ -224,7 +227,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
 
         # Choose the library for reading
         if settings.CONSUMER_BARCODE_SCANNER == "PYZBAR":
-            reader = self.read_barcodes_pyzbar
+            reader: Callable[[Image.Image], list[str]] = self.read_barcodes_pyzbar
             logger.debug("Scanning for barcodes using PYZBAR")
         else:
             reader = self.read_barcodes_zxing
@@ -237,7 +240,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
             logger.debug(f"PDF has {num_of_pages} pages")
 
             # Get limit from configuration
-            barcode_max_pages = (
+            barcode_max_pages: int = (
                 num_of_pages
                 if settings.CONSUMER_BARCODE_MAX_PAGES == 0
                 else settings.CONSUMER_BARCODE_MAX_PAGES
@@ -299,7 +302,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
             )
 
     @property
-    def asn(self) -> Optional[int]:
+    def asn(self) -> int | None:
         """
         Search the parsed barcodes for any ASNs.
         The first barcode that starts with CONSUMER_ASN_BARCODE_PREFIX
@@ -312,7 +315,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
         self.detect()
 
         # get the first barcode that starts with CONSUMER_ASN_BARCODE_PREFIX
-        asn_text = next(
+        asn_text: str | None = next(
             (x.value for x in self.barcodes if x.is_asn),
             None,
         )
@@ -334,36 +337,36 @@ class BarcodePlugin(ConsumeTaskPlugin):
         return asn
 
     @property
-    def tags(self) -> Optional[list[int]]:
+    def tags(self) -> list[int]:
         """
         Search the parsed barcodes for any tags.
         Returns the detected tag ids (or empty list)
         """
-        tags = []
+        tags: list[int] = []
 
         # Ensure the barcodes have been read
         self.detect()
 
         for x in self.barcodes:
-            tag_texts = x.value
+            tag_texts: str = x.value
 
             for raw in tag_texts.split(","):
                 try:
-                    tag = None
+                    tag_str: str | None = None
                     for regex in settings.CONSUMER_TAG_BARCODE_MAPPING:
                         if re.match(regex, raw, flags=re.IGNORECASE):
                             sub = settings.CONSUMER_TAG_BARCODE_MAPPING[regex]
-                            tag = (
+                            tag_str = (
                                 re.sub(regex, sub, raw, flags=re.IGNORECASE)
                                 if sub
                                 else raw
                             )
                             break
 
-                    if tag:
+                    if tag_str:
                         tag, _ = Tag.objects.get_or_create(
-                            name__iexact=tag,
-                            defaults={"name": tag},
+                            name__iexact=tag_str,
+                            defaults={"name": tag_str},
                         )
 
                         logger.debug(
@@ -388,7 +391,12 @@ class BarcodePlugin(ConsumeTaskPlugin):
         """
         # filter all barcodes for the separator string
         # get the page numbers of the separating barcodes
-        separator_pages = {bc.page: False for bc in self.barcodes if bc.is_separator}
+        retain = settings.CONSUMER_BARCODE_RETAIN_SPLIT_PAGES
+        separator_pages = {
+            bc.page: retain
+            for bc in self.barcodes
+            if bc.is_separator and (not retain or (retain and bc.page > 0))
+        }  # as below, dont include the first page if retain is enabled
         if not settings.CONSUMER_ENABLE_ASN_BARCODE:
             return separator_pages
 
@@ -409,7 +417,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
         """
 
         document_paths = []
-        fname = self.input_doc.original_file.stem
+        fname: str = self.input_doc.original_file.stem
         with Pdf.open(self.pdf_file) as input_pdf:
             # Start with an empty document
             current_document: list[Page] = []
@@ -428,7 +436,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
                 logger.debug(f"Starting new document at idx {idx}")
                 current_document = []
                 documents.append(current_document)
-                keep_page = pages_to_split_on[idx]
+                keep_page: bool = pages_to_split_on[idx]
                 if keep_page:
                     # Keep the page
                     # (new document is started by asn barcode)
@@ -447,7 +455,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
 
                 logger.debug(f"pdf no:{doc_idx} has {len(dst.pages)} pages")
                 savepath = Path(self.temp_dir.name) / output_filename
-                with open(savepath, "wb") as out:
+                with savepath.open("wb") as out:
                     dst.save(out)
 
                 copy_basic_file_stats(self.input_doc.original_file, savepath)

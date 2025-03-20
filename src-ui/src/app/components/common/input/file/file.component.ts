@@ -6,7 +6,11 @@ import {
   ViewChild,
   forwardRef,
 } from '@angular/core'
-import { NG_VALUE_ACCESSOR } from '@angular/forms'
+import {
+  FormsModule,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
+} from '@angular/forms'
 import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
@@ -20,6 +24,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-file',
   templateUrl: './file.component.html',
   styleUrl: './file.component.scss',
+  imports: [FormsModule, ReactiveFormsModule],
 })
 export class FileComponent extends AbstractInputComponent<string> {
   @Output()

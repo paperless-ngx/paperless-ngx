@@ -1,28 +1,36 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { MailComponent } from './mail.component'
 import { DatePipe } from '@angular/common'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { By } from '@angular/platform-browser'
+import { ActivatedRoute, convertToParamMap } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import {
-  NgbModule,
   NgbAlertModule,
-  NgbModalRef,
   NgbModal,
+  NgbModalRef,
+  NgbModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
-import { MailAccount } from 'src/app/data/mail-account'
+import { MailAccount, MailAccountType } from 'src/app/data/mail-account'
 import { MailRule } from 'src/app/data/mail-rule'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
+import { PermissionsService } from 'src/app/services/permissions.service'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { MailAccountEditDialogComponent } from '../../common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
 import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
 import { CheckComponent } from '../../common/input/check/check.component'
@@ -32,25 +40,21 @@ import { PermissionsFormComponent } from '../../common/input/permissions/permiss
 import { PermissionsGroupComponent } from '../../common/input/permissions/permissions-group/permissions-group.component'
 import { PermissionsUserComponent } from '../../common/input/permissions/permissions-user/permissions-user.component'
 import { SelectComponent } from '../../common/input/select/select.component'
+import { SwitchComponent } from '../../common/input/switch/switch.component'
+import { TagsComponent } from '../../common/input/tags/tags.component'
 import { TextComponent } from '../../common/input/text/text.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
-import { PermissionsService } from 'src/app/services/permissions.service'
-import { ToastService } from 'src/app/services/toast.service'
-import { TagsComponent } from '../../common/input/tags/tags.component'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { SwitchComponent } from '../../common/input/switch/switch.component'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { MailComponent } from './mail.component'
 
 const mailAccounts = [
-  { id: 1, name: 'account1' },
-  { id: 2, name: 'account2' },
+  { id: 1, name: 'account1', account_type: MailAccountType.IMAP },
+  { id: 2, name: 'account2', account_type: MailAccountType.IMAP },
+  { id: 3, name: 'account3', accout_type: MailAccountType.Gmail_OAuth },
 ]
 const mailRules = [
-  { id: 1, name: 'rule1', owner: 1, account: 1 },
-  { id: 2, name: 'rule2', owner: 2, account: 2 },
+  { id: 1, name: 'rule1', owner: 1, account: 1, enabled: true },
+  { id: 2, name: 'rule2', owner: 2, account: 2, enabled: true },
 ]
 
 describe('MailComponent', () => {
@@ -61,10 +65,19 @@ describe('MailComponent', () => {
   let modalService: NgbModal
   let toastService: ToastService
   let permissionsService: PermissionsService
+  let activatedRoute: ActivatedRoute
+  let settingsService: SettingsService
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        NgbModule,
+        RouterTestingModule.withRoutes(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        NgbAlertModule,
+        NgSelectModule,
+        NgxBootstrapIconsModule.pick(allIcons),
         MailComponent,
         PageHeaderComponent,
         IfPermissionsDirective,
@@ -86,15 +99,6 @@ describe('MailComponent', () => {
         PermissionsFormComponent,
         SwitchComponent,
       ],
-      imports: [
-        NgbModule,
-        RouterTestingModule.withRoutes(routes),
-        FormsModule,
-        ReactiveFormsModule,
-        NgbAlertModule,
-        NgSelectModule,
-        NgxBootstrapIconsModule.pick(allIcons),
-      ],
       providers: [
         CustomDatePipe,
         DatePipe,
@@ -109,6 +113,9 @@ describe('MailComponent', () => {
     modalService = TestBed.inject(NgbModal)
     toastService = TestBed.inject(ToastService)
     permissionsService = TestBed.inject(PermissionsService)
+    activatedRoute = TestBed.inject(ActivatedRoute)
+    settingsService = TestBed.inject(SettingsService)
+    settingsService.currentUser = { id: 1 }
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     jest
       .spyOn(permissionsService, 'currentUserHasObjectPermissions')
@@ -120,6 +127,8 @@ describe('MailComponent', () => {
     fixture = TestBed.createComponent(MailComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
+    jest.useFakeTimers()
+    jest.advanceTimersByTime(100)
   })
 
   function completeSetup(excludeService = null) {
@@ -208,6 +217,23 @@ describe('MailComponent', () => {
     expect(toastInfoSpy).toHaveBeenCalledWith('Deleted mail account')
   })
 
+  it('should support process mail account, show error if needed', () => {
+    completeSetup()
+    const processSpy = jest.spyOn(mailAccountService, 'processAccount')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    component.processAccount(mailAccounts[0] as MailAccount)
+    expect(processSpy).toHaveBeenCalled()
+    processSpy.mockReturnValueOnce(
+      throwError(() => new Error('error processing mail account'))
+    )
+    component.processAccount(mailAccounts[0] as MailAccount)
+    expect(toastErrorSpy).toHaveBeenCalled()
+    processSpy.mockReturnValueOnce(of(true))
+    component.processAccount(mailAccounts[0] as MailAccount)
+    expect(toastInfoSpy).toHaveBeenCalledWith('Processing mail account')
+  })
+
   it('should support edit / create mail rule, show error if needed', () => {
     completeSetup()
     let modal: NgbModalRef
@@ -224,6 +250,17 @@ describe('MailComponent', () => {
     )
     editDialog.cancel()
     component.editMailRule()
+  })
+
+  it('should support copy mail rule', () => {
+    completeSetup()
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
+    component.copyMailRule(mailRules[0] as MailRule)
+    const editDialog = modal.componentInstance as MailRuleEditDialogComponent
+    expect(editDialog.object.id).toBeNull()
+    expect(editDialog.object.name).toEqual(`${mailRules[0].name} (copy)`)
+    expect(editDialog.dialogMode).toEqual(EditDialogMode.CREATE)
   })
 
   it('should support delete mail rule, show error if needed', () => {
@@ -309,5 +346,64 @@ describe('MailComponent', () => {
     expect(dialog.object).toEqual(mailAccounts[0])
     dialog.confirmClicked.emit({ permissions: perms, merge: true })
     expect(accountPatchSpy).toHaveBeenCalled()
+  })
+
+  it('should update mail rule when enable is toggled', () => {
+    completeSetup()
+    const patchSpy = jest.spyOn(mailRuleService, 'patch')
+    const toggleInput = fixture.debugElement.query(
+      By.css('input[type="checkbox"]')
+    )
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    // fail first
+    patchSpy.mockReturnValueOnce(
+      throwError(() => new Error('Error getting config'))
+    )
+    toggleInput.nativeElement.click()
+    expect(patchSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
+    // succeed second
+    patchSpy.mockReturnValueOnce(of(mailRules[0] as MailRule))
+    toggleInput.nativeElement.click()
+    patchSpy.mockReturnValueOnce(
+      of({ ...mailRules[0], enabled: false } as MailRule)
+    )
+    toggleInput.nativeElement.click()
+    expect(patchSpy).toHaveBeenCalled()
+    expect(toastInfoSpy).toHaveBeenCalled()
+  })
+
+  it('should show success message when oauth account is connected', () => {
+    const queryParams = { oauth_success: '1' }
+    jest
+      .spyOn(activatedRoute, 'queryParamMap', 'get')
+      .mockReturnValue(of(convertToParamMap(queryParams)))
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    completeSetup()
+    expect(toastInfoSpy).toHaveBeenCalled()
+  })
+
+  it('should show error message when oauth account connect fails', () => {
+    const queryParams = { oauth_success: '0' }
+    jest
+      .spyOn(activatedRoute, 'queryParamMap', 'get')
+      .mockReturnValue(of(convertToParamMap(queryParams)))
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    completeSetup()
+    expect(toastErrorSpy).toHaveBeenCalled()
+  })
+
+  it('should open account edit dialog if oauth account is connected', () => {
+    const queryParams = { oauth_success: '1', oauth_account: '3' }
+    jest
+      .spyOn(activatedRoute, 'queryParamMap', 'get')
+      .mockReturnValue(of(convertToParamMap(queryParams)))
+    completeSetup()
+    component.oAuthAccountId = 3
+    const editSpy = jest.spyOn(component, 'editMailAccount')
+    component.ngOnInit()
+    jest.advanceTimersByTime(200)
+    expect(editSpy).toHaveBeenCalled()
   })
 })

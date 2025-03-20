@@ -1,31 +1,32 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import {
   NgbModal,
-  NgbPaginationModule,
-  NgbModalRef,
   NgbModalModule,
+  NgbModalRef,
+  NgbPaginationModule,
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { Workflow } from 'src/app/data/workflow'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { WorkflowService } from 'src/app/services/rest/workflow.service'
-import { ToastService } from 'src/app/services/toast.service'
-import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
-import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-import { WorkflowsComponent } from './workflows.component'
-import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
-import { PermissionsService } from 'src/app/services/permissions.service'
+import { WorkflowActionType } from 'src/app/data/workflow-action'
 import {
   DocumentSource,
   WorkflowTriggerType,
 } from 'src/app/data/workflow-trigger'
-import { WorkflowActionType } from 'src/app/data/workflow-action'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { PermissionsService } from 'src/app/services/permissions.service'
+import { WorkflowService } from 'src/app/services/rest/workflow.service'
+import { ToastService } from 'src/app/services/toast.service'
+import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
+import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
+import { WorkflowEditDialogComponent } from '../../common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
+import { PageHeaderComponent } from '../../common/page-header/page-header.component'
+import { WorkflowsComponent } from './workflows.component'
 
 const workflows: Workflow[] = [
   {
@@ -80,12 +81,6 @@ describe('WorkflowsComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        WorkflowsComponent,
-        IfPermissionsDirective,
-        PageHeaderComponent,
-        ConfirmDialogComponent,
-      ],
       imports: [
         NgbPaginationModule,
         FormsModule,
@@ -93,6 +88,10 @@ describe('WorkflowsComponent', () => {
         NgbModalModule,
         NgbPopoverModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        WorkflowsComponent,
+        IfPermissionsDirective,
+        PageHeaderComponent,
+        ConfirmDialogComponent,
       ],
       providers: [
         {
@@ -118,10 +117,11 @@ describe('WorkflowsComponent', () => {
     )
     modalService = TestBed.inject(NgbModal)
     toastService = TestBed.inject(ToastService)
-
+    jest.useFakeTimers()
     fixture = TestBed.createComponent(WorkflowsComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
+    jest.advanceTimersByTime(100)
   })
 
   it('should support create, show notification on error / success', () => {
@@ -173,6 +173,70 @@ describe('WorkflowsComponent', () => {
     expect(reloadSpy).toHaveBeenCalled()
   })
 
+  it('should support copy', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
+
+    const copyButton = fixture.debugElement.queryAll(By.css('button'))[6]
+    copyButton.triggerEventHandler('click')
+
+    expect(modal).not.toBeUndefined()
+    const editDialog = modal.componentInstance as WorkflowEditDialogComponent
+    expect(editDialog.object.name).toEqual(workflows[0].name + ' (copy)')
+    expect(editDialog.dialogMode).toEqual(EditDialogMode.CREATE)
+  })
+
+  it('should null ids on copy', () => {
+    const workflow = {
+      id: 1,
+      name: 'Workflow 1',
+      order: 1,
+      enabled: true,
+      triggers: [
+        {
+          id: 1,
+          type: WorkflowTriggerType.Consumption,
+          sources: [DocumentSource.ConsumeFolder],
+          filter_filename: '*',
+        },
+      ],
+      actions: [
+        {
+          id: 1,
+          type: WorkflowActionType.Email,
+          email: {
+            id: 1,
+            subject: 'foo',
+            body: 'bar',
+            to: 'baz',
+            include_document: true,
+          },
+        },
+        {
+          id: 2,
+          type: WorkflowActionType.Webhook,
+          webhook: {
+            id: 2,
+            url: 'foo',
+            use_params: false,
+            params: {},
+            body: 'bar',
+            headers: {},
+            include_document: true,
+          },
+        },
+      ],
+    }
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
+    component.copyWorkflow(workflow)
+    expect(modal).not.toBeUndefined()
+    const editDialog = modal.componentInstance as WorkflowEditDialogComponent
+    expect(editDialog.object.id).toBeNull()
+    expect(editDialog.object.triggers[0].id).toBeNull()
+    expect(editDialog.object.actions[0].id).toBeNull()
+  })
+
   it('should support delete, show notification on error / success', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
@@ -180,7 +244,7 @@ describe('WorkflowsComponent', () => {
     const deleteSpy = jest.spyOn(workflowService, 'delete')
     const reloadSpy = jest.spyOn(component, 'reload')
 
-    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[4]
+    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[5]
     deleteButton.triggerEventHandler('click')
 
     expect(modal).not.toBeUndefined()
@@ -196,5 +260,28 @@ describe('WorkflowsComponent', () => {
     deleteSpy.mockReturnValueOnce(of(true))
     editDialog.confirmClicked.emit()
     expect(reloadSpy).toHaveBeenCalled()
+  })
+
+  it('should update workflow when enable is toggled', () => {
+    const patchSpy = jest.spyOn(workflowService, 'patch')
+    const toggleInput = fixture.debugElement.query(
+      By.css('input[type="checkbox"]')
+    )
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    // fail first
+    patchSpy.mockReturnValueOnce(
+      throwError(() => new Error('Error getting config'))
+    )
+    toggleInput.nativeElement.click()
+    expect(patchSpy).toHaveBeenCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
+    // succeed second
+    patchSpy.mockReturnValueOnce(of(workflows[0]))
+    toggleInput.nativeElement.click()
+    patchSpy.mockReturnValueOnce(of({ ...workflows[0], enabled: false }))
+    toggleInput.nativeElement.click()
+    expect(patchSpy).toHaveBeenCalled()
+    expect(toastInfoSpy).toHaveBeenCalled()
   })
 })

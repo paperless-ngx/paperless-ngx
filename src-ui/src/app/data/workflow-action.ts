@@ -3,7 +3,36 @@ import { ObjectWithId } from './object-with-id'
 export enum WorkflowActionType {
   Assignment = 1,
   Removal = 2,
+  Email = 3,
+  Webhook = 4,
 }
+
+export interface WorkflowActionEmail extends ObjectWithId {
+  subject?: string
+
+  body?: string
+
+  to?: string
+
+  include_document?: boolean
+}
+
+export interface WorkflowActionWebhook extends ObjectWithId {
+  url?: string
+
+  use_params?: boolean
+
+  as_json?: boolean
+
+  params?: object
+
+  body?: string
+
+  headers?: object
+
+  include_document?: boolean
+}
+
 export interface WorkflowAction extends ObjectWithId {
   type: WorkflowActionType
 
@@ -62,4 +91,8 @@ export interface WorkflowAction extends ObjectWithId {
   remove_custom_fields?: number[] // [CustomField.id]
 
   remove_all_custom_fields?: boolean
+
+  email?: WorkflowActionEmail
+
+  webhook?: WorkflowActionWebhook
 }

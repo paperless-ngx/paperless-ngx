@@ -1,20 +1,19 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { environment } from 'src/environments/environment'
-import { DocumentNotesComponent } from './document-notes.component'
-import { UserService } from 'src/app/services/rest/user.service'
-import { of, throwError } from 'rxjs'
-import { DocumentNotesService } from 'src/app/services/rest/document-notes.service'
-import { ToastService } from 'src/app/services/toast.service'
-import { DocumentNote } from 'src/app/data/document-note'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { DatePipe } from '@angular/common'
-import { By } from '@angular/platform-browser'
-import { PermissionsService } from 'src/app/services/permissions.service'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { By } from '@angular/platform-browser'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { of, throwError } from 'rxjs'
+import { DocumentNote } from 'src/app/data/document-note'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
+import { PermissionsService } from 'src/app/services/permissions.service'
+import { DocumentNotesService } from 'src/app/services/rest/document-notes.service'
+import { UserService } from 'src/app/services/rest/user.service'
+import { ToastService } from 'src/app/services/toast.service'
+import { DocumentNotesComponent } from './document-notes.component'
 
 const notes: DocumentNote[] = [
   {
@@ -57,15 +56,13 @@ describe('DocumentNotesComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        DocumentNotesComponent,
-        CustomDatePipe,
-        IfPermissionsDirective,
-      ],
       imports: [
         FormsModule,
         ReactiveFormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        DocumentNotesComponent,
+        CustomDatePipe,
+        IfPermissionsDirective,
       ],
       providers: [
         {

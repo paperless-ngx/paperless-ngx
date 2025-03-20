@@ -1,5 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { DragDropModule } from '@angular/cdk/drag-drop'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms'
 import { DragDropSelectComponent } from './drag-drop-select.component'
 
@@ -9,8 +9,7 @@ describe('DragDropSelectComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DragDropModule, FormsModule],
-      declarations: [DragDropSelectComponent],
+      imports: [DragDropModule, FormsModule, DragDropSelectComponent],
     }).compileComponents()
 
     fixture = TestBed.createComponent(DragDropSelectComponent)

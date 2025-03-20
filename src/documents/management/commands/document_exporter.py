@@ -6,9 +6,12 @@ import tempfile
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING
-from typing import Optional
 
 import tqdm
+from allauth.mfa.models import Authenticator
+from allauth.socialaccount.models import SocialAccount
+from allauth.socialaccount.models import SocialApp
+from allauth.socialaccount.models import SocialToken
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
@@ -45,6 +48,8 @@ from documents.models import Tag
 from documents.models import UiSettings
 from documents.models import Workflow
 from documents.models import WorkflowAction
+from documents.models import WorkflowActionEmail
+from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowTrigger
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
@@ -76,6 +81,18 @@ class Command(CryptMixin, BaseCommand):
                 "Compare file checksums when determining whether to export "
                 "a file or not. If not specified, file size and time "
                 "modified is used instead."
+            ),
+        )
+
+        parser.add_argument(
+            "-cj",
+            "--compare-json",
+            default=False,
+            action="store_true",
+            help=(
+                "Compare json file checksums when determining whether to "
+                "export a json file or not (manifest or metadata). "
+                "If not specified, the file is always exported."
             ),
         )
 
@@ -175,6 +192,7 @@ class Command(CryptMixin, BaseCommand):
         self.target = Path(options["target"]).resolve()
         self.split_manifest: bool = options["split_manifest"]
         self.compare_checksums: bool = options["compare_checksums"]
+        self.compare_json: bool = options["compare_json"]
         self.use_filename_format: bool = options["use_filename_format"]
         self.use_folder_prefix: bool = options["use_folder_prefix"]
         self.delete: bool = options["delete"]
@@ -183,7 +201,7 @@ class Command(CryptMixin, BaseCommand):
         self.zip_export: bool = options["zip"]
         self.data_only: bool = options["data_only"]
         self.no_progress_bar: bool = options["no_progress_bar"]
-        self.passphrase: Optional[str] = options.get("passphrase")
+        self.passphrase: str | None = options.get("passphrase")
 
         self.files_in_export_dir: set[Path] = set()
         self.exported_files: set[str] = set()
@@ -259,12 +277,18 @@ class Command(CryptMixin, BaseCommand):
             "group_object_permissions": GroupObjectPermission.objects.all(),
             "workflow_triggers": WorkflowTrigger.objects.all(),
             "workflow_actions": WorkflowAction.objects.all(),
+            "workflow_email_actions": WorkflowActionEmail.objects.all(),
+            "workflow_webhook_actions": WorkflowActionWebhook.objects.all(),
             "workflows": Workflow.objects.all(),
             "custom_fields": CustomField.objects.all(),
             "custom_field_instances": CustomFieldInstance.objects.all(),
             "app_configs": ApplicationConfiguration.objects.all(),
             "notes": Note.objects.all(),
             "documents": Document.objects.order_by("id").all(),
+            "social_accounts": SocialAccount.objects.all(),
+            "social_apps": SocialApp.objects.all(),
+            "social_tokens": SocialToken.objects.all(),
+            "authenticators": Authenticator.objects.all(),
         }
 
         if settings.AUDIT_LOG_ENABLED:
@@ -274,9 +298,9 @@ class Command(CryptMixin, BaseCommand):
             manifest_dict = {}
 
             # Build an overall manifest
-            for key in manifest_key_to_object_query:
+            for key, object_query in manifest_key_to_object_query.items():
                 manifest_dict[key] = json.loads(
-                    serializers.serialize("json", manifest_key_to_object_query[key]),
+                    serializers.serialize("json", object_query),
                 )
 
             self.encrypt_secret_fields(manifest_dict)
@@ -336,12 +360,11 @@ class Command(CryptMixin, BaseCommand):
                         manifest_dict["custom_field_instances"],
                     ),
                 )
-                manifest_name.write_text(
-                    json.dumps(content, indent=2, ensure_ascii=False),
-                    encoding="utf-8",
+
+                self.check_and_write_json(
+                    content,
+                    manifest_name,
                 )
-                if manifest_name in self.files_in_export_dir:
-                    self.files_in_export_dir.remove(manifest_name)
 
         # These were exported already
         if self.split_manifest:
@@ -351,15 +374,13 @@ class Command(CryptMixin, BaseCommand):
 
         # 4.1 write primary manifest to target folder
         manifest = []
-        for key in manifest_dict:
-            manifest.extend(manifest_dict[key])
+        for key, item in manifest_dict.items():
+            manifest.extend(item)
         manifest_path = (self.target / "manifest.json").resolve()
-        manifest_path.write_text(
-            json.dumps(manifest, indent=2, ensure_ascii=False),
-            encoding="utf-8",
+        self.check_and_write_json(
+            manifest,
+            manifest_path,
         )
-        if manifest_path in self.files_in_export_dir:
-            self.files_in_export_dir.remove(manifest_path)
 
         # 4.2 write version information to target folder
         extra_metadata_path = (self.target / "metadata.json").resolve()
@@ -371,16 +392,11 @@ class Command(CryptMixin, BaseCommand):
         # Django stores most of these in the field itself, we store them once here
         if self.passphrase:
             metadata.update(self.get_crypt_params())
-        extra_metadata_path.write_text(
-            json.dumps(
-                metadata,
-                indent=2,
-                ensure_ascii=False,
-            ),
-            encoding="utf-8",
+
+        self.check_and_write_json(
+            metadata,
+            extra_metadata_path,
         )
-        if extra_metadata_path in self.files_in_export_dir:
-            self.files_in_export_dir.remove(extra_metadata_path)
 
         if self.delete:
             # 5. Remove files which we did not explicitly export in this run
@@ -427,7 +443,7 @@ class Command(CryptMixin, BaseCommand):
         document: Document,
         base_name: str,
         document_dict: dict,
-    ) -> tuple[Path, Optional[Path], Optional[Path]]:
+    ) -> tuple[Path, Path | None, Path | None]:
         """
         Generates the targets for a given document, including the original file, archive file and thumbnail (depending on settings).
         """
@@ -461,8 +477,8 @@ class Command(CryptMixin, BaseCommand):
         self,
         document: Document,
         original_target: Path,
-        thumbnail_target: Optional[Path],
-        archive_target: Optional[Path],
+        thumbnail_target: Path | None,
+        archive_target: Path | None,
     ) -> None:
         """
         Copies files from the document storage location to the specified target location.
@@ -509,10 +525,39 @@ class Command(CryptMixin, BaseCommand):
                     archive_target,
                 )
 
+    def check_and_write_json(
+        self,
+        content: list[dict] | dict,
+        target: Path,
+    ):
+        """
+        Writes the source content to the target json file.
+        If --compare-json arg was used, don't write to target file if
+        the file exists and checksum is identical to content checksum.
+        This preserves the file timestamps when no changes are made.
+        """
+
+        target = target.resolve()
+        perform_write = True
+        if target in self.files_in_export_dir:
+            self.files_in_export_dir.remove(target)
+            if self.compare_json:
+                target_checksum = hashlib.md5(target.read_bytes()).hexdigest()
+                src_str = json.dumps(content, indent=2, ensure_ascii=False)
+                src_checksum = hashlib.md5(src_str.encode("utf-8")).hexdigest()
+                if src_checksum == target_checksum:
+                    perform_write = False
+
+        if perform_write:
+            target.write_text(
+                json.dumps(content, indent=2, ensure_ascii=False),
+                encoding="utf-8",
+            )
+
     def check_and_copy(
         self,
         source: Path,
-        source_checksum: Optional[str],
+        source_checksum: str | None,
         target: Path,
     ):
         """
@@ -558,15 +603,14 @@ class Command(CryptMixin, BaseCommand):
                 crypt_fields = crypt_config["fields"]
                 for manifest_record in manifest[exporter_key]:
                     for field in crypt_fields:
-                        manifest_record["fields"][field] = self.encrypt_string(
-                            value=manifest_record["fields"][field],
-                        )
+                        if manifest_record["fields"][field]:
+                            manifest_record["fields"][field] = self.encrypt_string(
+                                value=manifest_record["fields"][field],
+                            )
 
-        elif MailAccount.objects.count() > 0:
+        elif MailAccount.objects.count() > 0 or SocialToken.objects.count() > 0:
             self.stdout.write(
                 self.style.NOTICE(
-                    "You have configured mail accounts, "
-                    "but no passphrase was given. "
-                    "Passwords will be in plaintext",
+                    "No passphrase was given, sensitive fields will be in plaintext",
                 ),
             )

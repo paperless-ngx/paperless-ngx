@@ -1,4 +1,5 @@
 import { DatePipe } from '@angular/common'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
@@ -6,85 +7,60 @@ import {
 import {
   ComponentFixture,
   TestBed,
+  discardPeriodicTasks,
   fakeAsync,
   tick,
-  discardPeriodicTasks,
 } from '@angular/core/testing'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import {
-  Router,
   ActivatedRoute,
-  convertToParamMap,
+  Router,
   RouterModule,
+  convertToParamMap,
 } from '@angular/router'
 import {
-  NgbModal,
-  NgbModule,
-  NgbModalModule,
-  NgbModalRef,
   NgbDateStruct,
+  NgbModal,
+  NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgSelectModule } from '@ng-select/ng-select'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
-import {
-  FILTER_FULLTEXT_MORELIKE,
-  FILTER_CORRESPONDENT,
-  FILTER_DOCUMENT_TYPE,
-  FILTER_STORAGE_PATH,
-  FILTER_HAS_TAGS_ALL,
-  FILTER_CREATED_AFTER,
-  FILTER_CREATED_BEFORE,
-} from 'src/app/data/filter-rule-type'
 import { Correspondent } from 'src/app/data/correspondent'
+import { CustomFieldDataType } from 'src/app/data/custom-field'
+import { DataType } from 'src/app/data/datatype'
 import { Document } from 'src/app/data/document'
 import { DocumentType } from 'src/app/data/document-type'
+import {
+  FILTER_CORRESPONDENT,
+  FILTER_CREATED_AFTER,
+  FILTER_CREATED_BEFORE,
+  FILTER_DOCUMENT_TYPE,
+  FILTER_FULLTEXT_MORELIKE,
+  FILTER_HAS_TAGS_ALL,
+  FILTER_STORAGE_PATH,
+} from 'src/app/data/filter-rule-type'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
-import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
-import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
-import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
-import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
-import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
-import { DateComponent } from '../common/input/date/date.component'
-import { NumberComponent } from '../common/input/number/number.component'
-import { PermissionsFormComponent } from '../common/input/permissions/permissions-form/permissions-form.component'
-import { SelectComponent } from '../common/input/select/select.component'
-import { TagsComponent } from '../common/input/tags/tags.component'
-import { TextComponent } from '../common/input/text/text.component'
-import { PageHeaderComponent } from '../common/page-header/page-header.component'
-import { DocumentNotesComponent } from '../document-notes/document-notes.component'
-import { DocumentDetailComponent } from './document-detail.component'
-import { ShareLinksDropdownComponent } from '../common/share-links-dropdown/share-links-dropdown.component'
-import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
-import { CustomFieldDataType } from 'src/app/data/custom-field'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { environment } from 'src/environments/environment'
-import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
-import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
-import { DeletePagesConfirmDialogComponent } from '../common/confirm-dialog/delete-pages-confirm-dialog/delete-pages-confirm-dialog.component'
-import { PdfViewerModule } from 'ng2-pdf-viewer'
-import { DataType } from 'src/app/data/datatype'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { TagService } from 'src/app/services/rest/tag.service'
+import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
+import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
+import { DocumentDetailComponent } from './document-detail.component'
 
 const doc: Document = {
   id: 3,
@@ -158,41 +134,10 @@ describe('DocumentDetailComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        DocumentDetailComponent,
-        DocumentTitlePipe,
-        PageHeaderComponent,
-        IfPermissionsDirective,
-        TagsComponent,
-        SelectComponent,
-        TextComponent,
-        NumberComponent,
-        DateComponent,
-        DocumentNotesComponent,
-        CustomDatePipe,
-        DocumentTypeEditDialogComponent,
-        CorrespondentEditDialogComponent,
-        StoragePathEditDialogComponent,
-        IfOwnerDirective,
-        PermissionsFormComponent,
-        SafeHtmlPipe,
-        ConfirmDialogComponent,
-        SafeUrlPipe,
-        ShareLinksDropdownComponent,
-        CustomFieldsDropdownComponent,
-        SplitConfirmDialogComponent,
-        RotateConfirmDialogComponent,
-        DeletePagesConfirmDialogComponent,
-      ],
       imports: [
+        DocumentDetailComponent,
         RouterModule.forRoot(routes),
-        NgbModule,
-        NgSelectModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NgbModalModule,
         NgxBootstrapIconsModule.pick(allIcons),
-        PdfViewerModule,
       ],
       providers: [
         DocumentTitlePipe,
@@ -772,6 +717,15 @@ describe('DocumentDetailComponent', () => {
     expect(component.previewNumPages).toEqual(1000)
   })
 
+  it('should include delay of 300ms after previewloaded before showing pdf', fakeAsync(() => {
+    initNormally()
+    expect(component.previewLoaded).toBeFalsy()
+    component.pdfPreviewLoaded({ numPages: 1000 } as any)
+    expect(component.previewNumPages).toEqual(1000)
+    tick(300)
+    expect(component.previewLoaded).toBeTruthy()
+  }))
+
   it('should support zoom controls', () => {
     initNormally()
     component.onZoomSelect({ target: { value: '1' } } as any) // from select
@@ -919,7 +873,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should display built-in pdf viewer if not disabled', () => {
     initNormally()
-    component.metadata = { has_archive_version: true }
+    component.document.archived_file_name = 'file.pdf'
     jest.spyOn(settingsService, 'get').mockReturnValue(false)
     expect(component.useNativePdfViewer).toBeFalsy()
     fixture.detectChanges()
@@ -928,7 +882,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should display native pdf viewer if enabled', () => {
     initNormally()
-    component.metadata = { has_archive_version: true }
+    component.document.archived_file_name = 'file.pdf'
     jest.spyOn(settingsService, 'get').mockReturnValue(true)
     expect(component.useNativePdfViewer).toBeTruthy()
     fixture.detectChanges()
@@ -1070,8 +1024,8 @@ describe('DocumentDetailComponent', () => {
   })
 
   it('should change preview element by render type', () => {
-    component.metadata = { has_archive_version: true }
     initNormally()
+    component.document.archived_file_name = 'file.pdf'
     fixture.detectChanges()
     expect(component.archiveContentRenderType).toEqual(
       component.ContentRenderType.PDF
@@ -1080,10 +1034,8 @@ describe('DocumentDetailComponent', () => {
       fixture.debugElement.query(By.css('pdf-viewer-container'))
     ).not.toBeUndefined()
 
-    component.metadata = {
-      has_archive_version: false,
-      original_mime_type: 'text/plain',
-    }
+    component.document.archived_file_name = undefined
+    component.document.mime_type = 'text/plain'
     fixture.detectChanges()
     expect(component.archiveContentRenderType).toEqual(
       component.ContentRenderType.Text
@@ -1092,10 +1044,7 @@ describe('DocumentDetailComponent', () => {
       fixture.debugElement.query(By.css('div.preview-sticky'))
     ).not.toBeUndefined()
 
-    component.metadata = {
-      has_archive_version: false,
-      original_mime_type: 'image/jpg',
-    }
+    component.document.mime_type = 'image/jpeg'
     fixture.detectChanges()
     expect(component.archiveContentRenderType).toEqual(
       component.ContentRenderType.Image
@@ -1103,13 +1052,9 @@ describe('DocumentDetailComponent', () => {
     expect(
       fixture.debugElement.query(By.css('.preview-sticky img'))
     ).not.toBeUndefined()
-
-    component.metadata = {
-      has_archive_version: false,
-      original_mime_type:
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    }
-    fixture.detectChanges()
+    ;(component.document.mime_type =
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
+      fixture.detectChanges()
     expect(component.archiveContentRenderType).toEqual(
       component.ContentRenderType.Other
     )
@@ -1219,6 +1164,14 @@ describe('DocumentDetailComponent', () => {
     )
     expect(saveSpy).toHaveBeenCalled()
 
+    jest.spyOn(openDocumentsService, 'isDirty').mockReturnValue(true)
+    jest.spyOn(component, 'hasNext').mockReturnValue(true)
+    const saveNextSpy = jest.spyOn(component, 'saveEditNext')
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 's', ctrlKey: true, shiftKey: true })
+    )
+    expect(saveNextSpy).toHaveBeenCalled()
+
     const closeSpy = jest.spyOn(component, 'close')
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'escape' }))
     expect(closeSpy).toHaveBeenCalled()
@@ -1259,5 +1212,47 @@ describe('DocumentDetailComponent', () => {
     expect(component.createDisabled(DataType.DocumentType)).toBeFalsy()
     expect(component.createDisabled(DataType.StoragePath)).toBeFalsy()
     expect(component.createDisabled(DataType.Tag)).toBeFalsy()
+  })
+
+  it('should call tryRenderTiff when no archive and file is tiff', () => {
+    initNormally()
+    const tiffRenderSpy = jest.spyOn(
+      DocumentDetailComponent.prototype as any,
+      'tryRenderTiff'
+    )
+    const doc = Object.assign({}, component.document)
+    doc.archived_file_name = null
+    doc.mime_type = 'image/tiff'
+    jest
+      .spyOn(documentService, 'getMetadata')
+      .mockReturnValue(
+        of({ has_archive_version: false, original_mime_type: 'image/tiff' })
+      )
+    component.updateComponent(doc)
+    fixture.detectChanges()
+    expect(component.archiveContentRenderType).toEqual(
+      component.ContentRenderType.TIFF
+    )
+    expect(tiffRenderSpy).toHaveBeenCalled()
+  })
+
+  it('should try to render tiff and show error if failed', () => {
+    initNormally()
+    // just the text request
+    httpTestingController.expectOne(component.previewUrl)
+
+    // invalid tiff
+    component['tryRenderTiff']()
+    httpTestingController
+      .expectOne(component.previewUrl)
+      .flush(new ArrayBuffer(100)) // arraybuffer
+    expect(component.tiffError).not.toBeUndefined()
+
+    // http error
+    component['tryRenderTiff']()
+    httpTestingController
+      .expectOne(component.previewUrl)
+      .error(new ErrorEvent('failed'))
+    expect(component.tiffError).not.toBeUndefined()
   })
 })

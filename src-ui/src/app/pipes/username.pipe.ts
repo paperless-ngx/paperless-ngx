@@ -1,11 +1,12 @@
 import { Pipe, PipeTransform } from '@angular/core'
-import { UserService } from '../services/rest/user.service'
+import { catchError, map, Observable, of } from 'rxjs'
+import { User } from '../data/user'
 import {
   PermissionAction,
-  PermissionType,
   PermissionsService,
+  PermissionType,
 } from '../services/permissions.service'
-import { User } from '../data/user'
+import { UserService } from '../services/rest/user.service'
 
 @Pipe({
   name: 'username',
@@ -14,23 +15,27 @@ export class UsernamePipe implements PipeTransform {
   users: User[]
 
   constructor(
-    permissionsService: PermissionsService,
-    userService: UserService
-  ) {
+    private permissionsService: PermissionsService,
+    private userService: UserService
+  ) {}
+
+  transform(userID: number): Observable<string> {
     if (
-      permissionsService.currentUserCan(
+      this.permissionsService.currentUserCan(
         PermissionAction.View,
         PermissionType.User
       )
     ) {
-      userService.listAll().subscribe((r) => (this.users = r.results))
+      return this.userService.listAll().pipe(
+        map((users) => {
+          this.users = users.results
+          return this.getName(this.users.find((u) => u.id === userID))
+        }),
+        catchError(() => of(''))
+      )
+    } else {
+      return of($localize`Shared`)
     }
-  }
-
-  transform(userID: number): string {
-    return this.users
-      ? (this.getName(this.users.find((u) => u.id === userID)) ?? '')
-      : $localize`Shared`
   }
 
   getName(user: User): string {

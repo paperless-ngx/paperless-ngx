@@ -1,13 +1,12 @@
-import { TestBed } from '@angular/core/testing'
-import { UsernamePipe } from './username.pipe'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
+import { TestBed } from '@angular/core/testing'
 import { environment } from 'src/environments/environment'
 import { PermissionsService } from '../services/permissions.service'
-import { UserService } from '../services/rest/user.service'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { UsernamePipe } from './username.pipe'
 
 describe('UsernamePipe', () => {
   let pipe: UsernamePipe
@@ -38,7 +37,11 @@ describe('UsernamePipe', () => {
     httpTestingController.verify()
   })
 
-  it('should transform user id to username', () => {
+  it('should transform user id to username', (done) => {
+    pipe.transform(2).subscribe((username) => {
+      expect(username).toEqual('username2')
+    })
+
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}users/?page=1&page_size=100000`
     )
@@ -56,24 +59,39 @@ describe('UsernamePipe', () => {
         },
       ],
     })
+    pipe.transform(3).subscribe((username) => {
+      expect(username).toEqual('User Name3')
+    })
 
-    let username = pipe.transform(2)
-    expect(username).toEqual('username2')
-
-    username = pipe.transform(3)
-    expect(username).toEqual('User Name3')
-
-    username = pipe.transform(4)
-    expect(username).toEqual('')
+    pipe.transform(4).subscribe((username) => {
+      expect(username).toEqual('')
+      done()
+    })
   })
 
-  it('should show generic label when no users retrieved', () => {
+  it('should show generic label when insufficient permissions', (done) => {
+    jest
+      .spyOn(permissionsService, 'currentUserCan')
+      .mockImplementation((action, type) => {
+        return false
+      })
+    pipe.transform(4).subscribe((username) => {
+      expect(username).toEqual('Shared')
+      done()
+    })
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}users/?page=1&page_size=100000`
+    )
+  })
+
+  it('should show empty string when no users retrieved due to error', (done) => {
+    pipe.transform(4).subscribe((username) => {
+      expect(username).toEqual('')
+      done()
+    })
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}users/?page=1&page_size=100000`
     )
-    req.flush(null)
-
-    let username = pipe.transform(4)
-    expect(username).toEqual('Shared')
+    req.error(new ProgressEvent('error'))
   })
 })

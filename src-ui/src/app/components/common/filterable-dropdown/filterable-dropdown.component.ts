@@ -1,21 +1,29 @@
+import { NgClass } from '@angular/common'
 import {
   Component,
+  ElementRef,
   EventEmitter,
   Input,
-  Output,
-  ElementRef,
-  ViewChild,
   OnInit,
-  OnDestroy,
+  Output,
+  ViewChild,
 } from '@angular/core'
-import { FilterPipe } from 'src/app/pipes/filter.pipe'
-import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
-import { ToggleableItemState } from './toggleable-dropdown-button/toggleable-dropdown-button.component'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { Subject, filter, takeUntil } from 'rxjs'
 import { MatchingModel } from 'src/app/data/matching-model'
-import { Subject, filter, take, takeUntil } from 'rxjs'
-import { SelectionDataItem } from 'src/app/services/rest/document.service'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
+import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { HotKeyService } from 'src/app/services/hot-key.service'
+import { SelectionDataItem } from 'src/app/services/rest/document.service'
+import { popperOptionsReenablePreventOverflow } from 'src/app/utils/popper-options'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
+import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
+import {
+  ToggleableDropdownButtonComponent,
+  ToggleableItemState,
+} from './toggleable-dropdown-button/toggleable-dropdown-button.component'
 
 export interface ChangedItems {
   itemsToAdd: MatchingModel[]
@@ -42,11 +50,23 @@ export class FilterableDropdownSelectionModel {
   private _intersection: Intersection = Intersection.Include
   temporaryIntersection: Intersection = this._intersection
 
-  items: MatchingModel[] = []
+  private _documentCounts: SelectionDataItem[] = []
+  public set documentCounts(counts: SelectionDataItem[]) {
+    this._documentCounts = counts
+  }
 
-  get itemsSorted(): MatchingModel[] {
-    // TODO: this is getting called very often
-    return this.items.sort((a, b) => {
+  private _items: MatchingModel[] = []
+  get items(): MatchingModel[] {
+    return this._items
+  }
+
+  set items(items: MatchingModel[]) {
+    this._items = items
+    this.sortItems()
+  }
+
+  private sortItems() {
+    this._items.sort((a, b) => {
       if (a.id == null && b.id != null) {
         return -1
       } else if (a.id != null && b.id == null) {
@@ -61,6 +81,18 @@ export class FilterableDropdownSelectionModel {
         this.getNonTemporary(b.id) == ToggleableItemState.NotSelected
       ) {
         return -1
+      } else if (
+        this._documentCounts.length &&
+        this.getDocumentCount(b.id) === 0 &&
+        this.getDocumentCount(a.id) > this.getDocumentCount(b.id)
+      ) {
+        return -1
+      } else if (
+        this._documentCounts.length &&
+        this.getDocumentCount(a.id) === 0 &&
+        this.getDocumentCount(a.id) < this.getDocumentCount(b.id)
+      ) {
+        return 1
       } else {
         return a.name.localeCompare(b.name)
       }
@@ -278,6 +310,10 @@ export class FilterableDropdownSelectionModel {
     )
   }
 
+  getDocumentCount(id: number) {
+    return this._documentCounts.find((c) => c.id === id)?.document_count
+  }
+
   init(map: Map<number, ToggleableItemState>) {
     this.temporarySelectionStates = map
     this.apply()
@@ -290,6 +326,7 @@ export class FilterableDropdownSelectionModel {
     })
     this._logicalOperator = this.temporaryLogicalOperator
     this._intersection = this.temporaryIntersection
+    this.sortItems()
   }
 
   reset(complete: boolean = false) {
@@ -324,11 +361,26 @@ export class FilterableDropdownSelectionModel {
   selector: 'pngx-filterable-dropdown',
   templateUrl: './filterable-dropdown.component.html',
   styleUrls: ['./filterable-dropdown.component.scss'],
+  imports: [
+    ClearableBadgeComponent,
+    ToggleableDropdownButtonComponent,
+    FilterPipe,
+    FormsModule,
+    ReactiveFormsModule,
+    NgxBootstrapIconsModule,
+    NgbDropdownModule,
+    NgClass,
+  ],
 })
-export class FilterableDropdownComponent implements OnDestroy, OnInit {
+export class FilterableDropdownComponent
+  extends LoadingComponentWithPermissions
+  implements OnInit
+{
   @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
   @ViewChild('dropdown') dropdown: NgbDropdown
   @ViewChild('buttonItems') buttonItems: ElementRef
+
+  public popperOptions = popperOptionsReenablePreventOverflow
 
   filterText: string
 
@@ -404,6 +456,19 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
   @Input()
   createRef: (name) => void
 
+  @Input()
+  set documentCounts(counts: SelectionDataItem[]) {
+    if (counts) {
+      this.selectionModel.documentCounts = counts
+    }
+  }
+
+  @Input()
+  shortcutKey: string
+
+  @Input()
+  extraButtonTitle: string
+
   creating: boolean = false
 
   @Output()
@@ -412,18 +477,15 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
   @Output()
   opened = new EventEmitter()
 
+  @Output()
+  extraButton = new EventEmitter<ChangedItems>()
+
   get modifierToggleEnabled(): boolean {
     return this.manyToOne
       ? this.selectionModel.selectionSize() > 1 &&
           this.selectionModel.getExcludedItems().length == 0
       : !this.selectionModel.isNoneSelected()
   }
-
-  @Input()
-  documentCounts: SelectionDataItem[]
-
-  @Input()
-  shortcutKey: string
 
   get name(): string {
     return this.title ? this.title.replace(/\s/g, '_').toLowerCase() : null
@@ -433,12 +495,11 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
 
   private keyboardIndex: number
 
-  private unsubscribeNotifier: Subject<any> = new Subject()
-
   constructor(
     private filterPipe: FilterPipe,
     private hotkeyService: HotKeyService
   ) {
+    super()
     this.selectionModelChange.subscribe((updatedModel) => {
       this.modelIsDirty = updatedModel.isDirty()
     })
@@ -461,11 +522,6 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
     }
   }
 
-  ngOnDestroy(): void {
-    this.unsubscribeNotifier.next(true)
-    this.unsubscribeNotifier.complete()
-  }
-
   applyClicked() {
     if (this.selectionModel.isDirty()) {
       this.dropdown.close()
@@ -483,7 +539,7 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
   dropdownOpenChange(open: boolean): void {
     if (open) {
       setTimeout(() => {
-        this.listFilterTextInput.nativeElement.focus()
+        this.listFilterTextInput?.nativeElement.focus()
       }, 0)
       if (this.editing) {
         this.selectionModel.reset()
@@ -492,7 +548,7 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
       this.opened.next(this)
     } else {
       if (this.creating) {
-        this.dropdown.open()
+        this.dropdown?.open()
         this.creating = false
       } else {
         this.filterText = ''
@@ -533,9 +589,7 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
   }
 
   getUpdatedDocumentCount(id: number) {
-    if (this.documentCounts) {
-      return this.documentCounts.find((c) => c.id === id)?.document_count
-    }
+    return this.selectionModel.getDocumentCount(id)
   }
 
   listKeyDown(event: KeyboardEvent) {
@@ -611,5 +665,14 @@ export class FilterableDropdownComponent implements OnDestroy, OnInit {
       this.manyToOne &&
       this.selectionModel.get(item.id) !== ToggleableItemState.Selected
     )
+  }
+
+  extraButtonClicked() {
+    // don't apply changes when clicking the extra button
+    const applyOnClose = this.applyOnClose
+    this.applyOnClose = false
+    this.dropdown.close()
+    this.extraButton.emit(this.selectionModel.diff())
+    this.applyOnClose = applyOnClose
   }
 }

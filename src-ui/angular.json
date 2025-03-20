@@ -81,7 +81,8 @@
             "scripts": [],
             "allowedCommonJsDependencies": [
               "ng2-pdf-viewer",
-              "file-saver"
+              "file-saver",
+              "utif"
             ],
             "vendorChunk": true,
             "extractLicenses": false,

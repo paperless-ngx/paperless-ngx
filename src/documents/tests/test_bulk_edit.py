@@ -189,6 +189,15 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         self.assertCountEqual(kwargs["document_ids"], [self.doc2.id, self.doc3.id])
 
     def test_modify_custom_fields(self):
+        """
+        GIVEN:
+            - 2 documents with custom fields
+            - 3 custom fields
+        WHEN:
+            - Custom fields are modified using old format (list of ids)
+        THEN:
+            - Custom fields are modified for the documents
+        """
         cf = CustomField.objects.create(
             name="cf1",
             data_type=CustomField.FieldDataType.STRING,
@@ -234,6 +243,98 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         self.async_task.assert_called_once()
         args, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id, self.doc2.id])
+
+    def test_modify_custom_fields_with_values(self):
+        """
+        GIVEN:
+            - 2 documents with custom fields
+            - 3 custom fields
+        WHEN:
+            - Custom fields are modified using new format (dict)
+        THEN:
+            - Custom fields are modified for the documents
+        """
+        cf = CustomField.objects.create(
+            name="cf",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        cf1 = CustomField.objects.create(
+            name="cf1",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        cf2 = CustomField.objects.create(
+            name="cf2",
+            data_type=CustomField.FieldDataType.MONETARY,
+        )
+        cf3 = CustomField.objects.create(
+            name="cf3",
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
+        CustomFieldInstance.objects.create(
+            document=self.doc2,
+            field=cf,
+        )
+        CustomFieldInstance.objects.create(
+            document=self.doc2,
+            field=cf1,
+        )
+        CustomFieldInstance.objects.create(
+            document=self.doc2,
+            field=cf3,
+        )
+        bulk_edit.modify_custom_fields(
+            [self.doc1.id, self.doc2.id],
+            add_custom_fields={cf2.id: None, cf3.id: [self.doc3.id]},
+            remove_custom_fields=[cf.id],
+        )
+
+        self.doc1.refresh_from_db()
+        self.doc2.refresh_from_db()
+
+        self.assertEqual(
+            self.doc1.custom_fields.count(),
+            2,
+        )
+        self.assertEqual(
+            self.doc1.custom_fields.get(field=cf2).value,
+            None,
+        )
+        self.assertEqual(
+            self.doc1.custom_fields.get(field=cf3).value,
+            [self.doc3.id],
+        )
+        self.assertEqual(
+            self.doc2.custom_fields.count(),
+            3,
+        )
+        self.assertEqual(
+            self.doc2.custom_fields.get(field=cf3).value,
+            [self.doc3.id],
+        )
+        # assert reflect document link
+        self.assertEqual(
+            self.doc3.custom_fields.first().value,
+            [self.doc2.id, self.doc1.id],
+        )
+
+        self.async_task.assert_called_once()
+        args, kwargs = self.async_task.call_args
+        self.assertCountEqual(kwargs["document_ids"], [self.doc1.id, self.doc2.id])
+
+        # removal of document link cf, should also remove symmetric link
+        bulk_edit.modify_custom_fields(
+            [self.doc3.id],
+            add_custom_fields={},
+            remove_custom_fields=[cf3.id],
+        )
+        self.assertNotIn(
+            self.doc3.id,
+            self.doc1.custom_fields.filter(field=cf3).first().value,
+        )
+        self.assertNotIn(
+            self.doc3.id,
+            self.doc2.custom_fields.filter(field=cf3).first().value,
+        )
 
     def test_delete(self):
         self.assertEqual(Document.objects.count(), 5)
@@ -327,6 +428,15 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         )
         self.assertEqual(groups_with_perms.count(), 2)
 
+    @mock.patch("documents.models.Document.delete")
+    def test_delete_documents_old_uuid_field(self, m):
+        m.side_effect = Exception("Data too long for column 'transaction_id' at row 1")
+        doc_ids = [self.doc1.id, self.doc2.id, self.doc3.id]
+        bulk_edit.delete(doc_ids)
+        with self.assertLogs(level="WARNING") as cm:
+            bulk_edit.delete(doc_ids)
+            self.assertIn("possible incompatible database column", cm.output[0])
+
 
 class TestPDFActions(DirectoriesMixin, TestCase):
     def setUp(self):
@@ -389,6 +499,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             title="B",
             filename=sample2,
             mime_type="application/pdf",
+            page_count=8,
         )
         self.doc2.archive_filename = sample2_archive
         self.doc2.save()
@@ -597,7 +708,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_consume_file.assert_not_called()
 
     @mock.patch("documents.tasks.bulk_update_documents.si")
-    @mock.patch("documents.tasks.update_document_archive_file.s")
+    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.s")
     @mock.patch("celery.chord.delay")
     def test_rotate(self, mock_chord, mock_update_document, mock_update_documents):
         """
@@ -616,7 +727,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertEqual(result, "OK")
 
     @mock.patch("documents.tasks.bulk_update_documents.si")
-    @mock.patch("documents.tasks.update_document_archive_file.s")
+    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.s")
     @mock.patch("pikepdf.Pdf.save")
     def test_rotate_with_error(
         self,
@@ -644,7 +755,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             mock_update_archive_file.assert_not_called()
 
     @mock.patch("documents.tasks.bulk_update_documents.si")
-    @mock.patch("documents.tasks.update_document_archive_file.s")
+    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.s")
     @mock.patch("celery.chord.delay")
     def test_rotate_non_pdf(
         self,
@@ -670,7 +781,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             mock_chord.assert_called_once()
             self.assertEqual(result, "OK")
 
-    @mock.patch("documents.tasks.update_document_archive_file.delay")
+    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.delay")
     @mock.patch("pikepdf.Pdf.save")
     def test_delete_pages(self, mock_pdf_save, mock_update_archive_file):
         """
@@ -681,15 +792,21 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         THEN:
             - Save should be called once
             - Archive file should be updated once
+            - The document's page_count should be reduced by the number of deleted pages
         """
         doc_ids = [self.doc2.id]
+        initial_page_count = self.doc2.page_count
         pages = [1, 3]
         result = bulk_edit.delete_pages(doc_ids, pages)
         mock_pdf_save.assert_called_once()
         mock_update_archive_file.assert_called_once()
         self.assertEqual(result, "OK")
 
-    @mock.patch("documents.tasks.update_document_archive_file.delay")
+        expected_page_count = initial_page_count - len(pages)
+        self.doc2.refresh_from_db()
+        self.assertEqual(self.doc2.page_count, expected_page_count)
+
+    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.delay")
     @mock.patch("pikepdf.Pdf.save")
     def test_delete_pages_with_error(self, mock_pdf_save, mock_update_archive_file):
         """

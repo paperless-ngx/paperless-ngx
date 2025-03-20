@@ -1,11 +1,6 @@
-import { Correspondent } from './correspondent'
-import { Tag } from './tag'
-import { DocumentType } from './document-type'
-import { Observable } from 'rxjs'
-import { StoragePath } from './storage-path'
-import { ObjectWithPermissions } from './object-with-permissions'
-import { DocumentNote } from './document-note'
 import { CustomFieldInstance } from './custom-field-instance'
+import { DocumentNote } from './document-note'
+import { ObjectWithPermissions } from './object-with-permissions'
 
 export enum DisplayMode {
   TABLE = 'table',
@@ -26,6 +21,7 @@ export enum DisplayField {
   OWNER = 'owner',
   SHARED = 'shared',
   ASN = 'asn',
+  PAGE_COUNT = 'pagecount',
 }
 
 export const DEFAULT_DISPLAY_FIELDS = [
@@ -73,6 +69,10 @@ export const DEFAULT_DISPLAY_FIELDS = [
     id: DisplayField.ASN,
     name: $localize`ASN`,
   },
+  {
+    id: DisplayField.PAGE_COUNT,
+    name: $localize`Pages`,
+  },
 ]
 
 export const DEFAULT_DASHBOARD_VIEW_PAGE_SIZE = 10
@@ -94,6 +94,7 @@ export const DOCUMENT_SORT_FIELDS = [
   { field: 'modified', name: $localize`Modified` },
   { field: 'num_notes', name: $localize`Notes` },
   { field: 'owner', name: $localize`Owner` },
+  { field: 'page_count', name: $localize`Pages` },
 ]
 
 export const DOCUMENT_SORT_FIELDS_FULLTEXT = [
@@ -112,23 +113,15 @@ export interface SearchHit {
 }
 
 export interface Document extends ObjectWithPermissions {
-  correspondent$?: Observable<Correspondent>
-
   correspondent?: number
 
-  document_type$?: Observable<DocumentType>
-
   document_type?: number
-
-  storage_path$?: Observable<StoragePath>
 
   storage_path?: number
 
   title?: string
 
   content?: string
-
-  tags$?: Observable<Tag[]>
 
   tags?: number[]
 
@@ -143,6 +136,8 @@ export interface Document extends ObjectWithPermissions {
   modified?: Date
 
   added?: Date
+
+  mime_type?: string
 
   deleted_at?: Date
 
@@ -164,4 +159,6 @@ export interface Document extends ObjectWithPermissions {
 
   // write-only field
   remove_inbox_tags?: boolean
+
+  page_count?: number
 }

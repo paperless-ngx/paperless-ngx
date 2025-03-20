@@ -1,21 +1,53 @@
-import { Component, OnDestroy, OnInit } from '@angular/core'
-import { FormControl, FormGroup } from '@angular/forms'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { ProfileService } from 'src/app/services/profile.service'
-import { SocialAccount, SocialAccountProvider } from 'src/app/data/user-profile'
-import { ToastService } from 'src/app/services/toast.service'
-import { Subject, takeUntil } from 'rxjs'
 import { Clipboard } from '@angular/cdk/clipboard'
+import { Component, OnInit } from '@angular/core'
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms'
+import {
+  NgbAccordionModule,
+  NgbActiveModal,
+  NgbPopoverModule,
+} from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { takeUntil } from 'rxjs'
+import {
+  SocialAccount,
+  SocialAccountProvider,
+  TotpSettings,
+} from 'src/app/data/user-profile'
+import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
+import { ProfileService } from 'src/app/services/profile.service'
+import { ToastService } from 'src/app/services/toast.service'
+import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
+import { ConfirmButtonComponent } from '../confirm-button/confirm-button.component'
+import { PasswordComponent } from '../input/password/password.component'
+import { TextComponent } from '../input/text/text.component'
 
 @Component({
   selector: 'pngx-profile-edit-dialog',
   templateUrl: './profile-edit-dialog.component.html',
   styleUrls: ['./profile-edit-dialog.component.scss'],
+  imports: [
+    ConfirmButtonComponent,
+    TextComponent,
+    PasswordComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    SafeHtmlPipe,
+    NgbAccordionModule,
+    NgbPopoverModule,
+    NgxBootstrapIconsModule,
+  ],
 })
-export class ProfileEditDialogComponent implements OnInit, OnDestroy {
+export class ProfileEditDialogComponent
+  extends LoadingComponentWithPermissions
+  implements OnInit
+{
   public networkActive: boolean = false
   public error: any
-  private unsubscribeNotifier: Subject<any> = new Subject()
 
   public form = new FormGroup({
     email: new FormControl(''),
@@ -25,6 +57,7 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
     first_name: new FormControl(''),
     last_name: new FormControl(''),
     auth_token: new FormControl(''),
+    totp_code: new FormControl(''),
   })
 
   private currentPassword: string
@@ -38,7 +71,14 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
   private emailConfirm: string
   public showEmailConfirm: boolean = false
 
+  public isTotpEnabled: boolean = false
+  public totpSettings: TotpSettings
+  public totpSettingsLoading: boolean = false
+  public totpLoading: boolean = false
+  public recoveryCodes: string[]
+
   public copied: boolean = false
+  public codesCopied: boolean = false
 
   public socialAccounts: SocialAccount[] = []
   public socialAccountProviders: SocialAccountProvider[] = []
@@ -48,7 +88,9 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
     public activeModal: NgbActiveModal,
     private toastService: ToastService,
     private clipboard: Clipboard
-  ) {}
+  ) {
+    super()
+  }
 
   ngOnInit(): void {
     this.networkActive = true
@@ -70,6 +112,7 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
           this.onPasswordChange()
         })
         this.socialAccounts = profile.social_accounts
+        this.isTotpEnabled = profile.is_mfa_enabled
       })
 
     this.profileService
@@ -78,11 +121,6 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
       .subscribe((providers) => {
         this.socialAccountProviders = providers
       })
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribeNotifier.next(true)
-    this.unsubscribeNotifier.complete()
   }
 
   get saveDisabled(): boolean {
@@ -147,6 +185,7 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
     const passwordChanged =
       this.newPassword && this.currentPassword !== this.newPassword
     const profile = Object.assign({}, this.form.value)
+    delete profile.totp_code
     this.networkActive = true
     this.profileService
       .update(profile)
@@ -212,5 +251,82 @@ export class ProfileEditDialogComponent implements OnInit, OnDestroy {
           )
         },
       })
+  }
+
+  public gettotpSettings(): void {
+    this.totpSettingsLoading = true
+    this.profileService
+      .getTotpSettings()
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (totpSettings) => {
+          this.totpSettingsLoading = false
+          this.totpSettings = totpSettings
+        },
+        error: (error) => {
+          this.toastService.showError(
+            $localize`Error fetching TOTP settings`,
+            error
+          )
+          this.totpSettingsLoading = false
+        },
+      })
+  }
+
+  public activateTotp(): void {
+    this.totpLoading = true
+    this.form.get('totp_code').disable()
+    this.profileService
+      .activateTotp(this.totpSettings.secret, this.form.get('totp_code').value)
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (activationResponse) => {
+          this.totpLoading = false
+          this.isTotpEnabled = activationResponse.success
+          this.recoveryCodes = activationResponse.recovery_codes
+          this.form.get('totp_code').enable()
+          if (activationResponse.success) {
+            this.toastService.showInfo($localize`TOTP activated successfully`)
+          } else {
+            this.toastService.showError($localize`Error activating TOTP`)
+          }
+        },
+        error: (error) => {
+          this.totpLoading = false
+          this.form.get('totp_code').enable()
+          this.toastService.showError($localize`Error activating TOTP`, error)
+        },
+      })
+  }
+
+  public deactivateTotp(): void {
+    this.totpLoading = true
+    this.profileService
+      .deactivateTotp()
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (success) => {
+          this.totpLoading = false
+          this.isTotpEnabled = !success
+          this.recoveryCodes = null
+          if (success) {
+            this.toastService.showInfo($localize`TOTP deactivated successfully`)
+          } else {
+            this.toastService.showError($localize`Error deactivating TOTP`)
+          }
+        },
+        error: (error) => {
+          this.totpLoading = false
+          this.toastService.showError($localize`Error deactivating TOTP`, error)
+        },
+      })
+  }
+
+  public copyRecoveryCodes(): void {
+    this.clipboard.copy(this.recoveryCodes.join('\n'))
+    this.codesCopied = true
+    setTimeout(() => {
+      this.codesCopied = false
+    }, 3000)
   }
 }

@@ -6,23 +6,23 @@ on Paperless-ngx.
 Check out the source from GitHub. The repository is organized in the
 following way:
 
-- `main` always represents the latest release and will only see
-  changes when a new release is made.
-- `dev` contains the code that will be in the next release.
-- `feature-X` contains bigger changes that will be in some release, but
-  not necessarily the next one.
+-   `main` always represents the latest release and will only see
+    changes when a new release is made.
+-   `dev` contains the code that will be in the next release.
+-   `feature-X` contains bigger changes that will be in some release, but
+    not necessarily the next one.
 
 When making functional changes to Paperless-ngx, _always_ make your changes
 on the `dev` branch.
 
 Apart from that, the folder structure is as follows:
 
-- `docs/` - Documentation.
-- `src-ui/` - Code of the front end.
-- `src/` - Code of the back end.
-- `scripts/` - Various scripts that help with different parts of
-  development.
-- `docker/` - Files required to build the docker image.
+-   `docs/` - Documentation.
+-   `src-ui/` - Code of the front end.
+-   `src/` - Code of the back end.
+-   `scripts/` - Various scripts that help with different parts of
+    development.
+-   `docker/` - Files required to build the docker image.
 
 ## Contributing to Paperless-ngx
 
@@ -69,13 +69,13 @@ first-time setup.
 3.  Create `consume` and `media` directories:
 
     ```bash
-    $ mkdir -p consume media
+    mkdir -p consume media
     ```
 
 4.  Install the Python dependencies:
 
     ```bash
-    $ pipenv install --dev
+    pipenv install --dev
     ```
 
     !!! note
@@ -85,7 +85,7 @@ first-time setup.
 5.  Install pre-commit hooks:
 
     ```bash
-    $ pre-commit install
+    pre-commit install
     ```
 
 6.  Apply migrations and create a superuser for your development instance:
@@ -93,23 +93,23 @@ first-time setup.
     ```bash
     # src/
 
-    $ python3 manage.py migrate
-    $ python3 manage.py createsuperuser
+    python3 manage.py migrate
+    python3 manage.py createsuperuser
     ```
 
 7.  You can now either ...
 
-    - install redis or
+    -   install redis or
 
-    - use the included `scripts/start_services.sh` to use docker to fire
-      up a redis instance (and some other services such as tika,
-      gotenberg and a database server) or
+    -   use the included `scripts/start_services.sh` to use docker to fire
+        up a redis instance (and some other services such as tika,
+        gotenberg and a database server) or
 
-    - spin up a bare redis container
+    -   spin up a bare redis container
 
-      ```
-      $ docker run -d -p 6379:6379 --restart unless-stopped redis:latest
-      ```
+        ```
+        docker run -d -p 6379:6379 --restart unless-stopped redis:latest
+        ```
 
 8.  Continue with either back-end or front-end development – or both :-).
 
@@ -122,9 +122,9 @@ work well for development, but you can use whatever you want.
 Configure the IDE to use the `src/`-folder as the base source folder.
 Configure the following launch configurations in your IDE:
 
-- `python3 manage.py runserver`
-- `python3 manage.py document_consumer`
-- `celery --app paperless worker -l DEBUG` (or any other log level)
+-   `python3 manage.py runserver`
+-   `python3 manage.py document_consumer`
+-   `celery --app paperless worker -l DEBUG` (or any other log level)
 
 To start them all:
 
@@ -150,11 +150,11 @@ $ ng build --configuration production
 
 ### Testing
 
-- Run `pytest` in the `src/` directory to execute all tests. This also
-  generates a HTML coverage report. When runnings test, `paperless.conf`
-  is loaded as well. However, the tests rely on the default
-  configuration. This is not ideal. But for now, make sure no settings
-  except for DEBUG are overridden when testing.
+-   Run `pytest` in the `src/` directory to execute all tests. This also
+    generates a HTML coverage report. When runnings test, `paperless.conf`
+    is loaded as well. However, the tests rely on the default
+    configuration. This is not ideal. But for now, make sure no settings
+    except for DEBUG are overridden when testing.
 
 !!! note
 
@@ -176,7 +176,7 @@ The front end is built using AngularJS. In order to get started, you need Node.j
 1.  Install the Angular CLI. You might need sudo privileges to perform this command:
 
     ```bash
-    $ npm install -g @angular/cli
+    npm install -g @angular/cli
     ```
 
 2.  Make sure that it's on your path.
@@ -184,13 +184,13 @@ The front end is built using AngularJS. In order to get started, you need Node.j
 3.  Install all necessary modules:
 
     ```bash
-    $ npm install
+    npm install
     ```
 
 4.  You can launch a development server by running:
 
     ```bash
-    $ ng serve
+    ng serve
     ```
 
     This will automatically update whenever you save. However, in-place
@@ -245,14 +245,14 @@ these parts have to be translated separately.
 
 ### Front end localization
 
-- The AngularJS front end does localization according to the [Angular
-  documentation](https://angular.io/guide/i18n).
-- The source language of the project is "en_US".
-- The source strings end up in the file `src-ui/messages.xlf`.
-- The translated strings need to be placed in the
-  `src-ui/src/locale/` folder.
-- In order to extract added or changed strings from the source files,
-  call `ng extract-i18n`.
+-   The AngularJS front end does localization according to the [Angular
+    documentation](https://angular.io/guide/i18n).
+-   The source language of the project is "en_US".
+-   The source strings end up in the file `src-ui/messages.xlf`.
+-   The translated strings need to be placed in the
+    `src-ui/src/locale/` folder.
+-   In order to extract added or changed strings from the source files,
+    call `ng extract-i18n`.
 
 Adding new languages requires adding the translated files in the
 `src-ui/src/locale/` folder and adjusting a couple files.
@@ -298,18 +298,18 @@ A majority of the strings that appear in the back end appear only when
 the admin is used. However, some of these are still shown on the front
 end (such as error messages).
 
-- The django application does localization according to the [Django
-  documentation](https://docs.djangoproject.com/en/3.1/topics/i18n/translation/).
-- The source language of the project is "en_US".
-- Localization files end up in the folder `src/locale/`.
-- In order to extract strings from the application, call
-  `python3 manage.py makemessages -l en_US`. This is important after
-  making changes to translatable strings.
-- The message files need to be compiled for them to show up in the
-  application. Call `python3 manage.py compilemessages` to do this.
-  The generated files don't get committed into git, since these are
-  derived artifacts. The build pipeline takes care of executing this
-  command.
+-   The django application does localization according to the [Django
+    documentation](https://docs.djangoproject.com/en/3.1/topics/i18n/translation/).
+-   The source language of the project is "en_US".
+-   Localization files end up in the folder `src/locale/`.
+-   In order to extract strings from the application, call
+    `python3 manage.py makemessages -l en_US`. This is important after
+    making changes to translatable strings.
+-   The message files need to be compiled for them to show up in the
+    application. Call `python3 manage.py compilemessages` to do this.
+    The generated files don't get committed into git, since these are
+    derived artifacts. The build pipeline takes care of executing this
+    command.
 
 Adding new languages requires adding the translated files in the
 `src/locale/`-folder and adjusting the file
@@ -335,13 +335,13 @@ If you want to build the documentation locally, this is how you do it:
 1.  Have an active pipenv shell (`pipenv shell`) and install Python dependencies:
 
     ```bash
-    $ pipenv install --dev
+    pipenv install --dev
     ```
 
 2.  Build the documentation
 
     ```bash
-    $ mkdocs build --config-file mkdocs.yml
+    mkdocs build --config-file mkdocs.yml
     ```
 
     _alternatively..._
@@ -352,7 +352,7 @@ If you want to build the documentation locally, this is how you do it:
     something.
 
     ```bash
-    $ mkdocs serve
+    mkdocs serve
     ```
 
 ## Building the Docker image
@@ -360,10 +360,10 @@ If you want to build the documentation locally, this is how you do it:
 The docker image is primarily built by the GitHub actions workflow, but
 it can be faster when developing to build and tag an image locally.
 
-Building the image works as with any image:
+Make sure you have the `docker-buildx` package installed. Building the image works as with any image:
 
 ```
-docker build --file Dockerfile --tag paperless:local --progress simple .
+docker build --file Dockerfile --tag paperless:local .
 ```
 
 ## Extending Paperless-ngx
@@ -378,10 +378,10 @@ base code.
 Paperless-ngx uses parsers to add documents. A parser is
 responsible for:
 
-- Retrieving the content from the original
-- Creating a thumbnail
-- _optional:_ Retrieving a created date from the original
-- _optional:_ Creating an archived document from the original
+-   Retrieving the content from the original
+-   Creating a thumbnail
+-   _optional:_ Retrieving a created date from the original
+-   _optional:_ Creating an archived document from the original
 
 Custom parsers can be added to Paperless-ngx to support more file types. In
 order to do that, you need to write the parser itself and announce its
@@ -439,14 +439,37 @@ def myparser_consumer_declaration(sender, **kwargs):
     }
 ```
 
-- `parser` is a reference to a class that extends `DocumentParser`.
-- `weight` is used whenever two or more parsers are able to parse a
-  file: The parser with the higher weight wins. This can be used to
-  override the parsers provided by Paperless-ngx.
-- `mime_types` is a dictionary. The keys are the mime types your
-  parser supports and the value is the default file extension that
-  Paperless-ngx should use when storing files and serving them for
-  download. We could guess that from the file extensions, but some
-  mime types have many extensions associated with them and the Python
-  methods responsible for guessing the extension do not always return
-  the same value.
+-   `parser` is a reference to a class that extends `DocumentParser`.
+-   `weight` is used whenever two or more parsers are able to parse a
+    file: The parser with the higher weight wins. This can be used to
+    override the parsers provided by Paperless-ngx.
+-   `mime_types` is a dictionary. The keys are the mime types your
+    parser supports and the value is the default file extension that
+    Paperless-ngx should use when storing files and serving them for
+    download. We could guess that from the file extensions, but some
+    mime types have many extensions associated with them and the Python
+    methods responsible for guessing the extension do not always return
+    the same value.
+
+## Using Visual Studio Code devcontainer
+
+Another easy way to get started with development is to use Visual Studio
+Code devcontainers. This approach will create a preconfigured development
+environment with all of the required tools and dependencies.
+[Learn more about devcontainers](https://code.visualstudio.com/docs/devcontainers/containers).
+The .devcontainer/vscode/tasks.json and .devcontainer/vscode/launch.json files
+contain more information about the specific tasks and launch configurations (see the
+non-standard "description" field).
+
+To get started:
+
+1. Clone the repository on your machine and open the Paperless-ngx folder in VS Code.
+
+2. VS Code will prompt you with "Reopen in container". Do so and wait for the environment to start.
+
+3. Initialize the project by running the task **Project Setup: Run all Init Tasks**. This
+   will initialize the database tables and create a superuser. Then you can compile the front end
+   for production or run the frontend in debug mode.
+
+4. The project is ready for debugging, start either run the fullstack debug or individual debug
+   processes. Yo spin up the project without debugging run the task **Project Start: Run all Services**

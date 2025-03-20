@@ -1,12 +1,12 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { of } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
+import { DisplayField, Document } from 'src/app/data/document'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { CustomFieldDisplayComponent } from './custom-field-display.component'
-import { DisplayField, Document } from 'src/app/data/document'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 const customFields: CustomField[] = [
   { id: 1, name: 'Field 1', data_type: CustomFieldDataType.String },
@@ -17,7 +17,11 @@ const customFields: CustomField[] = [
     name: 'Field 4',
     data_type: CustomFieldDataType.Select,
     extra_data: {
-      select_options: ['Option 1', 'Option 2', 'Option 3'],
+      select_options: [
+        { label: 'Option 1', id: 'abc-123' },
+        { label: 'Option 2', id: 'def-456' },
+        { label: 'Option 3', id: 'ghi-789' },
+      ],
     },
   },
   {
@@ -45,8 +49,7 @@ describe('CustomFieldDisplayComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [CustomFieldDisplayComponent],
-      imports: [],
+      imports: [CustomFieldDisplayComponent],
       providers: [
         DocumentService,
         provideHttpClient(withInterceptorsFromDi()),
@@ -131,6 +134,8 @@ describe('CustomFieldDisplayComponent', () => {
   })
 
   it('should show select value', () => {
-    expect(component.getSelectValue(customFields[3], 2)).toEqual('Option 3')
+    expect(component.getSelectValue(customFields[3], 'ghi-789')).toEqual(
+      'Option 3'
+    )
   })
 })

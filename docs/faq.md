@@ -40,28 +40,28 @@ system. On Linux, chances are high that this location is
 You can always drag those files out of that folder to use them
 elsewhere. Here are a couple notes about that.
 
-- Paperless-ngx never modifies your original documents. It keeps
-  checksums of all documents and uses a scheduled sanity checker to
-  check that they remain the same.
-- By default, paperless uses the internal ID of each document as its
-  filename. This might not be very convenient for export. However, you
-  can adjust the way files are stored in paperless by
-  [configuring the filename format](advanced_usage.md#file-name-handling).
-- [The exporter](administration.md#exporter) is
-  another easy way to get your files out of paperless with reasonable
-  file names.
+-   Paperless-ngx never modifies your original documents. It keeps
+    checksums of all documents and uses a scheduled sanity checker to
+    check that they remain the same.
+-   By default, paperless uses the internal ID of each document as its
+    filename. This might not be very convenient for export. However, you
+    can adjust the way files are stored in paperless by
+    [configuring the filename format](advanced_usage.md#file-name-handling).
+-   [The exporter](administration.md#exporter) is
+    another easy way to get your files out of paperless with reasonable
+    file names.
 
 ## _What file types does paperless-ngx support?_
 
 **A:** Currently, the following files are supported:
 
-- PDF documents, PNG images, JPEG images, TIFF images, GIF images and
-  WebP images are processed with OCR and converted into PDF documents.
-- Plain text documents are supported as well and are added verbatim to
-  paperless.
-- With the optional Tika integration enabled (see [Tika configuration](https://docs.paperless-ngx.com/configuration#tika)),
-  Paperless also supports various Office documents (.docx, .doc, odt,
-  .ppt, .pptx, .odp, .xls, .xlsx, .ods).
+-   PDF documents, PNG images, JPEG images, TIFF images, GIF images and
+    WebP images are processed with OCR and converted into PDF documents.
+-   Plain text documents are supported as well and are added verbatim to
+    paperless.
+-   With the optional Tika integration enabled (see [Tika configuration](https://docs.paperless-ngx.com/configuration#tika)),
+    Paperless also supports various Office documents (.docx, .doc, odt,
+    .ppt, .pptx, .odp, .xls, .xlsx, .ods).
 
 Paperless-ngx determines the type of a file by inspecting its content.
 The file extensions do not matter.
@@ -127,8 +127,16 @@ ASGI-enabled web server as well that processes WebSocket connections,
 and configure Apache to redirect WebSocket connections to this server.
 Multiple options for ASGI servers exist:
 
-- `gunicorn` with `uvicorn` as the worker implementation (the default
-  of paperless)
-- `daphne` as a standalone server, which is the reference
-  implementation for ASGI.
-- `uvicorn` as a standalone server
+-   `gunicorn` with `uvicorn` as the worker implementation (the default
+    of paperless)
+-   `daphne` as a standalone server, which is the reference
+    implementation for ASGI.
+-   `uvicorn` as a standalone server
+
+## _What about the Redis licensing change and using one of the open source forks_?
+
+Currently (October 2024), forks of Redis such as Valkey or Redirect are not officially supported by our upstream
+libraries, so using one of these to replace Redis is not officially supported.
+
+However, they do claim to be compatible with the Redis protocol and will likely work, but we will
+not be updating from using Redis as the broker officially just yet.

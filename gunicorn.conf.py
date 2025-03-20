@@ -3,7 +3,7 @@ import os
 # See https://docs.gunicorn.org/en/stable/settings.html for
 # explanations of settings
 
-bind = f'{os.getenv("PAPERLESS_BIND_ADDR", "[::]")}:{os.getenv("PAPERLESS_PORT", 8000)}'
+bind = f"{os.getenv('PAPERLESS_BIND_ADDR', '[::]')}:{os.getenv('PAPERLESS_PORT', 8000)}"
 
 workers = int(os.getenv("PAPERLESS_WEBSERVER_WORKERS", 1))
 worker_class = "paperless.workers.ConfigurableWorker"

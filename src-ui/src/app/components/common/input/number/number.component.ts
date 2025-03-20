@@ -1,5 +1,10 @@
 import { Component, forwardRef, Input } from '@angular/core'
-import { NG_VALUE_ACCESSOR } from '@angular/forms'
+import {
+  FormsModule,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
+} from '@angular/forms'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { AbstractInputComponent } from '../abstract-input'
 
@@ -14,6 +19,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-number',
   templateUrl: './number.component.html',
   styleUrls: ['./number.component.scss'],
+  imports: [FormsModule, ReactiveFormsModule, NgxBootstrapIconsModule],
 })
 export class NumberComponent extends AbstractInputComponent<number> {
   @Input()

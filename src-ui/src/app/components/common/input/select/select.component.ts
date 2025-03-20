@@ -5,7 +5,14 @@ import {
   Input,
   Output,
 } from '@angular/core'
-import { NG_VALUE_ACCESSOR } from '@angular/forms'
+import {
+  FormsModule,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
+} from '@angular/forms'
+import { RouterModule } from '@angular/router'
+import { NgSelectModule } from '@ng-select/ng-select'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
@@ -19,6 +26,13 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-select',
   templateUrl: './select.component.html',
   styleUrls: ['./select.component.scss'],
+  imports: [
+    NgSelectModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class SelectComponent extends AbstractInputComponent<number> {
   constructor() {
@@ -32,11 +46,6 @@ export class SelectComponent extends AbstractInputComponent<number> {
   set items(items) {
     this._items = items
     if (items && this.value) this.checkForPrivateItems(this.value)
-  }
-
-  @Input()
-  set itemsArray(items: any[]) {
-    this._items = items.map((item, index) => ({ id: index, name: item }))
   }
 
   writeValue(newValue: any): void {

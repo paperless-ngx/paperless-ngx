@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { MatchingModel } from 'src/app/data/matching-model'
+import { TagComponent } from '../../tag/tag.component'
 
 export enum ToggleableItemState {
   NotSelected = 0,
@@ -12,6 +14,7 @@ export enum ToggleableItemState {
   selector: 'pngx-toggleable-dropdown-button',
   templateUrl: './toggleable-dropdown-button.component.html',
   styleUrls: ['./toggleable-dropdown-button.component.scss'],
+  imports: [TagComponent, NgxBootstrapIconsModule],
 })
 export class ToggleableDropdownButtonComponent {
   @Input()
@@ -29,8 +32,11 @@ export class ToggleableDropdownButtonComponent {
   @Input()
   hideCount: boolean = false
 
+  @Input()
+  opacifyCount: boolean = true
+
   @Output()
-  toggle = new EventEmitter()
+  toggled = new EventEmitter()
 
   @Output()
   exclude = new EventEmitter()
@@ -39,11 +45,15 @@ export class ToggleableDropdownButtonComponent {
     return 'is_inbox_tag' in this.item
   }
 
+  get currentCount(): number {
+    return this.count ?? this.item.document_count
+  }
+
   toggleItem(event: MouseEvent): void {
     if (this.state == ToggleableItemState.Selected) {
       this.exclude.emit()
     } else {
-      this.toggle.emit()
+      this.toggled.emit()
     }
   }
 

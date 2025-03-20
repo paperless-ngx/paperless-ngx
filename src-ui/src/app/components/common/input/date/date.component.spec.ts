@@ -1,19 +1,13 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-import {
-  FormsModule,
-  NG_VALUE_ACCESSOR,
-  ReactiveFormsModule,
-} from '@angular/forms'
-import { DateComponent } from './date.component'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import {
-  NgbDateParserFormatter,
-  NgbDatepickerModule,
-} from '@ng-bootstrap/ng-bootstrap'
-import { RouterTestingModule } from '@angular/router/testing'
-import { LocalizedDateParserFormatter } from 'src/app/utils/ngb-date-parser-formatter'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { NG_VALUE_ACCESSOR } from '@angular/forms'
+import { RouterModule } from '@angular/router'
+import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { routes } from 'src/app/app-routing.module'
+import { LocalizedDateParserFormatter } from 'src/app/utils/ngb-date-parser-formatter'
+import { DateComponent } from './date.component'
 
 describe('DateComponent', () => {
   let component: DateComponent
@@ -22,13 +16,9 @@ describe('DateComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [DateComponent],
       imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        NgbDatepickerModule,
-        RouterTestingModule,
         NgxBootstrapIconsModule.pick(allIcons),
+        RouterModule.forRoot(routes),
       ],
       providers: [
         {

@@ -45,7 +45,7 @@
       <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
-      <button ngbDropdownItem (click)="reprocess()" [disabled]="!userCanEdit">
+      <button ngbDropdownItem (click)="reprocess()" [disabled]="!userCanEdit || !userIsOwner">
         <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs>&nbsp;<span i18n>Reprocess</span>
       </button>
 
@@ -53,15 +53,15 @@
         <i-bs width="1em" height="1em" name="diagram-3"></i-bs>&nbsp;<span i18n>More like this</span>
       </button>
 
-      <button ngbDropdownItem (click)="splitDocument()" [disabled]="originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
+      <button ngbDropdownItem (click)="splitDocument()" [disabled]="!userCanAdd || originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
         <i-bs width="1em" height="1em" name="scissors"></i-bs>&nbsp;<span i18n>Split</span>
       </button>
 
-      <button ngbDropdownItem (click)="rotateDocument()" [disabled]="!userIsOwner || originalContentRenderType !== ContentRenderType.PDF">
+      <button ngbDropdownItem (click)="rotateDocument()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
         <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
       </button>
 
-      <button ngbDropdownItem (click)="deletePages()" [disabled]="!userIsOwner || originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
+      <button ngbDropdownItem (click)="deletePages()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
         <i-bs name="file-earmark-minus"></i-bs>&nbsp;<ng-container i18n>Delete page(s)</ng-container>
       </button>
     </div>
@@ -70,13 +70,13 @@
   <pngx-custom-fields-dropdown
     *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
     [documentId]="documentId"
-    [disabled]="!userIsOwner"
+    [disabled]="!userIsOwner || !userCanEdit"
     [existingFields]="document?.custom_fields"
     (created)="refreshCustomFields()"
     (added)="addField($event)">
   </pngx-custom-fields-dropdown>
 
-  <pngx-share-links-dropdown [documentId]="documentId" [hasArchiveVersion]="!!document?.archived_file_name" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }"></pngx-share-links-dropdown>
+  <pngx-share-links-dropdown [documentId]="documentId" [hasArchiveVersion]="!!document?.archived_file_name" [disabled]="!userCanEdit && !userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }"></pngx-share-links-dropdown>
 </pngx-page-header>
 
 <div class="row">
@@ -122,7 +122,7 @@
                     @case (CustomFieldDataType.String) {
                       <pngx-input-text formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userIsOwner"
+                      [removable]="userIsOwner && userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [error]="getCustomFieldError(i)"></pngx-input-text>
@@ -130,7 +130,7 @@
                     @case (CustomFieldDataType.Date) {
                       <pngx-input-date formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userIsOwner"
+                      [removable]="userIsOwner && userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [error]="getCustomFieldError(i)"></pngx-input-date>
@@ -138,7 +138,7 @@
                     @case (CustomFieldDataType.Integer) {
                       <pngx-input-number formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userIsOwner"
+                      [removable]="userIsOwner && userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [showAdd]="false"
@@ -147,7 +147,7 @@
                     @case (CustomFieldDataType.Float) {
                       <pngx-input-number formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userIsOwner"
+                      [removable]="userIsOwner && userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [showAdd]="false"
@@ -158,7 +158,7 @@
                       <pngx-input-monetary formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
                       [defaultCurrency]="getCustomFieldFromInstance(fieldInstance)?.extra_data?.default_currency"
-                      [removable]="userIsOwner"
+                      [removable]="userIsOwner && userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [error]="getCustomFieldError(i)"></pngx-input-monetary>
@@ -166,14 +166,14 @@
                     @case (CustomFieldDataType.Boolean) {
                       <pngx-input-check formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userIsOwner"
+                      [removable]="userIsOwner && userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"></pngx-input-check>
                     }
                     @case (CustomFieldDataType.Url) {
                       <pngx-input-url formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userIsOwner"
+                      [removable]="userIsOwner && userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [error]="getCustomFieldError(i)"></pngx-input-url>
@@ -182,7 +182,7 @@
                       <pngx-input-document-link formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
                       [parentDocumentID]="documentId"
-                      [removable]="userIsOwner"
+                      [removable]="userIsOwner && userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [error]="getCustomFieldError(i)"></pngx-input-document-link>
@@ -190,10 +190,11 @@
                     @case (CustomFieldDataType.Select) {
                       <pngx-input-select formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [itemsArray]="getCustomFieldFromInstance(fieldInstance)?.extra_data.select_options"
+                      [items]="getCustomFieldFromInstance(fieldInstance)?.extra_data.select_options"
+                      bindLabel="label"
                       [allowNull]="true"
                       [horizontal]="true"
-                      [removable]="userIsOwner"
+                      [removable]="userIsOwner && userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [error]="getCustomFieldError(i)"></pngx-input-select>
                     }
@@ -344,20 +345,24 @@
       @if (!hasNext()) {
         <button type="button" class="order-2 btn btn-sm btn-outline-primary" (click)="save(true)" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save &amp; close</button>
       }
+      <button type="button" class="order-0 btn btn-sm btn-outline-secondary" (click)="discard()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Discard</button>
     </ng-container>
-    <button type="button" class="order-0 btn btn-sm btn-outline-secondary" (click)="discard()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Discard</button>
   </div>
 </ng-template>
 
 <ng-template #previewContent>
-  @if (!metadata) {
-    <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+  <div class="thumb-preview position-absolute pe-none" [class.fade]="previewLoaded">
+    @if (showThumbnailOverlay) {
+      <img [src]="thumbUrl | safeUrl" class="" width="100%" height="auto" alt="Document loading..." i18n-alt />
+    }
+    <div class="position-absolute top-0 start-0 m-2 p-2 d-flex align-items-center justify-content-center">
       <div>
         <div class="spinner-border spinner-border-sm me-2" role="status"></div>
         <ng-container i18n>Loading...</ng-container>
       </div>
     </div>
-  } @else {
+  </div>
+  @if (document) {
     @switch (archiveContentRenderType) {
       @case (ContentRenderType.PDF) {
         @if (!useNativePdfViewer) {
@@ -379,12 +384,21 @@
         }
       }
       @case (ContentRenderType.Text) {
-        <div class="preview-sticky bg-light p-3 overflow-auto" width="100%">{{previewText}}</div>
+        <div class="preview-sticky bg-light p-3 overflow-auto whitespace-preserve" width="100%">{{previewText}}</div>
       }
       @case (ContentRenderType.Image) {
         <div class="preview-sticky">
           <img [src]="previewUrl | safeUrl" width="100%" height="100%" alt="{{title}}" />
         </div>
+      }
+      @case (ContentRenderType.TIFF) {
+        @if (!tiffError) {
+          <div class="preview-sticky">
+            <img [src]="tiffURL" width="100%" height="100%" alt="{{title}}" />
+          </div>
+        } @else {
+          <div class="preview-sticky bg-light p-3 overflow-auto whitespace-preserve" width="100%">{{tiffError}}</div>
+        }
       }
       @case (ContentRenderType.Other) {
         <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>

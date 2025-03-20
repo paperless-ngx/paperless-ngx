@@ -1,45 +1,47 @@
+import { CdkDragDrop } from '@angular/cdk/drag-drop'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of } from 'rxjs'
-import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
-import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
-import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
-import { StoragePathService } from 'src/app/services/rest/storage-path.service'
-import { SettingsService } from 'src/app/services/settings.service'
-import { NumberComponent } from '../../input/number/number.component'
-import { PermissionsGroupComponent } from '../../input/permissions/permissions-group/permissions-group.component'
-import { PermissionsUserComponent } from '../../input/permissions/permissions-user/permissions-user.component'
-import { SelectComponent } from '../../input/select/select.component'
-import { TagsComponent } from '../../input/tags/tags.component'
-import { TextComponent } from '../../input/text/text.component'
-import { SwitchComponent } from '../../input/switch/switch.component'
-import { EditDialogMode } from '../edit-dialog.component'
-import {
-  DOCUMENT_SOURCE_OPTIONS,
-  WORKFLOW_ACTION_OPTIONS,
-  WORKFLOW_TYPE_OPTIONS,
-  WorkflowEditDialogComponent,
-} from './workflow-edit-dialog.component'
-import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { CustomFieldDataType } from 'src/app/data/custom-field'
+import { MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model'
 import { Workflow } from 'src/app/data/workflow'
-import {
-  WorkflowTriggerType,
-  DocumentSource,
-} from 'src/app/data/workflow-trigger'
-import { CdkDragDrop } from '@angular/cdk/drag-drop'
 import {
   WorkflowAction,
   WorkflowActionType,
 } from 'src/app/data/workflow-action'
-import { MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model'
+import {
+  DocumentSource,
+  WorkflowTriggerType,
+} from 'src/app/data/workflow-trigger'
+import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
+import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
+import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ConfirmButtonComponent } from '../../confirm-button/confirm-button.component'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { NumberComponent } from '../../input/number/number.component'
+import { PermissionsGroupComponent } from '../../input/permissions/permissions-group/permissions-group.component'
+import { PermissionsUserComponent } from '../../input/permissions/permissions-user/permissions-user.component'
+import { SelectComponent } from '../../input/select/select.component'
+import { SwitchComponent } from '../../input/switch/switch.component'
+import { TagsComponent } from '../../input/tags/tags.component'
+import { TextComponent } from '../../input/text/text.component'
+import { EditDialogMode } from '../edit-dialog.component'
+import {
+  DOCUMENT_SOURCE_OPTIONS,
+  SCHEDULE_DATE_FIELD_OPTIONS,
+  WORKFLOW_ACTION_OPTIONS,
+  WORKFLOW_TYPE_OPTIONS,
+  WorkflowEditDialogComponent,
+} from './workflow-edit-dialog.component'
 
 const workflow: Workflow = {
   name: 'Workflow 1',
@@ -75,7 +77,11 @@ describe('WorkflowEditDialogComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgSelectModule,
+        NgbModule,
         WorkflowEditDialogComponent,
         IfPermissionsDirective,
         IfOwnerDirective,
@@ -89,7 +95,6 @@ describe('WorkflowEditDialogComponent', () => {
         SafeHtmlPipe,
         ConfirmButtonComponent,
       ],
-      imports: [FormsModule, ReactiveFormsModule, NgSelectModule, NgbModule],
       providers: [
         NgbActiveModal,
         {
@@ -148,7 +153,18 @@ describe('WorkflowEditDialogComponent', () => {
           useValue: {
             listAll: () =>
               of({
-                results: [],
+                results: [
+                  {
+                    id: 1,
+                    name: 'cf1',
+                    data_type: CustomFieldDataType.String,
+                  },
+                  {
+                    id: 2,
+                    name: 'cf2',
+                    data_type: CustomFieldDataType.Date,
+                  },
+                ],
               }),
           },
         },
@@ -186,8 +202,9 @@ describe('WorkflowEditDialogComponent', () => {
     expect(editTitleSpy).toHaveBeenCalled()
   })
 
-  it('should return source options, type options, type name', () => {
-    // coverage
+  it('should return source options, type options, type name, schedule date field options', () => {
+    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+    component.ngOnInit()
     expect(component.sourceOptions).toEqual(DOCUMENT_SOURCE_OPTIONS)
     expect(component.triggerTypeOptions).toEqual(WORKFLOW_TYPE_OPTIONS)
     expect(
@@ -200,6 +217,16 @@ describe('WorkflowEditDialogComponent', () => {
       component.getActionTypeOptionName(WorkflowActionType.Assignment)
     ).toEqual('Assignment')
     expect(component.getActionTypeOptionName(null)).toEqual('')
+    expect(component.scheduleDateFieldOptions).toEqual(
+      SCHEDULE_DATE_FIELD_OPTIONS
+    )
+
+    // Email disabled
+    jest.spyOn(settingsService, 'get').mockReturnValue(false)
+    component.ngOnInit()
+    expect(component.actionTypeOptions).toEqual(
+      WORKFLOW_ACTION_OPTIONS.filter((a) => a.id !== WorkflowActionType.Email)
+    )
   })
 
   it('should support add and remove triggers and actions', () => {
@@ -330,5 +357,16 @@ describe('WorkflowEditDialogComponent', () => {
     expect(
       component.actionFields.at(0).get('remove_change_groups').disabled
     ).toBeFalsy()
+  })
+
+  it('should prune empty nested objects on save', () => {
+    component.object = workflow
+    component.addTrigger()
+    component.addAction()
+    expect(component.objectForm.get('actions').value[0].email).not.toBeNull()
+    expect(component.objectForm.get('actions').value[0].webhook).not.toBeNull()
+    component.save()
+    expect(component.objectForm.get('actions').value[0].email).toBeNull()
+    expect(component.objectForm.get('actions').value[0].webhook).toBeNull()
   })
 })

@@ -1,6 +1,6 @@
 <div class="row flex-wrap row-gap-3" tourAnchor="tour.documents-filter-editor">
   <div class="col">
-    <div class="form-inline d-flex align-items-center">
+    <div class="form-inline d-flex align-items-center fade" [class.show]="show">
       <div class="input-group input-group-sm flex-fill w-auto flex-nowrap">
         <div ngbDropdown>
           <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>{{textFilterTargetName}}</button>
@@ -35,8 +35,8 @@
   <div class="col-auto">
     <div class="d-flex flex-wrap gap-3">
       <div class="d-flex flex-wrap gap-2">
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Tag)) {
-          <pngx-filterable-dropdown class="flex-fill" title="Tags" icon="tag-fill" i18n-title
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Tag) && tags.length > 0) {
+          <pngx-filterable-dropdown class="flex-fill fade" [class.show]="show" title="Tags" icon="tag-fill" i18n-title
           filterPlaceholder="Filter tags" i18n-filterPlaceholder
           [items]="tags"
           [manyToOne]="true"
@@ -48,8 +48,8 @@
           [disabled]="disabled"
           shortcutKey="t"></pngx-filterable-dropdown>
         }
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
-          <pngx-filterable-dropdown class="flex-fill" title="Correspondent" icon="person-fill" i18n-title
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Correspondent) && correspondents.length > 0) {
+          <pngx-filterable-dropdown class="flex-fill fade" [class.show]="show" title="Correspondent" icon="person-fill" i18n-title
           filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
           [items]="correspondents"
           [(selectionModel)]="correspondentSelectionModel"
@@ -60,8 +60,8 @@
           [disabled]="disabled"
           shortcutKey="y"></pngx-filterable-dropdown>
         }
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
-            <pngx-filterable-dropdown class="flex-fill" title="Document type" icon="file-earmark-fill" i18n-title
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.DocumentType) && documentTypes.length > 0) {
+            <pngx-filterable-dropdown class="flex-fill fade" [class.show]="show" title="Document type" icon="file-earmark-fill" i18n-title
             filterPlaceholder="Filter document types" i18n-filterPlaceholder
             [items]="documentTypes"
             [(selectionModel)]="documentTypeSelectionModel"
@@ -73,7 +73,7 @@
             shortcutKey="u"></pngx-filterable-dropdown>
         }
         @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.StoragePath) && storagePaths.length > 0) {
-          <pngx-filterable-dropdown class="flex-fill" title="Storage path" icon="folder-fill" i18n-title
+          <pngx-filterable-dropdown class="flex-fill fade" [class.show]="show" title="Storage path" icon="folder-fill" i18n-title
           filterPlaceholder="Filter storage paths" i18n-filterPlaceholder
           [items]="storagePaths"
           [(selectionModel)]="storagePathSelectionModel"
@@ -86,17 +86,12 @@
         }
 
         @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.CustomField) && customFields.length > 0) {
-          <pngx-filterable-dropdown class="flex-fill" title="Custom fields" icon="ui-radios" i18n-title
-          filterPlaceholder="Filter custom fields" i18n-filterPlaceholder
-          [items]="customFields"
-          [manyToOne]="true"
-          [(selectionModel)]="customFieldSelectionModel"
+          <pngx-custom-fields-query-dropdown class="flex-fill fade" [class.show]="show" title="Custom fields" icon="ui-radios" i18n-title
+          [(selectionModel)]="customFieldQueriesModel"
           (selectionModelChange)="updateRules()"
-          (opened)="onCustomFieldsDropdownOpen()"
-          [documentCounts]="customFieldDocumentCounts"
-          [allowSelectNone]="true"></pngx-filterable-dropdown>
+          ></pngx-custom-fields-query-dropdown>
         }
-        <pngx-dates-dropdown
+        <pngx-dates-dropdown class="flex-fill fade" [class.show]="show"
           title="Dates" i18n-title
           (datesSet)="updateRules()"
           [(createdDateBefore)]="dateCreatedBefore"
@@ -106,7 +101,7 @@
           [(addedDateAfter)]="dateAddedAfter"
           [(addedRelativeDate)]="dateAddedRelativeDate">
         </pngx-dates-dropdown>
-        <pngx-permissions-filter-dropdown
+        <pngx-permissions-filter-dropdown class="flex-fill fade" [class.show]="show"
           title="Permissions" i18n-title
           (ownerFilterSet)="updateRules()"
         [(selectionModel)]="permissionsSelectionModel"></pngx-permissions-filter-dropdown>

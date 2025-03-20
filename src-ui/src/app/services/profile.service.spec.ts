@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing'
 
-import { ProfileService } from './profile.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { environment } from 'src/environments/environment'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { ProfileService } from './profile.service'
 
 describe('ProfileService', () => {
   let httpTestingController: HttpTestingController
@@ -71,5 +71,33 @@ describe('ProfileService', () => {
       `${environment.apiBaseUrl}profile/social_account_providers/`
     )
     expect(req.request.method).toEqual('GET')
+  })
+
+  it('calls get totp settings endpoint', () => {
+    service.getTotpSettings().subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}profile/totp/`
+    )
+    expect(req.request.method).toEqual('GET')
+  })
+
+  it('calls activate totp endpoint', () => {
+    service.activateTotp('secret', 'code').subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}profile/totp/`
+    )
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body).toEqual({
+      secret: 'secret',
+      code: 'code',
+    })
+  })
+
+  it('calls deactivate totp endpoint', () => {
+    service.deactivateTotp().subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}profile/totp/`
+    )
+    expect(req.request.method).toEqual('DELETE')
   })
 })

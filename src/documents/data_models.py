@@ -2,7 +2,6 @@ import dataclasses
 import datetime
 from enum import IntEnum
 from pathlib import Path
-from typing import Optional
 
 import magic
 from guardian.shortcuts import get_groups_with_perms
@@ -17,20 +16,20 @@ class DocumentMetadataOverrides:
     meaning no override is happening
     """
 
-    filename: Optional[str] = None
-    title: Optional[str] = None
-    correspondent_id: Optional[int] = None
-    document_type_id: Optional[int] = None
-    tag_ids: Optional[list[int]] = None
-    storage_path_id: Optional[int] = None
-    created: Optional[datetime.datetime] = None
-    asn: Optional[int] = None
-    owner_id: Optional[int] = None
-    view_users: Optional[list[int]] = None
-    view_groups: Optional[list[int]] = None
-    change_users: Optional[list[int]] = None
-    change_groups: Optional[list[int]] = None
-    custom_field_ids: Optional[list[int]] = None
+    filename: str | None = None
+    title: str | None = None
+    correspondent_id: int | None = None
+    document_type_id: int | None = None
+    tag_ids: list[int] | None = None
+    storage_path_id: int | None = None
+    created: datetime.datetime | None = None
+    asn: int | None = None
+    owner_id: int | None = None
+    view_users: list[int] | None = None
+    view_groups: list[int] | None = None
+    change_users: list[int] | None = None
+    change_groups: list[int] | None = None
+    custom_field_ids: list[int] | None = None
 
     def update(self, other: "DocumentMetadataOverrides") -> "DocumentMetadataOverrides":
         """
@@ -156,7 +155,7 @@ class ConsumableDocument:
 
     source: DocumentSource
     original_file: Path
-    mailrule_id: Optional[int] = None
+    mailrule_id: int | None = None
     mime_type: str = dataclasses.field(init=False, default=None)
 
     def __post_init__(self):

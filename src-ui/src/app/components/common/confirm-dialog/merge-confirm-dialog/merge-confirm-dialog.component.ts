@@ -1,16 +1,28 @@
+import {
+  CdkDragDrop,
+  DragDropModule,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop'
 import { Component, OnInit } from '@angular/core'
-import { ConfirmDialogComponent } from '../confirm-dialog.component'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { DocumentService } from 'src/app/services/rest/document.service'
-import { PermissionsService } from 'src/app/services/permissions.service'
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop'
-import { Subject, takeUntil } from 'rxjs'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { takeUntil } from 'rxjs'
 import { Document } from 'src/app/data/document'
+import { PermissionsService } from 'src/app/services/permissions.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
+import { ConfirmDialogComponent } from '../confirm-dialog.component'
 
 @Component({
   selector: 'pngx-merge-confirm-dialog',
   templateUrl: './merge-confirm-dialog.component.html',
   styleUrl: './merge-confirm-dialog.component.scss',
+  imports: [
+    DragDropModule,
+    FormsModule,
+    ReactiveFormsModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class MergeConfirmDialogComponent
   extends ConfirmDialogComponent
@@ -24,8 +36,6 @@ export class MergeConfirmDialogComponent
   }
 
   public metadataDocumentID: number = -1
-
-  private unsubscribeNotifier: Subject<any> = new Subject()
 
   constructor(
     activeModal: NgbActiveModal,

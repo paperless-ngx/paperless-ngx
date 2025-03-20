@@ -56,7 +56,8 @@ export interface CustomField extends ObjectWithId {
   name: string
   created?: Date
   extra_data?: {
-    select_options?: string[]
+    select_options?: Array<{ label: string; id: string }>
     default_currency?: string
   }
+  document_count?: number
 }

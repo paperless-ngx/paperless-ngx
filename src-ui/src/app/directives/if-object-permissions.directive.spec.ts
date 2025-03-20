@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { IfObjectPermissionsDirective } from './if-object-permissions.directive'
 import { PermissionsService } from '../services/permissions.service'
+import { IfObjectPermissionsDirective } from './if-object-permissions.directive'
 
 @Component({
   template: `
@@ -16,6 +16,7 @@ import { PermissionsService } from '../services/permissions.service'
       </button>
     </div>
   `,
+  imports: [IfObjectPermissionsDirective],
 })
 class TestComponent {}
 
@@ -25,7 +26,7 @@ describe('IfObjectPermissionsDirective', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [IfObjectPermissionsDirective, TestComponent],
+      imports: [IfObjectPermissionsDirective, TestComponent],
       providers: [PermissionsService],
     })
     permissionsService = TestBed.inject(PermissionsService)
