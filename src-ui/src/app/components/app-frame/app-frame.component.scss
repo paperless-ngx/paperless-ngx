@@ -244,7 +244,7 @@ main {
   }
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (min-width: 366px) and (max-width: 768px) {
   .navbar-toggler {
     // compensate for 2 buttons on the right
     margin-right: 45px;
@@ -254,6 +254,13 @@ main {
 @media screen and (min-width: 768px) {
   .navbar-brand.slim {
     max-width: 50px;
+  }
+}
+
+@media screen and (max-width: 345px) {
+  .custom-title {
+    max-width: 102px;
+    overflow: hidden;
   }
 }
 
