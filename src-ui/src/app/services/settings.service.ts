@@ -602,7 +602,6 @@ export class SettingsService {
         )
       } catch (error) {
         this.toastService.showError(errorMessage)
-        console.log(error)
       }
 
       this.storeSettings()
@@ -614,7 +613,6 @@ export class SettingsService {
           },
           error: (e) => {
             this.toastService.showError(errorMessage)
-            console.log(e)
           },
         })
     }
@@ -636,7 +634,6 @@ export class SettingsService {
             this.toastService.showError(
               'Error migrating update checking setting'
             )
-            console.log(e)
           },
         })
     }

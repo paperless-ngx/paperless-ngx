@@ -492,11 +492,9 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     component.selectionModel.items = items
     component.selectionModel = selectionModel
     component.selectionModel.intersection = Intersection.Include
-    console.log(component.selectionModel.items[0])
     component.selectionModel.set(null, ToggleableItemState.Selected)
     component.selectionModel.intersection = Intersection.Exclude
     component.selectionModel.toggleIntersection()
-    console.log(component.selectionModel)
     expect(component.selectionModel.getExcludedItems()).toEqual([
       negativeNullItem,
     ])
