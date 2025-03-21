@@ -580,14 +580,23 @@ class DocumentViewSet(
 
     def update(self, request, *args, **kwargs):
         response = super().update(request, *args, **kwargs)
+        try:
+            doc = self.get_object()
+        except Http404:
+            # if we get this far document it was probably 'given away'
+            doc = Document.objects.get(id=kwargs["pk"])
+
         from documents import index
 
-        index.add_or_update_document(self.get_object())
+        index.add_or_update_document(doc)
 
         document_updated.send(
             sender=self.__class__,
-            document=self.get_object(),
+            document=doc,
         )
+
+        if not has_perms_owner_aware(request.user, "change_document", doc):
+            return HttpResponseForbidden("Insufficient permissions")
 
         return response
 

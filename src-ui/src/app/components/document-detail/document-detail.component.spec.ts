@@ -1,5 +1,9 @@
 import { DatePipe } from '@angular/common'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import {
+  HttpErrorResponse,
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
@@ -503,7 +507,7 @@ describe('DocumentDetailComponent', () => {
     const updateSpy = jest.spyOn(documentService, 'update')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
     updateSpy.mockImplementation(() =>
-      throwError(() => new Error('failed to save'))
+      throwError(() => new HttpErrorResponse({ status: 403 }))
     )
     component.save(true)
     expect(updateSpy).toHaveBeenCalled()
