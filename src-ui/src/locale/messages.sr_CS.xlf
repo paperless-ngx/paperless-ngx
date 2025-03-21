@@ -1144,7 +1144,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">194</context>
         </context-group>
-        <target state="needs-translation">Default zoom</target>
+        <target state="translated">Podrazumevano uveličanje</target>
       </trans-unit>
       <trans-unit id="2222784219255971268" datatype="html">
         <source>Fit width</source>
@@ -1368,7 +1368,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">265,267</context>
         </context-group>
-        <target state="needs-translation"> Settings apply to this user account for objects (Tags, Mail Rules, etc. but not documents) created via the web UI. </target>
+        <target state="translated"> Podešavanja se primenjuju na ovaj korisnički nalog za objekte (oznake, pravila za poštu i slično, ali ne i za dokumente) kreirane putem veb interfejsa. </target>
       </trans-unit>
       <trans-unit id="4292903881380648974" datatype="html">
         <source>Default Owner</source>
@@ -2746,19 +2746,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">958</context>
+          <context context-type="linenumber">968</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1318</context>
+          <context context-type="linenumber">1328</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1357</context>
+          <context context-type="linenumber">1367</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1398</context>
+          <context context-type="linenumber">1408</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3426,7 +3426,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">911</context>
+          <context context-type="linenumber">921</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3528,7 +3528,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Try to include archive version in merge for non-PDF files</target>
+        <target state="translated">Pokušajte da uključite arhivsku verziju prilikom spajanja za datoteke koje nisu u PDF formatu</target>
       </trans-unit>
       <trans-unit id="5612366187076076264" datatype="html">
         <source>Delete original documents after successful merge</source>
@@ -3694,7 +3694,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1375</context>
+          <context context-type="linenumber">1385</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
@@ -3820,7 +3820,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.html</context>
           <context context-type="linenumber">101</context>
         </context-group>
-        <target state="needs-translation">Relative dates</target>
+        <target state="translated">Relativni datumi</target>
       </trans-unit>
       <trans-unit id="6052766076365105714" datatype="html">
         <source>now</source>
@@ -3920,7 +3920,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.ts</context>
           <context context-type="linenumber">93</context>
         </context-group>
-        <target state="needs-translation">This year</target>
+        <target state="translated">Ove godine</target>
       </trans-unit>
       <trans-unit id="842657237693374355" datatype="html">
         <source>This month</source>
@@ -3928,7 +3928,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.ts</context>
           <context context-type="linenumber">98</context>
         </context-group>
-        <target state="needs-translation">This month</target>
+        <target state="translated">Ovaj mesec</target>
       </trans-unit>
       <trans-unit id="4498682414491138092" datatype="html">
         <source>Yesterday</source>
@@ -6810,7 +6810,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Hint: saved views can be created from the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/documents&quot;&gt;"/>documents list<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></target>
+        <target state="translated">Savet: sačuvani prikazi mogu se kreirati iz <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/documents&quot;&gt;"/> liste dokumenata<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></target>
       </trans-unit>
       <trans-unit id="6581372518205328477" datatype="html">
         <source>Hello <x id="PH" equiv-text="this.settingsService.displayName"/>, welcome to <x id="PH_1" equiv-text="environment.appTitle"/></source>
@@ -7010,7 +7010,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
-        <target state="needs-translation">Upload documents</target>
+        <target state="translated">Otpremni dokumenta</target>
       </trans-unit>
       <trans-unit id="6388681050646106203" datatype="html">
         <source>or drop files anywhere</source>
@@ -7018,7 +7018,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">or drop files anywhere</target>
+        <target state="translated">ili prevucite datoteke bilo gde</target>
       </trans-unit>
       <trans-unit id="1749180330008942007" datatype="html">
         <source>Dismiss completed</source>
@@ -7610,7 +7610,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">829</context>
+          <context context-type="linenumber">839</context>
         </context-group>
         <target state="translated">Dokument "<x id="PH" equiv-text="newValues.title"/>" je sačuvan uspešno.</target>
       </trans-unit>
@@ -7618,7 +7618,7 @@
         <source>Error saving document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">835</context>
+          <context context-type="linenumber">845</context>
         </context-group>
         <target state="translated">Greška prilikom čuvanja dokumenta "<x id="PH" equiv-text="this.document.title"/>"</target>
       </trans-unit>
@@ -7626,7 +7626,7 @@
         <source>Error saving document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">880</context>
+          <context context-type="linenumber">890</context>
         </context-group>
         <target state="translated">Greška prilikom čuvanja dokumenta</target>
       </trans-unit>
@@ -7634,7 +7634,7 @@
         <source>Do you really want to move the document &quot;<x id="PH" equiv-text="this.document.title"/>&quot; to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">912</context>
+          <context context-type="linenumber">922</context>
         </context-group>
         <target state="translated">Da li zaista želite da premestite ovaj dokument "<x id="PH" equiv-text="this.document.title"/>" u otpad?</target>
       </trans-unit>
@@ -7642,7 +7642,7 @@
         <source>Documents can be restored prior to permanent deletion.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">913</context>
+          <context context-type="linenumber">923</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7654,7 +7654,7 @@
         <source>Move to trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">915</context>
+          <context context-type="linenumber">925</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7666,7 +7666,7 @@
         <source>Error deleting document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">934</context>
+          <context context-type="linenumber">944</context>
         </context-group>
         <target state="translated">Greška prilikom brisanja dokumenta</target>
       </trans-unit>
@@ -7674,7 +7674,7 @@
         <source>Reprocess confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">954</context>
+          <context context-type="linenumber">964</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7686,7 +7686,7 @@
         <source>This operation will permanently recreate the archive file for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">955</context>
+          <context context-type="linenumber">965</context>
         </context-group>
         <target state="translated">Ova akcija će trajno ponovo kreirati arhivski fajl za ovaj dokument.</target>
       </trans-unit>
@@ -7694,7 +7694,7 @@
         <source>The archive file will be re-generated with the current settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">956</context>
+          <context context-type="linenumber">966</context>
         </context-group>
         <target state="translated">Arhivski fajl će biti ponovo generisan sa trenutnim podešavanjima.</target>
       </trans-unit>
@@ -7702,7 +7702,7 @@
         <source>Reprocess operation for &quot;<x id="PH" equiv-text="this.document.title"/>&quot; will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">966</context>
+          <context context-type="linenumber">976</context>
         </context-group>
         <target state="translated">Operacija ponovne obrade za "<x id="PH" equiv-text="this.document.title"/>" će početi u pozadini. Zatvorite i ponovo otvorite ili ponovo učitajte dokument nakon što operacija bude završena da biste videli novi sadržaj.</target>
       </trans-unit>
@@ -7710,7 +7710,7 @@
         <source>Error executing operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">977</context>
+          <context context-type="linenumber">987</context>
         </context-group>
         <target state="translated">Greška prilikom izvršavanja operacije</target>
       </trans-unit>
@@ -7718,7 +7718,7 @@
         <source>Error downloading document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1024</context>
+          <context context-type="linenumber">1034</context>
         </context-group>
         <target state="translated">Greška prilikom preuzimanja dokumenta</target>
       </trans-unit>
@@ -7726,7 +7726,7 @@
         <source>Page Fit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1103</context>
+          <context context-type="linenumber">1113</context>
         </context-group>
         <target state="translated">Prilagodi stranicu</target>
       </trans-unit>
@@ -7734,7 +7734,7 @@
         <source>Split confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1316</context>
+          <context context-type="linenumber">1326</context>
         </context-group>
         <target state="translated">Potvrdi deljenje</target>
       </trans-unit>
@@ -7742,7 +7742,7 @@
         <source>This operation will split the selected document(s) into new documents.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1317</context>
+          <context context-type="linenumber">1327</context>
         </context-group>
         <target state="translated">Ova akcija će podeliti odabrani dokument na nova dokumenta.</target>
       </trans-unit>
@@ -7750,7 +7750,7 @@
         <source>Split operation for &quot;<x id="PH" equiv-text="this.document.title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1333</context>
+          <context context-type="linenumber">1343</context>
         </context-group>
         <target state="translated">Operacija podele za "<x id="PH" equiv-text="this.document.title"/>" će započeti u pozadini.</target>
       </trans-unit>
@@ -7758,7 +7758,7 @@
         <source>Error executing split operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1342</context>
+          <context context-type="linenumber">1352</context>
         </context-group>
         <target state="translated">Greška prilikom izvršavanja akcije deljenja</target>
       </trans-unit>
@@ -7766,7 +7766,7 @@
         <source>Rotate confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1355</context>
+          <context context-type="linenumber">1365</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7778,7 +7778,7 @@
         <source>This operation will permanently rotate the original version of the current document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1356</context>
+          <context context-type="linenumber">1366</context>
         </context-group>
         <target state="translated">Ova akcija će trajno rotirati originalnu verziju trenutnog dokumenta.</target>
       </trans-unit>
@@ -7786,7 +7786,7 @@
         <source>Rotation of &quot;<x id="PH" equiv-text="this.document.title"/>&quot; will begin in the background. Close and re-open the document after the operation has completed to see the changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1372</context>
+          <context context-type="linenumber">1382</context>
         </context-group>
         <target state="translated">Rotacija za "<x id="PH" equiv-text="this.document.title"/>" će započeti u pozadini. Zatvorite i ponovo otvorite ili ponovo učitajte ovaj dokument nakon što operacija bude završena da biste videli promene.</target>
       </trans-unit>
@@ -7794,7 +7794,7 @@
         <source>Error executing rotate operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1384</context>
+          <context context-type="linenumber">1394</context>
         </context-group>
         <target state="translated">Greška prilikom izvršavanja akcije rotacije</target>
       </trans-unit>
@@ -7802,7 +7802,7 @@
         <source>Delete pages confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1396</context>
+          <context context-type="linenumber">1406</context>
         </context-group>
         <target state="translated">Potvrda brisanja stranica</target>
       </trans-unit>
@@ -7810,7 +7810,7 @@
         <source>This operation will permanently delete the selected pages from the original document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1397</context>
+          <context context-type="linenumber">1407</context>
         </context-group>
         <target state="translated">Ova akcija će trajno obrisati odabrane stranice iz originalnog dokumenta.</target>
       </trans-unit>
@@ -7818,7 +7818,7 @@
         <source>Delete pages operation for &quot;<x id="PH" equiv-text="this.document.title"/>&quot; will begin in the background. Close and re-open or reload this document after the operation has completed to see the changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1412</context>
+          <context context-type="linenumber">1422</context>
         </context-group>
         <target state="translated">Operacija brisanja stranica za "<x id="PH" equiv-text="this.document.title"/>" će započeti u pozadini. Zatvorite i ponovo otvorite ili ponovo učitajte ovaj dokument nakon što operacija bude završena da biste videli promene.</target>
       </trans-unit>
@@ -7826,7 +7826,7 @@
         <source>Error executing delete pages operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1421</context>
+          <context context-type="linenumber">1431</context>
         </context-group>
         <target state="translated">Greška prilikom izvršavanja operacije brisanja stranica</target>
       </trans-unit>
@@ -7834,11 +7834,11 @@
         <source>An error occurred loading tiff: <x id="PH" equiv-text="err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1481</context>
+          <context context-type="linenumber">1491</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1485</context>
+          <context context-type="linenumber">1495</context>
         </context-group>
         <target state="translated">Došlo je do greške prilikom učitavanja TIFF-a: <x id="PH" equiv-text="err.toString()"/></target>
       </trans-unit>
@@ -8873,7 +8873,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">250,254</context>
         </context-group>
-        <target state="needs-translation">Correspondent: <x id="PH" equiv-text="this.correspondentSelectionModel.items.find(                 (c) =&gt; c.id == +rule.value               )?.name"/></target>
+        <target state="translated">Korespondent: <x id="PH" equiv-text="this.correspondentSelectionModel.items.find(                 (c) =&gt; c.id == +rule.value               )?.name"/></target>
       </trans-unit>
       <trans-unit id="8170755470576301659" datatype="html">
         <source>Without correspondent</source>
@@ -8889,7 +8889,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">262,266</context>
         </context-group>
-        <target state="needs-translation">Document type: <x id="PH" equiv-text="this.documentTypeSelectionModel.items.find(                 (dt) =&gt; dt.id == +rule.value               )?.name"/></target>
+        <target state="translated">Vrsta dokumenta: <x id="PH" equiv-text="this.documentTypeSelectionModel.items.find(                 (dt) =&gt; dt.id == +rule.value               )?.name"/></target>
       </trans-unit>
       <trans-unit id="4362173610367509215" datatype="html">
         <source>Without document type</source>
@@ -8905,7 +8905,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">274,278</context>
         </context-group>
-        <target state="needs-translation">Storage path: <x id="PH" equiv-text="this.storagePathSelectionModel.items.find(                 (sp) =&gt; sp.id == +rule.value               )?.name"/></target>
+        <target state="translated">Putanja skladišta: <x id="PH" equiv-text="this.storagePathSelectionModel.items.find(                 (sp) =&gt; sp.id == +rule.value               )?.name"/></target>
       </trans-unit>
       <trans-unit id="1562820715074533164" datatype="html">
         <source>Without storage path</source>
@@ -8921,7 +8921,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">284,286</context>
         </context-group>
-        <target state="needs-translation">Tag: <x id="PH" equiv-text="this.tagSelectionModel.items.find((t) =&gt; t.id == +rule.value)?.name"/></target>
+        <target state="translated">Oznaka: <x id="PH" equiv-text="this.tagSelectionModel.items.find((t) =&gt; t.id == +rule.value)?.name"/></target>
       </trans-unit>
       <trans-unit id="6494566478302448576" datatype="html">
         <source>Without any tag</source>
