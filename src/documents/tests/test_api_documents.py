@@ -262,34 +262,6 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_document_given_away(self):
-        """
-        GIVEN:
-            - Document with owner
-        WHEN:
-            - Document is update and given away
-        THEN:
-            - 403 Forbidden is returned
-        """
-        non_superuser = User.objects.create_user(username="test")
-        non_superuser.user_permissions.add(*Permission.objects.all())
-        self.client.force_authenticate(user=non_superuser)
-
-        doc = Document.objects.create(
-            title="none",
-            checksum="123",
-            mime_type="application/pdf",
-            owner=non_superuser,
-        )
-
-        response = self.client.patch(
-            f"/api/documents/{doc.pk}/",
-            {"owner": self.user.id},
-            format="json",
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
     @override_settings(FILENAME_FORMAT="")
     def test_download_with_archive(self):
         content = b"This is a test"

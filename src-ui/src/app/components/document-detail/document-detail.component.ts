@@ -824,13 +824,11 @@ export class DocumentDetailComponent
         },
         error: (error) => {
           this.networkActive = false
-          if (error.status === 403) {
-            // e.g. document was 'given away'
-            this.openDocumentService.setDirty(this.document, false)
+          if (!this.userCanEdit) {
             this.toastService.showInfo(
               $localize`Document "${this.document.title}" saved successfully.`
             )
-            this.close()
+            close && this.close()
           } else {
             this.error = error.error
             this.toastService.showError(
