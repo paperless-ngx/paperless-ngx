@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-11 13:33-0700\n"
-"PO-Revision-Date: 2025-03-11 20:35\n"
+"PO-Revision-Date: 2025-03-21 12:12\n"
 "Last-Translator: \n"
 "Language-Team: Serbian (Latin)\n"
 "Language: sr_CS\n"
@@ -1038,11 +1038,11 @@ msgstr "dodeli ova prilagođena polja"
 
 #: documents/models.py:1275
 msgid "custom field values"
-msgstr ""
+msgstr "prilagođene vrednosti polja"
 
 #: documents/models.py:1279
 msgid "Optional values to assign to the custom fields."
-msgstr ""
+msgstr "Opcione vrednosti za dodelu za prilagođena polja."
 
 #: documents/models.py:1288
 msgid "remove these tag(s)"
@@ -1184,19 +1184,19 @@ msgstr "Otkrivena je nevažeća promenljiva."
 
 #: documents/templates/account/account_inactive.html:5
 msgid "Paperless-ngx account inactive"
-msgstr ""
+msgstr "Paperless-ngx nalog je neaktivan"
 
 #: documents/templates/account/account_inactive.html:9
 msgid "Account inactive."
-msgstr ""
+msgstr "Nalog je neaktivan."
 
 #: documents/templates/account/account_inactive.html:14
 msgid "This account is inactive."
-msgstr ""
+msgstr "Ovaj nalog je neaktivan."
 
 #: documents/templates/account/account_inactive.html:16
 msgid "Return to login"
-msgstr ""
+msgstr "Povratak na prijavu"
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
@@ -1406,7 +1406,7 @@ msgstr "Kao poslednji korak, molimo Vas da popunite sledeći obrazac:"
 
 #: documents/validators.py:36
 msgid ", "
-msgstr ""
+msgstr ", "
 
 #: paperless/apps.py:11
 msgid "Paperless"
