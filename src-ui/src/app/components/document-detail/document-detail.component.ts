@@ -824,11 +824,22 @@ export class DocumentDetailComponent
         },
         error: (error) => {
           this.networkActive = false
-          if (!this.userCanEdit) {
+          const canEdit =
+            this.permissionsService.currentUserCan(
+              PermissionAction.Change,
+              PermissionType.Document
+            ) &&
+            this.permissionsService.currentUserHasObjectPermissions(
+              PermissionAction.Change,
+              this.document
+            )
+          if (!canEdit) {
+            // document was 'given away'
+            this.openDocumentService.setDirty(this.document, false)
             this.toastService.showInfo(
               $localize`Document "${this.document.title}" saved successfully.`
             )
-            close && this.close()
+            this.close()
           } else {
             this.error = error.error
             this.toastService.showError(
