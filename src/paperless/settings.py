@@ -375,7 +375,6 @@ if DEBUG:
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.locale.LocaleMiddleware",
@@ -387,6 +386,14 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
 ]
+
+# Insert whitenoise middleware if not disabled via environment variable
+if not __get_boolean("PAPERLESS_DISABLE_WHITENOISE", "NO"):
+    MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+else:
+    # Remove whitenoise from INSTALLED_APPS if disabled
+    if "whitenoise.runserver_nostatic" in INSTALLED_APPS:
+        INSTALLED_APPS.remove("whitenoise.runserver_nostatic")
 
 # Optional to enable compression
 if __get_boolean("PAPERLESS_ENABLE_COMPRESSION", "yes"):  # pragma: no cover
