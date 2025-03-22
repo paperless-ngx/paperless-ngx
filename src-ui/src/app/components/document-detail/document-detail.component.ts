@@ -18,6 +18,7 @@ import {
   NgbNavModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
+import { MarkdownModule } from 'ngx-markdown'
 import { PDFDocumentProxy, PdfViewerModule } from 'ng2-pdf-viewer'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { DeviceDetectorService } from 'ngx-device-detector'
@@ -169,12 +170,12 @@ export enum ZoomSetting {
     NgbDropdownModule,
     NgxBootstrapIconsModule,
     PdfViewerModule,
+    MarkdownModule,
   ],
 })
 export class DocumentDetailComponent
   extends ComponentWithPermissions
-  implements OnInit, OnDestroy, DirtyComponent
-{
+  implements OnInit, OnDestroy, DirtyComponent {
   @ViewChild('inputTitle')
   titleInput: TextComponent
 
@@ -257,6 +258,8 @@ export class DocumentDetailComponent
 
   DocumentDetailNavIDs = DocumentDetailNavIDs
   activeNavID: number
+
+  contentEditMode: boolean = false
 
   constructor(
     private documentsService: DocumentService,
@@ -409,9 +412,8 @@ export class DocumentDetailComponent
               this.previewText = res.toString()
             },
             error: (err) => {
-              this.previewText = $localize`An error occurred loading content: ${
-                err.message ?? err.toString()
-              }`
+              this.previewText = $localize`An error occurred loading content: ${err.message ?? err.toString()
+                }`
             },
           })
           this.thumbUrl = this.documentsService.getThumbUrl(documentId)
@@ -448,7 +450,7 @@ export class DocumentDetailComponent
                 this.documentForm.get('permissions_form').value['owner']
               openDocument['permissions'] =
                 this.documentForm.get('permissions_form').value[
-                  'set_permissions'
+                'set_permissions'
                 ]
               delete openDocument['permissions_form']
             }
@@ -795,7 +797,7 @@ export class DocumentDetailComponent
 
   save(close: boolean = false) {
     this.networkActive = true
-    ;(document.activeElement as HTMLElement)?.dispatchEvent(new Event('change'))
+      ; (document.activeElement as HTMLElement)?.dispatchEvent(new Event('change'))
     this.documentsService
       .update(this.document)
       .pipe(first())
@@ -1121,7 +1123,7 @@ export class DocumentDetailComponent
     this.previewZoomScale = ZoomSetting.PageWidth
     this.previewZoomSetting =
       Object.values(ZoomSetting)[
-        Math.min(Object.values(ZoomSetting).length - 1, currentIndex + 1)
+      Math.min(Object.values(ZoomSetting).length - 1, currentIndex + 1)
       ]
   }
 

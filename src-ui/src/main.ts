@@ -19,6 +19,7 @@ import {
   NgbModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
+import { MarkdownModule } from 'ngx-markdown'
 import { PdfViewerModule } from 'ng2-pdf-viewer'
 import {
   NgxBootstrapIconsModule,
@@ -358,7 +359,8 @@ bootstrapApplication(AppComponent, {
       ColorSliderModule,
       TourNgBootstrapModule,
       DragDropModule,
-      NgxBootstrapIconsModule.pick(icons)
+      NgxBootstrapIconsModule.pick(icons),
+      MarkdownModule.forRoot()
     ),
     {
       provide: APP_INITIALIZER,
