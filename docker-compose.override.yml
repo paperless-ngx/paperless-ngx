@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  webserver:
+    # Map source files for development
+    volumes:
+      - ./src:/usr/src/paperless/src
+      - ./src-ui:/usr/src/paperless/src-ui
+    environment:
+      # Configure to use the development frontend instead of the built static files
+      PAPERLESS_FRONTEND_URL: http://localhost:4200
+      # Disable whitenoise middleware to prevent errors with missing static files
+      PAPERLESS_DISABLE_WHITENOISE: 1
+      # Enable debug mode for development (enables CORS for localhost:4200)
+      PAPERLESS_DEBUG: "yes"
