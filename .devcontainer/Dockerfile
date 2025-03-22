@@ -14,10 +14,10 @@ ARG GS_VERSION=10.03.1
 
 # Set Python environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    # Ignore warning from Whitenoise
-    PYTHONWARNINGS="ignore:::django.http.response:517" \
-    PNGX_CONTAINERIZED=1
+  PYTHONUNBUFFERED=1 \
+  # Ignore warning from Whitenoise
+  PYTHONWARNINGS="ignore:::django.http.response:517" \
+  PNGX_CONTAINERIZED=1
 
 #
 # Begin installation and configuration
@@ -73,50 +73,49 @@ ARG RUNTIME_PACKAGES="\
 # These change very infrequently
 RUN set -eux \
   echo "Installing system packages" \
-    && apt-get update \
-    && apt-get install --yes --quiet --no-install-recommends ${RUNTIME_PACKAGES}
+  && apt-get update \
+  && apt-get install --yes --quiet --no-install-recommends ${RUNTIME_PACKAGES}
 
 ARG PYTHON_PACKAGES="\
   python3 \
   python3-pip \
   python3-wheel \
-  pipenv \
   ca-certificates"
 
 RUN set -eux \
   echo "Installing python packages" \
-    && apt-get update \
-    && apt-get install --yes --quiet ${PYTHON_PACKAGES}
+  && apt-get update \
+  && apt-get install --yes --quiet ${PYTHON_PACKAGES}
 
 RUN set -eux \
   && echo "Installing pre-built updates" \
-    && echo "Installing qpdf ${QPDF_VERSION}" \
-      && curl --fail --silent --show-error --location \
-        --output libqpdf29_${QPDF_VERSION}-1_${TARGETARCH}.deb \
-        https://github.com/paperless-ngx/builder/releases/download/qpdf-${QPDF_VERSION}/libqpdf29_${QPDF_VERSION}-1_${TARGETARCH}.deb \
-      && curl --fail --silent --show-error --location \
-        --output qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
-        https://github.com/paperless-ngx/builder/releases/download/qpdf-${QPDF_VERSION}/qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
-      && dpkg --install ./libqpdf29_${QPDF_VERSION}-1_${TARGETARCH}.deb \
-      && dpkg --install ./qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
-    && echo "Installing Ghostscript ${GS_VERSION}" \
-      && curl --fail --silent --show-error --location \
-          --output libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
-      && curl --fail --silent --show-error --location \
-          --output ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
-      && curl --fail --silent --show-error --location \
-          --output libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
-          https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
-        && dpkg --install ./libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
-        && dpkg --install ./libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
-        && dpkg --install ./ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
-    && echo "Installing jbig2enc" \
-      && curl --fail --silent --show-error --location \
-        --output jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
-        https://github.com/paperless-ngx/builder/releases/download/jbig2enc-${JBIG2ENC_VERSION}/jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
-      && dpkg --install ./jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb
+  && echo "Installing qpdf ${QPDF_VERSION}" \
+  && curl --fail --silent --show-error --location \
+  --output libqpdf29_${QPDF_VERSION}-1_${TARGETARCH}.deb \
+  https://github.com/paperless-ngx/builder/releases/download/qpdf-${QPDF_VERSION}/libqpdf29_${QPDF_VERSION}-1_${TARGETARCH}.deb \
+  && curl --fail --silent --show-error --location \
+  --output qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
+  https://github.com/paperless-ngx/builder/releases/download/qpdf-${QPDF_VERSION}/qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
+  && dpkg --install ./libqpdf29_${QPDF_VERSION}-1_${TARGETARCH}.deb \
+  && dpkg --install ./qpdf_${QPDF_VERSION}-1_${TARGETARCH}.deb \
+  && echo "Installing Ghostscript ${GS_VERSION}" \
+  && curl --fail --silent --show-error --location \
+  --output libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
+  https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
+  && curl --fail --silent --show-error --location \
+  --output ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
+  https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
+  && curl --fail --silent --show-error --location \
+  --output libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
+  https://github.com/paperless-ngx/builder/releases/download/ghostscript-${GS_VERSION}/libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
+  && dpkg --install ./libgs10-common_${GS_VERSION}.dfsg-1_all.deb \
+  && dpkg --install ./libgs10_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
+  && dpkg --install ./ghostscript_${GS_VERSION}.dfsg-1_${TARGETARCH}.deb \
+  && echo "Installing jbig2enc" \
+  && curl --fail --silent --show-error --location \
+  --output jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
+  https://github.com/paperless-ngx/builder/releases/download/jbig2enc-${JBIG2ENC_VERSION}/jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
+  && dpkg --install ./jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb
 
 # setup docker-specific things
 # These change sometimes, but rarely
@@ -125,11 +124,11 @@ WORKDIR /usr/src/paperless/src/docker/
 COPY [ \
   "docker/imagemagick-policy.xml", \
   "./" \
-]
+  ]
 
 RUN set -eux \
   && echo "Configuring ImageMagick" \
-    && mv imagemagick-policy.xml /etc/ImageMagick-6/policy.xml
+  && mv imagemagick-policy.xml /etc/ImageMagick-6/policy.xml
 
 # Packages needed only for building a few quick Python
 # dependencies
@@ -147,34 +146,52 @@ ARG BUILD_PACKAGES="\
 RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
   set -eux \
   && echo "Installing build system packages" \
-    && apt-get update \
-    && apt-get install --yes --quiet ${BUILD_PACKAGES}
+  && apt-get update \
+  && apt-get install --yes --quiet ${BUILD_PACKAGES}
 
 RUN set -eux \
   && npm update npm -g
+
+# Install uv
+# Download the latest installer
+ADD https://astral.sh/uv/install.sh /uv-installer.sh
+# Run the installer then remove it
+RUN set -eux \
+  && sh /uv-installer.sh \
+  && rm /uv-installer.sh
+# Install uv in a shared location accessible to all users
+ENV PATH="/usr/local/bin:$PATH"
+# Move uv from root's local bin to system bin for shared access
+RUN set -eux \
+  && mkdir -p /root/.local/bin \
+  && if [ -f "/root/.local/bin/uv" ]; then \
+       cp /root/.local/bin/uv /usr/local/bin/ && \
+       chmod +x /usr/local/bin/uv; \
+     fi
 
 # add users, setup scripts
 # Mount the compiled frontend to expected location
 RUN set -eux \
   && echo "Setting up user/group" \
-    && groupmod --new-name paperless node \
-    && usermod --login paperless --home /usr/src/paperless node \
-    && usermod -s /bin/bash paperless \
-    && echo "paperless ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
+  && groupmod --new-name paperless node \
+  && usermod --login paperless --home /usr/src/paperless node \
+  && usermod -s /bin/bash paperless \
+  && echo "paperless ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
   && echo "Creating volume directories" \
-    && mkdir --parents --verbose /usr/src/paperless/paperless-ngx/data \
-    && mkdir --parents --verbose /usr/src/paperless/paperless-ngx/media \
-    && mkdir --parents --verbose /usr/src/paperless/paperless-ngx/consume \
-    && mkdir --parents --verbose /usr/src/paperless/paperless-ngx/export \
-    && mkdir --parents --verbose /usr/src/paperless/paperless-ngx/.venv \
+  && mkdir --parents --verbose /usr/src/paperless/paperless-ngx/data \
+  && mkdir --parents --verbose /usr/src/paperless/paperless-ngx/media \
+  && mkdir --parents --verbose /usr/src/paperless/paperless-ngx/consume \
+  && mkdir --parents --verbose /usr/src/paperless/paperless-ngx/export \
+  && mkdir --parents --verbose /usr/src/paperless/.cache/uv \
   && echo "Adjusting all permissions" \
-    && chown --from root:root --changes --recursive paperless:paperless /usr/src/paperless
+  && chown --from root:root --changes --recursive paperless:paperless /usr/src/paperless \
+  && chown --changes --recursive paperless:paperless /usr/src/paperless/.cache/uv \
+  && if [ -d "/root/.cargo/bin" ]; then chown --changes --recursive paperless:paperless /root/.cargo/bin; fi
 #  && echo "Collecting static files" \
 #    && gosu paperless python3 manage.py collectstatic --clear --no-input --link \
 #    && gosu paperless python3 manage.py compilemessages
 
 VOLUME ["/usr/src/paperless/paperless-ngx/data", \
-        "/usr/src/paperless/paperless-ngx/media", \
-        "/usr/src/paperless/paperless-ngx/consume", \
-        "/usr/src/paperless/paperless-ngx/export", \
-        "/usr/src/paperless/paperless-ngx/.venv"]
+  "/usr/src/paperless/paperless-ngx/media", \
+  "/usr/src/paperless/paperless-ngx/consume", \
+  "/usr/src/paperless/paperless-ngx/export"]

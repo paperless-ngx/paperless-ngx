@@ -43,7 +43,7 @@ services:
     volumes:
       - ..:/usr/src/paperless/paperless-ngx:delegated
       - ../.devcontainer/vscode:/usr/src/paperless/paperless-ngx/.vscode:delegated # VSCode config files
-      - pipenv:/usr/src/paperless/paperless-ngx/.venv
+      - uv_cache:/root/.cache/uv
       - /usr/src/paperless/paperless-ngx/src/documents/static/frontend # Static frontend files exist only in container
       - /usr/src/paperless/paperless-ngx/src/.pytest_cache
       - /usr/src/paperless/paperless-ngx/.ruff_cache
@@ -107,4 +107,4 @@ services:
 
 volumes:
   redisdata_embeddings:
-  pipenv:
+  uv_cache:
