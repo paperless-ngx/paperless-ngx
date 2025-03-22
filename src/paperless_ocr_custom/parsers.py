@@ -350,7 +350,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
             with open(path_file, 'rb') as file:
                 pdf_data = file.read()
             payload = {'title': (str(path_file).split("/")[-1]),
-                       'folder': '1',
+                       'folder': settings.FOLDER_UPLOAD,
                        'extract': '1'}
             response_upload = requests.post(api_upload_file_ocr, data=payload,
                                             files={
@@ -389,7 +389,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                     pdf_data = file.read()
 
                 payload = {'title': (str(path_file).split("/")[-1]),
-                           'folder': '1',
+                           'folder': settings.FOLDER_UPLOAD,
                            'extract': '1'}
                 response_upload = requests.post(api_upload_file_ocr,
                                                 data=payload,

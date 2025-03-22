@@ -112,7 +112,7 @@ def upload_file(path_document, callback_url, api_upload_file_ocr, username_ocr,
         with open(path_document, 'rb') as file:
             pdf_data = file.read()
         payload = {'title': (str(path_document).split("/")[-1]),
-                   'folder': '456234',
+                   'folder': settings.FOLDER_UPLOAD,
                    'get_value': '1',
                    'callback_url': callback_url,
                    }
@@ -155,7 +155,7 @@ def upload_file(path_document, callback_url, api_upload_file_ocr, username_ocr,
                 pdf_data = file.read()
 
             payload = {'title': (str(path_document).split("/")[-1]),
-                       'folder': '456234',
+                       'folder': settings.FOLDER_UPLOAD,
                        'get_value': '1',
                        'callback_url': callback_url}
             response_upload = requests.post(api_upload_file_ocr,
@@ -165,7 +165,8 @@ def upload_file(path_document, callback_url, api_upload_file_ocr, username_ocr,
                                                     -1],
                                                 pdf_data)},
                                             headers=headers)
-            print("response_upload", response_upload)
+        logger.info(f"response_upload:{api_upload_file_ocr}{response_upload}", )
+
 
         if response_upload.status_code == 201:
             # get_file_id = response_upload.json().get('id', '')
@@ -174,7 +175,7 @@ def upload_file(path_document, callback_url, api_upload_file_ocr, username_ocr,
             return response_upload.json()
         return None
     except Exception as e:
-        logger.error(f"Upload file failed: {str(e)}")
+        logger.exception("Exception", e)
         return None
 
 
@@ -186,7 +187,7 @@ def peel_field(path_document, callback_url):
     api_refresh_ocr = settings.API_REFRESH_OCR
     refresh_token_ocr = cache.get("refresh_token_ocr", '')
     api_upload_file_ocr = settings.API_UPLOAD_FILE_OCR
-
+    logger.info("peel-field--------------")
     response = upload_file(path_document=path_document,
                            callback_url=callback_url,
                            api_upload_file_ocr=api_upload_file_ocr,

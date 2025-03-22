@@ -1194,6 +1194,7 @@ API_LOGIN_OCR = os.getenv("API_LOGIN_OCR", "")
 API_REFRESH_OCR = os.getenv("API_REFRESH_OCR", "")
 API_OCR_BY_FILE_ID = os.getenv("API_OCR_BY_FILE_ID", "")
 API_UPLOAD_FILE_OCR = os.getenv("API_UPLOAD_FILE_OCR", "")
+FOLDER_UPLOAD = os.getenv("FOLDER_UPLOAD","")
 
 ###############################################################################
 # Elastic search                                                              #
