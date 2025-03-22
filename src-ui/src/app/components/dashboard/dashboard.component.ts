@@ -20,6 +20,7 @@ import { SavedViewWidgetComponent } from './widgets/saved-view-widget/saved-view
 import { StatisticsWidgetComponent } from './widgets/statistics-widget/statistics-widget.component'
 import { UploadFileWidgetComponent } from './widgets/upload-file-widget/upload-file-widget.component'
 import { WelcomeWidgetComponent } from './widgets/welcome-widget/welcome-widget.component'
+import { AiChatWidgetComponent } from './widgets/ai-chat-widget/ai-chat-widget.component'
 
 @Component({
   selector: 'pngx-dashboard',
@@ -32,6 +33,7 @@ import { WelcomeWidgetComponent } from './widgets/welcome-widget/welcome-widget.
     StatisticsWidgetComponent,
     UploadFileWidgetComponent,
     WelcomeWidgetComponent,
+    AiChatWidgetComponent,
     IfPermissionsDirective,
     DragDropModule,
     TourNgBootstrapModule,

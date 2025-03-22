@@ -1,5 +1,8 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { WidgetFrameComponent } from '../widget-frame/widget-frame.component';
+import { CommonModule } from '@angular/common';
 
 interface ChatMessage {
   text: string;
@@ -9,7 +12,12 @@ interface ChatMessage {
 @Component({
   selector: 'app-ai-chat-widget',
   templateUrl: './ai-chat-widget.component.html',
-  styleUrls: ['./ai-chat-widget.component.scss']
+  styleUrls: ['./ai-chat-widget.component.scss'],
+  imports: [
+    FormsModule,
+    WidgetFrameComponent,
+    CommonModule
+  ]
 })
 export class AiChatWidgetComponent {
   @ViewChild('chatContainer', { static: false }) chatContainer: ElementRef;
