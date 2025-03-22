@@ -13,29 +13,34 @@ import {
   NgbDatepickerModule,
   NgbDropdownModule,
 } from '@ng-bootstrap/ng-bootstrap'
+import { NgSelectModule } from '@ng-select/ng-select'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, Subscription } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
-import { popperOptionsReenablePreventOverflow } from 'src/app/utils/popper-options'
+import { pngxPopperOptions } from 'src/app/utils/popper-options'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
 
 export interface DateSelection {
-  createdBefore?: string
-  createdAfter?: string
+  createdTo?: string
+  createdFrom?: string
   createdRelativeDateID?: number
-  addedBefore?: string
-  addedAfter?: string
+  addedTo?: string
+  addedFrom?: string
   addedRelativeDateID?: number
 }
 
 export enum RelativeDate {
-  LAST_7_DAYS = 0,
-  LAST_MONTH = 1,
-  LAST_3_MONTHS = 2,
-  LAST_YEAR = 3,
+  WITHIN_1_WEEK = 1,
+  WITHIN_1_MONTH = 2,
+  WITHIN_3_MONTHS = 3,
+  WITHIN_1_YEAR = 4,
+  THIS_YEAR = 5,
+  THIS_MONTH = 6,
+  TODAY = 7,
+  YESTERDAY = 8,
 }
 
 @Component({
@@ -49,13 +54,14 @@ export enum RelativeDate {
     NgxBootstrapIconsModule,
     NgbDatepickerModule,
     NgbDropdownModule,
+    NgSelectModule,
     FormsModule,
     ReactiveFormsModule,
     NgClass,
   ],
 })
 export class DatesDropdownComponent implements OnInit, OnDestroy {
-  public popperOptions = popperOptionsReenablePreventOverflow
+  public popperOptions = pngxPopperOptions
 
   constructor(settings: SettingsService) {
     this.datePlaceHolder = settings.getLocalizedDateInputFormat()
@@ -63,24 +69,44 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
 
   relativeDates = [
     {
-      id: RelativeDate.LAST_7_DAYS,
-      name: $localize`Last 7 days`,
+      id: RelativeDate.WITHIN_1_WEEK,
+      name: $localize`Within 1 week`,
       date: new Date().setDate(new Date().getDate() - 7),
     },
     {
-      id: RelativeDate.LAST_MONTH,
-      name: $localize`Last month`,
+      id: RelativeDate.WITHIN_1_MONTH,
+      name: $localize`Within 1 month`,
       date: new Date().setMonth(new Date().getMonth() - 1),
     },
     {
-      id: RelativeDate.LAST_3_MONTHS,
-      name: $localize`Last 3 months`,
+      id: RelativeDate.WITHIN_3_MONTHS,
+      name: $localize`Within 3 months`,
       date: new Date().setMonth(new Date().getMonth() - 3),
     },
     {
-      id: RelativeDate.LAST_YEAR,
-      name: $localize`Last year`,
+      id: RelativeDate.WITHIN_1_YEAR,
+      name: $localize`Within 1 year`,
       date: new Date().setFullYear(new Date().getFullYear() - 1),
+    },
+    {
+      id: RelativeDate.THIS_YEAR,
+      name: $localize`This year`,
+      date: new Date('1/1/' + new Date().getFullYear()),
+    },
+    {
+      id: RelativeDate.THIS_MONTH,
+      name: $localize`This month`,
+      date: new Date().setDate(1),
+    },
+    {
+      id: RelativeDate.TODAY,
+      name: $localize`Today`,
+      date: new Date().setHours(0, 0, 0, 0),
+    },
+    {
+      id: RelativeDate.YESTERDAY,
+      name: $localize`Yesterday`,
+      date: new Date().setDate(new Date().getDate() - 1),
     },
   ]
 
@@ -88,38 +114,38 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
 
   // created
   @Input()
-  createdDateBefore: string
+  createdDateTo: string = null
 
   @Output()
-  createdDateBeforeChange = new EventEmitter<string>()
+  createdDateToChange = new EventEmitter<string>()
 
   @Input()
-  createdDateAfter: string
+  createdDateFrom: string = null
 
   @Output()
-  createdDateAfterChange = new EventEmitter<string>()
+  createdDateFromChange = new EventEmitter<string>()
 
   @Input()
-  createdRelativeDate: RelativeDate
+  createdRelativeDate: RelativeDate = null
 
   @Output()
   createdRelativeDateChange = new EventEmitter<number>()
 
   // added
   @Input()
-  addedDateBefore: string
+  addedDateTo: string = null
 
   @Output()
-  addedDateBeforeChange = new EventEmitter<string>()
+  addedDateToChange = new EventEmitter<string>()
 
   @Input()
-  addedDateAfter: string
+  addedDateFrom: string = null
 
   @Output()
-  addedDateAfterChange = new EventEmitter<string>()
+  addedDateFromChange = new EventEmitter<string>()
 
   @Input()
-  addedRelativeDate: RelativeDate
+  addedRelativeDate: RelativeDate = null
 
   @Output()
   addedRelativeDateChange = new EventEmitter<number>()
@@ -133,14 +159,19 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
   @Input()
   disabled: boolean = false
 
+  @Input()
+  placement: string = 'bottom-start'
+
+  public readonly today: string = new Date().toISOString().split('T')[0]
+
   get isActive(): boolean {
     return (
       this.createdRelativeDate !== null ||
-      this.createdDateAfter?.length > 0 ||
-      this.createdDateBefore?.length > 0 ||
+      this.createdDateFrom?.length > 0 ||
+      this.createdDateTo?.length > 0 ||
       this.addedRelativeDate !== null ||
-      this.addedDateAfter?.length > 0 ||
-      this.addedDateBefore?.length > 0
+      this.addedDateFrom?.length > 0 ||
+      this.addedDateTo?.length > 0
     )
   }
 
@@ -161,42 +192,42 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
   }
 
   reset() {
-    this.createdDateBefore = null
-    this.createdDateAfter = null
+    this.createdDateTo = null
+    this.createdDateFrom = null
     this.createdRelativeDate = null
-    this.addedDateBefore = null
-    this.addedDateAfter = null
+    this.addedDateTo = null
+    this.addedDateFrom = null
     this.addedRelativeDate = null
     this.onChange()
   }
 
-  setCreatedRelativeDate(rd: RelativeDate) {
-    this.createdDateBefore = null
-    this.createdDateAfter = null
-    this.createdRelativeDate = this.createdRelativeDate == rd ? null : rd
+  onSetCreatedRelativeDate(rd: { id: number; name: string; date: number }) {
+    // createdRelativeDate is set by ngModel
+    this.createdDateTo = null
+    this.createdDateFrom = null
     this.onChange()
   }
 
-  setAddedRelativeDate(rd: RelativeDate) {
-    this.addedDateBefore = null
-    this.addedDateAfter = null
-    this.addedRelativeDate = this.addedRelativeDate == rd ? null : rd
+  onSetAddedRelativeDate(rd: { id: number; name: string; date: number }) {
+    // addedRelativeDate is set by ngModel
+    this.addedDateTo = null
+    this.addedDateFrom = null
     this.onChange()
   }
 
   onChange() {
-    this.createdDateBeforeChange.emit(this.createdDateBefore)
-    this.createdDateAfterChange.emit(this.createdDateAfter)
+    this.createdDateToChange.emit(this.createdDateTo)
+    this.createdDateFromChange.emit(this.createdDateFrom)
     this.createdRelativeDateChange.emit(this.createdRelativeDate)
-    this.addedDateBeforeChange.emit(this.addedDateBefore)
-    this.addedDateAfterChange.emit(this.addedDateAfter)
+    this.addedDateToChange.emit(this.addedDateTo)
+    this.addedDateFromChange.emit(this.addedDateFrom)
     this.addedRelativeDateChange.emit(this.addedRelativeDate)
     this.datesSet.emit({
-      createdAfter: this.createdDateAfter,
-      createdBefore: this.createdDateBefore,
+      createdFrom: this.createdDateFrom,
+      createdTo: this.createdDateTo,
       createdRelativeDateID: this.createdRelativeDate,
-      addedAfter: this.addedDateAfter,
-      addedBefore: this.addedDateBefore,
+      addedFrom: this.addedDateFrom,
+      addedTo: this.addedDateTo,
       addedRelativeDateID: this.addedRelativeDate,
     })
   }
@@ -205,30 +236,40 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
     this.createdRelativeDate = null
     this.addedRelativeDate = null
     this.datesSetDebounce$.next({
-      createdAfter: this.createdDateAfter,
-      createdBefore: this.createdDateBefore,
-      addedAfter: this.addedDateAfter,
-      addedBefore: this.addedDateBefore,
+      createdAfter: this.createdDateFrom,
+      createdBefore: this.createdDateTo,
+      addedAfter: this.addedDateFrom,
+      addedBefore: this.addedDateTo,
     })
   }
 
-  clearCreatedBefore() {
-    this.createdDateBefore = null
+  clearCreatedTo() {
+    this.createdDateTo = null
     this.onChange()
   }
 
-  clearCreatedAfter() {
-    this.createdDateAfter = null
+  clearCreatedFrom() {
+    this.createdDateFrom = null
     this.onChange()
   }
 
-  clearAddedBefore() {
-    this.addedDateBefore = null
+  clearCreatedRelativeDate() {
+    this.createdRelativeDate = null
     this.onChange()
   }
 
-  clearAddedAfter() {
-    this.addedDateAfter = null
+  clearAddedTo() {
+    this.addedDateTo = null
+    this.onChange()
+  }
+
+  clearAddedFrom() {
+    this.addedDateFrom = null
+    this.onChange()
+  }
+
+  clearAddedRelativeDate() {
+    this.addedRelativeDate = null
     this.onChange()
   }
 

@@ -1,7 +1,11 @@
 # Default code owners
 * @paperless-ngx/core
 
-# Backend team has more knowledge over the Python code and Docker setup
+/src-ui/ @paperless-ngx/frontend
+
+/src/ @paperless-ngx/backend
+pyproject.toml @paperless-ngx/backend
+uv.lock @paperless-ngx/backend
 *.py @paperless-ngx/backend
 pyproject.toml @paperless-ngx/backend
 requirements.txt @paperless-ngx/backend

@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import logging
 import os
 import shutil
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import httpx
 from celery import shared_task
@@ -23,9 +25,6 @@ from guardian.shortcuts import remove_perm
 
 from documents import matching
 from documents.caching import clear_document_caches
-from documents.classifier import DocumentClassifier
-from documents.data_models import ConsumableDocument
-from documents.data_models import DocumentMetadataOverrides
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_unique_filename
@@ -37,6 +36,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import PaperlessTask
+from documents.models import SavedView
 from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
@@ -45,6 +45,13 @@ from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.templating.workflows import parse_w_workflow_placeholders
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from documents.classifier import DocumentClassifier
+    from documents.data_models import ConsumableDocument
+    from documents.data_models import DocumentMetadataOverrides
 
 logger = logging.getLogger("paperless.handlers")
 
@@ -85,6 +92,7 @@ def _suggestion_printer(
 def set_correspondent(
     sender,
     document: Document,
+    *,
     logging_group=None,
     classifier: DocumentClassifier | None = None,
     replace=False,
@@ -140,6 +148,7 @@ def set_correspondent(
 def set_document_type(
     sender,
     document: Document,
+    *,
     logging_group=None,
     classifier: DocumentClassifier | None = None,
     replace=False,
@@ -196,6 +205,7 @@ def set_document_type(
 def set_tags(
     sender,
     document: Document,
+    *,
     logging_group=None,
     classifier: DocumentClassifier | None = None,
     replace=False,
@@ -251,6 +261,7 @@ def set_tags(
 def set_storage_path(
     sender,
     document: Document,
+    *,
     logging_group=None,
     classifier: DocumentClassifier | None = None,
     replace=False,
@@ -353,7 +364,7 @@ def cleanup_document_deletion(sender, instance, **kwargs):
                         f"{filename} could not be deleted: {e}",
                     )
             elif filename and not os.path.isfile(filename):
-                logger.warn(f"Expected {filename} tp exist, but it did not")
+                logger.warning(f"Expected {filename} to exist, but it did not")
 
         delete_empty_directories(
             os.path.dirname(instance.source_path),
@@ -521,20 +532,49 @@ def check_paths_and_prune_custom_fields(sender, instance: CustomField, **kwargs)
     """
     if (
         instance.data_type == CustomField.FieldDataType.SELECT
+        and instance.fields.count() > 0
+        and instance.extra_data
     ):  # Only select fields, for now
+        select_options = {
+            option["id"]: option["label"]
+            for option in instance.extra_data.get("select_options", [])
+        }
+
         for cf_instance in instance.fields.all():
-            options = instance.extra_data.get("select_options", [])
-            try:
-                next(
-                    option["label"]
-                    for option in options
-                    if option["id"] == cf_instance.value
-                )
-            except StopIteration:
-                # The value of this custom field instance is not in the select options anymore
+            # Check if the current value is still a valid option
+            if cf_instance.value not in select_options:
                 cf_instance.value_select = None
-                cf_instance.save()
+                cf_instance.save(update_fields=["value_select"])
+
+            # Update the filename and move files if necessary
             update_filename_and_move_files(sender, cf_instance)
+
+
+@receiver(models.signals.post_delete, sender=CustomField)
+def cleanup_custom_field_deletion(sender, instance: CustomField, **kwargs):
+    """
+    When a custom field is deleted, ensure no saved views reference it.
+    """
+    field_identifier = SavedView.DisplayFields.CUSTOM_FIELD % instance.pk
+    # remove field from display_fields of all saved views
+    for view in SavedView.objects.filter(display_fields__isnull=False).distinct():
+        if field_identifier in view.display_fields:
+            logger.debug(
+                f"Removing custom field {instance} from view {view}",
+            )
+            view.display_fields.remove(field_identifier)
+            view.save()
+
+    # remove from sort_field of all saved views
+    views_with_sort_updated = SavedView.objects.filter(
+        sort_field=field_identifier,
+    ).update(
+        sort_field=SavedView.DisplayFields.CREATED,
+    )
+    if views_with_sort_updated > 0:
+        logger.debug(
+            f"Removing custom field {instance} from sort field of {views_with_sort_updated} views",
+        )
 
 
 def add_to_index(sender, document, **kwargs):
@@ -592,7 +632,7 @@ def send_webhook(
         else:
             httpx.post(
                 url,
-                data=data,
+                content=data,
                 files=files,
                 headers=headers,
             ).raise_for_status()
@@ -730,23 +770,40 @@ def run_workflows(
         if action.assign_custom_fields.exists():
             if not use_overrides:
                 for field in action.assign_custom_fields.all():
-                    if not CustomFieldInstance.objects.filter(
+                    value_field_name = CustomFieldInstance.get_value_field_name(
+                        data_type=field.data_type,
+                    )
+                    args = {
+                        value_field_name: action.assign_custom_fields_values.get(
+                            str(field.pk),
+                            None,
+                        ),
+                    }
+                    # for some reason update_or_create doesn't work here
+                    instance = CustomFieldInstance.objects.filter(
                         field=field,
                         document=document,
-                    ).exists():
-                        # can be triggered on existing docs, so only add the field if it doesn't already exist
+                    ).first()
+                    if instance:
+                        setattr(instance, value_field_name, args[value_field_name])
+                        instance.save()
+                    else:
                         CustomFieldInstance.objects.create(
+                            **args,
                             field=field,
                             document=document,
                         )
             else:
-                overrides.custom_field_ids = list(
-                    set(
-                        (overrides.custom_field_ids or [])
-                        + list(
-                            action.assign_custom_fields.values_list("pk", flat=True),
-                        ),
-                    ),
+                if overrides.custom_fields is None:
+                    overrides.custom_fields = {}
+                overrides.custom_fields.update(
+                    {
+                        field.pk: action.assign_custom_fields_values.get(
+                            str(field.pk),
+                            None,
+                        )
+                        for field in action.assign_custom_fields.all()
+                    },
                 )
 
     def removal_action():
@@ -904,18 +961,18 @@ def run_workflows(
             if not use_overrides:
                 CustomFieldInstance.objects.filter(document=document).delete()
             else:
-                overrides.custom_field_ids = None
+                overrides.custom_fields = None
         elif action.remove_custom_fields.exists():
             if not use_overrides:
                 CustomFieldInstance.objects.filter(
                     field__in=action.remove_custom_fields.all(),
                     document=document,
                 ).delete()
-            elif overrides.custom_field_ids:
+            elif overrides.custom_fields:
                 for field in action.remove_custom_fields.filter(
-                    pk__in=overrides.custom_field_ids,
+                    pk__in=overrides.custom_fields.keys(),
                 ):
-                    overrides.custom_field_ids.remove(field.pk)
+                    overrides.custom_fields.pop(field.pk, None)
 
     def email_action():
         if not settings.EMAIL_ENABLED:
@@ -962,29 +1019,37 @@ def run_workflows(
             added = timezone.localtime(timezone.now())
             created = timezone.localtime(overrides.created)
 
-        subject = parse_w_workflow_placeholders(
-            action.email.subject,
-            correspondent,
-            document_type,
-            owner_username,
-            added,
-            filename,
-            current_filename,
-            created,
-            title,
-            doc_url,
+        subject = (
+            parse_w_workflow_placeholders(
+                action.email.subject,
+                correspondent,
+                document_type,
+                owner_username,
+                added,
+                filename,
+                current_filename,
+                created,
+                title,
+                doc_url,
+            )
+            if action.email.subject
+            else ""
         )
-        body = parse_w_workflow_placeholders(
-            action.email.body,
-            correspondent,
-            document_type,
-            owner_username,
-            added,
-            filename,
-            current_filename,
-            created,
-            title,
-            doc_url,
+        body = (
+            parse_w_workflow_placeholders(
+                action.email.body,
+                correspondent,
+                document_type,
+                owner_username,
+                added,
+                filename,
+                current_filename,
+                created,
+                title,
+                doc_url,
+            )
+            if action.email.body
+            else ""
         )
         try:
             n_messages = send_email(
@@ -1065,7 +1130,7 @@ def run_workflows(
                             f"Error occurred parsing webhook params: {e}",
                             extra={"group": logging_group},
                         )
-            else:
+            elif action.webhook.body:
                 data = parse_w_workflow_placeholders(
                     action.webhook.body,
                     correspondent,
@@ -1097,7 +1162,7 @@ def run_workflows(
                 ) as f:
                     files = {
                         "file": (
-                            document.original_filename,
+                            filename,
                             f.read(),
                             document.mime_type,
                         ),
@@ -1174,6 +1239,8 @@ def run_workflows(
                     webhook_action()
 
             if not use_overrides:
+                # limit title to 128 characters
+                document.title = document.title[:128]
                 # save first before setting tags
                 document.save()
                 document.tags.set(doc_tag_ids)
@@ -1213,10 +1280,11 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
         user_id = overrides.owner_id if overrides else None
 
         PaperlessTask.objects.create(
+            type=PaperlessTask.TaskType.AUTO,
             task_id=headers["id"],
             status=states.PENDING,
             task_file_name=task_file_name,
-            task_name=headers["task"],
+            task_name=PaperlessTask.TaskName.CONSUME_FILE,
             result=None,
             date_created=timezone.now(),
             date_started=None,

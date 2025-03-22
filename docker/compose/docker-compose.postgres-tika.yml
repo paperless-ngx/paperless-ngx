@@ -38,7 +38,7 @@ services:
       - redisdata:/data
 
   db:
-    image: docker.io/library/postgres:16
+    image: docker.io/library/postgres:17
     restart: unless-stopped
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -71,7 +71,7 @@ services:
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
 
   gotenberg:
-    image: docker.io/gotenberg/gotenberg:8.7
+    image: docker.io/gotenberg/gotenberg:8.17
     restart: unless-stopped
 
     # The gotenberg chromium route is used to convert .eml files. We do not

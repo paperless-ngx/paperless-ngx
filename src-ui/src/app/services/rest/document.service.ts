@@ -62,6 +62,10 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     private customFieldService: CustomFieldsService
   ) {
     super(http, 'documents')
+    this.reload()
+  }
+
+  public reload() {
     if (
       this.permissionsService.currentUserCan(
         PermissionAction.View,
@@ -253,5 +257,20 @@ export class DocumentService extends AbstractPaperlessService<Document> {
 
   public get searchQuery(): string {
     return this._searchQuery
+  }
+
+  emailDocument(
+    documentId: number,
+    addresses: string,
+    subject: string,
+    message: string,
+    useArchiveVersion: boolean
+  ): Observable<any> {
+    return this.http.post(this.getResourceUrl(documentId, 'email'), {
+      addresses: addresses,
+      subject: subject,
+      message: message,
+      use_archive_version: useArchiveVersion,
+    })
   }
 }

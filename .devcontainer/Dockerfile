@@ -76,16 +76,14 @@ RUN set -eux \
   && apt-get update \
   && apt-get install --yes --quiet --no-install-recommends ${RUNTIME_PACKAGES}
 
-ARG PYTHON_PACKAGES="\
-  python3 \
-  python3-pip \
-  python3-wheel \
-  ca-certificates"
+ARG PYTHON_PACKAGES="ca-certificates"
 
 RUN set -eux \
   echo "Installing python packages" \
   && apt-get update \
   && apt-get install --yes --quiet ${PYTHON_PACKAGES}
+
+COPY --from=ghcr.io/astral-sh/uv:0.6 /uv /bin/uv
 
 RUN set -eux \
   && echo "Installing pre-built updates" \
@@ -122,13 +120,15 @@ RUN set -eux \
 WORKDIR /usr/src/paperless/src/docker/
 
 COPY [ \
-  "docker/imagemagick-policy.xml", \
+  "docker/rootfs/etc/ImageMagick-6/paperless-policy.xml", \
   "./" \
   ]
 
 RUN set -eux \
   && echo "Configuring ImageMagick" \
-  && mv imagemagick-policy.xml /etc/ImageMagick-6/policy.xml
+  && mv paperless-policy.xml /etc/ImageMagick-6/policy.xml
+
+COPY --from=ghcr.io/astral-sh/uv:0.6 /uv /bin/uv
 
 # Packages needed only for building a few quick Python
 # dependencies
@@ -139,35 +139,17 @@ ARG BUILD_PACKAGES="\
   libpq-dev \
   # https://github.com/PyMySQL/mysqlclient#linux
   default-libmysqlclient-dev \
-  pkg-config \
-  pre-commit"
+  pkg-config"
 
 # hadolint ignore=DL3042
-RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
+RUN --mount=type=cache,target=/root/.cache/uv,id=pip-cache \
   set -eux \
   && echo "Installing build system packages" \
   && apt-get update \
   && apt-get install --yes --quiet ${BUILD_PACKAGES}
 
 RUN set -eux \
-  && npm update npm -g
-
-# Install uv
-# Download the latest installer
-ADD https://astral.sh/uv/install.sh /uv-installer.sh
-# Run the installer then remove it
-RUN set -eux \
-  && sh /uv-installer.sh \
-  && rm /uv-installer.sh
-# Install uv in a shared location accessible to all users
-ENV PATH="/usr/local/bin:$PATH"
-# Move uv from root's local bin to system bin for shared access
-RUN set -eux \
-  && mkdir -p /root/.local/bin \
-  && if [ -f "/root/.local/bin/uv" ]; then \
-       cp /root/.local/bin/uv /usr/local/bin/ && \
-       chmod +x /usr/local/bin/uv; \
-     fi
+  && npm update -g pnpm
 
 # add users, setup scripts
 # Mount the compiled frontend to expected location
@@ -184,12 +166,7 @@ RUN set -eux \
   && mkdir --parents --verbose /usr/src/paperless/paperless-ngx/export \
   && mkdir --parents --verbose /usr/src/paperless/.cache/uv \
   && echo "Adjusting all permissions" \
-  && chown --from root:root --changes --recursive paperless:paperless /usr/src/paperless \
-  && chown --changes --recursive paperless:paperless /usr/src/paperless/.cache/uv \
-  && if [ -d "/root/.cargo/bin" ]; then chown --changes --recursive paperless:paperless /root/.cargo/bin; fi
-#  && echo "Collecting static files" \
-#    && gosu paperless python3 manage.py collectstatic --clear --no-input --link \
-#    && gosu paperless python3 manage.py compilemessages
+  && chown --from root:root --changes --recursive paperless:paperless /usr/src/paperless
 
 VOLUME ["/usr/src/paperless/paperless-ngx/data", \
   "/usr/src/paperless/paperless-ngx/media", \

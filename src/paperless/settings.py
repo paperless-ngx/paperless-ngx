@@ -3,7 +3,6 @@ import json
 import math
 import multiprocessing
 import os
-import re
 import tempfile
 from os import PathLike
 from pathlib import Path
@@ -329,6 +328,8 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.mfa",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
     *env_apps,
 ]
 
@@ -346,6 +347,25 @@ REST_FRAMEWORK = {
     # Make sure these are ordered and that the most recent version appears
     # last. See api.md#api-versioning when adding new versions.
     "ALLOWED_VERSIONS": ["1", "2", "3", "4", "5", "6", "7"],
+    # DRF Spectacular default schema
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+# DRF Spectacular settings
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Paperless-ngx REST API",
+    "DESCRIPTION": "OpenAPI Spec for Paperless-ngx",
+    "VERSION": "6.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "COMPONENT_SPLIT_REQUEST": True,
+    "EXTERNAL_DOCS": {
+        "description": "Paperless-ngx API Documentation",
+        "url": "https://docs.paperless-ngx.com/api/",
+    },
+    "ENUM_NAME_OVERRIDES": {
+        "MatchingAlgorithm": "documents.models.MatchingModel.MATCHING_ALGORITHMS",
+    },
 }
 
 if DEBUG:
@@ -460,6 +480,7 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv(
 
 ACCOUNT_ADAPTER = "paperless.adapter.CustomAccountAdapter"
 ACCOUNT_ALLOW_SIGNUPS = __get_boolean("PAPERLESS_ACCOUNT_ALLOW_SIGNUPS")
+ACCOUNT_DEFAULT_GROUPS = __get_list("PAPERLESS_ACCOUNT_DEFAULT_GROUPS")
 
 SOCIALACCOUNT_ADAPTER = "paperless.adapter.CustomSocialAccountAdapter"
 SOCIALACCOUNT_ALLOW_SIGNUPS = __get_boolean(
@@ -470,6 +491,8 @@ SOCIALACCOUNT_AUTO_SIGNUP = __get_boolean("PAPERLESS_SOCIAL_AUTO_SIGNUP")
 SOCIALACCOUNT_PROVIDERS = json.loads(
     os.getenv("PAPERLESS_SOCIALACCOUNT_PROVIDERS", "{}"),
 )
+SOCIAL_ACCOUNT_DEFAULT_GROUPS = __get_list("PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS")
+SOCIAL_ACCOUNT_SYNC_GROUPS = __get_boolean("PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS")
 
 MFA_TOTP_ISSUER = "Paperless-ngx"
 
@@ -490,6 +513,8 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = not ACCOUNT_SESSION_REMEMBER
 SESSION_COOKIE_AGE = int(
     os.getenv("PAPERLESS_SESSION_COOKIE_AGE", 60 * 60 * 24 * 7 * 3),
 )
+# https://docs.djangoproject.com/en/5.1/ref/settings/#std-setting-SESSION_ENGINE
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
 if AUTO_LOGIN_USERNAME:
     _index = MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware")
@@ -524,10 +549,6 @@ def _parse_remote_user_settings() -> str:
 
 
 HTTP_REMOTE_USER_HEADER_NAME = _parse_remote_user_settings()
-
-# X-Frame options for embedded PDF display:
-X_FRAME_OPTIONS = "ANY" if DEBUG else "SAMEORIGIN"
-
 
 # The next 3 settings can also be set using just PAPERLESS_URL
 CSRF_TRUSTED_ORIGINS = __get_list("PAPERLESS_CSRF_TRUSTED_ORIGINS")
@@ -729,6 +750,7 @@ LANGUAGES = [
     ("tr-tr", _("Turkish")),
     ("uk-ua", _("Ukrainian")),
     ("zh-cn", _("Chinese Simplified")),
+    ("zh-tw", _("Chinese Traditional")),
 ]
 
 LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
@@ -800,6 +822,8 @@ LOGGING = {
         "ocrmypdf": {"handlers": ["file_paperless"], "level": "INFO"},
         "celery": {"handlers": ["file_celery"], "level": "DEBUG"},
         "kombu": {"handlers": ["file_celery"], "level": "DEBUG"},
+        "_granian": {"handlers": ["file_paperless"], "level": "DEBUG"},
+        "granian.access": {"handlers": ["file_paperless"], "level": "DEBUG"},
     },
 }
 
@@ -1031,6 +1055,11 @@ CONVERT_MEMORY_LIMIT = os.getenv("PAPERLESS_CONVERT_MEMORY_LIMIT")
 
 GS_BINARY = os.getenv("PAPERLESS_GS_BINARY", "gs")
 
+# Fallback layout for .eml consumption
+EMAIL_PARSE_DEFAULT_LAYOUT = __get_int(
+    "PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT",
+    1,  # MailRule.PdfLayout.TEXT_HTML but that can't be imported here
+)
 
 # Pre-2.x versions of Paperless stored your documents locally with GPG
 # encryption, but that is no longer the default.  This behaviour is still
@@ -1057,11 +1086,6 @@ FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
 # `created` date in the frontend. Duplicates are removed, which can result in
 # fewer dates shown.
 NUMBER_OF_SUGGESTED_DATES = __get_int("PAPERLESS_NUMBER_OF_SUGGESTED_DATES", 3)
-
-# Transformations applied before filename parsing
-FILENAME_PARSE_TRANSFORMS = []
-for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
-    FILENAME_PARSE_TRANSFORMS.append((re.compile(t["pattern"]), t["repl"]))
 
 # Specify the filename format for out files
 FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT")

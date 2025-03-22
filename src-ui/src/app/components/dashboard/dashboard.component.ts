@@ -6,6 +6,8 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
 import { Component } from '@angular/core'
+import { RouterModule } from '@angular/router'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { SavedView } from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -37,6 +39,8 @@ import { AiChatWidgetComponent } from './widgets/ai-chat-widget/ai-chat-widget.c
     IfPermissionsDirective,
     DragDropModule,
     TourNgBootstrapModule,
+    NgxBootstrapIconsModule,
+    RouterModule,
   ],
 })
 export class DashboardComponent extends ComponentWithPermissions {

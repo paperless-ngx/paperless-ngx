@@ -43,6 +43,7 @@ services:
     volumes:
       - ..:/usr/src/paperless/paperless-ngx:delegated
       - ../.devcontainer/vscode:/usr/src/paperless/paperless-ngx/.vscode:delegated # VSCode config files
+      - virtualenv:/usr/src/paperless/paperless-ngx/.venv # Virtual environment persisted in volume
       - uv_cache:/root/.cache/uv
       - /usr/src/paperless/paperless-ngx/src/documents/static/frontend # Static frontend files exist only in container
       - /usr/src/paperless/paperless-ngx/src/.pytest_cache
@@ -91,7 +92,7 @@ services:
       start_period: 5s
 
   gotenberg:
-    image: docker.io/gotenberg/gotenberg:7.10
+    image: docker.io/gotenberg/gotenberg:8.17
     restart: unless-stopped
 
     # The Gotenberg Chromium route is used to convert .eml files. We do not
@@ -106,5 +107,9 @@ services:
     restart: unless-stopped
 
 volumes:
+  data:
+  media:
+  redisdata:
+  virtualenv:
   redisdata_embeddings:
   uv_cache:

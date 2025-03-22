@@ -1,92 +1,43 @@
-import { Clipboard } from '@angular/cdk/clipboard'
-import { DecimalPipe } from '@angular/common'
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import {
+  NgbAccordionModule,
   NgbProgressbarModule,
-  NgbToastModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { Subscription, interval, take } from 'rxjs'
+import { Subscription } from 'rxjs'
 import { Toast, ToastService } from 'src/app/services/toast.service'
+import { ToastComponent } from '../toast/toast.component'
 
 @Component({
   selector: 'pngx-toasts',
   templateUrl: './toasts.component.html',
   styleUrls: ['./toasts.component.scss'],
   imports: [
-    DecimalPipe,
-    NgbToastModule,
+    ToastComponent,
+    NgbAccordionModule,
     NgbProgressbarModule,
     NgxBootstrapIconsModule,
   ],
 })
 export class ToastsComponent implements OnInit, OnDestroy {
-  constructor(
-    public toastService: ToastService,
-    private clipboard: Clipboard
-  ) {}
+  constructor(public toastService: ToastService) {}
 
   private subscription: Subscription
 
-  public toasts: Toast[] = []
-
-  public copied: boolean = false
-
-  public seconds: number = 0
+  public toasts: Toast[] = [] // array to force change detection
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe()
   }
 
   ngOnInit(): void {
-    this.subscription = this.toastService.getToasts().subscribe((toasts) => {
-      this.toasts = toasts
-      this.toasts.forEach((t) => {
-        if (typeof t.error === 'string') {
-          try {
-            t.error = JSON.parse(t.error)
-          } catch (e) {}
-        }
-      })
+    this.subscription = this.toastService.showToast.subscribe((toast) => {
+      this.toasts = toast ? [toast] : []
     })
   }
 
-  onShow(toast: Toast) {
-    const refreshInterval = 150
-    const delay = toast.delay - 500 // for fade animation
-
-    interval(refreshInterval)
-      .pipe(take(delay / refreshInterval))
-      .subscribe((count) => {
-        toast.delayRemaining = Math.max(
-          0,
-          delay - refreshInterval * (count + 1)
-        )
-      })
-  }
-
-  public isDetailedError(error: any): boolean {
-    return (
-      typeof error === 'object' &&
-      'status' in error &&
-      'statusText' in error &&
-      'url' in error &&
-      'message' in error &&
-      'error' in error
-    )
-  }
-
-  public copyError(error: any) {
-    this.clipboard.copy(JSON.stringify(error))
-    this.copied = true
-    setTimeout(() => {
-      this.copied = false
-    }, 3000)
-  }
-
-  getErrorText(error: any) {
-    let text: string = error.error?.detail ?? error.error ?? ''
-    if (typeof text === 'object') text = JSON.stringify(text)
-    return `${text.slice(0, 200)}${text.length > 200 ? '...' : ''}`
+  closeToast() {
+    this.toastService.closeToast(this.toasts[0])
+    this.toasts = []
   }
 }

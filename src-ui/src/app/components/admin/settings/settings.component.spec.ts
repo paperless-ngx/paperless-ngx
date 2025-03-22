@@ -212,7 +212,7 @@ describe('SettingsComponent', () => {
     expect(toastErrorSpy).toHaveBeenCalled()
     expect(storeSpy).toHaveBeenCalled()
     expect(appearanceSettingsSpy).not.toHaveBeenCalled()
-    expect(setSpy).toHaveBeenCalledTimes(28)
+    expect(setSpy).toHaveBeenCalledTimes(29)
 
     // succeed
     storeSpy.mockReturnValueOnce(of(true))
@@ -303,12 +303,17 @@ describe('SettingsComponent', () => {
         redis_error:
           'Error 61 connecting to localhost:6379. Connection refused.',
         celery_status: SystemStatusItemStatus.ERROR,
+        celery_url: 'celery@localhost',
+        celery_error: 'Error connecting to celery@localhost',
         index_status: SystemStatusItemStatus.OK,
         index_last_modified: new Date().toISOString(),
         index_error: null,
         classifier_status: SystemStatusItemStatus.OK,
         classifier_last_trained: new Date().toISOString(),
         classifier_error: null,
+        sanity_check_status: SystemStatusItemStatus.ERROR,
+        sanity_check_last_run: new Date().toISOString(),
+        sanity_check_error: 'Error running sanity check.',
       },
     }
     jest.spyOn(systemStatusService, 'get').mockReturnValue(of(status))
@@ -320,6 +325,8 @@ describe('SettingsComponent', () => {
     component['systemStatus'].database.status = SystemStatusItemStatus.OK
     component['systemStatus'].tasks.redis_status = SystemStatusItemStatus.OK
     component['systemStatus'].tasks.celery_status = SystemStatusItemStatus.OK
+    component['systemStatus'].tasks.sanity_check_status =
+      SystemStatusItemStatus.OK
     expect(component.systemStatusHasErrors).toBeFalsy()
   })
 

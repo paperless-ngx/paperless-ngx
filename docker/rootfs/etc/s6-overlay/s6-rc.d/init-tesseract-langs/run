@@ -1,0 +1,65 @@
+#!/command/with-contenv /usr/bin/bash
+# shellcheck shell=bash
+
+declare -r log_prefix="[init-tesseract-langs]"
+
+install_languages() {
+	echo "Installing languages..."
+
+	read -ra langs <<<"$1"
+
+	# Check that it is not empty
+	if [ ${#langs[@]} -eq 0 ]; then
+		return
+	fi
+
+	# Build list of packages to install
+	to_install=()
+	for lang in "${langs[@]}"; do
+		pkg="tesseract-ocr-$lang"
+
+		if dpkg --status "$pkg" &>/dev/null; then
+			echo "${log_prefix} Package $pkg already installed!"
+			continue
+		else
+			to_install+=("$pkg")
+		fi
+	done
+
+	# Use apt only when we install packages
+	if [ ${#to_install[@]} -gt 0 ]; then
+
+		# Warn the user if they're not root, but try anyway
+		if [[ -n "${USER_IS_NON_ROOT}" ]]; then
+			echo "${log_prefix} ERROR: Unable to install language ${pkg} as non-root, startup may fail"
+		fi
+
+		apt-get --quiet update &>/dev/null
+
+		for pkg in "${to_install[@]}"; do
+			if ! apt-cache --quiet show "$pkg" &>/dev/null; then
+				echo "${log_prefix} Skipped $pkg: Package not found! :("
+				continue
+			fi
+			echo "${log_prefix} Installing package $pkg..."
+			if ! apt-get --quiet --assume-yes install "$pkg" &>/dev/null; then
+				echo "${log_prefix} Could not install $pkg"
+				exit 1
+			else
+				echo "${log_prefix} Installed $pkg"
+			fi
+		done
+
+	fi
+}
+
+echo "${log_prefix} Checking if additional teseract languages needed"
+
+# Install additional languages if specified
+if [[ -n "$PAPERLESS_OCR_LANGUAGES" ]]; then
+
+	install_languages "$PAPERLESS_OCR_LANGUAGES"
+	echo "${log_prefix} Additional packages installed"
+else
+	echo "${log_prefix} No additional installs requested"
+fi

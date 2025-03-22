@@ -1,4 +1,5 @@
-import datetime
+from __future__ import annotations
+
 import logging
 import mimetypes
 import os
@@ -6,10 +7,10 @@ import re
 import shutil
 import subprocess
 import tempfile
-from collections.abc import Iterator
 from functools import lru_cache
 from pathlib import Path
 from re import Match
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.utils import timezone
@@ -18,6 +19,10 @@ from documents.loggers import LoggingMixin
 from documents.signals import document_consumer_declaration
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
+
+if TYPE_CHECKING:
+    import datetime
+    from collections.abc import Iterator
 
 # This regular expression will try to find dates in the document at
 # hand and will match the following formats:
@@ -41,7 +46,7 @@ DATE_REGEX = re.compile(
     r"(\b|(?!=([_-])))(\d{1,2}[\. ]+[a-zéûäëčžúřěáíóńźçŞğü]{3,9} \d{4}|[a-zéûäëčžúřěáíóńźçŞğü]{3,9} \d{1,2}, \d{4})(\b|(?=([_-])))|"
     r"(\b|(?!=([_-])))([^\W\d_]{3,9} \d{1,2}, (\d{4}))(\b|(?=([_-])))|"
     r"(\b|(?!=([_-])))([^\W\d_]{3,9} \d{4})(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))(\d{1,2}[^ ]{2}[\. ]+[^ ]{3,9}[ \.\/-]\d{4})(\b|(?=([_-])))|"
+    r"(\b|(?!=([_-])))(\d{1,2}[^ 0-9]{2}[\. ]+[^ ]{3,9}[ \.\/-]\d{4})(\b|(?=([_-])))|"
     r"(\b|(?!=([_-])))(\b\d{1,2}[ \.\/-][a-zéûäëčžúřěáíóńźçŞğü]{3}[ \.\/-]\d{4})(\b|(?=([_-])))",
     re.IGNORECASE,
 )
@@ -106,7 +111,7 @@ def get_supported_file_extensions() -> set[str]:
     return extensions
 
 
-def get_parser_class_for_mime_type(mime_type: str) -> type["DocumentParser"] | None:
+def get_parser_class_for_mime_type(mime_type: str) -> type[DocumentParser] | None:
     """
     Returns the best parser (by weight) for the given mimetype or
     None if no parser exists
@@ -133,6 +138,7 @@ def get_parser_class_for_mime_type(mime_type: str) -> type["DocumentParser"] | N
 def run_convert(
     input_file,
     output_file,
+    *,
     density=None,
     scale=None,
     alpha=None,

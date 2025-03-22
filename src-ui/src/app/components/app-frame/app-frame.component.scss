@@ -244,14 +244,28 @@ main {
   }
 }
 
+@media screen and (min-width: 366px) and (max-width: 768px) {
+  .navbar-toggler {
+    // compensate for 2 buttons on the right
+    margin-right: 45px;
+  }
+}
+
 @media screen and (min-width: 768px) {
   .navbar-brand.slim {
     max-width: 50px;
   }
 }
 
-.dropdown.show .dropdown-toggle,
-.dropdown-toggle:hover {
+@media screen and (max-width: 345px) {
+  .custom-title {
+    max-width: 110px;
+    overflow: hidden;
+  }
+}
+
+:host ::ng-deep .dropdown.show .dropdown-toggle,
+:host ::ng-deep .dropdown-toggle:hover {
   opacity: 0.7;
 }
 

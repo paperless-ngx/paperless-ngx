@@ -14,6 +14,7 @@ on:
       - 'translations**'
 
 env:
+  DEFAULT_UV_VERSION: "0.6.x"
   # This is the default version of Python to use in most steps which aren't specific
   DEFAULT_PYTHON_VERSION: "3.11"
 
@@ -56,24 +57,25 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
-          cache: "pip"
-          cache-dependency-path: 'pyproject.toml'
       -
         name: Install uv
-        run: |
-          pip install --user uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
+          enable-cache: true
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       -
-        name: Install dependencies
+        name: Install Python dependencies
         run: |
-          uv pip install -e ".[dev]"
-      -
-        name: List installed Python dependencies
-        run: |
-          pip list
+          uv sync --python ${{ steps.setup-python.outputs.python-version }} --dev --frozen
       -
         name: Make documentation
         run: |
-          mkdocs build --config-file ./mkdocs.yml
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --dev \
+            --frozen \
+            mkdocs build --config-file ./mkdocs.yml
       -
         name: Deploy documentation
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -81,7 +83,11 @@ jobs:
           echo "docs.paperless-ngx.com" > "${{ github.workspace }}/docs/CNAME"
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          mkdocs gh-deploy --force --no-history
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --dev \
+            --frozen \
+            mkdocs gh-deploy --force --no-history
       -
         name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -114,12 +120,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "${{ matrix.python-version }}"
-          cache: "pip"
-          cache-dependency-path: 'pyproject.toml'
       -
         name: Install uv
-        run: |
-          pip install --user uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
+          enable-cache: true
+          python-version: ${{ steps.setup-python.outputs.python-version }}
       -
         name: Install system dependencies
         run: |
@@ -128,16 +135,18 @@ jobs:
       -
         name: Configure ImageMagick
         run: |
-          sudo cp docker/imagemagick-policy.xml /etc/ImageMagick-6/policy.xml
+          sudo cp docker/rootfs/etc/ImageMagick-6/paperless-policy.xml /etc/ImageMagick-6/policy.xml
       -
         name: Install Python dependencies
         run: |
-          python --version
-          uv pip install -e ".[dev,typing]"
+          uv sync \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --group testing \
+            --frozen
       -
         name: List installed Python dependencies
         run: |
-          pip list
+          uv pip list
       -
         name: Tests
         env:
@@ -147,17 +156,26 @@ jobs:
           PAPERLESS_MAIL_TEST_USER: ${{ secrets.TEST_MAIL_USER }}
           PAPERLESS_MAIL_TEST_PASSWD: ${{ secrets.TEST_MAIL_PASSWD }}
         run: |
-          cd src/
-          pytest -ra
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --dev \
+            --frozen \
+            pytest
       -
-        name: Upload coverage
-        if: ${{ matrix.python-version == env.DEFAULT_PYTHON_VERSION }}
-        uses: actions/upload-artifact@v4
+        name: Upload backend test results to Codecov
+        if: always()
+        uses: codecov/test-results-action@v1
         with:
-          name: backend-coverage-report
-          path: src/coverage.xml
-          retention-days: 7
-          if-no-files-found: warn
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: backend-python-${{ matrix.python-version }}
+          files: junit.xml
+      -
+        name: Upload backend coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: backend-python-${{ matrix.python-version }}
+          files: coverage.xml
       -
         name: Stop containers
         if: always()
@@ -165,42 +183,46 @@ jobs:
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml logs
           docker compose --file ${{ github.workspace }}/docker/compose/docker-compose.ci-test.yml down
 
-  install-frontend-depedendencies:
+  install-frontend-dependencies:
     name: "Install Frontend Dependencies"
     runs-on: ubuntu-24.04
     needs:
       - pre-commit
     steps:
       - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
       -
         name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          cache: 'npm'
-          cache-dependency-path: 'src-ui/package-lock.json'
+          cache: 'pnpm'
+          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
         id: cache-frontend-deps
         uses: actions/cache@v4
         with:
           path: |
-            ~/.npm
+            ~/.pnpm-store
             ~/.cache
-          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
+          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
       -
         name: Install dependencies
         if: steps.cache-frontend-deps.outputs.cache-hit != 'true'
-        run: cd src-ui && npm ci
+        run: cd src-ui && pnpm install
       -
         name: Install Playwright
         if: steps.cache-frontend-deps.outputs.cache-hit != 'true'
-        run: cd src-ui && npx playwright install --with-deps
+        run: cd src-ui && pnpm playwright install --with-deps
 
   tests-frontend:
     name: "Frontend Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     runs-on: ubuntu-24.04
     needs:
-      - install-frontend-depedendencies
+      - install-frontend-dependencies
     strategy:
       fail-fast: false
       matrix:
@@ -209,124 +231,88 @@ jobs:
         shard-count: [4]
     steps:
       - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
       -
         name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          cache: 'npm'
-          cache-dependency-path: 'src-ui/package-lock.json'
+          cache: 'pnpm'
+          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
         id: cache-frontend-deps
         uses: actions/cache@v4
         with:
           path: |
-            ~/.npm
+            ~/.pnpm-store
             ~/.cache
-          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
+          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
       - name: Re-link Angular cli
-        run: cd src-ui && npm link @angular/cli
+        run: cd src-ui && pnpm link @angular/cli
       -
         name: Linting checks
-        run: cd src-ui && npm run lint
+        run: cd src-ui && pnpm run lint
       -
         name: Run Jest unit tests
-        run: cd src-ui && npm run test -- --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
-      -
-        name: Upload Jest coverage
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: jest-coverage-report-${{ matrix.shard-index }}
-          path: |
-            src-ui/coverage/coverage-final.json
-            src-ui/coverage/lcov.info
-            src-ui/coverage/clover.xml
-          retention-days: 7
-          if-no-files-found: warn
+        run: cd src-ui && pnpm run test --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
       -
         name: Run Playwright e2e tests
-        run: cd src-ui && npx playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
+        run: cd src-ui && pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
       -
-        name: Upload Playwright test results
+        name: Upload frontend test results to Codecov
+        uses: codecov/test-results-action@v1
         if: always()
-        uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-${{ matrix.shard-index }}
-          path: src-ui/playwright-report
-          retention-days: 7
-
-  tests-coverage-upload:
-    name: "Upload to Codecov"
-    runs-on: ubuntu-24.04
-    needs:
-      - tests-backend
-      - tests-frontend
-    steps:
-      -
-        uses: actions/checkout@v4
-      -
-        name: Download frontend jest coverage
-        uses: actions/download-artifact@v4
-        with:
-          path: src-ui/coverage/
-          pattern: jest-coverage-report-*
-      -
-        name: Download frontend playwright coverage
-        uses: actions/download-artifact@v4
-        with:
-          path: src-ui/coverage/
-          pattern: playwright-report-*
-          merge-multiple: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: frontend-node-${{ matrix.node-version }}
+          directory: src-ui/
       -
         name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          # not required for public repos, but intermittently fails otherwise
           token: ${{ secrets.CODECOV_TOKEN }}
-          flags: frontend
+          flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/coverage/
-          # dont include backend coverage files here
-          files: '!coverage.xml'
+
+  frontend-bundle-analysis:
+    name: "Frontend Bundle Analysis"
+    runs-on: ubuntu-24.04
+    needs:
+      - tests-frontend
+    steps:
+      - uses: actions/checkout@v4
       -
-        name: Download backend coverage
-        uses: actions/download-artifact@v4
+        name: Install pnpm
+        uses: pnpm/action-setup@v4
         with:
-          name: backend-coverage-report
-          path: src/
-      -
-        name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          # not required for public repos, but intermittently fails otherwise
-          token: ${{ secrets.CODECOV_TOKEN }}
-          # future expansion
-          flags: backend
-          directory: src/
+          version: 10
       -
         name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          cache: 'npm'
-          cache-dependency-path: 'src-ui/package-lock.json'
+          cache: 'pnpm'
+          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       -
         name: Cache frontend dependencies
         id: cache-frontend-deps
         uses: actions/cache@v4
         with:
           path: |
-            ~/.npm
+            ~/.pnpm-store
             ~/.cache
           key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/package-lock.json') }}
       -
         name: Re-link Angular cli
-        run: cd src-ui && npm link @angular/cli
+        run: cd src-ui && pnpm link @angular/cli
       -
         name: Build frontend and upload analysis
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        run: cd src-ui && ng build --configuration=production
+        run: cd src-ui && pnpm run build --configuration=production
 
   build-docker-image:
     name: Build Docker image for ${{ github.ref_name }}
@@ -469,16 +455,17 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
-          cache: "pip"
-          cache-dependency-path: 'pyproject.toml'
       -
         name: Install uv
-        run: |
-          pip install --user uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
+          enable-cache: true
+          python-version: ${{ steps.setup-python.outputs.python-version }}
       -
         name: Install dependencies
         run: |
-          uv pip install -e ".[dev]"
+          uv sync --python ${{ steps.setup-python.outputs.python-version }} --dev --frozen
       -
         name: Install system dependencies
         run: |
@@ -499,19 +486,21 @@ jobs:
       -
         name: Generate requirements file
         run: |
-          uv pip list > requirements.txt
+           uv export --quiet --no-dev --all-extras --format requirements-txt --output-file requirements.txt
       -
         name: Compile messages
         run: |
           cd src/
-          uv pip install -e ".[dev]"
-          python3 manage.py compilemessages
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            manage.py compilemessages
       -
         name: Collect static files
         run: |
           cd src/
-          uv pip install -e ".[dev]"
-          python3 manage.py collectstatic --no-input
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            manage.py collectstatic --no-input
       -
         name: Move files
         run: |
@@ -528,10 +517,11 @@ jobs:
                           .env \
                           Dockerfile \
                           pyproject.toml \
+                          uv.lock \
+                          requirements.txt \
                           LICENSE \
                           README.md \
-                          paperless.conf.example \
-                          gunicorn.conf.py
+                          paperless.conf.example
           do
             cp --verbose ${file_name} dist/paperless-ngx/
           done
@@ -628,15 +618,17 @@ jobs:
           ref: main
       -
         name: Set up Python
+        id: setup-python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
-          cache: "pip"
-          cache-dependency-path: 'pyproject.toml'
       -
         name: Install uv
-        run: |
-          pip install --user uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
+          enable-cache: true
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       -
         name: Append Changelog to docs
         id: append-Changelog
@@ -652,8 +644,10 @@ jobs:
           CURRENT_CHANGELOG=`tail --lines +2 changelog.md`
           echo -e "$CURRENT_CHANGELOG" >> changelog-new.md
           mv changelog-new.md changelog.md
-          uv pip install -e ".[dev]"
-          pre-commit run --files changelog.md || true
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --dev \
+            pre-commit run --files changelog.md || true
           git config --global user.name "github-actions"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -am "Changelog ${{ needs.publish-release.outputs.version }} - GHA"

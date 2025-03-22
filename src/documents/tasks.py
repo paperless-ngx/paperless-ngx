@@ -9,6 +9,7 @@ from tempfile import TemporaryDirectory
 import tqdm
 from celery import Task
 from celery import shared_task
+from celery import states
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -35,6 +36,7 @@ from documents.models import Correspondent
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import PaperlessTask
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import Workflow
@@ -63,7 +65,7 @@ def index_optimize():
     writer.commit(optimize=True)
 
 
-def index_reindex(progress_bar_disable=False):
+def index_reindex(*, progress_bar_disable=False):
     documents = Document.objects.all()
 
     ix = index.open_index(recreate=True)
@@ -74,19 +76,34 @@ def index_reindex(progress_bar_disable=False):
 
 
 @shared_task
-def train_classifier():
+def train_classifier(*, scheduled=True):
+    task = PaperlessTask.objects.create(
+        type=PaperlessTask.TaskType.SCHEDULED_TASK
+        if scheduled
+        else PaperlessTask.TaskType.MANUAL_TASK,
+        task_id=uuid.uuid4(),
+        task_name=PaperlessTask.TaskName.TRAIN_CLASSIFIER,
+        status=states.STARTED,
+        date_created=timezone.now(),
+        date_started=timezone.now(),
+    )
     if (
         not Tag.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
         and not DocumentType.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
         and not Correspondent.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
         and not StoragePath.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
     ):
-        logger.info("No automatic matching items, not training")
+        result = "No automatic matching items, not training"
+        logger.info(result)
         # Special case, items were once auto and trained, so remove the model
         # and prevent its use again
         if settings.MODEL_FILE.exists():
             logger.info(f"Removing {settings.MODEL_FILE} so it won't be used")
             settings.MODEL_FILE.unlink()
+        task.status = states.SUCCESS
+        task.result = result
+        task.date_done = timezone.now()
+        task.save()
         return
 
     classifier = load_classifier()
@@ -100,11 +117,19 @@ def train_classifier():
                 f"Saving updated classifier model to {settings.MODEL_FILE}...",
             )
             classifier.save()
+            task.result = "Training completed successfully"
         else:
             logger.debug("Training data unchanged.")
+            task.result = "Training data unchanged"
+
+        task.status = states.SUCCESS
+        task.date_done = timezone.now()
+        task.save(update_fields=["status", "result", "date_done"])
 
     except Exception as e:
         logger.warning("Classifier error: " + str(e))
+        task.status = states.FAILURE
+        task.result = str(e)
 
 
 @shared_task(bind=True)
@@ -176,13 +201,16 @@ def consume_file(
 
 
 @shared_task
-def sanity_check():
-    messages = sanity_checker.check_sanity()
+def sanity_check(*, scheduled=True, raise_on_error=True):
+    messages = sanity_checker.check_sanity(scheduled=scheduled)
 
     messages.log_messages()
 
     if messages.has_error:
-        raise SanityCheckFailedException("Sanity check failed with errors. See log.")
+        message = "Sanity check exited with errors. See log."
+        if raise_on_error:
+            raise SanityCheckFailedException(message)
+        return message
     elif messages.has_warning:
         return "Sanity check exited with warnings. See log."
     elif len(messages) > 0:
@@ -244,7 +272,7 @@ def update_document_content_maybe_archive_file(document_id):
         with transaction.atomic():
             oldDocument = Document.objects.get(pk=document.pk)
             if parser.get_archive_path():
-                with open(parser.get_archive_path(), "rb") as f:
+                with Path(parser.get_archive_path()).open("rb") as f:
                     checksum = hashlib.md5(f.read()).hexdigest()
                 # I'm going to save first so that in case the file move
                 # fails, the database is rolled back.
@@ -335,7 +363,7 @@ def empty_trash(doc_ids=None):
     )
 
     try:
-        deleted_document_ids = documents.values_list("id", flat=True)
+        deleted_document_ids = list(documents.values_list("id", flat=True))
         # Temporarily connect the cleanup handler
         models.signals.post_delete.connect(cleanup_document_deletion, sender=Document)
         documents.delete()  # this is effectively a hard delete

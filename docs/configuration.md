@@ -198,6 +198,18 @@ Docker, this may be the `environment` key of the webserver or a
 containing the configuration parameters. Be sure to use the correct format
 and watch out for indentation if editing the YAML file.
 
+### Email Parsing
+
+#### [`PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT=<int>`(#PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT) {#PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT}
+
+: The default layout to use for emails that are consumed as documents. Must be one of the integer choices below. Note that mail
+rules can specify this setting, thus this fallback is used for the default selection and for .eml files consumed by other means.
+
+    - `1` = Text, then HTML
+    - `2` = HTML, then text
+    - `3` = HTML only
+    - `4` = Text only
+
 ## Paths and folders
 
 #### [`PAPERLESS_CONSUMPTION_DIR=<path>`](#PAPERLESS_CONSUMPTION_DIR) {#PAPERLESS_CONSUMPTION_DIR}
@@ -545,6 +557,20 @@ This is for use with self-signed certificates against local IMAP servers.
     Settings this value has security implications for the security of your email.
     Understand what it does and be sure you need to before setting.
 
+### Authentication & SSO {#authentication}
+
+#### [`PAPERLESS_ACCOUNT_ALLOW_SIGNUPS=<bool>`](#PAPERLESS_ACCOUNT_ALLOW_SIGNUPS) {#PAPERLESS_ACCOUNT_ALLOW_SIGNUPS}
+
+: Allow users to signup for a new Paperless-ngx account.
+
+    Defaults to False
+
+#### [`PAPERLESS_ACCOUNT_DEFAULT_GROUPS=<comma-separated-list>`](#PAPERLESS_ACCOUNT_DEFAULT_GROUPS) {#PAPERLESS_ACCOUNT_DEFAULT_GROUPS}
+
+: A list of group names that users will be added to when they sign up for a new account. Groups listed here must already exist.
+
+    Defaults to None
+
 #### [`PAPERLESS_SOCIALACCOUNT_PROVIDERS=<json>`](#PAPERLESS_SOCIALACCOUNT_PROVIDERS) {#PAPERLESS_SOCIALACCOUNT_PROVIDERS}
 
 : This variable is used to setup login and signup via social account providers which are compatible with django-allauth.
@@ -568,11 +594,24 @@ system. See the corresponding
 
     Defaults to True
 
-#### [`PAPERLESS_ACCOUNT_ALLOW_SIGNUPS=<bool>`](#PAPERLESS_ACCOUNT_ALLOW_SIGNUPS) {#PAPERLESS_ACCOUNT_ALLOW_SIGNUPS}
+#### [`PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS=<bool>`](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS) {#PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS}
 
-: Allow users to signup for a new Paperless-ngx account.
+: Sync groups from the third party authentication system (e.g. OIDC) to Paperless-ngx. When enabled, users will be added or removed from groups based on their group membership in the third party authentication system. Groups must already exist in Paperless-ngx and have the same name as in the third party authentication system. Groups are updated upon logging in via the third party authentication system, see the corresponding [django-allauth documentation](https://docs.allauth.org/en/dev/socialaccount/signals.html).
+
+: In order to pass groups from the authentication system you will need to update your [PAPERLESS_SOCIALACCOUNT_PROVIDERS](#PAPERLESS_SOCIALACCOUNT_PROVIDERS) setting by adding a top-level "SCOPES" setting which includes "groups", e.g.:
+
+    ```json
+    {"openid_connect":{"SCOPE": ["openid","profile","email","groups"]...
+    ```
 
     Defaults to False
+
+#### [`PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS=<comma-separated-list>`](#PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS) {#PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS}
+
+: A list of group names that users who signup via social accounts will be added to upon signup. Groups listed here must already exist.
+If both the [PAPERLESS_ACCOUNT_DEFAULT_GROUPS](#PAPERLESS_ACCOUNT_DEFAULT_GROUPS) setting and this setting are used, the user will be added to both sets of groups.
+
+    Defaults to None
 
 #### [`PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL=<string>`](#PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL) {#PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL}
 
@@ -1018,6 +1057,11 @@ be used with caution!
 
 ## Document Consumption {#consume_config}
 
+#### [`PAPERLESS_CONSUMER_DISABLE=<bool>`](#PAPERLESS_CONSUMER_DISABLE) {#PAPERLESS_CONSUMER_DISABLE}
+
+: Completely disable the directory-based consumer in docker. If you don't plan to consume documents
+via the consumption directory, you can disable the consumer to save resources.
+
 #### [`PAPERLESS_CONSUMER_DELETE_DUPLICATES=<bool>`](#PAPERLESS_CONSUMER_DELETE_DUPLICATES) {#PAPERLESS_CONSUMER_DELETE_DUPLICATES}
 
 : When the consumer detects a duplicate document, it will not touch
@@ -1072,8 +1116,6 @@ or hidden folders some tools use to store data.
     Currently, "PYZBAR" (the default) or "ZXING" might be selected.
     If you have problems that your Barcodes/QR-Codes are not detected
     (especially with bad scan quality and/or small codes), try the other one.
-
-    zxing is not available on all platforms.
 
 #### [`PAPERLESS_PRE_CONSUME_SCRIPT=<filename>`](#PAPERLESS_PRE_CONSUME_SCRIPT) {#PAPERLESS_PRE_CONSUME_SCRIPT}
 
@@ -1496,13 +1538,23 @@ increase RAM usage.
 
     Defaults to 1.
 
+    !!! note
+
+         This option may also be set with `GRANIAN_WORKERS` and
+         this option may be removed in the future
+
 #### [`PAPERLESS_BIND_ADDR=<ip address>`](#PAPERLESS_BIND_ADDR) {#PAPERLESS_BIND_ADDR}
 
 : The IP address the webserver will listen on inside the container.
 There are special setups where you may need to configure this value
 to restrict the Ip address or interface the webserver listens on.
 
-    Defaults to `[::]`, meaning all interfaces, including IPv6.
+    Defaults to `::`, meaning all interfaces, including IPv6.
+
+    !!! note
+
+         This option may also be set with `GRANIAN_HOST` and
+         this option may be removed in the future
 
 #### [`PAPERLESS_PORT=<port>`](#PAPERLESS_PORT) {#PAPERLESS_PORT}
 
@@ -1516,6 +1568,11 @@ one pod).
     the "ports" key in `docker-compose.yml`.
 
     Defaults to 8000.
+
+    !!! note
+
+         This option may also be set with `GRANIAN_PORT` and
+         this option may be removed in the future
 
 #### [`USERMAP_UID=<uid>`](#USERMAP_UID) {#USERMAP_UID}
 
@@ -1586,9 +1643,11 @@ started by the container.
 
 #### [`PAPERLESS_SUPERVISORD_WORKING_DIR=<defined>`](#PAPERLESS_SUPERVISORD_WORKING_DIR) {#PAPERLESS_SUPERVISORD_WORKING_DIR}
 
-: If this environment variable is defined, the `supervisord.log` and `supervisord.pid` file will be created under the specified path in `PAPERLESS_SUPERVISORD_WORKING_DIR`. Setting `PAPERLESS_SUPERVISORD_WORKING_DIR=/tmp` and `PYTHONPYCACHEPREFIX=/tmp/pycache` would allow paperless to work on a read-only filesystem.
+!!! warning
 
-    Please take note that the `PAPERLESS_DATA_DIR` and `PAPERLESS_MEDIA_ROOT` paths still have to be writable, just like the `PAPERLESS_SUPERVISORD_WORKING_DIR`. The can be archived by using bind or volume mounts. Only works in the container is run as user *paperless*
+        This option is deprecated and has no effect.  For read only file system support,
+        see [S6_READ_ONLY_ROOT](https://github.com/just-containers/s6-overlay#customizing-s6-overlay-behaviour)
+        from s6-overlay.
 
 ## Frontend Settings
 
