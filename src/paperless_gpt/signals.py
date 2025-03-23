@@ -1,6 +1,7 @@
-def get_parser(*args, **kwargs) -> LLMDocumentParser:
-    from .parsers import LLMDocumentParser
+from .parsers import LLMDocumentParser
 
+
+def get_parser(*args, **kwargs) -> LLMDocumentParser:
     return LLMDocumentParser(*args, **kwargs)
 
 

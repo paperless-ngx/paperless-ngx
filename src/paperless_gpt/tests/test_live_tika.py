@@ -51,9 +51,10 @@ class TestTikaParserAgainstServer(TestCase):
 
                 succeeded = True
             except Exception as e:
-                print(f"{e} during try #{retry_count}", flush=True)
-
                 retry_count = retry_count + 1
+
+                if retry_count == max_retry_count:
+                    raise e
 
                 time.sleep(retry_time)
                 retry_time = retry_time * 2.0
@@ -82,7 +83,7 @@ class TestTikaParserAgainstServer(TestCase):
             "This is an ODT test document, created September 14, 2022",
         )
         self.assertIsNotNone(self.parser.archive_path)
-        with open(self.parser.archive_path, "rb") as f:
+        with self.parser.archive_path.open("rb") as f:
             # PDFs begin with the bytes PDF-x.y
             self.assertTrue(b"PDF-" in f.read()[:10])
 
@@ -111,7 +112,7 @@ class TestTikaParserAgainstServer(TestCase):
             "This is an DOCX test document, also made September 14, 2022",
         )
         self.assertIsNotNone(self.parser.archive_path)
-        with open(self.parser.archive_path, "rb") as f:
+        with self.parser.archive_path.open("rb") as f:
             self.assertTrue(b"PDF-" in f.read()[:10])
 
         # self.assertEqual(self.parser.date, datetime.datetime(2022, 9, 14))
