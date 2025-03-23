@@ -1,1 +1,1 @@
-# Tests module for Mistral OCR 
+# Tests module for Mistral OCR

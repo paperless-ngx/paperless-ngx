@@ -17,4 +17,4 @@ def mistral_ocr_consumer_declaration(sender, **kwargs):
             "image/bmp": ".bmp",
             "image/webp": ".webp",
         },
-    } 
+    }

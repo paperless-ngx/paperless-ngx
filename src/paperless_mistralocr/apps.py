@@ -11,4 +11,4 @@ class PaperlessMistralOcrConfig(AppConfig):
 
         document_consumer_declaration.connect(mistral_ocr_consumer_declaration)
 
-        AppConfig.ready(self) 
+        AppConfig.ready(self)
