@@ -1,0 +1,18 @@
+:host {
+  display: block;
+}
+
+.modal-body {
+  min-height: 60vh;
+  max-height: 80vh;
+
+  markdown {
+    height: 100%;
+    display: block;
+  }
+
+  // Style for RTL text
+  .rtl {
+    direction: rtl;
+  }
+}

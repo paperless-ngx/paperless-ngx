@@ -106,6 +106,7 @@ import { DocumentHistoryComponent } from '../document-history/document-history.c
 import { DocumentNotesComponent } from '../document-notes/document-notes.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { MetadataCollapseComponent } from './metadata-collapse/metadata-collapse.component'
+import { MarkdownModalComponent } from '../common/markdown-modal'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -171,6 +172,7 @@ export enum ZoomSetting {
     NgxBootstrapIconsModule,
     PdfViewerModule,
     MarkdownModule,
+    MarkdownModalComponent,
   ],
 })
 export class DocumentDetailComponent
@@ -1494,5 +1496,16 @@ export class DocumentDetailComponent
         this.tiffError = $localize`An error occurred loading tiff: ${err.toString()}`
       },
     })
+  }
+
+  openMarkdownModal() {
+    const modalRef = this.modalService.open(MarkdownModalComponent, {
+      size: 'xl',
+      centered: true,
+      scrollable: true,
+    });
+    modalRef.componentInstance.content = this.documentForm.get('content').value;
+    modalRef.componentInstance.title = this.title;
+    modalRef.componentInstance.isRTL = this.isRTL;
   }
 }

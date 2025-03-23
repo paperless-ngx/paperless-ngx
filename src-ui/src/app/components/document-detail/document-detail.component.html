@@ -243,8 +243,14 @@
               </div>
               }
               @if (!contentEditMode) {
-              <markdown [data]="documentForm.get('content').value" class="form-control overflow-auto" id="content"
-                [class.rtl]="isRTL"></markdown>
+              <div class="position-relative">
+                <markdown [data]="documentForm.get('content').value" class="form-control overflow-auto" id="content"
+                  [class.rtl]="isRTL" [sanitize]="false"></markdown>
+                <button type="button" class="btn btn-outline-secondary position-absolute top-0 end-0 m-2"
+                  (click)="openMarkdownModal()">
+                  <i-bs name="arrows-fullscreen"></i-bs>
+                </button>
+              </div>
               }
               @if (contentEditMode && userCanEdit) {
               <textarea class=" form-control" rows="20" formControlName='content' [class.rtl]="isRTL"></textarea>
