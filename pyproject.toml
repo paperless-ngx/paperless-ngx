@@ -158,7 +158,7 @@ lint.extend-select = [
 	"UP",   # https://docs.astral.sh/ruff/rules/#pyupgrade-up
 	"W",    # https://docs.astral.sh/ruff/rules/#pycodestyle-e-w
 ]
-lint.ignore = ["DJ001", "RUF012", "SIM105"]
+lint.ignore = ["DJ001", "RUF012", "SIM105", "COM812"]
 # Migrations
 lint.per-file-ignores."*/migrations/*.py" = ["E501", "SIM", "T201"]
 # Testing
