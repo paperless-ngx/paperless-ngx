@@ -157,6 +157,7 @@ lint.extend-select = [
 	"TID",  # https://docs.astral.sh/ruff/rules/#flake8-tidy-imports-tid
 	"UP",   # https://docs.astral.sh/ruff/rules/#pyupgrade-up
 	"W",    # https://docs.astral.sh/ruff/rules/#pycodestyle-e-w
+	"F401",
 ]
 lint.ignore = ["DJ001", "RUF012", "SIM105", "COM812"]
 # Migrations
