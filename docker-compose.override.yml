@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   webserver:
     # Map source files for development

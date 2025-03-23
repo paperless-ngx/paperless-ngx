@@ -23,6 +23,7 @@ var/
 .installed.cfg
 *.egg
 /src/paperless_mail/templates/node_modules
+node_modules/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
