@@ -1,8 +1,0 @@
-project_id_env: CROWDIN_PROJECT_ID
-api_token_env: CROWDIN_PERSONAL_TOKEN
-preserve_hierarchy: true
-files:
-  - source: /src/locale/en_US/LC_MESSAGES/django.po
-    translation: /src/locale/%locale_with_underscore%/LC_MESSAGES/django.po
-  - source: /src-ui/messages.xlf
-    translation: /src-ui/src/locale/messages.%locale_with_underscore%.xlf
