@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 from django.conf import settings
+
 from paperless_gpt.signals import llm_consumer_declaration
 
 

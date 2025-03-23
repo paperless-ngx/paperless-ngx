@@ -3,11 +3,12 @@ import os
 from pathlib import Path
 from unittest import mock
 
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
+from requests import Response
+
 from documents.parsers import ParseError
 from paperless_tika.parsers import TikaDocumentParser
-from requests import Response
 
 
 class TestTikaParser(TestCase):
