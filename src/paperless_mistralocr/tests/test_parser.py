@@ -1,11 +1,8 @@
-import os
 import tempfile
-import unittest
-from unittest import mock
 from pathlib import Path
+from unittest import mock
 
 from django.test import TestCase
-from django.test import override_settings
 
 # Mock the HAS_MISTRAL flag for testing
 with mock.patch("paperless_mistralocr.parsers.HAS_MISTRAL", True):

@@ -1,19 +1,15 @@
-import os
-import json
-import tempfile
-from pathlib import Path
-from typing import Dict, Any, Optional, List, TYPE_CHECKING
-from datetime import datetime
 import base64
+import os
 import re
+from pathlib import Path
 
-from django.conf import settings
-from PIL import Image
 import magic
+from django.conf import settings
 
 try:
     from mistralai import Mistral
-    from mistralai.models import OCRResponse, SDKError
+    from mistralai.models import OCRResponse
+    from mistralai.models import SDKError
 
     HAS_MISTRAL = True
 except ImportError:
@@ -209,7 +205,7 @@ class MistralOcrDocumentParser(DocumentParser):
 
         try:
             # Create Mistral client
-            self.log.debug(f"Initializing Mistral client for OCR processing")
+            self.log.debug("Initializing Mistral client for OCR processing")
             client = Mistral(api_key=api_key)
 
             # Determine if the file is an image or PDF
@@ -247,8 +243,8 @@ class MistralOcrDocumentParser(DocumentParser):
 
         except Exception as e:
             if isinstance(e, SDKError):
-                raise ParseError(f"Mistral API error: {str(e)}")
-            raise ParseError(f"Error calling Mistral OCR API: {str(e)}")
+                raise ParseError(f"Mistral API error: {e!s}")
+            raise ParseError(f"Error calling Mistral OCR API: {e!s}")
 
     def replace_images_in_markdown(self, markdown_str: str, images_dict: dict) -> str:
         """

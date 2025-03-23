@@ -3,7 +3,6 @@ Settings for the Mistral OCR module.
 """
 
 import os
-from django.conf import settings
 
 # Default Mistral OCR settings
 MISTRAL_API_KEY = os.getenv("PAPERLESS_MISTRAL_API_KEY", "")

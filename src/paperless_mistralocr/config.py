@@ -1,7 +1,9 @@
 import dataclasses
 import os
+
 from django.conf import settings
-from paperless.config import BaseConfig, OutputTypeConfig
+
+from paperless.config import OutputTypeConfig
 
 
 @dataclasses.dataclass
