@@ -109,6 +109,7 @@ Paperless-ngx now includes an optional integration with Mistral AI's OCR API for
 ### Setup
 
 1. Install the required Python package:
+
    ```
    pip install mistralai
    ```
@@ -116,6 +117,7 @@ Paperless-ngx now includes an optional integration with Mistral AI's OCR API for
 2. Get a Mistral API key from [Mistral AI Console](https://console.mistral.ai/).
 
 3. Add your API key to your environment:
+
    ```
    PAPERLESS_MISTRAL_API_KEY=your_api_key_here
    ```
@@ -131,16 +133,19 @@ For more details, see the [Mistral OCR module documentation](src/paperless_mistr
 This project uses [uv](https://github.com/astral-sh/uv) for dependency management. uv is a fast Python package installer and resolver that has replaced pipenv in this project.
 
 1. Install uv:
+
    ```
    pip install uv
    ```
 
 2. Install dependencies using uv:
+
    ```
    uv pip install -e ".[dev,typing]"
    ```
 
 3. Add new dependencies to pyproject.toml and install them:
+
    ```
    uv pip install -e ".[dev,typing]"
    ```

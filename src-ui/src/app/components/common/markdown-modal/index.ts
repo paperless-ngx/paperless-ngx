@@ -1,1 +1,1 @@
-export * from './markdown-modal.component';
+export * from './markdown-modal.component'

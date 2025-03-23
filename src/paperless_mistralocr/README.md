@@ -14,6 +14,7 @@ This module integrates Mistral AI's OCR API for text extraction and document und
 This module is included in Paperless-ngx. To enable it:
 
 1. Install the required Python package:
+
    ```
    pip install mistralai
    ```
@@ -21,6 +22,7 @@ This module is included in Paperless-ngx. To enable it:
 2. Get an API key from [Mistral AI](https://console.mistral.ai/)
 
 3. Set the API key as an environment variable:
+
    ```
    PAPERLESS_MISTRAL_API_KEY=your_api_key_here
    ```
@@ -34,12 +36,13 @@ This module is included in Paperless-ngx. To enable it:
 
 The module uses the following configuration options:
 
-| Environment Variable | Description | Default |
-|---------------------|-------------|---------|
-| PAPERLESS_MISTRAL_API_KEY | API key for Mistral AI | (required) |
-| PAPERLESS_MISTRAL_MODEL | Model to use for OCR | mistral-ocr-latest |
+| Environment Variable      | Description            | Default            |
+| ------------------------- | ---------------------- | ------------------ |
+| PAPERLESS_MISTRAL_API_KEY | API key for Mistral AI | (required)         |
+| PAPERLESS_MISTRAL_MODEL   | Model to use for OCR   | mistral-ocr-latest |
 
 The module also inherits other OCR settings from Paperless-ngx, such as:
+
 - OCR_MODE (skip, redo, force)
 - OCR_OUTPUT_TYPE (pdf, pdfa, etc.)
 
@@ -71,7 +74,8 @@ docker-compose logs -f paperless
 ```
 
 Common issues:
+
 - Missing or invalid API key
 - Network connectivity problems
 - Missing mistralai Python package
-- Document size limitations 
+- Document size limitations

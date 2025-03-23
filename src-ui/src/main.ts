@@ -19,7 +19,6 @@ import {
   NgbModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { MarkdownModule } from 'ngx-markdown'
 import { PdfViewerModule } from 'ng2-pdf-viewer'
 import {
   NgxBootstrapIconsModule,
@@ -34,6 +33,7 @@ import {
   arrowRight,
   arrowRightShort,
   arrowUpRight,
+  arrowsFullscreen,
   asterisk,
   bell,
   bodyText,
@@ -85,7 +85,6 @@ import {
   folder,
   folderFill,
   fullscreen,
-  arrowsFullscreen,
   funnel,
   gear,
   google,
@@ -139,6 +138,7 @@ import {
 import { ColorSliderModule } from 'ngx-color/slider'
 import { CookieService } from 'ngx-cookie-service'
 import { NgxFileDropModule } from 'ngx-file-drop'
+import { MarkdownModule } from 'ngx-markdown'
 import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { AppRoutingModule } from './app/app-routing.module'
 import { AppComponent } from './app/app.component'
