@@ -1,5 +1,4 @@
 import datetime
-import os
 from pathlib import Path
 from unittest import mock
 
@@ -30,13 +29,13 @@ class TestTikaParser(TestCase):
         response.status_code = 200
         post.return_value = response
 
-        file = os.path.join(self.parser.tempdir, "input.odt")
+        file = Path(self.parser.tempdir) / "input.odt"
         Path(file).touch()
         self.parser.parse(file, "application/vnd.oasis.opendocument.text")
 
         self.assertEqual(self.parser.text, "the content")
         self.assertIsNotNone(self.parser.archive_path)
-        with open(self.parser.archive_path, "rb") as f:
+        with Path(self.parser.archive_path).open("rb") as f:
             self.assertEqual(f.read(), b"PDF document")
 
         self.assertEqual(self.parser.date, datetime.datetime(2020, 11, 21))
@@ -47,7 +46,7 @@ class TestTikaParser(TestCase):
             "metadata": {"Creation-Date": "2020-11-21", "Some-key": "value"},
         }
 
-        file = os.path.join(self.parser.tempdir, "input.odt")
+        file = Path(self.parser.tempdir) / "input.odt"
         Path(file).touch()
 
         metadata = self.parser.extract_metadata(
@@ -78,7 +77,7 @@ class TestTikaParser(TestCase):
         response.status_code = 500
         post.return_value = response
 
-        file = os.path.join(self.parser.tempdir, "input.odt")
+        file = Path(self.parser.tempdir) / "input.odt"
         Path(file).touch()
 
         with self.assertRaises(ParseError):
@@ -94,7 +93,7 @@ class TestTikaParser(TestCase):
         THEN:
             - Request to Gotenberg contains the expected PDF/A format string
         """
-        file = os.path.join(self.parser.tempdir, "input.odt")
+        file = Path(self.parser.tempdir) / "input.odt"
         Path(file).touch()
 
         response = Response()

@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 import dateutil.parser
@@ -11,7 +10,7 @@ from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
 
 
-class TikaDocumentParser(DocumentParser):
+class LLMDocumentParser(DocumentParser):
     """
     This parser sends documents to a local tika server
     """
@@ -83,15 +82,15 @@ class TikaDocumentParser(DocumentParser):
         self.archive_path = self.convert_to_pdf(document_path, file_name)
 
     def convert_to_pdf(self, document_path, file_name):
-        pdf_path = os.path.join(self.tempdir, "convert.pdf")
+        pdf_path = Path(self.tempdir) / "convert.pdf"
         gotenberg_server = settings.TIKA_GOTENBERG_ENDPOINT
         url = gotenberg_server + "/forms/libreoffice/convert"
 
         self.log("info", f"Converting {document_path} to PDF as {pdf_path}")
-        with open(document_path, "rb") as document_handle:
+        with Path(document_path).open("rb") as document_handle:
             files = {
                 "files": (
-                    "convert" + os.path.splitext(document_path)[-1],
+                    "convert" + Path(document_path).suffix,
                     document_handle,
                 ),
             }
@@ -115,7 +114,7 @@ class TikaDocumentParser(DocumentParser):
                     f"Error while converting document to PDF: {err}",
                 ) from err
 
-        with open(pdf_path, "wb") as file:
+        with pdf_path.open("wb") as file:
             file.write(response.content)
             file.close()
 

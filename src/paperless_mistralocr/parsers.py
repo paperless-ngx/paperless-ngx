@@ -1,5 +1,4 @@
 import base64
-import os
 import re
 from pathlib import Path
 
@@ -152,8 +151,8 @@ class MistralOcrDocumentParser(DocumentParser):
                     "remove",
                     "-strip",
                     "-auto-orient",
-                    image_path,
-                    out_path,
+                    str(image_path),
+                    str(out_path),
                 ],
                 logger=self.log,
             )
@@ -197,7 +196,7 @@ class MistralOcrDocumentParser(DocumentParser):
         model = self.settings.model
 
         # Check file size before uploading
-        file_size = os.path.getsize(document_path)
+        file_size = Path(document_path).stat().st_size
         if file_size > 50 * 1024 * 1024:  # 50MB limit
             raise ParseError(
                 f"File size too large for Mistral API: {file_size / (1024 * 1024):.2f}MB (max 50MB)"
@@ -215,7 +214,7 @@ class MistralOcrDocumentParser(DocumentParser):
             self.log.debug(f"Calling Mistral OCR API for {document_path}")
 
             # Read file and encode it as base64
-            with open(document_path, "rb") as f:
+            with Path(document_path).open("rb") as f:
                 file_content = f.read()
                 file_base64 = base64.b64encode(file_content).decode("utf-8")
 
@@ -232,9 +231,7 @@ class MistralOcrDocumentParser(DocumentParser):
                 model=model,
                 document={
                     "type": document_type,
-                    "document_url"
-                    if not is_image
-                    else "image_url": f"{mime_prefix}{file_base64}",
+                    document_type: f"{mime_prefix}{file_base64}",
                 },
                 include_image_base64=True,
             )
@@ -288,6 +285,8 @@ class MistralOcrDocumentParser(DocumentParser):
         """
         Convert the document to PDF format for archiving
         """
+        from django.conf import settings
+
         pdf_path = Path(self.tempdir) / "convert.pdf"
 
         # If it's an image, use convert/ImageMagick
@@ -297,8 +296,8 @@ class MistralOcrDocumentParser(DocumentParser):
                 run_subprocess(
                     [
                         settings.CONVERT_BINARY,
-                        document_path,
-                        pdf_path,
+                        str(document_path),
+                        str(pdf_path),
                     ],
                     logger=self.log,
                 )
