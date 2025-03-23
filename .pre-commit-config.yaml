@@ -76,3 +76,8 @@ repos:
     rev: "v0.10.0.1"
     hooks:
       - id: shellcheck
+  - repo: https://github.com/google/yamlfmt
+    rev: v0.14.0
+    hooks:
+      - id: yamlfmt
+        exclude: "^src-ui/pnpm-lock.yaml"
