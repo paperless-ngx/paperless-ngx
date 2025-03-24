@@ -909,6 +909,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                 self.archive_path = archive_path
 
             self.text = self.extract_text(sidecar_file, archive_path)
+            self.log.debug(f' gia tri text_original1: {len(text_original)}')
 
             if not self.text:
                 raise NoTextFoundException(

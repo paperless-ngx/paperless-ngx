@@ -53,7 +53,9 @@ from documents.plugins.base import NoCleanupPluginMixin
 from documents.plugins.base import NoSetupPluginMixin
 from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
-from documents.utils import copy_basic_file_stats, compress_pdf
+from documents.utils import copy_basic_file_stats, compress_pdf, \
+    check_digital_signature, \
+    pdf_has_text_pdftotext
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import get_content_before_last_number
 from documents.utils import run_subprocess
@@ -949,8 +951,8 @@ class Consumer(LoggingMixin):
                     page_count=page_count,
                     mime_type=mime_type,
                 )
-
-                if (application_config.enable_compress):
+                self.log.info(f' pdf_has_text_pdftotext: {pdf_has_text_pdftotext(self.working_copy)}, check_digital_signature: {check_digital_signature(self.working_copy)}')
+                if (application_config.enable_compress and not pdf_has_text_pdftotext(self.working_copy) and not check_digital_signature(self.working_copy)):
                     compress_pdf(self.original_path, self.working_copy, int(application_config.quality_compress))
                     copy_file_with_basic_stats(self.working_copy,
                                                self.original_path)
@@ -1145,7 +1147,6 @@ class Consumer(LoggingMixin):
         text: str,
         date: datetime.datetime | None,
         page_count: int | None,
-        checksum: str,
         mime_type: str,
     ) -> Document:
         # If someone gave us the original filename, use it instead of doc.
@@ -1187,7 +1188,7 @@ class Consumer(LoggingMixin):
             title=title[:127],
             content=text,
             mime_type=mime_type,
-            checksum=checksum,
+            checksum=hashlib.md5(self.working_copy.read_bytes()).hexdigest(),
             created=create_date,
             modified=create_date,
             storage_type=storage_type,

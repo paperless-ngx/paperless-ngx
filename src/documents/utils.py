@@ -3,6 +3,8 @@ import logging
 import os
 import re
 import shutil
+import subprocess
+import tempfile
 from os import utime
 from pathlib import Path
 from subprocess import CompletedProcess
@@ -10,6 +12,7 @@ from subprocess import run
 from typing import Optional
 from typing import Union
 
+import PyPDF2
 from django.conf import settings
 from PIL import Image
 from pdf2image.pdf2image import convert_from_path
@@ -194,3 +197,32 @@ def compress_pdf(input_pdf_path, output_pdf_path, quality=100):
     # Close the BytesIO objects
     for img in compressed_images:
         img.close()
+
+
+def check_digital_signature(pdf_path):
+    with open(pdf_path, 'rb') as file:
+        reader = PyPDF2.PdfFileReader(file)
+        if '/Sig' in reader.trailer['/Root'].keys():
+            return True
+        return False
+
+def pdf_has_text_pdftotext(pdf_path: Path) -> bool:
+    try:
+        with tempfile.NamedTemporaryFile(mode="r+", suffix=".txt") as tmp:
+            subprocess.run(
+                [
+                    "pdftotext",
+                    "-q",
+                    "-layout",
+                    "-enc", "UTF-8",
+                    str(pdf_path),
+                    tmp.name,
+                ],
+                check=True
+            )
+            tmp.seek(0)
+            text = tmp.read()
+            return bool(text.strip())  # Có text → True
+    except Exception as e:
+
+        return False

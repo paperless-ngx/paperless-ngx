@@ -1448,23 +1448,11 @@ class PostDocumentView(GenericAPIView):
 
         settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
 
-        temp_file_path = Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR)) / Path(
+        temp_file_path = Path(
+            tempfile.mkdtemp(dir=settings.SCRATCH_DIR)) / Path(
             pathvalidate.sanitize_filename(doc_name),
         )
-        temp_file_path_compress = Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR)) / Path(
-            pathvalidate.sanitize_filename(doc_name),
-        )
-
         temp_file_path.write_bytes(doc_data)
-        application_config = ApplicationConfiguration.objects.all().first()
-
-        if (application_config.enable_compress):
-            temp_file_path_compress.write_bytes(doc_data)
-            compress_pdf(temp_file_path_compress, temp_file_path,
-                         int(application_config.quality_compress))
-            temp_file_path_compress.unlink()
-
-
 
         os.utime(temp_file_path, times=(t, t))
         input_doc = ConsumableDocument(
@@ -1486,7 +1474,7 @@ class PostDocumentView(GenericAPIView):
             asn=archive_serial_number,
             owner_id=request.user.id,
             custom_field_ids=custom_field_ids,
-            checksum=hashlib.md5(temp_file_path.read_bytes()).hexdigest()
+
         )
 
         async_task = consume_file.apply(
