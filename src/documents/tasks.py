@@ -50,6 +50,7 @@ from documents.plugins.base import StopConsumeTaskError
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
+from documents.signals import document_ids_deleted
 from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
 
@@ -368,6 +369,10 @@ def empty_trash(doc_ids=None):
         models.signals.post_delete.connect(cleanup_document_deletion, sender=Document)
         documents.delete()  # this is effectively a hard delete
         logger.info(f"Deleted {len(deleted_document_ids)} documents from trash")
+
+        document_ids_deleted.send(sender=Document, document_ids=deleted_document_ids)
+
+
 
         if settings.AUDIT_LOG_ENABLED:
             # Delete the audit log entries for documents that dont exist anymore

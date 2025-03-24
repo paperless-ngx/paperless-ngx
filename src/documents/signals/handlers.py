@@ -582,6 +582,23 @@ def add_to_index(sender, document, **kwargs):
 
     index.add_or_update_document(document)
 
+def compute_and_store_embeddings(sender, document, **kwargs):
+    from documents.embeddings import DocumentEmbeddings
+
+    if not settings.EMBEDDING_ENABLED:
+        logger.info(f"Embedding is disabled. Skipping document '{document.title}'. Enable by setting PAPERLESS_EMBEDDING_ENABLED=true")
+        return
+    else:
+        logger.info(f"Embedding is enabled. Computing and storing embeddings for document '{document.title}'")
+
+    embeddings = DocumentEmbeddings()
+    embeddings.embedd_document(document)
+
+def delete_embeddings(sender, document_ids, **kwargs):
+    from documents.embeddings import DocumentEmbeddings
+
+    embeddings = DocumentEmbeddings()
+    embeddings.delete_embeddings(document_ids)
 
 def run_workflows_added(
     sender,

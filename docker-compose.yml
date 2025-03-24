@@ -1,33 +1,14 @@
 services:
   broker:
-    image: docker.io/library/redis:7
+    image: redis/redis-stack-server:latest
     restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
       - redisdata:/data
-
-  docjarvis:
-    build:
-      context: /Users/joschka/Library/CloudStorage/OneDrive-Personal/Code/projects/chatgpt-retrieval-plugin/
-    ports:
-      - "4321:4321"
-    restart: unless-stopped
-    volumes:
-      - /Users/joschka/Code/projects/paperflow-ai/export:/documents
-    env_file: /Users/joschka/Library/CloudStorage/OneDrive-Personal/Code/projects/chatgpt-retrieval-plugin/.env
-    depends_on:
-      - docjarvis_redis
-
-  docjarvis_redis:
-    image: redis/redis-stack-server:latest
-    volumes:
-        - redis_data:/data
-    command: redis-stack-server --port 6378 --protected-mode no
-    ports:
-      - "6378:6378"
+    command: redis-stack-server --protected-mode no
     healthcheck:
-      test: ["CMD", "redis-cli", "-h", "localhost", "-p", "6378", "ping"]
+      test: ["CMD", "redis-cli", "-h", "localhost", "ping"]
       interval: 2s
       timeout: 1m30s
       retries: 5
@@ -65,7 +46,6 @@ services:
       - broker
       - gotenberg
       - tika
-      - docjarvis
     ports:
       - "8000:8000"
     healthcheck:
@@ -74,10 +54,10 @@ services:
       timeout: 10s
       retries: 5
     volumes:
-      - data:/usr/src/paperless/data
-      - media:/usr/src/paperless/media
-      - ./export:/usr/src/paperless/export
-      - ./consume:/usr/src/paperless/consume
+      - ./data/data:/usr/src/paperless/data
+      - ./data/media:/usr/src/paperless/media
+      - ./data/export:/usr/src/paperless/export
+      - ./data/consume:/usr/src/paperless/consume
       - ./src:/usr/src/paperless/src
       - ./src-ui:/usr/src/paperless/src-ui
     env_file: docker-compose.env
@@ -87,6 +67,7 @@ services:
       PAPERLESS_TIKA_ENABLED: 1
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+
 
   gotenberg:
     image: docker.io/gotenberg/gotenberg:7.8
@@ -104,8 +85,6 @@ services:
     restart: unless-stopped
 
 volumes:
-  data:
-  media:
   pgdata:
   redisdata:
   redis_data:
