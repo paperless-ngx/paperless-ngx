@@ -105,7 +105,9 @@ def upload_file(path_document, callback_url, api_upload_file_ocr, username_ocr,
 
         # upload file -------------------
         get_file_id = ''
+
         access_token_ocr = cache.get('access_token_ocr', '')
+
         headers = {
             'Authorization': f"Bearer {access_token_ocr}"
         }
@@ -123,8 +125,10 @@ def upload_file(path_document, callback_url, api_upload_file_ocr, username_ocr,
                                                     -1],
                                                 pdf_data)},
                                         headers=headers)
-
+        logger.info(f"Response status code: {response_upload.status_code}")
+        logger.info(f"Response content: {response_upload.content}")
         if access_token_ocr == '' or response_upload.status_code == 401:
+            logger.info("access_token not exist")
             token = get_access_and_refresh_token(
                 username_ocr=username_ocr,
                 password_ocr=password_ocr,

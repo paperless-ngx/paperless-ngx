@@ -335,7 +335,6 @@ class RasterisedDocumentCustomParser(DocumentParser):
             app_config: ApplicationConfiguration | None
             # access_token_ocr = args.get("access_token_ocr", 'None')
             access_token_ocr = cache.get('access_token_ocr','')
-
             # login API custom-field
             if len(args) == 0 and args.get('form_code') == '':
                 return data_ocr, data_ocr_fields, form_code
@@ -346,7 +345,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
             headers = {
                 'Authorization': f"Bearer {access_token_ocr}"
             }
-            pdf_data = None
+
             with open(path_file, 'rb') as file:
                 pdf_data = file.read()
             payload = {'title': (str(path_file).split("/")[-1]),

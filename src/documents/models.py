@@ -772,7 +772,7 @@ class DocumentType(MatchingModel):
         CustomField,
         related_name="document_types",
         blank=True,
-        verbose_name=_("tags"),
+        verbose_name=_("custom_fields"),
     )
     class Meta(MatchingModel.Meta):
         verbose_name = _("document type")

@@ -759,7 +759,6 @@ class Consumer(LoggingMixin):
         override_change_users=None,
         override_change_groups=None,
         override_custom_field_ids=None,
-        override_checksum=None
     ) -> Document:
         """
         Return the document object if it was successfully created.
@@ -870,7 +869,7 @@ class Consumer(LoggingMixin):
                 ConsumerFilePhase.WORKING,
                 ConsumerStatusShortMessage.PARSING_DOCUMENT,
             )
-            # application_config = ApplicationConfiguration.objects.all().first()
+            application_config = ApplicationConfiguration.objects.all().first()
             # enable_ocr = ApplicationConfiguration.objects.filter().first().enable_ocr
             # if enable_ocr:
             #     self.log.debug(f"Parsing {self.filename}...")
@@ -908,7 +907,6 @@ class Consumer(LoggingMixin):
                 date = parse_date(self.filename, text)
             archive_path = self.working_copy
             page_count = document_parser.get_page_count(self.working_copy, mime_type)
-            checksum = override_checksum
         except ParseError as e:
             self._fail(
                 str(e),
@@ -949,9 +947,13 @@ class Consumer(LoggingMixin):
                     text=text,
                     date=date,
                     page_count=page_count,
-                    checksum= checksum,
                     mime_type=mime_type,
                 )
+
+                if (application_config.enable_compress):
+                    compress_pdf(self.original_path, self.working_copy, int(application_config.quality_compress))
+                    copy_file_with_basic_stats(self.working_copy,
+                                               self.original_path)
                 new_file = None
                 # self.log.debug("Consumer", document.folder)
 

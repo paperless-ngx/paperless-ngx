@@ -43,7 +43,7 @@ export class DocumentTypeEditDialogComponent extends EditDialogComponent<Documen
   getForm(): FormGroup {
     return new FormGroup({
       name: new FormControl(''),
-      custom_fields: new FormControl(),
+      custom_fields: new FormControl([]),
       matching_algorithm: new FormControl(DEFAULT_MATCHING_ALGORITHM),
       match: new FormControl(''),
       is_insensitive: new FormControl(true),

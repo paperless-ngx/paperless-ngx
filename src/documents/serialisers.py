@@ -497,7 +497,7 @@ class CustomFieldField(serializers.PrimaryKeyRelatedField):
         return CustomField.objects.all()
 
 class DocumentTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
-    custom_fields = CustomFieldField(many=True)
+    custom_fields = CustomFieldField(many=True, allow_null=True, required=False)
     code = serializers.CharField(allow_blank=True, allow_null=True,required=False)
     class Meta:
         model = DocumentType
