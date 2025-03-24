@@ -39,7 +39,7 @@ dependencies = [
   "drf-spectacular~=0.28",
   "drf-spectacular-sidecar~=2025.3.1",
   "drf-writable-nested~=0.7.1",
-  "filelock~=3.17.0",
+  "filelock~=3.18.0",
   "flower~=2.0.1",
   "gotenberg-client~=0.9.0",
   "httpx-oauth~=0.16",
@@ -78,7 +78,7 @@ optional-dependencies.postgres = [
   "psycopg-c==3.2.5",
 ]
 optional-dependencies.webserver = [
-  "granian~=2.0.1",
+  "granian~=2.2.0",
 ]
 
 [dependency-groups]
