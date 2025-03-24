@@ -1,9 +1,11 @@
 import json
 import logging
 import time
+from logging import Logger
 
 import requests
 
+from documents.models import Document
 from paperless.models import ApplicationConfiguration
 from django.conf import settings
 from django.core.cache import cache
@@ -98,7 +100,7 @@ def get_access_and_refresh_token(refresh_token_ocr, api_refresh_ocr,
     return token
 
 
-def upload_file(path_document, callback_url, api_upload_file_ocr, username_ocr,
+def upload_file(path_document, file_id, callback_url, api_upload_file_ocr, username_ocr,
                 password_ocr, api_login_ocr, api_refresh_ocr,
                 refresh_token_ocr):
     try:
@@ -123,7 +125,8 @@ def upload_file(path_document, callback_url, api_upload_file_ocr, username_ocr,
                                             'file': (
                                                 str(path_document).split("/")[
                                                     -1],
-                                                pdf_data)},
+                                                pdf_data)} if not file_id else {
+                                            'file_id': file_id},
                                         headers=headers)
         logger.info(f"Response status code: {response_upload.status_code}")
         logger.info(f"Response content: {response_upload.content}")
@@ -169,7 +172,7 @@ def upload_file(path_document, callback_url, api_upload_file_ocr, username_ocr,
                                                     -1],
                                                 pdf_data)},
                                             headers=headers)
-        logger.info(f"response_upload:{api_upload_file_ocr}{response_upload}", )
+        logger.info(f"response_upload:{api_upload_file_ocr}{response_upload.status_code}", )
 
 
         if response_upload.status_code == 201:
@@ -178,21 +181,25 @@ def upload_file(path_document, callback_url, api_upload_file_ocr, username_ocr,
 
             return response_upload.json()
         return None
+
     except Exception as e:
         logger.exception("Exception", e)
         return None
 
 
-def peel_field(path_document, callback_url):
+def peel_field(document:Document, callback_url):
+
     app_config = ApplicationConfiguration.objects.filter().first()
     username_ocr = app_config.username_ocr
     password_ocr = app_config.password_ocr
     api_login_ocr = settings.API_LOGIN_OCR
     api_refresh_ocr = settings.API_REFRESH_OCR
-    refresh_token_ocr = cache.get("refresh_token_ocr", '')
+    refresh_token_ocr = cache.get('refresh_token_ocr', '')
     api_upload_file_ocr = settings.API_UPLOAD_FILE_OCR
     logger.info("peel-field--------------")
-    response = upload_file(path_document=path_document,
+
+    response = upload_file(path_document=document.archive_path,
+                           file_id=document.file_id,
                            callback_url=callback_url,
                            api_upload_file_ocr=api_upload_file_ocr,
                            username_ocr=username_ocr,
@@ -200,4 +207,9 @@ def peel_field(path_document, callback_url):
                            api_login_ocr=api_login_ocr,
                            api_refresh_ocr=api_refresh_ocr,
                            refresh_token_ocr=refresh_token_ocr)
+    if not document.file_id:
+        document.file_id=response.get('id', None)
+        document.save()
+        logger.info(f'update document.file_id: {document.id} with file_id: {response.get("id", None)}')
+    logger.info(f"response upload peel field: {response}")
     return response

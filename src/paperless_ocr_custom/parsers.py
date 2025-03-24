@@ -340,8 +340,6 @@ class RasterisedDocumentCustomParser(DocumentParser):
                 return data_ocr, data_ocr_fields, form_code
 
             # upload file -------------------
-            get_file_id = ''
-
             headers = {
                 'Authorization': f"Bearer {access_token_ocr}"
             }

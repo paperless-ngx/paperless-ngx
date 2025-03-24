@@ -404,7 +404,7 @@ def update_document_archive_file(self, document_id=None):
                     archive_checksum=checksum,
                     content=parser.get_text() or '',
                     archive_filename=document.archive_filename,
-                    # file_id = parser.get_file_id()
+                    file_id = parser.get_file_id()
                 )
                 newDocument = Document.objects.get(pk=document.pk)
                 if settings.AUDIT_LOG_ENABLED:
@@ -482,7 +482,8 @@ def update_value_customfield_to_document(self, document_id=None):
 
     try:
         enable_ocr = ApplicationConfiguration.objects.all().first().enable_ocr
-        if enable_ocr:
+        if enable_ocr and document.document_type:
+            logger.info(f'update_value_customfield_to_document')
             # update count request
             self.request.api_call_count=parser.get_api_call_count()
             if document.archive_path:
@@ -496,8 +497,8 @@ def update_value_customfield_to_document(self, document_id=None):
                         ip_address = socket.gethostbyname(hostname)
                         callback_url = f"http://{ip_address}"
                     callback_url = f"{callback_url}/api/peel-field/{document.id}/peel-field/"
-                    logger.info("callback url", callback_url)
-                    peel_field(document.archive_path, callback_url)
+                    logger.info(f"document_id: {document.id}, path_document: {document.archive_path}, file_id: {document.file_id}, callback url: {callback_url} ")
+                    peel_field(document=document, callback_url=callback_url)
                     if settings.AUDIT_LOG_ENABLED:
                         LogEntry.objects.log_create(
                             instance=document,
