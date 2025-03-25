@@ -594,11 +594,11 @@ def compute_and_store_embeddings(sender, document, **kwargs):
     embeddings = DocumentEmbeddings()
     embeddings.embedd_document(document)
 
-def delete_embeddings(sender, document_ids, **kwargs):
+def delete_embeddings(sender, embedding_index_ids: list[str], **kwargs):
     from documents.embeddings import DocumentEmbeddings
 
     embeddings = DocumentEmbeddings()
-    embeddings.delete_embeddings(document_ids)
+    embeddings.delete_embeddings(embedding_index_ids)
 
 def run_workflows_added(
     sender,

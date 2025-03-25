@@ -73,6 +73,7 @@ class DocumentEmbeddings:
                     "document_id": document.pk,
                     "document_title": document.title,
                     "chunk_index": i,
+                    "n_chunks": len(chunks),
                 }
                 for i in range(len(chunks))
             ]
@@ -81,41 +82,24 @@ class DocumentEmbeddings:
             return False
         try:
             logger.debug(f"Adding {len(chunks)} chunks to vector store for document '{document.title}'")
-            self.vector_store.add_texts(chunks, metadatas=metadatas)
+            index_ids = self.vector_store.add_texts(chunks, metadatas=metadatas)
+            document.embedding_index_ids = index_ids
+            document.save(update_fields=("embedding_index_ids",))
         except Exception as e:
             logger.error(f"Error adding texts to vector store for document '{document.title}': {e}")
             return False
         logger.info(f"Successfully generated and stored embeddings for document '{document.title}'")
         return True
 
-    def delete_embeddings(self, document_ids) -> bool:
-        from redisvl.query.filter import Tag
-        from redisvl.query import FilterQuery
-        # Redis query index for all entries with the document_id in the metadatas
-        keys_to_delete = []
-        for document_id in document_ids:
+    def delete_embeddings(self, embedding_index_ids: list[str]):
+        if embedding_index_ids:
             try:
-                filter_condition = Tag("document_id") == str(document_id)
-                query_results = self.vector_store.index.query(FilterQuery(filter_expression=filter_condition))
-                if query_results:
-                    # Extract document keys from query results
-                    for result in query_results:
-                        if isinstance(result, dict) and "id" in result:
-                            keys_to_delete.append(result["id"])
-                    logger.info(f"Found {len(query_results)} entries to delete for document_id {document_id}")
+                count = self.vector_store.index.drop_keys(embedding_index_ids)
+                if count == len(embedding_index_ids):
+                    logger.info(f"Successfully deleted {count} entries from vector store")
                 else:
-                    logger.warning(f"No entries found for document_id {document_id}")
-            except Exception as e:
-                logger.error(f"Error querying vector store for document_id {document_id}: {e}")
-
-        if keys_to_delete:
-            try:
-                self.vector_store.delete(keys_to_delete)
-                logger.info(f"Successfully deleted {len(keys_to_delete)} entries from vector store")
-                return True
+                    logger.warning(f"Only {count} entries were deleted from vector store ({len(embedding_index_ids)} were given)")
             except Exception as e:
                 logger.error(f"Error deleting entries from vector store: {e}")
-                return False
         else:
-            logger.warning("No entries found to delete")
-            return True
+            logger.warning("No embedding index ids given to delete!")

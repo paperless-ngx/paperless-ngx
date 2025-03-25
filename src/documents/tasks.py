@@ -5,6 +5,7 @@ import uuid
 from datetime import timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from itertools import chain
 
 import tqdm
 from celery import Task
@@ -365,12 +366,13 @@ def empty_trash(doc_ids=None):
 
     try:
         deleted_document_ids = list(documents.values_list("id", flat=True))
+        deleted_documents_embedding_ids = list(chain.from_iterable(documents.values_list("embedding_index_ids", flat=True)))
         # Temporarily connect the cleanup handler
         models.signals.post_delete.connect(cleanup_document_deletion, sender=Document)
         documents.delete()  # this is effectively a hard delete
         logger.info(f"Deleted {len(deleted_document_ids)} documents from trash")
 
-        document_ids_deleted.send(sender=Document, document_ids=deleted_document_ids)
+        document_ids_deleted.send(sender=Document, embedding_index_ids=deleted_documents_embedding_ids)
 
 
 

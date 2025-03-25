@@ -184,6 +184,12 @@ class Document(SoftDeleteModel, ModelWithOwner):
         verbose_name=_("tags"),
     )
 
+    embedding_index_ids = models.JSONField(
+        _("embedding index ids"),
+        default=list,
+        help_text=_("The ids of the embeddings in the vector store."),
+    )
+
     checksum = models.CharField(
         _("checksum"),
         max_length=32,
