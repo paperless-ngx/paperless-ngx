@@ -1995,7 +1995,7 @@ requires-dist = [
     { name = "channels-redis", specifier = "~=4.2" },
     { name = "concurrent-log-handler", specifier = "~=0.9.25" },
     { name = "dateparser", specifier = "~=1.2" },
-    { name = "django", specifier = "~=5.1.6" },
+    { name = "django", specifier = "~=5.1.7" },
     { name = "django-allauth", extras = ["socialaccount", "mfa"], specifier = "~=65.4.0" },
     { name = "django-auditlog", specifier = "~=3.0.0" },
     { name = "django-celery-results", specifier = "~=2.5.1" },
