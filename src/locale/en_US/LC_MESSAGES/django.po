@@ -1040,7 +1040,7 @@ msgstr ""
 
 #: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."
-msgstr "EDOCS is loading..."
+msgstr "EDOC is loading..."
 
 #: documents/templates/index.html:62
 msgid "Still here?! Hmm, something might be wrong."
@@ -1397,7 +1397,7 @@ msgstr ""
 
 #: paperless/urls.py:236
 msgid "Paperless-ngx administration"
-msgstr "EDOCS administration"
+msgstr "EDOC administration"
 
 #: paperless_mail/admin.py:39
 msgid "Authentication"

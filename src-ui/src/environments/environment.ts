@@ -6,7 +6,7 @@ export const environment = {
   production: false,
   apiBaseUrl: 'http://localhost:8000/api/',
   apiVersion: '5',
-  appTitle: 'EDOCS',
+  appTitle: 'EDOC',
   version: 'DEVELOPMENT',
   webSocketHost: 'localhost:8000',
   webSocketProtocol: 'ws:',
