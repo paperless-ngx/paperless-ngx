@@ -2,11 +2,17 @@ import { CommonModule } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import { Component, ElementRef, ViewChild } from '@angular/core'
 import { FormsModule } from '@angular/forms'
+import { environment } from 'src/environments/environment'
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 
 interface ChatMessage {
   text: string
   fromUser: boolean
+}
+
+interface AiResponse {
+  reply: string
+  document_ids: string[]
 }
 
 @Component({
@@ -21,7 +27,7 @@ export class AiChatWidgetComponent {
   currentMessage = ''
   showTypingAnimation = false
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   sendMessage() {
     if (this.currentMessage.trim() === '') {
@@ -40,7 +46,7 @@ export class AiChatWidgetComponent {
     })
 
     // Send the message to a chatbot API and display the response
-    const apiUrl = 'http://localhost:4321/question'
+    const apiUrl = `${environment.apiBaseUrl}question/`
     const requestBody = { question: this.currentMessage }
     const headers = {
       Authorization:
@@ -49,12 +55,12 @@ export class AiChatWidgetComponent {
     }
     this.showTypingAnimation = true // show the typing animation
     this.http
-      .post(apiUrl, requestBody, { headers })
-      .subscribe((response: any) => {
+      .post<AiResponse>(apiUrl, requestBody, { headers })
+      .subscribe((response: AiResponse) => {
         this.showTypingAnimation = false // hide the typing animation
         // Add the chatbot's response to the chat
         this.messages.push({
-          text: response.german,
+          text: response.reply, // Using German response by default
           fromUser: false,
         })
         // Scroll the chat container to the bottom

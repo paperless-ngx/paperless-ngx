@@ -18,6 +18,7 @@ from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular.views import SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 
+from documents.ai_chat import QuestionView
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
@@ -141,6 +142,11 @@ urlpatterns = [
                             ),
                         ],
                     ),
+                ),
+                re_path(
+                    "^question/",
+                    QuestionView.as_view(),
+                    name="question",
                 ),
                 re_path(
                     "^bulk_edit_objects/",
