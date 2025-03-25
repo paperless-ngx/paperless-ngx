@@ -15,6 +15,7 @@ from concurrent_log_handler.queue import setup_logging_queues
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 from pydantic import SecretStr
+
 # Tap paperless.conf if it's available
 configuration_path = os.getenv("PAPERLESS_CONFIGURATION_PATH")
 if configuration_path and os.path.exists(configuration_path):
@@ -1277,8 +1278,12 @@ EMBEDDING_PROVIDER = os.getenv("PAPERLESS_EMBEDDING_PROVIDER", "mistralai")
 EMBEDDING_MODEL = os.getenv("PAPERLESS_EMBEDDING_MODEL", "mistral-embed")
 EMBEDDING_CHUNK_SIZE = __get_int("PAPERLESS_EMBEDDING_CHUNK_SIZE", 1000)
 EMBEDDING_CHUNK_OVERLAP = __get_int("PAPERLESS_EMBEDDING_CHUNK_OVERLAP", 100)
-EMBEDDING_SEMANTIC_CHUNKING = __get_boolean("PAPERLESS_EMBEDDING_SEMANTIC_CHUNKING", "false")
-EMBEDDING_REDIS_URL = os.getenv("PAPERLESS_REDIS_EMBEDDING_URL", "redis://localhost:6378")
+EMBEDDING_SEMANTIC_CHUNKING = __get_boolean(
+    "PAPERLESS_EMBEDDING_SEMANTIC_CHUNKING", "false"
+)
+EMBEDDING_REDIS_URL = os.getenv(
+    "PAPERLESS_REDIS_EMBEDDING_URL", "redis://localhost:6378"
+)
 
 OPENAI_API_KEY = SecretStr(os.getenv("PAPERLESS_OPENAI_API_KEY", ""))
 MISTRAL_API_KEY = SecretStr(os.getenv("PAPERLESS_MISTRAL_API_KEY", ""))

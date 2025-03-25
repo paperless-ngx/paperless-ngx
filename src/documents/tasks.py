@@ -3,9 +3,9 @@ import logging
 import shutil
 import uuid
 from datetime import timedelta
+from itertools import chain
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from itertools import chain
 
 import tqdm
 from celery import Task
@@ -50,8 +50,8 @@ from documents.plugins.base import ProgressManager
 from documents.plugins.base import StopConsumeTaskError
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
-from documents.signals import document_updated
 from documents.signals import document_ids_deleted
+from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
 
@@ -366,15 +366,17 @@ def empty_trash(doc_ids=None):
 
     try:
         deleted_document_ids = list(documents.values_list("id", flat=True))
-        deleted_documents_embedding_ids = list(chain.from_iterable(documents.values_list("embedding_index_ids", flat=True)))
+        deleted_documents_embedding_ids = list(
+            chain.from_iterable(documents.values_list("embedding_index_ids", flat=True))
+        )
         # Temporarily connect the cleanup handler
         models.signals.post_delete.connect(cleanup_document_deletion, sender=Document)
         documents.delete()  # this is effectively a hard delete
         logger.info(f"Deleted {len(deleted_document_ids)} documents from trash")
 
-        document_ids_deleted.send(sender=Document, embedding_index_ids=deleted_documents_embedding_ids)
-
-
+        document_ids_deleted.send(
+            sender=Document, embedding_index_ids=deleted_documents_embedding_ids
+        )
 
         if settings.AUDIT_LOG_ENABLED:
             # Delete the audit log entries for documents that dont exist anymore
