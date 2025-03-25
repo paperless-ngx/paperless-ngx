@@ -451,11 +451,11 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     component.title = 'Foo Bar'
     const closeSpy = jest.spyOn(component, 'close')
-    const updateSpy = jest.spyOn(documentService, 'update')
+    const patchSpy = jest.spyOn(documentService, 'patch')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
-    updateSpy.mockImplementation((o) => of(doc))
+    patchSpy.mockImplementation((o) => of(doc))
     component.save(true)
-    expect(updateSpy).toHaveBeenCalled()
+    expect(patchSpy).toHaveBeenCalled()
     expect(closeSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith(
       'Document "Doc 3" saved successfully.'
@@ -466,11 +466,11 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     component.title = 'Foo Bar'
     const closeSpy = jest.spyOn(component, 'close')
-    const updateSpy = jest.spyOn(documentService, 'update')
+    const patchSpy = jest.spyOn(documentService, 'patch')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
-    updateSpy.mockImplementation((o) => of(doc))
+    patchSpy.mockImplementation((o) => of(doc))
     component.save()
-    expect(updateSpy).toHaveBeenCalled()
+    expect(patchSpy).toHaveBeenCalled()
     expect(closeSpy).not.toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith(
       'Document "Doc 3" saved successfully.'
@@ -482,12 +482,12 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     component.title = 'Foo Bar'
     const closeSpy = jest.spyOn(component, 'close')
-    const updateSpy = jest.spyOn(documentService, 'update')
+    const patchSpy = jest.spyOn(documentService, 'patch')
     const toastSpy = jest.spyOn(toastService, 'showError')
     const error = new Error('failed to save')
-    updateSpy.mockImplementation(() => throwError(() => error))
+    patchSpy.mockImplementation(() => throwError(() => error))
     component.save()
-    expect(updateSpy).toHaveBeenCalled()
+    expect(patchSpy).toHaveBeenCalled()
     expect(closeSpy).not.toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith(
       'Error saving document "Doc 3"',
@@ -500,13 +500,13 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     component.title = 'Foo Bar'
     const closeSpy = jest.spyOn(component, 'close')
-    const updateSpy = jest.spyOn(documentService, 'update')
+    const patchSpy = jest.spyOn(documentService, 'patch')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
-    updateSpy.mockImplementation(() =>
+    patchSpy.mockImplementation(() =>
       throwError(() => new Error('failed to save'))
     )
     component.save(true)
-    expect(updateSpy).toHaveBeenCalled()
+    expect(patchSpy).toHaveBeenCalled()
     expect(closeSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith(
       'Document "Doc 3" saved successfully.'
@@ -517,8 +517,8 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     const nextDocId = 100
     component.title = 'Foo Bar'
-    const updateSpy = jest.spyOn(documentService, 'update')
-    updateSpy.mockReturnValue(of(doc))
+    const patchSpy = jest.spyOn(documentService, 'patch')
+    patchSpy.mockReturnValue(of(doc))
     const nextSpy = jest.spyOn(documentListViewService, 'getNext')
     nextSpy.mockReturnValue(of(nextDocId))
     const closeSpy = jest.spyOn(openDocumentsService, 'closeDocument')
@@ -526,7 +526,7 @@ describe('DocumentDetailComponent', () => {
     const navigateSpy = jest.spyOn(router, 'navigate')
 
     component.saveEditNext()
-    expect(updateSpy).toHaveBeenCalled()
+    expect(patchSpy).toHaveBeenCalled()
     expect(navigateSpy).toHaveBeenCalledWith(['documents', nextDocId])
     expect
   })
@@ -536,12 +536,12 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     component.title = 'Foo Bar'
     const closeSpy = jest.spyOn(component, 'close')
-    const updateSpy = jest.spyOn(documentService, 'update')
+    const patchSpy = jest.spyOn(documentService, 'patch')
     const toastSpy = jest.spyOn(toastService, 'showError')
     const error = new Error('failed to save')
-    updateSpy.mockImplementation(() => throwError(() => error))
+    patchSpy.mockImplementation(() => throwError(() => error))
     component.saveEditNext()
-    expect(updateSpy).toHaveBeenCalled()
+    expect(patchSpy).toHaveBeenCalled()
     expect(closeSpy).not.toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith('Error saving document', error)
   })
@@ -965,10 +965,10 @@ describe('DocumentDetailComponent', () => {
     expect(fixture.debugElement.nativeElement.textContent).toContain(
       customFields[1].name
     )
-    const updateSpy = jest.spyOn(documentService, 'update')
+    const patchSpy = jest.spyOn(documentService, 'patch')
     component.save(true)
-    expect(updateSpy.mock.lastCall[0].custom_fields).toHaveLength(2)
-    expect(updateSpy.mock.lastCall[0].custom_fields[1]).toEqual({
+    expect(patchSpy.mock.lastCall[0].custom_fields).toHaveLength(2)
+    expect(patchSpy.mock.lastCall[0].custom_fields[1]).toEqual({
       field: customFields[1].id,
       value: null,
     })
@@ -985,9 +985,9 @@ describe('DocumentDetailComponent', () => {
     expect(
       fixture.debugElement.query(By.css('form')).nativeElement.textContent
     ).not.toContain('Field 1')
-    const updateSpy = jest.spyOn(documentService, 'update')
+    const patchSpy = jest.spyOn(documentService, 'patch')
     component.save(true)
-    expect(updateSpy.mock.lastCall[0].custom_fields).toHaveLength(
+    expect(patchSpy.mock.lastCall[0].custom_fields).toHaveLength(
       initialLength - 1
     )
   })

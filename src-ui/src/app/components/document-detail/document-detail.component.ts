@@ -797,7 +797,7 @@ export class DocumentDetailComponent
     this.networkActive = true
     ;(document.activeElement as HTMLElement)?.dispatchEvent(new Event('change'))
     this.documentsService
-      .update(this.document)
+      .patch(this.document)
       .pipe(first())
       .subscribe({
         next: (docValues) => {
@@ -851,7 +851,7 @@ export class DocumentDetailComponent
     this.networkActive = true
     this.store.next(this.documentForm.value)
     this.documentsService
-      .update(this.document)
+      .patch(this.document)
       .pipe(
         switchMap((updateResult) => {
           return this.documentListViewService
