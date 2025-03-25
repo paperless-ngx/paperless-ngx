@@ -535,19 +535,19 @@ class CustomFieldSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
-        # TODO: remove pending https://github.com/encode/django-rest-framework/issues/7173
-        name = attrs.get(
-            "name",
-            self.instance.name if hasattr(self.instance, "name") else None,
-        )
-        if ("name" in attrs) and self.Meta.model.objects.filter(
-            name=name,
-        ).exists():
-            raise serializers.ValidationError(
-                {"error": "Object violates name unique constraint"},
+            # TODO: remove pending https://github.com/encode/django-rest-framework/issues/7173
+            name = attrs.get(
+                "name",
+                self.instance.name if hasattr(self.instance, "name") else None,
             )
-        return super().validate(attrs)
-
+            if "name" in attrs:
+                if self.instance and self.instance.name == name:
+                    return super().validate(attrs)
+                if self.Meta.model.objects.filter(name=name).exists():
+                    raise serializers.ValidationError(
+                        {"error": "Object violates name unique constraint"},
+                    )
+            return super().validate(attrs)
 
 class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
     """

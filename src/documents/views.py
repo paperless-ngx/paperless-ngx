@@ -2936,10 +2936,23 @@ class WebhookViewSet(ViewSet):
         """
         data = request.data
         logger.info(f"Webhook called with document_id={pk}, data={data}")
-        field_values = data.get('extract_data',[])
-
-        if len(field_values)>0:
-            field_values=field_values[0]['field_category'][0]['field_data'][0]['field_value']
+        field_values = data.get('extract_data', [])
+        if field_values and 'field_category' in field_values[0] and field_values[0]['field_category']:
+            field_category = field_values[0]['field_category'][0]
+            if 'field_data' in field_category and field_category['field_data']:
+                field_data = field_category['field_data'][0]
+                if 'field_value' in field_data:
+                    field_values = field_data['field_value']
+                else:
+                    field_values = []
+            else:
+                field_values = []
+        else:
+            field_values = []
+        # field_values = data.get('extract_data',[])
+        #
+        # if len(field_values)>0:
+        #     field_values=field_values[0]['field_category'][0]['field_data'][0]['field_value']
         logger.info(f"field_values={field_values}")
         if field_values:
             dict_field_values = dict()

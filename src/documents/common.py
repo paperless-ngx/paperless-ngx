@@ -4,6 +4,7 @@ import time
 from logging import Logger
 
 import requests
+from scipy.stats import false_discovery_control
 
 from documents.models import Document
 from paperless.models import ApplicationConfiguration
@@ -11,7 +12,6 @@ from django.conf import settings
 from django.core.cache import cache
 
 logger = logging.getLogger("edoc.common")
-
 
 def call_ocr_api_with_retries(method, url, headers, params, payload,
                               max_retries=5, delay=5, timeout=100,
@@ -109,7 +109,7 @@ def upload_file(path_document, file_id, callback_url, api_upload_file_ocr, usern
         get_file_id = ''
 
         access_token_ocr = cache.get('access_token_ocr', '')
-
+        logger.info(f"access_token_ocr {len(access_token_ocr)} , file_id: {file_id}")
         headers = {
             'Authorization': f"Bearer {access_token_ocr}"
         }
@@ -120,16 +120,17 @@ def upload_file(path_document, file_id, callback_url, api_upload_file_ocr, usern
                    'get_value': '1',
                    'callback_url': callback_url,
                    }
+        if file_id:
+            payload['file_id']=file_id
         response_upload = requests.post(api_upload_file_ocr, data=payload,
                                         files={
                                             'file': (
                                                 str(path_document).split("/")[
                                                     -1],
-                                                pdf_data)} if not file_id else {
-                                            'file_id': file_id},
+                                                pdf_data)} if not file_id else None,
                                         headers=headers)
         logger.info(f"Response status code: {response_upload.status_code}")
-        logger.info(f"Response content: {response_upload.content}")
+        logger.info(f"Response content: {response_upload}")
         if access_token_ocr == '' or response_upload.status_code == 401:
             logger.info("access_token not exist")
             token = get_access_and_refresh_token(
@@ -161,16 +162,13 @@ def upload_file(path_document, file_id, callback_url, api_upload_file_ocr, usern
             with open(path_document, 'rb') as file:
                 pdf_data = file.read()
 
-            payload = {'title': (str(path_document).split("/")[-1]),
-                       'folder': settings.FOLDER_UPLOAD,
-                       'get_value': '1',
-                       'callback_url': callback_url}
-            response_upload = requests.post(api_upload_file_ocr,
-                                            data=payload,
-                                            files={'file': (
-                                                str(path_document).split("/")[
-                                                    -1],
-                                                pdf_data)},
+            response_upload = requests.post(api_upload_file_ocr, data=payload,
+                                            files={
+                                                'file': (
+                                                    str(path_document).split(
+                                                        "/")[
+                                                        -1],
+                                                    pdf_data)} if not file_id else None,
                                             headers=headers)
         logger.info(f"response_upload:{api_upload_file_ocr}{response_upload.status_code}", )
 
@@ -196,7 +194,7 @@ def peel_field(document:Document, callback_url):
     api_refresh_ocr = settings.API_REFRESH_OCR
     refresh_token_ocr = cache.get('refresh_token_ocr', '')
     api_upload_file_ocr = settings.API_UPLOAD_FILE_OCR
-    logger.info("peel-field--------------")
+    logger.info(f"into peel-field with callback_url {callback_url}")
 
     response = upload_file(path_document=document.archive_path,
                            file_id=document.file_id,
@@ -207,9 +205,14 @@ def peel_field(document:Document, callback_url):
                            api_login_ocr=api_login_ocr,
                            api_refresh_ocr=api_refresh_ocr,
                            refresh_token_ocr=refresh_token_ocr)
-    if not document.file_id:
+    logger.info(f"response upload peel field: {response}")
+    update = False
+    if response:
+        update = True
+
+    if not document.file_id and update:
+
         document.file_id=response.get('id', None)
         document.save()
         logger.info(f'update document.file_id: {document.id} with file_id: {response.get("id", None)}')
-    logger.info(f"response upload peel field: {response}")
     return response

@@ -69,7 +69,7 @@ if settings.AUDIT_LOG_ENABLED:
     import json
 
     from auditlog.models import LogEntry
-logger = logging.getLogger("paperless.tasks")
+logger = logging.getLogger("edoc.tasks")
 
 
 def revoke_permission():
