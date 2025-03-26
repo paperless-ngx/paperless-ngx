@@ -24,7 +24,7 @@
 # - Click 'Deploy the stack' and wait for it to be deployed
 # - Open the list of containers, select paperless_webserver_1
 # - Click 'Console' and then 'Connect' to open the command line inside the container
-# - Run 'python3 manage.py createsuperuser' to create a user
+# - Run 'createsuperuser' to create a user
 # - Exit the console
 #
 # For more extensive installation and update instructions, refer to the
