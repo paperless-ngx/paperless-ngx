@@ -825,10 +825,6 @@ export class DocumentDetailComponent
         error: (error) => {
           this.networkActive = false
           const canEdit =
-            this.permissionsService.currentUserCan(
-              PermissionAction.Change,
-              PermissionType.Document
-            ) &&
             this.permissionsService.currentUserHasObjectPermissions(
               PermissionAction.Change,
               this.document
