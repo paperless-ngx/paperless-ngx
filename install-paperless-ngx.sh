@@ -402,6 +402,6 @@ if [ "$DATABASE_BACKEND" == "postgres" ] || [ "$DATABASE_BACKEND" == "mariadb" ]
 	docker compose stop
 fi
 
-docker compose run --rm -e DJANGO_SUPERUSER_PASSWORD="$PASSWORD" webserver ./manage.py createsuperuser --noinput --username "$USERNAME" --email "$EMAIL"
+docker compose run --rm -e DJANGO_SUPERUSER_PASSWORD="$PASSWORD" webserver createsuperuser --noinput --username "$USERNAME" --email "$EMAIL"
 
 docker compose up --detach

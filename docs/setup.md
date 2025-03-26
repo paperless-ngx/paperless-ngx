@@ -143,13 +143,13 @@ account. The script essentially automatically performs the steps described in [D
     execute the following command:
 
     ```shell-session
-    docker compose exec webserver ./manage.py createsuperuser
+    docker compose exec webserver createsuperuser
     ```
 
     or using docker exec from within the container:
 
     ```shell-session
-    ./manage.py createsuperuser
+    createsuperuser
     ```
 
     This will guide you through the superuser setup.

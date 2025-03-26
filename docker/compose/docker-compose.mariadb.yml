@@ -22,7 +22,7 @@
 # - Run 'docker compose pull'.
 # - Run 'docker compose up -d'.
 # - Wait until the webserver has completed startup
-# - Run 'docker compose exec webserver ./manage.py createsuperuser' to create a user.
+# - Run 'docker compose exec webserver createsuperuser' to create a user.
 #
 # For more extensive installation and update instructions, refer to the
 # documentation.
