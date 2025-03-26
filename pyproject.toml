@@ -23,7 +23,7 @@ dependencies = [
   "dateparser~=1.2",
   # WARNING: django does not use semver.
   #          Only patch versions are guaranteed to not introduce breaking changes.
-  "django~=5.1.6",
+  "django~=5.1.7",
   "django-allauth[socialaccount,mfa]~=65.4.0",
   "django-auditlog~=3.0.0",
   "django-celery-results~=2.5.1",
