@@ -629,3 +629,11 @@ entries created prior to this are not removed. This command allows you to prune 
 ```shell
 prune_audit_logs
 ```
+
+### Create superuser {#create-superuser}
+
+If you need to create a superuser, use the following command:
+
+```shell
+create_superuser
+```
