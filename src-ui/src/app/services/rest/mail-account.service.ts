@@ -3,12 +3,12 @@ import { Injectable } from '@angular/core'
 import { combineLatest, Observable } from 'rxjs'
 import { tap } from 'rxjs/operators'
 import { MailAccount } from 'src/app/data/mail-account'
-import { AbstractPaperlessService } from './abstract-paperless-service'
+import { AbstractEdocService } from './abstract-edoc-service'
 
 @Injectable({
   providedIn: 'root',
 })
-export class MailAccountService extends AbstractPaperlessService<MailAccount> {
+export class MailAccountService extends AbstractEdocService<MailAccount> {
   loading: boolean
 
   constructor(http: HttpClient) {

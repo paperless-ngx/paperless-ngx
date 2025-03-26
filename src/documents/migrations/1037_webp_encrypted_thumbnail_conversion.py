@@ -12,7 +12,7 @@ from django.db import migrations
 
 from documents.parsers import run_convert
 
-logger = logging.getLogger("paperless.migrations")
+logger = logging.getLogger("edoc.migrations")
 
 
 def _do_convert(work_package):

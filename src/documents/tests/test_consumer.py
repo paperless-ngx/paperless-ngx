@@ -424,7 +424,7 @@ class TestConsumer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self._assert_first_last_send_progress()
 
     def testOverrideTitleInvalidPlaceholders(self):
-        with self.assertLogs("paperless.consumer", level="ERROR") as cm:
+        with self.assertLogs("edoc.consumer", level="ERROR") as cm:
             document = self.consumer.try_consume_file(
                 self.get_test_file(),
                 override_title="Override {correspondent]",
@@ -999,17 +999,17 @@ class PreConsumeTestCase(TestCase):
             os.chmod(script.name, st.st_mode | stat.S_IEXEC)
 
             with override_settings(PRE_CONSUME_SCRIPT=script.name):
-                with self.assertLogs("paperless.consumer", level="INFO") as cm:
+                with self.assertLogs("edoc.consumer", level="INFO") as cm:
                     c = Consumer()
                     c.working_copy = "path-to-file"
 
                     c.run_pre_consume_script()
                     self.assertIn(
-                        "INFO:paperless.consumer:This message goes to stdout",
+                        "INFO:edoc.consumer:This message goes to stdout",
                         cm.output,
                     )
                     self.assertIn(
-                        "WARNING:paperless.consumer:This message goes to stderr",
+                        "WARNING:edoc.consumer:This message goes to stderr",
                         cm.output,
                     )
 

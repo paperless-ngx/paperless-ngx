@@ -6,7 +6,7 @@ class TestMigrateWorkflow(TestMigrations):
     migrate_from = "1043_alter_savedviewfilterrule_rule_type"
     migrate_to = "1044_workflow_workflowaction_workflowtrigger_and_more"
     dependencies = (
-        ("paperless_mail", "0023_remove_mailrule_filter_attachment_filename_and_more"),
+        ("edoc_mail", "0023_remove_mailrule_filter_attachment_filename_and_more"),
     )
 
     def setUpBeforeMigration(self, apps):
@@ -32,10 +32,10 @@ class TestMigrateWorkflow(TestMigrations):
             name="Custom Field 1",
             data_type="string",
         )
-        ma = apps.get_model("paperless_mail", "MailAccount").objects.create(
+        ma = apps.get_model("edoc_mail", "MailAccount").objects.create(
             name="MailAccount 1",
         )
-        mr = apps.get_model("paperless_mail", "MailRule").objects.create(
+        mr = apps.get_model("edoc_mail", "MailRule").objects.create(
             name="MailRule 1",
             order=0,
             account=ma,

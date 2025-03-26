@@ -1,8 +1,8 @@
-# Docker Compose file for running paperless from the Docker Hub.
-# This file contains everything paperless needs to run.
+# Docker Compose file for running edoc from the Docker Hub.
+# This file contains everything edoc needs to run.
 # Paperless supports amd64, arm and arm64 hardware.
 #
-# All compose files of paperless configure paperless in the following way:
+# All compose files of edoc configure edoc in the following way:
 #
 # - Paperless is (re)started on system boot, if it was running before shutdown.
 # - Docker volumes for storing data are managed by Docker.
@@ -15,10 +15,10 @@
 #
 # - Instead of SQLite (default), PostgreSQL is used as the database server.
 #
-# To install and update paperless with this file, do the following:
+# To install and update edoc with this file, do the following:
 #
 # - Open portainer Stacks list and click 'Add stack'
-# - Paste the contents of this file and assign a name, e.g. 'paperless'
+# - Paste the contents of this file and assign a name, e.g. 'edoc'
 # - Click 'Deploy the stack' and wait for it to be deployed
 # - Open the list of containers, select paperless_webserver_1
 # - Click 'Console' and then 'Connect' to open the command line inside the container
@@ -42,12 +42,12 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: paperless
-      POSTGRES_USER: paperless
-      POSTGRES_PASSWORD: paperless
+      POSTGRES_DB: edoc
+      POSTGRES_USER: edoc
+      POSTGRES_PASSWORD: edoc
 
   webserver:
-    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    image: ghcr.io/edoc-ngx/edoc-ngx:latest
     restart: unless-stopped
     depends_on:
       - db
@@ -55,14 +55,14 @@ services:
     ports:
       - "8010:8000"
     volumes:
-      - data:/usr/src/paperless/data
-      - media:/usr/src/paperless/media
-      - ./export:/usr/src/paperless/export
-      - ./consume:/usr/src/paperless/consume
+      - data:/usr/src/edoc/data
+      - media:/usr/src/edoc/media
+      - ./export:/usr/src/edoc/export
+      - ./consume:/usr/src/edoc/consume
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBHOST: db
-# The UID and GID of the user used to run paperless in the container. Set this
+# The UID and GID of the user used to run edoc in the container. Set this
 # to your UID and GID on the host so that you have write access to the
 # consumption directory.
       USERMAP_UID: 1000
@@ -76,7 +76,7 @@ services:
 # See https://packages.debian.org/search?keywords=tesseract-ocr-&searchon=names&suite=buster
 # for available languages.
       #PAPERLESS_OCR_LANGUAGES: tur ces
-# Adjust this key if you plan to make paperless available publicly. It should
+# Adjust this key if you plan to make edoc available publicly. It should
 # be a very long sequence of random characters. You don't need to remember it.
       #PAPERLESS_SECRET_KEY: change-me
 # Use this variable to set a timezone for the Paperless Docker containers. If not specified, defaults to UTC.

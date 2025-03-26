@@ -20,7 +20,7 @@ from documents.loggers import LoggingMixin
 from documents.signals import document_consumer_declaration
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
-from paperless.models import ApplicationConfiguration
+from edoc.models import ApplicationConfiguration
 
 # This regular expression will try to find dates in the document at
 # hand and will match the following formats:
@@ -50,7 +50,7 @@ DATE_REGEX = re.compile(
 )
 
 
-logger = logging.getLogger("paperless.parsing")
+logger = logging.getLogger("edoc.parsing")
 
 
 @lru_cache(maxsize=8)
@@ -352,10 +352,10 @@ class ParseError(Exception):
 class DocumentParser(LoggingMixin):
     """
     Subclass this to make your own parser.  Have a look at
-    `paperless_tesseract.parsers` for inspiration.
+    `edoc_tesseract.parsers` for inspiration.
     """
 
-    logging_name = "paperless.parsing"
+    logging_name = "edoc.parsing"
 
     def __init__(self, logging_group, progress_callback=None):
         super().__init__()
@@ -363,7 +363,7 @@ class DocumentParser(LoggingMixin):
         self.settings = self.get_settings()
         settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
         self.tempdir = Path(
-            tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR),
+            tempfile.mkdtemp(prefix="edoc-", dir=settings.SCRATCH_DIR),
         )
 
         self.archive_path = None

@@ -13,8 +13,8 @@ import {
   ConfigCategory,
   ConfigOption,
   ConfigOptionType,
-  PaperlessConfig,
-} from 'src/app/data/paperless-config'
+  EdocConfig,
+} from 'src/app/data/edoc-config'
 import { ConfigService } from 'src/app/services/config.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
@@ -47,7 +47,7 @@ export class ConfigComponent
 
   public loading: boolean = false
 
-  initialConfig: PaperlessConfig
+  initialConfig: EdocConfig
   store: BehaviorSubject<any>
   storeSub: Subscription
   isDirty$: Observable<boolean>
@@ -115,7 +115,7 @@ export class ConfigComponent
     this.unsubscribeNotifier.complete()
   }
 
-  private initialize(config: PaperlessConfig) {
+  private initialize(config: EdocConfig) {
     if (!this.store) {
       this.store = new BehaviorSubject(config)
 
@@ -140,7 +140,7 @@ export class ConfigComponent
   public saveConfig() {
     this.loading = true
     this.configService
-      .saveConfig(this.configForm.value as PaperlessConfig)
+      .saveConfig(this.configForm.value as EdocConfig)
       .pipe(takeUntil(this.unsubscribeNotifier), first())
       .subscribe({
         next: (config) => {

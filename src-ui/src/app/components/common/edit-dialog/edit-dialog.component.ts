@@ -10,7 +10,7 @@ import {
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { User } from 'src/app/data/user'
-import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service'
+import { AbstractEdocService } from 'src/app/services/rest/abstract-edoc-service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { PermissionsFormObject } from '../input/permissions/permissions-form/permissions-form.component'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -26,7 +26,7 @@ export abstract class EditDialogComponent<
   T extends ObjectWithPermissions | ObjectWithId,
 > implements OnInit {
   constructor(
-    protected service: AbstractPaperlessService<T>,
+    protected service: AbstractEdocService<T>,
     private activeModal: NgbActiveModal,
     private userService: UserService,
     private settingsService: SettingsService
@@ -128,12 +128,12 @@ export abstract class EditDialogComponent<
   getFormOrigin(){
     return this.objectForm
   }
- 
+
   setFormOrigin(objectForm){
     // console.log('gia tri gan',objectForm)
     return this.objectForm=objectForm
   }
- 
+
 
   getMatchingAlgorithms() {
     return MATCHING_ALGORITHMS

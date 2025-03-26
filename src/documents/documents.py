@@ -4,7 +4,7 @@ from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
 from guardian.shortcuts import get_users_with_perms
 
-from paperless.settings import ELASTIC_SEARCH_DOCUMENT_INDEX
+from edoc.settings import ELASTIC_SEARCH_DOCUMENT_INDEX
 from .models import Document as DocumentModel, Note, CustomFieldInstance
 
 

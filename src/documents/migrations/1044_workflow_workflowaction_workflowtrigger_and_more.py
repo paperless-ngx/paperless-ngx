@@ -68,7 +68,7 @@ def migrate_consumption_templates(apps, schema_editor):
     StoragePath = apps.get_model(app_label=app_name, model_name="StoragePath")
     Tag = apps.get_model(app_label=app_name, model_name="Tag")
     CustomField = apps.get_model(app_label=app_name, model_name="CustomField")
-    MailRule = apps.get_model(app_label="paperless_mail", model_name="MailRule")
+    MailRule = apps.get_model(app_label="edoc_mail", model_name="MailRule")
     User = apps.get_model(app_label="auth", model_name="User")
     Group = apps.get_model(app_label="auth", model_name="Group")
 
@@ -207,7 +207,7 @@ def undelete_consumption_template_content_type(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("paperless_mail", "0023_remove_mailrule_filter_attachment_filename_and_more"),
+        ("edoc_mail", "0023_remove_mailrule_filter_attachment_filename_and_more"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("auth", "0012_alter_user_first_name_max_length"),
         ("documents", "1043_alter_savedviewfilterrule_rule_type"),
@@ -429,7 +429,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
-                        to="paperless_mail.mailrule",
+                        to="edoc_mail.mailrule",
                         verbose_name="filter documents from this mail rule",
                     ),
                 ),

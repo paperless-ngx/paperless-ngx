@@ -11,7 +11,7 @@ from documents.signals.handlers import set_document_type
 from documents.signals.handlers import set_storage_path
 from documents.signals.handlers import set_tags
 
-logger = logging.getLogger("paperless.management.retagger")
+logger = logging.getLogger("edoc.management.retagger")
 
 
 class Command(ProgressBarMixin, BaseCommand):

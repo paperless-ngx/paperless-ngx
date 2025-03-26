@@ -358,11 +358,11 @@ class TestBarcode(
             - Scanning handles the exception without crashing
         """
         test_file = self.SAMPLE_DIR / "password-is-test.pdf"
-        with self.assertLogs("paperless.barcodes", level="WARNING") as cm:
+        with self.assertLogs("edoc.barcodes", level="WARNING") as cm:
             with self.get_reader(test_file) as reader:
                 reader.detect()
                 warning = cm.output[0]
-                expected_str = "WARNING:paperless.barcodes:File is likely password protected, not checking for barcodes"
+                expected_str = "WARNING:edoc.barcodes:File is likely password protected, not checking for barcodes"
                 self.assertTrue(warning.startswith(expected_str))
 
                 separator_page_numbers = reader.get_separation_pages()

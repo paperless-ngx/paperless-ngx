@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core'
 import { Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { first } from 'rxjs'
-import { PaperlessTask } from 'src/app/data/paperless-task'
+import { EdocTask } from 'src/app/data/edoc-task'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
@@ -50,11 +50,11 @@ export class TasksComponent
     clearInterval(this.autoRefreshInterval)
   }
 
-  dismissTask(task: PaperlessTask) {
+  dismissTask(task: EdocTask) {
     this.dismissTasks(task)
   }
 
-  dismissTasks(task: PaperlessTask = undefined) {
+  dismissTasks(task: EdocTask = undefined) {
     let tasks = task ? new Set([task.id]) : new Set(this.selectedTasks.values())
     if (!task && tasks.size == 0)
       tasks = new Set(this.tasksService.allFileTasks.map((t) => t.id))
@@ -78,23 +78,23 @@ export class TasksComponent
     }
   }
 
-  dismissAndGo(task: PaperlessTask) {
+  dismissAndGo(task: EdocTask) {
     this.dismissTask(task)
     this.router.navigate(['documents', task.related_document])
   }
 
-  expandTask(task: PaperlessTask) {
+  expandTask(task: EdocTask) {
     this.expandedTask = this.expandedTask == task.id ? undefined : task.id
   }
 
-  toggleSelected(task: PaperlessTask) {
+  toggleSelected(task: EdocTask) {
     this.selectedTasks.has(task.id)
       ? this.selectedTasks.delete(task.id)
       : this.selectedTasks.add(task.id)
   }
 
-  get currentTasks(): PaperlessTask[] {
-    let tasks: PaperlessTask[] = []
+  get currentTasks(): EdocTask[] {
+    let tasks: EdocTask[] = []
     switch (this.activeTab) {
       case 'queued':
         tasks = this.tasksService.queuedFileTasks

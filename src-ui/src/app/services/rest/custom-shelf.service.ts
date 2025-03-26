@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { AbstractPaperlessService } from './abstract-paperless-service'
+import { AbstractEdocService } from './abstract-edoc-service'
 import { AbstractNameFilterService } from './abstract-name-filter-service'
 import { CustomField } from 'src/app/data/custom-field'
 import { Shelf } from 'src/app/data/custom-shelf'

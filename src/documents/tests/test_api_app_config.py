@@ -6,8 +6,8 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.tests.utils import DirectoriesMixin
-from paperless.models import ApplicationConfiguration
-from paperless.models import ColorConvertChoices
+from edoc.models import ApplicationConfiguration
+from edoc.models import ColorConvertChoices
 
 
 class TestApiAppConfig(DirectoriesMixin, APITestCase):

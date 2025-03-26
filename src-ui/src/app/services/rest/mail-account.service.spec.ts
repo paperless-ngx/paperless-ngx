@@ -2,7 +2,7 @@ import { HttpTestingController } from '@angular/common/http/testing'
 import { Subscription } from 'rxjs'
 import { TestBed } from '@angular/core/testing'
 import { environment } from 'src/environments/environment'
-import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
+import { commonAbstractEdocServiceTests } from './abstract-edoc-service.spec'
 import { MailAccountService } from './mail-account.service'
 import { IMAPSecurity } from 'src/app/data/mail-account'
 
@@ -44,7 +44,7 @@ const mail_accounts = [
 ]
 
 // run common tests
-commonAbstractPaperlessServiceTests(endpoint, MailAccountService)
+commonAbstractEdocServiceTests(endpoint, MailAccountService)
 
 describe(`Additional service tests for MailAccountService`, () => {
   it('should correct api endpoint on test account', () => {

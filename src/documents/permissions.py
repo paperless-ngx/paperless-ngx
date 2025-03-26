@@ -16,7 +16,7 @@ from rest_framework.permissions import DjangoObjectPermissions
 from documents.models import Folder, Warehouse
 
 
-class PaperlessObjectPermissions(DjangoObjectPermissions):
+class EdocObjectPermissions(DjangoObjectPermissions):
     """
     A permissions backend that checks for object-level permissions
     or for ownership.
@@ -42,7 +42,7 @@ class PaperlessObjectPermissions(DjangoObjectPermissions):
             return True  # no owner
 
 
-class PaperlessAdminPermissions(BasePermission):
+class EdocAdminPermissions(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_staff
 

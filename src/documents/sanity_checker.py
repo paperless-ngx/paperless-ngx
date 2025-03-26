@@ -28,7 +28,7 @@ class SanityCheckMessages:
         self._messages[doc_pk].append({"level": logging.INFO, "message": message})
 
     def log_messages(self):
-        logger = logging.getLogger("paperless.sanity_checker")
+        logger = logging.getLogger("edoc.sanity_checker")
 
         if len(self._messages) == 0:
             logger.info("Sanity checker detected no issues.")

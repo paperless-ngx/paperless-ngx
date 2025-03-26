@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: paperless-ng\n"
+"Project-Id-Version: edoc-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-28 12:40+0100\n"
 "PO-Revision-Date: 2021-03-06 21:39\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Crowdin-Project: paperless-ng\n"
+"X-Crowdin-Project: edoc-ng\n"
 "X-Crowdin-Project-ID: 434940\n"
 "X-Crowdin-Language: la-LA\n"
 "X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
@@ -453,7 +453,7 @@ msgid "Metadata"
 msgstr ""
 
 #: paperless_mail/admin.py:48
-msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
+msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, edoc will still process all matching rules that you have defined."
 msgstr ""
 
 #: paperless_mail/apps.py:9

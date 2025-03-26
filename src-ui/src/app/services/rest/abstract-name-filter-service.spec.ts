@@ -6,7 +6,7 @@ import {
   AbstractNameFilterService,
   BulkEditObjectOperation,
 } from './abstract-name-filter-service'
-import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
+import { commonAbstractEdocServiceTests } from './abstract-edoc-service.spec'
 
 let httpTestingController: HttpTestingController
 let service: AbstractNameFilterService<any>
@@ -16,7 +16,7 @@ export const commonAbstractNameFilterPaperlessServiceTests = (
   endpoint,
   ServiceClass
 ) => {
-  commonAbstractPaperlessServiceTests(endpoint, ServiceClass)
+  commonAbstractEdocServiceTests(endpoint, ServiceClass)
 
   describe(`Common name filter service tests for ${endpoint}`, () => {
     test('should call appropriate api endpoint for list filtering', () => {

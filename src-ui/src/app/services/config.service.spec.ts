@@ -6,7 +6,7 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing'
 import { environment } from 'src/environments/environment'
-import { OutputTypeConfig, PaperlessConfig } from '../data/paperless-config'
+import { OutputTypeConfig, EdocConfig } from '../data/./edoc-config'
 
 describe('ConfigService', () => {
   let service: ConfigService
@@ -32,7 +32,7 @@ describe('ConfigService', () => {
       .saveConfig({
         id: 1,
         output_type: OutputTypeConfig.PDF_A,
-      } as PaperlessConfig)
+      } as EdocConfig)
       .subscribe()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}config/1/`
@@ -54,7 +54,7 @@ describe('ConfigService', () => {
       .saveConfig({
         id: 1,
         app_logo: '/logo/foobar.png',
-      } as PaperlessConfig)
+      } as EdocConfig)
       .subscribe()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}config/1/`

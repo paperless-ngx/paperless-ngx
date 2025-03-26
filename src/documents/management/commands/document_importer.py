@@ -34,7 +34,7 @@ from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.signals.handlers import update_filename_and_move_files
 from documents.utils import copy_file_with_basic_stats
-from paperless import version
+from edoc import version
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
@@ -265,7 +265,7 @@ class Command(BaseCommand):
         settings.THUMBNAIL_DIR.mkdir(parents=True, exist_ok=True)
         settings.ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
 
-        self.stdout.write("Copy files into paperless...")
+        self.stdout.write("Copy files into edoc...")
 
         manifest_documents = list(
             filter(lambda r: r["model"] == "documents.document", self.manifest),

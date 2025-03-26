@@ -15,10 +15,10 @@ from django.template.defaultfilters import slugify
 from documents.file_handling import defaultdictNoStr
 from documents.file_handling import many_to_dictionary
 
-logger = logging.getLogger("paperless.migrations")
+logger = logging.getLogger("edoc.migrations")
 
 ###############################################################################
-# This is code copied straight paperless before the change.
+# This is code copied straight edoc before the change.
 ###############################################################################
 
 

@@ -1538,19 +1538,19 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         log_data = "test\ntest2\n"
         with open(os.path.join(settings.LOGGING_DIR, "mail.log"), "w") as f:
             f.write(log_data)
-        with open(os.path.join(settings.LOGGING_DIR, "paperless.log"), "w") as f:
+        with open(os.path.join(settings.LOGGING_DIR, "edoc.log"), "w") as f:
             f.write(log_data)
         response = self.client.get("/api/logs/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertCountEqual(response.data, ["mail", "paperless"])
+        self.assertCountEqual(response.data, ["mail", "edoc"])
 
     def test_get_logs_only_when_exist(self):
         log_data = "test\ntest2\n"
-        with open(os.path.join(settings.LOGGING_DIR, "paperless.log"), "w") as f:
+        with open(os.path.join(settings.LOGGING_DIR, "edoc.log"), "w") as f:
             f.write(log_data)
         response = self.client.get("/api/logs/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertCountEqual(response.data, ["paperless"])
+        self.assertCountEqual(response.data, ["edoc"])
 
     def test_get_invalid_log(self):
         response = self.client.get("/api/logs/bogus_log/")
@@ -1558,14 +1558,14 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
     @override_settings(LOGGING_DIR="bogus_dir")
     def test_get_nonexistent_log(self):
-        response = self.client.get("/api/logs/paperless/")
+        response = self.client.get("/api/logs/edoc/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_log(self):
         log_data = "test\ntest2\n"
-        with open(os.path.join(settings.LOGGING_DIR, "paperless.log"), "w") as f:
+        with open(os.path.join(settings.LOGGING_DIR, "edoc.log"), "w") as f:
             f.write(log_data)
-        response = self.client.get("/api/logs/paperless/")
+        response = self.client.get("/api/logs/edoc/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertListEqual(response.data, ["test", "test2"])
 

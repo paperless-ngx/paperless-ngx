@@ -21,7 +21,7 @@ from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 from guardian.models import GroupObjectPermission
 
-logger = logging.getLogger("paperless.matching")
+logger = logging.getLogger("edoc.matching")
 
 
 def log_reason(

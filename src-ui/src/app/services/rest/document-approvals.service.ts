@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core'
 import { HttpClient, HttpParams } from '@angular/common/http'
-import { AbstractPaperlessService } from './abstract-paperless-service'
+import { AbstractEdocService } from './abstract-edoc-service'
 import { Observable } from 'rxjs'
 import { DocumentApproval } from 'src/app/data/document-approval'
 
 @Injectable({
   providedIn: 'root',
 })
-export class DocumentApprovalsService extends AbstractPaperlessService<DocumentApproval> {
+export class DocumentApprovalsService extends AbstractEdocService<DocumentApproval> {
   constructor(http: HttpClient) {
     super(http, 'documents')
   }

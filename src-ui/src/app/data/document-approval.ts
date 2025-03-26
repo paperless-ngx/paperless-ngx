@@ -2,7 +2,7 @@ import { Group } from './group'
 import { ObjectWithId } from './object-with-id'
 import { User } from './user'
 
-export enum PaperlessApprovalAccessType {
+export enum EdocApprovalAccessType {
   // just file tasks, for now
   Owner = 'OWNER',
   Edit = 'EDIT',
@@ -10,7 +10,7 @@ export enum PaperlessApprovalAccessType {
 
 }
 
-export enum PaperlessApprovalStatus {
+export enum ApprovalStatus {
   Pending = 'PENDING',
   Success = 'SUCCESS',
   Failure = 'FAILURE',
@@ -18,10 +18,10 @@ export enum PaperlessApprovalStatus {
 }
 
 export interface DocumentApproval extends ObjectWithId {
-  
-  access_type: PaperlessApprovalAccessType
 
-  status: PaperlessApprovalStatus
+  access_type: EdocApprovalAccessType
+
+  status: ApprovalStatus
 
   submitted_by: number
 

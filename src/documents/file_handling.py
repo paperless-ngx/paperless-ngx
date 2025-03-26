@@ -10,7 +10,7 @@ from django.utils import timezone
 
 from documents.models import Document
 
-logger = logging.getLogger("paperless.filehandling")
+logger = logging.getLogger("edoc.filehandling")
 
 
 class defaultdictNoStr(defaultdict):
@@ -174,7 +174,7 @@ def generate_filename(
                 )
             else:
                 document_type = no_value_default
-                
+
             if doc.archive_serial_number:
                 asn = str(doc.archive_serial_number)
             else:

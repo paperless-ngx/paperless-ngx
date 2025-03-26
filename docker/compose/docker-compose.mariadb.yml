@@ -1,8 +1,8 @@
-# Docker Compose file for running paperless from the Docker Hub.
-# This file contains everything paperless needs to run.
+# Docker Compose file for running edoc from the Docker Hub.
+# This file contains everything edoc needs to run.
 # Paperless supports amd64, arm and arm64 hardware.
 #
-# All compose files of paperless configure paperless in the following way:
+# All compose files of edoc configure edoc in the following way:
 #
 # - Paperless is (re)started on system boot, if it was running before shutdown.
 # - Docker volumes for storing data are managed by Docker.
@@ -15,7 +15,7 @@
 #
 # - Instead of SQLite (default), MariaDB is used as the database server.
 #
-# To install and update paperless with this file, do the following:
+# To install and update edoc with this file, do the following:
 #
 # - Copy this file as 'docker-compose.yml' and the files 'docker-compose.env'
 #   and '.env' into a folder.
@@ -40,14 +40,14 @@ services:
     volumes:
       - dbdata:/var/lib/mysql
     environment:
-      MARIADB_HOST: paperless
-      MARIADB_DATABASE: paperless
-      MARIADB_USER: paperless
-      MARIADB_PASSWORD: paperless
-      MARIADB_ROOT_PASSWORD: paperless
+      MARIADB_HOST: edoc
+      MARIADB_DATABASE: edoc
+      MARIADB_USER: edoc
+      MARIADB_PASSWORD: edoc
+      MARIADB_ROOT_PASSWORD: edoc
 
   webserver:
-    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    image: ghcr.io/edoc-ngx/edoc-ngx:latest
     restart: unless-stopped
     depends_on:
       - db
@@ -55,17 +55,17 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - data:/usr/src/paperless/data
-      - media:/usr/src/paperless/media
-      - ./export:/usr/src/paperless/export
-      - ./consume:/usr/src/paperless/consume
+      - data:/usr/src/edoc/data
+      - media:/usr/src/edoc/media
+      - ./export:/usr/src/edoc/export
+      - ./consume:/usr/src/edoc/consume
     env_file: docker-compose.env
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBENGINE: mariadb
       PAPERLESS_DBHOST: db
-      PAPERLESS_DBUSER: paperless # only needed if non-default username
-      PAPERLESS_DBPASS: paperless # only needed if non-default password
+      PAPERLESS_DBUSER: edoc # only needed if non-default username
+      PAPERLESS_DBPASS: edoc # only needed if non-default password
       PAPERLESS_DBPORT: 3306
 
 volumes:

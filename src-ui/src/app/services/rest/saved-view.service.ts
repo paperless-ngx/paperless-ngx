@@ -4,14 +4,14 @@ import { combineLatest, Observable } from 'rxjs'
 import { tap } from 'rxjs/operators'
 import { SavedView } from 'src/app/data/saved-view'
 import { PermissionsService } from '../permissions.service'
-import { AbstractPaperlessService } from './abstract-paperless-service'
+import { AbstractEdocService } from './abstract-edoc-service'
 import { SettingsService } from '../settings.service'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 
 @Injectable({
   providedIn: 'root',
 })
-export class SavedViewService extends AbstractPaperlessService<SavedView> {
+export class SavedViewService extends AbstractEdocService<SavedView> {
   loading: boolean
 
   constructor(

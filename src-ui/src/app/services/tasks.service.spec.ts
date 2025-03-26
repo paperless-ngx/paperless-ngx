@@ -5,8 +5,8 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing'
 import { environment } from 'src/environments/environment'
-import { PaperlessTaskType } from '../data/paperless-task'
-import { PaperlessTaskStatus } from '../data/paperless-task'
+import { EdocTaskType } from '../data/./edoc-task'
+import { EdocTaskStatus } from '../data/./edoc-task'
 
 describe('TasksService', () => {
   let httpTestingController: HttpTestingController
@@ -52,40 +52,40 @@ describe('TasksService', () => {
     expect(tasksService.total).toEqual(0)
     const mockTasks = [
       {
-        type: PaperlessTaskType.File,
-        status: PaperlessTaskStatus.Complete,
+        type: EdocTaskType.File,
+        status: EdocTaskStatus.Complete,
         acknowledged: false,
         task_id: '1234',
         task_file_name: 'file1.pdf',
         date_created: new Date(),
       },
       {
-        type: PaperlessTaskType.File,
-        status: PaperlessTaskStatus.Failed,
+        type: EdocTaskType.File,
+        status: EdocTaskStatus.Failed,
         acknowledged: false,
         task_id: '1235',
         task_file_name: 'file2.pdf',
         date_created: new Date(),
       },
       {
-        type: PaperlessTaskType.File,
-        status: PaperlessTaskStatus.Pending,
+        type: EdocTaskType.File,
+        status: EdocTaskStatus.Pending,
         acknowledged: false,
         task_id: '1236',
         task_file_name: 'file3.pdf',
         date_created: new Date(),
       },
       {
-        type: PaperlessTaskType.File,
-        status: PaperlessTaskStatus.Started,
+        type: EdocTaskType.File,
+        status: EdocTaskStatus.Started,
         acknowledged: false,
         task_id: '1237',
         task_file_name: 'file4.pdf',
         date_created: new Date(),
       },
       {
-        type: PaperlessTaskType.File,
-        status: PaperlessTaskStatus.Complete,
+        type: EdocTaskType.File,
+        status: EdocTaskStatus.Complete,
         acknowledged: false,
         task_id: '1238',
         task_file_name: 'file5.pdf',

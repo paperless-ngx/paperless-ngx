@@ -625,7 +625,7 @@ class UiSettings(models.Model):
         return self.user.username
 
 
-class PaperlessTask(models.Model):
+class EdocTask(models.Model):
     ALL_STATES = sorted(states.ALL_STATES)
     TASK_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
 
@@ -1367,7 +1367,7 @@ class WorkflowTrigger(models.Model):
     )
 
     filter_mailrule = models.ForeignKey(
-        "paperless_mail.MailRule",
+        "edoc_mail.MailRule",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,

@@ -5,7 +5,7 @@ from argparse import RawTextHelpFormatter
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 
-logger = logging.getLogger("paperless.management.superuser")
+logger = logging.getLogger("edoc.management.superuser")
 
 
 class Command(BaseCommand):

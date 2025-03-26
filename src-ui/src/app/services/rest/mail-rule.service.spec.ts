@@ -2,7 +2,7 @@ import { HttpTestingController } from '@angular/common/http/testing'
 import { Subscription } from 'rxjs'
 import { TestBed } from '@angular/core/testing'
 import { environment } from 'src/environments/environment'
-import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
+import { commonAbstractEdocServiceTests } from './abstract-edoc-service.spec'
 import { MailRuleService } from './mail-rule.service'
 import { MailFilterAttachmentType } from 'src/app/data/mail-rule'
 import { MailMetadataTitleOption } from 'src/app/data/mail-rule'
@@ -70,7 +70,7 @@ const mail_rules = [
 ]
 
 // run common tests
-commonAbstractPaperlessServiceTests(endpoint, MailRuleService)
+commonAbstractEdocServiceTests(endpoint, MailRuleService)
 
 describe(`Additional service tests for MailRuleService`, () => {
   it('should support patchMany', () => {

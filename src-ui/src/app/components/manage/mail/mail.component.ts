@@ -8,7 +8,7 @@ import {
   PermissionsService,
   PermissionAction,
 } from 'src/app/services/permissions.service'
-import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service'
+import { AbstractEdocService } from 'src/app/services/rest/abstract-edoc-service'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -203,7 +203,7 @@ export class MailComponent
     modal.componentInstance.confirmClicked.subscribe(
       ({ permissions, merge }) => {
         modal.componentInstance.buttonsEnabled = false
-        const service: AbstractPaperlessService<MailRule | MailAccount> =
+        const service: AbstractEdocService<MailRule | MailAccount> =
           'account' in object ? this.mailRuleService : this.mailAccountService
         object.owner = permissions['owner']
         object['set_permissions'] = permissions['set_permissions']

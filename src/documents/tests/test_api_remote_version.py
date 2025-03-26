@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.tests.utils import DirectoriesMixin
-from paperless import version
+from edoc import version
 
 
 class TestApiRemoteVersion(DirectoriesMixin, APITestCase):

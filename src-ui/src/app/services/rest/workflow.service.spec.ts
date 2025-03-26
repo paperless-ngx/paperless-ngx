@@ -1,7 +1,7 @@
 import { HttpTestingController } from '@angular/common/http/testing'
 import { TestBed } from '@angular/core/testing'
 import { environment } from 'src/environments/environment'
-import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
+import { commonAbstractEdocServiceTests } from './abstract-edoc-service.spec'
 import { WorkflowService } from './workflow.service'
 import { Workflow } from 'src/app/data/workflow'
 import {
@@ -58,7 +58,7 @@ const workflows: Workflow[] = [
 ]
 
 // run common tests
-commonAbstractPaperlessServiceTests(endpoint, WorkflowService)
+commonAbstractEdocServiceTests(endpoint, WorkflowService)
 
 describe(`Additional service tests for WorkflowService`, () => {
   it('should reload', () => {

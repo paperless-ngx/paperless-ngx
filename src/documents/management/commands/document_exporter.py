@@ -45,11 +45,11 @@ from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.utils import copy_file_with_basic_stats
-from paperless import version
-from paperless.db import GnuPG
-from paperless.models import ApplicationConfiguration
-from paperless_mail.models import MailAccount
-from paperless_mail.models import MailRule
+from edoc import version
+from edoc.db import GnuPG
+from edoc.models import ApplicationConfiguration
+from edoc_mail.models import MailAccount
+from edoc_mail.models import MailRule
 
 
 class Command(BaseCommand):
@@ -188,7 +188,7 @@ class Command(BaseCommand):
             settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
             temp_dir = tempfile.TemporaryDirectory(
                 dir=settings.SCRATCH_DIR,
-                prefix="paperless-export",
+                prefix="edoc-export",
             )
             self.target = Path(temp_dir.name).resolve()
 

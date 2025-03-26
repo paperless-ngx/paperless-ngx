@@ -16,7 +16,7 @@ from documents.plugins.base import NoCleanupPluginMixin
 from documents.plugins.base import NoSetupPluginMixin
 from documents.plugins.base import StopConsumeTaskError
 
-logger = logging.getLogger("paperless.double_sided")
+logger = logging.getLogger("edoc.double_sided")
 
 # Hardcoded for now, could be made a configurable setting if needed
 TIMEOUT_MINUTES: Final[int] = 30

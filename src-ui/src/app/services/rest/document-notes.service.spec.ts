@@ -2,7 +2,7 @@ import { HttpTestingController } from '@angular/common/http/testing'
 import { Subscription } from 'rxjs'
 import { TestBed } from '@angular/core/testing'
 import { environment } from 'src/environments/environment'
-import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
+import { commonAbstractEdocServiceTests } from './abstract-edoc-service.spec'
 import { DocumentNotesService } from './document-notes.service'
 
 let httpTestingController: HttpTestingController
@@ -30,7 +30,7 @@ const notes = [
 ]
 
 // run common tests
-commonAbstractPaperlessServiceTests(endpoint, DocumentNotesService)
+commonAbstractEdocServiceTests(endpoint, DocumentNotesService)
 
 describe(`Additional service tests for DocumentNotesService`, () => {
   test('should call correct api endpoint on get notes', () => {

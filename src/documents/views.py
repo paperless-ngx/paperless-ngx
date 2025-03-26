@@ -143,7 +143,7 @@ from documents.models import DossierForm
 from documents.models import Folder
 from documents.models import FontLanguage
 from documents.models import Note
-from documents.models import PaperlessTask
+from documents.models import EdocTask
 from documents.models import SavedView
 from documents.models import ShareLink
 from documents.models import StoragePath
@@ -155,8 +155,8 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.parsers import custom_get_parser_class_for_mime_type
 from documents.parsers import parse_date_generator
-from documents.permissions import PaperlessAdminPermissions
-from documents.permissions import PaperlessObjectPermissions
+from documents.permissions import EdocAdminPermissions
+from documents.permissions import EdocObjectPermissions
 from documents.permissions import check_user_can_change_folder
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import get_objects_for_user_owner_aware
@@ -209,18 +209,18 @@ from documents.tasks import restore_documents
 from documents.utils import check_storage, compress_pdf
 from documents.utils import generate_unique_name
 from documents.utils import get_directory_size
-from paperless import version
-from paperless.celery import app as celery_app
-from paperless.config import GeneralConfig
-from paperless.db import GnuPG
-from paperless.models import ApplicationConfiguration
-from paperless.views import StandardPagination
-from paperless.wsgi import application
+from edoc import version
+from edoc.celery import app as celery_app
+from edoc.config import GeneralConfig
+from edoc.db import GnuPG
+from edoc.models import ApplicationConfiguration
+from edoc.views import StandardPagination
+from edoc.wsgi import application
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
 
-logger = logging.getLogger("paperless.api")
+logger = logging.getLogger("edoc.api")
 
 
 class IndexView(TemplateView):
@@ -318,7 +318,7 @@ class CorrespondentViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
     serializer_class = CorrespondentSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
@@ -348,7 +348,7 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             return TagSerializer
 
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
@@ -365,7 +365,7 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
     serializer_class = DocumentTypeSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
@@ -382,7 +382,7 @@ class ArchiveFontViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
     serializer_class = ArchiveFontSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
@@ -399,7 +399,7 @@ class FontLanguageViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
     serializer_class = FontLanguageSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
@@ -504,7 +504,7 @@ class DocumentViewSet(
     queryset = Document.objects.annotate(num_notes=Count("notes"))
     serializer_class = DocumentSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
     filter_backends = (
         DjangoFilterBackend,
         SearchFilter,
@@ -1334,9 +1334,9 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
 
 class LogViewSet(ViewSet):
-    permission_classes = (IsAuthenticated, PaperlessAdminPermissions)
+    permission_classes = (IsAuthenticated, EdocAdminPermissions)
 
-    log_files = ["paperless", "mail"]
+    log_files = ["edoc", "mail"]
 
     def get_log_filename(self, log):
         return os.path.join(settings.LOGGING_DIR, f"{log}.log")
@@ -1368,7 +1368,7 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin):
     queryset = SavedView.objects.all()
     serializer_class = SavedViewSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
 
     def get_queryset(self):
         user = self.request.user
@@ -1707,7 +1707,7 @@ class StatisticsView(APIView):
         )
 
         request_count = (
-            PaperlessTask.objects.aggregate(Sum("api_call_count"))["api_call_count__sum"] or 0        )
+            EdocTask.objects.aggregate(Sum("api_call_count"))["api_call_count__sum"] or 0        )
 
         pages_total = documents.aggregate(Sum("page_count")).get("page_count__sum")
         return Response(
@@ -1790,7 +1790,7 @@ class StatisticsCustomView(APIView):
             )
 
             request_count = (
-                PaperlessTask.objects.filter(date_done__range=(from_date, to_date))
+                EdocTask.objects.filter(date_done__range=(from_date, to_date))
                 .annotate(date_done_date=TruncDate("date_done"))
                 .values("date_done_date")
                 .annotate(
@@ -2004,7 +2004,7 @@ class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
     serializer_class = StoragePathSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
@@ -2110,7 +2110,7 @@ class RemoteVersionView(GenericAPIView):
         try:
             req = urllib.request.Request(
                 "https://api.github.com/repos/paperless-ngx/"
-                "paperless-ngx/releases/latest",
+                "edoc-ngx/releases/latest",
             )
             # Ensure a JSON response
             req.add_header("Accept", "application/json")
@@ -2149,7 +2149,7 @@ class TasksViewSet(ReadOnlyModelViewSet):
 
     def get_queryset(self):
         queryset = (
-            PaperlessTask.objects.filter(
+            EdocTask.objects.filter(
                 acknowledged=False,
             )
             .order_by("date_created")
@@ -2157,7 +2157,7 @@ class TasksViewSet(ReadOnlyModelViewSet):
         )
         task_id = self.request.query_params.get("task_id")
         if task_id is not None:
-            queryset = PaperlessTask.objects.filter(task_id=task_id)
+            queryset = EdocTask.objects.filter(task_id=task_id)
         return queryset
 
 
@@ -2303,7 +2303,7 @@ class AcknowledgeTasksView(GenericAPIView):
         tasks = serializer.validated_data.get("tasks")
 
         try:
-            result = PaperlessTask.objects.filter(id__in=tasks).update(
+            result = EdocTask.objects.filter(id__in=tasks).update(
                 acknowledged=True,
             )
             return Response({"result": result})
@@ -2318,7 +2318,7 @@ class ShareLinkViewSet(ModelViewSet, PassUserMixin):
 
     serializer_class = ShareLinkSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
@@ -2607,7 +2607,7 @@ class BulkEditObjectsView(PassUserMixin):
 
 
 class WorkflowTriggerViewSet(ModelViewSet):
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
 
     serializer_class = WorkflowTriggerSerializer
     pagination_class = StandardPagination
@@ -2618,7 +2618,7 @@ class WorkflowTriggerViewSet(ModelViewSet):
 
 
 class WorkflowActionViewSet(ModelViewSet):
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
 
     serializer_class = WorkflowActionSerializer
     pagination_class = StandardPagination
@@ -2636,7 +2636,7 @@ class WorkflowActionViewSet(ModelViewSet):
 
 
 class WorkflowViewSet(ModelViewSet):
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
 
     serializer_class = WorkflowSerializer
     pagination_class = StandardPagination
@@ -2654,7 +2654,7 @@ class WorkflowViewSet(ModelViewSet):
 
 
 class CustomFieldViewSet(ModelViewSet):
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
 
     serializer_class = CustomFieldSerializer
     pagination_class = StandardPagination
@@ -2988,7 +2988,7 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
     serializer_class = WarehouseSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
@@ -3250,7 +3250,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
     serializer_class = FolderSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
@@ -3642,7 +3642,7 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
     serializer_class = DossierSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
@@ -3844,7 +3844,7 @@ class DossierFormViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
     serializer_class = DossierFormSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
@@ -3973,7 +3973,7 @@ class BackupRecordViewSet(ModelViewSet):
 
     serializer_class = BackupRecordSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,

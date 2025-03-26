@@ -52,7 +52,7 @@ class TestAutoComplete(DirectoriesMixin, TestCase):
             # DRF does call the validators, this test won't
             archive_serial_number=Document.ARCHIVE_SERIAL_NUMBER_MAX + 1,
         )
-        with self.assertLogs("paperless.index", level="ERROR") as cm:
+        with self.assertLogs("edoc.index", level="ERROR") as cm:
             with mock.patch(
                 "documents.index.AsyncWriter.update_document",
             ) as mocked_update_doc:
@@ -64,7 +64,7 @@ class TestAutoComplete(DirectoriesMixin, TestCase):
                 self.assertEqual(kwargs["asn"], 0)
 
                 error_str = cm.output[0]
-                expected_str = "ERROR:paperless.index:Not indexing Archive Serial Number 4294967296 of document 1"
+                expected_str = "ERROR:edoc.index:Not indexing Archive Serial Number 4294967296 of document 1"
                 self.assertIn(expected_str, error_str)
 
     def test_archive_serial_number_is_none(self):

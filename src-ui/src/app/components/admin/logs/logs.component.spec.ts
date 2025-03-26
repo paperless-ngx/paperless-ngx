@@ -13,18 +13,18 @@ import { NgbModule, NgbNavLink } from '@ng-bootstrap/ng-bootstrap'
 import { BrowserModule, By } from '@angular/platform-browser'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 
-const paperless_logs = [
-  '[2023-05-29 03:05:01,224] [DEBUG] [paperless.tasks] Training data unchanged.',
-  '[2023-05-29 04:05:00,622] [DEBUG] [paperless.classifier] Gathering data from database...',
-  '[2023-05-29 04:05:01,213] [DEBUG] [paperless.tasks] Training data unchanged.',
-  '[2023-06-11 00:30:01,774] [INFO] [paperless.sanity_checker] Document contains no OCR data',
-  '[2023-06-11 00:30:01,774] [WARNING] [paperless.sanity_checker] Made up',
-  '[2023-06-11 00:30:01,774] [ERROR] [paperless.sanity_checker] Document contains no OCR data',
-  '[2023-06-11 00:30:01,774] [CRITICAL] [paperless.sanity_checker] Document contains no OCR data',
+const edoc_logs = [
+  '[2023-05-29 03:05:01,224] [DEBUG] [edoc.tasks] Training data unchanged.',
+  '[2023-05-29 04:05:00,622] [DEBUG] [edoc.classifier] Gathering data from database...',
+  '[2023-05-29 04:05:01,213] [DEBUG] [edoc.tasks] Training data unchanged.',
+  '[2023-06-11 00:30:01,774] [INFO] [edoc.sanity_checker] Document contains no OCR data',
+  '[2023-06-11 00:30:01,774] [WARNING] [edoc.sanity_checker] Made up',
+  '[2023-06-11 00:30:01,774] [ERROR] [edoc.sanity_checker] Document contains no OCR data',
+  '[2023-06-11 00:30:01,774] [CRITICAL] [edoc.sanity_checker] Document contains no OCR data',
 ]
 const mail_logs = [
-  '[2023-06-09 01:10:00,666] [DEBUG] [paperless_mail] Rule inbox@example.com.Incoming: Searching folder with criteria (SINCE 10-May-2023 UNSEEN)',
-  '[2023-06-09 01:10:01,385] [DEBUG] [paperless_mail] Rule inbox@example.com.Incoming: Processed 3 matching mail(s)',
+  '[2023-06-09 01:10:00,666] [DEBUG] [edoc_mail] Rule inbox@example.com.Incoming: Searching folder with criteria (SINCE 10-May-2023 UNSEEN)',
+  '[2023-06-09 01:10:01,385] [DEBUG] [edoc_mail] Rule inbox@example.com.Incoming: Processed 3 matching mail(s)',
 ]
 
 describe('LogsComponent', () => {
@@ -47,10 +47,10 @@ describe('LogsComponent', () => {
     }).compileComponents()
 
     logService = TestBed.inject(LogService)
-    jest.spyOn(logService, 'list').mockReturnValue(of(['paperless', 'mail']))
+    jest.spyOn(logService, 'list').mockReturnValue(of(['edoc', 'mail']))
     logSpy = jest.spyOn(logService, 'get')
     logSpy.mockImplementation((id) => {
-      return of(id === 'paperless' ? paperless_logs : mail_logs)
+      return of(id === 'edoc' ? edoc_logs : mail_logs)
     })
     fixture = TestBed.createComponent(LogsComponent)
     component = fixture.componentInstance
@@ -61,10 +61,10 @@ describe('LogsComponent', () => {
   })
 
   it('should display logs with first log initially', () => {
-    expect(logSpy).toHaveBeenCalledWith('paperless')
+    expect(logSpy).toHaveBeenCalledWith('edoc')
     fixture.detectChanges()
     expect(fixture.debugElement.nativeElement.textContent).toContain(
-      paperless_logs[0]
+      edoc_logs[0]
     )
   })
 

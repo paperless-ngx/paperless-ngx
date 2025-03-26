@@ -4,22 +4,22 @@ set -e
 
 # Source: https://github.com/sameersbn/docker-gitlab/
 map_uidgid() {
-	local -r usermap_original_uid=$(id -u paperless)
-	local -r usermap_original_gid=$(id -g paperless)
+	local -r usermap_original_uid=$(id -u edoc)
+	local -r usermap_original_gid=$(id -g edoc)
 	local -r usermap_new_uid=${USERMAP_UID:-$usermap_original_uid}
 	local -r usermap_new_gid=${USERMAP_GID:-${usermap_original_gid:-$usermap_new_uid}}
 	if [[ ${usermap_new_uid} != "${usermap_original_uid}" || ${usermap_new_gid} != "${usermap_original_gid}" ]]; then
-		echo "Mapping UID and GID for paperless:paperless to $usermap_new_uid:$usermap_new_gid"
-		usermod -o -u "${usermap_new_uid}" paperless
-		groupmod -o -g "${usermap_new_gid}" paperless
+		echo "Mapping UID and GID for edoc:edoc to $usermap_new_uid:$usermap_new_gid"
+		usermod -o -u "${usermap_new_uid}" edoc
+		groupmod -o -g "${usermap_new_gid}" edoc
 	fi
 }
 
 map_folders() {
 	# Export these so they can be used in docker-prepare.sh
-	export DATA_DIR="${PAPERLESS_DATA_DIR:-/usr/src/paperless/data}"
-	export MEDIA_ROOT_DIR="${PAPERLESS_MEDIA_ROOT:-/usr/src/paperless/media}"
-	export CONSUME_DIR="${PAPERLESS_CONSUMPTION_DIR:-/usr/src/paperless/consume}"
+	export DATA_DIR="${PAPERLESS_DATA_DIR:-/usr/src/edoc/data}"
+	export MEDIA_ROOT_DIR="${PAPERLESS_MEDIA_ROOT:-/usr/src/edoc/media}"
+	export CONSUME_DIR="${PAPERLESS_CONSUMPTION_DIR:-/usr/src/edoc/consume}"
 }
 
 custom_container_init() {
@@ -77,7 +77,7 @@ initialize() {
 	# Check for overrides of certain folders
 	map_folders
 
-	local -r export_dir="/usr/src/paperless/export"
+	local -r export_dir="/usr/src/edoc/export"
 
 	for dir in \
 		"${export_dir}" \
@@ -90,19 +90,19 @@ initialize() {
 		fi
 	done
 
-	local -r tmp_dir="${PAPERLESS_SCRATCH_DIR:=/tmp/paperless}"
+	local -r tmp_dir="${PAPERLESS_SCRATCH_DIR:=/tmp/edoc}"
 	echo "Creating directory scratch directory ${tmp_dir}"
 	mkdir --parents "${tmp_dir}"
 
 	set +e
-	echo "Adjusting permissions of paperless files. This may take a while."
-	chown -R paperless:paperless "${tmp_dir}"
+	echo "Adjusting permissions of edoc files. This may take a while."
+	chown -R edoc:edoc "${tmp_dir}"
 	for dir in \
 		"${export_dir}" \
 		"${DATA_DIR}" \
 		"${MEDIA_ROOT_DIR}" \
 		"${CONSUME_DIR}"; do
-		find "${dir}" -not \( -user paperless -and -group paperless \) -exec chown paperless:paperless {} +
+		find "${dir}" -not \( -user edoc -and -group edoc \) -exec chown edoc:edoc {} +
 	done
 	set -e
 
@@ -147,8 +147,8 @@ install_languages() {
 
 echo "Paperless-ngx docker container starting..."
 
-gosu_cmd=(gosu paperless)
-if [ "$(id -u)" == "$(id -u paperless)" ]; then
+gosu_cmd=(gosu edoc)
+if [ "$(id -u)" == "$(id -u edoc)" ]; then
 	gosu_cmd=()
 fi
 

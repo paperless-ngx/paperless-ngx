@@ -9,7 +9,7 @@ export interface SocialAccountProvider {
   login_url: string
 }
 
-export interface PaperlessUserProfile {
+export interface EdocUserProfile {
   email?: string
   password?: string
   first_name?: string

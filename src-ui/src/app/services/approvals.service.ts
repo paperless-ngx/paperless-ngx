@@ -3,9 +3,9 @@ import { Injectable } from '@angular/core'
 import { Subject } from 'rxjs'
 import { first, takeUntil } from 'rxjs/operators'
 import {
-  PaperlessApproval,
+  Approval,
   PaperlessApprovalStatus,
-} from 'src/app/data/paperless-approval'
+} from 'src/app/data/approval'
 import { environment } from 'src/environments/environment'
 
 @Injectable({
@@ -34,7 +34,7 @@ export class ApprovalsService {
 
   public get successApprovals(): PaperlessApproval[] {
     return this.approvals.filter((t) => t.status == PaperlessApprovalStatus.Success)
-    
+
   }
 
   public get failureApprovals(): PaperlessApproval[] {

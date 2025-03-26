@@ -7,7 +7,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { EditDialogComponent, EditDialogMode } from '../edit-dialog.component'
 import {
   DocumentApproval,
-  PaperlessApprovalAccessType,
+  EdocApprovalAccessType,
 } from 'src/app/data/document-approval'
 import { DocumentApprovalsService } from 'src/app/services/rest/document-approvals.service'
 import { Group } from 'src/app/data/group'
@@ -35,7 +35,7 @@ export class ApprovalEditDialogComponent
     // },
     {
       label: $localize`View`,
-      value: PaperlessApprovalAccessType.View,
+      value: EdocApprovalAccessType.View,
     },
   ]
 
@@ -45,7 +45,7 @@ export class ApprovalEditDialogComponent
     { label: $localize`30 days`, value: 30 },
     { label: $localize`Never`, value: null },
   ]
-  defaultAccessType = PaperlessApprovalAccessType.View;
+  defaultAccessType = EdocApprovalAccessType.View;
   defaultExpiration: number = null
   expiration: number = 7
   groups: Group[]
@@ -102,7 +102,7 @@ export class ApprovalEditDialogComponent
         expiration: expirationDate,
       });
     }
-  
+
     // Gọi phương thức save() của lớp cha
     super.save();
   }

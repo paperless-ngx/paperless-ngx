@@ -59,8 +59,8 @@ from documents.utils import copy_basic_file_stats, compress_pdf, \
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import get_content_before_last_number
 from documents.utils import run_subprocess
-from paperless.models import ApplicationConfiguration
-from paperless_ocr_custom.parsers import RasterisedDocumentCustomParser
+from edoc.models import ApplicationConfiguration
+from edoc_ocr_custom.parsers import RasterisedDocumentCustomParser
 
 
 class WorkflowTriggerPlugin(
@@ -298,7 +298,7 @@ def get_config_dossier_form(override_dossier_id):
 
 
 class Consumer(LoggingMixin):
-    logging_name = "paperless.consumer"
+    logging_name = "edoc.consumer"
 
     def _send_progress(
         self,
@@ -1068,7 +1068,7 @@ class Consumer(LoggingMixin):
                 self.original_path.unlink()
                 self.working_copy.unlink()
 
-                # https://github.com/jonaswinkler/paperless-ng/discussions/1037
+                # https://github.com/jonaswinkler/edoc-ng/discussions/1037
                 shadow_file = os.path.join(
                     os.path.dirname(self.original_path),
                     "._" + os.path.basename(self.original_path),

@@ -23,7 +23,7 @@ from documents.tasks import bulk_update_documents, update_document_field, \
 from documents.tasks import consume_file
 from documents.tasks import update_document_archive_file
 
-logger = logging.getLogger("paperless.bulk_edit")
+logger = logging.getLogger("edoc.bulk_edit")
 
 
 def set_correspondent(doc_ids, correspondent):

@@ -18,7 +18,7 @@ import {
   PaperlessTask,
   PaperlessTaskType,
   PaperlessTaskStatus,
-} from 'src/app/data/paperless-task'
+} from 'src/app/data/edoc-task'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { PermissionsService } from 'src/app/services/permissions.service'
@@ -72,7 +72,7 @@ const tasks: PaperlessTask[] = [
   {
     id: 464,
     task_id: '2eac4716-2aa6-4dcd-9953-264e11656d7e',
-    task_file_name: 'paperless-mail-l4dkg8ir',
+    task_file_name: 'edoc-mail-l4dkg8ir',
     date_created: new Date('2023-06-04T11:24:32.898089-07:00'),
     date_done: new Date('2023-06-04T11:24:44.678605-07:00'),
     type: PaperlessTaskType.File,
@@ -96,7 +96,7 @@ const tasks: PaperlessTask[] = [
   {
     id: 462,
     task_id: 'a5b9ca47-0c8e-490f-a04c-6db5d5fc09e5',
-    task_file_name: 'paperless-mail-_rrpmqk6',
+    task_file_name: 'edoc-mail-_rrpmqk6',
     date_created: new Date('2023-06-07T02:54:35.694916Z'),
     date_done: null,
     type: PaperlessTaskType.File,

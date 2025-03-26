@@ -1,6 +1,6 @@
 from documents.loggers import LoggingMixin
 from documents.models import CustomFieldInstance, Document, Dossier
-from paperless.models import ApplicationConfiguration
+from edoc.models import ApplicationConfiguration
 
 
 class UpdateDataDocument(LoggingMixin):

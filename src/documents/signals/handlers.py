@@ -34,7 +34,7 @@ from documents.file_handling import generate_unique_filename
 from documents.models import Approval, CustomFieldInstance, DocumentType
 from documents.models import Document
 from documents.models import MatchingModel
-from documents.models import PaperlessTask
+from documents.models import EdocTask
 from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
@@ -42,7 +42,7 @@ from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import set_permissions_for_object
 
-logger = logging.getLogger("paperless.handlers")
+logger = logging.getLogger("edoc.handlers")
 
 
 def add_inbox_tags(sender, document: Document, logging_group=None, **kwargs):
@@ -1053,7 +1053,7 @@ def run_workflow_approval(
 @before_task_publish.connect
 def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
     """
-    Creates the PaperlessTask object in a pending state.  This is sent before
+    Creates the EdocTask object in a pending state.  This is sent before
     the task reaches the broker, but before it begins executing on a worker.
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#before-task-publish
@@ -1078,7 +1078,7 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
         # task_file_name = input_doc.original_file.name
         task_file_name = document.original_filename
 
-        PaperlessTask.objects.create(
+        EdocTask.objects.create(
             task_id=headers["id"],
             status=states.PENDING,
             task_file_name=task_file_name,
@@ -1091,21 +1091,21 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
     except Exception as e:  # pragma: no cover
         # Don't let an exception in the signal handlers prevent
         # a document from being consumed.
-        logger.exception("Creating PaperlessTask failed", e)
+        logger.exception("Creating EdocTask failed", e)
 
 
 @task_prerun.connect
 def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs):
     """
 
-    Updates the PaperlessTask to be started.  Sent before the task begins execution
+    Updates the EdocTask to be started.  Sent before the task begins execution
     on a worker.
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-prerun
     """
     try:
         close_old_connections()
-        task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
+        task_instance = EdocTask.objects.filter(task_id=task_id).first()
 
         if task_instance is not None:
             task_instance.status = states.STARTED
@@ -1114,7 +1114,7 @@ def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs):
     except Exception:  # pragma: no cover
         # Don't let an exception in the signal handlers prevent
         # a document from being consumed.
-        logger.exception("Setting PaperlessTask started failed")
+        logger.exception("Setting EdocTask started failed")
 
 
 @task_postrun.connect
@@ -1127,14 +1127,14 @@ def task_postrun_handler(
     **kwargs,
 ):
     """
-    Updates the result of the PaperlessTask.
+    Updates the result of the EdocTask.
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-postrun
     """
     api_call_count = getattr(task.request, "api_call_count",0)
     try:
         close_old_connections()
-        task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
+        task_instance = EdocTask.objects.filter(task_id=task_id).first()
         if task_instance is not None:
             task_instance.status = state
             task_instance.result = retval
@@ -1144,7 +1144,7 @@ def task_postrun_handler(
     except Exception:  # pragma: no cover
         # Don't let an exception in the signal handlers prevent
         # a document from being consumed.
-        logger.exception("Updating PaperlessTask failed")
+        logger.exception("Updating EdocTask failed")
 
 
 @task_failure.connect
@@ -1157,13 +1157,13 @@ def task_failure_handler(
     **kwargs,
 ):
     """
-    Updates the result of a failed PaperlessTask.
+    Updates the result of a failed EdocTask.
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-failure
     """
     try:
         close_old_connections()
-        task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
+        task_instance = EdocTask.objects.filter(task_id=task_id).first()
 
         if task_instance is not None and task_instance.result is None:
             task_instance.status = states.FAILURE
@@ -1171,4 +1171,4 @@ def task_failure_handler(
             task_instance.date_done = timezone.now()
             task_instance.save()
     except Exception:  # pragma: no cover
-        logger.exception("Updating PaperlessTask failed")
+        logger.exception("Updating EdocTask failed")

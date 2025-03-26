@@ -2,14 +2,14 @@ $color-mode-type: data;
 
 @import 'bootstrap/scss/mixins/color-mode';
 
-@mixin paperless-green {
+@mixin edoc-green {
   // base color e.g. #17541f = hsl(128, 57%, 21%)
   --pngx-primary: 128, 57%;
   --pngx-primary-lightness: 21%;
 }
 
 :root {
-  @include paperless-green;
+  @include edoc-green;
   --pngx-primary-text-contrast: var(--bs-light);
 
   --bs-primary: hsl(var(--pngx-primary), var(--pngx-primary-lightness));
@@ -63,7 +63,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 }
 
 // Dark mode
-@mixin paperless-green-dark-mode {
+@mixin edoc-green-dark-mode {
   --pngx-primary-lightness: 31%;
   --bs-primary: hsl(var(--pngx-primary),var(--pngx-primary-lightness));
 }
@@ -197,8 +197,8 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     mix-blend-mode: luminosity;
   }
 
-  .paperless-input-select .ng-select .ng-dropdown-panel .ng-dropdown-panel-items .ng-option:not(.ng-option-selected):hover,
-  .paperless-input-select .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
+  .edoc-input-select .ng-select .ng-dropdown-panel .ng-dropdown-panel-items .ng-option:not(.ng-option-selected):hover,
+  .edoc-input-select .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
     background-color: var(--bs-light) !important;
   }
 
@@ -300,11 +300,11 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 
 @include color-mode(dark) {
   body:not(.primary-light):not(.primary-dark) {
-    @include paperless-green-dark-mode;
+    @include edoc-green-dark-mode;
 
     .navbar.bg-primary {
       // navbar is og green in dark mode
-      @include paperless-green;
+      @include edoc-green;
     }
   }
 
@@ -317,11 +317,11 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     body {
       // no custom theme color
       &:not(.primary-light):not(.primary-dark) {
-        @include paperless-green-dark-mode;
+        @include edoc-green-dark-mode;
 
         .navbar.bg-primary {
           // navbar is og green in dark mode
-          @include paperless-green;
+          @include edoc-green;
         }
       }
 

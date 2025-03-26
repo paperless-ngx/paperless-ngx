@@ -13,7 +13,7 @@ from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
 from documents.models import Document
 from documents.models import Tag
-from paperless import version
+from edoc import version
 
 
 class TestSystemStatus(APITestCase):

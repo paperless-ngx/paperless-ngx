@@ -11,7 +11,7 @@ import {
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { User } from 'src/app/data/user'
-import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service'
+import { AbstractEdocService } from 'src/app/services/rest/abstract-edoc-service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
@@ -30,7 +30,7 @@ export abstract class EditCustomShelfComponent<
 > implements OnInit {
   [x: string]: any
   constructor(
-    protected service: AbstractPaperlessService<T>,
+    protected service: AbstractEdocService<T>,
     private activeModal: NgbActiveModal,
     private userService: UserService,
     private settingsService: SettingsService

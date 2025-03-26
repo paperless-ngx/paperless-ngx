@@ -45,7 +45,7 @@ from documents.models import DossierForm
 from documents.models import Folder
 from documents.models import FontLanguage
 from documents.models import MatchingModel
-from documents.models import PaperlessTask
+from documents.models import EdocTask
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
 from documents.models import ShareLink
@@ -63,7 +63,7 @@ from documents.permissions import set_permissions_for_object
 from documents.validators import uri_validator
 from .documents import DocumentDocument
 
-logger = logging.getLogger("paperless.api")
+logger = logging.getLogger("edoc.api")
 
 
 # https://www.django-rest-framework.org/api-guide/serializers/#example
@@ -1656,7 +1656,7 @@ class UiSettingsViewSerializer(serializers.ModelSerializer):
 
 class TasksViewSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PaperlessTask
+        model = EdocTask
         depth = 1
         fields = (
             "id",
@@ -1770,7 +1770,7 @@ class AcknowledgeTasksViewSerializer(serializers.Serializer):
             raise serializers.ValidationError(f"{name} must be a list")
         if not all(isinstance(i, int) for i in tasks):
             raise serializers.ValidationError(f"{name} must be a list of integers")
-        count = PaperlessTask.objects.filter(id__in=tasks).count()
+        count = EdocTask.objects.filter(id__in=tasks).count()
         if not count == len(tasks):
             raise serializers.ValidationError(
                 f"Some tasks in {name} don't exist or were specified twice.",

@@ -1,5 +1,5 @@
 import { ObjectWithId } from 'src/app/data/object-with-id'
-import { AbstractPaperlessService } from './abstract-paperless-service'
+import { AbstractEdocService } from './abstract-edoc-service'
 import { PermissionsObject } from 'src/app/data/object-with-permissions'
 import { Observable } from 'rxjs'
 
@@ -10,7 +10,7 @@ export enum BulkEditObjectOperation {
   Share = "Share",
 }
 
-export abstract class AbstractNameFilterService<T extends ObjectWithId,> extends AbstractPaperlessService<T> {
+export abstract class AbstractNameFilterService<T extends ObjectWithId,> extends AbstractEdocService<T> {
   listFiltered(
     page?: number,
     pageSize?: number,

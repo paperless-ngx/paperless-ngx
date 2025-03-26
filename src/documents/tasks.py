@@ -43,7 +43,7 @@ from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.index import update_index_document
-from documents.models import BackupRecord, PaperlessTask
+from documents.models import BackupRecord, EdocTask
 from documents.models import Correspondent
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -62,8 +62,8 @@ from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated, document_consumption_finished
 from documents.signals.handlers import cleanup_document_deletion, bulk_set_custom_fields_from_document_type_to_document
-from paperless.models import ApplicationConfiguration
-from paperless_ocr_custom.parsers import RasterisedDocumentCustomParser
+from edoc.models import ApplicationConfiguration
+from edoc_ocr_custom.parsers import RasterisedDocumentCustomParser
 
 if settings.AUDIT_LOG_ENABLED:
     import json

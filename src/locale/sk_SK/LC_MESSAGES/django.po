@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: paperless-ngx\n"
+"Project-Id-Version: edoc-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-07 18:36-0700\n"
 "PO-Revision-Date: 2024-04-08 01:36\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 3;\n"
-"X-Crowdin-Project: paperless-ngx\n"
+"X-Crowdin-Project: edoc-ngx\n"
 "X-Crowdin-Project-ID: 500308\n"
 "X-Crowdin-Language: sk\n"
 "X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
@@ -1201,7 +1201,7 @@ msgid "Application logo"
 msgstr ""
 
 #: paperless/models.py:188
-msgid "paperless application settings"
+msgid "edoc application settings"
 msgstr ""
 
 #: paperless/settings.py:666
@@ -1365,8 +1365,8 @@ msgid "Metadata"
 msgstr "Metadáta"
 
 #: paperless_mail/admin.py:92
-msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr "Automaticky priradiť metadáta dokumentom, ktoré sú spracovávané na základe tohto pravidla. Ak aj v tomto kroku nepriradíte dokumentom štítky, typy alebo odosielateľov, paperless skontroluje a vykoná všetky definované pravidlá."
+msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, edoc will still process all matching rules that you have defined."
+msgstr "Automaticky priradiť metadáta dokumentom, ktoré sú spracovávané na základe tohto pravidla. Ak aj v tomto kroku nepriradíte dokumentom štítky, typy alebo odosielateľov, edoc skontroluje a vykoná všetky definované pravidlá."
 
 #: paperless_mail/apps.py:11
 msgid "Paperless mail"

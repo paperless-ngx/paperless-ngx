@@ -7929,7 +7929,7 @@
       <trans-unit id="432834967329800065" datatype="html">
         <source>General Settings</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
           <context context-type="linenumber">50</context>
         </context-group>
         <target state="translated">Algemene instellingen</target>
@@ -7937,7 +7937,7 @@
       <trans-unit id="2762851116637676072" datatype="html">
         <source>OCR Settings</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
         <target state="translated">OCR-instellingen</target>
@@ -7945,7 +7945,7 @@
       <trans-unit id="1313137480169642057" datatype="html">
         <source>Output Type</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
           <context context-type="linenumber">75</context>
         </context-group>
         <target state="translated">Uitvoer bestandstype</target>
@@ -7953,7 +7953,7 @@
       <trans-unit id="2826581353496868063" datatype="html">
         <source>Language</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
           <context context-type="linenumber">83</context>
         </context-group>
         <target state="translated">Taal</target>
@@ -7961,7 +7961,7 @@
       <trans-unit id="3817498941817715969" datatype="html">
         <source>Pages</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
         <target state="translated">Pagina's</target>
@@ -7969,7 +7969,7 @@
       <trans-unit id="1713271461473302108" datatype="html">
         <source>Mode</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
           <context context-type="linenumber">97</context>
         </context-group>
         <target state="translated">Modus</target>
@@ -7977,7 +7977,7 @@
       <trans-unit id="6114528299376689399" datatype="html">
         <source>Skip Archive File</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
           <context context-type="linenumber">105</context>
         </context-group>
         <target state="translated">Archiefbestand maken overslaan</target>
@@ -7985,7 +7985,7 @@
       <trans-unit id="1115402553541327390" datatype="html">
         <source>Image DPI</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
           <context context-type="linenumber">113</context>
         </context-group>
         <target state="translated">Afbeelding DPI</target>
@@ -7993,7 +7993,7 @@
       <trans-unit id="6352596107300820129" datatype="html">
         <source>Clean</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
           <context context-type="linenumber">120</context>
         </context-group>
         <target state="translated">Opschoon methode</target>
@@ -8001,7 +8001,7 @@
       <trans-unit id="725308589819024010" datatype="html">
         <source>Deskew</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
           <context context-type="linenumber">128</context>
         </context-group>
         <target state="translated">Rechtzetten</target>
@@ -8009,7 +8009,7 @@
       <trans-unit id="6256076128297775802" datatype="html">
         <source>Rotate Pages</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
           <context context-type="linenumber">135</context>
         </context-group>
         <target state="translated">Pagina's draaien</target>
@@ -8017,7 +8017,7 @@
       <trans-unit id="8527188778859256947" datatype="html">
         <source>Rotate Pages Threshold</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
           <context context-type="linenumber">142</context>
         </context-group>
         <target state="translated">Drempelwaarde pagina draaien</target>
@@ -8025,7 +8025,7 @@
       <trans-unit id="3762131309176747817" datatype="html">
         <source>Max Image Pixels</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
           <context context-type="linenumber">149</context>
         </context-group>
         <target state="translated">Limiet afbeeldingspixels</target>
@@ -8033,7 +8033,7 @@
       <trans-unit id="7846583355792281769" datatype="html">
         <source>Color Conversion Strategy</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
           <context context-type="linenumber">156</context>
         </context-group>
         <target state="translated">Methode kleuromzetting</target>
@@ -8041,7 +8041,7 @@
       <trans-unit id="4696480417479207939" datatype="html">
         <source>OCR Arguments</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
           <context context-type="linenumber">164</context>
         </context-group>
         <target state="translated">OCR argumenten</target>
@@ -8049,7 +8049,7 @@
       <trans-unit id="7106327322456204362" datatype="html">
         <source>Application Logo</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
           <context context-type="linenumber">171</context>
         </context-group>
         <target state="translated">Applicatie logo</target>
@@ -8057,7 +8057,7 @@
       <trans-unit id="2684743776608068095" datatype="html">
         <source>Application Title</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
           <context context-type="linenumber">178</context>
         </context-group>
         <target state="translated">Applicatie titel</target>

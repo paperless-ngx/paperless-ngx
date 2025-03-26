@@ -11,7 +11,7 @@ from documents.management.commands.mixins import ProgressBarMixin
 from documents.models import Document
 from documents.tasks import update_document_archive_file
 
-logger = logging.getLogger("paperless.management.archiver")
+logger = logging.getLogger("edoc.management.archiver")
 
 
 class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):

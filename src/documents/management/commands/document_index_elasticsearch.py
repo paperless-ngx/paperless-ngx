@@ -4,7 +4,7 @@ from elasticsearch import Elasticsearch
 from documents.management.commands.mixins import ProgressBarMixin
 from documents.tasks import index_reindex_elasticsearch, \
     index_optimize_elasticsearch
-from paperless.settings import ELASTIC_SEARCH_DOCUMENT_INDEX, \
+from edoc.settings import ELASTIC_SEARCH_DOCUMENT_INDEX, \
     ELASTIC_SEARCH_HOST
 
 

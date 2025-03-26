@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db import migrations
 from django.db import models
 
-from paperless.db import GnuPG
+from edoc.db import GnuPG
 
 STORAGE_TYPE_UNENCRYPTED = "unencrypted"
 STORAGE_TYPE_GPG = "gpg"

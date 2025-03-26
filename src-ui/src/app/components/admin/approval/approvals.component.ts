@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core'
 import { Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { first } from 'rxjs'
-import { PaperlessApproval, PaperlessApprovalStatus } from 'src/app/data/paperless-approval'
+import { Approval, ApprovalStatus } from 'src/app/data/approval'
 import { ApprovalsService } from 'src/app/services/approvals.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
@@ -83,7 +83,7 @@ export class ApprovalsComponent
     // console.log(approvals)
   }
 
-  displayName(approval: PaperlessApproval): string {
+  displayName(approval: Approval): string {
     if (!approval.submitted_by) return '';
       if (!approval.submitted_by) return ''
       const user_id = typeof approval.submitted_by === 'number' ? approval.submitted_by : approval.submitted_by
@@ -97,7 +97,7 @@ export class ApprovalsComponent
     return this.permissionsService.getCurrentUser().id === object.submitted_by
   }
 
-  displayGroup(approval: PaperlessApproval): string {
+  displayGroup(approval: Approval): string {
     if (!approval.submitted_by_group) return ''
     const nameArray = this.groups?.filter(obj => approval.submitted_by_group.includes(obj.id)).map(obj => obj.name);
     return nameArray?.toString()
@@ -107,11 +107,11 @@ export class ApprovalsComponent
     clearInterval(this.autoRefreshInterval)
   }
 
-  updateApproval(approval: PaperlessApproval, status: String) {
+  updateApproval(approval: Approval, status: String) {
     this.updateApprovals(approval,status)
   }
 
-  updateApprovals(approval: PaperlessApproval = undefined, status: String = '') {
+  updateApprovals(approval: Approval = undefined, status: String = '') {
     let approvals = approval ? new Set([approval.id]) : new Set(this.selectedApprovals.values())
     if (!approval && approvals.size == 0)
       approvals = new Set(this.approvalsService.allApprovals.map((t) => t.id))
@@ -161,23 +161,23 @@ export class ApprovalsComponent
     }
   }
 
-  goDocument(approval: PaperlessApproval) {
+  goDocument(approval: Approval) {
     // this.updateApproval(approval)
     this.router.navigate(['documents', approval.object_pk])
   }
 
-  expandApproval(approval: PaperlessApproval) {
+  expandApproval(approval: Approval) {
     this.expandedApproval = this.expandedApproval == approval.id ? undefined : approval.id
   }
 
-  toggleSelected(approval: PaperlessApproval) {
+  toggleSelected(approval: Approval) {
     this.selectedApprovals.has(approval.id)
       ? this.selectedApprovals.delete(approval.id)
       : this.selectedApprovals.add(approval.id)
   }
 
-  get currentApprovals(): PaperlessApproval[] {
-    let approvals: PaperlessApproval[] = []
+  get currentApprovals(): Approval[] {
+    let approvals: Approval[] = []
     switch (this.activeTab) {
       case 'pending':
         approvals = this.approvalsService.pendingApprovals
@@ -236,6 +236,6 @@ export class ApprovalsComponent
     }
   }
 
-  protected readonly PaperlessApprovalStatus = PaperlessApprovalStatus
+  protected readonly ApprovalStatus = ApprovalStatus
   protected readonly app = app
 }

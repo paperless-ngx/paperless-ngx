@@ -245,28 +245,28 @@ COPY --from=compile-frontend --chown=1000:1000 /src/src/documents/static/fronten
 # Mount the compiled frontend to expected location
 RUN set -eux \
   && echo "Setting up user/group" \
-    && addgroup --gid 1000 paperless \
-    && useradd --uid 1000 --gid paperless --home-dir /usr/src/paperless paperless \
+    && addgroup --gid 1000 edoc \
+    && useradd --uid 1000 --gid edoc --home-dir /usr/src/edoc edoc \
   && echo "Creating volume directories" \
-    && mkdir --parents --verbose /usr/src/paperless/data \
-    && mkdir --parents --verbose /usr/src/paperless/media \
-    && mkdir --parents --verbose /usr/src/paperless/consume \
-    && mkdir --parents --verbose /usr/src/paperless/export \
+    && mkdir --parents --verbose /usr/src/edoc/data \
+    && mkdir --parents --verbose /usr/src/edoc/media \
+    && mkdir --parents --verbose /usr/src/edoc/consume \
+    && mkdir --parents --verbose /usr/src/edoc/export \
   && echo "Adjusting all permissions" \
-    && chown --from root:root --changes --recursive paperless:paperless /usr/src/paperless \
+    && chown --from root:root --changes --recursive edoc:edoc /usr/src/edoc \
   && echo "Collecting static files" \
-    && gosu paperless python3 manage.py collectstatic --clear --no-input --link \
-    && gosu paperless python3 manage.py compilemessages
+    && gosu edoc python3 manage.py collectstatic --clear --no-input --link \
+    && gosu edoc python3 manage.py compilemessages
 
-VOLUME ["/usr/src/paperless/data", \
-        "/usr/src/paperless/media", \
-        "/usr/src/paperless/consume", \
-        "/usr/src/paperless/export"]
+VOLUME ["/usr/src/edoc/data", \
+        "/usr/src/edoc/media", \
+        "/usr/src/edoc/consume", \
+        "/usr/src/edoc/export"]
 
 ENTRYPOINT ["/sbin/docker-entrypoint.sh"]
 
 EXPOSE 8000
 
-CMD ["/usr/local/bin/paperless_cmd.sh"]
+CMD ["/usr/local/bin/edoc_cmd.sh"]
 
 HEALTHCHECK --interval=30s --timeout=10s --retries=5 CMD [ "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000" ]

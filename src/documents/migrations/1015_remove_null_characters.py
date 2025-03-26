@@ -3,7 +3,7 @@ import logging
 
 from django.db import migrations
 
-logger = logging.getLogger("paperless.migrations")
+logger = logging.getLogger("edoc.migrations")
 
 
 def remove_null_characters(apps, schema_editor):

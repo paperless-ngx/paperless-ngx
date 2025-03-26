@@ -77,8 +77,8 @@ def move_documents_and_create_thumbnails(apps, schema_editor):
             ),
         )
 
-        thumb_temp = tempfile.mkdtemp(prefix="paperless", dir=settings.SCRATCH_DIR)
-        orig_temp = tempfile.mkdtemp(prefix="paperless", dir=settings.SCRATCH_DIR)
+        thumb_temp = tempfile.mkdtemp(prefix="edoc", dir=settings.SCRATCH_DIR)
+        orig_temp = tempfile.mkdtemp(prefix="edoc", dir=settings.SCRATCH_DIR)
 
         orig_source = os.path.join(settings.MEDIA_ROOT, "documents", f)
         orig_target = os.path.join(orig_temp, f.replace(".gpg", ""))

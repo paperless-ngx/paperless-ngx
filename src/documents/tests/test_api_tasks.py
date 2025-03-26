@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from documents.models import PaperlessTask
+from documents.models import EdocTask
 from documents.tests.utils import DirectoriesMixin
 
 
@@ -29,12 +29,12 @@ class TestTasks(DirectoriesMixin, APITestCase):
             - Attempting and pending tasks are serialized and provided
         """
 
-        task1 = PaperlessTask.objects.create(
+        task1 = EdocTask.objects.create(
             task_id=str(uuid.uuid4()),
             task_file_name="task_one.pdf",
         )
 
-        task2 = PaperlessTask.objects.create(
+        task2 = EdocTask.objects.create(
             task_id=str(uuid.uuid4()),
             task_file_name="task_two.pdf",
         )
@@ -65,12 +65,12 @@ class TestTasks(DirectoriesMixin, APITestCase):
         """
 
         id1 = str(uuid.uuid4())
-        task1 = PaperlessTask.objects.create(
+        task1 = EdocTask.objects.create(
             task_id=id1,
             task_file_name="task_one.pdf",
         )
 
-        _ = PaperlessTask.objects.create(
+        _ = EdocTask.objects.create(
             task_id=str(uuid.uuid4()),
             task_file_name="task_two.pdf",
         )
@@ -92,12 +92,12 @@ class TestTasks(DirectoriesMixin, APITestCase):
         THEN:
             - No task data is returned
         """
-        PaperlessTask.objects.create(
+        EdocTask.objects.create(
             task_id=str(uuid.uuid4()),
             task_file_name="task_one.pdf",
         )
 
-        _ = PaperlessTask.objects.create(
+        _ = EdocTask.objects.create(
             task_id=str(uuid.uuid4()),
             task_file_name="task_two.pdf",
         )
@@ -116,7 +116,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         THEN:
             - Task is marked as acknowledged
         """
-        task = PaperlessTask.objects.create(
+        task = EdocTask.objects.create(
             task_id=str(uuid.uuid4()),
             task_file_name="task_one.pdf",
         )
@@ -142,7 +142,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         THEN:
             - The returned data includes the task result
         """
-        PaperlessTask.objects.create(
+        EdocTask.objects.create(
             task_id=str(uuid.uuid4()),
             task_file_name="task_one.pdf",
             status=celery.states.SUCCESS,
@@ -168,7 +168,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         THEN:
             - The returned result is the exception info
         """
-        PaperlessTask.objects.create(
+        EdocTask.objects.create(
             task_id=str(uuid.uuid4()),
             task_file_name="task_one.pdf",
             status=celery.states.FAILURE,
@@ -197,7 +197,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         THEN:
             - Returned data include the filename
         """
-        PaperlessTask.objects.create(
+        EdocTask.objects.create(
             task_id=str(uuid.uuid4()),
             task_file_name="test.pdf",
             task_name="documents.tasks.some_task",
@@ -223,7 +223,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         THEN:
             - Returned data include the filename
         """
-        PaperlessTask.objects.create(
+        EdocTask.objects.create(
             task_id=str(uuid.uuid4()),
             task_file_name="anothertest.pdf",
             task_name="documents.tasks.some_task",

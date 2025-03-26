@@ -2,7 +2,7 @@ import { HttpTestingController } from '@angular/common/http/testing'
 import { TestBed } from '@angular/core/testing'
 import { Subscription } from 'rxjs'
 import { environment } from 'src/environments/environment'
-import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
+import { commonAbstractEdocServiceTests } from './abstract-edoc-service.spec'
 import { ShareLinkService } from './share-link.service'
 
 let httpTestingController: HttpTestingController
@@ -11,7 +11,7 @@ let subscription: Subscription
 const endpoint = 'share_links'
 
 // run common tests
-commonAbstractPaperlessServiceTests(endpoint, ShareLinkService)
+commonAbstractEdocServiceTests(endpoint, ShareLinkService)
 
 describe(`Additional service tests for ShareLinkService`, () => {
   beforeEach(() => {

@@ -7,7 +7,7 @@ import requests
 from scipy.stats import false_discovery_control
 
 from documents.models import Document
-from paperless.models import ApplicationConfiguration
+from edoc.models import ApplicationConfiguration
 from django.conf import settings
 from django.core.cache import cache
 

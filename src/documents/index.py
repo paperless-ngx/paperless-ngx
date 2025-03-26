@@ -49,9 +49,9 @@ from documents.models import CustomFieldInstance, Warehouse
 from documents.models import Document
 from documents.models import Note
 from documents.models import User
-from paperless.settings import ELASTIC_SEARCH_DOCUMENT_INDEX
+from edoc.settings import ELASTIC_SEARCH_DOCUMENT_INDEX
 
-logger = logging.getLogger("paperless.index")
+logger = logging.getLogger("edoc.index")
 
 
 def get_schema():

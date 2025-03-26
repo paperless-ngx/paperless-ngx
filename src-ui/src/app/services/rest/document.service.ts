@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Document } from 'src/app/data/document'
 import { DocumentMetadata } from 'src/app/data/document-metadata'
-import { AbstractPaperlessService } from './abstract-paperless-service'
+import { AbstractEdocService } from './abstract-edoc-service'
 import { HttpClient } from '@angular/common/http'
 import { Observable } from 'rxjs'
 import { Results } from 'src/app/data/results'
@@ -68,7 +68,7 @@ export interface SelectionData {
 @Injectable({
   providedIn: 'root',
 })
-export class DocumentService extends AbstractPaperlessService<Document> {
+export class DocumentService extends AbstractEdocService<Document> {
   private _searchQuery: string
 
   constructor(

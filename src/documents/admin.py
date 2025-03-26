@@ -9,7 +9,7 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
-from documents.models import PaperlessTask
+from documents.models import EdocTask
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
 from documents.models import ShareLink
@@ -210,7 +210,7 @@ admin.site.register(Folder, FolderAdmin)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(SavedView, SavedViewAdmin)
 admin.site.register(StoragePath, StoragePathAdmin)
-admin.site.register(PaperlessTask, TaskAdmin)
+admin.site.register(EdocTask, TaskAdmin)
 admin.site.register(Note, NotesAdmin)
 admin.site.register(ShareLink, ShareLinksAdmin)
 admin.site.register(CustomField, CustomFieldsAdmin)

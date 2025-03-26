@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Observable, first, map } from 'rxjs'
 import { environment } from 'src/environments/environment'
-import { PaperlessConfig } from '../data/paperless-config'
+import { EdocConfig } from '../data/edoc-config'
 
 @Injectable({
   providedIn: 'root',
@@ -12,18 +12,18 @@ export class ConfigService {
 
   constructor(protected http: HttpClient) {}
 
-  getConfig(): Observable<PaperlessConfig> {
-    return this.http.get<[PaperlessConfig]>(this.baseUrl).pipe(
+  getConfig(): Observable<EdocConfig> {
+    return this.http.get<[EdocConfig]>(this.baseUrl).pipe(
       first(),
       map((configs) => configs[0])
     )
   }
 
-  saveConfig(config: PaperlessConfig): Observable<PaperlessConfig> {
+  saveConfig(config: EdocConfig): Observable<EdocConfig> {
     // dont pass string
     if (typeof config.app_logo === 'string') delete config.app_logo
     return this.http
-      .patch<PaperlessConfig>(`${this.baseUrl}${config.id}/`, config)
+      .patch<EdocConfig>(`${this.baseUrl}${config.id}/`, config)
       .pipe(first())
   }
 
@@ -31,11 +31,11 @@ export class ConfigService {
     file: File,
     configID: number,
     configKey: string
-  ): Observable<PaperlessConfig> {
+  ): Observable<EdocConfig> {
     let formData = new FormData()
     formData.append(configKey, file, file.name)
     return this.http
-      .patch<PaperlessConfig>(`${this.baseUrl}${configID}/`, formData)
+      .patch<EdocConfig>(`${this.baseUrl}${configID}/`, formData)
       .pipe(first())
   }
 }

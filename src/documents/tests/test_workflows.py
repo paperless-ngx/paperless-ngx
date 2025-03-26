@@ -33,8 +33,8 @@ from documents.signals import document_consumption_finished
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
-from paperless_mail.models import MailAccount
-from paperless_mail.models import MailRule
+from edoc_mail.models import MailAccount
+from edoc_mail.models import MailRule
 
 
 class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
@@ -136,7 +136,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="INFO") as cm:
+            with self.assertLogs("edoc.matching", level="INFO") as cm:
                 tasks.consume_file(
                     ConsumableDocument(
                         source=DocumentSource.ConsumeFolder,
@@ -213,7 +213,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
 
         test_file = self.SAMPLE_DIR / "simple.pdf"
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="INFO") as cm:
+            with self.assertLogs("edoc.matching", level="INFO") as cm:
                 tasks.consume_file(
                     ConsumableDocument(
                         source=DocumentSource.ConsumeFolder,
@@ -304,7 +304,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="INFO") as cm:
+            with self.assertLogs("edoc.matching", level="INFO") as cm:
                 tasks.consume_file(
                     ConsumableDocument(
                         source=DocumentSource.ConsumeFolder,
@@ -366,7 +366,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            with self.assertLogs("edoc.matching", level="DEBUG") as cm:
                 tasks.consume_file(
                     ConsumableDocument(
                         source=DocumentSource.ConsumeFolder,
@@ -417,7 +417,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            with self.assertLogs("edoc.matching", level="DEBUG") as cm:
                 tasks.consume_file(
                     ConsumableDocument(
                         source=DocumentSource.ConsumeFolder,
@@ -478,7 +478,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            with self.assertLogs("edoc.matching", level="DEBUG") as cm:
                 tasks.consume_file(
                     ConsumableDocument(
                         source=DocumentSource.ConsumeFolder,
@@ -539,7 +539,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            with self.assertLogs("edoc.matching", level="DEBUG") as cm:
                 tasks.consume_file(
                     ConsumableDocument(
                         source=DocumentSource.ConsumeFolder,
@@ -601,7 +601,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            with self.assertLogs("edoc.matching", level="DEBUG") as cm:
                 tasks.consume_file(
                     ConsumableDocument(
                         source=DocumentSource.ApiUpload,
@@ -651,7 +651,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         )
         doc.save()
 
-        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+        with self.assertLogs("edoc.matching", level="DEBUG") as cm:
             document_matches_workflow(
                 doc,
                 w,
@@ -696,7 +696,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="INFO") as cm:
+            with self.assertLogs("edoc.matching", level="INFO") as cm:
                 tasks.consume_file(
                     ConsumableDocument(
                         source=DocumentSource.ConsumeFolder,
@@ -788,7 +788,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         doc.tags.set([self.t3])
         doc.save()
 
-        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+        with self.assertLogs("edoc.matching", level="DEBUG") as cm:
             document_consumption_finished.send(
                 sender=self.__class__,
                 document=doc,
@@ -824,7 +824,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
             content="Hello world foo bar",
         )
 
-        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+        with self.assertLogs("edoc.matching", level="DEBUG") as cm:
             document_consumption_finished.send(
                 sender=self.__class__,
                 document=doc,
@@ -863,7 +863,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
             content="Hello world bar",
         )
 
-        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+        with self.assertLogs("edoc.matching", level="DEBUG") as cm:
             document_consumption_finished.send(
                 sender=self.__class__,
                 document=doc,
@@ -898,7 +898,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         doc.tags.set([self.t3])
         doc.save()
 
-        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+        with self.assertLogs("edoc.matching", level="DEBUG") as cm:
             document_consumption_finished.send(
                 sender=self.__class__,
                 document=doc,
@@ -931,7 +931,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
             original_filename="sample.pdf",
         )
 
-        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+        with self.assertLogs("edoc.matching", level="DEBUG") as cm:
             document_consumption_finished.send(
                 sender=self.__class__,
                 document=doc,
@@ -965,7 +965,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
             original_filename="sample.pdf",
         )
 
-        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+        with self.assertLogs("edoc.matching", level="DEBUG") as cm:
             document_consumption_finished.send(
                 sender=self.__class__,
                 document=doc,
@@ -1009,7 +1009,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
             created=created,
         )
 
-        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+        with self.assertLogs("edoc.handlers", level="ERROR") as cm:
             document_consumption_finished.send(
                 sender=self.__class__,
                 document=doc,
@@ -1432,7 +1432,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="INFO") as cm:
+            with self.assertLogs("edoc.matching", level="INFO") as cm:
                 tasks.consume_file(
                     ConsumableDocument(
                         source=DocumentSource.ConsumeFolder,
@@ -1522,7 +1522,7 @@ class TestWorkflows(DirectoriesMixin, FileSystemAssertsMixin, APITestCase):
         test_file = self.SAMPLE_DIR / "simple.pdf"
 
         with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="INFO") as cm:
+            with self.assertLogs("edoc.matching", level="INFO") as cm:
                 tasks.consume_file(
                     ConsumableDocument(
                         source=DocumentSource.ConsumeFolder,

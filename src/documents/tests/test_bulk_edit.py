@@ -410,7 +410,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_open_pdf.side_effect = Exception("Error opening PDF")
         doc_ids = [self.doc2.id, self.doc3.id]
 
-        with self.assertLogs("paperless.bulk_edit", level="ERROR") as cm:
+        with self.assertLogs("edoc.bulk_edit", level="ERROR") as cm:
             bulk_edit.merge(doc_ids)
             error_str = cm.output[0]
             expected_str = (
@@ -455,7 +455,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         doc_ids = [self.doc2.id]
         pages = [[1, 2], [3]]
 
-        with self.assertLogs("paperless.bulk_edit", level="ERROR") as cm:
+        with self.assertLogs("edoc.bulk_edit", level="ERROR") as cm:
             bulk_edit.split(doc_ids, pages)
             error_str = cm.output[0]
             expected_str = "Error splitting document 2"
@@ -503,7 +503,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_pdf_save.side_effect = Exception("Error saving PDF")
         doc_ids = [self.doc2.id, self.doc3.id]
 
-        with self.assertLogs("paperless.bulk_edit", level="ERROR") as cm:
+        with self.assertLogs("edoc.bulk_edit", level="ERROR") as cm:
             bulk_edit.rotate(doc_ids, 90)
             error_str = cm.output[0]
             expected_str = "Error rotating document"
@@ -527,7 +527,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         THEN:
             - Rotate action should be performed 1 time, with the non-PDF document skipped
         """
-        with self.assertLogs("paperless.bulk_edit", level="INFO") as cm:
+        with self.assertLogs("edoc.bulk_edit", level="INFO") as cm:
             result = bulk_edit.rotate([self.doc2.id, self.img_doc.id], 90)
             output_str = cm.output[1]
             expected_str = "Document 4 is not a PDF, skipping rotation"

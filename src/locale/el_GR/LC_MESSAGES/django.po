@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: paperless-ngx\n"
+"Project-Id-Version: edoc-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-07 18:36-0700\n"
 "PO-Revision-Date: 2024-04-08 01:36\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Crowdin-Project: paperless-ngx\n"
+"X-Crowdin-Project: edoc-ngx\n"
 "X-Crowdin-Project-ID: 500308\n"
 "X-Crowdin-Language: el\n"
 "X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
@@ -919,7 +919,7 @@ msgstr "Αποστολή Οδηγιών!"
 
 #: documents/templates/account/password_reset_done.html:5
 msgid "Paperless-ngx reset password sent"
-msgstr "Επαναφορά κωδικού paperless-ngx εστάλη"
+msgstr "Επαναφορά κωδικού edoc-ngx εστάλη"
 
 #: documents/templates/account/password_reset_done.html:9
 msgid "Check your inbox."
@@ -931,7 +931,7 @@ msgstr "Σας στείλαμε μήνυμα ηλεκτρονικού ταχυδ
 
 #: documents/templates/account/password_reset_from_key.html:5
 msgid "Paperless-ngx reset password confirmation"
-msgstr "Επιβεβαίωση κωδικού paperless-ngx"
+msgstr "Επιβεβαίωση κωδικού edoc-ngx"
 
 #: documents/templates/account/password_reset_from_key.html:9
 msgid "Set a new password."
@@ -955,7 +955,7 @@ msgstr "Αλλαγή κωδικού πρόσβασης"
 
 #: documents/templates/account/password_reset_from_key_done.html:5
 msgid "Paperless-ngx reset password complete"
-msgstr "Η επαναφορά κωδικού paperless-ngx πραγματοποιήθηκε"
+msgstr "Η επαναφορά κωδικού edoc-ngx πραγματοποιήθηκε"
 
 #: documents/templates/account/password_reset_from_key_done.html:9
 msgid "Password reset complete."
@@ -1201,7 +1201,7 @@ msgid "Application logo"
 msgstr ""
 
 #: paperless/models.py:188
-msgid "paperless application settings"
+msgid "edoc application settings"
 msgstr ""
 
 #: paperless/settings.py:666
@@ -1365,8 +1365,8 @@ msgid "Metadata"
 msgstr "Μεταδεδομένα"
 
 #: paperless_mail/admin.py:92
-msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr "Ανάθεση μεταδεδομένων σε έγγραφα που καταναλώνονται από αυτόν τον κανόνα αυτόματα. Αν δεν αναθέσετε ετικέτες, τύπους ή ανταποκριτές εδώ, το paperless θα επεξεργαστεί όλους τους κανόνες που έχετε ορίσει και ταιριάζουν."
+msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, edoc will still process all matching rules that you have defined."
+msgstr "Ανάθεση μεταδεδομένων σε έγγραφα που καταναλώνονται από αυτόν τον κανόνα αυτόματα. Αν δεν αναθέσετε ετικέτες, τύπους ή ανταποκριτές εδώ, το edoc θα επεξεργαστεί όλους τους κανόνες που έχετε ορίσει και ταιριάζουν."
 
 #: paperless_mail/apps.py:11
 msgid "Paperless mail"

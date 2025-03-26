@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
 import {
-  PaperlessUserProfile,
+  EdocUserProfile,
   SocialAccountProvider,
 } from '../data/user-profile'
 import { environment } from 'src/environments/environment'
@@ -15,14 +15,14 @@ export class ProfileService {
 
   constructor(private http: HttpClient) {}
 
-  get(): Observable<PaperlessUserProfile> {
-    return this.http.get<PaperlessUserProfile>(
+  get(): Observable<EdocUserProfile> {
+    return this.http.get<EdocUserProfile>(
       `${environment.apiBaseUrl}${this.endpoint}/`
     )
   }
 
-  update(profile: PaperlessUserProfile): Observable<PaperlessUserProfile> {
-    return this.http.patch<PaperlessUserProfile>(
+  update(profile: EdocUserProfile): Observable<EdocUserProfile> {
+    return this.http.patch<EdocUserProfile>(
       `${environment.apiBaseUrl}${this.endpoint}/`,
       profile
     )

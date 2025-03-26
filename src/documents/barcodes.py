@@ -22,7 +22,7 @@ from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import maybe_override_pixel_limit
 
-logger = logging.getLogger("paperless.barcodes")
+logger = logging.getLogger("edoc.barcodes")
 
 
 @dataclass(frozen=True)
@@ -114,7 +114,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
             tmp_dir = Path(
                 tempfile.mkdtemp(
                     dir=settings.SCRATCH_DIR,
-                    prefix="paperless-barcode-split-",
+                    prefix="edoc-barcode-split-",
                 ),
             ).resolve()
 

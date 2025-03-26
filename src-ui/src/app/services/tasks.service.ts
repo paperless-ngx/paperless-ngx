@@ -3,10 +3,10 @@ import { Injectable } from '@angular/core'
 import { Subject } from 'rxjs'
 import { first, takeUntil } from 'rxjs/operators'
 import {
-  PaperlessTask,
-  PaperlessTaskStatus,
-  PaperlessTaskType,
-} from 'src/app/data/paperless-task'
+  EdocTask,
+  EdocTaskStatus,
+  EdocTaskType,
+} from 'src/app/data/edoc-task'
 import { environment } from 'src/environments/environment'
 
 @Injectable({
@@ -17,7 +17,7 @@ export class TasksService {
 
   public loading: boolean
 
-  private fileTasks: PaperlessTask[] = []
+  private fileTasks: EdocTask[] = []
 
   private unsubscribeNotifer: Subject<any> = new Subject()
 
@@ -25,26 +25,26 @@ export class TasksService {
     return this.fileTasks.length
   }
 
-  public get allFileTasks(): PaperlessTask[] {
+  public get allFileTasks(): EdocTask[] {
     return this.fileTasks.slice(0)
   }
 
-  public get queuedFileTasks(): PaperlessTask[] {
-    return this.fileTasks.filter((t) => t.status == PaperlessTaskStatus.Pending)
+  public get queuedFileTasks(): EdocTask[] {
+    return this.fileTasks.filter((t) => t.status == EdocTaskStatus.Pending)
   }
 
-  public get startedFileTasks(): PaperlessTask[] {
-    return this.fileTasks.filter((t) => t.status == PaperlessTaskStatus.Started)
+  public get startedFileTasks(): EdocTask[] {
+    return this.fileTasks.filter((t) => t.status == EdocTaskStatus.Started)
   }
 
-  public get completedFileTasks(): PaperlessTask[] {
+  public get completedFileTasks(): EdocTask[] {
     return this.fileTasks.filter(
-      (t) => t.status == PaperlessTaskStatus.Complete
+      (t) => t.status == EdocTaskStatus.Complete
     )
   }
 
-  public get failedFileTasks(): PaperlessTask[] {
-    return this.fileTasks.filter((t) => t.status == PaperlessTaskStatus.Failed)
+  public get failedFileTasks(): EdocTask[] {
+    return this.fileTasks.filter((t) => t.status == EdocTaskStatus.Failed)
   }
 
   constructor(private http: HttpClient) {}
@@ -53,10 +53,10 @@ export class TasksService {
     this.loading = true
 
     this.http
-      .get<PaperlessTask[]>(`${this.baseUrl}tasks/`)
+      .get<EdocTask[]>(`${this.baseUrl}tasks/`)
       .pipe(takeUntil(this.unsubscribeNotifer), first())
       .subscribe((r) => {
-        this.fileTasks = r.filter((t) => t.type == PaperlessTaskType.File) // they're all File tasks, for now
+        this.fileTasks = r.filter((t) => t.type == EdocTaskType.File) // they're all File tasks, for now
         this.loading = false
       })
   }

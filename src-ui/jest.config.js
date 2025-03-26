@@ -5,7 +5,7 @@ module.exports = {
     '/node_modules/',
     '/e2e/',
     'abstract-name-filter-service',
-    'abstract-paperless-service',
+    'abstract-edoc-service',
   ],
   coveragePathIgnorePatterns: ['/src/app/components/common/pdf-viewer/*'],
   transformIgnorePatterns: [`<rootDir>/node_modules/(?!.*\\.mjs$|lodash-es)`],

@@ -42,7 +42,7 @@ class DocumentsConfig(AppConfig):
         approval_updated.connect(run_workflow_approval_updated)
 
         # if settings.SCHEDULER_DEFAULT:
-        #     from paperless import operator
+        #     from edoc import operator
         #     operator.start()
 
         AppConfig.ready(self)

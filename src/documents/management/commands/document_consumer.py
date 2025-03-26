@@ -29,7 +29,7 @@ try:
 except ImportError:  # pragma: no cover
     INotify = flags = None
 
-logger = logging.getLogger("paperless.management.consumer")
+logger = logging.getLogger("edoc.management.consumer")
 
 
 def _tags_from_path(filepath) -> list[int]:
