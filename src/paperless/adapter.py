@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.forms import ValidationError
 from django.urls import reverse
 
+from documents.models import Document
 from paperless.signals import handle_social_account_updated
 
 logger = logging.getLogger("paperless.auth")
@@ -24,8 +25,9 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         if (
             User.objects.exclude(username__in=["consumer", "AnonymousUser"]).count()
             == 0
+            and Document.objects.count() == 0
         ):
-            # If there are no users, allow signups
+            # I.e. a fresh install, allow signups
             return True
         allow_signups = super().is_open_for_signup(request)
         # Override with setting, otherwise default to super.
@@ -83,7 +85,9 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         if (
             User.objects.exclude(username__in=["consumer", "AnonymousUser"]).count()
             == 0
+            and Document.objects.count() == 0
         ):
+            # I.e. a fresh install, make the user a superuser
             logger.debug(f"Creating initial superuser `{user}`")
             user.is_superuser = True
             user.is_staff = True

@@ -15,7 +15,7 @@
 {% endblock form_top_content %}
 
 {% block form_content %}
-		{% if not HAS_USERS %}
+		{% if FIRST_INSTALL %}
 			<script type="text/javascript">
 				// forward to the signup page if no users exist
 				window.location.href = "{{ signup_url }}";

@@ -6,7 +6,7 @@
 {% endblock head_title %}
 
 {% block form_top_content %}
-		{% if HAS_USERS %}
+		{% if not FIRST_INSTALL %}
 			<p>
 					{% blocktrans %}Already have an account? <a href="{{ login_url }}">Sign in</a>{% endblocktrans %}
 			</p>
@@ -14,7 +14,7 @@
 {% endblock form_top_content %}
 
 {% block form_content %}
-		{% if not HAS_USERS %}
+		{% if FIRST_INSTALL %}
 			<p>
 				{% blocktrans %}Note: This is the first user account for this installation and will be granted superuser privileges.{% endblocktrans %}
 			</p>
@@ -49,7 +49,7 @@
 {% endblock form_content %}
 
 {% block after_form_content %}
-	{% if HAS_USERS %}
+	{% if not FIRST_INSTALL %}
 		{% load allauth socialaccount %}
 		{% get_providers as socialaccount_providers %}
 		{% if socialaccount_providers %}
