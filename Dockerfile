@@ -239,6 +239,7 @@ COPY --from=compile-frontend --chown=1000:1000 /src/src/documents/static/fronten
 # add users, setup scripts
 # Mount the compiled frontend to expected location
 RUN set -eux \
+  && sed -i '1s|^#!/usr/bin/env python3|#!/command/with-contenv python3|' manage.py \
   && echo "Setting up user/group" \
     && addgroup --gid 1000 paperless \
     && useradd --uid 1000 --gid paperless --home-dir /usr/src/paperless paperless \
