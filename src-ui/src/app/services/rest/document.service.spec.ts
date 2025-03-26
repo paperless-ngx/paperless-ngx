@@ -268,15 +268,15 @@ describe(`DocumentService`, () => {
     expect(req.request.method).toEqual('GET')
   })
 
-  it('should pass remove_inbox_tags setting to update', () => {
-    subscription = service.update(documents[0]).subscribe()
+  it('should pass remove_inbox_tags setting to patch', () => {
+    subscription = service.patch(documents[0]).subscribe()
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/`
     )
     expect(req.request.body.remove_inbox_tags).toEqual(false)
 
     settingsService.set(SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS, true)
-    subscription = service.update(documents[0]).subscribe()
+    subscription = service.patch(documents[0]).subscribe()
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/`
     )

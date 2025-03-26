@@ -793,11 +793,30 @@ export class DocumentDetailComponent
       })
   }
 
+  private getChangedFields(): any {
+    const changes = {
+      id: this.document.id,
+    }
+    Object.keys(this.documentForm.controls).forEach((key) => {
+      if (this.documentForm.get(key).dirty) {
+        if (key === 'permissions_form') {
+          changes['owner'] =
+            this.documentForm.get('permissions_form').value['owner']
+          changes['set_permissions'] =
+            this.documentForm.get('permissions_form').value['set_permissions']
+        } else {
+          changes[key] = this.documentForm.get(key).value
+        }
+      }
+    })
+    return changes
+  }
+
   save(close: boolean = false) {
     this.networkActive = true
     ;(document.activeElement as HTMLElement)?.dispatchEvent(new Event('change'))
     this.documentsService
-      .patch(this.document)
+      .patch(this.getChangedFields())
       .pipe(first())
       .subscribe({
         next: (docValues) => {
@@ -851,7 +870,7 @@ export class DocumentDetailComponent
     this.networkActive = true
     this.store.next(this.documentForm.value)
     this.documentsService
-      .patch(this.document)
+      .patch(this.getChangedFields())
       .pipe(
         switchMap((updateResult) => {
           return this.documentListViewService
@@ -1304,6 +1323,8 @@ export class DocumentDetailComponent
       created: new Date(),
     })
     this.updateFormForCustomFields(true)
+    this.documentForm.get('custom_fields').markAsDirty()
+    this.documentForm.updateValueAndValidity()
   }
 
   public removeField(fieldInstance: CustomFieldInstance) {
@@ -1312,6 +1333,7 @@ export class DocumentDetailComponent
       1
     )
     this.updateFormForCustomFields(true)
+    this.documentForm.get('custom_fields').markAsDirty()
     this.documentForm.updateValueAndValidity()
   }
 
