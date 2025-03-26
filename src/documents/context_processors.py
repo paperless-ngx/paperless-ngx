@@ -1,4 +1,5 @@
 from django.conf import settings as django_settings
+from django.contrib.auth.models import User
 
 from paperless.config import GeneralConfig
 
@@ -25,4 +26,8 @@ def settings(request):
         "domain": getattr(django_settings, "PAPERLESS_URL", request.get_host()),
         "APP_TITLE": app_title,
         "APP_LOGO": app_logo,
+        "HAS_USERS": User.objects.exclude(
+            username__in=["consumer", "AnonymousUser"],
+        ).count()
+        > 0,
     }

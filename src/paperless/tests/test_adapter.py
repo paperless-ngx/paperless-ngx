@@ -17,6 +17,11 @@ class TestCustomAccountAdapter(TestCase):
     def test_is_open_for_signup(self):
         adapter = get_adapter()
 
+        # With no accounts, signups should be allowed
+        self.assertTrue(adapter.is_open_for_signup(None))
+
+        User.objects.create_user("testuser")
+
         # Test when ACCOUNT_ALLOW_SIGNUPS is True
         settings.ACCOUNT_ALLOW_SIGNUPS = True
         self.assertTrue(adapter.is_open_for_signup(None))

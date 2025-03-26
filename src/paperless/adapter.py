@@ -21,6 +21,12 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         Check whether the site is open for signups, which can be
         disabled via the ACCOUNT_ALLOW_SIGNUPS setting.
         """
+        if (
+            User.objects.exclude(username__in=["consumer", "AnonymousUser"]).count()
+            == 0
+        ):
+            # If there are no users, allow signups
+            return True
         allow_signups = super().is_open_for_signup(request)
         # Override with setting, otherwise default to super.
         return getattr(settings, "ACCOUNT_ALLOW_SIGNUPS", allow_signups)
@@ -73,6 +79,15 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         Save the user instance. Default groups are assigned to the user, if
         specified in the settings.
         """
+
+        if (
+            User.objects.exclude(username__in=["consumer", "AnonymousUser"]).count()
+            == 0
+        ):
+            logger.debug(f"Creating initial superuser `{user}`")
+            user.is_superuser = True
+            user.is_staff = True
+
         user: User = super().save_user(request, user, form, commit)
         group_names: list[str] = settings.ACCOUNT_DEFAULT_GROUPS
         if len(group_names) > 0:

@@ -133,30 +133,9 @@ account. The script essentially automatically performs the steps described in [D
 
 6.  Run `docker compose up -d`. This will create and start the necessary containers.
 
-7.  Wait for the containers to complete their startup. You can monitor the logs using Docker, such as:
-
-    ```shell-session
-    docker logs --follow webserver
-    ```
-
-8.  To be able to login, you will need a "superuser". To create it,
-    execute the following command:
-
-    ```shell-session
-    docker compose exec webserver createsuperuser
-    ```
-
-    or using docker exec from within the container:
-
-    ```shell-session
-    createsuperuser
-    ```
-
-    This will guide you through the superuser setup.
-
-9.  Congratulations! Your Paperless-ngx instance should now be accessible at `http://127.0.0.1:8000`
-    (or similar, depending on your configuration). Use the superuser credentials you have
-    created in the previous step to login.
+7.  Congratulations! Your Paperless-ngx instance should now be accessible at `http://127.0.0.1:8000`
+    (or similar, depending on your configuration). When you first access the web interface, you will be
+    prompted to create a superuser account.
 
 ### Build the Docker image yourself {#docker_build}
 
@@ -392,15 +371,14 @@ are released, dependency support is confirmed, etc.
         dependencies for Postgres or Mariadb.  You can select those extras with `--extra <EXTRA>`
         or all with `--all-extras`
 
-9.  Go to `/opt/paperless/src`, and execute the following commands:
+9.  Go to `/opt/paperless/src`, and execute the following command:
 
     ```bash
     # This creates the database schema.
     sudo -Hu paperless python3 manage.py migrate
-
-    # This creates your first paperless user
-    sudo -Hu paperless python3 manage.py createsuperuser
     ```
+
+    When you first access the web interface you will be prompted to create a superuser account.
 
 10. Optional: Test that paperless is working by executing
 
