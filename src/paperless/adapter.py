@@ -25,7 +25,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         if (
             User.objects.exclude(username__in=["consumer", "AnonymousUser"]).count()
             == 0
-            and Document.objects.count() == 0
+            and Document.global_objects.count() == 0
         ):
             # I.e. a fresh install, allow signups
             return True
@@ -85,7 +85,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         if (
             User.objects.exclude(username__in=["consumer", "AnonymousUser"]).count()
             == 0
-            and Document.objects.count() == 0
+            and Document.global_objects.count() == 0
         ):
             # I.e. a fresh install, make the user a superuser
             logger.debug(f"Creating initial superuser `{user}`")

@@ -31,5 +31,5 @@ def settings(request):
             username__in=["consumer", "AnonymousUser"],
         ).count()
         == 0
-        and Document.objects.count() == 0,
+        and Document.global_objects.count() == 0,
     }
