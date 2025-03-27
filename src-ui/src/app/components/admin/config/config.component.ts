@@ -9,7 +9,7 @@ import {
   takeUntil,
 } from 'rxjs'
 import {
-  PaperlessConfigOptions,
+  EdocConfigOptions,
   ConfigCategory,
   ConfigOption,
   ConfigOptionType,
@@ -42,7 +42,7 @@ export class ConfigComponent
   }
 
   getCategoryOptions(category: string): ConfigOption[] {
-    return PaperlessConfigOptions.filter((o) => o.category === category)
+    return EdocConfigOptions.filter((o) => o.category === category)
   }
 
   public loading: boolean = false
@@ -61,7 +61,7 @@ export class ConfigComponent
   ) {
     super()
     this.configForm.addControl('id', new FormControl())
-    PaperlessConfigOptions.forEach((option) => {
+    EdocConfigOptions.forEach((option) => {
       this.configForm.addControl(option.key, new FormControl())
     })
   }
@@ -83,7 +83,7 @@ export class ConfigComponent
       })
 
     // validate JSON inputs
-    PaperlessConfigOptions.filter(
+    EdocConfigOptions.filter(
       (o) => o.type === ConfigOptionType.JSON
     ).forEach((option) => {
       this.configForm

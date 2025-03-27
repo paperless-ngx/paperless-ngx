@@ -4,7 +4,7 @@ import { Subject } from 'rxjs'
 import { first, takeUntil } from 'rxjs/operators'
 import {
   Approval,
-  PaperlessApprovalStatus,
+  ApprovalStatus,
 } from 'src/app/data/approval'
 import { environment } from 'src/environments/environment'
 
@@ -16,7 +16,7 @@ export class ApprovalsService {
 
   public loading: boolean
 
-  private approvals: PaperlessApproval[] = []
+  private approvals: Approval[] = []
 
   private unsubscribeNotifer: Subject<any> = new Subject()
 
@@ -24,27 +24,27 @@ export class ApprovalsService {
     return this.approvals.length
   }
 
-  public get allApprovals(): PaperlessApproval[] {
+  public get allApprovals(): Approval[] {
     return this.approvals.slice(0)
   }
 
-  public get pendingApprovals(): PaperlessApproval[] {
-    return this.approvals.filter((t) => t.status == PaperlessApprovalStatus.Pending)
+  public get pendingApprovals(): Approval[] {
+    return this.approvals.filter((t) => t.status == ApprovalStatus.Pending)
   }
 
-  public get successApprovals(): PaperlessApproval[] {
-    return this.approvals.filter((t) => t.status == PaperlessApprovalStatus.Success)
+  public get successApprovals(): Approval[] {
+    return this.approvals.filter((t) => t.status == ApprovalStatus.Success)
 
   }
 
-  public get failureApprovals(): PaperlessApproval[] {
+  public get failureApprovals(): Approval[] {
     return this.approvals.filter(
-      (t) => t.status == PaperlessApprovalStatus.Failure
+      (t) => t.status == ApprovalStatus.Failure
     )
   }
 
-  public get revokedApprovals(): PaperlessApproval[] {
-    return this.approvals.filter((t) => t.status == PaperlessApprovalStatus.Revoked)
+  public get revokedApprovals(): Approval[] {
+    return this.approvals.filter((t) => t.status == ApprovalStatus.Revoked)
   }
 
   constructor(private http: HttpClient) {}
@@ -52,7 +52,7 @@ export class ApprovalsService {
   public reload() {
     this.loading = true
     this.http
-    .get<PaperlessApproval[]>(`${this.baseUrl}approvals/`)
+    .get<Approval[]>(`${this.baseUrl}approvals/`)
     .pipe(takeUntil(this.unsubscribeNotifer), first())
     .subscribe((r) => {
       this.approvals = r // they're all  approvals, for now
