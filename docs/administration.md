@@ -635,5 +635,5 @@ prune_audit_logs
 If you need to create a superuser, use the following command:
 
 ```shell
-create_superuser
+createsuperuser
 ```
