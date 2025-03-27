@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name='paperlesstask',
+            model_name='edoctask',
             name='api_call_count',
             field=models.IntegerField(default=0, help_text='API call count', null=True, verbose_name='API call count'),
         ),

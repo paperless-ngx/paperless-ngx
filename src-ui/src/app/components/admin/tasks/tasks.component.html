@@ -8,7 +8,7 @@
     <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedTasks.size === 0">
       <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
     </button>
-    <button class="btn btn-sm btn-outline-primary me-4" (click)="dismissTasks()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }" [disabled]="tasksService.total === 0">
+    <button class="btn btn-sm btn-outline-primary me-4" (click)="dismissTasks()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.EdocTask }" [disabled]="tasksService.total === 0">
       <i-bs name="check2-all"></i-bs>&nbsp;{{dismissButtonText}}
     </button>
     <div class="form-check form-switch mb-0">
@@ -81,7 +81,7 @@
           </td>
           <td scope="row">
             <div class="btn-group" role="group">
-              <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }">
+              <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.EdocTask }">
                 <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Dismiss</ng-container>
               </button>
               <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">

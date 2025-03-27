@@ -9,7 +9,7 @@ from django.db import models
 class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("documents", "1030_alter_paperlesstask_task_file_name"),
+        ("documents", "1030_alter_edoctask_task_file_name"),
     ]
 
     operations = [

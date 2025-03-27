@@ -5,16 +5,16 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "1027_remove_paperlesstask_attempted_task_and_more"),
+        ("documents", "1027_remove_edoctask_attempted_task_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="task_args",
         ),
         migrations.RemoveField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="task_kwargs",
         ),
     ]

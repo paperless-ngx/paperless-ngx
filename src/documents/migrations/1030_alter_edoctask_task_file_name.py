@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="task_file_name",
             field=models.CharField(
                 help_text="Name of the file which the Task was run for",

@@ -543,7 +543,7 @@
               </a>
             </li>
             <li class="nav-item app-link"
-                *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.PaperlessTask }"
+                *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.EdocTask }"
                 tourAnchor="tour.file-tasks">
               <a class="nav-link" routerLink="tasks" routerLinkActive="active" (click)="closeMenu()"
                  ngbPopover="File Tasks" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"

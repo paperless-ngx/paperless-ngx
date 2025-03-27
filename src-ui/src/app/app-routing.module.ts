@@ -347,7 +347,7 @@ export const routes: Routes = [
         data: {
           requiredPermission: {
             action: PermissionAction.View,
-            type: PermissionType.PaperlessTask,
+            type: PermissionType.EdocTask,
           },
         },
       },
@@ -358,7 +358,7 @@ export const routes: Routes = [
         data: {
           requiredPermission: {
             action: PermissionAction.View,
-            type: PermissionType.PaperlessTask,
+            type: PermissionType.EdocTask,
           },
         },
       },

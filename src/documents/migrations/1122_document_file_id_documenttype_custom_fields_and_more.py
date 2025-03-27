@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '1121_paperlesstask_api_call_count'),
+        ('documents', '1121_edoctask_api_call_count'),
     ]
 
     operations = [

@@ -7,7 +7,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "1028_remove_paperlesstask_task_args_and_more"),
+        ("documents", "1028_remove_edoctask_task_args_and_more"),
     ]
 
     operations = [

@@ -12,11 +12,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RemoveField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="attempted_task",
         ),
         migrations.AddField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="date_created",
             field=models.DateTimeField(
                 default=django.utils.timezone.now,
@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="date_done",
             field=models.DateTimeField(
                 default=None,
@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="date_started",
             field=models.DateTimeField(
                 default=None,
@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="result",
             field=models.TextField(
                 default=None,
@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="status",
             field=models.CharField(
                 choices=[
@@ -75,7 +75,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="task_args",
             field=models.JSONField(
                 help_text="JSON representation of the positional arguments used with the task",
@@ -84,7 +84,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="task_file_name",
             field=models.CharField(
                 help_text="Name of the file which the Task was run for",
@@ -94,7 +94,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="task_kwargs",
             field=models.JSONField(
                 help_text="JSON representation of the named arguments used with the task",
@@ -103,7 +103,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="task_name",
             field=models.CharField(
                 help_text="Name of the Task which was run",
@@ -113,7 +113,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AlterField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="acknowledged",
             field=models.BooleanField(
                 default=False,
@@ -122,7 +122,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AlterField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="task_id",
             field=models.CharField(
                 help_text="Celery ID for the Task that was run",

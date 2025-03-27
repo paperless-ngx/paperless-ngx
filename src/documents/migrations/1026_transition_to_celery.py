@@ -13,27 +13,27 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RemoveField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="created",
         ),
         migrations.RemoveField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="name",
         ),
         migrations.RemoveField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="started",
         ),
         # Remove the field from the model
         migrations.RemoveField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="attempted_task",
         ),
         # Add the field back, pointing to the correct model
         # This resolves a problem where the temporary change in 1022
         # results in a type mismatch
         migrations.AddField(
-            model_name="paperlesstask",
+            model_name="edoctask",
             name="attempted_task",
             field=models.OneToOneField(
                 blank=True,
