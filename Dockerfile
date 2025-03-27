@@ -150,26 +150,26 @@ RUN set -eux \
 
 # Copy gunicorn config
 # Changes very infrequently
-WORKDIR /usr/src/paperless/
+WORKDIR /usr/src/edoc/
 
 COPY gunicorn.conf.py .
 
 # setup docker-specific things
 # These change sometimes, but rarely
-WORKDIR /usr/src/paperless/src/docker/
+WORKDIR /usr/src/edoc/src/docker/
 
 COPY [ \
   "docker/imagemagick-policy.xml", \
   "docker/supervisord.conf", \
   "docker/docker-entrypoint.sh", \
   "docker/docker-prepare.sh", \
-  "docker/paperless_cmd.sh", \
+  "docker/edoc_cmd.sh", \
   "docker/wait-for-redis.py", \
   "docker/env-from-file.sh", \
   "docker/management_script.sh", \
   "docker/flower-conditional.sh", \
   "docker/install_management_commands.sh", \
-  "/usr/src/paperless/src/docker/" \
+  "/usr/src/edoc/src/docker/" \
 ]
 
 RUN set -eux \
@@ -187,15 +187,15 @@ RUN set -eux \
     && chmod 755 /sbin/wait-for-redis.py \
     && mv env-from-file.sh /sbin/env-from-file.sh \
     && chmod 755 /sbin/env-from-file.sh \
-    && mv paperless_cmd.sh /usr/local/bin/paperless_cmd.sh \
-    && chmod 755 /usr/local/bin/paperless_cmd.sh \
+    && mv edoc_cmd.sh /usr/local/bin/edoc_cmd.sh \
+    && chmod 755 /usr/local/bin/edoc_cmd.sh \
     && mv flower-conditional.sh /usr/local/bin/flower-conditional.sh \
     && chmod 755 /usr/local/bin/flower-conditional.sh \
   && echo "Installing management commands" \
     && chmod +x install_management_commands.sh \
     && ./install_management_commands.sh
 
-WORKDIR /usr/src/paperless/src/
+WORKDIR /usr/src/edoc/src/
 
 # Python dependencies
 # Change pretty frequently
