@@ -50,7 +50,7 @@ describe('ObjectNamePipe', () => {
     })
   })
 
-  it('should return empty string if object not found', (done) => {
+  it('should return Private string if object not found', (done) => {
     const mockObjects = {
       results: [{ id: 2, name: 'Object 2' }],
       count: 1,
@@ -60,7 +60,7 @@ describe('ObjectNamePipe', () => {
     jest.spyOn(objectService, 'listAll').mockReturnValue(of(mockObjects))
 
     pipe.transform(1).subscribe((result) => {
-      expect(result).toBe('')
+      expect(result).toBe('Private')
       done()
     })
   })

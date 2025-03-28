@@ -35,7 +35,10 @@ export abstract class ObjectNamePipe implements PipeTransform {
       return this.objectService.listAll().pipe(
         map((objects) => {
           this.objects = objects.results
-          return this.objects.find((o) => o.id === obejctId)?.name || ''
+          return (
+            this.objects.find((o) => o.id === obejctId)?.name ||
+            $localize`Private`
+          )
         }),
         catchError(() => of(''))
       )
