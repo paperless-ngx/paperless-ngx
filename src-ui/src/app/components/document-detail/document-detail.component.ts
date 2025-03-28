@@ -783,6 +783,7 @@ export class DocumentDetailComponent
           this.title = doc.title
           this.updateFormForCustomFields()
           this.documentForm.patchValue(doc)
+          this.documentForm.markAsPristine()
           this.openDocumentService.setDirty(doc, false)
         },
         error: () => {
