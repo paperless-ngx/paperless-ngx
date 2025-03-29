@@ -8,8 +8,8 @@ wait_for_postgres() {
 
 	echo "Waiting for PostgreSQL to start..."
 
-	local -r host="${PAPERLESS_DBHOST:-localhost}"
-	local -r port="${PAPERLESS_DBPORT:-5432}"
+	local -r host="${EDOC_DBHOST:-localhost}"
+	local -r port="${EDOC_DBPORT:-5432}"
 
 	# Disable warning, host and port can't have spaces
 	# shellcheck disable=SC2086
@@ -30,8 +30,8 @@ wait_for_postgres() {
 wait_for_mariadb() {
 	echo "Waiting for MariaDB to start..."
 
-	local -r host="${PAPERLESS_DBHOST:=localhost}"
-	local -r port="${PAPERLESS_DBPORT:=3306}"
+	local -r host="${EDOC_DBHOST:=localhost}"
+	local -r port="${EDOC_DBPORT:=3306}"
 
 	local attempt_num=1
 	local -r max_attempts=5
@@ -91,15 +91,15 @@ search_index() {
 }
 
 superuser() {
-	if [[ -n "${PAPERLESS_ADMIN_USER}" ]]; then
+	if [[ -n "${EDOC_ADMIN_USER}" ]]; then
 		python3 manage.py manage_superuser
 	fi
 }
 
 do_work() {
-	if [[ "${PAPERLESS_DBENGINE}" == "mariadb" ]]; then
+	if [[ "${EDOC_DBENGINE}" == "mariadb" ]]; then
 		wait_for_mariadb
-	elif [[ -n "${PAPERLESS_DBHOST}" ]]; then
+	elif [[ -n "${EDOC_DBHOST}" ]]; then
 		wait_for_postgres
 	fi
 

@@ -1027,7 +1027,7 @@
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
                <context context-type="linenumber">58</context>
             </context-group>
-            <target state="translated">Đã thu hồi lúc</target>
+            <target state="translated">Thu hồi lúc</target>
          </trans-unit>
          <trans-unit id="8864288285279476751" datatype="html">
             <source>Method</source>
@@ -1199,7 +1199,7 @@
                <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
                <context context-type="linenumber">95</context>
             </context-group>
-            <target state="translated">Đã thu hồi</target>
+            <target state="translated">Thu hồi</target>
          </trans-unit>
          <trans-unit id="2134950584701094962" datatype="html">
             <source>Open Document</source>
@@ -1548,7 +1548,7 @@
                <context context-type="linenumber">225,227</context>
             </context-group>
             <target state="translated">
-               Đã thu hồi
+               Thu hồi
                <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.revokedApprovals.length &gt; 0) {" />
                <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&amp;lt;span class=&amp;quot;badge bg-secondary ms-2&amp;quot;&gt;" />
                <x id="INTERPOLATION" equiv-text="{{approvalsService.revokedApprovals.length}}" />
@@ -12718,6 +12718,86 @@
             </context-group>
             <target state="translated">Liên kết tài liệu</target>
          </trans-unit>
+         <trans-unit id="432834967329800065" datatype="html">
+            <source>General Settings</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
+               <context context-type="linenumber">50</context>
+            </context-group>
+            <target state="translated">Cài đặt chung</target>
+         </trans-unit>
+         <trans-unit id="2762851116637676072" datatype="html">
+            <source>OCR Settings</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
+               <context context-type="linenumber">51</context>
+            </context-group>
+            <target state="translated">Cài đặt OCR</target>
+         </trans-unit>
+         <trans-unit id="6264430177495072932" datatype="html">
+            <source>Compress Settings</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
+               <context context-type="linenumber">52</context>
+            </context-group>
+            <target state="translated">Cài đặt nén</target>
+         </trans-unit>
+         <trans-unit id="8676248813204017585" datatype="html">
+            <source>Enable Ocr</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
+               <context context-type="linenumber">76</context>
+            </context-group>
+            <target state="translated">Bật/Tắt Ocr</target>
+         </trans-unit>
+         <trans-unit id="4829958431017494183" datatype="html">
+            <source>Enable Compress</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
+               <context context-type="linenumber">83</context>
+            </context-group>
+            <target state="translated">Tắt/Bật nén</target>
+         </trans-unit>
+         <trans-unit id="1593985023200898946" datatype="html">
+            <source>Quanlity compress</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
+               <context context-type="linenumber">98</context>
+            </context-group>
+            <target state="translated">Chất lượng nén(0-100)</target>
+         </trans-unit>
+         <trans-unit id="2580168214963307924" datatype="html">
+            <source>Username OCR</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
+               <context context-type="linenumber">193</context>
+            </context-group>
+            <target state="translated">Tài khoản OCR</target>
+         </trans-unit>
+         <trans-unit id="8266220028196883502" datatype="html">
+            <source>Password OCR</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
+               <context context-type="linenumber">200</context>
+            </context-group>
+            <target state="translated">Mật khẩu OCR</target>
+         </trans-unit>
+         <trans-unit id="7106327322456204362" datatype="html">
+            <source>Application Logo</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
+               <context context-type="linenumber">207</context>
+            </context-group>
+            <target state="translated">Logo ứng dụng</target>
+         </trans-unit>
+         <trans-unit id="2684743776608068095" datatype="html">
+            <source>Application Title</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
+               <context context-type="linenumber">214</context>
+            </context-group>
+            <target state="translated">Tiêu đề ứng dụng</target>
+         </trans-unit>
          <trans-unit id="2167862279705099846" datatype="html">
             <source>Auto: Learn matching automatically</source>
             <context-group purpose="location">
@@ -12813,86 +12893,6 @@
                <context context-type="linenumber">46</context>
             </context-group>
             <target state="translated">Không có: Vô hiệu hóa phù hợp</target>
-         </trans-unit>
-         <trans-unit id="432834967329800065" datatype="html">
-            <source>General Settings</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
-               <context context-type="linenumber">50</context>
-            </context-group>
-            <target state="translated">Cài đặt chung</target>
-         </trans-unit>
-         <trans-unit id="2762851116637676072" datatype="html">
-            <source>OCR Settings</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
-               <context context-type="linenumber">51</context>
-            </context-group>
-            <target state="translated">Cài đặt OCR</target>
-         </trans-unit>
-         <trans-unit id="6264430177495072932" datatype="html">
-            <source>Compress Settings</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
-               <context context-type="linenumber">52</context>
-            </context-group>
-            <target state="translated">Cài đặt nén</target>
-         </trans-unit>
-         <trans-unit id="8676248813204017585" datatype="html">
-            <source>Enable Ocr</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
-               <context context-type="linenumber">76</context>
-            </context-group>
-            <target state="translated">Bật/Tắt Ocr</target>
-         </trans-unit>
-         <trans-unit id="4829958431017494183" datatype="html">
-            <source>Enable Compress</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
-               <context context-type="linenumber">83</context>
-            </context-group>
-            <target state="translated">Tắt/Bật nén</target>
-         </trans-unit>
-         <trans-unit id="1593985023200898946" datatype="html">
-            <source>Quanlity compress</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
-               <context context-type="linenumber">98</context>
-            </context-group>
-            <target state="translated">Chất lượng nén(0-100)</target>
-         </trans-unit>
-         <trans-unit id="2580168214963307924" datatype="html">
-            <source>Username OCR</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
-               <context context-type="linenumber">193</context>
-            </context-group>
-            <target state="translated">Tài khoản OCR</target>
-         </trans-unit>
-         <trans-unit id="8266220028196883502" datatype="html">
-            <source>Password OCR</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
-               <context context-type="linenumber">200</context>
-            </context-group>
-            <target state="translated">Mật khẩu OCR</target>
-         </trans-unit>
-         <trans-unit id="7106327322456204362" datatype="html">
-            <source>Application Logo</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
-               <context context-type="linenumber">207</context>
-            </context-group>
-            <target state="translated">Logo ứng dụng</target>
-         </trans-unit>
-         <trans-unit id="2684743776608068095" datatype="html">
-            <source>Application Title</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/data/edoc-config.ts</context>
-               <context context-type="linenumber">214</context>
-            </context-group>
-            <target state="translated">Tiêu đề ứng dụng</target>
          </trans-unit>
          <trans-unit id="5948496158474272829" datatype="html">
             <source>Warning: You have unsaved changes to your document(s).</source>

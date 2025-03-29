@@ -13,10 +13,10 @@ for line in $(printenv)
 do
 	# Extract the name of the environment variable
 	env_name=${line%%=*}
-	# Check if it starts with "PAPERLESS_" and ends in "_FILE"
-	if [[ ${env_name} == PAPERLESS_*_FILE ]]; then
+	# Check if it starts with "EDOC_" and ends in "_FILE"
+	if [[ ${env_name} == EDOC_*_FILE ]]; then
 		# This should have been named different..
-		if [[ ${env_name} == "PAPERLESS_OCR_SKIP_ARCHIVE_FILE" ]]; then
+		if [[ ${env_name} == "EDOC_OCR_SKIP_ARCHIVE_FILE" ]]; then
 			continue
 		fi
 		# Extract the value of the environment

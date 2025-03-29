@@ -15,7 +15,7 @@ if __name__ == "__main__":
     MAX_RETRY_COUNT: Final[int] = 5
     RETRY_SLEEP_SECONDS: Final[int] = 5
 
-    REDIS_URL: Final[str] = os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")
+    REDIS_URL: Final[str] = os.getenv("EDOC_REDIS", "redis://localhost:6379")
 
     print("Waiting for Redis...", flush=True)
 
@@ -36,7 +36,7 @@ if __name__ == "__main__":
                 attempt += 1
 
     if attempt >= MAX_RETRY_COUNT:
-        print("Failed to connect to redis using environment variable PAPERLESS_REDIS.")
+        print("Failed to connect to redis using environment variable EDOC_REDIS.")
         sys.exit(os.EX_UNAVAILABLE)
     else:
         print("Connected to Redis broker.")

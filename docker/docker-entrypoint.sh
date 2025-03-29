@@ -17,9 +17,9 @@ map_uidgid() {
 
 map_folders() {
 	# Export these so they can be used in docker-prepare.sh
-	export DATA_DIR="${PAPERLESS_DATA_DIR:-/usr/src/edoc/data}"
-	export MEDIA_ROOT_DIR="${PAPERLESS_MEDIA_ROOT:-/usr/src/edoc/media}"
-	export CONSUME_DIR="${PAPERLESS_CONSUMPTION_DIR:-/usr/src/edoc/consume}"
+	export DATA_DIR="${EDOC_DATA_DIR:-/usr/src/edoc/data}"
+	export MEDIA_ROOT_DIR="${EDOC_MEDIA_ROOT:-/usr/src/edoc/media}"
+	export CONSUME_DIR="${EDOC_CONSUMPTION_DIR:-/usr/src/edoc/consume}"
 }
 
 custom_container_init() {
@@ -90,7 +90,7 @@ initialize() {
 		fi
 	done
 
-	local -r tmp_dir="${PAPERLESS_SCRATCH_DIR:=/tmp/edoc}"
+	local -r tmp_dir="${EDOC_SCRATCH_DIR:=/tmp/edoc}"
 	echo "Creating directory scratch directory ${tmp_dir}"
 	mkdir --parents "${tmp_dir}"
 
@@ -153,8 +153,8 @@ if [ "$(id -u)" == "$(id -u edoc)" ]; then
 fi
 
 # Install additional languages if specified
-if [[ -n "$PAPERLESS_OCR_LANGUAGES" ]]; then
-	install_languages "$PAPERLESS_OCR_LANGUAGES"
+if [[ -n "$EDOC_OCR_LANGUAGES" ]]; then
+	install_languages "$EDOC_OCR_LANGUAGES"
 fi
 
 initialize

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-SUPERVISORD_WORKING_DIR="${PAPERLESS_SUPERVISORD_WORKING_DIR:-$PWD}"
+SUPERVISORD_WORKING_DIR="${EDOC_SUPERVISORD_WORKING_DIR:-$PWD}"
 rootless_args=()
-if [ "$(id -u)" == "$(id -u paperless)" ]; then
+if [ "$(id -u)" == "$(id -u edoc)" ]; then
 	rootless_args=(
 		--user
-		paperless
+		edoc
 		--logfile
 		"${SUPERVISORD_WORKING_DIR}/supervisord.log"
 		--pidfile
