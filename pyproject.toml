@@ -1,6 +1,6 @@
 [project]
 name = "paperless-ngx"
-version = "2.14.7"
+version = "2.15.0"
 description = "A community-supported supercharged version of paperless: scan, index and archive all your physical documents"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -23,7 +23,7 @@ dependencies = [
   "dateparser~=1.2",
   # WARNING: django does not use semver.
   #          Only patch versions are guaranteed to not introduce breaking changes.
-  "django~=5.1.6",
+  "django~=5.1.7",
   "django-allauth[socialaccount,mfa]~=65.4.0",
   "django-auditlog~=3.0.0",
   "django-celery-results~=2.5.1",
@@ -78,7 +78,7 @@ optional-dependencies.postgres = [
   "psycopg-c==3.2.5",
 ]
 optional-dependencies.webserver = [
-  "granian~=2.0.1",
+  "granian[uvloop]~=2.2.0",
 ]
 
 [dependency-groups]

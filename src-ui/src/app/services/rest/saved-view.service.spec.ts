@@ -156,6 +156,72 @@ describe(`Additional service tests for SavedViewService`, () => {
     httpTestingController.verify() // no reload
   })
 
+  it('should reload after create, delete, patch and patchMany', () => {
+    const reloadSpy = jest.spyOn(service, 'reload')
+    service
+      .create({
+        name: 'New Saved View',
+        show_on_dashboard: true,
+        show_in_sidebar: true,
+        sort_field: 'name',
+        sort_reverse: true,
+        filter_rules: [],
+      })
+      .subscribe()
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}${endpoint}/`)
+      .flush({})
+    expect(reloadSpy).toHaveBeenCalled()
+    reloadSpy.mockClear()
+    httpTestingController
+      .expectOne(
+        `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
+      )
+      .flush({
+        results: saved_views,
+      })
+    service.delete(saved_views[0]).subscribe()
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}${endpoint}/1/`)
+      .flush({})
+    expect(reloadSpy).toHaveBeenCalled()
+    reloadSpy.mockClear()
+    httpTestingController
+      .expectOne(
+        `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
+      )
+      .flush({
+        results: saved_views,
+      })
+    service.patch(saved_views[0], true).subscribe()
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}${endpoint}/1/`)
+      .flush({})
+    expect(reloadSpy).toHaveBeenCalled()
+    httpTestingController
+      .expectOne(
+        `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
+      )
+      .flush({
+        results: saved_views,
+      })
+    service.patchMany(saved_views).subscribe()
+    saved_views.forEach((saved_view) => {
+      const req = httpTestingController.expectOne(
+        `${environment.apiBaseUrl}${endpoint}/${saved_view.id}/`
+      )
+      req.flush({})
+    })
+    expect(reloadSpy).toHaveBeenCalled()
+    httpTestingController
+      .expectOne(
+        `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000`
+      )
+      .flush({
+        results: saved_views,
+      })
+  })
+
   beforeEach(() => {
     // Dont need to setup again
 

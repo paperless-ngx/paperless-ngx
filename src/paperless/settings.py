@@ -549,6 +549,9 @@ def _parse_remote_user_settings() -> str:
 
 HTTP_REMOTE_USER_HEADER_NAME = _parse_remote_user_settings()
 
+# X-Frame options for embedded PDF display:
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
 # The next 3 settings can also be set using just PAPERLESS_URL
 CSRF_TRUSTED_ORIGINS = __get_list("PAPERLESS_CSRF_TRUSTED_ORIGINS")
 

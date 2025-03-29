@@ -131,24 +131,30 @@ account. The script essentially automatically performs the steps described in [D
     by default but you can change the image to pull from Docker Hub by changing the `image`
     line to `image: paperlessngx/paperless-ngx:latest`.
 
-6.  To be able to login, you will need a "superuser". To create it,
+6.  Run `docker compose up -d`. This will create and start the necessary containers.
+
+7.  Wait for the containers to complete their startup. You can monitor the logs using Docker, such as:
+
+    ```shell-session
+    docker logs --follow webserver
+    ```
+
+8.  To be able to login, you will need a "superuser". To create it,
     execute the following command:
 
     ```shell-session
-    docker compose run --rm webserver createsuperuser
+    docker compose exec webserver createsuperuser
     ```
 
     or using docker exec from within the container:
 
     ```shell-session
-    python3 manage.py createsuperuser
+    createsuperuser
     ```
 
     This will guide you through the superuser setup.
 
-7.  Run `docker compose up -d`. This will create and start the necessary containers.
-
-8.  Congratulations! Your Paperless-ngx instance should now be accessible at `http://127.0.0.1:8000`
+9.  Congratulations! Your Paperless-ngx instance should now be accessible at `http://127.0.0.1:8000`
     (or similar, depending on your configuration). Use the superuser credentials you have
     created in the previous step to login.
 
@@ -708,7 +714,8 @@ Paperless runs on Raspberry Pi. However, some things are rather slow on
 the Pi and configuring some options in paperless can help improve
 performance immensely:
 
--   Stick with SQLite to save some resources.
+-   Stick with SQLite to save some resources. See [troubleshooting](troubleshooting.md#log-reports-creating-paperlesstask-failed)
+    if you encounter issues with SQLite locking.
 -   If you do not need the filesystem-based consumer, consider disabling it
     entirely by setting [`PAPERLESS_CONSUMER_DISABLE`](configuration.md#PAPERLESS_CONSUMER_DISABLE) to `true`.
 -   Consider setting [`PAPERLESS_OCR_PAGES`](configuration.md#PAPERLESS_OCR_PAGES) to 1, so that paperless will
