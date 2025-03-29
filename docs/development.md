@@ -84,7 +84,7 @@ first-time setup.
     $ uv run pre-commit install
     ```
 
-6.  Apply migrations and create a superuser for your development instance:
+6.  Apply migrations and create a superuser (also can be done via the web UI) for your development instance:
 
     ```bash
     # src/
