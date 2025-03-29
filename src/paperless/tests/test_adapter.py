@@ -17,6 +17,11 @@ class TestCustomAccountAdapter(TestCase):
     def test_is_open_for_signup(self):
         adapter = get_adapter()
 
+        # With no accounts, signups should be allowed
+        self.assertTrue(adapter.is_open_for_signup(None))
+
+        User.objects.create_user("testuser")
+
         # Test when ACCOUNT_ALLOW_SIGNUPS is True
         settings.ACCOUNT_ALLOW_SIGNUPS = True
         self.assertTrue(adapter.is_open_for_signup(None))
@@ -100,6 +105,27 @@ class TestCustomAccountAdapter(TestCase):
         self.assertEqual(user.groups.count(), 1)
         self.assertTrue(user.groups.filter(name="group1").exists())
         self.assertFalse(user.groups.filter(name="group2").exists())
+
+    def test_fresh_install_save_creates_superuser(self):
+        adapter = get_adapter()
+        form = mock.Mock(
+            cleaned_data={
+                "username": "testuser",
+                "email": "user@paperless-ngx.com",
+            },
+        )
+        user = adapter.save_user(HttpRequest(), User(), form, commit=True)
+        self.assertTrue(user.is_superuser)
+
+        # Next time, it should not create a superuser
+        form = mock.Mock(
+            cleaned_data={
+                "username": "testuser2",
+                "email": "user2@paperless-ngx.com",
+            },
+        )
+        user2 = adapter.save_user(HttpRequest(), User(), form, commit=True)
+        self.assertFalse(user2.is_superuser)
 
 
 class TestCustomSocialAccountAdapter(TestCase):
