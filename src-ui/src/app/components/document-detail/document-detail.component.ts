@@ -100,13 +100,13 @@ import { SelectComponent } from '../common/input/select/select.component'
 import { TagsComponent } from '../common/input/tags/tags.component'
 import { TextComponent } from '../common/input/text/text.component'
 import { UrlComponent } from '../common/input/url/url.component'
-import { MarkdownModalComponent } from '../common/markdown-modal'
 import { PageHeaderComponent } from '../common/page-header/page-header.component'
 import { ShareLinksDialogComponent } from '../common/share-links-dialog/share-links-dialog.component'
 import { DocumentHistoryComponent } from '../document-history/document-history.component'
 import { DocumentNotesComponent } from '../document-notes/document-notes.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { MetadataCollapseComponent } from './metadata-collapse/metadata-collapse.component'
+import { MarkdownModalComponent } from '../common/markdown-modal'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -172,13 +172,11 @@ export enum ZoomSetting {
     NgxBootstrapIconsModule,
     PdfViewerModule,
     MarkdownModule,
-    MarkdownModalComponent,
   ],
 })
 export class DocumentDetailComponent
   extends ComponentWithPermissions
-  implements OnInit, OnDestroy, DirtyComponent
-{
+  implements OnInit, OnDestroy, DirtyComponent {
   @ViewChild('inputTitle')
   titleInput: TextComponent
 
@@ -415,9 +413,8 @@ export class DocumentDetailComponent
               this.previewText = res.toString()
             },
             error: (err) => {
-              this.previewText = $localize`An error occurred loading content: ${
-                err.message ?? err.toString()
-              }`
+              this.previewText = $localize`An error occurred loading content: ${err.message ?? err.toString()
+                }`
             },
           })
           this.thumbUrl = this.documentsService.getThumbUrl(documentId)
@@ -454,7 +451,7 @@ export class DocumentDetailComponent
                 this.documentForm.get('permissions_form').value['owner']
               openDocument['permissions'] =
                 this.documentForm.get('permissions_form').value[
-                  'set_permissions'
+                'set_permissions'
                 ]
               delete openDocument['permissions_form']
             }
@@ -801,7 +798,7 @@ export class DocumentDetailComponent
 
   save(close: boolean = false) {
     this.networkActive = true
-    ;(document.activeElement as HTMLElement)?.dispatchEvent(new Event('change'))
+      ; (document.activeElement as HTMLElement)?.dispatchEvent(new Event('change'))
     this.documentsService
       .update(this.document)
       .pipe(first())
@@ -1127,7 +1124,7 @@ export class DocumentDetailComponent
     this.previewZoomScale = ZoomSetting.PageWidth
     this.previewZoomSetting =
       Object.values(ZoomSetting)[
-        Math.min(Object.values(ZoomSetting).length - 1, currentIndex + 1)
+      Math.min(Object.values(ZoomSetting).length - 1, currentIndex + 1)
       ]
   }
 
