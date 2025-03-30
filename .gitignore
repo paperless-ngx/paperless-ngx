@@ -5,6 +5,9 @@ __pycache__/
 # C extensions
 *.so
 
+#  Cursor IDE
+.cursor
+
 # Distribution / packaging
 .Python
 env/
