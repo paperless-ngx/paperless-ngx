@@ -131,26 +131,11 @@ account. The script essentially automatically performs the steps described in [D
     by default but you can change the image to pull from Docker Hub by changing the `image`
     line to `image: paperlessngx/paperless-ngx:latest`.
 
-6.  To be able to login, you will need a "superuser". To create it,
-    execute the following command:
+6.  Run `docker compose up -d`. This will create and start the necessary containers.
 
-    ```shell-session
-    docker compose run --rm webserver createsuperuser
-    ```
-
-    or using docker exec from within the container:
-
-    ```shell-session
-    python3 manage.py createsuperuser
-    ```
-
-    This will guide you through the superuser setup.
-
-7.  Run `docker compose up -d`. This will create and start the necessary containers.
-
-8.  Congratulations! Your Paperless-ngx instance should now be accessible at `http://127.0.0.1:8000`
-    (or similar, depending on your configuration). Use the superuser credentials you have
-    created in the previous step to login.
+7.  Congratulations! Your Paperless-ngx instance should now be accessible at `http://127.0.0.1:8000`
+    (or similar, depending on your configuration). When you first access the web interface, you will be
+    prompted to create a superuser account.
 
 ### Build the Docker image yourself {#docker_build}
 
@@ -386,15 +371,14 @@ are released, dependency support is confirmed, etc.
         dependencies for Postgres or Mariadb.  You can select those extras with `--extra <EXTRA>`
         or all with `--all-extras`
 
-9.  Go to `/opt/paperless/src`, and execute the following commands:
+9.  Go to `/opt/paperless/src`, and execute the following command:
 
     ```bash
     # This creates the database schema.
     sudo -Hu paperless python3 manage.py migrate
-
-    # This creates your first paperless user
-    sudo -Hu paperless python3 manage.py createsuperuser
     ```
+
+    When you first access the web interface you will be prompted to create a superuser account.
 
 10. Optional: Test that paperless is working by executing
 
@@ -708,7 +692,8 @@ Paperless runs on Raspberry Pi. However, some things are rather slow on
 the Pi and configuring some options in paperless can help improve
 performance immensely:
 
--   Stick with SQLite to save some resources.
+-   Stick with SQLite to save some resources. See [troubleshooting](troubleshooting.md#log-reports-creating-paperlesstask-failed)
+    if you encounter issues with SQLite locking.
 -   If you do not need the filesystem-based consumer, consider disabling it
     entirely by setting [`PAPERLESS_CONSUMER_DISABLE`](configuration.md#PAPERLESS_CONSUMER_DISABLE) to `true`.
 -   Consider setting [`PAPERLESS_OCR_PAGES`](configuration.md#PAPERLESS_OCR_PAGES) to 1, so that paperless will

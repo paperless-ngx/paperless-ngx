@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.forms import ValidationError
 from django.urls import reverse
 
+from documents.models import Document
 from paperless.signals import handle_social_account_updated
 
 logger = logging.getLogger("paperless.auth")
@@ -21,6 +22,13 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         Check whether the site is open for signups, which can be
         disabled via the ACCOUNT_ALLOW_SIGNUPS setting.
         """
+        if (
+            User.objects.exclude(username__in=["consumer", "AnonymousUser"]).count()
+            == 0
+            and Document.global_objects.count() == 0
+        ):
+            # I.e. a fresh install, allow signups
+            return True
         allow_signups = super().is_open_for_signup(request)
         # Override with setting, otherwise default to super.
         return getattr(settings, "ACCOUNT_ALLOW_SIGNUPS", allow_signups)
@@ -73,6 +81,17 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         Save the user instance. Default groups are assigned to the user, if
         specified in the settings.
         """
+
+        if (
+            User.objects.exclude(username__in=["consumer", "AnonymousUser"]).count()
+            == 0
+            and Document.global_objects.count() == 0
+        ):
+            # I.e. a fresh install, make the user a superuser
+            logger.debug(f"Creating initial superuser `{user}`")
+            user.is_superuser = True
+            user.is_staff = True
+
         user: User = super().save_user(request, user, form, commit)
         group_names: list[str] = settings.ACCOUNT_DEFAULT_GROUPS
         if len(group_names) > 0:

@@ -21,6 +21,7 @@ import {
 } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { pngxPopperOptions } from 'src/app/utils/popper-options'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 
@@ -36,6 +37,8 @@ import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit
   ],
 })
 export class CustomFieldsDropdownComponent extends LoadingComponentWithPermissions {
+  public popperOptions = pngxPopperOptions
+
   @Input()
   documentId: number
 

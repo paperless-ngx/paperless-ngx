@@ -808,10 +808,10 @@ def run_workflows(
                         field=field,
                         document=document,
                     ).first()
-                    if instance:
+                    if instance and args[value_field_name] is not None:
                         setattr(instance, value_field_name, args[value_field_name])
                         instance.save()
-                    else:
+                    elif not instance:
                         CustomFieldInstance.objects.create(
                             **args,
                             field=field,
