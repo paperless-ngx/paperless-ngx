@@ -53,7 +53,7 @@ export class AiChatWidgetComponent implements OnInit {
     const apiUrl = `${environment.apiBaseUrl}question/`
     const requestBody = {
       question: this.currentMessage,
-      session_id: this.sessionId
+      session_id: this.sessionId || undefined  // Only send if it exists
     }
     const headers = {
       Authorization:
@@ -63,20 +63,32 @@ export class AiChatWidgetComponent implements OnInit {
     this.showTypingAnimation = true // show the typing animation
     this.http
       .post<AiResponse>(apiUrl, requestBody, { headers })
-      .subscribe((response: AiResponse) => {
-        this.showTypingAnimation = false // hide the typing animation
+      .subscribe({
+        next: (response: AiResponse) => {
+          this.showTypingAnimation = false // hide the typing animation
 
-        // Save the session ID for future messages
-        this.sessionId = response.session_id
-        localStorage.setItem('paperless_chat_session_id', response.session_id)
+          // Save the session ID for future messages
+          this.sessionId = response.session_id
+          localStorage.setItem('paperless_chat_session_id', response.session_id)
 
-        // Add the chatbot's response to the chat
-        this.messages.push({
-          text: response.reply, // Updated from response.german
-          fromUser: false,
-        })
-        // Scroll the chat container to the bottom
-        this.scrollToBottom()
+          // Add the chatbot's response to the chat
+          this.messages.push({
+            text: response.reply,
+            fromUser: false,
+          })
+          // Scroll the chat container to the bottom
+          this.scrollToBottom()
+        },
+        error: (error) => {
+          this.showTypingAnimation = false
+          console.error('Error sending message:', error)
+          // Add error message to chat
+          this.messages.push({
+            text: 'Sorry, there was an error processing your message. Please try again.',
+            fromUser: false,
+          })
+          this.scrollToBottom()
+        }
       })
 
     // Clear the input field
