@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
-import { Component, ElementRef, ViewChild } from '@angular/core'
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { environment } from 'src/environments/environment'
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
@@ -13,6 +13,7 @@ interface ChatMessage {
 interface AiResponse {
   reply: string
   document_ids: string[]
+  session_id: string
 }
 
 @Component({
@@ -21,13 +22,19 @@ interface AiResponse {
   styleUrls: ['./ai-chat-widget.component.scss'],
   imports: [FormsModule, WidgetFrameComponent, CommonModule],
 })
-export class AiChatWidgetComponent {
+export class AiChatWidgetComponent implements OnInit {
   @ViewChild('chatContainer', { static: false }) chatContainer: ElementRef
   messages: ChatMessage[] = []
   currentMessage = ''
   showTypingAnimation = false
+  sessionId: string | null = null
 
   constructor(private http: HttpClient) { }
+
+  ngOnInit() {
+    // Try to load session ID from localStorage
+    this.sessionId = localStorage.getItem('paperless_chat_session_id')
+  }
 
   sendMessage() {
     if (this.currentMessage.trim() === '') {
@@ -40,14 +47,14 @@ export class AiChatWidgetComponent {
       fromUser: true,
     })
     // Scroll the chat container to the bottom
-    setTimeout(() => {
-      this.chatContainer.nativeElement.scrollTop =
-        this.chatContainer.nativeElement.scrollHeight
-    })
+    this.scrollToBottom()
 
     // Send the message to a chatbot API and display the response
     const apiUrl = `${environment.apiBaseUrl}question/`
-    const requestBody = { question: this.currentMessage }
+    const requestBody = {
+      question: this.currentMessage,
+      session_id: this.sessionId
+    }
     const headers = {
       Authorization:
         'Bearer ' +
@@ -58,19 +65,54 @@ export class AiChatWidgetComponent {
       .post<AiResponse>(apiUrl, requestBody, { headers })
       .subscribe((response: AiResponse) => {
         this.showTypingAnimation = false // hide the typing animation
+
+        // Save the session ID for future messages
+        this.sessionId = response.session_id
+        localStorage.setItem('paperless_chat_session_id', response.session_id)
+
         // Add the chatbot's response to the chat
         this.messages.push({
-          text: response.reply, // Using German response by default
+          text: response.reply, // Updated from response.german
           fromUser: false,
         })
         // Scroll the chat container to the bottom
-        setTimeout(() => {
-          this.chatContainer.nativeElement.scrollTop =
-            this.chatContainer.nativeElement.scrollHeight
-        })
+        this.scrollToBottom()
       })
 
     // Clear the input field
     this.currentMessage = ''
+  }
+
+  clearChatHistory() {
+    if (!this.sessionId) {
+      return
+    }
+
+    const apiUrl = `${environment.apiBaseUrl}clear_chat_history/`
+    const requestBody = { session_id: this.sessionId }
+    const headers = {
+      Authorization:
+        'Bearer ' +
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzNTYzNDU2NyIsIm5hbWUiOiJKb3NjaGthIiwiaWF0IjoxNTE2MjM5MDIyfQ.iecqerProyQ4OyhjzyMtHEb869b3Vbitp_T5tkip2Z4',
+    }
+
+    this.http.post(apiUrl, requestBody, { headers }).subscribe(
+      () => {
+        // Clear the local messages
+        this.messages = []
+        // Keep the session ID, but clear the history in Redis
+      },
+      (error) => {
+        console.error('Failed to clear chat history:', error)
+      }
+    )
+  }
+
+  private scrollToBottom() {
+    setTimeout(() => {
+      if (this.chatContainer) {
+        this.chatContainer.nativeElement.scrollTop = this.chatContainer.nativeElement.scrollHeight
+      }
+    })
   }
 }

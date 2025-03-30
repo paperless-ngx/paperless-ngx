@@ -18,6 +18,7 @@ from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular.views import SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 
+from documents.ai_chat import ClearChatHistoryView
 from documents.ai_chat import QuestionView
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
@@ -147,6 +148,11 @@ urlpatterns = [
                     "^question/",
                     QuestionView.as_view(),
                     name="question",
+                ),
+                re_path(
+                    "^clear_chat_history/",
+                    ClearChatHistoryView.as_view(),
+                    name="clear_chat_history",
                 ),
                 re_path(
                     "^bulk_edit_objects/",

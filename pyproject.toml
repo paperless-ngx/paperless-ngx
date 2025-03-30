@@ -52,6 +52,7 @@ dependencies = [
   "langchain-openai>=0.3.9",
   "langchain-redis>=0.2",
   "langdetect~=1.0.9",
+  "langgraph>=0.3.21",
   "mistralai>=1.6",
   "nltk~=3.9.1",
   "ocrmypdf~=16.10.0",
