@@ -459,6 +459,32 @@ def update_document_archive_file(self, document_id=None):
         parser.cleanup()
     return f"Success. New document id {document.pk} created"
 
+@shared_task()
+def bulk_delete_file(folder_list = None):
+    documents = []
+    folders_ids = []
+    for f in folder_list:
+        folders_f_ids = Folder.objects.filter(
+            path__startswith=f.path).values_list('id', flat=True)
+        folders_ids.extend(folders_f_ids)
+    dossier_ids = []
+
+    documents_f = Document.objects.filter(folder__in=folders_ids).defer(
+        'content').select_related('dossier')
+    documents.extend(documents_f)
+    for d in documents_f:
+        if d.dossier_id:
+            dossier_ids.append(d.dossier_id)
+
+    with transaction.atomic():
+        Document.objects.filter(id__in=[d.id for d in documents]).delete()
+        Dossier.objects.filter(id__in=dossier_ids).delete()
+        Folder.objects.filter(id__in=folders_ids).delete()
+
+        logger.info("deleted file")
+
+
+
 @shared_task(bind=True)
 def update_value_customfield_to_document(self, document_id=None):
     """

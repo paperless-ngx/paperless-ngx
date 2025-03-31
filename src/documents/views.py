@@ -201,7 +201,7 @@ from documents.signals import approval_updated
 from documents.signals import document_updated
 
 from documents.tasks import backup_documents, \
-    bulk_update_custom_field_form_document_type_to_document
+    bulk_update_custom_field_form_document_type_to_document, bulk_delete_file
 from documents.tasks import consume_file
 from documents.tasks import deleted_backup
 from documents.tasks import empty_trash
@@ -2549,24 +2549,13 @@ class BulkEditObjectsView(PassUserMixin):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         elif operation == "delete" and object_type == "folders":
-
             folder_list = Folder.objects.filter(id__in=object_ids)
             for f in folder_list:
                 if f.owner == user or user.is_superuser or f.owner is None:
                     continue
                 else:
                     return HttpResponseForbidden("Insufficient permissions")
-
-            for f in folder_list:
-                folders = Folder.objects.filter(path__startswith=f.path)
-                documents = Document.objects.filter(folder__in=folders).defer('content').select_related('dossier')
-                dossier_ids = []
-                for d in documents:
-                    if d.dossier:
-                        dossier_ids.append(d.dossier.id)
-                documents.delete()
-                Dossier.objects.filter(id__in=dossier_ids).delete()
-                folders.delete()
+            bulk_delete_file.delay(folder_list)
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         elif operation == "delete" and object_type == "dossiers":
