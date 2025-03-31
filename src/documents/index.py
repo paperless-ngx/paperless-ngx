@@ -14,6 +14,7 @@ from typing import Optional
 from dateutil.parser import isoparse
 from django.conf import settings
 from django.contrib.admin.templatetags.admin_list import results
+from django.db.models.functions import Substr
 from django.utils import timezone as django_timezone
 from django_extensions.jobs import monthly
 from elasticsearch import Elasticsearch
@@ -499,7 +500,7 @@ class DelayedElasticSearch(DelayedQuery):
         exact_matches = re.findall(r'"(.*?)"', q_str)
 
         # Loại bỏ các chuỗi trong dấu ngoặc kép để tạo thành cleaned_string
-        cleaned_string = re.sub(r'"(.*?)"', '', q_str).strip()
+        # cleaned_string = re.sub(r'"(.*?)"', '', q_str).strip()
         exact_queries = [Q("match_phrase", content=match) for match in
                          exact_matches]
         cleaned_string = cleaned_string.replace('"', '')
@@ -532,7 +533,7 @@ class DelayedElasticSearch(DelayedQuery):
         q_str = self.query_params.get("query", "")
         added = re.search(r'added:\[(.*?)\]', q_str)
         created = re.search(r'created:\[(.*?)\]', q_str)
-        map_created = {'-1 week to now': "now-1w/w", '-1 month to now': "now-1M/M", '-3 month to now': "now-3M/M", '-1 year to now': "now-1y/y",}
+        map_created = {'-1 week to now': "now-7d/d", '-1 month to now': "now-1M/M", '-3 month to now': "now-3M/M", '-1 year to now': "now-1y/y",}
         if added is not None:
             criterias.append(Q("range", **{'added': {"lt": "now/d"}}))
             criterias.append(Q("range", **{'added': {"gt": map_created[added.group(1)]}}))
@@ -694,7 +695,10 @@ class DelayedElasticSearch(DelayedQuery):
                 "warehouse",
                 # "folder",
                 "owner",
-            ).prefetch_related("tags", "custom_fields", "notes").filter(id__in=doc_ids).defer('content',
+            ).prefetch_related("tags", "custom_fields", "notes").filter(id__in=doc_ids).annotate(
+                truncated_content=Substr('content', 1, 500)  # Lấy tối đa 500 ký tự từ content
+            ).defer(
+                'content',
                 'owner__password',  # Bỏ qua trường password
                 'owner__is_staff',   # Bỏ qua trường is_staff
                 'owner__is_active',  # Bỏ qua trường is_active

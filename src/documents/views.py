@@ -1236,7 +1236,12 @@ class SearchResultElasticSearchSerializer(DocumentSerializer, PassUserMixin):
         # print('instance',instance.doc_obj.__dict__)
         if getattr(instance, 'doc_obj', None)==None:
             return None
-        instance.doc_obj.content = ""
+        # instance.doc_obj.content = ""
+        highlight_content = None
+        if hasattr(instance.meta, 'highlight'):
+            highlight_content = instance.meta.highlight.content[0]
+        if not highlight_content:
+            highlight_content = instance.doc_obj.truncated_content
         doc = (
             instance.doc_obj
         )
@@ -1245,10 +1250,8 @@ class SearchResultElasticSearchSerializer(DocumentSerializer, PassUserMixin):
             [str(c.note) for c in doc.notes.all()],
         )
         r = super().to_representation(doc)
-        highlight_content = None
         highlight_note = None
-        if hasattr(instance.meta,'highlight'):
-            highlight_content = instance.meta.highlight.content[0]
+
             # highlight_note = instance.meta.highlight.note[0]
         r["__search_hit__"] = {
             "score": None,
