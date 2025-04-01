@@ -30,14 +30,13 @@
     [placeholder]="placeholder"
     [notFoundText]="notFoundText"
     [multiple]="true"
-    bindValue="id"
     [compareWith]="compareDocuments"
     [trackByFn]="trackByFn"
     [minTermLength]="2"
     [loading]="loading"
     [typeahead]="documentsInput$"
     (mousedown)="$event.stopImmediatePropagation()"
-    (change)="onChange(selectedDocuments)">
+    (change)="onChange(selectedDocumentIDs)">
     <ng-template ng-label-tmp let-document="item">
       <div class="d-flex align-items-center">
         @if (!disabled) {
