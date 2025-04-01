@@ -536,10 +536,10 @@ class DelayedElasticSearch(DelayedQuery):
         map_created = {'-1 week to now': "now-7d/d", '-1 month to now': "now-1M/M", '-3 month to now': "now-3M/M", '-1 year to now': "now-1y/y",}
         if added is not None:
             criterias.append(Q("range", **{'added': {"lt": "now/d"}}))
-            criterias.append(Q("range", **{'added': {"gt": map_created[added.group(1)]}}))
+            criterias.append(Q("range", **{'added': {"gte": map_created[added.group(1)]}}))
         if created is not None:
             criterias.append(Q("range", **{'created': {"lt": "now/d"}}))
-            criterias.append(Q("range", **{'created': {"gt": map_created[created.group(1)]}}))
+            criterias.append(Q("range", **{'created': {"gte": map_created[created.group(1)]}}))
 
         for key, value in self.query_params.items():
             if key == "is_tagged":
@@ -623,7 +623,6 @@ class DelayedElasticSearch(DelayedQuery):
     def get_combined_query(self):
         base_query = self._get_query()  # Lấy truy vấn cơ bản
         filter_query = self._get_query_filter()  # Lấy truy vấn lọc
-
         # Lấy trường và chiều sắp xếp
         sort_field, reverse = self._get_query_sortedby()
 
