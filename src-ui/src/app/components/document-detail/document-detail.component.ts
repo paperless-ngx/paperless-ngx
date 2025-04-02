@@ -1286,9 +1286,7 @@ export class DocumentDetailComponent
     this.document.custom_fields?.forEach((fieldInstance) => {
       this.customFieldFormFields.push(
         new FormGroup({
-          field: new FormControl(
-            this.getCustomFieldFromInstance(fieldInstance)?.id
-          ),
+          field: new FormControl(fieldInstance.field),
           value: new FormControl(fieldInstance.value),
         }),
         { emitEvent }
