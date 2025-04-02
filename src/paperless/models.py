@@ -167,6 +167,10 @@ class ApplicationConfiguration(AbstractSingletonModel):
         null=True,
     )
 
+    """
+    Settings for the Paperless application
+    """
+
     app_title = models.CharField(
         verbose_name=_("Application title"),
         null=True,
@@ -182,6 +186,83 @@ class ApplicationConfiguration(AbstractSingletonModel):
             FileExtensionValidator(allowed_extensions=["jpg", "png", "gif", "svg"]),
         ],
         upload_to="logo/",
+    )
+
+    """
+    Settings for the barcode scanner
+    """
+
+    # PAPERLESS_CONSUMER_ENABLE_BARCODES
+    barcodes_enabled = models.BooleanField(
+        verbose_name=_("Enables barcode scanning"),
+        null=True,
+    )
+
+    # PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT
+    barcode_enable_tiff_support = models.BooleanField(
+        verbose_name=_("Enables barcode TIFF support"),
+        null=True,
+    )
+
+    # PAPERLESS_CONSUMER_BARCODE_STRING
+    barcode_string = models.CharField(
+        verbose_name=_("Sets the barcode string"),
+        null=True,
+        blank=True,
+        max_length=32,
+    )
+
+    # PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES
+    barcode_retain_split_pages = models.BooleanField(
+        verbose_name=_("Retains split pages"),
+        null=True,
+    )
+
+    # PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE
+    barcode_enable_asn = models.BooleanField(
+        verbose_name=_("Enables ASN barcode"),
+        null=True,
+    )
+
+    # PAPERLESS_CONSUMER_ASN_BARCODE_PREFIX
+    barcode_asn_prefix = models.CharField(
+        verbose_name=_("Sets the ASN barcode prefix"),
+        null=True,
+        blank=True,
+        max_length=32,
+    )
+
+    # PAPERLESS_CONSUMER_BARCODE_UPSCALE
+    barcode_upscale = models.FloatField(
+        verbose_name=_("Sets the barcode upscale factor"),
+        null=True,
+        validators=[MinValueValidator(1.0)],
+    )
+
+    # PAPERLESS_CONSUMER_BARCODE_DPI
+    barcode_dpi = models.PositiveIntegerField(
+        verbose_name=_("Sets the barcode DPI"),
+        null=True,
+        validators=[MinValueValidator(1)],
+    )
+
+    # PAPERLESS_CONSUMER_BARCODE_MAX_PAGES
+    barcode_max_pages = models.PositiveIntegerField(
+        verbose_name=_("Sets the maximum pages for barcode"),
+        null=True,
+        validators=[MinValueValidator(1)],
+    )
+
+    # PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE
+    barcode_enable_tag = models.BooleanField(
+        verbose_name=_("Enables tag barcode"),
+        null=True,
+    )
+
+    # PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING
+    barcode_tag_mapping = models.JSONField(
+        verbose_name=_("Sets the tag barcode mapping"),
+        null=True,
     )
 
     class Meta:
