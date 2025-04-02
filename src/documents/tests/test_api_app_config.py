@@ -32,28 +32,39 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.assertEqual(
-            json.dumps(response.data[0]),
-            json.dumps(
-                {
-                    "id": 1,
-                    "user_args": None,
-                    "output_type": None,
-                    "pages": None,
-                    "language": None,
-                    "mode": None,
-                    "skip_archive_file": None,
-                    "image_dpi": None,
-                    "unpaper_clean": None,
-                    "deskew": None,
-                    "rotate_pages": None,
-                    "rotate_pages_threshold": None,
-                    "max_image_pixels": None,
-                    "color_conversion_strategy": None,
-                    "app_title": None,
-                    "app_logo": None,
-                },
-            ),
+        self.maxDiff = None
+
+        self.assertDictEqual(
+            response.data[0],
+            {
+                "id": 1,
+                "output_type": None,
+                "pages": None,
+                "language": None,
+                "mode": None,
+                "skip_archive_file": None,
+                "image_dpi": None,
+                "unpaper_clean": None,
+                "deskew": None,
+                "rotate_pages": None,
+                "rotate_pages_threshold": None,
+                "max_image_pixels": None,
+                "color_conversion_strategy": None,
+                "user_args": None,
+                "app_title": None,
+                "app_logo": None,
+                "barcodes_enabled": None,
+                "barcode_enable_tiff_support": None,
+                "barcode_string": None,
+                "barcode_retain_split_pages": None,
+                "barcode_enable_asn": None,
+                "barcode_asn_prefix": None,
+                "barcode_upscale": None,
+                "barcode_dpi": None,
+                "barcode_max_pages": None,
+                "barcode_enable_tag": None,
+                "barcode_tag_mapping": None,
+            },
         )
 
     def test_api_get_ui_settings_with_config(self):
