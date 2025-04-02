@@ -159,6 +159,43 @@ Available options are `postgresql` and `mariadb`.
 
     Defaults to unset, which uses Django’s built-in defaults.
 
+#### [`PAPERLESS_DB_READ_CACHE_ENABLED=<bool>`](#PAPERLESS_DB_READ_CACHE_ENABLED) {#PAPERLESS_DB_READ_CACHE_ENABLED}
+
+: Enables the database read cache using Redis. This can significantly improve application response times by caching database queries, at the cost of increased memory usage.
+
+    Defaults to `false`.
+
+    !!! danger
+
+    **Do not modify the database outside the application while it is running.**
+    This includes actions such as restoring a backup, upgrading the database, or performing manual inserts. All external modifications must be done **only when the application is stopped**.
+    After making any such changes, you **must invalidate the DB read cache** using the `invalidate_db_cache` management command.
+
+#### [`PAPERLESS_DB_READ_CACHE_TTL=<int>`](#PAPERLESS_DB_READ_CACHE_TTL) {#PAPERLESS_DB_READ_CACHE_TTL}
+
+: Specifies how long (in seconds) database query results should be cached.
+
+    Defaults to `3600` (one hour).
+    Requires `PAPERLESS_DB_READ_CACHE_ENABLED` to be set to `true`.
+
+    !!! warning
+
+    A high TTL increases memory usage over time.
+
+In case of an out-of-memory (OOM) situation, Redis may stop accepting new data—including DB cache entries, scheduled tasks, and documents to consume.
+If your system has limited RAM, consider configuring a dedicated Redis instance for the DB read cache, with a memory limit and the eviction policy set to `allkeys-lru`.
+For more details, refer to the [Redis eviction policy documentation](https://redis.io/docs/latest/develop/reference/eviction/), and see the `PAPERLESS_DB_READ_CACHE_REDIS_URL` setting to specify a separate Redis broker.
+
+#### [`PAPERLESS_DB_READ_CACHE_REDIS_URL=<url>`](#PAPERLESS_DB_READ_CACHE_REDIS_URL) {#PAPERLESS_DB_READ_CACHE_REDIS_URL}
+
+: Defines the Redis instance used for the database read cache.
+
+    Defaults to `None`.
+    Requires `PAPERLESS_DB_READ_CACHE_ENABLED` to be set to `true`.
+
+    !!! Note
+    If this value is not set, the same Redis instance used for scheduled tasks will be used for caching as well.
+
 ## Optional Services
 
 ### Tika {#tika}

@@ -457,6 +457,19 @@ of the index and usually makes queries faster and also ensures that the
 autocompletion works properly. This command is regularly invoked by the
 task scheduler.
 
+### Clearing the database read cache
+
+If the database read cache is enabled, **you must run this command** after making any changes to the database outside the application context.
+This includes operations such as restoring a database backup or executing SQL statements like UPDATE, INSERT, DELETE, ALTER, CREATE, or DROP.
+
+Failing to invalidate the cache after such modifications can lead to stale data being served from the cache, and **may cause data corruption** or inconsistent behavior in the application.
+
+Use the following management command to clear the cache:
+
+```
+invalidate_db_cache
+```
+
 ### Managing filenames {#renamer}
 
 If you use paperless' feature to
