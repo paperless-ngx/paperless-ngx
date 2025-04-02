@@ -920,6 +920,25 @@ if DEBUG and os.getenv("PAPERLESS_CACHE_BACKEND") is None:
         "django.core.cache.backends.locmem.LocMemCache"  # pragma: no cover
     )
 
+# Cachalot: Database read cache. Supports Redis backend only.
+if __get_boolean("PAPERLESS_DB_READ_CACHE_ENABLED"):
+    INSTALLED_APPS.append("cachalot")
+
+_, CACHALOT_REDIS_URL = _parse_redis_url(
+    os.getenv("PAPERLESS_DB_READ_CACHE_REDIS_URL", None),
+)
+CACHALOT_REDIS_PREFIX = os.getenv("PAPERLESS_DB_READ_CACHE_REDIS_PREFIX", "")
+CACHES["cachalot"] = {
+    "BACKEND": "django.core.cache.backends.redis.RedisCache",
+    "LOCATION": CACHALOT_REDIS_URL,
+    "KEY_PREFIX": CACHALOT_REDIS_PREFIX,
+}
+CACHALOT_CACHE = "cachalot"
+CACHALOT_TIMEOUT = __get_int("PAPERLESS_DB_READ_CACHE_TTL", 3600)
+CACHALOT_QUERY_KEYGEN = "paperless.db_cache.custom_get_query_cache_key"
+CACHALOT_TABLE_KEYGEN = "paperless.db_cache.custom_get_table_cache_key"
+CACHALOT_FINAL_SQL_CHECK = True
+
 
 def default_threads_per_worker(task_workers) -> int:
     # always leave one core open
