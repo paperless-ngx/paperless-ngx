@@ -899,7 +899,10 @@ class Document(SoftDeleteModel, ModelWithOwner):
         _("file_id"),
         max_length=100,
         editable=False,
-        default=''
+        default='',
+        null=True,
+        blank=True
+
     )
 
     indexed = models.BooleanField(blank=True, null=True, default=True)
