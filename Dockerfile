@@ -39,11 +39,11 @@ RUN set -eux \
 #  - Don't leave anything extra in here
 FROM docker.io/python:3.11-slim-bookworm as main-app
 
-LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
-LABEL org.opencontainers.image.documentation="https://docs.paperless-ngx.com/"
-LABEL org.opencontainers.image.source="https://github.com/paperless-ngx/paperless-ngx"
-LABEL org.opencontainers.image.url="https://github.com/paperless-ngx/paperless-ngx"
-LABEL org.opencontainers.image.licenses="GPL-3.0-only"
+#LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
+#LABEL org.opencontainers.image.documentation="https://docs.paperless-ngx.com/"
+#LABEL org.opencontainers.image.source="https://github.com/paperless-ngx/paperless-ngx"
+#LABEL org.opencontainers.image.url="https://github.com/paperless-ngx/paperless-ngx"
+#LABEL org.opencontainers.image.licenses="GPL-3.0-only"
 
 ARG DEBIAN_FRONTEND=noninteractive
 

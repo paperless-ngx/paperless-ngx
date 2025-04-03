@@ -145,7 +145,7 @@ install_languages() {
 	done
 }
 
-echo "Paperless-ngx docker container starting..."
+echo "Edoc docker container starting..."
 
 gosu_cmd=(gosu edoc)
 if [ "$(id -u)" == "$(id -u edoc)" ]; then
