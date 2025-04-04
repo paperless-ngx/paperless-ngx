@@ -1,4 +1,5 @@
 import shutil
+from datetime import date
 from pathlib import Path
 from unittest import mock
 
@@ -39,18 +40,24 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         self.dt2 = DocumentType.objects.create(name="dt2")
         self.t1 = Tag.objects.create(name="t1")
         self.t2 = Tag.objects.create(name="t2")
-        self.doc1 = Document.objects.create(checksum="A", title="A")
+        self.doc1 = Document.objects.create(
+            checksum="A",
+            title="A",
+            created=date(2023, 1, 1),
+        )
         self.doc2 = Document.objects.create(
             checksum="B",
             title="B",
             correspondent=self.c1,
             document_type=self.dt1,
+            created=date(2023, 1, 2),
         )
         self.doc3 = Document.objects.create(
             checksum="C",
             title="C",
             correspondent=self.c2,
             document_type=self.dt2,
+            created=date(2023, 1, 3),
         )
         self.doc4 = Document.objects.create(checksum="D", title="D")
         self.doc5 = Document.objects.create(checksum="E", title="E")
@@ -529,6 +536,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             filename=sample2,
             mime_type="application/pdf",
             page_count=8,
+            created=date(2023, 1, 2),
         )
         self.doc2.archive_filename = sample2_archive
         self.doc2.save()
@@ -557,6 +565,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             title="D",
             filename=img_doc,
             mime_type="image/jpeg",
+            created=date(2023, 1, 3),
         )
         self.img_doc.archive_filename = img_doc_archive
         self.img_doc.save()

@@ -214,7 +214,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
 
     created = models.DateField(
         _("created"),
-        default=timezone.now().date(),
+        default=timezone.now,
         db_index=True,
     )
 

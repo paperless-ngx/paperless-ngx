@@ -422,7 +422,7 @@ class OwnedObjectListSerializer(serializers.ListSerializer):
 
 
 class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
-    last_correspondence = serializers.DateTimeField(read_only=True, required=False)
+    last_correspondence = serializers.DateField(read_only=True, required=False)
 
     class Meta:
         model = Correspondent

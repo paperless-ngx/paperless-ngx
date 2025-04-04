@@ -740,6 +740,19 @@ class DocumentFilterSet(FilterSet):
 
     mime_type = MimeTypeFilter()
 
+    # Backwards compatibility
+    created__date__gt = Filter(
+        field_name="created",
+        label="Created after",
+        lookup_expr="gt",
+    )
+
+    created__date__lt = Filter(
+        field_name="created",
+        label="Created before",
+        lookup_expr="lt",
+    )
+
     class Meta:
         model = Document
         fields = {

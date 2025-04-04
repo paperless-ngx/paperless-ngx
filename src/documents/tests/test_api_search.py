@@ -721,7 +721,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         d3.tags.add(t2)
         d4 = Document.objects.create(
             checksum="4",
-            created=timezone.make_aware(datetime.datetime(2020, 7, 13)),
+            created=datetime.date(2020, 7, 13),
             content="test",
             original_filename="doc4.pdf",
         )
