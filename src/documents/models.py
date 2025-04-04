@@ -1,3 +1,4 @@
+import datetime
 from pathlib import Path
 from typing import Final
 
@@ -214,7 +215,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
 
     created = models.DateField(
         _("created"),
-        default=timezone.now,
+        default=datetime.datetime.today,
         db_index=True,
     )
 
