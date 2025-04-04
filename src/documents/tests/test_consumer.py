@@ -7,7 +7,6 @@ from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
 
-from dateutil import tz
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
@@ -919,7 +918,7 @@ class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
 
         self.assertEqual(
             document.created,
-            datetime.datetime(1996, 2, 20, tzinfo=tz.gettz(settings.TIME_ZONE)),
+            datetime.date(1996, 2, 20),
         )
 
     @override_settings(FILENAME_DATE_ORDER="YMD")
@@ -949,7 +948,7 @@ class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
 
         self.assertEqual(
             document.created,
-            datetime.datetime(2022, 2, 1, tzinfo=tz.gettz(settings.TIME_ZONE)),
+            datetime.date(2022, 2, 1),
         )
 
     def test_consume_date_filename_date_use_content(self):
@@ -979,7 +978,7 @@ class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
 
         self.assertEqual(
             document.created,
-            datetime.datetime(1996, 2, 20, tzinfo=tz.gettz(settings.TIME_ZONE)),
+            datetime.date(1996, 2, 20),
         )
 
     @override_settings(
@@ -1011,7 +1010,7 @@ class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
 
         self.assertEqual(
             document.created,
-            datetime.datetime(1997, 2, 20, tzinfo=tz.gettz(settings.TIME_ZONE)),
+            datetime.date(1997, 2, 20),
         )
 
 
