@@ -722,7 +722,7 @@ def run_workflows(
                         timezone.localtime(document.added),
                         document.original_filename or "",
                         document.filename or "",
-                        timezone.localtime(document.created),
+                        document.created,
                     )
                 except Exception:
                     logger.exception(
