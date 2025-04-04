@@ -333,7 +333,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         self.assertEqual(generate_filename(doc1), "2020-03-06.pdf")
 
-        doc1.created = timezone.make_aware(datetime.datetime(2020, 11, 16, 1, 1, 1))
+        doc1.created = datetime.date(2020, 11, 16)
 
         self.assertEqual(generate_filename(doc1), "2020-11-16.pdf")
 
