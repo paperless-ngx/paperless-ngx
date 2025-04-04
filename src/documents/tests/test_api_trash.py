@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.core.cache import cache
@@ -116,6 +118,7 @@ class TestTrashAPI(APITestCase):
             checksum="checksum",
             mime_type="application/pdf",
             owner=self.user,
+            created=date(2023, 1, 1),
         )
         document_u1.delete()
         document_not_owned = Document.objects.create(
@@ -123,6 +126,7 @@ class TestTrashAPI(APITestCase):
             content="content2",
             checksum="checksum2",
             mime_type="application/pdf",
+            created=date(2023, 1, 2),
         )
         document_not_owned.delete()
         user2 = User.objects.create_user(username="user2")
