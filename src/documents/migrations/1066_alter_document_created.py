@@ -5,6 +5,12 @@ import datetime
 
 from django.db import migrations
 from django.db import models
+from django.db.models.functions import TruncDate
+
+
+def migrate_date(apps, schema_editor):
+    Document = apps.get_model("documents", "Document")
+    Document.objects.update(created_date=TruncDate("created"))
 
 
 class Migration(migrations.Migration):
@@ -13,6 +19,21 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AddField(
+            model_name="document",
+            name="created_date",
+            field=models.DateField(null=True),
+        ),
+        migrations.RunPython(migrate_date, reverse_code=migrations.RunPython.noop),
+        migrations.RemoveField(
+            model_name="document",
+            name="created",
+        ),
+        migrations.RenameField(
+            model_name="document",
+            old_name="created_date",
+            new_name="created",
+        ),
         migrations.AlterField(
             model_name="document",
             name="created",
