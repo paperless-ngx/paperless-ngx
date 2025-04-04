@@ -51,6 +51,15 @@ DATE_KWARGS = [
     "year",
     "month",
     "day",
+    "gt",
+    "gte",
+    "lt",
+    "lte",
+]
+DATETIME_KWARGS = [
+    "year",
+    "month",
+    "day",
     "date__gt",
     "date__gte",
     "gt",
@@ -739,8 +748,8 @@ class DocumentFilterSet(FilterSet):
             "content": CHAR_KWARGS,
             "archive_serial_number": INT_KWARGS,
             "created": DATE_KWARGS,
-            "added": DATE_KWARGS,
-            "modified": DATE_KWARGS,
+            "added": DATETIME_KWARGS,
+            "modified": DATETIME_KWARGS,
             "original_filename": CHAR_KWARGS,
             "checksum": CHAR_KWARGS,
             "correspondent": ["isnull"],
@@ -764,8 +773,8 @@ class ShareLinkFilterSet(FilterSet):
     class Meta:
         model = ShareLink
         fields = {
-            "created": DATE_KWARGS,
-            "expiration": DATE_KWARGS,
+            "created": DATETIME_KWARGS,
+            "expiration": DATETIME_KWARGS,
         }
 
 

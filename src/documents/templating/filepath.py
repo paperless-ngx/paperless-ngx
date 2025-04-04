@@ -137,16 +137,14 @@ def get_creation_date_context(document: Document) -> dict[str, str]:
     Given a Document, localizes the creation date and builds a context dictionary with some common, shorthand
     formatted values from it
     """
-    local_created = timezone.localdate(document.created)
-
     return {
-        "created": local_created.isoformat(),
-        "created_year": local_created.strftime("%Y"),
-        "created_year_short": local_created.strftime("%y"),
-        "created_month": local_created.strftime("%m"),
-        "created_month_name": local_created.strftime("%B"),
-        "created_month_name_short": local_created.strftime("%b"),
-        "created_day": local_created.strftime("%d"),
+        "created": document.created.isoformat(),
+        "created_year": document.created.strftime("%Y"),
+        "created_year_short": document.created.strftime("%y"),
+        "created_month": document.created.strftime("%m"),
+        "created_month_name": document.created.strftime("%B"),
+        "created_month_name_short": document.created.strftime("%b"),
+        "created_day": document.created.strftime("%d"),
     }
 
 

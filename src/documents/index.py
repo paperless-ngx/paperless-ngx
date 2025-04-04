@@ -5,6 +5,7 @@ import math
 from collections import Counter
 from contextlib import contextmanager
 from datetime import datetime
+from datetime import time
 from datetime import timezone
 from shutil import rmtree
 from typing import TYPE_CHECKING
@@ -168,7 +169,7 @@ def update_document(writer: AsyncWriter, doc: Document) -> None:
         type=doc.document_type.name if doc.document_type else None,
         type_id=doc.document_type.id if doc.document_type else None,
         has_type=doc.document_type is not None,
-        created=doc.created,
+        created=datetime.combine(doc.created, time.min),
         added=doc.added,
         asn=asn,
         modified=doc.modified,

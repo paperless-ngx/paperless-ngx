@@ -3,7 +3,6 @@ import os
 import shutil
 import stat
 import tempfile
-import zoneinfo
 from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
@@ -247,20 +246,9 @@ class TestConsumer(
 
         self._assert_first_last_send_progress()
 
-        # Convert UTC time from DB to local time
-        document_date_local = timezone.localtime(document.created)
-
-        self.assertEqual(
-            document_date_local.tzinfo,
-            zoneinfo.ZoneInfo("America/Chicago"),
-        )
-        self.assertEqual(document_date_local.tzinfo, rough_create_date_local.tzinfo)
-        self.assertEqual(document_date_local.year, rough_create_date_local.year)
-        self.assertEqual(document_date_local.month, rough_create_date_local.month)
-        self.assertEqual(document_date_local.day, rough_create_date_local.day)
-        self.assertEqual(document_date_local.hour, rough_create_date_local.hour)
-        self.assertEqual(document_date_local.minute, rough_create_date_local.minute)
-        # Skipping seconds and more precise
+        self.assertEqual(document.created.year, rough_create_date_local.year)
+        self.assertEqual(document.created.month, rough_create_date_local.month)
+        self.assertEqual(document.created.day, rough_create_date_local.day)
 
     @override_settings(FILENAME_FORMAT=None)
     def testDeleteMacFiles(self):
