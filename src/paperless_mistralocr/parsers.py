@@ -1,6 +1,4 @@
 import base64
-import hashlib
-import os
 import re
 from pathlib import Path
 
@@ -9,7 +7,9 @@ from django.conf import settings
 
 try:
     from mistralai import Mistral
-    from mistralai.models import OCRResponse, ImageURLChunk, DocumentURLChunk
+    from mistralai.models import DocumentURLChunk
+    from mistralai.models import ImageURLChunk
+    from mistralai.models import OCRResponse
     from mistralai.models import SDKError
 
     HAS_MISTRAL = True
@@ -238,7 +238,11 @@ class MistralOcrDocumentParser(DocumentParser):
             )
 
             # Call the appropriate OCR method based on the file type
-            document = ImageURLChunk(image_url=f"{mime_prefix}{file_base64}") if is_image else DocumentURLChunk(document_url=f"{mime_prefix}{file_base64}")
+            document = (
+                ImageURLChunk(image_url=f"{mime_prefix}{file_base64}")
+                if is_image
+                else DocumentURLChunk(document_url=f"{mime_prefix}{file_base64}")
+            )
 
             # Call OCR API with base64 encoded content
             ocr_response = client.ocr.process(
@@ -253,7 +257,6 @@ class MistralOcrDocumentParser(DocumentParser):
             if isinstance(e, SDKError):
                 raise ParseError(f"Mistral API error: {e!s}")
             raise ParseError(f"Error calling Mistral OCR API: {e!s}")
-
 
     def get_combined_markdown(self, ocr_response: OCRResponse) -> tuple[str, list[str]]:
         """
@@ -281,12 +284,11 @@ class MistralOcrDocumentParser(DocumentParser):
                     ocr_images.append(img.image_base64)
                     markdown_str = markdown_str.replace(
                         f"![{img.id}]({img.id})",
-                        f"![{img.id}]([OCR_IMAGE:{img_index}])"
+                        f"![{img.id}]([OCR_IMAGE:{img_index}])",
                     )
                     img_index += 1
 
             markdowns.append(markdown_str)
-
 
         return "\n\n".join(markdowns), ocr_images
 

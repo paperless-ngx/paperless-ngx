@@ -521,7 +521,9 @@ class ConsumerPlugin(
             page_count = document_parser.get_page_count(self.working_copy, mime_type)
 
             # Check if the parser has OCR image paths
-            if hasattr(document_parser, 'get_ocr_images') and callable(getattr(document_parser, 'get_ocr_images')):
+            if hasattr(document_parser, "get_ocr_images") and callable(
+                getattr(document_parser, "get_ocr_images")
+            ):
                 ocr_images = document_parser.get_ocr_images()
                 self.log.debug(f"Found {len(ocr_images)} OCR images")
 

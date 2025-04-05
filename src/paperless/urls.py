@@ -18,11 +18,10 @@ from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular.views import SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 
-from documents.ai_chat import ClearChatHistoryView
-from documents.ai_chat import QuestionView
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
+from documents.views import ClearChatHistoryView
 from documents.views import CorrespondentViewSet
 from documents.views import CustomFieldViewSet
 from documents.views import DocumentTypeViewSet
@@ -30,6 +29,7 @@ from documents.views import GlobalSearchView
 from documents.views import IndexView
 from documents.views import LogViewSet
 from documents.views import PostDocumentView
+from documents.views import QuestionView
 from documents.views import RemoteVersionView
 from documents.views import SavedViewViewSet
 from documents.views import SearchAutoCompleteView
@@ -264,7 +264,8 @@ urlpatterns = [
                 re_path(
                     r"^ocr_image/(?P<pk>\d+)_(?P<img_index>\d+)$",
                     RedirectView.as_view(
-                        url=settings.BASE_URL + "api/documents/%(pk)s/ocr_image/%(img_index)s/",
+                        url=settings.BASE_URL
+                        + "api/documents/%(pk)s/ocr_image/%(img_index)s/",
                     ),
                 ),
                 re_path(
