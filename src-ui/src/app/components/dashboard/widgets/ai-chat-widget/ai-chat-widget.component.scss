@@ -47,7 +47,7 @@
 
     .message-bubble {
       background-color: #007bff;
-      color: #eee;
+      color: #fff;
       border-radius: 10px 0px 10px 10px;
     }
   }
@@ -57,8 +57,8 @@
     align-items: flex-start;
 
     .message-bubble {
-      background-color: #333;
-      color: #eee;
+      background-color: var(--pngx-bg-alt);
+      color: var(--pngx-text);
       border-radius: 0px 10px 10px 10px;
     }
   }
@@ -82,18 +82,19 @@
     font-size: 14px;
     line-height: 1.4;
     border-radius: 20px;
-    border: none;
-    background-color: #333;
-    box-shadow: 1px 1px 3px rgba(255, 255, 255, 0.1);
-    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    background-color: var(--pngx-bg-alt);
+    color: var(--pngx-text);
+    border: 1px solid var(--pngx-border);
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 
     &:focus {
       outline: none;
-      background-color: #222;
+      border-color: #80bdff;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     }
 
     &::placeholder {
-      color: #aaa;
+      color: var(--pngx-text-muted);
     }
 
     &:-webkit-autofill,
