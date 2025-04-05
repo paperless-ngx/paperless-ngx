@@ -55,14 +55,10 @@ export class AiChatWidgetComponent implements OnInit {
       question: this.currentMessage,
       session_id: this.sessionId || undefined  // Only send if it exists
     }
-    const headers = {
-      Authorization:
-        'Bearer ' +
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzNTYzNDU2NyIsIm5hbWUiOiJKb3NjaGthIiwiaWF0IjoxNTE2MjM5MDIyfQ.iecqerProyQ4OyhjzyMtHEb869b3Vbitp_T5tkip2Z4',
-    }
+
     this.showTypingAnimation = true // show the typing animation
     this.http
-      .post<AiResponse>(apiUrl, requestBody, { headers })
+      .post<AiResponse>(apiUrl, requestBody)
       .subscribe({
         next: (response: AiResponse) => {
           this.showTypingAnimation = false // hide the typing animation
@@ -102,22 +98,17 @@ export class AiChatWidgetComponent implements OnInit {
 
     const apiUrl = `${environment.apiBaseUrl}clear_chat_history/`
     const requestBody = { session_id: this.sessionId }
-    const headers = {
-      Authorization:
-        'Bearer ' +
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzNTYzNDU2NyIsIm5hbWUiOiJKb3NjaGthIiwiaWF0IjoxNTE2MjM5MDIyfQ.iecqerProyQ4OyhjzyMtHEb869b3Vbitp_T5tkip2Z4',
-    }
 
-    this.http.post(apiUrl, requestBody, { headers }).subscribe(
-      () => {
+    this.http.post(apiUrl, requestBody).subscribe({
+      next: () => {
         // Clear the local messages
         this.messages = []
         // Keep the session ID, but clear the history in Redis
       },
-      (error) => {
+      error: (error) => {
         console.error('Failed to clear chat history:', error)
       }
-    )
+    })
   }
 
   private scrollToBottom() {

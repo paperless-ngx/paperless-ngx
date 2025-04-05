@@ -2889,8 +2889,6 @@ class TrashView(ListModelMixin, PassUserMixin):
             empty_trash(doc_ids=doc_ids)
         return Response({"result": "OK", "doc_ids": doc_ids})
 
-logger = logging.getLogger("paperless.ai_chat")
-
 
 class QuestionSerializer(serializers.Serializer):
     question = serializers.CharField(
