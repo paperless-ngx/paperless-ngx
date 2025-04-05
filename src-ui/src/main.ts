@@ -138,7 +138,7 @@ import {
 import { ColorSliderModule } from 'ngx-color/slider'
 import { CookieService } from 'ngx-cookie-service'
 import { NgxFileDropModule } from 'ngx-file-drop'
-import { MarkdownModule } from 'ngx-markdown'
+import { MarkdownModule, MARKED_OPTIONS } from 'ngx-markdown'
 import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { AppRoutingModule } from './app/app-routing.module'
 import { AppComponent } from './app/app.component'
@@ -190,6 +190,7 @@ import localeZhHant from '@angular/common/locales/zh-Hant'
 import { CorrespondentNamePipe } from './app/pipes/correspondent-name.pipe'
 import { DocumentTypeNamePipe } from './app/pipes/document-type-name.pipe'
 import { StoragePathNamePipe } from './app/pipes/storage-path-name.pipe'
+import { MarkdownConfigService } from './app/services/markdown-config.service'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -364,7 +365,13 @@ bootstrapApplication(AppComponent, {
       TourNgBootstrapModule,
       DragDropModule,
       NgxBootstrapIconsModule.pick(icons),
-      MarkdownModule.forRoot()
+      MarkdownModule.forRoot({
+        markedOptions: {
+          provide: MARKED_OPTIONS,
+          useFactory: (markdownConfigService: MarkdownConfigService) => markdownConfigService.createMarkedOptions(),
+          deps: [MarkdownConfigService]
+        }
+      })
     ),
     {
       provide: APP_INITIALIZER,

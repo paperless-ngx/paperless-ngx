@@ -487,6 +487,17 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         description="View the document thumbnail",
         responses={200: OpenApiTypes.BINARY},
     ),
+    ocr_image=extend_schema(
+        description="View the document OCR image",
+        responses={200: OpenApiTypes.BINARY},
+        parameters=[
+            OpenApiParameter(
+                name="img_index",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+            ),
+        ],
+    ),
     preview=extend_schema(
         description="View the document preview",
         responses={200: OpenApiTypes.BINARY},
@@ -793,6 +804,27 @@ class DocumentViewSet(
                 handle = doc.thumbnail_file
 
             return HttpResponse(handle, content_type="image/webp")
+        except (FileNotFoundError, Document.DoesNotExist):
+            raise Http404
+
+    @action(methods=["get"], detail=True, filter_backends=[], url_path=r"ocr_image/(?P<img_index>\d+)")
+    @method_decorator(cache_control(no_cache=True))
+    def ocr_image(self, request, pk=None, img_index=0):
+        try:
+            img_index = int(img_index)
+            doc = Document.objects.select_related("owner").get(id=pk)
+            if request.user is not None and not has_perms_owner_aware(
+                request.user,
+                "view_document",
+                doc,
+            ):
+                return HttpResponseForbidden("Insufficient permissions")
+            if doc.storage_type == Document.STORAGE_TYPE_GPG:
+                handle = GnuPG.decrypted(doc.ocr_image_file(img_index))
+            else:
+                handle = doc.ocr_image_file(img_index)
+
+            return HttpResponse(handle, content_type="image/jpeg")
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404
 

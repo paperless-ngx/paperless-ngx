@@ -107,6 +107,7 @@ import { DocumentNotesComponent } from '../document-notes/document-notes.compone
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { MetadataCollapseComponent } from './metadata-collapse/metadata-collapse.component'
 import { MarkdownModalComponent } from '../common/markdown-modal'
+import { MarkdownConfigService } from 'src/app/services/markdown-config.service'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -281,7 +282,8 @@ export class DocumentDetailComponent
     private http: HttpClient,
     private hotKeyService: HotKeyService,
     private componentRouterService: ComponentRouterService,
-    private deviceDetectorService: DeviceDetectorService
+    private deviceDetectorService: DeviceDetectorService,
+    private markdownConfigService: MarkdownConfigService
   ) {
     super()
   }
@@ -608,6 +610,7 @@ export class DocumentDetailComponent
   updateComponent(doc: Document) {
     this.document = doc
     this.requiresPassword = false
+    this.markdownConfigService.setCurrentDocumentId(doc.id)
     this.updateFormForCustomFields()
     if (this.archiveContentRenderType === ContentRenderType.TIFF) {
       this.tryRenderTiff()
@@ -1506,5 +1509,6 @@ export class DocumentDetailComponent
     modalRef.componentInstance.content = this.documentForm.get('content').value
     modalRef.componentInstance.title = this.title
     modalRef.componentInstance.isRTL = this.isRTL
+    modalRef.componentInstance.documentId = this.documentId
   }
 }

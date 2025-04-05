@@ -1,4 +1,6 @@
 import base64
+import hashlib
+import os
 import re
 from pathlib import Path
 
@@ -7,7 +9,7 @@ from django.conf import settings
 
 try:
     from mistralai import Mistral
-    from mistralai.models import OCRResponse
+    from mistralai.models import OCRResponse, ImageURLChunk, DocumentURLChunk
     from mistralai.models import SDKError
 
     HAS_MISTRAL = True
@@ -29,11 +31,16 @@ class MistralOcrDocumentParser(DocumentParser):
 
     logging_name = "paperless.parsing.mistral_ocr"
     settings: MistralOcrConfig
+    ocr_images: list[str]  # base64 encoded images
 
     if not HAS_MISTRAL:
         raise ParseError(
             "mistralai package is not installed. Please install it with: pip install mistralai"
         )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.ocr_image_paths = []
 
     def get_settings(self) -> MistralOcrConfig:
         """
@@ -120,6 +127,9 @@ class MistralOcrDocumentParser(DocumentParser):
                 self.logging_group,
             )
 
+    def get_ocr_images(self) -> list[str] | None:
+        return self.ocr_images
+
     def is_image(self, mime_type) -> bool:
         """
         Check if the mime type is an image
@@ -167,10 +177,13 @@ class MistralOcrDocumentParser(DocumentParser):
         """
         self.log.info(f"Parsing {document_path} with Mistral OCR API")
 
+        # Initialize empty ocr_image_paths list
+        self.ocr_image_paths = []
+
         ocr_response = self._call_mistral_api(document_path, mime_type)
 
         # Extract text content from the OCR response
-        self.text = self.get_combined_markdown(ocr_response)
+        self.text, self.ocr_images = self.get_combined_markdown(ocr_response)
 
         # If date wasn't found in metadata, try to extract it from text
         if self.text:
@@ -218,21 +231,19 @@ class MistralOcrDocumentParser(DocumentParser):
                 file_content = f.read()
                 file_base64 = base64.b64encode(file_content).decode("utf-8")
 
-            # Call the appropriate OCR method based on the file type
-            document_type = "image_url" if is_image else "document_url"
             mime_prefix = (
                 "data:image/jpeg;base64,"
                 if is_image
                 else "data:application/pdf;base64,"
             )
 
+            # Call the appropriate OCR method based on the file type
+            document = ImageURLChunk(image_url=f"{mime_prefix}{file_base64}") if is_image else DocumentURLChunk(document_url=f"{mime_prefix}{file_base64}")
+
             # Call OCR API with base64 encoded content
             ocr_response = client.ocr.process(
                 model=model,
-                document={
-                    "type": document_type,
-                    document_type: f"{mime_prefix}{file_base64}",
-                },
+                document=document,
                 include_image_base64=True,
             )
 
@@ -243,43 +254,41 @@ class MistralOcrDocumentParser(DocumentParser):
                 raise ParseError(f"Mistral API error: {e!s}")
             raise ParseError(f"Error calling Mistral OCR API: {e!s}")
 
-    def replace_images_in_markdown(self, markdown_str: str, images_dict: dict) -> str:
-        """
-        Replace image placeholders in markdown with base64-encoded images.
 
-        Args:
-            markdown_str: Markdown text containing image placeholders
-            images_dict: Dictionary mapping image IDs to base64 strings
-
-        Returns:
-            Markdown text with images replaced by base64 data
-        """
-        for img_name, base64_str in images_dict.items():
-            markdown_str = markdown_str.replace(
-                f"![{img_name}]({img_name})", f"![{img_name}]({base64_str})"
-            )
-        return markdown_str
-
-    def get_combined_markdown(self, ocr_response: OCRResponse) -> str:
+    def get_combined_markdown(self, ocr_response: OCRResponse) -> tuple[str, list[str]]:
         """
         Combine OCR text and images into a single markdown document.
+        Save images as files instead of embedding them.
 
         Args:
             ocr_response: Response from OCR processing containing text and images
 
         Returns:
-            Combined markdown string with embedded images
+            Tuple of (combined markdown string, list of images in base64 format)
         """
-        markdowns: list[str] = []
-        # Extract images from page
-        for page in ocr_response.pages:
-            image_data = {}
-            for img in page.images:
-                image_data[img.id] = img.image_base64
-            # Replace image placeholders with actual images
-            markdowns.append(self.replace_images_in_markdown(page.markdown, image_data))
+        markdowns = []
+        img_index = 0
 
-        return "\n\n".join(markdowns)
+        ocr_images = []
+
+        # Extract images from each page
+        for page in ocr_response.pages:
+            markdown_str = page.markdown
+
+            # Extract images from the page
+            for img in page.images:
+                if img.image_base64:
+                    ocr_images.append(img.image_base64)
+                    markdown_str = markdown_str.replace(
+                        f"![{img.id}]({img.id})",
+                        f"![{img.id}]([OCR_IMAGE:{img_index}])"
+                    )
+                    img_index += 1
+
+            markdowns.append(markdown_str)
+
+
+        return "\n\n".join(markdowns), ocr_images
 
     def _convert_to_pdf(self, document_path: Path) -> Path:
         """
@@ -344,3 +353,9 @@ class MistralOcrDocumentParser(DocumentParser):
 
         # If we get here, we couldn't convert the document to PDF
         raise ParseError(f"Could not convert {document_path} to PDF format")
+
+    def get_ocr_image_paths(self) -> list[str]:
+        """
+        Return the list of saved OCR image paths
+        """
+        return self.ocr_image_paths

@@ -262,6 +262,12 @@ urlpatterns = [
                     ),
                 ),
                 re_path(
+                    r"^ocr_image/(?P<pk>\d+)_(?P<img_index>\d+)$",
+                    RedirectView.as_view(
+                        url=settings.BASE_URL + "api/documents/%(pk)s/ocr_image/%(img_index)s/",
+                    ),
+                ),
+                re_path(
                     r"^preview/(?P<pk>\d+)$",
                     RedirectView.as_view(
                         url=settings.BASE_URL + "api/documents/%(pk)s/preview/",

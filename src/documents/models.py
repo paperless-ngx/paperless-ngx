@@ -190,6 +190,12 @@ class Document(SoftDeleteModel, ModelWithOwner):
         help_text=_("The ids of the embeddings in the vector store."),
     )
 
+    ocr_image_count = models.PositiveIntegerField(
+        _("number of OCR images"),
+        default=0,
+        help_text=_("The number of images extracted during OCR processing."),
+    )
+
     checksum = models.CharField(
         _("checksum"),
         max_length=32,
@@ -372,8 +378,24 @@ class Document(SoftDeleteModel, ModelWithOwner):
         return webp_file_path.resolve()
 
     @property
+    def ocr_image_paths(self) -> list[Path]:
+        """
+        Returns a list of Path objects for the OCR images
+        """
+        image_paths = []
+        for i in range(self.ocr_image_count):
+            path = (settings.OCR_IMAGES_DIR / Path(f"{self.pk:07}_{i}.jpg")).resolve()
+            image_paths.append(path)
+        return image_paths
+
+    @property
     def thumbnail_file(self):
         return Path(self.thumbnail_path).open("rb")
+
+    def ocr_image_file(self, index: int):
+        if int(index) >= len(self.ocr_image_paths):
+            raise ValueError(f"Index {index} is out of bounds for ocr_image_paths")
+        return Path(self.ocr_image_paths[index]).open("rb")
 
     @property
     def created_date(self):

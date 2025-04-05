@@ -353,6 +353,7 @@ def cleanup_document_deletion(sender, instance, **kwargs):
             instance.source_path,
             instance.archive_path,
             instance.thumbnail_path,
+            *instance.ocr_image_paths,
         ):
             if filename and os.path.isfile(filename):
                 try:

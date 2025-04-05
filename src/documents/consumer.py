@@ -197,6 +197,7 @@ class ConsumerPlugin(
         settings.THUMBNAIL_DIR.mkdir(parents=True, exist_ok=True)
         settings.ORIGINALS_DIR.mkdir(parents=True, exist_ok=True)
         settings.ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
+        settings.OCR_IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
     def pre_check_asn_value(self):
         """
@@ -470,6 +471,7 @@ class ConsumerPlugin(
         thumbnail = None
         archive_path = None
         page_count = None
+        ocr_images = None
 
         try:
             self._send_progress(
@@ -518,6 +520,11 @@ class ConsumerPlugin(
             archive_path = document_parser.get_archive_path()
             page_count = document_parser.get_page_count(self.working_copy, mime_type)
 
+            # Check if the parser has OCR image paths
+            if hasattr(document_parser, 'get_ocr_images') and callable(getattr(document_parser, 'get_ocr_images')):
+                ocr_images = document_parser.get_ocr_images()
+                self.log.debug(f"Found {len(ocr_images)} OCR images")
+
         except ParseError as e:
             document_parser.cleanup()
             if tempdir:
@@ -563,6 +570,7 @@ class ConsumerPlugin(
                     date=date,
                     page_count=page_count,
                     mime_type=mime_type,
+                    ocr_image_count=len(ocr_images) if ocr_images else 0,
                 )
 
                 # If we get here, it was successful. Proceed with post-consume
@@ -597,6 +605,28 @@ class ConsumerPlugin(
                         thumbnail,
                         document.thumbnail_path,
                     )
+
+                    if ocr_images:
+                        import base64
+
+                        ocr_image_paths = document.ocr_image_paths
+                        for ocr_image, path in zip(ocr_images, ocr_image_paths):
+                            try:
+                                # Extract the actual base64 data (remove data URL prefix if present)
+                                if "base64," in ocr_image:
+                                    base64_data = ocr_image.split("base64,")[1]
+                                else:
+                                    base64_data = ocr_image
+
+                                # Decode the base64 data to binary
+                                image_data = base64.b64decode(base64_data)
+
+                                # Save the image to the file
+                                with path.open("wb") as f:
+                                    f.write(image_data)
+
+                            except Exception as e:
+                                self.log.warning(f"Error saving OCR image: {e}")
 
                     if archive_path and Path(archive_path).is_file():
                         document.archive_filename = generate_unique_filename(
@@ -701,6 +731,7 @@ class ConsumerPlugin(
         date: datetime.datetime | None,
         page_count: int | None,
         mime_type: str,
+        ocr_image_count: int = 0,
     ) -> Document:
         # If someone gave us the original filename, use it instead of doc.
 
@@ -752,6 +783,7 @@ class ConsumerPlugin(
             storage_type=storage_type,
             page_count=page_count,
             original_filename=self.filename,
+            ocr_image_count=ocr_image_count,
         )
 
         self.apply_overrides(document)
