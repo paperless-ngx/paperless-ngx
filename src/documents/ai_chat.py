@@ -14,6 +14,7 @@ from langchain_openai import ChatOpenAI
 from langchain_redis import RedisChatMessageHistory
 from langgraph.graph import END
 from langgraph.graph import StateGraph
+from langgraph.graph.state import CompiledStateGraph
 
 from documents.embeddings import DocumentEmbeddings
 
@@ -68,7 +69,7 @@ def search_documents(query: str) -> tuple[str, list[str]]:
         return "", []
 
 
-def create_chat_graph():
+def create_chat_graph() -> CompiledStateGraph:
     """Create the LangGraph chat graph"""
 
     # Initialize the chat model
