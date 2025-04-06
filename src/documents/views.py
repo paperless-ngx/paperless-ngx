@@ -3018,3 +3018,69 @@ class ClearChatHistoryView(APIView):
                 {"status": "error", "message": "Failed to clear chat history"},
                 status=500,
             )
+
+
+class ChatHistorySerializer(serializers.Serializer):
+    session_id = serializers.CharField(
+        required=True, help_text="The session ID to get the chat history for"
+    )
+
+
+@extend_schema(
+    description="Get the chat history for a session",
+    request=ChatHistorySerializer,
+    responses={
+        200: {
+            "type": "object",
+            "properties": {
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "text": {"type": "string"},
+                            "fromUser": {"type": "boolean"},
+                        },
+                    },
+                },
+            },
+        }
+    },
+)
+class ChatHistoryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request, format=None) -> Response:
+        serializer = ChatHistorySerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=400)
+
+        validated_data = cast(dict[str, Any], serializer.validated_data)
+        session_id = validated_data["session_id"]
+
+        try:
+            # Get the chat history
+            history = get_chat_history(session_id)
+            messages = []
+
+            # Convert the history messages to the format expected by the frontend
+            for message in history.messages:
+                if isinstance(message, HumanMessage):
+                    messages.append({
+                        "text": message.content,
+                        "fromUser": True,
+                    })
+                elif isinstance(message, AIMessage):
+                    messages.append({
+                        "text": message.content,
+                        "fromUser": False,
+                    })
+
+            return Response({"messages": messages})
+
+        except Exception as e:
+            logger.error(f"Error getting chat history: {e!s}")
+            return Response(
+                {"status": "error", "message": "Failed to get chat history"},
+                status=500,
+            )

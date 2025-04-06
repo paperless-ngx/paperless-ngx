@@ -16,6 +16,10 @@ interface AiResponse {
   session_id: string
 }
 
+interface ChatHistoryResponse {
+  messages: ChatMessage[]
+}
+
 @Component({
   selector: 'app-ai-chat-widget',
   templateUrl: './ai-chat-widget.component.html',
@@ -28,16 +32,62 @@ export class AiChatWidgetComponent implements OnInit {
   currentMessage = ''
   showTypingAnimation = false
   sessionId: string | null = null
+  isLoadingHistory: boolean = false
 
   constructor(private http: HttpClient) { }
 
   ngOnInit() {
     // Try to load session ID from localStorage
     this.sessionId = localStorage.getItem('paperless_chat_session_id')
-    this.messages.push({
-      text: 'Hello, I am Paperflow AI and I have access to all of your documents. How can I help you today?',
-      fromUser: false,
-    })
+
+    if (this.sessionId) {
+      // Load chat history from API if session ID exists
+      console.info('Loading chat history for session ID:', this.sessionId)
+      this.loadChatHistory()
+    } else {
+      // Just add welcome message if no session ID
+      this.messages.push({
+        text: 'Hello, I am Paperflow AI and I have access to all of your documents. How can I help you today?',
+        fromUser: false,
+      })
+    }
+  }
+
+  loadChatHistory() {
+    if (!this.sessionId) {
+      return
+    }
+
+    this.isLoadingHistory = true
+    const apiUrl = `${environment.apiBaseUrl}chat_history/`
+    const requestBody = { session_id: this.sessionId }
+
+    this.http.post<ChatHistoryResponse>(apiUrl, requestBody)
+      .subscribe({
+        next: (response) => {
+          if (response.messages && response.messages.length > 0) {
+            this.messages = response.messages
+          } else {
+            // If no messages in history, add the welcome message
+            this.messages.push({
+              text: 'Hello, I am Paperflow AI and I have access to all of your documents. How can I help you today?',
+              fromUser: false,
+            })
+          }
+          this.isLoadingHistory = false
+          this.scrollToBottom()
+        },
+        error: (error) => {
+          console.error('Error loading chat history:', error)
+          // Add default welcome message on error
+          this.messages.push({
+            text: 'Hello, I am Paperflow AI and I have access to all of your documents. How can I help you today?',
+            fromUser: false,
+          })
+          this.isLoadingHistory = false
+          this.scrollToBottom()
+        }
+      })
   }
 
   sendMessage() {

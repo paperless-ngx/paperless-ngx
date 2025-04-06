@@ -1,6 +1,12 @@
 <pngx-widget-frame title="Paperflow AI" i18n-title>
   <ng-container content>
     <div class="chat-container" #chatContainer>
+      <div *ngIf="isLoadingHistory" class="loading-history text-center my-3">
+        <div class="spinner-border spinner-border-sm text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <span class="ms-2">Loading chat history...</span>
+      </div>
       <div *ngFor="let message of messages" class="chat-message"
         [ngClass]="{'user-message': message.fromUser, 'bot-message': !message.fromUser}">
         <div class="message-bubble">{{ message.text }}</div>

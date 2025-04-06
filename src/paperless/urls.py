@@ -22,6 +22,7 @@ from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
 from documents.views import ClearChatHistoryView
+from documents.views import ChatHistoryView
 from documents.views import CorrespondentViewSet
 from documents.views import CustomFieldViewSet
 from documents.views import DocumentTypeViewSet
@@ -153,6 +154,11 @@ urlpatterns = [
                     "^clear_chat_history/",
                     ClearChatHistoryView.as_view(),
                     name="clear_chat_history",
+                ),
+                re_path(
+                    "^chat_history/",
+                    ChatHistoryView.as_view(),
+                    name="chat_history",
                 ),
                 re_path(
                     "^bulk_edit_objects/",
