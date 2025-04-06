@@ -78,7 +78,7 @@ def create_chat_graph() -> CompiledStateGraph:
         raise ValueError("OpenAI API key is not set")
 
     llm = ChatOpenAI(
-        model="gpt-4",  # Using latest model
+        model="gpt-4o-mini",  # Using latest model
         temperature=0,
         api_key=api_key,
     )
