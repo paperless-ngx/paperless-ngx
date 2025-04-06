@@ -14,14 +14,14 @@
 }
 
 .chat-container::-webkit-scrollbar-track {
-  background-color: #00000000;
+  background-color: #60050500;
   /* Color of the scrollbar track */
 }
 
 .chat-container::-webkit-scrollbar-thumb {
   background-color: rgba(109, 109, 109, 0.2);
   /* Color of the scrollbar thumb */
-  border-radius: 8px;
+  border-radius: var(--bs-border-radius);
   /* Rounded corners of the scrollbar thumb */
 }
 
@@ -46,9 +46,9 @@
     align-items: flex-end;
 
     .message-bubble {
-      background-color: #007bff;
+      background-color: var(--bs-primary);
       color: #fff;
-      border-radius: 10px 0px 10px 10px;
+      border-radius: var(--bs-border-radius) 0px var(--bs-border-radius) var(--bs-border-radius);
     }
   }
 
@@ -59,7 +59,7 @@
     .message-bubble {
       background-color: var(--pngx-bg-alt);
       color: var(--pngx-text);
-      border-radius: 0px 10px 10px 10px;
+      border-radius: 0px var(--bs-border-radius) var(--bs-border-radius) var(--bs-border-radius);
     }
   }
 
@@ -69,63 +69,13 @@
     position: relative;
     font-size: 14px;
     line-height: 1.4;
+    border: var(--bs-border-width) solid var(--bs-border-color)
   }
 }
 
 .chat-form {
   display: flex;
   margin-top: 10px;
-
-  input[type="text"] {
-    flex-grow: 1;
-    padding: 10px;
-    font-size: 14px;
-    line-height: 1.4;
-    border-radius: 20px;
-    background-color: var(--pngx-bg-alt);
-    color: var(--pngx-text);
-    border: 1px solid var(--pngx-border);
-    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-
-    &:focus {
-      outline: none;
-      border-color: #80bdff;
-      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-    }
-
-    &::placeholder {
-      color: var(--pngx-text-muted);
-    }
-
-    &:-webkit-autofill,
-    &:-webkit-autofill:hover,
-    &:-webkit-autofill:focus {
-      -webkit-text-fill-color: #fff;
-      -webkit-box-shadow: 0 0 0px 1000px #333 inset;
-      transition: background-color 5000s ease-in-out 0s;
-    }
-  }
-
-  button[type="submit"] {
-    margin-left: 10px;
-    padding: 10px 20px;
-    border-radius: 20px;
-    border: none;
-    font-size: 14px;
-    line-height: 1.4;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
-
-    &:hover {
-      background-color: #0069d9;
-    }
-
-    &:focus {
-      outline: none;
-    }
-  }
 }
 
 .typing-animation {
@@ -182,24 +132,4 @@
 .chat-actions {
   display: flex;
   justify-content: flex-end;
-}
-
-.clear-history-btn {
-  background-color: transparent;
-  color: #999;
-  border: none;
-  font-size: 12px;
-  cursor: pointer;
-  padding: 5px 10px;
-  border-radius: 5px;
-  transition: all 0.2s ease;
-
-  &:hover {
-    color: #dc3545;
-    background-color: rgba(220, 53, 69, 0.1);
-  }
-
-  i {
-    margin-right: 4px;
-  }
 }

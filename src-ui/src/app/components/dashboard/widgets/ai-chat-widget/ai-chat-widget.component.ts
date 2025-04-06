@@ -34,6 +34,10 @@ export class AiChatWidgetComponent implements OnInit {
   ngOnInit() {
     // Try to load session ID from localStorage
     this.sessionId = localStorage.getItem('paperless_chat_session_id')
+    this.messages.push({
+      text: 'Hello, I am Paperflow AI and I have access to all of your documents. How can I help you today?',
+      fromUser: false,
+    })
   }
 
   sendMessage() {

@@ -1,4 +1,4 @@
-<pngx-widget-frame title="Document Jarvis" i18n-title>
+<pngx-widget-frame title="Paperflow AI" i18n-title>
   <ng-container content>
     <div class="chat-container" #chatContainer>
       <div *ngFor="let message of messages" class="chat-message"
@@ -13,12 +13,15 @@
     </div>
     <div class="chat-controls">
       <form class="chat-form" (submit)="sendMessage()">
-        <input type="text" placeholder="Ask me anything" [(ngModel)]="currentMessage" name="message" />
-        <button type="submit">Send</button>
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="Ask me anything" [(ngModel)]="currentMessage"
+            name="message" />
+          <button type="submit" class="btn btn-primary">Send</button>
+        </div>
       </form>
       <div class="chat-actions">
-        <button class="clear-history-btn" *ngIf="sessionId" (click)="clearChatHistory()" title="Clear chat history"
-          i18n-title>
+        <button class="btn btn-sm btn-outline-danger" *ngIf="sessionId" (click)="clearChatHistory()"
+          title="Clear chat history" i18n-title>
           <i-bs name="trash"></i-bs> Clear History
         </button>
       </div>
