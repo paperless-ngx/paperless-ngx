@@ -9,7 +9,9 @@
       </div>
       <div *ngFor="let message of messages" class="chat-message"
         [ngClass]="{'user-message': message.fromUser, 'bot-message': !message.fromUser}">
-        <div class="message-bubble">{{ message.text }}</div>
+        <div class="message-bubble">
+          <markdown [data]="message.text"></markdown>
+        </div>
       </div>
       <div *ngIf="showTypingAnimation" class="typing-animation">
         <div class="dot"></div>

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { FormsModule } from '@angular/forms'
+import { MarkdownModule } from 'ngx-markdown'
 import { environment } from 'src/environments/environment'
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 
@@ -24,7 +25,7 @@ interface ChatHistoryResponse {
   selector: 'app-ai-chat-widget',
   templateUrl: './ai-chat-widget.component.html',
   styleUrls: ['./ai-chat-widget.component.scss'],
-  imports: [FormsModule, WidgetFrameComponent, CommonModule],
+  imports: [FormsModule, WidgetFrameComponent, CommonModule, MarkdownModule],
 })
 export class AiChatWidgetComponent implements OnInit {
   @ViewChild('chatContainer', { static: false }) chatContainer: ElementRef

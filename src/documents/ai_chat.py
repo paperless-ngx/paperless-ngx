@@ -98,6 +98,7 @@ def create_chat_graph() -> CompiledStateGraph:
     Answer the user's question based on the following context from their documents and the conversation history.
     If the context doesn't contain relevant information, say so politely and suggest
     what kind of documents might contain the answer. Formulate your answer in the same language as the question.
+    You can use markdown to format your answer.
     """
 
     user_template = """

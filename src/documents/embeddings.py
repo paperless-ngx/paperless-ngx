@@ -51,7 +51,7 @@ class DocumentEmbeddings:
                 f"Unknown embedding provider: {settings.EMBEDDING_PROVIDER}"
             )
 
-        self.splitter = SemanticChunker(self.embedding_model)
+        self.splitter = SemanticChunker(self.embedding_model, min_chunk_size=2000)
 
         if not settings.EMBEDDING_REDIS_URL:
             logger.warning(
