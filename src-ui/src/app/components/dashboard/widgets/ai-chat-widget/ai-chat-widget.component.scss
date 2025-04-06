@@ -48,7 +48,7 @@
     .message-bubble {
       background-color: var(--bs-primary);
       color: #fff;
-      border-radius: var(--bs-border-radius) 0px var(--bs-border-radius) var(--bs-border-radius);
+      border-top-right-radius: 0px;
     }
   }
 
@@ -59,7 +59,7 @@
     .message-bubble {
       background-color: var(--pngx-bg-alt);
       color: var(--pngx-text);
-      border-radius: 0px var(--bs-border-radius) var(--bs-border-radius) var(--bs-border-radius);
+      border-top-left-radius: 0px;
     }
   }
 
@@ -69,7 +69,8 @@
     position: relative;
     font-size: 14px;
     line-height: 1.4;
-    border: var(--bs-border-width) solid var(--bs-border-color)
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    border-radius: 15px;
   }
 }
 
