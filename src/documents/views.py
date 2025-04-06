@@ -4,7 +4,6 @@ import os
 import platform
 import re
 import tempfile
-import uuid
 import zipfile
 from datetime import datetime
 from pathlib import Path
@@ -57,9 +56,6 @@ from drf_spectacular.utils import OpenApiParameter
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import extend_schema_view
 from drf_spectacular.utils import inline_serializer
-from langchain_community.callbacks.manager import get_openai_callback
-from langchain_core.messages import AIMessage
-from langchain_core.messages import HumanMessage
 from langdetect import detect
 from packaging import version as packaging_version
 from redis import Redis
@@ -85,9 +81,6 @@ from rest_framework.viewsets import ViewSet
 
 from documents import bulk_edit
 from documents import index
-from documents.ai_chat import ChatState
-from documents.ai_chat import create_chat_graph
-from documents.ai_chat import get_chat_history
 from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
@@ -2923,10 +2916,6 @@ class AnswerResponseSerializer(serializers.Serializer):
 class QuestionView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.chat_graph = create_chat_graph()
-
     def post(self, request: Request, format=None) -> Response:
         serializer = QuestionSerializer(data=request.data)
         if not serializer.is_valid():
@@ -2935,55 +2924,31 @@ class QuestionView(APIView):
         # Get validated data
         validated_data = cast(dict[str, Any], serializer.validated_data)
         question = validated_data["question"]
-
-        # Get or create session ID
         session_id = validated_data.get("session_id")
-        if not session_id:
-            session_id = f"chat_{request.user.id}_{uuid.uuid4()}"
-
-        # Get chat history
-        history = get_chat_history(session_id)
 
         try:
-            # Create initial state
-            initial_state: ChatState = {
-                "messages": [*history.messages, HumanMessage(content=question)],
-                "context": "",
-                "document_ids": [],
-            }
+            # Process the question using the chat component
+            from documents.ai_chat import process_question
 
-            # Run the chat graph
-            with get_openai_callback() as cb:
-                final_state = self.chat_graph.invoke(initial_state)
-
-                logger.info(
-                    f"OpenAI API usage: {cb.total_tokens} tokens, cost: ${cb.total_cost}"
-                )
-
-            # Get the last AI message
-            last_message = final_state["messages"][-1]
-            if not isinstance(last_message, AIMessage):
-                raise ValueError("Expected last message to be AI message")
-
-            # Update chat history
-            history.add_user_message(question)
-            history.add_ai_message(str(last_message.content))
+            reply, document_ids, session_id = process_question(
+                question=question, user_id=request.user.id, session_id=session_id
+            )
 
             return Response(
                 {
-                    "reply": last_message.content,
-                    "document_ids": final_state["document_ids"],
+                    "reply": reply,
+                    "document_ids": document_ids,
                     "session_id": session_id,
                 }
             )
 
         except Exception as e:
-            logger.error(f"Error in chat: {e!s}")
+            logger.error(f"Error in chat view: {e!s}")
             return Response(
                 {
                     "reply": "An error occurred while generating the answer",
                     "document_ids": [],
-                    "session_id": session_id,
+                    "session_id": session_id or f"chat_{request.user.id}_error",
                 },
                 status=500,
             )
@@ -3006,14 +2971,21 @@ class ClearChatHistoryView(APIView):
         session_id = validated_data["session_id"]
 
         try:
-            # Get the chat history and clear it
-            history = get_chat_history(session_id)
-            history.clear()
-            logger.info(f"Cleared chat history for session: {session_id}")
-            return Response({"status": "success"})
+            # Use the chat component to clear history
+            from documents.ai_chat import clear_chat_history
+
+            success = clear_chat_history(session_id)
+
+            if success:
+                return Response({"status": "success"})
+            else:
+                return Response(
+                    {"status": "error", "message": "Failed to clear chat history"},
+                    status=500,
+                )
 
         except Exception as e:
-            logger.error(f"Error clearing chat history: {e!s}")
+            logger.error(f"Error in clear chat history view: {e!s}")
             return Response(
                 {"status": "error", "message": "Failed to clear chat history"},
                 status=500,
@@ -3059,27 +3031,14 @@ class ChatHistoryView(APIView):
         session_id = validated_data["session_id"]
 
         try:
-            # Get the chat history
-            history = get_chat_history(session_id)
-            messages = []
+            # Use the chat component to get messages
+            from documents.ai_chat import get_chat_messages
 
-            # Convert the history messages to the format expected by the frontend
-            for message in history.messages:
-                if isinstance(message, HumanMessage):
-                    messages.append({
-                        "text": message.content,
-                        "fromUser": True,
-                    })
-                elif isinstance(message, AIMessage):
-                    messages.append({
-                        "text": message.content,
-                        "fromUser": False,
-                    })
-
+            messages = get_chat_messages(session_id)
             return Response({"messages": messages})
 
         except Exception as e:
-            logger.error(f"Error getting chat history: {e!s}")
+            logger.error(f"Error in chat history view: {e!s}")
             return Response(
                 {"status": "error", "message": "Failed to get chat history"},
                 status=500,

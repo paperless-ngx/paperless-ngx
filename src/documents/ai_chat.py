@@ -1,8 +1,12 @@
 import logging
+import random
+import traceback
 from typing import Annotated
+from typing import Any
 from typing import TypedDict
 
 from django.conf import settings
+from langchain_community.callbacks import get_openai_callback
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.messages import AIMessage
 from langchain_core.messages import BaseMessage
@@ -29,7 +33,13 @@ class ChatState(TypedDict):
 
 def get_chat_history(session_id: str) -> BaseChatMessageHistory:
     """Get a chat history instance for the given session ID"""
-    redis_url = getattr(settings, "EMBEDDING_REDIS_URL", "redis://localhost:6379")
+    redis_url = getattr(settings, "EMBEDDING_REDIS_URL")
+    if not redis_url:
+        logger.error("EMBEDDING_REDIS_URL is not set, AI Chat will not work")
+        raise ValueError("EMBEDDING_REDIS_URL is not set")
+    logger.info(
+        f"Creating RedisChatMessageHistory with URL {redis_url} for session {session_id}"
+    )
     return RedisChatMessageHistory(
         session_id=session_id,
         redis_url=redis_url,
@@ -165,3 +175,121 @@ def create_chat_graph() -> CompiledStateGraph:
     graph.set_entry_point("rag")
 
     return graph.compile()
+
+
+def process_question(
+    question: str, user_id: int, session_id: str | None = None
+) -> tuple[str, list[str], str]:
+    """
+    Process a user question through the chat agent and handle chat history.
+
+    Args:
+        question: The user's question
+        user_id: The ID of the user asking the question
+        session_id: Optional session ID for conversation continuity
+
+    Returns:
+        Tuple of (reply, document_ids, session_id)
+    """
+    # Create chat graph
+    chat_graph = create_chat_graph()
+
+    # Get or create session ID
+    if not session_id:
+        session_id = f"{user_id}_{random.randint(1, 1000000)}"
+
+    # Get chat history
+    history = get_chat_history(session_id)
+    user_message = HumanMessage(content=question)
+
+    try:
+        # Create initial state
+        initial_state: ChatState = {
+            "messages": [*history.messages, user_message],
+            "context": "",
+            "document_ids": [],
+        }
+
+        # Run the chat graph
+        with get_openai_callback() as cb:
+            final_state = chat_graph.invoke(initial_state)
+            logger.info(
+                f"OpenAI API usage: {cb.total_tokens} tokens, cost: ${cb.total_cost}"
+            )
+
+        # Get the last AI message
+        ai_answer = final_state["messages"][-1]
+        if not isinstance(ai_answer, AIMessage):
+            raise ValueError("Expected last message to be AI message")
+
+        # Update chat history
+        history.add_messages([user_message, ai_answer])
+
+        return str(ai_answer.content), final_state["document_ids"], session_id
+
+    except Exception as e:
+        logger.error(f"Error in chat: {type(e)}: {e!s}")
+        logger.error(traceback.format_exc())
+        return "An error occurred while generating the answer", [], session_id
+
+
+def clear_chat_history(session_id: str) -> bool:
+    """
+    Clear the chat history for a specific session.
+
+    Args:
+        session_id: The session ID to clear history for
+
+    Returns:
+        Boolean indicating success
+    """
+    logger.info(f"Clearing chat history for session: {session_id}")
+    try:
+        history = get_chat_history(session_id)
+        history.clear()
+        logger.info(f"Cleared chat history for session: {session_id}")
+        return True
+    except Exception as e:
+        logger.error(f"Error clearing chat history: {e!s}")
+        return False
+
+
+def get_chat_messages(session_id: str) -> list[dict[str, Any]]:
+    """
+    Get the formatted chat messages for a specific session.
+
+    Args:
+        session_id: The session ID to get messages for
+
+    Returns:
+        List of message dictionaries in the format expected by the frontend
+    """
+    try:
+        history = get_chat_history(session_id)
+        messages = []
+
+        logger.info(
+            f"Found {len(history.messages)} messages in chat history for session: {session_id}"
+        )
+        for message in history.messages:
+            logger.info(f"Message of type {type(message)}: {message.content}")
+            if isinstance(message, HumanMessage):
+                messages.append(
+                    {
+                        "text": message.content,
+                        "fromUser": True,
+                    }
+                )
+            elif isinstance(message, AIMessage):
+                messages.append(
+                    {
+                        "text": message.content,
+                        "fromUser": False,
+                    }
+                )
+
+        return messages
+    except Exception as e:
+        logger.error(f"Error getting chat messages: {e!s}")
+        logger.error(traceback.format_exc())
+        return []

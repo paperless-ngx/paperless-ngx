@@ -153,6 +153,9 @@ export class AiChatWidgetComponent implements OnInit {
     const apiUrl = `${environment.apiBaseUrl}clear_chat_history/`
     const requestBody = { session_id: this.sessionId }
 
+    localStorage.removeItem('paperless_chat_session_id')
+    this.sessionId = undefined
+
     this.http.post(apiUrl, requestBody).subscribe({
       next: () => {
         // Clear the local messages

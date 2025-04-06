@@ -60,6 +60,7 @@
       background-color: var(--pngx-bg-alt);
       color: var(--pngx-text);
       border-top-left-radius: 0px;
+      border: var(--bs-border-width) solid var(--bs-border-color);
     }
   }
 
@@ -69,7 +70,6 @@
     position: relative;
     font-size: 14px;
     line-height: 1.4;
-    border: var(--bs-border-width) solid var(--bs-border-color);
     border-radius: 15px;
   }
 }

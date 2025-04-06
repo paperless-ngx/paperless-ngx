@@ -21,8 +21,8 @@ from rest_framework.routers import DefaultRouter
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
-from documents.views import ClearChatHistoryView
 from documents.views import ChatHistoryView
+from documents.views import ClearChatHistoryView
 from documents.views import CorrespondentViewSet
 from documents.views import CustomFieldViewSet
 from documents.views import DocumentTypeViewSet
