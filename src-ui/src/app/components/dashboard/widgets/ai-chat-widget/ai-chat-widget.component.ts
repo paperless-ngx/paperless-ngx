@@ -159,7 +159,11 @@ export class AiChatWidgetComponent implements OnInit {
     this.http.post(apiUrl, requestBody).subscribe({
       next: () => {
         // Clear the local messages
-        this.messages = []
+        this.messages = [{
+          text: 'Hello, I am Paperflow AI and I have access to all of your documents. How can I help you today?',
+          fromUser: false,
+        }]
+
         // Keep the session ID, but clear the history in Redis
       },
       error: (error) => {
