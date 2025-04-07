@@ -2,7 +2,9 @@
 
 
 import datetime
+import os
 
+import pytz
 from django.db import migrations
 from django.db import models
 from django.db.models.functions import TruncDate
@@ -10,7 +12,12 @@ from django.db.models.functions import TruncDate
 
 def migrate_date(apps, schema_editor):
     Document = apps.get_model("documents", "Document")
-    Document.objects.update(created_date=TruncDate("created"))
+    Document.objects.update(
+        created_date=TruncDate(
+            "created",
+            tzinfo=pytz.timezone(os.getenv("PAPERLESS_TIME_ZONE", "UTC")),
+        ),
+    )
 
 
 class Migration(migrations.Migration):
