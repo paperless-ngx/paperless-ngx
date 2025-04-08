@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-11 13:33-0700\n"
-"PO-Revision-Date: 2025-03-11 20:34\n"
+"POT-Creation-Date: 2025-03-26 21:04-0700\n"
+"PO-Revision-Date: 2025-03-29 17:14\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -1223,28 +1223,28 @@ msgstr "请登录。"
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
 msgstr "还没有账户? <a href=\"%(signup_url)s\">注册</a>"
 
-#: documents/templates/account/login.html:19
-#: documents/templates/account/signup.html:15
+#: documents/templates/account/login.html:25
+#: documents/templates/account/signup.html:22
 #: documents/templates/socialaccount/signup.html:13
 msgid "Username"
 msgstr "用户名"
 
-#: documents/templates/account/login.html:20
-#: documents/templates/account/signup.html:17
+#: documents/templates/account/login.html:26
+#: documents/templates/account/signup.html:24
 msgid "Password"
 msgstr "密码"
 
-#: documents/templates/account/login.html:30
+#: documents/templates/account/login.html:36
 #: documents/templates/mfa/authenticate.html:23
 msgid "Sign in"
 msgstr "登录"
 
-#: documents/templates/account/login.html:34
+#: documents/templates/account/login.html:40
 msgid "Forgot your password?"
 msgstr "忘记密码"
 
-#: documents/templates/account/login.html:45
-#: documents/templates/account/signup.html:49
+#: documents/templates/account/login.html:51
+#: documents/templates/account/signup.html:57
 msgid "or sign in via"
 msgstr "或者通过以下方式登录"
 
@@ -1317,21 +1317,25 @@ msgstr "你的新密码已经被设置，你现在可以<a href=\"%(login_url)s\
 msgid "Paperless-ngx sign up"
 msgstr "Paperless-ngx 注册"
 
-#: documents/templates/account/signup.html:10
+#: documents/templates/account/signup.html:11
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
 msgstr "已经有一个帐户？ <a href=\"%(login_url)s\">登录</a>"
 
-#: documents/templates/account/signup.html:16
+#: documents/templates/account/signup.html:19
+msgid "Note: This is the first user account for this installation and will be granted superuser privileges."
+msgstr ""
+
+#: documents/templates/account/signup.html:23
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
 msgstr "电子邮箱(可选)"
 
-#: documents/templates/account/signup.html:18
+#: documents/templates/account/signup.html:25
 msgid "Password (again)"
 msgstr "密码 (再输入一次)"
 
-#: documents/templates/account/signup.html:36
+#: documents/templates/account/signup.html:43
 #: documents/templates/socialaccount/signup.html:27
 msgid "Sign up"
 msgstr "注册"
@@ -1556,139 +1560,139 @@ msgstr "应用程序图标"
 msgid "paperless application settings"
 msgstr "无纸应用设置"
 
-#: paperless/settings.py:723
+#: paperless/settings.py:722
 msgid "English (US)"
 msgstr "英语(美国)"
 
-#: paperless/settings.py:724
+#: paperless/settings.py:723
 msgid "Arabic"
 msgstr "阿拉伯语"
 
-#: paperless/settings.py:725
+#: paperless/settings.py:724
 msgid "Afrikaans"
 msgstr "Afrikaans 荷兰语"
 
-#: paperless/settings.py:726
+#: paperless/settings.py:725
 msgid "Belarusian"
 msgstr "白俄罗斯语"
 
-#: paperless/settings.py:727
+#: paperless/settings.py:726
 msgid "Bulgarian"
 msgstr "保加利亚语"
 
-#: paperless/settings.py:728
+#: paperless/settings.py:727
 msgid "Catalan"
 msgstr "Catalan 加泰罗尼亚语"
 
-#: paperless/settings.py:729
+#: paperless/settings.py:728
 msgid "Czech"
 msgstr "捷克语"
 
-#: paperless/settings.py:730
+#: paperless/settings.py:729
 msgid "Danish"
 msgstr "丹麦语"
 
-#: paperless/settings.py:731
+#: paperless/settings.py:730
 msgid "German"
 msgstr "德语"
 
-#: paperless/settings.py:732
+#: paperless/settings.py:731
 msgid "Greek"
 msgstr "Greek 希腊语"
 
-#: paperless/settings.py:733
+#: paperless/settings.py:732
 msgid "English (GB)"
 msgstr "英语(英国)"
 
-#: paperless/settings.py:734
+#: paperless/settings.py:733
 msgid "Spanish"
 msgstr "西班牙语"
 
-#: paperless/settings.py:735
+#: paperless/settings.py:734
 msgid "Finnish"
 msgstr "已完成"
 
-#: paperless/settings.py:736
+#: paperless/settings.py:735
 msgid "French"
 msgstr "法语"
 
-#: paperless/settings.py:737
+#: paperless/settings.py:736
 msgid "Hungarian"
 msgstr "匈牙利语"
 
-#: paperless/settings.py:738
+#: paperless/settings.py:737
 msgid "Italian"
 msgstr "意大利语"
 
-#: paperless/settings.py:739
+#: paperless/settings.py:738
 msgid "Japanese"
 msgstr "日语"
 
-#: paperless/settings.py:740
+#: paperless/settings.py:739
 msgid "Korean"
 msgstr "韩语"
 
-#: paperless/settings.py:741
+#: paperless/settings.py:740
 msgid "Luxembourgish"
 msgstr "卢森堡语"
 
-#: paperless/settings.py:742
+#: paperless/settings.py:741
 msgid "Norwegian"
 msgstr "Norwegian 挪威语"
 
-#: paperless/settings.py:743
+#: paperless/settings.py:742
 msgid "Dutch"
 msgstr "荷兰语"
 
-#: paperless/settings.py:744
+#: paperless/settings.py:743
 msgid "Polish"
 msgstr "波兰语"
 
-#: paperless/settings.py:745
+#: paperless/settings.py:744
 msgid "Portuguese (Brazil)"
 msgstr "葡萄牙语 (巴西)"
 
-#: paperless/settings.py:746
+#: paperless/settings.py:745
 msgid "Portuguese"
 msgstr "葡萄牙语"
 
-#: paperless/settings.py:747
+#: paperless/settings.py:746
 msgid "Romanian"
 msgstr "罗马尼亚语"
 
-#: paperless/settings.py:748
+#: paperless/settings.py:747
 msgid "Russian"
 msgstr "俄语"
 
-#: paperless/settings.py:749
+#: paperless/settings.py:748
 msgid "Slovak"
 msgstr "斯洛伐克语"
 
-#: paperless/settings.py:750
+#: paperless/settings.py:749
 msgid "Slovenian"
 msgstr "斯洛语尼亚语"
 
-#: paperless/settings.py:751
+#: paperless/settings.py:750
 msgid "Serbian"
 msgstr "塞尔维亚语"
 
-#: paperless/settings.py:752
+#: paperless/settings.py:751
 msgid "Swedish"
 msgstr "瑞典语"
 
-#: paperless/settings.py:753
+#: paperless/settings.py:752
 msgid "Turkish"
 msgstr "土耳其语"
 
-#: paperless/settings.py:754
+#: paperless/settings.py:753
 msgid "Ukrainian"
 msgstr "乌克兰语"
 
-#: paperless/settings.py:755
+#: paperless/settings.py:754
 msgid "Chinese Simplified"
 msgstr "简体中文"
 
-#: paperless/settings.py:756
+#: paperless/settings.py:755
 msgid "Chinese Traditional"
 msgstr ""
 
