@@ -76,11 +76,14 @@ RUN set -eux \
         && rm ./*.tar.xz \
         && rm ./*.sha256 \
     && echo "Configuring Bash to see container environment" \
-      && echo '#!/bin/sh' > /tmp/bash-wrapper \
-      && echo 'exec /command/with-contenv /bin/bash.original "$@"' >> /tmp/bash-wrapper \
+      && echo '#!/bin/execlineb -P' > /tmp/bash-wrapper \
+      && echo '/command/with-contenv' >> /tmp/bash-wrapper \
+      && echo '/usr/bin/bash' >> /tmp/bash-wrapper \
+      && echo 'importas -i ARGS @' >> /tmp/bash-wrapper \
+      && echo '$ARGS' >> /tmp/bash-wrapper \
       && chmod +x /tmp/bash-wrapper \
-      && cp /bin/bash /bin/bash.original \
-      && mv /tmp/bash-wrapper /bin/bash \
+      && cp /usr/bin/bash /usr/bin/bash.original \
+      && mv /tmp/bash-wrapper /usr/bin/bash \
     && echo "Cleaning up image" \
       && apt-get --yes purge ${S6_BUILD_TIME_PKGS} \
       && apt-get --yes autoremove --purge \
