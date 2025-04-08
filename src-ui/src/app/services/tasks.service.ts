@@ -41,7 +41,7 @@ export class TasksService {
 
   public get completedFileTasks(): EdocTask[] {
     return this.fileTasks.filter(
-      (t) => t.status == EdocTaskStatus.Complete
+      (t) => t.status == EdocTaskStatus.Complete,
     )
   }
 
@@ -49,7 +49,8 @@ export class TasksService {
     return this.fileTasks.filter((t) => t.status == EdocTaskStatus.Failed)
   }
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+  }
 
 
   public queuedFileEdocTasks(page: number = 1): Observable<Results<EdocTask>> {

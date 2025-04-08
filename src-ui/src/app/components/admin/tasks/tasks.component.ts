@@ -28,24 +28,26 @@ export class TasksComponent
   public tasksQueued: Results<EdocTask> = {
     count: 0,
     results: [],
-    all: []
+    all: [],
   }
   public tasksStarted: Results<EdocTask> = {
     count: 0,
     results: [],
-    all: []
+    all: [],
   }
   public tasksCompleted: Results<EdocTask> = {
     count: 0,
     results: [],
-    all: []
+    all: [],
   }
 
   public tasksFailed: Results<EdocTask> = {
     count: 0,
     results: [],
-    all: []
+    all: [],
   }
+
+  public tasksCurrent: EdocTask[] = []
 
   get dismissButtonText(): string {
     return this.selectedTasks.size > 0
@@ -134,6 +136,61 @@ export class TasksComponent
     return tasks
   }
 
+
+  currentDataEdocTasks() {
+    console.log('run')
+    switch (this.activeTab) {
+      case 'queued':
+        if (this.page == 1) {
+          this.tasksCurrent = this.tasksQueued.results
+          break
+        }
+        this.queuedFileEdocTasks(this.page)
+
+        break
+      case 'started':
+        if (this.page == 1) {
+
+          break
+        }
+        this.startedFileEdocTasks(this.page)
+
+        break
+      case 'completed':
+        if (this.page == 1) {
+          this.tasksCurrent = this.tasksCompleted.results
+          break
+        }
+        this.completedFileEdocTasks(this.page)
+
+        break
+      case 'failed':
+        if (this.page == 1) {
+          this.tasksCurrent = this.tasksFailed.results
+          break
+        }
+        this.failedFileEdocTasks(this.page)
+        break
+    }
+  }
+
+  SetCurrentDataEdocTasks() {
+    switch (this.activeTab) {
+      case 'queued':
+        this.tasksCurrent = this.tasksQueued.results
+        break
+      case 'started':
+        this.tasksCurrent = this.tasksStarted.results
+        break
+      case 'completed':
+        this.tasksCurrent = this.tasksCompleted.results
+        break
+      case 'failed':
+        this.tasksCurrent = this.tasksFailed.results
+        break
+    }
+  }
+
   toggleAll(event: PointerEvent) {
     if ((event.target as HTMLInputElement).checked) {
       this.selectedTasks = new Set(this.currentTasks.map((t) => t.id))
@@ -181,6 +238,7 @@ export class TasksComponent
     this.startedFileEdocTasks(1)
     this.completedFileEdocTasks(1)
     this.failedFileEdocTasks(1)
+    // this.currentDataEdocTasks();
   }
 
   queuedFileEdocTasks(pageQueue = 1) {
@@ -189,6 +247,7 @@ export class TasksComponent
       .pipe(
         tap((r) => {
           this.tasksQueued = r
+          this.SetCurrentDataEdocTasks()
         }),
         // delay(100)
       )
@@ -202,6 +261,7 @@ export class TasksComponent
       .pipe(
         tap((r) => {
           this.tasksStarted = r
+          this.SetCurrentDataEdocTasks()
         }),
         // delay(100)
       )
@@ -215,6 +275,7 @@ export class TasksComponent
       .pipe(
         tap((r) => {
           this.tasksCompleted = r
+          this.SetCurrentDataEdocTasks()
         }),
         // delay(100)
       )
@@ -228,6 +289,7 @@ export class TasksComponent
       .pipe(
         tap((r) => {
           this.tasksFailed = r
+          this.SetCurrentDataEdocTasks()
         }),
         // delay(100)
       )
@@ -250,4 +312,7 @@ export class TasksComponent
 
   }
 
+  onPageChange($event: number) {
+    this.currentDataEdocTasks()
+  }
 }
