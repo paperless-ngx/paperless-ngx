@@ -5,6 +5,7 @@ import {
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from '@angular/forms'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
@@ -18,7 +19,12 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-monetary',
   templateUrl: './monetary.component.html',
   styleUrls: ['./monetary.component.scss'],
-  imports: [CurrencyPipe, FormsModule, ReactiveFormsModule],
+  imports: [
+    CurrencyPipe,
+    FormsModule,
+    ReactiveFormsModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class MonetaryComponent extends AbstractInputComponent<string> {
   public currency: string = ''

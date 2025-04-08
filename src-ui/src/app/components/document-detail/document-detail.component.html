@@ -9,9 +9,9 @@
     }
     <div class="input-group input-group-sm me-md-5 d-none d-md-flex">
       <button class="btn btn-outline-secondary" (click)="decreaseZoom()" i18n>-</button>
-      <select class="form-select" (change)="onZoomSelect($event)">
+      <select class="form-select" (change)="setZoom($event.target.value)">
         @for (setting of zoomSettings; track setting) {
-          <option [value]="setting" [selected]="previewZoomSetting === setting">
+          <option [value]="setting" [attr.selected]="isZoomSelected(setting) ? 'selected' : null">
             {{ getZoomSettingTitle(setting) }}
           </option>
         }
@@ -25,15 +25,20 @@
   </button>
 
   <div class="btn-group">
-    <a [href]="downloadUrl" class="btn btn-sm btn-outline-primary">
-      <i-bs width="1.2em" height="1.2em" name="download"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Download</span>
-    </a>
+    <button (click)="download()" class="btn btn-sm btn-outline-primary" [disabled]="downloading">
+      @if (downloading) {
+        <div class="spinner-border spinner-border-sm" role="status"></div>
+      } @else {
+        <i-bs width="1.2em" height="1.2em" name="download"></i-bs>
+      }
+      <span class="d-none d-lg-inline ps-1" i18n>Download</span>
+    </button>
 
     @if (metadata?.has_archive_version) {
       <div class="btn-group" ngbDropdown role="group">
-        <button class="btn btn-sm btn-outline-primary dropdown-toggle" ngbDropdownToggle></button>
+        <button class="btn btn-sm btn-outline-primary dropdown-toggle" [disabled]="downloading" ngbDropdownToggle></button>
         <div class="dropdown-menu shadow" ngbDropdownMenu>
-          <a ngbDropdownItem [href]="downloadOriginalUrl" i18n>Download original</a>
+          <button ngbDropdownItem (click)="download(true)" [disabled]="downloading" i18n>Download original</button>
         </div>
       </div>
     }
@@ -70,13 +75,30 @@
   <pngx-custom-fields-dropdown
     *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
     [documentId]="documentId"
-    [disabled]="!userIsOwner || !userCanEdit"
+    [disabled]="!userCanEdit"
     [existingFields]="document?.custom_fields"
     (created)="refreshCustomFields()"
     (added)="addField($event)">
   </pngx-custom-fields-dropdown>
 
-  <pngx-share-links-dropdown [documentId]="documentId" [hasArchiveVersion]="!!document?.archived_file_name" [disabled]="!userCanEdit && !userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }"></pngx-share-links-dropdown>
+
+  <div class="ms-auto" ngbDropdown>
+    <button class="btn btn-sm btn-outline-primary" id="sendDropdown" ngbDropdownToggle>
+      <i-bs name="send"></i-bs>
+      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Send</ng-container></div>
+    </button>
+    <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
+      <button ngbDropdownItem (click)="openShareLinks()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }">
+        <i-bs name="link"></i-bs>&nbsp;<span i18n>Share Links</span>
+      </button>
+      @if (emailEnabled) {
+        <button ngbDropdownItem (click)="openEmailDocument()">
+          <i-bs name="envelope"></i-bs>&nbsp;<span i18n>Email</span>
+        </button>
+      }
+    </div>
+  </div>
+
 </pngx-page-header>
 
 <div class="row">
@@ -122,7 +144,7 @@
                     @case (CustomFieldDataType.String) {
                       <pngx-input-text formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userIsOwner && userCanEdit"
+                      [removable]="userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [error]="getCustomFieldError(i)"></pngx-input-text>
@@ -130,7 +152,7 @@
                     @case (CustomFieldDataType.Date) {
                       <pngx-input-date formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userIsOwner && userCanEdit"
+                      [removable]="userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [error]="getCustomFieldError(i)"></pngx-input-date>
@@ -138,7 +160,7 @@
                     @case (CustomFieldDataType.Integer) {
                       <pngx-input-number formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userIsOwner && userCanEdit"
+                      [removable]="userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [showAdd]="false"
@@ -147,7 +169,7 @@
                     @case (CustomFieldDataType.Float) {
                       <pngx-input-number formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userIsOwner && userCanEdit"
+                      [removable]="userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [showAdd]="false"
@@ -158,7 +180,7 @@
                       <pngx-input-monetary formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
                       [defaultCurrency]="getCustomFieldFromInstance(fieldInstance)?.extra_data?.default_currency"
-                      [removable]="userIsOwner && userCanEdit"
+                      [removable]="userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [error]="getCustomFieldError(i)"></pngx-input-monetary>
@@ -166,14 +188,14 @@
                     @case (CustomFieldDataType.Boolean) {
                       <pngx-input-check formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userIsOwner && userCanEdit"
+                      [removable]="userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"></pngx-input-check>
                     }
                     @case (CustomFieldDataType.Url) {
                       <pngx-input-url formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [removable]="userIsOwner && userCanEdit"
+                      [removable]="userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [error]="getCustomFieldError(i)"></pngx-input-url>
@@ -182,7 +204,7 @@
                       <pngx-input-document-link formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
                       [parentDocumentID]="documentId"
-                      [removable]="userIsOwner && userCanEdit"
+                      [removable]="userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
                       [error]="getCustomFieldError(i)"></pngx-input-document-link>
@@ -194,7 +216,7 @@
                       bindLabel="label"
                       [allowNull]="true"
                       [horizontal]="true"
-                      [removable]="userIsOwner && userCanEdit"
+                      [removable]="userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [error]="getCustomFieldError(i)"></pngx-input-select>
                     }
@@ -351,9 +373,9 @@
 </ng-template>
 
 <ng-template #previewContent>
-  <div class="thumb-preview position-absolute pe-none" [class.fade]="previewLoaded">
+  <div class="thumb-preview position-absolute pe-none text-center" [class.fade]="previewLoaded">
     @if (showThumbnailOverlay) {
-      <img [src]="thumbUrl | safeUrl" class="" width="100%" height="auto" alt="Document loading..." i18n-alt />
+      <img [src]="thumbUrl | safeUrl" class="mx-auto" [attr.width]="previewZoomScale === 'page-fit' ? 'auto' : '100%'" [attr.height]="previewZoomScale === 'page-fit' ? '100%' : 'auto'" alt="Document loading..." i18n-alt />
     }
     <div class="position-absolute top-0 start-0 m-2 p-2 d-flex align-items-center justify-content-center">
       <div>

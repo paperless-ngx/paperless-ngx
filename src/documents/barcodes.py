@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import re
 import tempfile
@@ -10,7 +12,6 @@ from pdf2image import convert_from_path
 from pikepdf import Page
 from pikepdf import PasswordError
 from pikepdf import Pdf
-from PIL import Image
 
 from documents.converters import convert_from_tiff_to_pdf
 from documents.data_models import ConsumableDocument
@@ -24,6 +25,8 @@ from documents.utils import maybe_override_pixel_limit
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
+    from PIL import Image
 
 logger = logging.getLogger("paperless.barcodes")
 

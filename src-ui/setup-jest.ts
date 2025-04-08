@@ -40,6 +40,7 @@ import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
 import localeZh from '@angular/common/locales/zh'
+import localeZhHant from '@angular/common/locales/zh-Hant'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -73,6 +74,7 @@ registerLocaleData(localeSv)
 registerLocaleData(localeTr)
 registerLocaleData(localeUk)
 registerLocaleData(localeZh)
+registerLocaleData(localeZhHant)
 
 /* global mocks for jsdom */
 const mock = () => {
@@ -100,6 +102,15 @@ Object.defineProperty(navigator, 'clipboard', {
   },
 })
 Object.defineProperty(navigator, 'canShare', { value: () => true })
+if (!navigator.share) {
+  Object.defineProperty(navigator, 'share', { value: jest.fn() })
+}
+if (!URL.createObjectURL) {
+  Object.defineProperty(window.URL, 'createObjectURL', { value: jest.fn() })
+}
+if (!URL.revokeObjectURL) {
+  Object.defineProperty(window.URL, 'revokeObjectURL', { value: jest.fn() })
+}
 Object.defineProperty(window, 'ResizeObserver', { value: mock() })
 Object.defineProperty(window, 'location', {
   configurable: true,
@@ -109,3 +120,20 @@ Object.defineProperty(window, 'location', {
 HTMLCanvasElement.prototype.getContext = <
   typeof HTMLCanvasElement.prototype.getContext
 >jest.fn()
+
+// pdfjs
+jest.mock('pdfjs-dist', () => ({
+  getDocument: jest.fn(() => ({
+    promise: Promise.resolve({ numPages: 3 }),
+  })),
+  GlobalWorkerOptions: { workerSrc: '' },
+  VerbosityLevel: { ERRORS: 0 },
+  globalThis: {
+    pdfjsLib: {
+      GlobalWorkerOptions: {
+        workerSrc: '',
+      },
+    },
+  },
+}))
+jest.mock('pdfjs-dist/web/pdf_viewer', () => ({}))

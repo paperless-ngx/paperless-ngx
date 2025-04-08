@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 from allauth.account import views as allauth_account_views
 from allauth.mfa.base import views as allauth_mfa_views
@@ -14,6 +14,8 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import RedirectView
 from django.views.static import serve
+from drf_spectacular.views import SpectacularAPIView
+from drf_spectacular.views import SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 
 from documents.views import BulkDownloadView
@@ -203,6 +205,27 @@ urlpatterns = [
                     OauthCallbackView.as_view(),
                     name="oauth_callback",
                 ),
+                re_path(
+                    "^schema/",
+                    include(
+                        [
+                            re_path(
+                                "^$",
+                                SpectacularAPIView.as_view(),
+                                name="schema",
+                            ),
+                            re_path(
+                                "^view/",
+                                SpectacularSwaggerView.as_view(),
+                                name="swagger-ui",
+                            ),
+                        ],
+                    ),
+                ),
+                re_path(
+                    "^$",  # Redirect to the API swagger view
+                    RedirectView.as_view(url="schema/view/"),
+                ),
                 *api_router.urls,
             ],
         ),
@@ -247,7 +270,7 @@ urlpatterns = [
     re_path(
         r"^logo(?P<path>.*)$",
         serve,
-        kwargs={"document_root": os.path.join(settings.MEDIA_ROOT, "logo")},
+        kwargs={"document_root": Path(settings.MEDIA_ROOT) / "logo"},
     ),
     # allauth
     path(
@@ -255,10 +278,15 @@ urlpatterns = [
         include(
             [
                 # see allauth/account/urls.py
-                # login, logout, signup
+                # login, logout, signup, account_inactive
                 path("login/", allauth_account_views.login, name="account_login"),
                 path("logout/", allauth_account_views.logout, name="account_logout"),
                 path("signup/", allauth_account_views.signup, name="account_signup"),
+                path(
+                    "account_inactive/",
+                    allauth_account_views.account_inactive,
+                    name="account_inactive",
+                ),
                 # password reset
                 path(
                     "password/",
@@ -281,6 +309,11 @@ urlpatterns = [
                             ),
                         ],
                     ),
+                ),
+                re_path(
+                    r"^confirm-email/(?P<key>[-:\w]+)/$",
+                    allauth_account_views.ConfirmEmailView.as_view(),
+                    name="account_confirm_email",
                 ),
                 re_path(
                     r"^password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",

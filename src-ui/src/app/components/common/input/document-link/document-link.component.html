@@ -30,25 +30,24 @@
     [placeholder]="placeholder"
     [notFoundText]="notFoundText"
     [multiple]="true"
-    bindValue="id"
     [compareWith]="compareDocuments"
     [trackByFn]="trackByFn"
     [minTermLength]="2"
     [loading]="loading"
     [typeahead]="documentsInput$"
     (mousedown)="$event.stopImmediatePropagation()"
-    (change)="onChange(selectedDocuments)">
+    (change)="onChange(selectedDocumentIDs)">
     <ng-template ng-label-tmp let-document="item">
       <div class="d-flex align-items-center">
         @if (!disabled) {
-          <button class="btn p-0 lh-1" (click)="unselect(document)" title="Remove link" i18n-title><i-bs name="x"></i-bs></button>
+          <button class="btn p-0 lh-1" (click)="unselect(document)" (mousedown)="$event.stopImmediatePropagation()" type="button" title="Remove link" i18n-title><i-bs name="x"></i-bs></button>
         }
         @if (document.title) {
           <a routerLink="/documents/{{document.id}}" class="badge bg-light text-primary" (mousedown)="$event.stopImmediatePropagation();" title="Open link" i18n-title>
             <i-bs width="0.9em" height="0.9em" name="file-text"></i-bs>&nbsp;<span>{{document.title}}</span>
           </a>
         } @else {
-          <span class="badge bg-light text-muted" (click)="unselect(document)" title="Remove link" i18n-title>
+          <span class="badge bg-light text-muted" (click)="unselect(document)" (mousedown)="$event.stopImmediatePropagation()" type="button" title="Remove link" i18n-title>
             <i-bs width="0.9em" height="0.9em" name="exclamation-triangle-fill"></i-bs>&nbsp;<span i18n>Not found</span>
           </span>
         }

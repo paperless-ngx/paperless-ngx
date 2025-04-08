@@ -47,6 +47,7 @@ import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ConfirmButtonComponent } from '../../confirm-button/confirm-button.component'
 import { CheckComponent } from '../../input/check/check.component'
+import { CustomFieldsValuesComponent } from '../../input/custom-fields-values/custom-fields-values.component'
 import { EntriesComponent } from '../../input/entries/entries.component'
 import { NumberComponent } from '../../input/number/number.component'
 import { PermissionsGroupComponent } from '../../input/permissions/permissions-group/permissions-group.component'
@@ -70,6 +71,10 @@ export const DOCUMENT_SOURCE_OPTIONS = [
   {
     id: DocumentSource.MailFetch,
     name: $localize`Mail Fetch`,
+  },
+  {
+    id: DocumentSource.WebUI,
+    name: $localize`Web UI`,
   },
 ]
 
@@ -147,6 +152,7 @@ const TRIGGER_MATCHING_ALGORITHMS = MATCHING_ALGORITHMS.filter(
     SelectComponent,
     TextAreaComponent,
     TagsComponent,
+    CustomFieldsValuesComponent,
     PermissionsGroupComponent,
     PermissionsUserComponent,
     ConfirmButtonComponent,
@@ -435,6 +441,9 @@ export class WorkflowEditDialogComponent
         assign_change_users: new FormControl(action.assign_change_users),
         assign_change_groups: new FormControl(action.assign_change_groups),
         assign_custom_fields: new FormControl(action.assign_custom_fields),
+        assign_custom_fields_values: new FormControl(
+          action.assign_custom_fields_values
+        ),
         remove_tags: new FormControl(action.remove_tags),
         remove_all_tags: new FormControl(action.remove_all_tags),
         remove_document_types: new FormControl(action.remove_document_types),
@@ -561,6 +570,7 @@ export class WorkflowEditDialogComponent
       assign_change_users: [],
       assign_change_groups: [],
       assign_custom_fields: [],
+      assign_custom_fields_values: {},
       remove_tags: [],
       remove_all_tags: false,
       remove_document_types: [],
@@ -638,5 +648,13 @@ export class WorkflowEditDialogComponent
         }
       })
     super.save()
+  }
+
+  public removeSelectedCustomField(fieldId: number, group: FormGroup) {
+    group
+      .get('assign_custom_fields')
+      .setValue(
+        group.get('assign_custom_fields').value.filter((id) => id !== fieldId)
+      )
   }
 }

@@ -1,16 +1,18 @@
+from __future__ import annotations
+
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import NoReturn
-from zipfile import ZipFile
-
-from documents.models import Document
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from zipfile import ZipFile
+
+    from documents.models import Document
 
 
 class BulkArchiveStrategy:
-    def __init__(self, zipf: ZipFile, follow_formatting: bool = False) -> None:
+    def __init__(self, zipf: ZipFile, *, follow_formatting: bool = False) -> None:
         self.zipf: ZipFile = zipf
         if follow_formatting:
             self.make_unique_filename: Callable[..., Path | str] = (
@@ -22,6 +24,7 @@ class BulkArchiveStrategy:
     def _filename_only(
         self,
         doc: Document,
+        *,
         archive: bool = False,
         folder: str = "",
     ) -> str:
@@ -33,7 +36,10 @@ class BulkArchiveStrategy:
         """
         counter = 0
         while True:
-            filename: str = folder + doc.get_public_filename(archive, counter)
+            filename: str = folder + doc.get_public_filename(
+                archive=archive,
+                counter=counter,
+            )
             if filename in self.zipf.namelist():
                 counter += 1
             else:
@@ -42,6 +48,7 @@ class BulkArchiveStrategy:
     def _formatted_filepath(
         self,
         doc: Document,
+        *,
         archive: bool = False,
         folder: str = "",
     ) -> Path:

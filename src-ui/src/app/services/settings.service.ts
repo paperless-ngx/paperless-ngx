@@ -244,6 +244,12 @@ const LANGUAGE_OPTIONS = [
     englishName: 'Chinese Simplified',
     dateInputFormat: 'yyyy-mm-dd',
   },
+  {
+    code: 'zh-tw',
+    name: $localize`Chinese Traditional`,
+    englishName: 'Chinese Traditional',
+    dateInputFormat: 'yyyy/mm/dd',
+  },
 ]
 
 const ISO_LANGUAGE_OPTION: LanguageOption = {
@@ -596,7 +602,6 @@ export class SettingsService {
         )
       } catch (error) {
         this.toastService.showError(errorMessage)
-        console.log(error)
       }
 
       this.storeSettings()
@@ -608,7 +613,6 @@ export class SettingsService {
           },
           error: (e) => {
             this.toastService.showError(errorMessage)
-            console.log(e)
           },
         })
     }
@@ -630,7 +634,6 @@ export class SettingsService {
             this.toastService.showError(
               'Error migrating update checking setting'
             )
-            console.log(e)
           },
         })
     }

@@ -20,7 +20,6 @@
 # - Copy this file as 'docker-compose.yml' and the files 'docker-compose.env'
 #   and '.env' into a folder.
 # - Run 'docker compose pull'.
-# - Run 'docker compose run --rm webserver createsuperuser' to create a user.
 # - Run 'docker compose up -d'.
 #
 # For more extensive installation and update instructions, refer to the
@@ -34,7 +33,7 @@ services:
       - redisdata:/data
 
   db:
-    image: docker.io/library/postgres:16
+    image: docker.io/library/postgres:17
     restart: unless-stopped
     volumes:
       - pgdata:/var/lib/postgresql/data

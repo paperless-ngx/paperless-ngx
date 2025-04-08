@@ -1,0 +1,18 @@
+#!/command/with-contenv /usr/bin/bash
+# shellcheck shell=bash
+
+
+if [[ -n "${PAPERLESS_CONSUMER_DISABLE}" ]]; then
+	echo "[svc-consumer] Consumer is disabled, exiting"
+	# https://skarnet.org/software/s6/s6-svc.html
+	s6-svc -Od .
+
+else
+	cd ${PAPERLESS_SRC_DIR}
+
+	if [[ -n "${USER_IS_NON_ROOT}" ]]; then
+		exec python3 manage.py document_consumer
+	else
+		exec s6-setuidgid paperless python3 manage.py document_consumer
+	fi
+fi

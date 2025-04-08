@@ -11,20 +11,9 @@ from rest_framework import serializers
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 from paperless.models import ApplicationConfiguration
+from paperless_mail.serialisers import ObfuscatedPasswordField
 
 logger = logging.getLogger("paperless.settings")
-
-
-class ObfuscatedUserPasswordField(serializers.Field):
-    """
-    Sends *** string instead of password in the clear
-    """
-
-    def to_representation(self, value):
-        return "**********" if len(value) > 0 else ""
-
-    def to_internal_value(self, data):
-        return data
 
 
 class PaperlessAuthTokenSerializer(AuthTokenSerializer):
@@ -58,7 +47,7 @@ class PaperlessAuthTokenSerializer(AuthTokenSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password = ObfuscatedUserPasswordField(required=False)
+    password = ObfuscatedPasswordField(required=False)
     user_permissions = serializers.SlugRelatedField(
         many=True,
         queryset=Permission.objects.exclude(content_type__app_label="admin"),
@@ -68,7 +57,7 @@ class UserSerializer(serializers.ModelSerializer):
     inherited_permissions = serializers.SerializerMethodField()
     is_mfa_enabled = serializers.SerializerMethodField()
 
-    def get_is_mfa_enabled(self, user: User):
+    def get_is_mfa_enabled(self, user: User) -> bool:
         mfa_adapter = get_mfa_adapter()
         return mfa_adapter.is_mfa_enabled(user)
 
@@ -91,7 +80,7 @@ class UserSerializer(serializers.ModelSerializer):
             "is_mfa_enabled",
         )
 
-    def get_inherited_permissions(self, obj):
+    def get_inherited_permissions(self, obj) -> list[str]:
         return obj.get_group_permissions()
 
     def update(self, instance, validated_data):
@@ -157,13 +146,13 @@ class SocialAccountSerializer(serializers.ModelSerializer):
             "name",
         )
 
-    def get_name(self, obj):
+    def get_name(self, obj) -> str:
         return obj.get_provider_account().to_str()
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(allow_null=False)
-    password = ObfuscatedUserPasswordField(required=False, allow_null=False)
+    email = serializers.EmailField(allow_blank=True, required=False)
+    password = ObfuscatedPasswordField(required=False, allow_null=False)
     auth_token = serializers.SlugRelatedField(read_only=True, slug_field="key")
     social_accounts = SocialAccountSerializer(
         many=True,
@@ -171,10 +160,14 @@ class ProfileSerializer(serializers.ModelSerializer):
         source="socialaccount_set",
     )
     is_mfa_enabled = serializers.SerializerMethodField()
+    has_usable_password = serializers.SerializerMethodField()
 
-    def get_is_mfa_enabled(self, user: User):
+    def get_is_mfa_enabled(self, user: User) -> bool:
         mfa_adapter = get_mfa_adapter()
         return mfa_adapter.is_mfa_enabled(user)
+
+    def get_has_usable_password(self, user: User) -> bool:
+        return user.has_usable_password()
 
     class Meta:
         model = User

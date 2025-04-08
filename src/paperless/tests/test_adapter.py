@@ -4,6 +4,8 @@ from allauth.account.adapter import get_adapter
 from allauth.core import context
 from allauth.socialaccount.adapter import get_adapter as get_social_adapter
 from django.conf import settings
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import User
 from django.forms import ValidationError
 from django.http import HttpRequest
 from django.test import TestCase
@@ -14,6 +16,11 @@ from django.urls import reverse
 class TestCustomAccountAdapter(TestCase):
     def test_is_open_for_signup(self):
         adapter = get_adapter()
+
+        # With no accounts, signups should be allowed
+        self.assertTrue(adapter.is_open_for_signup(None))
+
+        User.objects.create_user("testuser")
 
         # Test when ACCOUNT_ALLOW_SIGNUPS is True
         settings.ACCOUNT_ALLOW_SIGNUPS = True
@@ -81,6 +88,45 @@ class TestCustomAccountAdapter(TestCase):
                     expected_url,
                 )
 
+    @override_settings(ACCOUNT_DEFAULT_GROUPS=["group1", "group2"])
+    def test_save_user_adds_groups(self):
+        Group.objects.create(name="group1")
+        user = User.objects.create_user("testuser")
+        adapter = get_adapter()
+        form = mock.Mock(
+            cleaned_data={
+                "username": "testuser",
+                "email": "user@example.com",
+            },
+        )
+
+        user = adapter.save_user(HttpRequest(), user, form, commit=True)
+
+        self.assertEqual(user.groups.count(), 1)
+        self.assertTrue(user.groups.filter(name="group1").exists())
+        self.assertFalse(user.groups.filter(name="group2").exists())
+
+    def test_fresh_install_save_creates_superuser(self):
+        adapter = get_adapter()
+        form = mock.Mock(
+            cleaned_data={
+                "username": "testuser",
+                "email": "user@paperless-ngx.com",
+            },
+        )
+        user = adapter.save_user(HttpRequest(), User(), form, commit=True)
+        self.assertTrue(user.is_superuser)
+
+        # Next time, it should not create a superuser
+        form = mock.Mock(
+            cleaned_data={
+                "username": "testuser2",
+                "email": "user2@paperless-ngx.com",
+            },
+        )
+        user2 = adapter.save_user(HttpRequest(), User(), form, commit=True)
+        self.assertFalse(user2.is_superuser)
+
 
 class TestCustomSocialAccountAdapter(TestCase):
     def test_is_open_for_signup(self):
@@ -105,3 +151,19 @@ class TestCustomSocialAccountAdapter(TestCase):
             adapter.get_connect_redirect_url(request, socialaccount),
             expected_url,
         )
+
+    @override_settings(SOCIAL_ACCOUNT_DEFAULT_GROUPS=["group1", "group2"])
+    def test_save_user_adds_groups(self):
+        Group.objects.create(name="group1")
+        adapter = get_social_adapter()
+        request = HttpRequest()
+        user = User.objects.create_user("testuser")
+        sociallogin = mock.Mock(
+            user=user,
+        )
+
+        user = adapter.save_user(request, sociallogin, None)
+
+        self.assertEqual(user.groups.count(), 1)
+        self.assertTrue(user.groups.filter(name="group1").exists())
+        self.assertFalse(user.groups.filter(name="group2").exists())

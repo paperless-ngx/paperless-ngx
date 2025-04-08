@@ -4,7 +4,6 @@ import { RouterModule } from '@angular/router'
 import {
   NgbAlert,
   NgbAlertModule,
-  NgbCollapseModule,
   NgbProgressbarModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -12,16 +11,14 @@ import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
-import {
-  ConsumerStatusService,
-  FileStatus,
-  FileStatusPhase,
-} from 'src/app/services/consumer-status.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
+import {
+  FileStatus,
+  FileStatusPhase,
+  WebsocketStatusService,
+} from 'src/app/services/websocket-status.service'
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
-
-const MAX_ALERTS = 5
 
 @Component({
   selector: 'pngx-upload-file-widget',
@@ -34,19 +31,16 @@ const MAX_ALERTS = 5
     NgTemplateOutlet,
     RouterModule,
     NgbAlertModule,
-    NgbCollapseModule,
     NgbProgressbarModule,
     NgxBootstrapIconsModule,
     TourNgBootstrapModule,
   ],
 })
 export class UploadFileWidgetComponent extends ComponentWithPermissions {
-  alertsExpanded = false
-
   @ViewChildren(NgbAlert) alerts: QueryList<NgbAlert>
 
   constructor(
-    private consumerStatusService: ConsumerStatusService,
+    private websocketStatusService: WebsocketStatusService,
     private uploadDocumentsService: UploadDocumentsService,
     public settingsService: SettingsService
   ) {
@@ -54,13 +48,13 @@ export class UploadFileWidgetComponent extends ComponentWithPermissions {
   }
 
   getStatus() {
-    return this.consumerStatusService.getConsumerStatus().slice(0, MAX_ALERTS)
+    return this.websocketStatusService.getConsumerStatus()
   }
 
   getStatusSummary() {
     let strings = []
     let countUploadingAndProcessing =
-      this.consumerStatusService.getConsumerStatusNotCompleted().length
+      this.websocketStatusService.getConsumerStatusNotCompleted().length
     let countFailed = this.getStatusFailed().length
     let countSuccess = this.getStatusSuccess().length
     if (countUploadingAndProcessing > 0) {
@@ -77,28 +71,24 @@ export class UploadFileWidgetComponent extends ComponentWithPermissions {
     )
   }
 
-  getStatusHidden() {
-    if (this.consumerStatusService.getConsumerStatus().length < MAX_ALERTS)
-      return []
-    else return this.consumerStatusService.getConsumerStatus().slice(MAX_ALERTS)
-  }
-
   getStatusUploading() {
-    return this.consumerStatusService.getConsumerStatus(
+    return this.websocketStatusService.getConsumerStatus(
       FileStatusPhase.UPLOADING
     )
   }
 
   getStatusFailed() {
-    return this.consumerStatusService.getConsumerStatus(FileStatusPhase.FAILED)
+    return this.websocketStatusService.getConsumerStatus(FileStatusPhase.FAILED)
   }
 
   getStatusSuccess() {
-    return this.consumerStatusService.getConsumerStatus(FileStatusPhase.SUCCESS)
+    return this.websocketStatusService.getConsumerStatus(
+      FileStatusPhase.SUCCESS
+    )
   }
 
   getStatusCompleted() {
-    return this.consumerStatusService.getConsumerStatusCompleted()
+    return this.websocketStatusService.getConsumerStatusCompleted()
   }
 
   getTotalUploadProgress() {
@@ -134,12 +124,12 @@ export class UploadFileWidgetComponent extends ComponentWithPermissions {
   }
 
   dismiss(status: FileStatus) {
-    this.consumerStatusService.dismiss(status)
+    this.websocketStatusService.dismiss(status)
   }
 
   dismissCompleted() {
     this.getStatusCompleted().forEach((status) =>
-      this.consumerStatusService.dismiss(status)
+      this.websocketStatusService.dismiss(status)
     )
   }
 

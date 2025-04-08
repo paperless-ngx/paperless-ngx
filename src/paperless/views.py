@@ -18,6 +18,9 @@ from django.http import HttpResponseForbidden
 from django.http import HttpResponseNotFound
 from django.views.generic import View
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema_view
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import action
@@ -27,9 +30,9 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
+from documents.index import DelayedQuery
 from documents.permissions import PaperlessObjectPermissions
 from paperless.filters import GroupFilterSet
 from paperless.filters import UserFilterSet
@@ -64,17 +67,17 @@ class StandardPagination(PageNumberPagination):
         )
 
     def get_all_result_ids(self):
-        ids = []
-        if hasattr(self.page.paginator.object_list, "saved_results"):
-            results_page = self.page.paginator.object_list.saved_results[0]
-            if results_page is not None:
-                for i in range(len(results_page.results.docs())):
-                    try:
-                        fields = results_page.results.fields(i)
-                        if "id" in fields:
-                            ids.append(fields["id"])
-                    except Exception:
-                        pass
+        query = self.page.paginator.object_list
+        if isinstance(query, DelayedQuery):
+            try:
+                ids = [
+                    query.searcher.ixreader.stored_fields(
+                        doc_num,
+                    )["id"]
+                    for doc_num in query.saved_results.get(0).results.docs()
+                ]
+            except Exception:
+                pass
         else:
             ids = self.page.paginator.object_list.values_list("pk", flat=True)
         return ids
@@ -148,7 +151,7 @@ class UserViewSet(ModelViewSet):
         ).first()
         if authenticator is not None:
             delete_and_cleanup(request, authenticator)
-            return Response(True)
+            return Response(data=True)
         else:
             return HttpResponseNotFound("TOTP not found")
 
@@ -197,6 +200,34 @@ class ProfileView(GenericAPIView):
         return Response(serializer.to_representation(user))
 
 
+@extend_schema_view(
+    get=extend_schema(
+        responses={
+            (200, "application/json"): OpenApiTypes.OBJECT,
+        },
+    ),
+    post=extend_schema(
+        request={
+            "application/json": {
+                "type": "object",
+                "properties": {
+                    "secret": {"type": "string"},
+                    "code": {"type": "string"},
+                },
+                "required": ["secret", "code"],
+            },
+        },
+        responses={
+            (200, "application/json"): OpenApiTypes.OBJECT,
+        },
+    ),
+    delete=extend_schema(
+        responses={
+            (200, "application/json"): OpenApiTypes.BOOL,
+            404: OpenApiTypes.STR,
+        },
+    ),
+)
 class TOTPView(GenericAPIView):
     """
     TOTP views
@@ -262,11 +293,21 @@ class TOTPView(GenericAPIView):
         ).first()
         if authenticator is not None:
             delete_and_cleanup(request, authenticator)
-            return Response(True)
+            return Response(data=True)
         else:
             return HttpResponseNotFound("TOTP not found")
 
 
+@extend_schema_view(
+    post=extend_schema(
+        request={
+            "application/json": None,
+        },
+        responses={
+            (200, "application/json"): OpenApiTypes.STR,
+        },
+    ),
+)
 class GenerateAuthTokenView(GenericAPIView):
     """
     Generates (or re-generates) an auth token, requires a logged in user
@@ -287,6 +328,15 @@ class GenerateAuthTokenView(GenericAPIView):
         )
 
 
+@extend_schema_view(
+    list=extend_schema(
+        description="Get the application configuration",
+        external_docs={
+            "description": "Application Configuration",
+            "url": "https://docs.paperless-ngx.com/configuration/",
+        },
+    ),
+)
 class ApplicationConfigurationViewSet(ModelViewSet):
     model = ApplicationConfiguration
 
@@ -296,6 +346,23 @@ class ApplicationConfigurationViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated, DjangoModelPermissions)
 
 
+@extend_schema_view(
+    post=extend_schema(
+        request={
+            "application/json": {
+                "type": "object",
+                "properties": {
+                    "id": {"type": "integer"},
+                },
+                "required": ["id"],
+            },
+        },
+        responses={
+            (200, "application/json"): OpenApiTypes.INT,
+            400: OpenApiTypes.STR,
+        },
+    ),
+)
 class DisconnectSocialAccountView(GenericAPIView):
     """
     Disconnects a social account provider from the user account
@@ -315,7 +382,14 @@ class DisconnectSocialAccountView(GenericAPIView):
             return HttpResponseBadRequest("Social account not found")
 
 
-class SocialAccountProvidersView(APIView):
+@extend_schema_view(
+    get=extend_schema(
+        responses={
+            (200, "application/json"): OpenApiTypes.OBJECT,
+        },
+    ),
+)
+class SocialAccountProvidersView(GenericAPIView):
     """
     List of social account providers
     """

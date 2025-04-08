@@ -12,12 +12,13 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, filter, takeUntil } from 'rxjs'
+import { NEGATIVE_NULL_FILTER_VALUE } from 'src/app/data/filter-rule-type'
 import { MatchingModel } from 'src/app/data/matching-model'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { HotKeyService } from 'src/app/services/hot-key.service'
 import { SelectionDataItem } from 'src/app/services/rest/document.service'
-import { popperOptionsReenablePreventOverflow } from 'src/app/utils/popper-options'
+import { pngxPopperOptions } from 'src/app/utils/popper-options'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
 import {
@@ -61,15 +62,56 @@ export class FilterableDropdownSelectionModel {
   }
 
   set items(items: MatchingModel[]) {
-    this._items = items
-    this.sortItems()
+    if (items) {
+      this._items = Array.from(items)
+      this.sortItems()
+      this.setNullItem()
+    }
+  }
+
+  private setNullItem() {
+    if (this.manyToOne && this.logicalOperator === LogicalOperator.Or) {
+      if (this._items[0]?.id === null) {
+        this._items.shift()
+      }
+      return
+    }
+
+    const item = {
+      name: $localize`:Filter drop down element to filter for documents with no correspondent/type/tag assigned:Not assigned`,
+      id:
+        this.manyToOne || this.intersection === Intersection.Include
+          ? null
+          : NEGATIVE_NULL_FILTER_VALUE,
+    }
+
+    if (
+      this._items[0]?.id === null ||
+      this._items[0]?.id === NEGATIVE_NULL_FILTER_VALUE
+    ) {
+      this._items[0] = item
+    } else if (this._items) {
+      this._items.unshift(item)
+    }
+  }
+
+  constructor(manyToOne: boolean = false) {
+    this.manyToOne = manyToOne
   }
 
   private sortItems() {
     this._items.sort((a, b) => {
-      if (a.id == null && b.id != null) {
+      if (
+        (a.id == null && b.id != null) ||
+        (a.id == NEGATIVE_NULL_FILTER_VALUE &&
+          b.id != NEGATIVE_NULL_FILTER_VALUE)
+      ) {
         return -1
-      } else if (a.id != null && b.id == null) {
+      } else if (
+        (a.id != null && b.id == null) ||
+        (a.id != NEGATIVE_NULL_FILTER_VALUE &&
+          b.id == NEGATIVE_NULL_FILTER_VALUE)
+      ) {
         return 1
       } else if (
         this.getNonTemporary(a.id) == ToggleableItemState.NotSelected &&
@@ -230,6 +272,7 @@ export class FilterableDropdownSelectionModel {
 
   set logicalOperator(operator: LogicalOperator) {
     this.temporaryLogicalOperator = operator
+    this.setNullItem()
   }
 
   toggleOperator() {
@@ -242,6 +285,7 @@ export class FilterableDropdownSelectionModel {
 
   set intersection(intersection: Intersection) {
     this.temporaryIntersection = intersection
+    this.setNullItem()
   }
 
   toggleIntersection() {
@@ -250,9 +294,20 @@ export class FilterableDropdownSelectionModel {
       this.intersection == Intersection.Include
         ? ToggleableItemState.Selected
         : ToggleableItemState.Excluded
+
     this.temporarySelectionStates.forEach((state, key) => {
-      this.temporarySelectionStates.set(key, newState)
+      if (key === null && this.intersection === Intersection.Exclude) {
+        this.temporarySelectionStates.set(NEGATIVE_NULL_FILTER_VALUE, newState)
+      } else if (
+        key === NEGATIVE_NULL_FILTER_VALUE &&
+        this.intersection === Intersection.Include
+      ) {
+        this.temporarySelectionStates.set(null, newState)
+      } else {
+        this.temporarySelectionStates.set(key, newState)
+      }
     })
+
     this.changed.next(this)
   }
 
@@ -274,6 +329,7 @@ export class FilterableDropdownSelectionModel {
     this.temporarySelectionStates.clear()
     this.temporaryLogicalOperator = this._logicalOperator = LogicalOperator.And
     this.temporaryIntersection = this._intersection = Intersection.Include
+    this.setNullItem()
     if (fireEvent) {
       this.changed.next(this)
     }
@@ -305,8 +361,10 @@ export class FilterableDropdownSelectionModel {
 
   isNoneSelected() {
     return (
-      this.selectionSize() == 1 &&
-      this.get(null) == ToggleableItemState.Selected
+      (this.selectionSize() == 1 &&
+        this.get(null) == ToggleableItemState.Selected) ||
+      (this.intersection == Intersection.Exclude &&
+        this.get(NEGATIVE_NULL_FILTER_VALUE) == ToggleableItemState.Excluded)
     )
   }
 
@@ -380,29 +438,17 @@ export class FilterableDropdownComponent
   @ViewChild('dropdown') dropdown: NgbDropdown
   @ViewChild('buttonItems') buttonItems: ElementRef
 
-  public popperOptions = popperOptionsReenablePreventOverflow
+  public popperOptions = pngxPopperOptions
 
   filterText: string
 
-  @Input()
-  set items(items: MatchingModel[]) {
-    if (items) {
-      this._selectionModel.items = Array.from(items)
-      this._selectionModel.items.unshift({
-        name: $localize`:Filter drop down element to filter for documents with no correspondent/type/tag assigned:Not assigned`,
-        id: null,
-      })
-    }
-  }
+  _selectionModel: FilterableDropdownSelectionModel
 
   get items(): MatchingModel[] {
     return this._selectionModel.items
   }
 
-  _selectionModel: FilterableDropdownSelectionModel =
-    new FilterableDropdownSelectionModel()
-
-  @Input()
+  @Input({ required: true })
   set selectionModel(model: FilterableDropdownSelectionModel) {
     if (this.selectionModel) {
       this.selectionModel.changed.complete()
@@ -422,11 +468,6 @@ export class FilterableDropdownComponent
 
   @Output()
   selectionModelChange = new EventEmitter<FilterableDropdownSelectionModel>()
-
-  @Input()
-  set manyToOne(manyToOne: boolean) {
-    this.selectionModel.manyToOne = manyToOne
-  }
 
   get manyToOne() {
     return this.selectionModel.manyToOne
@@ -484,7 +525,7 @@ export class FilterableDropdownComponent
     return this.manyToOne
       ? this.selectionModel.selectionSize() > 1 &&
           this.selectionModel.getExcludedItems().length == 0
-      : !this.selectionModel.isNoneSelected()
+      : true
   }
 
   get name(): string {

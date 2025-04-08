@@ -1,0 +1,14 @@
+#!/command/with-contenv /usr/bin/bash
+# shellcheck shell=bash
+
+set -e
+
+cd "${PAPERLESS_SRC_DIR}"
+
+if [[ $(id -u) == 0 ]]; then
+	s6-setuidgid paperless python3 manage.py document_create_classifier "$@"
+elif [[ $(id -un) == "paperless" ]]; then
+	python3 manage.py document_create_classifier "$@"
+else
+	echo "Unknown user."
+fi
