@@ -509,6 +509,12 @@ Invoice_{{ custom_fields|get_cf_value("Select Field") }}_{{ custom_fields|get_cf
 
 This will create a path like `invoices/2022/01/01/Invoice_OptionTwo_20220101.pdf` if the custom field "Date Field" is set to January 1, 2022 and "Select Field" is set to `OptionTwo`.
 
+You can also use a custom `slugify` filter to slufigy text:
+
+```jinja
+{{ title | slugify }}
+```
+
 ## Automatic recovery of invalid PDFs {#pdf-recovery}
 
 Paperless will attempt to "clean" certain invalid PDFs with `qpdf` before processing if, for example, the mime_type

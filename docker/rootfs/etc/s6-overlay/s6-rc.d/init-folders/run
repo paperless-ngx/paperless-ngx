@@ -1,0 +1,33 @@
+#!/command/with-contenv /usr/bin/bash
+# shellcheck shell=bash
+
+declare -r log_prefix="[init-folders]"
+
+declare -r export_dir="/usr/src/paperless/export"
+declare -r data_dir="${PAPERLESS_DATA_DIR:-/usr/src/paperless/data}"
+declare -r media_root_dir="${PAPERLESS_MEDIA_ROOT:-/usr/src/paperless/media}"
+declare -r consume_dir="${PAPERLESS_CONSUMPTION_DIR:-/usr/src/paperless/consume}"
+declare -r tmp_dir="${PAPERLESS_SCRATCH_DIR:=/tmp/paperless}"
+
+echo "${log_prefix} Checking for folder existence"
+
+for dir in \
+	"${export_dir}" \
+	"${data_dir}" "${data_dir}/index" \
+	"${media_root_dir}" "${media_root_dir}/documents" "${media_root_dir}/documents/originals" "${media_root_dir}/documents/thumbnails" \
+	"${consume_dir}" \
+	"${tmp_dir}"; do
+	if [[ ! -d "${dir}" ]]; then
+		mkdir --parents --verbose "${dir}"
+	fi
+done
+
+echo "${log_prefix} Adjusting file and folder permissions"
+for dir in \
+	"${export_dir}" \
+	"${data_dir}" \
+	"${media_root_dir}" \
+	"${consume_dir}" \
+	"${tmp_dir}"; do
+	find "${dir}" -not \( -user paperless -and -group paperless \) -exec chown --changes paperless:paperless {} +
+done

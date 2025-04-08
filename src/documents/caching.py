@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 import logging
 from binascii import hexlify
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 from typing import Final
-from typing import Optional
 
 from django.core.cache import cache
 
@@ -80,7 +81,7 @@ def get_suggestion_cache(document_id: int) -> SuggestionCacheData | None:
 def set_suggestions_cache(
     document_id: int,
     suggestions: dict,
-    classifier: Optional["DocumentClassifier"],
+    classifier: DocumentClassifier | None,
     *,
     timeout=CACHE_50_MINUTES,
 ) -> None:

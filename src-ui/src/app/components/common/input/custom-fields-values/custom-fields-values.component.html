@@ -1,0 +1,77 @@
+<div class="list-group mt-3 selected-fields">
+  @for (fieldId of selectedFields; track fieldId) {
+    <div class="list-group-item
+      d-flex
+      justify-content-between
+      align-items-center">
+      @switch (getCustomField(fieldId)?.data_type) {
+        @case (CustomFieldDataType.String) {
+          <pngx-input-text [(ngModel)]="value[fieldId]" (ngModelChange)="onChange(value)"
+          [title]="getCustomField(fieldId)?.name"
+          class="flex-grow-1"
+          [horizontal]="true"></pngx-input-text>
+        }
+        @case (CustomFieldDataType.Date) {
+          <pngx-input-date [(ngModel)]="value[fieldId]" (ngModelChange)="onChange(value)"
+          [title]="getCustomField(fieldId)?.name"
+          class="flex-grow-1"
+          [horizontal]="true"></pngx-input-date>
+        }
+        @case (CustomFieldDataType.Integer) {
+          <pngx-input-number [(ngModel)]="value[fieldId]" (ngModelChange)="onChange(value)"
+          [title]="getCustomField(fieldId)?.name"
+          class="flex-grow-1"
+          [horizontal]="true"
+          [showAdd]="false"></pngx-input-number>
+        }
+        @case (CustomFieldDataType.Float) {
+          <pngx-input-number [(ngModel)]="value[fieldId]" (ngModelChange)="onChange(value)"
+          [title]="getCustomField(fieldId)?.name"
+          class="flex-grow-1"
+          [horizontal]="true"
+          [showAdd]="false"
+          [step]=".1"></pngx-input-number>
+        }
+        @case (CustomFieldDataType.Monetary) {
+          <pngx-input-monetary [(ngModel)]="value[fieldId]" (ngModelChange)="onChange(value)"
+          [title]="getCustomField(fieldId)?.name"
+          class="flex-grow-1"
+          [defaultCurrency]="getCustomField(fieldId)?.extra_data?.default_currency"
+          class="flex-grow-1"
+          [horizontal]="true"></pngx-input-monetary>
+        }
+        @case (CustomFieldDataType.Boolean) {
+          <pngx-input-check [(ngModel)]="value[fieldId]" (ngModelChange)="onChange(value)"
+          [title]="getCustomField(fieldId)?.name"
+          class="flex-grow-1"
+          [horizontal]="true"></pngx-input-check>
+        }
+        @case (CustomFieldDataType.Url) {
+          <pngx-input-url [(ngModel)]="value[fieldId]" (ngModelChange)="onChange(value)"
+          [title]="getCustomField(fieldId)?.name"
+          class="flex-grow-1"
+          [horizontal]="true"></pngx-input-url>
+        }
+        @case (CustomFieldDataType.DocumentLink) {
+          <pngx-input-document-link [(ngModel)]="value[fieldId]" (ngModelChange)="onChange(value)"
+          [title]="getCustomField(fieldId)?.name"
+          class="flex-grow-1"
+          [horizontal]="true"></pngx-input-document-link>
+        }
+        @case (CustomFieldDataType.Select) {
+          <pngx-input-select [(ngModel)]="value[fieldId]" (ngModelChange)="onChange(value)"
+          [title]="getCustomField(fieldId)?.name"
+          class="flex-grow-1"
+          [items]="getCustomField(fieldId)?.extra_data.select_options"
+          class="flex-grow-1"
+          bindLabel="label"
+          [allowNull]="true"
+          [horizontal]="true"></pngx-input-select>
+        }
+      }
+      <button type="button" class="btn btn-link text-danger" (click)="removeSelectedField.next(fieldId)">
+        <i-bs name="trash"></i-bs>
+      </button>
+    </div>
+  }
+</div>

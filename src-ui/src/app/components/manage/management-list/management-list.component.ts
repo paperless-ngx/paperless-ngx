@@ -21,7 +21,6 @@ import {
   MATCHING_ALGORITHMS,
   MatchingModel,
 } from 'src/app/data/matching-model'
-import { ObjectWithId } from 'src/app/data/object-with-id'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import {
   SortableDirective,
@@ -56,7 +55,7 @@ export interface ManagementListColumn {
 }
 
 @Directive()
-export abstract class ManagementListComponent<T extends ObjectWithId>
+export abstract class ManagementListComponent<T extends MatchingModel>
   extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy
 {
@@ -195,7 +194,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     activeModal.componentInstance.succeeded.subscribe(() => {
       this.reloadData()
       this.toastService.showInfo(
-        $localize`Successfully updated ${this.typeName}.`
+        $localize`Successfully updated ${this.typeName} "${object.name}".`
       )
     })
     activeModal.componentInstance.failed.subscribe((e) => {
@@ -208,7 +207,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
 
   abstract getDeleteMessage(object: T)
 
-  filterDocuments(object: ObjectWithId) {
+  filterDocuments(object: MatchingModel) {
     this.documentListViewService.quickFilter([
       { rule_type: this.filterRuleType, value: object.id.toString() },
     ])

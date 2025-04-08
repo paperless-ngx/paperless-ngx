@@ -118,13 +118,10 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     }
   }
 
-  removeTag(event: PointerEvent, id: number) {
+  removeTag(tagID: number) {
     if (this.disabled) return
 
-    // prevent opening dropdown
-    event.stopImmediatePropagation()
-
-    let index = this.value.indexOf(id)
+    let index = this.value.indexOf(tagID)
     if (index > -1) {
       let oldValue = this.value
       oldValue.splice(index, 1)

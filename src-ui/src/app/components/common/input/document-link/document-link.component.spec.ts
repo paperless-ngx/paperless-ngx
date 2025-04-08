@@ -74,6 +74,11 @@ describe('DocumentLinkComponent', () => {
     expect(component.selectedDocuments).toEqual([documents[1], documents[0]])
   })
 
+  it('should retrieve document IDs from selected documents', () => {
+    component.selectedDocuments = documents
+    expect(component.selectedDocumentIDs).toEqual([1, 12, 16, 23])
+  })
+
   it('should search API on select text input', () => {
     const listSpy = jest.spyOn(documentService, 'listFiltered')
     listSpy.mockImplementation(

@@ -588,3 +588,45 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_webhook_action_url_validation(self):
+        """
+        GIVEN:
+            - API request to create a workflow with a notification action
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+        """
+
+        for url, expected_resp_code in [
+            ("https://examplewithouttld:3000/path", status.HTTP_201_CREATED),
+            ("file:///etc/passwd/path", status.HTTP_400_BAD_REQUEST),
+        ]:
+            response = self.client.post(
+                self.ENDPOINT,
+                json.dumps(
+                    {
+                        "name": "Workflow 2",
+                        "order": 1,
+                        "triggers": [
+                            {
+                                "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                                "sources": [DocumentSource.ApiUpload],
+                                "filter_filename": "*",
+                            },
+                        ],
+                        "actions": [
+                            {
+                                "type": WorkflowAction.WorkflowActionType.WEBHOOK,
+                                "webhook": {
+                                    "url": url,
+                                    "include_document": False,
+                                },
+                            },
+                        ],
+                    },
+                ),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, expected_resp_code)

@@ -47,7 +47,8 @@
           "sv-SE": "src/locale/messages.sv_SE.xlf",
           "tr-TR": "src/locale/messages.tr_TR.xlf",
           "uk-UA": "src/locale/messages.uk_UA.xlf",
-          "zh-CN": "src/locale/messages.zh_CN.xlf"
+          "zh-CN": "src/locale/messages.zh_CN.xlf",
+          "zh-TW": "src/locale/messages.zh_TW.xlf"
         }
       },
       "architect": {
@@ -177,7 +178,8 @@
     "schematicCollections": [
       "@angular-eslint/schematics"
     ],
-    "analytics": false
+    "analytics": false,
+    "packageManager": "pnpm"
   },
   "schematics": {
     "@angular-eslint/schematics:application": {

@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import hashlib
 import itertools
 import logging
 import tempfile
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Literal
 
 from celery import chain
@@ -10,7 +13,6 @@ from celery import chord
 from celery import group
 from celery import shared_task
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.db.models import Q
 from django.utils import timezone
 
@@ -24,9 +26,13 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.permissions import set_permissions_for_object
+from documents.plugins.helpers import DocumentsStatusManager
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
 from documents.tasks import update_document_content_maybe_archive_file
+
+if TYPE_CHECKING:
+    from django.contrib.auth.models import User
 
 logger: logging.Logger = logging.getLogger("paperless.bulk_edit")
 
@@ -219,6 +225,9 @@ def delete(doc_ids: list[int]) -> Literal["OK"]:
         with index.open_index_writer() as writer:
             for id in doc_ids:
                 index.remove_document_by_id(writer, id)
+
+        status_mgr = DocumentsStatusManager()
+        status_mgr.send_documents_deleted(doc_ids)
     except Exception as e:
         if "Data too long for column" in str(e):
             logger.warning(
@@ -241,6 +250,7 @@ def reprocess(doc_ids: list[int]) -> Literal["OK"]:
 def set_permissions(
     doc_ids: list[int],
     set_permissions,
+    *,
     owner=None,
     merge=False,
 ) -> Literal["OK"]:
@@ -305,8 +315,10 @@ def rotate(doc_ids: list[int], degrees: int) -> Literal["OK"]:
 
 def merge(
     doc_ids: list[int],
+    *,
     metadata_document_id: int | None = None,
     delete_originals: bool = False,
+    archive_fallback: bool = False,
     user: User | None = None,
 ) -> Literal["OK"]:
     logger.info(
@@ -322,7 +334,14 @@ def merge(
     for doc_id in doc_ids:
         doc = qs.get(id=doc_id)
         try:
-            with pikepdf.open(str(doc.source_path)) as pdf:
+            doc_path = (
+                doc.archive_path
+                if archive_fallback
+                and doc.mime_type != "application/pdf"
+                and doc.has_archive_version
+                else doc.source_path
+            )
+            with pikepdf.open(str(doc_path)) as pdf:
                 version = max(version, pdf.pdf_version)
                 merged_pdf.pages.extend(pdf.pages)
             affected_docs.append(doc.id)
@@ -338,7 +357,7 @@ def merge(
         Path(
             tempfile.mkdtemp(dir=settings.SCRATCH_DIR),
         )
-        / f"{'_'.join([str(doc_id) for doc_id in doc_ids])[:100]}_merged.pdf"
+        / f"{'_'.join([str(doc_id) for doc_id in affected_docs])[:100]}_merged.pdf"
     )
     merged_pdf.remove_unreferenced_resources()
     merged_pdf.save(filepath, min_version=version)
@@ -383,6 +402,7 @@ def merge(
 def split(
     doc_ids: list[int],
     pages: list[list[int]],
+    *,
     delete_originals: bool = False,
     user: User | None = None,
 ) -> Literal["OK"]:

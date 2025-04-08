@@ -15,6 +15,12 @@
 {% endblock form_top_content %}
 
 {% block form_content %}
+		{% if FIRST_INSTALL %}
+			<script type="text/javascript">
+				// forward to the signup page if no users exist
+				window.location.href = "{{ signup_url }}";
+			</script>
+		{% endif %}
     {% if not DISABLE_REGULAR_LOGIN %}
         {% translate "Username" as i18n_username %}
         {% translate "Password" as i18n_password %}

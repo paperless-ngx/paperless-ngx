@@ -34,6 +34,17 @@
       }
 
       <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
+        @if (!settingsService.offerTour() && savedViewService.allViews.length === 0) {
+          <div class="col">
+            <div class="card shadow-sm bg-light opacity-50">
+              <div class="card-body">
+                <div class="text-center">
+                  <p class="mb-0 fst-italic"><i-bs name="info-circle" class="me-2"></i-bs><ng-container i18n>Hint: saved views can be created from the <a routerLink="/documents">documents list</a></ng-container></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
         @for (v of dashboardViews; track v.id) {
           <div class="col">
             <pngx-saved-view-widget
@@ -49,12 +60,8 @@
   </div>
   <div class="col-12 col-lg-4 col-xl-3 col-sidebar">
     <div class="row row-cols-1 g-4 mb-4 sticky-lg-top z-0">
-      <div class="col">
-        <pngx-statistics-widget *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.UISettings }"></pngx-statistics-widget>
-      </div>
-      <div class="col">
-        <pngx-upload-file-widget></pngx-upload-file-widget>
-      </div>
+      <pngx-upload-file-widget></pngx-upload-file-widget>
+      <pngx-statistics-widget *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.UISettings }"></pngx-statistics-widget>
     </div>
   </div>
 </div>

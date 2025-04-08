@@ -71,6 +71,10 @@ export class DocumentLinkComponent
   @Input()
   placeholder: string = $localize`Search for documents`
 
+  get selectedDocumentIDs(): number[] {
+    return this.selectedDocuments.map((d) => d.id)
+  }
+
   constructor(private documentsService: DocumentService) {
     super()
   }

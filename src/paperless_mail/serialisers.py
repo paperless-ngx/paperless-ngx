@@ -8,13 +8,13 @@ from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
 
-class ObfuscatedPasswordField(serializers.Field):
+class ObfuscatedPasswordField(serializers.CharField):
     """
     Sends *** string instead of password in the clear
     """
 
-    def to_representation(self, value):
-        return "*" * len(value)
+    def to_representation(self, value) -> str:
+        return "*" * max(10, len(value))
 
     def to_internal_value(self, data):
         return data
@@ -96,6 +96,7 @@ class MailRuleSerializer(OwnedObjectSerializer):
             "order",
             "attachment_type",
             "consumption_scope",
+            "pdf_layout",
             "owner",
             "user_can_change",
             "permissions",

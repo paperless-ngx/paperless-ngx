@@ -1,12 +1,10 @@
 import datetime
 import os
-import re
 import shutil
 import stat
 import tempfile
 import zoneinfo
 from pathlib import Path
-from unittest import TestCase as UnittestTestCase
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -21,11 +19,11 @@ from guardian.core import ObjectPermissionChecker
 
 from documents.consumer import ConsumerError
 from documents.data_models import DocumentMetadataOverrides
+from documents.data_models import DocumentSource
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
-from documents.models import FileInfo
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.parsers import DocumentParser
@@ -35,143 +33,8 @@ from documents.tasks import sanity_check
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import GetConsumerMixin
-
-
-class TestAttributes(UnittestTestCase):
-    TAGS = ("tag1", "tag2", "tag3")
-
-    def _test_guess_attributes_from_name(self, filename, sender, title, tags):
-        file_info = FileInfo.from_filename(filename)
-
-        if sender:
-            self.assertEqual(file_info.correspondent.name, sender, filename)
-        else:
-            self.assertIsNone(file_info.correspondent, filename)
-
-        self.assertEqual(file_info.title, title, filename)
-
-        self.assertEqual(tuple(t.name for t in file_info.tags), tags, filename)
-
-    def test_guess_attributes_from_name_when_title_starts_with_dash(self):
-        self._test_guess_attributes_from_name(
-            "- weird but should not break.pdf",
-            None,
-            "- weird but should not break",
-            (),
-        )
-
-    def test_guess_attributes_from_name_when_title_ends_with_dash(self):
-        self._test_guess_attributes_from_name(
-            "weird but should not break -.pdf",
-            None,
-            "weird but should not break -",
-            (),
-        )
-
-
-class TestFieldPermutations(TestCase):
-    valid_dates = (
-        "20150102030405Z",
-        "20150102Z",
-    )
-    valid_correspondents = ["timmy", "Dr. McWheelie", "Dash Gor-don", "o Θεpμaoτής", ""]
-    valid_titles = ["title", "Title w Spaces", "Title a-dash", "Tίτλoς", ""]
-    valid_tags = ["tag", "tig,tag", "tag1,tag2,tag-3"]
-
-    def _test_guessed_attributes(
-        self,
-        filename,
-        created=None,
-        correspondent=None,
-        title=None,
-        tags=None,
-    ):
-        info = FileInfo.from_filename(filename)
-
-        # Created
-        if created is None:
-            self.assertIsNone(info.created, filename)
-        else:
-            self.assertEqual(info.created.year, int(created[:4]), filename)
-            self.assertEqual(info.created.month, int(created[4:6]), filename)
-            self.assertEqual(info.created.day, int(created[6:8]), filename)
-
-        # Correspondent
-        if correspondent:
-            self.assertEqual(info.correspondent.name, correspondent, filename)
-        else:
-            self.assertEqual(info.correspondent, None, filename)
-
-        # Title
-        self.assertEqual(info.title, title, filename)
-
-        # Tags
-        if tags is None:
-            self.assertEqual(info.tags, (), filename)
-        else:
-            self.assertEqual([t.name for t in info.tags], tags.split(","), filename)
-
-    def test_just_title(self):
-        template = "{title}.pdf"
-        for title in self.valid_titles:
-            spec = dict(title=title)
-            filename = template.format(**spec)
-            self._test_guessed_attributes(filename, **spec)
-
-    def test_created_and_title(self):
-        template = "{created} - {title}.pdf"
-
-        for created in self.valid_dates:
-            for title in self.valid_titles:
-                spec = {"created": created, "title": title}
-                self._test_guessed_attributes(template.format(**spec), **spec)
-
-    def test_invalid_date_format(self):
-        info = FileInfo.from_filename("06112017Z - title.pdf")
-        self.assertEqual(info.title, "title")
-        self.assertIsNone(info.created)
-
-    def test_filename_parse_transforms(self):
-        filename = "tag1,tag2_20190908_180610_0001.pdf"
-        all_patt = re.compile("^.*$")
-        none_patt = re.compile("$a")
-        re.compile("^([a-z0-9,]+)_(\\d{8})_(\\d{6})_([0-9]+)\\.")
-
-        # No transformations configured (= default)
-        info = FileInfo.from_filename(filename)
-        self.assertEqual(info.title, "tag1,tag2_20190908_180610_0001")
-        self.assertEqual(info.tags, ())
-        self.assertIsNone(info.created)
-
-        # Pattern doesn't match (filename unaltered)
-        with self.settings(FILENAME_PARSE_TRANSFORMS=[(none_patt, "none.gif")]):
-            info = FileInfo.from_filename(filename)
-            self.assertEqual(info.title, "tag1,tag2_20190908_180610_0001")
-
-        # Simple transformation (match all)
-        with self.settings(FILENAME_PARSE_TRANSFORMS=[(all_patt, "all.gif")]):
-            info = FileInfo.from_filename(filename)
-            self.assertEqual(info.title, "all")
-
-        # Multiple transformations configured (first pattern matches)
-        with self.settings(
-            FILENAME_PARSE_TRANSFORMS=[
-                (all_patt, "all.gif"),
-                (all_patt, "anotherall.gif"),
-            ],
-        ):
-            info = FileInfo.from_filename(filename)
-            self.assertEqual(info.title, "all")
-
-        # Multiple transformations configured (second pattern matches)
-        with self.settings(
-            FILENAME_PARSE_TRANSFORMS=[
-                (none_patt, "none.gif"),
-                (all_patt, "anotherall.gif"),
-            ],
-        ):
-            info = FileInfo.from_filename(filename)
-            self.assertEqual(info.title, "anotherall")
+from paperless_mail.models import MailRule
+from paperless_mail.parsers import MailDocumentParser
 
 
 class _BaseTestParser(DocumentParser):
@@ -233,7 +96,7 @@ class FaultyGenericExceptionParser(_BaseTestParser):
         raise Exception("Generic exception.")
 
 
-def fake_magic_from_file(file, mime=False):
+def fake_magic_from_file(file, *, mime=False):
     if mime:
         if file.name.startswith("invalid_pdf"):
             return "application/octet-stream"
@@ -243,6 +106,8 @@ def fake_magic_from_file(file, mime=False):
             return "image/png"
         elif os.path.splitext(file)[1] == ".webp":
             return "image/webp"
+        elif os.path.splitext(file)[1] == ".eml":
+            return "message/rfc822"
         else:
             return "unknown"
     else:
@@ -543,7 +408,9 @@ class TestConsumer(
 
         with self.get_consumer(
             self.get_test_file(),
-            DocumentMetadataOverrides(custom_field_ids=[cf1.id, cf3.id]),
+            DocumentMetadataOverrides(
+                custom_fields={cf1.id: "value1", cf3.id: "http://example.com"},
+            ),
         ) as consumer:
             consumer.run()
 
@@ -555,6 +422,11 @@ class TestConsumer(
         self.assertIn(cf1, fields_used)
         self.assertNotIn(cf2, fields_used)
         self.assertIn(cf3, fields_used)
+        self.assertEqual(document.custom_fields.get(field=cf1).value, "value1")
+        self.assertEqual(
+            document.custom_fields.get(field=cf3).value,
+            "http://example.com",
+        )
         self._assert_first_last_send_progress()
 
     def testOverrideAsn(self):
@@ -974,6 +846,59 @@ class TestConsumer(
 
             self.assertEqual(command[0], "qpdf")
             self.assertEqual(command[1], "--replace-input")
+
+    @mock.patch("paperless_mail.models.MailRule.objects.get")
+    @mock.patch("paperless_mail.parsers.MailDocumentParser.parse")
+    @mock.patch("documents.parsers.document_consumer_declaration.send")
+    def test_mail_parser_receives_mailrule(
+        self,
+        mock_consumer_declaration_send: mock.Mock,
+        mock_mail_parser_parse: mock.Mock,
+        mock_mailrule_get: mock.Mock,
+    ):
+        """
+        GIVEN:
+            - A mail document from a mail rule
+        WHEN:
+            - The consumer is run
+        THEN:
+            - The mail parser should receive the mail rule
+        """
+        mock_consumer_declaration_send.return_value = [
+            (
+                None,
+                {
+                    "parser": MailDocumentParser,
+                    "mime_types": {"message/rfc822": ".eml"},
+                    "weight": 0,
+                },
+            ),
+        ]
+        mock_mailrule_get.return_value = mock.Mock(
+            pdf_layout=MailRule.PdfLayout.HTML_ONLY,
+        )
+        with self.get_consumer(
+            filepath=(
+                Path(__file__).parent.parent.parent
+                / Path("paperless_mail")
+                / Path("tests")
+                / Path("samples")
+            ).resolve()
+            / "html.eml",
+            source=DocumentSource.MailFetch,
+            mailrule_id=1,
+        ) as consumer:
+            # fails because no gotenberg
+            with self.assertRaises(
+                ConsumerError,
+            ):
+                consumer.run()
+                mock_mail_parser_parse.assert_called_once_with(
+                    consumer.working_copy,
+                    "message/rfc822",
+                    file_name="sample.pdf",
+                    mailrule=mock_mailrule_get.return_value,
+                )
 
 
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)

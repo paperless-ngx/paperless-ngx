@@ -29,7 +29,7 @@ class DocumentMetadataOverrides:
     view_groups: list[int] | None = None
     change_users: list[int] | None = None
     change_groups: list[int] | None = None
-    custom_field_ids: list[int] | None = None
+    custom_fields: dict | None = None
 
     def update(self, other: "DocumentMetadataOverrides") -> "DocumentMetadataOverrides":
         """
@@ -81,11 +81,10 @@ class DocumentMetadataOverrides:
             self.change_groups.extend(other.change_groups)
             self.change_groups = list(set(self.change_groups))
 
-        if self.custom_field_ids is None:
-            self.custom_field_ids = other.custom_field_ids
-        elif other.custom_field_ids is not None:
-            self.custom_field_ids.extend(other.custom_field_ids)
-            self.custom_field_ids = list(set(self.custom_field_ids))
+        if self.custom_fields is None:
+            self.custom_fields = other.custom_fields
+        elif other.custom_fields is not None:
+            self.custom_fields.update(other.custom_fields)
 
         return self
 
@@ -114,9 +113,10 @@ class DocumentMetadataOverrides:
                 only_with_perms_in=["change_document"],
             ).values_list("id", flat=True),
         )
-        overrides.custom_field_ids = list(
-            doc.custom_fields.values_list("field", flat=True),
-        )
+        overrides.custom_fields = {
+            custom_field.id: custom_field.value
+            for custom_field in doc.custom_fields.all()
+        }
 
         groups_with_perms = get_groups_with_perms(
             doc,
@@ -144,6 +144,7 @@ class DocumentSource(IntEnum):
     ConsumeFolder = 1
     ApiUpload = 2
     MailFetch = 3
+    WebUI = 4
 
 
 @dataclasses.dataclass

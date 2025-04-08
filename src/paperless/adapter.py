@@ -1,11 +1,19 @@
+import logging
 from urllib.parse import quote
 
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.core import context
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import User
 from django.forms import ValidationError
 from django.urls import reverse
+
+from documents.models import Document
+from paperless.signals import handle_social_account_updated
+
+logger = logging.getLogger("paperless.auth")
 
 
 class CustomAccountAdapter(DefaultAccountAdapter):
@@ -14,6 +22,13 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         Check whether the site is open for signups, which can be
         disabled via the ACCOUNT_ALLOW_SIGNUPS setting.
         """
+        if (
+            User.objects.exclude(username__in=["consumer", "AnonymousUser"]).count()
+            == 0
+            and Document.global_objects.count() == 0
+        ):
+            # I.e. a fresh install, allow signups
+            return True
         allow_signups = super().is_open_for_signup(request)
         # Override with setting, otherwise default to super.
         return getattr(settings, "ACCOUNT_ALLOW_SIGNUPS", allow_signups)
@@ -61,6 +76,31 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             path = path.replace("UID-KEY", quote(key))
             return settings.PAPERLESS_URL + path
 
+    def save_user(self, request, user, form, commit=True):  # noqa: FBT002
+        """
+        Save the user instance. Default groups are assigned to the user, if
+        specified in the settings.
+        """
+
+        if (
+            User.objects.exclude(username__in=["consumer", "AnonymousUser"]).count()
+            == 0
+            and Document.global_objects.count() == 0
+        ):
+            # I.e. a fresh install, make the user a superuser
+            logger.debug(f"Creating initial superuser `{user}`")
+            user.is_superuser = True
+            user.is_staff = True
+
+        user: User = super().save_user(request, user, form, commit)
+        group_names: list[str] = settings.ACCOUNT_DEFAULT_GROUPS
+        if len(group_names) > 0:
+            groups = Group.objects.filter(name__in=group_names)
+            logger.debug(f"Adding default groups to user `{user}`: {group_names}")
+            user.groups.add(*groups)
+            user.save()
+        return user
+
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def is_open_for_signup(self, request, sociallogin):
@@ -80,10 +120,20 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         url = reverse("base")
         return url
 
-    def populate_user(self, request, sociallogin, data):
+    def save_user(self, request, sociallogin, form=None):
         """
-        Populate the user with data from the social account. Stub is kept in case
-        global default permissions are implemented in the future.
+        Save the user instance. Default groups are assigned to the user, if
+        specified in the settings.
         """
-        # TODO: If default global permissions are implemented, should also be here
-        return super().populate_user(request, sociallogin, data)  # pragma: no cover
+        # save_user also calls account_adapter save_user which would set ACCOUNT_DEFAULT_GROUPS
+        user: User = super().save_user(request, sociallogin, form)
+        group_names: list[str] = settings.SOCIAL_ACCOUNT_DEFAULT_GROUPS
+        if len(group_names) > 0:
+            groups = Group.objects.filter(name__in=group_names)
+            logger.debug(
+                f"Adding default social groups to user `{user}`: {group_names}",
+            )
+            user.groups.add(*groups)
+            user.save()
+        handle_social_account_updated(None, request, sociallogin)
+        return user

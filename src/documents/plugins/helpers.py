@@ -15,16 +15,14 @@ class ProgressStatusOptions(str, enum.Enum):
     FAILED = "FAILED"
 
 
-class ProgressManager:
+class BaseStatusManager:
     """
     Handles sending of progress information via the channel layer, with proper management
     of the open/close of the layer to ensure messages go out and everything is cleaned up
     """
 
-    def __init__(self, filename: str, task_id: str | None = None) -> None:
-        self.filename = filename
+    def __init__(self) -> None:
         self._channel: RedisPubSubChannelLayer | None = None
-        self.task_id = task_id
 
     def __enter__(self):
         self.open()
@@ -49,6 +47,24 @@ class ProgressManager:
             async_to_sync(self._channel.flush)
             self._channel = None
 
+    def send(self, payload: dict[str, str | int | None]) -> None:
+        # Ensure the layer is open
+        self.open()
+
+        # Just for IDEs
+        if TYPE_CHECKING:
+            assert self._channel is not None
+
+        # Construct and send the update
+        async_to_sync(self._channel.group_send)("status_updates", payload)
+
+
+class ProgressManager(BaseStatusManager):
+    def __init__(self, filename: str | None = None, task_id: str | None = None) -> None:
+        super().__init__()
+        self.filename = filename
+        self.task_id = task_id
+
     def send_progress(
         self,
         status: ProgressStatusOptions,
@@ -57,13 +73,6 @@ class ProgressManager:
         max_progress: int,
         extra_args: dict[str, str | int | None] | None = None,
     ) -> None:
-        # Ensure the layer is open
-        self.open()
-
-        # Just for IDEs
-        if TYPE_CHECKING:
-            assert self._channel is not None
-
         payload = {
             "type": "status_update",
             "data": {
@@ -78,5 +87,16 @@ class ProgressManager:
         if extra_args is not None:
             payload["data"].update(extra_args)
 
-        # Construct and send the update
-        async_to_sync(self._channel.group_send)("status_updates", payload)
+        self.send(payload)
+
+
+class DocumentsStatusManager(BaseStatusManager):
+    def send_documents_deleted(self, documents: list[int]) -> None:
+        payload = {
+            "type": "documents_deleted",
+            "data": {
+                "documents": documents,
+            },
+        }
+
+        self.send(payload)
