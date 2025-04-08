@@ -461,6 +461,7 @@ def check_scheduled_workflows():
                             )
                             continue
                         run_workflows(
-                            WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
-                            document,
+                            trigger_type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+                            workflow_to_run=workflow,
+                            document=document,
                         )
