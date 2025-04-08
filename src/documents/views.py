@@ -81,6 +81,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.viewsets import ViewSet
+from underthesea.models.text_classifier import Model
 
 from documents import bulk_edit
 from documents import index
@@ -106,7 +107,7 @@ from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.documents import DocumentDocument
-from documents.filters import ArchiveFontFilterSet
+from documents.filters import ArchiveFontFilterSet, EdocTaskFilterSet
 from documents.filters import BackupRecordFilterSet
 from documents.filters import CorrespondentFilterSet
 from documents.filters import CustomFieldFilterSet
@@ -2163,6 +2164,29 @@ class TasksViewSet(ReadOnlyModelViewSet):
             queryset = EdocTask.objects.filter(task_id=task_id)
         return queryset
 
+class EdocTasksViewSet(ModelViewSet):
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TasksViewSerializer
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+    )
+    filterset_class = EdocTaskFilterSet
+    ordering_fields = ("task_name","date_created","date_started","date_done")
+    queryset = EdocTask.objects.all()
+    def get_queryset(self):
+        queryset = (
+            EdocTask.objects.filter(
+                acknowledged=False,
+            )
+            .order_by("date_created")
+            .reverse()
+        )
+        task_id = self.request.query_params.get("task_id")
+        if task_id is not None:
+            queryset = EdocTask.objects.filter(task_id=task_id)
+        return queryset
 
 class ApprovalViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated,)

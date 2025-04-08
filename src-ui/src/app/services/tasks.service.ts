@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, HttpParams } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { Subject } from 'rxjs'
+import { Observable, Subject } from 'rxjs'
 import { first, takeUntil } from 'rxjs/operators'
 import {
   EdocTask,
@@ -8,6 +8,8 @@ import {
   EdocTaskType,
 } from 'src/app/data/edoc-task'
 import { environment } from 'src/environments/environment'
+import { Results } from '../data/results'
+import { Document } from '../data/document'
 
 @Injectable({
   providedIn: 'root',
@@ -48,6 +50,35 @@ export class TasksService {
   }
 
   constructor(private http: HttpClient) {}
+
+
+  public queuedFileEdocTasks(page: number = 1): Observable<Results<EdocTask>> {
+    const httpParams = new HttpParams().set('page', page.toString())
+    return this.http.get<Results<EdocTask>>(`${environment.apiBaseUrl}edoc_tasks/?status__iexact=PENDING`, {
+      params: httpParams,
+    })
+  }
+
+  public startedFileEdocTasks(page: number = 1): Observable<Results<EdocTask>> {
+    const httpParams = new HttpParams().set('page', page.toString())
+    return this.http.get<Results<EdocTask>>(`${environment.apiBaseUrl}edoc_tasks/?status__iexact=STARTED`, {
+      params: httpParams,
+    })
+  }
+
+  public completedFileEdocTasks(page: number = 1): Observable<Results<EdocTask>> {
+    const httpParams = new HttpParams().set('page', page.toString())
+    return this.http.get<Results<EdocTask>>(`${environment.apiBaseUrl}edoc_tasks/?status__iexact=SUCCESS`, {
+      params: httpParams,
+    })
+  }
+
+  public failedFileEdocTasks(page: number = 1): Observable<Results<EdocTask>> {
+    const httpParams = new HttpParams().set('page', page.toString())
+    return this.http.get<Results<EdocTask>>(`${environment.apiBaseUrl}edoc_tasks/?status__iexact=FAILURE`, {
+      params: httpParams,
+    })
+  }
 
   public reload() {
     this.loading = true

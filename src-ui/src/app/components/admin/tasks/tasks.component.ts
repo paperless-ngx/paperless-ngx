@@ -1,11 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 import { Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { first } from 'rxjs'
+import { delay, first, Observable, tap } from 'rxjs'
 import { EdocTask } from 'src/app/data/edoc-task'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { Results } from '../../../data/results'
 
 @Component({
   selector: 'pngx-tasks',
@@ -14,8 +15,7 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
 })
 export class TasksComponent
   extends ComponentWithPermissions
-  implements OnInit, OnDestroy
-{
+  implements OnInit, OnDestroy {
   public activeTab: string
   public selectedTasks: Set<number> = new Set()
   public togggleAll: boolean = false
@@ -25,6 +25,27 @@ export class TasksComponent
   public page: number = 1
 
   public autoRefreshInterval: any
+  public tasksQueued: Results<EdocTask> = {
+    count: 0,
+    results: [],
+    all: []
+  }
+  public tasksStarted: Results<EdocTask> = {
+    count: 0,
+    results: [],
+    all: []
+  }
+  public tasksCompleted: Results<EdocTask> = {
+    count: 0,
+    results: [],
+    all: []
+  }
+
+  public tasksFailed: Results<EdocTask> = {
+    count: 0,
+    results: [],
+    all: []
+  }
 
   get dismissButtonText(): string {
     return this.selectedTasks.size > 0
@@ -35,13 +56,14 @@ export class TasksComponent
   constructor(
     public tasksService: TasksService,
     private modalService: NgbModal,
-    private readonly router: Router
+    private readonly router: Router,
   ) {
     super()
   }
 
   ngOnInit() {
-    this.tasksService.reload()
+    // this.tasksService.reload()
+    this.reloadData()
     this.toggleAutoRefresh()
   }
 
@@ -148,8 +170,84 @@ export class TasksComponent
       this.autoRefreshInterval = null
     } else {
       this.autoRefreshInterval = setInterval(() => {
-        this.tasksService.reload()
+        // this.tasksService.reload()
+        this.reloadData()
       }, 5000)
     }
   }
+
+  reloadData() {
+    this.queuedFileEdocTasks(1)
+    this.startedFileEdocTasks(1)
+    this.completedFileEdocTasks(1)
+    this.failedFileEdocTasks(1)
+  }
+
+  queuedFileEdocTasks(pageQueue = 1) {
+    this.tasksService
+      .queuedFileEdocTasks(pageQueue)
+      .pipe(
+        tap((r) => {
+          this.tasksQueued = r
+        }),
+        // delay(100)
+      )
+      .subscribe(() => {
+      })
+  }
+
+  startedFileEdocTasks(pageQueue = 1) {
+    this.tasksService
+      .startedFileEdocTasks(this.page)
+      .pipe(
+        tap((r) => {
+          this.tasksStarted = r
+        }),
+        // delay(100)
+      )
+      .subscribe(() => {
+      })
+  }
+
+  completedFileEdocTasks(pageQueue = 1) {
+    this.tasksService
+      .completedFileEdocTasks(this.page)
+      .pipe(
+        tap((r) => {
+          this.tasksCompleted = r
+        }),
+        // delay(100)
+      )
+      .subscribe(() => {
+      })
+  }
+
+  failedFileEdocTasks(pageQueue = 1) {
+    this.tasksService
+      .failedFileEdocTasks(this.page)
+      .pipe(
+        tap((r) => {
+          this.tasksFailed = r
+        }),
+        // delay(100)
+      )
+      .subscribe(() => {
+      })
+  }
+
+  getCountTaskAll() {
+
+    switch (this.activeTab) {
+      case 'queued':
+        return this.tasksQueued.count
+      case 'started':
+        return this.tasksStarted.count
+      case 'completed':
+        return this.tasksCompleted.count
+      case 'failed':
+        return this.tasksFailed.count
+    }
+
+  }
+
 }

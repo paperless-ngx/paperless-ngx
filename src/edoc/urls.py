@@ -48,6 +48,7 @@ from documents.views import SystemStatusView
 from documents.views import SystemStorageStatusView
 from documents.views import TagViewSet
 from documents.views import TasksViewSet
+from documents.views import EdocTasksViewSet
 from documents.views import TrashView
 from documents.views import UiSettingsView
 from documents.views import UnifiedSearchViewSet
@@ -81,6 +82,7 @@ api_router.register(r"tags", TagViewSet)
 api_router.register(r"saved_views", SavedViewViewSet)
 api_router.register(r"storage_paths", StoragePathViewSet)
 api_router.register(r"tasks", TasksViewSet, basename="tasks")
+api_router.register(r"edoc_tasks", EdocTasksViewSet, basename="edoc_tasks")
 api_router.register(r"users", UserViewSet, basename="users")
 api_router.register(r"groups", GroupViewSet, basename="groups")
 api_router.register(r"mail_accounts", MailAccountViewSet)

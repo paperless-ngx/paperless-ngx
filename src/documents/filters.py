@@ -15,7 +15,7 @@ from guardian.utils import get_user_obj_perms_model
 from rest_framework_guardian.filters import ObjectPermissionsFilter
 
 from documents.models import Approval, Correspondent, Dossier, DossierForm, \
-    ArchiveFont, FontLanguage, BackupRecord
+    ArchiveFont, FontLanguage, BackupRecord, EdocTask
 from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
@@ -450,6 +450,14 @@ class WarehouseFilterSet(FilterSet):
 #             "ctype": CHAR_KWARGS,
 #             "path": CHAR_KWARGS,
 #         }
+
+class EdocTaskFilterSet(FilterSet):
+    class Meta:
+        model = EdocTask
+        fields = {
+            "id": ID_KWARGS,
+            "status": CHAR_KWARGS,
+        }
 
 class FolderFilterSet(FilterSet):
     parent_folder__id__none = ObjectFilter(field_name="parent_folder", exclude=True)
