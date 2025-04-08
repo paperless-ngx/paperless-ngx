@@ -2,11 +2,8 @@ from __future__ import annotations
 
 import logging
 import re
-from datetime import timedelta
 from fnmatch import fnmatch
 from typing import TYPE_CHECKING
-
-from django.utils import timezone
 
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
@@ -389,14 +386,6 @@ def existing_document_matches_workflow(
         )
         trigger_matched = False
 
-    # Scheduled trigger
-    if (
-        trigger.type == WorkflowTrigger.WorkflowTriggerType.SCHEDULED
-        and not document_matches_scheduled_workflow(document, trigger)
-    ):
-        reason = (f"Document {document} does not match scheduled trigger {trigger}",)
-        trigger_matched = False
-
     return (trigger_matched, reason)
 
 
@@ -444,35 +433,3 @@ def document_matches_workflow(
                 logger.debug(reason)
 
     return trigger_matched
-
-
-def document_matches_scheduled_workflow(
-    document: Document,
-    trigger: WorkflowTrigger,
-) -> bool:
-    """
-    Returns True if the Document matches a scheduled workflow
-    """
-
-    offset_td = timedelta(days=trigger.schedule_offset_days)
-    logger.debug(
-        f"Checking trigger {trigger} with offset {offset_td} against field: {trigger.schedule_date_field}",
-    )
-    matches = False
-    match trigger.schedule_date_field:
-        case WorkflowTrigger.ScheduleDateField.ADDED:
-            matches = document.added < timezone.now() - offset_td
-        case WorkflowTrigger.ScheduleDateField.CREATED:
-            matches = document.created < timezone.now() - offset_td
-        case WorkflowTrigger.ScheduleDateField.MODIFIED:
-            matches = document.modified < timezone.now() - offset_td
-        case WorkflowTrigger.ScheduleDateField.CUSTOM_FIELD:
-            cf_instance = document.custom_field_instances.filter(
-                field=trigger.schedule_date_custom_field,
-            ).first()
-            if cf_instance:
-                matches = cf_instance.value_date < timezone.now() - offset_td
-            else:
-                matches = False
-
-    return matches
