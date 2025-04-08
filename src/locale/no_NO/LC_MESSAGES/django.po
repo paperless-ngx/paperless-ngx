@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-11 13:33-0700\n"
-"PO-Revision-Date: 2025-03-11 20:35\n"
+"POT-Creation-Date: 2025-03-26 21:04-0700\n"
+"PO-Revision-Date: 2025-03-29 17:14\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -55,7 +55,7 @@ msgstr ""
 
 #: documents/filters.py:827
 msgid "Custom field not found"
-msgstr ""
+msgstr "Egendefinert felt ble ikke funnet"
 
 #: documents/models.py:36 documents/models.py:710
 msgid "owner"
@@ -196,11 +196,11 @@ msgstr "Sjekksummen av det arkiverte dokumentet."
 
 #: documents/models.py:205
 msgid "page count"
-msgstr ""
+msgstr "antall sider"
 
 #: documents/models.py:212
 msgid "The number of pages of the document."
-msgstr ""
+msgstr "Antall sider i dokumentet."
 
 #: documents/models.py:216 documents/models.py:630 documents/models.py:668
 #: documents/models.py:739 documents/models.py:797
@@ -318,7 +318,7 @@ msgstr "ASN"
 
 #: documents/models.py:395
 msgid "Pages"
-msgstr ""
+msgstr "Sider"
 
 #: documents/models.py:401
 msgid "show on dashboard"
@@ -526,7 +526,7 @@ msgstr "har ikke egendefinert felt"
 
 #: documents/models.py:489
 msgid "custom fields query"
-msgstr ""
+msgstr "egendefinerte felt spørring"
 
 #: documents/models.py:490
 msgid "created to"
@@ -566,15 +566,15 @@ msgstr "filtrer regler"
 
 #: documents/models.py:534
 msgid "Auto Task"
-msgstr ""
+msgstr "Automatisk oppgave"
 
 #: documents/models.py:535
 msgid "Scheduled Task"
-msgstr ""
+msgstr "Planlagt oppgave"
 
 #: documents/models.py:536
 msgid "Manual Task"
-msgstr ""
+msgstr "Manuell oppgave"
 
 #: documents/models.py:539
 msgid "Consume File"
@@ -590,7 +590,7 @@ msgstr ""
 
 #: documents/models.py:542
 msgid "Index Optimize"
-msgstr ""
+msgstr "index optimalisering"
 
 #: documents/models.py:547
 msgid "Task ID"
@@ -622,7 +622,7 @@ msgstr "Oppgavenavn"
 
 #: documents/models.py:569
 msgid "Name of the task that was run"
-msgstr ""
+msgstr "Navn på oppgaven som ble kjørt"
 
 #: documents/models.py:576
 msgid "Task State"
@@ -666,11 +666,11 @@ msgstr "Dataene returnert av oppgaven"
 
 #: documents/models.py:614
 msgid "Task Type"
-msgstr ""
+msgstr "Oppgave type"
 
 #: documents/models.py:615
 msgid "The type of task that was run"
-msgstr ""
+msgstr "Type oppgave som ble utført"
 
 #: documents/models.py:626
 msgid "Note for the document"
@@ -722,7 +722,7 @@ msgstr "URL"
 
 #: documents/models.py:730
 msgid "Date"
-msgstr ""
+msgstr "Dato"
 
 #: documents/models.py:731
 msgid "Boolean"
@@ -746,7 +746,7 @@ msgstr "Dokument lenke"
 
 #: documents/models.py:736
 msgid "Select"
-msgstr ""
+msgstr "Velg"
 
 #: documents/models.py:748
 msgid "data type"
@@ -790,7 +790,7 @@ msgstr "Dokument oppdatert"
 
 #: documents/models.py:932
 msgid "Scheduled"
-msgstr ""
+msgstr "Planlagt"
 
 #: documents/models.py:935
 msgid "Consume Folder"
@@ -806,15 +806,15 @@ msgstr "Epost-henting"
 
 #: documents/models.py:938
 msgid "Web UI"
-msgstr ""
+msgstr "Web UI"
 
 #: documents/models.py:943
 msgid "Modified"
-msgstr ""
+msgstr "Endret"
 
 #: documents/models.py:944
 msgid "Custom Field"
-msgstr ""
+msgstr "Egendefinerte felt"
 
 #: documents/models.py:947
 msgid "Workflow Trigger Type"
@@ -898,7 +898,7 @@ msgstr ""
 
 #: documents/models.py:1075
 msgid "email subject"
-msgstr ""
+msgstr "e-post emne"
 
 #: documents/models.py:1079
 msgid "The subject of the email, can include some placeholders, see documentation."
@@ -906,7 +906,7 @@ msgstr ""
 
 #: documents/models.py:1085
 msgid "email body"
-msgstr ""
+msgstr "epost innhold"
 
 #: documents/models.py:1088
 msgid "The body (message) of the email, can include some placeholders, see documentation."
@@ -1222,28 +1222,28 @@ msgstr "Vennligst logg inn."
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
 msgstr ""
 
-#: documents/templates/account/login.html:19
-#: documents/templates/account/signup.html:15
+#: documents/templates/account/login.html:25
+#: documents/templates/account/signup.html:22
 #: documents/templates/socialaccount/signup.html:13
 msgid "Username"
 msgstr "Brukernavn"
 
-#: documents/templates/account/login.html:20
-#: documents/templates/account/signup.html:17
+#: documents/templates/account/login.html:26
+#: documents/templates/account/signup.html:24
 msgid "Password"
 msgstr "Passord"
 
-#: documents/templates/account/login.html:30
+#: documents/templates/account/login.html:36
 #: documents/templates/mfa/authenticate.html:23
 msgid "Sign in"
 msgstr "Logg inn"
 
-#: documents/templates/account/login.html:34
+#: documents/templates/account/login.html:40
 msgid "Forgot your password?"
 msgstr "Glemt passord?"
 
-#: documents/templates/account/login.html:45
-#: documents/templates/account/signup.html:49
+#: documents/templates/account/login.html:51
+#: documents/templates/account/signup.html:57
 msgid "or sign in via"
 msgstr ""
 
@@ -1316,21 +1316,25 @@ msgstr "Ditt nye passord er satt. Du kan nå <a href=\"%(login_url)s\">logge inn
 msgid "Paperless-ngx sign up"
 msgstr ""
 
-#: documents/templates/account/signup.html:10
+#: documents/templates/account/signup.html:11
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
 msgstr ""
 
-#: documents/templates/account/signup.html:16
+#: documents/templates/account/signup.html:19
+msgid "Note: This is the first user account for this installation and will be granted superuser privileges."
+msgstr ""
+
+#: documents/templates/account/signup.html:23
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
 msgstr ""
 
-#: documents/templates/account/signup.html:18
+#: documents/templates/account/signup.html:25
 msgid "Password (again)"
 msgstr ""
 
-#: documents/templates/account/signup.html:36
+#: documents/templates/account/signup.html:43
 #: documents/templates/socialaccount/signup.html:27
 msgid "Sign up"
 msgstr ""
@@ -1555,139 +1559,139 @@ msgstr ""
 msgid "paperless application settings"
 msgstr ""
 
-#: paperless/settings.py:723
+#: paperless/settings.py:722
 msgid "English (US)"
 msgstr "Engelsk (US)"
 
-#: paperless/settings.py:724
+#: paperless/settings.py:723
 msgid "Arabic"
 msgstr "Arabisk"
 
-#: paperless/settings.py:725
+#: paperless/settings.py:724
 msgid "Afrikaans"
 msgstr "Afrikansk"
 
-#: paperless/settings.py:726
+#: paperless/settings.py:725
 msgid "Belarusian"
 msgstr "Hviterussisk"
 
-#: paperless/settings.py:727
+#: paperless/settings.py:726
 msgid "Bulgarian"
 msgstr ""
 
-#: paperless/settings.py:728
+#: paperless/settings.py:727
 msgid "Catalan"
 msgstr "Katalansk"
 
-#: paperless/settings.py:729
+#: paperless/settings.py:728
 msgid "Czech"
 msgstr "Tsjekkisk"
 
-#: paperless/settings.py:730
+#: paperless/settings.py:729
 msgid "Danish"
 msgstr "Dansk"
 
-#: paperless/settings.py:731
+#: paperless/settings.py:730
 msgid "German"
 msgstr "Tysk"
 
-#: paperless/settings.py:732
+#: paperless/settings.py:731
 msgid "Greek"
 msgstr "Gresk"
 
-#: paperless/settings.py:733
+#: paperless/settings.py:732
 msgid "English (GB)"
 msgstr "Engelsk (GB)"
 
-#: paperless/settings.py:734
+#: paperless/settings.py:733
 msgid "Spanish"
 msgstr "Spansk"
 
-#: paperless/settings.py:735
+#: paperless/settings.py:734
 msgid "Finnish"
 msgstr "Finsk"
 
-#: paperless/settings.py:736
+#: paperless/settings.py:735
 msgid "French"
 msgstr "Fransk"
 
-#: paperless/settings.py:737
+#: paperless/settings.py:736
 msgid "Hungarian"
 msgstr ""
 
-#: paperless/settings.py:738
+#: paperless/settings.py:737
 msgid "Italian"
 msgstr "Italiensk"
 
-#: paperless/settings.py:739
+#: paperless/settings.py:738
 msgid "Japanese"
 msgstr ""
 
-#: paperless/settings.py:740
+#: paperless/settings.py:739
 msgid "Korean"
 msgstr ""
 
-#: paperless/settings.py:741
+#: paperless/settings.py:740
 msgid "Luxembourgish"
 msgstr "Luxembourgsk"
 
-#: paperless/settings.py:742
+#: paperless/settings.py:741
 msgid "Norwegian"
 msgstr "Norsk"
 
-#: paperless/settings.py:743
+#: paperless/settings.py:742
 msgid "Dutch"
 msgstr "Nederlandsk"
 
-#: paperless/settings.py:744
+#: paperless/settings.py:743
 msgid "Polish"
 msgstr "Polsk"
 
-#: paperless/settings.py:745
+#: paperless/settings.py:744
 msgid "Portuguese (Brazil)"
 msgstr "Portugisisk (Brasil)"
 
-#: paperless/settings.py:746
+#: paperless/settings.py:745
 msgid "Portuguese"
 msgstr "Portugisisk"
 
-#: paperless/settings.py:747
+#: paperless/settings.py:746
 msgid "Romanian"
 msgstr "Rumensk"
 
-#: paperless/settings.py:748
+#: paperless/settings.py:747
 msgid "Russian"
 msgstr "Russisk"
 
-#: paperless/settings.py:749
+#: paperless/settings.py:748
 msgid "Slovak"
 msgstr "Slovakisk"
 
-#: paperless/settings.py:750
+#: paperless/settings.py:749
 msgid "Slovenian"
 msgstr "Slovenian"
 
-#: paperless/settings.py:751
+#: paperless/settings.py:750
 msgid "Serbian"
 msgstr "Serbisk"
 
-#: paperless/settings.py:752
+#: paperless/settings.py:751
 msgid "Swedish"
 msgstr "Svensk"
 
-#: paperless/settings.py:753
+#: paperless/settings.py:752
 msgid "Turkish"
 msgstr "Tyrkisk"
 
-#: paperless/settings.py:754
+#: paperless/settings.py:753
 msgid "Ukrainian"
 msgstr "Ukrainsk"
 
-#: paperless/settings.py:755
+#: paperless/settings.py:754
 msgid "Chinese Simplified"
 msgstr "Kinesisk forenklet"
 
-#: paperless/settings.py:756
+#: paperless/settings.py:755
 msgid "Chinese Traditional"
 msgstr ""
 

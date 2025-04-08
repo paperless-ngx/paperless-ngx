@@ -649,11 +649,12 @@ def send_webhook(
 def run_workflows(
     trigger_type: WorkflowTrigger.WorkflowTriggerType,
     document: Document | ConsumableDocument,
+    workflow_to_run: Workflow | None = None,
     logging_group=None,
     overrides: DocumentMetadataOverrides | None = None,
     original_file: Path | None = None,
 ) -> tuple[DocumentMetadataOverrides, str] | None:
-    """Run workflows which match a Document (or ConsumableDocument) for a specific trigger type.
+    """Run workflows which match a Document (or ConsumableDocument) for a specific trigger type or a single workflow if given.
 
     Assignment or removal actions are either applied directly to the document or an overrides object. If an overrides
     object is provided, the function returns the object with the applied changes or None if no actions were applied and a string
@@ -1192,24 +1193,28 @@ def run_workflows(
     messages = []
 
     workflows = (
-        Workflow.objects.filter(enabled=True, triggers__type=trigger_type)
-        .prefetch_related(
-            "actions",
-            "actions__assign_view_users",
-            "actions__assign_view_groups",
-            "actions__assign_change_users",
-            "actions__assign_change_groups",
-            "actions__assign_custom_fields",
-            "actions__remove_tags",
-            "actions__remove_correspondents",
-            "actions__remove_document_types",
-            "actions__remove_storage_paths",
-            "actions__remove_custom_fields",
-            "actions__remove_owners",
-            "triggers",
+        (
+            Workflow.objects.filter(enabled=True, triggers__type=trigger_type)
+            .prefetch_related(
+                "actions",
+                "actions__assign_view_users",
+                "actions__assign_view_groups",
+                "actions__assign_change_users",
+                "actions__assign_change_groups",
+                "actions__assign_custom_fields",
+                "actions__remove_tags",
+                "actions__remove_correspondents",
+                "actions__remove_document_types",
+                "actions__remove_storage_paths",
+                "actions__remove_custom_fields",
+                "actions__remove_owners",
+                "triggers",
+            )
+            .order_by("order")
+            .distinct()
         )
-        .order_by("order")
-        .distinct()
+        if workflow_to_run is None
+        else [workflow_to_run]
     )
 
     for workflow in workflows:
@@ -1220,7 +1225,14 @@ def run_workflows(
             document.refresh_from_db()
             doc_tag_ids = list(document.tags.values_list("pk", flat=True))
 
-        if matching.document_matches_workflow(document, workflow, trigger_type):
+        # If a workflow is supplied, we don't need to check if it matches
+        matches = (
+            matching.document_matches_workflow(document, workflow, trigger_type)
+            if workflow_to_run is None
+            else True
+        )
+
+        if matches:
             action: WorkflowAction
             for action in workflow.actions.all():
                 message = f"Applying {action} from {workflow}"
