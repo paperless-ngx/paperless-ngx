@@ -64,10 +64,6 @@
 -   Fix: deselect and trigger refresh for deleted documents from bulk operations with delete originals [@shamoon](https://github.com/shamoon) ([#8996](https://github.com/paperless-ngx/paperless-ngx/pull/8996))
 -   Fix: allow empty email in profile [@shamoon](https://github.com/shamoon) ([#9012](https://github.com/paperless-ngx/paperless-ngx/pull/9012))
 
-### Documentation
-
--   Fix: fix auto-close when doc update no longer has permissions [@shamoon](https://github.com/shamoon) ([#9453](https://github.com/paperless-ngx/paperless-ngx/pull/9453))
-
 ### Maintenance
 
 -   docker(deps): Bump astral-sh/uv from 0.6.5-python3.12-bookworm-slim to 0.6.9-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#9488](https://github.com/paperless-ngx/paperless-ngx/pull/9488))
