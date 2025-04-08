@@ -75,6 +75,12 @@ RUN set -eux \
       && echo "Removing downloaded archives" \
         && rm ./*.tar.xz \
         && rm ./*.sha256 \
+    && echo "Configuring Bash to see container environment" \
+      && echo '#!/bin/sh' > /tmp/bash-wrapper \
+      && echo 'exec /command/with-contenv /bin/bash.original "$@"' >> /tmp/bash-wrapper \
+      && chmod +x /tmp/bash-wrapper \
+      && cp /bin/bash /bin/bash.original \
+      && mv /tmp/bash-wrapper /bin/bash \
     && echo "Cleaning up image" \
       && apt-get --yes purge ${S6_BUILD_TIME_PKGS} \
       && apt-get --yes autoremove --purge \
