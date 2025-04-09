@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-26 21:04-0700\n"
-"PO-Revision-Date: 2025-04-02 00:33\n"
+"PO-Revision-Date: 2025-04-09 12:12\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -582,7 +582,7 @@ msgstr "Fichier à consommer"
 
 #: documents/models.py:540
 msgid "Train Classifier"
-msgstr ""
+msgstr "Entrainer le classificateur"
 
 #: documents/models.py:541
 msgid "Check Sanity"

@@ -556,7 +556,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="translated">應用程式設定</target>
+        <target state="translated">系統配置</target>
       </trans-unit>
       <trans-unit id="8528041182664173532" datatype="html">
         <source>Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of Paperless-ngx. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</source>
@@ -564,7 +564,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="translated">全域應用程式設定選項適用於此安裝版本的&lt;strong&gt;每位&lt;/strong&gt;使用者。雖然也可以透過環境變數或設定檔來設定，但這裡的設定將始終優先於其他設定。</target>
+        <target state="translated">全域系統配置會套用至該系統的&lt;strong&gt;每一位&lt;/strong&gt;使用者。雖然環境變數或設定檔也可以調整相關設定，但此處的設定將優先於他處的設定。</target>
       </trans-unit>
       <trans-unit id="7991430199894172363" datatype="html">
         <source>Read the documentation about this setting</source>
@@ -864,7 +864,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="translated">自訂外觀、通知等選項。設定只適用於&lt;strong&gt;目前使用者&lt;/strong&gt;。</target>
+        <target state="translated">自訂外觀、通知等選項。這些設定只套用於&lt;strong&gt;目前的使用者&lt;/strong&gt;。</target>
       </trans-unit>
       <trans-unit id="1685061484835793745" datatype="html">
         <source>Start tour</source>

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-26 21:04-0700\n"
-"PO-Revision-Date: 2025-03-29 17:14\n"
+"PO-Revision-Date: 2025-04-09 21:44\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -23,7 +23,7 @@ msgstr "Documenten"
 
 #: documents/filters.py:374
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "Waarde moet een geldige JSON zijn."
 
 #: documents/filters.py:393
 msgid "Invalid custom field query expression"
@@ -766,7 +766,7 @@ msgstr "aangepaste velden"
 
 #: documents/models.py:766
 msgid "custom fields"
-msgstr "Aangepaste velden"
+msgstr "aangepaste velden"
 
 #: documents/models.py:863
 msgid "custom field instance"
