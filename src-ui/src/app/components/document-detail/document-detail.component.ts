@@ -1,5 +1,5 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, HttpResponse } from '@angular/common/http'
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import {
   FormArray,
@@ -995,44 +995,49 @@ export class DocumentDetailComponent
       this.documentId,
       original
     )
-    this.http.get(downloadUrl, { responseType: 'blob' }).subscribe({
-      next: (blob) => {
-        this.downloading = false
-        const blobParts = [blob]
-        const file = new File(
-          blobParts,
-          original
-            ? this.document.original_file_name
-            : this.document.archived_file_name,
-          {
-            type: original ? this.document.mime_type : 'application/pdf',
-          }
-        )
-        if (
-          !this.deviceDetectorService.isDesktop() &&
-          navigator.canShare &&
-          navigator.canShare({ files: [file] })
-        ) {
-          navigator.share({
-            files: [file],
+    this.http
+      .get(downloadUrl, { observe: 'response', responseType: 'blob' })
+      .subscribe({
+        next: (response: HttpResponse<Blob>) => {
+          const filename = response.headers
+            .get('Content-Disposition')
+            ?.split(';')
+            .find((part) => part.trim().startsWith('filename='))
+            ?.split('=')[1]
+            ?.replace(/"b'/g, '')
+            ?.replace(/'"/g, '')
+          const blob = new Blob([response.body], {
+            type: response.body.type,
           })
-        } else {
-          const url = URL.createObjectURL(blob)
-          const a = document.createElement('a')
-          a.href = url
-          a.download = this.document.title
-          a.click()
-          URL.revokeObjectURL(url)
-        }
-      },
-      error: (error) => {
-        this.downloading = false
-        this.toastService.showError(
-          $localize`Error downloading document`,
-          error
-        )
-      },
-    })
+          this.downloading = false
+          const file = new File([blob], filename, {
+            type: response.body.type,
+          })
+          if (
+            !this.deviceDetectorService.isDesktop() &&
+            navigator.canShare &&
+            navigator.canShare({ files: [file] })
+          ) {
+            navigator.share({
+              files: [file],
+            })
+          } else {
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = filename
+            a.click()
+            URL.revokeObjectURL(url)
+          }
+        },
+        error: (error) => {
+          this.downloading = false
+          this.toastService.showError(
+            $localize`Error downloading document`,
+            error
+          )
+        },
+      })
   }
 
   hasNext() {
