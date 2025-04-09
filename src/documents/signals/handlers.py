@@ -1225,14 +1225,7 @@ def run_workflows(
             document.refresh_from_db()
             doc_tag_ids = list(document.tags.values_list("pk", flat=True))
 
-        # If a workflow is supplied, we don't need to check if it matches
-        matches = (
-            matching.document_matches_workflow(document, workflow, trigger_type)
-            if workflow_to_run is None
-            else True
-        )
-
-        if matches:
+        if matching.document_matches_workflow(document, workflow, trigger_type):
             action: WorkflowAction
             for action in workflow.actions.all():
                 message = f"Applying {action} from {workflow}"
