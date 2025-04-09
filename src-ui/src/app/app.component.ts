@@ -69,7 +69,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.successSubscription = this.consumerStatusService
       .onDocumentConsumptionFinished()
       .subscribe((status) => {
-        this.tasksService.reload()
+        // this.tasksService.reload()
         if (
           this.showNotification(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS)
         ) {
@@ -106,7 +106,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.failedSubscription = this.consumerStatusService
       .onDocumentConsumptionFailed()
       .subscribe((status) => {
-        this.tasksService.reload()
+        // this.tasksService.reload()
         if (
           this.showNotification(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED)
         ) {
@@ -119,7 +119,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.newDocumentSubscription = this.consumerStatusService
       .onDocumentDetected()
       .subscribe((status) => {
-        this.tasksService.reload()
+        // this.tasksService.reload()
         if (
           this.showNotification(
             SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT

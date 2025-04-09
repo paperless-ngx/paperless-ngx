@@ -99,7 +99,7 @@ export class AppFrameComponent
     if (this.settingsService.get(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED)) {
       this.checkForUpdates()
     }
-    this.tasksService.reload()
+    // this.tasksService.reload()
 
     this.djangoMessagesService.get().forEach((message) => {
       switch (message.level) {
