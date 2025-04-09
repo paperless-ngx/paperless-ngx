@@ -565,6 +565,10 @@ if DEBUG:
     # Allow access from the angular development server during debugging
     CORS_ALLOWED_ORIGINS.append("http://localhost:4200")
 
+CORS_EXPOSE_HEADERS = [
+    "Content-Disposition",
+]
+
 ALLOWED_HOSTS = __get_list("PAPERLESS_ALLOWED_HOSTS", ["*"])
 if ALLOWED_HOSTS != ["*"]:
     # always allow localhost. Necessary e.g. for healthcheck in docker.
