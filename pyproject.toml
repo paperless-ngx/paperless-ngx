@@ -65,7 +65,7 @@ dependencies = [
   "tqdm~=4.67.1",
   "watchdog~=6.0",
   "whitenoise~=6.9",
-  "whoosh~=2.7",
+  "whoosh-reloaded>=2.7.5",
   "zxing-cpp~=2.3.0",
 ]
 
