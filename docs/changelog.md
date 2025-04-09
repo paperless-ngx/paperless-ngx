@@ -1,5 +1,34 @@
 # Changelog
 
+## paperless-ngx 2.15.1
+
+### Bug Fixes
+
+-   Fix: Run migration lock as the correct user [@stumpylog](https://github.com/stumpylog) ([#9604](https://github.com/paperless-ngx/paperless-ngx/pull/9604))
+-   Fix: Adds a warning to the user if their secret file includes a trailing newline [@stumpylog](https://github.com/stumpylog) ([#9601](https://github.com/paperless-ngx/paperless-ngx/pull/9601))
+-   Fix: correct download filename in 2.15.0 [@shamoon](https://github.com/shamoon) ([#9599](https://github.com/paperless-ngx/paperless-ngx/pull/9599))
+-   Fix: dont exclude matching check for scheduled workflows [@shamoon](https://github.com/shamoon) ([#9594](https://github.com/paperless-ngx/paperless-ngx/pull/9594))
+
+### Maintenance
+
+-   docker(deps): Bump astral-sh/uv from 0.6.9-python3.12-bookworm-slim to 0.6.13-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#9573](https://github.com/paperless-ngx/paperless-ngx/pull/9573))
+
+### Dependencies
+
+-   docker(deps): Bump astral-sh/uv from 0.6.9-python3.12-bookworm-slim to 0.6.13-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#9573](https://github.com/paperless-ngx/paperless-ngx/pull/9573))
+-   Chore: move to whoosh-reloaded, for now [@shamoon](https://github.com/shamoon) ([#9605](https://github.com/paperless-ngx/paperless-ngx/pull/9605))
+
+### All App Changes
+
+<details>
+<summary>4 changes</summary>
+
+-   Fix: Run migration lock as the correct user [@stumpylog](https://github.com/stumpylog) ([#9604](https://github.com/paperless-ngx/paperless-ngx/pull/9604))
+-   Fix: Adds a warning to the user if their secret file includes a trailing newline [@stumpylog](https://github.com/stumpylog) ([#9601](https://github.com/paperless-ngx/paperless-ngx/pull/9601))
+-   Fix: correct download filename in 2.15.0 [@shamoon](https://github.com/shamoon) ([#9599](https://github.com/paperless-ngx/paperless-ngx/pull/9599))
+-   Fix: dont exclude matching check for scheduled workflows [@shamoon](https://github.com/shamoon) ([#9594](https://github.com/paperless-ngx/paperless-ngx/pull/9594))
+</details>
+
 ## paperless-ngx 2.15.0
 
 ### Features
