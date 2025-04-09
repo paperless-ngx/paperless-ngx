@@ -1,5 +1,10 @@
 import { DatePipe } from '@angular/common'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import {
+  HttpHeaders,
+  HttpResponse,
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
@@ -1329,6 +1334,34 @@ describe('DocumentDetailComponent', () => {
     expect(shareSpy).not.toHaveBeenCalled()
     expect(createSpy).toHaveBeenCalledWith('a')
     expect(urlRevokeSpy).toHaveBeenCalled()
+  })
+
+  it('should download a file with the correct filename', () => {
+    const mockBlob = new Blob(['test content'], { type: 'text/plain' })
+    const mockResponse = new HttpResponse({
+      body: mockBlob,
+      headers: new HttpHeaders({
+        'Content-Disposition': 'attachment; filename="test-file.txt"',
+      }),
+    })
+
+    const downloadUrl = 'http://example.com/download'
+    component.documentId = 123
+    jest.spyOn(documentService, 'getDownloadUrl').mockReturnValue(downloadUrl)
+
+    const createSpy = jest.spyOn(document, 'createElement')
+    const anchor: HTMLAnchorElement = {} as HTMLAnchorElement
+    createSpy.mockReturnValueOnce(anchor)
+
+    component.download(false)
+
+    httpTestingController
+      .expectOne(downloadUrl)
+      .flush(mockBlob, { headers: mockResponse.headers })
+
+    expect(createSpy).toHaveBeenCalledWith('a')
+    expect(anchor.download).toBe('test-file.txt')
+    createSpy.mockClear()
   })
 
   it('should get email enabled status from settings', () => {
