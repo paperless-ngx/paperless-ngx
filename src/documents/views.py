@@ -2376,9 +2376,13 @@ def serve_file(*, doc: Document, use_archive: bool, disposition: str):
     # RFC 5987 addresses this issue
     # see https://datatracker.ietf.org/doc/html/rfc5987#section-4.2
     # Chromium cannot handle commas in the filename
-    filename_normalized = normalize("NFKD", filename.replace(",", "_")).encode(
-        "ascii",
-        "ignore",
+    filename_normalized = (
+        normalize("NFKD", filename.replace(",", "_"))
+        .encode(
+            "ascii",
+            "ignore",
+        )
+        .decode("ascii")
     )
     filename_encoded = quote(filename)
     content_disposition = (
