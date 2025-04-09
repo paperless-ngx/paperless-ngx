@@ -7,12 +7,7 @@
 -   Fix: Run migration lock as the correct user [@stumpylog](https://github.com/stumpylog) ([#9604](https://github.com/paperless-ngx/paperless-ngx/pull/9604))
 -   Fix: Adds a warning to the user if their secret file includes a trailing newline [@stumpylog](https://github.com/stumpylog) ([#9601](https://github.com/paperless-ngx/paperless-ngx/pull/9601))
 -   Fix: correct download filename in 2.15.0 [@shamoon](https://github.com/shamoon) ([#9599](https://github.com/paperless-ngx/paperless-ngx/pull/9599))
--   Documentation: update crowdin links [@nathanaelhoun](https://github.com/nathanaelhoun) ([#9595](https://github.com/paperless-ngx/paperless-ngx/pull/9595))
 -   Fix: dont exclude matching check for scheduled workflows [@shamoon](https://github.com/shamoon) ([#9594](https://github.com/paperless-ngx/paperless-ngx/pull/9594))
-
-### Documentation
-
--   Documentation: update crowdin links [@nathanaelhoun](https://github.com/nathanaelhoun) ([#9595](https://github.com/paperless-ngx/paperless-ngx/pull/9595))
 
 ### Maintenance
 
