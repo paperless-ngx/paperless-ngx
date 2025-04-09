@@ -109,7 +109,7 @@ ARG GS_VERSION=10.03.1
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     # Ignore warning from Whitenoise about async iterators
-    PYTHONWARNINGS="ignore:::django.http.response:517" \
+    PYTHONWARNINGS="ignore:::django.http.response:517,ignore::SyntaxWarning:whoosh.analysis" \
     PNGX_CONTAINERIZED=1 \
     # https://docs.astral.sh/uv/reference/settings/#link-mode
     UV_LINK_MODE=copy \
