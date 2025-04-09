@@ -1002,10 +1002,9 @@ export class DocumentDetailComponent
           const filename = response.headers
             .get('Content-Disposition')
             ?.split(';')
-            .find((part) => part.trim().startsWith('filename='))
+            ?.find((part) => part.trim().startsWith('filename='))
             ?.split('=')[1]
-            ?.replace(/"b'/g, '')
-            ?.replace(/'"/g, '')
+            ?.replace(/['"]/g, '')
           const blob = new Blob([response.body], {
             type: response.body.type,
           })
