@@ -81,7 +81,7 @@ Some notes about translation:
 
 If a language has already been added, and you would like to contribute new translations or change existing translations, please read the "Translation" section in the README.md file for further details on that.
 
-If you would like the project to be translated to another language, first head over to https://crwd.in/paperless-ngx to check if that language has already been enabled for translation.
+If you would like the project to be translated to another language, first head over to https://crowdin.com/project/paperless-ngx to check if that language has already been enabled for translation.
 If not, please request the language to be added by creating an issue on GitHub. The issue should contain:
 
 - English name of the language (the localized name can be added on Crowdin).
