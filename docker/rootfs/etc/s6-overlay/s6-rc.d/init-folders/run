@@ -28,8 +28,8 @@ declare -r extra_dirs=(
 if [[ -n "${USER_IS_NON_ROOT}" ]]; then
 	# Non-root mode: Create directories as current user, warn about permission issues
 	echo "${log_prefix} Running in non-root mode, checking directories"
-	current_uid=$(id -u)
-	current_gid=$(id -g)
+	current_uid=$(id --user)
+	current_gid=$(id --group)
 
 	for dir in "${extra_dirs[@]}"; do
 		if [[ ! -d "${dir}" ]]; then
