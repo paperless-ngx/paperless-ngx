@@ -204,6 +204,7 @@ COPY --from=pipenv-base /usr/src/pipenv/requirements.txt ./
 # Packages needed only for building a few quick Python
 # dependencies
 ARG BUILD_PACKAGES="\
+
   build-essential \
   git \
   # https://www.psycopg.org/docs/install.html#prerequisites
@@ -218,7 +219,7 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
   && echo "Installing build system packages" \
     && apt-get update \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
-    && python3 -m pip install --no-cache-dir --upgrade wheel \
+    && python3 -m pip install --no-cache-dir --upgrade setuptools wheel \
   && echo "Installing Python requirements" \
     && python3 -m pip install --default-timeout=1000 --no-cache-dir --requirement requirements.txt \
   && echo "Installing NLTK data" \
