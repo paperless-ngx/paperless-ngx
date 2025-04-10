@@ -81,7 +81,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.viewsets import ViewSet
-from underthesea.models.text_classifier import Model
+
 
 from documents import bulk_edit
 from documents import index
