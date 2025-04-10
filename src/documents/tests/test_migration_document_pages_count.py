@@ -1,4 +1,3 @@
-import os
 import shutil
 from pathlib import Path
 
@@ -8,11 +7,11 @@ from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import TestMigrations
 
 
-def source_path_before(self):
+def source_path_before(self) -> Path:
     if self.filename:
         fname = str(self.filename)
 
-    return os.path.join(settings.ORIGINALS_DIR, fname)
+    return Path(settings.ORIGINALS_DIR) / fname
 
 
 class TestMigrateDocumentPageCount(DirectoriesMixin, TestMigrations):
