@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-26 21:04-0700\n"
-"PO-Revision-Date: 2025-03-29 17:14\n"
+"PO-Revision-Date: 2025-04-11 12:13\n"
 "Last-Translator: \n"
 "Language-Team: Serbian (Latin)\n"
 "Language: sr_CS\n"
@@ -1324,7 +1324,7 @@ msgstr "Već imate nalog? <a href=\"%(login_url)s\">Prijavi se</a>"
 
 #: documents/templates/account/signup.html:19
 msgid "Note: This is the first user account for this installation and will be granted superuser privileges."
-msgstr ""
+msgstr "Napomena: Ovo je prvi korisnički nalog za ovu instalaciju i biće mu dodeljena administratorska ovlašćenja."
 
 #: documents/templates/account/signup.html:23
 #: documents/templates/socialaccount/signup.html:14
