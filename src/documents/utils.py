@@ -1,4 +1,4 @@
-import io
+
 import logging
 import os
 import re
@@ -12,12 +12,9 @@ from subprocess import run
 from typing import Optional
 from typing import Union
 
-import PyPDF2
 import pathvalidate
 from django.conf import settings
 from PIL import Image
-from pdf2image.pdf2image import convert_from_path
-
 
 def _coerce_to_path(
     source: Union[Path, str],

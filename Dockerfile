@@ -219,7 +219,7 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
   && echo "Installing build system packages" \
     && apt-get update \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
-    && python3 -m pip install --no-cache-dir --upgrade setuptools wheel \
+    && python3 -m pip install --no-cache-dir --upgrade wheel \
   && echo "Installing Python requirements" \
     && python3 -m pip install --default-timeout=1000 --no-cache-dir --requirement requirements.txt \
   && echo "Installing NLTK data" \
