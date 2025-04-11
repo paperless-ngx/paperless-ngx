@@ -125,9 +125,11 @@ zstandard==0.22.0; python_version >= '3.8'
 zxing-cpp==2.2.0; platform_machine == 'x86_64' and python_version >= '3.6'
 django-apscheduler==0.6.2
 PyPDF2==2.11.2
+pypdf==5.4.0
 pandas==2.2.2
 openpyxl==3.1.5
 python-decouple==3.8
 django-soft-delete==1.0.16
 django-elasticsearch-dsl==7.4
 django-elasticsearch-dsl-drf==0.22.5
+pymupdf==1.25.5

@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.core.validators import FileExtensionValidator
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -211,6 +212,10 @@ class ApplicationConfiguration(AbstractSingletonModel):
 
     class Meta:
         verbose_name = _("edoc application settings")
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        cache.delete('quality_compress')
 
     def __str__(self) -> str:  # pragma: no cover
         return "ApplicationConfiguration"

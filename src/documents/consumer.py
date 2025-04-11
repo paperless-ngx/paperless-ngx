@@ -951,13 +951,12 @@ class Consumer(LoggingMixin):
                     page_count=page_count,
                     mime_type=mime_type,
                 )
-                self.log.info(f' pdf_has_text_pdftotext: {pdf_has_text_pdftotext(self.working_copy)}, check_digital_signature: {check_digital_signature(self.working_copy)}')
-                if (application_config.enable_compress and not pdf_has_text_pdftotext(self.working_copy) and not check_digital_signature(self.working_copy)):
-                    compress_pdf(self.original_path, self.working_copy, int(application_config.quality_compress))
-                    copy_file_with_basic_stats(self.working_copy,
-                                               self.original_path)
+                if mime_type.__eq__('application/pdf'):
+                    if (application_config.enable_compress and not pdf_has_text_pdftotext(self.working_copy) and not check_digital_signature(self.working_copy)):
+                        compress_pdf(self.original_path, self.working_copy, int(application_config.quality_compress))
+                        copy_file_with_basic_stats(self.working_copy,
+                                                   self.original_path)
                 new_file = None
-                # self.log.debug("Consumer", document.folder)
 
                 new_file = Folder.objects.create(
                     name=document.title,

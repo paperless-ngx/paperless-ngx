@@ -12,21 +12,26 @@ from typing import TYPE_CHECKING
 
 import requests
 from PIL import Image
-from PyPDF2 import PdfReader
-from PyPDF2.errors import PdfReadError
+from pypdf import PdfReader
+from pypdf.errors import PdfReadError, PdfStreamError
+
 from django.conf import settings
 from django.core.cache import cache, caches
 from pdf2image import convert_from_path
+from pypdf import PdfReader, PdfWriter, PageObject
+from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
-from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
+
+import math
 
 from documents.models import DossierForm
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
+from documents.render_pdf import draw_text_on_pdf, draw_invisible_text
 from documents.utils import maybe_override_pixel_limit
 from documents.utils import run_subprocess
 from edoc.config import OcrConfig
@@ -327,7 +332,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
             with open(path_file, 'rb') as f:
                 pdf_reader = PdfReader(f)
                 page_count = len(pdf_reader.pages)
-        except (OSError, IOError, ValueError, PdfReadError):
+        except (OSError, IOError, ValueError, PdfReadError, PdfStreamError):
             pass
         # check token
         try:
@@ -553,12 +558,11 @@ class RasterisedDocumentCustomParser(DocumentParser):
     #     return (data_ocr,data_ocr_fields)
 
     def render_pdf_ocr(self, sidecar, mime_type, input_path, output_path,
-                       data_ocr):
+                       data_ocr, quality_compress = 85, font_path=''):
         font_name = 'Arial'
         data = data_ocr or {}
 
-        font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                 'fonts', 'arial-font/arial.ttf')
+
         with open(sidecar, "w") as txt_sidecar:
             txt_sidecar.write(data.get("content_formated", ""))
         if self.is_image(mime_type):
@@ -596,32 +600,38 @@ class RasterisedDocumentCustomParser(DocumentParser):
             shutil.copy(str(input_path), str(output_path))
             if len(data) < 1:
                 return
+
             input_pdf = PdfReader(input_path)
-            images = convert_from_path(input_path,
-                                       first_page=1,
-                                       last_page=input_pdf.getNumPages() + 1)
             can = canvas.Canvas(str(output_path), pagesize=letter)
+
+            pdfmetrics.registerFont(TTFont('Arial', font_path))
+            font_name = "Arial"
+
             for page_num, page in enumerate(input_pdf.pages):
+                image = convert_from_path(input_path,
+                                          first_page=page_num + 1,
+                                          last_page=page_num + 2)[0]
+
                 page_height = page.mediabox.getHeight()
                 page_width = page.mediabox.getWidth()
+
                 width_api_img = data["pages"][page_num]["dimensions"][1]
                 height_api_img = data["pages"][page_num]["dimensions"][0]
+
                 # set size new page
                 if width_api_img < height_api_img and page_height < page_width:
                     page_height, page_width = page_width, page_height
+
                 can.setPageSize((page_width, page_height))
+
                 byte_image = io.BytesIO()
-                images[page_num].save(byte_image, format='JPEG')
-                jpg_image = byte_image.getvalue()
-                # can.drawImage(ImageReader(io.BytesIO(jpg_image)),
-                #               0, 0,
-                #               width=float(page_width),
-                #               height=float(page_height))
-                # set font size
-                pdfmetrics.registerFont(TTFont('Arial', font_path))
-                # print(f'kich thuoc goc: height{page_height}, width{page_width}, kich thuoc api: height{height_api_img} width{width_api_img}')
+                image.save(byte_image, format='JPEG',
+                           quality=int(quality_compress), optimize=True)
+                byte_image.seek(0)
+
                 rolate_height = height_api_img / page_height
                 rolate_width = width_api_img / page_width
+
                 for block in data["pages"][page_num]["blocks"]:
                     for line in block.get("lines", []):
                         y1_line = (
@@ -631,17 +641,17 @@ class RasterisedDocumentCustomParser(DocumentParser):
 
                         y_center_coordinates = y2_line - (
                             y2_line - y1_line) / 2
+
                         for word in line.get("words", []):
                             x1 = word["bbox"][0][0] / float(rolate_width)
                             y1 = word["bbox"][0][1] / float(rolate_height)
                             x2 = word["bbox"][1][0] / float(rolate_width)
                             y2 = word["bbox"][1][1] / float(rolate_height)
-                            font_size = math.floor((y2 - y1) * 72 / 96)
+
+                            font_size = max(1, math.floor((y2 - y1) * 72 / 96))
                             value = word["value"]
-                            # font_size = float(y2-y1) * 72 / 96
                             x_center_coordinates = x2 - (x2 - x1) / 2
-                            # y_center_coordinates =y2 - (y2-y1)/2
-                            # value=' '+value+' '
+
                             w = can.stringWidth(value, font_name, font_size)
                             can.setFont('Arial', font_size)
                             can.drawString(int(x_center_coordinates - w / 2),
@@ -649,13 +659,13 @@ class RasterisedDocumentCustomParser(DocumentParser):
                                                page_height) - y_center_coordinates - (
                                                    font_size / 2)) + 2,
                                            value)
-                can.drawImage(ImageReader(io.BytesIO(jpg_image)),
+
+                can.drawImage(ImageReader(byte_image),
                               0, 0,
                               width=float(page_width),
                               height=float(page_height))
                 can.showPage()
-            # can.save()
-            # can._filename='/home/otxtan/project/tc-edoc/media/archive-fallback.pdf'
+
             can.save()
 
     def ocr_img_or_pdf(self, document_path, mime_type, dossier_form, sidecar,
@@ -666,8 +676,23 @@ class RasterisedDocumentCustomParser(DocumentParser):
         data_ocr, data_ocr_fields, form_code = self.ocr_file(document_path,
                                                              dossier_form,
                                                              **kwargs)
-        self.render_pdf_ocr(sidecar, mime_type, document_path, output_file,
-                            data_ocr)
+        # self.render_pdf_ocr(sidecar, mime_type, document_path, output_file,
+        #                     data_ocr, self.quality_compress, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+        #                          'fonts', 'arial-font/arial.ttf'))
+        # draw_text_on_pdf(
+        #     input_path=document_path,
+        #     output_path=output_file,
+        #     data=data_ocr,
+        #     font_path=os.path.join(os.path.dirname(os.path.abspath(__file__)),
+        #                          'fonts', 'arial-font/arial.ttf'))
+
+        draw_invisible_text(
+            input_path=document_path,
+            output_path=output_file,
+            data=data_ocr,
+        )
+
+
         return data_ocr, data_ocr_fields, form_code
 
     def extract_text(
@@ -907,7 +932,6 @@ class RasterisedDocumentCustomParser(DocumentParser):
                 self.archive_path = archive_path
 
             self.text = self.extract_text(sidecar_file, archive_path)
-            self.log.debug(f' gia tri text_original1: {len(text_original)}')
 
             if not self.text:
                 raise NoTextFoundException(

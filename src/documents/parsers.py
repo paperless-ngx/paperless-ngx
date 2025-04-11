@@ -14,7 +14,7 @@ from typing import Optional
 
 from django.conf import settings
 from django.utils import timezone
-import requests
+from django.core.cache import cache
 
 from documents.loggers import LoggingMixin
 from documents.signals import document_consumer_declaration
@@ -365,7 +365,7 @@ class DocumentParser(LoggingMixin):
         self.tempdir = Path(
             tempfile.mkdtemp(prefix="edoc-", dir=settings.SCRATCH_DIR),
         )
-
+        self.quality_compress = self.get_quality_compress()
         self.archive_path = None
         self.text = None
         self.date: Optional[datetime.datetime] = None
@@ -405,6 +405,19 @@ class DocumentParser(LoggingMixin):
 
     def get_archive_path(self):
         return self.archive_path
+
+    def get_quality_compress(self):
+        cache_key = 'quality_compress'
+        quality = cache.get(cache_key)
+        if quality is None:
+            try:
+                config = ApplicationConfiguration.objects.first()  # hoặc filter điều kiện phù hợp
+                quality = config.quality_compress
+                cache.set(cache_key, quality, timeout=60 * 60)  # Cache 1 tiếng
+            except Exception as e:
+                quality = 85  # fallback default
+        return quality
+
 
     def get_thumbnail(self, document_path, mime_type, file_name=None):
         """
