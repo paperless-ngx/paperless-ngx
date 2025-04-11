@@ -206,7 +206,7 @@ from documents.tasks import consume_file
 from documents.tasks import deleted_backup
 from documents.tasks import empty_trash
 from documents.tasks import restore_documents
-from documents.utils import check_storage, compress_pdf
+from documents.utils import check_storage
 from documents.utils import generate_unique_name
 from documents.utils import get_directory_size
 from edoc import version

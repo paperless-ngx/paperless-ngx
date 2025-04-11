@@ -21,6 +21,7 @@ from filelock import FileLock
 from rest_framework.reverse import reverse
 
 from documents.classifier import load_classifier
+from documents.compress import smart_compress, logger
 from documents.data_models import DocumentMetadataOverrides
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
@@ -53,7 +54,7 @@ from documents.plugins.base import NoCleanupPluginMixin
 from documents.plugins.base import NoSetupPluginMixin
 from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
-from documents.utils import copy_basic_file_stats, compress_pdf, \
+from documents.utils import copy_basic_file_stats, \
     check_digital_signature, \
     pdf_has_text_pdftotext
 from documents.utils import copy_file_with_basic_stats
@@ -951,11 +952,11 @@ class Consumer(LoggingMixin):
                     page_count=page_count,
                     mime_type=mime_type,
                 )
-                if mime_type.__eq__('application/pdf'):
-                    if (application_config.enable_compress and not pdf_has_text_pdftotext(self.working_copy) and not check_digital_signature(self.working_copy)):
-                        compress_pdf(self.original_path, self.working_copy, int(application_config.quality_compress))
-                        copy_file_with_basic_stats(self.working_copy,
-                                                   self.original_path)
+
+                is_compressed = smart_compress(input_path=self.original_path, output_path= self.working_copy, quality= int(document_parser.quality_compress))
+                if is_compressed:
+                    copy_file_with_basic_stats(self.working_copy,
+                                               self.original_path)
                 new_file = None
 
                 new_file = Folder.objects.create(

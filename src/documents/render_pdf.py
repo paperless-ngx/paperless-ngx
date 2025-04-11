@@ -1,7 +1,10 @@
 import io
+import logging
 import os
+import tempfile
 from pathlib import Path
 
+import pathvalidate
 from pypdf import PdfReader, PdfWriter, PageObject
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
@@ -10,6 +13,12 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.utils import ImageReader
 from io import BytesIO
 import math
+
+from documents.compress import smart_compress
+from documents.utils import get_temp_file_path
+
+logger = logging.getLogger("edoc.render_pdf")
+logging.basicConfig(level=logging.INFO)
 
 def create_overlay(width, height, text_data, font_path):
     packet = io.BytesIO()
@@ -96,7 +105,8 @@ def create_pdf_from_image(image_path):
     page.show_pdf_page(rect, img_pdf, 0)
     return doc
 
-def draw_invisible_text(input_path, output_path, data):
+
+def draw_invisible_text(input_path, output_path, data, quality = 85):
     if is_image_file(input_path):
         doc = create_pdf_from_image(input_path)
     elif is_pdf_file(input_path):
@@ -144,5 +154,12 @@ def draw_invisible_text(input_path, output_path, data):
                         fontname='helv'
                     )
 
-    doc.save(output_path)
+    file_temp=get_temp_file_path(output_path)
+    if not file_temp.exists():
+        file_temp.parent.mkdir(parents=True, exist_ok=True)
+
+
+    logger.info("file_temp---------------", file_temp)
+    doc.save(file_temp)
+    smart_compress(file_temp, output_path, quality=quality)
 

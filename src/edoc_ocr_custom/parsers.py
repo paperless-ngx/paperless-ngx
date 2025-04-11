@@ -690,6 +690,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
             input_path=document_path,
             output_path=output_file,
             data=data_ocr,
+            quality=self.quality_compress
         )
 
 

@@ -13,6 +13,7 @@ from typing import Optional
 from typing import Union
 
 import PyPDF2
+import pathvalidate
 from django.conf import settings
 from PIL import Image
 from pdf2image.pdf2image import convert_from_path
@@ -174,30 +175,6 @@ def get_directory_size(directory):
     return total_size
 
 
-def compress_pdf(input_pdf_path, output_pdf_path, quality=100):
-    # Convert PDF to a list of images
-    pages = convert_from_path(input_pdf_path)
-
-    # Create a list to hold the compressed images
-    compressed_images = []
-
-    # Iterate through each page
-    for page in pages:
-        page_image = page.convert("RGB")
-
-        # Compress the page image
-        file_bytes = io.BytesIO()
-        page_image.save(file_bytes, format='JPEG', quality=quality, optimize=True)
-        file_bytes.seek(0)
-        compressed_images.append(Image.open(file_bytes))
-
-    # Save the compressed images as a new PDF
-    compressed_images[0].save(output_pdf_path, save_all=True, append_images=compressed_images[1:])
-
-    # Close the BytesIO objects
-    for img in compressed_images:
-        img.close()
-
 
 def check_digital_signature(pdf_path):
     with open(pdf_path, 'rb') as file:
@@ -226,3 +203,23 @@ def pdf_has_text_pdftotext(pdf_path: Path) -> bool:
     except Exception as e:
 
         return False
+
+def get_temp_file_path(file_name_or_path):
+    # Lấy tên file cuối cùng
+    original_name = Path(file_name_or_path).name
+
+    # An toàn hoá tên file
+    safe_name = pathvalidate.sanitize_filename(original_name)
+
+    # Tạo thư mục tạm
+    tmp_obj = tempfile.TemporaryDirectory(prefix="edoc-ngx",
+                                          dir=settings.SCRATCH_DIR)
+    temp_dir = Path(tmp_obj.name)
+
+    # Đảm bảo thư mục tồn tại (dù thường TemporaryDirectory đã tạo)
+    temp_dir.mkdir(parents=True, exist_ok=True)
+
+    temp_file_path = temp_dir / safe_name
+
+    return temp_file_path  # Trả lại cả temp_path và object quản lý
+
