@@ -51,6 +51,8 @@ export class FileStatus {
 
   ownerId: number
 
+  exist: boolean
+
   getProgress(): number {
     switch (this.phase) {
       case FileStatusPhase.STARTED:
@@ -70,7 +72,7 @@ export class FileStatus {
   updateProgress(
     status: FileStatusPhase,
     currentProgress?: number,
-    maxProgress?: number
+    maxProgress?: number,
   ) {
     if (status >= this.phase) {
       this.phase = status
@@ -88,7 +90,8 @@ export class FileStatus {
   providedIn: 'root',
 })
 export class ConsumerStatusService {
-  constructor(private settingsService: SettingsService) {}
+  constructor(private settingsService: SettingsService) {
+  }
 
   private statusWebSocket: WebSocket
 
@@ -102,7 +105,7 @@ export class ConsumerStatusService {
     let status =
       this.consumerStatus.find((e) => e.taskId == taskId) ||
       this.consumerStatus.find(
-        (e) => e.filename == filename && e.taskId == null
+        (e) => e.filename == filename && e.taskId == null,
       )
     let created = false
     if (!status) {
@@ -116,11 +119,18 @@ export class ConsumerStatusService {
   }
 
   newFileUpload(filename: string): FileStatus {
+    let existing = this.consumerStatus.find(
+      (e) => e.filename === filename,
+    )
     let status = new FileStatus()
     status.filename = filename
-    this.consumerStatus.push(status)
+    status.exist = true
+    if (!existing) {
+      this.consumerStatus.push(status)
+    }
     return status
   }
+
 
   getConsumerStatus(phase?: FileStatusPhase) {
     if (phase != null) {
@@ -137,7 +147,7 @@ export class ConsumerStatusService {
   getConsumerStatusCompleted() {
     return this.consumerStatus.filter(
       (s) =>
-        s.phase == FileStatusPhase.FAILED || s.phase == FileStatusPhase.SUCCESS
+        s.phase == FileStatusPhase.FAILED || s.phase == FileStatusPhase.SUCCESS,
     )
   }
 
@@ -145,7 +155,7 @@ export class ConsumerStatusService {
     this.disconnect()
 
     this.statusWebSocket = new WebSocket(
-      `${environment.webSocketProtocol}//${environment.webSocketHost}${environment.webSocketBaseUrl}status/`
+      `${environment.webSocketProtocol}//${environment.webSocketHost}${environment.webSocketBaseUrl}status/`,
     )
     this.statusWebSocket.onmessage = (ev) => {
       let statusMessage: WebsocketConsumerStatusMessage = JSON.parse(ev['data'])
@@ -161,7 +171,7 @@ export class ConsumerStatusService {
 
       let statusMessageGet = this.get(
         statusMessage.task_id,
-        statusMessage.filename
+        statusMessage.filename,
       )
       let status = statusMessageGet.status
       let created = statusMessageGet.created
@@ -169,7 +179,7 @@ export class ConsumerStatusService {
       status.updateProgress(
         FileStatusPhase.WORKING,
         statusMessage.current_progress,
-        statusMessage.max_progress
+        statusMessage.max_progress,
       )
       if (
         statusMessage.message &&
@@ -224,7 +234,7 @@ export class ConsumerStatusService {
       index = this.consumerStatus.findIndex((s) => s.taskId == status.taskId)
     } else {
       index = this.consumerStatus.findIndex(
-        (s) => s.filename == status.filename
+        (s) => s.filename == status.filename,
       )
     }
 
@@ -237,8 +247,8 @@ export class ConsumerStatusService {
     this.consumerStatus = this.consumerStatus.filter(
       (status) =>
         ![FileStatusPhase.SUCCESS, FileStatusPhase.FAILED].includes(
-          status.phase
-        )
+          status.phase,
+        ),
     )
   }
 

@@ -85,5 +85,8 @@ export class UploadDocumentsService {
           this.uploadSubscriptions[file.name]?.complete()
         },
       })
+    if (status.exist){
+      status = null
+    }
   }
 }
