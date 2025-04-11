@@ -47,7 +47,12 @@ export class TasksComponent
     all: [],
   }
 
-  public tasksCurrent: EdocTask[] = []
+  // public tasksCurrent: EdocTask[] = []
+  public tasksCurrent: Results<EdocTask> = {
+    count: 0,
+    results: [],
+    all: [],
+  }
 
   get dismissButtonText(): string {
     return this.selectedTasks.size > 0
@@ -74,6 +79,15 @@ export class TasksComponent
     clearInterval(this.autoRefreshInterval)
   }
 
+  removeTask(task_ids: Set<number>) {
+    this.tasksCurrent.results = this.tasksCurrent.results.filter(
+      task => !task_ids.has(task.id),
+    )
+    this.tasksCurrent.all = this.tasksCurrent.all.filter(
+      task => !task_ids.has(task),
+    )
+  }
+
   dismissTask(task: EdocTask) {
     this.dismissTasks(task)
   }
@@ -93,10 +107,12 @@ export class TasksComponent
       modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
         modal.componentInstance.buttonsEnabled = false
         modal.close()
+        this.removeTask(tasks)
         this.tasksService.dismissTasks(tasks)
         this.selectedTasks.clear()
       })
     } else {
+      this.removeTask(tasks)
       this.tasksService.dismissTasks(tasks)
       this.selectedTasks.clear()
     }
@@ -142,7 +158,7 @@ export class TasksComponent
     switch (this.activeTab) {
       case 'queued':
         if (this.page == 1) {
-          this.tasksCurrent = this.tasksQueued.results
+          this.tasksCurrent = this.tasksQueued
           break
         }
         this.queuedFileEdocTasks(this.page)
@@ -158,7 +174,7 @@ export class TasksComponent
         break
       case 'completed':
         if (this.page == 1) {
-          this.tasksCurrent = this.tasksCompleted.results
+          this.tasksCurrent = this.tasksCompleted
           break
         }
         this.completedFileEdocTasks(this.page)
@@ -166,7 +182,7 @@ export class TasksComponent
         break
       case 'failed':
         if (this.page == 1) {
-          this.tasksCurrent = this.tasksFailed.results
+          this.tasksCurrent = this.tasksFailed
           break
         }
         this.failedFileEdocTasks(this.page)
@@ -177,23 +193,24 @@ export class TasksComponent
   SetCurrentDataEdocTasks() {
     switch (this.activeTab) {
       case 'queued':
-        this.tasksCurrent = this.tasksQueued.results
+        this.tasksCurrent = this.tasksQueued
         break
       case 'started':
-        this.tasksCurrent = this.tasksStarted.results
+        this.tasksCurrent = this.tasksStarted
         break
       case 'completed':
-        this.tasksCurrent = this.tasksCompleted.results
+        this.tasksCurrent = this.tasksCompleted
         break
       case 'failed':
-        this.tasksCurrent = this.tasksFailed.results
+        this.tasksCurrent = this.tasksFailed
         break
     }
   }
 
   toggleAll(event: PointerEvent) {
+    this.SetCurrentDataEdocTasks()
     if ((event.target as HTMLInputElement).checked) {
-      this.selectedTasks = new Set(this.currentTasks.map((t) => t.id))
+      this.selectedTasks = new Set(this.tasksCurrent.all.map((t) => t))
     } else {
       this.clearSelection()
     }

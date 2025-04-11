@@ -33,7 +33,7 @@
     <tr>
       <th scope="col">
         <div class="form-check">
-          <input type="checkbox" class="form-check-input" id="all-tasks" [disabled]="currentTasks.length === 0"
+          <input type="checkbox" class="form-check-input" id="all-tasks" [disabled]="tasksCurrent.all.lenght === 0"
                  [(ngModel)]="togggleAll" (click)="toggleAll($event); $event.stopPropagation();">
           <label class="form-check-label" for="all-tasks"></label>
         </div>
@@ -49,7 +49,7 @@
     </thead>
     <tbody>
 
-      @for (task of tasksCurrent; track task) {
+      @for (task of this.tasksCurrent.results; track task) {
         <tr (click)="toggleSelected(task, $event); $event.stopPropagation();">
           <td>
             <div class="form-check">
@@ -141,7 +141,7 @@
     }</a>
     <ng-template ngbNavContent>
       <ng-container [ngTemplateOutlet]="tasksTemplate"
-                    [ngTemplateOutletContext]="{tasksCurrent:tasksFailed.results}"></ng-container>
+                    [ngTemplateOutletContext]="{tasksCurrent:tasksFailed}"></ng-container>
     </ng-template>
   </li>
   <li ngbNavItem="completed">
@@ -150,7 +150,7 @@
     }</a>
     <ng-template ngbNavContent>
       <ng-container [ngTemplateOutlet]="tasksTemplate"
-                    [ngTemplateOutletContext]="{tasksCurrent:tasksCompleted.results}"></ng-container>
+                    [ngTemplateOutletContext]="{tasksCurrent:tasksCompleted}"></ng-container>
     </ng-template>
   </li>
   <li ngbNavItem="started">
@@ -159,7 +159,7 @@
     }</a>
     <ng-template ngbNavContent>
       <ng-container [ngTemplateOutlet]="tasksTemplate"
-                    [ngTemplateOutletContext]="{tasksCurrent:tasksStarted.results}"></ng-container>
+                    [ngTemplateOutletContext]="{tasksCurrent:tasksStarted}"></ng-container>
     </ng-template>
   </li>
   <li ngbNavItem="queued">
@@ -168,7 +168,7 @@
     }</a>
     <ng-template ngbNavContent>
       <ng-container [ngTemplateOutlet]="tasksTemplate"
-                    [ngTemplateOutletContext]="{tasksCurrent:tasksQueued.results}"></ng-container>
+                    [ngTemplateOutletContext]="{tasksCurrent:tasksQueued}"></ng-container>
     </ng-template>
   </li>
 </ul>
