@@ -112,30 +112,6 @@ able to run paperless, you're a bit on your own. If you can't run the
 docker image, the documentation has instructions for bare metal
 installs.
 
-## _How do I proxy this with NGINX?_
-
-**A:** See [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-a-Reverse-Proxy-with-Paperless-ngx#nginx).
-
-## _How do I get WebSocket support with Apache mod_wsgi_?
-
-**A:** `mod_wsgi` by itself does not support ASGI. Paperless will
-continue to work with WSGI, but certain features such as status
-notifications about document consumption won't be available.
-
-If you want to continue using `mod_wsgi`, you will have to run an
-ASGI-enabled web server as well that processes WebSocket connections,
-and configure Apache to redirect WebSocket connections to this server.
-Multiple options for ASGI servers exist:
-
--   `gunicorn` with `uvicorn` as the worker implementation (the default
-    of paperless)
--   `daphne` as a standalone server, which is the reference
-    implementation for ASGI.
--   `uvicorn` as a standalone server
-
-You may also find the [Django documentation](https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/) on ASGI
-useful to review.
-
 ## _What about the Redis licensing change and using one of the open source forks_?
 
 Currently (October 2024), forks of Redis such as Valkey or Redirect are not officially supported by our upstream
