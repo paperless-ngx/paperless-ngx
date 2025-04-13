@@ -12,6 +12,7 @@ from subprocess import run
 from typing import Optional
 from typing import Union
 
+import PyPDF2
 import pathvalidate
 from django.conf import settings
 from PIL import Image
