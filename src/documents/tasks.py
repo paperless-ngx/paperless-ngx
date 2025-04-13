@@ -322,6 +322,7 @@ def update_document_content_maybe_archive_file(document_id):
             else:
                 Document.objects.filter(pk=document.pk).update(
                     content=parser.get_text(),
+                    ocr_image_count=len(ocr_images) if ocr_images else 0,
                 )
 
                 if settings.AUDIT_LOG_ENABLED:
