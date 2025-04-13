@@ -1,9 +1,9 @@
 import logging
 import random
 import traceback
+from collections.abc import Sequence
 from typing import Annotated
 from typing import Any
-from typing import Sequence
 from typing import TypedDict
 
 from django.conf import settings
@@ -19,8 +19,8 @@ from langchain_openai import ChatOpenAI
 from langchain_redis import RedisChatMessageHistory
 from langgraph.graph import END
 from langgraph.graph import StateGraph
-from langgraph.graph.state import CompiledStateGraph
 from langgraph.graph.message import add_messages
+from langgraph.graph.state import CompiledStateGraph
 
 from documents.embeddings import DocumentEmbeddings
 from documents.models import Document

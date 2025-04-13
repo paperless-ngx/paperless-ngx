@@ -97,7 +97,10 @@ class DocumentEmbeddings:
             )
             # index_ids = self.vector_store.add_texts(chunks, metadatas=metadatas)
             index_ids = self.vector_store.add_documents(
-                [LangchainDocument(page_content=chunk, metadata=metadata) for chunk, metadata in zip(chunks, metadatas)]
+                [
+                    LangchainDocument(page_content=chunk, metadata=metadata)
+                    for chunk, metadata in zip(chunks, metadatas)
+                ]
             )
             document.embedding_index_ids = index_ids
             document.save(update_fields=("embedding_index_ids",))
