@@ -53,6 +53,7 @@ from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowTrigger
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
+from documents.settings import EXPORTER_OCR_IMAGES
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.utils import copy_file_with_basic_stats
 from paperless import version
@@ -328,7 +329,7 @@ class Command(CryptMixin, BaseCommand):
             base_name = self.generate_base_name(document)
 
             # 3.3. write filenames into manifest
-            original_target, thumbnail_target, archive_target = (
+            original_target, thumbnail_target, archive_target, ocr_image_targets = (
                 self.generate_document_targets(document, base_name, document_dict)
             )
 
@@ -339,6 +340,7 @@ class Command(CryptMixin, BaseCommand):
                     original_target,
                     thumbnail_target,
                     archive_target,
+                    ocr_image_targets,
                 )
 
             if self.split_manifest:
@@ -443,7 +445,7 @@ class Command(CryptMixin, BaseCommand):
         document: Document,
         base_name: str,
         document_dict: dict,
-    ) -> tuple[Path, Path | None, Path | None]:
+    ) -> tuple[Path, Path | None, Path | None, list[Path]]:
         """
         Generates the targets for a given document, including the original file, archive file and thumbnail (depending on settings).
         """
@@ -471,7 +473,20 @@ class Command(CryptMixin, BaseCommand):
         else:
             archive_target = None
 
-        return original_target, thumbnail_target, archive_target
+        # Handle OCR images
+        ocr_image_targets = []
+        if document.ocr_image_count > 0:
+            ocr_image_names = []
+            for i in range(document.ocr_image_count):
+                ocr_image_name = f"{base_name}-ocr-image-{i}.jpg"
+                if self.use_folder_prefix:
+                    ocr_image_name = os.path.join("ocr_images", ocr_image_name)
+                ocr_image_target = (self.target / Path(ocr_image_name)).resolve()
+                ocr_image_targets.append(ocr_image_target)
+                ocr_image_names.append(ocr_image_name)
+            document_dict[EXPORTER_OCR_IMAGES] = ocr_image_names
+
+        return original_target, thumbnail_target, archive_target, ocr_image_targets
 
     def copy_document_files(
         self,
@@ -479,6 +494,7 @@ class Command(CryptMixin, BaseCommand):
         original_target: Path,
         thumbnail_target: Path | None,
         archive_target: Path | None,
+        ocr_image_targets: list[Path] | None = None,
     ) -> None:
         """
         Copies files from the document storage location to the specified target location.
@@ -506,6 +522,15 @@ class Command(CryptMixin, BaseCommand):
                 with document.archive_path as out_file:
                     archive_target.write_bytes(GnuPG.decrypted(out_file))
                     os.utime(archive_target, times=(t, t))
+
+            # Export OCR images if they exist
+            if ocr_image_targets and document.ocr_image_count > 0:
+                for i, target in enumerate(ocr_image_targets):
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    if i < document.ocr_image_count:
+                        with document.ocr_image_file(i) as out_file:
+                            target.write_bytes(GnuPG.decrypted(out_file))
+                            os.utime(target, times=(t, t))
         else:
             self.check_and_copy(
                 document.source_path,
@@ -524,6 +549,12 @@ class Command(CryptMixin, BaseCommand):
                     document.archive_checksum,
                     archive_target,
                 )
+
+            # Export OCR images if they exist
+            if ocr_image_targets and document.ocr_image_count > 0:
+                for i, target in enumerate(ocr_image_targets):
+                    if i < len(document.ocr_image_paths):
+                        self.check_and_copy(document.ocr_image_paths[i], None, target)
 
     def check_and_write_json(
         self,

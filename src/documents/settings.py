@@ -3,6 +3,7 @@
 EXPORTER_FILE_NAME = "__exported_file_name__"
 EXPORTER_THUMBNAIL_NAME = "__exported_thumbnail_name__"
 EXPORTER_ARCHIVE_NAME = "__exported_archive_name__"
+EXPORTER_OCR_IMAGES = "__exported_ocr_images__"
 
 EXPORTER_CRYPTO_SETTINGS_NAME = "__crypto__"
 EXPORTER_CRYPTO_SALT_NAME = "__salt_hex__"

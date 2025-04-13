@@ -21,6 +21,7 @@ from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save
 from filelock import FileLock
 
+from documents.embeddings import DocumentEmbeddings
 from documents.file_handling import create_source_path_directory
 from documents.management.commands.mixins import CryptMixin
 from documents.models import Correspondent
@@ -34,6 +35,7 @@ from documents.parsers import run_convert
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_CRYPTO_SETTINGS_NAME
 from documents.settings import EXPORTER_FILE_NAME
+from documents.settings import EXPORTER_OCR_IMAGES
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.signals.handlers import check_paths_and_prune_custom_fields
 from documents.signals.handlers import update_filename_and_move_files
@@ -79,6 +81,13 @@ class Command(CryptMixin, BaseCommand):
         parser.add_argument(
             "--passphrase",
             help="If provided, is used to sensitive fields in the export",
+        )
+
+        parser.add_argument(
+            "--no-embeddings",
+            default=False,
+            action="store_true",
+            help="If set, embeddings will not be generated for imported documents",
         )
 
     def pre_check(self) -> None:
@@ -228,6 +237,7 @@ class Command(CryptMixin, BaseCommand):
         self.source = Path(options["source"]).resolve()
         self.data_only: bool = options["data_only"]
         self.no_progress_bar: bool = options["no_progress_bar"]
+        self.no_embeddings: bool = options["no_embeddings"]
         self.passphrase: str | None = options.get("passphrase")
         self.version: str | None = None
         self.salt: str | None = None
@@ -346,6 +356,7 @@ class Command(CryptMixin, BaseCommand):
         settings.ORIGINALS_DIR.mkdir(parents=True, exist_ok=True)
         settings.THUMBNAIL_DIR.mkdir(parents=True, exist_ok=True)
         settings.ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
+        settings.OCR_IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
         self.stdout.write("Copy files into paperless...")
 
@@ -370,6 +381,13 @@ class Command(CryptMixin, BaseCommand):
                 archive_path = self.source / archive_file
             else:
                 archive_path = None
+
+            # Handle OCR images if present
+            ocr_image_paths = []
+            if EXPORTER_OCR_IMAGES in record:
+                for ocr_image_file in record[EXPORTER_OCR_IMAGES]:
+                    ocr_image_path = (self.source / ocr_image_file).resolve()
+                    ocr_image_paths.append(ocr_image_path)
 
             document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
@@ -399,14 +417,44 @@ class Command(CryptMixin, BaseCommand):
                             document.thumbnail_path,
                         )
 
-                if archive_path:
+                if archive_path and document.archive_path:
                     create_source_path_directory(document.archive_path)
                     # TODO: this assumes that the export is valid and
                     #  archive_filename is present on all documents with
                     #  archived files
                     copy_file_with_basic_stats(archive_path, document.archive_path)
 
+                # Import OCR images if present
+                for i, ocr_image_path in enumerate(ocr_image_paths):
+                    if i < len(document.ocr_image_paths):
+                        copy_file_with_basic_stats(
+                            ocr_image_path,
+                            document.ocr_image_paths[i]
+                        )
+
             document.save()
+
+        # Regenerate embeddings for imported documents
+        if not self.data_only and hasattr(settings, "EMBEDDING_PROVIDER") and settings.EMBEDDING_PROVIDER and not self.no_embeddings:
+            self.stdout.write("Regenerating document embeddings...")
+            try:
+                embeddings = DocumentEmbeddings()
+                for record in tqdm.tqdm(manifest_documents, disable=self.no_progress_bar):
+                    document = Document.objects.get(pk=record["pk"])
+                    try:
+                        embeddings.embedd_document(document)
+                    except Exception as e:
+                        self.stdout.write(
+                            self.style.WARNING(
+                                f"Failed to generate embeddings for document {document.title}: {e}"
+                            )
+                        )
+            except Exception as e:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"Error initializing document embeddings: {e}. Skipping embeddings generation."
+                    )
+                )
 
     def decrypt_secret_fields(self) -> None:
         """
