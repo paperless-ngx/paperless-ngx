@@ -21,6 +21,7 @@ class DocumentsConfig(AppConfig):
         from documents.signals.handlers import set_document_type
         from documents.signals.handlers import set_storage_path
         from documents.signals.handlers import set_tags
+        from documents.signals.handlers import update_embeddings
 
         document_consumption_finished.connect(add_inbox_tags)
         document_consumption_finished.connect(set_correspondent)
@@ -31,6 +32,7 @@ class DocumentsConfig(AppConfig):
         document_consumption_finished.connect(compute_and_store_embeddings)
         document_consumption_finished.connect(run_workflows_added)
         document_updated.connect(run_workflows_updated)
+        document_updated.connect(update_embeddings)
         document_ids_deleted.connect(delete_embeddings)
         import documents.schema  # noqa: F401
 
