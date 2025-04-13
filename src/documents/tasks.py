@@ -31,6 +31,7 @@ from documents.consumer import WorkflowTriggerPlugin
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.double_sided import CollatePlugin
+from documents.embeddings import DocumentEmbeddings
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.models import Correspondent
@@ -271,6 +272,14 @@ def update_document_content_maybe_archive_file(document_id):
             document.get_public_filename(),
         )
 
+                    # Handle OCR images if available
+        if hasattr(parser, "get_ocr_images") and callable(
+            getattr(parser, "get_ocr_images")
+        ):
+            ocr_images = parser.get_ocr_images()
+        else:
+            ocr_images = None
+
         with transaction.atomic():
             oldDocument = Document.objects.get(pk=document.pk)
             if parser.get_archive_path():
@@ -332,6 +341,33 @@ def update_document_content_maybe_archive_file(document_id):
                     shutil.move(parser.get_archive_path(), document.archive_path)
                 shutil.move(thumbnail, document.thumbnail_path)
 
+
+                if ocr_images:
+                    import base64
+
+                    ocr_image_paths = document.ocr_image_paths
+                    for ocr_image, path in zip(ocr_images, ocr_image_paths):
+                        try:
+                            # Extract the actual base64 data (remove data URL prefix if present)
+                            if "base64," in ocr_image:
+                                base64_data = ocr_image.split("base64,")[1]
+                            else:
+                                base64_data = ocr_image
+
+                            # Decode the base64 data to binary
+                            image_data = base64.b64decode(base64_data)
+
+                            # Save the image to the file
+                            with path.open("wb") as f:
+                                f.write(image_data)
+                        except Exception as e:
+                            logger.warning(f"Error saving OCR image: {e}")
+
+                    # Update the document with the number of OCR images
+                    Document.objects.filter(pk=document.pk).update(
+                        ocr_image_count=len(ocr_images)
+                    )
+
         document.refresh_from_db()
         logger.info(
             f"Updating index for document {document_id} ({document.archive_checksum})",
@@ -340,6 +376,10 @@ def update_document_content_maybe_archive_file(document_id):
             index.update_document(writer, document)
 
         clear_document_caches(document.pk)
+
+        logger.info(f"Embedding document {document_id}")
+        embeddings = DocumentEmbeddings()
+        embeddings.embedd_document(document)
 
     except Exception:
         logger.exception(
@@ -473,3 +513,42 @@ def check_scheduled_workflows():
                             WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
                             document,
                         )
+
+
+@shared_task
+def create_missing_embeddings():
+    """
+    Create embeddings for all documents that don't have embeddings yet.
+    """
+    from documents.embeddings import DocumentEmbeddings
+
+    if not settings.EMBEDDING_ENABLED:
+        logger.info("Embedding is disabled. Skipping embedding generation.")
+        return
+
+    documents = Document.objects.filter(embedding_index_ids=[])
+    if not documents.exists():
+        logger.info("No documents without embeddings found.")
+        return
+
+    logger.info(
+        f"Found {documents.count()} documents without embeddings. Creating embeddings..."
+    )
+
+    embeddings = DocumentEmbeddings()
+    success_count = 0
+    error_count = 0
+
+    for document in documents:
+        try:
+            if embeddings.embedd_document(document):
+                success_count += 1
+            else:
+                error_count += 1
+        except Exception as e:
+            logger.error(f"Error creating embeddings for document {document.pk}: {e}")
+            error_count += 1
+
+    logger.info(
+        f"Embedding generation completed. Success: {success_count}, Errors: {error_count}"
+    )
