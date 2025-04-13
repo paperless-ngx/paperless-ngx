@@ -4,6 +4,7 @@ import logging
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from langchain_core.documents import Document as LangchainDocument
 from langchain_experimental.text_splitter import SemanticChunker
 from langchain_mistralai.embeddings import MistralAIEmbeddings
 from langchain_openai.embeddings import OpenAIEmbeddings
@@ -94,7 +95,10 @@ class DocumentEmbeddings:
             logger.debug(
                 f"Adding {len(chunks)} chunks to vector store for document '{document.title}'"
             )
-            index_ids = self.vector_store.add_texts(chunks, metadatas=metadatas)
+            # index_ids = self.vector_store.add_texts(chunks, metadatas=metadatas)
+            index_ids = self.vector_store.add_documents(
+                [LangchainDocument(page_content=chunk, metadata=metadata) for chunk, metadata in zip(chunks, metadatas)]
+            )
             document.embedding_index_ids = index_ids
             document.save(update_fields=("embedding_index_ids",))
         except Exception as e:

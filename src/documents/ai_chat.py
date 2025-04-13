@@ -3,6 +3,7 @@ import random
 import traceback
 from typing import Annotated
 from typing import Any
+from typing import Sequence
 from typing import TypedDict
 
 from django.conf import settings
@@ -19,14 +20,16 @@ from langchain_redis import RedisChatMessageHistory
 from langgraph.graph import END
 from langgraph.graph import StateGraph
 from langgraph.graph.state import CompiledStateGraph
+from langgraph.graph.message import add_messages
 
 from documents.embeddings import DocumentEmbeddings
+from documents.models import Document
 
 logger = logging.getLogger("paperless.ai_chat")
 
 
 class ChatState(TypedDict):
-    messages: Annotated[list[BaseMessage], "The chat messages"]
+    messages: Annotated[Sequence[BaseMessage], add_messages]
     context: Annotated[str, "The context from RAG"]
     document_ids: Annotated[list[str], "The document IDs used for context"]
 
@@ -58,12 +61,26 @@ def search_documents(query: str) -> tuple[str, list[str]]:
         search_results = vector_store.similarity_search(
             query,
             k=3,  # Retrieve top 3 most relevant chunks
+            return_metadata=True,
+            return_all=True,
         )
 
         # Extract content from the search results
+        # logger.info(search_results[0])
         context_texts = [doc.page_content for doc in search_results]
-        context = "\n\n".join(context_texts)
-
+        document_ids = [doc.metadata.get("document_id") for doc in search_results]
+        documents = [Document.objects.get(pk=id) for id in document_ids]
+        context = "\n\n".join(
+            str(
+                {
+                    "title": doc.title,
+                    "id": doc.pk,
+                    "content": context_text,
+                    "link": f"{settings.PAPERLESS_URL}/documents/{doc.pk}/",
+                }
+            )
+            for doc, context_text in zip(documents, context_texts)
+        )
         # Get document IDs
         document_ids = []
         for doc in search_results:
@@ -76,6 +93,7 @@ def search_documents(query: str) -> tuple[str, list[str]]:
 
     except Exception as e:
         logger.error(f"Error searching vector store: {e!s}")
+        traceback.print_exc()
         return "", []
 
 
@@ -99,6 +117,12 @@ def create_chat_graph() -> CompiledStateGraph:
     If the context doesn't contain relevant information, say so politely and suggest
     what kind of documents might contain the answer. Formulate your answer in the same language as the question.
     You can use markdown to format your answer.
+    Cite the documents in your answer using numbers counting up from one like '[1]'. Place the citations directly after the corresponding information in your answer.
+    On the bottom of your answer give a list of references for each document you cited using the following format:
+    \n[1]: [title](link)\n
+    [2]: [title](link)\n
+    [3]: [title](link)\n
+    If you don't have any references, don't mention it. If you are citing different chunks from the same document (same id), use the same citation number for each chunk.
     """
 
     user_template = """
@@ -155,11 +179,8 @@ def create_chat_graph() -> CompiledStateGraph:
             }
         )
 
-        # Add the response to messages
-        new_messages = state["messages"] + [AIMessage(content=response)]
-
         return {
-            "messages": new_messages,
+            "messages": [AIMessage(content=response)],
             "context": state["context"],
             "document_ids": state["document_ids"],
         }
