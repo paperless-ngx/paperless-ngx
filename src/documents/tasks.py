@@ -297,6 +297,7 @@ def update_document_content_maybe_archive_file(document_id):
                     archive_checksum=checksum,
                     content=parser.get_text(),
                     archive_filename=document.archive_filename,
+                    ocr_image_count=len(ocr_images) if ocr_images else 0,
                 )
                 newDocument = Document.objects.get(pk=document.pk)
                 if settings.AUDIT_LOG_ENABLED:
