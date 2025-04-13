@@ -21,7 +21,7 @@ from filelock import FileLock
 from rest_framework.reverse import reverse
 
 from documents.classifier import load_classifier
-from documents.compress import smart_compress, logger
+from documents.compress import smart_compress
 from documents.data_models import DocumentMetadataOverrides
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
@@ -953,9 +953,10 @@ class Consumer(LoggingMixin):
                     mime_type=mime_type,
                 )
 
-                is_compressed = smart_compress(input_path=self.original_path, output_path= self.working_copy, quality= int(document_parser.quality_compress))
-                if is_compressed:
-                    copy_file_with_basic_stats(self.working_copy,
+                if document_parser.enable_compress and not pdf_has_text_pdftotext(self.working_copy) and not check_digital_signature(self.working_copy):
+                    is_compressed = smart_compress(input_path=self.original_path, output_path= self.working_copy, quality= int(document_parser.quality_compress), ghosts_script=True)
+                    if is_compressed:
+                        copy_file_with_basic_stats(self.working_copy,
                                                self.original_path)
                 new_file = None
 

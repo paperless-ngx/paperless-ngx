@@ -216,6 +216,9 @@ class ApplicationConfiguration(AbstractSingletonModel):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         cache.delete('quality_compress')
+        cache.delete('enable_compress')
+        cache.delete('password_ocr')
+        cache.delete('username_ocr')
 
     def __str__(self) -> str:  # pragma: no cover
         return "ApplicationConfiguration"

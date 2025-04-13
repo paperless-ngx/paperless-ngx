@@ -366,6 +366,7 @@ class DocumentParser(LoggingMixin):
             tempfile.mkdtemp(prefix="edoc-", dir=settings.SCRATCH_DIR),
         )
         self.quality_compress = self.get_quality_compress()
+        self.enable_compress = self.get_enable_compress()
         self.archive_path = None
         self.text = None
         self.date: Optional[datetime.datetime] = None
@@ -413,11 +414,47 @@ class DocumentParser(LoggingMixin):
             try:
                 config = ApplicationConfiguration.objects.first()  # hoặc filter điều kiện phù hợp
                 quality = config.quality_compress
-                cache.set(cache_key, quality, timeout=60 * 60)  # Cache 1 tiếng
+                cache.set(cache_key, quality, timeout=60 * 60 * 60)  # Cache 1 tiếng
             except Exception as e:
                 quality = 85  # fallback default
         return quality
 
+    def get_enable_compress(self):
+        cache_key = 'enable_compress'
+        quality = cache.get(cache_key)
+        if quality is None:
+            try:
+                config = ApplicationConfiguration.objects.first()  # hoặc filter điều kiện phù hợp
+                enable_compress = config.enable_compress
+                cache.set(cache_key, enable_compress, timeout=60 * 60 * 60)  # Cache 1 tiếng
+            except Exception as e:
+                quality = False
+        return quality
+
+    def get_setting_ocr(self, field):
+        """
+        Trả về giá trị của 1 trường từ ApplicationConfiguration nếu tồn tại.
+        Ưu tiên lấy từ cache. Nếu không có thì lấy từ DB và cache lại.
+        """
+        cache_key = f"{field}"
+
+        value = cache.get(cache_key)
+        if value is not None:
+            return value
+
+        valid_fields = {f.name for f in
+                        ApplicationConfiguration._meta.get_fields()}
+        if field not in valid_fields:
+            return None
+
+        try:
+            config = ApplicationConfiguration.objects.first()
+            if config is not None:
+                value = getattr(config, field, None)
+                cache.set(cache_key, value, timeout=60 * 60 * 60)  # Cache 1 tiếng
+                return value
+        except Exception:
+            return None
 
     def get_thumbnail(self, document_path, mime_type, file_name=None):
         """

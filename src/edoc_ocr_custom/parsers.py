@@ -31,7 +31,8 @@ from documents.models import DossierForm
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
-from documents.render_pdf import draw_text_on_pdf, draw_invisible_text
+from documents.render_pdf import draw_text_on_pdf, draw_invisible_text, \
+    render_pdf_ocr
 from documents.utils import maybe_override_pixel_limit
 from documents.utils import run_subprocess
 from edoc.config import OcrConfig
@@ -267,65 +268,14 @@ class RasterisedDocumentCustomParser(DocumentParser):
                                               delay=5,
                                               timeout=20)
 
-    def ocr_file(self, path_file, dossier_form: DossierForm, **args):
-        # config {
-        #     "api_login_ocr": "http://172.16.100.201:18000/token",
-        #     "api_upload_file_ocr": "http://172.16.100.201:18000/api/v1/file/upload",
-        #     "api_ocr_by_file_id": "http://172.16.100.201:18000/api/v1/ocr/general",
-        #     "access_token_ocr": "",
-        #     "username_ocr": "test",
-        #     "password_ocr": "test",
-        #     "form_code": [
-        #         {
-        #             "name":"van_ban_hanh_chinh",
-        #             "mapping": [
-        #                 {
-        #                     "Tiêu đề": "Tiêu đề",
-        #                     "Số văn bản": "Số hiệu văn bản",
-        #                     "Kính gửi": "Kính gửi",
-        #                     "Người ký văn bản": "Người ký văn bản",
-        #                     "Ngày phát hành": "Ngày phát hành",
-        #                     "Đơn vị phát hành": "Đơn vị phát hành",
-        #                     "Nơi gửi": "Nơi gửi",
-        #                     "Thời gian tạo": "Thời gian tạo"
-        #                 }
-        #             ]
-        #         },
-        #         {
-        #             "name":"van_ban_nha_dat",
-        #             "mapping": [
-        #                 {
-        #                     "Tiêu đề": "Tiêu đề",
-        #                     "Số văn bản": "Số hiệu văn bản",
-        #                     "Kính gửi": "Kính gửi",
-        #                     "Người ký văn bản": "Người ký văn bản",
-        #                     "Ngày phát hành": "Ngày phát hành",
-        #                     "Đơn vị phát hành": "Đơn vị phát hành",
-        #                     "Nơi gửi": "Nơi gửi",
-        #                     "Thời gian tạo": "Thời gian tạo"
-        #                 }
-        #             ]
-        #         }
-        #     ],
-        #     "api_login_ocr_field": "https://ocr-general-api.tcgroup.vn/user/api/token/",
-        #     "api_refresh_ocr_field": "https://ocr-general-api.tcgroup.vn/user/api/token/refresh/",
-        #     "api_ocr_field": "https://ocr-general-api.tcgroup.vn/home/api/v1/extract-by-rule",
-        #     "access_token_ocr_field": "",
-        #     "refresh_token_ocr_field": "",
-        #     "username_ocr_field": "ductm@tc.vn",
-        #     "password_ocr_field": "Ductm@123456"
-        # }
+    def ocr_file(self, path_file, username_ocr, password_ocr, api_login_ocr, api_refresh_ocr, api_upload_file_ocr, dossier_form: DossierForm, **args):
         # data general
         data_ocr = None
         data_ocr_fields = None
         form_code = ""
         app_config = ApplicationConfiguration.objects.filter().first()
-        username_ocr = app_config.username_ocr
-        password_ocr = app_config.password_ocr
-        api_login_ocr = settings.API_LOGIN_OCR
-        api_refresh_ocr = settings.API_REFRESH_OCR
         refresh_token_ocr = cache.get("refresh_token_ocr", '')
-        api_upload_file_ocr = settings.API_UPLOAD_FILE_OCR
+
         # count page number
         page_count = 1
         try:
@@ -557,141 +507,40 @@ class RasterisedDocumentCustomParser(DocumentParser):
 
     #     return (data_ocr,data_ocr_fields)
 
-    def render_pdf_ocr(self, sidecar, mime_type, input_path, output_path,
-                       data_ocr, quality_compress = 85, font_path=''):
-        font_name = 'Arial'
-        data = data_ocr or {}
 
-
-        with open(sidecar, "w") as txt_sidecar:
-            txt_sidecar.write(data.get("content_formated", ""))
-        if self.is_image(mime_type):
-            img = Image.open(input_path)
-            width, height = img.size
-            c = canvas.Canvas(str(output_path), pagesize=(width, height))
-            pdfmetrics.registerFont(TTFont(font_name, font_path))
-            # c.drawImage(input_path, 0, 0, width=width, height=height)
-            for page in data.get("pages", {}):
-                for block in page["blocks"]:
-                    for line in block.get("lines", []):
-                        y1 = line.get("bbox")[0][1]
-                        y2 = line.get("bbox")[1][1]
-                        font_size = math.floor((y2 - y1) * 72 / 96)
-                        y_center_coordinates = y2 - (y2 - y1) / 2
-                        for word in line.get("words", []):
-                            x1 = word["bbox"][0][0]
-                            # y1 = word["bbox"][0][1]
-                            x2 = word["bbox"][1][0]
-                            # y2 = word["bbox"][1][1]
-                            value = word["value"]
-                            # font_size = math.ceil(float(y2-y1) * 72 / 96)
-                            # font_size = (y2-y1) * 72 / 96
-                            x_center_coordinates = x2 - (x2 - x1) / 2
-                            # y_center_coordinates =y2 - (y2-y1)/2
-                            w = c.stringWidth(value, font_name, font_size)
-                            c.setFont('Arial', font_size)
-                            c.drawString(x_center_coordinates - w / 2,
-                                         height - y_center_coordinates - (
-                                             font_size / 2),
-                                         value)
-            c.drawImage(input_path, 0, 0, width=width, height=height)
-            c.save()
-        else:
-            shutil.copy(str(input_path), str(output_path))
-            if len(data) < 1:
-                return
-
-            input_pdf = PdfReader(input_path)
-            can = canvas.Canvas(str(output_path), pagesize=letter)
-
-            pdfmetrics.registerFont(TTFont('Arial', font_path))
-            font_name = "Arial"
-
-            for page_num, page in enumerate(input_pdf.pages):
-                image = convert_from_path(input_path,
-                                          first_page=page_num + 1,
-                                          last_page=page_num + 2)[0]
-
-                page_height = page.mediabox.getHeight()
-                page_width = page.mediabox.getWidth()
-
-                width_api_img = data["pages"][page_num]["dimensions"][1]
-                height_api_img = data["pages"][page_num]["dimensions"][0]
-
-                # set size new page
-                if width_api_img < height_api_img and page_height < page_width:
-                    page_height, page_width = page_width, page_height
-
-                can.setPageSize((page_width, page_height))
-
-                byte_image = io.BytesIO()
-                image.save(byte_image, format='JPEG',
-                           quality=int(quality_compress), optimize=True)
-                byte_image.seek(0)
-
-                rolate_height = height_api_img / page_height
-                rolate_width = width_api_img / page_width
-
-                for block in data["pages"][page_num]["blocks"]:
-                    for line in block.get("lines", []):
-                        y1_line = (
-                            line.get("bbox")[0][1] / float(rolate_height))
-                        y2_line = (
-                            line.get("bbox")[1][1] / float(rolate_height))
-
-                        y_center_coordinates = y2_line - (
-                            y2_line - y1_line) / 2
-
-                        for word in line.get("words", []):
-                            x1 = word["bbox"][0][0] / float(rolate_width)
-                            y1 = word["bbox"][0][1] / float(rolate_height)
-                            x2 = word["bbox"][1][0] / float(rolate_width)
-                            y2 = word["bbox"][1][1] / float(rolate_height)
-
-                            font_size = max(1, math.floor((y2 - y1) * 72 / 96))
-                            value = word["value"]
-                            x_center_coordinates = x2 - (x2 - x1) / 2
-
-                            w = can.stringWidth(value, font_name, font_size)
-                            can.setFont('Arial', font_size)
-                            can.drawString(int(x_center_coordinates - w / 2),
-                                           int(float(
-                                               page_height) - y_center_coordinates - (
-                                                   font_size / 2)) + 2,
-                                           value)
-
-                can.drawImage(ImageReader(byte_image),
-                              0, 0,
-                              width=float(page_width),
-                              height=float(page_height))
-                can.showPage()
-
-            can.save()
 
     def ocr_img_or_pdf(self, document_path, mime_type, dossier_form, sidecar,
                        output_file, **kwargs):
         data_ocr = None
         data_ocr_fields = None
         form_code = None
-        data_ocr, data_ocr_fields, form_code = self.ocr_file(document_path,
-                                                             dossier_form,
+        username_ocr = self.get_setting_ocr('username_ocr')
+        password_ocr = self.get_setting_ocr('password_ocr')
+        api_login_ocr = settings.API_LOGIN_OCR
+        api_refresh_ocr = settings.API_REFRESH_OCR
+        api_upload_file_ocr = settings.API_UPLOAD_FILE_OCR
+        data_ocr, data_ocr_fields, form_code = self.ocr_file(path_file=document_path,username_ocr=username_ocr,password_ocr=password_ocr, api_login_ocr=api_login_ocr,api_refresh_ocr=api_refresh_ocr, api_upload_file_ocr=api_upload_file_ocr, dossier_form=dossier_form,
                                                              **kwargs)
-        # self.render_pdf_ocr(sidecar, mime_type, document_path, output_file,
-        #                     data_ocr, self.quality_compress, os.path.join(os.path.dirname(os.path.abspath(__file__)),
-        #                          'fonts', 'arial-font/arial.ttf'))
+        with open(sidecar, "w") as txt_sidecar:
+            txt_sidecar.write(data_ocr.get("content_formated", ""))
+
+        render_pdf_ocr(input_path=document_path, output_path=output_file,
+                            data_ocr=data_ocr, quality_compress=self.quality_compress, font_path=os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                 'fonts', 'arial-font/arial.ttf'))
         # draw_text_on_pdf(
         #     input_path=document_path,
         #     output_path=output_file,
         #     data=data_ocr,
         #     font_path=os.path.join(os.path.dirname(os.path.abspath(__file__)),
         #                          'fonts', 'arial-font/arial.ttf'))
-
-        draw_invisible_text(
-            input_path=document_path,
-            output_path=output_file,
-            data=data_ocr,
-            quality=self.quality_compress
-        )
+        # draw_invisible_text(
+        #     input_path=document_path,
+        #     output_path=output_file,
+        #     data=data_ocr,
+        #     quality=int(self.quality_compress),
+        #     font_path=os.path.join(os.path.dirname(os.path.abspath(__file__)),
+        #                            'fonts', 'arial-font/arial.ttf')
+        # )
 
 
         return data_ocr, data_ocr_fields, form_code

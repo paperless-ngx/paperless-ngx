@@ -1,7 +1,10 @@
+import io
 import subprocess
 from pathlib import Path
 from PIL import Image
 import logging
+
+from pdf2image.pdf2image import convert_from_path
 
 logger = logging.getLogger("edoc.compress")
 logging.basicConfig(level=logging.INFO)
@@ -17,8 +20,32 @@ def map_quality_to_setting(quality):
     else:
         return "/prepress"
 
+def compress_pdf(input_pdf_path, output_pdf_path, quality=85):
+    # Convert PDF to a list of images
+    pages = convert_from_path(input_pdf_path)
 
-def compress_pdf(input_path, output_path, quality=80):
+    # Create a list to hold the compressed images
+    compressed_images = []
+
+    # Iterate through each page
+    for page in pages:
+        page_image = page.convert("RGB")
+
+        # Compress the page image
+        file_bytes = io.BytesIO()
+        page_image.save(file_bytes, format='JPEG', quality=quality, optimize=True)
+        file_bytes.seek(0)
+        compressed_images.append(Image.open(file_bytes))
+
+    # Save the compressed images as a new PDF
+    compressed_images[0].save(output_pdf_path, save_all=True, append_images=compressed_images[1:])
+
+    # Close the BytesIO objects
+    for img in compressed_images:
+        img.close()
+
+
+def compress_pdf_with_ghostscript(input_path, output_path, quality=80):
     setting = map_quality_to_setting(quality)
     cmd = [
         "gs", "-sDEVICE=pdfwrite",
@@ -28,6 +55,7 @@ def compress_pdf(input_path, output_path, quality=80):
         f"-sOutputFile={output_path}",
         str(input_path)
     ]
+
     try:
         subprocess.run(cmd, check=True)
         logger.info(f"✔️ Nén PDF xong: {output_path} (quality={quality}, setting={setting})")
@@ -90,13 +118,13 @@ def compress_bmp(input_path, output_path):
     except Exception as e:
         logger.error(f"❌ Lỗi nén BMP: {e}")
 
-def smart_compress(input_path: str, output_path: str, quality: int = 85) -> bool:
+def smart_compress(input_path: str, output_path: str, quality: int = 85, ghosts_script = False) -> bool:
     ext = Path(input_path).suffix.lower()
     logger.info(f"🔍 Đang xử lý nén: {input_path} → {output_path} (ext={ext}, quality={quality})")
 
     try:
         if ext == ".pdf":
-            compress_pdf(input_path, output_path, quality)
+            compress_pdf(input_path, output_path, quality) if not ghosts_script else compress_pdf_with_ghostscript(input_path, output_path, quality)
         elif ext in [".jpg", ".jpeg"]:
             compress_jpg(input_path, output_path, quality)
         elif ext == ".png":
