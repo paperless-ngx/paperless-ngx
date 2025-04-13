@@ -71,6 +71,12 @@ class DocumentEmbeddings:
                 f"Document '{document.title}' has no content. Skipping embedding generation."
             )
             return False
+
+        # First delete existing embeddings if they exist
+        if document.embedding_index_ids:
+            self.delete_embeddings(document.embedding_index_ids)
+            document.embedding_index_ids = []
+            document.save(update_fields=["embedding_index_ids"])
         try:
             chunks = self.splitter.split_text(document.content)
         except Exception as e:

@@ -619,12 +619,6 @@ def update_embeddings(sender, document: Document, **kwargs):
     embeddings = DocumentEmbeddings()
 
     try:
-        # First delete existing embeddings if they exist
-        if document.embedding_index_ids:
-            embeddings.delete_embeddings(document.embedding_index_ids)
-            document.embedding_index_ids = []
-            document.save(update_fields=["embedding_index_ids"])
-
         # Create new embeddings
         success = embeddings.embedd_document(document)
         if success:
