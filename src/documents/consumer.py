@@ -360,15 +360,17 @@ class Consumer(LoggingMixin):
         # check folder when uploading documents
         if self.override_owner_id is None:
             return
-        folder = Folder.objects.filter(id=self.override_folder_id).first()
-        user = User.objects.get(id=self.override_owner_id)
-        if folder:
-            user_can_change = check_user_can_change_folder(user, folder)
-            if not user_can_change:
-                self._fail(
-                    ConsumerStatusShortMessage.NO_UPLOAD_PERMISSION_TO_FOLDER,
-                    f"Cannot consume {self.filename}: no upload permission to folder",
-                )
+        if self.override_folder_id:
+            folder = Folder.objects.filter(id=self.override_folder_id).first()
+            user = User.objects.get(id=self.override_owner_id)
+            if folder:
+                user_can_change = check_user_can_change_folder(user, folder)
+                if not user_can_change:
+                    self._fail(
+                        ConsumerStatusShortMessage.NO_UPLOAD_PERMISSION_TO_FOLDER,
+                        f"Cannot consume {self.filename}: no upload permission to folder",
+                    )
+        return
 
     def pre_check_file_exists(self):
         """
@@ -388,7 +390,7 @@ class Consumer(LoggingMixin):
             checksum = hashlib.md5(f.read()).hexdigest()
         existing_doc = Document.objects.filter(
             Q(checksum=checksum) | Q(archive_checksum=checksum),
-        ).defer('content')
+        ).only('id')
         if existing_doc.exists():
             if settings.CONSUMER_DELETE_DUPLICATES:
                 os.unlink(self.original_path)
