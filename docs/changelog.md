@@ -1,5 +1,28 @@
 # Changelog
 
+## paperless-ngx 2.15.2
+
+### Bug Fixes
+
+-   Fix: Adds better handling during folder checking/creation/permissions for non-root [@stumpylog](https://github.com/stumpylog) ([#9616](https://github.com/paperless-ngx/paperless-ngx/pull/9616))
+-   Fix: Explicitly set the HOME environment to resolve issues running as root with database certificates [@stumpylog](https://github.com/stumpylog) ([#9643](https://github.com/paperless-ngx/paperless-ngx/pull/9643))
+-   Fix: prevent self-linking when bulk edit doc link [@shamoon](https://github.com/shamoon) ([#9629](https://github.com/paperless-ngx/paperless-ngx/pull/9629))
+
+### Dependencies
+
+-   Chore: Bump celery to 5.5.1 [@hannesortmeier](https://github.com/hannesortmeier) ([#9642](https://github.com/paperless-ngx/paperless-ngx/pull/9642))
+
+### All App Changes
+
+<details>
+<summary>4 changes</summary>
+
+-   Tweak: consistently use created date when displaying doc in list [@shamoon](https://github.com/shamoon) ([#9651](https://github.com/paperless-ngx/paperless-ngx/pull/9651))
+-   Fix: Adds better handling during folder checking/creation/permissions for non-root [@stumpylog](https://github.com/stumpylog) ([#9616](https://github.com/paperless-ngx/paperless-ngx/pull/9616))
+-   Fix: Explicitly set the HOME environment to resolve issues running as root with database certificates [@stumpylog](https://github.com/stumpylog) ([#9643](https://github.com/paperless-ngx/paperless-ngx/pull/9643))
+-   Fix: prevent self-linking when bulk edit doc link [@shamoon](https://github.com/shamoon) ([#9629](https://github.com/paperless-ngx/paperless-ngx/pull/9629))
+</details>
+
 ## paperless-ngx 2.15.1
 
 ### Bug Fixes
