@@ -89,7 +89,7 @@
                 @if (searchResults?.documents.length) {
                     <h6 class="dropdown-header" i18n="@@searchResults.documents">Documents</h6>
                     @for (document of searchResults.documents; track document.id) {
-                        <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: document, nameProp: 'title', type: DataType.Document, icon: 'file-text', date: document.added}"></ng-container>
+                        <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: document, nameProp: 'title', type: DataType.Document, icon: 'file-text', date: document.created}"></ng-container>
                     }
                 }
                 @if (searchResults?.saved_views.length) {
