@@ -1,13 +1,15 @@
+import logging
 import re
 
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
+from elasticsearch.helpers import bulk
 from guardian.shortcuts import get_users_with_perms
 
 from edoc.settings import ELASTIC_SEARCH_DOCUMENT_INDEX
 from .models import Document as DocumentModel, Note, CustomFieldInstance
 
-
+logger = logging.getLogger("edoc.document_elasticsearch")
 @registry.register_document
 class DocumentDocument(Document):
     id = fields.IntegerField(attr='id')
@@ -180,3 +182,157 @@ class DocumentDocument(Document):
     #     # Tái lập chỉ mục cho tất cả các tài liệu
     #     for doc in DocumentModel.objects.all():
     #         cls.update_document(doc)
+
+    @classmethod
+    def bulk_index_documents(cls, documents, batch_size=10000):
+        """
+        Chỉ mục các tài liệu vào Elasticsearch bằng phương pháp bulk indexing với batching.
+        :param documents: QuerySet hoặc danh sách các tài liệu cần chỉ mục.
+        :param batch_size: Kích thước lô (batch size) cho mỗi lần xử lý.
+        """
+        total_documents = len(documents)
+        logger.info(
+            f"Tổng số tài liệu cần xử lý: {total_documents}. Batch size: {batch_size}.")
+
+        # Process documents in batches
+        for i in range(0, total_documents, batch_size):
+            # Create a batch of documents
+            batch = documents[i:i + batch_size]
+            logger.info(
+                f"Đang xử lý batch {i // batch_size + 1} với {len(batch)} tài liệu.")
+
+            actions = []
+            for doc in batch:
+                try:
+                    parsed_document = cls().prepare_document_data(doc)
+                    actions.append({
+                        "_index": cls.Index.name,
+                        "_id": str(doc.id),
+                        "_source": parsed_document,
+                    })
+                    logger.info(
+                        f"Tài liệu {doc.id} đã được chuẩn bị để chỉ mục trong batch {i // batch_size + 1}.")
+                except Exception as e:
+                    logger.error(f"Lỗi khi xử lý tài liệu {doc.id}: {e}")
+
+            # Skip processing if the batch has no valid actions
+            if not actions:
+                logger.warning(
+                    f"Batch {i // batch_size + 1}: Không có tài liệu hợp lệ để chỉ mục.")
+                continue
+
+            try:
+                # Perform bulk indexing for the current batch
+                client = cls._get_connection()
+                bulk(client, actions)
+                logger.info(
+                    f"Batch {i // batch_size + 1}: Đã chỉ mục thành công {len(actions)} tài liệu.")
+            except Exception as e:
+                logger.error(
+                    f"Batch {i // batch_size + 1}: Lỗi khi thực hiện chỉ mục theo lô: {e}")
+    def prepare_document_data(self, instance):
+        """
+        Prepares the document data for Elasticsearch indexing.
+        :param instance: A document instance from the `DocumentModel`.
+        :return: Dictionary containing the document data.
+        """
+        try:
+            # Basic fields
+            document_data = {
+                "id": instance.id,
+                "title": instance.title or None,
+                "content": instance.content or None,
+                "asn": instance.archive_serial_number or None,
+                "created": instance.created,
+                "added": instance.added,
+                "modified": instance.modified,
+                "checksum": instance.checksum,
+                "page_count": instance.page_count,
+                "original_filename": instance.original_filename,
+            }
+
+            # Suggest content (bigram and trigram logic)
+            document_data["suggest_content"] = self.prepare_suggest_content(
+                instance)
+
+            # Tags
+            document_data["tags"] = [tag.name for tag in instance.tags.all()]
+            document_data["tag_id"] = [tag.id for tag in instance.tags.all()]
+            document_data["has_tag"] = bool(instance.tags.all())
+
+            # Correspondent information
+            if instance.correspondent:
+                document_data["correspondent"] = instance.correspondent.name
+                document_data["correspondent_id"] = instance.correspondent.id
+                document_data["has_correspondent"] = True
+            else:
+                document_data["correspondent"] = None
+                document_data["correspondent_id"] = None
+                document_data["has_correspondent"] = False
+
+            # Warehouse details
+            if instance.warehouse:
+                document_data["warehouse"] = instance.warehouse.name
+                document_data["warehouse_path"] = instance.warehouse.path
+                document_data["warehouse_id"] = instance.warehouse.id
+                document_data["has_warehouse"] = True
+            else:
+                document_data["warehouse"] = None
+                document_data["warehouse_path"] = None
+                document_data["warehouse_id"] = None
+                document_data["has_warehouse"] = False
+
+            # Folder details
+            if instance.folder:
+                document_data["folder"] = instance.folder.name
+                document_data["folder_id"] = instance.folder.id
+                document_data["has_folder"] = True
+            else:
+                document_data["folder"] = None
+                document_data["folder_id"] = None
+                document_data["has_folder"] = False
+
+            # Archive font details
+            if instance.archive_font:
+                document_data["archive_font"] = instance.archive_font.name
+                document_data["archive_font_id"] = instance.archive_font.id
+                document_data["has_archive_font"] = True
+            else:
+                document_data["archive_font"] = None
+                document_data["archive_font_id"] = None
+                document_data["has_archive_font"] = False
+
+            # Notes and custom fields
+            document_data["notes"] = list(
+                Note.objects.filter(document=instance).values_list('note',
+                                                                   flat=True))
+            document_data["custom_fields"] = ",".join([str(c) for c in
+                                                       CustomFieldInstance.objects.filter(
+                                                           document=instance)])
+            document_data["num_notes"] = len(document_data["notes"])
+            document_data["custom_field_count"] = len(
+                document_data["custom_fields"])
+
+            # Permissions and viewers
+            users_with_perms = get_users_with_perms(instance,
+                                                    only_with_perms_in=[
+                                                        "view_document"])
+            document_data["viewer_id"] = [user.id for user in users_with_perms]
+            document_data["is_shared"] = bool(users_with_perms)
+
+            # Owner details
+            if instance.owner:
+                document_data["owner"] = instance.owner.username
+                document_data["owner_id"] = instance.owner.id
+                document_data["has_owner"] = True
+            else:
+                document_data["owner"] = None
+                document_data["owner_id"] = None
+                document_data["has_owner"] = False
+
+            return document_data
+
+        except Exception as e:
+            logger.error(
+                f"Error preparing document data for instance {instance.id}: {e}")
+            return None  # Or raise the exception if necessary

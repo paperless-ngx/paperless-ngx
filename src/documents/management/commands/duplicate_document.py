@@ -6,7 +6,7 @@ from django.db.models import Q
 from tqdm import tqdm
 
 from documents.models import Document
-from documents.index import update_index_document
+from documents.index import update_index_document, update_index_bulk_documents
 from documents.management.commands.mixins import ProgressBarMixin
 
 logger = logging.getLogger("edoc.duplicate_document")
@@ -23,17 +23,27 @@ def process_document(document):
         logger.error(f"Failed to index document {document.id}: {e}")
 
 
-def duplicate_documents_with_workers(duplicate_count=1, limit=None, num_workers=5, progress_bar_disable=False):
+def duplicate_documents_with_workers(duplicate_count=1, limit=None, num_workers=5, batch_size=10000, progress_bar_disable=False):
     """
     Duplicate documents and update their index using workers.
     """
     # Filter documents with non-empty content
-    documents = Document.objects.filter(~Q(content=""))
+    documents = Document.objects.select_related(
+        'document_type',
+        'warehouse',
+        'archive_font',
+        'folder',
+        'owner'
+    ).prefetch_related(
+        'tags',
+        'custom_fields',
+        'notes'
+    ).filter(~Q(content=""))
     if limit:
         documents = documents[:limit]
 
     new_documents = []
-    logger.info(f"Document count to process: {documents.count()}")
+    logger.info(f"Document count to process: {documents.count()} batch_size {batch_size}")
 
     for document in tqdm(documents, disable=progress_bar_disable):
         for _ in range(duplicate_count):
@@ -56,14 +66,18 @@ def duplicate_documents_with_workers(duplicate_count=1, limit=None, num_workers=
             new_documents.append(new_document)
 
     # Bulk create new documents
-    created_documents = Document.objects.bulk_create(new_documents, batch_size=1000)
+    created_documents = Document.objects.bulk_create(new_documents, batch_size=batch_size)
     logger.info(f"Created {len(created_documents)} new documents.")
 
     # Use ThreadPoolExecutor to process indexing in parallel
-    with ThreadPoolExecutor(max_workers=num_workers) as executor:
-        for document in tqdm(created_documents, disable=progress_bar_disable):
-            executor.submit(process_document, document)
+    # with ThreadPoolExecutor(max_workers=num_workers) as executor:
+    #     for document in created_documents:
+    #         try:
+    #             executor.submit(process_document, document)
+    #         except Exception as e:
+    #             logger.error(f"Failed to process document {document.id}: {e}")
 
+    update_index_bulk_documents(created_documents, batch_size)
     logger.info("All documents have been indexed successfully.")
 
 
@@ -97,6 +111,12 @@ class Command(ProgressBarMixin, BaseCommand):
             default=5,
             help="Number of workers to use for parallel indexing.",
         )
+        parser.add_argument(
+            "--batch-size",
+            type=int,
+            default=10000,
+            help="Number of workers to use for parallel indexing.",
+        )
         self.add_argument_progress_bar_mixin(parser)
 
     def handle(self, *args, **options):
@@ -105,11 +125,13 @@ class Command(ProgressBarMixin, BaseCommand):
         limit = options["limit"]  # Limit the number of documents to process
         duplicate_count = options["duplicate_count"]  # Number of duplicates per document
         num_workers = options["num_workers"]  # Number of workers for parallel processing
+        batch_size = options["batch_size"]  # Number of workers for parallel processing
 
         if options["command"] == "duplicate":
             duplicate_documents_with_workers(
                 duplicate_count=duplicate_count,
                 limit=limit,
                 num_workers=num_workers,
+                batch_size=batch_size,
                 progress_bar_disable=self.use_progress_bar,
             )

@@ -137,6 +137,9 @@ def open_index_searcher() -> Searcher:
 def update_index_document(doc: Document):
     DocumentDocument().update_document(doc)
 
+def update_index_bulk_documents(docs,batch_size):
+    DocumentDocument().bulk_index_documents(docs,batch_size=batch_size)
+
 def delete_document_index(doc: Document = None, id: int=None):
     if doc is not None:
         id = doc.id
