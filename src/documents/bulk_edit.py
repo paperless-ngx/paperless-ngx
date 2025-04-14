@@ -179,6 +179,12 @@ def modify_custom_fields(
                     custom_field.data_type
                 ]
                 defaults[value_field] = value
+                if (
+                    custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK
+                    and doc_id in value
+                ):
+                    # Prevent self-linking
+                    continue
             CustomFieldInstance.objects.update_or_create(
                 document_id=doc_id,
                 field_id=field_id,

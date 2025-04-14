@@ -336,6 +336,35 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             self.doc2.custom_fields.filter(field=cf3).first().value,
         )
 
+    def test_modify_custom_fields_doclink_self_link(self):
+        """
+        GIVEN:
+            - 2 existing documents
+            - Existing doc link custom field
+        WHEN:
+            - Doc link field is modified to include self link
+        THEN:
+            - Self link should not be created
+        """
+        cf = CustomField.objects.create(
+            name="cf",
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
+        bulk_edit.modify_custom_fields(
+            [self.doc1.id, self.doc2.id],
+            add_custom_fields={cf.id: [self.doc1.id]},
+            remove_custom_fields=[],
+        )
+
+        self.assertEqual(
+            self.doc1.custom_fields.first().value,
+            [self.doc2.id],
+        )
+        self.assertEqual(
+            self.doc2.custom_fields.first().value,
+            [self.doc1.id],
+        )
+
     def test_delete(self):
         self.assertEqual(Document.objects.count(), 5)
         bulk_edit.delete([self.doc1.id, self.doc2.id])
