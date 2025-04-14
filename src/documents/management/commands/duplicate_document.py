@@ -1,32 +1,48 @@
 import logging
-from operator import index
-
-import tqdm
+import uuid
+from concurrent.futures import ThreadPoolExecutor
 from django.core.management import BaseCommand
-from nltk.corpus.reader import documents
-from pymupdf.extra import page_count
+from django.db.models import Q
+from tqdm import tqdm
 
+from documents.models import Document
 from documents.index import update_index_document
 from documents.management.commands.mixins import ProgressBarMixin
-from documents.models import Document
-import datetime
-import uuid
-from django.db import transaction
-logger = logging.getLogger("edoc.duplicate_document")
-def duplicate_documents_with_changes(progress_bar_disable=False):
-    documents = Document.objects.all()
-    new_documents = []
-    logger.info(f"document {documents.count()}")
 
-    for document in tqdm.tqdm(documents, disable=progress_bar_disable):
-        for _ in range(5):  # Create 5 new records for each document
-            document:Document
+logger = logging.getLogger("edoc.duplicate_document")
+
+
+def process_document(document):
+    """
+    Process a single document: log and update its index.
+    """
+    try:
+        logger.info(f'Add index for document {document.id}')
+        update_index_document(document)
+    except Exception as e:
+        logger.error(f"Failed to index document {document.id}: {e}")
+
+
+def duplicate_documents_with_workers(duplicate_count=1, limit=None, num_workers=5, progress_bar_disable=False):
+    """
+    Duplicate documents and update their index using workers.
+    """
+    # Filter documents with non-empty content
+    documents = Document.objects.filter(~Q(content=""))
+    if limit:
+        documents = documents[:limit]
+
+    new_documents = []
+    logger.info(f"Document count to process: {documents.count()}")
+
+    for document in tqdm(documents, disable=progress_bar_disable):
+        for _ in range(duplicate_count):
             new_document = Document(
                 title=document.title,
                 content=document.content,
-                checksum=uuid.uuid4().hex,  # Generate a new checksum
-                archive_filename=f"{uuid.uuid4().hex}",  # Generate a new archive file
-                filename=f"{uuid.uuid4().hex}",  # Generate a new archive file
+                checksum=uuid.uuid4().hex,  # Generate a unique checksum
+                archive_filename=f"{uuid.uuid4().hex}",  # Generate unique archive file
+                filename=f"{uuid.uuid4().hex}",  # Generate unique filename
                 mime_type=document.mime_type,
                 storage_type=document.storage_type,
                 owner_id=document.owner_id,
@@ -35,28 +51,65 @@ def duplicate_documents_with_changes(progress_bar_disable=False):
                 file_id=document.file_id,
                 folder_id=document.folder_id,
                 original_filename=document.original_filename,
-                archive_checksum=f"{uuid.uuid4().hex}"
-                # Copy other fields as needed
+                archive_checksum=f"{uuid.uuid4().hex}",  # Generate new archive checksum
             )
             new_documents.append(new_document)
-    logger.info(f'new_documents {len(new_documents)}')
-    # Save all new documents in bulk
-    with transaction.atomic():
-        created_documents = Document.objects.bulk_create(new_documents, batch_size=1000)
-        for document in created_documents:
-            logger.info(f'add index for document{document.id}')
-            update_index_document(document)
 
-    logger.info(f"Created {len(new_documents)} new documents.")
+    # Bulk create new documents
+    created_documents = Document.objects.bulk_create(new_documents, batch_size=1000)
+    logger.info(f"Created {len(created_documents)} new documents.")
+
+    # Use ThreadPoolExecutor to process indexing in parallel
+    with ThreadPoolExecutor(max_workers=num_workers) as executor:
+        for document in tqdm(created_documents, disable=progress_bar_disable):
+            executor.submit(process_document, document)
+
+    logger.info("All documents have been indexed successfully.")
+
 
 class Command(ProgressBarMixin, BaseCommand):
-    help = "Manages the document index elastic search."
+    """
+    Django management command to duplicate documents and update their index.
+    """
+    help = "Duplicate documents and manage their indexing using multiple workers."
 
     def add_arguments(self, parser):
-        parser.add_argument("command", choices=["duplicate"])
+        parser.add_argument(
+            "command",
+            choices=["duplicate"],
+            help="Command to execute (only supports 'duplicate').",
+        )
+        parser.add_argument(
+            "--limit",
+            type=int,
+            default=None,
+            help="Limit the number of documents to process.",
+        )
+        parser.add_argument(
+            "--duplicate-count",
+            type=int,
+            default=1,
+            help="Number of duplicates to create for each document.",
+        )
+        parser.add_argument(
+            "--num-workers",
+            type=int,
+            default=5,
+            help="Number of workers to use for parallel indexing.",
+        )
         self.add_argument_progress_bar_mixin(parser)
 
     def handle(self, *args, **options):
         self.handle_progress_bar_mixin(**options)
 
-        duplicate_documents_with_changes(progress_bar_disable=self.use_progress_bar)
+        limit = options["limit"]  # Limit the number of documents to process
+        duplicate_count = options["duplicate_count"]  # Number of duplicates per document
+        num_workers = options["num_workers"]  # Number of workers for parallel processing
+
+        if options["command"] == "duplicate":
+            duplicate_documents_with_workers(
+                duplicate_count=duplicate_count,
+                limit=limit,
+                num_workers=num_workers,
+                progress_bar_disable=self.use_progress_bar,
+            )
