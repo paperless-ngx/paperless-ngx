@@ -15,5 +15,6 @@ if [ $(id -u) == $(id -u paperless) ]; then
 	printf "true" > /var/run/s6/container_environment/USER_IS_NON_ROOT
 	echo "${log_prefix}  paperless-ngx docker container running under a user"
 else
+	printf "/usr/src/paperless" > /var/run/s6/container_environment/HOME
 	echo "${log_prefix}  paperless-ngx docker container starting init as root"
 fi
