@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-04-14 08:54-0700\n"
-"PO-Revision-Date: 2025-04-14 15:55\n"
+"PO-Revision-Date: 2025-04-14 19:48\n"
 "Last-Translator: \n"
 "Language-Team: Bulgarian\n"
 "Language: bg_BG\n"
@@ -51,7 +51,7 @@ msgstr "{data_type} не поддържа заявка expr {expr!r}."
 
 #: documents/filters.py:648
 msgid "Maximum nesting depth exceeded."
-msgstr ""
+msgstr "Надвишена е максималната дълбочина на вмъкване."
 
 #: documents/filters.py:827
 msgid "Custom field not found"
@@ -582,11 +582,11 @@ msgstr "Използвайте файл"
 
 #: documents/models.py:540
 msgid "Train Classifier"
-msgstr ""
+msgstr "Обучение на класификатора"
 
 #: documents/models.py:541
 msgid "Check Sanity"
-msgstr ""
+msgstr "Проверете здравия разум"
 
 #: documents/models.py:542
 msgid "Index Optimize"
