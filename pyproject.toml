@@ -1,6 +1,6 @@
 [project]
 name = "paperless-ngx"
-version = "2.15.1"
+version = "2.15.2"
 description = "A community-supported supercharged version of paperless: scan, index and archive all your physical documents"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -16,7 +16,7 @@ classifiers = [
 
 dependencies = [
   "bleach~=6.2.0",
-  "celery[redis]~=5.4.0",
+  "celery[redis]~=5.5.1",
   "channels~=4.2",
   "channels-redis~=4.2",
   "concurrent-log-handler~=0.9.25",

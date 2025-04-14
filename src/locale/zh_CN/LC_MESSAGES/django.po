@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-26 21:04-0700\n"
-"PO-Revision-Date: 2025-03-29 17:14\n"
+"POT-Creation-Date: 2025-04-14 08:54-0700\n"
+"PO-Revision-Date: 2025-04-14 15:55\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -530,23 +530,23 @@ msgstr "自定义字段查询"
 
 #: documents/models.py:490
 msgid "created to"
-msgstr ""
+msgstr "创建到"
 
 #: documents/models.py:491
 msgid "created from"
-msgstr ""
+msgstr "创建于"
 
 #: documents/models.py:492
 msgid "added to"
-msgstr ""
+msgstr "添加到"
 
 #: documents/models.py:493
 msgid "added from"
-msgstr ""
+msgstr "添加于"
 
 #: documents/models.py:494
 msgid "mime type is"
-msgstr ""
+msgstr "MIME 类型是"
 
 #: documents/models.py:504
 msgid "rule type"
@@ -566,31 +566,31 @@ msgstr "过滤规则"
 
 #: documents/models.py:534
 msgid "Auto Task"
-msgstr ""
+msgstr "自动任务"
 
 #: documents/models.py:535
 msgid "Scheduled Task"
-msgstr ""
+msgstr "计划任务"
 
 #: documents/models.py:536
 msgid "Manual Task"
-msgstr ""
+msgstr "手动任务"
 
 #: documents/models.py:539
 msgid "Consume File"
-msgstr ""
+msgstr "处理文件"
 
 #: documents/models.py:540
 msgid "Train Classifier"
-msgstr ""
+msgstr "训练分类器"
 
 #: documents/models.py:541
 msgid "Check Sanity"
-msgstr ""
+msgstr "检查健全性"
 
 #: documents/models.py:542
 msgid "Index Optimize"
-msgstr ""
+msgstr "索引优化"
 
 #: documents/models.py:547
 msgid "Task ID"
@@ -622,7 +622,7 @@ msgstr "任务名称"
 
 #: documents/models.py:569
 msgid "Name of the task that was run"
-msgstr ""
+msgstr "运行的任务名称"
 
 #: documents/models.py:576
 msgid "Task State"
@@ -666,11 +666,11 @@ msgstr "任务返回的数据"
 
 #: documents/models.py:614
 msgid "Task Type"
-msgstr ""
+msgstr "任务类型"
 
 #: documents/models.py:615
 msgid "The type of task that was run"
-msgstr ""
+msgstr "运行的任务类型"
 
 #: documents/models.py:626
 msgid "Note for the document"
@@ -806,7 +806,7 @@ msgstr "邮件获取"
 
 #: documents/models.py:938
 msgid "Web UI"
-msgstr ""
+msgstr "网页界面 (Web UI)"
 
 #: documents/models.py:943
 msgid "Modified"
@@ -938,7 +938,7 @@ msgstr "使用参数"
 
 #: documents/models.py:1127
 msgid "send as JSON"
-msgstr ""
+msgstr "以 JSON 格式发送"
 
 #: documents/models.py:1131
 msgid "webhook parameters"
@@ -1038,11 +1038,11 @@ msgstr "分配这些自定义字段"
 
 #: documents/models.py:1275
 msgid "custom field values"
-msgstr ""
+msgstr "自定义字段值"
 
 #: documents/models.py:1279
 msgid "Optional values to assign to the custom fields."
-msgstr ""
+msgstr "给自定义字段分配可选值。"
 
 #: documents/models.py:1288
 msgid "remove these tag(s)"
@@ -1184,19 +1184,19 @@ msgstr "检测到无效变量。"
 
 #: documents/templates/account/account_inactive.html:5
 msgid "Paperless-ngx account inactive"
-msgstr ""
+msgstr "Paperless-ngx 账户未激活"
 
 #: documents/templates/account/account_inactive.html:9
 msgid "Account inactive."
-msgstr ""
+msgstr "帐户未激活。"
 
 #: documents/templates/account/account_inactive.html:14
 msgid "This account is inactive."
-msgstr ""
+msgstr "此账户未激活"
 
 #: documents/templates/account/account_inactive.html:16
 msgid "Return to login"
-msgstr ""
+msgstr "返回登录页面"
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
@@ -1324,7 +1324,7 @@ msgstr "已经有一个帐户？ <a href=\"%(login_url)s\">登录</a>"
 
 #: documents/templates/account/signup.html:19
 msgid "Note: This is the first user account for this installation and will be granted superuser privileges."
-msgstr ""
+msgstr "注意：这是此安装的第一个用户帐户，将被授予超级用户权限。"
 
 #: documents/templates/account/signup.html:23
 #: documents/templates/socialaccount/signup.html:14
@@ -1410,7 +1410,7 @@ msgstr "作为最后一步，请填写以下表格："
 
 #: documents/validators.py:36
 msgid ", "
-msgstr ""
+msgstr ", "
 
 #: paperless/apps.py:11
 msgid "Paperless"
@@ -1560,141 +1560,141 @@ msgstr "应用程序图标"
 msgid "paperless application settings"
 msgstr "无纸应用设置"
 
-#: paperless/settings.py:722
+#: paperless/settings.py:726
 msgid "English (US)"
 msgstr "英语(美国)"
 
-#: paperless/settings.py:723
+#: paperless/settings.py:727
 msgid "Arabic"
 msgstr "阿拉伯语"
 
-#: paperless/settings.py:724
+#: paperless/settings.py:728
 msgid "Afrikaans"
 msgstr "Afrikaans 荷兰语"
 
-#: paperless/settings.py:725
+#: paperless/settings.py:729
 msgid "Belarusian"
 msgstr "白俄罗斯语"
 
-#: paperless/settings.py:726
+#: paperless/settings.py:730
 msgid "Bulgarian"
 msgstr "保加利亚语"
 
-#: paperless/settings.py:727
+#: paperless/settings.py:731
 msgid "Catalan"
 msgstr "Catalan 加泰罗尼亚语"
 
-#: paperless/settings.py:728
+#: paperless/settings.py:732
 msgid "Czech"
 msgstr "捷克语"
 
-#: paperless/settings.py:729
+#: paperless/settings.py:733
 msgid "Danish"
 msgstr "丹麦语"
 
-#: paperless/settings.py:730
+#: paperless/settings.py:734
 msgid "German"
 msgstr "德语"
 
-#: paperless/settings.py:731
+#: paperless/settings.py:735
 msgid "Greek"
 msgstr "Greek 希腊语"
 
-#: paperless/settings.py:732
+#: paperless/settings.py:736
 msgid "English (GB)"
 msgstr "英语(英国)"
 
-#: paperless/settings.py:733
+#: paperless/settings.py:737
 msgid "Spanish"
 msgstr "西班牙语"
 
-#: paperless/settings.py:734
+#: paperless/settings.py:738
 msgid "Finnish"
 msgstr "已完成"
 
-#: paperless/settings.py:735
+#: paperless/settings.py:739
 msgid "French"
 msgstr "法语"
 
-#: paperless/settings.py:736
+#: paperless/settings.py:740
 msgid "Hungarian"
 msgstr "匈牙利语"
 
-#: paperless/settings.py:737
+#: paperless/settings.py:741
 msgid "Italian"
 msgstr "意大利语"
 
-#: paperless/settings.py:738
+#: paperless/settings.py:742
 msgid "Japanese"
 msgstr "日语"
 
-#: paperless/settings.py:739
+#: paperless/settings.py:743
 msgid "Korean"
 msgstr "韩语"
 
-#: paperless/settings.py:740
+#: paperless/settings.py:744
 msgid "Luxembourgish"
 msgstr "卢森堡语"
 
-#: paperless/settings.py:741
+#: paperless/settings.py:745
 msgid "Norwegian"
 msgstr "Norwegian 挪威语"
 
-#: paperless/settings.py:742
+#: paperless/settings.py:746
 msgid "Dutch"
 msgstr "荷兰语"
 
-#: paperless/settings.py:743
+#: paperless/settings.py:747
 msgid "Polish"
 msgstr "波兰语"
 
-#: paperless/settings.py:744
+#: paperless/settings.py:748
 msgid "Portuguese (Brazil)"
 msgstr "葡萄牙语 (巴西)"
 
-#: paperless/settings.py:745
+#: paperless/settings.py:749
 msgid "Portuguese"
 msgstr "葡萄牙语"
 
-#: paperless/settings.py:746
+#: paperless/settings.py:750
 msgid "Romanian"
 msgstr "罗马尼亚语"
 
-#: paperless/settings.py:747
+#: paperless/settings.py:751
 msgid "Russian"
 msgstr "俄语"
 
-#: paperless/settings.py:748
+#: paperless/settings.py:752
 msgid "Slovak"
 msgstr "斯洛伐克语"
 
-#: paperless/settings.py:749
+#: paperless/settings.py:753
 msgid "Slovenian"
 msgstr "斯洛语尼亚语"
 
-#: paperless/settings.py:750
+#: paperless/settings.py:754
 msgid "Serbian"
 msgstr "塞尔维亚语"
 
-#: paperless/settings.py:751
+#: paperless/settings.py:755
 msgid "Swedish"
 msgstr "瑞典语"
 
-#: paperless/settings.py:752
+#: paperless/settings.py:756
 msgid "Turkish"
 msgstr "土耳其语"
 
-#: paperless/settings.py:753
+#: paperless/settings.py:757
 msgid "Ukrainian"
 msgstr "乌克兰语"
 
-#: paperless/settings.py:754
+#: paperless/settings.py:758
 msgid "Chinese Simplified"
 msgstr "简体中文"
 
-#: paperless/settings.py:755
+#: paperless/settings.py:759
 msgid "Chinese Traditional"
-msgstr ""
+msgstr "繁体中文"
 
 #: paperless/urls.py:374
 msgid "Paperless-ngx administration"
@@ -1846,23 +1846,23 @@ msgstr "处理所有文件，包括“内嵌”附件。"
 
 #: paperless_mail/models.py:119
 msgid "System default"
-msgstr ""
+msgstr "系统默认"
 
 #: paperless_mail/models.py:120
 msgid "Text, then HTML"
-msgstr ""
+msgstr "纯文本，然后是 HTML"
 
 #: paperless_mail/models.py:121
 msgid "HTML, then text"
-msgstr ""
+msgstr "HTML，然后是纯文本"
 
 #: paperless_mail/models.py:122
 msgid "HTML only"
-msgstr ""
+msgstr "仅 HTML"
 
 #: paperless_mail/models.py:123
 msgid "Text only"
-msgstr ""
+msgstr "仅纯文本"
 
 #: paperless_mail/models.py:126
 msgid "Delete"
@@ -1974,7 +1974,7 @@ msgstr "消费范围"
 
 #: paperless_mail/models.py:241
 msgid "pdf layout"
-msgstr ""
+msgstr "PDF 布局"
 
 #: paperless_mail/models.py:247
 msgid "action"
