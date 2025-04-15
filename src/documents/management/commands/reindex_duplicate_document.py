@@ -34,9 +34,9 @@ def duplicate_documents_with_workers(duplicate_count=1, limit=None, num_workers=
     Duplicate documents and update their index using workers.
     """
     # Filter documents with non-empty content
-    if start_time is None:
-        start_time = datetime(2025, 4, 14, 8, 3, 17, 704503, tzinfo=timezone.utc)
-    logger.info(f'start time: {start_time}')
+    # if start_time is None:
+    #     start_time = datetime(2025, 4, 14, 8, 3, 17, 704503, tzinfo=timezone.utc)
+    # logger.info(f'start time: {start_time}')
 
     documents = Document.objects.select_related(
         'document_type',
@@ -48,7 +48,7 @@ def duplicate_documents_with_workers(duplicate_count=1, limit=None, num_workers=
         'tags',
         'custom_fields',
         'notes'
-    ).filter(~Q(content=""),created__gte=start_time, created__lte=datetime.now(timezone.utc))
+    ).filter(~Q(content=""))
     if limit:
         documents = documents[:limit]
 
@@ -77,19 +77,19 @@ def duplicate_documents_with_workers(duplicate_count=1, limit=None, num_workers=
 
 
             )
-            new_folders.append(folder)
+            # new_folders.append(folder)
             new_documents.append(document)
             if len(new_documents) >= batch_size:
-                created_folders = Folder.objects.bulk_create(new_folders, batch_size=batch_size)
+                # created_folders = Folder.objects.bulk_create(new_folders, batch_size=batch_size)
 
-                for folder in created_folders:
-                    folder.path = f"{folder_id}/{folder.id}"
-                    dict_checksum_id_folder[folder.checksum] = folder.id
-                Folder.objects.bulk_update(created_folders, ['path'],batch_size=batch_size)
-                logger.info('folder updated')
-                for doc in new_documents:
-                    doc.folder_id = dict_checksum_id_folder[doc.checksum]
-                Document.objects.bulk_update(new_documents, ['folder_id'], batch_size=batch_size)
+                # for folder in created_folders:
+                #     folder.path = f"{folder_id}/{folder.id}"
+                #     dict_checksum_id_folder[folder.checksum] = folder.id
+                # Folder.objects.bulk_update(created_folders, ['path'],batch_size=batch_size)
+                # logger.info('folder updated')
+                # for doc in new_documents:
+                #     doc.folder_id = dict_checksum_id_folder[doc.checksum]
+                # Document.objects.bulk_update(new_documents, ['folder_id'], batch_size=batch_size)
                 # Bulk create new documents
                 update_index_bulk_documents(new_documents, batch_size)
                 logger.info("All documents have been indexed successfully.")
