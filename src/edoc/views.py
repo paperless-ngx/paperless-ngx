@@ -6,11 +6,14 @@ from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.core.paginator import Paginator
 from django.db.models.functions import Lower
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
+from django.utils.functional import cached_property
 from django.views.generic import View
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import pagination
 from rest_framework.authtoken.models import Token
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import GenericAPIView
@@ -48,6 +51,69 @@ class StandardPagination(PageNumberPagination):
                 ],
             ),
         )
+
+    def get_all_result_ids(self):
+        ids = []
+        if hasattr(self.page.paginator.object_list, "saved_results"):
+            # print('test',self.page.paginator.object_list.saved_results[0].results.fields)
+            results_page = self.page.paginator.object_list.saved_results[0]
+            if results_page is not None:
+                if not hasattr(results_page.results, 'docs'):
+                    ids = results_page.results.doc
+                else:
+                    for i in range(len(results_page.results.docs())):
+                        try:
+                            fields = results_page.results.fields(i)
+                            if "id" in fields:
+                                ids.append(fields["id"])
+                        except Exception:
+                            pass
+        else:
+            # print('noi dung',self.page.paginator.__dict__)
+            ids = self.page.paginator.object_list.values_list("pk", flat=True)
+        return ids
+
+    def get_paginated_response_schema(self, schema):
+        response_schema = super().get_paginated_response_schema(schema)
+        response_schema["properties"]["all"] = {
+            "type": "array",
+            "example": "[1, 2, 3]",
+        }
+        return response_schema
+
+
+class WithoutCountPaginator(Paginator):
+
+    @cached_property
+    def count(self):
+        return 9999999999
+
+
+class CustomPagination(pagination.LimitOffsetPagination):
+    def get_count(self, queryset):
+        return 9999999999
+
+
+class CustomStandardPagination(PageNumberPagination):
+    page_size = 25
+    page_size_query_param = "page_size"
+    max_page_size = 99999999
+
+    def get_paginated_response(self, data):
+        return Response(
+            OrderedDict(
+                [
+                    ("count", self.max_page_size),
+                    ("next", self.get_next_link()),
+                    ("previous", self.get_previous_link()),
+                    ("all", []),
+                    ("results", data),
+                ],
+            ),
+        )
+
+    def get_count(self, queryset):
+        return 9999999999
 
     def get_all_result_ids(self):
         ids = []

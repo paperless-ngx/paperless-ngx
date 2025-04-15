@@ -214,7 +214,7 @@ from edoc.celery import app as celery_app
 from edoc.config import GeneralConfig
 from edoc.db import GnuPG
 from edoc.models import ApplicationConfiguration
-from edoc.views import StandardPagination
+from edoc.views import StandardPagination, CustomStandardPagination
 from edoc.wsgi import application
 
 if settings.AUDIT_LOG_ENABLED:
@@ -503,7 +503,7 @@ class DocumentViewSet(
     model = Document
     queryset = Document.objects.annotate(num_notes=Count("notes"))
     serializer_class = DocumentSerializer
-    pagination_class = StandardPagination
+    pagination_class = CustomStandardPagination
     permission_classes = (IsAuthenticated, EdocObjectPermissions)
     filter_backends = (
         DjangoFilterBackend,
