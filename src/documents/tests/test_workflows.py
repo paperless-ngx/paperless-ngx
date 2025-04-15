@@ -1600,6 +1600,56 @@ class TestWorkflows(
             doc.refresh_from_db()
             self.assertIsNone(doc.owner)
 
+    def test_workflow_scheduled_trigger_negative_offset(self):
+        """
+        GIVEN:
+            - Existing workflow with SCHEDULED trigger and negative offset of -7 days
+        WHEN:
+            - Scheduled workflows are checked for document with custom field date 8 days in the past
+        THEN:
+            - Workflow runs and document owner is updated
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_offset_days=-7,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.CUSTOM_FIELD,
+            schedule_date_custom_field=self.cf1,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        cfi = CustomFieldInstance.objects.create(
+            document=doc,
+            field=self.cf1,
+            value_date=timezone.now() - timedelta(days=5),
+        )
+
+        tasks.check_scheduled_workflows()
+
+        doc.refresh_from_db()
+        self.assertIsNone(doc.owner)  # has not triggered yet
+
+        cfi.value_date = timezone.now() - timedelta(days=8)
+        cfi.save()
+
+        tasks.check_scheduled_workflows()
+        doc.refresh_from_db()
+        self.assertEqual(doc.owner, self.user2)
+
     def test_workflow_enabled_disabled(self):
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
