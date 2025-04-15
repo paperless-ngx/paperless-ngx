@@ -1,5 +1,7 @@
 import logging
 import re
+from tracemalloc import Traceback
+from types import TracebackType
 
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
@@ -191,15 +193,15 @@ class DocumentDocument(Document):
         :param batch_size: Kích thước lô (batch size) cho mỗi lần xử lý.
         """
         total_documents = len(documents)
-        logger.info(
-            f"Tổng số tài liệu cần xử lý: {total_documents}. Batch size: {batch_size}.")
+        # logger.info(
+        #     f"Tổng số tài liệu cần xử lý: {total_documents}. Batch size: {batch_size}.")
 
         # Process documents in batches
         for i in range(0, total_documents, batch_size):
             # Create a batch of documents
             batch = documents[i:i + batch_size]
-            logger.info(
-                f"Đang xử lý batch {i // batch_size + 1} với {len(batch)} tài liệu.")
+            # logger.info(
+            #     f"Đang xử lý batch {i // batch_size + 1} với {len(batch)} tài liệu.")
 
             actions = []
             for doc in batch:
@@ -210,9 +212,10 @@ class DocumentDocument(Document):
                         "_id": str(doc.id),
                         "_source": parsed_document,
                     })
-                    logger.info(
-                        f"Tài liệu {doc.id} đã được chuẩn bị để chỉ mục trong batch {i // batch_size + 1}.")
+                    # logger.info(
+                    #     f"Tài liệu {doc.id} đã được chuẩn bị để chỉ mục trong batch {i // batch_size + 1}.")
                 except Exception as e:
+                    raise e
                     logger.error(f"Lỗi khi xử lý tài liệu {doc.id}: {e}")
 
             # Skip processing if the batch has no valid actions
@@ -256,9 +259,14 @@ class DocumentDocument(Document):
                 instance)
 
             # Tags
-            document_data["tags"] = [tag.name for tag in instance.tags.all()]
-            document_data["tag_id"] = [tag.id for tag in instance.tags.all()]
+            document_data["tags"] = []
+            document_data["tag_id"] = []
             document_data["has_tag"] = bool(instance.tags.all())
+
+            for tag in instance.tags.all():
+                document_data["tags"].append(tag.name)
+                document_data["tag_id"].append(tag.id)
+
 
             # Correspondent information
             if instance.correspondent:
@@ -303,22 +311,25 @@ class DocumentDocument(Document):
                 document_data["has_archive_font"] = False
 
             # Notes and custom fields
-            document_data["notes"] = list(
-                Note.objects.filter(document=instance).values_list('note',
-                                                                   flat=True))
-            document_data["custom_fields"] = ",".join([str(c) for c in
-                                                       CustomFieldInstance.objects.filter(
-                                                           document=instance)])
+            # document_data["notes"] = list(
+            #     Note.objects.filter(document=instance).values_list('note',
+            #                                                        flat=True))
+            document_data["notes"] = []
+
+            # document_data["custom_fields"] = ",".join([str(c) for c in
+            #                                            CustomFieldInstance.objects.filter(
+            #                                                document=instance)])
+            document_data['custom_fields'] = "" # for testing
             document_data["num_notes"] = len(document_data["notes"])
             document_data["custom_field_count"] = len(
                 document_data["custom_fields"])
 
             # Permissions and viewers
-            users_with_perms = get_users_with_perms(instance,
-                                                    only_with_perms_in=[
-                                                        "view_document"])
-            document_data["viewer_id"] = [user.id for user in users_with_perms]
-            document_data["is_shared"] = bool(users_with_perms)
+            # users_with_perms = get_users_with_perms(instance,
+            #                                         only_with_perms_in=[
+            #                                             "view_document"])
+            document_data["viewer_id"] = [1]
+            document_data["is_shared"] = False
 
             # Owner details
             if instance.owner:
@@ -335,4 +346,5 @@ class DocumentDocument(Document):
         except Exception as e:
             logger.error(
                 f"Error preparing document data for instance {instance.id}: {e}")
+            raise e
             return None  # Or raise the exception if necessary

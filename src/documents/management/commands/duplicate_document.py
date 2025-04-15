@@ -64,21 +64,31 @@ def duplicate_documents_with_workers(duplicate_count=1, limit=None, num_workers=
                 archive_checksum=f"{uuid.uuid4().hex}",  # Generate new archive checksum
             )
             new_documents.append(new_document)
+            if len(new_documents) >= batch_size:
+                # Bulk create new documents
+                created_documents = Document.objects.bulk_create(new_documents,
+                                                                 batch_size=batch_size)
+                logger.info(f"Created {len(created_documents)} new documents.")
 
-    # Bulk create new documents
-    created_documents = Document.objects.bulk_create(new_documents, batch_size=batch_size)
-    logger.info(f"Created {len(created_documents)} new documents.")
 
-    # Use ThreadPoolExecutor to process indexing in parallel
-    # with ThreadPoolExecutor(max_workers=num_workers) as executor:
-    #     for document in created_documents:
-    #         try:
-    #             executor.submit(process_document, document)
-    #         except Exception as e:
-    #             logger.error(f"Failed to process document {document.id}: {e}")
+                update_index_bulk_documents(created_documents, batch_size)
+                logger.info("All documents have been indexed successfully.")
 
-    update_index_bulk_documents(created_documents, batch_size)
-    logger.info("All documents have been indexed successfully.")
+                new_documents.clear()
+
+    if len(new_documents) >= 0:
+        # Bulk create new documents
+        created_documents = Document.objects.bulk_create(new_documents,
+                                                         batch_size=batch_size)
+        logger.info(f"Created {len(created_documents)} new documents.")
+
+        update_index_bulk_documents(created_documents, batch_size)
+        logger.info("All documents have been indexed successfully.")
+
+        new_documents.clear()
+
+
+
 
 
 class Command(ProgressBarMixin, BaseCommand):
