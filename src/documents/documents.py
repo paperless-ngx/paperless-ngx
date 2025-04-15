@@ -66,16 +66,16 @@ class DocumentDocument(Document):
     class Index:
         name = ELASTIC_SEARCH_DOCUMENT_INDEX
         settings = {
-            'number_of_shards': 5,  # Phân đoạn cho dữ liệu lớn
-            'number_of_replicas': 2,
+            'number_of_shards': 3,  # Phân đoạn cho dữ liệu lớn
+            'number_of_replicas': 1,
 
         }
 
     class Django:
         model = DocumentModel
         fields = []
-
-    def prepare_suggest_content(self, instance):
+    @staticmethod
+    def prepare_suggest_content( instance):
         # Trích xuất các cụm từ từ content để dùng cho gợi ý
 
         content = instance.content
@@ -206,7 +206,8 @@ class DocumentDocument(Document):
             actions = []
             for doc in batch:
                 try:
-                    parsed_document = cls().prepare_document_data(doc)
+
+                    parsed_document = DocumentDocument.prepare_document_data(doc)
                     actions.append({
                         "_index": cls.Index.name,
                         "_id": str(doc.id),
@@ -233,7 +234,8 @@ class DocumentDocument(Document):
             except Exception as e:
                 logger.error(
                     f"Batch {i // batch_size + 1}: Lỗi khi thực hiện chỉ mục theo lô: {e}")
-    def prepare_document_data(self, instance):
+    @staticmethod
+    def prepare_document_data(instance):
         """
         Prepares the document data for Elasticsearch indexing.
         :param instance: A document instance from the `DocumentModel`.
@@ -255,7 +257,7 @@ class DocumentDocument(Document):
             }
 
             # Suggest content (bigram and trigram logic)
-            document_data["suggest_content"] = self.prepare_suggest_content(
+            document_data["suggest_content"] = DocumentDocument.prepare_suggest_content(
                 instance)
 
             # Tags

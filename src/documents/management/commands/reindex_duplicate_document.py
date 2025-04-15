@@ -1,5 +1,6 @@
 import logging
 import math
+import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
@@ -10,7 +11,9 @@ from django.db.models import Q
 from numpy.ma.core import true_divide
 from openpyxl.styles.builtins import title
 from tqdm import tqdm
+from elasticsearch.helpers import bulk
 
+from documents.documents import DocumentDocument
 from documents.models import Document, Folder
 from documents.index import update_index_document, update_index_bulk_documents
 from documents.management.commands.mixins import ProgressBarMixin
@@ -37,6 +40,7 @@ def duplicate_documents_with_workers(duplicate_count=1, limit=None, num_workers=
     # if start_time is None:
     #     start_time = datetime(2025, 4, 14, 8, 3, 17, 704503, tzinfo=timezone.utc)
     # logger.info(f'start time: {start_time}')
+    start_time = time.time()
 
     documents = Document.objects.select_related(
         'document_type',
@@ -51,59 +55,69 @@ def duplicate_documents_with_workers(duplicate_count=1, limit=None, num_workers=
     ).filter(~Q(content=""))
     if limit:
         documents = documents[:limit]
-
-    new_documents = []
-    new_folders = []
+    logger.info(f'time query: {time.time()-start_time}')
+    # new_documents = []
+    # new_folders = []
     document_count = documents.count()
     num_batches = math.ceil(document_count / batch_size)
     dict_checksum_id_folder = dict()
     logger.info(f"Document count to process: {document_count} batch_size {batch_size}: {num_batches} batches")
+    actions = []
     for batch_idx in range(num_batches):
-        logger.info(f"Document count to process: {batch_idx}  batches")
-        for document in documents[batch_idx * batch_size: (batch_idx + 1) * batch_size]:
-            # create folder
-            document:Document
-            folder = Folder(
-                name = document.title,
-                checksum=document.checksum,
-                type='file',
-                created=document.created,
-                updated=document.modified,
-                parent_folder_id=folder_id,
-                owner_id=owner_id,
-                path='',
-                is_insensitive=True,
-                matching_algorithm=1,
+        time_create_batch = time.time()
+        # logger.info(f"Document count to process: {batch_idx}  batches")
+        for doc in documents[batch_idx * batch_size: (batch_idx + 1) * batch_size]:
+            start_time_doc = time.time()
+            try:
 
 
-            )
-            # new_folders.append(folder)
-            new_documents.append(document)
-            if len(new_documents) >= batch_size:
-                # created_folders = Folder.objects.bulk_create(new_folders, batch_size=batch_size)
-
-                # for folder in created_folders:
-                #     folder.path = f"{folder_id}/{folder.id}"
-                #     dict_checksum_id_folder[folder.checksum] = folder.id
-                # Folder.objects.bulk_update(created_folders, ['path'],batch_size=batch_size)
-                # logger.info('folder updated')
-                # for doc in new_documents:
-                #     doc.folder_id = dict_checksum_id_folder[doc.checksum]
-                # Document.objects.bulk_update(new_documents, ['folder_id'], batch_size=batch_size)
+                parsed_document = DocumentDocument.prepare_document_data(doc)
+                actions.append({
+                    "_index": DocumentDocument.Index.name,
+                    "_id": str(doc.id),
+                    "_source": parsed_document,
+                })
+                # logger.info(
+                #     f"Tài liệu {doc.id} đã được chuẩn bị để chỉ mục trong batch {i // batch_size + 1}.")
+            except Exception as e:
+                raise e
+                logger.error(f"Lỗi khi xử lý tài liệu {doc.id}: {e}")
+            # logger.info(f'time parse doc {time.time()- start_time_doc:.6f}s')
+            # new_documents.append(document)
+            if len(actions) >= batch_size:
+                # logger.info(f'time create batch {time.time()-time_create_batch}')
+                time_create_batch_ = time.time() - time_create_batch
+                time_create_batch = time.time()
                 # Bulk create new documents
-                update_index_bulk_documents(new_documents, batch_size)
-                logger.info("All documents have been indexed successfully.")
-                dict_checksum_id_folder.clear()
-                new_folders.clear()
-                new_documents.clear()
+                time_reindex = time.time()
+                try:
+                    # Perform bulk indexing for the current batch
+                    client = DocumentDocument._get_connection()
+                    bulk(client, actions)
+                    # logger.info(
+                        # f"Batch {i // batch_size + 1}: Đã chỉ mục thành công {len(actions)} tài liệu.")
+                except Exception as e:
+                    logger.error(e)
+                time_reindex_ = time.time()-time_reindex
+                time_reindex = time.time()
+                logger.info(f"All documents in batch {batch_idx} have been indexed successfully.  time_create_batch: {time_create_batch_:.3f}s, index_time: {time_reindex_:.3f}s, total_time: {time_reindex_+time_create_batch_:.3f}s")
+
+                actions.clear()
 
 
-    if len(new_documents) >= 0:
+    if len(actions) >= 0:
         # Bulk create new documents
-        update_index_bulk_documents(new_documents, batch_size)
+        try:
+            # Perform bulk indexing for the current batch
+            client = DocumentDocument._get_connection()
+            bulk(client, actions)
+            # logger.info(
+            #     f"Batch {i // batch_size + 1}: Đã chỉ mục thành công {len(actions)} tài liệu.")
+        except Exception as e:
+            logger.error(e)
         logger.info("All documents have been indexed successfully.")
 
-        new_documents.clear()
+        actions.clear()
 
 
 
