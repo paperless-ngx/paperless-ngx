@@ -528,18 +528,26 @@ class DocumentViewSet(
     )
 
     def get_queryset(self):
+        detail_id = self.kwargs.get(
+            'pk')  # 'pk' thường là tên mặc định cho primary key
+
+        if detail_id:
+            return (
+                Document.objects.distinct()
+                .select_related(
+                    "document_type",
+                    "warehouse",
+                    "owner",
+                )
+                .prefetch_related("tags", "custom_fields", "notes")
+            )
         return (
-            Document.objects.distinct()
-            .annotate(num_notes=Count("notes"))
-            .select_related(
-                "correspondent",
-                "storage_path",
+            Document.objects.select_related(
                 "document_type",
                 "warehouse",
-                "folder",
                 "owner",
             )
-            .prefetch_related("tags", "custom_fields", "notes")
+            .prefetch_related("tags")
         )
 
     def get_serializer(self, *args, **kwargs):
