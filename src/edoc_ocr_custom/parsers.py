@@ -511,39 +511,52 @@ class RasterisedDocumentCustomParser(DocumentParser):
 
     def ocr_img_or_pdf(self, document_path, mime_type, dossier_form, sidecar,
                        output_file, **kwargs):
+
         data_ocr = None
         data_ocr_fields = None
         form_code = None
-        username_ocr = self.get_setting_ocr('username_ocr')
-        password_ocr = self.get_setting_ocr('password_ocr')
-        api_login_ocr = settings.API_LOGIN_OCR
-        api_refresh_ocr = settings.API_REFRESH_OCR
-        api_upload_file_ocr = settings.API_UPLOAD_FILE_OCR
-        data_ocr, data_ocr_fields, form_code = self.ocr_file(path_file=document_path,username_ocr=username_ocr,password_ocr=password_ocr, api_login_ocr=api_login_ocr,api_refresh_ocr=api_refresh_ocr, api_upload_file_ocr=api_upload_file_ocr, dossier_form=dossier_form,
-                                                             **kwargs)
-        with open(sidecar, "w") as txt_sidecar:
-            txt_sidecar.write(data_ocr.get("content_formated", ""))
+        try:
+            username_ocr = self.get_setting_ocr('username_ocr')
+            password_ocr = self.get_setting_ocr('password_ocr')
+            api_login_ocr = settings.API_LOGIN_OCR
+            api_refresh_ocr = settings.API_REFRESH_OCR
+            api_upload_file_ocr = settings.API_UPLOAD_FILE_OCR
+            data_ocr, data_ocr_fields, form_code = self.ocr_file(
+                path_file=document_path, username_ocr=username_ocr,
+                password_ocr=password_ocr, api_login_ocr=api_login_ocr,
+                api_refresh_ocr=api_refresh_ocr,
+                api_upload_file_ocr=api_upload_file_ocr,
+                dossier_form=dossier_form,
+                **kwargs)
+            with open(sidecar, "w") as txt_sidecar:
+                txt_sidecar.write(data_ocr.get("content_formated", ""))
 
-        render_pdf_ocr(input_path=document_path, output_path=output_file,
-                            data_ocr=data_ocr, quality_compress=self.quality_compress, font_path=os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                 'fonts', 'arial-font/arial.ttf'))
-        # draw_text_on_pdf(
-        #     input_path=document_path,
-        #     output_path=output_file,
-        #     data=data_ocr,
-        #     font_path=os.path.join(os.path.dirname(os.path.abspath(__file__)),
-        #                          'fonts', 'arial-font/arial.ttf'))
-        # draw_invisible_text(
-        #     input_path=document_path,
-        #     output_path=output_file,
-        #     data=data_ocr,
-        #     quality=int(self.quality_compress),
-        #     font_path=os.path.join(os.path.dirname(os.path.abspath(__file__)),
-        #                            'fonts', 'arial-font/arial.ttf')
-        # )
+            render_pdf_ocr(input_path=document_path, output_path=output_file,
+                           data_ocr=data_ocr,
+                           quality_compress=self.quality_compress,
+                           font_path=os.path.join(
+                               os.path.dirname(os.path.abspath(__file__)),
+                               'fonts', 'arial-font/arial.ttf'))
+            # draw_text_on_pdf(
+            #     input_path=document_path,
+            #     output_path=output_file,
+            #     data=data_ocr,
+            #     font_path=os.path.join(os.path.dirname(os.path.abspath(__file__)),
+            #                          'fonts', 'arial-font/arial.ttf'))
+            # draw_invisible_text(
+            #     input_path=document_path,
+            #     output_path=output_file,
+            #     data=data_ocr,
+            #     quality=int(self.quality_compress),
+            #     font_path=os.path.join(os.path.dirname(os.path.abspath(__file__)),
+            #                            'fonts', 'arial-font/arial.ttf')
+            # )
 
+            return data_ocr, data_ocr_fields, form_code
 
-        return data_ocr, data_ocr_fields, form_code
+        except Exception as e:
+                raise ParseError(f"{e.__class__.__name__}: {e!s}") from e
+
 
     def extract_text(
         self,
