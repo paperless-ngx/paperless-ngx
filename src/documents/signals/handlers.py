@@ -349,11 +349,15 @@ def cleanup_document_deletion(sender, instance, **kwargs):
                 )
                 return
 
-        for filename in (
-            instance.source_path,
+        files = (
             instance.archive_path,
             instance.thumbnail_path,
-        ):
+        )
+        if not settings.EMPTY_TRASH_DIR:
+            # Only delete the original file if we are not moving it to trash dir
+            files += (instance.source_path,)
+
+        for filename in files:
             if filename and os.path.isfile(filename):
                 try:
                     os.unlink(filename)
