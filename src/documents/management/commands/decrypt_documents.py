@@ -18,7 +18,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--passphrase",
             help=(
-                "If PAPERLESS_PASSPHRASE isn't set already, you need to "
+                "If EDOC_PASSPHRASE isn't set already, you need to "
                 "specify it here"
             ),
         )

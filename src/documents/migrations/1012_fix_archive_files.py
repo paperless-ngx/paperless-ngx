@@ -130,7 +130,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
 
     except (ValueError, KeyError, IndexError):
         logger.warning(
-            f"Invalid PAPERLESS_FILENAME_FORMAT: "
+            f"Invalid EDOC_FILENAME_FORMAT: "
             f"{settings.FILENAME_FORMAT}, falling back to default",
         )
 

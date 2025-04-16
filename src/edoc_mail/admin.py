@@ -58,7 +58,7 @@ class MailRuleAdmin(GuardedModelAdmin):
             _("Filter"),
             {
                 "description": _(
-                    "Paperless will only process mails that match ALL of the "
+                    "EDOC will only process mails that match ALL of the "
                     "filters given below.",
                 ),
                 "fields": (

@@ -309,7 +309,7 @@ class RasterisedDocumentParser(DocumentParser):
                 ocrmypdf_args = {**ocrmypdf_args, **self.settings.user_args}
             except Exception as e:
                 self.log.warning(
-                    f"There is an issue with PAPERLESS_OCR_USER_ARGS, so "
+                    f"There is an issue with EDOC_OCR_USER_ARGS, so "
                     f"they will not be used. Error: {e}",
                 )
 
@@ -399,7 +399,7 @@ class RasterisedDocumentParser(DocumentParser):
             if "Ghostscript PDF/A rendering" in str(e):
                 self.log.warning(
                     "Ghostscript PDF/A rendering failed, consider setting "
-                    "PAPERLESS_OCR_USER_ARGS: '{\"continue_on_soft_render_error\": true}'",
+                    "EDOC_OCR_USER_ARGS: '{\"continue_on_soft_render_error\": true}'",
                 )
 
             raise ParseError(

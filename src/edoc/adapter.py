@@ -32,7 +32,6 @@ class CustomAccountAdapter(DefaultAccountAdapter):
     def is_safe_url(self, url):
         """
         Check if the URL is a safe URL.
-        See https://github.com/paperless-ngx/paperless-ngx/issues/5780
         """
         from django.utils.http import url_has_allowed_host_and_scheme
 
@@ -51,7 +50,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         """
         Return the URL to reset a password e.g. in reset email.
         """
-        if settings.PAPERLESS_URL is None:
+        if settings.EDOC_URL is None:
             return super().get_reset_password_from_key_url(key)
         else:
             path = reverse(
@@ -59,7 +58,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
                 kwargs={"uidb36": "UID", "key": "KEY"},
             )
             path = path.replace("UID-KEY", quote(key))
-            return settings.PAPERLESS_URL + path
+            return settings.EDOC_URL + path
 
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):

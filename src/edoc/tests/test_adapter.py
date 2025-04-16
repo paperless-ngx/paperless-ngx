@@ -67,15 +67,15 @@ class TestCustomAccountAdapter(TestCase):
         with context.request_context(request):
             adapter = get_adapter()
 
-            # Test when PAPERLESS_URL is None
+            # Test when EDOC_URL is None
             expected_url = f"https://foo.org{reverse('account_reset_password_from_key', kwargs={'uidb36': 'UID', 'key': 'KEY'})}"
             self.assertEqual(
                 adapter.get_reset_password_from_key_url("UID-KEY"),
                 expected_url,
             )
 
-            # Test when PAPERLESS_URL is not None
-            with override_settings(PAPERLESS_URL="https://bar.com"):
+            # Test when EDOC_URL is not None
+            with override_settings(EDOC_URL="https://bar.com"):
                 expected_url = f"https://bar.com{reverse('account_reset_password_from_key', kwargs={'uidb36': 'UID', 'key': 'KEY'})}"
                 self.assertEqual(
                     adapter.get_reset_password_from_key_url("UID-KEY"),

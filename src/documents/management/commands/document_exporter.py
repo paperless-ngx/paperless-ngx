@@ -92,7 +92,7 @@ class Command(BaseCommand):
             default=False,
             action="store_true",
             help=(
-                "Use PAPERLESS_FILENAME_FORMAT for storing files in the "
+                "Use EDOC_FILENAME_FORMAT for storing files in the "
                 "export directory, if configured."
             ),
         )

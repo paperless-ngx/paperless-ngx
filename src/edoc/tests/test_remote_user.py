@@ -31,7 +31,7 @@ class TestRemoteUser(DirectoriesMixin, APITestCase):
         with mock.patch.dict(
             os.environ,
             {
-                "PAPERLESS_ENABLE_HTTP_REMOTE_USER": "True",
+                "EDOC_ENABLE_HTTP_REMOTE_USER": "True",
             },
         ):
             _parse_remote_user_settings()
@@ -66,7 +66,7 @@ class TestRemoteUser(DirectoriesMixin, APITestCase):
         with mock.patch.dict(
             os.environ,
             {
-                "PAPERLESS_ENABLE_HTTP_REMOTE_USER_API": "True",
+                "EDOC_ENABLE_HTTP_REMOTE_USER_API": "True",
             },
         ):
             _parse_remote_user_settings()
@@ -101,8 +101,8 @@ class TestRemoteUser(DirectoriesMixin, APITestCase):
         with mock.patch.dict(
             os.environ,
             {
-                "PAPERLESS_ENABLE_HTTP_REMOTE_USER": "True",
-                "PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME": "HTTP_FOO",
+                "EDOC_ENABLE_HTTP_REMOTE_USER": "True",
+                "EDOC_HTTP_REMOTE_USER_HEADER_NAME": "HTTP_FOO",
             },
         ):
             header_name = _parse_remote_user_settings()

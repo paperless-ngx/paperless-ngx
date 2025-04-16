@@ -76,7 +76,7 @@ def remove_dirs(dirs):
 
 
 @contextmanager
-def paperless_environment():
+def edoc_environment():
     dirs = None
     try:
         dirs = setup_directories()

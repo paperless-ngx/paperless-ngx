@@ -110,7 +110,7 @@ def set_checksums(apps, schema_editor):
         if checksum in sums:
             error = "\n{line}{p1}\n\n{doc1}\n{doc2}\n\n{p2}\n\n{code}\n\n{p3}{line}".format(
                 p1=colourise(
-                    "It appears that you have two identical documents in your collection and \nPaperless no longer supports this (see issue #97).  The documents in question\nare:",
+                    "It appears that you have two identical documents in your collection and \nEdoc no longer supports this (see issue #97).  The documents in question\nare:",
                     fg="yellow",
                 ),
                 p2=colourise(

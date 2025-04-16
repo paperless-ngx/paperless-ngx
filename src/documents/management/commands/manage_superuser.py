@@ -13,11 +13,11 @@ class Command(BaseCommand):
         "Creates a Django superuser:\n"
         "  User named: admin\n"
         "  Email: root@localhost\n"
-        "  Password: based on env variable PAPERLESS_ADMIN_PASSWORD\n"
+        "  Password: based on env variable EDOC_ADMIN_PASSWORD\n"
         "No superuser will be created, when:\n"
         "  - The username is taken already exists\n"
         "  - A superuser already exists\n"
-        "  - PAPERLESS_ADMIN_PASSWORD is not set"
+        "  - EDOC_ADMIN_PASSWORD is not set"
     )
 
     def create_parser(self, *args, **kwargs):
@@ -26,9 +26,9 @@ class Command(BaseCommand):
         return parser
 
     def handle(self, *args, **options):
-        username = os.getenv("PAPERLESS_ADMIN_USER", "admin")
-        mail = os.getenv("PAPERLESS_ADMIN_MAIL", "root@localhost")
-        password = os.getenv("PAPERLESS_ADMIN_PASSWORD")
+        username = os.getenv("EDOC_ADMIN_USER", "admin")
+        mail = os.getenv("EDOC_ADMIN_MAIL", "root@localhost")
+        password = os.getenv("EDOC_ADMIN_PASSWORD")
 
         # Check if there's already a user called admin
         if User.objects.filter(username=username).exists():
@@ -52,7 +52,7 @@ class Command(BaseCommand):
         if password is None:
             self.stdout.write(
                 self.style.ERROR(
-                    "Please check if PAPERLESS_ADMIN_PASSWORD has been"
+                    "Please check if EDOC_ADMIN_PASSWORD has been"
                     " set in the environment",
                 ),
             )

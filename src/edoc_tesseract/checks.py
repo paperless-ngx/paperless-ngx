@@ -26,7 +26,7 @@ def check_default_language_available(app_configs, **kwargs):
     if not settings.OCR_LANGUAGE:
         return [
             Warning(
-                "No OCR language has been specified with PAPERLESS_OCR_LANGUAGE. "
+                "No OCR language has been specified with EDOC_OCR_LANGUAGE. "
                 "This means that tesseract will fallback to english.",
             ),
         ]
@@ -38,8 +38,8 @@ def check_default_language_available(app_configs, **kwargs):
             return [
                 Error(
                     f"The selected ocr language {lang} is "
-                    f"not installed. Paperless cannot OCR your documents "
-                    f"without it. Please fix PAPERLESS_OCR_LANGUAGE.",
+                    f"not installed. EDOC cannot OCR your documents "
+                    f"without it. Please fix EDOC_OCR_LANGUAGE.",
                 ),
             ]
 

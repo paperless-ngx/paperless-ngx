@@ -240,7 +240,6 @@ class SharedByUser(Filter):
         ctype = ContentType.objects.get_for_model(self.model)
         UserObjectPermission = get_user_obj_perms_model()
         GroupObjectPermission = get_group_obj_perms_model()
-        # see https://github.com/paperless-ngx/paperless-ngx/issues/5392, we limit subqueries
         # to 1 because Postgres doesn't like returning > 1 row, but all we care about is > 0
         return (
             qs.filter(

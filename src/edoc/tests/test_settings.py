@@ -246,7 +246,7 @@ class TestCeleryScheduleParsing(TestCase):
             - The search index task is not present
             - The default schedule is returned for other tasks
         """
-        with mock.patch.dict(os.environ, {"PAPERLESS_INDEX_TASK_CRON": "disable"}):
+        with mock.patch.dict(os.environ, {"EDOC_INDEX_TASK_CRON": "disable"}):
             schedule = _parse_beat_schedule()
 
         self.assertDictEqual(
@@ -282,10 +282,10 @@ class TestCeleryScheduleParsing(TestCase):
         with mock.patch.dict(
             os.environ,
             {
-                "PAPERLESS_EMAIL_TASK_CRON": "disable",
-                "PAPERLESS_TRAIN_TASK_CRON": "disable",
-                "PAPERLESS_SANITY_TASK_CRON": "disable",
-                "PAPERLESS_INDEX_TASK_CRON": "disable",
+                "EDOC_EMAIL_TASK_CRON": "disable",
+                "EDOC_TRAIN_TASK_CRON": "disable",
+                "EDOC_SANITY_TASK_CRON": "disable",
+                "EDOC_INDEX_TASK_CRON": "disable",
             },
         ):
             schedule = _parse_beat_schedule()
@@ -300,16 +300,16 @@ class TestDBSettings(TestCase):
     def test_db_timeout_with_sqlite(self):
         """
         GIVEN:
-            - PAPERLESS_DB_TIMEOUT is set
+            - EDOC_DB_TIMEOUT is set
         WHEN:
             - Settings are parsed
         THEN:
-            - PAPERLESS_DB_TIMEOUT set for sqlite
+            - EDOC_DB_TIMEOUT set for sqlite
         """
         with mock.patch.dict(
             os.environ,
             {
-                "PAPERLESS_DB_TIMEOUT": "10",
+                "EDOC_DB_TIMEOUT": "10",
             },
         ):
             databases = _parse_db_settings()
@@ -324,17 +324,17 @@ class TestDBSettings(TestCase):
     def test_db_timeout_with_not_sqlite(self):
         """
         GIVEN:
-            - PAPERLESS_DB_TIMEOUT is set but db is not sqlite
+            - EDOC_DB_TIMEOUT is set but db is not sqlite
         WHEN:
             - Settings are parsed
         THEN:
-            - PAPERLESS_DB_TIMEOUT set correctly in non-sqlite db & for fallback sqlite db
+            - EDOC_DB_TIMEOUT set correctly in non-sqlite db & for fallback sqlite db
         """
         with mock.patch.dict(
             os.environ,
             {
-                "PAPERLESS_DBHOST": "127.0.0.1",
-                "PAPERLESS_DB_TIMEOUT": "10",
+                "EDOC_DBHOST": "127.0.0.1",
+                "EDOC_DB_TIMEOUT": "10",
             },
         ):
             databases = _parse_db_settings()
@@ -357,7 +357,7 @@ class TestEdocURLSettings(TestCase):
     def test_edoc_url(self):
         """
         GIVEN:
-            - PAPERLESS_URL is set
+            - EDOC_URL is set
         WHEN:
             - The URL is parsed
         THEN:
@@ -366,7 +366,7 @@ class TestEdocURLSettings(TestCase):
         with mock.patch.dict(
             os.environ,
             {
-                "PAPERLESS_URL": "https://example.com",
+                "EDOC_URL": "https://example.com",
             },
         ):
             url = _parse_edoc_url()
@@ -381,7 +381,7 @@ class TestPathSettings(TestCase):
     def test_default_paths(self):
         """
         GIVEN:
-            - PAPERLESS_FORCE_SCRIPT_NAME is not set
+            - EDOC_FORCE_SCRIPT_NAME is not set
         WHEN:
             - Settings are parsed
         THEN:
@@ -394,11 +394,11 @@ class TestPathSettings(TestCase):
         self.assertEqual("/dashboard", base_paths[3])  # LOGIN_REDIRECT_URL
         self.assertEqual("/", base_paths[4])  # LOGOUT_REDIRECT_URL
 
-    @mock.patch("os.environ", {"PAPERLESS_FORCE_SCRIPT_NAME": "/edoc"})
+    @mock.patch("os.environ", {"EDOC_FORCE_SCRIPT_NAME": "/edoc"})
     def test_subpath(self):
         """
         GIVEN:
-            - PAPERLESS_FORCE_SCRIPT_NAME is set
+            - EDOC_FORCE_SCRIPT_NAME is set
         WHEN:
             - Settings are parsed
         THEN:
@@ -414,14 +414,14 @@ class TestPathSettings(TestCase):
     @mock.patch(
         "os.environ",
         {
-            "PAPERLESS_FORCE_SCRIPT_NAME": "/edoc",
-            "PAPERLESS_LOGOUT_REDIRECT_URL": "/foobar/",
+            "EDOC_FORCE_SCRIPT_NAME": "/edoc",
+            "EDOC_LOGOUT_REDIRECT_URL": "/foobar/",
         },
     )
     def test_subpath_with_explicit_logout_url(self):
         """
         GIVEN:
-            - PAPERLESS_FORCE_SCRIPT_NAME is set and so is PAPERLESS_LOGOUT_REDIRECT_URL
+            - EDOC_FORCE_SCRIPT_NAME is set and so is EDOC_LOGOUT_REDIRECT_URL
         WHEN:
             - Settings are parsed
         THEN:
