@@ -1,6 +1,6 @@
 import os
-from os.path import basename
 
+import debug_toolbar
 from django.conf import settings
 from django.conf.urls import include
 from django.contrib import admin
@@ -15,7 +15,8 @@ from django.views.static import serve
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
-from documents.views import AcknowledgeTasksView, DocumentElasticSearch, WebhookViewSet
+from documents.views import AcknowledgeTasksView, DocumentElasticSearch, \
+    WebhookViewSet
 from documents.views import ApprovalUpdateMutipleView
 from documents.views import ApprovalViewSet
 from documents.views import ArchiveFontViewSet
@@ -30,6 +31,7 @@ from documents.views import CustomFieldViewSet
 from documents.views import DocumentTypeViewSet
 from documents.views import DossierFormViewSet
 from documents.views import DossierViewSet
+from documents.views import EdocTasksViewSet
 from documents.views import FolderViewSet
 from documents.views import FontLanguageViewSet
 from documents.views import IndexView
@@ -39,8 +41,8 @@ from documents.views import RemoteVersionView
 from documents.views import SavedViewViewSet
 from documents.views import SearchAutoCompleteView
 from documents.views import SelectionDataView
-from documents.views import SharedLinkView
 from documents.views import ShareLinkViewSet
+from documents.views import SharedLinkView
 from documents.views import StatisticsCustomView
 from documents.views import StatisticsView
 from documents.views import StoragePathViewSet
@@ -48,7 +50,6 @@ from documents.views import SystemStatusView
 from documents.views import SystemStorageStatusView
 from documents.views import TagViewSet
 from documents.views import TasksViewSet
-from documents.views import EdocTasksViewSet
 from documents.views import TrashView
 from documents.views import UiSettingsView
 from documents.views import UnifiedSearchViewSet
@@ -76,7 +77,8 @@ api_router.register(r"document_types", DocumentTypeViewSet)
 api_router.register(r"archive_fonts", ArchiveFontViewSet)
 api_router.register(r"font_languages", FontLanguageViewSet)
 api_router.register(r"documents", UnifiedSearchViewSet)
-api_router.register(r"elastic_searchs", DocumentElasticSearch, basename="elastic_searchs")
+api_router.register(r"elastic_searchs", DocumentElasticSearch,
+                    basename="elastic_searchs")
 api_router.register(r"logs", LogViewSet, basename="logs")
 api_router.register(r"tags", TagViewSet)
 api_router.register(r"saved_views", SavedViewViewSet)
@@ -95,14 +97,16 @@ api_router.register(r"custom_fields", CustomFieldViewSet)
 api_router.register(r"config", ApplicationConfigurationViewSet)
 api_router.register(r"warehouses", WarehouseViewSet)
 api_router.register(r"approvals", ApprovalViewSet)
-api_router.register(r"content_types", ContentTypeViewSet, basename="content_types")
+api_router.register(r"content_types", ContentTypeViewSet,
+                    basename="content_types")
 api_router.register(r"folders", FolderViewSet)
 api_router.register(r"dossiers", DossierViewSet)
 api_router.register(r"dossier_forms", DossierFormViewSet)
 api_router.register(r"backup_records", BackupRecordViewSet)
 api_router.register(r'peel-field', WebhookViewSet, basename='webhook')
 # api_router.register(r"approvals", ApprovalViewSet)
-api_router.register(r"content_types", ContentTypeViewSet, basename="content_types")
+api_router.register(r"content_types", ContentTypeViewSet,
+                    basename="content_types")
 
 urlpatterns = [
     re_path(
@@ -126,7 +130,8 @@ urlpatterns = [
                 #     DocumentElasticSearch.as_view({"get":"list"}),
                 #     name="document_elastic_search",
                 # ),
-                re_path("^statistics/", StatisticsView.as_view(), name="statistics"),
+                re_path("^statistics/", StatisticsView.as_view(),
+                        name="statistics"),
                 re_path(
                     "^statistics_custom/",
                     StatisticsCustomView.as_view(),
@@ -172,7 +177,8 @@ urlpatterns = [
                     RemoteVersionView.as_view(),
                     name="remoteversion",
                 ),
-                re_path("^ui_settings/", UiSettingsView.as_view(), name="ui_settings"),
+                re_path("^ui_settings/", UiSettingsView.as_view(),
+                        name="ui_settings"),
                 re_path(
                     "^acknowledge_tasks/",
                     AcknowledgeTasksView.as_view(),
@@ -194,7 +200,8 @@ urlpatterns = [
                     BulkEditObjectsView.as_view(),
                     name="bulk_edit_objects",
                 ),
-                path("profile/generate_auth_token/", GenerateAuthTokenView.as_view()),
+                path("profile/generate_auth_token/",
+                     GenerateAuthTokenView.as_view()),
                 path(
                     "profile/disconnect_social_account/",
                     DisconnectSocialAccountView.as_view(),
@@ -300,9 +307,9 @@ urlpatterns = [
     ),
 ]
 
-
 websocket_urlpatterns = [
-    path(settings.BASE_URL.lstrip("/") + "ws/status/", StatusConsumer.as_asgi()),
+    path(settings.BASE_URL.lstrip("/") + "ws/status/",
+         StatusConsumer.as_asgi()),
 ]
 
 # Text in each page's <h1> (and above login form).
@@ -311,3 +318,7 @@ admin.site.site_header = "Edoc"
 admin.site.site_title = "Edoc"
 # Text at the top of the admin index page.
 admin.site.index_title = _("Edoc administration")
+
+urlpatterns = [
+                  re_path(r'^__debug__/', include(debug_toolbar.urls)),
+              ] + urlpatterns
