@@ -622,20 +622,30 @@ def send_webhook(
     as_json: bool = False,
 ):
     try:
+        post_args = {
+            "url": url,
+            "headers": headers,
+            "files": files,
+        }
         if as_json:
-            httpx.post(
-                url,
-                json=data,
-                files=files,
-                headers=headers,
-            ).raise_for_status()
+            post_args["json"] = data
+        elif isinstance(data, dict):
+            post_args["data"] = data
         else:
-            httpx.post(
-                url,
-                content=data,
-                files=files,
-                headers=headers,
-            ).raise_for_status()
+            post_args["content"] = data
+
+        httpx.post(
+            **post_args,
+        ).raise_for_status()
+        logger.info(
+            f"Webhook sent to {url}",
+        )
+    except Exception as e:
+        logger.error(
+            f"Failed attempt sending webhook to {url}: {e}",
+        )
+        raise e
+
         logger.info(
             f"Webhook sent to {url}",
         )
