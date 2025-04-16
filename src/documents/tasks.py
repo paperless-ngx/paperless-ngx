@@ -43,7 +43,7 @@ from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.index import update_index_document
-from documents.models import BackupRecord, EdocTask
+from documents.models import BackupRecord
 from documents.models import Correspondent
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -352,7 +352,7 @@ def update_document_archive_file(self, document_id=None):
     parser: DocumentParser = parser_class(logging_group=uuid.uuid4())
 
     try:
-        enable_ocr = ApplicationConfiguration.objects.all().first().enable_ocr
+        enable_ocr= parser.get_setting_ocr('enable_ocr')
         if enable_ocr:
             # self.log.debug(f"Parsing {self.filename}...")
 
@@ -364,7 +364,7 @@ def update_document_archive_file(self, document_id=None):
                 parent_dossier = None
                 if dossier is not None:
                     parent_dossier = dossier.parent_dossier
-                data_ocr_fields = parser.parse(
+                parser.parse(
                     document.source_path,
                     mime_type,
                     document.get_public_filename(),
@@ -377,7 +377,6 @@ def update_document_archive_file(self, document_id=None):
                     document.get_public_filename(),
                 )
         # parser.parse(document.source_path, mime_type, document.get_public_filename())
-
         # update count request
         self.request.api_call_count=parser.get_api_call_count()
 
@@ -447,6 +446,11 @@ def update_document_archive_file(self, document_id=None):
                 logging_group=uuid.uuid4(),
                 classifier=classifier,
             )
+
+            if parser.get_text() is None or parser.get_text() == "":
+                raise Exception(
+                    f"data empty document {document} (ID: {document_id})")
+
             logger.info("Document consumption finished------------")
 
             clear_document_caches(document.pk)

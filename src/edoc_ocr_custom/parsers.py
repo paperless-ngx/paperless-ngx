@@ -528,8 +528,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                 api_upload_file_ocr=api_upload_file_ocr,
                 dossier_form=dossier_form,
                 **kwargs)
-            with open(sidecar, "w") as txt_sidecar:
-                txt_sidecar.write(data_ocr.get("content_formated", ""))
+
 
             render_pdf_ocr(input_path=document_path, output_path=output_file,
                            data_ocr=data_ocr,
@@ -537,6 +536,12 @@ class RasterisedDocumentCustomParser(DocumentParser):
                            font_path=os.path.join(
                                os.path.dirname(os.path.abspath(__file__)),
                                'fonts', 'arial-font/arial.ttf'))
+            content_formated = ""
+            if data_ocr:
+                content_formated = data_ocr.get("content_formated", "")
+            if len(content_formated)>0:
+                    with open(sidecar, "w") as txt_sidecar:
+                        txt_sidecar.write(data_ocr.get("content_formated", ""))
             # draw_text_on_pdf(
             #     input_path=document_path,
             #     output_path=output_file,
