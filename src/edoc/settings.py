@@ -48,7 +48,8 @@ def __get_boolean(key: str, default: str = "NO") -> bool:
     Return a boolean value based on whatever the user has supplied in the
     environment based on whether the value "looks like" it's True or not.
     """
-    return bool(os.getenv(key, default).lower() in ("yes", "y", "1", "t", "true"))
+    return bool(
+        os.getenv(key, default).lower() in ("yes", "y", "1", "t", "true"))
 
 
 def __get_int(key: str, default: int) -> int:
@@ -173,7 +174,7 @@ def _parse_beat_schedule() -> dict:
             "options": {
                 # 1 minute before default schedule sends again
                 "expires": 9.0
-                * 60.0,
+                           * 60.0,
             },
         },
         {
@@ -209,8 +210,8 @@ def _parse_beat_schedule() -> dict:
             "options": {
                 # 1 hour before default schedule sends again
                 "expires": ((7.0 * 24.0) - 1.0)
-                * 60.0
-                * 60.0,
+                           * 60.0
+                           * 60.0,
             },
         },
         {
@@ -321,6 +322,7 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     # "django_apscheduler",
+    "debug_toolbar",
     *env_apps,
 ]
 
@@ -354,6 +356,9 @@ MIDDLEWARE = [
     "edoc.middleware.LoginLanguageMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
+
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+
     "edoc.middleware.ApiVersionMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -363,7 +368,8 @@ MIDDLEWARE = [
 
 # Optional to enable compression
 if __get_boolean("EDOC_ENABLE_COMPRESSION", "yes"):  # pragma: no cover
-    MIDDLEWARE.insert(0, "compression_middleware.middleware.CompressionMiddleware")
+    MIDDLEWARE.insert(0,
+                      "compression_middleware.middleware.CompressionMiddleware")
 
 ROOT_URLCONF = "edoc.urls"
 
@@ -435,9 +441,13 @@ CHANNEL_LAYERS = {
 # EDOC_OCR_CUSTOM
 TCGROUP_OCR_CUSTOM = {
     "URL": {
-        "URL_UPLOAD_FILE": os.getenv("URL_UPLOAD_FILE","https://ocr-core-api.tcgroup.vn/api/v1/file/upload"),
-        "URL_OCR_BY_FILEID": os.getenv("URL_OCR_BY_FILEID","https://ocr-core-api.tcgroup.vn/api/v1/ocr/general"),
-        "URL_OCR_CUSTOM_FIELD_BY_FILEID": os.getenv("URL_OCR_CUSTOM_FIELD_BY_FILEID","https://ocr-general-api.tcgroup.vn/home/api/v1/extract-by-rule"),
+        "URL_UPLOAD_FILE": os.getenv("URL_UPLOAD_FILE",
+                                     "https://ocr-core-api.tcgroup.vn/api/v1/file/upload"),
+        "URL_OCR_BY_FILEID": os.getenv("URL_OCR_BY_FILEID",
+                                       "https://ocr-core-api.tcgroup.vn/api/v1/ocr/general"),
+        "URL_OCR_CUSTOM_FIELD_BY_FILEID": os.getenv(
+            "URL_OCR_CUSTOM_FIELD_BY_FILEID",
+            "https://ocr-general-api.tcgroup.vn/home/api/v1/extract-by-rule"),
     }
 }
 
@@ -484,7 +494,8 @@ ACCOUNT_EMAIL_VERIFICATION = os.getenv(
 ACCOUNT_SESSION_REMEMBER = __get_boolean("EDOC_ACCOUNT_SESSION_REMEMBER")
 
 if AUTO_LOGIN_USERNAME:
-    _index = MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware")
+    _index = MIDDLEWARE.index(
+        "django.contrib.auth.middleware.AuthenticationMiddleware")
     # This overrides everything the auth middleware is doing but still allows
     # regular login in case the provided user does not exist.
     MIDDLEWARE.insert(_index + 1, "edoc.auth.AutoLoginMiddleware")
@@ -519,7 +530,6 @@ HTTP_REMOTE_USER_HEADER_NAME = _parse_remote_user_settings()
 
 # X-Frame options for embedded PDF display:
 X_FRAME_OPTIONS = "ANY" if DEBUG else "SAMEORIGIN"
-
 
 # The next 3 settings can also be set using just EDOC_URL
 CSRF_TRUSTED_ORIGINS = __get_list("EDOC_CSRF_TRUSTED_ORIGINS")
@@ -688,7 +698,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 LANGUAGE_CODE = "vi-vn"
 
 LANGUAGES = [
-    ("en-us", _("English (US)")),  # needs to be first to act as fallback language
+    ("en-us", _("English (US)")),
+    # needs to be first to act as fallback language
     ("en-gb", _("English (GB)")),
     ("vi-vn", _("Vietnamese")),
 ]
@@ -803,7 +814,8 @@ CELERY_ACCEPT_CONTENT = ["application/json", "application/x-python-serialize"]
 CELERY_BEAT_SCHEDULE = _parse_beat_schedule()
 
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#beat-schedule-filename
-CELERY_BEAT_SCHEDULE_FILENAME = os.path.join(DATA_DIR, "celerybeat-schedule.db")
+CELERY_BEAT_SCHEDULE_FILENAME = os.path.join(DATA_DIR,
+                                             "celerybeat-schedule.db")
 
 # django setting.
 CACHES = {
@@ -989,7 +1001,6 @@ CONVERT_MEMORY_LIMIT = os.getenv("EDOC_CONVERT_MEMORY_LIMIT")
 
 GS_BINARY = os.getenv("EDOC_GS_BINARY", "gs")
 
-
 # Pre-2.x versions of Edoc stored your documents locally with GPG
 # encryption, but that is no longer the default.  This behaviour is still
 # available, but it must be explicitly enabled by setting
@@ -1098,6 +1109,7 @@ if ENABLE_UPDATE_CHECK != "default":
 APP_TITLE = os.getenv("EDOC_APP_TITLE", None)
 APP_LOGO = os.getenv("EDOC_APP_LOGO", None)
 
+
 ###############################################################################
 # Machine Learning                                                            #
 ###############################################################################
@@ -1167,19 +1179,30 @@ API_LOGIN_OCR = os.getenv("API_LOGIN_OCR", "")
 API_REFRESH_OCR = os.getenv("API_REFRESH_OCR", "")
 API_OCR_BY_FILE_ID = os.getenv("API_OCR_BY_FILE_ID", "")
 API_UPLOAD_FILE_OCR = os.getenv("API_UPLOAD_FILE_OCR", "")
-FOLDER_UPLOAD = os.getenv("FOLDER_UPLOAD","")
+FOLDER_UPLOAD = os.getenv("FOLDER_UPLOAD", "")
 
 ###############################################################################
 # Elastic search                                                              #
 ###############################################################################
-ELASTIC_SEARCH_DOCUMENT_INDEX=os.getenv("ELASTIC_SEARCH_DOCUMENT_INDEX", "edoc")
-ELASTIC_SEARCH_HOST=os.getenv("ELASTIC_SEARCH_HOST", "")
+ELASTIC_SEARCH_DOCUMENT_INDEX = os.getenv("ELASTIC_SEARCH_DOCUMENT_INDEX",
+                                          "edoc")
+ELASTIC_SEARCH_HOST = os.getenv("ELASTIC_SEARCH_HOST", "")
 ELASTICSEARCH_DSL = {
     'default': {
-        'hosts': os.getenv("ELASTIC_SEARCH_HOST", ""),  # Địa chỉ của Elasticsearch
-        'http_auth': (os.getenv("ELASTIC_SEARCH_USERNAME", ""), os.getenv("ELASTIC_SEARCH_PASSWORD", "")),  # Thông tin xác thực (nếu có)
-        'use_ssl': False,              # Nếu sử dụng SSL
-        'verify_certs': False,         # Kiểm tra chứng chỉ
-        'ca_certs': os.getenv("ELASTIC_SEARCH_CA", ""),  # Đường dẫn đến chứng chỉ CA
+        'hosts': os.getenv("ELASTIC_SEARCH_HOST", ""),
+        # Địa chỉ của Elasticsearch
+        'http_auth': (os.getenv("ELASTIC_SEARCH_USERNAME", ""),
+                      os.getenv("ELASTIC_SEARCH_PASSWORD", "")),
+        # Thông tin xác thực (nếu có)
+        'use_ssl': False,  # Nếu sử dụng SSL
+        'verify_certs': False,  # Kiểm tra chứng chỉ
+        'ca_certs': os.getenv("ELASTIC_SEARCH_CA", ""),
+        # Đường dẫn đến chứng chỉ CA
     },
 }
+
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]
