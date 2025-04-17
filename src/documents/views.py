@@ -147,6 +147,7 @@ from documents.serialisers import CustomFieldSerializer
 from documents.serialisers import DocumentListSerializer
 from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
+from documents.serialisers import DocumentVersionSerializer
 from documents.serialisers import NotesSerializer
 from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import RunTaskViewSerializer
@@ -1102,6 +1103,56 @@ class DocumentViewSet(
             logger.warning(f"An error occurred emailing document: {e!s}")
             return HttpResponseServerError(
                 "Error emailing document, check logs for more detail.",
+            )
+
+    @action(methods=["post"], detail=True)
+    def update_version(self, request, pk=None):
+        serializer = DocumentVersionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            doc = Document.objects.select_related("owner").get(pk=pk)
+            if request.user is not None and not has_perms_owner_aware(
+                request.user,
+                "change_document",
+                doc,
+            ):
+                return HttpResponseForbidden("Insufficient permissions")
+        except Document.DoesNotExist:
+            raise Http404
+
+        try:
+            doc_name, doc_data = serializer.validated_data.get("document")
+
+            t = int(mktime(datetime.now().timetuple()))
+
+            settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
+
+            temp_file_path = Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR)) / Path(
+                pathvalidate.sanitize_filename(doc_name),
+            )
+
+            temp_file_path.write_bytes(doc_data)
+
+            os.utime(temp_file_path, times=(t, t))
+
+            input_doc = ConsumableDocument(
+                source=DocumentSource.ApiUpload,
+                original_file=temp_file_path,
+                head_version_id=doc.pk,
+            )
+
+            async_task = consume_file.delay(
+                input_doc,
+            )
+            logger.debug(
+                f"Updated document {doc.id} with new version",
+            )
+            return Response(async_task.id)
+        except Exception as e:
+            logger.warning(f"An error occurred updating document: {e!s}")
+            return HttpResponseServerError(
+                "Error updating document, check logs for more detail.",
             )
 
 

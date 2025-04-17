@@ -1869,6 +1869,15 @@ class PostDocumentSerializer(serializers.Serializer):
             return created.date()
 
 
+class DocumentVersionSerializer(serializers.Serializer):
+    document = serializers.FileField(
+        label="Document",
+        write_only=True,
+    )
+
+    validate_document = PostDocumentSerializer().validate_document
+
+
 class BulkDownloadSerializer(DocumentListSerializer):
     content = serializers.ChoiceField(
         choices=["archive", "originals", "both"],

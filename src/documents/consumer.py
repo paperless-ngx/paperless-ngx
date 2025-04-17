@@ -113,6 +113,12 @@ class ConsumerPluginMixin:
 
         self.filename = self.metadata.filename or self.input_doc.original_file.name
 
+        if input_doc.head_version_id:
+            self.log.debug(f"Document head version id: {input_doc.head_version_id}")
+            head_version = Document.objects.get(pk=input_doc.head_version_id)
+            version_index = head_version.versions.count()
+            self.filename += f"_v{version_index}"
+
     def _send_progress(
         self,
         current_progress: int,
@@ -470,12 +476,28 @@ class ConsumerPlugin(
         try:
             with transaction.atomic():
                 # store the document.
-                document = self._store(
-                    text=text,
-                    date=date,
-                    page_count=page_count,
-                    mime_type=mime_type,
-                )
+                if self.input_doc.head_version_id:
+                    # If this is a new version of an existing document, we need
+                    # to make sure we're not creating a new document, but updating
+                    # the existing one.
+                    original_document = Document.objects.get(
+                        pk=self.input_doc.head_version_id,
+                    )
+                    self.log.debug("Saving record for updated version to database")
+                    original_document.pk = None
+                    original_document.head_version = Document.objects.get(
+                        pk=self.input_doc.head_version_id,
+                    )
+                    original_document.modified = timezone.now()
+                    original_document.save()
+                    document = original_document
+                else:
+                    document = self._store(
+                        text=text,
+                        date=date,
+                        page_count=page_count,
+                        mime_type=mime_type,
+                    )
 
                 # If we get here, it was successful. Proceed with post-consume
                 # hooks. If they fail, nothing will get changed.

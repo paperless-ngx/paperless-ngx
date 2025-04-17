@@ -145,13 +145,17 @@ def consume_file(
     if overrides is None:
         overrides = DocumentMetadataOverrides()
 
-    plugins: list[type[ConsumeTaskPlugin]] = [
-        ConsumerPreflightPlugin,
-        CollatePlugin,
-        BarcodePlugin,
-        WorkflowTriggerPlugin,
-        ConsumerPlugin,
-    ]
+    plugins: list[type[ConsumeTaskPlugin]] = (
+        [ConsumerPreflightPlugin,ConsumerPlugin]
+        if input_doc.head_version_id is not None
+        else [
+            ConsumerPreflightPlugin,
+            CollatePlugin,
+            BarcodePlugin,
+            WorkflowTriggerPlugin,
+            ConsumerPlugin,
+        ]
+    )
 
     with (
         ProgressManager(
