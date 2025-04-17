@@ -17,7 +17,8 @@ from rest_framework import pagination
 from rest_framework.authtoken.models import Token
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import GenericAPIView
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.pagination import PageNumberPagination, \
+    LimitOffsetPagination
 from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -82,11 +83,27 @@ class StandardPagination(PageNumberPagination):
         return response_schema
 
 
-class WithoutCountPaginator(Paginator):
 
+class WithoutCountPaginator(Paginator):
     @cached_property
     def count(self):
         return 9999999999
+
+
+class CustomLimitOffsetPagination(LimitOffsetPagination):
+    default_limit = 10  # Số phần tử mặc định mỗi trang
+    max_limit = 10000  # Số phần tử tối đa mỗi trang
+    limit_query_param = "page_size"
+    offset_query_param = 'page'
+    def get_count(self, queryset):
+        return 9999999999
+
+    def get_offset(self, request):
+        page = super().get_offset(request)
+        page_size = super().get_limit(request)
+        offset = page * page_size
+        return offset
+
 
 
 class CustomPagination(pagination.LimitOffsetPagination):
