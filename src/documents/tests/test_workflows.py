@@ -1336,6 +1336,8 @@ class TestWorkflows(
         GIVEN:
             - Existing workflow with SCHEDULED trigger against the created field and action that assigns owner
             - Existing doc that matches the trigger
+            - Workflow set to trigger at (now - offset) = now - 1 day
+            - Document created date is 2 days ago → trigger condition met
         WHEN:
             - Scheduled workflows are checked
         THEN:
@@ -1359,7 +1361,7 @@ class TestWorkflows(
         w.save()
 
         now = timezone.localtime(timezone.now())
-        created = now - timedelta(weeks=520)
+        created = now - timedelta(days=2)
         doc = Document.objects.create(
             title="sample test",
             correspondent=self.c,
@@ -1377,6 +1379,8 @@ class TestWorkflows(
         GIVEN:
             - Existing workflow with SCHEDULED trigger against the added field and action that assigns owner
             - Existing doc that matches the trigger
+            - Workflow set to trigger at (now - offset) = now - 1 day
+            - Document added date is 365 days ago
         WHEN:
             - Scheduled workflows are checked
         THEN:
@@ -1418,6 +1422,8 @@ class TestWorkflows(
         GIVEN:
             - Existing workflow with SCHEDULED trigger against the modified field and action that assigns owner
             - Existing doc that matches the trigger
+            - Workflow set to trigger at (now - offset) = now - 1 day
+            - Document modified date is mocked as sufficiently in the past
         WHEN:
             - Scheduled workflows are checked
         THEN:
@@ -1458,6 +1464,8 @@ class TestWorkflows(
         GIVEN:
             - Existing workflow with SCHEDULED trigger against a custom field and action that assigns owner
             - Existing doc that matches the trigger
+            - Workflow set to trigger at (now - offset) = now - 1 day
+            - Custom field date is 2 days ago
         WHEN:
             - Scheduled workflows are checked
         THEN:
@@ -1502,6 +1510,7 @@ class TestWorkflows(
         GIVEN:
             - Existing workflow with SCHEDULED trigger
             - Existing doc that has already had the workflow run
+            - Document created 2 days ago, workflow offset = 1 day → trigger time = yesterday
         WHEN:
             - Scheduled workflows are checked
         THEN:
@@ -1552,6 +1561,7 @@ class TestWorkflows(
         GIVEN:
             - Existing workflow with SCHEDULED trigger and recurring interval of 7 days
             - Workflow run date is 6 days ago
+            - Document created 40 days ago, offset = 30 → trigger time = 10 days ago
         WHEN:
             - Scheduled workflows are checked
         THEN:
@@ -1603,7 +1613,9 @@ class TestWorkflows(
     def test_workflow_scheduled_trigger_negative_offset(self):
         """
         GIVEN:
-            - Existing workflow with SCHEDULED trigger and negative offset of -7 days
+            - Existing workflow with SCHEDULED trigger and negative offset of -7 days (so 7 days after date)
+            - Custom field date initially set to 5 days ago → trigger time = 2 days in future
+            - Then updated to 8 days ago → trigger time = 1 day ago
         WHEN:
             - Scheduled workflows are checked for document with custom field date 8 days in the past
         THEN:
