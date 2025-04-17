@@ -774,6 +774,220 @@ class DocumentSerializer(
     DynamicFieldsModelSerializer,
 ):
     approvals = serializers.SerializerMethodField(read_only=True)
+    correspondent = serializers.SerializerMethodField(read_only=True)
+    tags = TagsField(many=True)
+    warehouse = WarehouseField(allow_null=True)
+    warehouse_w = SerializerMethodField(read_only=True)
+    warehouse_s = SerializerMethodField(read_only=True)
+    folder = serializers.SerializerMethodField(read_only=True)
+
+    document_type = DocumentTypeField(allow_null=True)
+    archive_font = ArchiveFontField(allow_null=True)
+    storage_path = serializers.SerializerMethodField(read_only=True)
+    original_file_name = SerializerMethodField()
+    archived_file_name = SerializerMethodField()
+    created_date = serializers.DateField(required=False)
+    page_count = SerializerMethodField()
+    custom_fields = SerializerMethodField(read_only=True)
+    def get_notes(self, obj):
+        return []
+    def get_correspondent(self, obj):
+        return None
+    def get_folder(self, obj):
+        return None
+    def get_storage_path(self, obj):
+        return None
+
+    def get_warehouse_w(self, obj):
+        try:
+            if obj.warehouse is None:
+                return None
+            return str(obj.warehouse.path).split('/')[1]
+        except Exception:
+            return None
+
+    def get_warehouse_s(self, obj):
+        try:
+            if obj.warehouse is None:
+                return None
+            return str(obj.warehouse.path).split('/')[1]
+        except Exception:
+            return None
+    def to_representation(self, instance):
+        value = instance.created
+        return value.astimezone(timezone.get_default_timezone()).isoformat()
+    def get_custom_fields(self, obj):
+        return []
+        # custom_fields = CustomFieldInstance.objects.filter(document=obj)
+        # serializer = CustomFieldInstanceSerializer(custom_fields, many=True)
+        # return serializer.data
+
+    owner = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        required=False,
+        allow_null=True,
+    )
+
+    remove_inbox_tags = serializers.BooleanField(
+        default=False,
+        write_only=True,
+        allow_null=True,
+        required=False,
+    )
+
+    exploit = serializers.SerializerMethodField(read_only=True)
+
+    def get_exploit(self, obj):
+        current_user = self.context.get("request").user
+
+        if current_user is not None and has_perms_owner_aware(
+            current_user,
+            "view_document",
+            obj,
+        ):
+            return 1
+        elif Approval.objects.filter(
+            object_pk=obj.pk, status="PENDING", submitted_by=current_user
+        ):
+            return 2
+        else:
+            return 3
+
+    def get_approvals(self, obj):
+        return []
+
+
+    def get_page_count(self, obj):
+        return obj.page_count
+
+    def get_original_file_name(self, obj):
+        return obj.original_filename
+
+    def get_archived_file_name(self, obj):
+        if obj.has_archive_version:
+            return obj.get_public_filename(archive=True)
+        else:
+            return None
+
+    def to_representation(self, instance):
+        doc = super().to_representation(instance)
+        if self.truncate_content and "content" in self.fields:
+            doc["content"] = doc.get("content")[0:550]
+        return doc
+
+    def update(self, instance: Document, validated_data):
+        if "created_date" in validated_data and "created" not in validated_data:
+            new_datetime = datetime.datetime.combine(
+                validated_data.get("created_date"),
+                datetime.time(0, 0, 0, 0, zoneinfo.ZoneInfo(settings.TIME_ZONE)),
+            )
+            instance.created = new_datetime
+            instance.save()
+        if "created_date" in validated_data:
+            validated_data.pop("created_date")
+        if instance.custom_fields.count() > 0 and "custom_fields" in validated_data:
+            incoming_custom_fields = [
+                field["field"] for field in validated_data["custom_fields"]
+            ]
+            for custom_field_instance in instance.custom_fields.filter(
+                field__data_type=CustomField.FieldDataType.DOCUMENTLINK,
+            ):
+                if (
+                    custom_field_instance.field not in incoming_custom_fields
+                    and custom_field_instance.value is not None
+                ):
+                    # Doc link field is being removed entirely
+                    for doc_id in custom_field_instance.value:
+                        CustomFieldInstanceSerializer.remove_doclink(
+                            instance,
+                            custom_field_instance.field,
+                            doc_id,
+                        )
+        if validated_data.get("remove_inbox_tags"):
+            tag_ids_being_added = (
+                [
+                    tag.id
+                    for tag in validated_data["tags"]
+                    if tag not in instance.tags.all()
+                ]
+                if "tags" in validated_data
+                else []
+            )
+            inbox_tags_not_being_added = Tag.objects.filter(is_inbox_tag=True).exclude(
+                id__in=tag_ids_being_added,
+            )
+            if "tags" in validated_data:
+                validated_data["tags"] = [
+                    tag
+                    for tag in validated_data["tags"]
+                    if tag not in inbox_tags_not_being_added
+                ]
+            else:
+                validated_data["tags"] = [
+                    tag
+                    for tag in instance.tags.all()
+                    if tag not in inbox_tags_not_being_added
+                ]
+        super().update(instance, validated_data)
+        return instance
+
+    def __init__(self, *args, **kwargs):
+        self.truncate_content = kwargs.pop("truncate_content", False)
+
+        # return full permissions if we're doing a PATCH or PUT
+        context = kwargs.get("context")
+        if (
+            context.get("request").method == "PATCH"
+            or context.get("request").method == "PUT"
+        ):
+            kwargs["full_perms"] = True
+
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        model = Document
+        depth = 1
+        fields = (
+            "id",
+            "approvals",
+            "correspondent",
+            "document_type",
+            "archive_font",
+            "storage_path",
+            "warehouse",
+            "folder",
+            "title",
+            "content",
+            "tags",
+            "created",
+            "created_date",
+            "modified",
+            "added",
+            "deleted_at",
+            "archive_serial_number",
+            "original_file_name",
+            "archived_file_name",
+            "owner",
+            "permissions",
+            "user_can_change",
+            "is_shared_by_requester",
+            "set_permissions",
+            "notes",
+            "custom_fields",
+            "exploit",
+            "remove_inbox_tags",
+            "page_count",
+            "warehouse_s",
+            "warehouse_w",
+        )
+
+
+class DocumentDetailSerializer(
+    OwnedObjectSerializer,
+    NestedUpdateMixin,
+    DynamicFieldsModelSerializer,
+):
+    approvals = serializers.SerializerMethodField(read_only=True)
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)
     warehouse = WarehouseField(allow_null=True)
@@ -1000,7 +1214,6 @@ class DocumentSerializer(
             "warehouse_s",
             "warehouse_w",
         )
-
 
 class DocumentFolderSerializer(
     OwnedObjectSerializer,

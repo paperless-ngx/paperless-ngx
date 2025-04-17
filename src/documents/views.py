@@ -166,7 +166,7 @@ from documents.permissions import update_view_folder_parent_permissions
 from documents.permissions import \
     update_view_warehouse_shelf_boxcase_permissions
 from documents.serialisers import AcknowledgeTasksViewSerializer, \
-    DocumentDocumentSerializer, WebhookSerializer
+    DocumentDocumentSerializer, WebhookSerializer, DocumentDetailSerializer
 from documents.serialisers import ApprovalSerializer
 from documents.serialisers import ApprovalViewSerializer
 from documents.serialisers import ArchiveFontSerializer
@@ -214,7 +214,8 @@ from edoc.celery import app as celery_app
 from edoc.config import GeneralConfig
 from edoc.db import GnuPG
 from edoc.models import ApplicationConfiguration
-from edoc.views import StandardPagination, CustomStandardPagination
+from edoc.views import StandardPagination, CustomStandardPagination, \
+    CustomLimitOffsetPagination
 from edoc.wsgi import application
 
 if settings.AUDIT_LOG_ENABLED:
@@ -502,8 +503,8 @@ class DocumentViewSet(
 ):
     model = Document
     queryset = Document.objects.annotate(num_notes=Count("notes"))
-    serializer_class = DocumentSerializer
-    pagination_class = CustomStandardPagination
+    # serializer_class = DocumentSerializer
+    pagination_class = CustomLimitOffsetPagination
     permission_classes = (IsAuthenticated, EdocObjectPermissions)
     filter_backends = (
         DjangoFilterBackend,
@@ -546,9 +547,15 @@ class DocumentViewSet(
                 "document_type",
                 "warehouse",
                 "owner",
+
             )
-            .prefetch_related("tags")
+            .prefetch_related('tags')
         )
+
+    def get_serializer_class(self):
+        if 'pk' in self.kwargs:
+            return DocumentDetailSerializer
+        return DocumentSerializer
 
     def get_serializer(self, *args, **kwargs):
         fields_param = self.request.query_params.get("fields", None)
@@ -562,6 +569,26 @@ class DocumentViewSet(
             self.request.query_params.get("full_perms", False),
         )
         return super().get_serializer(*args, **kwargs)
+
+    # def list(self, request, *args, **kwargs):
+    #     queryset = self.filter_queryset(self.get_queryset())
+    #     # list_of_ids = queryset.values_list('id', flat=True)
+    #     # list_approval = Approval.objects.filter(object_pk__in=list_of_ids, ctype__model='document')
+    #     # dict_document_approvals_success = dict()
+    #     # for approval in list_approval:
+    #     #     if approval.status == states.SUCCESS:
+    #     #         dict_document_approvals_success[approval.object_pk].append(approval)
+    #     #
+    #
+    #
+    #     page = self.paginate_queryset(queryset)
+    #     if page is not None:
+    #         serializer = self.get_serializer(page, many=True)
+    #         return self.get_paginated_response(serializer.data)
+    #
+    #     serializer = self.get_serializer(queryset, many=True)
+    #     return Response(serializer.data)
+
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
