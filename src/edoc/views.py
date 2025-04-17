@@ -104,6 +104,23 @@ class CustomLimitOffsetPagination(LimitOffsetPagination):
         offset = page * page_size
         return offset
 
+    def get_page_size(self, request):
+        return super().get_limit(request)
+
+
+    def get_paginated_response(self, data):
+        return Response(
+            OrderedDict(
+                [
+                    ("count", 100000),
+                    ("next", self.get_next_link()),
+                    ("previous", self.get_previous_link()),
+                    ("all", []),
+                    ("results", data),
+                ],
+            ),
+        )
+
 
 
 class CustomPagination(pagination.LimitOffsetPagination):
