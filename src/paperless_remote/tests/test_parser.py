@@ -75,7 +75,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         mock_azure_client.return_value.begin_analyze_document.return_value.result.return_value = result
 
         with override_settings(
-            REMOTE_OCR_ENGINE="azureaivision",
+            REMOTE_OCR_ENGINE="azureai",
             REMOTE_OCR_API_KEY="somekey",
             REMOTE_OCR_ENDPOINT="https://endpoint.cognitiveservices.azure.com/",
         ):
