@@ -1,3 +1,5 @@
+import subprocess
+import tempfile
 from pathlib import Path
 
 from django.conf import settings
@@ -61,7 +63,41 @@ class RemoteDocumentParser(RasterisedDocumentParser):
         """
         This method uses the Azure AI Vision API to parse documents
         """
-        # TODO: Implement the Azure AI Vision API parsing logic
+        from azure.ai.documentintelligence import DocumentIntelligenceClient
+        from azure.core.credentials import AzureKeyCredential
+
+        client = DocumentIntelligenceClient(
+            endpoint=self.settings.endpoint,
+            credential=AzureKeyCredential(self.settings.api_key),
+        )
+
+        with file.open("rb") as f:
+            poller = client.begin_analyze_document(
+                model_id="prebuilt-read",
+                analyze_request=f,
+                content_type="application/octet-stream",
+                output_format="pdf",
+            )
+
+        result = poller.result()
+
+        # Download the PDF with embedded text
+        pdf_bytes = client.get_analyze_result_pdf(result.result_id)
+        self.archive_path = Path(self.tempdir) / "archive.pdf"
+        self.archive_path.write_bytes(pdf_bytes)
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".txt") as tmp:
+            subprocess.run(
+                [
+                    "pdftotext",
+                    "-q",
+                    "-layout",
+                    str(self.archive_path),
+                    tmp.name,
+                ],
+            )
+            with Path.open(tmp.name, encoding="utf-8") as t:
+                return t.read()
 
     def parse(self, document_path: Path, mime_type, file_name=None):
         if not self.settings.engine_is_valid():
