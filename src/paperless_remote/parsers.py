@@ -64,6 +64,7 @@ class RemoteDocumentParser(RasterisedDocumentParser):
         This method uses the Azure AI Vision API to parse documents
         """
         from azure.ai.documentintelligence import DocumentIntelligenceClient
+        from azure.ai.documentintelligence.models import AnalyzeDocumentRequest
         from azure.core.credentials import AzureKeyCredential
 
         client = DocumentIntelligenceClient(
@@ -72,19 +73,25 @@ class RemoteDocumentParser(RasterisedDocumentParser):
         )
 
         with file.open("rb") as f:
+            analyze_request = AnalyzeDocumentRequest(bytes_source=f.read())
             poller = client.begin_analyze_document(
                 model_id="prebuilt-read",
-                analyze_request=f,
-                content_type="application/octet-stream",
-                output_format="pdf",
+                body=analyze_request,
+                output=["pdf"],  # request searchable PDF output
+                content_type="application/json",
             )
 
-        result = poller.result()
+        poller.wait()
+        result_id = poller.details["operation_id"]
 
         # Download the PDF with embedded text
-        pdf_bytes = client.get_analyze_result_pdf(result.result_id)
         self.archive_path = Path(self.tempdir) / "archive.pdf"
-        self.archive_path.write_bytes(pdf_bytes)
+        with self.archive_path.open("wb") as f:
+            for chunk in client.get_analyze_result_pdf(
+                model_id="prebuilt-read",
+                result_id=result_id,
+            ):
+                f.write(chunk)
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=".txt") as tmp:
             subprocess.run(
@@ -96,7 +103,7 @@ class RemoteDocumentParser(RasterisedDocumentParser):
                     tmp.name,
                 ],
             )
-            with Path.open(tmp.name, encoding="utf-8") as t:
+            with Path(tmp.name).open(encoding="utf-8") as t:
                 return t.read()
 
     def parse(self, document_path: Path, mime_type, file_name=None):
