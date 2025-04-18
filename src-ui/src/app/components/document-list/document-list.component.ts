@@ -67,7 +67,6 @@ export class DocumentListComponent
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
 
   displayMode = 'smallCards' // largeCards, smallCards, details
-
   unmodifiedFilterRules: FilterRule[] = []
   private unmodifiedSavedView: SavedView
 
@@ -315,6 +314,7 @@ export class DocumentListComponent
   }
 
   resetFilters() {
+    this.list.currentPage=1
     this.setSortField(null)
     this.list.sortReverse=null
     this.filterEditor.resetSelected()

@@ -6,6 +6,7 @@ import os
 import platform
 import re
 import tempfile
+import time
 import traceback
 import urllib
 import zipfile
@@ -502,7 +503,7 @@ class DocumentViewSet(
     GenericViewSet,
 ):
     model = Document
-    queryset = Document.objects.annotate(num_notes=Count("notes"))
+    queryset = Document.objects.all()
     # serializer_class = DocumentSerializer
     pagination_class = CustomLimitOffsetPagination
     permission_classes = (IsAuthenticated, EdocObjectPermissions)
@@ -1521,6 +1522,125 @@ class PostDocumentView(GenericAPIView):
 
         return Response(async_task.id)
 
+class SelectQueryViewSet(
+    ListModelMixin,
+    GenericViewSet,
+):
+    model = Document
+    queryset = Document.objects.all()
+    pagination_class = CustomLimitOffsetPagination
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
+    parser_classes = (parsers.MultiPartParser, parsers.JSONParser)
+    filter_backends = (
+        DjangoFilterBackend,
+        SearchFilter,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    filterset_class = DocumentFilterSet
+    search_fields = (
+    "title", "correspondent__name", "content", "warehouse", "folder")
+    ordering_fields = (
+        "id",
+        "title",
+        "correspondent__name",
+        "document_type__name",
+        "archive_font__namecreated",
+        "modified",
+        "added",
+        "archive_serial_number",
+        "num_notes",
+        "owner",
+        "page_count",
+    )
+
+    def list(self, request, *args, **kwargs):
+        # Áp dụng các bộ lọc thông qua queryset
+        start_time_total = time.time()  # Bắt đầu tính tổng thời gian
+        start_time_query = time.time()
+        filtered_documents = self.filter_queryset(self.get_queryset().only('id'))  # Thực hiện query lọc
+
+        time_query = time.time() - start_time_query
+
+        # Lấy danh sách ID từ kết quả lọc (dùng nếu cần)
+        start_time_ids = time.time()
+        # ids = filtered_documents.values_list('id', flat=True)  # Tạm thời không dùng
+        time_get_ids = time.time() - start_time_ids
+
+        # Tính document_count cho các mô hình liên quan
+        # Tính cho tags
+        start_time_tags = time.time()
+        tags = Tag.objects.filter(documents__in=filtered_documents).annotate(
+            document_count=Count('documents')
+        ).only('id')
+        time_get_tags = time.time() - start_time_tags
+
+        # Tính cho types
+        start_time_types = time.time()
+        types = DocumentType.objects.filter(
+            documents__in=filtered_documents).annotate(
+            document_count=Count('documents')
+        ).only('id')
+        time_get_types = time.time() - start_time_types
+
+        # Tính cho warehouses
+        start_time_warehouses = time.time()
+        warehouses = Warehouse.objects.filter(
+            documents__in=filtered_documents
+        ).annotate(
+            document_count=Count('documents')
+        ).only('id')
+        time_get_warehouses = time.time() - start_time_warehouses
+
+        start_time_for_data = time.time()
+        # Debug dữ liệu đã lấy
+        for tag in tags:
+            print(tag.__dict__)
+        for type in types:
+            print(type.__dict__)
+        for warehouse in warehouses:
+            print(warehouse.__dict__)
+        print(f'time get data {time.time() - start_time_for_data}')
+        # Chuẩn bị dữ liệu trả về
+        start_time_response=time.time()
+        response_data = {
+            # "selected_correspondents": [
+            #     {"id": t.id, "document_count": t.document_count} for t in correspondents
+            # ],
+            "selected_tags": [
+                {"id": t.id, "document_count": t.document_count} for t in tags
+            ],
+            "selected_document_types": [
+                {"id": t.id, "document_count": t.document_count} for t in types
+            ],
+            "selected_warehouses": [
+                {"id": t.id, "document_count": t.document_count} for t in
+                warehouses
+            ],
+            # "selected_storage_paths": [
+            #     {"id": t.id, "document_count": t.document_count} for t in storage_paths
+            # ],
+        }
+        time_response = time.time() - start_time_response
+
+        # In debug thông tin thời gian
+        print(f'''
+        warehouse: {warehouses},
+        tags: {tags},
+        types: {types},
+        time_total: {time.time() - start_time_total},
+        time_query: {time_query},
+        time_get_ids: {time_get_ids},
+        time_tags: {time_get_tags},
+        time_types: {time_get_types},
+        time_warehouses: {time_get_warehouses},
+        time_response: {time_response}
+        ''')
+
+        print('response_data:', response_data)
+
+        return Response(response_data)
+
 
 class SelectionDataView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
@@ -1532,7 +1652,11 @@ class SelectionDataView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         ids = serializer.validated_data.get("documents")
-
+        correspondents =[]
+        tags = []
+        types =[]
+        storage_paths = []
+        warehouses = []
         correspondents = Correspondent.objects.annotate(
             document_count=Count(
                 Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
@@ -1563,12 +1687,6 @@ class SelectionDataView(GenericAPIView):
             ),
         )
 
-        folders = Folder.objects.annotate(
-            document_count=Count(
-                Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
-            ),
-        )
-
         r = Response(
             {
                 "selected_correspondents": [
@@ -1583,9 +1701,6 @@ class SelectionDataView(GenericAPIView):
                 ],
                 "selected_warehouses": [
                     {"id": t.id, "document_count": t.document_count} for t in warehouses
-                ],
-                "selected_folders": [
-                    {"id": t.id, "document_count": t.document_count} for t in folders
                 ],
                 "selected_storage_paths": [
                     {"id": t.id, "document_count": t.document_count}

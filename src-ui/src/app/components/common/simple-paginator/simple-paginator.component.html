@@ -1,0 +1,19 @@
+<nav aria-label="Pagination">
+  <ul class="pagination pagination-sm">
+    <li class="page-item" [class.disabled]="page === 1 || disablePrevious">
+      <button class="page-link" (click)="prevPage()" [disabled]="page === 1 || disablePrevious">
+        <ng-container i18n>Previous</ng-container>
+      </button>
+    </li>
+
+    <li class="page-item disabled">
+      <span class="page-link" i18n="Current page label">Page {{ page }}</span>
+    </li>
+
+    <li class="page-item" [class.disabled]="disableNext">
+      <button class="page-link" (click)="nextPage()" [disabled]="disableNext">
+        <ng-container i18n>Next</ng-container>
+      </button>
+    </li>
+  </ul>
+</nav>

@@ -83,6 +83,8 @@ export class DocumentListViewService {
 
   currentPageSize: number = this.settings.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)
 
+  nextPage: boolean = true
+
   private unsubscribeNotifier: Subject<any> = new Subject()
 
   private listViewStates: Map<number, ListViewState> = new Map()
@@ -100,10 +102,10 @@ export class DocumentListViewService {
   constructor(
     private documentService: DocumentService,
     private settings: SettingsService,
-    private router: Router
+    private router: Router,
   ) {
     let documentListViewConfigJson = localStorage.getItem(
-      DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG
+      DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG,
     )
     if (documentListViewConfigJson) {
       try {
@@ -143,7 +145,7 @@ export class DocumentListViewService {
     if (!this.listViewStates.has(this._activeSavedViewId)) {
       this.listViewStates.set(
         this._activeSavedViewId,
-        this.defaultListViewState()
+        this.defaultListViewState(),
       )
     }
     return this.listViewStates.get(this._activeSavedViewId)
@@ -191,7 +193,7 @@ export class DocumentListViewService {
   loadFromQueryParams(queryParams: ParamMap) {
     const paramsEmpty: boolean = queryParams.keys.length == 0
     let newState: ListViewState = this.listViewStates.get(
-      this._activeSavedViewId
+      this._activeSavedViewId,
     )
     if (!paramsEmpty) newState = paramsToViewState(queryParams)
     if (newState == undefined) newState = this.defaultListViewState() // if nothing in local storage
@@ -205,7 +207,7 @@ export class DocumentListViewService {
       this.activeListViewState.currentPage !== newState.currentPage ||
       filterRulesDiffer(
         this.activeListViewState.filterRules,
-        newState.filterRules
+        newState.filterRules,
       )
     ) {
       this.activeListViewState.filterRules = newState.filterRules
@@ -228,7 +230,7 @@ export class DocumentListViewService {
         activeListViewState.sortField,
         activeListViewState.sortReverse,
         activeListViewState.filterRules,
-        { truncate_content: true }
+        { truncate_content: true },
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
@@ -237,9 +239,27 @@ export class DocumentListViewService {
           this.isReloading = false
           activeListViewState.collectionSize = result.count
           activeListViewState.documents = result.results
-
+          this.hasNextPage = result.next
+          // this.documentService
+          //   .getSelectionData(result.all)
+          //   .pipe(first())
+          //   .subscribe({
+          //     next: (selectionData) => {
+          //       this.selectionData = selectionData
+          //     },
+          //     error: () => {
+          //       this.selectionData = null
+          //     },
+          //   })
           this.documentService
-            .getSelectionData(result.all)
+            .StatisticFiltered(
+              activeListViewState.currentPage,
+              this.currentPageSize,
+              activeListViewState.sortField,
+              activeListViewState.sortReverse,
+              activeListViewState.filterRules,
+              { truncate_content: true },
+            )
             .pipe(first())
             .subscribe({
               next: (selectionData) => {
@@ -286,7 +306,7 @@ export class DocumentListViewService {
                 .map((fieldName) => {
                   const fieldError: Array<string> = error.error[fieldName]
                   return `${DOCUMENT_SORT_FIELDS.find(
-                    (f) => f.field == fieldName
+                    (f) => f.field == fieldName,
                   )?.name}: ${fieldError[0]}`
                 })
                 .join(', ')
@@ -297,6 +317,8 @@ export class DocumentListViewService {
           }
         },
       })
+
+
   }
 
   set filterRules(filterRules: FilterRule[]) {
@@ -340,6 +362,15 @@ export class DocumentListViewService {
     return this.activeListViewState.collectionSize
   }
 
+  set hasNextPage(next: string) {
+    if (next != '')
+      this.nextPage = true
+  }
+
+  get hasNextPage(): number {
+    return this.activeListViewState.currentPage
+  }
+
   get currentPage(): number {
     return this.activeListViewState.currentPage
   }
@@ -377,7 +408,7 @@ export class DocumentListViewService {
       }
       localStorage.setItem(
         DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG,
-        JSON.stringify(savedState)
+        JSON.stringify(savedState),
       )
     }
   }
@@ -511,7 +542,7 @@ export class DocumentListViewService {
       const documentToIndex = this.documentIndexInCurrentView(d.id)
       const fromIndex = Math.min(
         this.rangeSelectionAnchorIndex,
-        documentToIndex
+        documentToIndex,
       )
       const toIndex = Math.max(this.rangeSelectionAnchorIndex, documentToIndex)
 
@@ -521,12 +552,12 @@ export class DocumentListViewService {
           .slice(
             Math.min(
               this.rangeSelectionAnchorIndex,
-              this.lastRangeSelectionToIndex
+              this.lastRangeSelectionToIndex,
             ),
             Math.max(
               this.rangeSelectionAnchorIndex,
-              this.lastRangeSelectionToIndex
-            ) + 1
+              this.lastRangeSelectionToIndex,
+            ) + 1,
           )
           .forEach((d) => {
             this.selected.delete(d.id)

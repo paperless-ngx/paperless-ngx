@@ -660,6 +660,7 @@ class DelayedElasticSearch(DelayedQuery):
                         post_tags=['</span>'])
         s = s.source(['id'])
         s = s[page_number * page_size - page_size:page_number * page_size]
+        print('page:', page_number * page_size - page_size, page_number * page_size)
         response = s.execute()
         return response
 
