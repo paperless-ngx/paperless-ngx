@@ -89,7 +89,7 @@ and more. These areas allow you to view, add, edit, delete and manage permission
 for these objects. You can also manage saved views, mail accounts, mail rules,
 workflows and more from the management sections.
 
-## Adding documents to paperless
+## Adding documents to Paperless-ngx
 
 Once you've got Paperless setup, you need to start feeding documents
 into it. When adding documents to paperless, it will perform the
@@ -159,7 +159,7 @@ process.
 Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Related-Projects) for a user-maintained list of related projects and
 software (e.g. for mobile devices) that is compatible with Paperless-ngx.
 
-### Email {#usage-email}
+### Incoming Email {#incoming-mail}
 
 You can tell paperless-ngx to consume documents from your email
 accounts. This is a very flexible and powerful feature, if you regularly
@@ -259,6 +259,31 @@ Once setup, navigating to the email settings page in Paperless-ngx will allow yo
 
 You can also submit a document using the REST API, see [POSTing documents](api.md#file-uploads)
 for details.
+
+## Sharing documents from Paperless-ngx
+
+Paperless-ngx supports sharing documents with other users by assigning them [permissions](#object-permissions)
+to the document. Document files can also be shared externally via [share links](#share-links), [email](#email-sharing)
+or using [email](#workflow-action-email) or [webhook](#workflow-action-webhook) actions in workflows.
+
+### Share Links
+
+"Share links" are shareable public links to files and can be created and managed under the 'Send' button on the document detail screen.
+
+-   Share links do not require a user to login and thus link directly to a file.
+-   Links are unique and are of the form `{paperless-url}/share/{randomly-generated-slug}`.
+-   Links can optionally have an expiration time set.
+-   After a link expires or is deleted users will be redirected to the regular paperless-ngx login.
+
+!!! tip
+
+    If your paperless-ngx instance is behind a reverse-proxy you may want to create an exception to bypass any authentication layers that are part of your setup in order to make links truly publicly-accessible. Of course, do so with caution.
+
+### Email Sharing {#email-sharing}
+
+Paperless-ngx supports directly sending documents via email. If an email server has been [configured](configuration.md#email-sending)
+the "Send" button on the document detail page will include an "Email" option. You can also share files via email automatically by using
+a [workflow action](#workflow-action-email).
 
 ## Permissions
 
@@ -369,7 +394,7 @@ fields and permissions, which will be merged.
 
 ### Workflow Triggers
 
-#### Types
+#### Types {#workflow-trigger-types}
 
 Currently, there are three events that correspond to workflow trigger 'types':
 
@@ -429,11 +454,11 @@ Workflows allow you to filter by:
 
 ### Workflow Actions
 
-#### Types
+#### Types {#workflow-action-types}
 
 The following workflow action types are available:
 
-##### Assignment
+##### Assignment {#workflow-action-assignment}
 
 "Assignment" actions can assign:
 
@@ -443,7 +468,7 @@ The following workflow action types are available:
 -   View and / or edit permissions to users or groups
 -   Custom fields. Note that no value for the field will be set
 
-##### Removal
+##### Removal {#workflow-action-removal}
 
 "Removal" actions can remove either all of or specific sets of the following:
 
@@ -452,7 +477,7 @@ The following workflow action types are available:
 -   View and / or edit permissions
 -   Custom fields
 
-##### Email
+##### Email {#workflow-action-email}
 
 "Email" actions can send documents via email. This action requires a mail server to be [configured](configuration.md#email-sending). You can specify:
 
@@ -460,7 +485,7 @@ The following workflow action types are available:
 -   The subject and body of the email, which can include placeholders, see [placeholders](usage.md#workflow-placeholders) below
 -   Whether to include the document as an attachment
 
-##### Webhook
+##### Webhook {#workflow-action-webhook}
 
 "Webhook" actions send a POST request to a specified URL. You can specify:
 
@@ -543,19 +568,6 @@ The following custom field types are supported:
 -   `Monetary`: [ISO 4217 currency code](https://en.wikipedia.org/wiki/ISO_4217#List_of_ISO_4217_currency_codes) and a number with exactly two decimals, e.g. USD12.30
 -   `Document Link`: reference(s) to other document(s) displayed as links, automatically creates a symmetrical link in reverse
 -   `Select`: a pre-defined list of strings from which the user can choose
-
-## Share Links
-
-Paperless-ngx added the ability to create shareable links to files in version 2.0. You can find the button for this on the document detail screen.
-
--   Share links do not require a user to login and thus link directly to a file.
--   Links are unique and are of the form `{paperless-url}/share/{randomly-generated-slug}`.
--   Links can optionally have an expiration time set.
--   After a link expires or is deleted users will be redirected to the regular paperless-ngx login.
-
-!!! tip
-
-    If your paperless-ngx instance is behind a reverse-proxy you may want to create an exception to bypass any authentication layers that are part of your setup in order to make links truly publicly-accessible. Of course, do so with caution.
 
 ## PDF Actions
 
