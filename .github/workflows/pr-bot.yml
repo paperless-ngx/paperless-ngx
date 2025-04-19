@@ -76,21 +76,16 @@ jobs:
               return;
             }
 
-            const body = `
-            Hello @${user},
-
-            Thank you very much for submitting this PR to us!
-
-            This is what will happen next:
-
-            1. CI tests will run against your PR to ensure quality and consistency.
-            2. Next, human contributors from paperless-ngx review your changes.
-            3. Please address any issues that come up during the review as soon as you are able to.
-            4. If accepted, your pull request will be merged into the \`dev\` branch and changes there will be tested further.
-            5. Eventually, changes from you and other contributors will be merged into \`main\` and a new release will be made.
-
-            You'll be hearing from us soon, and thank you again for contributing to our project.
-            `;
+            const body =
+                "Hello @" + user + ",\n\n" +
+                "Thank you very much for submitting this PR to us!\n\n" +
+                "This is what will happen next:\n\n" +
+                "1. CI tests will run against your PR to ensure quality and consistency.\n" +
+                "2. Next, human contributors from paperless-ngx review your changes.\n" +
+                "3. Please address any issues that come up during the review as soon as you are able to.\n" +
+                "4. If accepted, your pull request will be merged into the `dev` branch and changes there will be tested further.\n" +
+                "5. Eventually, changes from you and other contributors will be merged into `main` and a new release will be made.\n\n" +
+                "You'll be hearing from us soon, and thank you again for contributing to our project.";
 
             await github.rest.issues.createComment({
               issue_number: pr.number,
