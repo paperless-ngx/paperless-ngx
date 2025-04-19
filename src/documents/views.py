@@ -50,10 +50,11 @@ from django.utils.timezone import make_aware
 from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 from django.views import View
-from django.views.decorators.cache import cache_control
+from django.views.decorators.cache import cache_control, cache_page
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
+from django.views.decorators.vary import vary_on_cookie
 from django.views.generic import TemplateView
 from django_elasticsearch_dsl_drf.pagination import LimitOffsetPagination
 from django_filters.rest_framework import DjangoFilterBackend
@@ -266,7 +267,12 @@ class IndexView(TemplateView):
         )
         return context
 
+class CacheListView(ListModelMixin,UpdateModelMixin):
+    @method_decorator(cache_page(60 * 60 * 2))
+    @method_decorator(vary_on_cookie)
+    def list(self, request, *args, **kwargs):
 
+        result = super().list(request, *args, **kwargs)
 class PassUserMixin(GenericAPIView):
     """
     Pass a user object to serializer
@@ -1305,11 +1311,11 @@ class UnifiedSearchViewSet(DocumentViewSet):
         self.searcher = None
 
     def get_serializer_class(self):
-        if self._is_search_request():
-            # return SearchResultSerializer
-            return SearchResultElasticSearchSerializer
-        else:
-            return DocumentSerializer
+        # if self._is_search_request():
+        #     # return SearchResultSerializer
+        # else:
+        #     return DocumentSerializer
+        return SearchResultElasticSearchSerializer
 
     def _is_search_request(self):
         return (
@@ -1319,37 +1325,57 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
 
     def filter_queryset(self, queryset):
-        if self._is_search_request():
-            # docs=convert_elastic_search(self.request.query_params.get('query'),1 , self.paginator.get_page_size(self.request))
-            # return docs
-            from documents import index
-            if "query" in self.request.query_params:
-                # query_class = index.DelayedFullTextQuery
-                query_class = index.DelayedElasticSearch
-            elif "more_like_id" in self.request.query_params:
-                # query_class = index.DelayedMoreLikeThisQuery
-                query_class = index.DelayedElasticSearchLikeMore
-
-            else:
-                raise ValueError
-            return query_class(
-                self.searcher,
-                self.request.query_params,
-                self.paginator.get_page_size(self.request),
-                self.request.user,
-            )
+        # if self._is_search_request():
+        #     # docs=convert_elastic_search(self.request.query_params.get('query'),1 , self.paginator.get_page_size(self.request))
+        #     # return docs
+        #     from documents import index
+        #     if "query" in self.request.query_params:
+        #         # query_class = index.DelayedFullTextQuery
+        #         query_class = index.DelayedElasticSearch
+        #         print('query_class',query_class)
+        #     elif "more_like_id" in self.request.query_params:
+        #         # query_class = index.DelayedMoreLikeThisQuery
+        #         query_class = index.DelayedElasticSearchLikeMore
+        #
+        #     else:
+        #         raise ValueError
+        #     return query_class(
+        #         self.searcher,
+        #         self.request.query_params,
+        #         self.paginator.get_page_size(self.request),
+        #         self.request.user,
+        #     )
+        # else:
+        #
+        #     return super().filter_queryset(queryset)
+        from documents import index
+        if "query" in self.request.query_params:
+            # query_class = index.DelayedFullTextQuery
+            query_class = index.DelayedElasticSearch
+            print('query_class', query_class)
+        elif "more_like_id" in self.request.query_params:
+            # query_class = index.DelayedMoreLikeThisQuery
+            query_class = index.DelayedElasticSearchLikeMore
+        elif "query" not in self.request.query_params:
+            query_class = index.DelayedElasticSearch
         else:
-            return super().filter_queryset(queryset)
+            raise ValueError
+        return query_class(
+            self.searcher,
+            self.request.query_params,
+            self.paginator.get_page_size(self.request),
+            self.request.user,
+        )
 
     def list(self, request, *args, **kwargs):
         if self._is_search_request():
             # from documents import index
 
             try:
-                with index.open_index_searcher() as s:
-                    self.searcher = s
-                    return super().list(request)
-                # return super().list(request)
+                # with index.open_index_searcher() as s:
+                #     self.searcher = s
+                #     return super().list(request)
+                return super().list(request)
             except NotFound:
                 raise
             except Exception as e:
