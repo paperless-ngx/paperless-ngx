@@ -1880,7 +1880,7 @@ wheels = [
 
 [[package]]
 name = "paperless-ngx"
-version = "2.15.2"
+version = "2.15.3"
 source = { virtual = "." }
 dependencies = [
     { name = "bleach", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
