@@ -2227,6 +2227,26 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             },
         )
 
+    def test_docnote_serializer_v7(self):
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will have notes!",
+        )
+        Note.objects.create(
+            note="This is a note.",
+            document=doc,
+            user=self.user,
+        )
+        self.assertEqual(
+            self.client.get(
+                f"/api/documents/{doc.pk}/",
+                headers={"Accept": "application/json; version=7"},
+                format="json",
+            ).data["notes"][0]["user"],
+            self.user.id,
+        )
+
     def test_create_note(self):
         """
         GIVEN:
