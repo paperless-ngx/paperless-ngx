@@ -413,3 +413,8 @@ Initial API version.
     list of strings. When creating or updating a custom field value of a
     document for a select type custom field, the value should be the `id` of
     the option whereas previously was the index of the option.
+
+#### Version 8
+
+-   The user field of document notes now returns a simplified user object
+    rather than just the user ID.
