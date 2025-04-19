@@ -31,6 +31,9 @@ jobs:
           excluded_files: >
             /\.lock$/
             /\.txt$/
+            ^src-ui/pnpm-lock\.yaml$
+            ^src-ui/messages\.xlf$
+            ^src/locale/en_US/LC_MESSAGES/django\.po$
 
       - name: Label bot-generated PRs
         if: ${{ contains(github.actor, 'dependabot') || contains(github.actor, 'paperlessngx-bot') }}
