@@ -1,4 +1,4 @@
-name: Paperless-ngx PR Bot
+name: PR Bot
 
 on:
   pull_request:
