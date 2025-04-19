@@ -32,6 +32,32 @@ jobs:
             /\.lock$/
             /\.txt$/
 
+      - name: Label bot-generated PRs
+        if: ${{ contains(github.actor, 'dependabot') || contains(github.actor, 'paperlessngx-bot') }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const user = pr.user.login.toLowerCase();
+            const labels = [];
+
+            if (user.includes('dependabot')) {
+              labels.push('dependencies');
+            }
+
+            if (user.includes('paperlessngx-bot')) {
+              labels.push('translation', 'skip-changelog');
+            }
+
+            if (labels.length) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels,
+              });
+            }
+
       - name: Welcome comment
         if: ${{ !contains(github.actor, 'bot') }}
         uses: actions/github-script@v7
