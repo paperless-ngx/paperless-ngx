@@ -1,5 +1,27 @@
 # Changelog
 
+## paperless-ngx 2.15.3
+
+### Bug Fixes
+
+-   Fix: do not try deleting original file that was moved to trash dir [@shamoon](https://github.com/shamoon) ([#9684](https://github.com/paperless-ngx/paperless-ngx/pull/9684))
+-   Fix: preserve non-ASCII filenames in document downloads [@shamoon](https://github.com/shamoon) ([#9702](https://github.com/paperless-ngx/paperless-ngx/pull/9702))
+-   Fix: fix breaking api change to document notes user field [@shamoon](https://github.com/shamoon) ([#9714](https://github.com/paperless-ngx/paperless-ngx/pull/9714))
+-   Fix: another doc link fix [@shamoon](https://github.com/shamoon) ([#9700](https://github.com/paperless-ngx/paperless-ngx/pull/9700))
+-   Fix: correctly handle dict data with webhook [@shamoon](https://github.com/shamoon) ([#9674](https://github.com/paperless-ngx/paperless-ngx/pull/9674))
+
+### All App Changes
+
+<details>
+<summary>5 changes</summary>
+
+-   Fix: do not try deleting original file that was moved to trash dir [@shamoon](https://github.com/shamoon) ([#9684](https://github.com/paperless-ngx/paperless-ngx/pull/9684))
+-   Fix: preserve non-ASCII filenames in document downloads [@shamoon](https://github.com/shamoon) ([#9702](https://github.com/paperless-ngx/paperless-ngx/pull/9702))
+-   Fix: fix breaking api change to document notes user field [@shamoon](https://github.com/shamoon) ([#9714](https://github.com/paperless-ngx/paperless-ngx/pull/9714))
+-   Fix: another doc link fix [@shamoon](https://github.com/shamoon) ([#9700](https://github.com/paperless-ngx/paperless-ngx/pull/9700))
+-   Fix: correctly handle dict data with webhook [@shamoon](https://github.com/shamoon) ([#9674](https://github.com/paperless-ngx/paperless-ngx/pull/9674))
+</details>
+
 ## paperless-ngx 2.15.2
 
 ### Bug Fixes
