@@ -674,6 +674,10 @@ class DocumentViewSet(
 
         archive_metadata = None
         archive_filesize = None
+
+        if doc.has_archive_version:
+            archive_filesize = self.get_filesize(doc.archive_path)
+
         if document_cached_metadata is not None:
             original_metadata = document_cached_metadata.original_metadata
             archive_metadata = document_cached_metadata.archive_metadata
@@ -682,7 +686,6 @@ class DocumentViewSet(
             original_metadata = self.get_metadata(doc.source_path, doc.mime_type)
 
             if doc.has_archive_version:
-                archive_filesize = self.get_filesize(doc.archive_path)
                 archive_metadata = self.get_metadata(
                     doc.archive_path,
                     "application/pdf",
