@@ -66,6 +66,16 @@ jobs:
             const pr = context.payload.pull_request;
             const user = pr.user.login;
 
+            const { data: members } = await github.rest.orgs.listMembers({
+              org: 'paperless-ngx',
+            });
+
+            const memberLogins = members.map(m => m.login.toLowerCase());
+            if (memberLogins.includes(user.toLowerCase())) {
+              core.info('Skipping comment: user is org member');
+              return;
+            }
+
             const body = `
             Hello @${user},
 
