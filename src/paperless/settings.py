@@ -342,10 +342,10 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.AcceptHeaderVersioning",
-    "DEFAULT_VERSION": "7",
+    "DEFAULT_VERSION": "8",
     # Make sure these are ordered and that the most recent version appears
     # last. See api.md#api-versioning when adding new versions.
-    "ALLOWED_VERSIONS": ["1", "2", "3", "4", "5", "6", "7"],
+    "ALLOWED_VERSIONS": ["1", "2", "3", "4", "5", "6", "7", "8"],
     # DRF Spectacular default schema
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-14 08:54-0700\n"
-"PO-Revision-Date: 2025-04-14 15:55\n"
+"POT-Creation-Date: 2025-04-19 15:13-0700\n"
+"PO-Revision-Date: 2025-04-19 22:15\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -1174,12 +1174,12 @@ msgstr "Expressão regular inválida: %(error)s"
 msgid "Invalid color."
 msgstr "Cor inválida."
 
-#: documents/serialisers.py:1600
+#: documents/serialisers.py:1614
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Tipo de arquivo %(type)s não suportado"
 
-#: documents/serialisers.py:1689
+#: documents/serialisers.py:1703
 msgid "Invalid variable detected."
 msgstr "Variável inválida detectada."
 
