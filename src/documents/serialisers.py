@@ -877,6 +877,20 @@ class NotesSerializer(serializers.ModelSerializer):
         fields = ["id", "note", "created", "user"]
         ordering = ["-created"]
 
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+
+        request = self.context.get("request")
+        api_version = int(
+            request.version if request else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
+        )
+
+        if api_version < 8:
+            user_id = ret["user"]["id"]
+            ret["user"] = user_id
+
+        return ret
+
 
 class DocumentSerializer(
     OwnedObjectSerializer,

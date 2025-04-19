@@ -77,6 +77,7 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { getFilenameFromContentDisposition } from 'src/app/utils/http'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
@@ -999,12 +1000,10 @@ export class DocumentDetailComponent
       .get(downloadUrl, { observe: 'response', responseType: 'blob' })
       .subscribe({
         next: (response: HttpResponse<Blob>) => {
-          const filename = response.headers
-            .get('Content-Disposition')
-            ?.split(';')
-            ?.find((part) => part.trim().startsWith('filename='))
-            ?.split('=')[1]
-            ?.replace(/['"]/g, '')
+          const contentDisposition = response.headers.get('Content-Disposition')
+          const filename =
+            getFilenameFromContentDisposition(contentDisposition) ||
+            this.document.title
           const blob = new Blob([response.body], {
             type: response.body.type,
           })

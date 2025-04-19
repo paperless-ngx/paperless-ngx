@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-14 08:54-0700\n"
-"PO-Revision-Date: 2025-04-14 15:55\n"
+"POT-Creation-Date: 2025-04-19 15:13-0700\n"
+"PO-Revision-Date: 2025-04-19 22:14\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -1173,12 +1173,12 @@ msgstr "無效的正則表達式：%(error)s"
 msgid "Invalid color."
 msgstr "無效的顏色。"
 
-#: documents/serialisers.py:1600
+#: documents/serialisers.py:1614
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "不支援檔案類型 %(type)s"
 
-#: documents/serialisers.py:1689
+#: documents/serialisers.py:1703
 msgid "Invalid variable detected."
 msgstr "偵測到無效的變數。"
 

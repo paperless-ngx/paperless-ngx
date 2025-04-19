@@ -349,11 +349,15 @@ def cleanup_document_deletion(sender, instance, **kwargs):
                 )
                 return
 
-        for filename in (
-            instance.source_path,
+        files = (
             instance.archive_path,
             instance.thumbnail_path,
-        ):
+        )
+        if not settings.EMPTY_TRASH_DIR:
+            # Only delete the original file if we are not moving it to trash dir
+            files += (instance.source_path,)
+
+        for filename in files:
             if filename and os.path.isfile(filename):
                 try:
                     os.unlink(filename)
@@ -622,20 +626,30 @@ def send_webhook(
     as_json: bool = False,
 ):
     try:
+        post_args = {
+            "url": url,
+            "headers": headers,
+            "files": files,
+        }
         if as_json:
-            httpx.post(
-                url,
-                json=data,
-                files=files,
-                headers=headers,
-            ).raise_for_status()
+            post_args["json"] = data
+        elif isinstance(data, dict):
+            post_args["data"] = data
         else:
-            httpx.post(
-                url,
-                content=data,
-                files=files,
-                headers=headers,
-            ).raise_for_status()
+            post_args["content"] = data
+
+        httpx.post(
+            **post_args,
+        ).raise_for_status()
+        logger.info(
+            f"Webhook sent to {url}",
+        )
+    except Exception as e:
+        logger.error(
+            f"Failed attempt sending webhook to {url}: {e}",
+        )
+        raise e
+
         logger.info(
             f"Webhook sent to {url}",
         )

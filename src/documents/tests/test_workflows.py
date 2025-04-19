@@ -2614,7 +2614,7 @@ class TestWorkflows(
             )
 
             mock_post.assert_called_once_with(
-                "http://paperless-ngx.com",
+                url="http://paperless-ngx.com",
                 content="Test message",
                 headers={},
                 files=None,
@@ -2622,6 +2622,20 @@ class TestWorkflows(
 
             expected_str = "Webhook sent to http://paperless-ngx.com"
             self.assertIn(expected_str, cm.output[0])
+
+            # with dict
+            send_webhook(
+                url="http://paperless-ngx.com",
+                data={"message": "Test message"},
+                headers={},
+                files=None,
+            )
+            mock_post.assert_called_with(
+                url="http://paperless-ngx.com",
+                data={"message": "Test message"},
+                headers={},
+                files=None,
+            )
 
     @mock.patch("httpx.post")
     def test_workflow_webhook_send_webhook_retry(self, mock_http):
