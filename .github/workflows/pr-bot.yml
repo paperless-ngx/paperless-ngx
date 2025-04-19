@@ -1,91 +1,44 @@
 name: PR Bot
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened]
 
 permissions:
   contents: read
   pull-requests: write
-  issues: write
 
 jobs:
-  label-and-comment:
+  pr-bot:
+    name: Automated PR Bot
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Label by file path
+        uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get PR Diff
-        id: diff
-        run: |
-          curl -sSL -H "Accept: application/vnd.github.v3.diff" \
-            "${{ github.event.pull_request.url }}" > pr.diff
+      - name: Label by size
+        uses: Gascon1/pr-size-labeler@v1.3.0
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          xs_label: 'small-change'
+          xs_diff: '9'
+          s_label: 'non-trivial'
+          s_diff: '99999'
+          fail_if_xl: 'false'
+          excluded_files: >
+            /\.lock$/
+            /\.txt$/
 
-      - name: Determine Labels and Comment
-        id: label-and-comment
+      - name: Welcome comment
+        if: ${{ !contains(github.actor, 'bot') }}
         uses: actions/github-script@v7
         with:
           script: |
-            const fs = require('fs');
-            const diff = fs.readFileSync('pr.diff', 'utf8');
-            const user = context.payload.pull_request.user.login;
-            const isBot = user.includes('bot');
-            const labels = new Set();
-            let changeCount = 0;
-
-            // Simple diff parsing
-            const files = diff.match(/^diff --git a\/(.+?) b\//gm)?.map(line => line.split(' ')[2]) || [];
-
-            for (const file of files) {
-              if (file.startsWith('src/')) labels.add('backend');
-              if (file.startsWith('pyproject.toml')) labels.add('backend');
-              if (file.startsWith('src-ui/')) labels.add('frontend');
-              if (file.startsWith('docs/')) labels.add('documentation');
-              if (file.startsWith('.github/')) labels.add('ci-cd');
-            }
-
-            // Change size estimate (added lines > 2 chars, non-docs)
-            const addedLines = diff.match(/^\+[^+]/gm) || [];
-            for (const line of addedLines) {
-              const trimmed = line.slice(1).trim();
-              if (trimmed.length > 2 && !/\.(md|rst|txt|lock)$/.test(line)) {
-                changeCount++;
-              }
-            }
-
-            if (changeCount < 10) labels.add('small-change');
-            else labels.add('non-trivial');
-
-            if (user.includes('dependabot')) {
-              labels.clear();
-              labels.add('dependencies');
-            }
-
-            if (user.includes('paperlessngx-bot')) {
-              labels.add('skip-changelog');
-              labels.add('translation');
-            }
-
-            core.setOutput('labels', JSON.stringify([...labels]));
-            core.setOutput('should_comment', (!isBot).toString());
-            core.setOutput('user', user);
-
-      - name: Apply Labels
-        if: steps.label-and-comment.outputs.labels != '[]'
-        run: |
-          gh pr edit ${{ github.event.pull_request.number }} \
-            --add-label $(echo '${{ steps.label-and-comment.outputs.labels }}' | jq -r '. | join(",")')
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Comment on PR
-        if: steps.label-and-comment.outputs.should_comment == 'true'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const user = '${{ steps.label-and-comment.outputs.user }}';
+            const pr = context.payload.pull_request;
+            const user = pr.user.login;
 
             const body = `
             Hello @${user},
@@ -95,7 +48,7 @@ jobs:
             This is what will happen next:
 
             1. CI tests will run against your PR to ensure quality and consistency.
-            2. Next, human contributors from paperless-ngx review your changes. ${reviewNote}
+            2. Next, human contributors from paperless-ngx review your changes.
             3. Please address any issues that come up during the review as soon as you are able to.
             4. If accepted, your pull request will be merged into the \`dev\` branch and changes there will be tested further.
             5. Eventually, changes from you and other contributors will be merged into \`main\` and a new release will be made.
@@ -104,7 +57,7 @@ jobs:
             `;
 
             await github.rest.issues.createComment({
-              issue_number: context.issue.number,
+              issue_number: pr.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body,
