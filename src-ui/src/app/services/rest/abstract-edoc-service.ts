@@ -86,7 +86,7 @@ export abstract class AbstractEdocService<T extends ObjectWithId> {
         httpParams = httpParams.set(extraParamKey, extraParams[extraParamKey])
       }
     }
-    return this.http.get<SelectionData>(this.getResourceUrl(null, 'selection_query_data'), {
+    return this.http.get<SelectionData>(this.getResourceUrl(null,'statistics'), {
       params: httpParams,
     })
   }

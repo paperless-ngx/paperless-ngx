@@ -1315,6 +1315,9 @@ class UnifiedSearchViewSet(DocumentViewSet):
         #     # return SearchResultSerializer
         # else:
         #     return DocumentSerializer
+        if 'pk' in self.kwargs:  # `self.kwargs` chứa các tham số từ URL (vd: /documents/<id>)
+            return DocumentDetailSerializer
+
         return SearchResultElasticSearchSerializer
 
     def _is_search_request(self):
@@ -1348,16 +1351,17 @@ class UnifiedSearchViewSet(DocumentViewSet):
         # else:
         #
         #     return super().filter_queryset(queryset)
+
+        if 'pk' in self.kwargs:  # `self.kwargs` chứa các tham số từ URL, ví dụ: /documents/<id>
+            return super().filter_queryset(queryset)
+
         from documents import index
         if "query" in self.request.query_params:
-            # query_class = index.DelayedFullTextQuery
             query_class = index.DelayedElasticSearch
-            print('query_class', query_class)
+        if "query" not in self.request.query_params:
+            query_class = index.DelayedElasticSearch
         elif "more_like_id" in self.request.query_params:
-            # query_class = index.DelayedMoreLikeThisQuery
             query_class = index.DelayedElasticSearchLikeMore
-        elif "query" not in self.request.query_params:
-            query_class = index.DelayedElasticSearch
         else:
             raise ValueError
         return query_class(
@@ -1368,13 +1372,30 @@ class UnifiedSearchViewSet(DocumentViewSet):
         )
 
     def list(self, request, *args, **kwargs):
-        if self._is_search_request():
-            # from documents import index
 
+        # if self._is_search_request():
+        #     # from documents import index
+        #
+        #     try:
+        #         # with index.open_index_searcher() as s:
+        #         #     self.searcher = s
+        #         #     return super().list(request)
+        #         return super().list(request)
+        #     except NotFound:
+        #         raise
+        #     except Exception as e:
+        #         traceback.print_exc()
+        #         logger.warning(f"An error occurred listing search results: {e!s}")
+        #         return HttpResponseBadRequest(
+        #             "Error listing search results, check logs for more detail.",
+        #         )
+        # else:
+        #     return super().list(request)
+
+        if self._is_search_request():
             try:
-                # with index.open_index_searcher() as s:
-                #     self.searcher = s
-                #     return super().list(request)
+                with index.open_index_searcher() as s:
+                    self.searcher = s
                 return super().list(request)
             except NotFound:
                 raise
@@ -1385,7 +1406,6 @@ class UnifiedSearchViewSet(DocumentViewSet):
                     "Error listing search results, check logs for more detail.",
                 )
         else:
-            # print('da vào list', request.__dict__)
             return super().list(request)
 
     @action(detail=False, methods=["GET"], name="Get Next ASN")
@@ -1396,6 +1416,20 @@ class UnifiedSearchViewSet(DocumentViewSet):
             "archive_serial_number__max",
         )
         return Response(max_asn + 1)
+
+    @action(detail=False, methods=["GET"],
+            name="Statistics by Tags and Document Types")
+    def statistics(self, request, *args, **kwargs):
+        # Tạo truy vấn cơ bản từ query params
+
+        query_class = index.DelayedElasticSearch(self.searcher,
+            self.request.query_params,
+            self.paginator.get_page_size(self.request),
+            self.request.user)
+
+        response = query_class.search_statistics()
+        return Response(response, status=status.HTTP_200_OK)
+
 
 
 class LogViewSet(ViewSet):

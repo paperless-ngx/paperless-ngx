@@ -234,8 +234,8 @@ def remove_document_from_index(document: Document):
 
 class DelayedQuery:
     param_map = {
-        "title": ("title", ["icontains"]),
-        "title_content": ("title_content", ["icontains"]),
+        # "title": ("title", ["icontains"]),
+        # "title_content": ("title_content", ["icontains"]),
         "correspondent": ("correspondent", ["id", "id__in", "id__none", "isnull"]),
         "archive_font": ("archive_font", ["id", "id__in", "id__none", "isnull"]),
         "warehouse": ("warehouse", ["id", "id__in", "id__none", "isnull"]),
@@ -432,6 +432,45 @@ class LocalDateParser(English):
             d = self.reverse_timezone_offset(d)
         return d
 
+class StatisticElasticSearch():
+    def get_statistics(self):
+        query = {
+            "size": 0,
+            "aggs": {
+                "tags_stats": {
+                    "terms": {"field": "tag_id", "size": 100}
+                },
+                "document_type_stats": {
+                    "terms": {"field": "document_type_id", "size": 100}
+                },
+                "warehouse_stats": {
+                    "terms": {"field": "warehouse_id", "size": 100}
+                }
+            }
+        }
+        s = Search(
+            index=ELASTIC_SEARCH_DOCUMENT_INDEX)
+        s = s.query(query)
+        response = s.execute()
+
+        # Xử lý kết quả trả về
+        return {
+            "selected_tags": [
+                {"id": bucket["key"], "document_count": bucket["doc_count"]}
+                for bucket in response["aggregations"]["tags_stats"]["buckets"]
+            ],
+            "selected_document_types": [
+                {"id": bucket["key"], "document_count": bucket["doc_count"]}
+                for bucket in
+                response["aggregations"]["document_type_stats"]["buckets"]
+            ],
+            "selected_warehouses": [
+                {"id": bucket["key"], "document_count": bucket["doc_count"]}
+                for bucket in
+                response["aggregations"]["warehouse_stats"]["buckets"]
+            ]
+        }
+
 
 class DelayedFullTextQuery(DelayedQuery):
     def _get_query(self):
@@ -512,7 +551,7 @@ class DelayedElasticSearch(DelayedQuery):
         cleaned_string = cleaned_string.replace('"', '')
         normal_query = []
 
-        if cleaned_string:
+        if cleaned_string and 'query' in self.query_params:
             normal_query = [
                 Q("multi_match",
                   type="phrase",
@@ -554,14 +593,16 @@ class DelayedElasticSearch(DelayedQuery):
             if key == "title_content":
                 criterias.append(
                     Q("bool", should=[
-                        Q("match", **{"title": value}),
-                        Q("match", **{"content": value})
+                        Q("match_phrase_prefix", **{"title": value}),
+                        Q("match_phrase_prefix", **{"content": value})
                     ])
                 )
                 continue
-
-            # criterias.append(Q("match", **{"title": value}))
-            #     criterias.append(Q("match", **{"content": value}))
+            if key == "title__icontains":
+                criterias.append(
+                   Q("match_phrase_prefix", **{"title": value})
+                )
+                continue
 
             if "__" not in key:
                 continue
@@ -589,7 +630,7 @@ class DelayedElasticSearch(DelayedQuery):
                     criterias.append(Q("bool", should=in_filter))
                     continue
                 elif field in {"tag"}:
-                    in_filter = [Q("term", **{f"tags.id": int(object_id)}) for
+                    in_filter = [Q("term", **{f"tag_id": int(object_id)}) for
                                  object_id in value.split(",")]
                     criterias.append(Q("bool", should=in_filter))
                     continue
@@ -655,7 +696,8 @@ class DelayedElasticSearch(DelayedQuery):
         # Thêm phần sắp xếp vào truy vấn cuối cùng
         query_body = {
             "query": combined_query.to_dict(),
-            "sort": [sort_order] if sort_order else []
+            "sort": [sort_order] if sort_order else [],
+
         }
 
         return query_body
@@ -672,11 +714,54 @@ class DelayedElasticSearch(DelayedQuery):
         s = s.highlight('content', fragment_size=500, number_of_fragments=1,
                         pre_tags=['<span class="match">'],
                         post_tags=['</span>'])
-        s = s.source(['id'])
+        s = s.source(['id', 'warehouse_path'])
         s = s[page_number * page_size - page_size:page_number * page_size]
         response = s.execute()
-        print(f'ket qua \n{response} \nquery:{query_combined}')
+        print('search_pagination', response)
+        # print(self.search_statistics())
         return response
+
+
+
+    def search_statistics(self):
+        query_combined = self.get_combined_query()
+        aggregations = {
+            "tags_stats": {
+                "terms": {"field": "tag_id", "size": 100}
+            },
+            "document_type_stats": {
+                "terms": {"field": "document_type_id", "size": 100}
+            },
+            "warehouse_stats": {
+                "terms": {"field": "warehouse_id", "size": 100}
+            }
+        }
+        query_combined['aggs'] = aggregations
+        statistics_query = {
+            "query": query_combined['query'],
+            "aggs": query_combined["aggs"]
+        }
+
+        # Thực hiện query
+        response = Search().from_dict(statistics_query).index(
+            ELASTIC_SEARCH_DOCUMENT_INDEX).execute()
+
+        # Xử lý kết quả từ aggregations
+        statistics = {
+            "selected_tags": [
+                {"id": bucket["key"], "document_count": bucket["doc_count"]}
+                for bucket in response.aggregations.tags_stats.buckets
+            ],
+            "selected_document_types": [
+                {"id": bucket["key"], "document_count": bucket["doc_count"]}
+                for bucket in response.aggregations.document_type_stats.buckets
+            ],
+            "selected_warehouses": [
+                {"id": bucket["key"], "document_count": bucket["doc_count"]}
+                for bucket in response.aggregations.warehouse_stats.buckets
+            ]
+        }
+        return statistics
 
     def search_get_all(self):
         s = Search(
@@ -705,6 +790,11 @@ class DelayedElasticSearch(DelayedQuery):
         page_num = math.floor(item.start / self.page_size) + 1
         page_len = self.page_size
         # response = convert_elastic_search(self.query_params["query"], page_num , page_len)
+
+        if self.query_params.get("statistic", False):
+            response = self.search_statistics()
+            return response
+
         response = self.search_pagination(self.query_params.get("query",''), page_num , page_len)
 
         # print('tim____:',datetime.now() -start)
@@ -716,7 +806,7 @@ class DelayedElasticSearch(DelayedQuery):
                 # "correspondent",
                 # "storage_path",
                 # "document_type",
-                "warehouse",
+                # "warehouse",
                 # "folder",
                 # "owner",
             )
@@ -767,19 +857,6 @@ class DelayedElasticSearch(DelayedQuery):
         # page.results.doc = []
         if not self.first_score and len(page.results) > 0 and sortedby is None:
             self.first_score = getattr(page.results[0].meta, 'score')
-        # page.results.top_n = list(
-        #     map(
-        #         lambda hit: (
-        #             (hit[0] / self.first_score) if self.first_score else None,
-        #             hit[1],
-        #         ),
-        #         page.results.top_n,
-        #     ),
-        # )
-        # print(page.results)
-        # page.total = 1000
-
-
         self.saved_results[item.start] = page
         return page
 
