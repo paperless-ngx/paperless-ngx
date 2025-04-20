@@ -115,6 +115,43 @@ def refresh_suggestions_cache(
     cache.touch(doc_key, timeout)
 
 
+def get_llm_suggestion_cache(
+    document_id: int,
+    backend: str,
+) -> SuggestionCacheData | None:
+    doc_key = get_suggestion_cache_key(document_id)
+    data: SuggestionCacheData = cache.get(doc_key)
+
+    if data and data.classifier_version == 1000 and data.classifier_hash == backend:
+        return data
+
+    return None
+
+
+def set_llm_suggestions_cache(
+    document_id: int,
+    suggestions: dict,
+    *,
+    backend: str,
+    timeout: int = CACHE_50_MINUTES,
+) -> None:
+    """
+    Cache LLM-generated suggestions using a backend-specific identifier (e.g. 'openai:gpt-4').
+    """
+    from documents.caching import SuggestionCacheData
+
+    doc_key = get_suggestion_cache_key(document_id)
+    cache.set(
+        doc_key,
+        SuggestionCacheData(
+            classifier_version=1000,  # Unique marker for LLM-based suggestion
+            classifier_hash=backend,
+            suggestions=suggestions,
+        ),
+        timeout,
+    )
+
+
 def get_metadata_cache_key(document_id: int) -> str:
     """
     Returns the basic key for a document's metadata

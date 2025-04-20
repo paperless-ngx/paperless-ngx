@@ -77,13 +77,20 @@ from rest_framework.viewsets import ViewSet
 
 from documents import bulk_edit
 from documents import index
+from documents.ai.llm_classifier import get_ai_document_classification
+from documents.ai.matching import match_correspondents_by_name
+from documents.ai.matching import match_document_types_by_name
+from documents.ai.matching import match_storage_paths_by_name
+from documents.ai.matching import match_tags_by_name
 from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
+from documents.caching import get_llm_suggestion_cache
 from documents.caching import get_metadata_cache
 from documents.caching import get_suggestion_cache
 from documents.caching import refresh_metadata_cache
 from documents.caching import refresh_suggestions_cache
+from documents.caching import set_llm_suggestions_cache
 from documents.caching import set_metadata_cache
 from documents.caching import set_suggestions_cache
 from documents.classifier import load_classifier
@@ -763,37 +770,84 @@ class DocumentViewSet(
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
-        document_suggestions = get_suggestion_cache(doc.pk)
+        if settings.AI_CLASSIFICATION_ENABLED:
+            cached = get_llm_suggestion_cache(doc.pk, backend=settings.LLM_BACKEND)
 
-        if document_suggestions is not None:
-            refresh_suggestions_cache(doc.pk)
-            return Response(document_suggestions.suggestions)
+            if cached:
+                refresh_suggestions_cache(doc.pk)
+                return Response(cached.suggestions)
 
-        classifier = load_classifier()
+            llm_resp = get_ai_document_classification(doc)
+            resp_data = {
+                "title": llm_resp.get("title"),
+                "tags": [
+                    t.id
+                    for t in match_tags_by_name(llm_resp.get("tags", []), request.user)
+                ],
+                "correspondents": [
+                    c.id
+                    for c in match_correspondents_by_name(
+                        llm_resp.get("correspondents", []),
+                        request.user,
+                    )
+                ],
+                "document_types": [
+                    d.id
+                    for d in match_document_types_by_name(
+                        llm_resp.get("document_types", []),
+                    )
+                ],
+                "storage_paths": [
+                    s.id
+                    for s in match_storage_paths_by_name(
+                        llm_resp.get("storage_paths", []),
+                        request.user,
+                    )
+                ],
+                "dates": llm_resp.get("dates", []),
+            }
 
-        dates = []
-        if settings.NUMBER_OF_SUGGESTED_DATES > 0:
-            gen = parse_date_generator(doc.filename, doc.content)
-            dates = sorted(
-                {i for i in itertools.islice(gen, settings.NUMBER_OF_SUGGESTED_DATES)},
-            )
+            set_llm_suggestions_cache(doc.pk, resp_data, backend=settings.LLM_BACKEND)
+        else:
+            document_suggestions = get_suggestion_cache(doc.pk)
 
-        resp_data = {
-            "correspondents": [
-                c.id for c in match_correspondents(doc, classifier, request.user)
-            ],
-            "tags": [t.id for t in match_tags(doc, classifier, request.user)],
-            "document_types": [
-                dt.id for dt in match_document_types(doc, classifier, request.user)
-            ],
-            "storage_paths": [
-                dt.id for dt in match_storage_paths(doc, classifier, request.user)
-            ],
-            "dates": [date.strftime("%Y-%m-%d") for date in dates if date is not None],
-        }
+            if document_suggestions is not None:
+                refresh_suggestions_cache(doc.pk)
+                return Response(document_suggestions.suggestions)
 
-        # Cache the suggestions and the classifier hash for later
-        set_suggestions_cache(doc.pk, resp_data, classifier)
+            classifier = load_classifier()
+
+            dates = []
+            if settings.NUMBER_OF_SUGGESTED_DATES > 0:
+                gen = parse_date_generator(doc.filename, doc.content)
+                dates = sorted(
+                    {
+                        i
+                        for i in itertools.islice(
+                            gen,
+                            settings.NUMBER_OF_SUGGESTED_DATES,
+                        )
+                    },
+                )
+
+            resp_data = {
+                "correspondents": [
+                    c.id for c in match_correspondents(doc, classifier, request.user)
+                ],
+                "tags": [t.id for t in match_tags(doc, classifier, request.user)],
+                "document_types": [
+                    dt.id for dt in match_document_types(doc, classifier, request.user)
+                ],
+                "storage_paths": [
+                    dt.id for dt in match_storage_paths(doc, classifier, request.user)
+                ],
+                "dates": [
+                    date.strftime("%Y-%m-%d") for date in dates if date is not None
+                ],
+            }
+
+            # Cache the suggestions and the classifier hash for later
+            set_suggestions_cache(doc.pk, resp_data, classifier)
 
         return Response(resp_data)
 
