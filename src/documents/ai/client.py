@@ -1,5 +1,9 @@
+import logging
+
 import httpx
 from django.conf import settings
+
+logger = logging.getLogger("paperless.ai.client")
 
 
 def run_llm_query(prompt: str) -> str:
