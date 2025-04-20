@@ -33,12 +33,14 @@ def get_ai_document_classification(document: Document) -> dict:
     """
 
     try:
+        logger.debug(f"LLM classification prompt: {prompt}")
         result = run_llm_query(prompt)
+        logger.debug(f"LLM classification result: {result}")
         suggestions = parse_llm_classification_response(result)
-        return suggestions
-    except Exception as e:
-        logger.error(f"Error during LLM classification: {e}")
-        return None
+        return suggestions or {}
+    except Exception:
+        logger.exception("Error during LLM classification: %s", exc_info=True)
+        return {}
 
 
 def parse_llm_classification_response(text: str) -> dict:
