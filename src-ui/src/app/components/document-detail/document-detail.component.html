@@ -72,16 +72,6 @@
     </div>
   </div>
 
-  <pngx-custom-fields-dropdown
-    *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
-    [documentId]="documentId"
-    [disabled]="!userCanEdit"
-    [existingFields]="document?.custom_fields"
-    (created)="refreshCustomFields()"
-    (added)="addField($event)">
-  </pngx-custom-fields-dropdown>
-
-
   <div class="ms-auto" ngbDropdown>
     <button class="btn btn-sm btn-outline-primary" id="sendDropdown" ngbDropdownToggle>
       <i-bs name="send"></i-bs>
@@ -102,7 +92,7 @@
 </pngx-page-header>
 
 <div class="row">
-  <div class="col-md-6 col-xl-4 mb-4">
+  <div class="col-md-6 col-xl-5 mb-4">
 
     <form [formGroup]='documentForm' (ngSubmit)="save()">
 
@@ -118,6 +108,30 @@
             <i-bs width="1.2em" height="1.2em" name="arrow-right"></i-bs>
           </button>
         </div>
+
+        <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
+          <div class="btn-group pb-3 ms-auto">
+            <button type="button" class="btn btn-sm btn-outline-primary" (click)="getSuggestions()" [disabled]="!userCanEdit || suggestions || suggestionsLoading" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
+              @if (suggestionsLoading) {
+                <div class="spinner-border spinner-border-sm" role="status"></div>
+              } @else {
+                <i-bs width="1.2em" height="1.2em" name="stars"></i-bs>
+              }
+              <span class="d-none d-lg-inline ps-1" i18n>Suggest</span>
+            </button>
+          </div>
+
+          <div class="btn-group pb-3 ms-2">
+            <pngx-custom-fields-dropdown
+              *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
+              [documentId]="documentId"
+              [disabled]="!userCanEdit"
+              [existingFields]="document?.custom_fields"
+              (created)="refreshCustomFields()"
+              (added)="addField($event)">
+            </pngx-custom-fields-dropdown>
+          </div>
+        </ng-container>
 
         <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
       </div>
@@ -351,14 +365,14 @@
     </form>
   </div>
 
-  <div class="col-md-6 col-xl-8 mb-3 d-none d-md-block position-relative" #pdfPreview>
+  <div class="col-md-6 col-xl-7 mb-3 d-none d-md-block position-relative" #pdfPreview>
     <ng-container *ngTemplateOutlet="previewContent"></ng-container>
   </div>
 
 </div>
 
 <ng-template #saveButtons>
-  <div class="btn-group pb-3 ms-auto">
+  <div class="btn-group pb-3 ms-4">
     <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
       <button type="submit" class="order-3 btn btn-sm btn-primary" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save</button>
       @if (hasNext()) {
