@@ -74,6 +74,7 @@ import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -641,25 +642,30 @@ export class DocumentDetailComponent
         PermissionType.Document
       )
     ) {
-      this.documentsService
-        .getSuggestions(doc.id)
-        .pipe(
-          first(),
-          takeUntil(this.unsubscribeNotifier),
-          takeUntil(this.docChangeNotifier)
-        )
-        .subscribe({
-          next: (result) => {
-            this.suggestions = result
-          },
-          error: (error) => {
-            this.suggestions = null
-            this.toastService.showError(
-              $localize`Error retrieving suggestions.`,
-              error
+      this.tagService.getCachedMany(doc.tags).subscribe((tags) => {
+        // only show suggestions if document has inbox tags
+        if (tags.some((tag) => tag.is_inbox_tag)) {
+          this.documentsService
+            .getSuggestions(doc.id)
+            .pipe(
+              first(),
+              takeUntil(this.unsubscribeNotifier),
+              takeUntil(this.docChangeNotifier)
             )
-          },
-        })
+            .subscribe({
+              next: (result) => {
+                this.suggestions = result
+              },
+              error: (error) => {
+                this.suggestions = null
+                this.toastService.showError(
+                  $localize`Error retrieving suggestions.`,
+                  error
+                )
+              },
+            })
+        }
+      })
     }
     this.title = this.documentTitlePipe.transform(doc.title)
     const docFormValues = Object.assign({}, doc)
