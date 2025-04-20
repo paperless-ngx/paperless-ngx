@@ -770,7 +770,7 @@ class DocumentViewSet(
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
-        if settings.AI_CLASSIFICATION_ENABLED:
+        if settings.AI_ENABLED:
             cached = get_llm_suggestion_cache(doc.pk, backend=settings.LLM_BACKEND)
 
             if cached:
