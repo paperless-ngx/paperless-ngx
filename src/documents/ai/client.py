@@ -7,9 +7,20 @@ logger = logging.getLogger("paperless.ai.client")
 
 
 def run_llm_query(prompt: str) -> str:
-    if settings.LLM_BACKEND == "ollama":
-        return _run_ollama_query(prompt)
-    return _run_openai_query(prompt)
+    logger.debug(
+        "Running LLM query against %s with model %s",
+        settings.LLM_BACKEND,
+        settings.LLM_MODEL,
+    )
+    match settings.LLM_BACKEND:
+        case "openai":
+            result = _run_openai_query(prompt)
+        case "ollama":
+            result = _run_ollama_query(prompt)
+        case _:
+            raise ValueError(f"Unsupported LLM backend: {settings.LLM_BACKEND}")
+    logger.debug("LLM query result: %s", result)
+    return result
 
 
 def _run_ollama_query(prompt: str) -> str:

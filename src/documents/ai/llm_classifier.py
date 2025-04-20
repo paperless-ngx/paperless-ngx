@@ -15,6 +15,9 @@ def get_ai_document_classification(document: Document) -> dict:
     filename = document.filename or ""
     content = document.content or ""
 
+    # Limit the content to 10k characters
+    content = content[:10000]
+
     prompt = f"""
     You are a document classification assistant. Based on the content below, return a JSON object suggesting the following classification fields:
     - title: A descriptive title for the document
@@ -33,9 +36,7 @@ def get_ai_document_classification(document: Document) -> dict:
     """
 
     try:
-        logger.debug(f"LLM classification prompt: {prompt}")
         result = run_llm_query(prompt)
-        logger.debug(f"LLM classification result: {result}")
         suggestions = parse_llm_classification_response(result)
         return suggestions or {}
     except Exception:
