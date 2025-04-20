@@ -1,4 +1,6 @@
 export interface DocumentSuggestions {
+  title?: string
+
   tags?: number[]
 
   correspondents?: number[]
