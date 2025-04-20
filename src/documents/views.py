@@ -1315,9 +1315,11 @@ class UnifiedSearchViewSet(DocumentViewSet):
         #     # return SearchResultSerializer
         # else:
         #     return DocumentSerializer
+
+        if self.request.method in  ["POST", "PUT"]:
+            return DocumentSerializer
         if 'pk' in self.kwargs:  # `self.kwargs` chứa các tham số từ URL (vd: /documents/<id>)
             return DocumentDetailSerializer
-
         return SearchResultElasticSearchSerializer
 
     def _is_search_request(self):
@@ -1328,30 +1330,6 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
 
     def filter_queryset(self, queryset):
-        # if self._is_search_request():
-        #     # docs=convert_elastic_search(self.request.query_params.get('query'),1 , self.paginator.get_page_size(self.request))
-        #     # return docs
-        #     from documents import index
-        #     if "query" in self.request.query_params:
-        #         # query_class = index.DelayedFullTextQuery
-        #         query_class = index.DelayedElasticSearch
-        #         print('query_class',query_class)
-        #     elif "more_like_id" in self.request.query_params:
-        #         # query_class = index.DelayedMoreLikeThisQuery
-        #         query_class = index.DelayedElasticSearchLikeMore
-        #
-        #     else:
-        #         raise ValueError
-        #     return query_class(
-        #         self.searcher,
-        #         self.request.query_params,
-        #         self.paginator.get_page_size(self.request),
-        #         self.request.user,
-        #     )
-        # else:
-        #
-        #     return super().filter_queryset(queryset)
-
         if 'pk' in self.kwargs:  # `self.kwargs` chứa các tham số từ URL, ví dụ: /documents/<id>
             return super().filter_queryset(queryset)
 
@@ -1373,24 +1351,6 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
     def list(self, request, *args, **kwargs):
 
-        # if self._is_search_request():
-        #     # from documents import index
-        #
-        #     try:
-        #         # with index.open_index_searcher() as s:
-        #         #     self.searcher = s
-        #         #     return super().list(request)
-        #         return super().list(request)
-        #     except NotFound:
-        #         raise
-        #     except Exception as e:
-        #         traceback.print_exc()
-        #         logger.warning(f"An error occurred listing search results: {e!s}")
-        #         return HttpResponseBadRequest(
-        #             "Error listing search results, check logs for more detail.",
-        #         )
-        # else:
-        #     return super().list(request)
 
         if self._is_search_request():
             try:
