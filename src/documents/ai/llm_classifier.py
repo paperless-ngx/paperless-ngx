@@ -15,24 +15,37 @@ def get_ai_document_classification(document: Document) -> dict:
     filename = document.filename or ""
     content = document.content or ""
 
-    # Limit the content to 10k characters
-    content = content[:10000]
-
     prompt = f"""
-    You are a document classification assistant. Based on the content below, return a JSON object suggesting the following classification fields:
-    - title: A descriptive title for the document
-    - tags: A list of tags that describe the document (e.g. ["medical", "insurance"])
-    - correspondent: Who sent or issued this document (e.g. "Kaiser Permanente")
-    - document_types: The type or category (e.g. "invoice", "medical record", "statement")
-    - storage_paths: Suggested storage folders (e.g. "Insurance/2024")
-    - dates: Up to 3 dates in ISO format (YYYY-MM-DD) found in the document, relevant to its content
+    You are an assistant that extracts structured information from documents.
+    Only respond with the JSON object as described below.
+    Never ask for further information, additional content or ask questions. Never include any other text.
+    Suggested tags and document types must be strictly based on the content of the document.
+    Do not change the field names or the JSON structure, only provide the values. Use double quotes and proper JSON syntax.
 
-    Return only a valid JSON object. Do not add commentary.
+    The JSON object must contain the following fields:
+    - title: A short, descriptive title
+    - tags: A list of simple tags like ["insurance", "medical", "receipts"]
+    - correspondents: A list of names or organizations mentioned in the document
+    - document_types: The type/category of the document (e.g. "invoice", "medical record")
+    - storage_paths: Suggested folder paths (e.g. "Medical/Insurance")
+    - dates: List up to 3 relevant dates in YYYY-MM-DD format
 
-    FILENAME: {filename}
+    The format of the JSON object is as follows:
+    {{
+        "title": "xxxxx",
+        "tags": ["xxxx", "xxxx"],
+        "correspondents": ["xxxx", "xxxx"],
+        "document_types": ["xxxx", "xxxx"],
+        "storage_paths": ["xxxx", "xxxx"],
+        "dates": ["YYYY-MM-DD", "YYYY-MM-DD", "YYYY-MM-DD"],
+    }}
+    ---
+
+    FILENAME:
+    {filename}
 
     CONTENT:
-    {content}
+    {content[:8000]}  # Trim to safe size
     """
 
     try:
