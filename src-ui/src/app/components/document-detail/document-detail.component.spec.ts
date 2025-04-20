@@ -993,7 +993,7 @@ describe('DocumentDetailComponent', () => {
     expect(component.document.custom_fields).toHaveLength(initialLength - 1)
     expect(component.customFieldFormFields).toHaveLength(initialLength - 1)
     expect(
-      fixture.debugElement.query(By.css('form')).nativeElement.textContent
+      fixture.debugElement.query(By.css('form ul')).nativeElement.textContent
     ).not.toContain('Field 1')
     const patchSpy = jest.spyOn(documentService, 'patch')
     component.save(true)

@@ -191,6 +191,7 @@ export class DocumentDetailComponent
   document: Document
   metadata: DocumentMetadata
   suggestions: DocumentSuggestions
+  suggestionsLoading: boolean = false
   users: User[]
 
   title: string
@@ -650,25 +651,7 @@ export class DocumentDetailComponent
       this.tagService.getCachedMany(doc.tags).subscribe((tags) => {
         // only show suggestions if document has inbox tags
         if (tags.some((tag) => tag.is_inbox_tag)) {
-          this.documentsService
-            .getSuggestions(doc.id)
-            .pipe(
-              first(),
-              takeUntil(this.unsubscribeNotifier),
-              takeUntil(this.docChangeNotifier)
-            )
-            .subscribe({
-              next: (result) => {
-                this.suggestions = result
-              },
-              error: (error) => {
-                this.suggestions = null
-                this.toastService.showError(
-                  $localize`Error retrieving suggestions.`,
-                  error
-                )
-              },
-            })
+          this.getSuggestions()
         }
       })
     }
@@ -685,6 +668,31 @@ export class DocumentDetailComponent
 
   get customFieldFormFields(): FormArray {
     return this.documentForm.get('custom_fields') as FormArray
+  }
+
+  getSuggestions() {
+    this.suggestionsLoading = true
+    this.documentsService
+      .getSuggestions(this.documentId)
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier)
+      )
+      .subscribe({
+        next: (result) => {
+          this.suggestions = result
+          this.suggestionsLoading = false
+        },
+        error: (error) => {
+          this.suggestions = null
+          this.suggestionsLoading = false
+          this.toastService.showError(
+            $localize`Error retrieving suggestions.`,
+            error
+          )
+        },
+      })
   }
 
   createDocumentType(newName: string) {
