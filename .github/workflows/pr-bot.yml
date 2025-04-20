@@ -1,6 +1,8 @@
 name: PR Bot
 
 on:
+  pull_request:
+    types: [opened]
   pull_request_target:
     types: [opened]
 
