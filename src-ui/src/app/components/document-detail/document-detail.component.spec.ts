@@ -156,6 +156,16 @@ describe('DocumentDetailComponent', () => {
         {
           provide: TagService,
           useValue: {
+            getCachedMany: (ids: number[]) =>
+              of(
+                ids.map((id) => ({
+                  id,
+                  name: `Tag${id}`,
+                  is_inbox_tag: true,
+                  color: '#ff0000',
+                  text_color: '#000000',
+                }))
+              ),
             listAll: () =>
               of({
                 count: 3,
