@@ -77,12 +77,6 @@ from rest_framework.viewsets import ViewSet
 
 from documents import bulk_edit
 from documents import index
-from documents.ai.llm_classifier import get_ai_document_classification
-from documents.ai.matching import extract_unmatched_names
-from documents.ai.matching import match_correspondents_by_name
-from documents.ai.matching import match_document_types_by_name
-from documents.ai.matching import match_storage_paths_by_name
-from documents.ai.matching import match_tags_by_name
 from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
@@ -178,6 +172,12 @@ from documents.tasks import train_classifier
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.utils import get_boolean
 from paperless import version
+from paperless.ai.ai_classifier import get_ai_document_classification
+from paperless.ai.matching import extract_unmatched_names
+from paperless.ai.matching import match_correspondents_by_name
+from paperless.ai.matching import match_document_types_by_name
+from paperless.ai.matching import match_storage_paths_by_name
+from paperless.ai.matching import match_tags_by_name
 from paperless.celery import app as celery_app
 from paperless.config import GeneralConfig
 from paperless.db import GnuPG

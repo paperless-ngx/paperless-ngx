@@ -4,7 +4,7 @@ import logging
 from documents.models import Document
 from paperless.ai.client import run_llm_query
 
-logger = logging.getLogger("paperless.ai.llm_classifier")
+logger = logging.getLogger("paperless.ai.ai_classifier")
 
 
 def get_ai_document_classification(document: Document) -> dict:
@@ -50,14 +50,14 @@ def get_ai_document_classification(document: Document) -> dict:
 
     try:
         result = run_llm_query(prompt)
-        suggestions = parse_llm_classification_response(result)
+        suggestions = parse_ai_classification_response(result)
         return suggestions or {}
     except Exception:
         logger.exception("Error during LLM classification: %s", exc_info=True)
         return {}
 
 
-def parse_llm_classification_response(text: str) -> dict:
+def parse_ai_classification_response(text: str) -> dict:
     """
     Parses LLM output and ensures it conforms to expected schema.
     """
@@ -77,4 +77,9 @@ def parse_llm_classification_response(text: str) -> dict:
         }
     except json.JSONDecodeError:
         # fallback: try to extract JSON manually?
+        logger.exception(
+            "Failed to parse LLM classification response: %s",
+            text,
+            exc_info=True,
+        )
         return {}
