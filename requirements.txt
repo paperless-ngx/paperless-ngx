@@ -133,4 +133,4 @@ django-soft-delete==1.0.16
 django-elasticsearch-dsl==7.4
 django-elasticsearch-dsl-drf==0.22.5
 pymupdf==1.25.5
-debug_toolbar
+django-debug-toolbar
