@@ -537,7 +537,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                                os.path.dirname(os.path.abspath(__file__)),
                                'fonts', 'arial-font/arial.ttf'))
             content_formated = ""
-            if data_ocr:
+            if data_ocr is not None:
                 content_formated = data_ocr.get("content_formated", "")
             if len(content_formated)>0:
                     with open(sidecar, "w") as txt_sidecar:
