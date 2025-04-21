@@ -8,7 +8,7 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.permissions import get_objects_for_user_owner_aware
 
-MATCH_THRESHOLD = 0.7
+MATCH_THRESHOLD = 0.8
 
 logger = logging.getLogger("paperless.ai.matching")
 
@@ -59,8 +59,7 @@ def _normalize(s: str) -> str:
 def _match_names_to_queryset(names: list[str], queryset, attr: str):
     results = []
     objects = list(queryset)
-    object_names = [getattr(obj, attr) for obj in objects]
-    norm_names = [_normalize(name) for name in object_names]
+    object_names = [_normalize(getattr(obj, attr)) for obj in objects]
 
     for name in names:
         if not name:
@@ -68,32 +67,32 @@ def _match_names_to_queryset(names: list[str], queryset, attr: str):
         target = _normalize(name)
 
         # First try exact match
-        if target in norm_names:
-            index = norm_names.index(target)
+        if target in object_names:
+            index = object_names.index(target)
             results.append(objects[index])
+            # Remove the matched name from the list to avoid fuzzy matching later
+            object_names.remove(target)
             continue
 
         # Fuzzy match fallback
         matches = difflib.get_close_matches(
             target,
-            norm_names,
+            object_names,
             n=1,
             cutoff=MATCH_THRESHOLD,
         )
         if matches:
-            index = norm_names.index(matches[0])
+            index = object_names.index(matches[0])
             results.append(objects[index])
         else:
-            # Optional: log or store unmatched name
-            logging.debug(f"No match for: '{name}' in {attr} list")
-
+            pass
     return results
 
 
 def extract_unmatched_names(
-    llm_names: list[str],
+    names: list[str],
     matched_objects: list,
     attr="name",
 ) -> list[str]:
     matched_names = {getattr(obj, attr).lower() for obj in matched_objects}
-    return [name for name in llm_names if name.lower() not in matched_names]
+    return [name for name in names if name.lower() not in matched_names]
