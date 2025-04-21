@@ -59,6 +59,7 @@ updates:
       django:
         patterns:
           - "*django*"
+          - "drf-*"
       major-versions:
         update-types:
           - "major"
