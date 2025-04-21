@@ -1,5 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core'
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core'
+import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
 import { pngxPopperOptions } from 'src/app/utils/popper-options'
@@ -12,6 +18,8 @@ import { pngxPopperOptions } from 'src/app/utils/popper-options'
 })
 export class SuggestionsDropdownComponent {
   public popperOptions = pngxPopperOptions
+
+  @ViewChild('dropdown') dropdown: NgbDropdown
 
   @Input()
   suggestions: DocumentSuggestions = null
@@ -34,6 +42,14 @@ export class SuggestionsDropdownComponent {
 
   @Output()
   addCorrespondent: EventEmitter<string> = new EventEmitter()
+
+  public clickSuggest(): void {
+    if (!this.suggestions) {
+      this.getSuggestions.emit(this)
+    } else {
+      this.dropdown.toggle()
+    }
+  }
 
   get totalSuggestions(): number {
     return (
