@@ -419,9 +419,10 @@ class RasterisedDocumentCustomParser(DocumentParser):
                             headers, params, payload, 5, 5, 100,
                             status_code_fail=[401])
 
-        except Exception as e:
-            self.log.error("error", e)
-        return (data_ocr, data_ocr_fields, form_code)
+        # except Exception as e:
+        #     self.log.error("error", e)
+        finally:
+            return (data_ocr, data_ocr_fields, form_code)
 
     # # get ocr file img/pdf
     # def ocr_file(self, path_file, dossier_form:DossierForm):
