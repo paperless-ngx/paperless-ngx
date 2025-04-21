@@ -1,8 +1,8 @@
 import json
 import logging
 
-from documents.ai.client import run_llm_query
 from documents.models import Document
+from paperless.ai.client import run_llm_query
 
 logger = logging.getLogger("paperless.ai.llm_classifier")
 
