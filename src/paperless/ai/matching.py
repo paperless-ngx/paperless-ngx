@@ -6,6 +6,7 @@ from documents.models import Correspondent
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.permissions import get_objects_for_user_owner_aware
 
 MATCH_THRESHOLD = 0.7
 
@@ -13,30 +14,37 @@ logger = logging.getLogger("paperless.ai.matching")
 
 
 def match_tags_by_name(names: list[str], user) -> list[Tag]:
-    queryset = (
-        Tag.objects.filter(owner=user) if user.is_authenticated else Tag.objects.all()
+    queryset = get_objects_for_user_owner_aware(
+        user,
+        ["view_tag"],
+        Tag,
     )
     return _match_names_to_queryset(names, queryset, "name")
 
 
 def match_correspondents_by_name(names: list[str], user) -> list[Correspondent]:
-    queryset = (
-        Correspondent.objects.filter(owner=user)
-        if user.is_authenticated
-        else Correspondent.objects.all()
+    queryset = get_objects_for_user_owner_aware(
+        user,
+        ["view_correspondent"],
+        Correspondent,
     )
     return _match_names_to_queryset(names, queryset, "name")
 
 
 def match_document_types_by_name(names: list[str]) -> list[DocumentType]:
-    return _match_names_to_queryset(names, DocumentType.objects.all(), "name")
+    queryset = get_objects_for_user_owner_aware(
+        None,
+        ["view_documenttype"],
+        DocumentType,
+    )
+    return _match_names_to_queryset(names, queryset, "name")
 
 
 def match_storage_paths_by_name(names: list[str], user) -> list[StoragePath]:
-    queryset = (
-        StoragePath.objects.filter(owner=user)
-        if user.is_authenticated
-        else StoragePath.objects.all()
+    queryset = get_objects_for_user_owner_aware(
+        user,
+        ["view_storagepath"],
+        StoragePath,
     )
     return _match_names_to_queryset(names, queryset, "name")
 
