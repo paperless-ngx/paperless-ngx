@@ -26,6 +26,7 @@ from guardian.shortcuts import remove_perm
 
 from documents import matching
 from documents.caching import clear_document_caches
+from documents.caching import invalidate_llm_suggestions_cache
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_unique_filename
@@ -523,6 +524,15 @@ def update_filename_and_move_files(
                 os.path.dirname(old_archive_path),
                 root=settings.ARCHIVE_DIR,
             )
+
+
+@receiver(models.signals.post_save, sender=Document)
+def update_llm_suggestions_cache(sender, instance, **kwargs):
+    """
+    Invalidate the LLM suggestions cache when a document is saved.
+    """
+    # Invalidate the cache for the document
+    invalidate_llm_suggestions_cache(instance.pk)
 
 
 # should be disabled in /src/documents/management/commands/document_importer.py handle

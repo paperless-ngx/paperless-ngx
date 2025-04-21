@@ -122,7 +122,7 @@ def get_llm_suggestion_cache(
     doc_key = get_suggestion_cache_key(document_id)
     data: SuggestionCacheData = cache.get(doc_key)
 
-    if data and data.classifier_version == 1000 and data.classifier_hash == backend:
+    if data and data.classifier_hash == backend:
         return data
 
     return None
@@ -150,6 +150,19 @@ def set_llm_suggestions_cache(
         ),
         timeout,
     )
+
+
+def invalidate_llm_suggestions_cache(
+    document_id: int,
+) -> None:
+    """
+    Invalidate the LLM suggestions cache for a specific document and backend.
+    """
+    doc_key = get_suggestion_cache_key(document_id)
+    data: SuggestionCacheData = cache.get(doc_key)
+
+    if data:
+        cache.delete(doc_key)
 
 
 def get_metadata_cache_key(document_id: int) -> str:
