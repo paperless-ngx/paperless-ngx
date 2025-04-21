@@ -29,4 +29,21 @@ describe('SuggestionsDropdownComponent', () => {
     }
     expect(component.totalSuggestions).toBe(4)
   })
+
+  it('should emit getSuggestions when clickSuggest is called and suggestions are null', () => {
+    jest.spyOn(component.getSuggestions, 'emit')
+    component.suggestions = null
+    component.clickSuggest()
+    expect(component.getSuggestions.emit).toHaveBeenCalled()
+  })
+
+  it('should toggle dropdown when clickSuggest is called and suggestions are not null', () => {
+    component.suggestions = {
+      suggested_correspondents: [],
+      suggested_tags: [],
+      suggested_document_types: [],
+    }
+    component.clickSuggest()
+    expect(component.dropdown.open).toBeTruthy()
+  })
 })
