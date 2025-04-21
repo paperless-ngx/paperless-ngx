@@ -1,6 +1,5 @@
-<div ngbDropdown [popperOptions]="popperOptions">
-
-  <button type="button" class="btn btn-sm btn-outline-primary" (click)="getSuggestions.emit(this)" [disabled]="loading" ngbDropdownToggle>
+<div class="btn-group">
+  <button type="button" class="btn btn-sm btn-outline-primary" (click)="clickSuggest()" [disabled]="loading">
     @if (loading) {
       <div class="spinner-border spinner-border-sm" role="status"></div>
     } @else {
@@ -11,27 +10,33 @@
       <span class="badge bg-primary ms-2">{{ totalSuggestions }}</span>
     }
   </button>
+  <div class="btn-group" ngbDropdown #dropdown="ngbDropdown" [popperOptions]="popperOptions">
 
-  <div ngbDropdownMenu aria-labelledby="suggestionsDropdown" class="shadow suggestions-dropdown">
-      <div class="list-group list-group-flush">
-        @if (suggestions?.suggested_tags.length > 0) {
-          <div class="list-group-item text-uppercase text-muted small">Tags</div>
-          @for (tag of suggestions.suggested_tags; track tag) {
-            <a class="list-group-item list-group-item-action bg-light small" (click)="addTag.emit(tag)" i18n>{{ tag }}</a>
+    <button type="button" class="btn btn-sm btn-outline-primary" ngbDropdownToggle [disabled]="loading || !suggestions" aria-expanded="false" aria-controls="suggestionsDropdown" aria-label="Suggestions dropdown">
+      <span class="visually-hidden" i18n>Show suggestions</span>
+    </button>
+
+    <div ngbDropdownMenu aria-labelledby="suggestionsDropdown" class="shadow suggestions-dropdown">
+        <div class="list-group list-group-flush small">
+          @if (suggestions?.suggested_tags.length > 0) {
+            <small class="list-group-item text-uppercase text-muted small">Tags</small>
+            @for (tag of suggestions.suggested_tags; track tag) {
+              <button type="button" class="list-group-item list-group-item-action bg-light" (click)="addTag.emit(tag)" i18n>{{ tag }}</button>
+            }
           }
-        }
-        @if (suggestions?.suggested_document_types.length > 0) {
-          <div class="list-group-item text-uppercase text-muted small">Document Types</div>
-          @for (type of suggestions.suggested_document_types; track type) {
-            <a class="list-group-item list-group-item-action bg-light small" (click)="addDocumentType.emit(type)" i18n>{{ type }}</a>
+          @if (suggestions?.suggested_document_types.length > 0) {
+            <div class="list-group-item text-uppercase text-muted small">Document Types</div>
+            @for (type of suggestions.suggested_document_types; track type) {
+              <button type="button" class="list-group-item list-group-item-action bg-light" (click)="addDocumentType.emit(type)" i18n>{{ type }}</button>
+            }
           }
-        }
-        @if (suggestions?.suggested_correspondents.length > 0) {
-          <div class="list-group-item text-uppercase text-muted small">Correspondents</div>
-          @for (correspondent of suggestions.suggested_correspondents; track correspondent) {
-            <a class="list-group-item list-group-item-action bg-light small" (click)="addCorrespondent.emit(correspondent)" i18n>{{ correspondent }}</a>
+          @if (suggestions?.suggested_correspondents.length > 0) {
+            <div class="list-group-item text-uppercase text-muted small">Correspondents</div>
+            @for (correspondent of suggestions.suggested_correspondents; track correspondent) {
+              <button type="button" class="list-group-item list-group-item-action bg-light" (click)="addCorrespondent.emit(correspondent)" i18n>{{ correspondent }}</button>
+            }
           }
-        }
-      </div>
+        </div>
+    </div>
   </div>
 </div>
