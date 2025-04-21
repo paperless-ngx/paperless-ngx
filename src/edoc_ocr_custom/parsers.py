@@ -211,8 +211,8 @@ class RasterisedDocumentCustomParser(DocumentParser):
                     self.log.error("Got response", response_ocr.status_code)
                     return False
                 else:
-                    self.log.error('OCR error response: %s',
-                                   response_ocr.json())
+                    self.log.error('OCR error response: %s, status code: %s',
+                                   response_ocr.content, response_ocr.status_code)
                     retries += 1
                     time.sleep(delay)
             except requests.exceptions.Timeout:
