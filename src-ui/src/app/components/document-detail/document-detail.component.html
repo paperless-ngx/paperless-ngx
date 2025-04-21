@@ -111,14 +111,12 @@
 
         <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
           <div class="btn-group pb-3 ms-auto">
-            <button type="button" class="btn btn-sm btn-outline-primary" (click)="getSuggestions()" [disabled]="!userCanEdit || suggestions || suggestionsLoading" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-              @if (suggestionsLoading) {
-                <div class="spinner-border spinner-border-sm" role="status"></div>
-              } @else {
-                <i-bs width="1.2em" height="1.2em" name="stars"></i-bs>
-              }
-              <span class="d-none d-lg-inline ps-1" i18n>Suggest</span>
-            </button>
+            <pngx-suggestions-dropdown *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }"
+              [disabled]="!userCanEdit || suggestionsLoading"
+              [loading]="suggestionsLoading"
+              [suggestions]="suggestions"
+              (getSuggestions)="getSuggestions()">
+            </pngx-suggestions-dropdown>
           </div>
 
           <div class="btn-group pb-3 ms-2">

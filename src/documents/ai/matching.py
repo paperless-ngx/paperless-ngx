@@ -80,3 +80,12 @@ def _match_names_to_queryset(names: list[str], queryset, attr: str):
             logging.debug(f"No match for: '{name}' in {attr} list")
 
     return results
+
+
+def extract_unmatched_names(
+    llm_names: list[str],
+    matched_objects: list,
+    attr="name",
+) -> list[str]:
+    matched_names = {getattr(obj, attr).lower() for obj in matched_objects}
+    return [name for name in llm_names if name.lower() not in matched_names]

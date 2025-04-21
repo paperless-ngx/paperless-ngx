@@ -78,6 +78,7 @@ from rest_framework.viewsets import ViewSet
 from documents import bulk_edit
 from documents import index
 from documents.ai.llm_classifier import get_ai_document_classification
+from documents.ai.matching import extract_unmatched_names
 from documents.ai.matching import match_correspondents_by_name
 from documents.ai.matching import match_document_types_by_name
 from documents.ai.matching import match_storage_paths_by_name
@@ -778,32 +779,42 @@ class DocumentViewSet(
                 return Response(cached.suggestions)
 
             llm_resp = get_ai_document_classification(doc)
+
+            matched_tags = match_tags_by_name(llm_resp.get("tags", []), request.user)
+            matched_correspondents = match_correspondents_by_name(
+                llm_resp.get("correspondents", []),
+                request.user,
+            )
+            matched_types = match_document_types_by_name(
+                llm_resp.get("document_types", []),
+            )
+            matched_paths = match_storage_paths_by_name(
+                llm_resp.get("storage_paths", []),
+                request.user,
+            )
+
             resp_data = {
                 "title": llm_resp.get("title"),
-                "tags": [
-                    t.id
-                    for t in match_tags_by_name(llm_resp.get("tags", []), request.user)
-                ],
-                "correspondents": [
-                    c.id
-                    for c in match_correspondents_by_name(
-                        llm_resp.get("correspondents", []),
-                        request.user,
-                    )
-                ],
-                "document_types": [
-                    d.id
-                    for d in match_document_types_by_name(
-                        llm_resp.get("document_types", []),
-                    )
-                ],
-                "storage_paths": [
-                    s.id
-                    for s in match_storage_paths_by_name(
-                        llm_resp.get("storage_paths", []),
-                        request.user,
-                    )
-                ],
+                "tags": [t.id for t in matched_tags],
+                "suggested_tags": extract_unmatched_names(
+                    llm_resp.get("tags", []),
+                    matched_tags,
+                ),
+                "correspondents": [c.id for c in matched_correspondents],
+                "suggested_correspondents": extract_unmatched_names(
+                    llm_resp.get("correspondents", []),
+                    matched_correspondents,
+                ),
+                "document_types": [d.id for d in matched_types],
+                "suggested_document_types": extract_unmatched_names(
+                    llm_resp.get("document_types", []),
+                    matched_types,
+                ),
+                "storage_paths": [s.id for s in matched_paths],
+                "suggested_storage_paths": extract_unmatched_names(
+                    llm_resp.get("storage_paths", []),
+                    matched_paths,
+                ),
                 "dates": llm_resp.get("dates", []),
             }
 

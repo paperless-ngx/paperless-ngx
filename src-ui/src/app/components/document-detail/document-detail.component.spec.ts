@@ -1068,10 +1068,22 @@ describe('DocumentDetailComponent', () => {
 
   it('should get suggestions', () => {
     const suggestionsSpy = jest.spyOn(documentService, 'getSuggestions')
-    suggestionsSpy.mockReturnValue(of({ tags: [42, 43] }))
+    suggestionsSpy.mockReturnValue(
+      of({
+        tags: [42, 43],
+        suggested_tags: [],
+        suggested_document_types: [],
+        suggested_correspondents: [],
+      })
+    )
     initNormally()
     expect(suggestionsSpy).toHaveBeenCalled()
-    expect(component.suggestions).toEqual({ tags: [42, 43] })
+    expect(component.suggestions).toEqual({
+      tags: [42, 43],
+      suggested_tags: [],
+      suggested_document_types: [],
+      suggested_correspondents: [],
+    })
   })
 
   it('should show error if needed for get suggestions', () => {
