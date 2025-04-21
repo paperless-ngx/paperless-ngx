@@ -38,7 +38,7 @@ jobs:
             ^src/locale/en_US/LC_MESSAGES/django\.po$
 
       - name: Label bot-generated PRs
-        if: ${{ contains(github.actor, 'dependabot') || contains(github.actor, 'paperlessngx-bot') }}
+        if: ${{ contains(github.actor, 'dependabot') || contains(github.actor, 'crowdin-bot') }}
         uses: actions/github-script@v7
         with:
           script: |
