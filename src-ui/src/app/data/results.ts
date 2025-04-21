@@ -4,4 +4,8 @@ export interface Results<T> {
   results: T[]
 
   all: number[]
+
+  previous?: string
+
+  next?: string
 }

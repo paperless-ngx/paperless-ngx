@@ -1189,7 +1189,7 @@ ELASTIC_SEARCH_DOCUMENT_INDEX = os.getenv("ELASTIC_SEARCH_DOCUMENT_INDEX",
 ELASTIC_SEARCH_HOST = os.getenv("ELASTIC_SEARCH_HOST", "")
 ELASTICSEARCH_DSL = {
     'default': {
-        'hosts': os.getenv("ELASTIC_SEARCH_HOST", ""),
+        'hosts': ELASTIC_SEARCH_HOST,
         # Địa chỉ của Elasticsearch
         'http_auth': (os.getenv("ELASTIC_SEARCH_USERNAME", ""),
                       os.getenv("ELASTIC_SEARCH_PASSWORD", "")),

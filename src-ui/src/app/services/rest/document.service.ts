@@ -173,6 +173,23 @@ export class DocumentService extends AbstractEdocService<Document> {
     )
   }
 
+  StatisticFiltered(
+    page?: number,
+    pageSize?: number,
+    sortField?: string,
+    sortReverse?: boolean,
+    filterRules?: FilterRule[],
+    extraParams = {}
+  ): Observable<SelectionData> {
+    return this.statistic_filter(
+      page,
+      pageSize,
+      sortField,
+      sortReverse,
+      Object.assign(extraParams, queryParamsFromFilterRules(filterRules))
+    )
+  }
+
   listAllFilteredIds(filterRules?: FilterRule[]): Observable<number[]> {
     return this.listFiltered(1, 100000, null, null, filterRules, {
       fields: 'id',

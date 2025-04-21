@@ -292,6 +292,16 @@ class DocumentDocument(Document):
                 document_data["warehouse_id"] = None
                 document_data["has_warehouse"] = False
 
+            # document_type details
+            if instance.document_type:
+                document_data["type"] = instance.document_type.name
+                document_data["type_id"] = instance.document_type.id
+                document_data["has_type"] = True
+            else:
+                document_data["type"] = None
+                document_data["type_id"] = None
+                document_data["has_type"] = False
+
             # Folder details
             if instance.folder:
                 document_data["folder"] = instance.folder.name
@@ -344,7 +354,6 @@ class DocumentDocument(Document):
                 document_data["has_owner"] = False
 
             return document_data
-
         except Exception as e:
             logger.error(
                 f"Error preparing document data for instance {instance.id}: {e}")

@@ -106,6 +106,7 @@ import { UsernamePipe } from './pipes/username.pipe'
 import { LogoComponent } from './components/common/logo/logo.component'
 import { IsNumberPipe } from './pipes/is-number.pipe'
 import { ShareLinksDropdownComponent } from './components/common/share-links-dropdown/share-links-dropdown.component'
+import { SimplePaginatorComponent } from './components/common/simple-paginator/simple-paginator.component'
 import { WorkflowsComponent } from './components/manage/workflows/workflows.component'
 import { WorkflowEditDialogComponent } from './components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
 import { MailComponent } from './components/manage/mail/mail.component'
@@ -564,6 +565,7 @@ function initializeApp(settings: SettingsService) {
     LogoComponent,
     IsNumberPipe,
     ShareLinksDropdownComponent,
+    SimplePaginatorComponent,
     WorkflowsComponent,
     WorkflowEditDialogComponent,
     MailComponent,

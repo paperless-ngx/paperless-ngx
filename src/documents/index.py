@@ -2,6 +2,7 @@ import logging
 import math
 import os
 import re
+import time
 from collections import Counter
 from contextlib import contextmanager
 from datetime import datetime, timedelta
@@ -233,6 +234,8 @@ def remove_document_from_index(document: Document):
 
 class DelayedQuery:
     param_map = {
+        # "title": ("title", ["icontains"]),
+        # "title_content": ("title_content", ["icontains"]),
         "correspondent": ("correspondent", ["id", "id__in", "id__none", "isnull"]),
         "archive_font": ("archive_font", ["id", "id__in", "id__none", "isnull"]),
         "warehouse": ("warehouse", ["id", "id__in", "id__none", "isnull"]),
@@ -429,6 +432,45 @@ class LocalDateParser(English):
             d = self.reverse_timezone_offset(d)
         return d
 
+class StatisticElasticSearch():
+    def get_statistics(self):
+        query = {
+            "size": 0,
+            "aggs": {
+                "tags_stats": {
+                    "terms": {"field": "tag_id", "size": 100}
+                },
+                "document_type_stats": {
+                    "terms": {"field": "document_type_id", "size": 100}
+                },
+                "warehouse_stats": {
+                    "terms": {"field": "warehouse_id", "size": 100}
+                }
+            }
+        }
+        s = Search(
+            index=ELASTIC_SEARCH_DOCUMENT_INDEX)
+        s = s.query(query)
+        response = s.execute()
+
+        # Xử lý kết quả trả về
+        return {
+            "selected_tags": [
+                {"id": bucket["key"], "document_count": bucket["doc_count"]}
+                for bucket in response["aggregations"]["tags_stats"]["buckets"]
+            ],
+            "selected_document_types": [
+                {"id": bucket["key"], "document_count": bucket["doc_count"]}
+                for bucket in
+                response["aggregations"]["document_type_stats"]["buckets"]
+            ],
+            "selected_warehouses": [
+                {"id": bucket["key"], "document_count": bucket["doc_count"]}
+                for bucket in
+                response["aggregations"]["warehouse_stats"]["buckets"]
+            ]
+        }
+
 
 class DelayedFullTextQuery(DelayedQuery):
     def _get_query(self):
@@ -509,7 +551,7 @@ class DelayedElasticSearch(DelayedQuery):
         cleaned_string = cleaned_string.replace('"', '')
         normal_query = []
 
-        if cleaned_string:
+        if cleaned_string and 'query' in self.query_params:
             normal_query = [
                 Q("multi_match",
                   type="phrase",
@@ -548,6 +590,19 @@ class DelayedElasticSearch(DelayedQuery):
             if key == "is_tagged":
                 criterias.append(Q("term", has_tag=self.evalBoolean(value)))
                 continue
+            if key == "title_content":
+                criterias.append(
+                    Q("bool", should=[
+                        Q("match_phrase_prefix", **{"title": value}),
+                        Q("match_phrase_prefix", **{"content": value})
+                    ])
+                )
+                continue
+            if key == "title__icontains":
+                criterias.append(
+                   Q("match_phrase_prefix", **{"title": value})
+                )
+                continue
 
             if "__" not in key:
                 continue
@@ -575,7 +630,7 @@ class DelayedElasticSearch(DelayedQuery):
                     criterias.append(Q("bool", should=in_filter))
                     continue
                 elif field in {"tag"}:
-                    in_filter = [Q("term", **{f"tags.id": int(object_id)}) for
+                    in_filter = [Q("term", **{f"tag_id": int(object_id)}) for
                                  object_id in value.split(",")]
                     criterias.append(Q("bool", should=in_filter))
                     continue
@@ -641,7 +696,8 @@ class DelayedElasticSearch(DelayedQuery):
         # Thêm phần sắp xếp vào truy vấn cuối cùng
         query_body = {
             "query": combined_query.to_dict(),
-            "sort": [sort_order] if sort_order else []
+            "sort": [sort_order] if sort_order else [],
+
         }
 
         return query_body
@@ -658,10 +714,54 @@ class DelayedElasticSearch(DelayedQuery):
         s = s.highlight('content', fragment_size=500, number_of_fragments=1,
                         pre_tags=['<span class="match">'],
                         post_tags=['</span>'])
-        s = s.source(['id'])
+        s = s.source(['id', 'warehouse_path'])
         s = s[page_number * page_size - page_size:page_number * page_size]
         response = s.execute()
+        print('search_pagination', response)
+        # print(self.search_statistics())
         return response
+
+
+
+    def search_statistics(self):
+        query_combined = self.get_combined_query()
+        aggregations = {
+            "tags_stats": {
+                "terms": {"field": "tag_id", "size": 100}
+            },
+            "document_type_stats": {
+                "terms": {"field": "document_type_id", "size": 100}
+            },
+            "warehouse_stats": {
+                "terms": {"field": "warehouse_id", "size": 100}
+            }
+        }
+        query_combined['aggs'] = aggregations
+        statistics_query = {
+            "query": query_combined['query'],
+            "aggs": query_combined["aggs"]
+        }
+
+        # Thực hiện query
+        response = Search().from_dict(statistics_query).index(
+            ELASTIC_SEARCH_DOCUMENT_INDEX).execute()
+
+        # Xử lý kết quả từ aggregations
+        statistics = {
+            "selected_tags": [
+                {"id": bucket["key"], "document_count": bucket["doc_count"]}
+                for bucket in response.aggregations.tags_stats.buckets
+            ],
+            "selected_document_types": [
+                {"id": bucket["key"], "document_count": bucket["doc_count"]}
+                for bucket in response.aggregations.document_type_stats.buckets
+            ],
+            "selected_warehouses": [
+                {"id": bucket["key"], "document_count": bucket["doc_count"]}
+                for bucket in response.aggregations.warehouse_stats.buckets
+            ]
+        }
+        return statistics
 
     def search_get_all(self):
         s = Search(
@@ -670,8 +770,15 @@ class DelayedElasticSearch(DelayedQuery):
         s = s.query(query_combined['query'])  # Chỉ lấy phần query
         s = s.source(['id'])
         response = s.scan()
-        doc_ids = {int(doc.meta.id) for doc in response}
-        return doc_ids
+        print('response_get_all', len(response))
+        # Chuyển đổi kết quả thành danh sách các id
+        start_time = time.time()
+        doc_ids = [int(doc.meta.id) for doc in response]
+        time_get_all = time.time()-start_time
+
+        print('time_get_all',time_get_all)
+        # doc_ids = {int(doc.meta.id) for doc in response}
+        return []
 
     def __getitem__(self, item):
         if item.start in self.saved_results:
@@ -683,21 +790,28 @@ class DelayedElasticSearch(DelayedQuery):
         page_num = math.floor(item.start / self.page_size) + 1
         page_len = self.page_size
         # response = convert_elastic_search(self.query_params["query"], page_num , page_len)
-        response = self.search_pagination(self.query_params["query"], page_num , page_len)
+
+        if self.query_params.get("statistic", False):
+            response = self.search_statistics()
+            return response
+
+        response = self.search_pagination(self.query_params.get("query",''), page_num , page_len)
 
         # print('tim____:',datetime.now() -start)
         doc_ids = [int(d.meta.id) for d in response]
 
         # print('ket qua',self.get_combined_query())
         # start = datetime.now()
-        docs = Document.objects.select_related(
+        docs = (Document.objects.select_related(
                 # "correspondent",
                 # "storage_path",
-                "document_type",
+                # "document_type",
                 "warehouse",
                 # "folder",
                 "owner",
-            ).prefetch_related("tags", "custom_fields", "notes").filter(id__in=doc_ids).annotate(
+            )
+            .prefetch_related("tags", "custom_fields", "notes")
+            .filter(id__in=doc_ids).annotate(
                 truncated_content=Substr('content', 1, 500)  # Lấy tối đa 500 ký tự từ content
             ).defer(
                 'content',
@@ -705,21 +819,27 @@ class DelayedElasticSearch(DelayedQuery):
                 'owner__is_staff',   # Bỏ qua trường is_staff
                 'owner__is_active',  # Bỏ qua trường is_active
                 'owner__date_joined' # Bỏ qua trường date_joined
-            )
-
+            ))
 
         # print('time',datetime.now()-start)
+        start_time = time.time()
         # map docs to dict
         dict_docs = dict()
         for d in docs:
             dict_docs[d.id]=d
-
+        time_set_dict= time.time() - start_time
+        print('time_set_dict',time_set_dict)
+        start_time = time.time()
         # mapping docs to response
         for r in response:
             if dict_docs.get(int(r.meta.id), None):
                 r.doc_obj = dict_docs[int(r.meta.id)]
-
-        all_doc_ids = self.search_get_all()
+        time_mapping_docs_response = time.time()-start_time
+        print('time_mapping_docs_response',time_mapping_docs_response)
+        start_time = time.time()
+        # all_doc_ids = self.search_get_all()
+        time_get_all = time.time()-start_time
+        print('time_get_all',time_get_all)
         page: ResultsPage = ResultsPage(response, page_num, page_len)
         # filter = self._get_query_filter()
         # page: ResultsPage = self.searcher.search_page(
@@ -734,22 +854,9 @@ class DelayedElasticSearch(DelayedQuery):
         page.results.fragmenter = highlight.ContextFragmenter(surround=50)
         page.results.formatter = HtmlFormatter(tagname="span", between=" ... ")
 
-        page.results.doc = all_doc_ids
+        # page.results.doc = []
         if not self.first_score and len(page.results) > 0 and sortedby is None:
             self.first_score = getattr(page.results[0].meta, 'score')
-        # page.results.top_n = list(
-        #     map(
-        #         lambda hit: (
-        #             (hit[0] / self.first_score) if self.first_score else None,
-        #             hit[1],
-        #         ),
-        #         page.results.top_n,
-        #     ),
-        # )
-        # print(page.results)
-        page.total = len(all_doc_ids)
-
-
         self.saved_results[item.start] = page
         return page
 

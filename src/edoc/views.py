@@ -83,8 +83,8 @@ class StandardPagination(PageNumberPagination):
         return response_schema
 
 
-
 class WithoutCountPaginator(Paginator):
+
     @cached_property
     def count(self):
         return 9999999999
@@ -96,13 +96,30 @@ class CustomLimitOffsetPagination(LimitOffsetPagination):
     limit_query_param = "page_size"
     offset_query_param = 'page'
     def get_count(self, queryset):
-        return 9999999999
+        return 999999
 
     def get_offset(self, request):
         page = super().get_offset(request)
         page_size = super().get_limit(request)
-        offset = page * page_size
+        offset = (page-1) * page_size
         return offset
+
+    def get_page_size(self, request):
+        return super().get_limit(request)
+
+
+    def get_paginated_response(self, data):
+        return Response(
+            OrderedDict(
+                [
+                    ("count", self.count),
+                    ("next", self.get_next_link()),
+                    ("previous", self.get_previous_link()),
+                    ("all", []),
+                    ("results", data),
+                ],
+            ),
+        )
 
 
 

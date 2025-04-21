@@ -4,6 +4,7 @@ import { map, publishReplay, refCount } from 'rxjs/operators'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { Results } from 'src/app/data/results'
 import { environment } from 'src/environments/environment'
+import { SelectionData } from './document.service'
 
 export abstract class AbstractEdocService<T extends ObjectWithId> {
   protected baseUrl: string = environment.apiBaseUrl
@@ -58,6 +59,34 @@ export abstract class AbstractEdocService<T extends ObjectWithId> {
       }
     }
     return this.http.get<Results<T>>(this.getResourceUrl(), {
+      params: httpParams,
+    })
+  }
+
+  statistic_filter(
+    page?: number,
+    pageSize?: number,
+    sortField?: string,
+    sortReverse?: boolean,
+    extraParams?
+  ): Observable<SelectionData> {
+    let httpParams = new HttpParams()
+    if (page) {
+      httpParams = httpParams.set('page', page.toString())
+    }
+    if (pageSize) {
+      httpParams = httpParams.set('page_size', pageSize.toString())
+    }
+    let ordering = this.getOrderingQueryParam(sortField, sortReverse)
+    if (ordering) {
+      httpParams = httpParams.set('ordering', ordering)
+    }
+    for (let extraParamKey in extraParams) {
+      if (extraParams[extraParamKey] != null) {
+        httpParams = httpParams.set(extraParamKey, extraParams[extraParamKey])
+      }
+    }
+    return this.http.get<SelectionData>(this.getResourceUrl(null,'statistics'), {
       params: httpParams,
     })
   }

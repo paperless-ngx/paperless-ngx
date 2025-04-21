@@ -16,7 +16,7 @@ from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
 from documents.views import AcknowledgeTasksView, DocumentElasticSearch, \
-    WebhookViewSet
+    WebhookViewSet, SelectQueryViewSet
 from documents.views import ApprovalUpdateMutipleView
 from documents.views import ApprovalViewSet
 from documents.views import ArchiveFontViewSet
@@ -151,6 +151,10 @@ urlpatterns = [
                     "^documents/selection_data/",
                     SelectionDataView.as_view(),
                     name="selection_data",
+                ), re_path(
+                    "^documents/selection_query_data/",
+                    SelectQueryViewSet.as_view({'get': 'list'}),
+                    name="selection_query_data",
                 ),
                 re_path(
                     "^documents/bulk_download/",

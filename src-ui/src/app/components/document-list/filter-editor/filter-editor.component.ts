@@ -176,6 +176,8 @@ const DEFAULT_TEXT_FILTER_MODIFIER_OPTIONS = [
 export class FilterEditorComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy {
+  @Input() page: number = 1;
+  @Output() pageChange = new EventEmitter<number>();
   generateFilterName() {
     if (this.filterRules.length == 1) {
       let rule = this.filterRules[0]
@@ -1064,6 +1066,7 @@ export class FilterEditorComponent
   rulesModified: boolean = false
 
   updateRules() {
+    this.pageChange.emit(1);
     this.filterRulesChange.next(this.filterRules)
   }
 

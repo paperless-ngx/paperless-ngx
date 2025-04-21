@@ -6,6 +6,7 @@ import os
 import platform
 import re
 import tempfile
+import time
 import traceback
 import urllib
 import zipfile
@@ -49,10 +50,11 @@ from django.utils.timezone import make_aware
 from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 from django.views import View
-from django.views.decorators.cache import cache_control
+from django.views.decorators.cache import cache_control, cache_page
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
+from django.views.decorators.vary import vary_on_cookie
 from django.views.generic import TemplateView
 from django_elasticsearch_dsl_drf.pagination import LimitOffsetPagination
 from django_filters.rest_framework import DjangoFilterBackend
@@ -166,7 +168,7 @@ from documents.permissions import update_view_folder_parent_permissions
 from documents.permissions import \
     update_view_warehouse_shelf_boxcase_permissions
 from documents.serialisers import AcknowledgeTasksViewSerializer, \
-    DocumentDocumentSerializer, WebhookSerializer
+    DocumentDocumentSerializer, WebhookSerializer, DocumentDetailSerializer
 from documents.serialisers import ApprovalSerializer
 from documents.serialisers import ApprovalViewSerializer
 from documents.serialisers import ArchiveFontSerializer
@@ -214,7 +216,8 @@ from edoc.celery import app as celery_app
 from edoc.config import GeneralConfig
 from edoc.db import GnuPG
 from edoc.models import ApplicationConfiguration
-from edoc.views import StandardPagination, CustomStandardPagination
+from edoc.views import StandardPagination, CustomStandardPagination, \
+    CustomLimitOffsetPagination
 from edoc.wsgi import application
 
 if settings.AUDIT_LOG_ENABLED:
@@ -264,7 +267,12 @@ class IndexView(TemplateView):
         )
         return context
 
+class CacheListView(ListModelMixin,UpdateModelMixin):
+    @method_decorator(cache_page(60 * 60 * 2))
+    @method_decorator(vary_on_cookie)
+    def list(self, request, *args, **kwargs):
 
+        result = super().list(request, *args, **kwargs)
 class PassUserMixin(GenericAPIView):
     """
     Pass a user object to serializer
@@ -501,9 +509,9 @@ class DocumentViewSet(
     GenericViewSet,
 ):
     model = Document
-    queryset = Document.objects.annotate(num_notes=Count("notes"))
-    serializer_class = DocumentSerializer
-    pagination_class = CustomStandardPagination
+    queryset = Document.objects.all()
+    # serializer_class = DocumentSerializer
+    pagination_class = CustomLimitOffsetPagination
     permission_classes = (IsAuthenticated, EdocObjectPermissions)
     filter_backends = (
         DjangoFilterBackend,
@@ -546,9 +554,15 @@ class DocumentViewSet(
                 "document_type",
                 "warehouse",
                 "owner",
+
             )
-            .prefetch_related("tags")
+            .prefetch_related('tags')
         )
+
+    def get_serializer_class(self):
+        if 'pk' in self.kwargs:
+            return DocumentDetailSerializer
+        return DocumentSerializer
 
     def get_serializer(self, *args, **kwargs):
         fields_param = self.request.query_params.get("fields", None)
@@ -562,6 +576,26 @@ class DocumentViewSet(
             self.request.query_params.get("full_perms", False),
         )
         return super().get_serializer(*args, **kwargs)
+
+    # def list(self, request, *args, **kwargs):
+    #     queryset = self.filter_queryset(self.get_queryset())
+    #     # list_of_ids = queryset.values_list('id', flat=True)
+    #     # list_approval = Approval.objects.filter(object_pk__in=list_of_ids, ctype__model='document')
+    #     # dict_document_approvals_success = dict()
+    #     # for approval in list_approval:
+    #     #     if approval.status == states.SUCCESS:
+    #     #         dict_document_approvals_success[approval.object_pk].append(approval)
+    #     #
+    #
+    #
+    #     page = self.paginate_queryset(queryset)
+    #     if page is not None:
+    #         serializer = self.get_serializer(page, many=True)
+    #         return self.get_paginated_response(serializer.data)
+    #
+    #     serializer = self.get_serializer(queryset, many=True)
+    #     return Response(serializer.data)
+
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
@@ -1277,11 +1311,16 @@ class UnifiedSearchViewSet(DocumentViewSet):
         self.searcher = None
 
     def get_serializer_class(self):
-        if self._is_search_request():
-            # return SearchResultSerializer
-            return SearchResultElasticSearchSerializer
-        else:
+        # if self._is_search_request():
+        #     # return SearchResultSerializer
+        # else:
+        #     return DocumentSerializer
+
+        if self.request.method in  ["POST", "PUT"]:
             return DocumentSerializer
+        if 'pk' in self.kwargs:  # `self.kwargs` chứa các tham số từ URL (vd: /documents/<id>)
+            return DocumentDetailSerializer
+        return SearchResultElasticSearchSerializer
 
     def _is_search_request(self):
         return (
@@ -1291,37 +1330,29 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
 
     def filter_queryset(self, queryset):
-        if self._is_search_request():
-            # docs=convert_elastic_search(self.request.query_params.get('query'),1 , self.paginator.get_page_size(self.request))
-            # return docs
-            from documents import index
-            if "query" in self.request.query_params:
-                # query_class = index.DelayedFullTextQuery
-                query_class = index.DelayedElasticSearch
-            elif "more_like_id" in self.request.query_params:
-                # query_class = index.DelayedMoreLikeThisQuery
-                query_class = index.DelayedElasticSearchLikeMore
-
-            else:
-                raise ValueError
-            return query_class(
-                self.searcher,
-                self.request.query_params,
-                self.paginator.get_page_size(self.request),
-                self.request.user,
-            )
-        else:
+        if 'pk' in self.kwargs:  # `self.kwargs` chứa các tham số từ URL, ví dụ: /documents/<id>
             return super().filter_queryset(queryset)
 
-    def list(self, request, *args, **kwargs):
-        if self._is_search_request():
-            # from documents import index
+        from documents import index
 
+        query_class = index.DelayedElasticSearch
+        if "more_like_id" in self.request.query_params:
+            query_class = index.DelayedElasticSearchLikeMore
+        return query_class(
+            self.searcher,
+            self.request.query_params,
+            self.paginator.get_page_size(self.request),
+            self.request.user,
+        )
+
+    def list(self, request, *args, **kwargs):
+
+
+        if self._is_search_request():
             try:
                 with index.open_index_searcher() as s:
                     self.searcher = s
-                    return super().list(request)
-                # return super().list(request)
+                return super().list(request)
             except NotFound:
                 raise
             except Exception as e:
@@ -1331,7 +1362,6 @@ class UnifiedSearchViewSet(DocumentViewSet):
                     "Error listing search results, check logs for more detail.",
                 )
         else:
-            # print('da vào list', request.__dict__)
             return super().list(request)
 
     @action(detail=False, methods=["GET"], name="Get Next ASN")
@@ -1342,6 +1372,20 @@ class UnifiedSearchViewSet(DocumentViewSet):
             "archive_serial_number__max",
         )
         return Response(max_asn + 1)
+
+    @action(detail=False, methods=["GET"],
+            name="Statistics by Tags and Document Types")
+    def statistics(self, request, *args, **kwargs):
+        # Tạo truy vấn cơ bản từ query params
+
+        query_class = index.DelayedElasticSearch(self.searcher,
+            self.request.query_params,
+            self.paginator.get_page_size(self.request),
+            self.request.user)
+
+        response = query_class.search_statistics()
+        return Response(response, status=status.HTTP_200_OK)
+
 
 
 class LogViewSet(ViewSet):
@@ -1494,6 +1538,125 @@ class PostDocumentView(GenericAPIView):
 
         return Response(async_task.id)
 
+class SelectQueryViewSet(
+    ListModelMixin,
+    GenericViewSet,
+):
+    model = Document
+    queryset = Document.objects.all()
+    pagination_class = CustomLimitOffsetPagination
+    permission_classes = (IsAuthenticated, EdocObjectPermissions)
+    parser_classes = (parsers.MultiPartParser, parsers.JSONParser)
+    filter_backends = (
+        DjangoFilterBackend,
+        SearchFilter,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    filterset_class = DocumentFilterSet
+    search_fields = (
+    "title", "correspondent__name", "content", "warehouse", "folder")
+    ordering_fields = (
+        "id",
+        "title",
+        "correspondent__name",
+        "document_type__name",
+        "archive_font__namecreated",
+        "modified",
+        "added",
+        "archive_serial_number",
+        "num_notes",
+        "owner",
+        "page_count",
+    )
+
+    def list(self, request, *args, **kwargs):
+        # Áp dụng các bộ lọc thông qua queryset
+        start_time_total = time.time()  # Bắt đầu tính tổng thời gian
+        start_time_query = time.time()
+        filtered_documents = self.filter_queryset(self.get_queryset().only('id'))  # Thực hiện query lọc
+
+        time_query = time.time() - start_time_query
+
+        # Lấy danh sách ID từ kết quả lọc (dùng nếu cần)
+        start_time_ids = time.time()
+        # ids = filtered_documents.values_list('id', flat=True)  # Tạm thời không dùng
+        time_get_ids = time.time() - start_time_ids
+
+        # Tính document_count cho các mô hình liên quan
+        # Tính cho tags
+        start_time_tags = time.time()
+        tags = Tag.objects.filter(documents__in=filtered_documents).annotate(
+            document_count=Count('documents')
+        ).only('id')
+        time_get_tags = time.time() - start_time_tags
+
+        # Tính cho types
+        start_time_types = time.time()
+        types = DocumentType.objects.filter(
+            documents__in=filtered_documents).annotate(
+            document_count=Count('documents')
+        ).only('id')
+        time_get_types = time.time() - start_time_types
+
+        # Tính cho warehouses
+        start_time_warehouses = time.time()
+        warehouses = Warehouse.objects.filter(
+            documents__in=filtered_documents
+        ).annotate(
+            document_count=Count('documents')
+        ).only('id')
+        time_get_warehouses = time.time() - start_time_warehouses
+
+        start_time_for_data = time.time()
+        # Debug dữ liệu đã lấy
+        for tag in tags:
+            print(tag.__dict__)
+        for type in types:
+            print(type.__dict__)
+        for warehouse in warehouses:
+            print(warehouse.__dict__)
+        print(f'time get data {time.time() - start_time_for_data}')
+        # Chuẩn bị dữ liệu trả về
+        start_time_response=time.time()
+        response_data = {
+            # "selected_correspondents": [
+            #     {"id": t.id, "document_count": t.document_count} for t in correspondents
+            # ],
+            "selected_tags": [
+                {"id": t.id, "document_count": t.document_count} for t in tags
+            ],
+            "selected_document_types": [
+                {"id": t.id, "document_count": t.document_count} for t in types
+            ],
+            "selected_warehouses": [
+                {"id": t.id, "document_count": t.document_count} for t in
+                warehouses
+            ],
+            # "selected_storage_paths": [
+            #     {"id": t.id, "document_count": t.document_count} for t in storage_paths
+            # ],
+        }
+        time_response = time.time() - start_time_response
+
+        # In debug thông tin thời gian
+        print(f'''
+        warehouse: {warehouses},
+        tags: {tags},
+        types: {types},
+        time_total: {time.time() - start_time_total},
+        time_query: {time_query},
+        time_get_ids: {time_get_ids},
+        time_tags: {time_get_tags},
+        time_types: {time_get_types},
+        time_warehouses: {time_get_warehouses},
+        time_response: {time_response}
+        ''')
+
+        print('response_data:', response_data)
+
+        return Response(response_data)
+
 
 class SelectionDataView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
@@ -1505,7 +1668,11 @@ class SelectionDataView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         ids = serializer.validated_data.get("documents")
-
+        correspondents =[]
+        tags = []
+        types =[]
+        storage_paths = []
+        warehouses = []
         correspondents = Correspondent.objects.annotate(
             document_count=Count(
                 Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
@@ -1536,12 +1703,6 @@ class SelectionDataView(GenericAPIView):
             ),
         )
 
-        folders = Folder.objects.annotate(
-            document_count=Count(
-                Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
-            ),
-        )
-
         r = Response(
             {
                 "selected_correspondents": [
@@ -1556,9 +1717,6 @@ class SelectionDataView(GenericAPIView):
                 ],
                 "selected_warehouses": [
                     {"id": t.id, "document_count": t.document_count} for t in warehouses
-                ],
-                "selected_folders": [
-                    {"id": t.id, "document_count": t.document_count} for t in folders
                 ],
                 "selected_storage_paths": [
                     {"id": t.id, "document_count": t.document_count}
