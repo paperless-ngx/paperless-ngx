@@ -202,6 +202,8 @@ export class DocumentDetailComponent
   @ViewChild('inputTitle')
   titleInput: TextComponent
 
+  @ViewChild('tagsInput') tagsInput: TagsComponent
+
   expandOriginalMetadata = false
   expandArchivedMetadata = false
 
