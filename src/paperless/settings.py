@@ -350,23 +350,6 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
-# DRF Spectacular settings
-SPECTACULAR_SETTINGS = {
-    "TITLE": "Paperless-ngx REST API",
-    "DESCRIPTION": "OpenAPI Spec for Paperless-ngx",
-    "VERSION": "6.0.0",
-    "SERVE_INCLUDE_SCHEMA": False,
-    "SWAGGER_UI_DIST": "SIDECAR",
-    "COMPONENT_SPLIT_REQUEST": True,
-    "EXTERNAL_DOCS": {
-        "description": "Paperless-ngx API Documentation",
-        "url": "https://docs.paperless-ngx.com/api/",
-    },
-    "ENUM_NAME_OVERRIDES": {
-        "MatchingAlgorithm": "documents.models.MatchingModel.MATCHING_ALGORITHMS",
-    },
-}
-
 if DEBUG:
     REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append(
         "paperless.auth.AngularApiAuthenticationOverride",
@@ -409,6 +392,24 @@ def _parse_base_paths() -> tuple[str, str, str, str, str]:
 FORCE_SCRIPT_NAME, BASE_URL, LOGIN_URL, LOGIN_REDIRECT_URL, LOGOUT_REDIRECT_URL = (
     _parse_base_paths()
 )
+
+# DRF Spectacular settings
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Paperless-ngx REST API",
+    "DESCRIPTION": "OpenAPI Spec for Paperless-ngx",
+    "VERSION": "6.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "COMPONENT_SPLIT_REQUEST": True,
+    "EXTERNAL_DOCS": {
+        "description": "Paperless-ngx API Documentation",
+        "url": "https://docs.paperless-ngx.com/api/",
+    },
+    "ENUM_NAME_OVERRIDES": {
+        "MatchingAlgorithm": "documents.models.MatchingModel.MATCHING_ALGORITHMS",
+    },
+    "SCHEMA_PATH_PREFIX_INSERT": FORCE_SCRIPT_NAME or "",
+}
 
 WSGI_APPLICATION = "paperless.wsgi.application"
 ASGI_APPLICATION = "paperless.asgi.application"
