@@ -787,6 +787,7 @@ class DocumentViewSet(
             )
             matched_types = match_document_types_by_name(
                 llm_resp.get("document_types", []),
+                request.user,
             )
             matched_paths = match_storage_paths_by_name(
                 llm_resp.get("storage_paths", []),

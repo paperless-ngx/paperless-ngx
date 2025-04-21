@@ -51,7 +51,7 @@ class TestAIMatching(TestCase):
     def test_match_document_types_by_name(self, mock_get_objects):
         mock_get_objects.return_value = DocumentType.objects.all()
         names = ["Test Document Type 1", "Nonexistent Document Type"]
-        result = match_document_types_by_name(names)
+        result = match_document_types_by_name(names, user=None)
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].name, "Test Document Type 1")
 

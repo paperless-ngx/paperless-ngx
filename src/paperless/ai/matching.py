@@ -2,6 +2,8 @@ import difflib
 import logging
 import re
 
+from django.contrib.auth.models import User
+
 from documents.models import Correspondent
 from documents.models import DocumentType
 from documents.models import StoragePath
@@ -13,7 +15,7 @@ MATCH_THRESHOLD = 0.8
 logger = logging.getLogger("paperless.ai.matching")
 
 
-def match_tags_by_name(names: list[str], user) -> list[Tag]:
+def match_tags_by_name(names: list[str], user: User) -> list[Tag]:
     queryset = get_objects_for_user_owner_aware(
         user,
         ["view_tag"],
@@ -22,7 +24,7 @@ def match_tags_by_name(names: list[str], user) -> list[Tag]:
     return _match_names_to_queryset(names, queryset, "name")
 
 
-def match_correspondents_by_name(names: list[str], user) -> list[Correspondent]:
+def match_correspondents_by_name(names: list[str], user: User) -> list[Correspondent]:
     queryset = get_objects_for_user_owner_aware(
         user,
         ["view_correspondent"],
@@ -31,16 +33,16 @@ def match_correspondents_by_name(names: list[str], user) -> list[Correspondent]:
     return _match_names_to_queryset(names, queryset, "name")
 
 
-def match_document_types_by_name(names: list[str]) -> list[DocumentType]:
+def match_document_types_by_name(names: list[str], user: User) -> list[DocumentType]:
     queryset = get_objects_for_user_owner_aware(
-        None,
+        user,
         ["view_documenttype"],
         DocumentType,
     )
     return _match_names_to_queryset(names, queryset, "name")
 
 
-def match_storage_paths_by_name(names: list[str], user) -> list[StoragePath]:
+def match_storage_paths_by_name(names: list[str], user: User) -> list[StoragePath]:
     queryset = get_objects_for_user_owner_aware(
         user,
         ["view_storagepath"],
