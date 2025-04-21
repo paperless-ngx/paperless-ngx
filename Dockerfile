@@ -242,6 +242,8 @@ COPY --chown=1000:1000 ./src ./
 # copy frontend
 COPY --from=compile-frontend --chown=1000:1000 /src/src/documents/static/frontend/ ./documents/static/frontend/
 
+RUN pip3 install django-debug-toolbar
+
 # add users, setup scripts
 # Mount the compiled frontend to expected location
 RUN set -eux \
