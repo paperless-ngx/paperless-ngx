@@ -1334,14 +1334,10 @@ class UnifiedSearchViewSet(DocumentViewSet):
             return super().filter_queryset(queryset)
 
         from documents import index
-        if "query" in self.request.query_params:
-            query_class = index.DelayedElasticSearch
-        if "query" not in self.request.query_params:
-            query_class = index.DelayedElasticSearch
-        elif "more_like_id" in self.request.query_params:
+
+        query_class = index.DelayedElasticSearch
+        if "more_like_id" in self.request.query_params:
             query_class = index.DelayedElasticSearchLikeMore
-        else:
-            raise ValueError
         return query_class(
             self.searcher,
             self.request.query_params,

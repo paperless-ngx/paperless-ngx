@@ -806,11 +806,11 @@ class DelayedElasticSearch(DelayedQuery):
                 # "correspondent",
                 # "storage_path",
                 # "document_type",
-                # "warehouse",
+                "warehouse",
                 # "folder",
-                # "owner",
+                "owner",
             )
-            # .prefetch_related("tags", "custom_fields", "notes")
+            .prefetch_related("tags", "custom_fields", "notes")
             .filter(id__in=doc_ids).annotate(
                 truncated_content=Substr('content', 1, 500)  # Lấy tối đa 500 ký tự từ content
             ).defer(
