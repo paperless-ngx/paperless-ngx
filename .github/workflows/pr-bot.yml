@@ -50,7 +50,7 @@ jobs:
               labels.push('dependencies');
             }
 
-            if (user.includes('paperlessngx-bot')) {
+            if (user.includes('crowdin-bot')) {
               labels.push('translation', 'skip-changelog');
             }
 
