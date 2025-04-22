@@ -5,17 +5,14 @@ backend:
           - 'pyproject.toml'
           - 'uv.lock'
           - 'requirements.txt'
-
 frontend:
   - changed-files:
       - any-glob-to-any-file:
           - 'src-ui/**'
-
 documentation:
   - changed-files:
       - any-glob-to-any-file:
           - 'docs/**'
-
 ci-cd:
   - changed-files:
       - any-glob-to-any-file:
