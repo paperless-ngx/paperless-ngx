@@ -791,14 +791,9 @@ describe('DocumentDetailComponent', () => {
   it('should select correct zoom setting in dropdown', () => {
     initNormally()
     component.setZoom(ZoomSetting.PageFit)
-    expect(component.isZoomSelected(ZoomSetting.PageFit)).toBeTruthy()
-    expect(component.isZoomSelected(ZoomSetting.One)).toBeFalsy()
-    component.setZoom(ZoomSetting.PageWidth)
-    expect(component.isZoomSelected(ZoomSetting.One)).toBeTruthy()
-    expect(component.isZoomSelected(ZoomSetting.PageFit)).toBeFalsy()
+    expect(component.currentZoom).toEqual(ZoomSetting.PageFit)
     component.setZoom(ZoomSetting.Quarter)
-    expect(component.isZoomSelected(ZoomSetting.Quarter)).toBeTruthy()
-    expect(component.isZoomSelected(ZoomSetting.PageFit)).toBeFalsy()
+    expect(component.currentZoom).toEqual(ZoomSetting.Quarter)
   })
 
   it('should support updating notes dynamically', () => {
