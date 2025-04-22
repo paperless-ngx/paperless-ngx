@@ -571,16 +571,8 @@ class DelayedElasticSearch(DelayedQuery):
             ]
 
         final_query = Q("bool", must=exact_queries + normal_query)
-        user_criterias = get_permissions_criterias_elastic_search(
-            user=self.user)
-        if final_query:
-            if user_criterias:
-                final_query = (Q("bool", must=user_criterias+final_query))
-            return final_query
-        else:
-            return Q("bool", should=user_criterias+final_query) if user_criterias else None
 
-        # return final_query  # Chỉ trả về một truy vấn
+        return final_query  # Chỉ trả về một truy vấn
 
     def _get_query_filter(self):
         criterias = []
@@ -677,6 +669,16 @@ class DelayedElasticSearch(DelayedQuery):
                 criterias.append(Q("match", **{field: value}))
             elif query_filter == "istartswith":
                 criterias.append(Q("prefix", **{field: value}))
+        user_criterias = None
+        if str.__eq__(remove_time_queries(q_str), ''):
+            user_criterias = get_permissions_criterias_elastic_search(user=self.user)
+        print('criterias', criterias)
+        if criterias:
+            if user_criterias:
+                criterias.append(Q("bool", should=user_criterias))
+            return Q("bool", must=criterias)
+        else:
+            return Q("bool", should=user_criterias) if user_criterias else None
 
     def get_combined_query(self):
         base_query = self._get_query()  # Lấy truy vấn cơ bản
@@ -699,7 +701,6 @@ class DelayedElasticSearch(DelayedQuery):
             "sort": [sort_order] if sort_order else [],
 
         }
-        print('query_body', query_body)
         return query_body
 
     def search_pagination(self, content, page_number, page_size):
@@ -717,7 +718,6 @@ class DelayedElasticSearch(DelayedQuery):
         s = s.source(['id', 'warehouse_path'])
         s = s[page_number * page_size - page_size:page_number * page_size]
         response = s.execute()
-        print('search_pagination----------------------', response)
         # print(self.search_statistics())
         return response
 
@@ -770,7 +770,6 @@ class DelayedElasticSearch(DelayedQuery):
         s = s.query(query_combined['query'])  # Chỉ lấy phần query
         s = s.source(['id'])
         response = s.scan()
-        print('response_get_all', len(response))
         # Chuyển đổi kết quả thành danh sách các id
         start_time = time.time()
         doc_ids = [int(doc.meta.id) for doc in response]
@@ -1122,6 +1121,12 @@ def get_permissions_criterias(user: Optional[User] = None):
         user_criterias = []
     return user_criterias
 
+def remove_time_queries(query):
+    # Sử dụng regex để loại bỏ đoạn created: hoặc added: cùng giá trị của nó
+    cleaned_query = re.sub(r"(created:\[.*?\]|added:\[.*?\])", "", query)
+    # Loại bỏ dấu phẩy thừa hoặc khoảng trắng dư thừa
+    cleaned_query = re.sub(r",\s*", ", ", cleaned_query).strip(", ")
+    return cleaned_query
 
 def get_permissions_criterias_elastic_search(user: Optional[User] = None):
     user_criterias = [Q("term", has_owner=False)]

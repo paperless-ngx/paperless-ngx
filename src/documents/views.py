@@ -1317,7 +1317,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
         #     return DocumentSerializer
 
         if self.request.method in  ["POST", "PUT"]:
-            return DocumentSerializer
+            return DocumentDetailSerializer
         if 'pk' in self.kwargs:  # `self.kwargs` chứa các tham số từ URL (vd: /documents/<id>)
             return DocumentDetailSerializer
         return SearchResultElasticSearchSerializer
