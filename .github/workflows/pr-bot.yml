@@ -25,8 +25,7 @@ jobs:
           s_label: 'non-trivial'
           s_diff: '99999'
           fail_if_xl: 'false'
-          excluded_files: >
-            /\.lock$/ /\.txt$/ ^src-ui/pnpm-lock\.yaml$ ^src-ui/messages\.xlf$ ^src/locale/en_US/LC_MESSAGES/django\.po$
+          excluded_files: /\.lock$/ /\.txt$/ ^src-ui/pnpm-lock\.yaml$ ^src-ui/messages\.xlf$ ^src/locale/en_US/LC_MESSAGES/django\.po$
       - name: Label bot-generated PRs
         if: ${{ contains(github.actor, 'dependabot') || contains(github.actor, 'crowdin-bot') }}
         uses: actions/github-script@v7
