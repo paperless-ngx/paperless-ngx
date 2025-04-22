@@ -189,13 +189,13 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     return this.http.get<number>(this.getResourceUrl(null, 'next_asn'))
   }
 
-  update(o: Document): Observable<Document> {
+  patch(o: Document): Observable<Document> {
     // we want to only set created_date
-    o.created = undefined
+    delete o.created
     o.remove_inbox_tags = !!this.settingsService.get(
       SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS
     )
-    return super.update(o)
+    return super.patch(o)
   }
 
   uploadDocument(formData) {
