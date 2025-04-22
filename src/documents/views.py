@@ -772,51 +772,57 @@ class DocumentViewSet(
             return HttpResponseForbidden("Insufficient permissions")
 
         if settings.AI_ENABLED:
-            cached = get_llm_suggestion_cache(doc.pk, backend=settings.LLM_BACKEND)
+            cached_llm_suggestions = get_llm_suggestion_cache(
+                doc.pk,
+                backend=settings.LLM_BACKEND,
+            )
 
-            if cached:
+            if cached_llm_suggestions:
                 refresh_suggestions_cache(doc.pk)
-                return Response(cached.suggestions)
+                return Response(cached_llm_suggestions.suggestions)
 
-            llm_resp = get_ai_document_classification(doc)
+            llm_suggestions = get_ai_document_classification(doc)
 
-            matched_tags = match_tags_by_name(llm_resp.get("tags", []), request.user)
+            matched_tags = match_tags_by_name(
+                llm_suggestions.get("tags", []),
+                request.user,
+            )
             matched_correspondents = match_correspondents_by_name(
-                llm_resp.get("correspondents", []),
+                llm_suggestions.get("correspondents", []),
                 request.user,
             )
             matched_types = match_document_types_by_name(
-                llm_resp.get("document_types", []),
+                llm_suggestions.get("document_types", []),
                 request.user,
             )
             matched_paths = match_storage_paths_by_name(
-                llm_resp.get("storage_paths", []),
+                llm_suggestions.get("storage_paths", []),
                 request.user,
             )
 
             resp_data = {
-                "title": llm_resp.get("title"),
+                "title": llm_suggestions.get("title"),
                 "tags": [t.id for t in matched_tags],
                 "suggested_tags": extract_unmatched_names(
-                    llm_resp.get("tags", []),
+                    llm_suggestions.get("tags", []),
                     matched_tags,
                 ),
                 "correspondents": [c.id for c in matched_correspondents],
                 "suggested_correspondents": extract_unmatched_names(
-                    llm_resp.get("correspondents", []),
+                    llm_suggestions.get("correspondents", []),
                     matched_correspondents,
                 ),
                 "document_types": [d.id for d in matched_types],
                 "suggested_document_types": extract_unmatched_names(
-                    llm_resp.get("document_types", []),
+                    llm_suggestions.get("document_types", []),
                     matched_types,
                 ),
                 "storage_paths": [s.id for s in matched_paths],
                 "suggested_storage_paths": extract_unmatched_names(
-                    llm_resp.get("storage_paths", []),
+                    llm_suggestions.get("storage_paths", []),
                     matched_paths,
                 ),
-                "dates": llm_resp.get("dates", []),
+                "dates": llm_suggestions.get("dates", []),
             }
 
             set_llm_suggestions_cache(doc.pk, resp_data, backend=settings.LLM_BACKEND)
