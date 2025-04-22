@@ -1099,12 +1099,10 @@ export class DocumentDetailComponent
     )
   }
 
-  isZoomSelected(setting: ZoomSetting): boolean {
+  get currentZoom() {
     if (this.previewZoomScale === ZoomSetting.PageFit) {
-      return setting === ZoomSetting.PageFit
-    }
-
-    return this.previewZoomSetting === setting
+      return ZoomSetting.PageFit
+    } else return this.previewZoomSetting
   }
 
   getZoomSettingTitle(setting: ZoomSetting): string {
