@@ -33,7 +33,7 @@
           </ng-template>
         </ng-select>
         @if (allowCreate && !hideAddButton) {
-          <button class="btn btn-outline-secondary" type="button" (click)="createTag()" [disabled]="disabled">
+          <button class="btn btn-outline-secondary" type="button" (click)="createTag(null, true)" [disabled]="disabled">
             <i-bs width="1.2em" height="1.2em" name="plus"></i-bs>
           </button>
         }
