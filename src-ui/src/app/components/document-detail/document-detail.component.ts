@@ -90,6 +90,7 @@ import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspo
 import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
 import { EditDialogMode } from '../common/edit-dialog/edit-dialog.component'
 import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { TagEditDialogComponent } from '../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { EmailDocumentDialogComponent } from '../common/email-document-dialog/email-document-dialog.component'
 import { CheckComponent } from '../common/input/check/check.component'
 import { DateComponent } from '../common/input/date/date.component'
@@ -699,6 +700,47 @@ export class DocumentDetailComponent
       })
   }
 
+  public removeSuggestion(type: string, value: string) {
+    if (!this.suggestions) return
+
+    switch (type) {
+      case 'tag':
+        this.suggestions.suggested_tags =
+          this.suggestions.suggested_tags.filter((t) => t !== value)
+        break
+      case 'correspondent':
+        this.suggestions.suggested_correspondents =
+          this.suggestions.suggested_correspondents.filter((c) => c !== value)
+        break
+      case 'documentType':
+        this.suggestions.suggested_document_types =
+          this.suggestions.suggested_document_types.filter((dt) => dt !== value)
+        break
+    }
+  }
+
+  createTag(newName: string) {
+    var modal = this.modalService.open(TagEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    if (newName) modal.componentInstance.object = { name: newName }
+    modal.componentInstance.succeeded
+      .pipe(
+        switchMap((newTag) => {
+          return this.tagService
+            .listAll()
+            .pipe(map((tags) => ({ newTag, tags })))
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newTag, tags }) => {
+        this.tagsInput.tags = tags.results
+        this.tagsInput.addTag(newTag.id)
+        this.removeSuggestion('tag', newName)
+      })
+  }
+
   createDocumentType(newName: string) {
     var modal = this.modalService.open(DocumentTypeEditDialogComponent, {
       backdrop: 'static',
@@ -717,6 +759,7 @@ export class DocumentDetailComponent
       .subscribe(({ newDocumentType, documentTypes }) => {
         this.documentTypes = documentTypes.results
         this.documentForm.get('document_type').setValue(newDocumentType.id)
+        this.removeSuggestion('documentType', newName)
       })
   }
 
@@ -740,6 +783,7 @@ export class DocumentDetailComponent
       .subscribe(({ newCorrespondent, correspondents }) => {
         this.correspondents = correspondents.results
         this.documentForm.get('correspondent').setValue(newCorrespondent.id)
+        this.removeSuggestion('correspondent', newName)
       })
   }
 
