@@ -177,16 +177,16 @@ def _parse_beat_schedule() -> dict:
                            * 60.0,
             },
         },
-        {
-            "name": "Train the classifier",
-            "env_key": "EDOC_TRAIN_TASK_CRON",
-            "env_default": "0 2 * * *",  # 2:00 sáng mỗi ngày
-            "task": "documents.tasks.train_classifier",
-            "options": {
-                "expires": 3600.0,
-                # Tùy chọn: hết hạn sau 1 tiếng nếu chưa được thực thi
-            },
-        },
+        # {
+        #     "name": "Train the classifier",
+        #     "env_key": "EDOC_TRAIN_TASK_CRON",
+        #     "env_default": "0 2 * * *",  # 2:00 sáng mỗi ngày
+        #     "task": "documents.tasks.train_classifier",
+        #     "options": {
+        #         "expires": 3600.0,
+        #         # Tùy chọn: hết hạn sau 1 tiếng nếu chưa được thực thi
+        #     },
+        # },
 
         # {
         #     "name": "Optimize the index",
@@ -480,7 +480,7 @@ SOCIALACCOUNT_PROVIDERS = json.loads(
     os.getenv("EDOC_SOCIALACCOUNT_PROVIDERS", "{}"),
 )
 
-ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Edoc-ngx] "
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Edoc] "
 
 DISABLE_REGULAR_LOGIN = __get_boolean("EDOC_DISABLE_REGULAR_LOGIN")
 
