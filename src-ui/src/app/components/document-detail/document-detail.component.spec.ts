@@ -392,8 +392,11 @@ describe('DocumentDetailComponent', () => {
     currentUserCan = true
   })
 
-  it('should support creating tag', () => {
+  it('should support creating tag, remove from suggestions', () => {
     initNormally()
+    component.suggestions = {
+      suggested_tags: ['Tag1', 'NewTag12'],
+    }
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
@@ -407,10 +410,14 @@ describe('DocumentDetailComponent', () => {
       text_color: '#000000',
     })
     expect(component.documentForm.get('tags').value).toContain(12)
+    expect(component.suggestions.suggested_tags).not.toContain('NewTag12')
   })
 
-  it('should support creating document type', () => {
+  it('should support creating document type, remove from suggestions', () => {
     initNormally()
+    component.suggestions = {
+      suggested_document_types: ['DocumentType1', 'NewDocType2'],
+    }
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
@@ -418,10 +425,16 @@ describe('DocumentDetailComponent', () => {
     expect(modalSpy).toHaveBeenCalled()
     openModal.componentInstance.succeeded.next({ id: 12, name: 'NewDocType12' })
     expect(component.documentForm.get('document_type').value).toEqual(12)
+    expect(component.suggestions.suggested_document_types).not.toContain(
+      'NewDocType2'
+    )
   })
 
-  it('should support creating correspondent', () => {
+  it('should support creating correspondent, remove from suggestions', () => {
     initNormally()
+    component.suggestions = {
+      suggested_correspondents: ['Correspondent1', 'NewCorrrespondent12'],
+    }
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
@@ -432,6 +445,9 @@ describe('DocumentDetailComponent', () => {
       name: 'NewCorrrespondent12',
     })
     expect(component.documentForm.get('correspondent').value).toEqual(12)
+    expect(component.suggestions.suggested_correspondents).not.toContain(
+      'NewCorrrespondent12'
+    )
   })
 
   it('should support creating storage path', () => {
@@ -1112,30 +1128,6 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     expect(suggestionsSpy).toHaveBeenCalled()
     expect(errorSpy).toHaveBeenCalled()
-  })
-
-  it('should support removing suggestions', () => {
-    initNormally()
-    component.removeSuggestion('tag', 'Hello') // coverage
-    component.suggestions = {
-      tags: [42, 43],
-      suggested_tags: ['foo'],
-      document_types: [],
-      suggested_document_types: ['bar'],
-      correspondents: [],
-      suggested_correspondents: ['baz'],
-    }
-    component.removeSuggestion('tag', 'foo')
-    component.removeSuggestion('documentType', 'bar')
-    component.removeSuggestion('correspondent', 'baz')
-    expect(component.suggestions).toEqual({
-      tags: [42, 43],
-      suggested_tags: [],
-      document_types: [],
-      suggested_document_types: [],
-      correspondents: [],
-      suggested_correspondents: [],
-    })
   })
 
   it('should warn when open document does not match doc retrieved from backend on init', () => {
