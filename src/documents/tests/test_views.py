@@ -1,6 +1,8 @@
 import tempfile
 from datetime import timedelta
 from pathlib import Path
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -10,8 +12,15 @@ from django.test import override_settings
 from django.utils import timezone
 from rest_framework import status
 
+from documents.caching import get_llm_suggestion_cache
+from documents.caching import set_llm_suggestions_cache
+from documents.models import Correspondent
 from documents.models import Document
+from documents.models import DocumentType
 from documents.models import ShareLink
+from documents.models import StoragePath
+from documents.models import Tag
+from documents.signals.handlers import update_llm_suggestions_cache
 from documents.tests.utils import DirectoriesMixin
 from paperless.models import ApplicationConfiguration
 
@@ -154,3 +163,104 @@ class TestViews(DirectoriesMixin, TestCase):
         response.render()
         self.assertEqual(response.request["PATH_INFO"], "/accounts/login/")
         self.assertContains(response, b"Share link has expired")
+
+
+class TestAISuggestions(DirectoriesMixin, TestCase):
+    def setUp(self):
+        self.user = User.objects.create_superuser(username="testuser")
+        self.document = Document.objects.create(
+            title="Test Document",
+            filename="test.pdf",
+            mime_type="application/pdf",
+        )
+        self.tag1 = Tag.objects.create(name="tag1")
+        self.correspondent1 = Correspondent.objects.create(name="correspondent1")
+        self.document_type1 = DocumentType.objects.create(name="type1")
+        self.path1 = StoragePath.objects.create(name="path1")
+        super().setUp()
+
+    @patch("documents.views.get_llm_suggestion_cache")
+    @patch("documents.views.refresh_suggestions_cache")
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_BACKEND="mock_backend",
+    )
+    def test_suggestions_with_cached_llm(self, mock_refresh_cache, mock_get_cache):
+        mock_get_cache.return_value = MagicMock(suggestions={"tags": ["tag1", "tag2"]})
+
+        self.client.force_login(user=self.user)
+        response = self.client.get(f"/api/documents/{self.document.pk}/suggestions/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), {"tags": ["tag1", "tag2"]})
+        mock_refresh_cache.assert_called_once_with(self.document.pk)
+
+    @patch("documents.views.get_ai_document_classification")
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_BACKEND="mock_backend",
+    )
+    def test_suggestions_with_ai_enabled(
+        self,
+        mock_get_ai_classification,
+    ):
+        mock_get_ai_classification.return_value = {
+            "title": "AI Title",
+            "tags": ["tag1", "tag2"],
+            "correspondents": ["correspondent1"],
+            "document_types": ["type1"],
+            "storage_paths": ["path1"],
+            "dates": ["2023-01-01"],
+        }
+
+        self.client.force_login(user=self.user)
+        response = self.client.get(f"/api/documents/{self.document.pk}/suggestions/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.json(),
+            {
+                "title": "AI Title",
+                "tags": [self.tag1.pk],
+                "suggested_tags": ["tag2"],
+                "correspondents": [self.correspondent1.pk],
+                "suggested_correspondents": [],
+                "document_types": [self.document_type1.pk],
+                "suggested_document_types": [],
+                "storage_paths": [self.path1.pk],
+                "suggested_storage_paths": [],
+                "dates": ["2023-01-01"],
+            },
+        )
+
+    def test_invalidate_suggestions_cache(self):
+        self.client.force_login(user=self.user)
+        suggestions = {
+            "title": "AI Title",
+            "tags": ["tag1", "tag2"],
+            "correspondents": ["correspondent1"],
+            "document_types": ["type1"],
+            "storage_paths": ["path1"],
+            "dates": ["2023-01-01"],
+        }
+        set_llm_suggestions_cache(
+            self.document.pk,
+            suggestions,
+            backend="mock_backend",
+        )
+        self.assertEqual(
+            get_llm_suggestion_cache(
+                self.document.pk,
+                backend="mock_backend",
+            ).suggestions,
+            suggestions,
+        )
+        # post_save signal triggered
+        update_llm_suggestions_cache(
+            sender=None,
+            instance=self.document,
+        )
+        self.assertIsNone(
+            get_llm_suggestion_cache(
+                self.document.pk,
+                backend="mock_backend",
+            ),
+        )
