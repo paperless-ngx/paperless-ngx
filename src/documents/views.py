@@ -1350,8 +1350,8 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
         if self._is_search_request():
             try:
-                with index.open_index_searcher() as s:
-                    self.searcher = s
+                # with index.open_index_searcher() as s:
+                #     self.searcher = s
                 return super().list(request)
             except NotFound:
                 raise
