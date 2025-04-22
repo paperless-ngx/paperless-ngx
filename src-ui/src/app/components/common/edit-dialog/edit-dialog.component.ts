@@ -47,7 +47,7 @@ export abstract class EditDialogComponent<
   object: T
 
   @Output()
-  succeeded = new EventEmitter()
+  succeeded = new EventEmitter<T>()
 
   @Output()
   failed = new EventEmitter()

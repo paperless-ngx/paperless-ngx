@@ -405,7 +405,7 @@ describe('GlobalSearchComponent', () => {
     expect(toastErrorSpy).toHaveBeenCalled()
 
     // succeed
-    editDialog.succeeded.emit(true)
+    editDialog.succeeded.emit(object as any)
     expect(toastInfoSpy).toHaveBeenCalled()
   })
 
@@ -456,7 +456,7 @@ describe('GlobalSearchComponent', () => {
     expect(toastErrorSpy).toHaveBeenCalled()
 
     // succeed
-    editDialog.succeeded.emit(true)
+    editDialog.succeeded.emit(searchResults.tags[0] as any)
     expect(toastInfoSpy).toHaveBeenCalled()
   })
 
