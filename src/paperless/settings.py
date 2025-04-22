@@ -342,29 +342,12 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.AcceptHeaderVersioning",
-    "DEFAULT_VERSION": "7",
+    "DEFAULT_VERSION": "8",
     # Make sure these are ordered and that the most recent version appears
     # last. See api.md#api-versioning when adding new versions.
-    "ALLOWED_VERSIONS": ["1", "2", "3", "4", "5", "6", "7"],
+    "ALLOWED_VERSIONS": ["1", "2", "3", "4", "5", "6", "7", "8"],
     # DRF Spectacular default schema
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-}
-
-# DRF Spectacular settings
-SPECTACULAR_SETTINGS = {
-    "TITLE": "Paperless-ngx REST API",
-    "DESCRIPTION": "OpenAPI Spec for Paperless-ngx",
-    "VERSION": "6.0.0",
-    "SERVE_INCLUDE_SCHEMA": False,
-    "SWAGGER_UI_DIST": "SIDECAR",
-    "COMPONENT_SPLIT_REQUEST": True,
-    "EXTERNAL_DOCS": {
-        "description": "Paperless-ngx API Documentation",
-        "url": "https://docs.paperless-ngx.com/api/",
-    },
-    "ENUM_NAME_OVERRIDES": {
-        "MatchingAlgorithm": "documents.models.MatchingModel.MATCHING_ALGORITHMS",
-    },
 }
 
 if DEBUG:
@@ -409,6 +392,24 @@ def _parse_base_paths() -> tuple[str, str, str, str, str]:
 FORCE_SCRIPT_NAME, BASE_URL, LOGIN_URL, LOGIN_REDIRECT_URL, LOGOUT_REDIRECT_URL = (
     _parse_base_paths()
 )
+
+# DRF Spectacular settings
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Paperless-ngx REST API",
+    "DESCRIPTION": "OpenAPI Spec for Paperless-ngx",
+    "VERSION": "6.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "COMPONENT_SPLIT_REQUEST": True,
+    "EXTERNAL_DOCS": {
+        "description": "Paperless-ngx API Documentation",
+        "url": "https://docs.paperless-ngx.com/api/",
+    },
+    "ENUM_NAME_OVERRIDES": {
+        "MatchingAlgorithm": "documents.models.MatchingModel.MATCHING_ALGORITHMS",
+    },
+    "SCHEMA_PATH_PREFIX_INSERT": FORCE_SCRIPT_NAME or "",
+}
 
 WSGI_APPLICATION = "paperless.wsgi.application"
 ASGI_APPLICATION = "paperless.asgi.application"
@@ -549,6 +550,9 @@ def _parse_remote_user_settings() -> str:
 
 HTTP_REMOTE_USER_HEADER_NAME = _parse_remote_user_settings()
 
+# X-Frame options for embedded PDF display:
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
 # The next 3 settings can also be set using just PAPERLESS_URL
 CSRF_TRUSTED_ORIGINS = __get_list("PAPERLESS_CSRF_TRUSTED_ORIGINS")
 
@@ -561,6 +565,10 @@ CORS_ALLOWED_ORIGINS = __get_list(
 if DEBUG:
     # Allow access from the angular development server during debugging
     CORS_ALLOWED_ORIGINS.append("http://localhost:4200")
+
+CORS_EXPOSE_HEADERS = [
+    "Content-Disposition",
+]
 
 ALLOWED_HOSTS = __get_list("PAPERLESS_ALLOWED_HOSTS", ["*"])
 if ALLOWED_HOSTS != ["*"]:

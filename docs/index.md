@@ -197,7 +197,7 @@ People interested in continuing the work on paperless-ngx are encouraged to reac
 
 ### Translation
 
-Paperless-ngx is available in many languages that are coordinated on [Crowdin](https://crwd.in/paperless-ngx). If you want to help out by translating paperless-ngx into your language, please head over to the [Paperless-ngx project at Crowdin](https://crwd.in/paperless-ngx), and thank you!
+Paperless-ngx is available in many languages that are coordinated on [Crowdin](https://crowdin.com/project/paperless-ngx). If you want to help out by translating paperless-ngx into your language, please head over to the [Paperless-ngx project at Crowdin](https://crowdin.com/project/paperless-ngx), and thank you!
 
 ## Scanners & Software
 

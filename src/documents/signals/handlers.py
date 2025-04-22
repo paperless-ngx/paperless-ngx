@@ -349,11 +349,15 @@ def cleanup_document_deletion(sender, instance, **kwargs):
                 )
                 return
 
-        for filename in (
-            instance.source_path,
+        files = (
             instance.archive_path,
             instance.thumbnail_path,
-        ):
+        )
+        if not settings.EMPTY_TRASH_DIR:
+            # Only delete the original file if we are not moving it to trash dir
+            files += (instance.source_path,)
+
+        for filename in files:
             if filename and os.path.isfile(filename):
                 try:
                     os.unlink(filename)
@@ -622,20 +626,30 @@ def send_webhook(
     as_json: bool = False,
 ):
     try:
+        post_args = {
+            "url": url,
+            "headers": headers,
+            "files": files,
+        }
         if as_json:
-            httpx.post(
-                url,
-                json=data,
-                files=files,
-                headers=headers,
-            ).raise_for_status()
+            post_args["json"] = data
+        elif isinstance(data, dict):
+            post_args["data"] = data
         else:
-            httpx.post(
-                url,
-                content=data,
-                files=files,
-                headers=headers,
-            ).raise_for_status()
+            post_args["content"] = data
+
+        httpx.post(
+            **post_args,
+        ).raise_for_status()
+        logger.info(
+            f"Webhook sent to {url}",
+        )
+    except Exception as e:
+        logger.error(
+            f"Failed attempt sending webhook to {url}: {e}",
+        )
+        raise e
+
         logger.info(
             f"Webhook sent to {url}",
         )
@@ -649,11 +663,12 @@ def send_webhook(
 def run_workflows(
     trigger_type: WorkflowTrigger.WorkflowTriggerType,
     document: Document | ConsumableDocument,
+    workflow_to_run: Workflow | None = None,
     logging_group=None,
     overrides: DocumentMetadataOverrides | None = None,
     original_file: Path | None = None,
 ) -> tuple[DocumentMetadataOverrides, str] | None:
-    """Run workflows which match a Document (or ConsumableDocument) for a specific trigger type.
+    """Run workflows which match a Document (or ConsumableDocument) for a specific trigger type or a single workflow if given.
 
     Assignment or removal actions are either applied directly to the document or an overrides object. If an overrides
     object is provided, the function returns the object with the applied changes or None if no actions were applied and a string
@@ -784,10 +799,10 @@ def run_workflows(
                         field=field,
                         document=document,
                     ).first()
-                    if instance:
+                    if instance and args[value_field_name] is not None:
                         setattr(instance, value_field_name, args[value_field_name])
                         instance.save()
-                    else:
+                    elif not instance:
                         CustomFieldInstance.objects.create(
                             **args,
                             field=field,
@@ -1192,24 +1207,28 @@ def run_workflows(
     messages = []
 
     workflows = (
-        Workflow.objects.filter(enabled=True, triggers__type=trigger_type)
-        .prefetch_related(
-            "actions",
-            "actions__assign_view_users",
-            "actions__assign_view_groups",
-            "actions__assign_change_users",
-            "actions__assign_change_groups",
-            "actions__assign_custom_fields",
-            "actions__remove_tags",
-            "actions__remove_correspondents",
-            "actions__remove_document_types",
-            "actions__remove_storage_paths",
-            "actions__remove_custom_fields",
-            "actions__remove_owners",
-            "triggers",
+        (
+            Workflow.objects.filter(enabled=True, triggers__type=trigger_type)
+            .prefetch_related(
+                "actions",
+                "actions__assign_view_users",
+                "actions__assign_view_groups",
+                "actions__assign_change_users",
+                "actions__assign_change_groups",
+                "actions__assign_custom_fields",
+                "actions__remove_tags",
+                "actions__remove_correspondents",
+                "actions__remove_document_types",
+                "actions__remove_storage_paths",
+                "actions__remove_custom_fields",
+                "actions__remove_owners",
+                "triggers",
+            )
+            .order_by("order")
+            .distinct()
         )
-        .order_by("order")
-        .distinct()
+        if workflow_to_run is None
+        else [workflow_to_run]
     )
 
     for workflow in workflows:

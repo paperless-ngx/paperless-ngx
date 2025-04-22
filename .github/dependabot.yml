@@ -59,6 +59,7 @@ updates:
       django:
         patterns:
           - "*django*"
+          - "drf-*"
       major-versions:
         update-types:
           - "major"
@@ -100,7 +101,6 @@ updates:
     reviewers:
       - "paperless-ngx/ci-cd"
     labels:
-      - "ci-cd"
       - "dependencies"
     commit-message:
       prefix: "docker"
@@ -115,7 +115,6 @@ updates:
     reviewers:
       - "paperless-ngx/ci-cd"
     labels:
-      - "ci-cd"
       - "dependencies"
     commit-message:
       prefix: "docker-compose"

@@ -188,7 +188,7 @@ describe('MailComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     editDialog.failed.emit()
     expect(toastErrorSpy).toBeCalled()
-    editDialog.succeeded.emit(mailAccounts[0])
+    editDialog.succeeded.emit(mailAccounts[0] as any)
     expect(toastInfoSpy).toHaveBeenCalledWith(
       `Saved account "${mailAccounts[0].name}".`
     )
@@ -246,7 +246,7 @@ describe('MailComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     editDialog.failed.emit()
     expect(toastErrorSpy).toBeCalled()
-    editDialog.succeeded.emit(mailRules[0])
+    editDialog.succeeded.emit(mailRules[0] as any)
     expect(toastInfoSpy).toHaveBeenCalledWith(
       `Saved rule "${mailRules[0].name}".`
     )

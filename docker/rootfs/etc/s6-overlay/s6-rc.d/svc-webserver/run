@@ -14,7 +14,7 @@ if [[ -n "${PAPERLESS_FORCE_SCRIPT_NAME}" ]]; then
 fi
 
 if [[ -n "${USER_IS_NON_ROOT}" ]]; then
-  exec granian --interface asginl --ws "paperless.asgi:application"
+  exec granian --interface asginl --ws --loop uvloop "paperless.asgi:application"
 else
-  exec s6-setuidgid paperless granian --interface asginl --ws "paperless.asgi:application"
+  exec s6-setuidgid paperless granian --interface asginl --ws --loop uvloop "paperless.asgi:application"
 fi

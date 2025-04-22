@@ -673,7 +673,9 @@ class DocumentViewSet(
         document_cached_metadata = get_metadata_cache(doc.pk)
 
         archive_metadata = None
-        archive_filesize = None
+        archive_filesize = (
+            self.get_filesize(doc.archive_path) if doc.has_archive_version else None
+        )
         if document_cached_metadata is not None:
             original_metadata = document_cached_metadata.original_metadata
             archive_metadata = document_cached_metadata.archive_metadata
@@ -682,7 +684,6 @@ class DocumentViewSet(
             original_metadata = self.get_metadata(doc.source_path, doc.mime_type)
 
             if doc.has_archive_version:
-                archive_filesize = self.get_filesize(doc.archive_path)
                 archive_metadata = self.get_metadata(
                     doc.archive_path,
                     "application/pdf",
@@ -2376,9 +2377,13 @@ def serve_file(*, doc: Document, use_archive: bool, disposition: str):
     # RFC 5987 addresses this issue
     # see https://datatracker.ietf.org/doc/html/rfc5987#section-4.2
     # Chromium cannot handle commas in the filename
-    filename_normalized = normalize("NFKD", filename.replace(",", "_")).encode(
-        "ascii",
-        "ignore",
+    filename_normalized = (
+        normalize("NFKD", filename.replace(",", "_"))
+        .encode(
+            "ascii",
+            "ignore",
+        )
+        .decode("ascii")
     )
     filename_encoded = quote(filename)
     content_disposition = (

@@ -9,9 +9,9 @@
     }
     <div class="input-group input-group-sm me-md-5 d-none d-md-flex">
       <button class="btn btn-outline-secondary" (click)="decreaseZoom()" i18n>-</button>
-      <select class="form-select" (change)="setZoom($event.target.value)">
+      <select class="form-select" (change)="setZoom($event.target.value)" [ngModel]="currentZoom">
         @for (setting of zoomSettings; track setting) {
-          <option [value]="setting" [attr.selected]="isZoomSelected(setting) ? 'selected' : null">
+          <option [value]="setting">
             {{ getZoomSettingTitle(setting) }}
           </option>
         }

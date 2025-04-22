@@ -270,7 +270,7 @@ The following methods are supported:
 -   `remove_tag`
     -   Requires `parameters`: `{ "tag": TAG_ID }`
 -   `modify_tags`
-    -   Requires `parameters`: `{ "add_tags": [LIST_OF_TAG_IDS] }` and / or `{ "remove_tags": [LIST_OF_TAG_IDS] }`
+    -   Requires `parameters`: `{ "add_tags": [LIST_OF_TAG_IDS] }` and `{ "remove_tags": [LIST_OF_TAG_IDS] }`
 -   `delete`
     -   No `parameters` required
 -   `reprocess`
@@ -413,3 +413,8 @@ Initial API version.
     list of strings. When creating or updating a custom field value of a
     document for a select type custom field, the value should be the `id` of
     the option whereas previously was the index of the option.
+
+#### Version 8
+
+-   The user field of document notes now returns a simplified user object
+    rather than just the user ID.

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-11 13:33-0700\n"
-"PO-Revision-Date: 2025-03-11 20:34\n"
+"POT-Creation-Date: 2025-04-19 15:13-0700\n"
+"PO-Revision-Date: 2025-04-19 22:14\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -582,7 +582,7 @@ msgstr "Fichier à consommer"
 
 #: documents/models.py:540
 msgid "Train Classifier"
-msgstr ""
+msgstr "Entrainer le classificateur"
 
 #: documents/models.py:541
 msgid "Check Sanity"
@@ -1173,12 +1173,12 @@ msgstr "Expression régulière incorrecte : %(error)s"
 msgid "Invalid color."
 msgstr "Couleur incorrecte."
 
-#: documents/serialisers.py:1600
+#: documents/serialisers.py:1614
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Type de fichier %(type)s non pris en charge"
 
-#: documents/serialisers.py:1689
+#: documents/serialisers.py:1703
 msgid "Invalid variable detected."
 msgstr "Variable invalide détectée."
 
@@ -1188,7 +1188,7 @@ msgstr "Compte Paperless-ngx inactif"
 
 #: documents/templates/account/account_inactive.html:9
 msgid "Account inactive."
-msgstr ""
+msgstr "Compte inactif."
 
 #: documents/templates/account/account_inactive.html:14
 msgid "This account is inactive."
@@ -1222,28 +1222,28 @@ msgstr "Veuillez vous connecter."
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
 msgstr "Vous n’avez pas encore de compte ? <a href=\"%(signup_url)s\">Inscrivez-vous</a>"
 
-#: documents/templates/account/login.html:19
-#: documents/templates/account/signup.html:15
+#: documents/templates/account/login.html:25
+#: documents/templates/account/signup.html:22
 #: documents/templates/socialaccount/signup.html:13
 msgid "Username"
 msgstr "Nom d'utilisateur"
 
-#: documents/templates/account/login.html:20
-#: documents/templates/account/signup.html:17
+#: documents/templates/account/login.html:26
+#: documents/templates/account/signup.html:24
 msgid "Password"
 msgstr "Mot de passe"
 
-#: documents/templates/account/login.html:30
+#: documents/templates/account/login.html:36
 #: documents/templates/mfa/authenticate.html:23
 msgid "Sign in"
 msgstr "S'identifier"
 
-#: documents/templates/account/login.html:34
+#: documents/templates/account/login.html:40
 msgid "Forgot your password?"
 msgstr "Mot de passe oublié ?"
 
-#: documents/templates/account/login.html:45
-#: documents/templates/account/signup.html:49
+#: documents/templates/account/login.html:51
+#: documents/templates/account/signup.html:57
 msgid "or sign in via"
 msgstr "ou se connecter via"
 
@@ -1316,21 +1316,25 @@ msgstr "Votre nouveau mot de passe a été défini. Vous pouvez maintenant <a hr
 msgid "Paperless-ngx sign up"
 msgstr "S'inscrire à Paperless-ngx"
 
-#: documents/templates/account/signup.html:10
+#: documents/templates/account/signup.html:11
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
 msgstr "Vous avez déjà un compte ? <a href=\"%(login_url)s\">Connectez-vous</a>"
 
-#: documents/templates/account/signup.html:16
+#: documents/templates/account/signup.html:19
+msgid "Note: This is the first user account for this installation and will be granted superuser privileges."
+msgstr "Remarque : ceci est le premier compte utilisateur pour cette installation et lui sera donné les privilèges de superutilisateur."
+
+#: documents/templates/account/signup.html:23
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
 msgstr "Adresse électronique (facultatif)"
 
-#: documents/templates/account/signup.html:18
+#: documents/templates/account/signup.html:25
 msgid "Password (again)"
 msgstr "Mot de passe (à nouveau)"
 
-#: documents/templates/account/signup.html:36
+#: documents/templates/account/signup.html:43
 #: documents/templates/socialaccount/signup.html:27
 msgid "Sign up"
 msgstr "S'inscrire"
@@ -1555,139 +1559,139 @@ msgstr "Nom de l'application"
 msgid "paperless application settings"
 msgstr "paramètres de l'application paperless"
 
-#: paperless/settings.py:723
+#: paperless/settings.py:726
 msgid "English (US)"
 msgstr "Anglais (US)"
 
-#: paperless/settings.py:724
+#: paperless/settings.py:727
 msgid "Arabic"
 msgstr "Arabe"
 
-#: paperless/settings.py:725
+#: paperless/settings.py:728
 msgid "Afrikaans"
 msgstr "Afrikaans"
 
-#: paperless/settings.py:726
+#: paperless/settings.py:729
 msgid "Belarusian"
 msgstr "Biélorusse"
 
-#: paperless/settings.py:727
+#: paperless/settings.py:730
 msgid "Bulgarian"
 msgstr "Bulgare"
 
-#: paperless/settings.py:728
+#: paperless/settings.py:731
 msgid "Catalan"
 msgstr "Catalan"
 
-#: paperless/settings.py:729
+#: paperless/settings.py:732
 msgid "Czech"
 msgstr "Tchèque"
 
-#: paperless/settings.py:730
+#: paperless/settings.py:733
 msgid "Danish"
 msgstr "Danois"
 
-#: paperless/settings.py:731
+#: paperless/settings.py:734
 msgid "German"
 msgstr "Allemand"
 
-#: paperless/settings.py:732
+#: paperless/settings.py:735
 msgid "Greek"
 msgstr "Grec"
 
-#: paperless/settings.py:733
+#: paperless/settings.py:736
 msgid "English (GB)"
 msgstr "Anglais (GB)"
 
-#: paperless/settings.py:734
+#: paperless/settings.py:737
 msgid "Spanish"
 msgstr "Espagnol"
 
-#: paperless/settings.py:735
+#: paperless/settings.py:738
 msgid "Finnish"
 msgstr "Finnois"
 
-#: paperless/settings.py:736
+#: paperless/settings.py:739
 msgid "French"
 msgstr "Français"
 
-#: paperless/settings.py:737
+#: paperless/settings.py:740
 msgid "Hungarian"
 msgstr "Hongrois"
 
-#: paperless/settings.py:738
+#: paperless/settings.py:741
 msgid "Italian"
 msgstr "Italien"
 
-#: paperless/settings.py:739
+#: paperless/settings.py:742
 msgid "Japanese"
 msgstr "Japonais"
 
-#: paperless/settings.py:740
+#: paperless/settings.py:743
 msgid "Korean"
 msgstr "Coréen"
 
-#: paperless/settings.py:741
+#: paperless/settings.py:744
 msgid "Luxembourgish"
 msgstr "Luxembourgeois"
 
-#: paperless/settings.py:742
+#: paperless/settings.py:745
 msgid "Norwegian"
 msgstr "Norvégien"
 
-#: paperless/settings.py:743
+#: paperless/settings.py:746
 msgid "Dutch"
 msgstr "Néerlandais"
 
-#: paperless/settings.py:744
+#: paperless/settings.py:747
 msgid "Polish"
 msgstr "Polonais"
 
-#: paperless/settings.py:745
+#: paperless/settings.py:748
 msgid "Portuguese (Brazil)"
 msgstr "Portugais (Brésil)"
 
-#: paperless/settings.py:746
+#: paperless/settings.py:749
 msgid "Portuguese"
 msgstr "Portugais"
 
-#: paperless/settings.py:747
+#: paperless/settings.py:750
 msgid "Romanian"
 msgstr "Roumain"
 
-#: paperless/settings.py:748
+#: paperless/settings.py:751
 msgid "Russian"
 msgstr "Russe"
 
-#: paperless/settings.py:749
+#: paperless/settings.py:752
 msgid "Slovak"
 msgstr "Solvaque"
 
-#: paperless/settings.py:750
+#: paperless/settings.py:753
 msgid "Slovenian"
 msgstr "Slovène"
 
-#: paperless/settings.py:751
+#: paperless/settings.py:754
 msgid "Serbian"
 msgstr "Serbe"
 
-#: paperless/settings.py:752
+#: paperless/settings.py:755
 msgid "Swedish"
 msgstr "Suédois"
 
-#: paperless/settings.py:753
+#: paperless/settings.py:756
 msgid "Turkish"
 msgstr "Turc"
 
-#: paperless/settings.py:754
+#: paperless/settings.py:757
 msgid "Ukrainian"
 msgstr "Ukrainien"
 
-#: paperless/settings.py:755
+#: paperless/settings.py:758
 msgid "Chinese Simplified"
 msgstr "Chinois simplifié"
 
-#: paperless/settings.py:756
+#: paperless/settings.py:759
 msgid "Chinese Traditional"
 msgstr "Chinois traditionnel"
 

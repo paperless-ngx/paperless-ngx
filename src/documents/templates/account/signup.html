@@ -6,12 +6,19 @@
 {% endblock head_title %}
 
 {% block form_top_content %}
-    <p>
-        {% blocktrans %}Already have an account? <a href="{{ login_url }}">Sign in</a>{% endblocktrans %}
-    </p>
+		{% if not FIRST_INSTALL %}
+			<p>
+					{% blocktrans %}Already have an account? <a href="{{ login_url }}">Sign in</a>{% endblocktrans %}
+			</p>
+		{% endif %}
 {% endblock form_top_content %}
 
 {% block form_content %}
+		{% if FIRST_INSTALL %}
+			<p>
+				{% blocktrans %}Note: This is the first user account for this installation and will be granted superuser privileges.{% endblocktrans %}
+			</p>
+		{% endif %}
     {% translate "Username" as i18n_username %}
     {% translate "Email (optional)" as i18n_email %}
     {% translate "Password" as i18n_password1 %}
@@ -42,29 +49,31 @@
 {% endblock form_content %}
 
 {% block after_form_content %}
-  {% load allauth socialaccount %}
-  {% get_providers as socialaccount_providers %}
-  {% if socialaccount_providers %}
-      {% if not DISABLE_REGULAR_LOGIN %}
-        <p class="mt-3">{% translate "or sign in via" %}</p>
-      {% endif %}
-      <ul class="m-0 p-0">
-          {% for provider in socialaccount_providers %}
-              {% if provider.id == "openid" %}
-                  {% for brand in provider.get_brands %}
-                      {% provider_login_url provider openid=brand.openid_url process=process as href %}
-                  <li class="d-grid mt-3"><a class="btn btn-secondary" href="{{ href }}">{{ brand.name }}</a></li>
-                  {% endfor %}
-              {% else %}
-              {% provider_login_url provider process=process scope=scope auth_params=auth_params as href %}
-              <li class="d-grid mt-3">
-                <form class="d-grid" method="POST" action="{{ href }}">
-                  {% csrf_token %}
-                  <button type="submit" class="btn btn-secondary">{{ provider.name }}</button>
-                </form>
-              </li>
-              {% endif %}
-          {% endfor %}
-      </ul>
-  {% endif %}
+	{% if not FIRST_INSTALL %}
+		{% load allauth socialaccount %}
+		{% get_providers as socialaccount_providers %}
+		{% if socialaccount_providers %}
+				{% if not DISABLE_REGULAR_LOGIN %}
+					<p class="mt-3">{% translate "or sign in via" %}</p>
+				{% endif %}
+				<ul class="m-0 p-0">
+						{% for provider in socialaccount_providers %}
+								{% if provider.id == "openid" %}
+										{% for brand in provider.get_brands %}
+												{% provider_login_url provider openid=brand.openid_url process=process as href %}
+										<li class="d-grid mt-3"><a class="btn btn-secondary" href="{{ href }}">{{ brand.name }}</a></li>
+										{% endfor %}
+								{% else %}
+								{% provider_login_url provider process=process scope=scope auth_params=auth_params as href %}
+								<li class="d-grid mt-3">
+									<form class="d-grid" method="POST" action="{{ href }}">
+										{% csrf_token %}
+										<button type="submit" class="btn btn-secondary">{{ provider.name }}</button>
+									</form>
+								</li>
+								{% endif %}
+						{% endfor %}
+				</ul>
+		{% endif %}
+	{% endif %}
 {% endblock after_form_content %}

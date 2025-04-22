@@ -404,7 +404,7 @@ set this value to /paperless. No trailing slash!
 #### [`PAPERLESS_STATIC_URL=<path>`](#PAPERLESS_STATIC_URL) {#PAPERLESS_STATIC_URL}
 
 : Override the STATIC_URL here. Unless you're hosting Paperless off a
-subdomain like /paperless/, you probably don't need to change this.
+specific path like /paperless/, you probably don't need to change this.
 If you do change it, be sure to include the trailing slash.
 
     Defaults to "/static/".
@@ -1670,7 +1670,7 @@ started by the container.
 
 ## Email sending
 
-Setting an SMTP server for the backend will allow you to reset your
+Setting an SMTP server for the backend will allow you to use the Email workflow action, send documents from the UI as well as reset your
 password. All of these options come from their similarly-named [Django settings](https://docs.djangoproject.com/en/4.2/ref/settings/#email-host)
 
 #### [`PAPERLESS_EMAIL_HOST=<str>`](#PAPERLESS_EMAIL_HOST) {#PAPERLESS_EMAIL_HOST}

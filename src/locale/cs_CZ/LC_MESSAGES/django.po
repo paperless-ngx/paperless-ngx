@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-11 13:33-0700\n"
-"PO-Revision-Date: 2025-03-11 20:34\n"
+"POT-Creation-Date: 2025-04-19 15:13-0700\n"
+"PO-Revision-Date: 2025-04-19 22:14\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -530,23 +530,23 @@ msgstr "dotazy na vlastní pole"
 
 #: documents/models.py:490
 msgid "created to"
-msgstr ""
+msgstr "vytvořeno do"
 
 #: documents/models.py:491
 msgid "created from"
-msgstr ""
+msgstr "vytvořeno z"
 
 #: documents/models.py:492
 msgid "added to"
-msgstr ""
+msgstr "přidáno do"
 
 #: documents/models.py:493
 msgid "added from"
-msgstr ""
+msgstr "přidáno z"
 
 #: documents/models.py:494
 msgid "mime type is"
-msgstr ""
+msgstr "typ mime je"
 
 #: documents/models.py:504
 msgid "rule type"
@@ -566,31 +566,31 @@ msgstr "filtrovací pravidla"
 
 #: documents/models.py:534
 msgid "Auto Task"
-msgstr ""
+msgstr "Automatická úloha"
 
 #: documents/models.py:535
 msgid "Scheduled Task"
-msgstr ""
+msgstr "Plánovaná úloha"
 
 #: documents/models.py:536
 msgid "Manual Task"
-msgstr ""
+msgstr "Ruční úloha"
 
 #: documents/models.py:539
 msgid "Consume File"
-msgstr ""
+msgstr "Soubor zpracování"
 
 #: documents/models.py:540
 msgid "Train Classifier"
-msgstr ""
+msgstr "Trénovací klasifikátor"
 
 #: documents/models.py:541
 msgid "Check Sanity"
-msgstr ""
+msgstr "Zkontrolovat zdraví"
 
 #: documents/models.py:542
 msgid "Index Optimize"
-msgstr ""
+msgstr "Optimalizace indexu"
 
 #: documents/models.py:547
 msgid "Task ID"
@@ -622,7 +622,7 @@ msgstr "Název úlohy"
 
 #: documents/models.py:569
 msgid "Name of the task that was run"
-msgstr ""
+msgstr "Název úlohy, která byla spuštěna"
 
 #: documents/models.py:576
 msgid "Task State"
@@ -666,11 +666,11 @@ msgstr "Data vrácena úlohou"
 
 #: documents/models.py:614
 msgid "Task Type"
-msgstr ""
+msgstr "Typ úlohy"
 
 #: documents/models.py:615
 msgid "The type of task that was run"
-msgstr ""
+msgstr "Typ úlohy, která byla spuštěna"
 
 #: documents/models.py:626
 msgid "Note for the document"
@@ -806,7 +806,7 @@ msgstr "Načíst poštu"
 
 #: documents/models.py:938
 msgid "Web UI"
-msgstr ""
+msgstr "Webové rozhraní"
 
 #: documents/models.py:943
 msgid "Modified"
@@ -1038,11 +1038,11 @@ msgstr "přiřadit tato vlastní pole"
 
 #: documents/models.py:1275
 msgid "custom field values"
-msgstr ""
+msgstr "vlastní hodnoty polí"
 
 #: documents/models.py:1279
 msgid "Optional values to assign to the custom fields."
-msgstr ""
+msgstr "Volitelné hodnoty k přiřazení k vlastním polím."
 
 #: documents/models.py:1288
 msgid "remove these tag(s)"
@@ -1173,30 +1173,30 @@ msgstr "Neplatný regulární výraz: %(error)s"
 msgid "Invalid color."
 msgstr "Neplatná barva."
 
-#: documents/serialisers.py:1600
+#: documents/serialisers.py:1614
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Typ souboru %(type)s není podporován"
 
-#: documents/serialisers.py:1689
+#: documents/serialisers.py:1703
 msgid "Invalid variable detected."
 msgstr "Zjištěna neplatná proměnná."
 
 #: documents/templates/account/account_inactive.html:5
 msgid "Paperless-ngx account inactive"
-msgstr ""
+msgstr "Účet Paperless-ngx je neaktivní"
 
 #: documents/templates/account/account_inactive.html:9
 msgid "Account inactive."
-msgstr ""
+msgstr "Účet je neaktivní."
 
 #: documents/templates/account/account_inactive.html:14
 msgid "This account is inactive."
-msgstr ""
+msgstr "Tento účet je neaktivní."
 
 #: documents/templates/account/account_inactive.html:16
 msgid "Return to login"
-msgstr ""
+msgstr "Zpět na přihlášení"
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
@@ -1223,28 +1223,28 @@ msgstr "Prosím přihlaste se."
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
 msgstr "Ještě nemáte účet? <a href=\"%(signup_url)s\">Zaregistrujte se</a>"
 
-#: documents/templates/account/login.html:19
-#: documents/templates/account/signup.html:15
+#: documents/templates/account/login.html:25
+#: documents/templates/account/signup.html:22
 #: documents/templates/socialaccount/signup.html:13
 msgid "Username"
 msgstr "Uživatelské jméno"
 
-#: documents/templates/account/login.html:20
-#: documents/templates/account/signup.html:17
+#: documents/templates/account/login.html:26
+#: documents/templates/account/signup.html:24
 msgid "Password"
 msgstr "Heslo"
 
-#: documents/templates/account/login.html:30
+#: documents/templates/account/login.html:36
 #: documents/templates/mfa/authenticate.html:23
 msgid "Sign in"
 msgstr "Přihlásit se"
 
-#: documents/templates/account/login.html:34
+#: documents/templates/account/login.html:40
 msgid "Forgot your password?"
 msgstr "Zapomněli jste heslo?"
 
-#: documents/templates/account/login.html:45
-#: documents/templates/account/signup.html:49
+#: documents/templates/account/login.html:51
+#: documents/templates/account/signup.html:57
 msgid "or sign in via"
 msgstr "nebo se přihlásit prostřednictvím"
 
@@ -1317,21 +1317,25 @@ msgstr "Vaše nové heslo bylo nastaveno. Nyní se můžete <a href=\"%(login_ur
 msgid "Paperless-ngx sign up"
 msgstr "Registrace do Paperless-ngx"
 
-#: documents/templates/account/signup.html:10
+#: documents/templates/account/signup.html:11
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
 msgstr "Již máte účet? <a href=\"%(login_url)s\">Přihlaste se</a>"
 
-#: documents/templates/account/signup.html:16
+#: documents/templates/account/signup.html:19
+msgid "Note: This is the first user account for this installation and will be granted superuser privileges."
+msgstr "Poznámka: Toto je první uživatelský účet v této instalaci a budou mu udělena práva superuser."
+
+#: documents/templates/account/signup.html:23
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
 msgstr "E-mail (volitelný)"
 
-#: documents/templates/account/signup.html:18
+#: documents/templates/account/signup.html:25
 msgid "Password (again)"
 msgstr "Heslo (znovu)"
 
-#: documents/templates/account/signup.html:36
+#: documents/templates/account/signup.html:43
 #: documents/templates/socialaccount/signup.html:27
 msgid "Sign up"
 msgstr "Registrace"
@@ -1406,7 +1410,7 @@ msgstr "Jako poslední krok vyplňte následující formulář:"
 
 #: documents/validators.py:36
 msgid ", "
-msgstr ""
+msgstr ", "
 
 #: paperless/apps.py:11
 msgid "Paperless"
@@ -1556,141 +1560,141 @@ msgstr "Logo aplikace"
 msgid "paperless application settings"
 msgstr "nastavení aplikace paperless"
 
-#: paperless/settings.py:723
+#: paperless/settings.py:726
 msgid "English (US)"
 msgstr "Angličtina (US)"
 
-#: paperless/settings.py:724
+#: paperless/settings.py:727
 msgid "Arabic"
 msgstr "Arabština"
 
-#: paperless/settings.py:725
+#: paperless/settings.py:728
 msgid "Afrikaans"
 msgstr "Afrikánština"
 
-#: paperless/settings.py:726
+#: paperless/settings.py:729
 msgid "Belarusian"
 msgstr "Běloruština"
 
-#: paperless/settings.py:727
+#: paperless/settings.py:730
 msgid "Bulgarian"
 msgstr "Bulharština"
 
-#: paperless/settings.py:728
+#: paperless/settings.py:731
 msgid "Catalan"
 msgstr "Katalánština"
 
-#: paperless/settings.py:729
+#: paperless/settings.py:732
 msgid "Czech"
 msgstr "Čeština"
 
-#: paperless/settings.py:730
+#: paperless/settings.py:733
 msgid "Danish"
 msgstr "Dánština"
 
-#: paperless/settings.py:731
+#: paperless/settings.py:734
 msgid "German"
 msgstr "Němčina"
 
-#: paperless/settings.py:732
+#: paperless/settings.py:735
 msgid "Greek"
 msgstr "Řečtina"
 
-#: paperless/settings.py:733
+#: paperless/settings.py:736
 msgid "English (GB)"
 msgstr "Angličtina (GB)"
 
-#: paperless/settings.py:734
+#: paperless/settings.py:737
 msgid "Spanish"
 msgstr "Španělština"
 
-#: paperless/settings.py:735
+#: paperless/settings.py:738
 msgid "Finnish"
 msgstr "Finština"
 
-#: paperless/settings.py:736
+#: paperless/settings.py:739
 msgid "French"
 msgstr "Francouzština"
 
-#: paperless/settings.py:737
+#: paperless/settings.py:740
 msgid "Hungarian"
 msgstr "Maďarština"
 
-#: paperless/settings.py:738
+#: paperless/settings.py:741
 msgid "Italian"
 msgstr "Italština"
 
-#: paperless/settings.py:739
+#: paperless/settings.py:742
 msgid "Japanese"
 msgstr "Japonština"
 
-#: paperless/settings.py:740
+#: paperless/settings.py:743
 msgid "Korean"
 msgstr "Korejština"
 
-#: paperless/settings.py:741
+#: paperless/settings.py:744
 msgid "Luxembourgish"
 msgstr "Lucemburština"
 
-#: paperless/settings.py:742
+#: paperless/settings.py:745
 msgid "Norwegian"
 msgstr "Norština"
 
-#: paperless/settings.py:743
+#: paperless/settings.py:746
 msgid "Dutch"
 msgstr "Holandština"
 
-#: paperless/settings.py:744
+#: paperless/settings.py:747
 msgid "Polish"
 msgstr "Polština"
 
-#: paperless/settings.py:745
+#: paperless/settings.py:748
 msgid "Portuguese (Brazil)"
 msgstr "Portugalština (Brazílie)"
 
-#: paperless/settings.py:746
+#: paperless/settings.py:749
 msgid "Portuguese"
 msgstr "Portugalština"
 
-#: paperless/settings.py:747
+#: paperless/settings.py:750
 msgid "Romanian"
 msgstr "Rumunština"
 
-#: paperless/settings.py:748
+#: paperless/settings.py:751
 msgid "Russian"
 msgstr "Ruština"
 
-#: paperless/settings.py:749
+#: paperless/settings.py:752
 msgid "Slovak"
 msgstr "Slovenština"
 
-#: paperless/settings.py:750
+#: paperless/settings.py:753
 msgid "Slovenian"
 msgstr "Slovinština"
 
-#: paperless/settings.py:751
+#: paperless/settings.py:754
 msgid "Serbian"
 msgstr "Srbština"
 
-#: paperless/settings.py:752
+#: paperless/settings.py:755
 msgid "Swedish"
 msgstr "Švédština"
 
-#: paperless/settings.py:753
+#: paperless/settings.py:756
 msgid "Turkish"
 msgstr "Turečtina"
 
-#: paperless/settings.py:754
+#: paperless/settings.py:757
 msgid "Ukrainian"
 msgstr "Ukrajinština"
 
-#: paperless/settings.py:755
+#: paperless/settings.py:758
 msgid "Chinese Simplified"
 msgstr "Čínština (zjednodušená)"
 
-#: paperless/settings.py:756
+#: paperless/settings.py:759
 msgid "Chinese Traditional"
-msgstr ""
+msgstr "Čínština (tradiční)"
 
 #: paperless/urls.py:374
 msgid "Paperless-ngx administration"
@@ -1842,23 +1846,23 @@ msgstr "Zpracovat všechny soubory, včetně ‚vložených‘ příloh."
 
 #: paperless_mail/models.py:119
 msgid "System default"
-msgstr ""
+msgstr "Podle systému"
 
 #: paperless_mail/models.py:120
 msgid "Text, then HTML"
-msgstr ""
+msgstr "Text, poté HTML"
 
 #: paperless_mail/models.py:121
 msgid "HTML, then text"
-msgstr ""
+msgstr "HTML, poté text"
 
 #: paperless_mail/models.py:122
 msgid "HTML only"
-msgstr ""
+msgstr "Pouze HTML"
 
 #: paperless_mail/models.py:123
 msgid "Text only"
-msgstr ""
+msgstr "Pouze text"
 
 #: paperless_mail/models.py:126
 msgid "Delete"
@@ -1970,7 +1974,7 @@ msgstr "rozsah zpracování"
 
 #: paperless_mail/models.py:241
 msgid "pdf layout"
-msgstr ""
+msgstr "rozložení pdf"
 
 #: paperless_mail/models.py:247
 msgid "action"

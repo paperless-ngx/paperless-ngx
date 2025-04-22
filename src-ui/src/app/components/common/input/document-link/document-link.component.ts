@@ -71,6 +71,10 @@ export class DocumentLinkComponent
   @Input()
   placeholder: string = $localize`Search for documents`
 
+  get selectedDocumentIDs(): number[] {
+    return this.selectedDocuments.map((d) => d.id)
+  }
+
   constructor(private documentsService: DocumentService) {
     super()
   }
@@ -90,8 +94,8 @@ export class DocumentLinkComponent
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe((documentResults) => {
           this.loading = false
-          this.selectedDocuments = documentIDs.map((id) =>
-            documentResults.results.find((d) => d.id === id)
+          this.selectedDocuments = documentIDs.map(
+            (id) => documentResults.results.find((d) => d.id === id) ?? {}
           )
           super.writeValue(documentIDs)
         })

@@ -1,5 +1,5 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, HttpResponse } from '@angular/common/http'
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import {
   FormArray,
@@ -77,6 +77,7 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { getFilenameFromContentDisposition } from 'src/app/utils/http'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
@@ -1015,44 +1016,46 @@ export class DocumentDetailComponent
       this.documentId,
       original
     )
-    this.http.get(downloadUrl, { responseType: 'blob' }).subscribe({
-      next: (blob) => {
-        this.downloading = false
-        const blobParts = [blob]
-        const file = new File(
-          blobParts,
-          original
-            ? this.document.original_file_name
-            : this.document.archived_file_name,
-          {
-            type: original ? this.document.mime_type : 'application/pdf',
-          }
-        )
-        if (
-          !this.deviceDetectorService.isDesktop() &&
-          navigator.canShare &&
-          navigator.canShare({ files: [file] })
-        ) {
-          navigator.share({
-            files: [file],
+    this.http
+      .get(downloadUrl, { observe: 'response', responseType: 'blob' })
+      .subscribe({
+        next: (response: HttpResponse<Blob>) => {
+          const contentDisposition = response.headers.get('Content-Disposition')
+          const filename =
+            getFilenameFromContentDisposition(contentDisposition) ||
+            this.document.title
+          const blob = new Blob([response.body], {
+            type: response.body.type,
           })
-        } else {
-          const url = URL.createObjectURL(blob)
-          const a = document.createElement('a')
-          a.href = url
-          a.download = this.document.title
-          a.click()
-          URL.revokeObjectURL(url)
-        }
-      },
-      error: (error) => {
-        this.downloading = false
-        this.toastService.showError(
-          $localize`Error downloading document`,
-          error
-        )
-      },
-    })
+          this.downloading = false
+          const file = new File([blob], filename, {
+            type: response.body.type,
+          })
+          if (
+            !this.deviceDetectorService.isDesktop() &&
+            navigator.canShare &&
+            navigator.canShare({ files: [file] })
+          ) {
+            navigator.share({
+              files: [file],
+            })
+          } else {
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = filename
+            a.click()
+            URL.revokeObjectURL(url)
+          }
+        },
+        error: (error) => {
+          this.downloading = false
+          this.toastService.showError(
+            $localize`Error downloading document`,
+            error
+          )
+        },
+      })
   }
 
   hasNext() {
@@ -1116,12 +1119,10 @@ export class DocumentDetailComponent
     )
   }
 
-  isZoomSelected(setting: ZoomSetting): boolean {
+  get currentZoom() {
     if (this.previewZoomScale === ZoomSetting.PageFit) {
-      return setting === ZoomSetting.PageFit
-    }
-
-    return this.previewZoomSetting === setting
+      return ZoomSetting.PageFit
+    } else return this.previewZoomSetting
   }
 
   getZoomSettingTitle(setting: ZoomSetting): string {
@@ -1306,9 +1307,7 @@ export class DocumentDetailComponent
     this.document.custom_fields?.forEach((fieldInstance) => {
       this.customFieldFormFields.push(
         new FormGroup({
-          field: new FormControl(
-            this.getCustomFieldFromInstance(fieldInstance)?.id
-          ),
+          field: new FormControl(fieldInstance.field),
           value: new FormControl(fieldInstance.value),
         }),
         { emitEvent }

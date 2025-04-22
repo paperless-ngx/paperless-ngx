@@ -24,7 +24,6 @@
 # - Copy this file as 'docker-compose.yml' and the files 'docker-compose.env'
 #   and '.env' into a folder.
 # - Run 'docker compose pull'.
-# - Run 'docker compose run --rm webserver createsuperuser' to create a user.
 # - Run 'docker compose up -d'.
 #
 # For more extensive installation and update instructions, refer to the
@@ -71,7 +70,7 @@ services:
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
 
   gotenberg:
-    image: docker.io/gotenberg/gotenberg:8.17
+    image: docker.io/gotenberg/gotenberg:8.19
     restart: unless-stopped
 
     # The gotenberg chromium route is used to convert .eml files. We do not
