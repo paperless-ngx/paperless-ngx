@@ -695,25 +695,6 @@ export class DocumentDetailComponent
       })
   }
 
-  public removeSuggestion(type: string, value: string) {
-    if (!this.suggestions) return
-
-    switch (type) {
-      case 'tag':
-        this.suggestions.suggested_tags =
-          this.suggestions.suggested_tags.filter((t) => t !== value)
-        break
-      case 'correspondent':
-        this.suggestions.suggested_correspondents =
-          this.suggestions.suggested_correspondents.filter((c) => c !== value)
-        break
-      case 'documentType':
-        this.suggestions.suggested_document_types =
-          this.suggestions.suggested_document_types.filter((dt) => dt !== value)
-        break
-    }
-  }
-
   createTag(newName: string) {
     var modal = this.modalService.open(TagEditDialogComponent, {
       backdrop: 'static',
@@ -732,7 +713,10 @@ export class DocumentDetailComponent
       .subscribe(({ newTag, tags }) => {
         this.tagsInput.tags = tags.results
         this.tagsInput.addTag(newTag.id)
-        this.removeSuggestion('tag', newName)
+        if (this.suggestions) {
+          this.suggestions.suggested_tags =
+            this.suggestions.suggested_tags.filter((tag) => tag !== newName)
+        }
       })
   }
 
@@ -755,7 +739,12 @@ export class DocumentDetailComponent
         this.documentTypes = documentTypes.results
         this.documentForm.get('document_type').setValue(newDocumentType.id)
         this.documentForm.get('document_type').markAsDirty()
-        this.removeSuggestion('documentType', newName)
+        if (this.suggestions) {
+          this.suggestions.suggested_document_types =
+            this.suggestions.suggested_document_types.filter(
+              (dt) => dt !== newName
+            )
+        }
       })
   }
 
@@ -780,7 +769,12 @@ export class DocumentDetailComponent
         this.correspondents = correspondents.results
         this.documentForm.get('correspondent').setValue(newCorrespondent.id)
         this.documentForm.get('correspondent').markAsDirty()
-        this.removeSuggestion('correspondent', newName)
+        if (this.suggestions) {
+          this.suggestions.suggested_correspondents =
+            this.suggestions.suggested_correspondents.filter(
+              (c) => c !== newName
+            )
+        }
       })
   }
 
