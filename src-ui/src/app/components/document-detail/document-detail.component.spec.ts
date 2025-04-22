@@ -392,6 +392,23 @@ describe('DocumentDetailComponent', () => {
     currentUserCan = true
   })
 
+  it('should support creating tag', () => {
+    initNormally()
+    let openModal: NgbModalRef
+    modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
+    const modalSpy = jest.spyOn(modalService, 'open')
+    component.createTag('NewTag12')
+    expect(modalSpy).toHaveBeenCalled()
+    openModal.componentInstance.succeeded.next({
+      id: 12,
+      name: 'NewTag12',
+      is_inbox_tag: true,
+      color: '#ff0000',
+      text_color: '#000000',
+    })
+    expect(component.documentForm.get('tags').value).toContain(12)
+  })
+
   it('should support creating document type', () => {
     initNormally()
     let openModal: NgbModalRef
@@ -1095,6 +1112,30 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     expect(suggestionsSpy).toHaveBeenCalled()
     expect(errorSpy).toHaveBeenCalled()
+  })
+
+  it('should support removing suggestions', () => {
+    initNormally()
+    component.removeSuggestion('tag', 'Hello') // coverage
+    component.suggestions = {
+      tags: [42, 43],
+      suggested_tags: ['foo'],
+      document_types: [],
+      suggested_document_types: ['bar'],
+      correspondents: [],
+      suggested_correspondents: ['baz'],
+    }
+    component.removeSuggestion('tag', 'foo')
+    component.removeSuggestion('documentType', 'bar')
+    component.removeSuggestion('correspondent', 'baz')
+    expect(component.suggestions).toEqual({
+      tags: [42, 43],
+      suggested_tags: [],
+      document_types: [],
+      suggested_document_types: [],
+      correspondents: [],
+      suggested_correspondents: [],
+    })
   })
 
   it('should warn when open document does not match doc retrieved from backend on init', () => {
