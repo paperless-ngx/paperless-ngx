@@ -129,6 +129,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 {
                     "user_args": "",
                     "language": "",
+                    "barcode_tag_mapping": "",
                 },
             ),
             content_type="application/json",
@@ -137,6 +138,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         config = ApplicationConfiguration.objects.first()
         self.assertEqual(config.user_args, None)
         self.assertEqual(config.language, None)
+        self.assertEqual(config.barcode_tag_mapping, None)
 
     def test_api_replace_app_logo(self):
         """
