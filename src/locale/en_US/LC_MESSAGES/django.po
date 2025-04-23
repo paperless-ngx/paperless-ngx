@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-19 15:13-0700\n"
+"POT-Creation-Date: 2025-04-23 16:31+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1432,8 +1432,25 @@ msgstr ""
 msgid "As a final step, please complete the following form:"
 msgstr ""
 
+#: documents/validators.py:24
+#, python-brace-format
+msgid "Unable to parse URI {value}, missing scheme"
+msgstr ""
+
+#: documents/validators.py:29
+#, python-brace-format
+msgid "Unable to parse URI {value}, missing net location or path"
+msgstr ""
+
 #: documents/validators.py:36
-msgid ", "
+msgid ""
+"URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '."
+"join(allowed_schemes)}"
+msgstr ""
+
+#: documents/validators.py:45
+#, python-brace-format
+msgid "Unable to parse URI {value}"
 msgstr ""
 
 #: paperless/apps.py:11
@@ -1584,139 +1601,139 @@ msgstr ""
 msgid "paperless application settings"
 msgstr ""
 
-#: paperless/settings.py:726
+#: paperless/settings.py:732
 msgid "English (US)"
 msgstr ""
 
-#: paperless/settings.py:727
+#: paperless/settings.py:733
 msgid "Arabic"
 msgstr ""
 
-#: paperless/settings.py:728
+#: paperless/settings.py:734
 msgid "Afrikaans"
 msgstr ""
 
-#: paperless/settings.py:729
+#: paperless/settings.py:735
 msgid "Belarusian"
 msgstr ""
 
-#: paperless/settings.py:730
+#: paperless/settings.py:736
 msgid "Bulgarian"
 msgstr ""
 
-#: paperless/settings.py:731
+#: paperless/settings.py:737
 msgid "Catalan"
 msgstr ""
 
-#: paperless/settings.py:732
+#: paperless/settings.py:738
 msgid "Czech"
 msgstr ""
 
-#: paperless/settings.py:733
+#: paperless/settings.py:739
 msgid "Danish"
 msgstr ""
 
-#: paperless/settings.py:734
+#: paperless/settings.py:740
 msgid "German"
 msgstr ""
 
-#: paperless/settings.py:735
+#: paperless/settings.py:741
 msgid "Greek"
 msgstr ""
 
-#: paperless/settings.py:736
+#: paperless/settings.py:742
 msgid "English (GB)"
 msgstr ""
 
-#: paperless/settings.py:737
+#: paperless/settings.py:743
 msgid "Spanish"
 msgstr ""
 
-#: paperless/settings.py:738
+#: paperless/settings.py:744
 msgid "Finnish"
 msgstr ""
 
-#: paperless/settings.py:739
+#: paperless/settings.py:745
 msgid "French"
 msgstr ""
 
-#: paperless/settings.py:740
+#: paperless/settings.py:746
 msgid "Hungarian"
 msgstr ""
 
-#: paperless/settings.py:741
+#: paperless/settings.py:747
 msgid "Italian"
 msgstr ""
 
-#: paperless/settings.py:742
+#: paperless/settings.py:748
 msgid "Japanese"
 msgstr ""
 
-#: paperless/settings.py:743
+#: paperless/settings.py:749
 msgid "Korean"
 msgstr ""
 
-#: paperless/settings.py:744
+#: paperless/settings.py:750
 msgid "Luxembourgish"
 msgstr ""
 
-#: paperless/settings.py:745
+#: paperless/settings.py:751
 msgid "Norwegian"
 msgstr ""
 
-#: paperless/settings.py:746
+#: paperless/settings.py:752
 msgid "Dutch"
 msgstr ""
 
-#: paperless/settings.py:747
+#: paperless/settings.py:753
 msgid "Polish"
 msgstr ""
 
-#: paperless/settings.py:748
+#: paperless/settings.py:754
 msgid "Portuguese (Brazil)"
 msgstr ""
 
-#: paperless/settings.py:749
+#: paperless/settings.py:755
 msgid "Portuguese"
 msgstr ""
 
-#: paperless/settings.py:750
+#: paperless/settings.py:756
 msgid "Romanian"
 msgstr ""
 
-#: paperless/settings.py:751
+#: paperless/settings.py:757
 msgid "Russian"
 msgstr ""
 
-#: paperless/settings.py:752
+#: paperless/settings.py:758
 msgid "Slovak"
 msgstr ""
 
-#: paperless/settings.py:753
+#: paperless/settings.py:759
 msgid "Slovenian"
 msgstr ""
 
-#: paperless/settings.py:754
+#: paperless/settings.py:760
 msgid "Serbian"
 msgstr ""
 
-#: paperless/settings.py:755
+#: paperless/settings.py:761
 msgid "Swedish"
 msgstr ""
 
-#: paperless/settings.py:756
+#: paperless/settings.py:762
 msgid "Turkish"
 msgstr ""
 
-#: paperless/settings.py:757
+#: paperless/settings.py:763
 msgid "Ukrainian"
 msgstr ""
 
-#: paperless/settings.py:758
+#: paperless/settings.py:764
 msgid "Chinese Simplified"
 msgstr ""
 
-#: paperless/settings.py:759
+#: paperless/settings.py:765
 msgid "Chinese Traditional"
 msgstr ""
 
