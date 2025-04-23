@@ -880,6 +880,12 @@ class TestParserFileTypes(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsFile(parser.archive_path)
         self.assertIn("this is a test document", parser.get_text().lower())
 
+    def test_heic(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "simple.heic"), "image/heic")
+        self.assertIsFile(parser.archive_path)
+        self.assertIn("pizza", parser.get_text().lower())
+
     @override_settings(OCR_IMAGE_DPI=200)
     def test_gif(self):
         parser = RasterisedDocumentParser(None)
