@@ -115,6 +115,7 @@
               [disabled]="!userCanEdit || suggestionsLoading"
               [loading]="suggestionsLoading"
               [suggestions]="suggestions"
+              [aiEnabled]="aiEnabled"
               (getSuggestions)="getSuggestions()"
               (addTag)="createTag($event)"
               (addDocumentType)="createDocumentType($event)"

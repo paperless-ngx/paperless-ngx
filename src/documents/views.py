@@ -2220,6 +2220,7 @@ class UiSettingsView(GenericAPIView):
                 request.session["oauth_state"] = manager.state
 
         ui_settings["email_enabled"] = settings.EMAIL_ENABLED
+        ui_settings["ai_enabled"] = settings.AI_ENABLED
 
         user_resp = {
             "id": user.id,

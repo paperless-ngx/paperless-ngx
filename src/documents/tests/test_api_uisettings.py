@@ -47,6 +47,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
                     "backend_setting": "default",
                 },
                 "email_enabled": False,
+                "ai_enabled": False,
             },
         )
 
