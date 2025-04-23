@@ -22,6 +22,7 @@ from documents.tests.utils import DocumentConsumeDelayMixin
 from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
+from paperless.models import ApplicationConfiguration
 
 try:
     import zxingcpp  # noqa: F401
@@ -546,6 +547,27 @@ class TestBarcode(
                     10: True,
                 },
             )
+
+    def test_barcode_config(self):
+        """
+        GIVEN:
+            - Barcode app config is set (settings are not)
+        WHEN:
+            - Document with barcode is processed
+        THEN:
+            - The barcode config is used
+        """
+        app_config = ApplicationConfiguration.objects.first()
+        app_config.barcodes_enabled = True
+        app_config.barcode_string = "CUSTOM BARCODE"
+        app_config.save()
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-custom.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.detect()
+            separator_page_numbers = reader.get_separation_pages()
+
+            self.assertEqual(reader.pdf_file, test_file)
+            self.assertDictEqual(separator_page_numbers, {0: False})
 
 
 @override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
