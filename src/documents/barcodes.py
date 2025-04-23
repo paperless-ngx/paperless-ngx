@@ -15,9 +15,11 @@ from pikepdf import Pdf
 
 from documents.converters import convert_from_tiff_to_pdf
 from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentMetadataOverrides
 from documents.models import Tag
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import StopConsumeTaskError
+from documents.plugins.helpers import ProgressManager
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
@@ -40,6 +42,7 @@ class Barcode:
 
     page: int
     value: str
+    settings: BarcodeConfig
 
     @property
     def is_separator(self) -> bool:
@@ -85,6 +88,24 @@ class BarcodePlugin(ConsumeTaskPlugin):
         """
         return BarcodeConfig()
 
+    def __init__(
+        self,
+        input_doc: ConsumableDocument,
+        metadata: DocumentMetadataOverrides,
+        status_mgr: ProgressManager,
+        base_tmp_dir: Path,
+        task_id: str,
+    ) -> None:
+        super().__init__(
+            input_doc,
+            metadata,
+            status_mgr,
+            base_tmp_dir,
+            task_id,
+        )
+        # need these for able_to_run
+        self.settings = self.get_settings()
+
     def setup(self) -> None:
         self.temp_dir = tempfile.TemporaryDirectory(
             dir=self.base_tmp_dir,
@@ -93,7 +114,6 @@ class BarcodePlugin(ConsumeTaskPlugin):
         self.pdf_file: Path = self.input_doc.original_file
         self._tiff_conversion_done = False
         self.barcodes: list[Barcode] = []
-        self.settings = self.get_settings()
 
     def run(self) -> None:
         # Some operations may use PIL, override pixel setting if needed
@@ -290,7 +310,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
                 # Detect barcodes
                 for barcode_value in reader(page):
                     self.barcodes.append(
-                        Barcode(current_page_number, barcode_value),
+                        Barcode(current_page_number, barcode_value, self.settings),
                     )
 
                 # Delete temporary image file
