@@ -992,6 +992,44 @@ describe('DocumentDetailComponent', () => {
     )
   })
 
+  it('should correctly determine changed fields', () => {
+    initNormally()
+    expect(component['getChangedFields']()).toEqual({
+      id: doc.id,
+    })
+    component.documentForm.get('title').setValue('Foo Bar')
+    component.documentForm.get('permissions_form').setValue({
+      owner: 1,
+      set_permissions: {
+        view: {
+          users: [2],
+          groups: [],
+        },
+        change: {
+          users: [3],
+          groups: [],
+        },
+      },
+    })
+    component.documentForm.get('title').markAsDirty()
+    component.documentForm.get('permissions_form').markAsDirty()
+    expect(component['getChangedFields']()).toEqual({
+      id: doc.id,
+      title: 'Foo Bar',
+      owner: 1,
+      set_permissions: {
+        view: {
+          users: [2],
+          groups: [],
+        },
+        change: {
+          users: [3],
+          groups: [],
+        },
+      },
+    })
+  })
+
   it('should show custom field errors', () => {
     initNormally()
     component.error = {
