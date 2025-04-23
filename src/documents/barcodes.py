@@ -50,7 +50,7 @@ class Barcode:
         Returns True if the barcode value equals the configured separation value,
         False otherwise
         """
-        return self.value == self.settings.CONSUMER_BARCODE_STRING
+        return self.value == self.settings.barcode_string
 
     @property
     def is_asn(self) -> bool:
