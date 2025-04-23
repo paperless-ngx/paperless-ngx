@@ -25,6 +25,9 @@ export class SuggestionsDropdownComponent {
   suggestions: DocumentSuggestions = null
 
   @Input()
+  aiEnabled: boolean = false
+
+  @Input()
   loading: boolean = false
 
   @Input()
@@ -47,7 +50,7 @@ export class SuggestionsDropdownComponent {
     if (!this.suggestions) {
       this.getSuggestions.emit(this)
     } else {
-      this.dropdown.toggle()
+      this.dropdown?.toggle()
     }
   }
 

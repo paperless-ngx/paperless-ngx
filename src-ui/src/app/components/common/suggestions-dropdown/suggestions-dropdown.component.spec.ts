@@ -38,6 +38,8 @@ describe('SuggestionsDropdownComponent', () => {
   })
 
   it('should toggle dropdown when clickSuggest is called and suggestions are not null', () => {
+    component.aiEnabled = true
+    fixture.detectChanges()
     component.suggestions = {
       suggested_correspondents: [],
       suggested_tags: [],

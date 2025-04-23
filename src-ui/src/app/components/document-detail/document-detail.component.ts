@@ -294,6 +294,10 @@ export class DocumentDetailComponent
     return this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
   }
 
+  get aiEnabled(): boolean {
+    return this.settings.get(SETTINGS_KEYS.AI_ENABLED)
+  }
+
   get archiveContentRenderType(): ContentRenderType {
     return this.document?.archived_file_name
       ? this.getRenderType('application/pdf')
