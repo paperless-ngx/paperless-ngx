@@ -55,17 +55,6 @@ class OcrConfig(OutputTypeConfig):
     max_image_pixel: float | None = dataclasses.field(init=False)
     color_conversion_strategy: str = dataclasses.field(init=False)
     user_args: dict[str, str] | None = dataclasses.field(init=False)
-    barcodes_enabled: bool = dataclasses.field(init=False)
-    barcode_enable_tiff_support: bool = dataclasses.field(init=False)
-    barcode_string: str = dataclasses.field(init=False)
-    barcode_retain_split_pages: bool = dataclasses.field(init=False)
-    barcode_enable_asn: bool = dataclasses.field(init=False)
-    barcode_asn_prefix: str = dataclasses.field(init=False)
-    barcode_upscale: float = dataclasses.field(init=False)
-    barcode_dpi: int = dataclasses.field(init=False)
-    barcode_max_pages: int = dataclasses.field(init=False)
-    barcode_enable_tag: bool = dataclasses.field(init=False)
-    barcode_tag_mapping: dict[str, str] = dataclasses.field(init=False)
 
     def __post_init__(self) -> None:
         super().__post_init__()
@@ -108,6 +97,28 @@ class OcrConfig(OutputTypeConfig):
             except json.JSONDecodeError:
                 user_args = {}
         self.user_args = user_args
+
+
+@dataclasses.dataclass
+class BarcodeConfig(BaseConfig):
+    """
+    Barcodes settings
+    """
+
+    barcodes_enabled: bool = dataclasses.field(init=False)
+    barcode_enable_tiff_support: bool = dataclasses.field(init=False)
+    barcode_string: str = dataclasses.field(init=False)
+    barcode_retain_split_pages: bool = dataclasses.field(init=False)
+    barcode_enable_asn: bool = dataclasses.field(init=False)
+    barcode_asn_prefix: str = dataclasses.field(init=False)
+    barcode_upscale: float = dataclasses.field(init=False)
+    barcode_dpi: int = dataclasses.field(init=False)
+    barcode_max_pages: int = dataclasses.field(init=False)
+    barcode_enable_tag: bool = dataclasses.field(init=False)
+    barcode_tag_mapping: dict[str, str] = dataclasses.field(init=False)
+
+    def __post_init__(self) -> None:
+        app_config = self._get_config_instance()
 
         self.barcodes_enabled = (
             app_config.barcodes_enabled or settings.CONSUMER_ENABLE_BARCODES
