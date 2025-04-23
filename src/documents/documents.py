@@ -30,11 +30,9 @@ class DocumentDocument(Document):
     tag_id = fields.ListField(fields.IntegerField())
     has_tag = fields.BooleanField(attr='len(tags) > 0')
     type = fields.KeywordField(attr='document_type.name')
-    type_keyword = fields.KeywordField(attr='document_type.name')
     type_id = fields.IntegerField(attr='document_type.id')
     has_type = fields.BooleanField(attr='document_type is not None')
-    warehouse = fields.TextField(attr='warehouse.name')
-    warehouse_keyword = fields.KeywordField(attr='warehouse.name')
+    warehouse = fields.KeywordField(attr='warehouse.name')
     warehouse_path = fields.KeywordField(attr='warehouse.path')
     warehouse_id = fields.IntegerField(attr='warehouse.id')
     has_warehouse = fields.BooleanField(attr='warehouse is not None')
@@ -52,16 +50,17 @@ class DocumentDocument(Document):
     has_path = fields.BooleanField(attr='storage_path is not None')
     notes = fields.ListField(fields.TextField())  # Thay đổi kiểu dữ liệu
     num_notes = fields.IntegerField(attr='num_notes')
-    custom_fields = fields.TextField()  # Thay đổi kiểu dữ liệu
+    custom_fields = fields.ListField(fields.TextField())  # Thay đổi kiểu dữ liệu
     # custom_field_count = fields.IntegerField(attr='custom_field_count')
     owner = fields.KeywordField(attr='owner.username')
     owner_id = fields.IntegerField(attr='owner.id')
     has_owner = fields.BooleanField(attr='owner is not None')
-    viewer_id = fields.ListField(fields.IntegerField())
+    # viewer_id = fields.ListField(fields.IntegerField())
     checksum = fields.TextField(attr='checksum')
     page_count = fields.IntegerField(attr='page_count')
     original_filename = fields.TextField(attr='original_filename')
-    is_shared = fields.BooleanField(attr='len(viewer_id) > 0')
+    # is_shared = fields.BooleanField(attr='len(viewer_id) > 0')
+    # shared_by = fields.ListField(fields.IntegerField())
 
     class Index:
         name = ELASTIC_SEARCH_DOCUMENT_INDEX
@@ -125,56 +124,58 @@ class DocumentDocument(Document):
     @classmethod
     def update_document(cls, doc):
         document_data = {}
-        users_with_perms = get_users_with_perms(doc, only_with_perms_in=["view_document"])
+        # users_with_perms = get_users_with_perms(doc, only_with_perms_in=["view_document"])
         tags = [t.name for t in doc.tags.all()]
         tags_ids = [t.id for t in doc.tags.all()]
         notes = list(Note.objects.filter(document=doc).values_list('note', flat=True))
         custom_fields = ",".join([str(c) for c in CustomFieldInstance.objects.filter(document=doc)],)
 
-        viewer_ids = [u.id for u in users_with_perms]
+        # viewer_ids = [u.id for u in users_with_perms]
 
         # document_data['id'] = doc.id or None
-        document_data['title'] = doc.title or None
-        document_data['content'] = doc.content or None
+        document_data['title'] = doc.title or ''
+        document_data['content'] = doc.content or ''
         document_data['suggest_content'] = cls().prepare_suggest_content(instance=doc)
-        document_data['asn'] = doc.archive_serial_number or None
-        document_data['correspondent'] = doc.correspondent.name if doc.correspondent else None
-        document_data['correspondent_id'] = doc.correspondent.id if doc.correspondent else None
-        document_data['has_correspondent'] = doc.correspondent is not None
-        document_data['tags'] = tags or None
-        document_data['tag_id'] = tags_ids or None
+        document_data['asn'] = doc.archive_serial_number or -1
+        document_data['correspondent'] = doc.correspondent.name if doc.correspondent else ''
+        document_data['correspondent_id'] = doc.correspondent.id if doc.correspondent else -1
+        document_data['has_correspondent'] = bool(doc.correspondent) is not False
+        document_data['tags'] = tags or ['']
+        document_data['tag_id'] = tags_ids or [-1]
         document_data['has_tag'] = bool(tags)
-        document_data['type'] = doc.document_type.name if doc.document_type else None
-        document_data['type_id'] = doc.document_type.id if doc.document_type else None
-        document_data['has_type'] = doc.document_type is not None
-        document_data['warehouse'] = doc.warehouse.name if doc.warehouse else None
-        document_data['warehouse_path'] = doc.warehouse.path if doc.warehouse else None
-        document_data['warehouse_id'] = doc.warehouse.id if doc.warehouse else None
-        document_data['has_warehouse'] = doc.warehouse is not None
-        document_data['archive_font'] = doc.archive_font.name if doc.archive_font else None
-        document_data['archive_font_id'] = doc.archive_font.id if doc.archive_font else None
-        document_data['has_archive_font'] = doc.archive_font is not None
-        document_data['folder'] = doc.folder.name if doc.folder else None
-        document_data['folder_id'] = doc.folder.id if doc.folder else None
-        document_data['has_folder'] = doc.folder is not None
-        document_data['created'] = doc.created
-        document_data['added'] = doc.added
-        document_data['modified'] = doc.modified
-        document_data['path'] = doc.storage_path.name if doc.storage_path else None
-        document_data['path_id'] = doc.storage_path.id if doc.storage_path else None
-        document_data['has_path'] = doc.storage_path is not None
-        document_data['notes'] = notes or None  # Đảm bảo là danh sách
-        document_data['num_notes'] = len(notes)
-        document_data['custom_fields'] = custom_fields or None  # Đảm bảo là danh sách
-        document_data['custom_field_count'] = len(custom_fields)
-        document_data['owner'] = doc.owner.username if doc.owner else None
-        document_data['owner_id'] = doc.owner.id if doc.owner else None
-        document_data['has_owner'] = doc.owner is not None
-        document_data['viewer_id'] = viewer_ids or None  # Đảm bảo là danh sách
-        document_data['checksum'] = doc.checksum
-        document_data['page_count'] = doc.page_count
-        document_data['original_filename'] = doc.original_filename
-        document_data['is_shared'] = bool(viewer_ids)
+        document_data['type'] = doc.document_type.name if doc.document_type else ''
+        document_data['type_keyword'] = doc.document_type.name if doc.document_type else ''
+        document_data['type_id'] = doc.document_type.id if doc.document_type else -1
+        document_data['has_type'] = bool(doc.document_type) is not False
+        document_data['warehouse'] = doc.warehouse.name if doc.warehouse else ''
+        document_data['warehouse_path'] = doc.warehouse.path if doc.warehouse else ''
+        document_data['warehouse_id'] = doc.warehouse.id if doc.warehouse else -1
+        document_data['has_warehouse'] = bool(doc.warehouse) is not False
+        document_data['archive_font'] = doc.archive_font.name if doc.archive_font else ''
+        document_data['archive_font_id'] = doc.archive_font.id if doc.archive_font else -1
+        document_data['has_archive_font'] = doc.archive_font is not ''
+        document_data['folder'] = doc.folder.name if doc.folder else ''
+        document_data['folder_path'] = doc.folder.path if doc.folder else ''
+        document_data['folder_id'] = doc.folder.id if doc.folder else -1
+        document_data['has_folder'] = bool(doc.folder) is not None or False
+        document_data['created'] = doc.created or None
+        document_data['added'] = doc.added or None
+        document_data['modified'] = doc.modified or None
+        document_data['path'] = doc.storage_path.name if doc.storage_path else ''
+        document_data['path_id'] = doc.storage_path.id if doc.storage_path else -1
+        document_data['has_path'] = bool(doc.storage_path) is not None or False
+        document_data['notes'] = notes or ['']  # Đảm bảo là danh sách
+        document_data['num_notes'] = len(notes) or 0
+        document_data['custom_fields'] = custom_fields or ['']  # Đảm bảo là danh sách
+        document_data['custom_field_count'] = len(custom_fields) or 0
+        document_data['owner'] = doc.owner.username if doc.owner else ''
+        document_data['owner_id'] = doc.owner.id if doc.owner else -1
+        document_data['has_owner'] = bool(doc.owner) is not None or False
+        # document_data['viewer_id'] = viewer_ids or [-1]  # Đảm bảo là danh sách
+        document_data['checksum'] = doc.checksum or ''
+        document_data['page_count'] = doc.page_count or 0
+        document_data['original_filename'] = doc.original_filename or ''
+        # document_data['is_shared'] = bool(viewer_ids)
         document_instance = cls(**document_data,_id=str(doc.id))
         document_instance.save()  # Gọi save trên instance
 
@@ -242,28 +243,28 @@ class DocumentDocument(Document):
         :return: Dictionary containing the document data.
         """
         try:
+
+            # users_with_perms = get_users_with_perms(instance, only_with_perms_in=[
+            #     "view_document"])
+            # viewer_ids = [u.id for u in users_with_perms]
             # Basic fields
-            document_data = {
-                "id": instance.id,
-                "title": instance.title or None,
-                "content": instance.content or None,
-                "asn": instance.archive_serial_number or None,
-                "created": instance.created,
-                "added": instance.added,
-                "modified": instance.modified,
-                "checksum": instance.checksum,
-                "page_count": instance.page_count,
-                "original_filename": instance.original_filename,
-            }
+            document_data = {"id": instance.id, "title": instance.title or '',
+                             "content": instance.content or '',
+                             "asn": instance.archive_serial_number or -1,
+                             "created": instance.created,
+                             "added": instance.added,
+                             "modified": instance.modified,
+                             "checksum": instance.checksum or '',
+                             "page_count": instance.page_count or 0,
+                             "original_filename": instance.original_filename or '',
+                             "suggest_content": DocumentDocument.prepare_suggest_content(
+                                 instance), "tags": [''], "tag_id": [-1],
+                             "has_tag": bool(
+                                 instance.tags.all()) if instance.tags else False}
 
             # Suggest content (bigram and trigram logic)
-            document_data["suggest_content"] = DocumentDocument.prepare_suggest_content(
-                instance)
 
             # Tags
-            document_data["tags"] = []
-            document_data["tag_id"] = []
-            document_data["has_tag"] = bool(instance.tags.all())
 
             for tag in instance.tags.all():
                 document_data["tags"].append(tag.name)
@@ -271,14 +272,14 @@ class DocumentDocument(Document):
 
 
             # Correspondent information
+            document_data["has_correspondent"] = bool(instance.correspondent) is not False
             if instance.correspondent:
                 document_data["correspondent"] = instance.correspondent.name
                 document_data["correspondent_id"] = instance.correspondent.id
-                document_data["has_correspondent"] = True
             else:
-                document_data["correspondent"] = None
-                document_data["correspondent_id"] = None
-                document_data["has_correspondent"] = False
+                document_data["correspondent"] = ''
+                document_data["correspondent_id"] = -1
+
 
             # Warehouse details
             if instance.warehouse:
@@ -287,9 +288,9 @@ class DocumentDocument(Document):
                 document_data["warehouse_id"] = instance.warehouse.id
                 document_data["has_warehouse"] = True
             else:
-                document_data["warehouse"] = None
-                document_data["warehouse_path"] = None
-                document_data["warehouse_id"] = None
+                document_data["warehouse"] = ''
+                document_data["warehouse_path"] = ''
+                document_data["warehouse_id"] = -1
                 document_data["has_warehouse"] = False
 
             # document_type details
@@ -298,18 +299,20 @@ class DocumentDocument(Document):
                 document_data["type_id"] = instance.document_type.id
                 document_data["has_type"] = True
             else:
-                document_data["type"] = None
-                document_data["type_id"] = None
+                document_data["type"] = ''
+                document_data["type_id"] = -1
                 document_data["has_type"] = False
 
             # Folder details
             if instance.folder:
                 document_data["folder"] = instance.folder.name
                 document_data["folder_id"] = instance.folder.id
+                document_data["folder_path"] = instance.folder.path
                 document_data["has_folder"] = True
             else:
-                document_data["folder"] = None
-                document_data["folder_id"] = None
+                document_data["folder"] = ''
+                document_data["folder_id"] = -1
+                document_data["folder_path"] = ''
                 document_data["has_folder"] = False
 
             # Archive font details
@@ -318,30 +321,39 @@ class DocumentDocument(Document):
                 document_data["archive_font_id"] = instance.archive_font.id
                 document_data["has_archive_font"] = True
             else:
-                document_data["archive_font"] = None
-                document_data["archive_font_id"] = None
+                document_data["archive_font"] = ''
+                document_data["archive_font_id"] = -1
                 document_data["has_archive_font"] = False
 
             # Notes and custom fields
             # document_data["notes"] = list(
             #     Note.objects.filter(document=instance).values_list('note',
             #                                                        flat=True))
-            document_data["notes"] = []
+            document_data["notes"] = ['']
+            for note in instance.notes.all():
+                document_data["notes"].append(note.note)
 
-            # document_data["custom_fields"] = ",".join([str(c) for c in
-            #                                            CustomFieldInstance.objects.filter(
-            #                                                document=instance)])
-            document_data['custom_fields'] = "" # for testing
+            document_data["custom_fields"] = instance.custom_fields.all() or ['']
+            document_data["has_custom_fields"] = bool(
+                instance.custom_fields.all()) if instance.custom_fields else False
+            # for custom_field in instance.custom_fields.all():
+            #     document_data["custom_fields"].append(custom_field)
+
+
+            document_data["tags"] = ['']
+            document_data["tag_id"] = [-1]
+            document_data["has_tag_id"] = bool(
+                instance.tags.all()) if instance.tags else False
+            for tag in instance.tags.all():
+                document_data["tags"].append(tag.name)
+                document_data["tag_id"].append(tag.id)
+
             document_data["num_notes"] = len(document_data["notes"])
             document_data["custom_field_count"] = len(
                 document_data["custom_fields"])
 
-            # Permissions and viewers
-            # users_with_perms = get_users_with_perms(instance,
-            #                                         only_with_perms_in=[
-            #                                             "view_document"])
-            document_data["viewer_id"] = [1]
-            document_data["is_shared"] = False
+            # document_data["viewer_id"] = [1]
+            # document_data["is_shared"] = False
 
             # Owner details
             if instance.owner:
@@ -349,11 +361,14 @@ class DocumentDocument(Document):
                 document_data["owner_id"] = instance.owner.id
                 document_data["has_owner"] = True
             else:
-                document_data["owner"] = None
-                document_data["owner_id"] = None
+                document_data["owner"] = ''
+                document_data["owner_id"] = -1
                 document_data["has_owner"] = False
 
+            # document_data["viewer_id"] = viewer_ids or [-1]
+
             return document_data
+
         except Exception as e:
             logger.error(
                 f"Error preparing document data for instance {instance.id}: {e}")

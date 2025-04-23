@@ -551,15 +551,16 @@ class DocumentViewSet(
             )
         return (
             Document.objects.select_related(
-                "document_type",
-                "warehouse",
+                # "document_type",
+                # "warehouse",
                 "owner",
 
             )
-            .prefetch_related('tags')
+            # .prefetch_related('tags')
         )
 
     def get_serializer_class(self):
+        print('pk----------------')
         if 'pk' in self.kwargs:
             return DocumentDetailSerializer
         return DocumentSerializer
@@ -1160,6 +1161,8 @@ class DocumentViewSet(
             return Response(links)
 
     def update_name_folder(self, instance, serializer):
+        if instance.folder is None:
+            return
         instance.folder.name = serializer.validated_data.get("title")
         instance.folder.save()
 
@@ -1293,8 +1296,12 @@ class SearchResultElasticSearchSerializer(DocumentSerializer, PassUserMixin):
         )
         r = super().to_representation(doc)
         highlight_note = None
-
             # highlight_note = instance.meta.highlight.note[0]
+        r["warehouse_w"] = instance.warehouse_path.split('/')[0] if instance.warehouse_path else None
+        r["warehouse_s"] = instance.warehouse_path.split('/')[1] if instance.warehouse_path else None
+        r["tags"] = list(instance.tag_id) if getattr(instance, 'tag_id')!=[-1] else []
+        r["custom_fields"] = list(instance.custom_fields) if getattr(instance, 'custom_fields') !=1 else []
+        r["notes"] = list(instance.notes) if getattr(instance, 'notes') != [''] else []
         r["__search_hit__"] = {
             "score": None,
             "highlights": highlight_content,
@@ -1316,9 +1323,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
         # else:
         #     return DocumentSerializer
 
-        if self.request.method in  ["POST", "PUT"]:
-            return DocumentDetailSerializer
-        if 'pk' in self.kwargs:  # `self.kwargs` chứa các tham số từ URL (vd: /documents/<id>)
+        if self.request.method in  ["POST", "PUT"] or 'pk' in self.kwargs:
             return DocumentDetailSerializer
         return SearchResultElasticSearchSerializer
 

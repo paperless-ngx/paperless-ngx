@@ -775,7 +775,7 @@ class DocumentSerializer(
 ):
     approvals = serializers.SerializerMethodField(read_only=True)
     correspondent = serializers.SerializerMethodField(read_only=True)
-    tags = TagsField(many=True)
+    tags = serializers.SerializerMethodField(read_only=True)
     warehouse = WarehouseField(allow_null=True)
     warehouse_w = SerializerMethodField(read_only=True)
     warehouse_s = SerializerMethodField(read_only=True)
@@ -789,6 +789,7 @@ class DocumentSerializer(
     created_date = serializers.DateField(required=False)
     page_count = SerializerMethodField()
     custom_fields = SerializerMethodField(read_only=True)
+    notes = serializers.SerializerMethodField(read_only=True)
     def get_notes(self, obj):
         return []
     def get_correspondent(self, obj):
@@ -798,24 +799,30 @@ class DocumentSerializer(
     def get_storage_path(self, obj):
         return None
 
+    def get_tags(self, obj):
+        return []
+
     def get_warehouse_w(self, obj):
-        try:
-            if obj.warehouse is None:
-                return None
-            return str(obj.warehouse.path).split('/')[1]
-        except Exception:
-            return None
+        return None
+        # try:
+        #     if obj.warehouse is None:
+        #         return None
+        #     return str(obj.warehouse.path).split('/')[1]
+        # except Exception:
+        #     return None
+
 
     def get_warehouse_s(self, obj):
-        try:
-            if obj.warehouse is None:
-                return None
-            return str(obj.warehouse.path).split('/')[1]
-        except Exception:
-            return None
-    def to_representation(self, instance):
-        value = instance.created
-        return value.astimezone(timezone.get_default_timezone()).isoformat()
+        return None
+        # try:
+        #     if obj.warehouse is None:
+        #         return None
+        #     return str(obj.warehouse.path).split('/')[1]
+        # except Exception:
+        #     return None
+    # def to_representation(self, instance):
+    #     value = instance.created
+    #     return value.astimezone(timezone.get_default_timezone()).isoformat()
     def get_custom_fields(self, obj):
         return []
         # custom_fields = CustomFieldInstance.objects.filter(document=obj)
@@ -972,8 +979,8 @@ class DocumentSerializer(
             "user_can_change",
             "is_shared_by_requester",
             "set_permissions",
-            "notes",
-            "custom_fields",
+            # "notes",
+            # "custom_fields",
             "exploit",
             "remove_inbox_tags",
             "page_count",

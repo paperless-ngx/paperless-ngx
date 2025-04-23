@@ -510,13 +510,13 @@ class DelayedElasticSearch(DelayedQuery):
             "created": "created",
             "modified": "modified",
             "added": "added",
-            "title": "title_keyword",
+            "title": "title.keyword",
             "correspondent__name": "correspondent",
-            "document_type__name": "type",
-            "warehouse__name": "warehouse",
+            "document_type__name": "type.keyword",
+            "warehouse__name": "warehouse.keyword",
             "archive_serial_number": "asn",
             "num_notes": "num_notes",
-            "owner": "owner",
+            "owner": "owner.keyword",
             "page_count": "page_count",
             "score": "score"
         }
@@ -709,13 +709,14 @@ class DelayedElasticSearch(DelayedQuery):
 
 
         query_combined = self.get_combined_query()
+        print('query_combined',query_combined)
         s = s.query(query_combined['query'])  # Chỉ lấy phần query
         s = s.sort(*query_combined.get('sort', []))  # Thêm phần sắp xếp nếu có
 
         s = s.highlight('content', fragment_size=500, number_of_fragments=1,
                         pre_tags=['<span class="match">'],
                         post_tags=['</span>'])
-        s = s.source(['id', 'warehouse_path'])
+        s = s.source(['id', 'warehouse_path', 'tag_id', 'custom_fields','notes'])
         s = s[page_number * page_size - page_size:page_number * page_size]
         response = s.execute()
         # print(self.search_statistics())
@@ -801,24 +802,27 @@ class DelayedElasticSearch(DelayedQuery):
 
         # print('ket qua',self.get_combined_query())
         # start = datetime.now()
-        docs = (Document.objects.select_related(
+        docs = (
+            Document.objects.select_related(
                 # "correspondent",
                 # "storage_path",
                 # "document_type",
-                "warehouse",
+                # "warehouse",
                 # "folder",
                 "owner",
             )
-            .prefetch_related("tags", "custom_fields", "notes")
+            # .prefetch_related("tags","custom_fields", "notes")
             .filter(id__in=doc_ids).annotate(
                 truncated_content=Substr('content', 1, 500)  # Lấy tối đa 500 ký tự từ content
-            ).defer(
-                'content',
+            )
+            .defer(
+                # 'content',
                 'owner__password',  # Bỏ qua trường password
                 'owner__is_staff',   # Bỏ qua trường is_staff
                 'owner__is_active',  # Bỏ qua trường is_active
                 'owner__date_joined' # Bỏ qua trường date_joined
-            ))
+            )
+        )
 
         # print('time',datetime.now()-start)
         start_time = time.time()
