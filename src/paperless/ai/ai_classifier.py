@@ -2,7 +2,7 @@ import json
 import logging
 
 from documents.models import Document
-from paperless.ai.client import run_llm_query
+from paperless.ai.client import AIClient
 
 logger = logging.getLogger("paperless.ai.ai_classifier")
 
@@ -49,7 +49,8 @@ def get_ai_document_classification(document: Document) -> dict:
     """
 
     try:
-        result = run_llm_query(prompt)
+        client = AIClient()
+        result = client.run_llm_query(prompt)
         suggestions = parse_ai_classification_response(result)
         return suggestions or {}
     except Exception:
