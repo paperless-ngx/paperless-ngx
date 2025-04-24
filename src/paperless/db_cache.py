@@ -1,5 +1,3 @@
-"""Database caching utilities."""
-
 import redis
 from cachalot.utils import get_query_cache_key
 from cachalot.utils import get_table_cache_key
@@ -7,7 +5,7 @@ from django.core.cache import cache
 
 from paperless import settings
 
-PREFIX = "cachalot_"
+PREFIX = "pngx_cachalot_"
 
 
 def custom_get_query_cache_key(compiler):
@@ -24,10 +22,11 @@ def _cache_key_prefix():
 
 class CacheManager:
     def __init__(self):
-        if "cachalot" in settings.INSTALLED_APPS:
-            self.redis_instance = redis.from_url(settings.CACHALOT_REDIS_URL)
-        else:
-            self.redis_instance = None
+        self.redis_instance = (
+            redis.from_url(settings.CACHALOT_REDIS_URL)
+            if "cachalot" in settings.INSTALLED_APPS
+            else None
+        )
 
     def invalidate_cache(self, prefix=_cache_key_prefix(), chunk_size=1000) -> int:
         deleted_keys = 0
