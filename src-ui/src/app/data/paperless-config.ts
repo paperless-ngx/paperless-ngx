@@ -44,6 +44,7 @@ export enum ConfigOptionType {
   Boolean = 'boolean',
   JSON = 'json',
   File = 'file',
+  Password = 'password',
 }
 
 export const ConfigCategory = {
@@ -51,6 +52,11 @@ export const ConfigCategory = {
   OCR: $localize`OCR Settings`,
   Barcode: $localize`Barcode Settings`,
   AI: $localize`AI Settings`,
+}
+
+export const LLMBackendConfig = {
+  OPENAI: 'openai',
+  OLLAMA: 'ollama',
 }
 
 export interface ConfigOption {
@@ -267,7 +273,8 @@ export const PaperlessConfigOptions: ConfigOption[] = [
   {
     key: 'llm_backend',
     title: $localize`LLM Backend`,
-    type: ConfigOptionType.String,
+    type: ConfigOptionType.Select,
+    choices: mapToItems(LLMBackendConfig),
     config_key: 'PAPERLESS_LLM_BACKEND',
     category: ConfigCategory.AI,
   },
@@ -281,7 +288,7 @@ export const PaperlessConfigOptions: ConfigOption[] = [
   {
     key: 'llm_api_key',
     title: $localize`LLM API Key`,
-    type: ConfigOptionType.String,
+    type: ConfigOptionType.Password,
     config_key: 'PAPERLESS_LLM_API_KEY',
     category: ConfigCategory.AI,
   },
