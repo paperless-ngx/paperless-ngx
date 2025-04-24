@@ -190,6 +190,10 @@ class ProfileSerializer(serializers.ModelSerializer):
 class ApplicationConfigurationSerializer(serializers.ModelSerializer):
     user_args = serializers.JSONField(binary=True, allow_null=True)
     barcode_tag_mapping = serializers.JSONField(binary=True, allow_null=True)
+    llm_api_key = ObfuscatedPasswordField(
+        required=False,
+        allow_null=True,
+    )
 
     def run_validation(self, data):
         # Empty strings treated as None to avoid unexpected behavior
