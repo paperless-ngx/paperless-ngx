@@ -169,3 +169,25 @@ class GeneralConfig(BaseConfig):
 
         self.app_title = app_config.app_title or None
         self.app_logo = app_config.app_logo.url if app_config.app_logo else None
+
+
+@dataclasses.dataclass
+class AIConfig(BaseConfig):
+    """
+    AI related settings that require global scope
+    """
+
+    ai_enabled: bool = dataclasses.field(init=False)
+    llm_backend: str = dataclasses.field(init=False)
+    llm_model: str = dataclasses.field(init=False)
+    llm_api_key: str = dataclasses.field(init=False)
+    llm_url: str = dataclasses.field(init=False)
+
+    def __post_init__(self) -> None:
+        app_config = self._get_config_instance()
+
+        self.ai_enabled = app_config.ai_enabled or settings.AI_ENABLED
+        self.llm_backend = app_config.llm_backend or settings.LLM_BACKEND
+        self.llm_model = app_config.llm_model or settings.LLM_MODEL
+        self.llm_api_key = app_config.llm_api_key or settings.LLM_API_KEY
+        self.llm_url = app_config.llm_url or settings.LLM_URL

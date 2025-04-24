@@ -179,6 +179,7 @@ from paperless.ai.matching import match_document_types_by_name
 from paperless.ai.matching import match_storage_paths_by_name
 from paperless.ai.matching import match_tags_by_name
 from paperless.celery import app as celery_app
+from paperless.config import AIConfig
 from paperless.config import GeneralConfig
 from paperless.db import GnuPG
 from paperless.serialisers import GroupSerializer
@@ -771,10 +772,12 @@ class DocumentViewSet(
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
-        if settings.AI_ENABLED:
+        ai_config = AIConfig()
+
+        if ai_config.ai_enabled:
             cached_llm_suggestions = get_llm_suggestion_cache(
                 doc.pk,
-                backend=settings.LLM_BACKEND,
+                backend=ai_config.llm_backend,
             )
 
             if cached_llm_suggestions:
@@ -825,7 +828,7 @@ class DocumentViewSet(
                 "dates": llm_suggestions.get("dates", []),
             }
 
-            set_llm_suggestions_cache(doc.pk, resp_data, backend=settings.LLM_BACKEND)
+            set_llm_suggestions_cache(doc.pk, resp_data, backend=ai_config.llm_backend)
         else:
             document_suggestions = get_suggestion_cache(doc.pk)
 
@@ -2279,7 +2282,10 @@ class UiSettingsView(GenericAPIView):
                 request.session["oauth_state"] = manager.state
 
         ui_settings["email_enabled"] = settings.EMAIL_ENABLED
-        ui_settings["ai_enabled"] = settings.AI_ENABLED
+
+        ai_config = AIConfig()
+
+        ui_settings["ai_enabled"] = ai_config.ai_enabled
 
         user_resp = {
             "id": user.id,

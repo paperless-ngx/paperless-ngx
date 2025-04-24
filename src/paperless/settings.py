@@ -1419,5 +1419,4 @@ AI_ENABLED = __get_boolean("PAPERLESS_AI_ENABLED", "NO")
 LLM_BACKEND = os.getenv("PAPERLESS_LLM_BACKEND", "openai")  # or "ollama"
 LLM_MODEL = os.getenv("PAPERLESS_LLM_MODEL")
 LLM_API_KEY = os.getenv("PAPERLESS_LLM_API_KEY")
-OPENAI_URL = os.getenv("PAPERLESS_OPENAI_URL", "https://api.openai.com")
-OLLAMA_URL = os.getenv("PAPERLESS_OLLAMA_URL", "http://localhost:11434")
+LLM_URL = os.getenv("PAPERLESS_LLM_URL")
