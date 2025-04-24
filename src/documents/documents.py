@@ -333,11 +333,11 @@ class DocumentDocument(Document):
             for note in instance.notes.all():
                 document_data["notes"].append(note.note)
 
-            document_data["custom_fields"] = instance.custom_fields.all() or ['']
+            document_data["custom_fields"] = ['']
             document_data["has_custom_fields"] = bool(
                 instance.custom_fields.all()) if instance.custom_fields else False
-            # for custom_field in instance.custom_fields.all():
-            #     document_data["custom_fields"].append(custom_field)
+            for custom_field in instance.custom_fields.all():
+                document_data["custom_fields"].append(str(custom_field))
 
 
             document_data["tags"] = ['']
