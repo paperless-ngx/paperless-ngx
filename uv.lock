@@ -672,6 +672,18 @@ wheels = [
 ]
 
 [[package]]
+name = "django-cachalot"
+version = "2.8.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f5/53/1f781e58028a43028d6c799f2eab15eff65e841e3e288d6f2953e36f01a4/django_cachalot-2.8.0.tar.gz", hash = "sha256:30456720ac9f3fabeb90ce898530fe01130c25a1eca911cd016cfaeab251d627", size = 74673 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9a/05/f5846fd186189ac0a1deddb9c67450c838e5c8ceceb35b5260c61f622599/django_cachalot-2.8.0-py3-none-any.whl", hash = "sha256:315da766a5356c7968318326f7b0579f64571ad909f64cad0601f38153ca4e16", size = 55671 },
+]
+
+[[package]]
 name = "django-celery-results"
 version = "2.6.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1892,6 +1904,7 @@ dependencies = [
     { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "django-allauth", extra = ["mfa", "socialaccount"], marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "django-auditlog", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "django-cachalot", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "django-celery-results", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "django-compression-middleware", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "django-cors-headers", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -2022,6 +2035,7 @@ requires-dist = [
     { name = "django", specifier = "~=5.1.7" },
     { name = "django-allauth", extras = ["socialaccount", "mfa"], specifier = "~=65.4.0" },
     { name = "django-auditlog", specifier = "~=3.1.2" },
+    { name = "django-cachalot", specifier = "~=2.8.0" },
     { name = "django-celery-results", specifier = "~=2.6.0" },
     { name = "django-compression-middleware", specifier = "~=0.5.0" },
     { name = "django-cors-headers", specifier = "~=4.7.0" },
