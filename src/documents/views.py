@@ -3065,7 +3065,7 @@ class TrashView(ListModelMixin, PassUserMixin):
 
     model = Document
 
-    queryset = Document.deleted_objects.all()
+    queryset = Document.deleted_objects.all().defer('content')
 
     def get(self, request, format=None):
         self.serializer_class = DocumentSerializer
