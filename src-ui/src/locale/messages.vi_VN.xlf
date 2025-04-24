@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns:ns0="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
    <file source-language="en-US" datatype="plaintext" original="ng2.template">
       <body>
          <trans-unit id="ngb.alert.close" datatype="html">
@@ -10555,7 +10555,7 @@
                <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
                <context context-type="linenumber">116</context>
             </context-group>
-            <target state="translated">(được lọc)</target>
+            <target state="translated">(Đã lọc)</target>
          </trans-unit>
          <trans-unit id="6849725902312323996" datatype="html">
             <source>Reset filters</source>
