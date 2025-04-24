@@ -13,7 +13,8 @@ def mock_document():
     return Document(filename="test.pdf", content="This is a test document content.")
 
 
-@patch("paperless.ai.ai_classifier.run_llm_query")
+@pytest.mark.django_db
+@patch("paperless.ai.client.AIClient.run_llm_query")
 def test_get_ai_document_classification_success(mock_run_llm_query, mock_document):
     mock_response = json.dumps(
         {
@@ -37,7 +38,8 @@ def test_get_ai_document_classification_success(mock_run_llm_query, mock_documen
     assert result["dates"] == ["2023-01-01"]
 
 
-@patch("paperless.ai.ai_classifier.run_llm_query")
+@pytest.mark.django_db
+@patch("paperless.ai.client.AIClient.run_llm_query")
 def test_get_ai_document_classification_failure(mock_run_llm_query, mock_document):
     mock_run_llm_query.side_effect = Exception("LLM query failed")
 

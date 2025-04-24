@@ -1,58 +1,70 @@
 import logging
 
 import httpx
-from django.conf import settings
+
+from paperless.config import AIConfig
 
 logger = logging.getLogger("paperless.ai.client")
 
 
-def run_llm_query(prompt: str) -> str:
-    logger.debug(
-        "Running LLM query against %s with model %s",
-        settings.LLM_BACKEND,
-        settings.LLM_MODEL,
-    )
-    match settings.LLM_BACKEND:
-        case "openai":
-            result = _run_openai_query(prompt)
-        case "ollama":
-            result = _run_ollama_query(prompt)
-        case _:
-            raise ValueError(f"Unsupported LLM backend: {settings.LLM_BACKEND}")
-    logger.debug("LLM query result: %s", result)
-    return result
+class AIClient:
+    """
+    A client for interacting with an LLM backend.
+    """
 
+    def __init__(self):
+        self.settings = AIConfig()
 
-def _run_ollama_query(prompt: str) -> str:
-    with httpx.Client(timeout=30.0) as client:
-        response = client.post(
-            f"{settings.OLLAMA_URL}/api/chat",
-            json={
-                "model": settings.LLM_MODEL,
-                "messages": [{"role": "user", "content": prompt}],
-                "stream": False,
-            },
+    def run_llm_query(self, prompt: str) -> str:
+        logger.debug(
+            "Running LLM query against %s with model %s",
+            self.settings.llm_backend,
+            self.settings.llm_model,
         )
-        response.raise_for_status()
-        return response.json()["message"]["content"]
+        match self.settings.llm_backend:
+            case "openai":
+                result = self._run_openai_query(prompt)
+            case "ollama":
+                result = self._run_ollama_query(prompt)
+            case _:
+                raise ValueError(
+                    f"Unsupported LLM backend: {self.settings.llm_backend}",
+                )
+        logger.debug("LLM query result: %s", result)
+        return result
 
+    def _run_ollama_query(self, prompt: str) -> str:
+        url = self.settings.llm_url or "http://localhost:11434"
+        with httpx.Client(timeout=30.0) as client:
+            response = client.post(
+                f"{url}/api/chat",
+                json={
+                    "model": self.settings.llm_model,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "stream": False,
+                },
+            )
+            response.raise_for_status()
+            return response.json()["message"]["content"]
 
-def _run_openai_query(prompt: str) -> str:
-    if not settings.LLM_API_KEY:
-        raise RuntimeError("PAPERLESS_LLM_API_KEY is not set")
+    def _run_openai_query(self, prompt: str) -> str:
+        if not self.settings.llm_api_key:
+            raise RuntimeError("PAPERLESS_LLM_API_KEY is not set")
 
-    with httpx.Client(timeout=30.0) as client:
-        response = client.post(
-            f"{settings.OPENAI_URL}/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {settings.LLM_API_KEY}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": settings.LLM_MODEL,
-                "messages": [{"role": "user", "content": prompt}],
-                "temperature": 0.3,
-            },
-        )
-        response.raise_for_status()
-        return response.json()["choices"][0]["message"]["content"]
+        url = self.settings.llm_url or "https://api.openai.com"
+
+        with httpx.Client(timeout=30.0) as client:
+            response = client.post(
+                f"{url}/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {self.settings.llm_api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": self.settings.llm_model,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "temperature": 0.3,
+                },
+            )
+            response.raise_for_status()
+            return response.json()["choices"][0]["message"]["content"]

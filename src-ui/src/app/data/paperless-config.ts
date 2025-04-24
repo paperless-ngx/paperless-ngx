@@ -50,6 +50,7 @@ export const ConfigCategory = {
   General: $localize`General Settings`,
   OCR: $localize`OCR Settings`,
   Barcode: $localize`Barcode Settings`,
+  AI: $localize`AI Settings`,
 }
 
 export interface ConfigOption {
@@ -257,6 +258,39 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     type: ConfigOptionType.JSON,
     config_key: 'PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING',
     category: ConfigCategory.Barcode,
+    key: 'ai_enabled',
+    title: $localize`AI Enabled`,
+    type: ConfigOptionType.Boolean,
+    config_key: 'PAPERLESS_AI_ENABLED',
+    category: ConfigCategory.AI,
+  },
+  {
+    key: 'llm_backend',
+    title: $localize`LLM Backend`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_LLM_BACKEND',
+    category: ConfigCategory.AI,
+  },
+  {
+    key: 'llm_model',
+    title: $localize`LLM Model`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_LLM_MODEL',
+    category: ConfigCategory.AI,
+  },
+  {
+    key: 'llm_api_key',
+    title: $localize`LLM API Key`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_LLM_API_KEY',
+    category: ConfigCategory.AI,
+  },
+  {
+    key: 'llm_url',
+    title: $localize`LLM URL`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_LLM_URL',
+    category: ConfigCategory.AI,
   },
 ]
 
@@ -287,4 +321,9 @@ export interface PaperlessConfig extends ObjectWithId {
   barcode_max_pages: number
   barcode_enable_tag: boolean
   barcode_tag_mapping: object
+  ai_enabled: boolean
+  llm_backend: string
+  llm_model: string
+  llm_api_key: string
+  llm_url: string
 }
