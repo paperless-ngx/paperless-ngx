@@ -174,8 +174,8 @@
 		{
 			"label": "Maintenance: Install Frontend Dependencies",
 			"description": "Install frontend (pnpm) dependencies",
-			"type": "pnpm",
-			"script": "install",
+			"type": "shell",
+			"command": "pnpm install",
 			"path": "src-ui",
 			"group": "clean",
 			"problemMatcher": [],
