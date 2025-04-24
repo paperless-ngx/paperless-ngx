@@ -74,6 +74,15 @@ class ColorConvertChoices(models.TextChoices):
     CMYK = ("CMYK", _("CMYK"))
 
 
+class LLMBackend(models.TextChoices):
+    """
+    Matches to --llm-backend
+    """
+
+    OPENAI = ("openai", _("OpenAI"))
+    OLLAMA = ("ollama", _("Ollama"))
+
+
 class ApplicationConfiguration(AbstractSingletonModel):
     """
     Settings which are common across more than 1 parser
@@ -263,6 +272,45 @@ class ApplicationConfiguration(AbstractSingletonModel):
     barcode_tag_mapping = models.JSONField(
         verbose_name=_("Sets the tag barcode mapping"),
         null=True,
+    )
+
+    """
+    AI related settings
+    """
+
+    ai_enabled = models.BooleanField(
+        verbose_name=_("Enables AI features"),
+        null=True,
+        default=False,
+    )
+
+    llm_backend = models.CharField(
+        verbose_name=_("Sets the LLM backend"),
+        null=True,
+        blank=True,
+        max_length=32,
+        choices=LLMBackend.choices,
+    )
+
+    llm_model = models.CharField(
+        verbose_name=_("Sets the LLM model"),
+        null=True,
+        blank=True,
+        max_length=32,
+    )
+
+    llm_api_key = models.CharField(
+        verbose_name=_("Sets the LLM API key"),
+        null=True,
+        blank=True,
+        max_length=128,
+    )
+
+    llm_url = models.CharField(
+        verbose_name=_("Sets the LLM URL, optional"),
+        null=True,
+        blank=True,
+        max_length=128,
     )
 
     class Meta:
