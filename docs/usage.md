@@ -261,6 +261,14 @@ Once setup, navigating to the email settings page in Paperless-ngx will allow yo
 You can also submit a document using the REST API, see [POSTing documents](api.md#file-uploads)
 for details.
 
+## Document Suggestions
+
+Paperless-ngx can suggest tags, correspondents, document types and storage paths for documents based on the content of the document. This is done using a machine learning model that is trained on the documents in your database. The suggestions are shown in the document detail page and can be accepted or rejected by the user.
+
+### AI-Enhanced Suggestions
+
+If enabled, Paperless-ngx can use an AI LLM model to suggest document titles, dates, tags, correspondents and document types for documents. This feature will always be "opt-in" and does not disable the existing suggestion system. Currently, both remote (via the OpenAI API) and local (via Ollama) models are supported, see [configuration](configuration.md#ai) for details.
+
 ## Sharing documents from Paperless-ngx
 
 Paperless-ngx supports sharing documents with other users by assigning them [permissions](#object-permissions)

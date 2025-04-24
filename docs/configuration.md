@@ -1759,3 +1759,48 @@ password. All of these options come from their similarly-named [Django settings]
 #### [`PAPERLESS_EMAIL_USE_SSL=<bool>`](#PAPERLESS_EMAIL_USE_SSL) {#PAPERLESS_EMAIL_USE_SSL}
 
 : Defaults to false.
+
+## AI {#ai}
+
+#### [`PAPERLESS_ENABLE_AI=<bool>`](#PAPERLESS_ENABLE_AI) {#PAPERLESS_ENABLE_AI}
+
+: Enables the AI features in Paperless. This includes the AI-based
+suggestions. This setting is required to be set to true in order to use the AI features.
+
+    Defaults to false.
+
+#### [`PAPERLESS_AI_BACKEND=<str>`](#PAPERLESS_AI_BACKEND) {#PAPERLESS_AI_BACKEND}
+
+: The AI backend to use. This can be either "openai" or "ollama". If set to "ollama", the AI
+features will be run locally on your machine. If set to "openai", the AI features will be run
+using the OpenAI API. This setting is required to be set to use the AI features.
+
+    Defaults to None.
+
+    !!! note
+
+        The OpenAI API is a paid service. You will need to set up an OpenAI account and
+        will be charged for usage incurred by Paperless-ngx features and your document data
+        will (of course) be shared with OpenAI. Paperless-ngx does not endorse the use of the
+        OpenAI API in any way.
+
+        Refer to the OpenAI terms of service, and use at your own risk.
+
+#### [`PAPERLESS_LLM_MODEL=<str>`](#PAPERLESS_LLM_MODEL) {#PAPERLESS_LLM_MODEL}
+
+: The model to use for the AI backend, i.e. "gpt-3.5-turbo", "gpt-4" or any of the models supported by the
+current backend. This setting is required to be set to use the AI features.
+
+    Defaults to None.
+
+#### [`PAPERLESS_LLM_API_KEY=<str>`](#PAPERLESS_LLM_API_KEY) {#PAPERLESS_LLM_API_KEY}
+
+: The API key to use for the AI backend. This is required for the OpenAI backend only.
+
+    Defaults to None.
+
+#### [`PAPERLESS_LLM_URL=<str>`](#PAPERLESS_LLM_URL) {#PAPERLESS_LLM_URL}
+
+: The URL to use for the AI backend. This is required for the Ollama backend only.
+
+    Defaults to None.
