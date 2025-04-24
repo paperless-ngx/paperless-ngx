@@ -153,7 +153,7 @@ class DocumentDocument(Document):
         document_data['has_warehouse'] = bool(doc.warehouse) is not False
         document_data['archive_font'] = doc.archive_font.name if doc.archive_font else ''
         document_data['archive_font_id'] = doc.archive_font.id if doc.archive_font else -1
-        document_data['has_archive_font'] = doc.archive_font is not ''
+        document_data['has_archive_font'] = bool(doc.archive_font) is not False
         document_data['folder'] = doc.folder.name if doc.folder else ''
         document_data['folder_path'] = doc.folder.path if doc.folder else ''
         document_data['folder_id'] = doc.folder.id if doc.folder else -1
