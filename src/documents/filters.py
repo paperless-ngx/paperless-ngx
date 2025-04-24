@@ -515,10 +515,10 @@ class DossierFormFilterSet(FilterSet):
         }
 
 
-# class ApprovalFilterSet(FilterSet):
-#     class Meta:
-#         model = Approval
-#         fields = {
-#             "id": ID_KWARGS,
-#             "ctype": CHAR_KWARGS,
-#         }
+class ApprovalFilterSet(FilterSet):
+    class Meta:
+        model = Approval
+        fields = {
+            "id": ID_KWARGS,
+            "status": CHAR_KWARGS,
+        }

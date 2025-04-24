@@ -58,6 +58,7 @@ from django.views.decorators.vary import vary_on_cookie
 from django.views.generic import TemplateView
 from django_elasticsearch_dsl_drf.pagination import LimitOffsetPagination
 from django_filters.rest_framework import DjangoFilterBackend
+from guardian.ctypes import get_content_type
 from guardian.shortcuts import get_objects_for_user
 from guardian.shortcuts import get_users_with_perms
 from langdetect import detect
@@ -108,7 +109,8 @@ from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.documents import DocumentDocument
-from documents.filters import ArchiveFontFilterSet, EdocTaskFilterSet
+from documents.filters import ArchiveFontFilterSet, EdocTaskFilterSet, \
+    ApprovalFilterSet
 from documents.filters import BackupRecordFilterSet
 from documents.filters import CorrespondentFilterSet
 from documents.filters import CustomFieldFilterSet
@@ -2363,43 +2365,58 @@ class ApprovalViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated,)
 
     serializer_class = ApprovalSerializer
-    # pagination_class = StandardPagination
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+    )
+    filterset_class = ApprovalFilterSet
+    pagination_class = StandardPagination
     queryset = Approval.objects.all()
-
+    ordering_fields = ("created","modified")
     def get_queryset(self):
-        # TODO: get user -> group -> document ->
+        # # TODO: get user -> group -> document ->
+        # if self.request.user.is_superuser:
+        #     documents_can_change = Document.objects.all().values_list('id', flat=True)
+        # else:
+        #     documents_can_change = get_objects_for_user(
+        #         self.request.user,
+        #         "documents.change_document",
+        #         with_superuser=False,
+        #         any_perm=True,
+        #     ).values_list('id', flat=True)
+        # document_ids = [x.id for x in documents_can_change]
+        # # print(document_ids)
+        # approvals = (
+        #     Approval.objects.filter(
+        #         Q(object_pk__in=document_ids) | Q(submitted_by=self.request.user),
+        #     )
+        #     .order_by("created")
+        #     .reverse()
+        # )
+        #
+        # approvals_ids = []
+        # for x in approvals:
+        #     approvals_ids.append(x.object_pk)
+        # document_ids_queryset = Document.objects.filter(
+        #     id__in=approvals_ids,
+        # ).defer('content').values_list("id", flat=True)
+        # document_ids_set = set(document_ids_queryset)
+        # approval_new = []
+        # for approval in approvals:
+        #     if int(approval.object_pk) in document_ids_set:
+        #         approval_new.append(approval)
+        #
+        # return approval_new
+
+        query = Approval.objects.all()
         if self.request.user.is_superuser:
-            documents_can_change = Document.objects.all().defer('content')
-        else:
-            documents_can_change = get_objects_for_user(
-                self.request.user,
-                "documents.change_document",
-                with_superuser=False,
-                any_perm=True,
-            )
-        document_ids = [x.id for x in documents_can_change]
-        # print(document_ids)
-        approvals = (
-            Approval.objects.filter(
-                Q(object_pk__in=document_ids) | Q(submitted_by=self.request.user),
-            )
-            .order_by("created")
-            .reverse()
-        )
+            return query
+        # user owner
+        document_ids= query.values_list('pk')
+        document_approval_ids = Document.objects.filter(Q(owner=self.request.user) | Q(id__in=document_ids)).values_list('id', flat=True)
+        query = query.filter(pk__in = document_approval_ids)
 
-        approvals_ids = []
-        for x in approvals:
-            approvals_ids.append(x.object_pk)
-        document_ids_queryset = Document.objects.filter(
-            id__in=approvals_ids,
-        ).defer('content').values_list("id", flat=True)
-        document_ids_set = set(document_ids_queryset)
-        approval_new = []
-        for approval in approvals:
-            if int(approval.object_pk) in document_ids_set:
-                approval_new.append(approval)
-
-        return approval_new
+        return query
 
     model = Approval
 

@@ -3,9 +3,10 @@
   i18n-title
   info="Approvals shows you documents that have been consumed, are waiting to be, or may have failure during the process."
   i18n-info
-  >
+>
   <div class="btn-toolbar col col-md-auto align-items-center">
-    <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedApprovals.size === 0">
+    <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()"
+            [hidden]="selectedApprovals.size === 0">
       <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
     </button>
 
@@ -20,7 +21,8 @@
     </button> -->
 
     <div class="form-check form-switch mb-0">
-      <input class="form-check-input" type="checkbox" role="switch" id="autoRefreshSwitch" (click)="toggleAutoRefresh()" [attr.checked]="autoRefreshInterval">
+      <input class="form-check-input" type="checkbox" role="switch" id="autoRefreshSwitch" (click)="toggleAutoRefresh()"
+             [attr.checked]="autoRefreshInterval">
       <label class="form-check-label" for="autoRefreshSwitch" i18n>Auto refresh</label>
     </div>
   </div>
@@ -31,57 +33,58 @@
   <div class="visually-hidden" i18n>Loading...</div>
 }
 
-<ng-template let-approvals="approvals" #approvalsTemplate>
+<ng-template let-approvalsCurrent="approvalsCurrent" #approvalsTemplate>
   <table class="table table-striped align-middle border shadow-sm">
     <thead>
-      <tr>
-        <th scope="col">
-          <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="all-approvals" [disabled]="currentApprovals.length === 0" [(ngModel)]="togggleAll" (click)="toggleAll($event); $event.stopPropagation();">
-            <label class="form-check-label" for="all-approvals"></label>
-          </div>
-        </th>
-        <th scope="col" class="d-table-cell d-lg-cell" i18n>Name</th>
-        <th scope="col" class="d-table-cell d-lg-none" i18n>Info</th>
-<!--        <th scope="col" class="d-none d-lg-table-cell" i18n>Content type</th>-->
-        <th scope="col" class="d-none d-lg-table-cell" i18n>Submmit by</th>
-<!--        <th scope="col" class="d-none d-lg-table-cell" i18n>Submmit by group</th>-->
-        <th scope="col" class="d-none d-lg-table-cell" i18n>Created</th>
-        <th scope="col" class="d-none d-lg-table-cell" i18n>Expires</th>
-        @if (activeTab == 'success') {
-          <th scope="col" class="d-none d-lg-table-cell" i18n>Approve at</th>
-        }
-        @else if (activeTab == 'failure') {
-          <th scope="col" class="d-none d-lg-table-cell" i18n>Reject at</th>
-        }
-        @else if (activeTab == 'revoked') {
-          <th scope="col" class="d-none d-lg-table-cell" i18n>Revoked at</th>
-        }
-        <th scope="col" class="d-none d-lg-table-cell" i18n>Method</th>
-        <th scope="col" i18n>Actions</th>
-      </tr>
+    <tr>
+      <th scope="col">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="all-approvals" [disabled]="approvalsCurrent.all.length === 0"
+                 [(ngModel)]="togggleAll" (click)="toggleAll($event); $event.stopPropagation();">
+          <label class="form-check-label" for="all-approvals"></label>
+        </div>
+      </th>
+      <th scope="col" class="d-table-cell d-lg-cell" i18n>Name</th>
+      <th scope="col" class="d-table-cell d-lg-none" i18n>Info</th>
+      <!--        <th scope="col" class="d-none d-lg-table-cell" i18n>Content type</th>-->
+      <th scope="col" class="d-none d-lg-table-cell" i18n>Submmit by</th>
+      <!--        <th scope="col" class="d-none d-lg-table-cell" i18n>Submmit by group</th>-->
+      <th scope="col" class="d-none d-lg-table-cell" i18n>Created</th>
+      <th scope="col" class="d-none d-lg-table-cell" i18n>Expires</th>
+      @if (activeTab === 'success') {
+        <th scope="col" class="d-none d-lg-table-cell" i18n>Approve at</th>
+      } @else if (activeTab === 'failure') {
+        <th scope="col" class="d-none d-lg-table-cell" i18n>Reject at</th>
+      } @else if (activeTab === 'revoked') {
+        <th scope="col" class="d-none d-lg-table-cell" i18n>Revoked at</th>
+      }
+      <th scope="col" class="d-none d-lg-table-cell" i18n>Method</th>
+      <th scope="col" i18n>Actions</th>
+    </tr>
     </thead>
     <tbody>
-      @for (approval of approvals | slice: (page-1) * pageSize : page * pageSize; track approval) {
-        <tr (click)="toggleSelected(approval); $event.stopPropagation();">
+      @for (approval of this.approvalsCurrent.results; track approval) {
+        <tr (click)="toggleSelected(approval, $event); $event.stopPropagation();">
           <td>
             <div class="form-check">
-              <input type="checkbox" class="form-check-input" id="approval{{approval.id}}" [checked]="selectedApprovals.has(approval.id)" (click)="toggleSelected(approval); $event.stopPropagation();">
+              <input type="checkbox" class="form-check-input" id="approval{{approval.id}}"
+                     [checked]="selectedApprovals.has(approval.id)"
+                     (click)="toggleSelected(approval,$event); $event.stopPropagation();">
               <label class="form-check-label" for="approval{{approval.id}}"></label>
             </div>
           </td>
           <td class="overflow-auto name-col">{{ approval.name }}</td>
-<!--          <td class="d-none d-lg-table-cell">{{ approval.ctype }}</td>-->
+          <!--          <td class="d-none d-lg-table-cell">{{ approval.ctype }}</td>-->
           <td class="d-none d-lg-table-cell">{{ displayName(approval) }}</td>
-<!--          <td class="d-none d-lg-table-cell">{{ displayGroup(approval) }}</td>-->
+          <!--          <td class="d-none d-lg-table-cell">{{ displayGroup(approval) }}</td>-->
           <td class="d-none d-lg-table-cell">{{ approval.created | customDate:'short' }}</td>
-          @if (approval.expiration==null){
+          @if (approval.expiration == null) {
             <td class="d-none d-lg-table-cell" i18n>Unlimited</td>
-          } @else if (approval.expiration!=null){
+          } @else if (approval.expiration != null) {
             <td class="d-none d-lg-table-cell">{{ approval.expiration | customDate:'short' }}</td>
           }
-          @if (approval.status != PaperlessApprovalStatus.Pending){
-              <td class="d-none d-lg-table-cell">{{ approval.modified | customDate:'short' }} </td>
+          @if (approval.status != ApprovalStatus.Pending) {
+            <td class="d-none d-lg-table-cell">{{ approval.modified | customDate:'short' }}</td>
           }
 
           <td class="d-none d-lg-table-cell">{{ approval.access_type_display }}</td>
@@ -94,23 +97,33 @@
           </td>
           <td scope="row">
             <div class="btn-group" role="group">
-              @if (approval.status == 'PENDING'){
-                <button class="btn btn-sm btn-outline-success" (click)="updateApproval(approval,'SUCCESS'); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }" [hidden]="check_submit(approval)">
+              @if (approval.status == 'PENDING') {
+                <button class="btn btn-sm btn-outline-success"
+                        (click)="updateApproval(approval,'SUCCESS'); $event.stopPropagation();"
+                        *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }"
+                        [hidden]="check_submit(approval)">
                   <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Approve</ng-container>
                 </button>
-                <button class="btn btn-sm btn-outline-danger" (click)="updateApproval(approval,'FAILURE'); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }" [hidden]="check_submit(approval)">
+                <button class="btn btn-sm btn-outline-danger"
+                        (click)="updateApproval(approval,'FAILURE'); $event.stopPropagation();"
+                        *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }"
+                        [hidden]="check_submit(approval)">
                   <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Reject</ng-container>
                 </button>
               }
-              @if (approval.status == 'SUCCESS'){
-                <button class="btn btn-sm btn-outline-danger" (click)="updateApproval(approval,'REVOKED'); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }" [hidden]="check_submit(approval)">
+              @if (approval.status == 'SUCCESS') {
+                <button class="btn btn-sm btn-outline-danger"
+                        (click)="updateApproval(approval,'REVOKED'); $event.stopPropagation();"
+                        *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }"
+                        [hidden]="check_submit(approval)">
                   <i-bs name="check"></i-bs>&nbsp;<ng-container i18n>Revoked</ng-container>
                 </button>
               }
 
               <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
-                @if (approval.ctype=="document") {
-                  <button class="btn btn-sm btn-outline-primary" (click)="goDocument(approval); $event.stopPropagation();">
+                @if (approval.ctype == "document") {
+                  <button class="btn btn-sm btn-outline-primary"
+                          (click)="goDocument(approval); $event.stopPropagation();">
                     <i-bs name="file-text"></i-bs>&nbsp;<ng-container i18n>Open Document</ng-container>
                   </button>
                 }
@@ -125,52 +138,50 @@
                 <td>Name</td>
                 <td>{{ approval.name }}</td>
               </tr>
-<!--              <tr>-->
-<!--                <td>Content type</td>-->
-<!--                <td>{{ approval.ctype }}</td>-->
-<!--              </tr>-->
+              <!--              <tr>-->
+              <!--                <td>Content type</td>-->
+              <!--                <td>{{ approval.ctype }}</td>-->
+              <!--              </tr>-->
               <tr>
                 <td>Submmit by</td>
                 <td>{{ displayName(approval) }}</td>
               </tr>
-<!--              <tr>-->
-<!--                <td>Submmit by group</td>-->
-<!--                <td>{{ displayGroup(approval) }}</td>-->
-<!--              </tr>-->
+              <!--              <tr>-->
+              <!--                <td>Submmit by group</td>-->
+              <!--                <td>{{ displayGroup(approval) }}</td>-->
+              <!--              </tr>-->
               <tr>
                 <td>Created</td>
                 <td>{{ approval.created | customDate:'short' }}</td>
               </tr>
-<!--              <tr>-->
-<!--                <td>Created</td>-->
-<!--                <td>{{ approval.created | customDate:'short' }}</td>-->
-<!--              </tr>-->
+              <!--              <tr>-->
+              <!--                <td>Created</td>-->
+              <!--                <td>{{ approval.created | customDate:'short' }}</td>-->
+              <!--              </tr>-->
               <tr>
                 <td>Expires</td>
-                @if (approval.expiration==null){
+                @if (approval.expiration == null) {
                   <td class="">Unlimited</td>
                 }
-                @if (approval.expiration!=null){
+                @if (approval.expiration != null) {
                   <td class="">{{ approval.expiration | customDate:'short' }}</td>
                 }
               </tr>
               <tr>
                 @if (activeTab == 'success') {
-                  <td class="" >Approve at</td>
+                  <td class="">Approve at</td>
+                } @else if (activeTab == 'failure') {
+                  <td>Reject at</td>
+                } @else if (activeTab == 'revoked') {
+                  <td>Revoked at</td>
                 }
-                @else if (activeTab == 'failure') {
-                  <td >Reject at</td>
-                }
-                @else if (activeTab == 'revoked') {
-                  <td >Revoked at</td>
-                }
-                @if (activeTab !='pending'){
+                @if (activeTab != 'pending') {
                   <td class="">{{ approval.modified | customDate:'short' }}</td>
 
                 }
               </tr>
               <tr>
-                <td >Method</td>
+                <td>Method</td>
                 <td class="">{{ approval.access_type_display }}</td>
               </tr>
 
@@ -182,51 +193,58 @@
   </table>
 
   <div class="pb-3 d-sm-flex justify-content-between align-items-center">
-    @if (approvals.length > 0) {
+    @if (getCountTaskAll() > 0) {
       <div class="pb-2 pb-sm-0">
-        <ng-container i18n>{approvals.length, plural, =1 {One {{this.activeTabLocalized}} approval} other {{{approvals.length || 0}} total {{this.activeTabLocalized}} approvals}}</ng-container>
+        <ng-container
+          i18n>{getCountTaskAll(), plural, =1 {One {{ this.activeTabLocalized }} approval} other {{{ getCountTaskAll() || 0 }} total {{ this.activeTabLocalized }} approvals}}</ng-container>
         @if (selectedApprovals.size > 0) {
-          <ng-container i18n>&nbsp;({{selectedApprovals.size}} selected)</ng-container>
+          <ng-container i18n>&nbsp;({{ selectedApprovals.size }} selected)</ng-container>
         }
       </div>
     }
-    @if (approvals.length > pageSize) {
-      <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="approvals.length" maxSize="8" size="sm"></ngb-pagination>
+    @if (getCountTaskAll() > pageSize) {
+      <ngb-pagination [(page)]="page" (pageChange)="onPageChange($event);" [pageSize]="pageSize"
+                      [collectionSize]="getCountTaskAll()" maxSize="8" size="sm"></ngb-pagination>
+
     }
   </div>
 </ng-template>
 
 <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs" (hidden)="duringTabChange($event)">
   <li ngbNavItem="failure">
-    <a ngbNavLink i18n>Failure@if (approvalsService.failureApprovals.length > 0) {
-      <span class="badge bg-danger ms-2">{{approvalsService.failureApprovals.length}}</span>
+    <a ngbNavLink i18n>Failure@if (approvalsFailure.count > 0) {
+      <span class="badge bg-danger ms-2">{{ approvalsFailure.count }}</span>
     }</a>
     <ng-template ngbNavContent>
-      <ng-container [ngTemplateOutlet]="approvalsTemplate" [ngTemplateOutletContext]="{approvals:approvalsService.failureApprovals}"></ng-container>
+      <ng-container [ngTemplateOutlet]="approvalsTemplate"
+                    [ngTemplateOutletContext]="{approvalsCurrent:approvalsFailure}"></ng-container>
     </ng-template>
   </li>
   <li ngbNavItem="success">
-    <a ngbNavLink i18n>Success @if (approvalsService.successApprovals.length > 0) {
-      <span class="badge bg-secondary ms-2">{{approvalsService.successApprovals.length}}</span>
+    <a ngbNavLink i18n>Success @if (approvalsSuccess.count > 0) {
+      <span class="badge bg-secondary ms-2">{{ approvalsSuccess.count }}</span>
     }</a>
     <ng-template ngbNavContent>
-      <ng-container [ngTemplateOutlet]="approvalsTemplate" [ngTemplateOutletContext]="{approvals:approvalsService.successApprovals}"></ng-container>
+      <ng-container [ngTemplateOutlet]="approvalsTemplate"
+                    [ngTemplateOutletContext]="{approvalsCurrent:approvalsSuccess}"></ng-container>
     </ng-template>
   </li>
   <li ngbNavItem="pending">
-    <a ngbNavLink i18n>Pending @if (approvalsService.pendingApprovals.length > 0) {
-      <span class="badge bg-secondary ms-2">{{approvalsService.pendingApprovals.length}}</span>
+    <a ngbNavLink i18n>Pending @if (approvalsPending.count > 0) {
+      <span class="badge bg-secondary ms-2">{{ approvalsPending.count }}</span>
     }</a>
     <ng-template ngbNavContent>
-      <ng-container [ngTemplateOutlet]="approvalsTemplate" [ngTemplateOutletContext]="{approvals:approvalsService.pendingApprovals}"></ng-container>
+      <ng-container [ngTemplateOutlet]="approvalsTemplate"
+                    [ngTemplateOutletContext]="{approvalsCurrent:approvalsPending}"></ng-container>
     </ng-template>
   </li>
   <li ngbNavItem="revoked">
-    <a ngbNavLink i18n>Revoked @if (approvalsService.revokedApprovals.length > 0) {
-      <span class="badge bg-secondary ms-2">{{approvalsService.revokedApprovals.length}}</span>
+    <a ngbNavLink i18n>Revoked @if (approvalsRevoked.count > 0) {
+      <span class="badge bg-secondary ms-2">{{ approvalsRevoked.count }}</span>
     }</a>
     <ng-template ngbNavContent>
-      <ng-container [ngTemplateOutlet]="approvalsTemplate" [ngTemplateOutletContext]="{approvals:approvalsService.revokedApprovals}"></ng-container>
+      <ng-container [ngTemplateOutlet]="approvalsTemplate"
+                    [ngTemplateOutletContext]="{approvalsCurrent: approvalsRevoked}"></ng-container>
     </ng-template>
   </li>
 </ul>

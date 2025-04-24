@@ -1,12 +1,13 @@
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, HttpParams } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { Subject } from 'rxjs'
+import { Observable, Subject } from 'rxjs'
 import { first, takeUntil } from 'rxjs/operators'
 import {
   Approval,
   ApprovalStatus,
 } from 'src/app/data/approval'
 import { environment } from 'src/environments/environment'
+import { Results } from '../data/results'
 
 @Injectable({
   providedIn: 'root',
@@ -22,6 +23,33 @@ export class ApprovalsService {
 
   public get total(): number {
     return this.approvals.length
+  }
+  public getRevokedApprovals(page: number = 1): Observable<Results<Approval>> {
+    const httpParams = new HttpParams().set('page', page.toString())
+    return this.http.get<Results<Approval>>(`${environment.apiBaseUrl}approvals/?status__iexact=REVOKED`, {
+      params: httpParams,
+    })
+  }
+
+  public getPendingApprovals(page: number = 1): Observable<Results<Approval>> {
+    const httpParams = new HttpParams().set('page', page.toString())
+    return this.http.get<Results<Approval>>(`${environment.apiBaseUrl}approvals/?status__iexact=PENDING`, {
+      params: httpParams,
+    })
+  }
+
+  public getSuccessApprovals(page: number = 1): Observable<Results<Approval>> {
+    const httpParams = new HttpParams().set('page', page.toString())
+    return this.http.get<Results<Approval>>(`${environment.apiBaseUrl}approvals/?status__iexact=SUCCESS`, {
+      params: httpParams,
+    })
+  }
+
+  public getFailureApprovals(page: number = 1): Observable<Results<Approval>> {
+    const httpParams = new HttpParams().set('page', page.toString())
+    return this.http.get<Results<Approval>>(`${environment.apiBaseUrl}approvals/?status__iexact=FAILURE`, {
+      params: httpParams,
+    })
   }
 
   public get allApprovals(): Approval[] {

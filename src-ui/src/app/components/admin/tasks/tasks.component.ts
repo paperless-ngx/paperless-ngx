@@ -154,7 +154,6 @@ export class TasksComponent
 
 
   currentDataEdocTasks() {
-    console.log('run')
     switch (this.activeTab) {
       case 'queued':
         if (this.page == 1) {

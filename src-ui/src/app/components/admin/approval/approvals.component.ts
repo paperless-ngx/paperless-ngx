@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 import { Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { first } from 'rxjs'
+import { first, tap } from 'rxjs'
 import { Approval, ApprovalStatus } from 'src/app/data/approval'
 import { ApprovalsService } from 'src/app/services/approvals.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
@@ -12,6 +12,8 @@ import { UserService } from 'src/app/services/rest/user.service'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { PermissionsService } from '../../../services/permissions.service'
 import { app } from 'ngx-bootstrap-icons'
+import { Results } from '../../../data/results'
+import { EdocTask } from '../../../data/edoc-task'
 
 
 @Component({
@@ -34,6 +36,35 @@ export class ApprovalsComponent
   public page: number = 1
 
   public autoRefreshInterval: any
+
+  public approvalsPending: Results<Approval> = {
+    count: 0,
+    results: [],
+    all: [],
+  }
+  public approvalsRevoked: Results<Approval> = {
+    count: 0,
+    results: [],
+    all: [],
+  }
+  public approvalsSuccess: Results<Approval> = {
+    count: 0,
+    results: [],
+    all: [],
+  }
+
+  public approvalsFailure: Results<Approval> = {
+    count: 0,
+    results: [],
+    all: [],
+  }
+
+  // public approvalsCurrent: Approval[] = []
+  public approvalsCurrent: Results<Approval> = {
+    count: 0,
+    results: [],
+    all: [],
+  }
 
   get dismissButtonText(): string {
     return this.selectedApprovals.size > 0
@@ -78,7 +109,8 @@ export class ApprovalsComponent
   }
 
   ngOnInit() {
-    this.approvalsService.reload()
+    //this.approvalsService.reload()
+    this.reloadData()
     this.toggleAutoRefresh()
     // console.log(approvals)
   }
@@ -195,6 +227,59 @@ export class ApprovalsComponent
     return approvals
   }
 
+  currentDataApprovals() {
+    switch (this.activeTab) {
+      case 'revoked':
+        if (this.page == 1) {
+          this.approvalsCurrent = this.approvalsRevoked
+          break
+        }
+        this.revokedApprovals(this.page)
+
+        break
+      case 'pending':
+        if (this.page == 1) {
+
+          break
+        }
+        this.pendingApprovals(this.page)
+
+        break
+      case 'success':
+        if (this.page == 1) {
+          this.approvalsCurrent = this.approvalsSuccess
+          break
+        }
+        this.successApprovals(this.page)
+
+        break
+      case 'failure':
+        if (this.page == 1) {
+          this.approvalsCurrent = this.approvalsFailure
+          break
+        }
+        this.failureApprovals(this.page)
+        break
+    }
+  }
+
+  SetCurrentDataApprovals() {
+    switch (this.activeTab) {
+      case 'revoked':
+        this.approvalsCurrent = this.approvalsRevoked
+        break
+      case 'pending':
+        this.approvalsCurrent = this.approvalsPending
+        break
+      case 'success':
+        this.approvalsCurrent = this.approvalsSuccess
+        break
+      case 'failure':
+        this.approvalsCurrent = this.approvalsFailure
+        break
+    }
+  }
+
   toggleAll(event: PointerEvent) {
     if ((event.target as HTMLInputElement).checked) {
       this.selectedApprovals = new Set(this.currentApprovals.map((t) => t.id))
@@ -231,9 +316,91 @@ export class ApprovalsComponent
       this.autoRefreshInterval = null
     } else {
       this.autoRefreshInterval = setInterval(() => {
-        this.approvalsService.reload()
+        //this.approvalsService.reload()
+        this.reloadData()
       }, 5000)
     }
+  }
+  reloadData() {
+    this.revokedApprovals(1)
+    this.pendingApprovals(1)
+    this.successApprovals(1)
+    this.failureApprovals(1)
+    // this.currentDataEdocTasks();
+  }
+
+  revokedApprovals(pageQueue = 1) {
+    this.approvalsService
+      .getRevokedApprovals(pageQueue)
+      .pipe(
+        tap((r) => {
+          this.approvalsRevoked = r
+          this.SetCurrentDataApprovals()
+        }),
+        // delay(100)
+      )
+      .subscribe(() => {
+      })
+  }
+
+  pendingApprovals(pageQueue = 1) {
+    this.approvalsService
+      .getPendingApprovals(this.page)
+      .pipe(
+        tap((r) => {
+          this.approvalsPending = r
+          this.SetCurrentDataApprovals()
+        }),
+        // delay(100)
+      )
+      .subscribe(() => {
+      })
+  }
+
+  successApprovals(pageQueue = 1) {
+    this.approvalsService
+      .getSuccessApprovals(this.page)
+      .pipe(
+        tap((r) => {
+          this.approvalsSuccess = r
+          this.SetCurrentDataApprovals()
+        }),
+        // delay(100)
+      )
+      .subscribe(() => {
+      })
+  }
+
+  failureApprovals(pageQueue = 1) {
+    this.approvalsService
+      .getFailureApprovals(this.page)
+      .pipe(
+        tap((r) => {
+          this.approvalsFailure = r
+          this.SetCurrentDataApprovals()
+        }),
+        // delay(100)
+      )
+      .subscribe(() => {
+      })
+  }
+  getCountTaskAll() {
+
+    switch (this.activeTab) {
+      case 'pending':
+        return this.approvalsPending.count
+      case 'revoked':
+        return this.approvalsRevoked.count
+      case 'success':
+        return this.approvalsSuccess.count
+      case 'failure':
+        return this.approvalsFailure.count
+    }
+
+  }
+
+  onPageChange($event: number) {
+    this.currentDataApprovals()
   }
 
   protected readonly ApprovalStatus = ApprovalStatus
