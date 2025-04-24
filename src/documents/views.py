@@ -648,8 +648,9 @@ class DocumentViewSet(
         if dossier is not None:
             dossier.delete()
         index.remove_document_from_index(self.get_object())
-
-        return super().destroy(request, *args, **kwargs)
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+        # return super().destroy(request, *args, **kwargs)
 
     @staticmethod
     def original_requested(request):
