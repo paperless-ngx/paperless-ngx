@@ -29,6 +29,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { FileComponent } from '../../common/input/file/file.component'
 import { NumberComponent } from '../../common/input/number/number.component'
+import { PasswordComponent } from '../../common/input/password/password.component'
 import { SelectComponent } from '../../common/input/select/select.component'
 import { SwitchComponent } from '../../common/input/switch/switch.component'
 import { TextComponent } from '../../common/input/text/text.component'
@@ -46,6 +47,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     TextComponent,
     NumberComponent,
     FileComponent,
+    PasswordComponent,
     AsyncPipe,
     NgbNavModule,
     FormsModule,
