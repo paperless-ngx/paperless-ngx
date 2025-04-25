@@ -4,6 +4,7 @@ from llama_index.embeddings.openai import OpenAIEmbedding
 from documents.models import Document
 from documents.models import Note
 from paperless.config import AIConfig
+from paperless.models import LLMEmbeddingBackend
 
 EMBEDDING_DIMENSIONS = {
     "text-embedding-3-small": 1536,
@@ -15,12 +16,12 @@ def get_embedding_model():
     config = AIConfig()
 
     match config.llm_embedding_backend:
-        case "openai":
+        case LLMEmbeddingBackend.OPENAI:
             return OpenAIEmbedding(
                 model=config.llm_embedding_model or "text-embedding-3-small",
                 api_key=config.llm_api_key,
             )
-        case "local":
+        case LLMEmbeddingBackend.HUGGINGFACE:
             return HuggingFaceEmbedding(
                 model_name=config.llm_embedding_model
                 or "sentence-transformers/all-MiniLM-L6-v2",
