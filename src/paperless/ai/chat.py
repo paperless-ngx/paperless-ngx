@@ -51,7 +51,8 @@ def stream_chat_with_documents(query_str: str, documents: list[Document]):
     else:
         top_nodes = retriever.retrieve(query_str)
         context = "\n\n".join(
-            f"TITLE: {node.metadata.get('title')}\n{node.text}" for node in top_nodes
+            f"TITLE: {node.metadata.get('title')}\n{node.text[:500]}"
+            for node in top_nodes
         )
 
     prompt = CHAT_PROMPT_TMPL.partial_format(
