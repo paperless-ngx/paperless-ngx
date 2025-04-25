@@ -265,6 +265,14 @@ for details.
 
 Paperless-ngx can suggest tags, correspondents, document types and storage paths for documents based on the content of the document. This is done using a machine learning model that is trained on the documents in your database. The suggestions are shown in the document detail page and can be accepted or rejected by the user.
 
+## AI Features
+
+Paperless-ngx includes several features that use AI to enhance the document management experience. These features are optional and can be enabled or disabled in the settings. If you are using the AI features, you may want to also enable the "LLM index" feature, which supports Retrieval-Augmented Generation (RAG) which significantly improves the quality of the AI features. The LLM index feature is not enabled by default and requires additional configuration.
+
+### Document Chat
+
+Paperless-ngx can use an AI LLM model to answer questions about a document or across multiple documents. <<add more details here>>
+
 ### AI-Enhanced Suggestions
 
 If enabled, Paperless-ngx can use an AI LLM model to suggest document titles, dates, tags, correspondents and document types for documents. This feature will always be "opt-in" and does not disable the existing suggestion system. Currently, both remote (via the OpenAI API) and local (via Ollama) models are supported, see [configuration](configuration.md#ai) for details.

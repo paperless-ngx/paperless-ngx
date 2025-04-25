@@ -1769,6 +1769,18 @@ suggestions. This setting is required to be set to true in order to use the AI f
 
     Defaults to false.
 
+#### [`PAPERLESS_LLM_EMBEDDING_BACKEND=<str>`](#PAPERLESS_LLM_EMBEDDING_BACKEND) {#PAPERLESS_LLM_EMBEDDING_BACKEND}
+
+: The embedding backend to use for RAG. This can be either "openai" or "local".
+
+    Defaults to "local".
+
+#### [`PAPERLESS_LLM_EMBEDDING_MODEL=<str>`](#PAPERLESS_LLM_EMBEDDING_MODEL) {#PAPERLESS_LLM_EMBEDDING_MODEL}
+
+: The model to use for the embedding backend for RAG. This can be either "text-embedding-3-small" or any of the models supported by the current embedding backend.
+
+    Defaults to None.
+
 #### [`PAPERLESS_AI_BACKEND=<str>`](#PAPERLESS_AI_BACKEND) {#PAPERLESS_AI_BACKEND}
 
 : The AI backend to use. This can be either "openai" or "ollama". If set to "ollama", the AI
