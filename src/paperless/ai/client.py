@@ -35,7 +35,7 @@ class AIClient:
 
     def _run_ollama_query(self, prompt: str) -> str:
         url = self.settings.llm_url or "http://localhost:11434"
-        with httpx.Client(timeout=30.0) as client:
+        with httpx.Client(timeout=60.0) as client:
             response = client.post(
                 f"{url}/api/generate",
                 json={
