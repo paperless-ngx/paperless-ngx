@@ -171,6 +171,7 @@ from documents.tasks import train_classifier
 from documents.templating.filepath import validate_filepath_template_and_render
 from paperless import version
 from paperless.ai.ai_classifier import get_ai_document_classification
+from paperless.ai.chat import chat_with_documents
 from paperless.ai.matching import extract_unmatched_names
 from paperless.ai.matching import match_correspondents_by_name
 from paperless.ai.matching import match_document_types_by_name
@@ -1133,6 +1134,17 @@ class DocumentViewSet(
             return HttpResponseServerError(
                 "Error emailing document, check logs for more detail.",
             )
+
+    @action(methods=["post"], detail=False, url_path="chat")
+    def chat(self, request):
+        ai_config = AIConfig()
+        if not ai_config.ai_enabled:
+            return HttpResponseBadRequest("AI is required for this feature")
+
+        question = request.data["q"]
+        result = chat_with_documents(question, request.user)
+
+        return Response({"answer": result})
 
 
 @extend_schema_view(
