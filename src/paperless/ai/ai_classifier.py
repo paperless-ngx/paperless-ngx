@@ -62,14 +62,14 @@ def build_prompt_with_rag(document: Document) -> str:
     Only output valid JSON in the format below. No additional explanations.
 
     The JSON object must contain:
-    - title: A short, descriptive title based on the content
+    - title: A short, human-readable, descriptive title based on the content
     - tags: A list of relevant topics
     - correspondents: People or organizations involved
     - document_types: Type or category of the document
     - storage_paths: Suggested folder paths
     - dates: Up to 3 relevant dates in YYYY-MM-DD
 
-    Here is an example document:
+    Here is the document:
     FILENAME:
     {filename}
 
