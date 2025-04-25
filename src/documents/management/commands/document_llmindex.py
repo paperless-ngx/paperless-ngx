@@ -15,5 +15,7 @@ class Command(ProgressBarMixin, BaseCommand):
     def handle(self, *args, **options):
         self.handle_progress_bar_mixin(**options)
         with transaction.atomic():
-            if options["command"] == "rebuild":
-                llm_index_rebuild(progress_bar_disable=self.no_progress_bar)
+            llm_index_rebuild(
+                progress_bar_disable=self.no_progress_bar,
+                rebuild=options["command"] == "rebuild",
+            )
