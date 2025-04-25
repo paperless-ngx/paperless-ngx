@@ -1,7 +1,9 @@
 import logging
 
-import httpx
+from llama_index.core.llms import ChatMessage
+from llama_index.llms.openai import OpenAI
 
+from paperless.ai.llms import OllamaLLM
 from paperless.config import AIConfig
 
 logger = logging.getLogger("paperless.ai.client")
@@ -12,8 +14,23 @@ class AIClient:
     A client for interacting with an LLM backend.
     """
 
+    def get_llm(self):
+        if self.settings.llm_backend == "ollama":
+            return OllamaLLM(
+                model=self.settings.llm_model or "llama3",
+                base_url=self.settings.llm_url or "http://localhost:11434",
+            )
+        elif self.settings.llm_backend == "openai":
+            return OpenAI(
+                model=self.settings.llm_model or "gpt-3.5-turbo",
+                api_key=self.settings.openai_api_key,
+            )
+        else:
+            raise ValueError(f"Unsupported LLM backend: {self.settings.llm_backend}")
+
     def __init__(self):
         self.settings = AIConfig()
+        self.llm = self.get_llm()
 
     def run_llm_query(self, prompt: str) -> str:
         logger.debug(
@@ -21,50 +38,16 @@ class AIClient:
             self.settings.llm_backend,
             self.settings.llm_model,
         )
-        match self.settings.llm_backend:
-            case "openai":
-                result = self._run_openai_query(prompt)
-            case "ollama":
-                result = self._run_ollama_query(prompt)
-            case _:
-                raise ValueError(
-                    f"Unsupported LLM backend: {self.settings.llm_backend}",
-                )
+        result = self.llm.complete(prompt)
         logger.debug("LLM query result: %s", result)
         return result
 
-    def _run_ollama_query(self, prompt: str) -> str:
-        url = self.settings.llm_url or "http://localhost:11434"
-        with httpx.Client(timeout=60.0) as client:
-            response = client.post(
-                f"{url}/api/generate",
-                json={
-                    "model": self.settings.llm_model,
-                    "prompt": prompt,
-                    "stream": False,
-                },
-            )
-            response.raise_for_status()
-            return response.json()["response"]
-
-    def _run_openai_query(self, prompt: str) -> str:
-        if not self.settings.llm_api_key:
-            raise RuntimeError("PAPERLESS_LLM_API_KEY is not set")
-
-        url = self.settings.llm_url or "https://api.openai.com"
-
-        with httpx.Client(timeout=30.0) as client:
-            response = client.post(
-                f"{url}/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {self.settings.llm_api_key}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": self.settings.llm_model,
-                    "messages": [{"role": "user", "content": prompt}],
-                    "temperature": 0.3,
-                },
-            )
-            response.raise_for_status()
-            return response.json()["choices"][0]["message"]["content"]
+    def run_chat(self, messages: list[ChatMessage]) -> str:
+        logger.debug(
+            "Running chat query against %s with model %s",
+            self.settings.llm_backend,
+            self.settings.llm_model,
+        )
+        result = self.llm.chat(messages)
+        logger.debug("Chat result: %s", result)
+        return result

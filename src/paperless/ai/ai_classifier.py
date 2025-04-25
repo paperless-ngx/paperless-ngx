@@ -1,6 +1,8 @@
 import json
 import logging
 
+from llama_index.core.base.llms.types import CompletionResponse
+
 from documents.models import Document
 from paperless.ai.client import AIClient
 from paperless.ai.rag import get_context_for_document
@@ -28,6 +30,8 @@ def build_prompt_without_rag(document: Document) -> str:
     - storage_paths: Suggested folder paths (e.g. "Medical/Insurance")
     - dates: List up to 3 relevant dates in YYYY-MM-DD format
 
+    Respond ONLY in JSON.
+    Each field must be a list of plain strings.
     The format of the JSON object is as follows:
     {{
         "title": "xxxxx",
@@ -69,6 +73,18 @@ def build_prompt_with_rag(document: Document) -> str:
     - storage_paths: Suggested folder paths
     - dates: Up to 3 relevant dates in YYYY-MM-DD
 
+    Respond ONLY in JSON.
+    Each field must be a list of plain strings.
+    The format of the JSON object is as follows:
+    {{
+        "title": "xxxxx",
+        "tags": ["xxxx", "xxxx"],
+        "correspondents": ["xxxx", "xxxx"],
+        "document_types": ["xxxx", "xxxx"],
+        "storage_paths": ["xxxx", "xxxx"],
+        "dates": ["YYYY-MM-DD", "YYYY-MM-DD", "YYYY-MM-DD"],
+    }}
+
     Here is the document:
     FILENAME:
     {filename}
@@ -83,9 +99,9 @@ def build_prompt_with_rag(document: Document) -> str:
     return prompt
 
 
-def parse_ai_response(text: str) -> dict:
+def parse_ai_response(response: CompletionResponse) -> dict:
     try:
-        raw = json.loads(text)
+        raw = json.loads(response.text)
         return {
             "title": raw.get("title"),
             "tags": raw.get("tags", []),
@@ -95,7 +111,7 @@ def parse_ai_response(text: str) -> dict:
             "dates": raw.get("dates", []),
         }
     except json.JSONDecodeError:
-        logger.exception("Invalid JSON in RAG response")
+        logger.exception("Invalid JSON in AI response")
         return {}
 
 
