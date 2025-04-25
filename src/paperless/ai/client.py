@@ -14,6 +14,10 @@ class AIClient:
     A client for interacting with an LLM backend.
     """
 
+    def __init__(self):
+        self.settings = AIConfig()
+        self.llm = self.get_llm()
+
     def get_llm(self):
         if self.settings.llm_backend == "ollama":
             return OllamaLLM(
@@ -27,10 +31,6 @@ class AIClient:
             )
         else:
             raise ValueError(f"Unsupported LLM backend: {self.settings.llm_backend}")
-
-    def __init__(self):
-        self.settings = AIConfig()
-        self.llm = self.get_llm()
 
     def run_llm_query(self, prompt: str) -> str:
         logger.debug(
