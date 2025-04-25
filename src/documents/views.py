@@ -1,4 +1,5 @@
 import itertools
+import json
 import logging
 import os
 import platform
@@ -16,6 +17,7 @@ import httpx
 import pathvalidate
 from celery import states
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.db import connections
@@ -38,6 +40,7 @@ from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseServerError
+from django.http import StreamingHttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -45,6 +48,7 @@ from django.utils.timezone import make_aware
 from django.utils.translation import get_language
 from django.views import View
 from django.views.decorators.cache import cache_control
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
@@ -173,7 +177,7 @@ from documents.templating.filepath import validate_filepath_template_and_render
 from documents.utils import get_boolean
 from paperless import version
 from paperless.ai.ai_classifier import get_ai_document_classification
-from paperless.ai.chat import chat_with_documents
+from paperless.ai.chat import stream_chat_with_documents
 from paperless.ai.matching import extract_unmatched_names
 from paperless.ai.matching import match_correspondents_by_name
 from paperless.ai.matching import match_document_types_by_name
@@ -1168,19 +1172,27 @@ class DocumentViewSet(
                 "Error emailing document, check logs for more detail.",
             )
 
-    @action(methods=["post"], detail=False, url_path="chat")
-    def chat(self, request):
+
+@method_decorator(ensure_csrf_cookie, name="dispatch")
+@method_decorator(login_required, name="dispatch")
+class ChatStreamingView(View):
+    def post(self, request):
         ai_config = AIConfig()
         if not ai_config.ai_enabled:
             return HttpResponseBadRequest("AI is required for this feature")
 
-        question = request.data["q"]
-        doc_id = request.data.get("document_id", None)
+        try:
+            data = json.loads(request.body)
+            question = data["q"]
+            doc_id = data.get("document_id", None)
+        except (KeyError, json.JSONDecodeError):
+            return HttpResponseBadRequest("Invalid request")
+
         if doc_id:
             try:
                 document = Document.objects.get(id=doc_id)
             except Document.DoesNotExist:
-                return HttpResponseBadRequest("Invalid document ID")
+                return HttpResponseBadRequest("Document not found")
 
             if not has_perms_owner_aware(request.user, "view_document", document):
                 return HttpResponseForbidden("Insufficient permissions")
@@ -1193,9 +1205,12 @@ class DocumentViewSet(
                 Document,
             )
 
-        result = chat_with_documents(question, documents)
-
-        return Response({"answer": result})
+        response = StreamingHttpResponse(
+            stream_chat_with_documents(query_str=question, documents=documents),
+            content_type="text/plain",
+        )
+        response["Cache-Control"] = "no-cache"
+        return response
 
 
 @extend_schema_view(

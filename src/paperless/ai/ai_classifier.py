@@ -48,7 +48,7 @@ def build_prompt_without_rag(document: Document) -> str:
     {filename}
 
     CONTENT:
-    {content[:8000]}  # Trim to safe size
+    {content[:8000]}
     """
 
     return prompt
