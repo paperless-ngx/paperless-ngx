@@ -21,6 +21,27 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="applicationconfiguration",
+            name="llm_embedding_backend",
+            field=models.CharField(
+                blank=True,
+                choices=[("openai", "OpenAI"), ("local", "Local")],
+                max_length=32,
+                null=True,
+                verbose_name="Sets the LLM Embedding backend",
+            ),
+        ),
+        migrations.AddField(
+            model_name="applicationconfiguration",
+            name="llm_embedding_model",
+            field=models.CharField(
+                blank=True,
+                max_length=32,
+                null=True,
+                verbose_name="Sets the LLM Embedding model",
+            ),
+        ),
+        migrations.AddField(
+            model_name="applicationconfiguration",
             name="llm_api_key",
             field=models.CharField(
                 blank=True,
