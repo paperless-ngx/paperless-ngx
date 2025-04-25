@@ -174,7 +174,6 @@ from documents.utils import get_boolean
 from paperless import version
 from paperless.ai.ai_classifier import get_ai_document_classification
 from paperless.ai.chat import chat_with_documents
-from paperless.ai.chat import chat_with_single_document
 from paperless.ai.matching import extract_unmatched_names
 from paperless.ai.matching import match_correspondents_by_name
 from paperless.ai.matching import match_document_types_by_name
@@ -1178,13 +1177,23 @@ class DocumentViewSet(
         question = request.data["q"]
         doc_id = request.data.get("document_id", None)
         if doc_id:
-            document = Document.objects.get(id=doc_id)
+            try:
+                document = Document.objects.get(id=doc_id)
+            except Document.DoesNotExist:
+                return HttpResponseBadRequest("Invalid document ID")
+
             if not has_perms_owner_aware(request.user, "view_document", document):
                 return HttpResponseForbidden("Insufficient permissions")
 
-            result = chat_with_single_document(document, question, request.user)
+            documents = [document]
         else:
-            result = chat_with_documents(question, request.user)
+            documents = get_objects_for_user_owner_aware(
+                request.user,
+                "view_document",
+                Document,
+            )
+
+        result = chat_with_documents(question, documents)
 
         return Response({"answer": result})
 
