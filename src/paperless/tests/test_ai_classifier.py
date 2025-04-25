@@ -66,7 +66,7 @@ def test_parse_llm_classification_response_invalid_json():
 @patch("paperless.ai.client.AIClient.run_llm_query")
 @patch("paperless.ai.ai_classifier.build_prompt_with_rag")
 @override_settings(
-    LLM_EMBEDDING_BACKEND="local",
+    LLM_EMBEDDING_BACKEND="huggingface",
     LLM_EMBEDDING_MODEL="some_model",
     LLM_BACKEND="ollama",
     LLM_MODEL="some_model",
