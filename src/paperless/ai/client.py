@@ -1,9 +1,9 @@
 import logging
 
 from llama_index.core.llms import ChatMessage
+from llama_index.llms.ollama import Ollama
 from llama_index.llms.openai import OpenAI
 
-from paperless.ai.llms import OllamaLLM
 from paperless.config import AIConfig
 
 logger = logging.getLogger("paperless.ai.client")
@@ -20,9 +20,10 @@ class AIClient:
 
     def get_llm(self):
         if self.settings.llm_backend == "ollama":
-            return OllamaLLM(
+            return Ollama(
                 model=self.settings.llm_model or "llama3",
                 base_url=self.settings.llm_url or "http://localhost:11434",
+                request_timeout=120,
             )
         elif self.settings.llm_backend == "openai":
             return OpenAI(
