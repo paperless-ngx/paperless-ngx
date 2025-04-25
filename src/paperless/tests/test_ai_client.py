@@ -17,8 +17,8 @@ def mock_ai_config():
 
 @pytest.fixture
 def mock_ollama_llm():
-    with patch("paperless.ai.client.OllamaLLM") as MockOllamaLLM:
-        yield MockOllamaLLM
+    with patch("paperless.ai.client.Ollama") as MockOllama:
+        yield MockOllama
 
 
 @pytest.fixture
@@ -37,6 +37,7 @@ def test_get_llm_ollama(mock_ai_config, mock_ollama_llm):
     mock_ollama_llm.assert_called_once_with(
         model="test_model",
         base_url="http://test-url",
+        request_timeout=120,
     )
     assert client.llm == mock_ollama_llm.return_value
 

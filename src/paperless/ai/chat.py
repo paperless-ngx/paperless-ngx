@@ -70,5 +70,4 @@ def stream_chat_with_documents(query_str: str, documents: list[Document]):
 
     response_stream = query_engine.query(prompt)
 
-    for chunk in response_stream.response_gen:
-        yield chunk.text
+    yield from response_stream.response_gen
