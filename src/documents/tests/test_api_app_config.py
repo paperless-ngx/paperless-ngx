@@ -65,6 +65,8 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 "barcode_enable_tag": None,
                 "barcode_tag_mapping": None,
                 "ai_enabled": False,
+                "llm_embedding_backend": None,
+                "llm_embedding_model": None,
                 "llm_backend": None,
                 "llm_model": None,
                 "llm_api_key": None,

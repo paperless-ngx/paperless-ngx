@@ -37,28 +37,65 @@ class OllamaLLM(LLM):
             data = response.json()
             return CompletionResponse(text=data["response"])
 
+    def chat(self, messages: list[ChatMessage], **kwargs) -> ChatResponse:
+        with httpx.Client(timeout=120.0) as client:
+            response = client.post(
+                f"{self.base_url}/api/generate",
+                json={
+                    "model": self.model,
+                    "messages": [
+                        {
+                            "role": message.role,
+                            "content": message.content,
+                        }
+                        for message in messages
+                    ],
+                    "stream": False,
+                },
+            )
+            response.raise_for_status()
+            data = response.json()
+            return ChatResponse(text=data["response"])
+
     # -- Required stubs for ABC:
-    def stream_complete(self, prompt: str, **kwargs) -> CompletionResponseGen:
+    def stream_complete(
+        self,
+        prompt: str,
+        **kwargs,
+    ) -> CompletionResponseGen:  # pragma: no cover
         raise NotImplementedError("stream_complete not supported")
 
-    def chat(self, messages: list[ChatMessage], **kwargs) -> ChatResponse:
-        raise NotImplementedError("chat not supported")
-
-    def stream_chat(self, messages: list[ChatMessage], **kwargs) -> ChatResponseGen:
+    def stream_chat(
+        self,
+        messages: list[ChatMessage],
+        **kwargs,
+    ) -> ChatResponseGen:  # pragma: no cover
         raise NotImplementedError("stream_chat not supported")
 
-    async def achat(self, messages: list[ChatMessage], **kwargs) -> ChatResponse:
+    async def achat(
+        self,
+        messages: list[ChatMessage],
+        **kwargs,
+    ) -> ChatResponse:  # pragma: no cover
         raise NotImplementedError("async chat not supported")
 
     async def astream_chat(
         self,
         messages: list[ChatMessage],
         **kwargs,
-    ) -> ChatResponseGen:
+    ) -> ChatResponseGen:  # pragma: no cover
         raise NotImplementedError("async stream_chat not supported")
 
-    async def acomplete(self, prompt: str, **kwargs) -> CompletionResponse:
+    async def acomplete(
+        self,
+        prompt: str,
+        **kwargs,
+    ) -> CompletionResponse:  # pragma: no cover
         raise NotImplementedError("async complete not supported")
 
-    async def astream_complete(self, prompt: str, **kwargs) -> CompletionResponseGen:
+    async def astream_complete(
+        self,
+        prompt: str,
+        **kwargs,
+    ) -> CompletionResponseGen:  # pragma: no cover
         raise NotImplementedError("async stream_complete not supported")
