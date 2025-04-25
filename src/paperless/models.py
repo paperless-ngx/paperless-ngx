@@ -74,6 +74,11 @@ class ColorConvertChoices(models.TextChoices):
     CMYK = ("CMYK", _("CMYK"))
 
 
+class LLMEmbeddingBackend(models.TextChoices):
+    OPENAI = ("openai", _("OpenAI"))
+    LOCAL = ("local", _("Local"))
+
+
 class LLMBackend(models.TextChoices):
     """
     Matches to --llm-backend
@@ -282,6 +287,21 @@ class ApplicationConfiguration(AbstractSingletonModel):
         verbose_name=_("Enables AI features"),
         null=True,
         default=False,
+    )
+
+    llm_embedding_backend = models.CharField(
+        verbose_name=_("Sets the LLM embedding backend"),
+        null=True,
+        blank=True,
+        max_length=32,
+        choices=LLMEmbeddingBackend.choices,
+    )
+
+    llm_embedding_model = models.CharField(
+        verbose_name=_("Sets the LLM embedding model"),
+        null=True,
+        blank=True,
+        max_length=32,
     )
 
     llm_backend = models.CharField(

@@ -291,6 +291,7 @@ MODEL_FILE = __get_path(
     "PAPERLESS_MODEL_FILE",
     DATA_DIR / "classification_model.pickle",
 )
+LLM_INDEX_DIR = DATA_DIR / "llm_index"
 
 LOGGING_DIR = __get_path("PAPERLESS_LOGGING_DIR", DATA_DIR / "log")
 
@@ -1416,7 +1417,12 @@ OUTLOOK_OAUTH_ENABLED = bool(
 # AI Settings                                                                  #
 ################################################################################
 AI_ENABLED = __get_boolean("PAPERLESS_AI_ENABLED", "NO")
-LLM_BACKEND = os.getenv("PAPERLESS_LLM_BACKEND", "openai")  # or "ollama"
+LLM_EMBEDDING_BACKEND = os.getenv(
+    "PAPERLESS_LLM_EMBEDDING_BACKEND",
+    "local",
+)  # or "openai"
+LLM_EMBEDDING_MODEL = os.getenv("PAPERLESS_LLM_EMBEDDING_MODEL")
+LLM_BACKEND = os.getenv("PAPERLESS_LLM_BACKEND", "ollama")  # or "openai"
 LLM_MODEL = os.getenv("PAPERLESS_LLM_MODEL")
 LLM_API_KEY = os.getenv("PAPERLESS_LLM_API_KEY")
 LLM_URL = os.getenv("PAPERLESS_LLM_URL")
