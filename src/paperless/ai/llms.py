@@ -1,3 +1,5 @@
+import json
+
 import httpx
 from llama_index.core.base.llms.types import ChatMessage
 from llama_index.core.base.llms.types import ChatResponse
@@ -6,6 +8,7 @@ from llama_index.core.base.llms.types import CompletionResponse
 from llama_index.core.base.llms.types import CompletionResponseGen
 from llama_index.core.base.llms.types import LLMMetadata
 from llama_index.core.llms.llm import LLM
+from llama_index.core.prompts import SelectorPromptTemplate
 from pydantic import Field
 
 
@@ -37,33 +40,42 @@ class OllamaLLM(LLM):
             data = response.json()
             return CompletionResponse(text=data["response"])
 
-    def chat(self, messages: list[ChatMessage], **kwargs) -> ChatResponse:
-        with httpx.Client(timeout=120.0) as client:
-            response = client.post(
-                f"{self.base_url}/api/generate",
-                json={
-                    "model": self.model,
-                    "messages": [
-                        {
-                            "role": message.role,
-                            "content": message.content,
-                        }
-                        for message in messages
-                    ],
-                    "stream": False,
-                },
-            )
-            response.raise_for_status()
-            data = response.json()
-            return ChatResponse(text=data["response"])
+    def stream(self, prompt: str, **kwargs) -> CompletionResponseGen:
+        return self.stream_complete(prompt, **kwargs)
 
-    # -- Required stubs for ABC:
     def stream_complete(
         self,
-        prompt: str,
+        prompt: SelectorPromptTemplate,
         **kwargs,
-    ) -> CompletionResponseGen:  # pragma: no cover
-        raise NotImplementedError("stream_complete not supported")
+    ) -> CompletionResponseGen:
+        headers = {"Content-Type": "application/json"}
+        data = {
+            "model": self.model,
+            "prompt": prompt.format(llm=self),
+            "stream": True,
+        }
+
+        with httpx.stream(
+            "POST",
+            f"{self.base_url}/api/generate",
+            headers=headers,
+            json=data,
+            timeout=60.0,
+        ) as response:
+            response.raise_for_status()
+            for line in response.iter_lines():
+                if not line.strip():
+                    continue
+                chunk = json.loads(line)
+                if "response" in chunk:
+                    yield CompletionResponse(text=chunk["response"])
+
+    def chat(
+        self,
+        messages: list[ChatMessage],
+        **kwargs,
+    ) -> ChatResponse:  # pragma: no cover
+        raise NotImplementedError("chat not supported")
 
     def stream_chat(
         self,
