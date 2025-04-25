@@ -6,6 +6,7 @@ import uuid
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
+import faiss
 import tqdm
 from celery import Task
 from celery import shared_task
@@ -17,6 +18,11 @@ from django.db import transaction
 from django.db.models.signals import post_save
 from django.utils import timezone
 from filelock import FileLock
+from llama_index.core import Document as LlamaDocument
+from llama_index.core import StorageContext
+from llama_index.core import VectorStoreIndex
+from llama_index.core.settings import Settings
+from llama_index.vector_stores.faiss import FaissVectorStore
 from whoosh.writing import AsyncWriter
 
 from documents import index
@@ -54,6 +60,9 @@ from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
+from paperless.ai.embedding import build_llm_index_text
+from paperless.ai.embedding import get_embedding_dim
+from paperless.ai.embedding import get_embedding_model
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -517,3 +526,52 @@ def check_scheduled_workflows():
                             workflow_to_run=workflow,
                             document=document,
                         )
+
+
+def llm_index_rebuild(*, progress_bar_disable=False, rebuild=False):
+    if rebuild:
+        shutil.rmtree(settings.LLM_INDEX_DIR, ignore_errors=True)
+        settings.LLM_INDEX_DIR.mkdir(parents=True, exist_ok=True)
+
+    documents = Document.objects.all()
+
+    embed_model = get_embedding_model()
+
+    if rebuild or not settings.LLM_INDEX_DIR.exists():
+        embedding_dim = get_embedding_dim()
+        faiss_index = faiss.IndexFlatL2(embedding_dim)
+        vector_store = FaissVectorStore(faiss_index)
+    else:
+        vector_store = FaissVectorStore.from_persist_dir(settings.LLM_INDEX_DIR)
+    storage_context = StorageContext.from_defaults(vector_store=vector_store)
+    Settings.embed_model = embed_model
+
+    llm_docs = []
+    for document in tqdm.tqdm(documents, disable=progress_bar_disable):
+        if not document.content:
+            continue
+        llm_docs.append(
+            LlamaDocument(
+                text=build_llm_index_text(document),
+                metadata={
+                    "id": document.id,
+                    "title": document.title,
+                    "tags": [t.name for t in document.tags.all()],
+                    "correspondent": document.correspondent.name
+                    if document.correspondent
+                    else None,
+                    "document_type": document.document_type.name
+                    if document.document_type
+                    else None,
+                    "created": document.created.isoformat(),
+                    "added": document.added.isoformat(),
+                },
+            ),
+        )
+
+    index = VectorStoreIndex.from_documents(
+        llm_docs,
+        storage_context=storage_context,
+    )
+    settings.LLM_INDEX_DIR.mkdir(exist_ok=True)
+    index.storage_context.persist(persist_dir=settings.LLM_INDEX_DIR)
