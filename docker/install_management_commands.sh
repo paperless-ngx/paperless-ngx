@@ -11,6 +11,7 @@ for command in decrypt_documents \
 	mail_fetcher \
 	document_create_classifier \
 	document_index \
+	document_llmindex \
 	document_renamer \
 	document_retagger \
 	document_thumbnails \
