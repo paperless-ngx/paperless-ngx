@@ -37,15 +37,15 @@ class AIClient:
         url = self.settings.llm_url or "http://localhost:11434"
         with httpx.Client(timeout=30.0) as client:
             response = client.post(
-                f"{url}/api/chat",
+                f"{url}/api/generate",
                 json={
                     "model": self.settings.llm_model,
-                    "messages": [{"role": "user", "content": prompt}],
+                    "prompt": prompt,
                     "stream": False,
                 },
             )
             response.raise_for_status()
-            return response.json()["message"]["content"]
+            return response.json()["response"]
 
     def _run_openai_query(self, prompt: str) -> str:
         if not self.settings.llm_api_key:

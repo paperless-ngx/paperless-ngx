@@ -62,7 +62,7 @@ def build_prompt_with_rag(document: Document) -> str:
     Only output valid JSON in the format below. No additional explanations.
 
     The JSON object must contain:
-    - title: A short, descriptive title
+    - title: A short, descriptive title based on the content
     - tags: A list of relevant topics
     - correspondents: People or organizations involved
     - document_types: Type or category of the document
@@ -112,6 +112,6 @@ def get_ai_document_classification(document: Document) -> dict:
         client = AIClient()
         result = client.run_llm_query(prompt)
         return parse_ai_response(result)
-    except Exception:
+    except Exception as e:
         logger.exception("Failed AI classification")
-        return {}
+        raise e

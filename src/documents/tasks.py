@@ -7,6 +7,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import faiss
+import llama_index.core.settings as llama_settings
 import tqdm
 from celery import Task
 from celery import shared_task
@@ -21,7 +22,9 @@ from filelock import FileLock
 from llama_index.core import Document as LlamaDocument
 from llama_index.core import StorageContext
 from llama_index.core import VectorStoreIndex
-from llama_index.core.settings import Settings
+from llama_index.core.node_parser import SimpleNodeParser
+from llama_index.core.storage.docstore import SimpleDocumentStore
+from llama_index.core.storage.index_store import SimpleIndexStore
 from llama_index.vector_stores.faiss import FaissVectorStore
 from whoosh.writing import AsyncWriter
 
@@ -533,45 +536,56 @@ def llm_index_rebuild(*, progress_bar_disable=False, rebuild=False):
         shutil.rmtree(settings.LLM_INDEX_DIR, ignore_errors=True)
         settings.LLM_INDEX_DIR.mkdir(parents=True, exist_ok=True)
 
-    documents = Document.objects.all()
-
     embed_model = get_embedding_model()
+    llama_settings.Settings.embed_model = embed_model
 
     if rebuild or not settings.LLM_INDEX_DIR.exists():
         embedding_dim = get_embedding_dim()
         faiss_index = faiss.IndexFlatL2(embedding_dim)
-        vector_store = FaissVectorStore(faiss_index)
+        vector_store = FaissVectorStore(faiss_index=faiss_index)
     else:
         vector_store = FaissVectorStore.from_persist_dir(settings.LLM_INDEX_DIR)
-    storage_context = StorageContext.from_defaults(vector_store=vector_store)
-    Settings.embed_model = embed_model
 
-    llm_docs = []
-    for document in tqdm.tqdm(documents, disable=progress_bar_disable):
+    docstore = SimpleDocumentStore()
+    index_store = SimpleIndexStore()
+
+    storage_context = StorageContext.from_defaults(
+        docstore=docstore,
+        index_store=index_store,
+        persist_dir=settings.LLM_INDEX_DIR,
+        vector_store=vector_store,
+    )
+
+    parser = SimpleNodeParser()
+    nodes = []
+
+    for document in tqdm.tqdm(Document.objects.all(), disable=progress_bar_disable):
         if not document.content:
             continue
-        llm_docs.append(
-            LlamaDocument(
-                text=build_llm_index_text(document),
-                metadata={
-                    "id": document.id,
-                    "title": document.title,
-                    "tags": [t.name for t in document.tags.all()],
-                    "correspondent": document.correspondent.name
-                    if document.correspondent
-                    else None,
-                    "document_type": document.document_type.name
-                    if document.document_type
-                    else None,
-                    "created": document.created.isoformat(),
-                    "added": document.added.isoformat(),
-                },
-            ),
-        )
 
-    index = VectorStoreIndex.from_documents(
-        llm_docs,
+        text = build_llm_index_text(document)
+        metadata = {
+            "document_id": document.id,
+            "title": document.title,
+            "tags": [t.name for t in document.tags.all()],
+            "correspondent": document.correspondent.name
+            if document.correspondent
+            else None,
+            "document_type": document.document_type.name
+            if document.document_type
+            else None,
+            "created": document.created.isoformat() if document.created else None,
+            "added": document.added.isoformat() if document.added else None,
+        }
+
+        doc = LlamaDocument(text=text, metadata=metadata)
+        doc_nodes = parser.get_nodes_from_documents([doc])
+        nodes.extend(doc_nodes)
+
+    index = VectorStoreIndex(
+        nodes=nodes,
         storage_context=storage_context,
+        embed_model=embed_model,
     )
-    settings.LLM_INDEX_DIR.mkdir(exist_ok=True)
+
     index.storage_context.persist(persist_dir=settings.LLM_INDEX_DIR)
