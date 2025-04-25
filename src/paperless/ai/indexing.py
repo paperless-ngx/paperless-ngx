@@ -14,6 +14,11 @@ from paperless.ai.embedding import get_embedding_model
 logger = logging.getLogger("paperless.ai.indexing")
 
 
+def get_document_retriever(top_k: int = 5) -> VectorIndexRetriever:
+    index = load_index()
+    return VectorIndexRetriever(index=index, similarity_top_k=top_k)
+
+
 def load_index() -> VectorStoreIndex:
     """Loads the persisted LlamaIndex from disk."""
     vector_store = FaissVectorStore.from_persist_dir(settings.LLM_INDEX_DIR)
@@ -31,10 +36,8 @@ def load_index() -> VectorStoreIndex:
 
 def query_similar_documents(document: Document, top_k: int = 5) -> list[Document]:
     """Runs a similarity query and returns top-k similar Document objects."""
-
-    # Load index
-    index = load_index()
-    retriever = VectorIndexRetriever(index=index, similarity_top_k=top_k)
+    # Load the index
+    retriever = get_document_retriever(top_k=top_k)
 
     # Build query from the document text
     query_text = (document.title or "") + "\n" + (document.content or "")
