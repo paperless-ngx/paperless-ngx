@@ -1,4 +1,5 @@
 import logging
+import sys
 
 from llama_index.core import VectorStoreIndex
 from llama_index.core.prompts import PromptTemplate
@@ -70,4 +71,6 @@ def stream_chat_with_documents(query_str: str, documents: list[Document]):
 
     response_stream = query_engine.query(prompt)
 
-    yield from response_stream.response_gen
+    for chunk in response_stream.response_gen:
+        yield chunk
+        sys.stdout.flush()
