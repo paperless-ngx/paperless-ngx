@@ -8,7 +8,10 @@
       <div class="chat-messages font-monospace small">
         @for (message of messages; track message) {
           <div class="message d-flex flex-row small" [class.justify-content-end]="message.role === 'user'">
-            <span class="p-2 m-2" [class.bg-dark]="message.role === 'user'">{{ message.content }}</span>
+            <span class="p-2 m-2" [class.bg-dark]="message.role === 'user'">
+              {{ message.content }}
+              @if (message.isStreaming) { <span class="blinking-cursor">|</span> }
+            </span>
           </div>
         }
         <div #scrollAnchor></div>
