@@ -1,7 +1,9 @@
-import { Component, ElementRef, ViewChild } from '@angular/core'
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { NavigationEnd, Router } from '@angular/router'
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { filter, map } from 'rxjs'
 import { ChatMessage, ChatService } from 'src/app/services/chat.service'
 
 @Component({
@@ -15,24 +17,52 @@ import { ChatMessage, ChatService } from 'src/app/services/chat.service'
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
 })
-export class ChatComponent {
-  messages: ChatMessage[] = []
-  loading = false
-  documentId = 295 // Replace this with actual doc ID logic
-  input: string = ''
+export class ChatComponent implements OnInit {
+  public messages: ChatMessage[] = []
+  public loading = false
+  public input: string = ''
+  public documentId!: number
+
   @ViewChild('scrollAnchor') scrollAnchor!: ElementRef<HTMLDivElement>
-  @ViewChild('inputField') inputField!: ElementRef<HTMLInputElement>
+  @ViewChild('chatInput') chatInput!: ElementRef<HTMLInputElement>
 
   private typewriterBuffer: string[] = []
   private typewriterActive = false
 
-  constructor(private chatService: ChatService) {}
+  public get placeholder(): string {
+    return this.documentId
+      ? $localize`Ask a question about this document...`
+      : $localize`Ask a question about a document...`
+  }
+
+  constructor(
+    private chatService: ChatService,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    this.updateDocumentId(this.router.url)
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        map(() => this.router.url)
+      )
+      .subscribe((url) => {
+        this.updateDocumentId(url)
+      })
+  }
+
+  private updateDocumentId(url: string): void {
+    const docIdRe = url.match(/^\/documents\/(\d+)/)
+    this.documentId = docIdRe ? +docIdRe[1] : undefined
+  }
 
   sendMessage(): void {
     if (!this.input.trim()) return
 
     const userMessage: ChatMessage = { role: 'user', content: this.input }
     this.messages.push(userMessage)
+    this.scrollToBottom()
 
     const assistantMessage: ChatMessage = {
       role: 'assistant',
@@ -98,7 +128,7 @@ export class ChatComponent {
   public onOpenChange(open: boolean): void {
     if (open) {
       setTimeout(() => {
-        this.inputField.nativeElement.focus()
+        this.chatInput.nativeElement.focus()
       }, 10)
     }
   }
