@@ -45,7 +45,7 @@ def test_get_llm_ollama(mock_ai_config, mock_ollama_llm):
 def test_get_llm_openai(mock_ai_config, mock_openai_llm):
     mock_ai_config.llm_backend = "openai"
     mock_ai_config.llm_model = "test_model"
-    mock_ai_config.openai_api_key = "test_api_key"
+    mock_ai_config.llm_api_key = "test_api_key"
 
     client = AIClient()
 
