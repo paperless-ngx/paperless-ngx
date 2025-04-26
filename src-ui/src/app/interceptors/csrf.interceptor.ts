@@ -4,25 +4,19 @@ import {
   HttpInterceptor,
   HttpRequest,
 } from '@angular/common/http'
-import { Injectable, inject } from '@angular/core'
-import { Meta } from '@angular/platform-browser'
-import { CookieService } from 'ngx-cookie-service'
+import { inject, Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
+import { CsrfService } from '../services/csrf.service'
 
 @Injectable()
 export class CsrfInterceptor implements HttpInterceptor {
-  private cookieService = inject(CookieService)
-  private meta = inject(Meta)
+  private csrfService = inject(CsrfService)
 
   intercept(
     request: HttpRequest<unknown>,
     next: HttpHandler
   ): Observable<HttpEvent<unknown>> {
-    let prefix = ''
-    if (this.meta.getTag('name=cookie_prefix')) {
-      prefix = this.meta.getTag('name=cookie_prefix').content
-    }
-    let csrfToken = this.cookieService.get(`${prefix}csrftoken`)
+    const csrfToken = this.csrfService.getToken()
     if (csrfToken) {
       request = request.clone({
         setHeaders: {

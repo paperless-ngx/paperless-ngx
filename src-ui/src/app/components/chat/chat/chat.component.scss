@@ -1,0 +1,22 @@
+.dropdown-menu {
+  width: var(--pngx-toast-max-width);
+}
+
+.chat-messages {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.dropdown-toggle::after {
+  display: none;
+}
+
+.dropdown-item {
+  white-space: initial;
+}
+
+@media screen and (max-width: 400px) {
+  :host ::ng-deep .dropdown-menu-end {
+    right: -3rem;
+  }
+}

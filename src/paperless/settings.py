@@ -593,6 +593,10 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 # The next 3 settings can also be set using just PAPERLESS_URL
 CSRF_TRUSTED_ORIGINS = __get_list("PAPERLESS_CSRF_TRUSTED_ORIGINS")
 
+if DEBUG:
+    # Allow access from the angular development server during debugging
+    CSRF_TRUSTED_ORIGINS.append("http://localhost:4200")
+
 # We allow CORS from localhost:8000
 CORS_ALLOWED_ORIGINS = __get_list(
     "PAPERLESS_CORS_ALLOWED_HOSTS",
@@ -602,6 +606,8 @@ CORS_ALLOWED_ORIGINS = __get_list(
 if DEBUG:
     # Allow access from the angular development server during debugging
     CORS_ALLOWED_ORIGINS.append("http://localhost:4200")
+
+CORS_ALLOW_CREDENTIALS = True
 
 CORS_EXPOSE_HEADERS = [
     "Content-Disposition",
