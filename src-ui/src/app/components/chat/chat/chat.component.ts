@@ -45,9 +45,11 @@ export class ChatComponent implements OnInit {
     this.router.events
       .pipe(
         filter((event) => event instanceof NavigationEnd),
-        map(() => this.router.url)
+        map((event) => (event as NavigationEnd).url)
       )
       .subscribe((url) => {
+        console.log('URL changed:', url)
+
         this.updateDocumentId(url)
       })
   }
@@ -138,12 +140,5 @@ export class ChatComponent implements OnInit {
       event.preventDefault()
       this.sendMessage()
     }
-    // } else if (event.key === 'Escape' && !this.resultsDropdown.isOpen()) {
-    //   if (this.query?.length) {
-    //     this.reset(true)
-    //   } else {
-    //     this.searchInput.nativeElement.blur()
-    //   }
-    // }
   }
 }
