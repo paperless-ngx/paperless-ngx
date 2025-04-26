@@ -1,4 +1,3 @@
-import { NgClass } from '@angular/common'
 import { Component, ElementRef, ViewChild } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
@@ -12,7 +11,6 @@ import { ChatMessage, ChatService } from 'src/app/services/chat.service'
     ReactiveFormsModule,
     NgxBootstrapIconsModule,
     NgbDropdownModule,
-    NgClass,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
@@ -24,6 +22,9 @@ export class ChatComponent {
   input: string = ''
   @ViewChild('scrollAnchor') scrollAnchor!: ElementRef<HTMLDivElement>
   @ViewChild('inputField') inputField!: ElementRef<HTMLInputElement>
+
+  private typewriterBuffer: string[] = []
+  private typewriterActive = false
 
   constructor(private chatService: ChatService) {}
 
@@ -45,9 +46,9 @@ export class ChatComponent {
 
     this.chatService.streamChat(this.documentId, this.input).subscribe({
       next: (chunk) => {
-        assistantMessage.content += chunk.substring(lastPartialLength)
+        const delta = chunk.substring(lastPartialLength)
         lastPartialLength = chunk.length
-        this.scrollToBottom()
+        this.enqueueTypewriter(delta, assistantMessage)
       },
       error: () => {
         assistantMessage.content += '\n\n⚠️ Error receiving response.'
@@ -64,13 +65,37 @@ export class ChatComponent {
     this.input = ''
   }
 
-  scrollToBottom(): void {
+  enqueueTypewriter(chunk: string, message: ChatMessage): void {
+    if (!chunk) return
+
+    this.typewriterBuffer.push(...chunk.split(''))
+
+    if (!this.typewriterActive) {
+      this.typewriterActive = true
+      this.playTypewriter(message)
+    }
+  }
+
+  playTypewriter(message: ChatMessage): void {
+    if (this.typewriterBuffer.length === 0) {
+      this.typewriterActive = false
+      return
+    }
+
+    const nextChar = this.typewriterBuffer.shift()!
+    message.content += nextChar
+    this.scrollToBottom()
+
+    setTimeout(() => this.playTypewriter(message), 10) // 10ms per character
+  }
+
+  private scrollToBottom(): void {
     setTimeout(() => {
       this.scrollAnchor?.nativeElement?.scrollIntoView({ behavior: 'smooth' })
     }, 50)
   }
 
-  onOpenChange(open: boolean): void {
+  public onOpenChange(open: boolean): void {
     if (open) {
       setTimeout(() => {
         this.inputField.nativeElement.focus()
