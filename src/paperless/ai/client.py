@@ -28,7 +28,7 @@ class AIClient:
         elif self.settings.llm_backend == "openai":
             return OpenAI(
                 model=self.settings.llm_model or "gpt-3.5-turbo",
-                api_key=self.settings.openai_api_key,
+                api_key=self.settings.llm_api_key,
             )
         else:
             raise ValueError(f"Unsupported LLM backend: {self.settings.llm_backend}")
