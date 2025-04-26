@@ -1144,6 +1144,7 @@ class DocumentViewSet(
 @method_decorator(login_required, name="dispatch")
 class ChatStreamingView(View):
     def post(self, request):
+        request.compress_exempt = True
         ai_config = AIConfig()
         if not ai_config.ai_enabled:
             return HttpResponseBadRequest("AI is required for this feature")
@@ -1174,7 +1175,7 @@ class ChatStreamingView(View):
 
         response = StreamingHttpResponse(
             stream_chat_with_documents(query_str=question, documents=documents),
-            content_type="text/plain",
+            content_type="text/event-stream",
         )
         response["Cache-Control"] = "no-cache"
         return response
