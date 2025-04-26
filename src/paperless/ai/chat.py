@@ -37,7 +37,8 @@ def stream_chat_with_documents(query_str: str, documents: list[Document]):
 
     if len(nodes) == 0:
         logger.warning("No nodes found for the given documents.")
-        return "Sorry, I couldn't find any content to answer your question."
+        yield "Sorry, I couldn't find any content to answer your question."
+        return
 
     local_index = VectorStoreIndex(nodes=nodes)
     retriever = local_index.as_retriever(
