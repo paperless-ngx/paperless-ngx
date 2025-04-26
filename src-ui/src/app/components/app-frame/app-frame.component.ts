@@ -171,6 +171,10 @@ export class AppFrameComponent
       })
   }
 
+  get aiEnabled(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.AI_ENABLED)
+  }
+
   closeMenu() {
     this.isMenuCollapsed = true
   }
