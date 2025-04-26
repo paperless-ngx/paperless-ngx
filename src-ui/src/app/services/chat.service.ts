@@ -1,7 +1,11 @@
+import {
+  HttpClient,
+  HttpDownloadProgressEvent,
+  HttpEventType,
+} from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { Observable } from 'rxjs'
+import { filter, map, Observable } from 'rxjs'
 import { environment } from 'src/environments/environment'
-import { CsrfService } from './csrf.service'
 
 export interface ChatMessage {
   role: 'user' | 'assistant'
@@ -13,48 +17,31 @@ export interface ChatMessage {
   providedIn: 'root',
 })
 export class ChatService {
-  constructor(private csrfService: CsrfService) {}
+  constructor(private http: HttpClient) {}
 
   streamChat(documentId: number, prompt: string): Observable<string> {
-    return new Observable<string>((observer) => {
-      const url = `${environment.apiBaseUrl}documents/chat/`
-      const xhr = new XMLHttpRequest()
-      let lastLength = 0
-
-      xhr.open('POST', url)
-      xhr.setRequestHeader('Content-Type', 'application/json')
-
-      xhr.withCredentials = true
-      let csrfToken = this.csrfService.getToken()
-      if (csrfToken) {
-        xhr.setRequestHeader('X-CSRFToken', csrfToken)
-      }
-
-      xhr.onreadystatechange = () => {
-        if (xhr.readyState === 3 || xhr.readyState === 4) {
-          const partial = xhr.responseText.slice(lastLength)
-          lastLength = xhr.responseText.length
-
-          if (partial) {
-            observer.next(partial)
+    // use httpclient as we have withFetch
+    return this.http
+      .post(
+        `${environment.apiBaseUrl}documents/chat/`,
+        {
+          document_id: documentId,
+          q: prompt,
+        },
+        {
+          observe: 'events',
+          reportProgress: true,
+          responseType: 'text',
+          withCredentials: true,
+        }
+      )
+      .pipe(
+        map((event) => {
+          if (event.type === HttpEventType.DownloadProgress) {
+            return (event as HttpDownloadProgressEvent).partialText!
           }
-        }
-
-        if (xhr.readyState === 4) {
-          observer.complete()
-        }
-      }
-
-      xhr.onerror = () => {
-        observer.error(new Error('Streaming request failed.'))
-      }
-
-      const body = JSON.stringify({
-        document_id: documentId,
-        q: prompt,
-      })
-
-      xhr.send(body)
-    })
+        }),
+        filter((chunk) => !!chunk)
+      )
   }
 }
