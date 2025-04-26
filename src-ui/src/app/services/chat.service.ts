@@ -20,7 +20,6 @@ export class ChatService {
   constructor(private http: HttpClient) {}
 
   streamChat(documentId: number, prompt: string): Observable<string> {
-    // use httpclient as we have withFetch
     return this.http
       .post(
         `${environment.apiBaseUrl}documents/chat/`,
