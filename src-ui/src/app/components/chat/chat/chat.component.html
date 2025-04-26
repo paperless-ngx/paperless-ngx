@@ -20,8 +20,9 @@
       <form class="chat-input">
         <div class="input-group">
           <input
-            #inputField
-            class="form-control form-control-sm" name="chatInput" type="text" placeholder="Ask about this document..."
+            #chatInput
+            class="form-control form-control-sm" name="chatInput" type="text"
+            [placeholder]="placeholder"
             [disabled]="loading"
             [(ngModel)]="input"
             (keydown)="searchInputKeyDown($event)"
