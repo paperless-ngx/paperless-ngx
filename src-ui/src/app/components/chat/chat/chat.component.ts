@@ -41,9 +41,12 @@ export class ChatComponent {
     this.messages.push(assistantMessage)
     this.loading = true
 
+    let lastPartialLength = 0
+
     this.chatService.streamChat(this.documentId, this.input).subscribe({
       next: (chunk) => {
-        assistantMessage.content += chunk
+        assistantMessage.content += chunk.substring(lastPartialLength)
+        lastPartialLength = chunk.length
         this.scrollToBottom()
       },
       error: () => {
