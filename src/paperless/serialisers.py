@@ -203,6 +203,11 @@ class ApplicationConfigurationSerializer(serializers.ModelSerializer):
             data["barcode_tag_mapping"] = None
         if "language" in data and data["language"] == "":
             data["language"] = None
+        if "llm_api_key" in data and data["llm_api_key"] is not None:
+            if data["llm_api_key"] == "":
+                data["llm_api_key"] = None
+            elif len(data["llm_api_key"].replace("*", "")) == 0:
+                del data["llm_api_key"]
         return super().run_validation(data)
 
     def update(self, instance, validated_data):
