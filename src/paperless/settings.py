@@ -11,6 +11,7 @@ from typing import Final
 from urllib.parse import urlparse
 
 from celery.schedules import crontab
+from compression_middleware.middleware import CompressionMiddleware
 from concurrent_log_handler.queue import setup_logging_queues
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
@@ -374,6 +375,19 @@ MIDDLEWARE = [
 # Optional to enable compression
 if __get_boolean("PAPERLESS_ENABLE_COMPRESSION", "yes"):  # pragma: no cover
     MIDDLEWARE.insert(0, "compression_middleware.middleware.CompressionMiddleware")
+
+# Workaround to not compress streaming responses (e.g. chat).
+# See https://github.com/friedelwolff/django-compression-middleware/pull/7
+original_process_response = CompressionMiddleware.process_response
+
+
+def patched_process_response(self, request, response):
+    if getattr(request, "compress_exempt", False):
+        return response
+    return original_process_response(self, request, response)
+
+
+CompressionMiddleware.process_response = patched_process_response
 
 ROOT_URLCONF = "paperless.urls"
 
