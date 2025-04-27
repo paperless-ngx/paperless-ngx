@@ -48,6 +48,7 @@ from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.templating.workflows import parse_w_workflow_placeholders
+from paperless.config import AIConfig
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -1449,3 +1450,26 @@ def task_failure_handler(
             task_instance.save()
     except Exception:  # pragma: no cover
         logger.exception("Updating PaperlessTask failed")
+
+
+def add_or_update_document_in_llm_index(sender, document, **kwargs):
+    """
+    Add or update a document in the LLM index when it is created or updated.
+    """
+    ai_config = AIConfig()
+    if ai_config.llm_index_enabled():
+        from documents.tasks import update_document_in_llm_index
+
+        update_document_in_llm_index.delay(document)
+
+
+@receiver(models.signals.post_delete, sender=Document)
+def delete_document_from_llm_index(sender, instance: Document, **kwargs):
+    """
+    Delete a document from the LLM index when it is deleted.
+    """
+    ai_config = AIConfig()
+    if ai_config.llm_index_enabled():
+        from documents.tasks import remove_document_from_llm_index
+
+        remove_document_from_llm_index.delay(instance)

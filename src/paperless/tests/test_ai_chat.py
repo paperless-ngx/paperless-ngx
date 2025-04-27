@@ -45,7 +45,7 @@ def mock_document():
 def test_stream_chat_with_one_document_full_content(mock_document):
     with (
         patch("paperless.ai.chat.AIClient") as mock_client_cls,
-        patch("paperless.ai.chat.load_index") as mock_load_index,
+        patch("paperless.ai.chat.load_or_build_index") as mock_load_index,
         patch(
             "paperless.ai.chat.RetrieverQueryEngine.from_args",
         ) as mock_query_engine_cls,
@@ -76,7 +76,7 @@ def test_stream_chat_with_one_document_full_content(mock_document):
 def test_stream_chat_with_multiple_documents_retrieval(patch_embed_nodes):
     with (
         patch("paperless.ai.chat.AIClient") as mock_client_cls,
-        patch("paperless.ai.chat.load_index") as mock_load_index,
+        patch("paperless.ai.chat.load_or_build_index") as mock_load_index,
         patch(
             "paperless.ai.chat.RetrieverQueryEngine.from_args",
         ) as mock_query_engine_cls,
@@ -126,7 +126,7 @@ def test_stream_chat_with_multiple_documents_retrieval(patch_embed_nodes):
 def test_stream_chat_no_matching_nodes():
     with (
         patch("paperless.ai.chat.AIClient") as mock_client_cls,
-        patch("paperless.ai.chat.load_index") as mock_load_index,
+        patch("paperless.ai.chat.load_or_build_index") as mock_load_index,
     ):
         mock_client = MagicMock()
         mock_client_cls.return_value = mock_client

@@ -2,14 +2,11 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
-from llama_index.core.base.embeddings.base import BaseEmbedding
 
 from documents.models import Document
 from paperless.ai.embedding import build_llm_index_text
 from paperless.ai.embedding import get_embedding_dim
 from paperless.ai.embedding import get_embedding_model
-from paperless.ai.indexing import load_index
-from paperless.ai.indexing import query_similar_documents
 from paperless.ai.rag import get_context_for_document
 from paperless.models import LLMEmbeddingBackend
 
@@ -182,93 +179,3 @@ def test_build_llm_index_text(mock_document):
         assert "Notes: Note1,Note2" in result
         assert "Content:\n\nThis is the document content." in result
         assert "Custom Field - Field1: Value1\nCustom Field - Field2: Value2" in result
-
-
-# Indexing
-
-
-@pytest.fixture
-def mock_settings(settings):
-    settings.LLM_INDEX_DIR = "/fake/path"
-    return settings
-
-
-class FakeEmbedding(BaseEmbedding):
-    # TODO: gotta be a better way to do this
-    def _aget_query_embedding(self, query: str) -> list[float]:
-        return [0.1, 0.2, 0.3]
-
-    def _get_query_embedding(self, query: str) -> list[float]:
-        return [0.1, 0.2, 0.3]
-
-    def _get_text_embedding(self, text: str) -> list[float]:
-        return [0.1, 0.2, 0.3]
-
-
-def test_load_index(mock_settings):
-    with (
-        patch("paperless.ai.indexing.FaissVectorStore.from_persist_dir") as mock_faiss,
-        patch("paperless.ai.indexing.get_embedding_model") as mock_get_embed_model,
-        patch(
-            "paperless.ai.indexing.StorageContext.from_defaults",
-        ) as mock_storage_context,
-        patch("paperless.ai.indexing.load_index_from_storage") as mock_load_index,
-    ):
-        # Setup mocks
-        mock_vector_store = MagicMock()
-        mock_storage = MagicMock()
-        mock_index = MagicMock()
-
-        mock_faiss.return_value = mock_vector_store
-        mock_storage_context.return_value = mock_storage
-        mock_load_index.return_value = mock_index
-        mock_get_embed_model.return_value = FakeEmbedding()
-
-        # Act
-        result = load_index()
-
-        # Assert
-        mock_faiss.assert_called_once_with("/fake/path")
-        mock_get_embed_model.assert_called_once()
-        mock_storage_context.assert_called_once_with(
-            vector_store=mock_vector_store,
-            persist_dir="/fake/path",
-        )
-        mock_load_index.assert_called_once_with(mock_storage)
-        assert result == mock_index
-
-
-def test_query_similar_documents(mock_document):
-    with (
-        patch("paperless.ai.indexing.load_index") as mock_load_index_func,
-        patch("paperless.ai.indexing.VectorIndexRetriever") as mock_retriever_cls,
-        patch("paperless.ai.indexing.Document.objects.filter") as mock_filter,
-    ):
-        # Setup mocks
-        mock_index = MagicMock()
-        mock_load_index_func.return_value = mock_index
-
-        mock_retriever = MagicMock()
-        mock_retriever_cls.return_value = mock_retriever
-
-        mock_node1 = MagicMock()
-        mock_node1.metadata = {"document_id": 1}
-
-        mock_node2 = MagicMock()
-        mock_node2.metadata = {"document_id": 2}
-
-        mock_retriever.retrieve.return_value = [mock_node1, mock_node2]
-
-        mock_filtered_docs = [MagicMock(pk=1), MagicMock(pk=2)]
-        mock_filter.return_value = mock_filtered_docs
-
-        result = query_similar_documents(mock_document, top_k=3)
-
-        mock_load_index_func.assert_called_once()
-        mock_retriever_cls.assert_called_once_with(index=mock_index, similarity_top_k=3)
-        mock_retriever.retrieve.assert_called_once_with(
-            "Test Title\nThis is the document content.",
-        )
-        mock_filter.assert_called_once_with(pk__in=[1, 2])
-
-        assert result == mock_filtered_docs

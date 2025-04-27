@@ -1,44 +1,209 @@
 import logging
+import shutil
 
+import faiss
 import llama_index.core.settings as llama_settings
+import tqdm
 from django.conf import settings
+from llama_index.core import Document as LlamaDocument
 from llama_index.core import StorageContext
 from llama_index.core import VectorStoreIndex
-from llama_index.core import load_index_from_storage
+from llama_index.core.node_parser import SimpleNodeParser
 from llama_index.core.retrievers import VectorIndexRetriever
+from llama_index.core.schema import BaseNode
+from llama_index.core.storage.docstore import SimpleDocumentStore
+from llama_index.core.storage.index_store import SimpleIndexStore
 from llama_index.vector_stores.faiss import FaissVectorStore
 
 from documents.models import Document
+from paperless.ai.embedding import build_llm_index_text
+from paperless.ai.embedding import get_embedding_dim
 from paperless.ai.embedding import get_embedding_model
 
 logger = logging.getLogger("paperless.ai.indexing")
 
 
-def load_index() -> VectorStoreIndex:
-    """Loads the persisted LlamaIndex from disk."""
-    vector_store = FaissVectorStore.from_persist_dir(settings.LLM_INDEX_DIR)
-    embed_model = get_embedding_model()
+def get_or_create_storage_context(*, rebuild=False):
+    """
+    Loads or creates the StorageContext (vector store, docstore, index store).
+    If rebuild=True, deletes and recreates everything.
+    """
+    if rebuild:
+        shutil.rmtree(settings.LLM_INDEX_DIR, ignore_errors=True)
+        settings.LLM_INDEX_DIR.mkdir(parents=True, exist_ok=True)
 
-    llama_settings.Settings.embed_model = embed_model
-    llama_settings.Settings.chunk_size = 512
+    if rebuild or not settings.LLM_INDEX_DIR.exists():
+        embedding_dim = get_embedding_dim()
+        faiss_index = faiss.IndexFlatL2(embedding_dim)
+        vector_store = FaissVectorStore(faiss_index=faiss_index)
+        docstore = SimpleDocumentStore()
+        index_store = SimpleIndexStore()
+    else:
+        vector_store = FaissVectorStore.from_persist_dir(settings.LLM_INDEX_DIR)
+        docstore = SimpleDocumentStore.from_persist_dir(settings.LLM_INDEX_DIR)
+        index_store = SimpleIndexStore.from_persist_dir(settings.LLM_INDEX_DIR)
 
-    storage_context = StorageContext.from_defaults(
+    return StorageContext.from_defaults(
+        docstore=docstore,
+        index_store=index_store,
         vector_store=vector_store,
         persist_dir=settings.LLM_INDEX_DIR,
     )
-    return load_index_from_storage(storage_context)
+
+
+def get_vector_store_index(storage_context, embed_model):
+    """
+    Returns a VectorStoreIndex given a storage context and embed model.
+    """
+    return VectorStoreIndex(
+        storage_context=storage_context,
+        embed_model=embed_model,
+    )
+
+
+def build_document_node(document) -> list[BaseNode]:
+    """
+    Given a Document, returns parsed Nodes ready for indexing.
+    """
+    if not document.content:
+        return []
+
+    text = build_llm_index_text(document)
+    metadata = {
+        "document_id": document.id,
+        "title": document.title,
+        "tags": [t.name for t in document.tags.all()],
+        "correspondent": document.correspondent.name
+        if document.correspondent
+        else None,
+        "document_type": document.document_type.name
+        if document.document_type
+        else None,
+        "created": document.created.isoformat() if document.created else None,
+        "added": document.added.isoformat() if document.added else None,
+    }
+    doc = LlamaDocument(text=text, metadata=metadata)
+    parser = SimpleNodeParser()
+    return parser.get_nodes_from_documents([doc])
+
+
+def load_or_build_index(storage_context, embed_model, nodes=None):
+    """
+    Load an existing VectorStoreIndex if present,
+    or build a new one using provided nodes if storage is empty.
+    """
+    try:
+        return VectorStoreIndex(
+            storage_context=storage_context,
+            embed_model=embed_model,
+        )
+    except ValueError as e:
+        if "One of nodes, objects, or index_struct must be provided" in str(e):
+            if not nodes:
+                return None
+            return VectorStoreIndex(
+                nodes=nodes,
+                storage_context=storage_context,
+                embed_model=embed_model,
+            )
+        raise
+
+
+def remove_existing_document_nodes(document, index):
+    """
+    Removes existing documents from docstore for a given document from the index.
+    This is necessary because FAISS IndexFlatL2 is append-only.
+    """
+    all_node_ids = list(index.docstore.docs.keys())
+    existing_nodes = [
+        node.node_id
+        for node in index.docstore.get_nodes(all_node_ids)
+        if node.metadata.get("document_id") == document.id
+    ]
+    for node_id in existing_nodes:
+        # Delete from docstore, FAISS IndexFlatL2 are append-only
+        index.docstore.delete_document(node_id)
+
+
+def rebuild_llm_index(*, progress_bar_disable=False, rebuild=False):
+    """
+    Rebuilds the LLM index from scratch.
+    """
+    embed_model = get_embedding_model()
+    llama_settings.Settings.embed_model = embed_model
+
+    storage_context = get_or_create_storage_context(rebuild=rebuild)
+
+    nodes = []
+
+    for document in tqdm.tqdm(Document.objects.all(), disable=progress_bar_disable):
+        document_nodes = build_document_node(document)
+        nodes.extend(document_nodes)
+
+    if not nodes:
+        raise RuntimeError(
+            "No nodes to index — check that documents are available and have content.",
+        )
+
+    VectorStoreIndex(
+        nodes=nodes,
+        storage_context=storage_context,
+        embed_model=embed_model,
+    )
+    storage_context.persist(persist_dir=settings.LLM_INDEX_DIR)
+
+
+def llm_index_add_or_update_document(document):
+    """
+    Adds or updates a document in the LLM index.
+    If the document already exists, it will be replaced.
+    """
+    embed_model = get_embedding_model()
+    llama_settings.Settings.embed_model = embed_model
+
+    storage_context = get_or_create_storage_context(rebuild=False)
+
+    new_nodes = build_document_node(document)
+
+    index = load_or_build_index(storage_context, embed_model, nodes=new_nodes)
+
+    if index is None:
+        # Nothing to index
+        return
+
+    # Remove old nodes
+    remove_existing_document_nodes(document, index)
+
+    index.insert_nodes(new_nodes)
+
+    storage_context.persist(persist_dir=settings.LLM_INDEX_DIR)
+
+
+def llm_index_remove_document(document):
+    embed_model = get_embedding_model()
+    llama_settings.embed_model = embed_model
+
+    storage_context = get_or_create_storage_context(rebuild=False)
+
+    index = load_or_build_index(storage_context, embed_model)
+    if index is None:
+        return  # Nothing to remove
+
+    # Remove old nodes
+    remove_existing_document_nodes(document, index)
+
+    storage_context.persist(persist_dir=settings.LLM_INDEX_DIR)
 
 
 def query_similar_documents(document: Document, top_k: int = 5) -> list[Document]:
-    """Runs a similarity query and returns top-k similar Document objects."""
-    # Load the index
-    index = load_index()
+    """
+    Runs a similarity query and returns top-k similar Document objects.
+    """
+    index = load_or_build_index()
     retriever = VectorIndexRetriever(index=index, similarity_top_k=top_k)
 
     # Build query from the document text
     query_text = (document.title or "") + "\n" + (document.content or "")
-
-    # Query
     results = retriever.retrieve(query_text)
 
     # Each result.node.metadata["document_id"] should match our stored doc
