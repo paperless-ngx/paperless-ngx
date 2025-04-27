@@ -78,6 +78,7 @@ virtualenv
 /docker-compose.env
 /docker-compose.yml
 .ruff_cache/
+.pnpm-store/
 
 # Used for development
 scripts/import-for-development
