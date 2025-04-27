@@ -10,14 +10,18 @@ class StatusConsumer(WebsocketConsumer):
     def _authenticated(self):
         return "user" in self.scope and self.scope["user"].is_authenticated
 
-    def _is_owner_or_unowned(self, data):
+    def _can_view(self, data):
+        user = self.scope.get("user") if self.scope.get("user") else None
+        owner_id = data.get("owner_id")
+        users_can_view = data.get("users_can_view", [])
+        groups_can_view = data.get("groups_can_view", [])
         return (
-            (
-                self.scope["user"].is_superuser
-                or self.scope["user"].id == data["owner_id"]
+            user.is_superuser
+            or user.id == owner_id
+            or user.id in users_can_view
+            or any(
+                user.groups.filter(pk=group_id).exists() for group_id in groups_can_view
             )
-            if "owner_id" in data and "user" in self.scope
-            else True
         )
 
     def connect(self):
@@ -40,7 +44,7 @@ class StatusConsumer(WebsocketConsumer):
         if not self._authenticated():
             self.close()
         else:
-            if self._is_owner_or_unowned(event["data"]):
+            if self._can_view(event["data"]):
                 self.send(json.dumps(event))
 
     def documents_deleted(self, event):
