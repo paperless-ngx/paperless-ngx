@@ -96,6 +96,25 @@
 			}
 		},
 		{
+			"label": "Maintenance: Ownership of mounted folders",
+			"description": "Change the ownership of mounted folders to the paperless user",
+			"type": "shell",
+			"command": "sudo chown -R paperless:paperless .coverage consume data htmlcov media",
+			"group": "none",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": true,
+				"panel": "shared",
+				"showReuseMessage": false,
+				"clear": true,
+				"revealProblems": "onProblem"
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
 			"label": "Maintenance: manage.py migrate",
 			"description": "Apply database migrations",
 			"type": "shell",
@@ -205,6 +224,7 @@
 			"description": "Runs all init tasks to setup the project including migrate the database, create a superuser and compile the frontend for production",
 			"dependsOrder": "sequence",
 			"dependsOn": [
+				"Maintenance: Ownership of mounted folders",
 				"Maintenance: manage.py migrate",
 				"Maintenance: manage.py createsuperuser",
 				"Maintenance: Compile frontend for production"
