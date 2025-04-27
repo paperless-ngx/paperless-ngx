@@ -1,5 +1,5 @@
-import os
 from collections import OrderedDict
+from pathlib import Path
 
 from allauth.mfa import signals
 from allauth.mfa.adapter import get_adapter as get_mfa_adapter
@@ -93,14 +93,8 @@ class StandardPagination(PageNumberPagination):
 
 class FaviconView(View):
     def get(self, request, *args, **kwargs):  # pragma: no cover
-        favicon = os.path.join(
-            os.path.dirname(__file__),
-            "static",
-            "paperless",
-            "img",
-            "favicon.ico",
-        )
-        with open(favicon, "rb") as f:
+        favicon = Path(__file__).parent / "static" / "paperless" / "img" / "favicon.ico"
+        with favicon.open("rb") as f:
             return HttpResponse(f, content_type="image/x-icon")
 
 
