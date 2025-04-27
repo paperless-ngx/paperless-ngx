@@ -7,7 +7,7 @@ from llama_index.core.query_engine import RetrieverQueryEngine
 
 from documents.models import Document
 from paperless.ai.client import AIClient
-from paperless.ai.indexing import load_index
+from paperless.ai.indexing import load_or_build_index
 
 logger = logging.getLogger("paperless.ai.chat")
 
@@ -24,7 +24,7 @@ CHAT_PROMPT_TMPL = PromptTemplate(
 
 def stream_chat_with_documents(query_str: str, documents: list[Document]):
     client = AIClient()
-    index = load_index()
+    index = load_or_build_index()
 
     doc_ids = [doc.pk for doc in documents]
 
