@@ -221,22 +221,12 @@ lint.per-file-ignores."src/documents/parsers.py" = [
 lint.per-file-ignores."src/documents/signals/handlers.py" = [
   "PTH",
 ] # TODO Enable & remove
-lint.per-file-ignores."src/documents/views.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/paperless/checks.py" = [
-  "PTH",
-] # TODO Enable & remove
 lint.per-file-ignores."src/paperless/settings.py" = [
   "PTH",
 ] # TODO Enable & remove
-lint.per-file-ignores."src/paperless_mail/mail.py" = [
-  "PTH",
-] # TODO Enable & remove
 lint.per-file-ignores."src/paperless_tesseract/tests/test_parser.py" = [
-  "PTH",
   "RUF001",
-] # TODO PTH Enable & remove
+]
 lint.isort.force-single-line = true
 
 [tool.pytest.ini_options]

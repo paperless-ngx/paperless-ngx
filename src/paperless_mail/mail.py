@@ -1,7 +1,6 @@
 import datetime
 import itertools
 import logging
-import os
 import ssl
 import tempfile
 import traceback
@@ -484,7 +483,7 @@ class MailAccountHandler(LoggingMixin):
             return message.subject
 
         elif rule.assign_title_from == MailRule.TitleSource.FROM_FILENAME:
-            return os.path.splitext(os.path.basename(att.filename))[0]
+            return Path(att.filename).stem
 
         elif rule.assign_title_from == MailRule.TitleSource.NONE:
             return None
@@ -908,7 +907,7 @@ class MailAccountHandler(LoggingMixin):
             dir=settings.SCRATCH_DIR,
             suffix=".eml",
         )
-        with open(temp_filename, "wb") as f:
+        with Path(temp_filename).open("wb") as f:
             # Move "From"-header to beginning of file
             # TODO: This ugly workaround is needed because the parser is
             #   chosen only by the mime_type detected via magic
