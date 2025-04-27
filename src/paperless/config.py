@@ -199,3 +199,10 @@ class AIConfig(BaseConfig):
         self.llm_model = app_config.llm_model or settings.LLM_MODEL
         self.llm_api_key = app_config.llm_api_key or settings.LLM_API_KEY
         self.llm_url = app_config.llm_url or settings.LLM_URL
+
+    def llm_index_enabled(self) -> bool:
+        return (
+            self.ai_enabled
+            and self.llm_embedding_backend
+            and self.llm_embedding_backend
+        )
