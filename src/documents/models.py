@@ -62,7 +62,7 @@ class MatchingModel(ModelWithOwner):
         (MATCH_AUTO, _("Automatic")),
     )
 
-    name = models.CharField(_("name"), max_length=128)
+    name = models.CharField(_("name"), max_length=1024)
 
     match = models.CharField(_("match"), max_length=256, blank=True)
 
