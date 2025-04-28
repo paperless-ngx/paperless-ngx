@@ -52,23 +52,10 @@ def get_or_create_storage_context(*, rebuild=False):
     )
 
 
-def get_vector_store_index(storage_context, embed_model):
-    """
-    Returns a VectorStoreIndex given a storage context and embed model.
-    """
-    return VectorStoreIndex(
-        storage_context=storage_context,
-        embed_model=embed_model,
-    )
-
-
 def build_document_node(document: Document) -> list[BaseNode]:
     """
     Given a Document, returns parsed Nodes ready for indexing.
     """
-    if not document.content:
-        return []
-
     text = build_llm_index_text(document)
     metadata = {
         "document_id": str(document.id),
@@ -97,9 +84,10 @@ def load_or_build_index(storage_context: StorageContext, embed_model, nodes=None
     try:
         return load_index_from_storage(storage_context=storage_context)
     except ValueError as e:
-        logger.debug("Failed to load index from storage: %s", e)
+        logger.warning("Failed to load index from storage: %s", e)
         if not nodes:
-            return None
+            logger.info("No nodes provided for index creation.")
+            raise
         return VectorStoreIndex(
             nodes=nodes,
             storage_context=storage_context,
@@ -116,7 +104,7 @@ def remove_document_docstore_nodes(document: Document, index: VectorStoreIndex):
     existing_nodes = [
         node.node_id
         for node in index.docstore.get_nodes(all_node_ids)
-        if node.metadata.get("document_id") == document.id
+        if node.metadata.get("document_id") == str(document.id)
     ]
     for node_id in existing_nodes:
         # Delete from docstore, FAISS IndexFlatL2 are append-only
@@ -208,9 +196,6 @@ def llm_index_add_or_update_document(document: Document):
 
     index = load_or_build_index(storage_context, embed_model, nodes=new_nodes)
 
-    if index is None:
-        return
-
     remove_document_docstore_nodes(document, index)
 
     index.insert_nodes(new_nodes)
@@ -228,9 +213,6 @@ def llm_index_remove_document(document: Document):
     storage_context = get_or_create_storage_context(rebuild=False)
 
     index = load_or_build_index(storage_context, embed_model)
-
-    if index is None:
-        return
 
     remove_document_docstore_nodes(document, index)
 
