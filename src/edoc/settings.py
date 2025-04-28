@@ -829,8 +829,6 @@ CACHES = {
     },
 }
 
-# Use cached session engine
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 if DEBUG and os.getenv("EDOC_CACHE_BACKEND") is None:
     CACHES["default"][
