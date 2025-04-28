@@ -21,6 +21,7 @@ def build_prompt_without_rag(document: Document) -> str:
     Never ask for further information, additional content or ask questions. Never include any other text.
     Suggested tags and document types must be strictly based on the content of the document.
     Do not change the field names or the JSON structure, only provide the values. Use double quotes and proper JSON syntax.
+    Each field must be a list of plain strings.
 
     The JSON object must contain the following fields:
     - title: A short, descriptive title
@@ -30,8 +31,6 @@ def build_prompt_without_rag(document: Document) -> str:
     - storage_paths: Suggested folder paths (e.g. "Medical/Insurance")
     - dates: List up to 3 relevant dates in YYYY-MM-DD format
 
-    Respond ONLY in JSON.
-    Each field must be a list of plain strings.
     The format of the JSON object is as follows:
     {{
         "title": "xxxxx",
@@ -42,7 +41,6 @@ def build_prompt_without_rag(document: Document) -> str:
         "dates": ["YYYY-MM-DD", "YYYY-MM-DD", "YYYY-MM-DD"],
     }}
     ---
-
 
     FILENAME:
     {filename}
@@ -56,41 +54,9 @@ def build_prompt_without_rag(document: Document) -> str:
 
 def build_prompt_with_rag(document: Document) -> str:
     context = get_context_for_document(document)
-    content = document.content or ""
-    filename = document.filename or ""
+    prompt = build_prompt_without_rag(document)
 
-    prompt = f"""
-    You are a helpful assistant that extracts structured information from documents.
-    You have access to similar documents as context to help improve suggestions.
-
-    Only output valid JSON in the format below. No additional explanations.
-
-    The JSON object must contain:
-    - title: A short, human-readable, descriptive title based on the content
-    - tags: A list of relevant topics
-    - correspondents: People or organizations involved
-    - document_types: Type or category of the document
-    - storage_paths: Suggested folder paths
-    - dates: Up to 3 relevant dates in YYYY-MM-DD
-
-    Respond ONLY in JSON.
-    Each field must be a list of plain strings.
-    The format of the JSON object is as follows:
-    {{
-        "title": "xxxxx",
-        "tags": ["xxxx", "xxxx"],
-        "correspondents": ["xxxx", "xxxx"],
-        "document_types": ["xxxx", "xxxx"],
-        "storage_paths": ["xxxx", "xxxx"],
-        "dates": ["YYYY-MM-DD", "YYYY-MM-DD", "YYYY-MM-DD"],
-    }}
-
-    Here is the document:
-    FILENAME:
-    {filename}
-
-    CONTENT:
-    {content[:4000]}
+    prompt += f"""
 
     CONTEXT FROM SIMILAR DOCUMENTS:
     {context[:4000]}
