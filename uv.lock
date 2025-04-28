@@ -660,15 +660,15 @@ socialaccount = [
 
 [[package]]
 name = "django-auditlog"
-version = "3.0.0"
+version = "3.1.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "python-dateutil", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/44/df/6cbc296b2fdd808bd710671409a1a838c9741670933f170930cb7b9c5804/django-auditlog-3.0.0.tar.gz", hash = "sha256:9de49f80a4911135d136017123cd73461f869b4947eec14d5e76db4b88182f3f", size = 65475 }
+sdist = { url = "https://files.pythonhosted.org/packages/0e/3a/61bfb180019d08db3f7a2e4097bda14ee32bd57f5dffda0c84b2d4c26304/django_auditlog-3.1.2.tar.gz", hash = "sha256:435345b4055d16abfb4ada4bf11320f9e2f6d343874464471fa0041f13f3a474", size = 69359 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/bd/49/d62c4728cd80f42e5061b3ae9e12fd28b460bd1cd5754c4d34232d18aab2/django_auditlog-3.0.0-py3-none-any.whl", hash = "sha256:92db1cf4a51ceca5c26b3ff46997d9e3305a02da1bd435e2efb5b8b6d300ce1f", size = 35493 },
+    { url = "https://files.pythonhosted.org/packages/af/34/47edd758abcb4426953b5ff2fa4dd9956c2304e96160ab1b95c3a1ab6e61/django_auditlog-3.1.2-py3-none-any.whl", hash = "sha256:6432a83fdf4397a726488d101fedcb62daafd6d4b825a0fc4c50e3657f5883cd", size = 37312 },
 ]
 
 [[package]]
@@ -2021,7 +2021,7 @@ requires-dist = [
     { name = "dateparser", specifier = "~=1.2" },
     { name = "django", specifier = "~=5.1.7" },
     { name = "django-allauth", extras = ["socialaccount", "mfa"], specifier = "~=65.4.0" },
-    { name = "django-auditlog", specifier = "~=3.0.0" },
+    { name = "django-auditlog", specifier = "~=3.1.2" },
     { name = "django-celery-results", specifier = "~=2.6.0" },
     { name = "django-compression-middleware", specifier = "~=0.5.0" },
     { name = "django-cors-headers", specifier = "~=4.7.0" },
