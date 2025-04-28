@@ -6,6 +6,8 @@ import pytest
 from django.test import override_settings
 
 from documents.models import Document
+from paperless.ai.ai_classifier import build_prompt_with_rag
+from paperless.ai.ai_classifier import build_prompt_without_rag
 from paperless.ai.ai_classifier import get_ai_document_classification
 from paperless.ai.ai_classifier import parse_ai_response
 
@@ -101,3 +103,15 @@ def test_use_without_rag_if_not_configured(
     mock_run_llm_query.return_value.text = json.dumps({})
     get_ai_document_classification(mock_document)
     mock_build_prompt_without_rag.assert_called_once()
+
+
+@override_settings(
+    LLM_BACKEND="ollama",
+    LLM_MODEL="some_model",
+)
+def test_prompt_with_without_rag(mock_document):
+    prompt = build_prompt_without_rag(mock_document)
+    assert "CONTEXT FROM SIMILAR DOCUMENTS:" not in prompt
+
+    prompt = build_prompt_with_rag(mock_document)
+    assert "CONTEXT FROM SIMILAR DOCUMENTS:" in prompt
