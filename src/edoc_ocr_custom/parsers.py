@@ -365,7 +365,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                                                                   params,
                                                                   {},
                                                                   max_retries=5,
-                                                                  delay=page_count * 2,
+                                                                  delay=page_count * settings.DELAY_OCR,
                                                                   timeout=30,
                                                                   data_compare={'status_code': 1})
 
