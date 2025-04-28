@@ -53,7 +53,7 @@ class FakeEmbedding(BaseEmbedding):
 def test_build_document_node(real_document):
     nodes = indexing.build_document_node(real_document)
     assert len(nodes) > 0
-    assert nodes[0].metadata["document_id"] == real_document.id
+    assert nodes[0].metadata["document_id"] == str(real_document.id)
 
 
 @pytest.mark.django_db
@@ -63,8 +63,11 @@ def test_rebuild_llm_index(
     mock_embed_model,
 ):
     with patch("documents.models.Document.objects.all") as mock_all:
-        mock_all.return_value = [real_document]
-        indexing.rebuild_llm_index(rebuild=True)
+        mock_queryset = MagicMock()
+        mock_queryset.exists.return_value = True
+        mock_queryset.__iter__.return_value = iter([real_document])
+        mock_all.return_value = mock_queryset
+        indexing.update_llm_index(rebuild=True)
 
         assert any(temp_llm_index_dir.glob("*.json"))
 
@@ -75,7 +78,7 @@ def test_add_or_update_document_updates_existing_entry(
     real_document,
     mock_embed_model,
 ):
-    indexing.rebuild_llm_index(rebuild=True)
+    indexing.update_llm_index(rebuild=True)
     indexing.llm_index_add_or_update_document(real_document)
 
     assert any(temp_llm_index_dir.glob("*.json"))
@@ -87,7 +90,7 @@ def test_remove_document_deletes_node_from_docstore(
     real_document,
     mock_embed_model,
 ):
-    indexing.rebuild_llm_index(rebuild=True)
+    indexing.update_llm_index(rebuild=True)
     indexing.llm_index_add_or_update_document(real_document)
     indexing.llm_index_remove_document(real_document)
 
@@ -100,10 +103,17 @@ def test_rebuild_llm_index_no_documents(
     mock_embed_model,
 ):
     with patch("documents.models.Document.objects.all") as mock_all:
-        mock_all.return_value = []
+        mock_queryset = MagicMock()
+        mock_queryset.exists.return_value = False
+        mock_queryset.__iter__.return_value = iter([])
+        mock_all.return_value = mock_queryset
 
-        with pytest.raises(RuntimeError, match="No nodes to index"):
-            indexing.rebuild_llm_index(rebuild=True)
+        # check log message
+        with patch("paperless.ai.indexing.logger") as mock_logger:
+            indexing.update_llm_index(rebuild=True)
+            mock_logger.warning.assert_called_once_with(
+                "No documents found to index.",
+            )
 
 
 def test_query_similar_documents(

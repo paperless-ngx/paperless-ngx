@@ -201,6 +201,4 @@ class AIConfig(BaseConfig):
         self.llm_url = app_config.llm_url or settings.LLM_URL
 
     def llm_index_enabled(self) -> bool:
-        return (
-            self.ai_enabled and self.llm_embedding_backend and self.llm_embedding_model
-        )
+        return self.ai_enabled and self.llm_embedding_backend
