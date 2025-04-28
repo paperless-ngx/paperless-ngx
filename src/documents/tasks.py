@@ -56,7 +56,7 @@ from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
 from paperless.ai.indexing import llm_index_add_or_update_document
 from paperless.ai.indexing import llm_index_remove_document
-from paperless.ai.indexing import rebuild_llm_index
+from paperless.ai.indexing import update_llm_index
 from paperless.config import AIConfig
 
 if settings.AUDIT_LOG_ENABLED:
@@ -532,11 +532,14 @@ def check_scheduled_workflows():
                         )
 
 
-def llm_index_rebuild(*, progress_bar_disable=False, rebuild=False):
-    rebuild_llm_index(
-        progress_bar_disable=progress_bar_disable,
-        rebuild=rebuild,
-    )
+@shared_task
+def llmindex_index(*, progress_bar_disable=False, rebuild=False):
+    ai_config = AIConfig()
+    if ai_config.llm_index_enabled():
+        update_llm_index(
+            progress_bar_disable=progress_bar_disable,
+            rebuild=rebuild,
+        )
 
 
 @shared_task
@@ -552,6 +555,6 @@ def remove_document_from_llm_index(document):
 # TODO: schedule to run periodically
 @shared_task
 def rebuild_llm_index_task():
-    from paperless.ai.indexing import rebuild_llm_index
+    from paperless.ai.indexing import update_llm_index
 
-    rebuild_llm_index(rebuild=True)
+    update_llm_index(rebuild=True)

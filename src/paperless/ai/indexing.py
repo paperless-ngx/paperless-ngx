@@ -8,6 +8,7 @@ from django.conf import settings
 from llama_index.core import Document as LlamaDocument
 from llama_index.core import StorageContext
 from llama_index.core import VectorStoreIndex
+from llama_index.core import load_index_from_storage
 from llama_index.core.node_parser import SimpleNodeParser
 from llama_index.core.retrievers import VectorIndexRetriever
 from llama_index.core.schema import BaseNode
@@ -70,7 +71,7 @@ def build_document_node(document: Document) -> list[BaseNode]:
 
     text = build_llm_index_text(document)
     metadata = {
-        "document_id": document.id,
+        "document_id": str(document.id),
         "title": document.title,
         "tags": [t.name for t in document.tags.all()],
         "correspondent": document.correspondent.name
@@ -81,32 +82,29 @@ def build_document_node(document: Document) -> list[BaseNode]:
         else None,
         "created": document.created.isoformat() if document.created else None,
         "added": document.added.isoformat() if document.added else None,
+        "modified": document.modified.isoformat(),
     }
     doc = LlamaDocument(text=text, metadata=metadata)
     parser = SimpleNodeParser()
     return parser.get_nodes_from_documents([doc])
 
 
-def load_or_build_index(storage_context, embed_model, nodes=None):
+def load_or_build_index(storage_context: StorageContext, embed_model, nodes=None):
     """
     Load an existing VectorStoreIndex if present,
     or build a new one using provided nodes if storage is empty.
     """
     try:
+        return load_index_from_storage(storage_context=storage_context)
+    except ValueError as e:
+        logger.debug("Failed to load index from storage: %s", e)
+        if not nodes:
+            return None
         return VectorStoreIndex(
+            nodes=nodes,
             storage_context=storage_context,
             embed_model=embed_model,
         )
-    except ValueError as e:
-        if "One of nodes, objects, or index_struct must be provided" in str(e):
-            if not nodes:
-                return None
-            return VectorStoreIndex(
-                nodes=nodes,
-                storage_context=storage_context,
-                embed_model=embed_model,
-            )
-        raise
 
 
 def remove_document_docstore_nodes(document: Document, index: VectorStoreIndex):
@@ -125,31 +123,74 @@ def remove_document_docstore_nodes(document: Document, index: VectorStoreIndex):
         index.docstore.delete_document(node_id)
 
 
-def rebuild_llm_index(*, progress_bar_disable=False, rebuild=False):
+def update_llm_index(*, progress_bar_disable=False, rebuild=False):
     """
-    Rebuilds the LLM index from scratch.
+    Rebuild or update the LLM index.
     """
     embed_model = get_embedding_model()
     llama_settings.Settings.embed_model = embed_model
-
     storage_context = get_or_create_storage_context(rebuild=rebuild)
 
     nodes = []
 
-    for document in tqdm.tqdm(Document.objects.all(), disable=progress_bar_disable):
-        document_nodes = build_document_node(document)
-        nodes.extend(document_nodes)
+    documents = Document.objects.all()
+    if not documents.exists():
+        logger.warning("No documents found to index.")
+        return
 
-    if not nodes:
-        raise RuntimeError(
-            "No nodes to index — check that documents are available and have content.",
+    if rebuild:
+        # Rebuild index from scratch
+        for document in tqdm.tqdm(documents, disable=progress_bar_disable):
+            document_nodes = build_document_node(document)
+            nodes.extend(document_nodes)
+
+        VectorStoreIndex(
+            nodes=nodes,
+            storage_context=storage_context,
+            embed_model=embed_model,
+            show_progress=not progress_bar_disable,
         )
+    else:
+        # Update existing index
+        index = load_or_build_index(storage_context, embed_model)
+        all_node_ids = list(index.docstore.docs.keys())
+        existing_nodes = {
+            node.metadata.get("document_id"): node
+            for node in index.docstore.get_nodes(all_node_ids)
+        }
 
-    VectorStoreIndex(
-        nodes=nodes,
-        storage_context=storage_context,
-        embed_model=embed_model,
-    )
+        node_ids_to_remove = []
+
+        for document in tqdm.tqdm(documents, disable=progress_bar_disable):
+            doc_id = str(document.id)
+            document_modified = document.modified.isoformat()
+
+            if doc_id in existing_nodes:
+                node = existing_nodes[doc_id]
+                node_modified = node.metadata.get("modified")
+
+                if node_modified == document_modified:
+                    continue
+
+                node_ids_to_remove.append(node.node_id)
+                nodes.extend(build_document_node(document))
+            else:
+                # New document, add it
+                nodes.extend(build_document_node(document))
+
+        if node_ids_to_remove or nodes:
+            logger.info(
+                "Updating LLM index with %d new nodes and removing %d old nodes.",
+                len(nodes),
+                len(node_ids_to_remove),
+            )
+            if node_ids_to_remove:
+                index.delete_nodes(node_ids_to_remove)
+            if nodes:
+                index.insert_nodes(nodes)
+        else:
+            logger.info("No changes detected, skipping llm index rebuild.")
+
     storage_context.persist(persist_dir=settings.LLM_INDEX_DIR)
 
 
@@ -187,6 +228,7 @@ def llm_index_remove_document(document: Document):
     storage_context = get_or_create_storage_context(rebuild=False)
 
     index = load_or_build_index(storage_context, embed_model)
+
     if index is None:
         return
 
