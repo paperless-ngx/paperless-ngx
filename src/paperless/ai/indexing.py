@@ -61,7 +61,7 @@ def get_vector_store_index(storage_context, embed_model):
     )
 
 
-def build_document_node(document) -> list[BaseNode]:
+def build_document_node(document: Document) -> list[BaseNode]:
     """
     Given a Document, returns parsed Nodes ready for indexing.
     """
@@ -109,7 +109,7 @@ def load_or_build_index(storage_context, embed_model, nodes=None):
         raise
 
 
-def remove_existing_document_nodes(document, index):
+def remove_document_docstore_nodes(document: Document, index: VectorStoreIndex):
     """
     Removes existing documents from docstore for a given document from the index.
     This is necessary because FAISS IndexFlatL2 is append-only.
@@ -153,7 +153,7 @@ def rebuild_llm_index(*, progress_bar_disable=False, rebuild=False):
     storage_context.persist(persist_dir=settings.LLM_INDEX_DIR)
 
 
-def llm_index_add_or_update_document(document):
+def llm_index_add_or_update_document(document: Document):
     """
     Adds or updates a document in the LLM index.
     If the document already exists, it will be replaced.
@@ -168,18 +168,19 @@ def llm_index_add_or_update_document(document):
     index = load_or_build_index(storage_context, embed_model, nodes=new_nodes)
 
     if index is None:
-        # Nothing to index
         return
 
-    # Remove old nodes
-    remove_existing_document_nodes(document, index)
+    remove_document_docstore_nodes(document, index)
 
     index.insert_nodes(new_nodes)
 
     storage_context.persist(persist_dir=settings.LLM_INDEX_DIR)
 
 
-def llm_index_remove_document(document):
+def llm_index_remove_document(document: Document):
+    """
+    Removes a document from the LLM index.
+    """
     embed_model = get_embedding_model()
     llama_settings.embed_model = embed_model
 
@@ -187,10 +188,9 @@ def llm_index_remove_document(document):
 
     index = load_or_build_index(storage_context, embed_model)
     if index is None:
-        return  # Nothing to remove
+        return
 
-    # Remove old nodes
-    remove_existing_document_nodes(document, index)
+    remove_document_docstore_nodes(document, index)
 
     storage_context.persist(persist_dir=settings.LLM_INDEX_DIR)
 
@@ -202,11 +202,9 @@ def query_similar_documents(document: Document, top_k: int = 5) -> list[Document
     index = load_or_build_index()
     retriever = VectorIndexRetriever(index=index, similarity_top_k=top_k)
 
-    # Build query from the document text
     query_text = (document.title or "") + "\n" + (document.content or "")
     results = retriever.retrieve(query_text)
 
-    # Each result.node.metadata["document_id"] should match our stored doc
     document_ids = [
         int(node.metadata["document_id"])
         for node in results
