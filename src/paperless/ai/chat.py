@@ -26,7 +26,7 @@ def stream_chat_with_documents(query_str: str, documents: list[Document]):
     client = AIClient()
     index = load_or_build_index()
 
-    doc_ids = [doc.pk for doc in documents]
+    doc_ids = [str(doc.pk) for doc in documents]
 
     # Filter only the node(s) that match the document IDs
     nodes = [

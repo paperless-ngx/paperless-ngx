@@ -28,7 +28,6 @@ def real_document(db):
 
 @pytest.fixture
 def mock_embed_model():
-    """Mocks the embedding model."""
     with patch("paperless.ai.indexing.get_embedding_model") as mock:
         mock.return_value = FakeEmbedding()
         yield mock
@@ -57,7 +56,7 @@ def test_build_document_node(real_document):
 
 
 @pytest.mark.django_db
-def test_rebuild_llm_index(
+def test_update_llm_index(
     temp_llm_index_dir,
     real_document,
     mock_embed_model,
@@ -70,6 +69,49 @@ def test_rebuild_llm_index(
         indexing.update_llm_index(rebuild=True)
 
         assert any(temp_llm_index_dir.glob("*.json"))
+
+
+def test_get_or_create_storage_context_raises_exception(
+    temp_llm_index_dir,
+    mock_embed_model,
+):
+    with pytest.raises(Exception):
+        indexing.get_or_create_storage_context(rebuild=False)
+
+
+def test_load_or_build_index_builds_when_nodes_given(
+    temp_llm_index_dir,
+    mock_embed_model,
+    real_document,
+):
+    storage_context = MagicMock()
+    with patch(
+        "paperless.ai.indexing.load_index_from_storage",
+        side_effect=ValueError("Index not found"),
+    ):
+        with patch(
+            "paperless.ai.indexing.VectorStoreIndex",
+            return_value=MagicMock(),
+        ) as mock_index_cls:
+            indexing.load_or_build_index(
+                storage_context,
+                mock_embed_model,
+                nodes=[indexing.build_document_node(real_document)],
+            )
+            mock_index_cls.assert_called_once()
+
+
+def test_load_or_build_index_raises_exception_when_no_nodes(
+    temp_llm_index_dir,
+    mock_embed_model,
+):
+    storage_context = MagicMock()
+    with patch(
+        "paperless.ai.indexing.load_index_from_storage",
+        side_effect=ValueError("Index not found"),
+    ):
+        with pytest.raises(Exception):
+            indexing.load_or_build_index(storage_context, mock_embed_model)
 
 
 @pytest.mark.django_db
@@ -91,14 +133,18 @@ def test_remove_document_deletes_node_from_docstore(
     mock_embed_model,
 ):
     indexing.update_llm_index(rebuild=True)
-    indexing.llm_index_add_or_update_document(real_document)
-    indexing.llm_index_remove_document(real_document)
+    storage_context = indexing.get_or_create_storage_context()
+    index = indexing.load_or_build_index(storage_context, mock_embed_model)
+    assert len(index.docstore.docs) == 1
 
-    assert any(temp_llm_index_dir.glob("*.json"))
+    indexing.llm_index_remove_document(real_document)
+    storage_context = indexing.get_or_create_storage_context()
+    index = indexing.load_or_build_index(storage_context, mock_embed_model)
+    assert len(index.docstore.docs) == 0
 
 
 @pytest.mark.django_db
-def test_rebuild_llm_index_no_documents(
+def test_update_llm_index_no_documents(
     temp_llm_index_dir,
     mock_embed_model,
 ):
