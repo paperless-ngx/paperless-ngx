@@ -234,6 +234,20 @@ def _parse_beat_schedule() -> dict:
                 "expires": 59.0 * 60.0,
             },
         },
+        {
+            "name": "Rebuild LLM index",
+            "env_key": "PAPERLESS_LLM_INDEX_TASK_CRON",
+            # Default daily at 02:10
+            "env_default": "10 2 * * *",
+            "task": "documents.tasks.llmindex_index",
+            "options": {
+                # 1 hour before default schedule sends again
+                "expires": 23.0 * 60.0 * 60.0,
+                "kwargs": {
+                    "progress_bar_disable": True,
+                },
+            },
+        },
     ]
     for task in tasks:
         # Either get the environment setting or use the default

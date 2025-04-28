@@ -1816,3 +1816,10 @@ current backend. This setting is required to be set to use the AI features.
 : The URL to use for the AI backend. This is required for the Ollama backend only.
 
     Defaults to None.
+
+#### [`PAPERLESS_LLM_INDEX_TASK_CRON=<cron expression>`](#PAPERLESS_LLM_INDEX_TASK_CRON) {#PAPERLESS_LLM_INDEX_TASK_CRON}
+
+: Configures the schedule to update the AI embeddings for all documents. Only performed if
+AI is enabled and the LLM embedding backend is set.
+
+    Defaults to `10 2 * * *`, once per day.
