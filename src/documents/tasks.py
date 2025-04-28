@@ -248,8 +248,10 @@ def bulk_update_documents(document_ids):
 
     ai_config = AIConfig()
     if ai_config.llm_index_enabled():
-        for doc in documents:
-            llm_index_add_or_update_document()
+        update_llm_index(
+            progress_bar_disable=True,
+            rebuild=False,
+        )
 
 
 @shared_task
