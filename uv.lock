@@ -1842,7 +1842,7 @@ wheels = [
 
 [[package]]
 name = "ocrmypdf"
-version = "16.10.0"
+version = "16.10.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "deprecation", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -1855,9 +1855,9 @@ dependencies = [
     { name = "pluggy", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "rich", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/07/cf/d207aea8442a8e5a63b16faae89af2b9e3474d8d5925a5ea8c4f10f73fa9/ocrmypdf-16.10.0.tar.gz", hash = "sha256:d5b907a7b92951f1f3617f0f5ca002d866143d94fd168546a70e51756bf6412e", size = 6809110 }
+sdist = { url = "https://files.pythonhosted.org/packages/cd/67/524ae8f93dd60f59b10798f09286efe6670d1b277d4add78a1916a94003e/ocrmypdf-16.10.1.tar.gz", hash = "sha256:9f32059fc97e25931aaa0a8a4027b8c9faca7d9e1183089f32e0cba5631449f1", size = 6819366 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/33/47/10058f54f593f5e618a6796fc3e8dc3e19536128f832e2d3d6e4943e9834/ocrmypdf-16.10.0-py3-none-any.whl", hash = "sha256:5093b9b058e7278b17c0b0978eb5175063b7a5511e3b9068257ece063d91ce8f", size = 162336 },
+    { url = "https://files.pythonhosted.org/packages/1a/99/c6feaa9564c33828a5873868ade94f571b04fee3cec3d44d9de4a25d63a8/ocrmypdf-16.10.1-py3-none-any.whl", hash = "sha256:64873e4e7e282fc6c002afdbc9a24ca16700ab280566c6bc70910ee36622290f", size = 162365 },
 ]
 
 [[package]]
