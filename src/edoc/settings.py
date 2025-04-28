@@ -406,7 +406,7 @@ STORAGES = {
 }
 
 _CELERY_REDIS_URL, _CHANNELS_REDIS_URL = _parse_redis_url(
-    os.getenv("EDOC_REDIS", 'redis://:@123bytech@172.16.100.203:9377'),
+    os.getenv("EDOC_REDIS", ''),
 )
 
 TEMPLATES = [
@@ -835,6 +835,8 @@ if DEBUG and os.getenv("EDOC_CACHE_BACKEND") is None:
         "BACKEND"
     ] = "django.core.cache.backends.locmem.LocMemCache"  # pragma: no cover
 
+# Use cached session engine
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 def default_threads_per_worker(task_workers) -> int:
     # always leave one core open
