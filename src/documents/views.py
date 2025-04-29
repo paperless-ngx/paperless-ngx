@@ -789,7 +789,7 @@ class DocumentViewSet(
                 refresh_suggestions_cache(doc.pk)
                 return Response(cached_llm_suggestions.suggestions)
 
-            llm_suggestions = get_ai_document_classification(doc)
+            llm_suggestions = get_ai_document_classification(doc, request.user)
 
             matched_tags = match_tags_by_name(
                 llm_suggestions.get("tags", []),

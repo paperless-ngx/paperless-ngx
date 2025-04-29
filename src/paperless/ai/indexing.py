@@ -206,12 +206,32 @@ def llm_index_remove_document(document: Document):
     index.storage_context.persist(persist_dir=settings.LLM_INDEX_DIR)
 
 
-def query_similar_documents(document: Document, top_k: int = 5) -> list[Document]:
+def query_similar_documents(
+    document: Document,
+    top_k: int = 5,
+    document_ids: list[int] | None = None,
+) -> list[Document]:
     """
     Runs a similarity query and returns top-k similar Document objects.
     """
     index = load_or_build_index()
-    retriever = VectorIndexRetriever(index=index, similarity_top_k=top_k)
+
+    # constrain only the node(s) that match the document IDs, if given
+    doc_node_ids = (
+        [
+            node.node_id
+            for node in index.docstore.docs.values()
+            if node.metadata.get("document_id") in document_ids
+        ]
+        if document_ids
+        else None
+    )
+
+    retriever = VectorIndexRetriever(
+        index=index,
+        similarity_top_k=top_k,
+        doc_ids=doc_node_ids,
+    )
 
     query_text = (document.title or "") + "\n" + (document.content or "")
     results = retriever.retrieve(query_text)
