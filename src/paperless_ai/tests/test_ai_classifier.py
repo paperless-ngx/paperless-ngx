@@ -6,11 +6,11 @@ import pytest
 from django.test import override_settings
 
 from documents.models import Document
-from paperless.ai.ai_classifier import build_prompt_with_rag
-from paperless.ai.ai_classifier import build_prompt_without_rag
-from paperless.ai.ai_classifier import get_ai_document_classification
-from paperless.ai.ai_classifier import get_context_for_document
-from paperless.ai.ai_classifier import parse_ai_response
+from paperless_ai.ai_classifier import build_prompt_with_rag
+from paperless_ai.ai_classifier import build_prompt_without_rag
+from paperless_ai.ai_classifier import get_ai_document_classification
+from paperless_ai.ai_classifier import get_context_for_document
+from paperless_ai.ai_classifier import parse_ai_response
 
 
 @pytest.fixture
@@ -49,7 +49,7 @@ def mock_document():
 
 
 @pytest.mark.django_db
-@patch("paperless.ai.client.AIClient.run_llm_query")
+@patch("paperless_ai.client.AIClient.run_llm_query")
 @override_settings(
     LLM_BACKEND="ollama",
     LLM_MODEL="some_model",
@@ -77,7 +77,7 @@ def test_get_ai_document_classification_success(mock_run_llm_query, mock_documen
 
 
 @pytest.mark.django_db
-@patch("paperless.ai.client.AIClient.run_llm_query")
+@patch("paperless_ai.client.AIClient.run_llm_query")
 def test_get_ai_document_classification_failure(mock_run_llm_query, mock_document):
     mock_run_llm_query.side_effect = Exception("LLM query failed")
 
@@ -96,8 +96,8 @@ def test_parse_llm_classification_response_invalid_json():
 
 
 @pytest.mark.django_db
-@patch("paperless.ai.client.AIClient.run_llm_query")
-@patch("paperless.ai.ai_classifier.build_prompt_with_rag")
+@patch("paperless_ai.client.AIClient.run_llm_query")
+@patch("paperless_ai.ai_classifier.build_prompt_with_rag")
 @override_settings(
     LLM_EMBEDDING_BACKEND="huggingface",
     LLM_EMBEDDING_MODEL="some_model",
@@ -116,8 +116,8 @@ def test_use_rag_if_configured(
 
 
 @pytest.mark.django_db
-@patch("paperless.ai.client.AIClient.run_llm_query")
-@patch("paperless.ai.ai_classifier.build_prompt_without_rag")
+@patch("paperless_ai.client.AIClient.run_llm_query")
+@patch("paperless_ai.ai_classifier.build_prompt_without_rag")
 @patch("paperless.config.AIConfig")
 @override_settings(
     LLM_BACKEND="ollama",
@@ -144,7 +144,7 @@ def test_use_without_rag_if_not_configured(
 )
 def test_prompt_with_without_rag(mock_document):
     with patch(
-        "paperless.ai.ai_classifier.get_context_for_document",
+        "paperless_ai.ai_classifier.get_context_for_document",
         return_value="Context from similar documents",
     ):
         prompt = build_prompt_without_rag(mock_document)
@@ -174,7 +174,7 @@ def mock_similar_documents():
     return [doc1, doc2, doc3]
 
 
-@patch("paperless.ai.ai_classifier.query_similar_documents")
+@patch("paperless_ai.ai_classifier.query_similar_documents")
 def test_get_context_for_document(
     mock_query_similar_documents,
     mock_document,
@@ -193,6 +193,6 @@ def test_get_context_for_document(
 
 
 def test_get_context_for_document_no_similar_docs(mock_document):
-    with patch("paperless.ai.ai_classifier.query_similar_documents", return_value=[]):
+    with patch("paperless_ai.ai_classifier.query_similar_documents", return_value=[]):
         result = get_context_for_document(mock_document)
         assert result == ""

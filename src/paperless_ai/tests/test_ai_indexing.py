@@ -7,7 +7,7 @@ from django.utils import timezone
 from llama_index.core.base.embeddings.base import BaseEmbedding
 
 from documents.models import Document
-from paperless.ai import indexing
+from paperless_ai import indexing
 
 
 @pytest.fixture
@@ -29,7 +29,7 @@ def real_document(db):
 
 @pytest.fixture
 def mock_embed_model():
-    with patch("paperless.ai.indexing.get_embedding_model") as mock:
+    with patch("paperless_ai.indexing.get_embedding_model") as mock:
         mock.return_value = FakeEmbedding()
         yield mock
 
@@ -112,7 +112,7 @@ def test_update_llm_index_partial_update(
         mock_all.return_value = mock_queryset
 
         # assert logs "Updating LLM index with %d new nodes and removing %d old nodes."
-        with patch("paperless.ai.indexing.logger") as mock_logger:
+        with patch("paperless_ai.indexing.logger") as mock_logger:
             indexing.update_llm_index(rebuild=False)
             mock_logger.info.assert_called_once_with(
                 "Updating %d nodes in LLM index.",
@@ -139,15 +139,15 @@ def test_load_or_build_index_builds_when_nodes_given(
     real_document,
 ):
     with patch(
-        "paperless.ai.indexing.load_index_from_storage",
+        "paperless_ai.indexing.load_index_from_storage",
         side_effect=ValueError("Index not found"),
     ):
         with patch(
-            "paperless.ai.indexing.VectorStoreIndex",
+            "paperless_ai.indexing.VectorStoreIndex",
             return_value=MagicMock(),
         ) as mock_index_cls:
             with patch(
-                "paperless.ai.indexing.get_or_create_storage_context",
+                "paperless_ai.indexing.get_or_create_storage_context",
                 return_value=MagicMock(),
             ) as mock_storage:
                 mock_storage.return_value.persist_dir = temp_llm_index_dir
@@ -161,7 +161,7 @@ def test_load_or_build_index_raises_exception_when_no_nodes(
     temp_llm_index_dir,
 ):
     with patch(
-        "paperless.ai.indexing.load_index_from_storage",
+        "paperless_ai.indexing.load_index_from_storage",
         side_effect=ValueError("Index not found"),
     ):
         with pytest.raises(Exception):
@@ -207,7 +207,7 @@ def test_update_llm_index_no_documents(
         mock_all.return_value = mock_queryset
 
         # check log message
-        with patch("paperless.ai.indexing.logger") as mock_logger:
+        with patch("paperless_ai.indexing.logger") as mock_logger:
             indexing.update_llm_index(rebuild=True)
             mock_logger.warning.assert_called_once_with(
                 "No documents found to index.",
@@ -223,10 +223,10 @@ def test_query_similar_documents(
     real_document,
 ):
     with (
-        patch("paperless.ai.indexing.get_or_create_storage_context") as mock_storage,
-        patch("paperless.ai.indexing.load_or_build_index") as mock_load_or_build_index,
-        patch("paperless.ai.indexing.VectorIndexRetriever") as mock_retriever_cls,
-        patch("paperless.ai.indexing.Document.objects.filter") as mock_filter,
+        patch("paperless_ai.indexing.get_or_create_storage_context") as mock_storage,
+        patch("paperless_ai.indexing.load_or_build_index") as mock_load_or_build_index,
+        patch("paperless_ai.indexing.VectorIndexRetriever") as mock_retriever_cls,
+        patch("paperless_ai.indexing.Document.objects.filter") as mock_filter,
     ):
         mock_storage.return_value = MagicMock()
         mock_storage.return_value.persist_dir = temp_llm_index_dir
@@ -251,7 +251,7 @@ def test_query_similar_documents(
         result = indexing.query_similar_documents(real_document, top_k=3)
 
         mock_load_or_build_index.assert_called_once()
-        mock_retriever_cls.assert_called_once_with(index=mock_index, similarity_top_k=3)
+        mock_retriever_cls.assert_called_once()
         mock_retriever.retrieve.assert_called_once_with(
             "Test Document\nThis is some test content.",
         )

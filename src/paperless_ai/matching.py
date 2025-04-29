@@ -12,7 +12,7 @@ from documents.permissions import get_objects_for_user_owner_aware
 
 MATCH_THRESHOLD = 0.8
 
-logger = logging.getLogger("paperless.ai.matching")
+logger = logging.getLogger("paperless_ai.matching")
 
 
 def match_tags_by_name(names: list[str], user: User) -> list[Tag]:

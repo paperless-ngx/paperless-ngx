@@ -176,13 +176,6 @@ from documents.tasks import train_classifier
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.utils import get_boolean
 from paperless import version
-from paperless.ai.ai_classifier import get_ai_document_classification
-from paperless.ai.chat import stream_chat_with_documents
-from paperless.ai.matching import extract_unmatched_names
-from paperless.ai.matching import match_correspondents_by_name
-from paperless.ai.matching import match_document_types_by_name
-from paperless.ai.matching import match_storage_paths_by_name
-from paperless.ai.matching import match_tags_by_name
 from paperless.celery import app as celery_app
 from paperless.config import AIConfig
 from paperless.config import GeneralConfig
@@ -190,6 +183,13 @@ from paperless.db import GnuPG
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
+from paperless_ai.ai_classifier import get_ai_document_classification
+from paperless_ai.chat import stream_chat_with_documents
+from paperless_ai.matching import extract_unmatched_names
+from paperless_ai.matching import match_correspondents_by_name
+from paperless_ai.matching import match_document_types_by_name
+from paperless_ai.matching import match_storage_paths_by_name
+from paperless_ai.matching import match_tags_by_name
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.oauth import PaperlessMailOAuth2Manager

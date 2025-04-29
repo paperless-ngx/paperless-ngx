@@ -17,11 +17,11 @@ from llama_index.core.storage.index_store import SimpleIndexStore
 from llama_index.vector_stores.faiss import FaissVectorStore
 
 from documents.models import Document
-from paperless.ai.embedding import build_llm_index_text
-from paperless.ai.embedding import get_embedding_dim
-from paperless.ai.embedding import get_embedding_model
+from paperless_ai.embedding import build_llm_index_text
+from paperless_ai.embedding import get_embedding_dim
+from paperless_ai.embedding import get_embedding_model
 
-logger = logging.getLogger("paperless.ai.indexing")
+logger = logging.getLogger("paperless_ai.indexing")
 
 
 def get_or_create_storage_context(*, rebuild=False):

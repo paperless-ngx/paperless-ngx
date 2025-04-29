@@ -4,12 +4,12 @@ from unittest.mock import patch
 import pytest
 from llama_index.core.llms import ChatMessage
 
-from paperless.ai.client import AIClient
+from paperless_ai.client import AIClient
 
 
 @pytest.fixture
 def mock_ai_config():
-    with patch("paperless.ai.client.AIConfig") as MockAIConfig:
+    with patch("paperless_ai.client.AIConfig") as MockAIConfig:
         mock_config = MagicMock()
         MockAIConfig.return_value = mock_config
         yield mock_config
@@ -17,13 +17,13 @@ def mock_ai_config():
 
 @pytest.fixture
 def mock_ollama_llm():
-    with patch("paperless.ai.client.Ollama") as MockOllama:
+    with patch("paperless_ai.client.Ollama") as MockOllama:
         yield MockOllama
 
 
 @pytest.fixture
 def mock_openai_llm():
-    with patch("paperless.ai.client.OpenAI") as MockOpenAI:
+    with patch("paperless_ai.client.OpenAI") as MockOpenAI:
         yield MockOpenAI
 
 
