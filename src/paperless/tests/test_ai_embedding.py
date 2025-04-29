@@ -7,8 +7,13 @@ from documents.models import Document
 from paperless.ai.embedding import build_llm_index_text
 from paperless.ai.embedding import get_embedding_dim
 from paperless.ai.embedding import get_embedding_model
-from paperless.ai.rag import get_context_for_document
 from paperless.models import LLMEmbeddingBackend
+
+
+@pytest.fixture
+def mock_ai_config():
+    with patch("paperless.ai.embedding.AIConfig") as MockAIConfig:
+        yield MockAIConfig
 
 
 @pytest.fixture
@@ -44,59 +49,6 @@ def mock_document():
     doc.custom_fields.all = MagicMock(return_value=[cf1, cf2])
 
     return doc
-
-
-@pytest.fixture
-def mock_similar_documents():
-    doc1 = MagicMock()
-    doc1.content = "Content of document 1"
-    doc1.title = "Title 1"
-    doc1.filename = "file1.txt"
-
-    doc2 = MagicMock()
-    doc2.content = "Content of document 2"
-    doc2.title = None
-    doc2.filename = "file2.txt"
-
-    doc3 = MagicMock()
-    doc3.content = None
-    doc3.title = None
-    doc3.filename = None
-
-    return [doc1, doc2, doc3]
-
-
-@patch("paperless.ai.rag.query_similar_documents")
-def test_get_context_for_document(
-    mock_query_similar_documents,
-    mock_document,
-    mock_similar_documents,
-):
-    mock_query_similar_documents.return_value = mock_similar_documents
-
-    result = get_context_for_document(mock_document, max_docs=2)
-
-    expected_result = (
-        "TITLE: Title 1\nContent of document 1\n\n"
-        "TITLE: file2.txt\nContent of document 2"
-    )
-    assert result == expected_result
-    mock_query_similar_documents.assert_called_once()
-
-
-def test_get_context_for_document_no_similar_docs(mock_document):
-    with patch("paperless.ai.rag.query_similar_documents", return_value=[]):
-        result = get_context_for_document(mock_document)
-        assert result == ""
-
-
-# Embedding
-
-
-@pytest.fixture
-def mock_ai_config():
-    with patch("paperless.ai.embedding.AIConfig") as MockAIConfig:
-        yield MockAIConfig
 
 
 def test_get_embedding_model_openai(mock_ai_config):

@@ -1,3 +1,4 @@
+from llama_index.core.base.embeddings.base import BaseEmbedding
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.embeddings.openai import OpenAIEmbedding
 
@@ -12,7 +13,7 @@ EMBEDDING_DIMENSIONS = {
 }
 
 
-def get_embedding_model():
+def get_embedding_model() -> BaseEmbedding:
     config = AIConfig()
 
     match config.llm_embedding_backend:
