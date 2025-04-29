@@ -56,7 +56,7 @@ def test_stream_chat_with_one_document_full_content(mock_document):
 
         mock_node = TextNode(
             text="This is node content.",
-            metadata={"document_id": mock_document.pk, "title": "Test Document"},
+            metadata={"document_id": str(mock_document.pk), "title": "Test Document"},
         )
         mock_index = MagicMock()
         mock_index.docstore.docs.values.return_value = [mock_node]
@@ -90,11 +90,11 @@ def test_stream_chat_with_multiple_documents_retrieval(patch_embed_nodes):
         # Create two real TextNodes
         mock_node1 = TextNode(
             text="Content for doc 1.",
-            metadata={"document_id": 1, "title": "Document 1"},
+            metadata={"document_id": "1", "title": "Document 1"},
         )
         mock_node2 = TextNode(
             text="Content for doc 2.",
-            metadata={"document_id": 2, "title": "Document 2"},
+            metadata={"document_id": "2", "title": "Document 2"},
         )
         mock_index = MagicMock()
         mock_index.docstore.docs.values.return_value = [mock_node1, mock_node2]

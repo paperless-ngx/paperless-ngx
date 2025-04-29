@@ -2,6 +2,7 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
+from django.test import override_settings
 from django.utils import timezone
 from llama_index.core.base.embeddings.base import BaseEmbedding
 
@@ -162,15 +163,23 @@ def test_update_llm_index_no_documents(
             )
 
 
+@override_settings(
+    LLM_EMBEDDING_BACKEND="huggingface",
+    LLM_BACKEND="ollama",
+)
 def test_query_similar_documents(
     temp_llm_index_dir,
     real_document,
 ):
     with (
+        patch("paperless.ai.indexing.get_or_create_storage_context") as mock_storage,
         patch("paperless.ai.indexing.load_or_build_index") as mock_load_or_build_index,
         patch("paperless.ai.indexing.VectorIndexRetriever") as mock_retriever_cls,
         patch("paperless.ai.indexing.Document.objects.filter") as mock_filter,
     ):
+        mock_storage.return_value = MagicMock()
+        mock_storage.return_value.persist_dir = temp_llm_index_dir
+
         mock_index = MagicMock()
         mock_load_or_build_index.return_value = mock_index
 
