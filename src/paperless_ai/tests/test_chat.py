@@ -5,7 +5,7 @@ import pytest
 from llama_index.core import VectorStoreIndex
 from llama_index.core.schema import TextNode
 
-from paperless.ai.chat import stream_chat_with_documents
+from paperless_ai.chat import stream_chat_with_documents
 
 
 @pytest.fixture(autouse=True)
@@ -44,10 +44,10 @@ def mock_document():
 
 def test_stream_chat_with_one_document_full_content(mock_document):
     with (
-        patch("paperless.ai.chat.AIClient") as mock_client_cls,
-        patch("paperless.ai.chat.load_or_build_index") as mock_load_index,
+        patch("paperless_ai.chat.AIClient") as mock_client_cls,
+        patch("paperless_ai.chat.load_or_build_index") as mock_load_index,
         patch(
-            "paperless.ai.chat.RetrieverQueryEngine.from_args",
+            "paperless_ai.chat.RetrieverQueryEngine.from_args",
         ) as mock_query_engine_cls,
     ):
         mock_client = MagicMock()
@@ -75,10 +75,10 @@ def test_stream_chat_with_one_document_full_content(mock_document):
 
 def test_stream_chat_with_multiple_documents_retrieval(patch_embed_nodes):
     with (
-        patch("paperless.ai.chat.AIClient") as mock_client_cls,
-        patch("paperless.ai.chat.load_or_build_index") as mock_load_index,
+        patch("paperless_ai.chat.AIClient") as mock_client_cls,
+        patch("paperless_ai.chat.load_or_build_index") as mock_load_index,
         patch(
-            "paperless.ai.chat.RetrieverQueryEngine.from_args",
+            "paperless_ai.chat.RetrieverQueryEngine.from_args",
         ) as mock_query_engine_cls,
         patch.object(VectorStoreIndex, "as_retriever") as mock_as_retriever,
     ):
@@ -125,8 +125,8 @@ def test_stream_chat_with_multiple_documents_retrieval(patch_embed_nodes):
 
 def test_stream_chat_no_matching_nodes():
     with (
-        patch("paperless.ai.chat.AIClient") as mock_client_cls,
-        patch("paperless.ai.chat.load_or_build_index") as mock_load_index,
+        patch("paperless_ai.chat.AIClient") as mock_client_cls,
+        patch("paperless_ai.chat.load_or_build_index") as mock_load_index,
     ):
         mock_client = MagicMock()
         mock_client_cls.return_value = mock_client
