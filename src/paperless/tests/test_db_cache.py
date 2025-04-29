@@ -1,65 +1,163 @@
-from unittest.mock import MagicMock
+import os
+import time
 from unittest.mock import patch
 
-from paperless.db_cache import CacheManager
-from paperless.db_cache import _cache_key_prefix
-from paperless.db_cache import custom_get_query_cache_key
-from paperless.db_cache import custom_get_table_cache_key
+import pytest
+from cachalot.settings import cachalot_settings
+from django.conf import settings
+from django.db import connection
+from django.test import override_settings
+from django.test.utils import CaptureQueriesContext
+
+from documents.models import Document
+from paperless.db_cache import invalidate_db_cache
+from paperless.settings import _parse_cachalot_settings
+from paperless.settings import _parse_caches
 
 
-@patch("paperless.db_cache.get_query_cache_key")
-def test_custom_get_query_cache_key(mock_get_query_cache_key):
-    mock_get_query_cache_key.return_value = "query_key"
-    result = custom_get_query_cache_key(MagicMock())
-    assert result == "pngx_cachalot_query_key"
-    mock_get_query_cache_key.assert_called_once()
+def test_all_redis_caches_have_same_custom_prefix(monkeypatch):
+    """
+    Check that when setting a custom Redis prefix,
+    it is set for both the Django default and the cachalot cache.
+    """
+    from paperless import settings
+
+    monkeypatch.setattr(settings, "_REDIS_KEY_PREFIX", "test_a_custom_key_prefix")
+    caches = _parse_caches()
+    assert caches["cachalot"]["KEY_PREFIX"] == "test_a_custom_key_prefix"
+    assert caches["default"]["KEY_PREFIX"] == "test_a_custom_key_prefix"
 
 
-@patch("paperless.db_cache.get_table_cache_key")
-def test_custom_get_table_cache_key(mock_get_table_cache_key):
-    mock_get_table_cache_key.return_value = "table_key"
-    db_alias = "default"
-    table = "test_table"
-    result = custom_get_table_cache_key(db_alias, table)
-    assert result == "pngx_cachalot_table_key"
-    mock_get_table_cache_key.assert_called_once_with(db_alias, table)
+class TestDbCacheSettings:
+    def test_cachalot_default_settings(self):
+        # Cachalot must be installed even if disabled,
+        # so the cache can be invalidated anytime
+        assert "cachalot" in settings.INSTALLED_APPS
+        cachalot_settings = _parse_cachalot_settings()
+        caches = _parse_caches()
+
+        # Default settings
+        assert not cachalot_settings["CACHALOT_ENABLED"]
+        assert cachalot_settings["CACHALOT_TIMEOUT"] == 3600
+        assert caches["cachalot"]["KEY_PREFIX"] == ""
+        assert caches["cachalot"]["LOCATION"] == "redis://localhost:6379"
+
+        # Fixed settings
+        assert cachalot_settings["CACHALOT_CACHE"] == "cachalot"
+        assert (
+            cachalot_settings["CACHALOT_QUERY_KEYGEN"]
+            == "paperless.db_cache.custom_get_query_cache_key"
+        )
+        assert (
+            cachalot_settings["CACHALOT_TABLE_KEYGEN"]
+            == "paperless.db_cache.custom_get_table_cache_key"
+        )
+        assert cachalot_settings["CACHALOT_FINAL_SQL_CHECK"] is True
+
+    @patch.dict(
+        os.environ,
+        {
+            "PAPERLESS_DB_READ_CACHE_ENABLED": "true",
+            "PAPERLESS_DB_READ_CACHE_REDIS_URL": "redis://localhost:6380/7",
+            "PAPERLESS_DB_READ_CACHE_TTL": "7200",
+        },
+    )
+    def test_cachalot_custom_settings(self):
+        assert "cachalot" in settings.INSTALLED_APPS
+        cachalot_settings = _parse_cachalot_settings()
+        caches = _parse_caches()
+
+        # Modifiable settings
+        assert cachalot_settings["CACHALOT_ENABLED"]
+        assert cachalot_settings["CACHALOT_TIMEOUT"] == 7200
+        assert caches["cachalot"]["LOCATION"] == "redis://localhost:6380/7"
+
+        # Fixed settings
+        assert cachalot_settings["CACHALOT_CACHE"] == "cachalot"
+        assert (
+            cachalot_settings["CACHALOT_QUERY_KEYGEN"]
+            == "paperless.db_cache.custom_get_query_cache_key"
+        )
+        assert (
+            cachalot_settings["CACHALOT_TABLE_KEYGEN"]
+            == "paperless.db_cache.custom_get_table_cache_key"
+        )
+        assert cachalot_settings["CACHALOT_FINAL_SQL_CHECK"] is True
+
+    @pytest.mark.parametrize(
+        ("env_var_ttl", "expected_cachalot_timeout"),
+        [
+            # 0 or less will be ignored, and the default TTL will be set
+            ("0", 3600),
+            ("-1", 3600),
+            ("-500000", 3600),
+            # Any positive value will be set, for a maximum of one year
+            ("1", 1),
+            ("7524", 7524),
+            ("99999999999999", 31536000),
+        ],
+    )
+    def test_cachalot_ttl_parsing(
+        self,
+        env_var_ttl: int,
+        expected_cachalot_timeout: int,
+    ):
+        with patch.dict(os.environ, {"PAPERLESS_DB_READ_CACHE_TTL": f"{env_var_ttl}"}):
+            cachalot_timeout = _parse_cachalot_settings()["CACHALOT_TIMEOUT"]
+            assert cachalot_timeout == expected_cachalot_timeout
 
 
-@patch("django.core.cache.cache.make_key")
-def test_cache_key_prefix(mock_make_key):
-    mock_make_key.return_value = "pngx_cachalot_"
-    result = _cache_key_prefix()
-    assert result == "pngx_cachalot_"
+@override_settings(
+    CACHALOT_ENABLED=True,
+    CACHALOT_TIMEOUT=1,
+)
+@pytest.mark.django_db(transaction=True)
+def test_cache_hit_when_enabled():
+    cachalot_settings.reload()
+
+    assert cachalot_settings.CACHALOT_ENABLED
+    assert cachalot_settings.CACHALOT_TIMEOUT == 1
+    assert "cachalot" in settings.INSTALLED_APPS
+    assert settings.CACHALOT_TIMEOUT == 1
+
+    # Read a table to populate the cache
+    list(list(Document.objects.values_list("id", flat=True)))
+
+    # Invalidate the cache then read the database, there should be DB hit
+    invalidate_db_cache()
+    with CaptureQueriesContext(connection) as ctx:
+        list(list(Document.objects.values_list("id", flat=True)))
+    assert len(ctx)
+
+    # Doing the same request again should hit the cache, not the DB
+    with CaptureQueriesContext(connection) as ctx:
+        list(list(Document.objects.values_list("id", flat=True)))
+    assert not len(ctx)
+
+    # Wait the end of TTL
+    # Redis expire accuracy should be between 0 and 1 ms
+    time.sleep(1.002)
+
+    # Read the DB again. The DB should be hit because the cache has expired
+    with CaptureQueriesContext(connection) as ctx:
+        list(list(Document.objects.values_list("id", flat=True)))
+    assert len(ctx)
+
+    # Invalidate the cache at the end of test
+    invalidate_db_cache()
 
 
-@patch("paperless.db_cache.redis.from_url")
-@patch("paperless.db_cache.settings")
-def test_cache_manager_init_with_cachalot(mock_settings, mock_redis_from_url):
-    mock_settings.INSTALLED_APPS = ["cachalot"]
-    mock_settings.CACHALOT_REDIS_URL = "redis://localhost:6379/0"
-    mock_redis_instance = MagicMock()
-    mock_redis_from_url.return_value = mock_redis_instance
+@pytest.mark.django_db(transaction=True)
+def test_cache_is_disabled_by_default():
+    cachalot_settings.reload()
+    # Invalidate the cache just in case
+    invalidate_db_cache()
 
-    cache_manager = CacheManager()
+    # Read the table multiple times: the DB should always be hit without cache
+    for _ in range(3):
+        with CaptureQueriesContext(connection) as ctx:
+            list(list(Document.objects.values_list("id", flat=True)))
+        assert len(ctx)
 
-    assert cache_manager.redis_instance == mock_redis_instance
-    mock_redis_from_url.assert_called_once_with("redis://localhost:6379/0")
-
-
-@patch("paperless.db_cache.redis.from_url")
-@patch("paperless.db_cache.settings")
-@patch("paperless.db_cache._cache_key_prefix")
-def test_invalidate_cache(mock_cache_key_prefix, mock_settings, mock_redis_from_url):
-    mock_settings.INSTALLED_APPS = ["cachalot"]
-    mock_settings.CACHALOT_REDIS_URL = "redis://localhost:6379/0"
-    mock_cache_key_prefix.return_value = "pngx_cachalot_"
-    mock_redis_instance = MagicMock()
-    mock_redis_instance.scan_iter.return_value = ["key1", "key2"]
-    mock_redis_from_url.return_value = mock_redis_instance
-
-    cache_manager = CacheManager()
-    deleted_keys = cache_manager.invalidate_cache()
-
-    assert deleted_keys == 2
-    mock_redis_instance.delete.assert_any_call("key1")
-    mock_redis_instance.delete.assert_any_call("key2")
+    # Invalidate the cache at the end of test
+    invalidate_db_cache()
