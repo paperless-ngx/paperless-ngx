@@ -1,9 +1,11 @@
 import json
 import logging
 
+from django.contrib.auth.models import User
 from llama_index.core.base.llms.types import CompletionResponse
 
 from documents.models import Document
+from documents.permissions import get_objects_for_user_owner_aware
 from paperless.ai.client import AIClient
 from paperless.ai.indexing import query_similar_documents
 from paperless.config import AIConfig
@@ -52,8 +54,8 @@ def build_prompt_without_rag(document: Document) -> str:
     return prompt
 
 
-def build_prompt_with_rag(document: Document) -> str:
-    context = get_context_for_document(document)
+def build_prompt_with_rag(document: Document, user: User | None = None) -> str:
+    context = get_context_for_document(document, user)
     prompt = build_prompt_without_rag(document)
 
     prompt += f"""
@@ -65,8 +67,26 @@ def build_prompt_with_rag(document: Document) -> str:
     return prompt
 
 
-def get_context_for_document(doc: Document, max_docs: int = 5) -> str:
-    similar_docs = query_similar_documents(doc)[:max_docs]
+def get_context_for_document(
+    doc: Document,
+    user: User | None = None,
+    max_docs: int = 5,
+) -> str:
+    visible_documents = (
+        get_objects_for_user_owner_aware(
+            user,
+            "view_document",
+            Document,
+        )
+        if user
+        else None
+    )
+    similar_docs = query_similar_documents(
+        document=doc,
+        document_ids=[document.pk for document in visible_documents]
+        if visible_documents
+        else None,
+    )[:max_docs]
     context_blocks = []
     for similar in similar_docs:
         text = similar.content or ""
@@ -91,11 +111,14 @@ def parse_ai_response(response: CompletionResponse) -> dict:
         return {}
 
 
-def get_ai_document_classification(document: Document) -> dict:
+def get_ai_document_classification(
+    document: Document,
+    user: User | None = None,
+) -> dict:
     ai_config = AIConfig()
 
     prompt = (
-        build_prompt_with_rag(document)
+        build_prompt_with_rag(document, user)
         if ai_config.llm_embedding_backend
         else build_prompt_without_rag(document)
     )
