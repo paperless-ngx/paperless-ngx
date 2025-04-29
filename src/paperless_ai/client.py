@@ -6,7 +6,7 @@ from llama_index.llms.openai import OpenAI
 
 from paperless.config import AIConfig
 
-logger = logging.getLogger("paperless.ai.client")
+logger = logging.getLogger("paperless_ai.client")
 
 
 class AIClient:
