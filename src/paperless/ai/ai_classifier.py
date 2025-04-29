@@ -5,7 +5,7 @@ from llama_index.core.base.llms.types import CompletionResponse
 
 from documents.models import Document
 from paperless.ai.client import AIClient
-from paperless.ai.rag import get_context_for_document
+from paperless.ai.indexing import query_similar_documents
 from paperless.config import AIConfig
 
 logger = logging.getLogger("paperless.ai.rag_classifier")
@@ -63,6 +63,16 @@ def build_prompt_with_rag(document: Document) -> str:
     """
 
     return prompt
+
+
+def get_context_for_document(doc: Document, max_docs: int = 5) -> str:
+    similar_docs = query_similar_documents(doc)[:max_docs]
+    context_blocks = []
+    for similar in similar_docs:
+        text = similar.content or ""
+        title = similar.title or similar.filename or "Untitled"
+        context_blocks.append(f"TITLE: {title}\n{text}")
+    return "\n\n".join(context_blocks)
 
 
 def parse_ai_response(response: CompletionResponse) -> dict:
