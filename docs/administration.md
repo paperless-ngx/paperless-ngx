@@ -467,8 +467,11 @@ Failing to invalidate the cache after such modifications can lead to stale data 
 Use the following management command to clear the cache:
 
 ```
-invalidate_db_cache
+invalidate_cachalot
 ```
+
+!!! info
+The database read cache is based on Django-Cachalot. You can refer to their [documentation](https://django-cachalot.readthedocs.io/en/latest/quickstart.html#manage-py-command).
 
 ### Managing filenames {#renamer}
 
