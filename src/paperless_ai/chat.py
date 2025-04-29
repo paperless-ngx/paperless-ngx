@@ -6,10 +6,10 @@ from llama_index.core.prompts import PromptTemplate
 from llama_index.core.query_engine import RetrieverQueryEngine
 
 from documents.models import Document
-from paperless.ai.client import AIClient
-from paperless.ai.indexing import load_or_build_index
+from paperless_ai.client import AIClient
+from paperless_ai.indexing import load_or_build_index
 
-logger = logging.getLogger("paperless.ai.chat")
+logger = logging.getLogger("paperless_ai.chat")
 
 CHAT_PROMPT_TMPL = PromptTemplate(
     template="""Context information is below.

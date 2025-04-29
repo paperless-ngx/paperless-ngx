@@ -4,15 +4,15 @@ from unittest.mock import patch
 import pytest
 
 from documents.models import Document
-from paperless.ai.embedding import build_llm_index_text
-from paperless.ai.embedding import get_embedding_dim
-from paperless.ai.embedding import get_embedding_model
 from paperless.models import LLMEmbeddingBackend
+from paperless_ai.embedding import build_llm_index_text
+from paperless_ai.embedding import get_embedding_dim
+from paperless_ai.embedding import get_embedding_model
 
 
 @pytest.fixture
 def mock_ai_config():
-    with patch("paperless.ai.embedding.AIConfig") as MockAIConfig:
+    with patch("paperless_ai.embedding.AIConfig") as MockAIConfig:
         yield MockAIConfig
 
 
@@ -56,7 +56,7 @@ def test_get_embedding_model_openai(mock_ai_config):
     mock_ai_config.return_value.llm_embedding_model = "text-embedding-3-small"
     mock_ai_config.return_value.llm_api_key = "test_api_key"
 
-    with patch("paperless.ai.embedding.OpenAIEmbedding") as MockOpenAIEmbedding:
+    with patch("paperless_ai.embedding.OpenAIEmbedding") as MockOpenAIEmbedding:
         model = get_embedding_model()
         MockOpenAIEmbedding.assert_called_once_with(
             model="text-embedding-3-small",
@@ -72,7 +72,7 @@ def test_get_embedding_model_huggingface(mock_ai_config):
     )
 
     with patch(
-        "paperless.ai.embedding.HuggingFaceEmbedding",
+        "paperless_ai.embedding.HuggingFaceEmbedding",
     ) as MockHuggingFaceEmbedding:
         model = get_embedding_model()
         MockHuggingFaceEmbedding.assert_called_once_with(
