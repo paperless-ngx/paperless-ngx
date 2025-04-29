@@ -68,3 +68,19 @@ class TestAIMatching(TestCase):
         matched_objects = [self.tag1]
         unmatched_names = extract_unmatched_names(llm_names, matched_objects)
         self.assertEqual(unmatched_names, ["Nonexistent Tag"])
+
+    @patch("paperless.ai.matching.get_objects_for_user_owner_aware")
+    def test_match_tags_by_name_with_empty_names(self, mock_get_objects):
+        mock_get_objects.return_value = Tag.objects.all()
+        names = [None, "", "   "]
+        result = match_tags_by_name(names, user=None)
+        self.assertEqual(result, [])
+
+    @patch("paperless.ai.matching.get_objects_for_user_owner_aware")
+    def test_match_tags_with_fuzzy_matching(self, mock_get_objects):
+        mock_get_objects.return_value = Tag.objects.all()
+        names = ["Test Taag 1", "Teest Tag 2"]
+        result = match_tags_by_name(names, user=None)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].name, "Test Tag 1")
+        self.assertEqual(result[1].name, "Test Tag 2")
