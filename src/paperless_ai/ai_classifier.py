@@ -6,11 +6,11 @@ from llama_index.core.base.llms.types import CompletionResponse
 
 from documents.models import Document
 from documents.permissions import get_objects_for_user_owner_aware
-from paperless.ai.client import AIClient
-from paperless.ai.indexing import query_similar_documents
 from paperless.config import AIConfig
+from paperless_ai.client import AIClient
+from paperless_ai.indexing import query_similar_documents
 
-logger = logging.getLogger("paperless.ai.rag_classifier")
+logger = logging.getLogger("paperless_ai.rag_classifier")
 
 
 def build_prompt_without_rag(document: Document) -> str:

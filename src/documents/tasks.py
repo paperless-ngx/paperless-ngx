@@ -54,10 +54,10 @@ from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
-from paperless.ai.indexing import llm_index_add_or_update_document
-from paperless.ai.indexing import llm_index_remove_document
-from paperless.ai.indexing import update_llm_index
 from paperless.config import AIConfig
+from paperless_ai.indexing import llm_index_add_or_update_document
+from paperless_ai.indexing import llm_index_remove_document
+from paperless_ai.indexing import update_llm_index
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -557,6 +557,6 @@ def remove_document_from_llm_index(document):
 # TODO: schedule to run periodically
 @shared_task
 def rebuild_llm_index_task():
-    from paperless.ai.indexing import update_llm_index
+    from paperless_ai.indexing import update_llm_index
 
     update_llm_index(rebuild=True)
