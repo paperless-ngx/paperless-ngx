@@ -1160,8 +1160,14 @@ class DocumentViewSet(
             )
 
 
-@method_decorator(ensure_csrf_cookie, name="dispatch")
-@method_decorator(login_required, name="dispatch")
+@method_decorator(
+    [
+        ensure_csrf_cookie,
+        login_required,
+        cache_control(no_cache=True),
+    ],
+    name="dispatch",
+)
 class ChatStreamingView(View):
     def post(self, request):
         request.compress_exempt = True
@@ -1197,7 +1203,6 @@ class ChatStreamingView(View):
             stream_chat_with_documents(query_str=question, documents=documents),
             content_type="text/event-stream",
         )
-        response["Cache-Control"] = "no-cache"
         return response
 
 
