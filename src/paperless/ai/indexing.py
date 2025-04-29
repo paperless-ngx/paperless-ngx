@@ -147,8 +147,6 @@ def update_llm_index(*, progress_bar_disable=False, rebuild=False):
             for node in index.docstore.get_nodes(all_node_ids)
         }
 
-        node_ids_to_remove = []
-
         for document in tqdm.tqdm(documents, disable=progress_bar_disable):
             doc_id = str(document.id)
             document_modified = document.modified.isoformat()
@@ -160,22 +158,19 @@ def update_llm_index(*, progress_bar_disable=False, rebuild=False):
                 if node_modified == document_modified:
                     continue
 
-                node_ids_to_remove.append(node.node_id)
+                # Again, delete from docstore, FAISS IndexFlatL2 are append-only
+                index.docstore.delete_document(node.node_id)
                 nodes.extend(build_document_node(document))
             else:
                 # New document, add it
                 nodes.extend(build_document_node(document))
 
-        if node_ids_to_remove or nodes:
+        if nodes:
             logger.info(
-                "Updating LLM index with %d new nodes and removing %d old nodes.",
+                "Updating %d nodes in LLM index.",
                 len(nodes),
-                len(node_ids_to_remove),
             )
-            if node_ids_to_remove:
-                index.delete_nodes(node_ids_to_remove)
-            if nodes:
-                index.insert_nodes(nodes)
+            index.insert_nodes(nodes)
         else:
             logger.info("No changes detected, skipping llm index rebuild.")
 
