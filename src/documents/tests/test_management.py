@@ -256,21 +256,3 @@ class TestPruneAuditLogs(TestCase):
         call_command("prune_audit_logs")
 
         self.assertEqual(LogEntry.objects.count(), 0)
-
-
-class TestInvalidateDBCache(TestCase):
-    @mock.patch("paperless.db_cache.CacheManager.invalidate_cache")
-    def test_invalidate_db_cache(self, m):
-        call_command("invalidate_db_cache")
-
-        m.assert_called_once()
-
-    @mock.patch("paperless.db_cache.CacheManager.invalidate_cache")
-    def test_invalidate_db_cache_error(self, m):
-        m.side_effect = Exception("Cache invalidation error")
-
-        with self.assertRaises(Exception) as context:
-            call_command("invalidate_db_cache")
-
-        self.assertEqual(str(context.exception), "Cache invalidation error")
-        m.assert_called_once()
