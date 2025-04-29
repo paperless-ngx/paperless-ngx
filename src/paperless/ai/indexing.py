@@ -223,7 +223,10 @@ def query_similar_documents(document: Document, top_k: int = 5) -> list[Document
     """
     Runs a similarity query and returns top-k similar Document objects.
     """
-    index = load_or_build_index()
+    storage_context = get_or_create_storage_context(rebuild=False)
+    embed_model = get_embedding_model()
+    llama_settings.embed_model = embed_model
+    index = load_or_build_index(storage_context, embed_model)
     retriever = VectorIndexRetriever(index=index, similarity_top_k=top_k)
 
     query_text = (document.title or "") + "\n" + (document.content or "")
