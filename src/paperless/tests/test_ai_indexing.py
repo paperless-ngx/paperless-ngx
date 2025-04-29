@@ -72,6 +72,57 @@ def test_update_llm_index(
         assert any(temp_llm_index_dir.glob("*.json"))
 
 
+@pytest.mark.django_db
+def test_update_llm_index_partial_update(
+    temp_llm_index_dir,
+    real_document,
+    mock_embed_model,
+):
+    doc2 = Document.objects.create(
+        title="Test Document 2",
+        content="This is some test content 2.",
+        added=timezone.now(),
+        checksum="1234567890abcdef",
+    )
+    # Initial index
+    with patch("documents.models.Document.objects.all") as mock_all:
+        mock_queryset = MagicMock()
+        mock_queryset.exists.return_value = True
+        mock_queryset.__iter__.return_value = iter([real_document, doc2])
+        mock_all.return_value = mock_queryset
+
+        indexing.update_llm_index(rebuild=True)
+
+    # modify document
+    updated_document = real_document
+    updated_document.modified = timezone.now()  # simulate modification
+
+    # new doc
+    doc3 = Document.objects.create(
+        title="Test Document 3",
+        content="This is some test content 3.",
+        added=timezone.now(),
+        checksum="abcdef1234567890",
+    )
+
+    with patch("documents.models.Document.objects.all") as mock_all:
+        mock_queryset = MagicMock()
+        mock_queryset.exists.return_value = True
+        mock_queryset.__iter__.return_value = iter([updated_document, doc2, doc3])
+        mock_all.return_value = mock_queryset
+
+        # assert logs "Updating LLM index with %d new nodes and removing %d old nodes."
+        with patch("paperless.ai.indexing.logger") as mock_logger:
+            indexing.update_llm_index(rebuild=False)
+            mock_logger.info.assert_called_once_with(
+                "Updating %d nodes in LLM index.",
+                2,
+            )
+        indexing.update_llm_index(rebuild=False)
+
+    assert any(temp_llm_index_dir.glob("*.json"))
+
+
 def test_get_or_create_storage_context_raises_exception(
     temp_llm_index_dir,
     mock_embed_model,
