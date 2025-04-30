@@ -115,6 +115,13 @@ def remove_document_docstore_nodes(document: Document, index: VectorStoreIndex):
         index.docstore.delete_document(node_id)
 
 
+def vector_store_file_exists():
+    """
+    Check if the vector store file exists in the LLM index directory.
+    """
+    return Path(settings.LLM_INDEX_DIR / "default__vector_store.json").exists()
+
+
 def update_llm_index(*, progress_bar_disable=False, rebuild=False) -> str:
     """
     Rebuild or update the LLM index.
@@ -127,10 +134,7 @@ def update_llm_index(*, progress_bar_disable=False, rebuild=False) -> str:
         logger.warning(msg)
         return msg
 
-    if (
-        rebuild
-        or not Path(settings.LLM_INDEX_DIR / "default__vector_store.json").exists()
-    ):
+    if rebuild or not vector_store_file_exists():
         # Rebuild index from scratch
         logger.info("Rebuilding LLM index.")
         embed_model = get_embedding_model()
