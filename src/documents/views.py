@@ -15,7 +15,7 @@ from datetime import timedelta
 from pathlib import Path
 from time import mktime
 from unicodedata import normalize
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 from urllib.parse import urlparse
 
 import pandas as pd
@@ -98,6 +98,7 @@ from documents.caching import refresh_suggestions_cache
 from documents.caching import set_metadata_cache
 from documents.caching import set_suggestions_cache
 from documents.classifier import load_classifier
+from documents.common import verify_token
 from documents.conditionals import metadata_etag
 from documents.conditionals import metadata_last_modified
 from documents.conditionals import preview_etag
@@ -205,7 +206,8 @@ from documents.signals import approval_updated
 from documents.signals import document_updated
 
 from documents.tasks import backup_documents, \
-    bulk_update_custom_field_form_document_type_to_document, bulk_delete_file
+    bulk_update_custom_field_form_document_type_to_document, bulk_delete_file, \
+    update_ocr_document
 from documents.tasks import consume_file
 from documents.tasks import deleted_backup
 from documents.tasks import empty_trash
@@ -3132,6 +3134,22 @@ class TrashView(ListModelMixin, PassUserMixin):
 
 class WebhookViewSet(ViewSet):
     permission_classes = [AllowAny]
+
+
+    @action(detail=True, methods=['post'], url_path='update-content-document', permission_classes=[AllowAny])
+    def update_content(self, request, pk=None):
+        """
+        Nhận dữ liệu từ POST /api/update_content/<token>/
+        """
+        data = request.data
+        token = unquote(pk)
+        file_id = verify_token(token=token, secret_key=settings.EDOC_SECRET_KEY_OCR)
+        document = Document.objects.filter(file_id=file_id)
+        print('file_________________id',document)
+        logger.info(f"Webhook called with document={document.pk}, data={data}")
+        update_ocr_document.delay(document, data)
+
+        return Response({"message": "Received", "document_id": pk, "data": data})
 
     @action(detail=True, methods=['post'], url_path='peel-field', permission_classes=[AllowAny])
     def peel_field(self, request, pk=None):

@@ -1,9 +1,14 @@
 import json
 import logging
+import socket
 import time
 from logging import Logger
+from urllib.parse import quote
 
 import requests
+from django.core.signing import TimestampSigner, SignatureExpired, BadSignature
+from pypdf import PdfReader
+from pypdf.errors import PdfReadError, PdfStreamError
 from scipy.stats import false_discovery_control
 
 from documents.models import Document
@@ -12,6 +17,31 @@ from django.conf import settings
 from django.core.cache import cache
 
 logger = logging.getLogger("edoc.common")
+
+def generate_token(file_id, secret_key):
+    # Sử dụng secret key tùy chỉnh
+    signer = TimestampSigner(key=secret_key)
+
+    # Tạo token chứa ID của user
+    token = signer.sign(file_id)
+    return token
+
+def verify_token(token, secret_key, max_age_seconds=15 * 24 * 60 * 60):  # 15 ngày
+    signer = TimestampSigner(key=secret_key)
+
+    try:
+        # Giải mã token và kiểm tra thời gian hết hạn
+        file_id = signer.unsign(token, max_age=max_age_seconds)
+        return {"valid": True, "file_id": file_id}
+    except SignatureExpired:
+        # Token đã hết hạn
+        return {"valid": False, "error": "Token đã hết hạn."}
+    except BadSignature:
+        # Token không hợp lệ
+        return {"valid": False, "error": "Token không hợp lệ."}
+
+
+
 
 def call_ocr_api_with_retries(method, url, headers, params, payload,
                               max_retries=5, delay=5, timeout=100,
@@ -216,3 +246,158 @@ def peel_field(document:Document, callback_url):
         document.save()
         logger.info(f'update document.file_id: {document.id} with file_id: {response.get("id", None)}')
     return response
+
+
+
+def ocr_file_webhook(path_file, username_ocr, password_ocr, api_login_ocr, api_refresh_ocr, api_upload_file_ocr, api_call_count, **args):
+    file_id = None
+    # data general
+    data_ocr = None
+    data_ocr_fields = None
+    form_code = ""
+    app_config = ApplicationConfiguration.objects.filter().first()
+    refresh_token_ocr = cache.get("refresh_token_ocr", '')
+
+    # count page number
+    page_count = 1
+    try:
+        with open(path_file, 'rb') as f:
+            pdf_reader = PdfReader(f)
+            page_count = len(pdf_reader.pages)
+    except (OSError, IOError, ValueError, PdfReadError, PdfStreamError):
+        pass
+    # check token
+    try:
+
+        app_config: ApplicationConfiguration | None
+        access_token_ocr = cache.get('access_token_ocr','')
+        # login API custom-field
+
+        # upload file -------------------
+        headers = {
+            'Authorization': f"Bearer {access_token_ocr}"
+        }
+        token = generate_token(185913, settings.EDOC_SECRET_KEY_OCR)
+
+        callback_url = ""
+        try:
+            callback_url = settings.CSRF_TRUSTED_ORIGINS[0]
+        except (AttributeError, IndexError):
+            # fallback nếu CSRF_TRUSTED_ORIGINS không tồn tại hoặc rỗng
+            hostname = socket.gethostname()
+            ip_address = socket.gethostbyname(hostname)
+            callback_url = f"http://{ip_address}"
+        callback_url = f"{callback_url}/api/process_ocr/{quote(token)}/update-content-document/"
+        logger.debug(f'callback_url--------------------{callback_url}')
+        with open(path_file, 'rb') as file:
+            pdf_data = file.read()
+        payload = {'title': (str(path_file).split("/")[-1]),
+                   'folder': settings.FOLDER_UPLOAD,
+                   'extract': '1'}
+        response_upload = requests.post(api_upload_file_ocr, data=payload,
+                                        files={
+                                            'file': (
+                                                str(path_file).split("/")[
+                                                    -1],
+                                                pdf_data)},
+                                        headers=headers)
+
+        # login get access token and refresh token
+        if access_token_ocr == '' or response_upload.status_code == 401:
+            token = get_access_and_refresh_token(
+                username_ocr=username_ocr,
+                password_ocr=password_ocr,
+                api_login_ocr=api_login_ocr,
+                refresh_token_ocr=refresh_token_ocr,
+                api_refresh_ocr=api_refresh_ocr)
+            token = token.get('data', None)
+            if token is not None and token.get('access', '') != '' and token.get('refresh', '') != '':
+                cache.set("access_token_ocr",token['access'],86400)
+                cache.set("refresh_token_ocr",token['refresh'],86400)
+
+            elif token is not None and token.get('access','') != '' and token.get('refresh', '') == '':
+                cache.set("access_token_ocr",token['access'],86400)
+
+            else:
+                raise Exception(
+                    "Cannot get access token and refresh token")
+            # app_config.save()
+
+            headers = {
+                'Authorization': f"Bearer {cache.get('access_token_ocr','')}"
+            }
+            pdf_data = None
+
+            with open(path_file, 'rb') as file:
+                pdf_data = file.read()
+
+            payload = {'title': (str(path_file).split("/")[-1]),
+                       'folder': settings.FOLDER_UPLOAD,
+                       'extract': '1',
+                       'callback_url': callback_url
+                       }
+            response_upload = requests.post(api_upload_file_ocr,
+                                            data=payload,
+                                            files={'file': (str(path_file).split("/")[-1], pdf_data)},
+                                            headers=headers)
+
+        if response_upload.status_code == 201:
+            get_file_id = response_upload.json().get('id', '')
+            file_id = get_file_id
+
+            # else :
+            #     # logging.error('upload file: ', response_upload.status_code)
+            #     return data_ocr, data_ocr_fields, form_code
+
+            # ocr by file_id --------------------------
+            params = {'file_id': get_file_id}
+            url_ocr_pdf_by_fileid = settings.API_OCR_BY_FILE_ID
+            data_ocr_general = call_ocr_api_with_retries("GET",
+                                                              url_ocr_pdf_by_fileid,
+                                                              headers,
+                                                              params,
+                                                              {},
+                                                              max_retries=5,
+                                                              delay=page_count * int(settings.DELAY_OCR),
+                                                              timeout=30,
+                                                              data_compare={'status_code': 1})
+
+
+            if data_ocr_general is not None:
+                data_ocr = data_ocr_general.get('response', None)
+                enable_ocr_field = cache.get("enable_ocr_field", False)
+                url_ocr_pdf_custom_field_by_fileid = cache.get(
+                    "api_ocr_field", False)
+                api_call_count+=1
+                if not enable_ocr_field and not url_ocr_pdf_custom_field_by_fileid:
+                    return (data_ocr, data_ocr_fields, form_code, file_id, api_call_count)
+    # except Exception as e:
+    #     self.log.error("error", e)
+    finally:
+            return (data_ocr, data_ocr_fields, form_code, file_id, api_call_count)
+
+
+def get_setting_ocr(field):
+    """
+    Trả về giá trị của 1 trường từ ApplicationConfiguration nếu tồn tại.
+    Ưu tiên lấy từ cache. Nếu không có thì lấy từ DB và cache lại.
+    """
+    cache_key = f"{field}"
+
+    value = cache.get(cache_key)
+    if value is not None:
+        return value
+
+    valid_fields = {f.name for f in
+                    ApplicationConfiguration._meta.get_fields()}
+    if field not in valid_fields:
+        return None
+
+    try:
+        config = ApplicationConfiguration.objects.first()
+        if config is not None:
+            value = getattr(config, field, None)
+            cache.set(cache_key, value, timeout=60 * 60 * 60)  # Cache 1 tiếng
+            return value
+    except Exception:
+        return None

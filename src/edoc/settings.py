@@ -1179,6 +1179,8 @@ API_OCR_BY_FILE_ID = os.getenv("API_OCR_BY_FILE_ID", "")
 API_UPLOAD_FILE_OCR = os.getenv("API_UPLOAD_FILE_OCR", "")
 FOLDER_UPLOAD = os.getenv("FOLDER_UPLOAD", "")
 DELAY_OCR = os.getenv("DELAY_OCR", 1)
+EDOC_SECRET_KEY_OCR = os.getenv("EDOC_SECRET_KEY_OCR", "")
+METHOD_OCR = os.getenv("METHOD_OCR","RETRY")
 
 ###############################################################################
 # Elastic search                                                              #

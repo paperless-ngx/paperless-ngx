@@ -1088,6 +1088,7 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
             date_started=None,
             date_done=None,
         )
+        logger.info("Created edoc_task")
     except Exception as e:  # pragma: no cover
         # Don't let an exception in the signal handlers prevent
         # a document from being consumed.

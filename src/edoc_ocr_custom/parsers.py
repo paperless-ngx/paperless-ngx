@@ -1,9 +1,7 @@
-import io
 import json
-import math
+import json
 import os
 import re
-import shutil
 import tempfile
 import time
 from pathlib import Path
@@ -12,33 +10,23 @@ from typing import TYPE_CHECKING
 
 import requests
 from PIL import Image
+from django.conf import settings
+from django.core.cache import cache
 from pypdf import PdfReader
 from pypdf.errors import PdfReadError, PdfStreamError
 
-from django.conf import settings
-from django.core.cache import cache, caches
-from pdf2image import convert_from_path
-from pypdf import PdfReader, PdfWriter, PageObject
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.lib.utils import ImageReader
-
-import math
-
-from documents.models import DossierForm
+from documents.common import ocr_file_webhook, get_setting_ocr
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
-from documents.render_pdf import draw_text_on_pdf, draw_invisible_text, \
-    render_pdf_ocr
+from documents.render_pdf import render_pdf_ocr
 from documents.utils import maybe_override_pixel_limit
 from documents.utils import run_subprocess
 from edoc.config import OcrConfig
 from edoc.models import ApplicationConfiguration, ArchiveFileChoices
 from edoc.models import CleanChoices
 from edoc.models import ModeChoices
+from edoc.settings import BASE_DIR
 
 
 class NoTextFoundException(Exception):
@@ -268,7 +256,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                                               delay=5,
                                               timeout=20)
 
-    def ocr_file(self, path_file, username_ocr, password_ocr, api_login_ocr, api_refresh_ocr, api_upload_file_ocr, dossier_form: DossierForm, **args):
+    def ocr_file_retry(self, path_file, username_ocr, password_ocr, api_login_ocr, api_refresh_ocr, api_upload_file_ocr, api_call_count, **args):
         # data general
         data_ocr = None
         data_ocr_fields = None
@@ -377,47 +365,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                     self.api_call_count+=1
                     if not enable_ocr_field and not url_ocr_pdf_custom_field_by_fileid:
                         return (data_ocr, data_ocr_fields, form_code)
-                    # peeling field
-                    get_request_id = data_ocr_general.get('request_id', None)
-                    if dossier_form is None and app_config.user_args.get(
-                        "form_code", False):
-                        for i in app_config.user_args.get("form_code", []):
-                            payload = json.dumps({
-                                "request_id": f"{get_request_id}",
-                                "list_form_code": [
-                                    f"{i.get('name')}"
-                                ]
-                            })
-                            headers = {
-                                'Authorization': f"Bearer {args['access_token_ocr']}",
-                                'Content-Type': 'application/json'
-                            }
-                            data_ocr_fields = self.call_ocr_api_with_retries(
-                                "POST", url_ocr_pdf_custom_field_by_fileid,
-                                headers, params, payload, 5, 5, 100,
-                                status_code_fail=[401])
 
-                            if not isinstance(data_ocr_fields, list):
-                                continue
-                            if data_ocr_fields[0].get("id") != -1:
-                                form_code = i.get('name')
-                                break
-                    elif dossier_form is not None and dossier_form.form_rule:
-                        self.log.debug("da vao dossier form")
-                        payload = json.dumps({
-                            "request_id": f"{get_request_id}",
-                            "list_form_code": [
-                                f"{dossier_form.form_rule}"
-                            ]
-                        })
-                        headers = {
-                            'Authorization': f"Bearer {args['access_token_ocr']}",
-                            'Content-Type': 'application/json'
-                        }
-                        data_ocr_fields = self.call_ocr_api_with_retries(
-                            "POST", url_ocr_pdf_custom_field_by_fileid,
-                            headers, params, payload, 5, 5, 100,
-                            status_code_fail=[401])
 
         # except Exception as e:
         #     self.log.error("error", e)
@@ -517,26 +465,36 @@ class RasterisedDocumentCustomParser(DocumentParser):
         data_ocr_fields = None
         form_code = None
         try:
-            username_ocr = self.get_setting_ocr('username_ocr')
-            password_ocr = self.get_setting_ocr('password_ocr')
+            username_ocr = get_setting_ocr('username_ocr')
+            password_ocr = get_setting_ocr('password_ocr')
             api_login_ocr = settings.API_LOGIN_OCR
             api_refresh_ocr = settings.API_REFRESH_OCR
             api_upload_file_ocr = settings.API_UPLOAD_FILE_OCR
-            data_ocr, data_ocr_fields, form_code = self.ocr_file(
+            if settings.METHOD_OCR=='RETRY':
+                data_ocr, data_ocr_fields, form_code = self.ocr_file_retry(
+                    path_file=document_path, username_ocr=username_ocr,
+                    password_ocr=password_ocr, api_login_ocr=api_login_ocr,
+                    api_refresh_ocr=api_refresh_ocr,
+                    api_upload_file_ocr=api_upload_file_ocr,
+                    **kwargs)
+            elif settings.METHOD_OCR=='WEBHOOK':
+                self.log.debug('webhook--------------------')
+                data_ocr, data_ocr_fields, form_code, file_id_res, api_call_count_res= ocr_file_webhook(
                 path_file=document_path, username_ocr=username_ocr,
                 password_ocr=password_ocr, api_login_ocr=api_login_ocr,
                 api_refresh_ocr=api_refresh_ocr,
                 api_upload_file_ocr=api_upload_file_ocr,
-                dossier_form=dossier_form,
+                api_call_count=self.api_call_count,
                 **kwargs)
+                self.file_id=file_id_res
+                self.api_call_count=api_call_count_res
 
 
             render_pdf_ocr(input_path=document_path, output_path=output_file,
                            data_ocr=data_ocr,
                            quality_compress=self.quality_compress,
-                           font_path=os.path.join(
-                               os.path.dirname(os.path.abspath(__file__)),
-                               'fonts', 'arial-font/arial.ttf'))
+                           font_path=   os.path.join(BASE_DIR,
+                    "documents/resources/fonts/arial-font/arial.ttf"))
             content_formated = ""
             if data_ocr is not None:
                 content_formated = data_ocr.get("content_formated", "")

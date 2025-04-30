@@ -31,7 +31,7 @@ from documents.barcodes import BarcodePlugin
 from documents.caching import clear_document_caches
 from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
-from documents.common import peel_field
+from documents.common import peel_field, get_setting_ocr
 from documents.consumer import Consumer
 from documents.consumer import ConsumerError
 from documents.consumer import WorkflowTriggerPlugin
@@ -59,10 +59,12 @@ from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import ProgressManager
 from documents.plugins.base import StopConsumeTaskError
 from documents.plugins.helpers import ProgressStatusOptions
+from documents.render_pdf import render_pdf_ocr
 from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated, document_consumption_finished
 from documents.signals.handlers import cleanup_document_deletion, bulk_set_custom_fields_from_document_type_to_document
 from edoc.models import ApplicationConfiguration
+from edoc.settings import BASE_DIR
 from edoc_ocr_custom.parsers import RasterisedDocumentCustomParser
 
 if settings.AUDIT_LOG_ENABLED:
@@ -352,23 +354,15 @@ def update_document_archive_file(self, document_id=None):
     parser: DocumentParser = parser_class(logging_group=uuid.uuid4())
 
     try:
-        enable_ocr= parser.get_setting_ocr('enable_ocr')
+        enable_ocr= get_setting_ocr('enable_ocr')
         if enable_ocr:
             # self.log.debug(f"Parsing {self.filename}...")
 
             if isinstance(parser, RasterisedDocumentCustomParser):
-                dossier = None
-                if document.dossier is not None:
-                    dossier = Dossier.objects.filter(id=document.dossier.id).first()
-
-                parent_dossier = None
-                if dossier is not None:
-                    parent_dossier = dossier.parent_dossier
                 parser.parse(
                     document.source_path,
                     mime_type,
                     document.get_public_filename(),
-                    get_config_dossier_form(parent_dossier),
                 )
             else:
                 parser.parse(
@@ -526,7 +520,7 @@ def update_value_customfield_to_document(self, document_id=None):
                         hostname = socket.gethostname()
                         ip_address = socket.gethostbyname(hostname)
                         callback_url = f"http://{ip_address}"
-                    callback_url = f"{callback_url}/api/peel-field/{document.id}/peel-field/"
+                    callback_url = f"{callback_url}/api/process_ocr/{document.id}/peel-field/"
                     logger.info(f"document_id: {document.id}, path_document: {document.archive_path}, file_id: {document.file_id}, callback url: {callback_url} ")
                     peel_field(document=document, callback_url=callback_url)
                     if settings.AUDIT_LOG_ENABLED:
@@ -1007,3 +1001,25 @@ def deleted_backup(file_paths):
 
     except Exception as e:  # pragma: no cover
         logger.exception(f"Error while delete backup record: {e}")
+
+
+@shared_task
+def update_ocr_document(document, data_ocr):
+    try:
+        if document is None:
+            raise ValueError("Document không tồn tại")
+
+        document_path = document.source_path
+        output_file = document.archive_path
+
+        if data_ocr is not None:
+            render_pdf_ocr(
+                input_path=document_path,
+                output_path=output_file,
+                data_ocr=data_ocr,
+                quality_compress=get_setting_ocr('quality_compress'),
+                font_path=os.path.join(BASE_DIR, "documents/resources/fonts/arial-font/arial.ttf")
+            )
+    except Exception as e:  # Bắt lỗi và ghi log
+        logger.exception(f"Lỗi khi cập nhật nội dung tài liệu: {e}")
+        raise e
