@@ -2,21 +2,20 @@ import json
 import logging
 import socket
 import time
-from logging import Logger
 from urllib.parse import quote
 
 import requests
+from django.conf import settings
+from django.core.cache import cache
 from django.core.signing import TimestampSigner, SignatureExpired, BadSignature
 from pypdf import PdfReader
 from pypdf.errors import PdfReadError, PdfStreamError
-from scipy.stats import false_discovery_control
 
 from documents.models import Document
 from edoc.models import ApplicationConfiguration
-from django.conf import settings
-from django.core.cache import cache
 
 logger = logging.getLogger("edoc.common")
+
 
 def generate_token(file_id, secret_key):
     # Sử dụng secret key tùy chỉnh
@@ -26,7 +25,9 @@ def generate_token(file_id, secret_key):
     token = signer.sign(file_id)
     return token
 
-def verify_token(token, secret_key, max_age_seconds=15 * 24 * 60 * 60):  # 15 ngày
+
+def verify_token(token, secret_key,
+                 max_age_seconds=15 * 24 * 60 * 60):  # 15 ngày
     signer = TimestampSigner(key=secret_key)
 
     try:
@@ -39,8 +40,6 @@ def verify_token(token, secret_key, max_age_seconds=15 * 24 * 60 * 60):  # 15 ng
     except BadSignature:
         # Token không hợp lệ
         return {"valid": False, "error": "Token không hợp lệ."}
-
-
 
 
 def call_ocr_api_with_retries(method, url, headers, params, payload,
@@ -91,7 +90,7 @@ def call_ocr_api_with_retries(method, url, headers, params, payload,
     return None
 
 
-def login_ocr( username_ocr, password_ocr, api_login_ocr):
+def login_ocr(username_ocr, password_ocr, api_login_ocr):
     # check token
     payload = f"username={username_ocr}&password={password_ocr}"
     headers = {
@@ -99,12 +98,12 @@ def login_ocr( username_ocr, password_ocr, api_login_ocr):
     }
 
     return call_ocr_api_with_retries("POST", api_login_ocr,
-                                          headers=headers,
-                                          params={},
-                                          payload=payload,
-                                          max_retries=2,
-                                          delay=5,
-                                          timeout=20)
+                                     headers=headers,
+                                     params={},
+                                     payload=payload,
+                                     max_retries=2,
+                                     delay=5,
+                                     timeout=20)
 
 
 def get_access_and_refresh_token(refresh_token_ocr, api_refresh_ocr,
@@ -130,7 +129,8 @@ def get_access_and_refresh_token(refresh_token_ocr, api_refresh_ocr,
     return token
 
 
-def upload_file(path_document, file_id, callback_url, api_upload_file_ocr, username_ocr,
+def upload_file(path_document, file_id, callback_url, api_upload_file_ocr,
+                username_ocr,
                 password_ocr, api_login_ocr, api_refresh_ocr,
                 refresh_token_ocr):
     try:
@@ -139,7 +139,8 @@ def upload_file(path_document, file_id, callback_url, api_upload_file_ocr, usern
         get_file_id = ''
 
         access_token_ocr = cache.get('access_token_ocr', '')
-        logger.info(f"access_token_ocr {len(access_token_ocr)} , file_id: {file_id}")
+        logger.info(
+            f"access_token_ocr {len(access_token_ocr)} , file_id: {file_id}")
         headers = {
             'Authorization': f"Bearer {access_token_ocr}"
         }
@@ -151,7 +152,7 @@ def upload_file(path_document, file_id, callback_url, api_upload_file_ocr, usern
                    'callback_url': callback_url,
                    }
         if file_id:
-            payload['file_id']=file_id
+            payload['file_id'] = file_id
         response_upload = requests.post(api_upload_file_ocr, data=payload,
                                         files={
                                             'file': (
@@ -200,8 +201,8 @@ def upload_file(path_document, file_id, callback_url, api_upload_file_ocr, usern
                                                         -1],
                                                     pdf_data)} if not file_id else None,
                                             headers=headers)
-        logger.info(f"response_upload:{api_upload_file_ocr}{response_upload.status_code}", )
-
+        logger.info(
+            f"response_upload:{api_upload_file_ocr}{response_upload.status_code}", )
 
         if response_upload.status_code == 201:
             # get_file_id = response_upload.json().get('id', '')
@@ -215,8 +216,7 @@ def upload_file(path_document, file_id, callback_url, api_upload_file_ocr, usern
         return None
 
 
-def peel_field(document:Document, callback_url):
-
+def peel_field(document: Document, callback_url):
     app_config = ApplicationConfiguration.objects.filter().first()
     username_ocr = app_config.username_ocr
     password_ocr = app_config.password_ocr
@@ -241,15 +241,16 @@ def peel_field(document:Document, callback_url):
         update = True
 
     if not document.file_id and update:
-
-        document.file_id=response.get('id', None)
+        document.file_id = response.get('id', None)
         document.save()
-        logger.info(f'update document.file_id: {document.id} with file_id: {response.get("id", None)}')
+        logger.info(
+            f'update document.file_id: {document.id} with file_id: {response.get("id", None)}')
     return response
 
 
-
-def ocr_file_webhook(path_file, username_ocr, password_ocr, api_login_ocr, api_refresh_ocr, api_upload_file_ocr, api_call_count, **args):
+def ocr_file_webhook(path_file, username_ocr, password_ocr, api_login_ocr,
+                     api_refresh_ocr, api_upload_file_ocr, api_call_count,
+                     task_id, **args):
     file_id = None
     # data general
     data_ocr = None
@@ -270,14 +271,14 @@ def ocr_file_webhook(path_file, username_ocr, password_ocr, api_login_ocr, api_r
     try:
 
         app_config: ApplicationConfiguration | None
-        access_token_ocr = cache.get('access_token_ocr','')
+        access_token_ocr = cache.get('access_token_ocr', '')
         # login API custom-field
 
         # upload file -------------------
         headers = {
             'Authorization': f"Bearer {access_token_ocr}"
         }
-        token = generate_token(185913, settings.EDOC_SECRET_KEY_OCR)
+        token_auth = generate_token(task_id, settings.EDOC_SECRET_KEY_OCR)
 
         callback_url = ""
         try:
@@ -287,7 +288,7 @@ def ocr_file_webhook(path_file, username_ocr, password_ocr, api_login_ocr, api_r
             hostname = socket.gethostname()
             ip_address = socket.gethostbyname(hostname)
             callback_url = f"http://{ip_address}"
-        callback_url = f"{callback_url}/api/process_ocr/{quote(token)}/update-content-document/"
+        callback_url = f"{callback_url}/api/process_ocr/{quote(token_auth)}/update-content-document/"
         logger.debug(f'callback_url--------------------{callback_url}')
         with open(path_file, 'rb') as file:
             pdf_data = file.read()
@@ -311,12 +312,16 @@ def ocr_file_webhook(path_file, username_ocr, password_ocr, api_login_ocr, api_r
                 refresh_token_ocr=refresh_token_ocr,
                 api_refresh_ocr=api_refresh_ocr)
             token = token.get('data', None)
-            if token is not None and token.get('access', '') != '' and token.get('refresh', '') != '':
-                cache.set("access_token_ocr",token['access'],86400)
-                cache.set("refresh_token_ocr",token['refresh'],86400)
+            if token is not None and token.get('access',
+                                               '') != '' and token.get(
+                'refresh', '') != '':
+                cache.set("access_token_ocr", token['access'], 86400)
+                cache.set("refresh_token_ocr", token['refresh'], 86400)
 
-            elif token is not None and token.get('access','') != '' and token.get('refresh', '') == '':
-                cache.set("access_token_ocr",token['access'],86400)
+            elif token is not None and token.get('access',
+                                                 '') != '' and token.get(
+                'refresh', '') == '':
+                cache.set("access_token_ocr", token['access'], 86400)
 
             else:
                 raise Exception(
@@ -324,7 +329,7 @@ def ocr_file_webhook(path_file, username_ocr, password_ocr, api_login_ocr, api_r
             # app_config.save()
 
             headers = {
-                'Authorization': f"Bearer {cache.get('access_token_ocr','')}"
+                'Authorization': f"Bearer {cache.get('access_token_ocr', '')}"
             }
             pdf_data = None
 
@@ -338,7 +343,9 @@ def ocr_file_webhook(path_file, username_ocr, password_ocr, api_login_ocr, api_r
                        }
             response_upload = requests.post(api_upload_file_ocr,
                                             data=payload,
-                                            files={'file': (str(path_file).split("/")[-1], pdf_data)},
+                                            files={'file': (
+                                                str(path_file).split("/")[-1],
+                                                pdf_data)},
                                             headers=headers)
 
         if response_upload.status_code == 201:
@@ -353,28 +360,30 @@ def ocr_file_webhook(path_file, username_ocr, password_ocr, api_login_ocr, api_r
             params = {'file_id': get_file_id}
             url_ocr_pdf_by_fileid = settings.API_OCR_BY_FILE_ID
             data_ocr_general = call_ocr_api_with_retries("GET",
-                                                              url_ocr_pdf_by_fileid,
-                                                              headers,
-                                                              params,
-                                                              {},
-                                                              max_retries=5,
-                                                              delay=page_count * int(settings.DELAY_OCR),
-                                                              timeout=30,
-                                                              data_compare={'status_code': 1})
-
+                                                         url_ocr_pdf_by_fileid,
+                                                         headers,
+                                                         params,
+                                                         {},
+                                                         max_retries=5,
+                                                         delay=page_count * int(
+                                                             settings.DELAY_OCR),
+                                                         timeout=30,
+                                                         data_compare={
+                                                             'status_code': 1})
 
             if data_ocr_general is not None:
                 data_ocr = data_ocr_general.get('response', None)
                 enable_ocr_field = cache.get("enable_ocr_field", False)
                 url_ocr_pdf_custom_field_by_fileid = cache.get(
                     "api_ocr_field", False)
-                api_call_count+=1
+                api_call_count += 1
                 if not enable_ocr_field and not url_ocr_pdf_custom_field_by_fileid:
-                    return (data_ocr, data_ocr_fields, form_code, file_id, api_call_count)
+                    return (data_ocr, data_ocr_fields, form_code, file_id,
+                            api_call_count)
     # except Exception as e:
     #     self.log.error("error", e)
     finally:
-            return (data_ocr, data_ocr_fields, form_code, file_id, api_call_count)
+        return (data_ocr, data_ocr_fields, form_code, file_id, api_call_count)
 
 
 def get_setting_ocr(field):
