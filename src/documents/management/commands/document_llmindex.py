@@ -18,4 +18,5 @@ class Command(ProgressBarMixin, BaseCommand):
             llmindex_index(
                 progress_bar_disable=self.no_progress_bar,
                 rebuild=options["command"] == "rebuild",
+                scheduled=False,
             )

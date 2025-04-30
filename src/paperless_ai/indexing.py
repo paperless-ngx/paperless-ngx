@@ -115,7 +115,7 @@ def remove_document_docstore_nodes(document: Document, index: VectorStoreIndex):
         index.docstore.delete_document(node_id)
 
 
-def update_llm_index(*, progress_bar_disable=False, rebuild=False):
+def update_llm_index(*, progress_bar_disable=False, rebuild=False) -> str:
     """
     Rebuild or update the LLM index.
     """
@@ -123,8 +123,9 @@ def update_llm_index(*, progress_bar_disable=False, rebuild=False):
 
     documents = Document.objects.all()
     if not documents.exists():
-        logger.warning("No documents found to index.")
-        return
+        msg = "No documents found to index."
+        logger.warning(msg)
+        return msg
 
     if (
         rebuild
@@ -145,6 +146,7 @@ def update_llm_index(*, progress_bar_disable=False, rebuild=False):
             embed_model=embed_model,
             show_progress=not progress_bar_disable,
         )
+        msg = "LLM index rebuilt successfully."
     else:
         # Update existing index
         index = load_or_build_index()
@@ -173,15 +175,18 @@ def update_llm_index(*, progress_bar_disable=False, rebuild=False):
                 nodes.extend(build_document_node(document))
 
         if nodes:
+            msg = "LLM index updated successfully."
             logger.info(
                 "Updating %d nodes in LLM index.",
                 len(nodes),
             )
             index.insert_nodes(nodes)
         else:
-            logger.info("No changes detected, skipping llm index rebuild.")
+            msg = "No changes detected in LLM index."
+            logger.info(msg)
 
     index.storage_context.persist(persist_dir=settings.LLM_INDEX_DIR)
+    return msg
 
 
 def llm_index_add_or_update_document(document: Document):
