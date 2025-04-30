@@ -16,7 +16,7 @@ logger = logging.getLogger("paperless_ai.rag_classifier")
 
 def build_prompt_without_rag(document: Document) -> str:
     filename = document.filename or ""
-    content = truncate_content(document.content or "")
+    content = truncate_content(document.content[:4000] or "")
 
     prompt = f"""
     You are an assistant that extracts structured information from documents.
@@ -43,7 +43,7 @@ def build_prompt_without_rag(document: Document) -> str:
         "storage_paths": ["xxxx", "xxxx"],
         "dates": ["YYYY-MM-DD", "YYYY-MM-DD", "YYYY-MM-DD"],
     }}
-    ---
+    ---------
 
     FILENAME:
     {filename}
@@ -63,6 +63,10 @@ def build_prompt_with_rag(document: Document, user: User | None = None) -> str:
 
     CONTEXT FROM SIMILAR DOCUMENTS:
     {context}
+
+    ---------
+
+    DO NOT RESPOND WITH ANYTHING OTHER THAN THE JSON OBJECT.
     """
 
     return prompt
@@ -108,8 +112,24 @@ def parse_ai_response(response: CompletionResponse) -> dict:
             "dates": raw.get("dates", []),
         }
     except json.JSONDecodeError:
-        logger.exception("Invalid JSON in AI response")
-        return {}
+        logger.warning("Invalid JSON in AI response, attempting modified parsing...")
+        try:
+            # search for a valid json string like { ... } in the response
+            start = response.text.index("{")
+            end = response.text.rindex("}") + 1
+            json_str = response.text[start:end]
+            raw = json.loads(json_str)
+            return {
+                "title": raw.get("title"),
+                "tags": raw.get("tags", []),
+                "correspondents": raw.get("correspondents", []),
+                "document_types": raw.get("document_types", []),
+                "storage_paths": raw.get("storage_paths", []),
+                "dates": raw.get("dates", []),
+            }
+        except (ValueError, json.JSONDecodeError):
+            logger.exception("Failed to parse AI response")
+            return {}
 
 
 def get_ai_document_classification(
