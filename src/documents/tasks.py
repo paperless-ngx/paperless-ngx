@@ -558,12 +558,18 @@ def llmindex_index(
         )
         from paperless_ai.indexing import update_llm_index
 
-        result = update_llm_index(
-            progress_bar_disable=progress_bar_disable,
-            rebuild=rebuild,
-        )
-        task.status = states.SUCCESS
-        task.result = result
+        try:
+            result = update_llm_index(
+                progress_bar_disable=progress_bar_disable,
+                rebuild=rebuild,
+            )
+            task.status = states.SUCCESS
+            task.result = result
+        except Exception as e:
+            logger.error("LLM index error: " + str(e))
+            task.status = states.FAILURE
+            task.result = str(e)
+
         task.date_done = timezone.now()
         task.save(update_fields=["status", "result", "date_done"])
 
