@@ -535,13 +535,29 @@ def check_scheduled_workflows():
 
 
 @shared_task
-def llmindex_index(*, progress_bar_disable=False, rebuild=False):
+def llmindex_index(*, progress_bar_disable=True, rebuild=False, scheduled=True):
     ai_config = AIConfig()
     if ai_config.llm_index_enabled():
-        update_llm_index(
+        task = PaperlessTask.objects.create(
+            type=PaperlessTask.TaskType.SCHEDULED_TASK
+            if scheduled
+            else PaperlessTask.TaskType.MANUAL_TASK,
+            task_id=uuid.uuid4(),
+            task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
+            status=states.STARTED,
+            date_created=timezone.now(),
+            date_started=timezone.now(),
+        )
+        from paperless_ai.indexing import update_llm_index
+
+        result = update_llm_index(
             progress_bar_disable=progress_bar_disable,
             rebuild=rebuild,
         )
+        task.status = states.SUCCESS
+        task.result = result
+        task.date_done = timezone.now()
+        task.save(update_fields=["status", "result", "date_done"])
 
 
 @shared_task
@@ -552,11 +568,3 @@ def update_document_in_llm_index(document):
 @shared_task
 def remove_document_from_llm_index(document):
     llm_index_remove_document(document)
-
-
-# TODO: schedule to run periodically
-@shared_task
-def rebuild_llm_index_task():
-    from paperless_ai.indexing import update_llm_index
-
-    update_llm_index(rebuild=True)
