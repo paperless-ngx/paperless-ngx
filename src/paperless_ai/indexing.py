@@ -1,5 +1,6 @@
 import logging
 import shutil
+from pathlib import Path
 
 import faiss
 import llama_index.core.settings as llama_settings
@@ -125,11 +126,15 @@ def update_llm_index(*, progress_bar_disable=False, rebuild=False):
         logger.warning("No documents found to index.")
         return
 
-    if rebuild:
+    if (
+        rebuild
+        or not Path(settings.LLM_INDEX_DIR / "default__vector_store.json").exists()
+    ):
+        # Rebuild index from scratch
+        logger.info("Rebuilding LLM index.")
         embed_model = get_embedding_model()
         llama_settings.Settings.embed_model = embed_model
-        storage_context = get_or_create_storage_context(rebuild=rebuild)
-        # Rebuild index from scratch
+        storage_context = get_or_create_storage_context(rebuild=True)
         for document in tqdm.tqdm(documents, disable=progress_bar_disable):
             document_nodes = build_document_node(document)
             nodes.extend(document_nodes)
