@@ -90,7 +90,7 @@ def get_context_for_document(
     )[:max_docs]
     context_blocks = []
     for similar in similar_docs:
-        text = similar.content or ""
+        text = similar.content[:1000] or ""
         title = similar.title or similar.filename or "Untitled"
         context_blocks.append(f"TITLE: {title}\n{text}")
     return "\n\n".join(context_blocks)
