@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -174,3 +175,34 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 },
             )
         self.assertFalse(Path(old_logo.path).exists())
+
+    def test_enable_ai_index_triggers_update(self):
+        """
+        GIVEN:
+            - Existing config with AI disabled
+        WHEN:
+            - Config is updated to enable AI with llm_embedding_backend
+        THEN:
+            - LLM index is triggered to update
+        """
+        config = ApplicationConfiguration.objects.first()
+        config.ai_enabled = False
+        config.llm_embedding_backend = None
+        config.save()
+
+        with (
+            patch("documents.tasks.llmindex_index.delay") as mock_update,
+            patch("paperless_ai.indexing.vector_store_file_exists") as mock_exists,
+        ):
+            mock_exists.return_value = False
+            self.client.patch(
+                f"{self.ENDPOINT}1/",
+                json.dumps(
+                    {
+                        "ai_enabled": True,
+                        "llm_embedding_backend": "openai",
+                    },
+                ),
+                content_type="application/json",
+            )
+            mock_update.assert_called_once()
