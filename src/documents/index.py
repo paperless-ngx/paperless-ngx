@@ -715,7 +715,8 @@ class DelayedElasticSearch(DelayedQuery):
 
         s = s.highlight('content', fragment_size=500, number_of_fragments=1,
                         pre_tags=['<span class="match">'],
-                        post_tags=['</span>'])
+                        post_tags=['</span>'],
+                        max_analyzed_offset=900000)
         s = s.source(['id', 'warehouse_path', 'tag_id', 'custom_fields','notes'])
         s = s[page_number * page_size - page_size:page_number * page_size]
         response = s.execute()
