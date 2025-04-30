@@ -12,9 +12,11 @@ import {
   SystemStatus,
   SystemStatusItemStatus,
 } from 'src/app/data/system-status'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { FileSizePipe } from 'src/app/pipes/file-size.pipe'
 import { PermissionsService } from 'src/app/services/permissions.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { SystemStatusService } from 'src/app/services/system-status.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -46,13 +48,18 @@ export class SystemStatusDialogComponent {
     return this.permissionsService.isSuperUser()
   }
 
+  get aiEnabled(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.AI_ENABLED)
+  }
+
   constructor(
     public activeModal: NgbActiveModal,
     private clipboard: Clipboard,
     private systemStatusService: SystemStatusService,
     private tasksService: TasksService,
     private toastService: ToastService,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    private settingsService: SettingsService
   ) {}
 
   public close() {
