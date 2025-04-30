@@ -535,12 +535,20 @@ def check_scheduled_workflows():
 
 
 @shared_task
-def llmindex_index(*, progress_bar_disable=True, rebuild=False, scheduled=True):
+def llmindex_index(
+    *,
+    progress_bar_disable=True,
+    rebuild=False,
+    scheduled=True,
+    auto=False,
+):
     ai_config = AIConfig()
     if ai_config.llm_index_enabled():
         task = PaperlessTask.objects.create(
             type=PaperlessTask.TaskType.SCHEDULED_TASK
             if scheduled
+            else PaperlessTask.TaskType.AUTO
+            if auto
             else PaperlessTask.TaskType.MANUAL_TASK,
             task_id=uuid.uuid4(),
             task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
