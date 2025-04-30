@@ -1777,7 +1777,7 @@ suggestions. This setting is required to be set to true in order to use the AI f
 
 #### [`PAPERLESS_LLM_EMBEDDING_MODEL=<str>`](#PAPERLESS_LLM_EMBEDDING_MODEL) {#PAPERLESS_LLM_EMBEDDING_MODEL}
 
-: The model to use for the embedding backend for RAG. This can be either "text-embedding-3-small" or any of the models supported by the current embedding backend.
+: The model to use for the embedding backend for RAG. This can be set to any of the embedding models supported by the current embedding backend. If not supplied, defaults to "text-embedding-3-small" for OpenAI and "sentence-transformers/all-MiniLM-L6-v2" for Huggingface.
 
     Defaults to None.
 
@@ -1793,7 +1793,7 @@ using the OpenAI API. This setting is required to be set to use the AI features.
 
         The OpenAI API is a paid service. You will need to set up an OpenAI account and
         will be charged for usage incurred by Paperless-ngx features and your document data
-        will (of course) be shared with OpenAI. Paperless-ngx does not endorse the use of the
+        will (of course) be sent to the OpenAI API. Paperless-ngx does not endorse the use of the
         OpenAI API in any way.
 
         Refer to the OpenAI terms of service, and use at your own risk.
@@ -1801,7 +1801,7 @@ using the OpenAI API. This setting is required to be set to use the AI features.
 #### [`PAPERLESS_LLM_MODEL=<str>`](#PAPERLESS_LLM_MODEL) {#PAPERLESS_LLM_MODEL}
 
 : The model to use for the AI backend, i.e. "gpt-3.5-turbo", "gpt-4" or any of the models supported by the
-current backend. This setting is required to be set to use the AI features.
+current backend. If not supplied, defaults to "gpt-3.5-turbo" for OpenAI and "llama3" for Ollama.
 
     Defaults to None.
 
