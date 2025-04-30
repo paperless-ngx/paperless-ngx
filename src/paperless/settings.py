@@ -236,9 +236,6 @@ def _parse_beat_schedule() -> dict:
             "options": {
                 # 1 hour before default schedule sends again
                 "expires": 23.0 * 60.0 * 60.0,
-                "kwargs": {
-                    "progress_bar_disable": True,
-                },
             },
         },
     ]

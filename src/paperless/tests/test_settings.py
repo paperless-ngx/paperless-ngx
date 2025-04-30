@@ -208,9 +208,6 @@ class TestCeleryScheduleParsing(TestCase):
                     "schedule": crontab(minute=10, hour=2),
                     "options": {
                         "expires": self.LLM_INDEX_EXPIRE_TIME,
-                        "kwargs": {
-                            "progress_bar_disable": True,
-                        },
                     },
                 },
             },
@@ -270,9 +267,6 @@ class TestCeleryScheduleParsing(TestCase):
                     "schedule": crontab(minute=10, hour=2),
                     "options": {
                         "expires": self.LLM_INDEX_EXPIRE_TIME,
-                        "kwargs": {
-                            "progress_bar_disable": True,
-                        },
                     },
                 },
             },
@@ -324,9 +318,6 @@ class TestCeleryScheduleParsing(TestCase):
                     "schedule": crontab(minute=10, hour=2),
                     "options": {
                         "expires": self.LLM_INDEX_EXPIRE_TIME,
-                        "kwargs": {
-                            "progress_bar_disable": True,
-                        },
                     },
                 },
             },
