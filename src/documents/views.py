@@ -185,6 +185,7 @@ from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
 from paperless_ai.ai_classifier import get_ai_document_classification
 from paperless_ai.chat import stream_chat_with_documents
+from paperless_ai.indexing import update_llm_index
 from paperless_ai.matching import extract_unmatched_names
 from paperless_ai.matching import match_correspondents_by_name
 from paperless_ai.matching import match_document_types_by_name
@@ -2465,6 +2466,10 @@ class TasksViewSet(ReadOnlyModelViewSet):
             sanity_check,
             {"scheduled": False, "raise_on_error": False},
         ),
+        PaperlessTask.TaskName.LLMINDEX_UPDATE: (
+            update_llm_index,
+            {"scheduled": False, "rebuild": False},
+        ),
     }
 
     def get_queryset(self):
@@ -2970,6 +2975,31 @@ class SystemStatusView(PassUserMixin):
             last_sanity_check.date_done if last_sanity_check else None
         )
 
+        ai_config = AIConfig()
+        if not ai_config.llm_index_enabled:
+            llmindex_status = "DISABLED"
+            llmindex_error = None
+            llmindex_last_modified = None
+        else:
+            last_llmindex_update = (
+                PaperlessTask.objects.filter(
+                    task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
+                )
+                .order_by("-date_done")
+                .first()
+            )
+            llmindex_status = "OK"
+            llmindex_error = None
+            if last_llmindex_update is None:
+                llmindex_status = "WARNING"
+                llmindex_error = "No LLM index update tasks found"
+            elif last_llmindex_update and last_llmindex_update.status == states.FAILURE:
+                llmindex_status = "ERROR"
+                llmindex_error = last_llmindex_update.result
+            llmindex_last_modified = (
+                last_llmindex_update.date_done if last_llmindex_update else None
+            )
+
         return Response(
             {
                 "pngx_version": current_version,
@@ -3007,6 +3037,9 @@ class SystemStatusView(PassUserMixin):
                     "sanity_check_status": sanity_check_status,
                     "sanity_check_last_run": sanity_check_last_run,
                     "sanity_check_error": sanity_check_error,
+                    "llmindex_status": llmindex_status,
+                    "llmindex_last_modified": llmindex_last_modified,
+                    "llmindex_error": llmindex_error,
                 },
             },
         )
