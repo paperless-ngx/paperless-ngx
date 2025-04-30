@@ -9,13 +9,14 @@ from documents.permissions import get_objects_for_user_owner_aware
 from paperless.config import AIConfig
 from paperless_ai.client import AIClient
 from paperless_ai.indexing import query_similar_documents
+from paperless_ai.indexing import truncate_content
 
 logger = logging.getLogger("paperless_ai.rag_classifier")
 
 
 def build_prompt_without_rag(document: Document) -> str:
     filename = document.filename or ""
-    content = document.content or ""
+    content = truncate_content(document.content or "")
 
     prompt = f"""
     You are an assistant that extracts structured information from documents.
@@ -48,20 +49,20 @@ def build_prompt_without_rag(document: Document) -> str:
     {filename}
 
     CONTENT:
-    {content[:8000]}
+    {content}
     """
 
     return prompt
 
 
 def build_prompt_with_rag(document: Document, user: User | None = None) -> str:
-    context = get_context_for_document(document, user)
+    context = truncate_content(get_context_for_document(document, user))
     prompt = build_prompt_without_rag(document)
 
     prompt += f"""
 
     CONTEXT FROM SIMILAR DOCUMENTS:
-    {context[:4000]}
+    {context}
     """
 
     return prompt
