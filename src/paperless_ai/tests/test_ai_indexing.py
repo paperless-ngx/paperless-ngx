@@ -138,34 +138,69 @@ def test_load_or_build_index_builds_when_nodes_given(
     temp_llm_index_dir,
     real_document,
 ):
-    with patch(
-        "paperless_ai.indexing.load_index_from_storage",
-        side_effect=ValueError("Index not found"),
-    ):
-        with patch(
+    with (
+        patch(
+            "paperless_ai.indexing.load_index_from_storage",
+            side_effect=ValueError("Index not found"),
+        ),
+        patch(
             "paperless_ai.indexing.VectorStoreIndex",
             return_value=MagicMock(),
-        ) as mock_index_cls:
-            with patch(
-                "paperless_ai.indexing.get_or_create_storage_context",
-                return_value=MagicMock(),
-            ) as mock_storage:
-                mock_storage.return_value.persist_dir = temp_llm_index_dir
-                indexing.load_or_build_index(
-                    nodes=[indexing.build_document_node(real_document)],
-                )
-                mock_index_cls.assert_called_once()
+        ) as mock_index_cls,
+        patch(
+            "paperless_ai.indexing.get_or_create_storage_context",
+            return_value=MagicMock(),
+        ) as mock_storage,
+    ):
+        mock_storage.return_value.persist_dir = temp_llm_index_dir
+        indexing.load_or_build_index(
+            nodes=[indexing.build_document_node(real_document)],
+        )
+        mock_index_cls.assert_called_once()
 
 
 def test_load_or_build_index_raises_exception_when_no_nodes(
     temp_llm_index_dir,
+    mock_embed_model,
 ):
-    with patch(
-        "paperless_ai.indexing.load_index_from_storage",
-        side_effect=ValueError("Index not found"),
+    with (
+        patch(
+            "paperless_ai.indexing.load_index_from_storage",
+            side_effect=ValueError("Index not found"),
+        ),
+        patch(
+            "paperless_ai.indexing.get_or_create_storage_context",
+            return_value=MagicMock(),
+        ),
     ):
         with pytest.raises(Exception):
             indexing.load_or_build_index()
+
+
+@pytest.mark.django_db
+def test_load_or_build_index_succeeds_when_nodes_given(
+    temp_llm_index_dir,
+    mock_embed_model,
+):
+    with (
+        patch(
+            "paperless_ai.indexing.load_index_from_storage",
+            side_effect=ValueError("Index not found"),
+        ),
+        patch(
+            "paperless_ai.indexing.VectorStoreIndex",
+            return_value=MagicMock(),
+        ) as mock_index_cls,
+        patch(
+            "paperless_ai.indexing.get_or_create_storage_context",
+            return_value=MagicMock(),
+        ) as mock_storage,
+    ):
+        mock_storage.return_value.persist_dir = temp_llm_index_dir
+        indexing.load_or_build_index(
+            nodes=[MagicMock()],
+        )
+        mock_index_cls.assert_called_once()
 
 
 @pytest.mark.django_db
