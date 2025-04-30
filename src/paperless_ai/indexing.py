@@ -10,11 +10,14 @@ from llama_index.core import Document as LlamaDocument
 from llama_index.core import StorageContext
 from llama_index.core import VectorStoreIndex
 from llama_index.core import load_index_from_storage
+from llama_index.core.indices.prompt_helper import PromptHelper
 from llama_index.core.node_parser import SimpleNodeParser
+from llama_index.core.prompts import PromptTemplate
 from llama_index.core.retrievers import VectorIndexRetriever
 from llama_index.core.schema import BaseNode
 from llama_index.core.storage.docstore import SimpleDocumentStore
 from llama_index.core.storage.index_store import SimpleIndexStore
+from llama_index.core.text_splitter import TokenTextSplitter
 from llama_index.vector_stores.faiss import FaissVectorStore
 
 from documents.models import Document
@@ -220,6 +223,23 @@ def llm_index_remove_document(document: Document):
     index.storage_context.persist(persist_dir=settings.LLM_INDEX_DIR)
 
 
+def truncate_content(content: str) -> str:
+    prompt_helper = PromptHelper(
+        context_window=8192,
+        num_output=512,
+        chunk_overlap_ratio=0.1,
+        chunk_size_limit=None,
+    )
+    splitter = TokenTextSplitter(separator=" ", chunk_size=512, chunk_overlap=50)
+    content_chunks = splitter.split_text(content)
+    truncated_chunks = prompt_helper.truncate(
+        prompt=PromptTemplate(template="{content}"),
+        text_chunks=content_chunks,
+        padding=5,
+    )
+    return " ".join(truncated_chunks)
+
+
 def query_similar_documents(
     document: Document,
     top_k: int = 5,
@@ -247,7 +267,9 @@ def query_similar_documents(
         doc_ids=doc_node_ids,
     )
 
-    query_text = (document.title or "") + "\n" + (document.content or "")
+    query_text = truncate_content(
+        (document.title or "") + "\n" + (document.content or ""),
+    )
     results = retriever.retrieve(query_text)
 
     document_ids = [
