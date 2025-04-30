@@ -314,6 +314,9 @@ describe('SettingsComponent', () => {
         sanity_check_status: SystemStatusItemStatus.ERROR,
         sanity_check_last_run: new Date().toISOString(),
         sanity_check_error: 'Error running sanity check.',
+        llmindex_status: SystemStatusItemStatus.DISABLED,
+        llmindex_last_modified: new Date().toISOString(),
+        llmindex_error: null,
       },
     }
     jest.spyOn(systemStatusService, 'get').mockReturnValue(of(status))
