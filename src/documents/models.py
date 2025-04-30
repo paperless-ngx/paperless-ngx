@@ -2,7 +2,6 @@ import datetime
 import logging
 import os
 import re
-import unicodedata
 from collections import OrderedDict
 from pathlib import Path
 from typing import Final
@@ -625,6 +624,16 @@ class UiSettings(models.Model):
         return self.user.username
 
 
+class TaskType(models.IntegerChoices):
+    """
+    Enum containing OCR task types:
+    - `OCR_RETRY (1)`: Task for retrying OCR processing in case of failure.
+    - `OCR_WEBHOOK (2)`: Task for handling webhook events related to OCR.
+    """
+    OCR_RETRY = 1, _("OCR_RETRY")  # OCR retry task
+    OCR_WEBHOOK = 2, _("OCR_WEBHOOK")  # OCR webhook processing task
+
+
 class EdocTask(models.Model):
     ALL_STATES = sorted(states.ALL_STATES)
     TASK_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
@@ -699,8 +708,13 @@ class EdocTask(models.Model):
         )
     )
 
-
-
+    type = models.IntegerField(
+        choices=TaskType.choices,
+        db_index=True,
+        blank=True,
+        null=True,
+        help_text="Select the type of OCR task to execute."
+    )
 
     def __str__(self) -> str:
         return f"Task {self.task_id}"
