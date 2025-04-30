@@ -198,6 +198,48 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
         self.assertEqual(ApplicationConfiguration.objects.count(), 1)
 
+    def test_update_llm_api_key(self):
+        """
+        GIVEN:
+            - Existing config with llm_api_key specified
+        WHEN:
+            - API to update llm_api_key is called with all *s
+            - API to update llm_api_key is called with empty string
+        THEN:
+            - llm_api_key is unchanged
+            - llm_api_key is set to None
+        """
+        config = ApplicationConfiguration.objects.first()
+        config.llm_api_key = "1234567890"
+        config.save()
+
+        # Test with all *
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            json.dumps(
+                {
+                    "llm_api_key": "*" * 32,
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        config.refresh_from_db()
+        self.assertEqual(config.llm_api_key, "1234567890")
+        # Test with empty string
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            json.dumps(
+                {
+                    "llm_api_key": "",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        config.refresh_from_db()
+        self.assertEqual(config.llm_api_key, None)
+
     def test_enable_ai_index_triggers_update(self):
         """
         GIVEN:
