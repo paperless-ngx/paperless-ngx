@@ -3,14 +3,17 @@ from datetime import timedelta
 from pathlib import Path
 from unittest import mock
 
+from celery import states
 from django.conf import settings
 from django.test import TestCase
+from django.test import override_settings
 from django.utils import timezone
 
 from documents import tasks
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import PaperlessTask
 from documents.models import Tag
 from documents.sanity_checker import SanityCheckFailedException
 from documents.sanity_checker import SanityCheckMessages
@@ -270,3 +273,103 @@ class TestUpdateContent(DirectoriesMixin, TestCase):
 
         tasks.update_document_content_maybe_archive_file(doc.pk)
         self.assertNotEqual(Document.objects.get(pk=doc.pk).content, "test")
+
+
+class TestAIIndex(DirectoriesMixin, TestCase):
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_EMBEDDING_BACKEND="huggingface",
+    )
+    def test_ai_index_success(self):
+        """
+        GIVEN:
+            - Document exists, AI is enabled, llm index backend is set
+        WHEN:
+            - llmindex_index task is called
+        THEN:
+            - update_llm_index is called, and the task is marked as success
+        """
+        Document.objects.create(
+            title="test",
+            content="my document",
+            checksum="wow",
+        )
+        # lazy-loaded so mock the actual function
+        with mock.patch("paperless_ai.indexing.update_llm_index") as update_llm_index:
+            update_llm_index.return_value = "LLM index updated successfully."
+            tasks.llmindex_index()
+            update_llm_index.assert_called_once()
+            task = PaperlessTask.objects.get(
+                task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
+            )
+            self.assertEqual(task.status, states.SUCCESS)
+            self.assertEqual(task.result, "LLM index updated successfully.")
+
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_EMBEDDING_BACKEND="huggingface",
+    )
+    def test_ai_index_failure(self):
+        """
+        GIVEN:
+            - Document exists, AI is enabled, llm index backend is set
+        WHEN:
+            - llmindex_index task is called
+        THEN:
+            - update_llm_index raises an exception, and the task is marked as failure
+        """
+        Document.objects.create(
+            title="test",
+            content="my document",
+            checksum="wow",
+        )
+        # lazy-loaded so mock the actual function
+        with mock.patch("paperless_ai.indexing.update_llm_index") as update_llm_index:
+            update_llm_index.side_effect = Exception("LLM index update failed.")
+            tasks.llmindex_index()
+            update_llm_index.assert_called_once()
+            task = PaperlessTask.objects.get(
+                task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
+            )
+            self.assertEqual(task.status, states.FAILURE)
+            self.assertIn("LLM index update failed.", task.result)
+
+    def test_update_document_in_llm_index(self):
+        """
+        GIVEN:
+            - Nothing
+        WHEN:
+            - update_document_in_llm_index task is called
+        THEN:
+            - llm_index_add_or_update_document is called
+        """
+        doc = Document.objects.create(
+            title="test",
+            content="my document",
+            checksum="wow",
+        )
+        with mock.patch(
+            "documents.tasks.llm_index_add_or_update_document",
+        ) as llm_index_add_or_update_document:
+            tasks.update_document_in_llm_index(doc)
+            llm_index_add_or_update_document.assert_called_once_with(doc)
+
+    def test_remove_document_from_llm_index(self):
+        """
+        GIVEN:
+            - Nothing
+        WHEN:
+            - remove_document_from_llm_index task is called
+        THEN:
+            - llm_index_remove_document is called
+        """
+        doc = Document.objects.create(
+            title="test",
+            content="my document",
+            checksum="wow",
+        )
+        with mock.patch(
+            "documents.tasks.llm_index_remove_document",
+        ) as llm_index_remove_document:
+            tasks.remove_document_from_llm_index(doc)
+            llm_index_remove_document.assert_called_once_with(doc)
