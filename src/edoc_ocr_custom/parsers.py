@@ -1,9 +1,6 @@
-import io
 import json
-import math
 import os
 import re
-import shutil
 import tempfile
 import time
 from pathlib import Path
@@ -12,33 +9,23 @@ from typing import TYPE_CHECKING
 
 import requests
 from PIL import Image
+from django.conf import settings
+from django.core.cache import cache
 from pypdf import PdfReader
 from pypdf.errors import PdfReadError, PdfStreamError
-
-from django.conf import settings
-from django.core.cache import cache, caches
-from pdf2image import convert_from_path
-from pypdf import PdfReader, PdfWriter, PageObject
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.lib.utils import ImageReader
-
-import math
 
 from documents.models import DossierForm
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
-from documents.render_pdf import draw_text_on_pdf, draw_invisible_text, \
-    render_pdf_ocr
+from documents.render_pdf import render_pdf_ocr
 from documents.utils import maybe_override_pixel_limit
 from documents.utils import run_subprocess
 from edoc.config import OcrConfig
 from edoc.models import ApplicationConfiguration, ArchiveFileChoices
 from edoc.models import CleanChoices
 from edoc.models import ModeChoices
+from edoc.settings import BASE_DIR
 
 
 class NoTextFoundException(Exception):
@@ -534,9 +521,8 @@ class RasterisedDocumentCustomParser(DocumentParser):
             render_pdf_ocr(input_path=document_path, output_path=output_file,
                            data_ocr=data_ocr,
                            quality_compress=self.quality_compress,
-                           font_path=os.path.join(
-                               os.path.dirname(os.path.abspath(__file__)),
-                               'fonts', 'arial-font/arial.ttf'))
+                           font_path=os.path.join(BASE_DIR,
+                                                  "documents/resources/fonts/arial-font/arial.ttf"))
             content_formated = ""
             if data_ocr is not None:
                 content_formated = data_ocr.get("content_formated", "")
