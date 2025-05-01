@@ -885,7 +885,7 @@ class NotesSerializer(serializers.ModelSerializer):
             request.version if request else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
         )
 
-        if api_version < 8:
+        if api_version < 8 and "user" in ret:
             user_id = ret["user"]["id"]
             ret["user"] = user_id
 
