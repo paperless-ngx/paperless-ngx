@@ -13,8 +13,8 @@ from re import Match
 from typing import Optional
 
 from django.conf import settings
-from django.utils import timezone
 from django.core.cache import cache
+from django.utils import timezone
 
 from documents.loggers import LoggingMixin
 from documents.signals import document_consumer_declaration
@@ -360,6 +360,7 @@ class DocumentParser(LoggingMixin):
         super().__init__()
         self.logging_group = logging_group
         self.settings = self.get_settings()
+        self.task_id = None
         settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
         self.tempdir = Path(
             tempfile.mkdtemp(prefix="edoc-", dir=settings.SCRATCH_DIR),
@@ -440,6 +441,9 @@ class DocumentParser(LoggingMixin):
 
     def get_text(self):
         return self.text
+
+    def get_task_id(self):
+        return self.task_id
 
     def get_file_id(self):
         return None

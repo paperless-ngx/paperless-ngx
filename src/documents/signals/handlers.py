@@ -31,10 +31,11 @@ from documents.consumer import parse_doc_title_w_placeholders
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_unique_filename
-from documents.models import Approval, CustomFieldInstance, DocumentType
+from documents.models import Approval, CustomFieldInstance, DocumentType, \
+    TaskType
 from documents.models import Document
-from documents.models import MatchingModel
 from documents.models import EdocTask
+from documents.models import MatchingModel
 from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
@@ -1077,7 +1078,9 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
         # logger.debug("Waiting for 1", document, body[0], headers["task"], headers, "task" not in headers or headers["task"] != "documents.tasks.consume_file")
         # task_file_name = input_doc.original_file.name
         task_file_name = document.original_filename
-
+        task_type = TaskType.OCR_RETRY
+        if settings.METHOD_OCR == TaskType.OCR_WEBHOOK.label:
+            task_type = TaskType.OCR_RETRY.OCR_WEBHOOK
         EdocTask.objects.create(
             task_id=headers["id"],
             status=states.PENDING,
@@ -1087,6 +1090,7 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
             date_created=timezone.now(),
             date_started=None,
             date_done=None,
+            type=task_type
         )
         logger.info("Created edoc_task")
     except Exception as e:  # pragma: no cover
@@ -1135,7 +1139,8 @@ def task_postrun_handler(
     api_call_count = getattr(task.request, "api_call_count",0)
     try:
         close_old_connections()
-        task_instance = EdocTask.objects.filter(task_id=task_id).first()
+        task_instance = EdocTask.objects.filter(task_id=task_id,
+                                                type=TaskType.OCR_RETRY).first()
         if task_instance is not None:
             task_instance.status = state
             task_instance.result = retval

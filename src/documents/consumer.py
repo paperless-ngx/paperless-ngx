@@ -5,8 +5,8 @@ import tempfile
 import uuid
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING
 from typing import Optional
+from typing import TYPE_CHECKING
 
 import magic
 from asgiref.sync import async_to_sync
@@ -1109,7 +1109,7 @@ class Consumer(LoggingMixin):
 
         from documents.tasks import update_document_archive_file
         update_document_archive_file.delay(
-            document_id=document.id
+            document_id=document.id, task_id=task_id
         )
 
         # Return the most up to date fields

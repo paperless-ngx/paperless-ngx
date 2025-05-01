@@ -35,7 +35,6 @@ from documents.common import peel_field, get_setting_ocr
 from documents.consumer import Consumer
 from documents.consumer import ConsumerError
 from documents.consumer import WorkflowTriggerPlugin
-from documents.consumer import get_config_dossier_form
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.documents import DocumentDocument
@@ -62,7 +61,8 @@ from documents.plugins.helpers import ProgressStatusOptions
 from documents.render_pdf import render_pdf_ocr
 from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated, document_consumption_finished
-from documents.signals.handlers import cleanup_document_deletion, bulk_set_custom_fields_from_document_type_to_document
+from documents.signals.handlers import cleanup_document_deletion, \
+    bulk_set_custom_fields_from_document_type_to_document
 from edoc.models import ApplicationConfiguration
 from edoc.settings import BASE_DIR
 from edoc_ocr_custom.parsers import RasterisedDocumentCustomParser
@@ -333,7 +333,7 @@ def bulk_update_custom_field_form_document_type_to_document(document_ids, docume
 
 
 @shared_task(bind=True)
-def update_document_archive_file(self, document_id=None):
+def update_document_archive_file(self, document_id=None, task_id=None):
     """
     Re-creates the archive file of a document, including new OCR content and thumbnail
     """
@@ -359,6 +359,7 @@ def update_document_archive_file(self, document_id=None):
             # self.log.debug(f"Parsing {self.filename}...")
 
             if isinstance(parser, RasterisedDocumentCustomParser):
+                parser.task_id = task_id
                 parser.parse(
                     document.source_path,
                     mime_type,

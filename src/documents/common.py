@@ -17,12 +17,12 @@ from edoc.models import ApplicationConfiguration
 logger = logging.getLogger("edoc.common")
 
 
-def generate_token(file_id, secret_key):
+def generate_token(data, secret_key):
     # Sử dụng secret key tùy chỉnh
     signer = TimestampSigner(key=secret_key)
 
     # Tạo token chứa ID của user
-    token = signer.sign(file_id)
+    token = signer.sign(data)
     return token
 
 
@@ -32,8 +32,8 @@ def verify_token(token, secret_key,
 
     try:
         # Giải mã token và kiểm tra thời gian hết hạn
-        file_id = signer.unsign(token, max_age=max_age_seconds)
-        return {"valid": True, "file_id": file_id}
+        task_id = signer.unsign(token, max_age=max_age_seconds)
+        return {"valid": True, "task_id": task_id}
     except SignatureExpired:
         # Token đã hết hạn
         return {"valid": False, "error": "Token đã hết hạn."}

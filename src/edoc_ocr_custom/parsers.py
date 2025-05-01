@@ -16,6 +16,7 @@ from pypdf import PdfReader
 from pypdf.errors import PdfReadError, PdfStreamError
 
 from documents.common import ocr_file_webhook, get_setting_ocr
+from documents.models import TaskType
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
@@ -456,10 +457,8 @@ class RasterisedDocumentCustomParser(DocumentParser):
 
     #     return (data_ocr,data_ocr_fields)
 
-
-
-    def ocr_img_or_pdf(self, document_path, mime_type, dossier_form, sidecar,
-                       output_file, **kwargs):
+    def ocr_img_or_pdf(self, document_path, mime_type, sidecar,
+                       output_file, task_id, **kwargs):
 
         data_ocr = None
         data_ocr_fields = None
@@ -470,14 +469,14 @@ class RasterisedDocumentCustomParser(DocumentParser):
             api_login_ocr = settings.API_LOGIN_OCR
             api_refresh_ocr = settings.API_REFRESH_OCR
             api_upload_file_ocr = settings.API_UPLOAD_FILE_OCR
-            if settings.METHOD_OCR=='RETRY':
+            if settings.METHOD_OCR == TaskType.OCR_RETRY.label:
                 data_ocr, data_ocr_fields, form_code = self.ocr_file_retry(
                     path_file=document_path, username_ocr=username_ocr,
                     password_ocr=password_ocr, api_login_ocr=api_login_ocr,
                     api_refresh_ocr=api_refresh_ocr,
                     api_upload_file_ocr=api_upload_file_ocr,
                     **kwargs)
-            elif settings.METHOD_OCR=='WEBHOOK':
+            elif settings.METHOD_OCR == TaskType.OCR_WEBHOOK.label:
                 self.log.debug('webhook--------------------')
                 data_ocr, data_ocr_fields, form_code, file_id_res, api_call_count_res= ocr_file_webhook(
                 path_file=document_path, username_ocr=username_ocr,
@@ -485,6 +484,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                 api_refresh_ocr=api_refresh_ocr,
                 api_upload_file_ocr=api_upload_file_ocr,
                 api_call_count=self.api_call_count,
+                    task_id=self.task_id
                 **kwargs)
                 self.file_id=file_id_res
                 self.api_call_count=api_call_count_res
@@ -493,7 +493,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
             render_pdf_ocr(input_path=document_path, output_path=output_file,
                            data_ocr=data_ocr,
                            quality_compress=self.quality_compress,
-                           font_path=   os.path.join(BASE_DIR,
+                           font_path=os.path.join(BASE_DIR,
                     "documents/resources/fonts/arial-font/arial.ttf"))
             content_formated = ""
             if data_ocr is not None:
@@ -516,7 +516,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
             #                            'fonts', 'arial-font/arial.ttf')
             # )
 
-            return data_ocr, data_ocr_fields, form_code
+            return data_ocr, data_ocr_fields
 
         except Exception as e:
                 raise ParseError(f"{e.__class__.__name__}: {e!s}") from e
@@ -701,8 +701,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
 
         return ocrmypdf_args
 
-    def parse(self, document_path: Path, mime_type, file_name=None,
-              dossier_form=None):
+    def parse(self, document_path: Path, mime_type, file_name=None):
         # This forces tesseract to use one core per page.
         os.environ["OMP_THREAD_LIMIT"] = "1"
         VALID_TEXT_LENGTH = 50
@@ -749,7 +748,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
             archive_path,
             sidecar_file,
         )
-        data_ocr, data_ocr_fields, form_code = None, None, ''
+        data_ocr, data_ocr_fields = None, None
         try:
             self.log.debug(f"Calling OCRmyPDF with args: {args} ")
             # ocrmypdf.ocr(**args)
@@ -806,8 +805,9 @@ class RasterisedDocumentCustomParser(DocumentParser):
             try:
                 self.log.debug(f"Fallback: Calling OCRmyPDF with args: {args} {archive_path_fallback}")
                 # ocrmypdf.ocr(**args)
-                data_ocr, data_ocr_fields, form_code = self.ocr_img_or_pdf(
-                    document_path, mime_type, dossier_form, **args)
+                data_ocr, data_ocr_fields = self.ocr_img_or_pdf(
+                    document_path=document_path, mime_type=mime_type,
+                    task_id=self.task_id, **args)
                 # Don't return the archived file here, since this file
                 # is bigger and blurry due to --force-ocr.
                 self.archive_path = archive_path_fallback
