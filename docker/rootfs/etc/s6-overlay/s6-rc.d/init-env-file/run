@@ -9,7 +9,7 @@ if find /run/s6/container_environment/*"_FILE" -maxdepth 1 > /dev/null 2>&1; the
 	for FILENAME in /run/s6/container_environment/*; do
 		if [[ "${FILENAME##*/}" == PAPERLESS_*_FILE ]]; then
 			# This should have been named different..
-			if [[ ${FILENAME} == "PAPERLESS_OCR_SKIP_ARCHIVE_FILE" || ${FILENAME} == "PAPERLESS_MODEL_FILE" ]]; then
+			if [[ "${FILENAME##*/}" == "PAPERLESS_OCR_SKIP_ARCHIVE_FILE" || "${FILENAME##*/}" == "PAPERLESS_MODEL_FILE" ]]; then
 				continue
 			fi
 			SECRETFILE=$(cat "${FILENAME}")
