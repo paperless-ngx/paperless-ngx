@@ -460,9 +460,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
 
         data_ocr = None
         data_ocr_fields = None
-        form_code = None
-        self.log.debug(
-            f"ocr_img_or_pdf: {document_path} {mime_type} {sidecar} {output_file} {task_id}")
+
         try:
             username_ocr = get_setting_ocr('username_ocr')
             password_ocr = get_setting_ocr('password_ocr')
@@ -703,7 +701,8 @@ class RasterisedDocumentCustomParser(DocumentParser):
 
         return ocrmypdf_args
 
-    def parse(self, document_path: Path, mime_type, file_name=None):
+    def parse(self, document_path: Path, mime_type, file_name=None,
+              dossier_form=None):
         # This forces tesseract to use one core per page.
         os.environ["OMP_THREAD_LIMIT"] = "1"
         VALID_TEXT_LENGTH = 50
