@@ -522,7 +522,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                            data_ocr=data_ocr,
                            quality_compress=self.quality_compress,
                            font_path=os.path.join(BASE_DIR,
-                                                  "documents/resources/fonts/arial-font/arial.ttf"))
+                                                  "edoc_ocr_custom/fonts/arial-font/arial.ttf"))
             content_formated = ""
             if data_ocr is not None:
                 content_formated = data_ocr.get("content_formated", "")
