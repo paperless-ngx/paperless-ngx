@@ -230,7 +230,7 @@ jobs:
           flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/coverage/
   tests-frontend-e2e:
-    name: "Frontend E2E Tests (Node ${{ matrix.node-version }}) - ${{ matrix.shard-index }}/${{ matrix.shard-count }}"
+    name: "Frontend E2E Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     runs-on: ubuntu-24.04
     needs:
       - install-frontend-dependencies
