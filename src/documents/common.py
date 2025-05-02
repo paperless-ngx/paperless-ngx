@@ -8,8 +8,6 @@ import requests
 from django.conf import settings
 from django.core.cache import cache
 from django.core.signing import TimestampSigner, SignatureExpired, BadSignature
-from pypdf import PdfReader
-from pypdf.errors import PdfReadError, PdfStreamError
 
 from documents.models import Document
 from edoc.models import ApplicationConfiguration
@@ -252,22 +250,9 @@ def ocr_file_webhook(path_file, username_ocr, password_ocr, api_login_ocr,
                      api_refresh_ocr, api_upload_file_ocr, api_call_count,
                      task_id, **args):
     file_id = None
-    # data general
     data_ocr = None
     data_ocr_fields = None
-    form_code = ""
-    app_config = ApplicationConfiguration.objects.filter().first()
     refresh_token_ocr = cache.get("refresh_token_ocr", '')
-
-    # count page number
-    page_count = 1
-    try:
-        with open(path_file, 'rb') as f:
-            pdf_reader = PdfReader(f)
-            page_count = len(pdf_reader.pages)
-    except (OSError, IOError, ValueError, PdfReadError, PdfStreamError):
-        pass
-    # check token
     try:
 
         app_config: ApplicationConfiguration | None
@@ -289,12 +274,14 @@ def ocr_file_webhook(path_file, username_ocr, password_ocr, api_login_ocr,
             ip_address = socket.gethostbyname(hostname)
             callback_url = f"http://{ip_address}"
         callback_url = f"{callback_url}/api/process_ocr/{quote(token_auth)}/update-content-document/"
-        logger.debug(f'callback_url--------------------{callback_url}')
+
         with open(path_file, 'rb') as file:
             pdf_data = file.read()
         payload = {'title': (str(path_file).split("/")[-1]),
                    'folder': settings.FOLDER_UPLOAD,
-                   'extract': '1'}
+                   'extract': '1',
+                   'callback_url': callback_url
+                   }
         response_upload = requests.post(api_upload_file_ocr, data=payload,
                                         files={
                                             'file': (
@@ -326,7 +313,6 @@ def ocr_file_webhook(path_file, username_ocr, password_ocr, api_login_ocr,
             else:
                 raise Exception(
                     "Cannot get access token and refresh token")
-            # app_config.save()
 
             headers = {
                 'Authorization': f"Bearer {cache.get('access_token_ocr', '')}"
@@ -347,43 +333,21 @@ def ocr_file_webhook(path_file, username_ocr, password_ocr, api_login_ocr,
                                                 str(path_file).split("/")[-1],
                                                 pdf_data)},
                                             headers=headers)
+            api_call_count += 1
+            if response_upload.status_code != 201:
+                raise Exception(
+                    f"Cannot upload file to OCR API, status code: {response_upload.status_code}")
+
 
         if response_upload.status_code == 201:
             get_file_id = response_upload.json().get('id', '')
             file_id = get_file_id
+            api_call_count += 1
 
-            # else :
-            #     # logging.error('upload file: ', response_upload.status_code)
-            #     return data_ocr, data_ocr_fields, form_code
-
-            # ocr by file_id --------------------------
-            params = {'file_id': get_file_id}
-            url_ocr_pdf_by_fileid = settings.API_OCR_BY_FILE_ID
-            data_ocr_general = call_ocr_api_with_retries("GET",
-                                                         url_ocr_pdf_by_fileid,
-                                                         headers,
-                                                         params,
-                                                         {},
-                                                         max_retries=5,
-                                                         delay=page_count * int(
-                                                             settings.DELAY_OCR),
-                                                         timeout=30,
-                                                         data_compare={
-                                                             'status_code': 1})
-
-            if data_ocr_general is not None:
-                data_ocr = data_ocr_general.get('response', None)
-                enable_ocr_field = cache.get("enable_ocr_field", False)
-                url_ocr_pdf_custom_field_by_fileid = cache.get(
-                    "api_ocr_field", False)
-                api_call_count += 1
-                if not enable_ocr_field and not url_ocr_pdf_custom_field_by_fileid:
-                    return (data_ocr, data_ocr_fields, form_code, file_id,
-                            api_call_count)
     # except Exception as e:
     #     self.log.error("error", e)
     finally:
-        return (data_ocr, data_ocr_fields, form_code, file_id, api_call_count)
+        return (data_ocr, data_ocr_fields, file_id, api_call_count)
 
 
 def get_setting_ocr(field):

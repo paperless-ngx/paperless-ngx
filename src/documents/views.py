@@ -3137,17 +3137,21 @@ class WebhookViewSet(ViewSet):
         token = unquote(pk)
         result = verify_token(token=token,
                               secret_key=settings.EDOC_SECRET_KEY_OCR)
+        logger.info(f'result verify_token {result}')
         if not result['valid']:
             return Response({"message": "Received", "data": result['error']})
         task_id = result['task_id']
-        task = EdocTask.objects.filter(id=task_id).first()
-        related_doc_re = re.compile(r"New document id (\d+) created")
+        task = EdocTask.objects.filter(task_id=task_id).first()
+        if task is None:
+            return Response({"message": "Received", "data": "Task not found"})
+        related_doc_re = re.compile(
+            r"Success. document id (\d+) is being processed")
         document_id = related_doc_re.search(task.result).group(1)
         document = Document.objects.filter(id=document_id).first()
-        logger.info(f"Webhook called with document={document.pk}, data={data}")
-        update_ocr_document.delay(document, data)
+        logger.info(f"Webhook called with document={document.pk}")
+        update_ocr_document.delay(document, task, data['ocr'])
 
-        return Response({"message": "Received", "document_id": pk, "data": data})
+        return Response({"message": "Received", "document_id": pk})
 
     @action(detail=True, methods=['post'], url_path='peel-field', permission_classes=[AllowAny])
     def peel_field(self, request, pk=None):

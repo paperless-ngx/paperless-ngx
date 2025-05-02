@@ -1092,7 +1092,7 @@ def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs):
             date_done=None,
             type=task_type
         )
-        logger.info("Created edoc_task")
+        logger.info(f"Created edoc_task {headers['id']}")
     except Exception as e:  # pragma: no cover
         # Don't let an exception in the signal handlers prevent
         # a document from being consumed.
@@ -1139,6 +1139,14 @@ def task_postrun_handler(
     api_call_count = getattr(task.request, "api_call_count",0)
     try:
         close_old_connections()
+        logger.info(f'task postrun_handler {task_id}')
+        if settings.METHOD_OCR == TaskType.OCR_WEBHOOK.label:
+            task_instance = EdocTask.objects.filter(task_id=task_id).first()
+            if task_instance is not None:
+                task_instance.result = retval
+                task_instance.api_call_count = api_call_count
+                task_instance.save()
+                return
         task_instance = EdocTask.objects.filter(task_id=task_id,
                                                 type=TaskType.OCR_RETRY).first()
         if task_instance is not None:

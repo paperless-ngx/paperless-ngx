@@ -1109,7 +1109,7 @@ class Consumer(LoggingMixin):
 
         from documents.tasks import update_document_archive_file
         update_document_archive_file.delay(
-            document_id=document.id, task_id=task_id
+            document_id=document.id
         )
 
         # Return the most up to date fields

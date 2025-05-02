@@ -11,7 +11,7 @@ from tempfile import TemporaryDirectory
 from typing import Optional
 
 import tqdm
-from celery import Task
+from celery import Task, states
 from celery import shared_task
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -42,7 +42,7 @@ from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.index import update_index_document
-from documents.models import BackupRecord
+from documents.models import BackupRecord, TaskType, EdocTask
 from documents.models import Correspondent
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -333,7 +333,7 @@ def bulk_update_custom_field_form_document_type_to_document(document_ids, docume
 
 
 @shared_task(bind=True)
-def update_document_archive_file(self, document_id=None, task_id=None):
+def update_document_archive_file(self, document_id=None):
     """
     Re-creates the archive file of a document, including new OCR content and thumbnail
     """
@@ -359,7 +359,8 @@ def update_document_archive_file(self, document_id=None, task_id=None):
             # self.log.debug(f"Parsing {self.filename}...")
 
             if isinstance(parser, RasterisedDocumentCustomParser):
-                parser.task_id = task_id
+                parser.task_id = self.request.id
+                parser.document_id = document_id
                 parser.parse(
                     document.source_path,
                     mime_type,
@@ -442,7 +443,7 @@ def update_document_archive_file(self, document_id=None, task_id=None):
                 classifier=classifier,
             )
 
-            if parser.get_text() is None or parser.get_text() == "":
+            if parser.get_text() is None or parser.get_text() == "" and settings.METHOD_OCR == TaskType.OCR_RETRY.label:
                 raise Exception(
                     f"data empty document {document} (ID: {document_id})")
 
@@ -456,6 +457,8 @@ def update_document_archive_file(self, document_id=None, task_id=None):
         return f"Error while parsing document {document} (ID: {document_id} ex: {ex}) "
     finally:
         parser.cleanup()
+    if settings.METHOD_OCR == TaskType.OCR_WEBHOOK.label:
+        return f'Success. document id {document.pk} is being processed'
     return f"Success. New document id {document.pk} created"
 
 @shared_task()
@@ -1005,11 +1008,14 @@ def deleted_backup(file_paths):
 
 
 @shared_task
-def update_ocr_document(document, data_ocr):
+def update_ocr_document(document, task_instance: EdocTask, data_ocr):
     try:
         if document is None:
-            raise ValueError("Document không tồn tại")
-
+            raise ValueError("Document isn't exist")
+        if data_ocr is None:
+            raise ValueError("Data ocr isn't exist")
+        if task_instance is None:
+            raise ValueError("Task isn't exist")
         document_path = document.source_path
         output_file = document.archive_path
 
@@ -1019,8 +1025,17 @@ def update_ocr_document(document, data_ocr):
                 output_path=output_file,
                 data_ocr=data_ocr,
                 quality_compress=get_setting_ocr('quality_compress'),
-                font_path=os.path.join(BASE_DIR, "documents/resources/fonts/arial-font/arial.ttf")
+                font_path=os.path.join(BASE_DIR,
+                                       "edoc_ocr_custom/fonts/arial-font/arial.ttf")
             )
+        document.content = data_ocr.get('content_formated', '')
+        document.save()
+        task_instance.status = states.SUCCESS
+        processed_message = f"Success. Document id {document.pk} has been successfully processed."
+        task_instance.result = processed_message
+        task_instance.date_done = timezone.now()
+        # task_instance.api_call_count = api_call_count
+        task_instance.save()
     except Exception as e:  # Bắt lỗi và ghi log
         logger.exception(f"Lỗi khi cập nhật nội dung tài liệu: {e}")
         raise e

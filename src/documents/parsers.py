@@ -368,6 +368,7 @@ class DocumentParser(LoggingMixin):
         self.quality_compress = self.get_quality_compress()
         self.enable_compress = self.get_enable_compress()
         self.archive_path = None
+        self.document_id = None
         self.text = None
         self.date: Optional[datetime.datetime] = None
         self.progress_callback = progress_callback
@@ -444,6 +445,9 @@ class DocumentParser(LoggingMixin):
 
     def get_task_id(self):
         return self.task_id
+
+    def get_document_id(self):
+        return self.document_id
 
     def get_file_id(self):
         return None

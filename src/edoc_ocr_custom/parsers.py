@@ -1,5 +1,4 @@
 import json
-import json
 import os
 import re
 import tempfile
@@ -262,7 +261,6 @@ class RasterisedDocumentCustomParser(DocumentParser):
         data_ocr = None
         data_ocr_fields = None
         form_code = ""
-        app_config = ApplicationConfiguration.objects.filter().first()
         refresh_token_ocr = cache.get("refresh_token_ocr", '')
 
         # count page number
@@ -463,12 +461,16 @@ class RasterisedDocumentCustomParser(DocumentParser):
         data_ocr = None
         data_ocr_fields = None
         form_code = None
+        self.log.debug(
+            f"ocr_img_or_pdf: {document_path} {mime_type} {sidecar} {output_file} {task_id}")
         try:
             username_ocr = get_setting_ocr('username_ocr')
             password_ocr = get_setting_ocr('password_ocr')
             api_login_ocr = settings.API_LOGIN_OCR
             api_refresh_ocr = settings.API_REFRESH_OCR
             api_upload_file_ocr = settings.API_UPLOAD_FILE_OCR
+            self.log.info(
+                f"settings.METHOD_OCR {settings.METHOD_OCR}, {TaskType.OCR_WEBHOOK.label}")
             if settings.METHOD_OCR == TaskType.OCR_RETRY.label:
                 data_ocr, data_ocr_fields, form_code = self.ocr_file_retry(
                     path_file=document_path, username_ocr=username_ocr,
@@ -478,13 +480,13 @@ class RasterisedDocumentCustomParser(DocumentParser):
                     **kwargs)
             elif settings.METHOD_OCR == TaskType.OCR_WEBHOOK.label:
                 self.log.debug('webhook--------------------')
-                data_ocr, data_ocr_fields, form_code, file_id_res, api_call_count_res= ocr_file_webhook(
+                data_ocr, data_ocr_fields, file_id_res, api_call_count_res = ocr_file_webhook(
                 path_file=document_path, username_ocr=username_ocr,
                 password_ocr=password_ocr, api_login_ocr=api_login_ocr,
                 api_refresh_ocr=api_refresh_ocr,
                 api_upload_file_ocr=api_upload_file_ocr,
                 api_call_count=self.api_call_count,
-                    task_id=self.task_id
+                    task_id=self.task_id,
                 **kwargs)
                 self.file_id=file_id_res
                 self.api_call_count=api_call_count_res
@@ -494,7 +496,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                            data_ocr=data_ocr,
                            quality_compress=self.quality_compress,
                            font_path=os.path.join(BASE_DIR,
-                    "documents/resources/fonts/arial-font/arial.ttf"))
+                                                  "edoc_ocr_custom/fonts/arial-font/arial.ttf"))
             content_formated = ""
             if data_ocr is not None:
                 content_formated = data_ocr.get("content_formated", "")
@@ -835,7 +837,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                     f"be empty.",
                 )
                 self.text = ""
-        return data_ocr_fields, form_code
+        return data_ocr_fields
 
     def parse_field(self, document_path: Path, mime_type, file_name=None):
         # This forces tesseract to use one core per page.
