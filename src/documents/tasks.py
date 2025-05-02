@@ -1018,7 +1018,6 @@ def update_ocr_document(document, task_instance: EdocTask, data_ocr):
             raise ValueError("Task isn't exist")
         document_path = document.source_path
         output_file = document.archive_path
-
         if data_ocr is not None:
             render_pdf_ocr(
                 input_path=document_path,

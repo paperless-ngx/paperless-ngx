@@ -269,6 +269,10 @@ DATA_DIR = __get_path("EDOC_DATA_DIR", BASE_DIR.parent / "data")
 NLTK_DIR = __get_path("EDOC_NLTK_DIR", "/usr/share/nltk_data")
 
 TRASH_DIR = os.getenv("EDOC_TRASH_DIR")
+EMPTY_TRASH_DIR = os.getenv(
+    "EDOC_TRASH_DIR",
+    os.getenv("EDOC_EMPTY_TRASH_DIR"),
+)
 
 # Lock file for synchronizing changes to the MEDIA directory across multiple
 # threads.
