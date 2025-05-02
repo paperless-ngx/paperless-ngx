@@ -230,7 +230,7 @@ jobs:
           flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/coverage/
   tests-frontend-e2e:
-    name: "Frontend E2E Tests (Node ${{ matrix.node-version }})"
+    name: "Frontend E2E Tests (Node ${{ matrix.node-version }}) - ${{ matrix.shard-index }}/${{ matrix.shard-count }}"
     runs-on: ubuntu-24.04
     needs:
       - install-frontend-dependencies
@@ -238,6 +238,8 @@ jobs:
       fail-fast: false
       matrix:
         node-version: [20.x]
+        shard-index: [1, 2]
+        shard-count: [2]
     steps:
       - uses: actions/checkout@v4
       - name: Install pnpm
@@ -274,7 +276,7 @@ jobs:
       - name: Install Playwright
         run: cd src-ui && pnpm exec playwright install
       - name: Run Playwright e2e tests
-        run: cd src-ui && pnpm exec playwright test
+        run: cd src-ui && pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
   frontend-bundle-analysis:
     name: "Frontend Bundle Analysis"
     runs-on: ubuntu-24.04
