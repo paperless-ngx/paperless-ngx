@@ -178,10 +178,8 @@ jobs:
             ~/.cache
           key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
       - name: Install dependencies
-        if: steps.cache-frontend-deps.outputs.cache-hit != 'true'
         run: cd src-ui && pnpm install
-      - name: Install Playwright
-        if: steps.cache-frontend-deps.outputs.cache-hit != 'true'
+      - name: Install Playwright and Browsers
         run: cd src-ui && pnpm playwright install --with-deps
   tests-frontend:
     name: "Frontend Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
