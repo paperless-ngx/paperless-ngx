@@ -14,7 +14,8 @@ from django.core.cache import cache
 from pypdf import PdfReader
 from pypdf.errors import PdfReadError, PdfStreamError
 
-from documents.models import DossierForm
+from documents.common import ocr_file_webhook, get_setting_ocr
+from documents.models import TaskType
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
@@ -255,7 +256,9 @@ class RasterisedDocumentCustomParser(DocumentParser):
                                               delay=5,
                                               timeout=20)
 
-    def ocr_file(self, path_file, username_ocr, password_ocr, api_login_ocr, api_refresh_ocr, api_upload_file_ocr, dossier_form: DossierForm, **args):
+    def ocr_file_retry(self, path_file, username_ocr, password_ocr,
+                       api_login_ocr, api_refresh_ocr, api_upload_file_ocr,
+                       api_call_count, **args):
         # data general
         data_ocr = None
         data_ocr_fields = None
@@ -364,47 +367,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                     self.api_call_count+=1
                     if not enable_ocr_field and not url_ocr_pdf_custom_field_by_fileid:
                         return (data_ocr, data_ocr_fields, form_code)
-                    # peeling field
-                    get_request_id = data_ocr_general.get('request_id', None)
-                    if dossier_form is None and app_config.user_args.get(
-                        "form_code", False):
-                        for i in app_config.user_args.get("form_code", []):
-                            payload = json.dumps({
-                                "request_id": f"{get_request_id}",
-                                "list_form_code": [
-                                    f"{i.get('name')}"
-                                ]
-                            })
-                            headers = {
-                                'Authorization': f"Bearer {args['access_token_ocr']}",
-                                'Content-Type': 'application/json'
-                            }
-                            data_ocr_fields = self.call_ocr_api_with_retries(
-                                "POST", url_ocr_pdf_custom_field_by_fileid,
-                                headers, params, payload, 5, 5, 100,
-                                status_code_fail=[401])
 
-                            if not isinstance(data_ocr_fields, list):
-                                continue
-                            if data_ocr_fields[0].get("id") != -1:
-                                form_code = i.get('name')
-                                break
-                    elif dossier_form is not None and dossier_form.form_rule:
-                        self.log.debug("da vao dossier form")
-                        payload = json.dumps({
-                            "request_id": f"{get_request_id}",
-                            "list_form_code": [
-                                f"{dossier_form.form_rule}"
-                            ]
-                        })
-                        headers = {
-                            'Authorization': f"Bearer {args['access_token_ocr']}",
-                            'Content-Type': 'application/json'
-                        }
-                        data_ocr_fields = self.call_ocr_api_with_retries(
-                            "POST", url_ocr_pdf_custom_field_by_fileid,
-                            headers, params, payload, 5, 5, 100,
-                            status_code_fail=[401])
 
         # except Exception as e:
         #     self.log.error("error", e)
@@ -495,27 +458,39 @@ class RasterisedDocumentCustomParser(DocumentParser):
 
     #     return (data_ocr,data_ocr_fields)
 
-
-
-    def ocr_img_or_pdf(self, document_path, mime_type, dossier_form, sidecar,
-                       output_file, **kwargs):
+    def ocr_img_or_pdf(self, document_path, mime_type, sidecar,
+                       output_file, task_id, **kwargs):
 
         data_ocr = None
         data_ocr_fields = None
-        form_code = None
+
         try:
-            username_ocr = self.get_setting_ocr('username_ocr')
-            password_ocr = self.get_setting_ocr('password_ocr')
+            username_ocr = get_setting_ocr('username_ocr')
+            password_ocr = get_setting_ocr('password_ocr')
             api_login_ocr = settings.API_LOGIN_OCR
             api_refresh_ocr = settings.API_REFRESH_OCR
             api_upload_file_ocr = settings.API_UPLOAD_FILE_OCR
-            data_ocr, data_ocr_fields, form_code = self.ocr_file(
-                path_file=document_path, username_ocr=username_ocr,
-                password_ocr=password_ocr, api_login_ocr=api_login_ocr,
-                api_refresh_ocr=api_refresh_ocr,
-                api_upload_file_ocr=api_upload_file_ocr,
-                dossier_form=dossier_form,
-                **kwargs)
+            self.log.info(
+                f"settings.METHOD_OCR {settings.METHOD_OCR}, {TaskType.OCR_WEBHOOK.label}")
+            if settings.METHOD_OCR == TaskType.OCR_RETRY.label:
+                data_ocr, data_ocr_fields, form_code = self.ocr_file_retry(
+                    path_file=document_path, username_ocr=username_ocr,
+                    password_ocr=password_ocr, api_login_ocr=api_login_ocr,
+                    api_refresh_ocr=api_refresh_ocr,
+                    api_upload_file_ocr=api_upload_file_ocr,
+                    **kwargs)
+            elif settings.METHOD_OCR == TaskType.OCR_WEBHOOK.label:
+                self.log.debug('webhook--------------------')
+                data_ocr, data_ocr_fields, file_id_res, api_call_count_res = ocr_file_webhook(
+                    path_file=document_path, username_ocr=username_ocr,
+                    password_ocr=password_ocr, api_login_ocr=api_login_ocr,
+                    api_refresh_ocr=api_refresh_ocr,
+                    api_upload_file_ocr=api_upload_file_ocr,
+                    api_call_count=self.api_call_count,
+                    task_id=self.task_id,
+                    **kwargs)
+                self.file_id = file_id_res
+                self.api_call_count = api_call_count_res
 
 
             render_pdf_ocr(input_path=document_path, output_path=output_file,
@@ -544,7 +519,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
             #                            'fonts', 'arial-font/arial.ttf')
             # )
 
-            return data_ocr, data_ocr_fields, form_code
+            return data_ocr, data_ocr_fields
 
         except Exception as e:
                 raise ParseError(f"{e.__class__.__name__}: {e!s}") from e
@@ -777,7 +752,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
             archive_path,
             sidecar_file,
         )
-        data_ocr, data_ocr_fields, form_code = None, None, ''
+        data_ocr, data_ocr_fields = None, None
         try:
             self.log.debug(f"Calling OCRmyPDF with args: {args} ")
             # ocrmypdf.ocr(**args)
@@ -834,8 +809,9 @@ class RasterisedDocumentCustomParser(DocumentParser):
             try:
                 self.log.debug(f"Fallback: Calling OCRmyPDF with args: {args} {archive_path_fallback}")
                 # ocrmypdf.ocr(**args)
-                data_ocr, data_ocr_fields, form_code = self.ocr_img_or_pdf(
-                    document_path, mime_type, dossier_form, **args)
+                data_ocr, data_ocr_fields = self.ocr_img_or_pdf(
+                    document_path=document_path, mime_type=mime_type,
+                    task_id=self.task_id, **args)
                 # Don't return the archived file here, since this file
                 # is bigger and blurry due to --force-ocr.
                 self.archive_path = archive_path_fallback
@@ -863,7 +839,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                     f"be empty.",
                 )
                 self.text = ""
-        return data_ocr_fields, form_code
+        return data_ocr_fields
 
     def parse_field(self, document_path: Path, mime_type, file_name=None):
         # This forces tesseract to use one core per page.

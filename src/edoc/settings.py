@@ -15,9 +15,9 @@ from urllib.parse import urlparse
 
 from celery.schedules import crontab
 from concurrent_log_handler.queue import setup_logging_queues
+from decouple import config
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
-from decouple import config
 
 # Tap edoc.conf if it's available
 configuration_path = os.getenv("EDOC_CONFIGURATION_PATH")
@@ -1181,6 +1181,8 @@ API_OCR_BY_FILE_ID = os.getenv("API_OCR_BY_FILE_ID", "")
 API_UPLOAD_FILE_OCR = os.getenv("API_UPLOAD_FILE_OCR", "")
 FOLDER_UPLOAD = os.getenv("FOLDER_UPLOAD", "")
 DELAY_OCR = os.getenv("DELAY_OCR", 1)
+EDOC_SECRET_KEY_OCR = os.getenv("EDOC_SECRET_KEY_OCR", "")
+METHOD_OCR = os.getenv("METHOD_OCR", "RETRY")
 
 ###############################################################################
 # Elastic search                                                              #

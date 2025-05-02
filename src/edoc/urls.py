@@ -103,7 +103,7 @@ api_router.register(r"folders", FolderViewSet)
 api_router.register(r"dossiers", DossierViewSet)
 api_router.register(r"dossier_forms", DossierFormViewSet)
 api_router.register(r"backup_records", BackupRecordViewSet)
-api_router.register(r'peel-field', WebhookViewSet, basename='webhook')
+api_router.register(r'process_ocr', WebhookViewSet, basename='webhook')
 # api_router.register(r"approvals", ApprovalViewSet)
 api_router.register(r"content_types", ContentTypeViewSet,
                     basename="content_types")

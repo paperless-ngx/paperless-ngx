@@ -15,7 +15,7 @@ from datetime import timedelta
 from pathlib import Path
 from time import mktime
 from unicodedata import normalize
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 from urllib.parse import urlparse
 
 import pandas as pd
@@ -51,15 +51,12 @@ from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.cache import cache_control, cache_page
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
 from django.views.decorators.vary import vary_on_cookie
 from django.views.generic import TemplateView
 from django_elasticsearch_dsl_drf.pagination import LimitOffsetPagination
 from django_filters.rest_framework import DjangoFilterBackend
-from guardian.ctypes import get_content_type
-from guardian.shortcuts import get_objects_for_user
 from guardian.shortcuts import get_users_with_perms
 from langdetect import detect
 from packaging import version as packaging_version
@@ -84,7 +81,6 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.viewsets import ViewSet
 
-
 from documents import bulk_edit
 from documents import index
 from documents.bulk_download import ArchiveOnlyStrategy
@@ -98,6 +94,7 @@ from documents.caching import refresh_suggestions_cache
 from documents.caching import set_metadata_cache
 from documents.caching import set_suggestions_cache
 from documents.classifier import load_classifier
+from documents.common import verify_token
 from documents.conditionals import metadata_etag
 from documents.conditionals import metadata_last_modified
 from documents.conditionals import preview_etag
@@ -126,8 +123,7 @@ from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
 from documents.filters import WarehouseFilterSet
-from documents.index import autocomplete_elastic_search, \
-    autocomplete_string_elastic_search
+from documents.index import autocomplete_string_elastic_search
 from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_folders
@@ -144,10 +140,10 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Dossier
 from documents.models import DossierForm
+from documents.models import EdocTask
 from documents.models import Folder
 from documents.models import FontLanguage
 from documents.models import Note
-from documents.models import EdocTask
 from documents.models import SavedView
 from documents.models import ShareLink
 from documents.models import StoragePath
@@ -170,7 +166,7 @@ from documents.permissions import update_view_folder_parent_permissions
 from documents.permissions import \
     update_view_warehouse_shelf_boxcase_permissions
 from documents.serialisers import AcknowledgeTasksViewSerializer, \
-    DocumentDocumentSerializer, WebhookSerializer, DocumentDetailSerializer
+    DocumentDocumentSerializer, DocumentDetailSerializer
 from documents.serialisers import ApprovalSerializer
 from documents.serialisers import ApprovalViewSerializer
 from documents.serialisers import ArchiveFontSerializer
@@ -203,9 +199,9 @@ from documents.serialisers import WorkflowSerializer
 from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import approval_updated
 from documents.signals import document_updated
-
 from documents.tasks import backup_documents, \
-    bulk_update_custom_field_form_document_type_to_document, bulk_delete_file
+    bulk_update_custom_field_form_document_type_to_document, bulk_delete_file, \
+    update_ocr_document
 from documents.tasks import consume_file
 from documents.tasks import deleted_backup
 from documents.tasks import empty_trash
@@ -217,10 +213,7 @@ from edoc import version
 from edoc.celery import app as celery_app
 from edoc.config import GeneralConfig
 from edoc.db import GnuPG
-from edoc.models import ApplicationConfiguration
-from edoc.views import StandardPagination, CustomStandardPagination, \
-    CustomLimitOffsetPagination
-from edoc.wsgi import application
+from edoc.views import StandardPagination, CustomLimitOffsetPagination
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -3132,6 +3125,33 @@ class TrashView(ListModelMixin, PassUserMixin):
 
 class WebhookViewSet(ViewSet):
     permission_classes = [AllowAny]
+
+    @action(detail=True, methods=['post'], url_path='update-content-document',
+            permission_classes=[AllowAny])
+    def update_content(self, request, pk=None):
+        """
+        Nhận dữ liệu từ POST /api/update_content/<token>/
+        """
+        data = request.data
+        logger.info(f'token callback {pk}')
+        token = unquote(pk)
+        result = verify_token(token=token,
+                              secret_key=settings.EDOC_SECRET_KEY_OCR)
+        logger.info(f'result verify_token {result}')
+        if not result['valid']:
+            return Response({"message": "Received", "data": result['error']})
+        task_id = result['task_id']
+        task = EdocTask.objects.filter(task_id=task_id).first()
+        if task is None:
+            return Response({"message": "Received", "data": "Task not found"})
+        related_doc_re = re.compile(
+            r"Success. document id (\d+) is being processed")
+        document_id = related_doc_re.search(task.result).group(1)
+        document = Document.objects.filter(id=document_id).first()
+        logger.info(f"Webhook called with document={document.pk}")
+        update_ocr_document.delay(document, task, data['ocr'])
+
+        return Response({"message": "Received", "document_id": pk})
 
     @action(detail=True, methods=['post'], url_path='peel-field', permission_classes=[AllowAny])
     def peel_field(self, request, pk=None):

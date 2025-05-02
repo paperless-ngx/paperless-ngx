@@ -5,8 +5,8 @@ import tempfile
 import uuid
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING
 from typing import Optional
+from typing import TYPE_CHECKING
 
 import magic
 from asgiref.sync import async_to_sync
