@@ -177,21 +177,10 @@ jobs:
             ~/.pnpm-store
             ~/.cache
           key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
-      - name: Install Playwright system dependencies
-        run: npx playwright install-deps
       - name: Install dependencies
         run: cd src-ui && pnpm install
-      - name: Install Playwright and Browsers
-        run: cd src-ui && pnpm exec playwright install
   tests-frontend:
-    name: "Frontend Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
+    name: "Frontend Unit Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     runs-on: ubuntu-24.04
     needs:
       - install-frontend-dependencies
@@ -227,15 +216,6 @@ jobs:
         run: cd src-ui && pnpm run lint
       - name: Run Jest unit tests
         run: cd src-ui && pnpm run test --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
-      - name: Run Playwright e2e tests
-        run: cd src-ui && pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
       - name: Upload frontend test results to Codecov
         uses: codecov/test-results-action@v1
         if: always()
@@ -249,11 +229,60 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/coverage/
+  tests-frontend-e2e:
+    name: "Frontend E2E Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
+    runs-on: ubuntu-24.04
+    needs:
+      - install-frontend-dependencies
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20.x]
+        shard-index: [1, 2]
+        shard-count: [2]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'pnpm'
+          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
+      - name: Cache frontend dependencies
+        id: cache-frontend-deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pnpm-store
+            ~/.cache
+          key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
+      - name: Re-link Angular cli
+        run: cd src-ui && pnpm link @angular/cli
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+      - name: Install Playwright system dependencies
+        run: npx playwright install-deps
+      - name: Install dependencies
+        run: cd src-ui && pnpm install --no-frozen-lockfile
+      - name: Install Playwright
+        run: cd src-ui && pnpm exec playwright install
+      - name: Run Playwright e2e tests
+        run: cd src-ui && pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
   frontend-bundle-analysis:
     name: "Frontend Bundle Analysis"
     runs-on: ubuntu-24.04
     needs:
       - tests-frontend
+      - tests-frontend-e2e
     steps:
       - uses: actions/checkout@v4
       - name: Install pnpm
@@ -290,6 +319,7 @@ jobs:
     needs:
       - tests-backend
       - tests-frontend
+      - tests-frontend-e2e
     steps:
       - name: Check pushing to Docker Hub
         id: push-other-places
