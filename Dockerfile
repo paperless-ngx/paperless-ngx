@@ -47,7 +47,7 @@ ENV \
 ARG TARGETARCH
 ARG TARGETVARIANT
 # Lock this version
-ARG S6_OVERLAY_VERSION=3.2.0.2
+ARG S6_OVERLAY_VERSION=3.2.0.3
 
 ARG S6_BUILD_TIME_PKGS="curl \
                         xz-utils"
