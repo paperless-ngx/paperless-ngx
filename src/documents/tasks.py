@@ -41,7 +41,7 @@ from documents.documents import DocumentDocument
 from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
-from documents.index import update_index_document
+from documents.index import update_index_document, update_index_bulk_documents
 from documents.models import BackupRecord, TaskType, EdocTask
 from documents.models import Correspondent
 from documents.models import CustomFieldInstance
@@ -54,6 +54,8 @@ from documents.models import Tag
 from documents.models import Warehouse
 from documents.parsers import DocumentParser
 from documents.parsers import custom_get_parser_class_for_mime_type
+from documents.permissions import set_permissions_for_object, \
+    update_view_folder_parent_permissions
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import ProgressManager
 from documents.plugins.base import StopConsumeTaskError
@@ -1035,3 +1037,90 @@ def update_ocr_document(document, task_instance: EdocTask, data_ocr):
     except Exception as e:  # Bắt lỗi và ghi log
         logger.exception(f"Lỗi khi cập nhật nội dung tài liệu: {e}")
         raise e
+
+
+@shared_task(bind=True)
+def update_child_folder_paths(self, folder):
+    child_folders = Folder.objects.filter(parent_folder=folder)
+    for child_folder in child_folders:
+        if folder.path:
+            child_folder.path = f"{folder.path}/{child_folder.id}"
+        else:
+            child_folder.path = f"{child_folder.id}"
+        child_folder.save()
+        self.update_child_folder_paths(child_folder)
+
+
+@shared_task(bind=True)
+def update_child_folder_permisisons(self, folder, permissions, owner, merge,
+                                    owner_exist, set_permissions_exist):
+    child_folders = Folder.objects.filter(path__startswith=folder.path)
+    documents_list = Document.objects.filter(
+        folder__in=child_folders,
+    )
+    # documents_list = []
+    # for child in child_folders:
+    #     if child.type == "file":
+    #         documents_list._append(child.o)
+    permissions_copy = permissions.copy()
+    update_view_folder_parent_permissions(folder, permissions_copy)
+
+    try:
+        qs = child_folders
+
+        # if merge is true, we dont want to remove the owner
+        if owner_exist and (
+            not merge or (merge and owner is not None)
+        ):
+            # if merge is true, we dont want to overwrite the owner
+            qs_owner_update = qs.filter(owner__isnull=True) if merge else qs
+            qs_owner_update.update(owner=owner)
+        if set_permissions_exist:
+            for obj in qs:
+                set_permissions_for_object(
+                    permissions=permissions,
+                    object=obj,
+                    merge=merge,
+                )
+            for obj in documents_list:
+                set_permissions_for_object(
+                    permissions=permissions,
+                    object=obj,
+                    merge=merge,
+                )
+            update_index_bulk_documents(documents_list, 500)
+
+    except Exception as e:
+        logger.warning(
+            f"An error occurred performing bulk permissions edit: {e!s}",
+        )
+
+
+@shared_task(bind=True)
+def update_folder_permisisons(self: Task, instance: Document, permissions,
+                              owner, merge, owner_exist,
+                              set_permissions_exist):
+    folder = instance.folder
+    try:
+        if folder:
+            # if merge is true, we dont want to remove the owner
+            if owner_exist and (
+                not merge or (merge and owner is not None)
+            ):
+                # if merge is true, we dont want to overwrite the owner
+                qs_owner_update = (
+                    folder.filter(owner__isnull=True) if merge else folder
+                )
+                qs_owner_update.owner = owner
+                qs_owner_update.save()
+            if set_permissions_exist:
+                set_permissions_for_object(
+                    permissions=permissions,
+                    object=folder,
+                    merge=merge,
+                )
+
+    except Exception as e:
+        logger.warning(
+            f"An error occurred performing bulk permissions edit: {e!s}",
+        )

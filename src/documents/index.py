@@ -43,7 +43,7 @@ from whoosh.util.times import timespan
 from whoosh.writing import AsyncWriter
 
 from documents.documents import DocumentDocument
-from documents.models import CustomFieldInstance, Warehouse
+from documents.models import CustomFieldInstance, Warehouse, Folder
 from documents.models import Document
 from documents.models import Note
 from documents.models import User
@@ -632,6 +632,17 @@ class DelayedElasticSearch(DelayedQuery):
                                  object in warehouses]
                     criterias.append(Q("bool", should=in_filter))
                     continue
+                elif field in {"folder"}:
+                    folders = Folder.objects.filter(id__in=value.split(","))
+
+                    if folders is not None:
+                        in_filter = [
+                            Q("match_phrase_prefix",
+                              **{'folder_path': object.path})
+                            for object in folders]
+                        criterias.append(Q("bool", should=in_filter))
+                        # print('in_filter', in_filter)
+                    continue
                 elif field in {"tag"}:
                     in_filter = [Q("term", **{f"tag_id": int(object_id)}) for
                                  object_id in value.split(",")]
@@ -685,7 +696,6 @@ class DelayedElasticSearch(DelayedQuery):
     def get_combined_query(self):
         base_query = self._get_query()  # Lấy truy vấn cơ bản
         filter_query = self._get_query_filter()  # Lấy truy vấn lọc
-        print('filter_query', filter_query)
         # Lấy trường và chiều sắp xếp
         sort_field, reverse = self._get_query_sortedby()
 
@@ -704,6 +714,7 @@ class DelayedElasticSearch(DelayedQuery):
             "sort": [sort_order] if sort_order else [],
 
         }
+        print('query_body', query_body)
         return query_body
 
     def search_pagination(self, content, page_number, page_size):

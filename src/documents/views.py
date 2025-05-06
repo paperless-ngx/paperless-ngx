@@ -123,8 +123,7 @@ from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
 from documents.filters import WarehouseFilterSet
-from documents.index import autocomplete_string_elastic_search, \
-    update_index_bulk_documents
+from documents.index import autocomplete_string_elastic_search
 from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_folders
@@ -156,7 +155,8 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.parsers import custom_get_parser_class_for_mime_type
 from documents.parsers import parse_date_generator
-from documents.permissions import EdocAdminPermissions
+from documents.permissions import EdocAdminPermissions, get_permissions, \
+    set_permissions
 from documents.permissions import EdocObjectPermissions
 from documents.permissions import check_user_can_change_folder
 from documents.permissions import get_groups_with_only_permission
@@ -202,7 +202,8 @@ from documents.signals import approval_updated
 from documents.signals import document_updated
 from documents.tasks import backup_documents, \
     bulk_update_custom_field_form_document_type_to_document, bulk_delete_file, \
-    update_ocr_document
+    update_ocr_document, update_child_folder_paths, \
+    update_child_folder_permisisons, update_folder_permisisons
 from documents.tasks import consume_file
 from documents.tasks import deleted_backup
 from documents.tasks import empty_trash
@@ -617,7 +618,18 @@ class DocumentViewSet(
         # logger.debug(response)
         self.update_time_archive_font(self.get_object())
         self.update_name_folder(self.get_object(), serializer)
-        self.update_folder_permisisons(self.get_object(), serializer)
+        permissions = serializer.validated_data.get("set_permissions")
+        permissions_copy = permissions.copy()
+        update_view_folder_parent_permissions(instance, permissions_copy)
+        owner = serializer.validated_data.get("owner")
+        merge = serializer.validated_data.get("merge")
+        owner_exist = "owner" in serializer.validated_data
+        set_permissions_exist = "set_permissions" in serializer.validated_data
+        update_folder_permisisons.delay(instance=self.get_object(),
+                                        permissions=permissions_copy,
+                                        owner=owner, owner_exist=owner_exist,
+                                        merge=merge,
+                                        set_permissions_exist=set_permissions_exist)
         from documents import index
 
         index.add_or_update_document(self.get_object())
@@ -1174,38 +1186,7 @@ class DocumentViewSet(
             instance.archive_font.first_upload = instance.created
         instance.archive_font.save()
 
-    def update_folder_permisisons(self, instance, serializer):
-        folder = instance.folder
-        permissions = serializer.validated_data.get("set_permissions")
-        owner = serializer.validated_data.get("owner")
-        merge = serializer.validated_data.get("merge")
-        try:
-            if folder:
-                # if merge is true, we dont want to remove the owner
-                if "owner" in serializer.validated_data and (
-                    not merge or (merge and owner is not None)
-                ):
-                    # if merge is true, we dont want to overwrite the owner
-                    qs_owner_update = (
-                        folder.filter(owner__isnull=True) if merge else folder
-                    )
-                    qs_owner_update.owner = owner
-                    qs_owner_update.save()
-                if "set_permissions" in serializer.validated_data:
 
-                    set_permissions_for_object(
-                        permissions=permissions,
-                        object=folder,
-                        merge=merge,
-                    )
-
-        except Exception as e:
-            logger.warning(
-                f"An error occurred performing bulk permissions edit: {e!s}",
-            )
-            return HttpResponseBadRequest(
-                "Error performing bulk permissions edit, check logs for more detail.",
-            )
 
     def update_dossier_permisisons(self, instance, serializer):
         dossier = instance.dossier
@@ -3665,6 +3646,10 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 f"{folder.id}.{folder.name}".encode(),
             ).hexdigest()
             folder.save()
+            permission_parent_folder = get_permissions(obj=parent_folder)
+            if permission_parent_folder:
+                set_permissions(permissions=permission_parent_folder,
+                                object=folder)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -3707,7 +3692,18 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         self.update_document_name(instance, serializer)
         # update permission document
         # update permission folder child
-        self.update_child_folder_permisisons(instance, serializer)
+        permissions = serializer.validated_data.get("set_permissions")
+        permissions_copy = permissions.copy()
+        update_view_folder_parent_permissions(instance, permissions_copy)
+        owner = serializer.validated_data.get("owner")
+        merge = serializer.validated_data.get("merge")
+        owner_exist = "owner" in serializer.validated_data
+        set_permissions_exist = "set_permissions" in serializer.validated_data
+        update_child_folder_permisisons.delay(folder=instance,
+                                              permissions=permissions,
+                                              owner=owner, merge=merge,
+                                              owner_exist=owner_exist,
+                                              set_permissions_exist=set_permissions_exist)
         if old_parent_folder != instance.parent_folder:
             if instance.parent_folder:
                 instance.path = f"{instance.parent_folder.path}/{instance.id}"
@@ -3716,7 +3712,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 instance.path = f"{instance.id}"
             instance.save()
 
-            self.update_child_folder_paths(instance)
+            update_child_folder_paths.delay(folder=instance)
 
         return Response(serializer.data)
 
@@ -3772,64 +3768,8 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
         return Response(serializer.data)
 
-    def update_child_folder_paths(self, folder):
-        child_folders = Folder.objects.filter(parent_folder=folder)
-        for child_folder in child_folders:
-            if folder.path:
-                child_folder.path = f"{folder.path}/{child_folder.id}"
-            else:
-                child_folder.path = f"{child_folder.id}"
-            child_folder.save()
-            self.update_child_folder_paths(child_folder)
 
-    def update_child_folder_permisisons(self, folder, serializer):
-        child_folders = Folder.objects.filter(path__startswith=folder.path)
-        documents_list = Document.objects.filter(
-            folder__in=child_folders,
-        )
-        # documents_list = []
-        # for child in child_folders:
-        #     if child.type == "file":
-        #         documents_list._append(child.o)
 
-        permissions = serializer.validated_data.get("set_permissions")
-        permissions_copy = permissions.copy()
-        update_view_folder_parent_permissions(folder, permissions_copy)
-        owner = serializer.validated_data.get("owner")
-        merge = serializer.validated_data.get("merge")
-
-        try:
-            qs = child_folders
-
-            # if merge is true, we dont want to remove the owner
-            if "owner" in serializer.validated_data and (
-                not merge or (merge and owner is not None)
-            ):
-                # if merge is true, we dont want to overwrite the owner
-                qs_owner_update = qs.filter(owner__isnull=True) if merge else qs
-                qs_owner_update.update(owner=owner)
-            if "set_permissions" in serializer.validated_data:
-                for obj in qs:
-                    set_permissions_for_object(
-                        permissions=permissions,
-                        object=obj,
-                        merge=merge,
-                    )
-                for obj in documents_list:
-                    set_permissions_for_object(
-                        permissions=permissions,
-                        object=obj,
-                        merge=merge,
-                    )
-                update_index_bulk_documents(documents_list, 500)
-
-        except Exception as e:
-            logger.warning(
-                f"An error occurred performing bulk permissions edit: {e!s}",
-            )
-            return HttpResponseBadRequest(
-                "Error performing bulk permissions edit, check logs for more detail.",
-            )
 
     def destroy(self, request, pk, *args, **kwargs):
         folder = Folder.objects.get(id=pk)
