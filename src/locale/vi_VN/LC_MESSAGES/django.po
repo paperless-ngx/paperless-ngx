@@ -1895,5 +1895,5 @@ msgstr "trạng thái"
 #~ msgid "folders"
 #~ msgstr "thư mục"
 
-#~ msgid "The username and/or password you specified are not correct."
-#~ msgstr "Tên người dùng hoặc mật khẩu bạn chỉ định không chính xác."
+msgid "The username and/or password you specified are not correct."
+msgstr "Tên người dùng/mật khẩu của bạn không chính xác."

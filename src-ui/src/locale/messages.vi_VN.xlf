@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+<xliff xmlns:ns0="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
    <file source-language="en-US" datatype="plaintext" original="ng2.template">
       <body>
          <trans-unit id="ngb.alert.close" datatype="html">
@@ -529,7 +529,7 @@
             <source>Clear selection</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">9</context>
+               <context context-type="linenumber">10</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
@@ -597,7 +597,7 @@
             <source>Auto refresh</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">24</context>
+               <context context-type="linenumber">26</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/logs/logs.component.html</context>
@@ -613,7 +613,7 @@
             <source>Loading...</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">31</context>
+               <context context-type="linenumber">33</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
@@ -745,7 +745,7 @@
             <source>Name</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">44</context>
+               <context context-type="linenumber">47</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
@@ -941,7 +941,7 @@
             <source>Info</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">45</context>
+               <context context-type="linenumber">48</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
@@ -953,7 +953,7 @@
             <source>Submmit by</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">47</context>
+               <context context-type="linenumber">50</context>
             </context-group>
             <target state="translated">Người yêu cầu</target>
          </trans-unit>
@@ -961,7 +961,7 @@
             <source>Created</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">49</context>
+               <context context-type="linenumber">52</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
@@ -985,7 +985,7 @@
             <source>Expires</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">50</context>
+               <context context-type="linenumber">53</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/approval-edit-dialog/approval-edit-dialog.component.html</context>
@@ -1005,7 +1005,7 @@
             <source>Approve at</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">52</context>
+               <context context-type="linenumber">55</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-approvals/document-approvals.component.html</context>
@@ -1017,7 +1017,7 @@
             <source>Reject at</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">55</context>
+               <context context-type="linenumber">57</context>
             </context-group>
             <target state="translated">Từ chối lúc</target>
          </trans-unit>
@@ -1025,7 +1025,7 @@
             <source>Revoked at</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">58</context>
+               <context context-type="linenumber">59</context>
             </context-group>
             <target state="translated">Thu hồi lúc</target>
          </trans-unit>
@@ -1033,7 +1033,7 @@
             <source>Method</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">60</context>
+               <context context-type="linenumber">61</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-approvals/document-approvals.component.html</context>
@@ -1045,7 +1045,7 @@
             <source>Actions</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">61</context>
+               <context context-type="linenumber">62</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
@@ -1157,7 +1157,7 @@
             <source>Unlimited</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">79</context>
+               <context context-type="linenumber">82</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/document-approvals/document-approvals.component.html</context>
@@ -1169,11 +1169,11 @@
             <source>Approve</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">99</context>
+               <context context-type="linenumber">105</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">127</context>
+               <context context-type="linenumber">159</context>
             </context-group>
             <target state="translated">xét duyệt</target>
          </trans-unit>
@@ -1181,11 +1181,11 @@
             <source>Reject</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">102</context>
+               <context context-type="linenumber">111</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">138</context>
+               <context context-type="linenumber">170</context>
             </context-group>
             <target state="translated">Từ chối</target>
          </trans-unit>
@@ -1193,7 +1193,7 @@
             <source>Revoked</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">107</context>
+               <context context-type="linenumber">119</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
@@ -1205,7 +1205,7 @@
             <source>Open Document</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">114</context>
+               <context context-type="linenumber">127</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
@@ -1217,39 +1217,39 @@
             <source>
                <x id="START_TAG_TABLE" ctype="x-table" equiv-text="&lt;table #collapse=&quot;ngbCollapse&quot; [ngbCollapse]=&quot;expandedApproval !== approval.id&quot; class=&quot;small mb-0&quot;&gt;" />
                <x id="START_TABLE_ROW" ctype="x-tr" equiv-text="&lt;tr&gt;" />
-               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;" />
+               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td&gt;" />
                Name
                <x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;" />
-               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;" />
+               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td&gt;" />
                <x id="INTERPOLATION" equiv-text="{{ approval.name }}" />
                <x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;" />
                <x id="CLOSE_TABLE_ROW" ctype="x-tr" equiv-text="&lt;/tr&gt;" />
                <x id="START_TABLE_ROW" ctype="x-tr" equiv-text="&lt;tr&gt;" />
-               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;" />
+               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td&gt;" />
                Submmit by
                <x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;" />
-               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;" />
+               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td&gt;" />
                <x id="INTERPOLATION_1" equiv-text="{{ displayName(approval) }}" />
                <x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;" />
                <x id="CLOSE_TABLE_ROW" ctype="x-tr" equiv-text="&lt;/tr&gt;" />
                <x id="START_TABLE_ROW" ctype="x-tr" equiv-text="&lt;tr&gt;" />
-               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;" />
+               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td&gt;" />
                Created
                <x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;" />
-               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;" />
+               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td&gt;" />
                <x id="INTERPOLATION_2" equiv-text="{{ approval.created | customDate:'short' }}" />
                <x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;" />
                <x id="CLOSE_TABLE_ROW" ctype="x-tr" equiv-text="&lt;/tr&gt;" />
                <x id="START_TABLE_ROW" ctype="x-tr" equiv-text="&lt;tr&gt;" />
-               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;" />
+               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td&gt;" />
                Expires
                <x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;" />
-               <x id="START_BLOCK_IF" equiv-text="@if (approval.expiration==null){" />
+               <x id="START_BLOCK_IF" equiv-text="@if (approval.expiration == null) {" />
                <x id="START_TABLE_CELL_1" equiv-text="&lt;td class=&quot;&quot;&gt;" />
                Unlimited
                <x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
-               <x id="START_BLOCK_IF_1" equiv-text="@if (approval.expiration!=null){" />
+               <x id="START_BLOCK_IF_1" equiv-text="@if (approval.expiration != null) {" />
                <x id="START_TABLE_CELL_1" equiv-text="&lt;td class=&quot;&quot;&gt;" />
                <x id="INTERPOLATION_3" equiv-text="{{ approval.expiration | customDate:'short' }}" />
                <x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;" />
@@ -1262,23 +1262,23 @@
                <x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
                <x id="START_BLOCK_ELSE_IF" equiv-text="@else if (activeTab == 'failure') {" />
-               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;" />
+               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td&gt;" />
                Reject at
                <x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;" />
                <x id="CLOSE_BLOCK_ELSE_IF" equiv-text="}" />
                <x id="START_BLOCK_ELSE_IF_1" equiv-text="@else if (activeTab == 'revoked') {" />
-               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;" />
+               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td&gt;" />
                Revoked at
                <x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;" />
                <x id="CLOSE_BLOCK_ELSE_IF" equiv-text="}" />
-               <x id="START_BLOCK_IF_3" equiv-text="@if (activeTab !='pending'){" />
+               <x id="START_BLOCK_IF_3" equiv-text="@if (activeTab != 'pending') {" />
                <x id="START_TABLE_CELL_1" equiv-text="&lt;td class=&quot;&quot;&gt;" />
                <x id="INTERPOLATION_4" equiv-text="{{ approval.modified | customDate:'short' }}" />
                <x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
                <x id="CLOSE_TABLE_ROW" ctype="x-tr" equiv-text="&lt;/tr&gt;" />
                <x id="START_TABLE_ROW" ctype="x-tr" equiv-text="&lt;tr&gt;" />
-               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td &gt;" />
+               <x id="START_TABLE_CELL" ctype="x-td" equiv-text="&lt;td&gt;" />
                Method
                <x id="CLOSE_TABLE_CELL" ctype="x-td" equiv-text="&lt;/td&gt;" />
                <x id="START_TABLE_CELL_1" equiv-text="&lt;td class=&quot;&quot;&gt;" />
@@ -1289,7 +1289,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">123,177</context>
+               <context context-type="linenumber">136,188</context>
             </context-group>
             <target state="translated">
                <x id="START_TAG_TABLE" ctype="x-table" equiv-text="&amp;lt;table #collapse=&amp;quot;ngbCollapse&amp;quot; [ngbCollapse]=&amp;quot;expandedApproval !== approval.id&amp;quot; class=&amp;quot;small mb-0&amp;quot;&gt;" />
@@ -1377,7 +1377,7 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">187</context>
+               <context context-type="linenumber">199</context>
             </context-group>
             <target state="translated">
                {VAR_PLURAL, plural, =1 {1
@@ -1393,13 +1393,13 @@
          </trans-unit>
          <trans-unit id="1943508481059904274" datatype="html">
             <source>
-                (
-               <x id="INTERPOLATION" equiv-text="{{selectedApprovals.size}}" />
+               (
+               <x id="INTERPOLATION" equiv-text="{{ selectedApprovals.size }}" />
                selected)
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">189</context>
+               <context context-type="linenumber">201</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/backup/backup.component.html</context>
@@ -1471,15 +1471,15 @@
          <trans-unit id="8007171557896222103" datatype="html">
             <source>
                Failure
-               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.failureApprovals.length &gt; 0) {" />
+               <x id="START_BLOCK_IF" equiv-text="@if (approvalsFailure.count &gt; 0) {" />
                <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-danger ms-2&quot;&gt;" />
-               <x id="INTERPOLATION" equiv-text="{{approvalsService.failureApprovals.length}}" />
+               <x id="INTERPOLATION" equiv-text="{{ approvalsFailure.count }}" />
                <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">201,203</context>
+               <context context-type="linenumber">215,217</context>
             </context-group>
             <target state="translated">
                Từ chối
@@ -1493,15 +1493,15 @@
          <trans-unit id="4505393859135259953" datatype="html">
             <source>
                Success
-               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.successApprovals.length &gt; 0) {" />
+               <x id="START_BLOCK_IF" equiv-text="@if (approvalsSuccess.count &gt; 0) {" />
                <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-secondary ms-2&quot;&gt;" />
-               <x id="INTERPOLATION" equiv-text="{{approvalsService.successApprovals.length}}" />
+               <x id="INTERPOLATION" equiv-text="{{ approvalsSuccess.count }}" />
                <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">209,211</context>
+               <context context-type="linenumber">224,226</context>
             </context-group>
             <target state="translated">
                Chấp nhận
@@ -1515,15 +1515,15 @@
          <trans-unit id="7942845149370049078" datatype="html">
             <source>
                Pending
-               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.pendingApprovals.length &gt; 0) {" />
+               <x id="START_BLOCK_IF" equiv-text="@if (approvalsPending.count &gt; 0) {" />
                <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-secondary ms-2&quot;&gt;" />
-               <x id="INTERPOLATION" equiv-text="{{approvalsService.pendingApprovals.length}}" />
+               <x id="INTERPOLATION" equiv-text="{{ approvalsPending.count }}" />
                <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">217,219</context>
+               <context context-type="linenumber">233,235</context>
             </context-group>
             <target state="translated">
                Chờ xử lý
@@ -1537,15 +1537,15 @@
          <trans-unit id="7606624497891878555" datatype="html">
             <source>
                Revoked
-               <x id="START_BLOCK_IF" equiv-text="@if (approvalsService.revokedApprovals.length &gt; 0) {" />
+               <x id="START_BLOCK_IF" equiv-text="@if (approvalsRevoked.count &gt; 0) {" />
                <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-secondary ms-2&quot;&gt;" />
-               <x id="INTERPOLATION" equiv-text="{{approvalsService.revokedApprovals.length}}" />
+               <x id="INTERPOLATION" equiv-text="{{ approvalsRevoked.count }}" />
                <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
                <x id="CLOSE_BLOCK_IF" equiv-text="}" />
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.html</context>
-               <context context-type="linenumber">225,227</context>
+               <context context-type="linenumber">242,244</context>
             </context-group>
             <target state="translated">
                Thu hồi
@@ -1560,7 +1560,7 @@
             <source>Dismiss selected</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">40</context>
+               <context context-type="linenumber">71</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
@@ -1572,7 +1572,7 @@
             <source>Dismiss all</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">41</context>
+               <context context-type="linenumber">72</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
@@ -1584,7 +1584,7 @@
             <source>Approve selected</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">45</context>
+               <context context-type="linenumber">76</context>
             </context-group>
             <target state="translated">Xét duyệt đã chọn</target>
          </trans-unit>
@@ -1592,7 +1592,7 @@
             <source>Approval all</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">46</context>
+               <context context-type="linenumber">77</context>
             </context-group>
             <target state="translated">Xét duyệt tất cả</target>
          </trans-unit>
@@ -1600,7 +1600,7 @@
             <source>Reject selected</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">51</context>
+               <context context-type="linenumber">82</context>
             </context-group>
             <target state="translated">Từ chối đã chọn</target>
          </trans-unit>
@@ -1608,7 +1608,7 @@
             <source>Reject all</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">52</context>
+               <context context-type="linenumber">83</context>
             </context-group>
             <target state="translated">Từ chối tất cả</target>
          </trans-unit>
@@ -1616,7 +1616,7 @@
             <source>Revoke selected</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">56</context>
+               <context context-type="linenumber">87</context>
             </context-group>
             <target state="translated">Thu hồi đã chọn</target>
          </trans-unit>
@@ -1624,7 +1624,7 @@
             <source>Revoke all</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">57</context>
+               <context context-type="linenumber">88</context>
             </context-group>
             <target state="translated">Huỷ tất cả</target>
          </trans-unit>
@@ -1632,7 +1632,7 @@
             <source>Confirm Approve All</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">124</context>
+               <context context-type="linenumber">156</context>
             </context-group>
             <target state="translated">Xác nhận xét duyệt tất cả</target>
          </trans-unit>
@@ -1644,14 +1644,14 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">125</context>
+               <context context-type="linenumber">157</context>
             </context-group>
          </trans-unit>
          <trans-unit id="8149316136396574153" datatype="html">
             <source>Confirm Reject All</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">135</context>
+               <context context-type="linenumber">167</context>
             </context-group>
             <target state="translated">Xác nhận từ chối tất cả</target>
          </trans-unit>
@@ -1663,14 +1663,14 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">136</context>
+               <context context-type="linenumber">168</context>
             </context-group>
          </trans-unit>
          <trans-unit id="1968812985483407517" datatype="html">
             <source>Confirm Revoke All</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">146</context>
+               <context context-type="linenumber">178</context>
             </context-group>
             <target state="translated">Xác nhận huỷ tất cả</target>
          </trans-unit>
@@ -1682,14 +1682,14 @@
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">147</context>
+               <context context-type="linenumber">179</context>
             </context-group>
          </trans-unit>
          <trans-unit id="135077277733987408" datatype="html">
             <source>Revoke</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">149</context>
+               <context context-type="linenumber">181</context>
             </context-group>
             <target state="translated">Thu hồi</target>
          </trans-unit>
@@ -1697,7 +1697,7 @@
             <source>pending</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">218</context>
+               <context context-type="linenumber">303</context>
             </context-group>
             <target state="translated">đang chờ</target>
          </trans-unit>
@@ -1705,7 +1705,7 @@
             <source>success</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">220</context>
+               <context context-type="linenumber">305</context>
             </context-group>
             <target state="translated">thành công</target>
          </trans-unit>
@@ -1713,7 +1713,7 @@
             <source>failure</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">222</context>
+               <context context-type="linenumber">307</context>
             </context-group>
             <target state="translated">thất bại</target>
          </trans-unit>
@@ -1721,7 +1721,7 @@
             <source>revoked</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
-               <context context-type="linenumber">224</context>
+               <context context-type="linenumber">309</context>
             </context-group>
             <target state="translated">đã thu hồi</target>
          </trans-unit>
@@ -3385,7 +3385,6 @@
          </trans-unit>
          <trans-unit id="9187755754633397589" datatype="html">
             <source>
-
                <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;visually-hidden&quot;&gt;" />
                Appears on
                <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
@@ -3714,7 +3713,7 @@
             <source>queued</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-               <context context-type="linenumber">231</context>
+               <context context-type="linenumber">230</context>
             </context-group>
             <target state="translated">hàng đợi</target>
          </trans-unit>
@@ -3722,7 +3721,7 @@
             <source>started</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-               <context context-type="linenumber">233</context>
+               <context context-type="linenumber">232</context>
             </context-group>
             <target state="translated">đã bắt đầu</target>
          </trans-unit>
@@ -3730,7 +3729,7 @@
             <source>completed</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-               <context context-type="linenumber">235</context>
+               <context context-type="linenumber">234</context>
             </context-group>
             <target state="translated">hoàn thành</target>
          </trans-unit>
@@ -3738,7 +3737,7 @@
             <source>failed</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-               <context context-type="linenumber">237</context>
+               <context context-type="linenumber">236</context>
             </context-group>
             <target state="translated">thất bại</target>
          </trans-unit>
@@ -8607,7 +8606,6 @@
                <x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span class=&quot;fw-bold&quot; &gt;" />
                Assigned document type
                <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
-
                <x id="START_TAG_SPAN_2" ctype="x-span_2" equiv-text="&lt;span class=&quot;text-muted&quot;&gt;" />
                (
                <x id="INTERPOLATION" equiv-text="{{100-(statistics.unassigned_document_types_count/statistics.document_type_count)*100 | number: '1.0-1'}}" />
@@ -8624,7 +8622,6 @@
                <x id="START_TAG_SPAN_1" ctype="x-span_1" equiv-text="&lt;span class=&quot;fw-bold&quot; &gt;" />
                Unassigned document type
                <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;" />
-
                <x id="START_TAG_SPAN_2" ctype="x-span_2" equiv-text="&lt;span class=&quot;text-muted&quot;&gt;" />
                (
                <x id="INTERPOLATION_1" equiv-text="{{(statistics.unassigned_document_types_count/statistics.document_type_count)*100 | number: '1.0-1'}}" />
@@ -8724,7 +8721,7 @@
             <source>
                <x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;i-bs name=&quot;upload&quot;&gt;" />
                <x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;/i-bs&gt;" />
-                 Upload file
+               Upload file
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-button/upload-file-btn.component.html</context>
@@ -10555,7 +10552,7 @@
                <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
                <context context-type="linenumber">116</context>
             </context-group>
-            <target state="translated">(Đã lọc)</target>
+            <target state="translated">(được lọc)</target>
          </trans-unit>
          <trans-unit id="6849725902312323996" datatype="html">
             <source>Reset filters</source>
