@@ -123,7 +123,8 @@ from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
 from documents.filters import WarehouseFilterSet
-from documents.index import autocomplete_string_elastic_search
+from documents.index import autocomplete_string_elastic_search, \
+    update_index_bulk_documents
 from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_folders
@@ -617,7 +618,6 @@ class DocumentViewSet(
         self.update_time_archive_font(self.get_object())
         self.update_name_folder(self.get_object(), serializer)
         self.update_folder_permisisons(self.get_object(), serializer)
-        self.update_dossier_permisisons(self.get_object(), serializer)
         from documents import index
 
         index.add_or_update_document(self.get_object())
@@ -3098,7 +3098,7 @@ class TrashView(ListModelMixin, PassUserMixin):
         if action == "restore":
             deleted_docs = Document.deleted_objects.filter(
                 id__in=doc_ids,
-            ).select_related("folder", "dossier")
+            ).select_related("folder")
             # folders = {doc.folder for doc in deleted_docs}
             # dossiers = {doc.dossier for doc in deleted_docs}
             folder_set = set()
@@ -3114,8 +3114,7 @@ class TrashView(ListModelMixin, PassUserMixin):
                 #     doc.folder.restore(strict=False)
                 #     if doc.folder.parent_folder is not None:
                 #         doc.folder.parent_folder.restore(strict=False)
-                if doc.dossier is not None:
-                    doc.dossier.restore(strict=False)
+
         elif action == "empty":
             if doc_ids is None:
                 doc_ids = [doc.id for doc in docs]
@@ -3330,7 +3329,7 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
     def update_shelf_boxcase_permisisons(self, warehouse, serializer):
         child_shelf_boxcase = Warehouse.objects.filter(path__startswith=warehouse.path)
-        documents_list = Document.objects.select_related("dossier").filter(
+        documents_list = Document.objects.filter(
             warehouse__in=child_shelf_boxcase,
         ).defer('content')
         # documents_list = []
@@ -3367,11 +3366,7 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                         object=obj,
                         merge=merge,
                     )
-                    set_permissions_for_object(
-                        permissions=permissions,
-                        object=obj.dossier,
-                        merge=merge,
-                    )
+
 
         except Exception as e:
             logger.warning(
@@ -3789,7 +3784,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
     def update_child_folder_permisisons(self, folder, serializer):
         child_folders = Folder.objects.filter(path__startswith=folder.path)
-        documents_list = Document.objects.select_related("dossier").filter(
+        documents_list = Document.objects.filter(
             folder__in=child_folders,
         )
         # documents_list = []
@@ -3826,11 +3821,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                         object=obj,
                         merge=merge,
                     )
-                    set_permissions_for_object(
-                        permissions=permissions,
-                        object=obj.dossier,
-                        merge=merge,
-                    )
+                update_index_bulk_documents(documents_list, 500)
 
         except Exception as e:
             logger.warning(
@@ -3844,14 +3835,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         folder = Folder.objects.get(id=pk)
         folders = Folder.objects.filter(path__startswith=folder.path)
         documents = Document.objects.filter(folder__in=folders).defer('content')
-        dossier_ids = []
-        for d in documents:
-            if d.dossier:
-                dossier_ids.append(d.dossier.id)
-
-        dossier = Dossier.objects.filter(id__in=dossier_ids)
         documents.delete()
-        dossier.delete()
         folders.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -4228,7 +4212,6 @@ class BackupRecordViewSet(ModelViewSet):
             documents = Document.objects.all().defer("content")
             documents_deleted = Document.deleted_objects.all().defer("content")
             folders = Folder.objects.all()
-            dossiers = Dossier.objects.all()
             detail = {"documents": documents.count(), "size": used_size}
             from datetime import datetime
 
@@ -4252,7 +4235,6 @@ class BackupRecordViewSet(ModelViewSet):
                 documents,
                 documents_deleted,
                 folders,
-                dossiers,
                 name,
             )
             return Response(async_task_backup.id)

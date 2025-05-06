@@ -991,25 +991,7 @@ class Consumer(LoggingMixin):
                 new_file.save()
                 document.folder = new_file
 
-                dossier = None
-                if document.dossier:
-                    dossier = Dossier.objects.filter(id=document.dossier.pk).first()
-                    # update custom field by document_id
-                dossier_form = None
-                if dossier:
-                    dossier_form = dossier.dossier_form
-                new_dossier_document = Dossier.objects.create(
-                    name=document.title,
-                    parent_dossier=document.dossier,
-                    type="FILE",
-                    dossier_form=dossier_form,
-                )
-                if document.dossier:
-                    new_dossier_document.path = f"{document.dossier.path}/{new_file.id}"
-                else:
-                    new_dossier_document.path = f"{new_file.id}"
-                new_dossier_document.save()
-                document.dossier = new_dossier_document
+
 
                 # If we get here, it was successful. Proceed with post-consume
                 # hooks. If they fail, nothing will get changed.
@@ -1022,7 +1004,6 @@ class Consumer(LoggingMixin):
                 # create file from document
                 # self.log.info('gia tri documentt', document.folder)
 
-                document.dossier = new_dossier_document
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.
                 with FileLock(settings.MEDIA_LOCK):

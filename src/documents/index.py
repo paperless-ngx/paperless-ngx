@@ -377,6 +377,11 @@ class DelayedQuery:
         self.first_score = None
         self.user = user
         self.es = Elasticsearch()
+        if not self.es.indices.exists(index=ELASTIC_SEARCH_DOCUMENT_INDEX):
+            DocumentDocument.init()  # Tạo index nếu chưa có
+            logger.info(f"Index '{ELASTIC_SEARCH_DOCUMENT_INDEX}' created")
+        else:
+            logger.info(f"Index '{ELASTIC_SEARCH_DOCUMENT_INDEX}' already exists")
 
     def __len__(self):
         page = self[0:1]
@@ -672,7 +677,7 @@ class DelayedElasticSearch(DelayedQuery):
         user_criterias = None
         if str.__eq__(remove_time_queries(q_str), ''):
             user_criterias = get_permissions_criterias_elastic_search(user=self.user)
-        print('criterias', criterias)
+        print('user_criterias', user_criterias)
         if criterias:
             if user_criterias:
                 criterias.append(Q("bool", should=user_criterias))
@@ -683,6 +688,7 @@ class DelayedElasticSearch(DelayedQuery):
     def get_combined_query(self):
         base_query = self._get_query()  # Lấy truy vấn cơ bản
         filter_query = self._get_query_filter()  # Lấy truy vấn lọc
+        print('filter_query',filter_query)
         # Lấy trường và chiều sắp xếp
         sort_field, reverse = self._get_query_sortedby()
 
@@ -1134,13 +1140,21 @@ def remove_time_queries(query):
     return cleaned_query
 
 def get_permissions_criterias_elastic_search(user: Optional[User] = None):
-    user_criterias = [Q("term", has_owner=False)]
-
+    # user_criterias = [Q("term", has_owner=False)]
+    user_criterias = []
     if user is not None:
         if user.is_superuser:  # Superuser có thể xem tất cả tài liệu
             user_criterias = []
         else:
             # Nếu không phải superuser, thêm điều kiện cho owner_id và viewer_id
+            group_ids = user.groups.all().values_list('id', flat=True)
             user_criterias.append(Q("term", owner_id=user.id))
             user_criterias.append(Q("term", viewer_id=str(user.id)))
+            # user_criterias.append(Q("term", view_groups=group_ids))
+            if group_ids:
+                in_filter = [Q("term", **{f"view_groups": g}) for g in group_ids]
+                user_criterias.append(Q("bool", should=in_filter))
+            # in_filter = [Q("term", **{f"view_groups": g}) for g
+            #              in group_ids]
+            # user_criterias.append(Q("bool", should=in_filter))
     return Q("bool", should=user_criterias) if user_criterias else None

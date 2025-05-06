@@ -216,13 +216,13 @@ def delete(doc_ids):
     for doc in docs:
         doc_folder = doc.folder
         # doc.folder = None
-        doc_dossier = doc.dossier
+        # doc_dossier = doc.dossier
         # doc.dossier = None
         # doc.save()
         if doc_folder is not None:
             doc_folder.delete()
-        if doc_dossier is not None:
-            doc_dossier.delete()
+        # if doc_dossier is not None:
+        #     doc_dossier.delete()
     docs.delete()
     from documents import index
 
@@ -267,12 +267,12 @@ def set_permissions(doc_ids, set_permissions, owner=None, merge=False):
                 object=doc.folder,
                 merge=True,
             )
-        elif doc.dossier is not None:
-            set_permissions_for_object(
-                permissions=set_permissions,
-                object=doc.dossier,
-                merge=True,
-            )
+        # elif doc.dossier is not None:
+        #     set_permissions_for_object(
+        #         permissions=set_permissions,
+        #         object=doc.dossier,
+        #         merge=True,
+        #     )
 
     affected_docs = [doc.id for doc in qs]
 

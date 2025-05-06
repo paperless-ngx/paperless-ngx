@@ -10,6 +10,7 @@ from guardian.shortcuts import get_users_with_perms
 
 from edoc.settings import ELASTIC_SEARCH_DOCUMENT_INDEX
 from .models import Document as DocumentModel, Note, CustomFieldInstance
+from .permissions import get_groups_with_only_permission
 
 logger = logging.getLogger("edoc.document_elasticsearch")
 @registry.register_document
@@ -55,12 +56,17 @@ class DocumentDocument(Document):
     owner = fields.KeywordField(attr='owner.username')
     owner_id = fields.IntegerField(attr='owner.id')
     has_owner = fields.BooleanField(attr='owner is not None')
-    # viewer_id = fields.ListField(fields.IntegerField())
+    viewer_id = fields.ListField(fields.IntegerField())
     checksum = fields.TextField(attr='checksum')
     page_count = fields.IntegerField(attr='page_count')
     original_filename = fields.TextField(attr='original_filename')
-    # is_shared = fields.BooleanField(attr='len(viewer_id) > 0')
+    is_shared = fields.BooleanField(attr='len(viewer_id) > 0')
     # shared_by = fields.ListField(fields.IntegerField())
+    view_users = fields.ListField(fields.IntegerField())
+    view_groups = fields.ListField(fields.IntegerField())
+    change_users = fields.ListField(fields.IntegerField())
+    change_groups = fields.ListField(fields.IntegerField())
+
 
     class Index:
         name = ELASTIC_SEARCH_DOCUMENT_INDEX
@@ -121,6 +127,28 @@ class DocumentDocument(Document):
 
     def prepare_notes(self, instance):
         return [str(c.note) for c in Note.objects.filter(document=instance)]
+    @staticmethod
+    def get_permissions(instance):
+        view_codename = f"view_{instance.__class__.__name__.lower()}"
+        change_codename = f"change_{instance.__class__.__name__.lower()}"
+
+        return {
+            "view": {
+                "users": list(get_users_with_perms(instance,only_with_perms_in=[view_codename],
+                    with_group_users=False
+                ).values_list("id", flat=True)),
+                "groups": list(get_groups_with_only_permission(instance,codename=view_codename).values_list(
+                    "id", flat=True)),
+            },
+            # "change": {
+            #     "users": list(get_users_with_perms(instance,only_with_perms_in=[change_codename],
+            #         with_group_users=False
+            #     ).values_list("id", flat=True)),
+            #     "groups": list(get_groups_with_only_permission(instance,codename=change_codename).values_list(
+            #         "id", flat=True)),
+            # },
+        }
+
     @classmethod
     def update_document(cls, doc):
         document_data = {}
@@ -129,8 +157,8 @@ class DocumentDocument(Document):
         tags_ids = [t.id for t in doc.tags.all()]
         notes = list(Note.objects.filter(document=doc).values_list('note', flat=True))
         custom_fields = ",".join([str(c) for c in CustomFieldInstance.objects.filter(document=doc)],)
-
-        # viewer_ids = [u.id for u in users_with_perms]
+        permissions = cls().get_permissions(doc)
+        viewer_ids = [u for u in permissions['view']['users']]
 
         # document_data['id'] = doc.id or None
         document_data['title'] = doc.title or ''
@@ -171,12 +199,17 @@ class DocumentDocument(Document):
         document_data['owner'] = doc.owner.username if doc.owner else ''
         document_data['owner_id'] = doc.owner.id if doc.owner else -1
         document_data['has_owner'] = bool(doc.owner) is not None or False
-        # document_data['viewer_id'] = viewer_ids or [-1]  # Đảm bảo là danh sách
+        document_data['viewer_id'] = viewer_ids or [-1]  # Đảm bảo là danh sách
         document_data['checksum'] = doc.checksum or ''
         document_data['page_count'] = doc.page_count or 0
         document_data['original_filename'] = doc.original_filename or ''
-        # document_data['is_shared'] = bool(viewer_ids)
+        document_data['is_shared'] = bool(viewer_ids)
+        document_data['view_users'] = permissions['view']['users'] or [-1]
+        document_data['view_groups'] = permissions['view']['groups'] or [-1]
+        # document_data['change_users'] = permissions['change']['users'] or [-1]
+        # document_data['change_groups'] = permissions['change']['groups'] or [-1]
         document_instance = cls(**document_data,_id=str(doc.id))
+
         document_instance.save()  # Gọi save trên instance
 
 
@@ -246,7 +279,6 @@ class DocumentDocument(Document):
 
             # users_with_perms = get_users_with_perms(instance, only_with_perms_in=[
             #     "view_document"])
-            # viewer_ids = [u.id for u in users_with_perms]
             # Basic fields
             document_data = {"id": instance.id, "title": instance.title or '',
                              "content": instance.content or '',
@@ -264,6 +296,14 @@ class DocumentDocument(Document):
 
             # Suggest content (bigram and trigram logic)
 
+            permissions = DocumentDocument.get_permissions(instance)
+            viewer_ids = [u for u in permissions['view']['users']]
+            document_data["view_users"] = permissions['view']['users'] or [-1]
+            document_data["view_groups"] = permissions['view']['groups'] or [-1]
+            # document_data["change_users"] = permissions['change']['users'] or [-1]
+            # document_data["change_groups"] = permissions['change']['groups'] or [-1]
+            document_data["viewer_id"] = viewer_ids or [-1]
+            document_data["is_shared"] = bool(viewer_ids)
             # Tags
 
             for tag in instance.tags.all():
@@ -364,6 +404,7 @@ class DocumentDocument(Document):
                 document_data["owner"] = ''
                 document_data["owner_id"] = -1
                 document_data["has_owner"] = False
+
 
             # document_data["viewer_id"] = viewer_ids or [-1]
 

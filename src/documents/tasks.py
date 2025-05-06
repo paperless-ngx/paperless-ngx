@@ -907,7 +907,6 @@ def backup_documents(
     documents,
     documents_deleted,
     folders,
-    dossiers,
     name,
 ):
     # Lưu thông tin vào BackupRecord
@@ -982,8 +981,7 @@ def backup_documents(
             backup_document_file.write(serialize("json", documents))
         with open(backup_folder_file_path, "w") as backup_folder_file:
             backup_folder_file.write(serialize("json", folders))
-        with open(backup_dossier_path, "w") as backup_dossier_file:
-            backup_dossier_file.write(serialize("json", dossiers))
+
 
         backup.log = _("Backup successful")
 
