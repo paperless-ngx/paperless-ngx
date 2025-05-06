@@ -5,19 +5,15 @@ import re
 import time
 from collections import Counter
 from contextlib import contextmanager
-from datetime import datetime, timedelta
+from datetime import datetime
 from datetime import timezone
-from distutils.command.clean import clean
-from http.client import responses
 from shutil import rmtree
 from typing import Optional
 
 from dateutil.parser import isoparse
 from django.conf import settings
-from django.contrib.admin.templatetags.admin_list import results
 from django.db.models.functions import Substr
 from django.utils import timezone as django_timezone
-from django_extensions.jobs import monthly
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from guardian.shortcuts import get_users_with_perms
@@ -28,8 +24,8 @@ from whoosh.fields import BOOLEAN
 from whoosh.fields import DATETIME
 from whoosh.fields import KEYWORD
 from whoosh.fields import NUMERIC
-from whoosh.fields import TEXT
 from whoosh.fields import Schema
+from whoosh.fields import TEXT
 from whoosh.highlight import HtmlFormatter
 from whoosh.index import FileIndex
 from whoosh.index import create_in
@@ -381,7 +377,8 @@ class DelayedQuery:
             DocumentDocument.init()  # Tạo index nếu chưa có
             logger.info(f"Index '{ELASTIC_SEARCH_DOCUMENT_INDEX}' created")
         else:
-            logger.info(f"Index '{ELASTIC_SEARCH_DOCUMENT_INDEX}' already exists")
+            logger.info(
+                f"Index '{ELASTIC_SEARCH_DOCUMENT_INDEX}' already exists")
 
     def __len__(self):
         page = self[0:1]
@@ -688,7 +685,7 @@ class DelayedElasticSearch(DelayedQuery):
     def get_combined_query(self):
         base_query = self._get_query()  # Lấy truy vấn cơ bản
         filter_query = self._get_query_filter()  # Lấy truy vấn lọc
-        print('filter_query',filter_query)
+        print('filter_query', filter_query)
         # Lấy trường và chiều sắp xếp
         sort_field, reverse = self._get_query_sortedby()
 
@@ -1152,7 +1149,8 @@ def get_permissions_criterias_elastic_search(user: Optional[User] = None):
             user_criterias.append(Q("term", viewer_id=str(user.id)))
             # user_criterias.append(Q("term", view_groups=group_ids))
             if group_ids:
-                in_filter = [Q("term", **{f"view_groups": g}) for g in group_ids]
+                in_filter = [Q("term", **{f"view_groups": g}) for g in
+                             group_ids]
                 user_criterias.append(Q("bool", should=in_filter))
             # in_filter = [Q("term", **{f"view_groups": g}) for g
             #              in group_ids]

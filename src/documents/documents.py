@@ -1,7 +1,5 @@
 import logging
 import re
-from tracemalloc import Traceback
-from types import TracebackType
 
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
@@ -127,6 +125,7 @@ class DocumentDocument(Document):
 
     def prepare_notes(self, instance):
         return [str(c.note) for c in Note.objects.filter(document=instance)]
+
     @staticmethod
     def get_permissions(instance):
         view_codename = f"view_{instance.__class__.__name__.lower()}"
@@ -134,10 +133,14 @@ class DocumentDocument(Document):
 
         return {
             "view": {
-                "users": list(get_users_with_perms(instance,only_with_perms_in=[view_codename],
-                    with_group_users=False
-                ).values_list("id", flat=True)),
-                "groups": list(get_groups_with_only_permission(instance,codename=view_codename).values_list(
+                "users": list(get_users_with_perms(instance,
+                                                   only_with_perms_in=[
+                                                       view_codename],
+                                                   with_group_users=False
+                                                   ).values_list("id",
+                                                                 flat=True)),
+                "groups": list(get_groups_with_only_permission(instance,
+                                                               codename=view_codename).values_list(
                     "id", flat=True)),
             },
             # "change": {
@@ -299,7 +302,8 @@ class DocumentDocument(Document):
             permissions = DocumentDocument.get_permissions(instance)
             viewer_ids = [u for u in permissions['view']['users']]
             document_data["view_users"] = permissions['view']['users'] or [-1]
-            document_data["view_groups"] = permissions['view']['groups'] or [-1]
+            document_data["view_groups"] = permissions['view']['groups'] or [
+                -1]
             # document_data["change_users"] = permissions['change']['users'] or [-1]
             # document_data["change_groups"] = permissions['change']['groups'] or [-1]
             document_data["viewer_id"] = viewer_ids or [-1]
@@ -404,7 +408,6 @@ class DocumentDocument(Document):
                 document_data["owner"] = ''
                 document_data["owner_id"] = -1
                 document_data["has_owner"] = False
-
 
             # document_data["viewer_id"] = viewer_ids or [-1]
 

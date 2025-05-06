@@ -6,7 +6,7 @@ from typing import Optional
 
 from celery import chord
 from django.conf import settings
-from django.db.models import Q, Subquery, OuterRef, Max, Min
+from django.db.models import Q, Max, Min
 
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
@@ -14,9 +14,9 @@ from documents.data_models import DocumentSource
 from documents.models import Correspondent, Dossier, ArchiveFont
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import Folder
 from documents.models import StoragePath
 from documents.models import Warehouse
-from documents.models import Folder
 from documents.permissions import set_permissions_for_object
 from documents.tasks import bulk_update_documents, update_document_field, \
     bulk_update_custom_field_form_document_type_to_document

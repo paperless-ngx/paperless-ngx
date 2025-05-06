@@ -991,8 +991,6 @@ class Consumer(LoggingMixin):
                 new_file.save()
                 document.folder = new_file
 
-
-
                 # If we get here, it was successful. Proceed with post-consume
                 # hooks. If they fail, nothing will get changed.
                 document_consumption_finished.send(

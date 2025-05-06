@@ -982,7 +982,6 @@ def backup_documents(
         with open(backup_folder_file_path, "w") as backup_folder_file:
             backup_folder_file.write(serialize("json", folders))
 
-
         backup.log = _("Backup successful")
 
     except Exception as e:
