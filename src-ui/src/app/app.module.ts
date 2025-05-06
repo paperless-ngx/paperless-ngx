@@ -2,12 +2,8 @@ import { BrowserModule } from '@angular/platform-browser'
 import { APP_INITIALIZER, NgModule } from '@angular/core'
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
-import {
-  NgbDateAdapter,
-  NgbDateParserFormatter,
-  NgbModule,
-} from '@ng-bootstrap/ng-bootstrap'
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http'
+import { NgbDateAdapter, NgbDateParserFormatter, NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http'
 import { DocumentListComponent } from './components/document-list/document-list.component'
 import { DocumentDetailComponent } from './components/document-detail/document-detail.component'
 import { DashboardComponent } from './components/dashboard/dashboard.component'
@@ -22,9 +18,13 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { DatePipe, registerLocaleData } from '@angular/common'
 import { NotFoundComponent } from './components/not-found/not-found.component'
 import { ConfirmDialogComponent } from './components/common/confirm-dialog/confirm-dialog.component'
-import { CorrespondentEditDialogComponent } from './components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
+import {
+  CorrespondentEditDialogComponent,
+} from './components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { TagEditDialogComponent } from './components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
-import { DocumentTypeEditDialogComponent } from './components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
+import {
+  DocumentTypeEditDialogComponent,
+} from './components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
 import { TagComponent } from './components/common/tag/tag.component'
 import { ClearableBadgeComponent } from './components/common/clearable-badge/clearable-badge.component'
 import { PageHeaderComponent } from './components/common/page-header/page-header.component'
@@ -32,10 +32,16 @@ import { AppFrameComponent } from './components/app-frame/app-frame.component'
 import { ToastsComponent } from './components/common/toasts/toasts.component'
 import { FilterEditorComponent } from './components/document-list/filter-editor/filter-editor.component'
 import { FilterableDropdownComponent } from './components/common/filterable-dropdown/filterable-dropdown.component'
-import { ToggleableDropdownButtonComponent } from './components/common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
+import {
+  ToggleableDropdownButtonComponent,
+} from './components/common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
 import { DateDropdownComponent } from './components/common/date-dropdown/date-dropdown.component'
-import { DocumentCardLargeComponent } from './components/document-list/document-card-large/document-card-large.component'
-import { DocumentCardSmallComponent } from './components/document-list/document-card-small/document-card-small.component'
+import {
+  DocumentCardLargeComponent,
+} from './components/document-list/document-card-large/document-card-large.component'
+import {
+  DocumentCardSmallComponent,
+} from './components/document-list/document-card-small/document-card-small.component'
 import { BulkEditorComponent } from './components/document-list/bulk-editor/bulk-editor.component'
 import { NgxFileDropModule } from 'ngx-file-drop'
 import { TextComponent } from './components/common/input/text/text.component'
@@ -43,7 +49,9 @@ import { SelectComponent } from './components/common/input/select/select.compone
 import { CheckComponent } from './components/common/input/check/check.component'
 import { UrlComponent } from './components/common/input/url/url.component'
 import { PasswordComponent } from './components/common/input/password/password.component'
-import { SaveViewConfigDialogComponent } from './components/document-list/save-view-config-dialog/save-view-config-dialog.component'
+import {
+  SaveViewConfigDialogComponent,
+} from './components/document-list/save-view-config-dialog/save-view-config-dialog.component'
 import { TagsComponent } from './components/common/input/tags/tags.component'
 import { IfPermissionsDirective } from './directives/if-permissions.directive'
 import { SortableDirective } from './directives/sortable.directive'
@@ -51,8 +59,12 @@ import { CookieService } from 'ngx-cookie-service'
 import { CsrfInterceptor } from './interceptors/csrf.interceptor'
 import { SavedViewWidgetComponent } from './components/dashboard/widgets/saved-view-widget/saved-view-widget.component'
 import { StatisticsWidgetComponent } from './components/dashboard/widgets/statistics-widget/statistics-widget.component'
-import { StatisticsCustomWidgetComponent } from './components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component'
-import { UploadFileWidgetComponent } from './components/dashboard/widgets/upload-file-widget/upload-file-widget.component'
+import {
+  StatisticsCustomWidgetComponent,
+} from './components/dashboard/widgets/statistics-custom-widget/statistics-custom-widget.component'
+import {
+  UploadFileWidgetComponent,
+} from './components/dashboard/widgets/upload-file-widget/upload-file-widget.component'
 import { WidgetFrameComponent } from './components/dashboard/widgets/widget-frame/widget-frame.component'
 import { FileTreeWidgetComponent } from './components/common/folder-tree-widget/file-tree-widget.component'
 import { WarehouseTreeWidgetComponent } from './components/common/warehouse-tree-widget/warehouse-tree-widget.component'
@@ -83,7 +95,9 @@ import { PermissionsGuard } from './guards/permissions.guard'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
 import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
-import { StoragePathEditDialogComponent } from './components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import {
+  StoragePathEditDialogComponent,
+} from './components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { SettingsService } from './services/settings.service'
 import { TasksComponent } from './components/admin/tasks/tasks.component'
 import { TrashComponent } from './components/admin/trash/trash.component'
@@ -92,44 +106,72 @@ import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { UserEditDialogComponent } from './components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
 import { GroupEditDialogComponent } from './components/common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
 import { PermissionsSelectComponent } from './components/common/permissions-select/permissions-select.component'
-import { MailAccountEditDialogComponent } from './components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
-import { MailRuleEditDialogComponent } from './components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
-import { PermissionsUserComponent } from './components/common/input/permissions/permissions-user/permissions-user.component'
-import { PermissionsGroupComponent } from './components/common/input/permissions/permissions-group/permissions-group.component'
+import {
+  MailAccountEditDialogComponent,
+} from './components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component'
+import {
+  MailRuleEditDialogComponent,
+} from './components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component'
+import {
+  PermissionsUserComponent,
+} from './components/common/input/permissions/permissions-user/permissions-user.component'
+import {
+  PermissionsGroupComponent,
+} from './components/common/input/permissions/permissions-group/permissions-group.component'
 import { FontLanguageComponentInput } from './components/common/input/font-language/font-language.component'
 import { IfOwnerDirective } from './directives/if-owner.directive'
 import { IfObjectPermissionsDirective } from './directives/if-object-permissions.directive'
 import { PermissionsDialogComponent } from './components/common/permissions-dialog/permissions-dialog.component'
-import { PermissionsFormComponent } from './components/common/input/permissions/permissions-form/permissions-form.component'
-import { PermissionsFilterDropdownComponent } from './components/common/permissions-filter-dropdown/permissions-filter-dropdown.component'
+import {
+  PermissionsFormComponent,
+} from './components/common/input/permissions/permissions-form/permissions-form.component'
+import {
+  PermissionsFilterDropdownComponent,
+} from './components/common/permissions-filter-dropdown/permissions-filter-dropdown.component'
 import { UsernamePipe } from './pipes/username.pipe'
 import { LogoComponent } from './components/common/logo/logo.component'
 import { IsNumberPipe } from './pipes/is-number.pipe'
 import { ShareLinksDropdownComponent } from './components/common/share-links-dropdown/share-links-dropdown.component'
 import { SimplePaginatorComponent } from './components/common/simple-paginator/simple-paginator.component'
 import { WorkflowsComponent } from './components/manage/workflows/workflows.component'
-import { WorkflowEditDialogComponent } from './components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
+import {
+  WorkflowEditDialogComponent,
+} from './components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component'
 import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
 import { DragDropModule } from '@angular/cdk/drag-drop'
-import { FolderEditDialogComponent } from './components/common/edit-dialog/folder-edit-dialog/folder-edit-dialog.component'
+import {
+  FolderEditDialogComponent,
+} from './components/common/edit-dialog/folder-edit-dialog/folder-edit-dialog.component'
 import { DossiersComponent } from './components/manage/dossier-list/dossier-list.component'
-import { DossierEditDialogComponent } from './components/common/edit-dialog/dossier-edit-dialog/dossier-edit-dialog.component'
+import {
+  DossierEditDialogComponent,
+} from './components/common/edit-dialog/dossier-edit-dialog/dossier-edit-dialog.component'
 import { DossierCardSmallComponent } from './components/manage/dossier-card-small/dossier-card-small.component'
 import { FolderCardSmallComponent } from './components/manage/folder-card-small/folder-card-small.component'
 import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { CustomFieldsComponent } from './components/manage/custom-fields/custom-fields.component'
 import { FoldersComponent } from './components/manage/folder-list/folder-list.component'
 import { BoxCaseComponent } from './components/manage/boxcase/boxcase.component'
-import { WarehouseEditDialogComponent } from './components/common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
+import {
+  WarehouseEditDialogComponent,
+} from './components/common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
 import { WarehouseComponent } from './components/manage/warehouse/warehouse.component'
 import { BoxEditDialogComponent } from './components/common/edit-dialog/box-edit-dialog/box-edit-dialog.component'
 import { BackupComponent } from './components/admin/backup/backup.component'
-import { CustomFieldEditDialogComponent } from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import {
+  CustomFieldEditDialogComponent,
+} from './components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { ShelfComponent } from './components/manage/shelf/shelf.component'
-import { CustomShelfEditDialogComponent } from './components/common/edit-dialog/custom-shelf-edit-dialog/custom-shelf-edit-dialog.component'
-import { CustomFieldsDropdownComponent } from './components/common/custom-fields-dropdown/custom-fields-dropdown.component'
-import { ApprovalEditDialogComponent } from './components/common/edit-dialog/approval-edit-dialog/approval-edit-dialog.component'
+import {
+  CustomShelfEditDialogComponent,
+} from './components/common/edit-dialog/custom-shelf-edit-dialog/custom-shelf-edit-dialog.component'
+import {
+  CustomFieldsDropdownComponent,
+} from './components/common/custom-fields-dropdown/custom-fields-dropdown.component'
+import {
+  ApprovalEditDialogComponent,
+} from './components/common/edit-dialog/approval-edit-dialog/approval-edit-dialog.component'
 import { ProfileEditDialogComponent } from './components/common/profile-edit-dialog/profile-edit-dialog.component'
 import { PdfViewerComponent } from './components/common/pdf-viewer/pdf-viewer.component'
 import { DocumentLinkComponent } from './components/common/input/document-link/document-link.component'
@@ -137,17 +179,10 @@ import { PreviewPopupComponent } from './components/common/preview-popup/preview
 import { SwitchComponent } from './components/common/input/switch/switch.component'
 import { ConfigComponent } from './components/admin/config/config.component'
 import { FileComponent } from './components/common/input/file/file.component'
-import { NgxBootstrapIconsModule, allIcons, ColorTheme  } from 'ngx-bootstrap-icons'
-import { ConfirmButtonComponent } from './components/common/confirm-button/confirm-button.component'
-import { MonetaryComponent } from './components/common/input/monetary/monetary.component'
-import { SystemStatusDialogComponent } from './components/common/system-status-dialog/system-status-dialog.component'
-import { NgxFilesizeModule } from 'ngx-filesize'
-import { RotateConfirmDialogComponent } from './components/common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
-import { MergeConfirmDialogComponent } from './components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
-import { SplitConfirmDialogComponent } from './components/common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
 import {
   airplane,
   archive,
+  arrowBarRight,
   arrowClockwise,
   arrowCounterclockwise,
   arrowDown,
@@ -156,9 +191,9 @@ import {
   arrowRight,
   arrowRightShort,
   arrowUpRight,
-  arrowBarRight,
   asterisk,
   bodyText,
+  bookshelf,
   boxArrowUp,
   boxArrowUpRight,
   boxes,
@@ -167,20 +202,20 @@ import {
   calendarEvent,
   cardChecklist,
   caretDown,
-  caretUp,
   caretRight,
+  caretUp,
   chatLeftText,
   check,
   check2All,
   checkAll,
   checkCircleFill,
   checkLg,
-  chevronDown,
-  chevronUp,
-  chevronRight,
+  chevronDoubleDown,
   chevronDoubleLeft,
   chevronDoubleRight,
-  chevronDoubleDown,
+  chevronDown,
+  chevronRight,
+  chevronUp,
   clipboard,
   clipboardCheck,
   clipboardCheckFill,
@@ -199,28 +234,33 @@ import {
   fileEarmarkCheck,
   fileEarmarkFill,
   fileEarmarkLock,
+  fileEarmarkPdf,
+  fileFont,
   files,
   fileText,
   filter,
-  fileFont,
   folder,
   folderFill,
   funnel,
   gear,
+  globe,
   grid,
   gripVertical,
   hash,
   hddStack,
   house,
   houseDoorFill,
+  inboxes,
+  inboxesFill,
   infoCircle,
+  journalBookmark,
   journals,
   journalText,
-  journalBookmark,
   link,
   listTask,
   listUl,
   menuApp,
+  NgxBootstrapIconsModule,
   pencil,
   people,
   peopleFill,
@@ -233,7 +273,6 @@ import {
   plusCircle,
   questionCircle,
   save,
-  globe,
   scissors,
   search,
   slashCircle,
@@ -247,16 +286,78 @@ import {
   threeDots,
   threeDotsVertical,
   trash,
-  upload,
   uiRadios,
   upcScan,
+  upload,
   x,
   xLg,
-  bookshelf,
-  inboxes,
-  inboxesFill,
-  fileEarmarkPdf
 } from 'ngx-bootstrap-icons'
+import { ConfirmButtonComponent } from './components/common/confirm-button/confirm-button.component'
+import { MonetaryComponent } from './components/common/input/monetary/monetary.component'
+import { SystemStatusDialogComponent } from './components/common/system-status-dialog/system-status-dialog.component'
+import { NgxFilesizeModule } from 'ngx-filesize'
+import {
+  RotateConfirmDialogComponent,
+} from './components/common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
+import {
+  MergeConfirmDialogComponent,
+} from './components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
+import {
+  SplitConfirmDialogComponent,
+} from './components/common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
+import localeAf from '@angular/common/locales/af'
+import localeAr from '@angular/common/locales/ar'
+import localeBe from '@angular/common/locales/be'
+import localeBg from '@angular/common/locales/bg'
+import localeCa from '@angular/common/locales/ca'
+import localeCs from '@angular/common/locales/cs'
+import localeDa from '@angular/common/locales/da'
+import localeDe from '@angular/common/locales/de'
+import localeEl from '@angular/common/locales/el'
+import localeEnGb from '@angular/common/locales/en-GB'
+import localeEs from '@angular/common/locales/es'
+import localeFi from '@angular/common/locales/fi'
+import localeFr from '@angular/common/locales/fr'
+import localeHu from '@angular/common/locales/hu'
+import localeIt from '@angular/common/locales/it'
+import localeJa from '@angular/common/locales/ja'
+import localeLb from '@angular/common/locales/lb'
+import localeNl from '@angular/common/locales/nl'
+import localeNo from '@angular/common/locales/no'
+import localePl from '@angular/common/locales/pl'
+import localePt from '@angular/common/locales/pt'
+import localeRo from '@angular/common/locales/ro'
+import localeRu from '@angular/common/locales/ru'
+import localeSk from '@angular/common/locales/sk'
+import localeSl from '@angular/common/locales/sl'
+import localeSr from '@angular/common/locales/sr'
+import localeSv from '@angular/common/locales/sv'
+import localeTr from '@angular/common/locales/tr'
+import localeUk from '@angular/common/locales/uk'
+import localeZh from '@angular/common/locales/zh'
+import localeVi from '@angular/common/locales/vi'
+import { DossiersFormComponent } from './components/manage/dossier-form-list/dossier-form-list.component'
+import {
+  DossierFormEditDialogComponent,
+} from './components/common/edit-dialog/dossier-form-edit-dialog/dossier-form-edit-dialog.component'
+import {
+  DossierCustomFieldFormEditDialogComponent,
+} from './components/common/edit-dialog/dossier-instance-customfield-form-edit-dialog/dossier-instance-customfield-form-edit-dialog.component'
+import { CustomFieldSelectComponent } from './components/common/custom-field-select/custom-field-select.component'
+import {
+  DossierCustomFieldSelectComponent,
+} from './components/common/custom-field-select/dossier-custom-field-select/dossier-custom-field-select.component'
+import {
+  DossierFormCustomFieldSelectComponent,
+} from './components/common/custom-field-select/dossier-form-custom-field-select/dossier-form-custom-field-select.component'
+import { NodeFileWidgetComponent } from './components/dashboard/widgets/folder-node-widget/node-tree-widget.component'
+import { UploadFileButtonComponent } from './components/dashboard/widgets/upload-file-button/upload-file-btn.component'
+import {
+  FontLanguageEditDialogComponent,
+} from './components/common/edit-dialog/font-language-edit-dialog/font-language-edit-dialog.component'
+import {
+  ArchiveFontEditDialogComponent,
+} from './components/common/edit-dialog/archive-font-edit-dialog/archive-font-edit-dialog.component'
 
 const icons = {
   airplane,
@@ -370,52 +471,6 @@ const icons = {
   x,
   xLg,
 }
-
-import localeAf from '@angular/common/locales/af'
-import localeAr from '@angular/common/locales/ar'
-import localeBe from '@angular/common/locales/be'
-import localeBg from '@angular/common/locales/bg'
-import localeCa from '@angular/common/locales/ca'
-import localeCs from '@angular/common/locales/cs'
-import localeDa from '@angular/common/locales/da'
-import localeDe from '@angular/common/locales/de'
-import localeEl from '@angular/common/locales/el'
-import localeEnGb from '@angular/common/locales/en-GB'
-import localeEs from '@angular/common/locales/es'
-import localeFi from '@angular/common/locales/fi'
-import localeFr from '@angular/common/locales/fr'
-import localeHu from '@angular/common/locales/hu'
-import localeIt from '@angular/common/locales/it'
-import localeJa from '@angular/common/locales/ja'
-import localeLb from '@angular/common/locales/lb'
-import localeNl from '@angular/common/locales/nl'
-import localeNo from '@angular/common/locales/no'
-import localePl from '@angular/common/locales/pl'
-import localePt from '@angular/common/locales/pt'
-import localeRo from '@angular/common/locales/ro'
-import localeRu from '@angular/common/locales/ru'
-import localeSk from '@angular/common/locales/sk'
-import localeSl from '@angular/common/locales/sl'
-import localeSr from '@angular/common/locales/sr'
-import localeSv from '@angular/common/locales/sv'
-import localeTr from '@angular/common/locales/tr'
-import localeUk from '@angular/common/locales/uk'
-import localeZh from '@angular/common/locales/zh'
-import localeVi from '@angular/common/locales/vi'
-import { DossiersFormComponent } from './components/manage/dossier-form-list/dossier-form-list.component'
-import { DossierFormEditDialogComponent } from './components/common/edit-dialog/dossier-form-edit-dialog/dossier-form-edit-dialog.component'
-import { DossierCustomFieldFormEditDialogComponent } from './components/common/edit-dialog/dossier-instance-customfield-form-edit-dialog/dossier-instance-customfield-form-edit-dialog.component'
-import { CustomFieldSelectComponent } from './components/common/custom-field-select/custom-field-select.component'
-import { DossierCustomFieldSelectComponent } from './components/common/custom-field-select/dossier-custom-field-select/dossier-custom-field-select.component'
-import { DossierFormCustomFieldSelectComponent } from './components/common/custom-field-select/dossier-form-custom-field-select/dossier-form-custom-field-select.component'
-import { NodeFileWidgetComponent } from './components/dashboard/widgets/folder-node-widget/node-tree-widget.component'
-import { UploadFileButtonComponent } from './components/dashboard/widgets/upload-file-button/upload-file-btn.component'
-import {
-  FontLanguageEditDialogComponent
-} from './components/common/edit-dialog/font-language-edit-dialog/font-language-edit-dialog.component'
-import {
-  ArchiveFontEditDialogComponent
-} from './components/common/edit-dialog/archive-font-edit-dialog/archive-font-edit-dialog.component'
 
 
 registerLocaleData(localeAf)
@@ -615,6 +670,7 @@ function initializeApp(settings: SettingsService) {
       multi: true,
     },
     DatePipe,
+    CustomDatePipe,
     CookieService,
     {
       provide: HTTP_INTERCEPTORS,

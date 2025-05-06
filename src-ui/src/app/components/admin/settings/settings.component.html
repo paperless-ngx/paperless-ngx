@@ -4,9 +4,9 @@
   info="Options to customize appearance, notifications, saved views and more. Settings apply to the <strong>current user only</strong>."
   i18n-info
   >
-  <button class="btn btn-sm btn-outline-primary" (click)="tourService.start()">
-    <i-bs class="me-1" name="airplane"></i-bs>&nbsp;<ng-container i18n>Start tour</ng-container>
-  </button>
+  <!--  <button class="btn btn-sm btn-outline-primary" (click)="tourService.start()">-->
+  <!--    <i-bs class="me-1" name="airplane"></i-bs>&nbsp;<ng-container i18n>Start tour</ng-container>-->
+  <!--  </button>-->
   @if (permissionsService.isAdmin()) {
     <button class="btn btn-sm btn-outline-primary position-relative ms-md-5 me-1" (click)="showSystemStatus()"
       [disabled]="!systemStatus">

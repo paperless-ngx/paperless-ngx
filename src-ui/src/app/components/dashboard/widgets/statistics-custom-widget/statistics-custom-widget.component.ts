@@ -1,16 +1,16 @@
 import { HttpClient, HttpParams } from '@angular/common/http'
 import { Component, inject, OnDestroy, OnInit } from '@angular/core'
 import { Observable, Subscription } from 'rxjs'
-import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { environment } from 'src/environments/environment'
 
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
-import Chart from 'chart.js/auto';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
+import Chart from 'chart.js/auto'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
 
 import { NgbCalendar, NgbDate } from '@ng-bootstrap/ng-bootstrap'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 
 Chart.register(ChartDataLabels)
 
@@ -44,6 +44,7 @@ export class StatisticsCustomWidgetComponent
     private http: HttpClient,
     private consumerStatusService: ConsumerStatusService,
     private documentListViewService: DocumentListViewService,
+    private customDatePipe: CustomDatePipe,
   ) {
     super()
   }
@@ -56,7 +57,7 @@ export class StatisticsCustomWidgetComponent
   public tagsPieChart: any
   statistics: Statistics = {}
   data_graph: []
-  labels_graph: []
+  labels_graph: string[]
   data_count_page_graph: []
   data_date_request_count_graph: []
   data_document_type_pie_graph: []
@@ -72,31 +73,38 @@ export class StatisticsCustomWidgetComponent
 
 
   createDocumentCountBarChart() {
-    if (this.documentCountChart) {
-      this.documentCountChart.destroy()
-    }
-    this.documentCountChart = new Chart('DocumentChart',
-      {
-        type: 'bar',
-        data: {
-          labels: this.labels_graph,
-          datasets: [{
-            label: $localize`Documents`,
-            data: this.data_graph,
-            backgroundColor: [
-              'rgba(75, 192, 192, 0.2)',
-            ],
-            borderColor: [
-              'rgb(75, 192, 192)',
-            ],
-            borderWidth: 1,
-          }],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          aspectRatio: 2.5,
-          scales: {
+    const chartElement = document.getElementById('DocumentChart') as HTMLCanvasElement
+    if (chartElement) {
+      const existingChart = Chart.getChart('DocumentChart')
+      if (existingChart) {
+        existingChart.destroy() // Destroy the old chart instance
+      }
+      this.labels_graph = this.labels_graph.map(label =>
+        this.customDatePipe.transform(label),
+      )
+
+      this.documentCountChart = new Chart('DocumentChart',
+        {
+          type: 'bar',
+          data: {
+            labels: this.labels_graph,
+            datasets: [{
+              label: $localize`Documents`,
+              data: this.data_graph,
+              backgroundColor: [
+                'rgba(75, 192, 192, 0.2)',
+              ],
+              borderColor: [
+                'rgb(75, 192, 192)',
+              ],
+              borderWidth: 1,
+            }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            aspectRatio: 2.5,
+            scales: {
             y: {
               beginAtZero: true,
               ticks: {
@@ -111,19 +119,35 @@ export class StatisticsCustomWidgetComponent
             },
           },
           plugins: {
-          datalabels: {
-            display: false,
-            // color: 'white',
+            datalabels: {
+              display: true,
+              color: 'black',
+              anchor: 'end',      // Position the label at the end of the bar
+              align: 'top',       // Align the label to the top of the bar
+              offset: 1,      // Increase the offset to add more space
+              font: {
+                size: 10,
+              },
+              formatter: (value, context) => {
+                return value
+              },
+              // filter: (context) => {
+              //   return true;
+              // }
+            },
+          },
           },
         },
-        },
-      },
-    )
+      )
+    }
   }
 
   createCountPageBarChart() {
-    if (this.pageCountChart) {
-      this.pageCountChart.destroy()
+    const chartElement = document.getElementById('CountPageChart') as HTMLCanvasElement
+    if (chartElement) {
+      const existingChart = Chart.getChart('CountPageChart')
+      if (existingChart) {
+        existingChart.destroy() // Destroy the old chart instance
     }
     this.pageCountChart = new Chart('CountPageChart',
       {
@@ -161,43 +185,59 @@ export class StatisticsCustomWidgetComponent
             },
           },
           plugins: {
-          datalabels: {
-            display: false,
-            // color: 'white',
+            datalabels: {
+              display: true,
+              color: 'black',
+              anchor: 'end',      // Position the label at the end of the bar
+              align: 'top',       // Align the label to the top of the bar
+              offset: 1,      // Increase the offset to add more space
+              font: {
+                size: 10,
+              },
+              formatter: (value, context) => {
+                return value
+              },
+              // filter: (context) => {
+              //   return true;
+              // }
+            },
           },
         },
-        },
-      },
-    )
+      }
+    );
+    }
   }
 
-
   createCountRequestBarChart() {
-    if (this.pageRequestChart) {
-      this.pageRequestChart.destroy()
-    }
-    this.pageRequestChart = new Chart('CountRequestChart',
-      {
-        type: 'bar',
-        data: {
-          labels: this.labels_graph,
-          datasets: [{
-            label: $localize`Requests`,
-            data: this.data_date_request_count_graph,
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.2)',
-            ],
-            borderColor: [
-              'rgb(255, 99, 132)',
-            ],
-            borderWidth: 1,
-          }],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          aspectRatio: 2.5,
-          scales: {
+    const chartElement = document.getElementById('CountRequestChart') as HTMLCanvasElement
+    if (chartElement) {
+      const existingChart = Chart.getChart('CountRequestChart')
+      if (existingChart) {
+        existingChart.destroy() // Destroy the old chart instance
+      }
+
+      new Chart('CountRequestChart',
+        {
+          type: 'bar',
+          data: {
+            labels: this.labels_graph,
+            datasets: [{
+              label: $localize`Requests`,
+              data: this.data_date_request_count_graph,
+              backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+              ],
+              borderColor: [
+                'rgb(255, 99, 132)',
+              ],
+              borderWidth: 1,
+            }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            aspectRatio: 2.5,
+            scales: {
             y: {
               beginAtZero: true,
               ticks: {
@@ -212,14 +252,27 @@ export class StatisticsCustomWidgetComponent
             },
           },
           plugins: {
-          datalabels: {
-            display: false,
-            // color: 'white',
+            datalabels: {
+              display: true,
+              color: 'black',
+              anchor: 'end',      // Position the label at the end of the bar
+              align: 'top',       // Align the label to the top of the bar
+              offset: 1,      // Increase the offset to add more space
+              font: {
+                size: 10,
+              },
+              formatter: (value, context) => {
+                return value
+              },
+              // filter: (context) => {
+              //   return true;
+              // }
+            },
+          },
           },
         },
-        },
-      },
-    )
+      )
+    }
   }
 
   createDocumentTypePieChart() {
@@ -263,8 +316,8 @@ export class StatisticsCustomWidgetComponent
               const sum = ctx.dataset.data.reduce((a, b) => Number(a) + Number(b), 0)
               const result = ((value / Number(sum)) * 100).toFixed(2)
               if (parseInt(result) >= 10)
-              // const percentage = ((value / Number(sum)) * 100).toFixed(2) + '%'
-                return result +'%'
+                // const percentage = ((value / Number(sum)) * 100).toFixed(2) + '%'
+                return result + '%'
               return ''
             },
             color: 'white',
@@ -315,8 +368,8 @@ export class StatisticsCustomWidgetComponent
               const sum = ctx.dataset.data.reduce((a, b) => Number(a) + Number(b), 0)
               const result = ((value / Number(sum)) * 100).toFixed(2)
               if (parseInt(result) >= 10)
-              // const percentage = ((value / Number(sum)) * 100).toFixed(2) + '%'
-                return result +'%'
+                // const percentage = ((value / Number(sum)) * 100).toFixed(2) + '%'
+                return result + '%'
               return ''
             },
             color: 'white',
@@ -398,6 +451,10 @@ export class StatisticsCustomWidgetComponent
     this.fromDate = this.convertNgbDateToString(date)
     this.toDate = this.convertNgbDateToString(date)
     this.reload()
+  }
+
+  formatDate(date: Date) {
+    const result = this.customDatePipe.transform(date)
   }
 
 }
