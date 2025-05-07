@@ -23,7 +23,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends gettext
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
       - name: Install backend python dependencies
