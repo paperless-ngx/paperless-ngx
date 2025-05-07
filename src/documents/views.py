@@ -620,7 +620,9 @@ class DocumentViewSet(
         self.update_name_folder(self.get_object(), serializer)
         permissions = serializer.validated_data.get("set_permissions")
         permissions_copy = permissions.copy()
-        update_view_folder_parent_permissions(instance, permissions_copy)
+        if instance.folder is not None:
+            update_view_folder_parent_permissions.delay(instance.folder,
+                                                        permissions_copy)
         owner = serializer.validated_data.get("owner")
         merge = serializer.validated_data.get("merge")
         owner_exist = "owner" in serializer.validated_data
@@ -2712,7 +2714,8 @@ class BulkEditObjectsView(PassUserMixin):
                         },
                     }
 
-                    update_view_folder_parent_permissions(folder, permissions)
+                    update_view_folder_parent_permissions.delay(folder,
+                                                                permissions)
                     folder.save()
                     self.update_child_folder_paths(folder)
 
@@ -3694,7 +3697,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         # update permission folder child
         permissions = serializer.validated_data.get("set_permissions")
         permissions_copy = permissions.copy()
-        update_view_folder_parent_permissions(instance, permissions_copy)
+        update_view_folder_parent_permissions.delay(instance, permissions_copy)
         owner = serializer.validated_data.get("owner")
         merge = serializer.validated_data.get("merge")
         owner_exist = "owner" in serializer.validated_data
