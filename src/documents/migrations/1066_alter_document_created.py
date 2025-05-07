@@ -2,9 +2,7 @@
 
 
 import datetime
-import os
 
-import pytz
 from django.db import migrations
 from django.db import models
 from django.db.models.functions import TruncDate
@@ -12,12 +10,23 @@ from django.db.models.functions import TruncDate
 
 def migrate_date(apps, schema_editor):
     Document = apps.get_model("documents", "Document")
-    Document.objects.update(
-        created_date=TruncDate(
-            "created",
-            tzinfo=pytz.timezone(os.getenv("PAPERLESS_TIME_ZONE", "UTC")),
-        ),
-    )
+    queryset = Document.objects.annotate(
+        truncated_created=TruncDate("created"),
+    ).values("id", "truncated_created")
+
+    # Batch to avoid loading all objects into memory at once,
+    # which would be problematic for large datasets.
+    batch_size = 500
+    updates = []
+    for item in queryset.iterator(chunk_size=batch_size):
+        updates.append(
+            Document(id=item["id"], created_date=item["truncated_created"]),
+        )
+        if len(updates) >= batch_size:
+            Document.objects.bulk_update(updates, ["created_date"])
+            updates.clear()
+    if updates:
+        Document.objects.bulk_update(updates, ["created_date"])
 
 
 class Migration(migrations.Migration):
