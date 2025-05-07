@@ -46,7 +46,8 @@ from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import custom_get_parser_class_for_mime_type
 from documents.parsers import parse_date
-from documents.permissions import check_user_can_change_folder
+from documents.permissions import check_user_can_change_folder, \
+    get_permissions, set_permissions
 from documents.permissions import set_permissions_for_object
 from documents.plugins.base import AlwaysRunPluginMixin
 from documents.plugins.base import ConsumeTaskPlugin
@@ -972,6 +973,9 @@ class Consumer(LoggingMixin):
                 )
                 new_file.checksum = document.checksum
                 if document.folder:
+                    permissions = get_permissions(document.folder)
+                    set_permissions(permissions, document)
+                    set_permissions(permissions, new_file)
                     folder_path = get_content_before_last_number(document.folder.path)
                     if document.folder.type == Folder.FILE:
                         if len(document.folder.path.split("/")) == 1:
@@ -986,6 +990,8 @@ class Consumer(LoggingMixin):
                         new_file.parent_folder_id = int(
                             document.folder.path.split("/")[-1]
                         )
+
+
                 else:
                     new_file.path = f"{new_file.id}"
                 new_file.save()
