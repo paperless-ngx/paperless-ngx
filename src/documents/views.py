@@ -57,7 +57,6 @@ from django.views.decorators.vary import vary_on_cookie
 from django.views.generic import TemplateView
 from django_elasticsearch_dsl_drf.pagination import LimitOffsetPagination
 from django_filters.rest_framework import DjangoFilterBackend
-from guardian.shortcuts import get_users_with_perms
 from langdetect import detect
 from packaging import version as packaging_version
 from redis import Redis
@@ -159,7 +158,6 @@ from documents.permissions import EdocAdminPermissions, get_permissions, \
     set_permissions
 from documents.permissions import EdocObjectPermissions
 from documents.permissions import check_user_can_change_folder
-from documents.permissions import get_groups_with_only_permission
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
@@ -2689,6 +2687,7 @@ class BulkEditObjectsView(PassUserMixin):
                 folder.parent_folder = parent_folder_obj
 
                 if old_parent_folder != folder.parent_folder:
+                    old_path = folder.path
                     if folder.parent_folder:
                         folder.path = f"{folder.parent_folder.path}/{folder.id}"
                         folder.parent_folder = parent_folder_obj
@@ -2696,28 +2695,11 @@ class BulkEditObjectsView(PassUserMixin):
                     else:
                         folder.path = f"{folder.id}"
 
-                    groups = get_groups_with_only_permission(folder, "view_folder")
-                    users = get_users_with_perms(
-                        folder,
-                        attach_perms=False,
-                        with_group_users=False,
-                    )
-                    # logger.debug("users", users, groups, folder)
-                    permissions = {
-                        "view": {
-                            "users": users,
-                            "groups": groups,
-                        },
-                        "change": {
-                            "users": [],
-                            "groups": [],
-                        },
-                    }
-
+                    permissions = get_permissions(parent_folder_obj)
                     update_view_folder_parent_permissions.delay(folder,
                                                                 permissions)
                     folder.save()
-                    self.update_child_folder_paths(folder)
+                    update_child_folder_paths.delay(folder, old_path)
 
             return Response(status=status.HTTP_204_NO_CONTENT)
         # elif operation == "update" and object_type == "archive_fonts":
@@ -2776,15 +2758,6 @@ class BulkEditObjectsView(PassUserMixin):
 
         return Response({"result": "OK"})
 
-    def update_child_folder_paths(self, folder):
-        child_folders = Folder.objects.filter(parent_folder=folder)
-        for child_folder in child_folders:
-            if folder.path:
-                child_folder.path = f"{folder.path}/{child_folder.id}"
-            else:
-                child_folder.path = f"{child_folder.id}"
-            child_folder.save()
-            self.update_child_folder_paths(child_folder)
 
 
 class WorkflowTriggerViewSet(ModelViewSet):

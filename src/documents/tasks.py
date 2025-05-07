@@ -1039,16 +1039,21 @@ def update_ocr_document(document, task_instance: EdocTask, data_ocr):
         raise e
 
 
-@shared_task(bind=True)
-def update_child_folder_paths(self, folder):
-    child_folders = Folder.objects.filter(parent_folder=folder)
+@shared_task()
+def update_child_folder_paths(folder, old_path):
+    child_folders = Folder.objects.filter(path__startswith=f'{old_path}/')
     for child_folder in child_folders:
         if folder.path:
             child_folder.path = f"{folder.path}/{child_folder.id}"
         else:
             child_folder.path = f"{child_folder.id}"
-        child_folder.save()
-        self.update_child_folder_paths(child_folder)
+        # child_folder.save()
+        #
+        # update_child_folder_paths(child_folder)
+
+    Folder.objects.bulk_update(child_folders, ['path'], batch_size=1000)
+
+
 
 
 @shared_task(bind=True)
