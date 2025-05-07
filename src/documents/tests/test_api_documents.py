@@ -1313,7 +1313,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         _, overrides = self.get_last_consume_delay_call_args()
 
-        self.assertEqual(overrides.created, created)
+        self.assertEqual(overrides.created, created.date())
 
     def test_upload_with_asn(self):
         self.consume_file_mock.return_value = celery.result.AsyncResult(

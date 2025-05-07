@@ -1,3 +1,4 @@
+from datetime import date
 from datetime import datetime
 from pathlib import Path
 
@@ -10,7 +11,7 @@ def parse_w_workflow_placeholders(
     local_added: datetime,
     original_filename: str,
     filename: str,
-    created: datetime | None = None,
+    created: date | None = None,
     doc_title: str | None = None,
     doc_url: str | None = None,
 ) -> str:

@@ -3,12 +3,10 @@ import os
 import shutil
 import stat
 import tempfile
-import zoneinfo
 from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
 
-from dateutil import tz
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
@@ -247,20 +245,9 @@ class TestConsumer(
 
         self._assert_first_last_send_progress()
 
-        # Convert UTC time from DB to local time
-        document_date_local = timezone.localtime(document.created)
-
-        self.assertEqual(
-            document_date_local.tzinfo,
-            zoneinfo.ZoneInfo("America/Chicago"),
-        )
-        self.assertEqual(document_date_local.tzinfo, rough_create_date_local.tzinfo)
-        self.assertEqual(document_date_local.year, rough_create_date_local.year)
-        self.assertEqual(document_date_local.month, rough_create_date_local.month)
-        self.assertEqual(document_date_local.day, rough_create_date_local.day)
-        self.assertEqual(document_date_local.hour, rough_create_date_local.hour)
-        self.assertEqual(document_date_local.minute, rough_create_date_local.minute)
-        # Skipping seconds and more precise
+        self.assertEqual(document.created.year, rough_create_date_local.year)
+        self.assertEqual(document.created.month, rough_create_date_local.month)
+        self.assertEqual(document.created.day, rough_create_date_local.day)
 
     @override_settings(FILENAME_FORMAT=None)
     def testDeleteMacFiles(self):
@@ -931,7 +918,7 @@ class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
 
         self.assertEqual(
             document.created,
-            datetime.datetime(1996, 2, 20, tzinfo=tz.gettz(settings.TIME_ZONE)),
+            datetime.date(1996, 2, 20),
         )
 
     @override_settings(FILENAME_DATE_ORDER="YMD")
@@ -961,7 +948,7 @@ class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
 
         self.assertEqual(
             document.created,
-            datetime.datetime(2022, 2, 1, tzinfo=tz.gettz(settings.TIME_ZONE)),
+            datetime.date(2022, 2, 1),
         )
 
     def test_consume_date_filename_date_use_content(self):
@@ -991,7 +978,7 @@ class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
 
         self.assertEqual(
             document.created,
-            datetime.datetime(1996, 2, 20, tzinfo=tz.gettz(settings.TIME_ZONE)),
+            datetime.date(1996, 2, 20),
         )
 
     @override_settings(
@@ -1023,7 +1010,7 @@ class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
 
         self.assertEqual(
             document.created,
-            datetime.datetime(1997, 2, 20, tzinfo=tz.gettz(settings.TIME_ZONE)),
+            datetime.date(1997, 2, 20),
         )
 
 
