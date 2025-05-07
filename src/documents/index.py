@@ -373,12 +373,12 @@ class DelayedQuery:
         self.first_score = None
         self.user = user
         self.es = Elasticsearch()
-        if not self.es.indices.exists(index=ELASTIC_SEARCH_DOCUMENT_INDEX):
-            DocumentDocument.init()  # Tạo index nếu chưa có
-            logger.info(f"Index '{ELASTIC_SEARCH_DOCUMENT_INDEX}' created")
-        else:
-            logger.info(
-                f"Index '{ELASTIC_SEARCH_DOCUMENT_INDEX}' already exists")
+        # if not self.es.indices.exists(index=ELASTIC_SEARCH_DOCUMENT_INDEX):
+        #     DocumentDocument.init()  # Tạo index nếu chưa có
+        #     logger.info(f"Index '{ELASTIC_SEARCH_DOCUMENT_INDEX}' created")
+        # else:
+        #     logger.info(
+        #         f"Index '{ELASTIC_SEARCH_DOCUMENT_INDEX}' already exists")
 
     def __len__(self):
         page = self[0:1]
