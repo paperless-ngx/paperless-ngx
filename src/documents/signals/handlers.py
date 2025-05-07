@@ -31,6 +31,7 @@ from documents.consumer import parse_doc_title_w_placeholders
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_unique_filename
+from documents.index import add_or_update_document
 from documents.models import Approval, CustomFieldInstance, DocumentType, \
     TaskType
 from documents.models import Document
@@ -1054,6 +1055,8 @@ def run_workflow_approval(
                                         for g in groups:
                                             remove_perm(f"view_{model_name}", g, obj)
             obj.save()
+            # update index
+            add_or_update_document(obj)
 
 
 
