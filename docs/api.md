@@ -132,7 +132,7 @@ use cases:
 
 5. Documents with a custom field "address" (text) that is empty:
 
-    `?custom_field_query=["OR", ["address", "isnull", true], ["address", "exact", ""]]`
+    `?custom_field_query=["OR", [["address", "isnull", true], ["address", "exact", ""]]]`
 
 6. Documents that don't have a field called "foo":
 
