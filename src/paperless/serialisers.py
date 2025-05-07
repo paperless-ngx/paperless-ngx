@@ -4,6 +4,7 @@ from allauth.mfa.adapter import get_adapter as get_mfa_adapter
 from allauth.mfa.models import Authenticator
 from allauth.mfa.totp.internal.auth import TOTP
 from allauth.socialaccount.models import SocialAccount
+from allauth.socialaccount.models import SocialApp
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -146,8 +147,11 @@ class SocialAccountSerializer(serializers.ModelSerializer):
             "name",
         )
 
-    def get_name(self, obj) -> str:
-        return obj.get_provider_account().to_str()
+    def get_name(self, obj: SocialAccount) -> str:
+        try:
+            return obj.get_provider_account().to_str()
+        except SocialApp.DoesNotExist:
+            return "Unknown App"
 
 
 class ProfileSerializer(serializers.ModelSerializer):
