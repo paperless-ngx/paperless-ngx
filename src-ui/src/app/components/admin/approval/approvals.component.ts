@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core'
+import { Component, OnDestroy, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { first, tap } from 'rxjs'
@@ -13,7 +13,6 @@ import { GroupService } from 'src/app/services/rest/group.service'
 import { PermissionsService } from '../../../services/permissions.service'
 import { app } from 'ngx-bootstrap-icons'
 import { Results } from '../../../data/results'
-import { EdocTask } from '../../../data/edoc-task'
 
 
 @Component({
@@ -282,7 +281,7 @@ export class ApprovalsComponent
 
   toggleAll(event: PointerEvent) {
     if ((event.target as HTMLInputElement).checked) {
-      this.selectedApprovals = new Set(this.currentApprovals.map((t) => t.id))
+      this.selectedApprovals = new Set(this.approvalsCurrent.results.map((t) => t.id))
     } else {
       this.clearSelection()
     }

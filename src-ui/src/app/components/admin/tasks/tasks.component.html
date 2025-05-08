@@ -11,7 +11,7 @@
     </button>
     <button class="btn btn-sm btn-outline-primary me-4" (click)="dismissTasks()"
             *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.EdocTask }"
-            [disabled]="tasksService.total === 0">
+            [disabled]="tasksCurrent.count === 0">
       <i-bs name="check2-all"></i-bs>&nbsp;{{ dismissButtonText }}
     </button>
     <div class="form-check form-switch mb-0">

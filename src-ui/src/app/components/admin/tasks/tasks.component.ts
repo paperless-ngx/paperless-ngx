@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core'
+import { Component, OnDestroy, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { delay, first, Observable, tap } from 'rxjs'
+import { first, tap } from 'rxjs'
 import { EdocTask } from 'src/app/data/edoc-task'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
@@ -95,7 +95,7 @@ export class TasksComponent
   dismissTasks(task: EdocTask = undefined) {
     let tasks = task ? new Set([task.id]) : new Set(this.selectedTasks.values())
     if (!task && tasks.size == 0)
-      tasks = new Set(this.tasksService.allFileTasks.map((t) => t.id))
+      tasks = new Set(this.tasksCurrent.results.map((t) => t.id))
     if (tasks.size > 1) {
       let modal = this.modalService.open(ConfirmDialogComponent, {
         backdrop: 'static',

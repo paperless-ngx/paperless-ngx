@@ -5,10 +5,10 @@
   i18n-info
 >
   <div class="btn-toolbar col col-md-auto align-items-center">
-    <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()"
-            [hidden]="selectedApprovals.size === 0">
-      <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
-    </button>
+    <!--    <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()"-->
+    <!--            [hidden]="selectedApprovals.size === 0">-->
+    <!--      <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>-->
+    <!--    </button>-->
 
     <!-- <button class="btn btn-sm btn-outline-primary me-4" (click)="updateApprovals()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Approval }" [disabled]="approvalsService.total === 0">
       <i-bs name="check2-all"></i-bs>&nbsp;{{rejectButtonText}}
@@ -37,13 +37,13 @@
   <table class="table table-striped align-middle border shadow-sm">
     <thead>
     <tr>
-      <th scope="col">
-        <div class="form-check">
-          <input type="checkbox" class="form-check-input" id="all-approvals" [disabled]="approvalsCurrent.all.length === 0"
-                 [(ngModel)]="togggleAll" (click)="toggleAll($event); $event.stopPropagation();">
-          <label class="form-check-label" for="all-approvals"></label>
-        </div>
-      </th>
+      <!--      <th scope="col">-->
+      <!--        <div class="form-check">-->
+      <!--          <input type="checkbox" class="form-check-input" id="all-approvals" [disabled]="approvalsCurrent.all.length === 0"-->
+      <!--                 [(ngModel)]="togggleAll" (click)="toggleAll($event); $event.stopPropagation();">-->
+      <!--          <label class="form-check-label" for="all-approvals"></label>-->
+      <!--        </div>-->
+      <!--      </th>-->
       <th scope="col" class="d-table-cell d-lg-cell" i18n>Name</th>
       <th scope="col" class="d-table-cell d-lg-none" i18n>Info</th>
       <!--        <th scope="col" class="d-none d-lg-table-cell" i18n>Content type</th>-->
@@ -64,15 +64,16 @@
     </thead>
     <tbody>
       @for (approval of this.approvalsCurrent.results; track approval) {
-        <tr (click)="toggleSelected(approval, $event); $event.stopPropagation();">
-          <td>
-            <div class="form-check">
-              <input type="checkbox" class="form-check-input" id="approval{{approval.id}}"
-                     [checked]="selectedApprovals.has(approval.id)"
-                     (click)="toggleSelected(approval,$event); $event.stopPropagation();">
-              <label class="form-check-label" for="approval{{approval.id}}"></label>
-            </div>
-          </td>
+        <!--        <tr (click)="toggleSelected(approval, $event); $event.stopPropagation();">-->
+          <!--          <td>-->
+          <!--            <div class="form-check">-->
+          <!--              <input type="checkbox" class="form-check-input" id="approval{{approval.id}}"-->
+          <!--                     [checked]="selectedApprovals.has(approval.id)"-->
+          <!--                     (click)="toggleSelected(approval,$event); $event.stopPropagation();">-->
+          <!--              <label class="form-check-label" for="approval{{approval.id}}"></label>-->
+          <!--            </div>-->
+          <!--          </td>-->
+        <tr>
           <td class="overflow-auto name-col">{{ approval.name }}</td>
           <!--          <td class="d-none d-lg-table-cell">{{ approval.ctype }}</td>-->
           <td class="d-none d-lg-table-cell">{{ displayName(approval) }}</td>
