@@ -1175,7 +1175,7 @@
                <context context-type="sourcefile">src/app/components/admin/approval/approvals.component.ts</context>
                <context context-type="linenumber">159</context>
             </context-group>
-            <target state="translated">xét duyệt</target>
+            <target state="translated">Xét duyệt</target>
          </trans-unit>
          <trans-unit id="7378878529334768232" datatype="html">
             <source>Reject</source>
@@ -10541,7 +10541,7 @@
             <target state="translated">
                {VAR_PLURAL, plural, =1 {Đã chọn
                <x id="INTERPOLATION" />
-               } other {Selected
+               } other {Đã chọn
                <x id="INTERPOLATION" />
                }}
             </target>
@@ -11492,8 +11492,7 @@
          <trans-unit id="211408744872436427" datatype="html">
             <source>
                Successfully created
-               <x id="PH" equiv-text="this.typeName" />
-               .
+               <x id="PH" equiv-text="this.typeName" />.
             </source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/manage/boxcase/boxcase.component.ts</context>
@@ -11525,8 +11524,7 @@
             </context-group>
             <target state="translated">
                Đã tạo thành công
-               <x id="PH" equiv-text="this.typeName" />
-               .
+               <x id="PH" equiv-text="this.typeName" />.
             </target>
          </trans-unit>
          <trans-unit id="3928835053823658072" datatype="html">
@@ -11565,8 +11563,7 @@
             </context-group>
             <target state="translated">
                Đã xảy ra lỗi khi tạo
-               <x id="PH" equiv-text="this.typeName" />
-               .
+               <x id="PH" equiv-text="this.typeName" />.
             </target>
          </trans-unit>
          <trans-unit id="2193806797056113332" datatype="html">
