@@ -189,6 +189,7 @@ export class ApprovalsComponent
     } else {
       this.approvalsService.updateApprovals(approvals,status)
       this.selectedApprovals.clear()
+      this.reloadData()
     }
   }
 

@@ -1898,7 +1898,9 @@ class TasksViewSerializer(serializers.ModelSerializer):
         return "file"
 
     related_document = serializers.SerializerMethodField()
-    related_doc_re = re.compile(r"New document id (\d+) created")
+    # related_doc_re = re.compile(r"New document id (\d+) created")
+    related_doc_re = re.compile(
+        r"(?:New document id|Success\. Document id) (\d+)")
 
     def get_related_document(self, obj):
         result = None

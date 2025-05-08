@@ -2,10 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Observable, Subject } from 'rxjs'
 import { first, takeUntil } from 'rxjs/operators'
-import {
-  Approval,
-  ApprovalStatus,
-} from 'src/app/data/approval'
+import { Approval, ApprovalStatus } from 'src/app/data/approval'
 import { environment } from 'src/environments/environment'
 import { Results } from '../data/results'
 
@@ -61,6 +58,7 @@ export class ApprovalsService {
   }
 
   public get successApprovals(): Approval[] {
+    console.log(this.approvals)
     return this.approvals.filter((t) => t.status == ApprovalStatus.Success)
 
   }
@@ -95,7 +93,7 @@ export class ApprovalsService {
       })
       .pipe(takeUntil(this.unsubscribeNotifer), first())
       .subscribe((r) => {
-        this.reload()
+        // this.reload()
       })
   }
 
