@@ -20,7 +20,8 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
-from django_elasticsearch_dsl_drf.serializers import DocumentSerializer as DocumentElasticSearchSerializer
+from django_elasticsearch_dsl_drf.serializers import \
+    DocumentSerializer as DocumentElasticSearchSerializer
 from drf_writable_nested.serializers import NestedUpdateMixin
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import get_users_with_perms
@@ -32,7 +33,6 @@ from rest_framework.fields import SerializerMethodField
 
 from documents import bulk_edit
 from documents.data_models import DocumentSource
-from documents.models import Approval
 from documents.models import ArchiveFont
 from documents.models import BackupRecord
 from documents.models import Correspondent
@@ -42,10 +42,10 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Dossier
 from documents.models import DossierForm
+from documents.models import EdocTask
 from documents.models import Folder
 from documents.models import FontLanguage
 from documents.models import MatchingModel
-from documents.models import EdocTask
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
 from documents.models import ShareLink
@@ -2637,7 +2637,8 @@ class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 
     def get_document_count(self, obj):
         if obj.type == Folder.FOLDER:
-            folders = Folder.objects.filter(path__startswith=obj.path, type=Folder.FILE)
+            folders = Folder.objects.filter(path__startswith=f'{obj.path}/',
+                                            type=Folder.FILE)
             # documents = Document.objects.filter(folder__in=folders)
             return folders.count()
         return 0

@@ -1,15 +1,16 @@
 from functools import reduce
 from operator import or_
+
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import CharField
 from django.db.models import Count
 from django.db.models import OuterRef
 from django.db.models import Q
 from django.db.models.functions import Cast
+from django_filters import NumberFilter
 from django_filters.rest_framework import BooleanFilter
 from django_filters.rest_framework import Filter
 from django_filters.rest_framework import FilterSet
-from django_filters import CharFilter, NumberFilter
 from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
 from rest_framework_guardian.filters import ObjectPermissionsFilter
@@ -19,12 +20,12 @@ from documents.models import Approval, Correspondent, Dossier, DossierForm, \
 from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import Folder
 from documents.models import Log
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import Warehouse
-from documents.models import Folder
 
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
@@ -175,7 +176,8 @@ class FolderFilter(Filter):
 
         if self.in_list:
             folder_paths = Folder.objects.filter(id__in=object_ids).values_list("path")
-            list_folders = Folder.objects.filter(path__startswith = folder_paths).values_list("id")
+            list_folders = Folder.objects.filter(
+                path__startswith=f'{folder_paths}/').values_list("id")
             new_list = [x[0] for x in list_folders]
             qs = qs.filter(**{f"{self.field_name}__id__in": new_list}).distinct()
         else:

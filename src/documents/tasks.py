@@ -468,8 +468,12 @@ def bulk_delete_file(folder_list = None):
     documents = []
     folders_ids = []
     for f in folder_list:
+        f:Folder
+        path=f.path
+        if f.type==Folder.FOLDER:
+            path = f.path + '/'
         folders_f_ids = Folder.objects.filter(
-            path__startswith=f.path).values_list('id', flat=True)
+            path__startswith=path).values_list('id', flat=True)
         folders_ids.extend(folders_f_ids)
     dossier_ids = []
 
@@ -1059,7 +1063,11 @@ def update_child_folder_paths(folder, old_path):
 @shared_task(bind=True)
 def update_child_folder_permisisons(self, folder, permissions, owner, merge,
                                     owner_exist, set_permissions_exist):
-    child_folders = Folder.objects.filter(path__startswith=folder.path)
+    path=folder.path
+    if folder.type==Folder.FOLDER:
+        path = f'{folder.path}/'
+
+    child_folders = Folder.objects.filter(path__startswith=path)
     documents_list = Document.objects.filter(
         folder__in=child_folders,
     )
