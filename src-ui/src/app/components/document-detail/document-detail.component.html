@@ -115,6 +115,11 @@
             <div>
               <pngx-input-text #inputTitle i18n-title title="Title" formControlName="title" [horizontal]="true" (keyup)="titleKeyUp($event)" [error]="error?.title"></pngx-input-text>
               <pngx-input-number i18n-title title="Archive serial number" [error]="error?.archive_serial_number" [horizontal]="true" formControlName='archive_serial_number'></pngx-input-number>
+
+
+              <pngx-input-folder-link formControlName="folder_path" i18n-title title="Folder path"
+                                      [horizontal]="true" [link]="folderLink()"
+                                      [disabled]="true"></pngx-input-folder-link>
               <pngx-input-date i18n-title title="Date created" formControlName="created_date" [suggestions]="suggestions?.dates" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
               [error]="error?.created_date"></pngx-input-date>
               <pngx-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"

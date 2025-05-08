@@ -48,6 +48,7 @@ import { TextComponent } from './components/common/input/text/text.component'
 import { SelectComponent } from './components/common/input/select/select.component'
 import { CheckComponent } from './components/common/input/check/check.component'
 import { UrlComponent } from './components/common/input/url/url.component'
+import { FolderLinkComponent } from './components/common/input/folder-link/folder-link.component'
 import { PasswordComponent } from './components/common/input/password/password.component'
 import {
   SaveViewConfigDialogComponent,
@@ -568,6 +569,7 @@ function initializeApp(settings: SettingsService) {
     DossierFormCustomFieldSelectComponent,
     CheckComponent,
     UrlComponent,
+    FolderLinkComponent,
     PasswordComponent,
     SaveViewConfigDialogComponent,
     TagsComponent,

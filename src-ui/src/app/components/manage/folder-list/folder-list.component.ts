@@ -7,10 +7,7 @@ import { Folder } from 'src/app/data/folder'
 import { ActivatedRoute, Router } from '@angular/router'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { FILTER_HAS_FOLDER_ANY } from 'src/app/data/filter-rule-type'
-import {
-  PermissionsService,
-  PermissionType,
-} from 'src/app/services/permissions.service'
+import { PermissionsService, PermissionType } from 'src/app/services/permissions.service'
 
 import { DocumentService } from '../../../services/rest/document.service'
 import { Document } from '../../../data/document'
@@ -297,8 +294,8 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
     return this.folderCut
   }
 
-  isSidebarVisible: boolean = true // Biến để theo dõi trạng thái của sidebar
-  buttonLabel: string = 'Show Tree'
+  isSidebarVisible: boolean = false // Biến để theo dõi trạng thái của sidebar
+  buttonLabel = $localize`Show Tree`
 
   toggleSidebar(event) {
     const btnElement = event.target as HTMLElement
@@ -315,7 +312,7 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
       this.renderer.setStyle(svgElement, 'transition', 'transform 0.3s ease')
     }
     // // this.renderer.setStyle(svgElement, 'transition', 'transform 0.3s ease')
-    this.buttonLabel = !this.isSidebarVisible ? 'Hide Tree ' : 'Show Tree'
+    this.buttonLabel = !this.isSidebarVisible ? $localize`Hide Tree` : $localize`Show Tree`
     this.isSidebarVisible = !this.isSidebarVisible // Đảo ngược trạng thái khi nhấn nút
   }
 

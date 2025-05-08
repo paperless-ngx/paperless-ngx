@@ -36,6 +36,10 @@ export interface Document extends ObjectWithPermissions {
 
   storage_path?: number
 
+  folder_path?: string
+
+  parent_folder?: number
+
   warehouse$?: Observable<Warehouse>
 
   warehouse?: number

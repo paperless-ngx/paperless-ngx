@@ -2,7 +2,7 @@
   <div class="row">
     <div class="d-flex align-items-center position-relative hidden-button-container" [class.col-md-3]="horizontal">
       @if (title) {
-        <label class="form-label" [class.mb-md-0]="horizontal" [for]="inputId">{{title}}</label>
+        <label class="form-label" [class.mb-md-0]="horizontal" [for]="inputId">{{ title }}</label>
       }
       @if (removable) {
         <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">

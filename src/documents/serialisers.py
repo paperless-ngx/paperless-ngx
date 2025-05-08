@@ -16,6 +16,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.validators import DecimalValidator
 from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
+from django.db.models import When, Case
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
@@ -1001,6 +1002,8 @@ class DocumentDetailSerializer(
     warehouse_w = SerializerMethodField(read_only=True)
     warehouse_s = SerializerMethodField(read_only=True)
     folder = FolderField(allow_null=True)
+    folder_path = serializers.SerializerMethodField(read_only=True)
+    parent_folder = serializers.SerializerMethodField(read_only=True)
     document_type = DocumentTypeField(allow_null=True)
     archive_font = ArchiveFontField(allow_null=True)
     storage_path = StoragePathField(allow_null=True)
@@ -1009,6 +1012,27 @@ class DocumentDetailSerializer(
     archived_file_name = SerializerMethodField()
 
     created_date = serializers.DateField(required=False)
+
+    def get_folder_path(self, obj):
+        folder_path = obj.folder.path.split("/")  # Danh sách ID đầu vào
+        # bỏ qua phần tử cuối cùng
+        folder_path = folder_path[:-1]
+        order_cases = [When(id=id, then=index) for index, id in
+                       enumerate(folder_path)]
+
+        folders = Folder.objects.filter(id__in=folder_path).order_by(
+            Case(*order_cases)
+        )
+        path = ''
+        for f in folders:
+            path = path + f.name + '/'
+        return path
+
+    def get_parent_folder(self, obj):
+        if obj.folder is None:
+            return None
+        return obj.folder.parent_folder_id
+
 
     def get_warehouse_w(self, obj):
         try:
@@ -1213,6 +1237,8 @@ class DocumentDetailSerializer(
             "user_can_change",
             "is_shared_by_requester",
             "set_permissions",
+            "folder_path",
+            "parent_folder",
             "notes",
             "custom_fields",
             "exploit",

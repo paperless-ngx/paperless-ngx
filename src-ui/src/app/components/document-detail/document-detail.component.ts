@@ -1,12 +1,7 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core'
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import { FormArray, FormControl, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
-import {
-  NgbDateStruct,
-  NgbModal,
-  NgbNav,
-  NgbNavChangeEvent,
-} from '@ng-bootstrap/ng-bootstrap'
+import { NgbDateStruct, NgbModal, NgbNav, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
 import { Correspondent } from 'src/app/data/correspondent'
 import { Document } from 'src/app/data/document'
 import { DocumentMetadata } from 'src/app/data/document-metadata'
@@ -21,23 +16,21 @@ import { DocumentTypeService } from 'src/app/services/rest/document-type.service
 import { ArchiveFontService } from 'src/app/services/rest/archive-font.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
-import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
-import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
-import { ArchiveFontEditDialogComponent } from '../common/edit-dialog/archive-font-edit-dialog/archive-font-edit-dialog.component'
+import {
+  CorrespondentEditDialogComponent,
+} from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
+import {
+  DocumentTypeEditDialogComponent,
+} from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
+import {
+  ArchiveFontEditDialogComponent,
+} from '../common/edit-dialog/archive-font-edit-dialog/archive-font-edit-dialog.component'
 import { ToastService } from 'src/app/services/toast.service'
 import { TextComponent } from '../common/input/text/text.component'
 import { SettingsService } from 'src/app/services/settings.service'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
-import { Observable, Subject, BehaviorSubject } from 'rxjs'
-import {
-  first,
-  takeUntil,
-  switchMap,
-  map,
-  debounceTime,
-  distinctUntilChanged,
-  filter,
-} from 'rxjs/operators'
+import { BehaviorSubject, Observable, Subject } from 'rxjs'
+import { debounceTime, distinctUntilChanged, filter, first, map, switchMap, takeUntil } from 'rxjs/operators'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
 import {
   FILTER_ARCHIVE_FONT,
@@ -49,19 +42,18 @@ import {
   FILTER_HAS_TAGS_ALL,
   FILTER_HAS_WAREHOUSE_ANY,
   FILTER_STORAGE_PATH,
-  FILTER_WAREHOUSE,
 } from 'src/app/data/filter-rule-type'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { StoragePath } from 'src/app/data/storage-path'
-import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
-import { Warehouse } from 'src/app/data/warehouse'
-import { WarehouseEditDialogComponent } from '../common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import {
-  PermissionAction,
-  PermissionsService,
-  PermissionType,
-} from 'src/app/services/permissions.service'
+  StoragePathEditDialogComponent,
+} from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { Warehouse } from 'src/app/data/warehouse'
+import {
+  WarehouseEditDialogComponent,
+} from '../common/edit-dialog/warehouse-edit-dialog/warehouse-edit-dialog.component'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { PermissionAction, PermissionsService, PermissionType } from 'src/app/services/permissions.service'
 import { User } from 'src/app/data/user'
 import { UserService } from 'src/app/services/rest/user.service'
 import { DocumentNote } from 'src/app/data/document-note'
@@ -75,12 +67,15 @@ import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { PDFDocumentProxy } from '../common/pdf-viewer/typings'
-import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
-import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
+import {
+  SplitConfirmDialogComponent,
+} from '../common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
+import {
+  RotateConfirmDialogComponent,
+} from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { WarehouseService } from 'src/app/services/rest/warehouse.service'
 
 import { DocumentApproval } from 'src/app/data/document-approval'
-import { RouterTestingHarness } from '@angular/router/testing'
 
 enum DocumentDetailNavIDs {
   Details = 1,
@@ -143,6 +138,7 @@ export class DocumentDetailComponent
   downloadUrl: string
   downloadOriginalUrl: string
   downloadExcel: string
+  parent_folder: number
 
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
@@ -158,6 +154,8 @@ export class DocumentDetailComponent
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
     content: new FormControl(''),
+    folder_path: new FormControl(''),
+    parent_folder: new FormControl(''),
     created_date: new FormControl(),
     correspondent: new FormControl(),
     document_type: new FormControl(),
@@ -234,7 +232,6 @@ export class DocumentDetailComponent
   titleKeyUp(event) {
     this.titleSubject.next(event.target?.value)
   }
-
   get useNativePdfViewer(): boolean {
     return this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
   }
@@ -411,6 +408,8 @@ export class DocumentDetailComponent
       .pipe(
         switchMap((doc) => {
           this.documentId = doc.id
+          this.parent_folder = doc.parent_folder
+          console.log('parent_folder', doc.id)
           this.previewUrl = this.documentsService.getPreviewUrl(this.documentId)
           this.http.get(this.previewUrl, { responseType: 'text' }).subscribe({
             next: (res) => {
@@ -551,6 +550,10 @@ export class DocumentDetailComponent
         })
       }
     })
+  }
+
+  folderLink() {
+    return `/folders/${this.parent_folder}`
   }
 
   ngOnDestroy(): void {
