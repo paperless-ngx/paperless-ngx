@@ -1,0 +1,16 @@
+::ng-deep .ng-select-container .ng-value-container {
+    overflow: hidden;
+
+    .ng-value {
+        background-color: transparent !important;
+        border-color: transparent;
+    }
+}
+
+i-bs {
+    cursor: pointer;
+}
+
+.badge {
+    font-size: .75rem;
+}
