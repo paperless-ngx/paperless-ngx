@@ -553,6 +553,7 @@ export class DocumentDetailComponent
   }
 
   folderLink() {
+    if (!this.parent_folder) return `/folders/root`
     return `/folders/${this.parent_folder}`
   }
 
