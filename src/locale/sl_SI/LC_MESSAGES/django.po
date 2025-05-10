@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-19 15:13-0700\n"
-"PO-Revision-Date: 2025-04-19 22:15\n"
+"POT-Creation-Date: 2025-04-23 16:31+0000\n"
+"PO-Revision-Date: 2025-04-26 00:33\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -23,39 +23,39 @@ msgstr "Dokumenti"
 
 #: documents/filters.py:374
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "Vrednost mora biti veljaven JSON."
 
 #: documents/filters.py:393
 msgid "Invalid custom field query expression"
-msgstr ""
+msgstr "Neveljaven izraz poizvedbe po polju po meri"
 
 #: documents/filters.py:403
 msgid "Invalid expression list. Must be nonempty."
-msgstr ""
+msgstr "Neveljaven seznam izrazov. Ne sme biti prazen."
 
 #: documents/filters.py:424
 msgid "Invalid logical operator {op!r}"
-msgstr ""
+msgstr "Neveljaven logični operator {op!r}"
 
 #: documents/filters.py:438
 msgid "Maximum number of query conditions exceeded."
-msgstr ""
+msgstr "Preseženo je bilo največje dovoljeno število pogojev poizvedbe."
 
 #: documents/filters.py:503
 msgid "{name!r} is not a valid custom field."
-msgstr ""
+msgstr "{name!r} ni veljavno polje po meri."
 
 #: documents/filters.py:540
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr ""
+msgstr "{data_type} ne podpira izraza poizvedbe {expr!r}."
 
 #: documents/filters.py:648
 msgid "Maximum nesting depth exceeded."
-msgstr ""
+msgstr "Presežena je bila največja globina gnezdenja."
 
 #: documents/filters.py:827
 msgid "Custom field not found"
-msgstr ""
+msgstr "Polja po meri ni bilo mogoče najti"
 
 #: documents/models.py:36 documents/models.py:710
 msgid "owner"
@@ -196,11 +196,11 @@ msgstr "Kontrolna vsota arhiviranega dokumenta."
 
 #: documents/models.py:205
 msgid "page count"
-msgstr ""
+msgstr "število strani"
 
 #: documents/models.py:212
 msgid "The number of pages of the document."
-msgstr ""
+msgstr "Število strani dokumenta."
 
 #: documents/models.py:216 documents/models.py:630 documents/models.py:668
 #: documents/models.py:739 documents/models.py:797
@@ -318,7 +318,7 @@ msgstr "ASN"
 
 #: documents/models.py:395
 msgid "Pages"
-msgstr ""
+msgstr "Strani"
 
 #: documents/models.py:401
 msgid "show on dashboard"
@@ -526,27 +526,27 @@ msgstr "ne vsebuje polja po meri"
 
 #: documents/models.py:489
 msgid "custom fields query"
-msgstr ""
+msgstr "poizvedba polj po meri"
 
 #: documents/models.py:490
 msgid "created to"
-msgstr ""
+msgstr "ustvarjeno za"
 
 #: documents/models.py:491
 msgid "created from"
-msgstr ""
+msgstr "ustvarjeno iz"
 
 #: documents/models.py:492
 msgid "added to"
-msgstr ""
+msgstr "dodano k"
 
 #: documents/models.py:493
 msgid "added from"
-msgstr ""
+msgstr "dodano iz"
 
 #: documents/models.py:494
 msgid "mime type is"
-msgstr ""
+msgstr "tip mime je"
 
 #: documents/models.py:504
 msgid "rule type"
@@ -566,31 +566,31 @@ msgstr "filtriraj pravila"
 
 #: documents/models.py:534
 msgid "Auto Task"
-msgstr ""
+msgstr "Samodejno opravilo"
 
 #: documents/models.py:535
 msgid "Scheduled Task"
-msgstr ""
+msgstr "Načrtovano opravilo"
 
 #: documents/models.py:536
 msgid "Manual Task"
-msgstr ""
+msgstr "Ročno opravilo"
 
 #: documents/models.py:539
 msgid "Consume File"
-msgstr ""
+msgstr "Porabi datoteko"
 
 #: documents/models.py:540
 msgid "Train Classifier"
-msgstr ""
+msgstr "Klasifikator vlakov"
 
 #: documents/models.py:541
 msgid "Check Sanity"
-msgstr ""
+msgstr "Preverite razumnost"
 
 #: documents/models.py:542
 msgid "Index Optimize"
-msgstr ""
+msgstr "Optimizacija indeksa"
 
 #: documents/models.py:547
 msgid "Task ID"
@@ -622,7 +622,7 @@ msgstr "Ime opravila"
 
 #: documents/models.py:569
 msgid "Name of the task that was run"
-msgstr ""
+msgstr "Ime naloge, ki je bila izvedena"
 
 #: documents/models.py:576
 msgid "Task State"
@@ -666,11 +666,11 @@ msgstr "Od opravila vrnjeni podatki"
 
 #: documents/models.py:614
 msgid "Task Type"
-msgstr ""
+msgstr "Vrsta naloge"
 
 #: documents/models.py:615
 msgid "The type of task that was run"
-msgstr ""
+msgstr "Vrsta naloge, ki je bila izvedena"
 
 #: documents/models.py:626
 msgid "Note for the document"
@@ -790,7 +790,7 @@ msgstr "Dokument posodobljen"
 
 #: documents/models.py:932
 msgid "Scheduled"
-msgstr ""
+msgstr "Načrtovano"
 
 #: documents/models.py:935
 msgid "Consume Folder"
@@ -806,15 +806,15 @@ msgstr "Pridobi e-pošto"
 
 #: documents/models.py:938
 msgid "Web UI"
-msgstr ""
+msgstr "Spletni uporabniški vmesnik"
 
 #: documents/models.py:943
 msgid "Modified"
-msgstr ""
+msgstr "Spremenjeno"
 
 #: documents/models.py:944
 msgid "Custom Field"
-msgstr ""
+msgstr "Polje po meri"
 
 #: documents/models.py:947
 msgid "Workflow Trigger Type"
@@ -854,39 +854,39 @@ msgstr "vsebuje dopisnika"
 
 #: documents/models.py:1023
 msgid "schedule offset days"
-msgstr ""
+msgstr "dnevi izstopa v urniku"
 
 #: documents/models.py:1026
 msgid "The number of days to offset the schedule trigger by."
-msgstr ""
+msgstr "Število dni, za katere naj se sproži sprožilec razporeda."
 
 #: documents/models.py:1031
 msgid "schedule is recurring"
-msgstr ""
+msgstr "urnik se ponavlja"
 
 #: documents/models.py:1034
 msgid "If the schedule should be recurring."
-msgstr ""
+msgstr "Če bi moral biti urnik ponavljajoč se."
 
 #: documents/models.py:1039
 msgid "schedule recurring delay in days"
-msgstr ""
+msgstr "načrtujte ponavljajočo se zamudo v dnevih"
 
 #: documents/models.py:1043
 msgid "The number of days between recurring schedule triggers."
-msgstr ""
+msgstr "Število dni med ponavljajočimi se sprožilci razporeda."
 
 #: documents/models.py:1048
 msgid "schedule date field"
-msgstr ""
+msgstr "polje z datumom razporeda"
 
 #: documents/models.py:1053
 msgid "The field to check for a schedule trigger."
-msgstr ""
+msgstr "Polje za preverjanje sprožilca razporeda."
 
 #: documents/models.py:1062
 msgid "schedule date custom field"
-msgstr ""
+msgstr "polje po meri za datum razporeda"
 
 #: documents/models.py:1066
 msgid "workflow trigger"
@@ -898,75 +898,75 @@ msgstr "sprožilci procesa"
 
 #: documents/models.py:1075
 msgid "email subject"
-msgstr ""
+msgstr "zadeva e-pošte"
 
 #: documents/models.py:1079
 msgid "The subject of the email, can include some placeholders, see documentation."
-msgstr ""
+msgstr "Zadeva e-poštnega sporočila lahko vključuje nekaj nadomestnih besedil, glejte dokumentacijo."
 
 #: documents/models.py:1085
 msgid "email body"
-msgstr ""
+msgstr "telo e-pošte"
 
 #: documents/models.py:1088
 msgid "The body (message) of the email, can include some placeholders, see documentation."
-msgstr ""
+msgstr "Telo (sporočilo) e-pošte lahko vključuje nekaj nadomestnih besedil, glejte dokumentacijo."
 
 #: documents/models.py:1094
 msgid "emails to"
-msgstr ""
+msgstr "e-poštna sporočila za"
 
 #: documents/models.py:1097
 msgid "The destination email addresses, comma separated."
-msgstr ""
+msgstr "Ciljni e-poštni naslovi, ločeni z vejicami."
 
 #: documents/models.py:1103
 msgid "include document in email"
-msgstr ""
+msgstr "vključi dokument v e-pošto"
 
 #: documents/models.py:1114
 msgid "webhook url"
-msgstr ""
+msgstr "URL spletnega kavlja"
 
 #: documents/models.py:1117
 msgid "The destination URL for the notification."
-msgstr ""
+msgstr "Ciljni URL za obvestilo."
 
 #: documents/models.py:1122
 msgid "use parameters"
-msgstr ""
+msgstr "uporabite parametre"
 
 #: documents/models.py:1127
 msgid "send as JSON"
-msgstr ""
+msgstr "pošlji kot JSON"
 
 #: documents/models.py:1131
 msgid "webhook parameters"
-msgstr ""
+msgstr "parametri spletnega kavlja"
 
 #: documents/models.py:1134
 msgid "The parameters to send with the webhook URL if body not used."
-msgstr ""
+msgstr "Parametri, ki jih je treba poslati z URL-jem spletnega kavlja, če telo ni uporabljeno."
 
 #: documents/models.py:1138
 msgid "webhook body"
-msgstr ""
+msgstr "telo spletnega kavlja"
 
 #: documents/models.py:1141
 msgid "The body to send with the webhook URL if parameters not used."
-msgstr ""
+msgstr "Telo, ki ga je treba poslati z URL-jem spletnega kavlja, če parametri niso uporabljeni."
 
 #: documents/models.py:1145
 msgid "webhook headers"
-msgstr ""
+msgstr "glave spletnega kavlja"
 
 #: documents/models.py:1148
 msgid "The headers to send with the webhook URL."
-msgstr ""
+msgstr "Glave, ki jih je treba poslati z URL-jem spletnega kavlja."
 
 #: documents/models.py:1153
 msgid "include document in webhook"
-msgstr ""
+msgstr "vključi dokument v spletni kavelj"
 
 #: documents/models.py:1164
 msgid "Assignment"
@@ -982,7 +982,7 @@ msgstr "E-pošta"
 
 #: documents/models.py:1176
 msgid "Webhook"
-msgstr ""
+msgstr "Spletni kavelj"
 
 #: documents/models.py:1180
 msgid "Workflow Action Type"
@@ -1038,11 +1038,11 @@ msgstr "dodeli ta polja po meri"
 
 #: documents/models.py:1275
 msgid "custom field values"
-msgstr ""
+msgstr "vrednosti polj po meri"
 
 #: documents/models.py:1279
 msgid "Optional values to assign to the custom fields."
-msgstr ""
+msgstr "Neobvezne vrednosti, ki jih je treba dodeliti poljem po meri."
 
 #: documents/models.py:1288
 msgid "remove these tag(s)"
@@ -1114,11 +1114,11 @@ msgstr "odstrani vsa polja po meri"
 
 #: documents/models.py:1395
 msgid "email"
-msgstr ""
+msgstr "e-pošta"
 
 #: documents/models.py:1404
 msgid "webhook"
-msgstr ""
+msgstr "spletni kavelj"
 
 #: documents/models.py:1408
 msgid "workflow action"
@@ -1146,23 +1146,23 @@ msgstr "omogočeno"
 
 #: documents/models.py:1445
 msgid "workflow"
-msgstr ""
+msgstr "potek dela"
 
 #: documents/models.py:1449
 msgid "workflow trigger type"
-msgstr ""
+msgstr "vrsta sprožilca poteka dela"
 
 #: documents/models.py:1463
 msgid "date run"
-msgstr ""
+msgstr "datum poteka"
 
 #: documents/models.py:1469
 msgid "workflow run"
-msgstr ""
+msgstr "izvajanje poteka dela"
 
 #: documents/models.py:1470
 msgid "workflow runs"
-msgstr ""
+msgstr "poteka dela"
 
 #: documents/serialisers.py:135
 #, python-format
@@ -1184,19 +1184,19 @@ msgstr "Zaznani neveljavni znaki."
 
 #: documents/templates/account/account_inactive.html:5
 msgid "Paperless-ngx account inactive"
-msgstr ""
+msgstr "Paperless-ngx račun ni aktiven"
 
 #: documents/templates/account/account_inactive.html:9
 msgid "Account inactive."
-msgstr ""
+msgstr "Račun ni aktiven."
 
 #: documents/templates/account/account_inactive.html:14
 msgid "This account is inactive."
-msgstr ""
+msgstr "Ta račun ni aktiven."
 
 #: documents/templates/account/account_inactive.html:16
 msgid "Return to login"
-msgstr ""
+msgstr "Nazaj na prijavo"
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
@@ -1324,7 +1324,7 @@ msgstr "Že imate račun? <a href=\"%(login_url)s\">Prijavite se</a>"
 
 #: documents/templates/account/signup.html:19
 msgid "Note: This is the first user account for this installation and will be granted superuser privileges."
-msgstr ""
+msgstr "Opomba: To je prvi uporabniški račun za to namestitev in mu bodo dodeljene pravice superuporabnika."
 
 #: documents/templates/account/signup.html:23
 #: documents/templates/socialaccount/signup.html:14
@@ -1354,19 +1354,19 @@ msgstr "Tu je povezava do dokumentacije."
 
 #: documents/templates/mfa/authenticate.html:7
 msgid "Paperless-ngx Two-Factor Authentication"
-msgstr ""
+msgstr "Dvofaktorska avtentikacija Paperless-ngx"
 
 #: documents/templates/mfa/authenticate.html:12
 msgid "Your account is protected by two-factor authentication. Please enter an authenticator code:"
-msgstr ""
+msgstr "Vaš račun je zaščiten z dvofaktorsko avtentikacijo. Vnesite kodo za avtentikacijo:"
 
 #: documents/templates/mfa/authenticate.html:17
 msgid "Code"
-msgstr ""
+msgstr "Koda"
 
 #: documents/templates/mfa/authenticate.html:24
 msgid "Cancel"
-msgstr ""
+msgstr "Prekliči"
 
 #: documents/templates/paperless-ngx/base.html:58
 msgid "Share link was not found."
@@ -1408,9 +1408,24 @@ msgstr "Za prijavo boste uporabili račun ponudnika %(provider_name)s."
 msgid "As a final step, please complete the following form:"
 msgstr "Kot zadnji korak vas prosimo, da izpolnite naslednji obrazec:"
 
+#: documents/validators.py:24
+#, python-brace-format
+msgid "Unable to parse URI {value}, missing scheme"
+msgstr "Ni mogoče razčleniti URI-ja {value}, manjka shema"
+
+#: documents/validators.py:29
+#, python-brace-format
+msgid "Unable to parse URI {value}, missing net location or path"
+msgstr "Ni mogoče razčleniti URI-ja {value}, manjka omrežna lokacija ali pot"
+
 #: documents/validators.py:36
-msgid ", "
-msgstr ""
+msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
+msgstr "Shema URI '{parts.scheme}' ni dovoljena. Dovoljene sheme: {', '.join(allowed_schemes)}"
+
+#: documents/validators.py:45
+#, python-brace-format
+msgid "Unable to parse URI {value}"
+msgstr "Ni mogoče razčleniti URI-ja {value}"
 
 #: paperless/apps.py:11
 msgid "Paperless"
@@ -1560,141 +1575,141 @@ msgstr "Logotip aplikacije"
 msgid "paperless application settings"
 msgstr "aplikacijske nastavitve paperless"
 
-#: paperless/settings.py:726
+#: paperless/settings.py:732
 msgid "English (US)"
 msgstr "Angleščina (ZDA)"
 
-#: paperless/settings.py:727
+#: paperless/settings.py:733
 msgid "Arabic"
 msgstr "Arabščina"
 
-#: paperless/settings.py:728
+#: paperless/settings.py:734
 msgid "Afrikaans"
 msgstr "Afrikanščina"
 
-#: paperless/settings.py:729
+#: paperless/settings.py:735
 msgid "Belarusian"
 msgstr "Beloruščina"
 
-#: paperless/settings.py:730
+#: paperless/settings.py:736
 msgid "Bulgarian"
 msgstr "Bolgarščina"
 
-#: paperless/settings.py:731
+#: paperless/settings.py:737
 msgid "Catalan"
 msgstr "Katalonščina"
 
-#: paperless/settings.py:732
+#: paperless/settings.py:738
 msgid "Czech"
 msgstr "Češčina"
 
-#: paperless/settings.py:733
+#: paperless/settings.py:739
 msgid "Danish"
 msgstr "Danščina"
 
-#: paperless/settings.py:734
+#: paperless/settings.py:740
 msgid "German"
 msgstr "Nemščina"
 
-#: paperless/settings.py:735
+#: paperless/settings.py:741
 msgid "Greek"
 msgstr "Grščina"
 
-#: paperless/settings.py:736
+#: paperless/settings.py:742
 msgid "English (GB)"
 msgstr "Angleščina (GB)"
 
-#: paperless/settings.py:737
+#: paperless/settings.py:743
 msgid "Spanish"
 msgstr "Španščina"
 
-#: paperless/settings.py:738
+#: paperless/settings.py:744
 msgid "Finnish"
 msgstr "Finščina"
 
-#: paperless/settings.py:739
+#: paperless/settings.py:745
 msgid "French"
 msgstr "Francoščina"
 
-#: paperless/settings.py:740
+#: paperless/settings.py:746
 msgid "Hungarian"
 msgstr "Madžarščina"
 
-#: paperless/settings.py:741
+#: paperless/settings.py:747
 msgid "Italian"
 msgstr "Italijanščina"
 
-#: paperless/settings.py:742
+#: paperless/settings.py:748
 msgid "Japanese"
 msgstr "japonščina"
 
-#: paperless/settings.py:743
+#: paperless/settings.py:749
 msgid "Korean"
 msgstr "Korejščina"
 
-#: paperless/settings.py:744
+#: paperless/settings.py:750
 msgid "Luxembourgish"
 msgstr "Luksemburški"
 
-#: paperless/settings.py:745
+#: paperless/settings.py:751
 msgid "Norwegian"
 msgstr "Norveščina"
 
-#: paperless/settings.py:746
+#: paperless/settings.py:752
 msgid "Dutch"
 msgstr "Nizozemščina"
 
-#: paperless/settings.py:747
+#: paperless/settings.py:753
 msgid "Polish"
 msgstr "Poljščina"
 
-#: paperless/settings.py:748
+#: paperless/settings.py:754
 msgid "Portuguese (Brazil)"
 msgstr "Portugalščina (Brazilija)"
 
-#: paperless/settings.py:749
+#: paperless/settings.py:755
 msgid "Portuguese"
 msgstr "Portugalščina"
 
-#: paperless/settings.py:750
+#: paperless/settings.py:756
 msgid "Romanian"
 msgstr "Romunščina"
 
-#: paperless/settings.py:751
+#: paperless/settings.py:757
 msgid "Russian"
 msgstr "Ruščina"
 
-#: paperless/settings.py:752
+#: paperless/settings.py:758
 msgid "Slovak"
 msgstr "Slovaščina"
 
-#: paperless/settings.py:753
+#: paperless/settings.py:759
 msgid "Slovenian"
 msgstr "Slovenščina"
 
-#: paperless/settings.py:754
+#: paperless/settings.py:760
 msgid "Serbian"
 msgstr "Srbščina"
 
-#: paperless/settings.py:755
+#: paperless/settings.py:761
 msgid "Swedish"
 msgstr "Švedščina"
 
-#: paperless/settings.py:756
+#: paperless/settings.py:762
 msgid "Turkish"
 msgstr "Turščina"
 
-#: paperless/settings.py:757
+#: paperless/settings.py:763
 msgid "Ukrainian"
 msgstr "Ukrajinščina"
 
-#: paperless/settings.py:758
+#: paperless/settings.py:764
 msgid "Chinese Simplified"
 msgstr "Poenostavljena kitajščina"
 
-#: paperless/settings.py:759
+#: paperless/settings.py:765
 msgid "Chinese Traditional"
-msgstr ""
+msgstr "Tradicionalna kitajščina"
 
 #: paperless/urls.py:374
 msgid "Paperless-ngx administration"
@@ -1758,15 +1773,15 @@ msgstr "Uporabi STARTTLS"
 
 #: paperless_mail/models.py:19
 msgid "IMAP"
-msgstr ""
+msgstr "IMAP"
 
 #: paperless_mail/models.py:20
 msgid "Gmail OAuth"
-msgstr ""
+msgstr "Gmail OAuth"
 
 #: paperless_mail/models.py:21
 msgid "Outlook OAuth"
-msgstr ""
+msgstr "Outlook OAuth"
 
 #: paperless_mail/models.py:25
 msgid "IMAP server"
@@ -1806,19 +1821,19 @@ msgstr "Nabor znakov za uporabo pri komunikaciji s poštnim strežnikom, na prim
 
 #: paperless_mail/models.py:60
 msgid "account type"
-msgstr ""
+msgstr "vrsta računa"
 
 #: paperless_mail/models.py:66
 msgid "refresh token"
-msgstr ""
+msgstr "osveži žeton"
 
 #: paperless_mail/models.py:70
 msgid "The refresh token to use for token authentication e.g. with oauth2."
-msgstr ""
+msgstr "Žeton za osvežitev, ki se uporablja za preverjanje pristnosti žetonov, npr. z oauth2."
 
 #: paperless_mail/models.py:79
 msgid "The expiration date of the refresh token. "
-msgstr ""
+msgstr "Datum poteka veljavnosti osvežilnega žetona. "
 
 #: paperless_mail/models.py:89
 msgid "mail rule"
@@ -1846,23 +1861,23 @@ msgstr "Obdelajte vse datoteke, vključno z \"vgrajenimi\" prilogami."
 
 #: paperless_mail/models.py:119
 msgid "System default"
-msgstr ""
+msgstr "Privzeto sistemsko"
 
 #: paperless_mail/models.py:120
 msgid "Text, then HTML"
-msgstr ""
+msgstr "Besedilo, nato HTML"
 
 #: paperless_mail/models.py:121
 msgid "HTML, then text"
-msgstr ""
+msgstr "HTML, nato besedilo"
 
 #: paperless_mail/models.py:122
 msgid "HTML only"
-msgstr ""
+msgstr "Samo HTML"
 
 #: paperless_mail/models.py:123
 msgid "Text only"
-msgstr ""
+msgstr "Samo besedilo"
 
 #: paperless_mail/models.py:126
 msgid "Delete"
@@ -1974,7 +1989,7 @@ msgstr "obseg zajemanja"
 
 #: paperless_mail/models.py:241
 msgid "pdf layout"
-msgstr ""
+msgstr "postavitev Pdf-ja"
 
 #: paperless_mail/models.py:247
 msgid "action"
