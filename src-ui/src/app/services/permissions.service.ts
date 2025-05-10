@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core'
 import { ObjectWithPermissions } from '../data/object-with-permissions'
 import { User } from '../data/user'
-import { isString } from '@ng-bootstrap/ng-bootstrap/util/util'
 
 export enum PermissionAction {
   Add = 'add',
@@ -64,6 +63,27 @@ export enum DevelopPermissionType {
   Backup = '%s_backuprecord'
 }
 
+export const TranslateDevelopPermissionType = {
+  document: $localize`Document`,
+  tag: $localize`Tag`,
+  warehouse: $localize`Warehouse`,
+  documenttype: $localize`Documenttype`,
+  savedview: $localize`Savedview`,
+  edoctask: $localize`Edoctask`,
+  appconfig: $localize`Appconfig`,
+  uisettings: $localize`Uisettings`,
+  note: $localize`Note`,
+  user: $localize`User`,
+  group: $localize`Group`,
+  sharelink: $localize`Sharelink`,
+  customfield: $localize`Customfield`,
+  workflow: $localize`Workflow`,
+  approval: $localize`Approval`,
+  folder: $localize`Folder`,
+  fontlanguage: $localize`Fontlanguage`,
+  archivefont: $localize`Archivefont`,
+  backup: $localize`Backup`,
+} as const
 
 @Injectable({
   providedIn: 'root',

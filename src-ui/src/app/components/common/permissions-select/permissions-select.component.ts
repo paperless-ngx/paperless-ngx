@@ -1,15 +1,10 @@
 import { Component, forwardRef, Input, OnInit } from '@angular/core'
+import { AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms'
 import {
-  AbstractControl,
-  ControlValueAccessor,
-  FormControl,
-  FormGroup,
-  NG_VALUE_ACCESSOR,
-} from '@angular/forms'
-import {
+  DevelopPermissionType,
   PermissionAction,
   PermissionsService,
-  DevelopPermissionType,
+  TranslateDevelopPermissionType,
 } from 'src/app/services/permissions.service'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 
@@ -204,4 +199,5 @@ export class PermissionsSelectComponent
   }
 
   protected readonly DevelopPermissionType = DevelopPermissionType
+  protected readonly TranslateDevelopPermissionType = TranslateDevelopPermissionType
 }
