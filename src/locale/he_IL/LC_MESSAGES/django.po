@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-19 15:13-0700\n"
-"PO-Revision-Date: 2025-04-19 22:14\n"
+"POT-Creation-Date: 2025-04-23 16:31+0000\n"
+"PO-Revision-Date: 2025-04-27 00:37\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Language: he_IL\n"
@@ -23,39 +23,39 @@ msgstr "מסמכים"
 
 #: documents/filters.py:374
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "ערך מוכרך להיות JSON תקין."
 
 #: documents/filters.py:393
 msgid "Invalid custom field query expression"
-msgstr ""
+msgstr "ביטוי שאילתה לא חוקי של שדה מותאם אישית"
 
 #: documents/filters.py:403
 msgid "Invalid expression list. Must be nonempty."
-msgstr ""
+msgstr "רשימת ביטויים לא חוקית. מוכרך לכלול ערך."
 
 #: documents/filters.py:424
 msgid "Invalid logical operator {op!r}"
-msgstr ""
+msgstr "סימן פעולה לוגית לא חוקי {op!r}"
 
 #: documents/filters.py:438
 msgid "Maximum number of query conditions exceeded."
-msgstr ""
+msgstr "חריגה ממספר תנאי השאילתה המרבי."
 
 #: documents/filters.py:503
 msgid "{name!r} is not a valid custom field."
-msgstr ""
+msgstr "{name!r} הוא לא שדה מותאם אישית חוקי."
 
 #: documents/filters.py:540
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr ""
+msgstr "{data_type} לא תומך בביטוי שאילתה {expr!r}."
 
 #: documents/filters.py:648
 msgid "Maximum nesting depth exceeded."
-msgstr ""
+msgstr "חריגה מעומק הקינון המרבי."
 
 #: documents/filters.py:827
 msgid "Custom field not found"
-msgstr ""
+msgstr "שדה מותאם אישית לא נמצא"
 
 #: documents/models.py:36 documents/models.py:710
 msgid "owner"
@@ -196,7 +196,7 @@ msgstr "מחרוזת הבדיקה למסמך בארכיון."
 
 #: documents/models.py:205
 msgid "page count"
-msgstr ""
+msgstr "מספר עמודים"
 
 #: documents/models.py:212
 msgid "The number of pages of the document."
@@ -338,15 +338,15 @@ msgstr "מיין הפוך"
 
 #: documents/models.py:416
 msgid "View page size"
-msgstr ""
+msgstr "גודל עמוד תצוגה"
 
 #: documents/models.py:424
 msgid "View display mode"
-msgstr ""
+msgstr "מצב תצוגה"
 
 #: documents/models.py:431
 msgid "Document display fields"
-msgstr ""
+msgstr "שדות תצוגת מסמך"
 
 #: documents/models.py:438 documents/models.py:501
 msgid "saved view"
@@ -510,39 +510,39 @@ msgstr "משותף"
 
 #: documents/models.py:485
 msgid "has custom fields"
-msgstr ""
+msgstr "קיימים שדות מותאמים אישית"
 
 #: documents/models.py:486
 msgid "has custom field in"
-msgstr ""
+msgstr "קיימים שדות מותאמים אישית ב-"
 
 #: documents/models.py:487
 msgid "does not have custom field in"
-msgstr ""
+msgstr "לא קיימים שדות מותאמים אישית ב-"
 
 #: documents/models.py:488
 msgid "does not have custom field"
-msgstr ""
+msgstr "לא קיימים שדות מותאמים אישית"
 
 #: documents/models.py:489
 msgid "custom fields query"
-msgstr ""
+msgstr "שאילתת שדות מותאמים אישית"
 
 #: documents/models.py:490
 msgid "created to"
-msgstr ""
+msgstr "נוצר ל-"
 
 #: documents/models.py:491
 msgid "created from"
-msgstr ""
+msgstr "נוצר מ-"
 
 #: documents/models.py:492
 msgid "added to"
-msgstr ""
+msgstr "נוסף ל-"
 
 #: documents/models.py:493
 msgid "added from"
-msgstr ""
+msgstr "נוסף מ-"
 
 #: documents/models.py:494
 msgid "mime type is"
@@ -570,15 +570,15 @@ msgstr "משימה אוטומטית"
 
 #: documents/models.py:535
 msgid "Scheduled Task"
-msgstr ""
+msgstr "משימה מתוזמנת"
 
 #: documents/models.py:536
 msgid "Manual Task"
-msgstr ""
+msgstr "משימה ידנית"
 
 #: documents/models.py:539
 msgid "Consume File"
-msgstr ""
+msgstr "צרוך קובץ"
 
 #: documents/models.py:540
 msgid "Train Classifier"
@@ -622,7 +622,7 @@ msgstr "שם המשימה"
 
 #: documents/models.py:569
 msgid "Name of the task that was run"
-msgstr ""
+msgstr "שם המשימה שרצה"
 
 #: documents/models.py:576
 msgid "Task State"
@@ -666,7 +666,7 @@ msgstr "המידע מאוחזר ע\"י המשימה"
 
 #: documents/models.py:614
 msgid "Task Type"
-msgstr ""
+msgstr "סוג משימה"
 
 #: documents/models.py:615
 msgid "The type of task that was run"
@@ -1408,8 +1408,23 @@ msgstr ""
 msgid "As a final step, please complete the following form:"
 msgstr ""
 
+#: documents/validators.py:24
+#, python-brace-format
+msgid "Unable to parse URI {value}, missing scheme"
+msgstr ""
+
+#: documents/validators.py:29
+#, python-brace-format
+msgid "Unable to parse URI {value}, missing net location or path"
+msgstr ""
+
 #: documents/validators.py:36
-msgid ", "
+msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
+msgstr ""
+
+#: documents/validators.py:45
+#, python-brace-format
+msgid "Unable to parse URI {value}"
 msgstr ""
 
 #: paperless/apps.py:11
@@ -1560,139 +1575,139 @@ msgstr "לוגו יישום"
 msgid "paperless application settings"
 msgstr "הגדרות יישום paperless"
 
-#: paperless/settings.py:726
+#: paperless/settings.py:732
 msgid "English (US)"
 msgstr "אנגלית (ארה״ב)"
 
-#: paperless/settings.py:727
+#: paperless/settings.py:733
 msgid "Arabic"
 msgstr "ערבית"
 
-#: paperless/settings.py:728
+#: paperless/settings.py:734
 msgid "Afrikaans"
 msgstr "אפריקאנס"
 
-#: paperless/settings.py:729
+#: paperless/settings.py:735
 msgid "Belarusian"
 msgstr "בלרוסית"
 
-#: paperless/settings.py:730
+#: paperless/settings.py:736
 msgid "Bulgarian"
 msgstr "בולגרית"
 
-#: paperless/settings.py:731
+#: paperless/settings.py:737
 msgid "Catalan"
 msgstr "קטלאנית"
 
-#: paperless/settings.py:732
+#: paperless/settings.py:738
 msgid "Czech"
 msgstr "צ'כית"
 
-#: paperless/settings.py:733
+#: paperless/settings.py:739
 msgid "Danish"
 msgstr "דנית"
 
-#: paperless/settings.py:734
+#: paperless/settings.py:740
 msgid "German"
 msgstr "גרמנית"
 
-#: paperless/settings.py:735
+#: paperless/settings.py:741
 msgid "Greek"
 msgstr "יוונית"
 
-#: paperless/settings.py:736
+#: paperless/settings.py:742
 msgid "English (GB)"
 msgstr "אנגלית (בריטניה)"
 
-#: paperless/settings.py:737
+#: paperless/settings.py:743
 msgid "Spanish"
 msgstr "ספרדית"
 
-#: paperless/settings.py:738
+#: paperless/settings.py:744
 msgid "Finnish"
 msgstr "פינית"
 
-#: paperless/settings.py:739
+#: paperless/settings.py:745
 msgid "French"
 msgstr "צרפתית"
 
-#: paperless/settings.py:740
+#: paperless/settings.py:746
 msgid "Hungarian"
 msgstr "הונגרית"
 
-#: paperless/settings.py:741
+#: paperless/settings.py:747
 msgid "Italian"
 msgstr "איטלקית"
 
-#: paperless/settings.py:742
+#: paperless/settings.py:748
 msgid "Japanese"
 msgstr "יפנית"
 
-#: paperless/settings.py:743
+#: paperless/settings.py:749
 msgid "Korean"
 msgstr ""
 
-#: paperless/settings.py:744
+#: paperless/settings.py:750
 msgid "Luxembourgish"
 msgstr "לוקסמבורגית"
 
-#: paperless/settings.py:745
+#: paperless/settings.py:751
 msgid "Norwegian"
 msgstr "נורווגית"
 
-#: paperless/settings.py:746
+#: paperless/settings.py:752
 msgid "Dutch"
 msgstr "הולנדית"
 
-#: paperless/settings.py:747
+#: paperless/settings.py:753
 msgid "Polish"
 msgstr "פולנית"
 
-#: paperless/settings.py:748
+#: paperless/settings.py:754
 msgid "Portuguese (Brazil)"
 msgstr "פורטוגלית ברזילאית"
 
-#: paperless/settings.py:749
+#: paperless/settings.py:755
 msgid "Portuguese"
 msgstr "פורטוגלית"
 
-#: paperless/settings.py:750
+#: paperless/settings.py:756
 msgid "Romanian"
 msgstr "רומנית"
 
-#: paperless/settings.py:751
+#: paperless/settings.py:757
 msgid "Russian"
 msgstr "רוסית"
 
-#: paperless/settings.py:752
+#: paperless/settings.py:758
 msgid "Slovak"
 msgstr "סלובקית"
 
-#: paperless/settings.py:753
+#: paperless/settings.py:759
 msgid "Slovenian"
 msgstr "סלובנית"
 
-#: paperless/settings.py:754
+#: paperless/settings.py:760
 msgid "Serbian"
 msgstr "סרבית"
 
-#: paperless/settings.py:755
+#: paperless/settings.py:761
 msgid "Swedish"
 msgstr "שוודית"
 
-#: paperless/settings.py:756
+#: paperless/settings.py:762
 msgid "Turkish"
 msgstr "טורקית"
 
-#: paperless/settings.py:757
+#: paperless/settings.py:763
 msgid "Ukrainian"
 msgstr "אוקראינית"
 
-#: paperless/settings.py:758
+#: paperless/settings.py:764
 msgid "Chinese Simplified"
 msgstr "סינית מפושטת"
 
-#: paperless/settings.py:759
+#: paperless/settings.py:765
 msgid "Chinese Traditional"
 msgstr ""
 

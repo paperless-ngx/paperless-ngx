@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-19 15:13-0700\n"
-"PO-Revision-Date: 2025-04-19 22:14\n"
+"POT-Creation-Date: 2025-04-23 16:31+0000\n"
+"PO-Revision-Date: 2025-05-06 00:35\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -570,7 +570,7 @@ msgstr ""
 
 #: documents/models.py:535
 msgid "Scheduled Task"
-msgstr ""
+msgstr "Zaplanowane zadanie"
 
 #: documents/models.py:536
 msgid "Manual Task"
@@ -1196,7 +1196,7 @@ msgstr ""
 
 #: documents/templates/account/account_inactive.html:16
 msgid "Return to login"
-msgstr ""
+msgstr "Powrót do logowania"
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
@@ -1408,8 +1408,23 @@ msgstr "Zamierzasz użyć konta %(provider_name)s aby się zalogować."
 msgid "As a final step, please complete the following form:"
 msgstr "Na koniec należy wypełnić poniższy formularz:"
 
+#: documents/validators.py:24
+#, python-brace-format
+msgid "Unable to parse URI {value}, missing scheme"
+msgstr ""
+
+#: documents/validators.py:29
+#, python-brace-format
+msgid "Unable to parse URI {value}, missing net location or path"
+msgstr ""
+
 #: documents/validators.py:36
-msgid ", "
+msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
+msgstr ""
+
+#: documents/validators.py:45
+#, python-brace-format
+msgid "Unable to parse URI {value}"
 msgstr ""
 
 #: paperless/apps.py:11
@@ -1560,139 +1575,139 @@ msgstr "Logo aplikacji"
 msgid "paperless application settings"
 msgstr "paperless ustawienia aplikacji"
 
-#: paperless/settings.py:726
+#: paperless/settings.py:732
 msgid "English (US)"
 msgstr "Angielski (USA)"
 
-#: paperless/settings.py:727
+#: paperless/settings.py:733
 msgid "Arabic"
 msgstr "arabski"
 
-#: paperless/settings.py:728
+#: paperless/settings.py:734
 msgid "Afrikaans"
 msgstr "Afrykanerski"
 
-#: paperless/settings.py:729
+#: paperless/settings.py:735
 msgid "Belarusian"
 msgstr "Białoruski"
 
-#: paperless/settings.py:730
+#: paperless/settings.py:736
 msgid "Bulgarian"
 msgstr "Bułgarski"
 
-#: paperless/settings.py:731
+#: paperless/settings.py:737
 msgid "Catalan"
 msgstr "Kataloński"
 
-#: paperless/settings.py:732
+#: paperless/settings.py:738
 msgid "Czech"
 msgstr "Czeski"
 
-#: paperless/settings.py:733
+#: paperless/settings.py:739
 msgid "Danish"
 msgstr "Duński"
 
-#: paperless/settings.py:734
+#: paperless/settings.py:740
 msgid "German"
 msgstr "Niemiecki"
 
-#: paperless/settings.py:735
+#: paperless/settings.py:741
 msgid "Greek"
 msgstr "Grecki"
 
-#: paperless/settings.py:736
+#: paperless/settings.py:742
 msgid "English (GB)"
 msgstr "Angielski (Wielka Brytania)"
 
-#: paperless/settings.py:737
+#: paperless/settings.py:743
 msgid "Spanish"
 msgstr "Hiszpański"
 
-#: paperless/settings.py:738
+#: paperless/settings.py:744
 msgid "Finnish"
 msgstr "Fiński"
 
-#: paperless/settings.py:739
+#: paperless/settings.py:745
 msgid "French"
 msgstr "Francuski"
 
-#: paperless/settings.py:740
+#: paperless/settings.py:746
 msgid "Hungarian"
 msgstr "Węgierski"
 
-#: paperless/settings.py:741
+#: paperless/settings.py:747
 msgid "Italian"
 msgstr "Włoski"
 
-#: paperless/settings.py:742
+#: paperless/settings.py:748
 msgid "Japanese"
 msgstr "Japoński"
 
-#: paperless/settings.py:743
+#: paperless/settings.py:749
 msgid "Korean"
 msgstr "Koreański"
 
-#: paperless/settings.py:744
+#: paperless/settings.py:750
 msgid "Luxembourgish"
 msgstr "Luksemburski"
 
-#: paperless/settings.py:745
+#: paperless/settings.py:751
 msgid "Norwegian"
 msgstr "Norweski"
 
-#: paperless/settings.py:746
+#: paperless/settings.py:752
 msgid "Dutch"
 msgstr "Holenderski"
 
-#: paperless/settings.py:747
+#: paperless/settings.py:753
 msgid "Polish"
 msgstr "Polski"
 
-#: paperless/settings.py:748
+#: paperless/settings.py:754
 msgid "Portuguese (Brazil)"
 msgstr "Portugalski (Brazylia)"
 
-#: paperless/settings.py:749
+#: paperless/settings.py:755
 msgid "Portuguese"
 msgstr "Portugalski"
 
-#: paperless/settings.py:750
+#: paperless/settings.py:756
 msgid "Romanian"
 msgstr "Rumuński"
 
-#: paperless/settings.py:751
+#: paperless/settings.py:757
 msgid "Russian"
 msgstr "Rosyjski"
 
-#: paperless/settings.py:752
+#: paperless/settings.py:758
 msgid "Slovak"
 msgstr "Słowacki"
 
-#: paperless/settings.py:753
+#: paperless/settings.py:759
 msgid "Slovenian"
 msgstr "Słoweński"
 
-#: paperless/settings.py:754
+#: paperless/settings.py:760
 msgid "Serbian"
 msgstr "Serbski"
 
-#: paperless/settings.py:755
+#: paperless/settings.py:761
 msgid "Swedish"
 msgstr "Szwedzki"
 
-#: paperless/settings.py:756
+#: paperless/settings.py:762
 msgid "Turkish"
 msgstr "Turecki"
 
-#: paperless/settings.py:757
+#: paperless/settings.py:763
 msgid "Ukrainian"
 msgstr "Ukraiński"
 
-#: paperless/settings.py:758
+#: paperless/settings.py:764
 msgid "Chinese Simplified"
 msgstr "Chiński uproszczony"
 
-#: paperless/settings.py:759
+#: paperless/settings.py:765
 msgid "Chinese Traditional"
 msgstr ""
 
