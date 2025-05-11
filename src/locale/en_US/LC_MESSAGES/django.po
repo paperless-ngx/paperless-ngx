@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-23 16:31+0000\n"
+"POT-Creation-Date: 2025-05-11 19:44+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1589,15 +1589,59 @@ msgstr ""
 msgid "Adds additional user arguments for OCRMyPDF"
 msgstr ""
 
-#: paperless/models.py:171
+#: paperless/models.py:175
 msgid "Application title"
 msgstr ""
 
-#: paperless/models.py:178
+#: paperless/models.py:182
 msgid "Application logo"
 msgstr ""
 
-#: paperless/models.py:188
+#: paperless/models.py:197
+msgid "Enables barcode scanning"
+msgstr ""
+
+#: paperless/models.py:203
+msgid "Enables barcode TIFF support"
+msgstr ""
+
+#: paperless/models.py:209
+msgid "Sets the barcode string"
+msgstr ""
+
+#: paperless/models.py:217
+msgid "Retains split pages"
+msgstr ""
+
+#: paperless/models.py:223
+msgid "Enables ASN barcode"
+msgstr ""
+
+#: paperless/models.py:229
+msgid "Sets the ASN barcode prefix"
+msgstr ""
+
+#: paperless/models.py:237
+msgid "Sets the barcode upscale factor"
+msgstr ""
+
+#: paperless/models.py:244
+msgid "Sets the barcode DPI"
+msgstr ""
+
+#: paperless/models.py:251
+msgid "Sets the maximum pages for barcode"
+msgstr ""
+
+#: paperless/models.py:258
+msgid "Enables tag barcode"
+msgstr ""
+
+#: paperless/models.py:264
+msgid "Sets the tag barcode mapping"
+msgstr ""
+
+#: paperless/models.py:269
 msgid "paperless application settings"
 msgstr ""
 
