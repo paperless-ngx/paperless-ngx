@@ -1019,7 +1019,7 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has this correspondent"),
     )
 
-    schedule_offset_days = models.PositiveIntegerField(
+    schedule_offset_days = models.IntegerField(
         _("schedule offset days"),
         default=0,
         help_text=_(
