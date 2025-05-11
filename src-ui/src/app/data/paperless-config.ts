@@ -49,6 +49,7 @@ export enum ConfigOptionType {
 export const ConfigCategory = {
   General: $localize`General Settings`,
   OCR: $localize`OCR Settings`,
+  Barcode: $localize`Barcode Settings`,
 }
 
 export interface ConfigOption {
@@ -180,6 +181,83 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     config_key: 'PAPERLESS_APP_TITLE',
     category: ConfigCategory.General,
   },
+  {
+    key: 'barcodes_enabled',
+    title: $localize`Enable Barcodes`,
+    type: ConfigOptionType.Boolean,
+    config_key: 'PAPERLESS_CONSUMER_ENABLE_BARCODES',
+    category: ConfigCategory.Barcode,
+  },
+  {
+    key: 'barcode_enable_tiff_support',
+    title: $localize`Enable TIFF Support`,
+    type: ConfigOptionType.Boolean,
+    config_key: 'PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT',
+    category: ConfigCategory.Barcode,
+  },
+  {
+    key: 'barcode_string',
+    title: $localize`Barcode String`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_CONSUMER_BARCODE_STRING',
+    category: ConfigCategory.Barcode,
+  },
+  {
+    key: 'barcode_retain_split_pages',
+    title: $localize`Retain Split Pages`,
+    type: ConfigOptionType.Boolean,
+    config_key: 'PAPERLESS_CONSUMER_BARCODE_RETAIN_SPLIT_PAGES',
+    category: ConfigCategory.Barcode,
+  },
+  {
+    key: 'barcode_enable_asn',
+    title: $localize`Enable ASN`,
+    type: ConfigOptionType.Boolean,
+    config_key: 'PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE',
+    category: ConfigCategory.Barcode,
+  },
+  {
+    key: 'barcode_asn_prefix',
+    title: $localize`ASN Prefix`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_CONSUMER_ASN_BARCODE_PREFIX',
+    category: ConfigCategory.Barcode,
+  },
+  {
+    key: 'barcode_upscale',
+    title: $localize`Upscale`,
+    type: ConfigOptionType.Number,
+    config_key: 'PAPERLESS_CONSUMER_BARCODE_UPSCALE',
+    category: ConfigCategory.Barcode,
+  },
+  {
+    key: 'barcode_dpi',
+    title: $localize`DPI`,
+    type: ConfigOptionType.Number,
+    config_key: 'PAPERLESS_CONSUMER_BARCODE_DPI',
+    category: ConfigCategory.Barcode,
+  },
+  {
+    key: 'barcode_max_pages',
+    title: $localize`Max Pages`,
+    type: ConfigOptionType.Number,
+    config_key: 'PAPERLESS_CONSUMER_BARCODE_MAX_PAGES',
+    category: ConfigCategory.Barcode,
+  },
+  {
+    key: 'barcode_enable_tag',
+    title: $localize`Enable Tag Detection`,
+    type: ConfigOptionType.Boolean,
+    config_key: 'PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE',
+    category: ConfigCategory.Barcode,
+  },
+  {
+    key: 'barcode_tag_mapping',
+    title: $localize`Tag Mapping`,
+    type: ConfigOptionType.JSON,
+    config_key: 'PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING',
+    category: ConfigCategory.Barcode,
+  },
 ]
 
 export interface PaperlessConfig extends ObjectWithId {
@@ -198,4 +276,15 @@ export interface PaperlessConfig extends ObjectWithId {
   user_args: object
   app_logo: string
   app_title: string
+  barcodes_enabled: boolean
+  barcode_enable_tiff_support: boolean
+  barcode_string: string
+  barcode_retain_split_pages: boolean
+  barcode_enable_asn: boolean
+  barcode_asn_prefix: string
+  barcode_upscale: number
+  barcode_dpi: number
+  barcode_max_pages: number
+  barcode_enable_tag: boolean
+  barcode_tag_mapping: object
 }

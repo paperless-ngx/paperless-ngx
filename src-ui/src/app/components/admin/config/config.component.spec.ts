@@ -105,9 +105,9 @@ describe('ConfigComponent', () => {
 
   it('should support JSON validation for e.g. user_args', () => {
     component.configForm.patchValue({ user_args: '{ foo bar }' })
-    expect(component.errors).toEqual({ user_args: 'Invalid JSON' })
+    expect(component.errors['user_args']).toEqual('Invalid JSON')
     component.configForm.patchValue({ user_args: '{ "foo": "bar" }' })
-    expect(component.errors).toEqual({ user_args: null })
+    expect(component.errors['user_args']).toBeNull()
   })
 
   it('should upload file, show error if necessary', () => {
