@@ -6,8 +6,8 @@ from documents.tests.utils import TestMigrations
 
 
 class TestMigrateDocumentCreated(DirectoriesMixin, TestMigrations):
-    migrate_from = "1065_workflowaction_assign_custom_fields_values"
-    migrate_to = "1066_alter_document_created"
+    migrate_from = "1066_alter_workflowtrigger_schedule_offset_days"
+    migrate_to = "1067_alter_document_created"
 
     def setUpBeforeMigration(self, apps):
         # create 600 documents

@@ -31,7 +31,7 @@ def migrate_date(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "1065_workflowaction_assign_custom_fields_values"),
+        ("documents", "1066_alter_workflowtrigger_schedule_offset_days"),
     ]
 
     operations = [
