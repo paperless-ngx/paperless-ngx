@@ -1,9 +1,4 @@
-import { Component, HostListener, ViewChild } from '@angular/core'
-import {
-  NgxFileDropComponent,
-  NgxFileDropEntry,
-  NgxFileDropModule,
-} from 'ngx-file-drop'
+import { Component, HostListener } from '@angular/core'
 import {
   PermissionAction,
   PermissionsService,
@@ -17,7 +12,7 @@ import { UploadDocumentsService } from 'src/app/services/upload-documents.servic
   selector: 'pngx-file-drop',
   templateUrl: './file-drop.component.html',
   styleUrls: ['./file-drop.component.scss'],
-  imports: [NgxFileDropModule],
+  imports: [],
 })
 export class FileDropComponent {
   private fileLeaveTimeoutID: any
@@ -40,8 +35,6 @@ export class FileDropComponent {
       )
     )
   }
-
-  @ViewChild('ngxFileDrop') ngxFileDrop: NgxFileDropComponent
 
   @HostListener('document:dragover', ['$event']) onDragOver(event: DragEvent) {
     if (!this.dragDropEnabled || !event.dataTransfer?.types?.includes('Files'))
@@ -82,15 +75,17 @@ export class FileDropComponent {
     if (!this.dragDropEnabled) return
     event.preventDefault()
     event.stopImmediatePropagation()
-    // pass event onto ngx-file-drop to handle files
-    this.ngxFileDrop.dropFiles(event)
-    this.onDragLeave(event, true)
-  }
+    console.log('document:drop:', event)
+    console.log('event.dataTransfer:', event.dataTransfer)
+    console.log('event.dataTransfer.files:', event.dataTransfer?.files)
 
-  public dropped(files: NgxFileDropEntry[]) {
-    this.uploadDocumentsService.onNgxFileDrop(files)
-    if (files.length > 0)
+    const files = event.dataTransfer?.files
+    if (files && files.length > 0) {
+      this.uploadDocumentsService.uploadFiles(files)
       this.toastService.showInfo($localize`Initiating upload...`, 3000)
+    }
+
+    this.onDragLeave(event, true)
   }
 
   @HostListener('window:blur', ['$event']) public onWindowBlur() {

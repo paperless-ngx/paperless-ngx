@@ -9,7 +9,6 @@ import {
   tick,
 } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
-import { NgxFileDropEntry, NgxFileDropModule } from 'ngx-file-drop'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -27,7 +26,7 @@ describe('FileDropComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [NgxFileDropModule, FileDropComponent, ToastsComponent],
+      imports: [FileDropComponent, ToastsComponent],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
