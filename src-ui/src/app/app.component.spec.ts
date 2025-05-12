@@ -42,7 +42,6 @@ describe('AppComponent', () => {
       imports: [
         TourNgBootstrapModule,
         RouterModule.forRoot(routes),
-        NgxFileDropModule,
         NgbModalModule,
         AppComponent,
         ToastsComponent,

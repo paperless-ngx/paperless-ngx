@@ -82,10 +82,20 @@ describe('UploadFileWidgetComponent', () => {
   })
 
   it('should upload files', () => {
-    const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFiles')
-    fixture.debugElement
-      .query(By.css('input'))
-      .nativeElement.dispatchEvent(new Event('change'))
+    const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFile')
+    const file = new File(
+      [new Blob(['testing'], { type: 'application/pdf' })],
+      'file.pdf'
+    )
+    const fileInput = fixture.debugElement.query(By.css('input'))
+    jest.spyOn(fileInput.nativeElement, 'files', 'get').mockReturnValue({
+      item: () => file,
+      length: 1,
+      [Symbol.iterator]: () => ({
+        next: () => ({ done: false, value: file }),
+      }),
+    } as any)
+    fileInput.nativeElement.dispatchEvent(new Event('change'))
     expect(uploadSpy).toHaveBeenCalled()
   })
 

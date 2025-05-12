@@ -77,12 +77,24 @@ export class FileDropComponent {
     event.stopImmediatePropagation()
     console.log('document:drop:', event)
     console.log('event.dataTransfer:', event.dataTransfer)
-    console.log('event.dataTransfer.files:', event.dataTransfer?.files)
 
-    const files = event.dataTransfer?.files
-    if (files && files.length > 0) {
-      this.uploadDocumentsService.uploadFiles(files)
+    const files: File[] = []
+    if (event.dataTransfer?.items && event.dataTransfer.items.length) {
+      for (const item of Array.from(event.dataTransfer.items)) {
+        if (item.kind === 'file') {
+          const file = item.getAsFile()
+          if (file) files.push(file)
+        }
+      }
+    } else if (event.dataTransfer?.files) {
+      // Fallback for browsers without DataTransferItem API:
+      for (const file of Array.from(event.dataTransfer.files)) {
+        files.push(file)
+      }
+    }
+    if (files.length) {
       this.toastService.showInfo($localize`Initiating upload...`, 3000)
+      files.forEach((file) => this.uploadDocumentsService.uploadFile(file))
     }
 
     this.onDragLeave(event, true)

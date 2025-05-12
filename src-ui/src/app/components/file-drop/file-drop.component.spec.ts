@@ -70,7 +70,7 @@ describe('FileDropComponent', () => {
     tick(700)
     fixture.detectChanges()
     // drop
-    const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFiles')
+    const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFile')
     const dragEvent = new Event('drop')
     dragEvent['dataTransfer'] = {
       files: {
@@ -101,38 +101,57 @@ describe('FileDropComponent', () => {
     expect(dropzone.classes['hide']).toBeTruthy()
     // drop
     const toastSpy = jest.spyOn(toastService, 'show')
-    const uploadSpy = jest.spyOn(
-      UploadDocumentsService.prototype as any,
-      'uploadFile'
+    const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFile')
+    const file = new File(
+      [new Blob(['testing'], { type: 'application/pdf' })],
+      'file.pdf'
     )
     const dragEvent = new Event('drop')
     dragEvent['dataTransfer'] = {
-      files: {
-        item: () => {
-          return new File(
-            [new Blob(['testing'], { type: 'application/pdf' })],
-            'file.pdf'
-          )
+      items: [
+        {
+          kind: 'file',
+          type: 'application/pdf',
+          getAsFile: () => file,
         },
-        length: 1,
-      } as unknown as FileList,
+      ],
     }
     component.onDrop(dragEvent as DragEvent)
-    component.dropped([
-      {
-        fileEntry: {
-          isFile: true,
-          file: (callback) => {
-            callback(
-              new File(
-                [new Blob(['testing'], { type: 'application/pdf' })],
-                'file.pdf'
-              )
-            )
-          },
-        },
-      } as unknown as NgxFileDropEntry,
-    ])
+    tick(3000)
+    expect(toastSpy).toHaveBeenCalled()
+    expect(uploadSpy).toHaveBeenCalled()
+    discardPeriodicTasks()
+  }))
+
+  it('should support drag drop, initiate upload with files but no items', fakeAsync(() => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    expect(component.fileIsOver).toBeFalsy()
+    const overEvent = new Event('dragover') as DragEvent
+    ;(overEvent as any).dataTransfer = { types: ['Files'] }
+    component.onDragOver(overEvent)
+    tick(1)
+    fixture.detectChanges()
+    expect(component.fileIsOver).toBeTruthy()
+    const dropzone = fixture.debugElement.query(
+      By.css('.global-dropzone-overlay')
+    )
+    component.onDragLeave(new Event('dragleave') as DragEvent)
+    tick(700)
+    fixture.detectChanges()
+    expect(dropzone.classes['hide']).toBeTruthy()
+    // drop
+    const toastSpy = jest.spyOn(toastService, 'show')
+    const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFile')
+    const file = new File(
+      [new Blob(['testing'], { type: 'application/pdf' })],
+      'file.pdf'
+    )
+    const dragEvent = new Event('drop')
+    dragEvent['dataTransfer'] = {
+      items: [],
+      files: [file],
+    }
+    component.onDrop(dragEvent as DragEvent)
     tick(3000)
     expect(toastSpy).toHaveBeenCalled()
     expect(uploadSpy).toHaveBeenCalled()

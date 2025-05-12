@@ -18,13 +18,7 @@ export class UploadDocumentsService {
     private websocketStatusService: WebsocketStatusService
   ) {}
 
-  uploadFiles(files: FileList) {
-    for (let index = 0; index < files.length; index++) {
-      this.uploadFile(files.item(index))
-    }
-  }
-
-  private uploadFile(file: File) {
+  public uploadFile(file: File) {
     let formData = new FormData()
     formData.append('document', file, file.name)
     formData.append('from_webui', 'true')
