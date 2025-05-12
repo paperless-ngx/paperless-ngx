@@ -29,11 +29,11 @@
   </button>
   <div ngbDropdown>
 
-<!--    <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>-->
-<!--      <i-bs name="three-dots"></i-bs>-->
-<!--      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container>-->
-<!--      </div>-->
-<!--    </button>-->
+    <!--    <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>-->
+    <!--      <i-bs name="three-dots"></i-bs>-->
+    <!--      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container>-->
+    <!--      </div>-->
+    <!--    </button>-->
     <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
       <!-- <button ngbDropdownItem (click)="redoOcrSelected()" [disabled]="!userCanEditAll">
         <i-bs name="body-text"></i-bs>&nbsp;<ng-container i18n>Redo OCR</ng-container>
@@ -180,12 +180,15 @@
               @if (object.type == 'folder') {
                 <td scope="row" class="d-md-table-cell">
                   <button class="btn btn-link ms-0 ps-0 text-start"
-                          (click)=" goToFolder(object) ; $event.stopPropagation()">
-
+                          (click)="goToFolder(object); $event.stopPropagation()">
                     <i-bs class="me-1" name="folder-fill" width="2rem" height="2rem"></i-bs>
                   </button>
-                  <span class="custom-cursor"
-                        (click)="goToFolder(object); $event.stopPropagation()">{{ object.name }}</span>
+                  <span class="custom-cursor text-truncate"
+                        title="{{ object.name }}"
+                        style="max-width: 150px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; vertical-align: middle;"
+                        (click)="goToFolder(object); $event.stopPropagation()">
+                    {{ object.name }}
+                  </span>
                 </td>
               } @else {
                 <td scope="row" class="d-md-table-cell">
@@ -207,9 +210,16 @@
                     <i-bs class="me-1 " name="file-earmark-pdf" width="2rem"
                           height="2rem"></i-bs>
                   </a>
-                  <span class="custom-cursor"
+                  <!--                  <span class="custom-cursor"-->
+                  <!--                        [routerLink]="['/documents', object.document.id]"-->
+                  <!--                        (click)="$event.stopPropagation()">   {{ object.name }}-->
+                  <!--                  </span>-->
+                  <span class="custom-cursor text-truncate"
+                        title="{{ object.name }}"
                         [routerLink]="['/documents', object.document.id]"
-                        (click)="$event.stopPropagation()">   {{ object.name }}
+                        style="max-width: 150px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; vertical-align: middle;"
+                  >
+                    {{ object.name }}
                   </span>
                   <ng-template #previewContent>
                     <pngx-preview-popup [document]="object.document" (mouseenter)="mouseEnterPreview()"
