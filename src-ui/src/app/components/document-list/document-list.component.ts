@@ -1,34 +1,18 @@
-import {
-  Component,
-  OnDestroy,
-  OnInit,
-  QueryList,
-  ViewChild,
-  ViewChildren,
-} from '@angular/core'
+import { Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core'
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { filter, first, map, Subject, switchMap, takeUntil } from 'rxjs'
 import { FilterRule } from 'src/app/data/filter-rule'
-import {
-  filterRulesDiffer,
-  isFullTextFilterRule,
-} from 'src/app/utils/filter-rules'
+import { filterRulesDiffer, isFullTextFilterRule } from 'src/app/utils/filter-rules'
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 import { Document } from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import {
-  SortableDirective,
-  SortEvent,
-} from 'src/app/directives/sortable.directive'
+import { SortableDirective, SortEvent } from 'src/app/directives/sortable.directive'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
-import {
-  DOCUMENT_SORT_FIELDS,
-  DOCUMENT_SORT_FIELDS_FULLTEXT,
-} from 'src/app/services/rest/document.service'
+import { DOCUMENT_SORT_FIELDS, DOCUMENT_SORT_FIELDS_FULLTEXT } from 'src/app/services/rest/document.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -66,7 +50,7 @@ export class DocumentListComponent
 
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
 
-  displayMode = 'smallCards' // largeCards, smallCards, details
+  displayMode = 'largeCards' // largeCards, smallCards, details
   unmodifiedFilterRules: FilterRule[] = []
   private unmodifiedSavedView: SavedView
 
