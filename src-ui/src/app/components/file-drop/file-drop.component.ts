@@ -75,8 +75,6 @@ export class FileDropComponent {
     if (!this.dragDropEnabled) return
     event.preventDefault()
     event.stopImmediatePropagation()
-    console.log('document:drop:', event)
-    console.log('event.dataTransfer:', event.dataTransfer)
 
     const files: File[] = []
     if (event.dataTransfer?.items && event.dataTransfer.items.length) {
@@ -87,7 +85,7 @@ export class FileDropComponent {
         }
       }
     } else if (event.dataTransfer?.files) {
-      // Fallback for browsers without DataTransferItem API:
+      // Fallback for browsers without DataTransferItem API
       for (const file of Array.from(event.dataTransfer.files)) {
         files.push(file)
       }
