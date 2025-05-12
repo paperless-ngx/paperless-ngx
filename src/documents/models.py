@@ -221,6 +221,7 @@ class ArchiveFont(MatchingModel):
         _("note"),
         blank=True,
         help_text=_("Note for the archive font"),
+        null=True,
     )
 
     class Meta(MatchingModel.Meta):
