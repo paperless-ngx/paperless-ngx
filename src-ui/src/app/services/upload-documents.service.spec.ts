@@ -15,33 +15,6 @@ import {
   WebsocketStatusService,
 } from './websocket-status.service'
 
-const files = [
-  {
-    lastModified: 1693349892540,
-    lastModifiedDate: new Date(),
-    name: 'file1.pdf',
-    size: 386,
-    type: 'application/pdf',
-  },
-  {
-    lastModified: 1695618533892,
-    lastModifiedDate: new Date(),
-    name: 'file2.pdf',
-    size: 358265,
-    type: 'application/pdf',
-  },
-]
-
-const fileList = {
-  item: (x) => {
-    return new File(
-      [new Blob(['testing'], { type: files[x].type })],
-      files[x].name
-    )
-  },
-  length: files.length,
-} as unknown as FileList
-
 describe('UploadDocumentsService', () => {
   let httpTestingController: HttpTestingController
   let uploadDocumentsService: UploadDocumentsService
@@ -68,7 +41,11 @@ describe('UploadDocumentsService', () => {
   })
 
   it('calls post_document api endpoint on upload', () => {
-    uploadDocumentsService.uploadFiles(fileList)
+    const file = new File(
+      [new Blob(['testing'], { type: 'application/pdf' })],
+      'file.pdf'
+    )
+    uploadDocumentsService.uploadFile(file)
     const req = httpTestingController.match(
       `${environment.apiBaseUrl}documents/post_document/`
     )
@@ -78,7 +55,16 @@ describe('UploadDocumentsService', () => {
   })
 
   it('updates progress during upload and failure', () => {
-    uploadDocumentsService.uploadFiles(fileList)
+    const file = new File(
+      [new Blob(['testing'], { type: 'application/pdf' })],
+      'file.pdf'
+    )
+    const file2 = new File(
+      [new Blob(['testing'], { type: 'application/pdf' })],
+      'file2.pdf'
+    )
+    uploadDocumentsService.uploadFile(file)
+    uploadDocumentsService.uploadFile(file2)
 
     expect(websocketStatusService.getConsumerStatusNotCompleted()).toHaveLength(
       2
@@ -103,7 +89,11 @@ describe('UploadDocumentsService', () => {
   })
 
   it('updates progress on failure', () => {
-    uploadDocumentsService.uploadFiles(fileList)
+    const file = new File(
+      [new Blob(['testing'], { type: 'application/pdf' })],
+      'file.pdf'
+    )
+    uploadDocumentsService.uploadFile(file)
 
     let req = httpTestingController.match(
       `${environment.apiBaseUrl}documents/post_document/`
@@ -125,7 +115,7 @@ describe('UploadDocumentsService', () => {
       websocketStatusService.getConsumerStatus(FileStatusPhase.FAILED)
     ).toHaveLength(1)
 
-    uploadDocumentsService.uploadFiles(fileList)
+    uploadDocumentsService.uploadFile(file)
 
     req = httpTestingController.match(
       `${environment.apiBaseUrl}documents/post_document/`
@@ -142,36 +132,5 @@ describe('UploadDocumentsService', () => {
     expect(
       websocketStatusService.getConsumerStatus(FileStatusPhase.FAILED)
     ).toHaveLength(2)
-  })
-
-  it('accepts files via drag and drop', () => {
-    const uploadSpy = jest.spyOn(
-      UploadDocumentsService.prototype as any,
-      'uploadFile'
-    )
-    const fileEntry = {
-      name: 'file.pdf',
-      isDirectory: false,
-      isFile: true,
-      file: (callback) => {
-        return callback(
-          new File(
-            [new Blob(['testing'], { type: 'application/pdf' })],
-            'file.pdf'
-          )
-        )
-      },
-    }
-    uploadDocumentsService.onNgxFileDrop([
-      {
-        relativePath: 'path/to/file.pdf',
-        fileEntry,
-      },
-    ])
-    expect(uploadSpy).toHaveBeenCalled()
-
-    let req = httpTestingController.match(
-      `${environment.apiBaseUrl}documents/post_document/`
-    )
   })
 })
