@@ -135,7 +135,6 @@ import {
 } from 'ngx-bootstrap-icons'
 import { ColorSliderModule } from 'ngx-color/slider'
 import { CookieService } from 'ngx-cookie-service'
-import { NgxFileDropModule } from 'ngx-file-drop'
 import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
 import { AppRoutingModule } from './app/app-routing.module'
 import { AppComponent } from './app/app.component'
@@ -353,7 +352,6 @@ bootstrapApplication(AppComponent, {
       FormsModule,
       ReactiveFormsModule,
       PdfViewerModule,
-      NgxFileDropModule,
       NgSelectModule,
       ColorSliderModule,
       TourNgBootstrapModule,

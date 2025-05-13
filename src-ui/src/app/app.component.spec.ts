@@ -9,7 +9,6 @@ import {
 import { Router, RouterModule } from '@angular/router'
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap'
 import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { NgxFileDropModule } from 'ngx-file-drop'
 import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { Subject } from 'rxjs'
 import { routes } from './app-routing.module'
@@ -43,7 +42,6 @@ describe('AppComponent', () => {
       imports: [
         TourNgBootstrapModule,
         RouterModule.forRoot(routes),
-        NgxFileDropModule,
         NgbModalModule,
         AppComponent,
         ToastsComponent,
