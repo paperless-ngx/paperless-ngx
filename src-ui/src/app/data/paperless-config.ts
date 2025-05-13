@@ -269,6 +269,8 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     type: ConfigOptionType.JSON,
     config_key: 'PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING',
     category: ConfigCategory.Barcode,
+  },
+  {
     key: 'ai_enabled',
     title: $localize`AI Enabled`,
     type: ConfigOptionType.Boolean,
