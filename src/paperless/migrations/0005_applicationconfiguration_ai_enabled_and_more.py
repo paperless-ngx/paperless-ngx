@@ -6,7 +6,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("paperless", "0003_alter_applicationconfiguration_max_image_pixels"),
+        ("paperless", "0004_applicationconfiguration_barcode_asn_prefix_and_more"),
     ]
 
     operations = [
