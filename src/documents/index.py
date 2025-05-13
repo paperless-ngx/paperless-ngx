@@ -373,6 +373,7 @@ class DelayedQuery:
         self.first_score = None
         self.user = user
         self.es = Elasticsearch()
+        self.count_item = 0
         # if not self.es.indices.exists(index=ELASTIC_SEARCH_DOCUMENT_INDEX):
         #     DocumentDocument.init()  # Tạo index nếu chưa có
         #     logger.info(f"Index '{ELASTIC_SEARCH_DOCUMENT_INDEX}' created")
@@ -502,6 +503,12 @@ class DelayedFullTextQuery(DelayedQuery):
         return q, None
 
 class DelayedElasticSearch(DelayedQuery):
+
+    def __init__(self, searcher: Searcher, query_params, page_size, user):
+        super().__init__(searcher, query_params, page_size, user)
+        self.response = self.search_pagination(
+            self.query_params.get("query", ''), int(self.query_params['page']),
+            int(self.query_params['page_size']))
     def _get_query_sortedby(self):
         if "ordering" not in self.query_params:
             return None, False
@@ -717,6 +724,9 @@ class DelayedElasticSearch(DelayedQuery):
         print('query_body', query_body)
         return query_body
 
+    def count(self):
+        return self.count_item
+
     def search_pagination(self, content, page_number, page_size):
         s = Search(
             index=ELASTIC_SEARCH_DOCUMENT_INDEX)  # Thay 'your_index_name' bằng tên chỉ mục của bạn
@@ -733,7 +743,9 @@ class DelayedElasticSearch(DelayedQuery):
                         max_analyzed_offset=900000)
         s = s.source(['id', 'warehouse_path', 'tag_id', 'custom_fields','notes'])
         s = s[page_number * page_size - page_size:page_number * page_size]
+        s = s.extra(track_total_hits=True)
         response = s.execute()
+        self.count_item = response.hits.total.value
         # print(self.search_statistics())
         return response
 
@@ -810,8 +822,8 @@ class DelayedElasticSearch(DelayedQuery):
             response = self.search_statistics()
             return response
 
-        response = self.search_pagination(self.query_params.get("query",''), page_num , page_len)
-
+        # response = self.search_pagination(self.query_params.get("query",''), page_num , page_len)
+        response = self.response
         # print('tim____:',datetime.now() -start)
         doc_ids = [int(d.meta.id) for d in response]
 

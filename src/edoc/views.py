@@ -23,13 +23,14 @@ from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet,ReadOnlyModelViewSet
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from documents.permissions import EdocObjectPermissions
 from edoc.filters import GroupFilterSet
 from edoc.filters import UserFilterSet
 from edoc.models import ApplicationConfiguration
-from edoc.serialisers import ApplicationConfigurationSerializer, ContentTypeSerializer
+from edoc.serialisers import ApplicationConfigurationSerializer, \
+    ContentTypeSerializer
 from edoc.serialisers import GroupSerializer
 from edoc.serialisers import ProfileSerializer
 from edoc.serialisers import UserSerializer
@@ -95,8 +96,10 @@ class CustomLimitOffsetPagination(LimitOffsetPagination):
     max_limit = 10000  # Số phần tử tối đa mỗi trang
     limit_query_param = "page_size"
     offset_query_param = 'page'
-    def get_count(self, queryset):
-        return 999999
+
+    # def get_count(self, queryset):
+    #     print('-----query',queryset.count())
+    #     return 999999
 
     def get_offset(self, request):
         page = super().get_offset(request)
