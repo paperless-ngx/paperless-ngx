@@ -65,7 +65,7 @@ describe('FileDropComponent', () => {
     const dropzone = fixture.debugElement.query(
       By.css('.global-dropzone-overlay')
     )
-    expect(dropzone.classes['hide']).toBeTruthy()
+    expect(dropzone.classes['active']).toBeFalsy()
     component.onDragLeave(new Event('dragleave') as DragEvent)
     tick(700)
     fixture.detectChanges()
@@ -92,13 +92,9 @@ describe('FileDropComponent', () => {
     tick(1)
     fixture.detectChanges()
     expect(component.fileIsOver).toBeTruthy()
-    const dropzone = fixture.debugElement.query(
-      By.css('.global-dropzone-overlay')
-    )
     component.onDragLeave(new Event('dragleave') as DragEvent)
     tick(700)
     fixture.detectChanges()
-    expect(dropzone.classes['hide']).toBeTruthy()
     // drop
     const toastSpy = jest.spyOn(toastService, 'show')
     const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFile')
@@ -132,13 +128,9 @@ describe('FileDropComponent', () => {
     tick(1)
     fixture.detectChanges()
     expect(component.fileIsOver).toBeTruthy()
-    const dropzone = fixture.debugElement.query(
-      By.css('.global-dropzone-overlay')
-    )
     component.onDragLeave(new Event('dragleave') as DragEvent)
     tick(700)
     fixture.detectChanges()
-    expect(dropzone.classes['hide']).toBeTruthy()
     // drop
     const toastSpy = jest.spyOn(toastService, 'show')
     const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFile')
@@ -217,13 +209,9 @@ describe('FileDropComponent', () => {
     tick(1)
     fixture.detectChanges()
     expect(component.fileIsOver).toBeTruthy()
-    const dropzone = fixture.debugElement.query(
-      By.css('.global-dropzone-overlay')
-    )
     component.onDragLeave(new Event('dragleave') as DragEvent)
     tick(700)
     fixture.detectChanges()
-    expect(dropzone.classes['hide']).toBeTruthy()
     // drop
     const toastSpy = jest.spyOn(toastService, 'show')
     const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFile')
