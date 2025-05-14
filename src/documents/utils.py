@@ -14,8 +14,9 @@ from typing import Union
 
 import PyPDF2
 import pathvalidate
-from django.conf import settings
 from PIL import Image
+from django.conf import settings
+
 
 def _coerce_to_path(
     source: Union[Path, str],
@@ -175,6 +176,8 @@ def get_directory_size(directory):
 
 
 def check_digital_signature(pdf_path):
+    if not pdf_path.lower().endswith('.pdf'):  # Kiểm tra nếu không phải PDF
+        return False
     with open(pdf_path, 'rb') as file:
         reader = PyPDF2.PdfFileReader(file)
         if '/Sig' in reader.trailer['/Root'].keys():
