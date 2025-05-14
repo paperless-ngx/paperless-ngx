@@ -487,11 +487,36 @@ def bulk_delete_file(folder_list = None):
             dossier_ids.append(d.dossier_id)
 
     with transaction.atomic():
-        Document.objects.filter(id__in=[d.id for d in documents]).delete()
+        docs = Document.objects.filter(
+            id__in=[d.id for d in documents]).delete()
+        for d in docs:
+            index.delete_document_with_index(doc_id=d.id)
         Dossier.objects.filter(id__in=dossier_ids).delete()
         Folder.objects.filter(id__in=folders_ids).delete()
 
         logger.info("deleted file")
+
+
+@shared_task()
+def bulk_delete_document(doc_ids):
+    docs = Document.objects.filter(id__in=doc_ids)
+    for doc in docs:
+        doc_folder = doc.folder
+        # doc.folder = None
+        # doc_dossier = doc.dossier
+        # doc.dossier = None
+        doc.save()
+        if doc_folder is not None:
+            doc_folder.delete()
+        # if doc_dossier is not None:
+        #     doc_dossier.delete()
+    docs.delete()
+    # delete the document from the index
+    from documents import index
+    # doc_deleted=Document.deleted_objects.filter(doc)
+    for doc in docs:
+        index.delete_document_with_index(doc.id)
+    logger.info('deleted documents')
 
 
 

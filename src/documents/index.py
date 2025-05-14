@@ -47,7 +47,7 @@ from documents.models import CustomFieldInstance, Warehouse, Folder
 from documents.models import Document
 from documents.models import Note
 from documents.models import User
-from edoc.settings import ELASTIC_SEARCH_DOCUMENT_INDEX
+from edoc.settings import ELASTIC_SEARCH_DOCUMENT_INDEX, ELASTIC_SEARCH_HOST
 
 logger = logging.getLogger("edoc.index")
 
@@ -142,6 +142,28 @@ def delete_document_index(doc: Document = None, id: int=None):
         id = doc.id
     DocumentDocument().delete(id=str(id))
 
+
+def delete_document_with_index(doc_id, es_client=None):
+    """
+    Delete a document from the Elasticsearch index by its ID using the Elasticsearch client.
+
+    Args:
+        doc_id (int): The ID of the document to delete.
+        es_client (Elasticsearch, optional): Elasticsearch client instance.
+    """
+    try:
+        # Initialize Elasticsearch client if not provided
+        if es_client is None:
+            es_client = Elasticsearch([ELASTIC_SEARCH_HOST],
+                                      timeout=30)
+
+        # Delete the document
+        es_client.delete(index=ELASTIC_SEARCH_DOCUMENT_INDEX, id=str(doc_id))
+        logger.info(
+            f"Successfully deleted document with ID {doc_id} from Elasticsearch")
+    except Exception as e:
+        logger.error(f"Failed to delete document with ID {doc_id}: {str(e)}")
+        raise
 
 def update_document(writer: AsyncWriter, doc: Document):
     tags = ",".join([t.name for t in doc.tags.all()])

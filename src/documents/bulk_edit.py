@@ -218,14 +218,17 @@ def delete(doc_ids):
         # doc.folder = None
         # doc_dossier = doc.dossier
         # doc.dossier = None
-        # doc.save()
+        doc.save()
         if doc_folder is not None:
             doc_folder.delete()
         # if doc_dossier is not None:
         #     doc_dossier.delete()
     docs.delete()
+    # delete the document from the index
     from documents import index
-
+    # doc_deleted=Document.deleted_objects.filter(doc)
+    for doc in docs:
+        index.delete_document_with_index(doc.id)
     with index.open_index_writer() as writer:
         for id in doc_ids:
             index.remove_document_by_id(writer, id)

@@ -652,10 +652,10 @@ class DocumentViewSet(
         # instance.save()
         if folder is not None:
             folder.delete()
-        if dossier is not None:
-            dossier.delete()
-        index.remove_document_from_index(self.get_object())
+        # index.remove_document_from_index(self.get_object())
         instance.delete()
+        instance_deleted = Document.deleted_objects.get(id=instance.id)
+        index.delete_document_with_index(instance_deleted)
         return Response(status=status.HTTP_204_NO_CONTENT)
         # return super().destroy(request, *args, **kwargs)
 
@@ -3752,6 +3752,9 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         folders = Folder.objects.filter(path__startswith=folder.path)
         documents = Document.objects.filter(folder__in=folders).defer('content')
         documents.delete()
+        documents = Document.deleted_objects.filter(documents)
+        for doc in documents:
+            index.delete_document_with_index(doc_id=doc.id)
         folders.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
