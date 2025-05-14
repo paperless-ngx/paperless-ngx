@@ -389,7 +389,7 @@ class Consumer(LoggingMixin):
         """
         with open(self.original_path, "rb") as f:
             checksum = hashlib.md5(f.read()).hexdigest()
-        existing_doc = Document.objects.filter(
+        existing_doc = Document.global_objects.filter(
             Q(checksum=checksum) | Q(archive_checksum=checksum),
         ).only('id')
         if existing_doc.exists():
