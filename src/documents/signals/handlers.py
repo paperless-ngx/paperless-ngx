@@ -41,7 +41,8 @@ from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
-from documents.permissions import get_objects_for_user_owner_aware
+from documents.permissions import get_objects_for_user_owner_aware, \
+    update_view_folder_parent_permissions
 from documents.permissions import set_permissions_for_object
 
 logger = logging.getLogger("edoc.handlers")
@@ -827,6 +828,9 @@ def run_workflow(
                             object=document.folder,
                             merge=True,
                         )
+                        update_view_folder_parent_permissions.delay(
+                            document.folder,
+                            permissions)
                         # set_permissions_for_object(
                         #     permissions=permissions,
                         #     object=document.dossier,
