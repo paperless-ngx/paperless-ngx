@@ -6,20 +6,17 @@ from typing import Union
 from documents.classifier import DocumentClassifier
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
-from documents.models import Approval
-from documents.models import Correspondent
-from documents.models import Warehouse
-from documents.models import Folder
 from documents.models import Approval, Correspondent
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import Folder
 from documents.models import MatchingModel
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Warehouse
 from documents.models import Workflow
 from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
-from guardian.models import GroupObjectPermission
 
 logger = logging.getLogger("edoc.matching")
 
@@ -411,7 +408,6 @@ def existing_document_matches_workflow(
             f"Document groups {document.owner.groups.filter(id__in=trigger.filter_has_groups.all().values_list('id'))} do not include"
             f" {trigger.filter_has_groups.all()}",
         )
-        logger.info('group trigger ko matched')
         trigger_matched = False
 
     # Document correspondent vs trigger has_correspondent
