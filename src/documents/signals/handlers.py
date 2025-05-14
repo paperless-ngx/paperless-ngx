@@ -827,11 +827,11 @@ def run_workflow(
                             object=document.folder,
                             merge=True,
                         )
-                        set_permissions_for_object(
-                            permissions=permissions,
-                            object=document.dossier,
-                            merge=True,
-                        )
+                        # set_permissions_for_object(
+                        #     permissions=permissions,
+                        #     object=document.dossier,
+                        #     merge=True,
+                        # )
 
                     if action.assign_custom_fields is not None:
                         for field in action.assign_custom_fields.all():
@@ -915,11 +915,11 @@ def run_workflow(
                             object=document.folder,
                             merge=True,
                         )
-                        set_permissions_for_object(
-                            permissions=permissions,
-                            object=document.dossier,
-                            merge=True,
-                        )
+                        # set_permissions_for_object(
+                        #     permissions=permissions,
+                        #     object=document.dossier,
+                        #     merge=True,
+                        # )
                     elif (
                         (action.remove_view_users.all().count() > 0)
                         or (action.remove_view_groups.all().count() > 0)

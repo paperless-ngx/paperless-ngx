@@ -1216,10 +1216,10 @@ class Consumer(LoggingMixin):
                     pk=self.override_folder_id,
                 )
 
-        if self.override_dossier_id:
-            document.dossier = Dossier.objects.get(
-                pk=self.override_dossier_id,
-            )
+        # if self.override_dossier_id:
+        #     document.dossier = Dossier.objects.get(
+        #         pk=self.override_dossier_id,
+        #     )
 
         if self.override_warehouse_id:
             document.warehouse = Warehouse.objects.get(
