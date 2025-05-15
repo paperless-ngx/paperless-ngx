@@ -8,15 +8,15 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
-from documents.models import Note
 from documents.models import EdocTask
+from documents.models import Folder
+from documents.models import Note
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
 from documents.models import ShareLink
 from documents.models import StoragePath
-from documents.models import Warehouse
-from documents.models import Folder
 from documents.models import Tag
+from documents.models import Warehouse
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.admin import LogEntryAdmin
@@ -110,9 +110,7 @@ class DocumentAdmin(GuardedModelAdmin):
         super().delete_model(request, obj)
 
     def save_model(self, request, obj, form, change):
-        from documents import index
-
-        index.add_or_update_document(obj)
+        # index.add_or_update_document(obj)
         super().save_model(request, obj, form, change)
 
 

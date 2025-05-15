@@ -127,31 +127,70 @@ class DocumentDocument(Document):
     def prepare_notes(self, instance):
         return [str(c.note) for c in Note.objects.filter(document=instance)]
 
+    def prepare_view_users(self, instance):
+        return DocumentDocument.get_view_users(instance)
+
+    def prepare_view_groups(self, instance):
+        return DocumentDocument.get_view_groups(instance)
+
+    @staticmethod
+    def get_view_users(instance):
+        """Truy vấn riêng để lấy danh sách user có quyền view."""
+        view_codename = f"view_{instance.__class__.__name__.lower()}"
+        return list(
+            get_users_with_perms(
+                instance, only_with_perms_in=[view_codename],
+                with_group_users=False
+            ).values_list("id", flat=True)
+        )
+
+    @staticmethod
+    def get_view_groups(instance):
+        """Truy vấn riêng để lấy danh sách group có quyền view."""
+        view_codename = f"view_{instance.__class__.__name__.lower()}"
+        return list(
+            get_groups_with_only_permission(
+                instance, codename=view_codename
+            ).values_list("id", flat=True)
+        )
+
     @staticmethod
     def get_permissions(instance):
-        view_codename = f"view_{instance.__class__.__name__.lower()}"
-        change_codename = f"change_{instance.__class__.__name__.lower()}"
-
+        """Kết hợp kết quả hai truy vấn vào một dictionary."""
         return {
             "view": {
-                "users": list(get_users_with_perms(instance,
-                                                   only_with_perms_in=[
-                                                       view_codename],
-                                                   with_group_users=False
-                                                   ).values_list("id",
-                                                                 flat=True)),
-                "groups": list(get_groups_with_only_permission(instance,
-                                                               codename=view_codename).values_list(
-                    "id", flat=True)),
-            },
-            # "change": {
-            #     "users": list(get_users_with_perms(instance,only_with_perms_in=[change_codename],
-            #         with_group_users=False
-            #     ).values_list("id", flat=True)),
-            #     "groups": list(get_groups_with_only_permission(instance,codename=change_codename).values_list(
-            #         "id", flat=True)),
-            # },
+                "users": DocumentDocument.get_view_users(instance),
+                "groups": DocumentDocument.get_view_groups(instance)
+            }
         }
+
+    #
+    #
+    # @staticmethod
+    #     def get_permissions(instance):
+    #         view_codename = f"view_{instance.__class__.__name__.lower()}"
+    #         change_codename = f"change_{instance.__class__.__name__.lower()}"
+    #
+    #         return {
+    #             "view": {
+    #                 "users": list(get_users_with_perms(instance,
+    #                                                    only_with_perms_in=[
+    #                                                        view_codename],
+    #                                                    with_group_users=False
+    #                                                    ).values_list("id",
+    #                                                                  flat=True)),
+    #                 "groups": list(get_groups_with_only_permission(instance,
+    #                                                                codename=view_codename).values_list(
+    #                     "id", flat=True)),
+    #             },
+    #             # "change": {
+    #             #     "users": list(get_users_with_perms(instance,only_with_perms_in=[change_codename],
+    #             #         with_group_users=False
+    #             #     ).values_list("id", flat=True)),
+    #             #     "groups": list(get_groups_with_only_permission(instance,codename=change_codename).values_list(
+    #             #         "id", flat=True)),
+    #             # },
+    #         }
 
     @classmethod
     def update_document(cls, doc):
@@ -213,7 +252,8 @@ class DocumentDocument(Document):
         # document_data['change_users'] = permissions['change']['users'] or [-1]
         # document_data['change_groups'] = permissions['change']['groups'] or [-1]
         document_instance = cls(**document_data,_id=str(doc.id))
-
+        logger.info(
+            f"Đang cập nhật tài liệu {doc.id} {document_data} vào Elasticsearch.")
         document_instance.save()  # Gọi save trên instance
 
 

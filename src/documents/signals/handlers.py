@@ -24,7 +24,7 @@ from django.utils import timezone
 from filelock import FileLock
 from guardian.shortcuts import remove_perm
 
-from documents import matching, index
+from documents import matching
 from documents.caching import clear_document_caches
 from documents.classifier import DocumentClassifier
 from documents.consumer import parse_doc_title_w_placeholders
@@ -823,6 +823,7 @@ def run_workflow(
                             object=document,
                             merge=True,
                         )
+                        add_or_update_document(document)
                         set_permissions_for_object(
                             permissions=permissions,
                             object=document.folder,
@@ -914,7 +915,7 @@ def run_workflow(
                             object=document,
                             merge=False,
                         )
-                        index.add_or_update_document(document)
+                        add_or_update_document(document)
                         set_permissions_for_object(
                             permissions=permissions,
                             object=document.folder,
