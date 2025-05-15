@@ -263,7 +263,7 @@ def render_pdf_ocr(input_path, output_path,
 
             byte_image = io.BytesIO()
             image.save(byte_image, format='JPEG',
-                       quality=int(quality_compress), optimize=True)
+                       quality=30, optimize=True)
             byte_image.seek(0)
 
             rolate_height = height_api_img / page_height
@@ -279,7 +279,9 @@ def render_pdf_ocr(input_path, output_path,
                     y_center_coordinates = y2_line - (
                         y2_line - y1_line) / 2
                     font_size = max(1,
-                                    math.floor((y2_line - y1_line) * 72 / 96))
+                                    math.floor((int(y2_line) - int(
+                                        y1_line)) * 72 / 96))
+                    can.setFont('Arial', font_size - 2)
                     for word in line.get("words", []):
                         x1 = word["bbox"][0][0] / float(rolate_width)
                         y1 = word["bbox"][0][1] / float(rolate_height)
@@ -289,8 +291,8 @@ def render_pdf_ocr(input_path, output_path,
                         value = word["value"]
                         x_center_coordinates = x2 - (x2 - x1) / 2
 
-                        w = can.stringWidth(value, font_name, font_size)
-                        can.setFont('Arial', font_size)
+                        w = can.stringWidth(value, font_name, font_size - 2)
+
                         can.drawString(int(x_center_coordinates - w / 2),
                                        int(float(
                                            page_height) - y_center_coordinates - (
