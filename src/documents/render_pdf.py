@@ -1,26 +1,20 @@
 import io
 import logging
-import os
 import shutil
-import tempfile
 from pathlib import Path
 
 from PIL import Image
-from pdf2image.pdf2image import convert_from_path
 from PyPDF2 import PdfReader as pypdf2_pdfreader
-from pygments import highlight
-from pypdf import PdfReader, PdfWriter, PageObject
-from reportlab.pdfgen import canvas
+from pdf2image import convert_from_path
+from pypdf import PdfReader, PdfWriter
 from reportlab.lib.pagesizes import letter
+from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.lib.utils import ImageReader
-from io import BytesIO
-import math
+from reportlab.pdfgen import canvas
 
 from documents.compress import smart_compress
 from documents.utils import get_temp_file_path
-
 
 logger = logging.getLogger("edoc.render_pdf")
 logging.basicConfig(level=logging.INFO)
