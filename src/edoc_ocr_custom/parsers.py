@@ -470,6 +470,11 @@ class RasterisedDocumentCustomParser(DocumentParser):
             api_login_ocr = settings.API_LOGIN_OCR
             api_refresh_ocr = settings.API_REFRESH_OCR
             api_upload_file_ocr = settings.API_UPLOAD_FILE_OCR
+            render_pdf_ocr(input_path=document_path, output_path=output_file,
+                           data_ocr=data_ocr,
+                           quality_compress=self.quality_compress,
+                           font_path=os.path.join(BASE_DIR,
+                                                  "edoc_ocr_custom/fonts/arial-font/arial.ttf"))
             self.log.info(
                 f"settings.METHOD_OCR {settings.METHOD_OCR}, {TaskType.OCR_WEBHOOK.label}")
             if settings.METHOD_OCR == TaskType.OCR_RETRY.label:
@@ -493,11 +498,6 @@ class RasterisedDocumentCustomParser(DocumentParser):
                 self.api_call_count = api_call_count_res
 
 
-            render_pdf_ocr(input_path=document_path, output_path=output_file,
-                           data_ocr=data_ocr,
-                           quality_compress=self.quality_compress,
-                           font_path=os.path.join(BASE_DIR,
-                                                  "edoc_ocr_custom/fonts/arial-font/arial.ttf"))
             content_formated = ""
             if data_ocr is not None:
                 content_formated = data_ocr.get("content_formated", "")
