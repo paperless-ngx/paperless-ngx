@@ -20,6 +20,7 @@ from django.utils import timezone
 from filelock import FileLock
 from rest_framework.reverse import reverse
 
+from documents import index
 from documents.classifier import load_classifier
 from documents.compress import smart_compress
 from documents.data_models import DocumentMetadataOverrides
@@ -975,6 +976,7 @@ class Consumer(LoggingMixin):
                 if document.folder:
                     permissions = get_permissions(document.folder)
                     set_permissions(permissions, document)
+                    index.add_or_update_document(document)
                     set_permissions(permissions, new_file)
                     folder_path = get_content_before_last_number(document.folder.path)
                     if document.folder.type == Folder.FILE:

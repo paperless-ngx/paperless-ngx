@@ -1088,7 +1088,10 @@ def update_child_folder_paths(folder, old_path):
 @shared_task(bind=True)
 def update_child_folder_permisisons(self, folder, permissions, owner, merge,
                                     owner_exist, set_permissions_exist):
-    child_folders = Folder.objects.filter(path__startswith=f'{folder.path}/')
+    path = folder.path
+    if folder.type == Folder.FOLDER:
+        path = f"{folder.path}/"
+    child_folders = Folder.objects.filter(path__startswith=path)
     documents_list = Document.objects.filter(
         folder__in=child_folders,
     )
