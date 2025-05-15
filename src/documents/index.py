@@ -152,13 +152,19 @@ def delete_document_with_index(doc_id, es_client=None):
         es_client (Elasticsearch, optional): Elasticsearch client instance.
     """
     try:
+        logger.info('đã gọi hàm delete_document_with_index')
         # Initialize Elasticsearch client if not provided
         if es_client is None:
             es_client = Elasticsearch([ELASTIC_SEARCH_HOST],
                                       timeout=30)
+        doc_exists = es_client.exists(index=ELASTIC_SEARCH_DOCUMENT_INDEX,
+                                      id=doc_id)
+        if not doc_exists:
+            logger.warning(f"Tài liệu với ID {doc_id} không tồn tại.")
+            return
 
         # Delete the document
-        es_client.delete(index=ELASTIC_SEARCH_DOCUMENT_INDEX, id=str(doc_id))
+        es_client.delete(index=ELASTIC_SEARCH_DOCUMENT_INDEX, id=doc_id)
         logger.info(
             f"Successfully deleted document with ID {doc_id} from Elasticsearch")
     except Exception as e:
@@ -880,18 +886,18 @@ class DelayedElasticSearch(DelayedQuery):
         for d in docs:
             dict_docs[d.id]=d
         time_set_dict= time.time() - start_time
-        print('time_set_dict',time_set_dict)
+        logger.info('time_set_dict', time_set_dict)
         start_time = time.time()
         # mapping docs to response
         for r in response:
             if dict_docs.get(int(r.meta.id), None):
                 r.doc_obj = dict_docs[int(r.meta.id)]
         time_mapping_docs_response = time.time()-start_time
-        print('time_mapping_docs_response',time_mapping_docs_response)
+        logger.info('time_mapping_docs_response', time_mapping_docs_response)
         start_time = time.time()
         # all_doc_ids = self.search_get_all()
         time_get_all = time.time()-start_time
-        print('time_get_all',time_get_all)
+        logger.info('time_get_all', time_get_all)
         page: ResultsPage = ResultsPage(response, page_num, page_len)
         # filter = self._get_query_filter()
         # page: ResultsPage = self.searcher.search_page(

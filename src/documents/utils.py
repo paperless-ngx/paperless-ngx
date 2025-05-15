@@ -176,7 +176,8 @@ def get_directory_size(directory):
 
 
 def check_digital_signature(pdf_path):
-    if not pdf_path.lower().endswith('.pdf'):  # Kiểm tra nếu không phải PDF
+    if not str(pdf_path).lower().endswith(
+        '.pdf'):  # Kiểm tra nếu không phải PDF
         return False
     with open(pdf_path, 'rb') as file:
         reader = PyPDF2.PdfFileReader(file)

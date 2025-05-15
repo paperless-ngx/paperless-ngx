@@ -655,7 +655,7 @@ class DocumentViewSet(
         # index.remove_document_from_index(self.get_object())
         instance.delete()
         instance_deleted = Document.deleted_objects.get(id=instance.id)
-        index.delete_document_with_index(instance_deleted)
+        index.delete_document_with_index(instance_deleted.id)
         return Response(status=status.HTTP_204_NO_CONTENT)
         # return super().destroy(request, *args, **kwargs)
 
@@ -2729,7 +2729,24 @@ class BulkEditObjectsView(PassUserMixin):
                     continue
                 else:
                     return HttpResponseForbidden("Insufficient permissions")
-            bulk_delete_file.delay(folder_list)
+            sub_folders_list = []
+            document_ids = []
+
+            for f in folder_list:
+                if f.type == Folder.FOLDER:
+                    sub_folders = Folder.objects.filter(parent_folder=f.id)
+                    sub_folders_list.extend(folder_list)
+                if f.type == Folder.FILE:
+                    document_ids.append(f.id)
+
+            document_list = Document.objects.filter(folder_id__in=document_ids)
+            logger.debug(
+                f'delete document with index {document_list}, {folder_list}')
+            for d in document_list:
+                index.delete_document_with_index(doc_id=d.id)
+            document_list.delete()
+            folder_list.delete()
+            bulk_delete_file.delay(sub_folders_list)
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         elif operation == "delete" and object_type == "dossiers":
@@ -3752,7 +3769,6 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         folders = Folder.objects.filter(path__startswith=folder.path)
         documents = Document.objects.filter(folder__in=folders).defer('content')
         documents.delete()
-        documents = Document.deleted_objects.filter(documents)
         for doc in documents:
             index.delete_document_with_index(doc_id=doc.id)
         folders.delete()

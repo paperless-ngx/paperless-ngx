@@ -467,31 +467,29 @@ def update_document_archive_file(self, document_id=None):
 def bulk_delete_file(folder_list = None):
     documents = []
     folders_ids = []
+
     for f in folder_list:
         f: Folder
         path = ''
-        if f.type == Folder.FILE:
-            path = f.path
-        elif f.type == Folder.FOLDER:
+        if f.type == Folder.FOLDER:
             path = f.path + '/'
-        folders_f_ids = Folder.objects.filter(
-            path__startswith=path).values_list('id', flat=True)
-        folders_ids.extend(folders_f_ids)
-    dossier_ids = []
-
+            folders_f_ids = Folder.objects.filter(
+                path__startswith=path).values_list('id', flat=True)
+            folders_ids.extend(folders_f_ids)
+        elif f.type == Folder.FILE:
+            folders_ids.append(f.id)
+    logger.info("folders_ids", folders_ids)
     documents_f = Document.objects.filter(folder__in=folders_ids).defer(
-        'content').select_related('dossier')
+        'content')
     documents.extend(documents_f)
-    for d in documents_f:
-        if d.dossier_id:
-            dossier_ids.append(d.dossier_id)
+
 
     with transaction.atomic():
         docs = Document.objects.filter(
-            id__in=[d.id for d in documents]).delete()
+            id__in=[d.id for d in documents])
         for d in docs:
             index.delete_document_with_index(doc_id=d.id)
-        Dossier.objects.filter(id__in=dossier_ids).delete()
+        docs.delete()
         Folder.objects.filter(id__in=folders_ids).delete()
 
         logger.info("deleted file")
