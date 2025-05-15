@@ -13,7 +13,6 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 
-from documents.compress import smart_compress
 from documents.utils import get_temp_file_path
 
 logger = logging.getLogger("edoc.render_pdf")
@@ -238,98 +237,38 @@ def render_pdf_ocr(input_path, output_path,
 
         input_pdf = pypdf2_pdfreader(input_path)
         file_temp = get_temp_file_path(output_path)
-        if not file_temp.exists():
-            file_temp.parent.mkdir(parents=True, exist_ok=True)
-        # can = canvas.Canvas(str(file_temp), pagesize=letter)
-        #
-        # pdfmetrics.registerFont(TTFont('Arial', font_path))
-        # font_name = "Arial"
-        #
-        # for page_num, page in enumerate(input_pdf.pages):
-        #     image = convert_from_path(input_path,
-        #                               first_page=page_num + 1,
-        #                               last_page=page_num + 2)[0]
-        #
-        #     page_height = page.mediabox.getHeight()
-        #     page_width = page.mediabox.getWidth()
-        #
-        #     width_api_img = data["pages"][page_num]["dimensions"][1]
-        #     height_api_img = data["pages"][page_num]["dimensions"][0]
-        #
-        #     # set size new page
-        #     if width_api_img < height_api_img and page_height < page_width:
-        #         page_height, page_width = page_width, page_height
-        #
-        #     can.setPageSize((page_width, page_height))
-        #
-        #     byte_image = io.BytesIO()
-        #     image.save(byte_image, format='JPEG',
-        #                quality=int(quality_compress), optimize=True)
-        #     byte_image.seek(0)
-        #
-        #     rolate_height = height_api_img / page_height
-        #     rolate_width = width_api_img / page_width
-        #
-        #     for block in data["pages"][page_num]["blocks"]:
-        #         for line in block.get("lines", []):
-        #             y1_line = (
-        #                 line.get("bbox")[0][1] / float(rolate_height))
-        #             y2_line = (
-        #                 line.get("bbox")[1][1] / float(rolate_height))
-        #
-        #             y_center_coordinates = y2_line - (
-        #                 y2_line - y1_line) / 2
-        #
-        #             for word in line.get("words", []):
-        #                 x1 = word["bbox"][0][0] / float(rolate_width)
-        #                 y1 = word["bbox"][0][1] / float(rolate_height)
-        #                 x2 = word["bbox"][1][0] / float(rolate_width)
-        #                 y2 = word["bbox"][1][1] / float(rolate_height)
-        #
-        #                 font_size = max(1, math.floor((y2 - y1) * 72 / 96))
-        #                 value = word["value"]
-        #                 x_center_coordinates = x2 - (x2 - x1) / 2
-        #
-        #                 w = can.stringWidth(value, font_name, font_size)
-        #                 can.setFont('Arial', font_size)
-        #                 can.drawString(int(x_center_coordinates - w / 2),
-        #                                int(float(
-        #                                    page_height) - y_center_coordinates - (
-        #                                        font_size / 2)) + 2,
-        #                                value)
-        #
-        #     can.drawImage(ImageReader(byte_image),
-        #                   0, 0,
-        #                   width=float(page_width),
-        #                   height=float(page_height))
-        #     can.showPage()
-        #
-        # can.save()
-        images = convert_from_path(input_path,
-                                   first_page=1,
-                                   last_page=input_pdf.getNumPages() + 1)
-        can = canvas.Canvas(str(file_temp), pagesize=letter)
+        if not output_path.exists():
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+        can = canvas.Canvas(str(output_path), pagesize=letter)
+
+        pdfmetrics.registerFont(TTFont('Arial', font_path))
+        font_name = "Arial"
+
         for page_num, page in enumerate(input_pdf.pages):
+            image = convert_from_path(input_path,
+                                      first_page=page_num + 1,
+                                      last_page=page_num + 2)[0]
+
             page_height = page.mediabox.getHeight()
             page_width = page.mediabox.getWidth()
+
             width_api_img = data["pages"][page_num]["dimensions"][1]
             height_api_img = data["pages"][page_num]["dimensions"][0]
+
             # set size new page
             if width_api_img < height_api_img and page_height < page_width:
                 page_height, page_width = page_width, page_height
+
             can.setPageSize((page_width, page_height))
+
             byte_image = io.BytesIO()
-            images[page_num].save(byte_image, format='JPEG')
-            jpg_image = byte_image.getvalue()
-            # can.drawImage(ImageReader(io.BytesIO(jpg_image)),
-            #               0, 0,
-            #               width=float(page_width),
-            #               height=float(page_height))
-            # set font size
-            pdfmetrics.registerFont(TTFont('Arial', font_path))
-            # print(f'kich thuoc goc: height{page_height}, width{page_width}, kich thuoc api: height{height_api_img} width{width_api_img}')
+            image.save(byte_image, format='JPEG',
+                       quality=int(quality_compress), optimize=True)
+            byte_image.seek(0)
+
             rolate_height = height_api_img / page_height
             rolate_width = width_api_img / page_width
+
             for block in data["pages"][page_num]["blocks"]:
                 for line in block.get("lines", []):
                     y1_line = (
@@ -339,17 +278,17 @@ def render_pdf_ocr(input_path, output_path,
 
                     y_center_coordinates = y2_line - (
                         y2_line - y1_line) / 2
+                    font_size = max(1,
+                                    math.floor((y2_line - y1_line) * 72 / 96))
                     for word in line.get("words", []):
                         x1 = word["bbox"][0][0] / float(rolate_width)
                         y1 = word["bbox"][0][1] / float(rolate_height)
                         x2 = word["bbox"][1][0] / float(rolate_width)
                         y2 = word["bbox"][1][1] / float(rolate_height)
-                        font_size = math.floor((y2 - y1) * 72 / 96)
+
                         value = word["value"]
-                        # font_size = float(y2-y1) * 72 / 96
                         x_center_coordinates = x2 - (x2 - x1) / 2
-                        # y_center_coordinates =y2 - (y2-y1)/2
-                        # value=' '+value+' '
+
                         w = can.stringWidth(value, font_name, font_size)
                         can.setFont('Arial', font_size)
                         can.drawString(int(x_center_coordinates - w / 2),
@@ -357,20 +296,20 @@ def render_pdf_ocr(input_path, output_path,
                                            page_height) - y_center_coordinates - (
                                                font_size / 2)) + 2,
                                        value)
-            can.drawImage(ImageReader(io.BytesIO(jpg_image)),
+
+            can.drawImage(ImageReader(byte_image),
                           0, 0,
                           width=float(page_width),
                           height=float(page_height))
             can.showPage()
         # can.save()
-        # can._filename='/home/otxtan/project/tc-edoc/media/archive-fallback.pdf'
+        # can._filename=f'{Path(__file__).resolve().parent.parent.parent}/media/archive-fallback.pdf'
         can.save()
 
         # logger.info("file_temp---------------", file_temp)
         # doc.save(file_temp)
         # doc.save(output_path)
         logger.info('đã lưu xong')
-        smart_compress(file_temp, output_path, quality=49, ghosts_script=True)
 
         # doc = fitz.open(input_path)
     else:

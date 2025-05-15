@@ -1,10 +1,10 @@
 import io
+import logging
 import subprocess
 from pathlib import Path
-from PIL import Image
-import logging
 
-from pdf2image.pdf2image import convert_from_path
+from PIL import Image
+from pdf2image import convert_from_path
 
 logger = logging.getLogger("edoc.compress")
 logging.basicConfig(level=logging.INFO)
@@ -47,21 +47,26 @@ def compress_pdf(input_pdf_path, output_pdf_path, quality=85):
 
 def compress_pdf_with_ghostscript(input_path, output_path, quality=80):
     setting = map_quality_to_setting(quality)
+
     cmd = [
         "gs", "-sDEVICE=pdfwrite",
         "-dCompatibilityLevel=1.4",
         f"-dPDFSETTINGS={setting}",
         "-dNOPAUSE", "-dQUIET", "-dBATCH",
+        "-dSubsetFonts=false",  # Không tạo phiên bản con của font
+        "-dEmbedAllFonts=true",  # Giữ nguyên font gốc trong PDF
         f"-sOutputFile={output_path}",
         str(input_path)
     ]
 
     try:
-        subprocess.run(cmd, check=True)
+        result = subprocess.run(cmd, check=True, capture_output=True,
+                                text=True)
         logger.info(f"✔️ Nén PDF xong: {output_path} (quality={quality}, setting={setting})")
-    except subprocess.CalledProcessError as e:
-        logger.error(f"❌ Lỗi nén PDF: {e}")
 
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Lỗi Ghostscript: {e.stderr}")  # Hiển thị lỗi chi tiết
+        raise
 
 def compress_jpg(input_path, output_path, quality=80):
     try:
