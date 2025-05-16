@@ -1,24 +1,15 @@
 import { Injectable } from '@angular/core'
 import { ParamMap, Router } from '@angular/router'
-import { Observable, Subject, first, takeUntil } from 'rxjs'
+import { first, Observable, Subject, takeUntil } from 'rxjs'
 import { FilterRule } from '../data/filter-rule'
-import {
-  filterRulesDiffer,
-  cloneFilterRules,
-  isFullTextFilterRule,
-} from '../utils/filter-rules'
+import { cloneFilterRules, filterRulesDiffer, isFullTextFilterRule } from '../utils/filter-rules'
 import { Document } from '../data/document'
 import { SavedView } from '../data/saved-view'
 import { SETTINGS_KEYS } from '../data/ui-settings'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
 import { paramsFromViewState, paramsToViewState } from '../utils/query-params'
-import {
-  DocumentService,
-  DOCUMENT_SORT_FIELDS,
-  SelectionData,
-} from './rest/document.service'
+import { DOCUMENT_SORT_FIELDS, DocumentService, SelectionData } from './rest/document.service'
 import { SettingsService } from './settings.service'
-import { save } from 'ngx-bootstrap-icons'
 
 /**
  * Captures the current state of the list view.
@@ -83,7 +74,7 @@ export class DocumentListViewService {
 
   currentPageSize: number = this.settings.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)
 
-  nextPage: boolean = true
+  nextPage: boolean = false
 
   private unsubscribeNotifier: Subject<any> = new Subject()
 
@@ -363,12 +354,12 @@ export class DocumentListViewService {
   }
 
   set hasNextPage(next: string) {
-    if (next != '')
+    if (next != null)
       this.nextPage = true
   }
 
-  get hasNextPage(): number {
-    return this.activeListViewState.currentPage
+  get hasNextPage(): boolean {
+    return this.nextPage
   }
 
   get currentPage(): number {
