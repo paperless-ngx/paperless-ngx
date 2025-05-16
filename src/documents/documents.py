@@ -127,6 +127,9 @@ class DocumentDocument(Document):
     def prepare_notes(self, instance):
         return [str(c.note) for c in Note.objects.filter(document=instance)]
 
+    def prepare_viewer_id(self, instance):
+        return DocumentDocument.get_view_users(instance)
+
     def prepare_view_users(self, instance):
         return DocumentDocument.get_view_users(instance)
 
