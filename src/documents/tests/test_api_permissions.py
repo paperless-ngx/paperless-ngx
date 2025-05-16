@@ -474,7 +474,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.client.force_authenticate(user1)
 
         response = self.client.get(
-            "/api/documents/",
+            "/api/documents/?ordering=-id",
             format="json",
         )
 

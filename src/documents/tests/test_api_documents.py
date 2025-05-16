@@ -171,6 +171,32 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results[0]), 0)
 
+    def test_document_update_with_created_date(self):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - Document is updated with created_date and not created
+        THEN:
+            - Document created field is updated
+        """
+        doc = Document.objects.create(
+            title="none",
+            checksum="123",
+            mime_type="application/pdf",
+            created=date(2023, 1, 1),
+        )
+
+        created_date = date(2023, 2, 1)
+        self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            {"created_date": created_date},
+            format="json",
+        )
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.created_date, created_date)
+
     def test_document_actions(self):
         _, filename = tempfile.mkstemp(dir=self.dirs.originals_dir)
 
@@ -1313,7 +1339,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         _, overrides = self.get_last_consume_delay_call_args()
 
-        self.assertEqual(overrides.created, created)
+        self.assertEqual(overrides.created, created.date())
 
     def test_upload_with_asn(self):
         self.consume_file_mock.return_value = celery.result.AsyncResult(
