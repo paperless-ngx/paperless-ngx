@@ -3694,7 +3694,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         set_permissions_exist = "set_permissions" in serializer.validated_data
         update_child_folder_permisisons.delay(folder=instance,
                                               permissions=permissions,
-                                              owner=owner, merge=merge,
+                                              owner=owner, merge=True,
                                               owner_exist=owner_exist,
                                               set_permissions_exist=set_permissions_exist)
         if old_parent_folder != instance.parent_folder:
