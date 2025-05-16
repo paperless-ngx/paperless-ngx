@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import datetime
 import logging
 import math
 import re
-import zoneinfo
+from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
@@ -423,7 +422,7 @@ class OwnedObjectListSerializer(serializers.ListSerializer):
 
 
 class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
-    last_correspondence = serializers.DateTimeField(read_only=True, required=False)
+    last_correspondence = serializers.DateField(read_only=True, required=False)
 
     class Meta:
         model = Correspondent
@@ -966,11 +965,7 @@ class DocumentSerializer(
 
     def update(self, instance: Document, validated_data):
         if "created_date" in validated_data and "created" not in validated_data:
-            new_datetime = datetime.datetime.combine(
-                validated_data.get("created_date"),
-                datetime.time(0, 0, 0, 0, zoneinfo.ZoneInfo(settings.TIME_ZONE)),
-            )
-            instance.created = new_datetime
+            instance.created = validated_data.get("created_date")
             instance.save()
         if "created_date" in validated_data:
             validated_data.pop("created_date")
@@ -1645,6 +1640,11 @@ class PostDocumentSerializer(serializers.Serializer):
             return [custom_field.id for custom_field in custom_fields]
         else:
             return None
+
+    def validate_created(self, created):
+        # support datetime format for created for backwards compatibility
+        if isinstance(created, datetime):
+            return created.date()
 
 
 class BulkDownloadSerializer(DocumentListSerializer):
