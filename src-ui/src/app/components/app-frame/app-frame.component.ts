@@ -2,48 +2,26 @@ import { Component, HostListener, OnInit } from '@angular/core'
 import { FormControl } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { from, Observable } from 'rxjs'
-import {
-  debounceTime,
-  distinctUntilChanged,
-  map,
-  switchMap,
-  first,
-  catchError,
-} from 'rxjs/operators'
+import { catchError, debounceTime, distinctUntilChanged, first, map, switchMap } from 'rxjs/operators'
 import { Document } from 'src/app/data/document'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
-import {
-  DjangoMessageLevel,
-  DjangoMessagesService,
-} from 'src/app/services/django-messages.service'
+import { DjangoMessageLevel, DjangoMessagesService } from 'src/app/services/django-messages.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SearchService } from 'src/app/services/rest/search.service'
 import { environment } from 'src/environments/environment'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { FILTER_FULLTEXT_QUERY } from 'src/app/data/filter-rule-type'
-import {
-  RemoteVersionService,
-  AppRemoteVersion,
-} from 'src/app/services/rest/remote-version.service'
+import { AppRemoteVersion, RemoteVersionService } from 'src/app/services/rest/remote-version.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ComponentCanDeactivate } from 'src/app/guards/dirty-doc.guard'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { ToastService } from 'src/app/services/toast.service'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
-import {
-  PermissionAction,
-  PermissionsService,
-  PermissionType,
-} from 'src/app/services/permissions.service'
+import { PermissionAction, PermissionsService, PermissionType } from 'src/app/services/permissions.service'
 import { SavedView } from 'src/app/data/saved-view'
-import {
-  CdkDragStart,
-  CdkDragEnd,
-  CdkDragDrop,
-  moveItemInArray,
-} from '@angular/cdk/drag-drop'
+import { CdkDragDrop, CdkDragEnd, CdkDragStart, moveItemInArray } from '@angular/cdk/drag-drop'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 
@@ -173,32 +151,32 @@ export class AppFrameComponent
 
   set slimGeneralCategoryExpandedEnabled(enabled: boolean) {
     this.settingsService.set(SETTINGS_KEYS.GENERAL_CATEGORY_EXPANDED, enabled)
-    this.settingsService
-      .storeSettings()
-      .pipe(first())
-      .subscribe({
-        error: (error) => {
-          this.toastService.showError(
-            $localize`An error occurred while saving settings.`
-          )
-          console.warn(error)
-        },
-      })
+    // this.settingsService
+    //   .storeSettings()
+    //   .pipe(first())
+    //   .subscribe({
+    //     error: (error) => {
+    //       this.toastService.showError(
+    //         $localize`An error occurred while saving settings.`
+    //       )
+    //       console.warn(error)
+    //     },
+    //   })
   }
 
   set slimSpecificCategoryExpandedEnabled(enabled: boolean) {
     this.settingsService.set(SETTINGS_KEYS.SPECIFIC_CATEGORY_EXPANDED, enabled)
-    this.settingsService
-      .storeSettings()
-      .pipe(first())
-      .subscribe({
-        error: (error) => {
-          this.toastService.showError(
-            $localize`An error occurred while saving settings.`
-          )
-          console.warn(error)
-        },
-      })
+    // this.settingsService
+    //   .storeSettings()
+    //   .pipe(first())
+    //   .subscribe({
+    //     error: (error) => {
+    //       this.toastService.showError(
+    //         $localize`An error occurred while saving settings.`
+    //       )
+    //       console.warn(error)
+    //     },
+    //   })
   }
 
   closeMenu() {

@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core'
-import { Routes, RouterModule } from '@angular/router'
+import { RouterModule, Routes } from '@angular/router'
 import { AppFrameComponent } from './components/app-frame/app-frame.component'
 import { DashboardComponent } from './components/dashboard/dashboard.component'
 import { DocumentDetailComponent } from './components/document-detail/document-detail.component'
@@ -20,10 +20,7 @@ import { BackupComponent } from './components/admin/backup/backup.component'
 import { PermissionsGuard } from './guards/permissions.guard'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
-import {
-  PermissionAction,
-  PermissionType,
-} from './services/permissions.service'
+import { PermissionAction, PermissionType } from './services/permissions.service'
 import { WorkflowsComponent } from './components/manage/workflows/workflows.component'
 import { MailComponent } from './components/manage/mail/mail.component'
 import { UsersAndGroupsComponent } from './components/admin/users-groups/users-groups.component'
@@ -42,7 +39,6 @@ import { DossiersComponent } from './components/manage/dossier-list/dossier-list
 import { DossiersFormComponent } from './components/manage/dossier-form-list/dossier-form-list.component'
 import { FontLanguageListComponent } from './components/manage/font-language-list/font-language-list.component'
 import { ArchiveFontListComponent } from './components/manage/archive-font-list/archive-font-list.component'
-
 
 
 export const routes: Routes = [
@@ -357,8 +353,8 @@ export const routes: Routes = [
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
-            action: PermissionAction.View,
-            type: PermissionType.EdocTask,
+            action: PermissionAction.Delete,
+            type: PermissionType.Document,
           },
         },
       },
