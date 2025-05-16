@@ -475,7 +475,7 @@ class RasterisedDocumentCustomParser(DocumentParser):
                            quality_compress=self.quality_compress,
                            font_path=os.path.join(BASE_DIR,
                                                   "edoc_ocr_custom/fonts/arial-font/arial.ttf"))
-            EdocTask.objects.filter(id=task_id).update(
+            EdocTask.objects.filter(task_id=task_id).update(
                 result=f"Success. document id {self.document_id} is being processed"
             )
             self.log.info(
