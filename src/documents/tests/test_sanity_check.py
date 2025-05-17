@@ -5,6 +5,7 @@ from pathlib import Path
 import filelock
 from django.conf import settings
 from django.test import TestCase
+from django.test import override_settings
 
 from documents.models import Document
 from documents.sanity_checker import check_sanity
@@ -156,6 +157,17 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
             messages._messages[None][0]["message"],
             "Orphaned file in media dir",
         )
+
+    @override_settings(
+        APP_LOGO="logo/logo.png",
+    )
+    def test_ignore_logo(self):
+        self.make_test_data()
+        logo_dir = Path(self.dirs.media_dir, "logo")
+        logo_dir.mkdir(parents=True, exist_ok=True)
+        Path(self.dirs.media_dir, "logo", "logo.png").touch()
+        messages = check_sanity()
+        self.assertFalse(messages.has_warning)
 
     def test_archive_filename_no_checksum(self):
         doc = self.make_test_data()
