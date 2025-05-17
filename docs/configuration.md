@@ -629,7 +629,7 @@ If both the [PAPERLESS_ACCOUNT_DEFAULT_GROUPS](#PAPERLESS_ACCOUNT_DEFAULT_GROUPS
 
 !!! note
 
-    If you do not have a working email server set up you should set this to 'none'.
+    If you do not have a working email server set up this will be set to 'none'.
 
 #### [`PAPERLESS_ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS=<bool>`](#PAPERLESS_ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS) {#PAPERLESS_ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS}
 
