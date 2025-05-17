@@ -26,9 +26,9 @@ class TestChecks(DirectoriesMixin, TestCase):
         self.assertEqual(paths_check(None), [])
 
     @override_settings(
-        MEDIA_ROOT="uuh",
-        DATA_DIR="whatever",
-        CONSUMPTION_DIR="idontcare",
+        MEDIA_ROOT=Path("uuh"),
+        DATA_DIR=Path("whatever"),
+        CONSUMPTION_DIR=Path("idontcare"),
     )
     def test_paths_check_dont_exist(self):
         msgs = paths_check(None)
