@@ -463,6 +463,24 @@ CHANNEL_LAYERS = {
 }
 
 ###############################################################################
+# Email (SMTP) Backend                                                        #
+###############################################################################
+
+EMAIL_HOST: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST", "localhost")
+EMAIL_PORT: Final[int] = int(os.getenv("PAPERLESS_EMAIL_PORT", 25))
+EMAIL_HOST_USER: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL: Final[str] = os.getenv("PAPERLESS_EMAIL_FROM", EMAIL_HOST_USER)
+EMAIL_USE_TLS: Final[bool] = __get_boolean("PAPERLESS_EMAIL_USE_TLS")
+EMAIL_USE_SSL: Final[bool] = __get_boolean("PAPERLESS_EMAIL_USE_SSL")
+EMAIL_SUBJECT_PREFIX: Final[str] = "[Paperless-ngx] "
+EMAIL_TIMEOUT = 30.0
+EMAIL_ENABLED = EMAIL_HOST != "localhost" or EMAIL_HOST_USER != ""
+if DEBUG:  # pragma: no cover
+    EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+    EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
+
+###############################################################################
 # Security                                                                    #
 ###############################################################################
 
@@ -503,9 +521,13 @@ REDIRECT_LOGIN_TO_SSO = __get_boolean("PAPERLESS_REDIRECT_LOGIN_TO_SSO")
 
 AUTO_LOGIN_USERNAME = os.getenv("PAPERLESS_AUTO_LOGIN_USERNAME")
 
-ACCOUNT_EMAIL_VERIFICATION = os.getenv(
-    "PAPERLESS_ACCOUNT_EMAIL_VERIFICATION",
-    "optional",
+ACCOUNT_EMAIL_VERIFICATION = (
+    "none"
+    if not EMAIL_ENABLED
+    else os.getenv(
+        "PAPERLESS_ACCOUNT_EMAIL_VERIFICATION",
+        "optional",
+    )
 )
 
 ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS = __get_boolean(
@@ -1219,24 +1241,6 @@ def _get_nltk_language_setting(ocr_lang: str) -> str | None:
 NLTK_ENABLED: Final[bool] = __get_boolean("PAPERLESS_ENABLE_NLTK", "yes")
 
 NLTK_LANGUAGE: str | None = _get_nltk_language_setting(OCR_LANGUAGE)
-
-###############################################################################
-# Email (SMTP) Backend                                                        #
-###############################################################################
-
-EMAIL_HOST: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST", "localhost")
-EMAIL_PORT: Final[int] = int(os.getenv("PAPERLESS_EMAIL_PORT", 25))
-EMAIL_HOST_USER: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST_PASSWORD", "")
-DEFAULT_FROM_EMAIL: Final[str] = os.getenv("PAPERLESS_EMAIL_FROM", EMAIL_HOST_USER)
-EMAIL_USE_TLS: Final[bool] = __get_boolean("PAPERLESS_EMAIL_USE_TLS")
-EMAIL_USE_SSL: Final[bool] = __get_boolean("PAPERLESS_EMAIL_USE_SSL")
-EMAIL_SUBJECT_PREFIX: Final[str] = "[Paperless-ngx] "
-EMAIL_TIMEOUT = 30.0
-EMAIL_ENABLED = EMAIL_HOST != "localhost" or EMAIL_HOST_USER != ""
-if DEBUG:  # pragma: no cover
-    EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-    EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
 
 ###############################################################################
 # Email Preprocessors                                                         #
