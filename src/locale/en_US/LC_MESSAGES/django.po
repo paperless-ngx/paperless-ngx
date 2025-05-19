@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-17 05:22+0000\n"
+"POT-Creation-Date: 2025-05-19 16:38+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1176,21 +1176,21 @@ msgstr ""
 msgid "workflow runs"
 msgstr ""
 
-#: documents/serialisers.py:134
+#: documents/serialisers.py:135
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr ""
 
-#: documents/serialisers.py:560
+#: documents/serialisers.py:561
 msgid "Invalid color."
 msgstr ""
 
-#: documents/serialisers.py:1609
+#: documents/serialisers.py:1632
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:1703
+#: documents/serialisers.py:1726
 msgid "Invalid variable detected."
 msgstr ""
 
