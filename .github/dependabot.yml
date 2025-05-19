@@ -5,7 +5,6 @@ version: 2
 # Required for uv support for now
 enable-beta-ecosystems: true
 updates:
-
   # Enable version updates for pnpm
   - package-ecosystem: "npm"
     target-branch: "dev"
@@ -35,7 +34,6 @@ updates:
         patterns:
           - "@typescript-eslint*"
           - "eslint"
-
   # Enable version updates for Python
   - package-ecosystem: "uv"
     target-branch: "dev"
@@ -59,6 +57,7 @@ updates:
       django:
         patterns:
           - "*django*"
+          - "drf-*"
       major-versions:
         update-types:
           - "major"
@@ -70,7 +69,6 @@ updates:
         patterns:
           - psycopg*
           - zxing-cpp
-
   # Enable updates for GitHub Actions
   - package-ecosystem: "github-actions"
     target-branch: "dev"
@@ -90,7 +88,6 @@ updates:
           - "major"
           - "minor"
           - "patch"
-
   # Update Dockerfile in root directory
   - package-ecosystem: "docker"
     directory: "/"
@@ -100,12 +97,10 @@ updates:
     reviewers:
       - "paperless-ngx/ci-cd"
     labels:
-      - "ci-cd"
       - "dependencies"
     commit-message:
       prefix: "docker"
       include: "scope"
-
   # Update Docker Compose files in docker/compose directory
   - package-ecosystem: "docker-compose"
     directory: "/docker/compose/"
@@ -115,7 +110,6 @@ updates:
     reviewers:
       - "paperless-ngx/ci-cd"
     labels:
-      - "ci-cd"
       - "dependencies"
     commit-message:
       prefix: "docker-compose"

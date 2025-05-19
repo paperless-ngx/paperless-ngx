@@ -208,7 +208,7 @@ export class DocumentDetailComponent
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
     content: new FormControl(''),
-    created_date: new FormControl(),
+    created: new FormControl(),
     correspondent: new FormControl(),
     document_type: new FormControl(),
     storage_path: new FormControl(),
@@ -490,7 +490,7 @@ export class DocumentDetailComponent
           this.store = new BehaviorSubject({
             title: doc.title,
             content: doc.content,
-            created_date: doc.created_date,
+            created: doc.created,
             correspondent: doc.correspondent,
             document_type: doc.document_type,
             storage_path: doc.storage_path,
@@ -784,6 +784,7 @@ export class DocumentDetailComponent
           this.title = doc.title
           this.updateFormForCustomFields()
           this.documentForm.patchValue(doc)
+          this.documentForm.markAsPristine()
           this.openDocumentService.setDirty(doc, false)
         },
         error: () => {
@@ -794,11 +795,30 @@ export class DocumentDetailComponent
       })
   }
 
+  private getChangedFields(): any {
+    const changes = {
+      id: this.document.id,
+    }
+    Object.keys(this.documentForm.controls).forEach((key) => {
+      if (this.documentForm.get(key).dirty) {
+        if (key === 'permissions_form') {
+          changes['owner'] =
+            this.documentForm.get('permissions_form').value['owner']
+          changes['set_permissions'] =
+            this.documentForm.get('permissions_form').value['set_permissions']
+        } else {
+          changes[key] = this.documentForm.get(key).value
+        }
+      }
+    })
+    return changes
+  }
+
   save(close: boolean = false) {
     this.networkActive = true
     ;(document.activeElement as HTMLElement)?.dispatchEvent(new Event('change'))
     this.documentsService
-      .update(this.document)
+      .patch(this.getChangedFields())
       .pipe(first())
       .subscribe({
         next: (docValues) => {
@@ -852,7 +872,7 @@ export class DocumentDetailComponent
     this.networkActive = true
     this.store.next(this.documentForm.value)
     this.documentsService
-      .update(this.document)
+      .patch(this.getChangedFields())
       .pipe(
         switchMap((updateResult) => {
           return this.documentListViewService
@@ -1099,12 +1119,10 @@ export class DocumentDetailComponent
     )
   }
 
-  isZoomSelected(setting: ZoomSetting): boolean {
+  get currentZoom() {
     if (this.previewZoomScale === ZoomSetting.PageFit) {
-      return setting === ZoomSetting.PageFit
-    }
-
-    return this.previewZoomSetting === setting
+      return ZoomSetting.PageFit
+    } else return this.previewZoomSetting
   }
 
   getZoomSettingTitle(setting: ZoomSetting): string {
@@ -1305,6 +1323,8 @@ export class DocumentDetailComponent
       created: new Date(),
     })
     this.updateFormForCustomFields(true)
+    this.documentForm.get('custom_fields').markAsDirty()
+    this.documentForm.updateValueAndValidity()
   }
 
   public removeField(fieldInstance: CustomFieldInstance) {
@@ -1313,6 +1333,7 @@ export class DocumentDetailComponent
       1
     )
     this.updateFormForCustomFields(true)
+    this.documentForm.get('custom_fields').markAsDirty()
     this.documentForm.updateValueAndValidity()
   }
 

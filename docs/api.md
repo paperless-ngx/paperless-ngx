@@ -418,3 +418,9 @@ Initial API version.
 
 -   The user field of document notes now returns a simplified user object
     rather than just the user ID.
+
+#### Version 9
+
+-   The document `created` field is now a date, not a datetime. The
+    `created_date` field is considered deprecated and will be removed in a
+    future version.
