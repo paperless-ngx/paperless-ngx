@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-19 16:38+0000\n"
-"PO-Revision-Date: 2025-05-19 16:42\n"
+"POT-Creation-Date: 2025-05-19 20:52+0000\n"
+"PO-Revision-Date: 2025-05-19 20:54\n"
 "Last-Translator: \n"
 "Language-Team: Serbian (Latin)\n"
 "Language: sr_CS\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumenta"
 
-#: documents/filters.py:383
+#: documents/filters.py:384
 msgid "Value must be valid JSON."
 msgstr "Value must be valid JSON."
 
-#: documents/filters.py:402
+#: documents/filters.py:403
 msgid "Invalid custom field query expression"
 msgstr "Nevažeći izraz upita prilagođen polja"
 
-#: documents/filters.py:412
+#: documents/filters.py:413
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Nevažeća lista izraza. Ne sme biti prazna."
 
-#: documents/filters.py:433
+#: documents/filters.py:434
 msgid "Invalid logical operator {op!r}"
 msgstr "Nevažeći logični operator {op!r}"
 
-#: documents/filters.py:447
+#: documents/filters.py:448
 msgid "Maximum number of query conditions exceeded."
 msgstr "Premašen je maksimalni broj uslova u upitu."
 
-#: documents/filters.py:512
+#: documents/filters.py:513
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} nije validno prilagođeno polje."
 
-#: documents/filters.py:549
+#: documents/filters.py:550
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} ne podržava izraz u upitu {expr!r}."
 
-#: documents/filters.py:657
+#: documents/filters.py:658
 msgid "Maximum nesting depth exceeded."
 msgstr "Premašena je maksimalni nesting depth."
 
-#: documents/filters.py:849
+#: documents/filters.py:843
 msgid "Custom field not found"
 msgstr "Nije pronađeno prilagođeno polje"
 

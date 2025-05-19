@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-19 16:38+0000\n"
-"PO-Revision-Date: 2025-05-19 16:42\n"
+"POT-Creation-Date: 2025-05-19 20:52+0000\n"
+"PO-Revision-Date: 2025-05-19 20:54\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "문서"
 
-#: documents/filters.py:383
+#: documents/filters.py:384
 msgid "Value must be valid JSON."
 msgstr "값은 유효한 JSON이어야 합니다."
 
-#: documents/filters.py:402
+#: documents/filters.py:403
 msgid "Invalid custom field query expression"
 msgstr "잘못된 사용자 정의 필드 쿼리 표현식"
 
-#: documents/filters.py:412
+#: documents/filters.py:413
 msgid "Invalid expression list. Must be nonempty."
 msgstr "잘못된 표현식 목록입니다. 비어 있지 않아야 합니다."
 
-#: documents/filters.py:433
+#: documents/filters.py:434
 msgid "Invalid logical operator {op!r}"
 msgstr "잘못된 논리 연산자 {op!r}"
 
-#: documents/filters.py:447
+#: documents/filters.py:448
 msgid "Maximum number of query conditions exceeded."
 msgstr "쿼리 조건의 최대 개수를 초과했습니다."
 
-#: documents/filters.py:512
+#: documents/filters.py:513
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} 은(는) 잘못된 사용자 정의 필드입니다."
 
-#: documents/filters.py:549
+#: documents/filters.py:550
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type}은(는) 쿼리 표현식 {expr!r}을(를) 지원하지 않습니다."
 
-#: documents/filters.py:657
+#: documents/filters.py:658
 msgid "Maximum nesting depth exceeded."
 msgstr "최대 중첩 깊이를 초과했습니다."
 
-#: documents/filters.py:849
+#: documents/filters.py:843
 msgid "Custom field not found"
 msgstr "사용자 지정 필드를 찾을 수 없습니다."
 

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-19 16:38+0000\n"
-"PO-Revision-Date: 2025-05-19 16:42\n"
+"POT-Creation-Date: 2025-05-19 20:52+0000\n"
+"PO-Revision-Date: 2025-05-19 20:54\n"
 "Last-Translator: \n"
 "Language-Team: Thai\n"
 "Language: th_TH\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "เอกสาร"
 
-#: documents/filters.py:383
+#: documents/filters.py:384
 msgid "Value must be valid JSON."
 msgstr "ค่า ต้องอยู่ในรูปแบบ JSON ที่ถูกต้อง"
 
-#: documents/filters.py:402
+#: documents/filters.py:403
 msgid "Invalid custom field query expression"
 msgstr "รูปแบบการค้นหาฟิลด์ที่กำหนดเองไม่ถูกต้อง"
 
-#: documents/filters.py:412
+#: documents/filters.py:413
 msgid "Invalid expression list. Must be nonempty."
 msgstr "รายการคำสั่งไม่ถูกต้อง ต้องไม่เว้นว่าง"
 
-#: documents/filters.py:433
+#: documents/filters.py:434
 msgid "Invalid logical operator {op!r}"
 msgstr "ตัวดำเนินการเชิงตรรกะ {op!r} ไม่ถูกต้อง"
 
-#: documents/filters.py:447
+#: documents/filters.py:448
 msgid "Maximum number of query conditions exceeded."
 msgstr "จำนวนเงื่อนไขในการค้นหาเกินกำหนด"
 
-#: documents/filters.py:512
+#: documents/filters.py:513
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} ไม่ใช่ฟิลด์ที่กำหนดเองที่ถูกต้อง"
 
-#: documents/filters.py:549
+#: documents/filters.py:550
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} ไม่รองรับรูปแบบการค้นหา {expr!r}"
 
-#: documents/filters.py:657
+#: documents/filters.py:658
 msgid "Maximum nesting depth exceeded."
 msgstr "จำนวนการซ้อนเงื่อนไขสูงสุดเกินขีดจำกัด"
 
-#: documents/filters.py:849
+#: documents/filters.py:843
 msgid "Custom field not found"
 msgstr "ไม่พบฟิลด์ที่กำหนด"
 
