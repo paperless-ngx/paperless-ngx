@@ -12,11 +12,25 @@
 -   Enhancement: support heic images [@shamoon](https://github.com/shamoon) ([#9771](https://github.com/paperless-ngx/paperless-ngx/pull/9771))
 -   Enhancement: use patch instead of put for frontend document changes [@shamoon](https://github.com/shamoon) ([#9744](https://github.com/paperless-ngx/paperless-ngx/pull/9744))
 -   Chore: replace secretary with GHA [@shamoon](https://github.com/shamoon) ([#9723](https://github.com/paperless-ngx/paperless-ngx/pull/9723))
+-   Fixhancement: automatically disable email verification if no smtp setup [@shamoon](https://github.com/shamoon) ([#9949](https://github.com/paperless-ngx/paperless-ngx/pull/9949))
+-   Enhancement: support negative offset in scheduled workflows [@shamoon](https://github.com/shamoon) ([#9746](https://github.com/paperless-ngx/paperless-ngx/pull/9746))
+-   Fixhancement: better handle removed social apps in profile [@shamoon](https://github.com/shamoon) ([#9876](https://github.com/paperless-ngx/paperless-ngx/pull/9876))
+-   Enhancement: add barcode frontend config [@shamoon](https://github.com/shamoon) ([#9742](https://github.com/paperless-ngx/paperless-ngx/pull/9742))
+-   Enhancement: support heic images [@shamoon](https://github.com/shamoon) ([#9771](https://github.com/paperless-ngx/paperless-ngx/pull/9771))
+-   Enhancement: support allauth disable unknown account emails [@shamoon](https://github.com/shamoon) ([#9743](https://github.com/paperless-ngx/paperless-ngx/pull/9743))
+-   Fixhancement: tag plus button should add tag to doc [@shamoon](https://github.com/shamoon) ([#9762](https://github.com/paperless-ngx/paperless-ngx/pull/9762))
+-   Fixhancement: check more permissions for status consumer messages [@shamoon](https://github.com/shamoon) ([#9804](https://github.com/paperless-ngx/paperless-ngx/pull/9804))
 
 ### Bug Fixes
 
 -   Fixhancement: tag plus button should add tag to doc [@shamoon](https://github.com/shamoon) ([#9762](https://github.com/paperless-ngx/paperless-ngx/pull/9762))
 -   Fix: include subpath in drf-spectacular settings if set [@shamoon](https://github.com/shamoon) ([#9738](https://github.com/paperless-ngx/paperless-ngx/pull/9738))
+-   Fix: handle created change with api version increment, use created only on frontend, deprecate created_date [@shamoon](https://github.com/shamoon) ([#9962](https://github.com/paperless-ngx/paperless-ngx/pull/9962))
+-   Fix: ignore logo file from sanity checker [@shamoon](https://github.com/shamoon) ([#9946](https://github.com/paperless-ngx/paperless-ngx/pull/9946))
+-   Fix: correctly handle empty user for old notes api format, fix frontend API version [@shamoon](https://github.com/shamoon) ([#9846](https://github.com/paperless-ngx/paperless-ngx/pull/9846))
+-   Fix: fix single select in filterable dropdowns when editing [@shamoon](https://github.com/shamoon) ([#9834](https://github.com/paperless-ngx/paperless-ngx/pull/9834))
+-   Fix: always update classifier task result [@shamoon](https://github.com/shamoon) ([#9817](https://github.com/paperless-ngx/paperless-ngx/pull/9817))
+-   Fix: fix zoom increase/decrease buttons in FF [@shamoon](https://github.com/shamoon) ([#9761](https://github.com/paperless-ngx/paperless-ngx/pull/9761))
 
 ### Maintenance
 
@@ -25,6 +39,8 @@
 -   Chore: auto-generate translation strings [@shamoon](https://github.com/shamoon) ([#9462](https://github.com/paperless-ngx/paperless-ngx/pull/9462))
 -   Chore: add ymlfmt [@shamoon](https://github.com/shamoon) ([#9745](https://github.com/paperless-ngx/paperless-ngx/pull/9745))
 -   Chore: replace secretary with GHA [@shamoon](https://github.com/shamoon) ([#9723](https://github.com/paperless-ngx/paperless-ngx/pull/9723))
+-   Chore: resolve dynamic import warnings from pdfjs, again [@shamoon](https://github.com/shamoon) ([#9924](https://github.com/paperless-ngx/paperless-ngx/pull/9924))
+-   Fix/Chore: replace file drop package [@shamoon](https://github.com/shamoon) ([#9926](https://github.com/paperless-ngx/paperless-ngx/pull/9926))
 
 ### Dependencies
 
