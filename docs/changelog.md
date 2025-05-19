@@ -1,5 +1,15 @@
 # Changelog
 
+## paperless-ngx 2.16.1
+
+### Bug Fixes
+
+-   Fix: fix created date filtering broken in 2.16.0 [@shamoon](https://github.com/shamoon) ([#9976](https://github.com/paperless-ngx/paperless-ngx/pull/9976))
+
+### All App Changes
+
+-   Fix: fix created date filtering broken in 2.16.0 [@shamoon](https://github.com/shamoon) ([#9976](https://github.com/paperless-ngx/paperless-ngx/pull/9976))
+
 ## paperless-ngx 2.16.0
 
 ### Breaking Changes
