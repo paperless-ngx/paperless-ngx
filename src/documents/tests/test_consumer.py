@@ -1174,12 +1174,16 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                 m.assert_called_once()
 
     @mock.patch("documents.consumer.run_subprocess")
-    def test_post_consume_script_with_correspondent(self, m):
+    def test_post_consume_script_with_correspondent_and_type(self, m):
         with tempfile.NamedTemporaryFile() as script:
             with override_settings(POST_CONSUME_SCRIPT=script.name):
                 c = Correspondent.objects.create(name="my_bank")
+                t = DocumentType.objects.create(
+                    name="Test type",
+                )
                 doc = Document.objects.create(
                     title="Test",
+                    document_type=t,
                     mime_type="application/pdf",
                     correspondent=c,
                 )
@@ -1207,6 +1211,7 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
 
                 subset = {
                     "DOCUMENT_ID": str(doc.pk),
+                    "DOCUMENT_TYPE": "Test type",
                     "DOCUMENT_DOWNLOAD_URL": f"/api/documents/{doc.pk}/download/",
                     "DOCUMENT_THUMBNAIL_URL": f"/api/documents/{doc.pk}/thumb/",
                     "DOCUMENT_CORRESPONDENT": "my_bank",
