@@ -87,7 +87,7 @@ class TestFuzzyMatchCommand(TestCase):
             filename="other_test.pdf",
         )
         stdout, _ = self.call_command()
-        self.assertIn("No matches found", stdout)
+        self.assertEqual(stdout, "No matches found\n")
 
     def test_with_matches(self):
         """
@@ -116,7 +116,7 @@ class TestFuzzyMatchCommand(TestCase):
             filename="other_test.pdf",
         )
         stdout, _ = self.call_command("--processes", "1")
-        self.assertRegex(stdout, self.MSG_REGEX)
+        self.assertRegex(stdout, self.MSG_REGEX + "\n")
 
     def test_with_3_matches(self):
         """
@@ -152,10 +152,11 @@ class TestFuzzyMatchCommand(TestCase):
             filename="final_test.pdf",
         )
         stdout, _ = self.call_command()
-        lines = [x.strip() for x in stdout.splitlines() if x.strip()]
+        lines = [x.strip() for x in stdout.split("\n") if len(x.strip())]
         self.assertEqual(len(lines), 3)
-        for line in lines:
-            self.assertRegex(line, self.MSG_REGEX)
+        self.assertRegex(lines[0], self.MSG_REGEX)
+        self.assertRegex(lines[1], self.MSG_REGEX)
+        self.assertRegex(lines[2], self.MSG_REGEX)
 
     def test_document_deletion(self):
         """
@@ -196,12 +197,14 @@ class TestFuzzyMatchCommand(TestCase):
 
         stdout, _ = self.call_command("--delete")
 
-        self.assertIn(
+        lines = [x.strip() for x in stdout.split("\n") if len(x.strip())]
+        self.assertEqual(len(lines), 3)
+        self.assertEqual(
+            lines[0],
             "The command is configured to delete documents.  Use with caution",
-            stdout,
         )
-        self.assertRegex(stdout, self.MSG_REGEX)
-        self.assertIn("Deleting 1 documents based on ratio matches", stdout)
+        self.assertRegex(lines[1], self.MSG_REGEX)
+        self.assertEqual(lines[2], "Deleting 1 documents based on ratio matches")
 
         self.assertEqual(Document.objects.count(), 2)
         self.assertIsNotNone(Document.objects.get(pk=1))
