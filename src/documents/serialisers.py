@@ -21,6 +21,7 @@ from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 from drf_spectacular.utils import extend_schema_field
+from drf_spectacular.utils import extend_schema_serializer
 from drf_writable_nested.serializers import NestedUpdateMixin
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import get_users_with_perms
@@ -891,6 +892,9 @@ class NotesSerializer(serializers.ModelSerializer):
         return ret
 
 
+@extend_schema_serializer(
+    deprecate_fields=["created_date"],
+)
 class DocumentSerializer(
     OwnedObjectSerializer,
     NestedUpdateMixin,
