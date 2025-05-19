@@ -943,6 +943,22 @@ class DocumentSerializer(
         doc = super().to_representation(instance)
         if self.truncate_content and "content" in self.fields:
             doc["content"] = doc.get("content")[0:550]
+
+        request = self.context.get("request")
+        api_version = int(
+            request.version if request else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
+        )
+
+        if api_version < 9:
+            # provide created as a datetime for backwards compatibility
+            from django.utils import timezone
+
+            doc["created"] = timezone.make_aware(
+                datetime.combine(
+                    instance.created,
+                    datetime.min.time(),
+                ),
+            ).isoformat()
         return doc
 
     def validate(self, attrs):
@@ -968,6 +984,9 @@ class DocumentSerializer(
             instance.created = validated_data.get("created_date")
             instance.save()
         if "created_date" in validated_data:
+            logger.warning(
+                "created_date is deprecated, use created instead",
+            )
             validated_data.pop("created_date")
         if instance.custom_fields.count() > 0 and "custom_fields" in validated_data:
             incoming_custom_fields = [
