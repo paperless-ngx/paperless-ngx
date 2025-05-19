@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-19 16:38+0000\n"
-"PO-Revision-Date: 2025-05-19 16:42\n"
+"POT-Creation-Date: 2025-05-19 20:52+0000\n"
+"PO-Revision-Date: 2025-05-19 20:54\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Documents"
 
-#: documents/filters.py:383
+#: documents/filters.py:384
 msgid "Value must be valid JSON."
 msgstr "La valeur doit être un JSON valide."
 
-#: documents/filters.py:402
+#: documents/filters.py:403
 msgid "Invalid custom field query expression"
 msgstr "Requête sur un champ personnalisé invalide"
 
-#: documents/filters.py:412
+#: documents/filters.py:413
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Liste d'expressions invalide. Doit être non vide."
 
-#: documents/filters.py:433
+#: documents/filters.py:434
 msgid "Invalid logical operator {op!r}"
 msgstr "Opérateur logique {op!r} invalide"
 
-#: documents/filters.py:447
+#: documents/filters.py:448
 msgid "Maximum number of query conditions exceeded."
 msgstr "Nombre maximum de conditions de requête dépassé."
 
-#: documents/filters.py:512
+#: documents/filters.py:513
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} n'est pas un champ personnalisé valide."
 
-#: documents/filters.py:549
+#: documents/filters.py:550
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} ne supporte pas l'expression {expr!r}."
 
-#: documents/filters.py:657
+#: documents/filters.py:658
 msgid "Maximum nesting depth exceeded."
 msgstr "Profondeur de récursion maximale dépassée."
 
-#: documents/filters.py:849
+#: documents/filters.py:843
 msgid "Custom field not found"
 msgstr "Champ personnalisé non trouvé"
 

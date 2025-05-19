@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-19 16:38+0000\n"
-"PO-Revision-Date: 2025-05-19 16:42\n"
+"POT-Creation-Date: 2025-05-19 20:52+0000\n"
+"PO-Revision-Date: 2025-05-19 20:54\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "文档"
 
-#: documents/filters.py:383
+#: documents/filters.py:384
 msgid "Value must be valid JSON."
 msgstr "值必须是有效的 JSON 格式。"
 
-#: documents/filters.py:402
+#: documents/filters.py:403
 msgid "Invalid custom field query expression"
 msgstr "无效的自定义字段查询表达式"
 
-#: documents/filters.py:412
+#: documents/filters.py:413
 msgid "Invalid expression list. Must be nonempty."
 msgstr "无效的表达式列表。必须不为空。"
 
-#: documents/filters.py:433
+#: documents/filters.py:434
 msgid "Invalid logical operator {op!r}"
 msgstr "无效的逻辑运算符 {op!r}"
 
-#: documents/filters.py:447
+#: documents/filters.py:448
 msgid "Maximum number of query conditions exceeded."
 msgstr "超出查询条件的最大数量。"
 
-#: documents/filters.py:512
+#: documents/filters.py:513
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} 不是一个有效的自定义字段。"
 
-#: documents/filters.py:549
+#: documents/filters.py:550
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} 不支持查询表达式 {expr!r}。"
 
-#: documents/filters.py:657
+#: documents/filters.py:658
 msgid "Maximum nesting depth exceeded."
 msgstr "超出最大嵌套深度。"
 
-#: documents/filters.py:849
+#: documents/filters.py:843
 msgid "Custom field not found"
 msgstr "Custom field not found"
 
