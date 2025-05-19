@@ -21,6 +21,7 @@ from django.db.models import Value
 from django.db.models import When
 from django.db.models.functions import Cast
 from django.utils.translation import gettext_lazy as _
+from django_filters import DateFilter
 from django_filters.rest_framework import BooleanFilter
 from django_filters.rest_framework import Filter
 from django_filters.rest_framework import FilterSet
@@ -741,17 +742,10 @@ class DocumentFilterSet(FilterSet):
     mime_type = MimeTypeFilter()
 
     # Backwards compatibility
-    created__date__gt = Filter(
-        field_name="created",
-        label="Created after",
-        lookup_expr="gt",
-    )
-
-    created__date__lt = Filter(
-        field_name="created",
-        label="Created before",
-        lookup_expr="lt",
-    )
+    created__date__gt = DateFilter(field_name="created", lookup_expr="gt")
+    created__date__gte = DateFilter(field_name="created", lookup_expr="gte")
+    created__date__lt = DateFilter(field_name="created", lookup_expr="lt")
+    created__date__lte = DateFilter(field_name="created", lookup_expr="lte")
 
     class Meta:
         model = Document
