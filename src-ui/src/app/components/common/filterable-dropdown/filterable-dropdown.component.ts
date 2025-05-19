@@ -586,6 +586,8 @@ export class FilterableDropdownComponent
         this.selectionModel.reset()
         this.modelIsDirty = false
       }
+      this.selectionModel.singleSelect =
+        this.editing && !this.selectionModel.manyToOne
       this.opened.next(this)
     } else {
       if (this.creating) {

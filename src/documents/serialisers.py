@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import datetime
 import logging
 import math
 import re
-import zoneinfo
+from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
@@ -22,6 +21,7 @@ from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 from drf_spectacular.utils import extend_schema_field
+from drf_spectacular.utils import extend_schema_serializer
 from drf_writable_nested.serializers import NestedUpdateMixin
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import get_users_with_perms
@@ -423,7 +423,7 @@ class OwnedObjectListSerializer(serializers.ListSerializer):
 
 
 class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
-    last_correspondence = serializers.DateTimeField(read_only=True, required=False)
+    last_correspondence = serializers.DateField(read_only=True, required=False)
 
     class Meta:
         model = Correspondent
@@ -885,13 +885,16 @@ class NotesSerializer(serializers.ModelSerializer):
             request.version if request else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
         )
 
-        if api_version < 8:
+        if api_version < 8 and "user" in ret:
             user_id = ret["user"]["id"]
             ret["user"] = user_id
 
         return ret
 
 
+@extend_schema_serializer(
+    deprecate_fields=["created_date"],
+)
 class DocumentSerializer(
     OwnedObjectSerializer,
     NestedUpdateMixin,
@@ -944,6 +947,22 @@ class DocumentSerializer(
         doc = super().to_representation(instance)
         if self.truncate_content and "content" in self.fields:
             doc["content"] = doc.get("content")[0:550]
+
+        request = self.context.get("request")
+        api_version = int(
+            request.version if request else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
+        )
+
+        if api_version < 9:
+            # provide created as a datetime for backwards compatibility
+            from django.utils import timezone
+
+            doc["created"] = timezone.make_aware(
+                datetime.combine(
+                    instance.created,
+                    datetime.min.time(),
+                ),
+            ).isoformat()
         return doc
 
     def validate(self, attrs):
@@ -966,13 +985,12 @@ class DocumentSerializer(
 
     def update(self, instance: Document, validated_data):
         if "created_date" in validated_data and "created" not in validated_data:
-            new_datetime = datetime.datetime.combine(
-                validated_data.get("created_date"),
-                datetime.time(0, 0, 0, 0, zoneinfo.ZoneInfo(settings.TIME_ZONE)),
-            )
-            instance.created = new_datetime
+            instance.created = validated_data.get("created_date")
             instance.save()
         if "created_date" in validated_data:
+            logger.warning(
+                "created_date is deprecated, use created instead",
+            )
             validated_data.pop("created_date")
         if instance.custom_fields.count() > 0 and "custom_fields" in validated_data:
             incoming_custom_fields = [
@@ -1645,6 +1663,11 @@ class PostDocumentSerializer(serializers.Serializer):
             return [custom_field.id for custom_field in custom_fields]
         else:
             return None
+
+    def validate_created(self, created):
+        # support datetime format for created for backwards compatibility
+        if isinstance(created, datetime):
+            return created.date()
 
 
 class BulkDownloadSerializer(DocumentListSerializer):

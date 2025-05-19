@@ -5,7 +5,7 @@
       <trans-unit id="ngb.alert.close" datatype="html">
         <source>Close</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/alert/alert.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/alert/alert.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
         <target state="translated">닫기</target>
@@ -13,7 +13,7 @@
       <trans-unit id="ngb.carousel.slide-number" datatype="html">
         <source> Slide <x id="INTERPOLATION" equiv-text="ueryList&lt;NgbSli"/> of <x id="INTERPOLATION_1" equiv-text="EventSource = N"/> </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/carousel/carousel.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/carousel/carousel.ts</context>
           <context context-type="linenumber">132,136</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
@@ -22,27 +22,27 @@
       <trans-unit id="ngb.carousel.previous" datatype="html">
         <source>Previous</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/carousel/carousel.ts</context>
-          <context context-type="linenumber">156,160</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/carousel/carousel.ts</context>
+          <context context-type="linenumber">158,160</context>
         </context-group>
         <target state="translated">이전</target>
       </trans-unit>
       <trans-unit id="ngb.carousel.next" datatype="html">
         <source>Next</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/carousel/carousel.ts</context>
-          <context context-type="linenumber">196,199</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/carousel/carousel.ts</context>
+          <context context-type="linenumber">199</context>
         </context-group>
         <target state="translated">다음</target>
       </trans-unit>
       <trans-unit id="ngb.datepicker.previous-month" datatype="html">
         <source>Previous month</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">77,79</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">102</context>
         </context-group>
         <target state="translated">지난달</target>
@@ -50,11 +50,11 @@
       <trans-unit id="ngb.datepicker.next-month" datatype="html">
         <source>Next month</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">102</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">102</context>
         </context-group>
         <target state="translated">다음 달</target>
@@ -62,7 +62,7 @@
       <trans-unit id="ngb.timepicker.HH" datatype="html">
         <source>HH</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">시</target>
@@ -70,7 +70,7 @@
       <trans-unit id="ngb.toast.close-aria" datatype="html">
         <source>Close</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">닫기</target>
@@ -78,11 +78,11 @@
       <trans-unit id="ngb.datepicker.select-month" datatype="html">
         <source>Select month</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">월 선택</target>
@@ -90,7 +90,7 @@
       <trans-unit id="ngb.pagination.first" datatype="html">
         <source>««</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">««</target>
@@ -98,7 +98,7 @@
       <trans-unit id="ngb.timepicker.hours" datatype="html">
         <source>Hours</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">시간</target>
@@ -106,7 +106,7 @@
       <trans-unit id="ngb.pagination.previous" datatype="html">
         <source>«</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated"/>
@@ -114,7 +114,7 @@
       <trans-unit id="ngb.timepicker.MM" datatype="html">
         <source>MM</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">MM</target>
@@ -122,7 +122,7 @@
       <trans-unit id="ngb.pagination.next" datatype="html">
         <source>»</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">»</target>
@@ -130,11 +130,11 @@
       <trans-unit id="ngb.datepicker.select-year" datatype="html">
         <source>Select year</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">연도 선택</target>
@@ -142,7 +142,7 @@
       <trans-unit id="ngb.timepicker.minutes" datatype="html">
         <source>Minutes</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">분</target>
@@ -150,7 +150,7 @@
       <trans-unit id="ngb.pagination.last" datatype="html">
         <source>»»</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">»»</target>
@@ -158,7 +158,7 @@
       <trans-unit id="ngb.pagination.first-aria" datatype="html">
         <source>First</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">처음</target>
@@ -166,7 +166,7 @@
       <trans-unit id="ngb.timepicker.increment-hours" datatype="html">
         <source>Increment hours</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">시간 증가</target>
@@ -174,7 +174,7 @@
       <trans-unit id="ngb.pagination.previous-aria" datatype="html">
         <source>Previous</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">이전</target>
@@ -182,7 +182,7 @@
       <trans-unit id="ngb.timepicker.decrement-hours" datatype="html">
         <source>Decrement hours</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">감소 시간</target>
@@ -190,7 +190,7 @@
       <trans-unit id="ngb.pagination.next-aria" datatype="html">
         <source>Next</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">다음</target>
@@ -198,7 +198,7 @@
       <trans-unit id="ngb.timepicker.increment-minutes" datatype="html">
         <source>Increment minutes</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">분 단위 증가</target>
@@ -206,7 +206,7 @@
       <trans-unit id="ngb.pagination.last-aria" datatype="html">
         <source>Last</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">마지막</target>
@@ -214,7 +214,7 @@
       <trans-unit id="ngb.timepicker.decrement-minutes" datatype="html">
         <source>Decrement minutes</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">분 감소</target>
@@ -222,7 +222,7 @@
       <trans-unit id="ngb.timepicker.SS" datatype="html">
         <source>SS</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">SS</target>
@@ -230,7 +230,7 @@
       <trans-unit id="ngb.timepicker.seconds" datatype="html">
         <source>Seconds</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">초</target>
@@ -238,7 +238,7 @@
       <trans-unit id="ngb.timepicker.increment-seconds" datatype="html">
         <source>Increment seconds</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">초 단위 증가</target>
@@ -246,7 +246,7 @@
       <trans-unit id="ngb.timepicker.decrement-seconds" datatype="html">
         <source>Decrement seconds</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">초 단위로 감소</target>
@@ -256,7 +256,7 @@
           <x id="INTERPOLATION"/>
         </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
@@ -265,7 +265,7 @@
           <x id="INTERPOLATION" equiv-text="barConfig);  pu"/>
         </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.4_@angular+core@19.2.4_rxjs@7.8._7cb86cab255ede976b272d2c2294ed3c/node_modules/src/progressbar/progressbar.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.9_@angular+core@19.2.9_rxjs@7.8._9d4942db4d21b78bcb41ee657ee833ea/node_modules/src/progressbar/progressbar.ts</context>
           <context context-type="linenumber">41,42</context>
         </context-group>
         <target state="needs-translation"><x id="INTERPOLATION" equiv-text="barConfig);  pu"/></target>
@@ -1410,19 +1410,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">201</context>
+          <context context-type="linenumber">209</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">220</context>
+          <context context-type="linenumber">228</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">287</context>
+          <context context-type="linenumber">295</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">306</context>
+          <context context-type="linenumber">314</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
@@ -1446,19 +1446,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">209</context>
+          <context context-type="linenumber">217</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">228</context>
+          <context context-type="linenumber">236</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">295</context>
+          <context context-type="linenumber">303</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">314</context>
+          <context context-type="linenumber">322</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
@@ -1486,11 +1486,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">234</context>
+          <context context-type="linenumber">242</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">320</context>
+          <context context-type="linenumber">328</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/permissions/permissions-form/permissions-form.component.html</context>
@@ -2746,19 +2746,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">966</context>
+          <context context-type="linenumber">986</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1326</context>
+          <context context-type="linenumber">1347</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1365</context>
+          <context context-type="linenumber">1386</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1406</context>
+          <context context-type="linenumber">1427</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3426,7 +3426,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">919</context>
+          <context context-type="linenumber">939</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3694,7 +3694,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1383</context>
+          <context context-type="linenumber">1404</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
@@ -4002,7 +4002,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">163</context>
+          <context context-type="linenumber">171</context>
         </context-group>
         <target state="translated">대소문자 구분 안 함</target>
       </trans-unit>
@@ -4482,7 +4482,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">188</context>
+          <context context-type="linenumber">196</context>
         </context-group>
         <target state="translated">이 문서 유형 지정</target>
       </trans-unit>
@@ -4502,7 +4502,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">189</context>
+          <context context-type="linenumber">197</context>
         </context-group>
         <target state="translated">에서 통신원을 지정합니다.</target>
       </trans-unit>
@@ -5074,15 +5074,23 @@
         <source>Offset days</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">126</context>
+          <context context-type="linenumber">128</context>
         </context-group>
         <target state="translated">오프셋 날짜</target>
+      </trans-unit>
+      <trans-unit id="1488741788768120127" datatype="html">
+        <source>Positive values will trigger the workflow before the date, negative values after.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
+          <context context-type="linenumber">132</context>
+        </context-group>
+        <target state="needs-translation">Positive values will trigger the workflow before the date, negative values after.</target>
       </trans-unit>
       <trans-unit id="3726450101884717309" datatype="html">
         <source>Relative to</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">129</context>
+          <context context-type="linenumber">137</context>
         </context-group>
         <target state="translated">상대적</target>
       </trans-unit>
@@ -5090,7 +5098,7 @@
         <source>Custom field</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">133</context>
+          <context context-type="linenumber">141</context>
         </context-group>
         <target state="translated">사용자 정의 필드</target>
       </trans-unit>
@@ -5098,7 +5106,7 @@
         <source>Custom field to use for date.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">133</context>
+          <context context-type="linenumber">141</context>
         </context-group>
         <target state="translated">날짜에 사용할 사용자 지정 필드입니다.</target>
       </trans-unit>
@@ -5106,7 +5114,7 @@
         <source>Recurring</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">139</context>
+          <context context-type="linenumber">147</context>
         </context-group>
         <target state="translated">반복</target>
       </trans-unit>
@@ -5114,7 +5122,7 @@
         <source>Trigger is recurring.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">139</context>
+          <context context-type="linenumber">147</context>
         </context-group>
         <target state="translated">트리거가 반복되고 있습니다.</target>
       </trans-unit>
@@ -5122,7 +5130,7 @@
         <source>Recurring interval days</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">143</context>
+          <context context-type="linenumber">151</context>
         </context-group>
         <target state="translated">반복 간격일</target>
       </trans-unit>
@@ -5130,7 +5138,7 @@
         <source>Repeat the trigger every n days.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">143</context>
+          <context context-type="linenumber">151</context>
         </context-group>
         <target state="translated">n일마다 트리거를 반복합니다.</target>
       </trans-unit>
@@ -5138,7 +5146,7 @@
         <source>Trigger for documents that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> filters specified below.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">148</context>
+          <context context-type="linenumber">156</context>
         </context-group>
         <target state="translated">아래에 지정된 <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>모든<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> 필터와 일치하는 문서에 대해 트리거합니다.</target>
       </trans-unit>
@@ -5146,7 +5154,7 @@
         <source>Filter filename</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">151</context>
+          <context context-type="linenumber">159</context>
         </context-group>
         <target state="translated">파일 이름 필터</target>
       </trans-unit>
@@ -5154,7 +5162,7 @@
         <source>Apply to documents that match this filename. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">151</context>
+          <context context-type="linenumber">159</context>
         </context-group>
         <target state="translated">지정된 경우 파일 이름과 완전히 일치하는 문서만 사용합니다. *.pdf와 같은 와일드카드 또는 *invoice*와 같은 것이 허용됩니다. 대소문자를 구분하지 않습니다.</target>
       </trans-unit>
@@ -5162,7 +5170,7 @@
         <source>Filter sources</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">153</context>
+          <context context-type="linenumber">161</context>
         </context-group>
         <target state="translated">출처 필터</target>
       </trans-unit>
@@ -5170,7 +5178,7 @@
         <source>Filter path</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">154</context>
+          <context context-type="linenumber">162</context>
         </context-group>
         <target state="translated">필터 경로</target>
       </trans-unit>
@@ -5178,7 +5186,7 @@
         <source>Apply to documents that match this path. Wildcards specified as * are allowed. Case-normalized.&lt;/a&gt;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">154</context>
+          <context context-type="linenumber">162</context>
         </context-group>
         <target state="translated">이 경로와 일치하는 문서에 적용합니다. 와일드카드는 *로 지정할 수 있습니다. 대/소문자 정규화.&lt;/a&gt;</target>
       </trans-unit>
@@ -5186,7 +5194,7 @@
         <source>Filter mail rule</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">155</context>
+          <context context-type="linenumber">163</context>
         </context-group>
         <target state="translated">필터 메일 규칙</target>
       </trans-unit>
@@ -5194,7 +5202,7 @@
         <source>Apply to documents consumed via this mail rule.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">155</context>
+          <context context-type="linenumber">163</context>
         </context-group>
         <target state="translated">이 메일 규칙을 통해 사용되는 문서에 적용합니다.</target>
       </trans-unit>
@@ -5202,7 +5210,7 @@
         <source>Content matching algorithm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">158</context>
+          <context context-type="linenumber">166</context>
         </context-group>
         <target state="translated">콘텐츠 일치 알고리즘</target>
       </trans-unit>
@@ -5210,7 +5218,7 @@
         <source>Content matching pattern</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">160</context>
+          <context context-type="linenumber">168</context>
         </context-group>
         <target state="translated">콘텐츠 일치 패턴</target>
       </trans-unit>
@@ -5218,7 +5226,7 @@
         <source>Has any of tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">169</context>
+          <context context-type="linenumber">177</context>
         </context-group>
         <target state="translated">태그 중 하나라도 포함</target>
       </trans-unit>
@@ -5226,7 +5234,7 @@
         <source>Has correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">170</context>
+          <context context-type="linenumber">178</context>
         </context-group>
         <target state="translated">대응하는 사람이 있음</target>
       </trans-unit>
@@ -5234,7 +5242,7 @@
         <source>Has document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">171</context>
+          <context context-type="linenumber">179</context>
         </context-group>
         <target state="translated">문서 유형이 있음</target>
       </trans-unit>
@@ -5242,7 +5250,7 @@
         <source>Action type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">181</context>
+          <context context-type="linenumber">189</context>
         </context-group>
         <target state="translated">동작 유형</target>
       </trans-unit>
@@ -5250,7 +5258,7 @@
         <source>Assign title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">186</context>
+          <context context-type="linenumber">194</context>
         </context-group>
         <target state="translated">제목 지정</target>
       </trans-unit>
@@ -5258,7 +5266,7 @@
         <source>Can include some placeholders, see &lt;a target=&apos;_blank&apos; href=&apos;https://docs.paperless-ngx.com/usage/#workflows&apos;&gt;documentation&lt;/a&gt;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">186</context>
+          <context context-type="linenumber">194</context>
         </context-group>
         <target state="translated">일부 자리표시자를 포함할 수 있습니다. 자세한 내용은 &lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'&gt;문서&lt;/a&gt;를 참조하세요.</target>
       </trans-unit>
@@ -5266,7 +5274,7 @@
         <source>Assign tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">187</context>
+          <context context-type="linenumber">195</context>
         </context-group>
         <target state="translated">태그 할당</target>
       </trans-unit>
@@ -5274,7 +5282,7 @@
         <source>Assign storage path</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">190</context>
+          <context context-type="linenumber">198</context>
         </context-group>
         <target state="translated">이 저장 경로를 할당합니다.</target>
       </trans-unit>
@@ -5282,7 +5290,7 @@
         <source>Assign custom fields</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">191</context>
+          <context context-type="linenumber">199</context>
         </context-group>
         <target state="translated">사용자 지정 필드 할당</target>
       </trans-unit>
@@ -5290,7 +5298,7 @@
         <source>Assign owner</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">203</context>
         </context-group>
         <target state="translated">소유자 할당</target>
       </trans-unit>
@@ -5298,7 +5306,7 @@
         <source>Assign view permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">197</context>
+          <context context-type="linenumber">205</context>
         </context-group>
         <target state="translated">보기 권한 할당</target>
       </trans-unit>
@@ -5306,7 +5314,7 @@
         <source>Assign edit permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">216</context>
+          <context context-type="linenumber">224</context>
         </context-group>
         <target state="translated">편집 권한 할당</target>
       </trans-unit>
@@ -5314,7 +5322,7 @@
         <source>Remove tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">243</context>
+          <context context-type="linenumber">251</context>
         </context-group>
         <target state="translated">태그 제거</target>
       </trans-unit>
@@ -5322,31 +5330,31 @@
         <source>Remove all</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">244</context>
+          <context context-type="linenumber">252</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">250</context>
+          <context context-type="linenumber">258</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">256</context>
+          <context context-type="linenumber">264</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">262</context>
+          <context context-type="linenumber">270</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">268</context>
+          <context context-type="linenumber">276</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">275</context>
+          <context context-type="linenumber">283</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">281</context>
+          <context context-type="linenumber">289</context>
         </context-group>
         <target state="translated">모두 제거</target>
       </trans-unit>
@@ -5354,7 +5362,7 @@
         <source>Remove correspondents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">249</context>
+          <context context-type="linenumber">257</context>
         </context-group>
         <target state="translated">담당자 제거</target>
       </trans-unit>
@@ -5362,7 +5370,7 @@
         <source>Remove document types</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">255</context>
+          <context context-type="linenumber">263</context>
         </context-group>
         <target state="translated">모든 문서 유형 제거</target>
       </trans-unit>
@@ -5370,7 +5378,7 @@
         <source>Remove storage paths</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">261</context>
+          <context context-type="linenumber">269</context>
         </context-group>
         <target state="translated">모든 저장소 경로 제거</target>
       </trans-unit>
@@ -5378,7 +5386,7 @@
         <source>Remove custom fields</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">267</context>
+          <context context-type="linenumber">275</context>
         </context-group>
         <target state="translated">사용자 정의 필드 제거</target>
       </trans-unit>
@@ -5386,7 +5394,7 @@
         <source>Remove owners</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">274</context>
+          <context context-type="linenumber">282</context>
         </context-group>
         <target state="translated">소유자 제거</target>
       </trans-unit>
@@ -5394,7 +5402,7 @@
         <source>Remove permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">280</context>
+          <context context-type="linenumber">288</context>
         </context-group>
         <target state="translated">권한 제거</target>
       </trans-unit>
@@ -5402,7 +5410,7 @@
         <source>View permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">283</context>
+          <context context-type="linenumber">291</context>
         </context-group>
         <target state="translated">권한 보기</target>
       </trans-unit>
@@ -5410,7 +5418,7 @@
         <source>Edit permissions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">302</context>
+          <context context-type="linenumber">310</context>
         </context-group>
         <target state="translated">권한 수정</target>
       </trans-unit>
@@ -5418,7 +5426,7 @@
         <source>Email subject</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">330</context>
+          <context context-type="linenumber">338</context>
         </context-group>
         <target state="translated">이메일 제목</target>
       </trans-unit>
@@ -5426,7 +5434,7 @@
         <source>Email body</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">331</context>
+          <context context-type="linenumber">339</context>
         </context-group>
         <target state="translated">이메일 본문</target>
       </trans-unit>
@@ -5434,7 +5442,7 @@
         <source>Email recipients</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">332</context>
+          <context context-type="linenumber">340</context>
         </context-group>
         <target state="translated">이메일 수신자</target>
       </trans-unit>
@@ -5442,7 +5450,7 @@
         <source>Attach document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">333</context>
+          <context context-type="linenumber">341</context>
         </context-group>
         <target state="translated">문서 첨부</target>
       </trans-unit>
@@ -5450,7 +5458,7 @@
         <source>Webhook url</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">341</context>
+          <context context-type="linenumber">349</context>
         </context-group>
         <target state="translated">웹훅 URL</target>
       </trans-unit>
@@ -5458,7 +5466,7 @@
         <source>Use parameters for webhook body</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">343</context>
+          <context context-type="linenumber">351</context>
         </context-group>
         <target state="translated">웹훅 본문에 매개변수 사용</target>
       </trans-unit>
@@ -5466,7 +5474,7 @@
         <source>Send webhook payload as JSON</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">344</context>
+          <context context-type="linenumber">352</context>
         </context-group>
         <target state="needs-translation">Send webhook payload as JSON</target>
       </trans-unit>
@@ -5474,7 +5482,7 @@
         <source>Webhook params</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">347</context>
+          <context context-type="linenumber">355</context>
         </context-group>
         <target state="translated">웹훅 매개변수</target>
       </trans-unit>
@@ -5482,7 +5490,7 @@
         <source>Webhook body</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">349</context>
+          <context context-type="linenumber">357</context>
         </context-group>
         <target state="translated">웹훅 본문</target>
       </trans-unit>
@@ -5490,7 +5498,7 @@
         <source>Webhook headers</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">351</context>
+          <context context-type="linenumber">359</context>
         </context-group>
         <target state="translated">웹훅 헤더</target>
       </trans-unit>
@@ -5498,7 +5506,7 @@
         <source>Include document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
-          <context context-type="linenumber">352</context>
+          <context context-type="linenumber">360</context>
         </context-group>
         <target state="translated">문서 포함</target>
       </trans-unit>
@@ -7610,11 +7618,11 @@
         <source>Document &quot;<x id="PH" equiv-text="newValues.title"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">814</context>
+          <context context-type="linenumber">834</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">837</context>
+          <context context-type="linenumber">857</context>
         </context-group>
         <target state="needs-translation">Document "<x id="PH" equiv-text="newValues.title"/>" saved successfully.</target>
       </trans-unit>
@@ -7622,7 +7630,7 @@
         <source>Error saving document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">843</context>
+          <context context-type="linenumber">863</context>
         </context-group>
         <target state="needs-translation">Error saving document "<x id="PH" equiv-text="this.document.title"/>"</target>
       </trans-unit>
@@ -7630,7 +7638,7 @@
         <source>Error saving document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">888</context>
+          <context context-type="linenumber">908</context>
         </context-group>
         <target state="translated">문서를 저장하는데 오류가 발생하였습니다.</target>
       </trans-unit>
@@ -7638,7 +7646,7 @@
         <source>Do you really want to move the document &quot;<x id="PH" equiv-text="this.document.title"/>&quot; to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">920</context>
+          <context context-type="linenumber">940</context>
         </context-group>
         <target state="translated">"<x id="PH" equiv-text="this.document.title"/>" 문서를 휴지통으로 정말 옮기시겠습니까?</target>
       </trans-unit>
@@ -7646,7 +7654,7 @@
         <source>Documents can be restored prior to permanent deletion.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">921</context>
+          <context context-type="linenumber">941</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7658,7 +7666,7 @@
         <source>Move to trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">923</context>
+          <context context-type="linenumber">943</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7670,7 +7678,7 @@
         <source>Error deleting document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">942</context>
+          <context context-type="linenumber">962</context>
         </context-group>
         <target state="translated">문서 삭제 오류</target>
       </trans-unit>
@@ -7678,7 +7686,7 @@
         <source>Reprocess confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">962</context>
+          <context context-type="linenumber">982</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7690,7 +7698,7 @@
         <source>This operation will permanently recreate the archive file for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">963</context>
+          <context context-type="linenumber">983</context>
         </context-group>
         <target state="translated">이 작업을 수행하면 이 문서의 아카이브 파일이 영구적으로 다시 생성됩니다.</target>
       </trans-unit>
@@ -7698,7 +7706,7 @@
         <source>The archive file will be re-generated with the current settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">964</context>
+          <context context-type="linenumber">984</context>
         </context-group>
         <target state="translated">아카이브 파일은 현재 설정으로 다시 생성됩니다.</target>
       </trans-unit>
@@ -7706,7 +7714,7 @@
         <source>Reprocess operation for &quot;<x id="PH" equiv-text="this.document.title"/>&quot; will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">974</context>
+          <context context-type="linenumber">994</context>
         </context-group>
         <target state="needs-translation">Reprocess operation for "<x id="PH" equiv-text="this.document.title"/>" will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</target>
       </trans-unit>
@@ -7714,7 +7722,7 @@
         <source>Error executing operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">985</context>
+          <context context-type="linenumber">1005</context>
         </context-group>
         <target state="translated">작업 수행중 오류가 발생하였습니다.</target>
       </trans-unit>
@@ -7722,7 +7730,7 @@
         <source>Error downloading document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1034</context>
+          <context context-type="linenumber">1054</context>
         </context-group>
         <target state="needs-translation">Error downloading document</target>
       </trans-unit>
@@ -7730,7 +7738,7 @@
         <source>Page Fit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1113</context>
+          <context context-type="linenumber">1131</context>
         </context-group>
         <target state="translated">페이지 맞춤</target>
       </trans-unit>
@@ -7738,7 +7746,7 @@
         <source>Split confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1324</context>
+          <context context-type="linenumber">1345</context>
         </context-group>
         <target state="translated">분할 확인</target>
       </trans-unit>
@@ -7746,7 +7754,7 @@
         <source>This operation will split the selected document(s) into new documents.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1325</context>
+          <context context-type="linenumber">1346</context>
         </context-group>
         <target state="translated">이 작업을 수행하면 선택한 문서가 새 문서로 분할됩니다.</target>
       </trans-unit>
@@ -7754,7 +7762,7 @@
         <source>Split operation for &quot;<x id="PH" equiv-text="this.document.title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1341</context>
+          <context context-type="linenumber">1362</context>
         </context-group>
         <target state="needs-translation">Split operation for "<x id="PH" equiv-text="this.document.title"/>" will begin in the background.</target>
       </trans-unit>
@@ -7762,7 +7770,7 @@
         <source>Error executing split operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1350</context>
+          <context context-type="linenumber">1371</context>
         </context-group>
         <target state="translated">분할 작업 실행 중 오류 발생</target>
       </trans-unit>
@@ -7770,7 +7778,7 @@
         <source>Rotate confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1363</context>
+          <context context-type="linenumber">1384</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7782,7 +7790,7 @@
         <source>This operation will permanently rotate the original version of the current document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1364</context>
+          <context context-type="linenumber">1385</context>
         </context-group>
         <target state="translated">이 작업을 수행하면 현재 문서의 원본 버전이 영구적으로 회전합니다.</target>
       </trans-unit>
@@ -7790,7 +7798,7 @@
         <source>Rotation of &quot;<x id="PH" equiv-text="this.document.title"/>&quot; will begin in the background. Close and re-open the document after the operation has completed to see the changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1380</context>
+          <context context-type="linenumber">1401</context>
         </context-group>
         <target state="needs-translation">Rotation of "<x id="PH" equiv-text="this.document.title"/>" will begin in the background. Close and re-open the document after the operation has completed to see the changes.</target>
       </trans-unit>
@@ -7798,7 +7806,7 @@
         <source>Error executing rotate operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1392</context>
+          <context context-type="linenumber">1413</context>
         </context-group>
         <target state="translated">회전 작업 실행 중 오류 발생</target>
       </trans-unit>
@@ -7806,7 +7814,7 @@
         <source>Delete pages confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1404</context>
+          <context context-type="linenumber">1425</context>
         </context-group>
         <target state="translated">페이지 삭제 확인</target>
       </trans-unit>
@@ -7814,7 +7822,7 @@
         <source>This operation will permanently delete the selected pages from the original document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1405</context>
+          <context context-type="linenumber">1426</context>
         </context-group>
         <target state="translated">이 작업을 수행하면 원본 문서에서 선택한 페이지가 영구적으로 삭제됩니다.</target>
       </trans-unit>
@@ -7822,7 +7830,7 @@
         <source>Delete pages operation for &quot;<x id="PH" equiv-text="this.document.title"/>&quot; will begin in the background. Close and re-open or reload this document after the operation has completed to see the changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1420</context>
+          <context context-type="linenumber">1441</context>
         </context-group>
         <target state="needs-translation">Delete pages operation for "<x id="PH" equiv-text="this.document.title"/>" will begin in the background. Close and re-open or reload this document after the operation has completed to see the changes.</target>
       </trans-unit>
@@ -7830,7 +7838,7 @@
         <source>Error executing delete pages operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1429</context>
+          <context context-type="linenumber">1450</context>
         </context-group>
         <target state="translated">페이지 삭제 작업 실행 중 오류 발생</target>
       </trans-unit>
@@ -7838,11 +7846,11 @@
         <source>An error occurred loading tiff: <x id="PH" equiv-text="err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1489</context>
+          <context context-type="linenumber">1510</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1493</context>
+          <context context-type="linenumber">1514</context>
         </context-group>
         <target state="translated">tiff를 로드하는 동안 오류가 발생했습니다:<x id="PH" equiv-text="err.toString()"/></target>
       </trans-unit>
@@ -8315,7 +8323,7 @@
         <target state="translated">노트 보기</target>
       </trans-unit>
       <trans-unit id="3727324658595204357" datatype="html">
-        <source>Created: <x id="INTERPOLATION" equiv-text="{{ document.created_date | customDate }}"/></source>
+        <source>Created: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate }}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">115,116</context>
@@ -8328,7 +8336,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">91,92</context>
         </context-group>
-        <target state="translated">생성됨:<x id="INTERPOLATION" equiv-text="{{ document.created_date | customDate }}"/></target>
+        <target state="needs-translation">Created: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="2030261243264601523" datatype="html">
         <source>Added: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></source>
@@ -8706,7 +8714,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">90</context>
+          <context context-type="linenumber">91</context>
         </context-group>
         <target state="translated">페이지</target>
       </trans-unit>
@@ -9094,9 +9102,21 @@
         <source>Initiating upload...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/file-drop/file-drop.component.ts</context>
-          <context context-type="linenumber">93</context>
+          <context context-type="linenumber">139</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/file-drop/file-drop.component.ts</context>
+          <context context-type="linenumber">148</context>
         </context-group>
         <target state="translated">업로드 시작 중...</target>
+      </trans-unit>
+      <trans-unit id="146335022760474171" datatype="html">
+        <source>Failed to read dropped items: <x id="PH" equiv-text="e.message"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/file-drop/file-drop.component.ts</context>
+          <context context-type="linenumber">144</context>
+        </context-group>
+        <target state="needs-translation">Failed to read dropped items: <x id="PH" equiv-text="e.message"/></target>
       </trans-unit>
       <trans-unit id="6316128875819022658" datatype="html">
         <source>correspondent</source>
@@ -10239,11 +10259,19 @@
         </context-group>
         <target state="translated">OCR 설정</target>
       </trans-unit>
+      <trans-unit id="7943546022633063836" datatype="html">
+        <source>Barcode Settings</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+        <target state="needs-translation">Barcode Settings</target>
+      </trans-unit>
       <trans-unit id="1313137480169642057" datatype="html">
         <source>Output Type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">76</context>
         </context-group>
         <target state="translated">출력 유형</target>
       </trans-unit>
@@ -10251,7 +10279,7 @@
         <source>Language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">84</context>
         </context-group>
         <target state="translated">언어</target>
       </trans-unit>
@@ -10259,7 +10287,7 @@
         <source>Mode</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">97</context>
+          <context context-type="linenumber">98</context>
         </context-group>
         <target state="translated">모드</target>
       </trans-unit>
@@ -10267,7 +10295,7 @@
         <source>Skip Archive File</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">105</context>
+          <context context-type="linenumber">106</context>
         </context-group>
         <target state="translated">아카이브 파일 건너뛰기</target>
       </trans-unit>
@@ -10275,7 +10303,7 @@
         <source>Image DPI</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">113</context>
+          <context context-type="linenumber">114</context>
         </context-group>
         <target state="translated">이미지 DPI</target>
       </trans-unit>
@@ -10283,7 +10311,7 @@
         <source>Clean</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">120</context>
+          <context context-type="linenumber">121</context>
         </context-group>
         <target state="translated">비우기</target>
       </trans-unit>
@@ -10291,7 +10319,7 @@
         <source>Deskew</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">128</context>
+          <context context-type="linenumber">129</context>
         </context-group>
         <target state="translated">기울기 보정</target>
       </trans-unit>
@@ -10299,7 +10327,7 @@
         <source>Rotate Pages</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">135</context>
+          <context context-type="linenumber">136</context>
         </context-group>
         <target state="translated">페이지 회전</target>
       </trans-unit>
@@ -10307,7 +10335,7 @@
         <source>Rotate Pages Threshold</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">142</context>
+          <context context-type="linenumber">143</context>
         </context-group>
         <target state="translated">페이지 회전 임계값</target>
       </trans-unit>
@@ -10315,7 +10343,7 @@
         <source>Max Image Pixels</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">149</context>
+          <context context-type="linenumber">150</context>
         </context-group>
         <target state="translated">최대 이미지 픽셀</target>
       </trans-unit>
@@ -10323,7 +10351,7 @@
         <source>Color Conversion Strategy</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">156</context>
+          <context context-type="linenumber">157</context>
         </context-group>
         <target state="translated">색상 변환 전략</target>
       </trans-unit>
@@ -10331,7 +10359,7 @@
         <source>OCR Arguments</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">164</context>
+          <context context-type="linenumber">165</context>
         </context-group>
         <target state="translated">OCR 인수</target>
       </trans-unit>
@@ -10339,7 +10367,7 @@
         <source>Application Logo</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">171</context>
+          <context context-type="linenumber">172</context>
         </context-group>
         <target state="translated">애플리케이션 로고</target>
       </trans-unit>
@@ -10347,9 +10375,97 @@
         <source>Application Title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">178</context>
+          <context context-type="linenumber">179</context>
         </context-group>
         <target state="translated">애플리케이션 제목</target>
+      </trans-unit>
+      <trans-unit id="4763207540517250026" datatype="html">
+        <source>Enable Barcodes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">186</context>
+        </context-group>
+        <target state="needs-translation">Enable Barcodes</target>
+      </trans-unit>
+      <trans-unit id="5111693440737450705" datatype="html">
+        <source>Enable TIFF Support</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">193</context>
+        </context-group>
+        <target state="needs-translation">Enable TIFF Support</target>
+      </trans-unit>
+      <trans-unit id="7024102701648099736" datatype="html">
+        <source>Barcode String</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">200</context>
+        </context-group>
+        <target state="needs-translation">Barcode String</target>
+      </trans-unit>
+      <trans-unit id="5496493538285104278" datatype="html">
+        <source>Retain Split Pages</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">207</context>
+        </context-group>
+        <target state="needs-translation">Retain Split Pages</target>
+      </trans-unit>
+      <trans-unit id="3585266363073659539" datatype="html">
+        <source>Enable ASN</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">214</context>
+        </context-group>
+        <target state="needs-translation">Enable ASN</target>
+      </trans-unit>
+      <trans-unit id="2563883192247717052" datatype="html">
+        <source>ASN Prefix</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">221</context>
+        </context-group>
+        <target state="needs-translation">ASN Prefix</target>
+      </trans-unit>
+      <trans-unit id="876335624277968161" datatype="html">
+        <source>Upscale</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">228</context>
+        </context-group>
+        <target state="needs-translation">Upscale</target>
+      </trans-unit>
+      <trans-unit id="3330040801415354394" datatype="html">
+        <source>DPI</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">235</context>
+        </context-group>
+        <target state="needs-translation">DPI</target>
+      </trans-unit>
+      <trans-unit id="2056636654483201493" datatype="html">
+        <source>Max Pages</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">242</context>
+        </context-group>
+        <target state="needs-translation">Max Pages</target>
+      </trans-unit>
+      <trans-unit id="7410804727457548947" datatype="html">
+        <source>Enable Tag Detection</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">249</context>
+        </context-group>
+        <target state="needs-translation">Enable Tag Detection</target>
+      </trans-unit>
+      <trans-unit id="3723784143052004117" datatype="html">
+        <source>Tag Mapping</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">256</context>
+        </context-group>
+        <target state="needs-translation">Tag Mapping</target>
       </trans-unit>
       <trans-unit id="5948496158474272829" datatype="html">
         <source>Warning: You have unsaved changes to your document(s).</source>
@@ -10883,7 +10999,7 @@
         <source>Connecting...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">27</context>
         </context-group>
         <target state="translated">연결중...</target>
       </trans-unit>
@@ -10891,7 +11007,7 @@
         <source>Uploading...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
-          <context context-type="linenumber">55</context>
+          <context context-type="linenumber">39</context>
         </context-group>
         <target state="translated">업로드 중...</target>
       </trans-unit>
@@ -10899,7 +11015,7 @@
         <source>Upload complete, waiting...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
-          <context context-type="linenumber">58</context>
+          <context context-type="linenumber">42</context>
         </context-group>
         <target state="translated">업로드 완료, 잠시만 기다려주세요...</target>
       </trans-unit>
@@ -10907,7 +11023,7 @@
         <source>HTTP error: <x id="PH" equiv-text="error.status"/> <x id="PH_1" equiv-text="error.statusText"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
-          <context context-type="linenumber">71</context>
+          <context context-type="linenumber">55</context>
         </context-group>
         <target state="translated">HTTP 에러: <x id="PH" equiv-text="error.status"/> <x id="PH_1" equiv-text="error.statusText"/></target>
       </trans-unit>
@@ -10915,7 +11031,7 @@
         <source>Document already exists.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">23</context>
+          <context context-type="linenumber">24</context>
         </context-group>
         <target state="translated">문서가 이미 존재합니다.</target>
       </trans-unit>
@@ -10923,7 +11039,7 @@
         <source>Document already exists. Note: existing document is in the trash.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">25</context>
         </context-group>
         <target state="translated">문서가 이미 존재합니다. 참고: 기존 문서는 휴지통에 있습니다.</target>
       </trans-unit>
@@ -10931,7 +11047,7 @@
         <source>Document with ASN already exists.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">25</context>
+          <context context-type="linenumber">26</context>
         </context-group>
         <target state="translated">ASN이 포함된 문서가 이미 존재합니다.</target>
       </trans-unit>
@@ -10939,7 +11055,7 @@
         <source>Document with ASN already exists. Note: existing document is in the trash.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">26</context>
+          <context context-type="linenumber">27</context>
         </context-group>
         <target state="translated">ASN이 포함된 문서가 이미 존재합니다. 참고: 기존 문서는 휴지통에 있습니다.</target>
       </trans-unit>
@@ -10947,7 +11063,7 @@
         <source>File not found.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">27</context>
+          <context context-type="linenumber">28</context>
         </context-group>
         <target state="translated">파일을 찾지 못함.</target>
       </trans-unit>
@@ -10955,7 +11071,7 @@
         <source>Pre-consume script does not exist.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">29</context>
         </context-group>
         <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
         <target state="translated">사전 사용 스크립트가 존재하지 않습니다.</target>
@@ -10964,7 +11080,7 @@
         <source>Error while executing pre-consume script.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">29</context>
+          <context context-type="linenumber">30</context>
         </context-group>
         <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
         <target state="translated">사전 소비 스크립트를 실행하는 동안 오류가 발생했습니다.</target>
@@ -10973,7 +11089,7 @@
         <source>Post-consume script does not exist.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">31</context>
         </context-group>
         <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
         <target state="translated">소비 후 스크립트가 존재하지 않습니다.</target>
@@ -10982,7 +11098,7 @@
         <source>Error while executing post-consume script.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">32</context>
         </context-group>
         <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
         <target state="translated">사전 소비 스크립트를 실행하는 동안 오류가 발생했습니다.</target>
@@ -10991,7 +11107,7 @@
         <source>Received new file.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">33</context>
         </context-group>
         <target state="translated">새로운 파일 수신됨.</target>
       </trans-unit>
@@ -10999,7 +11115,7 @@
         <source>File type not supported.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">33</context>
+          <context context-type="linenumber">34</context>
         </context-group>
         <target state="translated">지원하지 않는 파일 확장자입니다.</target>
       </trans-unit>
@@ -11007,7 +11123,7 @@
         <source>Processing document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">34</context>
+          <context context-type="linenumber">35</context>
         </context-group>
         <target state="translated">문서 처리 중...</target>
       </trans-unit>
@@ -11015,7 +11131,7 @@
         <source>Generating thumbnail...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">35</context>
+          <context context-type="linenumber">36</context>
         </context-group>
         <target state="translated">썸네일 생성 중...</target>
       </trans-unit>
@@ -11023,7 +11139,7 @@
         <source>Retrieving date from document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">36</context>
+          <context context-type="linenumber">37</context>
         </context-group>
         <target state="translated">문서에서 날짜 가져오는 중...</target>
       </trans-unit>
@@ -11031,7 +11147,7 @@
         <source>Saving document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">38</context>
         </context-group>
         <target state="translated">문서 저장 중...</target>
       </trans-unit>
@@ -11039,7 +11155,7 @@
         <source>Finished.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">38</context>
+          <context context-type="linenumber">39</context>
         </context-group>
         <target state="translated">완료.</target>
       </trans-unit>

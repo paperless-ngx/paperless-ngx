@@ -342,29 +342,12 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.AcceptHeaderVersioning",
-    "DEFAULT_VERSION": "8",
+    "DEFAULT_VERSION": "9",  # match src-ui/src/environments/environment.prod.ts
     # Make sure these are ordered and that the most recent version appears
     # last. See api.md#api-versioning when adding new versions.
-    "ALLOWED_VERSIONS": ["1", "2", "3", "4", "5", "6", "7", "8"],
+    "ALLOWED_VERSIONS": ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
     # DRF Spectacular default schema
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-}
-
-# DRF Spectacular settings
-SPECTACULAR_SETTINGS = {
-    "TITLE": "Paperless-ngx REST API",
-    "DESCRIPTION": "OpenAPI Spec for Paperless-ngx",
-    "VERSION": "6.0.0",
-    "SERVE_INCLUDE_SCHEMA": False,
-    "SWAGGER_UI_DIST": "SIDECAR",
-    "COMPONENT_SPLIT_REQUEST": True,
-    "EXTERNAL_DOCS": {
-        "description": "Paperless-ngx API Documentation",
-        "url": "https://docs.paperless-ngx.com/api/",
-    },
-    "ENUM_NAME_OVERRIDES": {
-        "MatchingAlgorithm": "documents.models.MatchingModel.MATCHING_ALGORITHMS",
-    },
 }
 
 if DEBUG:
@@ -409,6 +392,24 @@ def _parse_base_paths() -> tuple[str, str, str, str, str]:
 FORCE_SCRIPT_NAME, BASE_URL, LOGIN_URL, LOGIN_REDIRECT_URL, LOGOUT_REDIRECT_URL = (
     _parse_base_paths()
 )
+
+# DRF Spectacular settings
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Paperless-ngx REST API",
+    "DESCRIPTION": "OpenAPI Spec for Paperless-ngx",
+    "VERSION": "6.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "COMPONENT_SPLIT_REQUEST": True,
+    "EXTERNAL_DOCS": {
+        "description": "Paperless-ngx API Documentation",
+        "url": "https://docs.paperless-ngx.com/api/",
+    },
+    "ENUM_NAME_OVERRIDES": {
+        "MatchingAlgorithm": "documents.models.MatchingModel.MATCHING_ALGORITHMS",
+    },
+    "SCHEMA_PATH_PREFIX_INSERT": FORCE_SCRIPT_NAME or "",
+}
 
 WSGI_APPLICATION = "paperless.wsgi.application"
 ASGI_APPLICATION = "paperless.asgi.application"
@@ -462,6 +463,24 @@ CHANNEL_LAYERS = {
 }
 
 ###############################################################################
+# Email (SMTP) Backend                                                        #
+###############################################################################
+
+EMAIL_HOST: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST", "localhost")
+EMAIL_PORT: Final[int] = int(os.getenv("PAPERLESS_EMAIL_PORT", 25))
+EMAIL_HOST_USER: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL: Final[str] = os.getenv("PAPERLESS_EMAIL_FROM", EMAIL_HOST_USER)
+EMAIL_USE_TLS: Final[bool] = __get_boolean("PAPERLESS_EMAIL_USE_TLS")
+EMAIL_USE_SSL: Final[bool] = __get_boolean("PAPERLESS_EMAIL_USE_SSL")
+EMAIL_SUBJECT_PREFIX: Final[str] = "[Paperless-ngx] "
+EMAIL_TIMEOUT = 30.0
+EMAIL_ENABLED = EMAIL_HOST != "localhost" or EMAIL_HOST_USER != ""
+if DEBUG:  # pragma: no cover
+    EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+    EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
+
+###############################################################################
 # Security                                                                    #
 ###############################################################################
 
@@ -502,9 +521,18 @@ REDIRECT_LOGIN_TO_SSO = __get_boolean("PAPERLESS_REDIRECT_LOGIN_TO_SSO")
 
 AUTO_LOGIN_USERNAME = os.getenv("PAPERLESS_AUTO_LOGIN_USERNAME")
 
-ACCOUNT_EMAIL_VERIFICATION = os.getenv(
-    "PAPERLESS_ACCOUNT_EMAIL_VERIFICATION",
-    "optional",
+ACCOUNT_EMAIL_VERIFICATION = (
+    "none"
+    if not EMAIL_ENABLED
+    else os.getenv(
+        "PAPERLESS_ACCOUNT_EMAIL_VERIFICATION",
+        "optional",
+    )
+)
+
+ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS = __get_boolean(
+    "PAPERLESS_ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS",
+    "True",
 )
 
 ACCOUNT_SESSION_REMEMBER = __get_boolean("PAPERLESS_ACCOUNT_SESSION_REMEMBER", "True")
@@ -1213,24 +1241,6 @@ def _get_nltk_language_setting(ocr_lang: str) -> str | None:
 NLTK_ENABLED: Final[bool] = __get_boolean("PAPERLESS_ENABLE_NLTK", "yes")
 
 NLTK_LANGUAGE: str | None = _get_nltk_language_setting(OCR_LANGUAGE)
-
-###############################################################################
-# Email (SMTP) Backend                                                        #
-###############################################################################
-
-EMAIL_HOST: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST", "localhost")
-EMAIL_PORT: Final[int] = int(os.getenv("PAPERLESS_EMAIL_PORT", 25))
-EMAIL_HOST_USER: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST_PASSWORD", "")
-DEFAULT_FROM_EMAIL: Final[str] = os.getenv("PAPERLESS_EMAIL_FROM", EMAIL_HOST_USER)
-EMAIL_USE_TLS: Final[bool] = __get_boolean("PAPERLESS_EMAIL_USE_TLS")
-EMAIL_USE_SSL: Final[bool] = __get_boolean("PAPERLESS_EMAIL_USE_SSL")
-EMAIL_SUBJECT_PREFIX: Final[str] = "[Paperless-ngx] "
-EMAIL_TIMEOUT = 30.0
-EMAIL_ENABLED = EMAIL_HOST != "localhost" or EMAIL_HOST_USER != ""
-if DEBUG:  # pragma: no cover
-    EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-    EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
 
 ###############################################################################
 # Email Preprocessors                                                         #

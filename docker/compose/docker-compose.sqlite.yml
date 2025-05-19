@@ -24,11 +24,10 @@
 
 services:
   broker:
-    image: docker.io/library/redis:7
+    image: docker.io/library/redis:8
     restart: unless-stopped
     volumes:
       - redisdata:/data
-
   webserver:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
@@ -44,7 +43,6 @@ services:
     env_file: docker-compose.env
     environment:
       PAPERLESS_REDIS: redis://broker:6379
-
 volumes:
   data:
   media:

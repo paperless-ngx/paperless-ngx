@@ -82,6 +82,11 @@ def check_sanity(*, progress=False, scheduled=True) -> SanityCheckMessages:
     if lockfile in present_files:
         present_files.remove(lockfile)
 
+    if settings.APP_LOGO:
+        logo_file = Path(settings.MEDIA_ROOT / settings.APP_LOGO).resolve()
+        if logo_file in present_files:
+            present_files.remove(logo_file)
+
     for doc in tqdm(Document.global_objects.all(), disable=not progress):
         # Check sanity of the thumbnail
         thumbnail_path: Final[Path] = Path(doc.thumbnail_path).resolve()

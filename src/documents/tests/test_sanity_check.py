@@ -1,11 +1,11 @@
 import logging
-import os
 import shutil
 from pathlib import Path
 
 import filelock
 from django.conf import settings
 from django.test import TestCase
+from django.test import override_settings
 
 from documents.models import Document
 from documents.sanity_checker import check_sanity
@@ -17,34 +17,34 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
         with filelock.FileLock(settings.MEDIA_LOCK):
             # just make sure that the lockfile is present.
             shutil.copy(
-                os.path.join(
-                    os.path.dirname(__file__),
-                    "samples",
-                    "documents",
-                    "originals",
-                    "0000001.pdf",
+                (
+                    Path(__file__).parent
+                    / "samples"
+                    / "documents"
+                    / "originals"
+                    / "0000001.pdf"
                 ),
-                os.path.join(self.dirs.originals_dir, "0000001.pdf"),
+                Path(self.dirs.originals_dir) / "0000001.pdf",
             )
             shutil.copy(
-                os.path.join(
-                    os.path.dirname(__file__),
-                    "samples",
-                    "documents",
-                    "archive",
-                    "0000001.pdf",
+                (
+                    Path(__file__).parent
+                    / "samples"
+                    / "documents"
+                    / "archive"
+                    / "0000001.pdf"
                 ),
-                os.path.join(self.dirs.archive_dir, "0000001.pdf"),
+                Path(self.dirs.archive_dir) / "0000001.pdf",
             )
             shutil.copy(
-                os.path.join(
-                    os.path.dirname(__file__),
-                    "samples",
-                    "documents",
-                    "thumbnails",
-                    "0000001.webp",
+                (
+                    Path(__file__).parent
+                    / "samples"
+                    / "documents"
+                    / "thumbnails"
+                    / "0000001.webp"
                 ),
-                os.path.join(self.dirs.thumbnail_dir, "0000001.webp"),
+                Path(self.dirs.thumbnail_dir) / "0000001.webp",
             )
 
         return Document.objects.create(
@@ -92,25 +92,25 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
 
     def test_no_thumbnail(self):
         doc = self.make_test_data()
-        os.remove(doc.thumbnail_path)
+        Path(doc.thumbnail_path).unlink()
         self.assertSanityError(doc, "Thumbnail of document does not exist")
 
     def test_thumbnail_no_access(self):
         doc = self.make_test_data()
-        os.chmod(doc.thumbnail_path, 0o000)
+        Path(doc.thumbnail_path).chmod(0o000)
         self.assertSanityError(doc, "Cannot read thumbnail file of document")
-        os.chmod(doc.thumbnail_path, 0o777)
+        Path(doc.thumbnail_path).chmod(0o777)
 
     def test_no_original(self):
         doc = self.make_test_data()
-        os.remove(doc.source_path)
+        Path(doc.source_path).unlink()
         self.assertSanityError(doc, "Original of document does not exist.")
 
     def test_original_no_access(self):
         doc = self.make_test_data()
-        os.chmod(doc.source_path, 0o000)
+        Path(doc.source_path).chmod(0o000)
         self.assertSanityError(doc, "Cannot read original file of document")
-        os.chmod(doc.source_path, 0o777)
+        Path(doc.source_path).chmod(0o777)
 
     def test_original_checksum_mismatch(self):
         doc = self.make_test_data()
@@ -120,14 +120,14 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
 
     def test_no_archive(self):
         doc = self.make_test_data()
-        os.remove(doc.archive_path)
+        Path(doc.archive_path).unlink()
         self.assertSanityError(doc, "Archived version of document does not exist.")
 
     def test_archive_no_access(self):
         doc = self.make_test_data()
-        os.chmod(doc.archive_path, 0o000)
+        Path(doc.archive_path).chmod(0o000)
         self.assertSanityError(doc, "Cannot read archive file of document")
-        os.chmod(doc.archive_path, 0o777)
+        Path(doc.archive_path).chmod(0o777)
 
     def test_archive_checksum_mismatch(self):
         doc = self.make_test_data()
@@ -157,6 +157,17 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
             messages._messages[None][0]["message"],
             "Orphaned file in media dir",
         )
+
+    @override_settings(
+        APP_LOGO="logo/logo.png",
+    )
+    def test_ignore_logo(self):
+        self.make_test_data()
+        logo_dir = Path(self.dirs.media_dir, "logo")
+        logo_dir.mkdir(parents=True, exist_ok=True)
+        Path(self.dirs.media_dir, "logo", "logo.png").touch()
+        messages = check_sanity()
+        self.assertFalse(messages.has_warning)
 
     def test_archive_filename_no_checksum(self):
         doc = self.make_test_data()
