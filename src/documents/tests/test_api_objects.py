@@ -4,7 +4,6 @@ from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
-from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -104,13 +103,13 @@ class TestApiObjects(DirectoriesMixin, APITestCase):
         Document.objects.create(
             mime_type="application/pdf",
             correspondent=self.c1,
-            created=timezone.make_aware(datetime.datetime(2022, 1, 1)),
+            created=datetime.date(2022, 1, 1),
             checksum="123",
         )
         Document.objects.create(
             mime_type="application/pdf",
             correspondent=self.c1,
-            created=timezone.make_aware(datetime.datetime(2022, 1, 2)),
+            created=datetime.date(2022, 1, 2),
             checksum="456",
         )
 

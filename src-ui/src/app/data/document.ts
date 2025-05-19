@@ -130,9 +130,6 @@ export interface Document extends ObjectWithPermissions {
   // UTC
   created?: Date
 
-  // localized date
-  created_date?: Date
-
   modified?: Date
 
   added?: Date
