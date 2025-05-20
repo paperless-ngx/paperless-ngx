@@ -163,8 +163,8 @@ export class ConsumerStatusService {
       // fallback if backend didn't restrict message
       if (
         statusMessage.owner_id &&
-        statusMessage.owner_id !== this.settingsService.currentUser?.id &&
-        !this.settingsService.currentUser?.is_superuser
+        statusMessage.owner_id !== this.settingsService.currentUser?.id
+        // && !this.settingsService.currentUser?.is_superuser
       ) {
         return
       }
