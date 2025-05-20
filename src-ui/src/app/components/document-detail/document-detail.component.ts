@@ -58,6 +58,7 @@ import { User } from 'src/app/data/user'
 import { UserService } from 'src/app/services/rest/user.service'
 import { DocumentNote } from 'src/app/data/document-note'
 import { HttpClient } from '@angular/common/http'
+import { Location } from '@angular/common'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { EditDialogMode } from '../common/edit-dialog/edit-dialog.component'
 import { ObjectWithId } from 'src/app/data/object-with-id'
@@ -224,7 +225,9 @@ export class DocumentDetailComponent
     private permissionsService: PermissionsService,
     private userService: UserService,
     private customFieldsService: CustomFieldsService,
-    private http: HttpClient
+    private http: HttpClient,
+    private location: Location,
+
   ) {
     super()
   }
@@ -853,7 +856,7 @@ export class DocumentDetailComponent
             this.documentListViewService.activeSavedViewId,
           ])
         } else {
-          this.router.navigate(['documents'])
+          this.location.back()
         }
       })
   }
