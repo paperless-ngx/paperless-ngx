@@ -10,7 +10,8 @@ jobs:
     name: Automated PR Bot
     runs-on: ubuntu-latest
     steps:
-      - name: Label by file path
+      - name: Label PR by file path or branch name
+        # see .github/labeler.yml for the labeler config
         uses: actions/labeler@v5
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -24,6 +25,31 @@ jobs:
           s_diff: '99999'
           fail_if_xl: 'false'
           excluded_files: /\.lock$/ /\.txt$/ ^src-ui/pnpm-lock\.yaml$ ^src-ui/messages\.xlf$ ^src/locale/en_US/LC_MESSAGES/django\.po$
+      - name: Label by PR title
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const title = pr.title.toLowerCase();
+            const labels = [];
+
+            if (/^(fix|bugfix)/i.test(title)) {
+              labels.push('bug');
+            } else if (/^feature/i.test(title)) {
+              labels.push('enhancement');
+            } else {
+              labels.push('enhancement'); // Default fallback
+            }
+
+            if (labels.length) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels,
+              });
+              core.info(`Added labels based on title: ${labels.join(', ')}`);
+            }
       - name: Label bot-generated PRs
         if: ${{ contains(github.actor, 'dependabot') || contains(github.actor, 'crowdin-bot') }}
         uses: actions/github-script@v7

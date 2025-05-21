@@ -17,3 +17,10 @@ ci-cd:
   - changed-files:
       - any-glob-to-any-file:
           - '.github/**'
+# pr types
+bug:
+  - head-branch:
+      - ['^fix']
+enhancement:
+  - head-branch:
+      - ['^feature']
