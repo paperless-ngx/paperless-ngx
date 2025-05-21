@@ -17,6 +17,7 @@ import { BulkEditObjectOperation } from '../../../services/rest/abstract-name-fi
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { SharedService } from '../../../shared.service'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 
 
 @Component({
@@ -40,6 +41,7 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
     permissionsService: PermissionsService,
     private renderer: Renderer2,
     public documentService: DocumentService,
+    private customDatePipe: CustomDatePipe,
   ) {
     function formatBytes(bytes, decimals = 2) {
       if (!+bytes) return '0 Bytes'
@@ -68,6 +70,12 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
         key: 'filesize',
         name: $localize`Size`,
         valueFn: (item) => (item.type == 'file') ? formatBytes(item.filesize) : '',
+        rendersHtml: true,
+      },
+        {
+          key: 'modified',
+          name: $localize`modified`,
+          valueFn: (item) => this.customDatePipe.transform(item.modified),
         rendersHtml: true,
       }],
     )

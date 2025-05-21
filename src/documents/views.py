@@ -201,7 +201,8 @@ from documents.signals import document_updated
 from documents.tasks import backup_documents, \
     bulk_update_custom_field_form_document_type_to_document, bulk_delete_file, \
     update_ocr_document, update_child_folder_paths, \
-    update_child_folder_permisisons, update_folder_permisisons
+    update_child_folder_permisisons, update_folder_permisisons, \
+    update_document_count_folder_path
 from documents.tasks import consume_file
 from documents.tasks import deleted_backup
 from documents.tasks import empty_trash
@@ -646,6 +647,7 @@ class DocumentViewSet(
 
         instance = self.get_object()
         folder = instance.folder
+
         dossier = instance.dossier
         # instance.folder = None
         # instance.dossier = None
@@ -653,6 +655,7 @@ class DocumentViewSet(
         if folder is not None:
             folder.delete()
         # index.remove_document_from_index(self.get_object())
+        update_document_count_folder_path(folder.path)
         instance.delete()
         instance_deleted = Document.deleted_objects.get(id=instance.id)
         index.delete_document_with_index(instance_deleted.id)
@@ -3426,7 +3429,11 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 )
 
 
-class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
+class FolderViewSet(PassUserMixin, RetrieveModelMixin,
+                    UpdateModelMixin,
+                    DestroyModelMixin,
+                    ListModelMixin,
+                    GenericViewSet, ):
     model = Folder
 
     queryset = (
@@ -3436,7 +3443,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 When(type="file", then=1),  # Gán giá trị 1 cho file
                 output_field=IntegerField(),
             ),
-        )
+        ).select_related("owner")
         .order_by("type_order", Lower("name"))
         .prefetch_related("documents")
     )
@@ -3450,30 +3457,31 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         ObjectOwnedOrGrantedPermissionsFilter,
     )
     filterset_class = FolderFilterSet
-    ordering_fields = ("name", "path", "parent_folder", "document_count", "type")
+    ordering_fields = (
+    "name", "parent_folder", "document_count", "type", "filesize", "modified")
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            ordering = request.query_params.get("ordering", None)
-            if ordering == "document_count":
-                sorted_data = sorted(serializer.data, key=lambda x: x["document_count"])
-            elif ordering == "-document_count":
-
-                sorted_data = sorted(
-                    serializer.data,
-                    key=lambda x: x["document_count"],
-                    reverse=True,
-                )
-            else:
-                sorted_data = serializer.data
-
-            return self.get_paginated_response(sorted_data)
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+    # def list(self, request, *args, **kwargs):
+    #     queryset = self.filter_queryset(self.get_queryset())
+    #
+    #     page = self.paginate_queryset(queryset)
+    #     if page is not None:
+    #         serializer = self.get_serializer(page, many=True)
+    #         ordering = request.query_params.get("ordering", None)
+    #         if ordering == "document_count":
+    #             sorted_data = sorted(serializer.data, key=lambda x: x["document_count"])
+    #         elif ordering == "-document_count":
+    #
+    #             sorted_data = sorted(
+    #                 serializer.data,
+    #                 key=lambda x: x["document_count"],
+    #                 reverse=True,
+    #             )
+    #         else:
+    #             sorted_data = serializer.data
+    #
+    #         return self.get_paginated_response(sorted_data)
+    #     serializer = self.get_serializer(queryset, many=True)
+    #     return Response(serializer.data)
 
     def getFolderDoc(self, request):
         currentUser = request.user
@@ -3772,6 +3780,7 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         for doc in documents:
             index.delete_document_with_index(doc_id=doc.id)
         folders.delete()
+        update_document_count_folder_path(folder.path)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 

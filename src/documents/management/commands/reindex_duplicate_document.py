@@ -1,22 +1,16 @@
 import logging
 import math
 import time
-import uuid
-from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 
-from click.core import batch
 from django.core.management import BaseCommand
 from django.db.models import Q
-from numpy.ma.core import true_divide
-from openpyxl.styles.builtins import title
-from tqdm import tqdm
 from elasticsearch.helpers import bulk
 
 from documents.documents import DocumentDocument
-from documents.models import Document, Folder
-from documents.index import update_index_document, update_index_bulk_documents
+from documents.index import update_index_document
 from documents.management.commands.mixins import ProgressBarMixin
+from documents.models import Document
 
 logger = logging.getLogger("edoc.duplicate_document")
 
@@ -32,7 +26,14 @@ def process_document(document):
         logger.error(f"Failed to index document {document.id}: {e}")
 
 
-def duplicate_documents_with_workers(duplicate_count=1, limit=None, num_workers=5, batch_size=10000, folder_id = None, owner_id = None, start_time=None, progress_bar_disable=False):
+def duplicate_documents_with_workers(duplicate_count: object = 1,
+                                     limit: object = None,
+                                     num_workers: object = 5,
+                                     batch_size: object = 10000,
+                                     folder_id: object = None,
+                                     owner_id: object = None,
+                                     start_time: object = None,
+                                     progress_bar_disable: object = False) -> object:
     """
     Duplicate documents and update their index using workers.
     """

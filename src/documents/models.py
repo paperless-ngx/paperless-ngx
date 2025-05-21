@@ -300,6 +300,70 @@ class Folder(SoftDeleteModel, MatchingModel):
         _("updated"), null=True, default=timezone.now, editable=False, db_index=True
     )
 
+    modified = models.DateTimeField(
+        _("modified"),
+        auto_now=True,
+        editable=False,
+        db_index=True,
+    )
+
+    filesize = models.BigIntegerField(
+        _("size"),
+        null=True,
+        blank=True,
+        default=0,
+        help_text=_("Size of the folder in bytes"),
+    )
+
+    documents_count = models.PositiveIntegerField(
+        _("documents count"),
+        null=True,
+        blank=True,
+        default=0,
+        help_text=_("Number of documents in the folder"),
+    )
+
+    filename = models.FilePathField(
+        _("filename"),
+        max_length=1024,
+        editable=False,
+        default=None,
+        unique=True,
+        null=True,
+        help_text=_("Current filename in storage"),
+    )
+
+    document_count = models.PositiveIntegerField(
+        _("document count"),
+        blank=False,
+        default=0,
+        null=True,
+        validators=[MinValueValidator(1)],
+        help_text=_(
+            "The number of document of the folder.",
+        ),
+    )
+
+    archive_filename = models.FilePathField(
+        _("archive filename"),
+        max_length=1024,
+        editable=False,
+        default=None,
+        unique=True,
+        null=True,
+        help_text=_("Current archive filename in storage"),
+    )
+
+    original_filename = models.CharField(
+        _("original filename"),
+        max_length=1024,
+        editable=False,
+        default=None,
+        unique=False,
+        null=True,
+        help_text=_("The original name of the file when it was uploaded"),
+    )
+
     class Meta(MatchingModel.Meta):
 
         verbose_name = "folder"

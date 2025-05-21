@@ -970,6 +970,11 @@ class Consumer(LoggingMixin):
                     owner=document.owner,
                     created=document.created,
                     updated=document.modified,
+                    filesize=os.path.getsize(self.original_path),
+                    archive_filename=document.archive_filename,
+                    original_filename=document.original_filename,
+                    filename=document.filename
+
                 )
                 new_file.checksum = document.checksum
                 if document.folder:
@@ -996,6 +1001,8 @@ class Consumer(LoggingMixin):
                 else:
                     new_file.path = f"{new_file.id}"
                 new_file.save()
+                from documents.tasks import update_document_count_folder_path
+                update_document_count_folder_path(new_file.path)
                 document.folder = new_file
 
                 # If we get here, it was successful. Proceed with post-consume

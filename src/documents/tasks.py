@@ -1071,16 +1071,39 @@ def update_ocr_document(document, task_instance: EdocTask, data_ocr):
 @shared_task()
 def update_child_folder_paths(folder, old_path):
     child_folders = Folder.objects.filter(path__startswith=f'{old_path}/')
+    file_ids = []
     for child_folder in child_folders:
         if folder.path:
             child_folder.path = f"{folder.path}/{child_folder.id}"
         else:
             child_folder.path = f"{child_folder.id}"
+        if folder.type == Folder.FILE:
+            file_ids.append(folder.id)
         # child_folder.save()
         #
         # update_child_folder_paths(child_folder)
 
     Folder.objects.bulk_update(child_folders, ['path'], batch_size=1000)
+    # reindex document update folder_path for document
+    documents = Document.objects.filter(folder__in=file_ids)
+    index.update_index_bulk_documents(documents, 100)
+    # update the document count for the old folder.
+    update_document_count_folder_path(folder.path)
+    # update the document count for the new folder.
+    update_document_count_folder_path(old_path)
+
+
+def update_document_count_folder_path(path):
+    # update document count
+    folder_ids = path.split('/')
+    folders = Folder.objects.filter(id__in=folder_ids, type=Folder.FOLDER)
+    for folder in folders:
+        folder.document_count = Folder.objects.filter(
+            path__startswith=f'{folder.path}/', type=Folder.FILE).only(
+            'id').count()
+        folder.save()
+
+
 
 
 

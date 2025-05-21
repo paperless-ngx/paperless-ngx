@@ -1,7 +1,6 @@
 import datetime
 import logging
 import math
-import os
 import re
 import zoneinfo
 from decimal import Decimal
@@ -2651,25 +2650,23 @@ class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             return 0
 
 
-class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+class FolderSerializer(OwnedObjectSerializer):
     name = AdjustedNameFieldFolder()
-    document_count = serializers.SerializerMethodField(read_only=True)
-    filesize = serializers.SerializerMethodField(read_only=True)
     document = serializers.SerializerMethodField(read_only=True)
 
-    def get_filesize(self, obj):
-        if obj.type == Folder.FOLDER:
-            return 0
-        path = getattr(obj.documents.first(), "archive_path", "")
-        return os.path.getsize(path) if path != "" and os.path.exists(path) else 0
+    # def get_filesize(self, obj):
+    #     if obj.type == Folder.FOLDER:
+    #         return 0
+    #     path = getattr(obj.documents.first(), "archive_path", "")
+    #     return os.path.getsize(path) if path != "" and os.path.exists(path) else 0
 
-    def get_document_count(self, obj):
-        if obj.type == Folder.FOLDER:
-            folders = Folder.objects.filter(path__startswith=f'{obj.path}/',
-                                            type=Folder.FILE)
-            # documents = Document.objects.filter(folder__in=folders)
-            return folders.count()
-        return 0
+    # def get_document_count(self, obj):
+    #     if obj.type == Folder.FOLDER:
+    #         folders = Folder.objects.filter(path__startswith=f'{obj.path}/',
+    #                                         type=Folder.FILE)
+    #         # documents = Document.objects.filter(folder__in=folders)
+    #         return folders.count()
+    #     return 0
 
     def get_document(self, obj):
         if obj.type == Folder.FILE:
@@ -2678,15 +2675,27 @@ class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
                 return DocumentFolderSerializer(document).data
         return None
 
-    def validate(self, data):
-        return data
+    # def validate(self, data):
+    #     return data
 
     def update(self, instance, validated_data):
         return super().update(instance, validated_data)
 
     class Meta:
         model = Folder
-        fields = "__all__"
+        fields = [
+            "id",
+            "name",
+            "parent_folder",
+            "path",
+            "type",
+            "document",
+            "document_count",
+            "filesize",
+            "modified",
+            "created",
+            "permissions"
+        ]
 
 
 class ExportDocumentFromFolderSerializer(serializers.Serializer):
