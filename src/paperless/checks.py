@@ -217,8 +217,8 @@ def audit_log_check(app_configs, **kwargs):
 @register()
 def check_postgres_version(app_configs, **kwargs):
     """
-    Django 5.2 deprecated PostgreSQL 13 support, and it will be removed in
-    a future Paperless-ngx version. This can be removed eventually.
+    Django 5.2 removed PostgreSQL 13 support and thus it will be removed in
+    a future Paperless-ngx version. This check can be removed eventually.
     See https://docs.djangoproject.com/en/5.2/releases/5.2/#dropped-support-for-postgresql-13
     """
     db_conn = connections["default"]
@@ -231,7 +231,7 @@ def check_postgres_version(app_configs, **kwargs):
                 if version.startswith("13"):
                     return [
                         Warning(
-                            "PostgreSQL 13 is deprecated in Django 5.2 and will not be supported in a future Paperless-ngx release.",
+                            "PostgreSQL 13 is deprecated and will not be supported in a future Paperless-ngx release.",
                             hint="Upgrade to PostgreSQL 14 or newer.",
                         ),
                     ]
