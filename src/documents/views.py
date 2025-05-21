@@ -2389,7 +2389,7 @@ class ApprovalViewSet(ModelViewSet):
         if self.request.user.is_superuser:
             return query
         # user owner
-        document_ids= query.values_list('pk')
+        document_ids = query.values_list('object_pk')
         document_approval_ids = Document.objects.filter(Q(owner=self.request.user) | Q(id__in=document_ids)).values_list('id', flat=True)
         query = query.filter(Q(pk__in = document_approval_ids) | Q(submitted_by=self.request.user))
 
