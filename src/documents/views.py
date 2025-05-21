@@ -2389,8 +2389,14 @@ class ApprovalViewSet(ModelViewSet):
         # document_ids = query.values_list('object_pk')
         document_ids = [int(id) for id in
                         query.values_list('object_pk', flat=True)]
-        document_approval_ids = Document.objects.filter(Q(owner=self.request.user) | Q(id__in=document_ids)).values_list('id', flat=True)
-        query = query.filter(Q(pk__in = document_approval_ids) | Q(submitted_by=self.request.user))
+        # print('document_ids:', document_ids)
+        document_approval_ids = [str(id) for id in Document.objects.filter(
+            Q(owner=self.request.user) & Q(id__in=document_ids)).values_list(
+            'id', flat=True)]
+        # print('document_approval_ids:', document_approval_ids)
+        query = query.filter(Q(object_pk__in=document_approval_ids) | Q(
+            submitted_by=self.request.user))
+        # print('query:', query)
 
         return query
 
@@ -2465,8 +2471,11 @@ class ApprovalUpdateMutipleView(GenericAPIView):
                     return HttpResponseForbidden("Insufficient permissions")
                 document_ids.append(int(approval.object_pk))
             documents = Document.objects.filter(id__in=document_ids).defer('content')
+            # print('documents-------------:', documents)
             for document in documents:
-                if not self.request.user.has_perm("change_document", document):
+                if self.request.user.is_superuser:
+                    continue
+                if not self.request.user == document.owner:
                     return HttpResponseForbidden("Insufficient permissions")
 
             result = approvals_match.update(

@@ -41,7 +41,7 @@ class DocumentDocument(Document):
     folder = fields.TextField(attr='folder.name')
     folder_id = fields.IntegerField(attr='folder.id')
     has_folder = fields.BooleanField(attr='folder is not None')
-    folder_path = fields.BooleanField(attr='folder.path')
+    folder_path = fields.TextField(attr='folder.path')
     created = fields.DateField(attr='created')
     added = fields.DateField(attr='added')
     modified = fields.DateField(attr='modified')
