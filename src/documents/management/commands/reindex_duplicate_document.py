@@ -11,7 +11,7 @@ from documents.documents import DocumentDocument
 from documents.index import update_index_document
 from documents.management.commands.mixins import ProgressBarMixin
 from documents.models import Document
-from edoc.settings import ELASTIC_SEARCH_DOCUMENT_INDEX, ELASTIC_SEARCH_HOST
+from edoc.settings import ELASTIC_SEARCH_DOCUMENT_INDEX
 
 logger = logging.getLogger("edoc.duplicate_document")
 
@@ -25,11 +25,6 @@ def process_document(document):
         update_index_document(document)
     except Exception as e:
         logger.error(f"Failed to index document {document.id}: {e}")
-
-
-from elasticsearch import Elasticsearch
-
-
 def delete_index(index_name):
     """
     Delete the specified Elasticsearch index if it exists.
@@ -44,7 +39,6 @@ def delete_index(index_name):
             logger.info(f"Failed to delete index '{index_name}': {e}")
     else:
         logger.error(f"Index '{index_name}' does not exist.")
-
 
 def duplicate_documents_with_workers(duplicate_count: object = 1,
                                      limit: object = None,
@@ -77,12 +71,13 @@ def duplicate_documents_with_workers(duplicate_count: object = 1,
     if limit:
         documents = documents[:limit]
     logger.info(f'time query: {time.time()-start_time}')
-    delete_index(ELASTIC_SEARCH_DOCUMENT_INDEX)
     # new_documents = []
     # new_folders = []
+
     document_count = documents.count()
     num_batches = math.ceil(document_count / batch_size)
     dict_checksum_id_folder = dict()
+    delete_index(ELASTIC_SEARCH_DOCUMENT_INDEX)
     logger.info(f"Document count to process: {document_count} batch_size {batch_size}: {num_batches} batches")
     actions = []
     for batch_idx in range(num_batches):
