@@ -49,17 +49,19 @@ def update_document_count_filesize(batch_size: object = 10000, ) -> object:
                       batch_idx * batch_size: (batch_idx + 1) * batch_size]:
             start_time_doc = time.time()
             try:
+                if folder.type == Folder.FOLDER:
+                    update_document_count_folder_path(folder.path)
+
                 if folder.documents.count() == 0:
                     continue
                 document = folder.documents.first()
                 if os.path.exists(document.source_path):
-                    folder.filesize = os.path.getsize(document.source_path),
+                    folder.filesize = os.path.getsize(document.source_path)
                 folder.archive_filename = document.archive_filename,
                 folder.original_filename = document.original_filename,
                 folder.filename = document.filename
-                if folder.type == Folder.FOLDER:
-                    update_document_count_folder_path(folder.path)
                 actions.append(folder)
+
 
 
 

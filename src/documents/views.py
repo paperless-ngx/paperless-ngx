@@ -3096,6 +3096,7 @@ class TrashView(ListModelMixin, PassUserMixin):
             folders_restore = Folder.deleted_objects.filter(id__in=list(folder_set))
             for f in folders_restore:
                 f.restore(strict=False)
+                update_document_count_folder_path(f.path)
             for doc in deleted_docs:
                 doc.restore(strict=False)
                 # if doc.folder is not None:
