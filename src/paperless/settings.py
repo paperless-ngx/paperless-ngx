@@ -914,7 +914,7 @@ def _parse_cachalot_settings():
         os.getenv("PAPERLESS_DB_READ_CACHE_REDIS_URL", None),
     )
     result = {
-        "CACHALOT_CACHE": "cachalot",
+        "CACHALOT_CACHE": "read-cache",
         "CACHALOT_ENABLED": __get_boolean(
             "PAPERLESS_DB_READ_CACHE_ENABLED",
             default="no",
@@ -952,7 +952,7 @@ def _parse_caches():
             "LOCATION": _CHANNELS_REDIS_URL,
             "KEY_PREFIX": _REDIS_KEY_PREFIX,
         },
-        "cachalot": {
+        "read-cache": {
             "BACKEND": _CACHE_BACKEND,
             "LOCATION": _parse_cachalot_settings()["CACHALOT_REDIS_URL"],
             "KEY_PREFIX": _REDIS_KEY_PREFIX,

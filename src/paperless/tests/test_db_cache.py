@@ -18,13 +18,13 @@ from paperless.settings import _parse_caches
 def test_all_redis_caches_have_same_custom_prefix(monkeypatch):
     """
     Check that when setting a custom Redis prefix,
-    it is set for both the Django default and the cachalot cache.
+    it is set for both the Django default cache and the read cache.
     """
     from paperless import settings
 
     monkeypatch.setattr(settings, "_REDIS_KEY_PREFIX", "test_a_custom_key_prefix")
     caches = _parse_caches()
-    assert caches["cachalot"]["KEY_PREFIX"] == "test_a_custom_key_prefix"
+    assert caches["read-cache"]["KEY_PREFIX"] == "test_a_custom_key_prefix"
     assert caches["default"]["KEY_PREFIX"] == "test_a_custom_key_prefix"
 
 
@@ -39,11 +39,11 @@ class TestDbCacheSettings:
         # Default settings
         assert not cachalot_settings["CACHALOT_ENABLED"]
         assert cachalot_settings["CACHALOT_TIMEOUT"] == 3600
-        assert caches["cachalot"]["KEY_PREFIX"] == ""
-        assert caches["cachalot"]["LOCATION"] == "redis://localhost:6379"
+        assert caches["read-cache"]["KEY_PREFIX"] == ""
+        assert caches["read-cache"]["LOCATION"] == "redis://localhost:6379"
 
         # Fixed settings
-        assert cachalot_settings["CACHALOT_CACHE"] == "cachalot"
+        assert cachalot_settings["CACHALOT_CACHE"] == "read-cache"
         assert (
             cachalot_settings["CACHALOT_QUERY_KEYGEN"]
             == "paperless.db_cache.custom_get_query_cache_key"
@@ -70,10 +70,10 @@ class TestDbCacheSettings:
         # Modifiable settings
         assert cachalot_settings["CACHALOT_ENABLED"]
         assert cachalot_settings["CACHALOT_TIMEOUT"] == 7200
-        assert caches["cachalot"]["LOCATION"] == "redis://localhost:6380/7"
+        assert caches["read-cache"]["LOCATION"] == "redis://localhost:6380/7"
 
         # Fixed settings
-        assert cachalot_settings["CACHALOT_CACHE"] == "cachalot"
+        assert cachalot_settings["CACHALOT_CACHE"] == "read-cache"
         assert (
             cachalot_settings["CACHALOT_QUERY_KEYGEN"]
             == "paperless.db_cache.custom_get_query_cache_key"
