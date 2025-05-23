@@ -214,6 +214,7 @@ from edoc import version
 from edoc.celery import app as celery_app
 from edoc.config import GeneralConfig
 from edoc.db import GnuPG
+from edoc.settings import EDOC_PEEL_FIELD
 from edoc.views import StandardPagination, CustomLimitOffsetPagination
 
 if settings.AUDIT_LOG_ENABLED:
@@ -613,7 +614,8 @@ class DocumentViewSet(
         elif document_type is None:
             update_document_field = False
         if update_document_field:
-            bulk_update_custom_field_form_document_type_to_document.delay( [instance.id], document_type.id, True)
+            bulk_update_custom_field_form_document_type_to_document.delay(
+                [instance.id], document_type.id, EDOC_PEEL_FIELD)
         # logger.debug(response)
         self.update_time_archive_font(self.get_object())
         self.update_name_folder(self.get_object(), serializer)

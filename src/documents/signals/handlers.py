@@ -44,6 +44,7 @@ from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware, \
     update_view_folder_parent_permissions
 from documents.permissions import set_permissions_for_object
+from edoc.settings import EDOC_PEEL_FIELD
 
 logger = logging.getLogger("edoc.handlers")
 
@@ -298,7 +299,10 @@ def set_document_type(
 
             document.document_type = selected
             # set custom fields from document type to document
-            bulk_set_custom_fields_from_document_type_to_document(selected.id, [document.id], True)
+            bulk_set_custom_fields_from_document_type_to_document(selected.id,
+                                                                  [
+                                                                      document.id],
+                                                                  EDOC_PEEL_FIELD)
             # call api update data to update custom fields
 
             document.save(update_fields=("document_type",))
