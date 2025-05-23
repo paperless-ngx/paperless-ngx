@@ -215,7 +215,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
 
     created = models.DateField(
         _("created"),
-        default=datetime.datetime.today,
+        default=datetime.date.today,
         db_index=True,
     )
 
