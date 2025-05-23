@@ -14,4 +14,4 @@ def custom_get_table_cache_key(db_alias, table):
 
 
 def invalidate_db_cache():
-    return cachalot_invalidate(cache_alias="cachalot")
+    return cachalot_invalidate(cache_alias="read-cache")
