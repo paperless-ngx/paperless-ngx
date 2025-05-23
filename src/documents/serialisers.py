@@ -2653,7 +2653,7 @@ class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 class FolderSerializer(OwnedObjectSerializer):
     name = AdjustedNameFieldFolder()
     document = serializers.SerializerMethodField(read_only=True)
-
+    document_count = serializers.IntegerField(read_only=True)
     # def get_filesize(self, obj):
     #     if obj.type == Folder.FOLDER:
     #         return 0
@@ -2678,8 +2678,8 @@ class FolderSerializer(OwnedObjectSerializer):
     # def validate(self, data):
     #     return data
 
-    def update(self, instance, validated_data):
-        return super().update(instance, validated_data)
+    # def update(self, instance, validated_data):
+    #     return super().update(instance, validated_data)
 
     class Meta:
         model = Folder
@@ -2694,7 +2694,11 @@ class FolderSerializer(OwnedObjectSerializer):
             "filesize",
             "modified",
             "created",
-            "permissions"
+            "owner",
+            "permissions",
+            "user_can_change",
+            "is_shared_by_requester",
+            "set_permissions",
         ]
 
 

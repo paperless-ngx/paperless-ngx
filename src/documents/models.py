@@ -315,13 +315,6 @@ class Folder(SoftDeleteModel, MatchingModel):
         help_text=_("Size of the folder in bytes"),
     )
 
-    documents_count = models.PositiveIntegerField(
-        _("documents count"),
-        null=True,
-        blank=True,
-        default=0,
-        help_text=_("Number of documents in the folder"),
-    )
 
     filename = models.FilePathField(
         _("filename"),
