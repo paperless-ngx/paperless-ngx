@@ -58,8 +58,8 @@ class TestDbCacheSettings:
         os.environ,
         {
             "PAPERLESS_DB_READ_CACHE_ENABLED": "true",
-            "PAPERLESS_DB_READ_CACHE_REDIS_URL": "redis://localhost:6380/7",
-            "PAPERLESS_DB_READ_CACHE_TTL": "7200",
+            "PAPERLESS_READ_CACHE_REDIS_URL": "redis://localhost:6380/7",
+            "PAPERLESS_READ_CACHE_TTL": "7200",
         },
     )
     def test_cachalot_custom_settings(self):
@@ -102,7 +102,7 @@ class TestDbCacheSettings:
         env_var_ttl: int,
         expected_cachalot_timeout: int,
     ):
-        with patch.dict(os.environ, {"PAPERLESS_DB_READ_CACHE_TTL": f"{env_var_ttl}"}):
+        with patch.dict(os.environ, {"PAPERLESS_READ_CACHE_TTL": f"{env_var_ttl}"}):
             cachalot_timeout = _parse_cachalot_settings()["CACHALOT_TIMEOUT"]
             assert cachalot_timeout == expected_cachalot_timeout
 
