@@ -9,7 +9,7 @@ from django.db import connection
 from django.test import override_settings
 from django.test.utils import CaptureQueriesContext
 
-from documents.models import Document
+from documents.models import Tag
 from paperless.db_cache import invalidate_db_cache
 from paperless.settings import _parse_cachalot_settings
 from paperless.settings import _parse_caches
@@ -121,17 +121,17 @@ def test_cache_hit_when_enabled():
     assert settings.CACHALOT_TIMEOUT == 1
 
     # Read a table to populate the cache
-    list(list(Document.objects.values_list("id", flat=True)))
+    list(list(Tag.objects.values_list("id", flat=True)))
 
     # Invalidate the cache then read the database, there should be DB hit
     invalidate_db_cache()
     with CaptureQueriesContext(connection) as ctx:
-        list(list(Document.objects.values_list("id", flat=True)))
+        list(list(Tag.objects.values_list("id", flat=True)))
     assert len(ctx)
 
     # Doing the same request again should hit the cache, not the DB
     with CaptureQueriesContext(connection) as ctx:
-        list(list(Document.objects.values_list("id", flat=True)))
+        list(list(Tag.objects.values_list("id", flat=True)))
     assert not len(ctx)
 
     # Wait the end of TTL
@@ -140,7 +140,7 @@ def test_cache_hit_when_enabled():
 
     # Read the DB again. The DB should be hit because the cache has expired
     with CaptureQueriesContext(connection) as ctx:
-        list(list(Document.objects.values_list("id", flat=True)))
+        list(list(Tag.objects.values_list("id", flat=True)))
     assert len(ctx)
 
     # Invalidate the cache at the end of test
@@ -156,7 +156,7 @@ def test_cache_is_disabled_by_default():
     # Read the table multiple times: the DB should always be hit without cache
     for _ in range(3):
         with CaptureQueriesContext(connection) as ctx:
-            list(list(Document.objects.values_list("id", flat=True)))
+            list(list(Tag.objects.values_list("id", flat=True)))
         assert len(ctx)
 
     # Invalidate the cache at the end of test
