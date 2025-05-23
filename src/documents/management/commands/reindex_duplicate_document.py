@@ -5,13 +5,14 @@ from datetime import datetime, timezone
 
 from django.core.management import BaseCommand
 from django.db.models import Q
+from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
 
 from documents.documents import DocumentDocument
 from documents.index import update_index_document
 from documents.management.commands.mixins import ProgressBarMixin
 from documents.models import Document
-from edoc.settings import ELASTIC_SEARCH_DOCUMENT_INDEX
+from edoc.settings import ELASTIC_SEARCH_HOST, ELASTIC_SEARCH_DOCUMENT_INDEX
 
 logger = logging.getLogger("edoc.duplicate_document")
 
@@ -25,6 +26,7 @@ def process_document(document):
         update_index_document(document)
     except Exception as e:
         logger.error(f"Failed to index document {document.id}: {e}")
+
 def delete_index(index_name):
     """
     Delete the specified Elasticsearch index if it exists.
@@ -40,14 +42,12 @@ def delete_index(index_name):
     else:
         logger.error(f"Index '{index_name}' does not exist.")
 
-def duplicate_documents_with_workers(duplicate_count: object = 1,
-                                     limit: object = None,
-                                     num_workers: object = 5,
-                                     batch_size: object = 10000,
-                                     folder_id: object = None,
-                                     owner_id: object = None,
-                                     start_time: object = None,
-                                     progress_bar_disable: object = False) -> object:
+
+def duplicate_documents_with_workers(duplicate_count=1, limit=None,
+                                     num_workers=5, batch_size=10000,
+                                     folder_id=None, owner_id=None,
+                                     start_time=None,
+                                     progress_bar_disable=False):
     """
     Duplicate documents and update their index using workers.
     """
@@ -73,7 +73,6 @@ def duplicate_documents_with_workers(duplicate_count: object = 1,
     logger.info(f'time query: {time.time()-start_time}')
     # new_documents = []
     # new_folders = []
-
     document_count = documents.count()
     num_batches = math.ceil(document_count / batch_size)
     dict_checksum_id_folder = dict()
@@ -231,4 +230,3 @@ class Command(ProgressBarMixin, BaseCommand):
                 start_time=start_time,
                 progress_bar_disable=self.use_progress_bar,
             )
-
