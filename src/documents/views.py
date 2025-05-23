@@ -1300,37 +1300,42 @@ class UnifiedSearchViewSet(DocumentViewSet):
         self.searcher = None
 
     def get_serializer_class(self):
-        # if self._is_search_request():
-        #     # return SearchResultSerializer
-        # else:
-        #     return DocumentSerializer
-
         if self.request.method in  ["POST", "PUT"] or 'pk' in self.kwargs:
             return DocumentDetailSerializer
-        return SearchResultElasticSearchSerializer
+        if self._is_search_request():
+            # return SearchResultSerializer
+            return SearchResultElasticSearchSerializer
+        else:
+            return DocumentSerializer
+
+        # return SearchResultElasticSearchSerializer
 
     def _is_search_request(self):
         return (
             "query" in self.request.query_params
             or "more_like_id" in self.request.query_params
+            or "title_content" in self.request.query_params
         )
 
 
     def filter_queryset(self, queryset):
-        if 'pk' in self.kwargs:  # `self.kwargs` chứa các tham số từ URL, ví dụ: /documents/<id>
+        if self._is_search_request():
+            if 'pk' in self.kwargs:  # `self.kwargs` chứa các tham số từ URL, ví dụ: /documents/<id>
+                return super().filter_queryset(queryset)
+
+            from documents import index
+
+            query_class = index.DelayedElasticSearch
+            if "more_like_id" in self.request.query_params:
+                query_class = index.DelayedElasticSearchLikeMore
+            return query_class(
+                self.searcher,
+                self.request.query_params,
+                self.paginator.get_page_size(self.request),
+                self.request.user,
+            )
+        else:
             return super().filter_queryset(queryset)
-
-        from documents import index
-
-        query_class = index.DelayedElasticSearch
-        if "more_like_id" in self.request.query_params:
-            query_class = index.DelayedElasticSearchLikeMore
-        return query_class(
-            self.searcher,
-            self.request.query_params,
-            self.paginator.get_page_size(self.request),
-            self.request.user,
-        )
 
     def list(self, request, *args, **kwargs):
 
