@@ -203,6 +203,34 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["created"], "2023-01-01")
 
+    def test_document_update_legacy_created_format(self):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - Document is updated with created in datetime format
+        THEN:
+            - Document created field is updated as date
+        """
+        doc = Document.objects.create(
+            title="none",
+            checksum="123",
+            mime_type="application/pdf",
+            created=date(2023, 1, 1),
+        )
+
+        created_datetime = datetime.datetime(2023, 2, 1, 12, 0, 0)
+        response = self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            {"created": created_datetime},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.created, date(2023, 2, 1))
+
     def test_document_update_with_created_date(self):
         """
         GIVEN:
