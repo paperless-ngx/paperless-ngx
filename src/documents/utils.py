@@ -40,10 +40,17 @@ def copy_file_with_basic_stats(
 
     The extended attribute copy does weird things with SELinux and files
     copied from temporary directories.
+
+    If there is a PermissionError (e.g., on ZFS with acltype=nfsv4)
+    fall back to copyfile (data only).
     """
     source, dest = _coerce_to_path(source, dest)
 
-    shutil.copy(source, dest)
+    try:
+        shutil.copy(source, dest)
+    except PermissionError:
+        shutil.copyfile(source, dest)
+
     copy_basic_file_stats(source, dest)
 
 
