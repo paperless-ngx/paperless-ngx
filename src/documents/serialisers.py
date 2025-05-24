@@ -966,13 +966,17 @@ class DocumentSerializer(
         return doc
 
     def to_internal_value(self, data):
-        if "created" in data:
-            created_val = data["created"]
-            if isinstance(created_val, str) and ":" in created_val:
-                try:
-                    data["created"] = datetime.fromisoformat(created_val).date()
-                except ValueError:  # pragma: no cover
-                    pass
+        if (
+            "created" in data
+            and isinstance(data["created"], str)
+            and ":" in data["created"]
+        ):
+            # Handle old format of isoformat datetime string
+            try:
+                data["created"] = datetime.fromisoformat(data["created"]).date()
+            except ValueError:  # pragma: no cover
+                # Just pass, validation will catch it
+                pass
         return super().to_internal_value(data)
 
     def validate(self, attrs):
