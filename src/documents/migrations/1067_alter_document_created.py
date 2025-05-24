@@ -5,28 +5,41 @@ import datetime
 
 from django.db import migrations
 from django.db import models
-from django.db.models.functions import TruncDate
+from django.utils.timezone import localtime
 
 
 def migrate_date(apps, schema_editor):
     Document = apps.get_model("documents", "Document")
-    queryset = Document.objects.annotate(
-        truncated_created=TruncDate("created"),
-    ).values("id", "truncated_created")
 
     # Batch to avoid loading all objects into memory at once,
     # which would be problematic for large datasets.
     batch_size = 500
     updates = []
-    for item in queryset.iterator(chunk_size=batch_size):
-        updates.append(
-            Document(id=item["id"], created_date=item["truncated_created"]),
-        )
+    total_updated = 0
+    total_checked = 0
+
+    for doc in Document.objects.only("id", "created").iterator(chunk_size=batch_size):
+        total_checked += 1
+        if doc.created:
+            doc.created_date = localtime(doc.created).date()
+            updates.append(doc)
+
         if len(updates) >= batch_size:
             Document.objects.bulk_update(updates, ["created_date"])
+            total_updated += len(updates)
+            print(
+                f"[1067_alter_document_created] {total_updated} of {total_checked} processed...",
+            )
             updates.clear()
+
     if updates:
         Document.objects.bulk_update(updates, ["created_date"])
+        total_updated += len(updates)
+        print(
+            f"[1067_alter_document_created] {total_updated} of {total_checked} processed...",
+        )
+
+    print(f"[1067_alter_document_created] completed for {total_checked} documents.")
 
 
 class Migration(migrations.Migration):
