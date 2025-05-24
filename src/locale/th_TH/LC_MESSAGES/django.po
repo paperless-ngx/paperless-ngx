@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-19 20:52+0000\n"
-"PO-Revision-Date: 2025-05-19 20:54\n"
+"POT-Creation-Date: 2025-05-24 17:14+0000\n"
+"PO-Revision-Date: 2025-05-24 17:17\n"
 "Last-Translator: \n"
 "Language-Team: Thai\n"
 "Language: th_TH\n"
@@ -83,7 +83,7 @@ msgstr "Regular expression"
 
 #: documents/models.py:58 documents/models.py:929
 msgid "Fuzzy word"
-msgstr ""
+msgstr "คำไม่ชัดเจน"
 
 #: documents/models.py:59
 msgid "Automatic"
@@ -290,7 +290,7 @@ msgstr "แท็ก"
 
 #: documents/models.py:391
 msgid "Correspondent"
-msgstr ""
+msgstr "คนเขียน"
 
 #: documents/models.py:392
 msgid "Document Type"
@@ -530,11 +530,11 @@ msgstr "การค้นหาฟิลด์ที่กำหนดเอง
 
 #: documents/models.py:493
 msgid "created to"
-msgstr ""
+msgstr "สร้างขึ้นเพื่อ"
 
 #: documents/models.py:494
 msgid "created from"
-msgstr ""
+msgstr "สร้างขึ้นจาก"
 
 #: documents/models.py:495
 msgid "added to"
@@ -542,7 +542,7 @@ msgstr ""
 
 #: documents/models.py:496
 msgid "added from"
-msgstr ""
+msgstr "เพิ่มจาก"
 
 #: documents/models.py:497
 msgid "mime type is"
@@ -566,19 +566,19 @@ msgstr "กฎในการค้น"
 
 #: documents/models.py:537
 msgid "Auto Task"
-msgstr ""
+msgstr "งานอัตโนมัติ"
 
 #: documents/models.py:538
 msgid "Scheduled Task"
-msgstr ""
+msgstr "งานที่กำหนดเวลาไว้"
 
 #: documents/models.py:539
 msgid "Manual Task"
-msgstr ""
+msgstr "งานแบบแมนนวล"
 
 #: documents/models.py:542
 msgid "Consume File"
-msgstr ""
+msgstr "ใช้ไฟล์"
 
 #: documents/models.py:543
 msgid "Train Classifier"
@@ -586,7 +586,7 @@ msgstr ""
 
 #: documents/models.py:544
 msgid "Check Sanity"
-msgstr ""
+msgstr "ตรวจสอบสุขภาพจิต"
 
 #: documents/models.py:545
 msgid "Index Optimize"
@@ -1173,12 +1173,12 @@ msgstr "Regular expression ไม่ถูกต้อง : %(error)s"
 msgid "Invalid color."
 msgstr "สีไม่ถูกต้อง"
 
-#: documents/serialisers.py:1632
+#: documents/serialisers.py:1646
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "ไม่รองรับไฟล์ประเภท %(type)s"
 
-#: documents/serialisers.py:1726
+#: documents/serialisers.py:1740
 msgid "Invalid variable detected."
 msgstr "ตรวจพบตัวแปรไม่ถูกต้อง"
 
