@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-19 20:52+0000\n"
-"PO-Revision-Date: 2025-05-19 20:54\n"
+"POT-Creation-Date: 2025-05-24 17:14+0000\n"
+"PO-Revision-Date: 2025-05-24 17:17\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -1173,12 +1173,12 @@ msgstr "Ongeldige reguliere expressie: %(error)s"
 msgid "Invalid color."
 msgstr "Ongeldig kleur."
 
-#: documents/serialisers.py:1632
+#: documents/serialisers.py:1646
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Bestandstype %(type)s niet ondersteund"
 
-#: documents/serialisers.py:1726
+#: documents/serialisers.py:1740
 msgid "Invalid variable detected."
 msgstr "Ongeldige variabele ontdekt."
 
