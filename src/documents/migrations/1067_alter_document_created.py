@@ -10,6 +10,9 @@ from django.utils.timezone import localtime
 
 def migrate_date(apps, schema_editor):
     Document = apps.get_model("documents", "Document")
+
+    # Batch to avoid loading all objects into memory at once,
+    # which would be problematic for large datasets.
     batch_size = 500
     updates = []
     total_updated = 0
@@ -24,15 +27,19 @@ def migrate_date(apps, schema_editor):
         if len(updates) >= batch_size:
             Document.objects.bulk_update(updates, ["created_date"])
             total_updated += len(updates)
-            print(f"Updated {total_updated} of {total_checked} processed...")
+            print(
+                f"[1067_alter_document_created] {total_updated} of {total_checked} processed...",
+            )
             updates.clear()
 
     if updates:
         Document.objects.bulk_update(updates, ["created_date"])
         total_updated += len(updates)
-        print(f"Updated: {total_updated} total documents.")
+        print(
+            f"[1067_alter_document_created] {total_updated} of {total_checked} processed...",
+        )
 
-    print(f"Done. Processed {total_checked} documents.")
+    print(f"[1067_alter_document_created] completed for {total_checked} documents.")
 
 
 class Migration(migrations.Migration):
