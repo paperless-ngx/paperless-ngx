@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import re
 from fnmatch import fnmatch
+from fnmatch import translate as fnmatch_translate
 from typing import TYPE_CHECKING
 
 from documents.data_models import ConsumableDocument
@@ -391,19 +392,19 @@ def existing_document_matches_workflow(
     return (trigger_matched, reason)
 
 
-def filter_documents_by_workflowtrigger_criteria(
+def prefilter_documents_by_workflowtrigger(
     documents: QuerySet[Document],
     trigger: WorkflowTrigger,
 ) -> QuerySet[Document]:
     """
-    Filters the documents queryset by the criteria defined in the workflow.
-    Returns a filtered queryset of documents that match the trigger's criteria.
+    To prevent scheduled workflows checking every document, we prefilter the
+    documents by the workflow trigger filters. This is done before e.g.
+    document_matches_workflow in run_workflows
     """
-    from django.db.models import Q
 
     if trigger.filter_has_tags.all().count() > 0:
         documents = documents.filter(
-            Q(tags__in=trigger.filter_has_tags.all()) | Q(tags__isnull=True),
+            tags__in=trigger.filter_has_tags.all(),
         ).distinct()
 
     if trigger.filter_has_correspondent is not None:
@@ -417,9 +418,10 @@ def filter_documents_by_workflowtrigger_criteria(
         )
 
     if trigger.filter_filename is not None and len(trigger.filter_filename) > 0:
-        documents = documents.filter(
-            original_filename__icontains=trigger.filter_filename,
-        )
+        # the true fnmatch will actually run later so we just want a loose filter here
+        regex = fnmatch_translate(trigger.filter_filename).lstrip("^").rstrip("$")
+        regex = f"(?i){regex}"
+        documents = documents.filter(original_filename__regex=regex)
 
     return documents
 
