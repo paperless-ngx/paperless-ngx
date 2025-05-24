@@ -5,6 +5,7 @@ import datetime
 
 from django.db import migrations
 from django.db import models
+from django.utils.timezone import localtime
 
 
 def migrate_date(apps, schema_editor):
@@ -17,7 +18,7 @@ def migrate_date(apps, schema_editor):
     for doc in Document.objects.only("id", "created").iterator(chunk_size=batch_size):
         total_checked += 1
         if doc.created:
-            doc.created_date = doc.created.date()
+            doc.created_date = localtime(doc.created).date()
             updates.append(doc)
 
         if len(updates) >= batch_size:
