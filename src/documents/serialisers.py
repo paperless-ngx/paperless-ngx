@@ -965,6 +965,16 @@ class DocumentSerializer(
             ).isoformat()
         return doc
 
+    def to_internal_value(self, data):
+        if "created" in data:
+            created_val = data["created"]
+            if isinstance(created_val, str) and ":" in created_val:
+                try:
+                    data["created"] = datetime.fromisoformat(created_val).date()
+                except ValueError:  # pragma: no cover
+                    pass
+        return super().to_internal_value(data)
+
     def validate(self, attrs):
         if (
             "archive_serial_number" in attrs
