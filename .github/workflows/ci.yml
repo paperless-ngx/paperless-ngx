@@ -6,11 +6,7 @@ on:
       - 'v[0-9]+.[0-9]+.[0-9]+'
       # https://semver.org/#spec-item-9
       - 'v[0-9]+.[0-9]+.[0-9]+-beta.rc[0-9]+'
-    branches-ignore:
-      - 'translations**'
   pull_request:
-    branches-ignore:
-      - 'translations**'
 env:
   DEFAULT_UV_VERSION: "0.6.x"
   # This is the default version of Python to use in most steps which aren't specific
