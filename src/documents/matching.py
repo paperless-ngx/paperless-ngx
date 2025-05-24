@@ -18,6 +18,8 @@ from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 
 if TYPE_CHECKING:
+    from django.db.models import QuerySet
+
     from documents.classifier import DocumentClassifier
 
 logger = logging.getLogger("paperless.matching")
@@ -387,6 +389,39 @@ def existing_document_matches_workflow(
         trigger_matched = False
 
     return (trigger_matched, reason)
+
+
+def filter_documents_by_workflowtrigger_criteria(
+    documents: QuerySet[Document],
+    trigger: WorkflowTrigger,
+) -> QuerySet[Document]:
+    """
+    Filters the documents queryset by the criteria defined in the workflow.
+    Returns a filtered queryset of documents that match the trigger's criteria.
+    """
+    from django.db.models import Q
+
+    if trigger.filter_has_tags.all().count() > 0:
+        documents = documents.filter(
+            Q(tags__in=trigger.filter_has_tags.all()) | Q(tags__isnull=True),
+        ).distinct()
+
+    if trigger.filter_has_correspondent is not None:
+        documents = documents.filter(
+            correspondent=trigger.filter_has_correspondent,
+        )
+
+    if trigger.filter_has_document_type is not None:
+        documents = documents.filter(
+            document_type=trigger.filter_has_document_type,
+        )
+
+    if trigger.filter_filename is not None and len(trigger.filter_filename) > 0:
+        documents = documents.filter(
+            original_filename__icontains=trigger.filter_filename,
+        )
+
+    return documents
 
 
 def document_matches_workflow(
