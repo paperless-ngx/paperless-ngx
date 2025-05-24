@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-24 17:14+0000\n"
-"PO-Revision-Date: 2025-05-24 17:17\n"
+"PO-Revision-Date: 2025-05-24 17:36\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Language: he_IL\n"
@@ -1542,7 +1542,7 @@ msgstr "Unpaper שולט בניקוי"
 
 #: paperless/models.py:138
 msgid "Enables deskew"
-msgstr "מאפשר יישור דף\n"
+msgstr "מאפשר יישור דף"
 
 #: paperless/models.py:141
 msgid "Enables page rotation"
