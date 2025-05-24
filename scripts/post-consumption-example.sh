@@ -6,6 +6,7 @@ A document with an id of ${DOCUMENT_ID} was just consumed.  I know the
 following additional information about it:
 
 * Generated File Name: ${DOCUMENT_FILE_NAME}
+* Document type: ${DOCUMENT_TYPE}
 * Archive Path: ${DOCUMENT_ARCHIVE_PATH}
 * Source Path: ${DOCUMENT_SOURCE_PATH}
 * Created: ${DOCUMENT_CREATED}

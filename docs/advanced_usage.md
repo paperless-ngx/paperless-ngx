@@ -179,6 +179,7 @@ variables:
 | ---------------------------- | ---------------------------------------------- |
 | `DOCUMENT_ID`                | Database primary key of the document           |
 | `DOCUMENT_FILE_NAME`         | Formatted filename, not including paths        |
+| `DOCUMENT_TYPE`              | The document type (if any)                     |
 | `DOCUMENT_CREATED`           | Date & time when document created              |
 | `DOCUMENT_MODIFIED`          | Date & time when document was last modified    |
 | `DOCUMENT_ADDED`             | Date & time when document was added            |

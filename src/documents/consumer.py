@@ -303,6 +303,7 @@ class ConsumerPlugin(
         script_env = os.environ.copy()
 
         script_env["DOCUMENT_ID"] = str(document.pk)
+        script_env["DOCUMENT_TYPE"] = str(document.document_type)
         script_env["DOCUMENT_CREATED"] = str(document.created)
         script_env["DOCUMENT_MODIFIED"] = str(document.modified)
         script_env["DOCUMENT_ADDED"] = str(document.added)
