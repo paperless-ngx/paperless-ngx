@@ -356,7 +356,7 @@ still have "object-level" permissions.
 | Tag           | Add, edit, delete or view Tags.                                                                                                                                          |
 | UISettings    | Add, edit, delete or view the UI settings that are used by the web app.<br/>:warning: **Users that will access the web UI must be granted at least _View_ permissions.** |
 | User          | Add, edit, delete or view Users.                                                                                                                                         |
-| Workflow      | Add, edit, delete or view Workflows.<br/>Note that Workflows are global, in other words all users who can access workflows have access to the same set of them.          |
+| Workflow      | Add, edit, delete or view Workflows.<br/>Note that Workflows are global; all users who can access workflows see the same set. Workflows have other permission implications — see [Workflow permissions](#workflow-permissions).          |
 
 #### Detailed Explanation of Object Permissions {#object-permissions}
 
