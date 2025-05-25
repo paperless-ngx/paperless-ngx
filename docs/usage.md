@@ -533,7 +533,7 @@ The following placeholders are only available for "added" or "updated" triggers
 All users who have application permissions for editing workflows can see the same set
 of workflows. In other words, workflows themselves intentionally do not have an owner or permissions.
 
-Given their potentially far-reaching capabilities, you may want to restrict access to workflows.
+Given their potentially far-reaching capabilities, including changing the permissions of existing documents, you may want to restrict access to workflows.
 
 Upon migration, existing installs will grant access to workflows to users who can add
 documents (and superusers who can always access all parts of the app).
