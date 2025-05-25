@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-24 17:14+0000\n"
-"PO-Revision-Date: 2025-05-24 17:36\n"
+"PO-Revision-Date: 2025-05-25 00:39\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Language: he_IL\n"
@@ -959,11 +959,11 @@ msgstr "."
 
 #: documents/models.py:1148
 msgid "webhook headers"
-msgstr ""
+msgstr "webhook כותרות ה"
 
 #: documents/models.py:1151
 msgid "The headers to send with the webhook URL."
-msgstr ""
+msgstr "הכותרות שיש לשלוח עם כתובת הוובהוק."
 
 #: documents/models.py:1156
 msgid "include document in webhook"
@@ -1155,15 +1155,15 @@ msgstr "סוג ההפעלה של זרימת העבודה"
 
 #: documents/models.py:1466
 msgid "date run"
-msgstr ""
+msgstr "תאריך הרצה"
 
 #: documents/models.py:1472
 msgid "workflow run"
-msgstr ""
+msgstr "הרצת זרימת עבודה"
 
 #: documents/models.py:1473
 msgid "workflow runs"
-msgstr ""
+msgstr "הרצות זרימת עבודה"
 
 #: documents/serialisers.py:135
 #, python-format
@@ -1185,19 +1185,19 @@ msgstr "משתנה לא חוקי זוהה."
 
 #: documents/templates/account/account_inactive.html:5
 msgid "Paperless-ngx account inactive"
-msgstr ""
+msgstr "חשבון פייפרלס לא פעיל"
 
 #: documents/templates/account/account_inactive.html:9
 msgid "Account inactive."
-msgstr ""
+msgstr "החשבון אינו פעיל."
 
 #: documents/templates/account/account_inactive.html:14
 msgid "This account is inactive."
-msgstr ""
+msgstr "חשבון זה אינו פעיל"
 
 #: documents/templates/account/account_inactive.html:16
 msgid "Return to login"
-msgstr ""
+msgstr "חזרה להתחברות"
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
@@ -1316,7 +1316,7 @@ msgstr "הסיסמה שלך הוגדרה בהצלחה במערכת. אתה יכ�
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr ""
+msgstr "PaperLess הרשמה ל"
 
 #: documents/templates/account/signup.html:11
 #, python-format
@@ -1325,7 +1325,7 @@ msgstr "יש לך חשבון? <a href=\"%(login_url)s\">התחבר</a>"
 
 #: documents/templates/account/signup.html:19
 msgid "Note: This is the first user account for this installation and will be granted superuser privileges."
-msgstr ""
+msgstr ". הערה: זהו חשבון המשתמש הראשון בהתקנה זו ויינתנו לו הרשאות מנהל על."
 
 #: documents/templates/account/signup.html:23
 #: documents/templates/socialaccount/signup.html:14
@@ -1355,7 +1355,7 @@ msgstr "הנה קישור למסמכים."
 
 #: documents/templates/mfa/authenticate.html:7
 msgid "Paperless-ngx Two-Factor Authentication"
-msgstr ""
+msgstr "PapwrLess אימות דו-שלבי של"
 
 #: documents/templates/mfa/authenticate.html:12
 msgid "Your account is protected by two-factor authentication. Please enter an authenticator code:"
@@ -1380,17 +1380,17 @@ msgstr "לינק לקישור הקובץ פג תוקף"
 #: documents/templates/socialaccount/authentication_error.html:5
 #: documents/templates/socialaccount/login.html:5
 msgid "Paperless-ngx social account sign in"
-msgstr ""
+msgstr "PaperLess התחברות באמצעות חשבון חברתי ל"
 
 #: documents/templates/socialaccount/authentication_error.html:10
 #, python-format
 msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
-msgstr ""
+msgstr "אירעה שגיאה בעת ניסיון ההתחברות דרך חשבון הרשת החברתית שלך. חזור ל- <a href=\"%(login_url)s\">דף ההתחברות</a>"
 
 #: documents/templates/socialaccount/login.html:10
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
-msgstr ""
+msgstr "%(provider)s אתה עומד לחבר חשבון צד שלישי חדש מ."
 
 #: documents/templates/socialaccount/login.html:13
 msgid "Continue"
@@ -1403,7 +1403,7 @@ msgstr "הרשם לחשבון חברתי לפייפר-לס"
 #: documents/templates/socialaccount/signup.html:10
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr ""
+msgstr "שלך כדי להתחבר %(provider_name)s אתה עומד להשתמש בחשבון ה-."
 
 #: documents/templates/socialaccount/signup.html:11
 msgid "As a final step, please complete the following form:"
@@ -1412,21 +1412,21 @@ msgstr ": כצעד אחרון, אנא מלא את הטופס הבא:"
 #: documents/validators.py:24
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "לא ניתן לנתח את כתובת הערך יו. אר. אל, חסרה הסכימה"
 
 #: documents/validators.py:29
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "לא ניתן לנתח את הערך יו. אר. אל, חסר מיקום רשת [נט לוקיישן] או נתיב."
 
 #: documents/validators.py:36
 msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
-msgstr ""
+msgstr "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
 
 #: documents/validators.py:45
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "לא ניתן לפרוש את כתובת הערך יו. אר. אל"
 
 #: paperless/apps.py:11
 msgid "Paperless"
@@ -1438,19 +1438,19 @@ msgstr "pdf"
 
 #: paperless/models.py:27
 msgid "pdfa"
-msgstr ""
+msgstr "pdfa"
 
 #: paperless/models.py:28
 msgid "pdfa-1"
-msgstr ""
+msgstr "pdf/A-1"
 
 #: paperless/models.py:29
 msgid "pdfa-2"
-msgstr ""
+msgstr "pdf/A-2"
 
 #: paperless/models.py:30
 msgid "pdfa-3"
-msgstr ""
+msgstr "pdf/A-3 (פורמט Pdf ארכיון, גרסה 3)"
 
 #: paperless/models.py:39
 msgid "skip"
@@ -1458,11 +1458,11 @@ msgstr "דלג"
 
 #: paperless/models.py:40
 msgid "redo"
-msgstr ""
+msgstr "חזור על הפעולה"
 
 #: paperless/models.py:41
 msgid "force"
-msgstr ""
+msgstr "אלץ"
 
 #: paperless/models.py:42
 msgid "skip_noarchive"
@@ -1502,7 +1502,7 @@ msgstr "RGB"
 
 #: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
-msgstr ""
+msgstr "שימוש בצבעים בלתי תלויים בהתקן"
 
 #: paperless/models.py:73
 msgid "Gray"
