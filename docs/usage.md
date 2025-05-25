@@ -338,25 +338,25 @@ Global permissions define what areas of the app and API endpoints users can acce
 determine if a user can create, edit, delete or view _any_ documents, but individual documents themselves
 still have "object-level" permissions.
 
-| Type          | Details                                                                                                                                                                  |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| AppConfig     | _Change_ or higher permissions grants access to the "Application Configuration" area.                                                                                    |
-| Correspondent | Add, edit, delete or view Correspondents.                                                                                                                                |
-| CustomField   | Add, edit, delete or view Custom Fields.                                                                                                                                 |
-| Document      | Add, edit, delete or view Documents.                                                                                                                                     |
-| DocumentType  | Add, edit, delete or view Document Types.                                                                                                                                |
-| Group         | Add, edit, delete or view Groups.                                                                                                                                        |
-| MailAccount   | Add, edit, delete or view Mail Accounts.                                                                                                                                 |
-| MailRule      | Add, edit, delete or view Mail Rules.                                                                                                                                    |
-| Note          | Add, edit, delete or view Notes.                                                                                                                                         |
-| PaperlessTask | View or dismiss (_Change_) File Tasks.                                                                                                                                   |
-| SavedView     | Add, edit, delete or view Saved Views.                                                                                                                                   |
-| ShareLink     | Add, delete or view Share Links.                                                                                                                                         |
-| StoragePath   | Add, edit, delete or view Storage Paths.                                                                                                                                 |
-| Tag           | Add, edit, delete or view Tags.                                                                                                                                          |
-| UISettings    | Add, edit, delete or view the UI settings that are used by the web app.<br/>:warning: **Users that will access the web UI must be granted at least _View_ permissions.** |
-| User          | Add, edit, delete or view Users.                                                                                                                                         |
-| Workflow      | Add, edit, delete or view Workflows.<br/>Note that Workflows are global; all users who can access workflows see the same set. Workflows have other permission implications — see [Workflow permissions](#workflow-permissions).          |
+| Type          | Details                                                                                                                                                                                                                         |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AppConfig     | _Change_ or higher permissions grants access to the "Application Configuration" area.                                                                                                                                           |
+| Correspondent | Add, edit, delete or view Correspondents.                                                                                                                                                                                       |
+| CustomField   | Add, edit, delete or view Custom Fields.                                                                                                                                                                                        |
+| Document      | Add, edit, delete or view Documents.                                                                                                                                                                                            |
+| DocumentType  | Add, edit, delete or view Document Types.                                                                                                                                                                                       |
+| Group         | Add, edit, delete or view Groups.                                                                                                                                                                                               |
+| MailAccount   | Add, edit, delete or view Mail Accounts.                                                                                                                                                                                        |
+| MailRule      | Add, edit, delete or view Mail Rules.                                                                                                                                                                                           |
+| Note          | Add, edit, delete or view Notes.                                                                                                                                                                                                |
+| PaperlessTask | View or dismiss (_Change_) File Tasks.                                                                                                                                                                                          |
+| SavedView     | Add, edit, delete or view Saved Views.                                                                                                                                                                                          |
+| ShareLink     | Add, delete or view Share Links.                                                                                                                                                                                                |
+| StoragePath   | Add, edit, delete or view Storage Paths.                                                                                                                                                                                        |
+| Tag           | Add, edit, delete or view Tags.                                                                                                                                                                                                 |
+| UISettings    | Add, edit, delete or view the UI settings that are used by the web app.<br/>:warning: **Users that will access the web UI must be granted at least _View_ permissions.**                                                        |
+| User          | Add, edit, delete or view Users.                                                                                                                                                                                                |
+| Workflow      | Add, edit, delete or view Workflows.<br/>Note that Workflows are global; all users who can access workflows see the same set. Workflows have other permission implications — see [Workflow permissions](#workflow-permissions). |
 
 #### Detailed Explanation of Object Permissions {#object-permissions}
 
