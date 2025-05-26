@@ -962,7 +962,9 @@ class Consumer(LoggingMixin):
                         copy_file_with_basic_stats(self.working_copy,
                                                self.original_path)
                 new_file = None
-
+                print("gia tri document",
+                      get_unique_name(Folder, document.title,
+                                      document.folder))
                 new_file = Folder.objects.create(
                     name=get_unique_name(Folder, document.title,
                                          document.folder),

@@ -226,7 +226,6 @@ def get_temp_file_path(file_name_or_path):
 
 
 def get_unique_name(model, base_name, parent_folder=None):
-    count = 1
     unique_name = base_name
     from documents.models import Folder
     # Nếu model là Folder, kiểm tra cả parent_folder
@@ -234,7 +233,6 @@ def get_unique_name(model, base_name, parent_folder=None):
     if model == Folder and parent_folder:
         query = query.filter(parent_folder=parent_folder)
     existing_names = query.order_by("name").values_list("name", flat=True)
-
     # while query.exists():
     #     unique_name = f"{base_name} ({count})"
     #     count += 1
@@ -243,4 +241,4 @@ def get_unique_name(model, base_name, parent_folder=None):
     #         query = query.filter(parent_folder=parent_folder)
     #
     # return unique_name
-    generate_unique_name(base_name, existing_names)
+    return generate_unique_name(base_name, existing_names)
