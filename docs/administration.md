@@ -333,7 +333,7 @@ must be provided to import. If this value is lost, the export cannot be imported
 The document importer takes the export produced by the [Document
 exporter](#exporter) and imports it into paperless.
 
-The importer works just like the exporter. You point it at a directory,
+The importer works just like the exporter. You point it at a directory or the generated .zip file,
 and the script does the rest of the work:
 
 ```shell
@@ -350,9 +350,6 @@ document_importer source
 When you use the provided docker compose script, put the export inside
 the `export` folder in your paperless source directory. Specify
 `../export` as the `source`.
-
-Note that .zip files (as can be generated from the exporter) are not supported. You must unzip them into
-the target directory first.
 
 !!! note
 
