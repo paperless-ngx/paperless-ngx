@@ -801,7 +801,7 @@ class Consumer(LoggingMixin):
         self.pre_change_folder()
         self.pre_check_file_exists()
         self.pre_check_directories()
-        self.pre_check_duplicate()
+        # self.pre_check_duplicate()
         self.pre_check_asn_value()
 
         self.log.info(f"Consuming {self.filename}")

@@ -279,7 +279,7 @@ class Folder(SoftDeleteModel, MatchingModel):
         _("checksum"),
         max_length=32,
         editable=False,
-        unique=True,
+        unique=False,
         null=True,
         help_text=_("The checksum of the original folder."),
     )
@@ -963,7 +963,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
         _("checksum"),
         max_length=32,
         editable=False,
-        unique=True,
+        unique=False,
         help_text=_("The checksum of the original document."),
     )
 
