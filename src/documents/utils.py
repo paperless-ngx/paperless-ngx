@@ -225,10 +225,22 @@ def get_temp_file_path(file_name_or_path):
     return temp_file_path  # Trả lại cả temp_path và object quản lý
 
 
-def get_unique_name(model, base_name):
+def get_unique_name(model, base_name, parent_folder=None):
     count = 1
     unique_name = base_name
-    while model.objects.filter(name=unique_name).exists():
-        unique_name = f"{base_name} ({count})"
-        count += 1
-    return unique_name
+    from documents.models import Folder
+    # Nếu model là Folder, kiểm tra cả parent_folder
+    query = model.objects.filter(name__startswith=unique_name.strip())
+    if model == Folder and parent_folder:
+        query = query.filter(parent_folder=parent_folder)
+    existing_names = query.order_by("name").values_list("name", flat=True)
+
+    # while query.exists():
+    #     unique_name = f"{base_name} ({count})"
+    #     count += 1
+    #     query = model.objects.filter(name=unique_name)
+    #     if model == Folder and parent_folder:
+    #         query = query.filter(parent_folder=parent_folder)
+    #
+    # return unique_name
+    generate_unique_name(base_name, existing_names)

@@ -207,7 +207,7 @@ from documents.tasks import consume_file
 from documents.tasks import deleted_backup
 from documents.tasks import empty_trash
 from documents.tasks import restore_documents
-from documents.utils import check_storage
+from documents.utils import check_storage, get_unique_name
 from documents.utils import generate_unique_name
 from documents.utils import get_directory_size
 from edoc import version
@@ -3662,7 +3662,9 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
                     },
                     status=status.HTTP_403_FORBIDDEN,
                 )
-            folder = serializer.save(parent_folder=parent_folder, owner=request.user)
+            owner = serializer.validated_data.get("owner")
+            merge = serializer.validated_data.get("merge", True)
+            folder = serializer.save(parent_folder=parent_folder, owner=owner)
             folder.path = f"{parent_folder.path}/{folder.id}"
             folder.checksum = hashlib.md5(
                 f"{folder.id}.{folder.name}".encode(),
@@ -3706,6 +3708,11 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
 
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
+
+        serializer.validated_data["name"] = get_unique_name(Folder,
+                                                            serializer.validated_data[
+                                                                "name"], int(
+                request.data["parent_folder"]))
         serializer.validated_data["updated"] = timezone.now()
 
         old_parent_folder = instance.parent_folder

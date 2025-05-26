@@ -2484,7 +2484,7 @@ def generate_unique_name(name, existing_names):
     i = 1
     new_name = name
     while new_name in existing_names:
-        new_name = f"{name}({i})"
+        new_name = f"{name} ({i})"
         i += 1
     return new_name
 
@@ -2682,6 +2682,18 @@ class FolderSerializer(OwnedObjectSerializer):
                 return DocumentFolderSerializer(document).data
         return None
 
+    def create(self, validated_data):
+        # default to current user if not set
+        if "owner" not in validated_data and self.user:
+            validated_data["owner"] = self.user
+        permissions = None
+        if "set_permissions" in validated_data:
+            permissions = validated_data.pop("set_permissions")
+            validated_data.pop("merge")
+        instance = super().create(validated_data)
+        if permissions is not None:
+            self._set_permissions(permissions, instance)
+        return instance
     # def validate(self, data):
     #     return data
 

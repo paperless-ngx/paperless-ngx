@@ -964,7 +964,8 @@ class Consumer(LoggingMixin):
                 new_file = None
 
                 new_file = Folder.objects.create(
-                    name=get_unique_name(Folder, document.title),
+                    name=get_unique_name(Folder, document.title,
+                                         document.folder),
                     parent_folder=document.folder,
                     type=Folder.FILE,
                     owner=document.owner,
