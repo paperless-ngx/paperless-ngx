@@ -5,7 +5,7 @@
 
 services:
   gotenberg:
-    image: docker.io/gotenberg/gotenberg:8.20
+    image: docker.io/gotenberg/gotenberg:8.21
     hostname: gotenberg
     container_name: gotenberg
     network_mode: host
