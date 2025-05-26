@@ -1,3 +1,4 @@
+import locale
 import os
 
 from django.conf import settings
@@ -6,6 +7,11 @@ from documents.models import Document
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.templating.utils import convert_format_str_to_template_format
 
+
+locale_setting = os.getenv("LC_ALL")
+if locale_setting is None:
+    locale_setting = "en_US.UTF8"
+locale.setlocale(locale.LC_ALL, locale_setting)
 
 def create_source_path_directory(source_path):
     os.makedirs(os.path.dirname(source_path), exist_ok=True)
