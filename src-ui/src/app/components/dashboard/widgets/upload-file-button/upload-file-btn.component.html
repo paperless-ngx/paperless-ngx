@@ -1,7 +1,9 @@
 <div content tourAnchor="tour.upload-widget" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Document }">
     <form class="">
 
-      <button class="btn btn-sm btn-outline-primary " (click)="fileUpload.click()" i18n> <i-bs name="upload"></i-bs>&nbsp; Upload file</button>
+      <button class="btn btn-sm btn-outline-primary " (click)="resetFileInput();fileUpload.click()" i18n>
+        <i-bs name="upload"></i-bs>&nbsp; Upload file
+      </button>
       <input type="file" class="visually-hidden" (change)="onFileSelected($event)" multiple #fileUpload>
     </form>
     @if (getStatus().length > 0) {

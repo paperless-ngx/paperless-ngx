@@ -1,16 +1,11 @@
-import { Component, QueryList, ViewChildren } from '@angular/core'
+import { Component, ElementRef, QueryList, ViewChild, ViewChildren } from '@angular/core'
 import { Router } from '@angular/router'
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap'
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import {
-  ConsumerStatusService,
-  FileStatus,
-  FileStatusPhase,
-} from 'src/app/services/consumer-status.service'
+import { ConsumerStatusService, FileStatus, FileStatusPhase } from 'src/app/services/consumer-status.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
-import { folder } from 'ngx-bootstrap-icons'
 
 const MAX_ALERTS = 5
 
@@ -21,14 +16,18 @@ const MAX_ALERTS = 5
 })
 export class UploadFileButtonComponent extends ComponentWithPermissions {
   alertsExpanded = false
+  @ViewChild('fileUpload', { static: false }) fileUpload!: ElementRef
+
+
 
   @ViewChildren(NgbAlert) alerts: QueryList<NgbAlert>
+
 
   constructor(
     private router: Router,
     private consumerStatusService: ConsumerStatusService,
     private uploadDocumentsService: UploadDocumentsService,
-    public settingsService: SettingsService
+    public settingsService: SettingsService,
   ) {
     super()
   }
@@ -53,7 +52,7 @@ export class UploadFileButtonComponent extends ComponentWithPermissions {
       strings.push($localize`Added: ${countSuccess}`)
     }
     return strings.join(
-      $localize`:this string is used to separate processing, failed and added on the file upload widget:, `
+      $localize`:this string is used to separate processing, failed and added on the file upload widget:, `,
     )
   }
 
@@ -65,7 +64,7 @@ export class UploadFileButtonComponent extends ComponentWithPermissions {
 
   getStatusUploading() {
     return this.consumerStatusService.getConsumerStatus(
-      FileStatusPhase.UPLOADING
+      FileStatusPhase.UPLOADING,
     )
   }
 
@@ -119,22 +118,29 @@ export class UploadFileButtonComponent extends ComponentWithPermissions {
 
   dismissCompleted() {
     this.getStatusCompleted().forEach((status) =>
-      this.consumerStatusService.dismiss(status)
+      this.consumerStatusService.dismiss(status),
     )
   }
 
   public onFileSelected(event: Event) {
     let getUrl = this.router.url.split('/')
-    let payload = { folder: '' ,dossiers:''};
-    const folderMatch = this.router.url.match(/folders\/(\d+)/);
-    const dossierMatch = this.router.url.match(/dossiers\/(\d+)/);
-    if (folderMatch) { payload.folder = folderMatch[1]}
-    if (dossierMatch) { payload.dossiers = dossierMatch[1]}
-
+    let payload = { folder: '', dossiers: '' }
+    const folderMatch = this.router.url.match(/folders\/(\d+)/)
+    const dossierMatch = this.router.url.match(/dossiers\/(\d+)/)
+    if (folderMatch) {
+      payload.folder = folderMatch[1]
+    }
+    if (dossierMatch) {
+      payload.dossiers = dossierMatch[1]
+    }
     this.uploadDocumentsService.uploadFiles(
       (event.target as HTMLInputElement).files,
-      payload
+      payload,
     )
+  }
+
+  resetFileInput() {
+    this.fileUpload.nativeElement.value = ''
   }
 
   get slimSidebarEnabled(): boolean {
