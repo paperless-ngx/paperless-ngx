@@ -224,3 +224,11 @@ def get_temp_file_path(file_name_or_path):
 
     return temp_file_path  # Trả lại cả temp_path và object quản lý
 
+
+def get_unique_name(model, base_name):
+    count = 1
+    unique_name = base_name
+    while model.objects.filter(name=unique_name).exists():
+        unique_name = f"{base_name} ({count})"
+        count += 1
+    return unique_name

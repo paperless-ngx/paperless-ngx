@@ -57,7 +57,7 @@ from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
 from documents.utils import copy_basic_file_stats, \
     check_digital_signature, \
-    pdf_has_text_pdftotext
+    pdf_has_text_pdftotext, get_unique_name
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import get_content_before_last_number
 from documents.utils import run_subprocess
@@ -964,7 +964,7 @@ class Consumer(LoggingMixin):
                 new_file = None
 
                 new_file = Folder.objects.create(
-                    name=document.title,
+                    name=get_unique_name(Folder, document.title),
                     parent_folder=document.folder,
                     type=Folder.FILE,
                     owner=document.owner,
