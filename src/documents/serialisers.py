@@ -288,15 +288,17 @@ class OwnedObjectSerializer(
             self._set_permissions(validated_data["set_permissions"], instance)
         if "owner" in validated_data and "name" in self.Meta.fields:
             name = validated_data.get("name", instance.name)
-            not_unique = (
-                self.Meta.model.objects.exclude(pk=instance.pk)
-                .filter(owner=validated_data["owner"], name=name)
-                .exists()
-            )
-            if not_unique:
-                raise serializers.ValidationError(
-                    {"error": "Object violates owner / name unique constraint"},
+            if "parent_folder" not in validated_data:
+                not_unique = (
+                    self.Meta.model.objects.exclude(pk=instance.pk)
+                    .filter(owner=validated_data["owner"], name=name)
+                    .exists()
                 )
+                if not_unique:
+                    raise serializers.ValidationError(
+                        {
+                            "error": "Object violates owner / name unique constraint"},
+                    )
         return super().update(instance, validated_data)
 
 
@@ -2654,6 +2656,11 @@ class FolderSerializer(OwnedObjectSerializer):
     name = AdjustedNameFieldFolder()
     document = serializers.SerializerMethodField(read_only=True)
     document_count = serializers.IntegerField(read_only=True)
+    merge = serializers.BooleanField(
+        default=False,
+        write_only=True,
+        required=False,
+    )
     # def get_filesize(self, obj):
     #     if obj.type == Folder.FOLDER:
     #         return 0
@@ -2699,6 +2706,7 @@ class FolderSerializer(OwnedObjectSerializer):
             "user_can_change",
             "is_shared_by_requester",
             "set_permissions",
+            "merge"
         ]
 
 

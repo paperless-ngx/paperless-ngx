@@ -3716,7 +3716,8 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
         permissions_copy = permissions.copy()
         update_view_folder_parent_permissions.delay(instance, permissions_copy)
         owner = serializer.validated_data.get("owner")
-        merge = serializer.validated_data.get("merge")
+        merge = serializer.validated_data.get("merge", True)
+
         owner_exist = "owner" in serializer.validated_data
         set_permissions_exist = "set_permissions" in serializer.validated_data
         update_child_folder_permisisons.delay(folder=instance,

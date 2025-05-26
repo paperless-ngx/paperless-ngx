@@ -1114,9 +1114,11 @@ def update_child_folder_permisisons(self, folder, permissions, owner, merge,
     path = folder.path
     if folder.type == Folder.FOLDER:
         path = f"{folder.path}/"
+
     child_folders = Folder.objects.filter(path__startswith=path)
+    folder_ids = child_folders.values_list('id', flat=True)
     documents_list = Document.objects.filter(
-        folder__in=child_folders,
+        folder_id__in=folder_ids
     )
     # documents_list = []
     # for child in child_folders:
@@ -1135,6 +1137,7 @@ def update_child_folder_permisisons(self, folder, permissions, owner, merge,
             # if merge is true, we dont want to overwrite the owner
             qs_owner_update = qs.filter(owner__isnull=True) if merge else qs
             qs_owner_update.update(owner=owner)
+            documents_list.update(owner=owner)
         if set_permissions_exist:
             for obj in qs:
                 set_permissions_for_object(
@@ -1142,6 +1145,7 @@ def update_child_folder_permisisons(self, folder, permissions, owner, merge,
                     object=obj,
                     merge=merge,
                 )
+            print('merge----', merge, permissions)
             for obj in documents_list:
                 set_permissions_for_object(
                     permissions=permissions,

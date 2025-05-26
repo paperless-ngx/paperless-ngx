@@ -2525,7 +2525,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/folder-edit-dialog/folder-edit-dialog.component.html</context>
-               <context context-type="linenumber">22</context>
+               <context context-type="linenumber">26</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/font-language-edit-dialog/font-language-edit-dialog.component.html</context>
@@ -4759,7 +4759,7 @@
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/folder-edit-dialog/folder-edit-dialog.component.html</context>
-               <context context-type="linenumber">21</context>
+               <context context-type="linenumber">25</context>
             </context-group>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/font-language-edit-dialog/font-language-edit-dialog.component.html</context>
@@ -5785,11 +5785,23 @@
             </context-group>
             <target state="translated">Edit item</target>
          </trans-unit>
+         <trans-unit id="7940755769131903278" datatype="html">
+            <source>Merge with existing permissions</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/common/edit-dialog/folder-edit-dialog/folder-edit-dialog.component.html</context>
+               <context context-type="linenumber">20</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.html</context>
+               <context context-type="linenumber">14</context>
+            </context-group>
+            <target state="translated">Hợp nhất với các quyền hiện có</target>
+         </trans-unit>
          <trans-unit id="733390306799768951" datatype="html">
             <source>Create new folder</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/folder-edit-dialog/folder-edit-dialog.component.ts</context>
-               <context context-type="linenumber">34</context>
+               <context context-type="linenumber">35</context>
             </context-group>
             <target state="translated">Tạo thư mục mới</target>
          </trans-unit>
@@ -5797,9 +5809,33 @@
             <source>Edit folder</source>
             <context-group purpose="location">
                <context context-type="sourcefile">src/app/components/common/edit-dialog/folder-edit-dialog/folder-edit-dialog.component.ts</context>
-               <context context-type="linenumber">38</context>
+               <context context-type="linenumber">39</context>
             </context-group>
             <target state="translated">Chỉnh sửa thư mục</target>
+         </trans-unit>
+         <trans-unit id="347498040201588614" datatype="html">
+            <source>Existing owner, user and group permissions will be merged with these settings.</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/common/edit-dialog/folder-edit-dialog/folder-edit-dialog.component.ts</context>
+               <context context-type="linenumber">58</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
+               <context context-type="linenumber">74</context>
+            </context-group>
+            <target state="translated">Các quyền hiện tại của chủ sở hữu, người dùng và nhóm sẽ được hợp nhất với các cài đặt này.</target>
+         </trans-unit>
+         <trans-unit id="3434726483516379481" datatype="html">
+            <source>Any and all existing owner, user and group permissions will be replaced.</source>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/common/edit-dialog/folder-edit-dialog/folder-edit-dialog.component.ts</context>
+               <context context-type="linenumber">59</context>
+            </context-group>
+            <context-group purpose="location">
+               <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
+               <context context-type="linenumber">75</context>
+            </context-group>
+            <target state="translated">Mọi quyền của chủ sở hữu, người dùng và nhóm hiện có sẽ được thay thế.</target>
          </trans-unit>
          <trans-unit id="7878445132438733225" datatype="html">
             <source>Create new user group</source>
@@ -7483,14 +7519,6 @@
             </context-group>
             <target state="translated">Đây là gì?</target>
          </trans-unit>
-         <trans-unit id="7940755769131903278" datatype="html">
-            <source>Merge with existing permissions</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.html</context>
-               <context context-type="linenumber">14</context>
-            </context-group>
-            <target state="translated">Hợp nhất với các quyền hiện có</target>
-         </trans-unit>
          <trans-unit id="7062872617520618723" datatype="html">
             <source>Set permissions</source>
             <context-group purpose="location">
@@ -7506,22 +7534,6 @@
                <context context-type="linenumber">33</context>
             </context-group>
             <target state="translated">Chỉnh sửa quyền cho</target>
-         </trans-unit>
-         <trans-unit id="347498040201588614" datatype="html">
-            <source>Existing owner, user and group permissions will be merged with these settings.</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
-               <context context-type="linenumber">74</context>
-            </context-group>
-            <target state="translated">Các quyền hiện tại của chủ sở hữu, người dùng và nhóm sẽ được hợp nhất với các cài đặt này.</target>
-         </trans-unit>
-         <trans-unit id="3434726483516379481" datatype="html">
-            <source>Any and all existing owner, user and group permissions will be replaced.</source>
-            <context-group purpose="location">
-               <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
-               <context context-type="linenumber">75</context>
-            </context-group>
-            <target state="translated">Mọi quyền của chủ sở hữu, người dùng và nhóm hiện có sẽ được thay thế.</target>
          </trans-unit>
          <trans-unit id="5947558132119506443" datatype="html">
             <source>My documents</source>
