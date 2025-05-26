@@ -39,7 +39,8 @@ def migrate_date(apps, schema_editor):
             f"[1067_alter_document_created] {total_updated} of {total_checked} processed...",
         )
 
-    print(f"[1067_alter_document_created] completed for {total_checked} documents.")
+    if total_checked > 0:
+        print(f"[1067_alter_document_created] completed for {total_checked} documents.")
 
 
 class Migration(migrations.Migration):
