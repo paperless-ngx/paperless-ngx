@@ -175,11 +175,22 @@ class FolderFilter(Filter):
             return qs
 
         if self.in_list:
-            folder_paths = Folder.objects.filter(id__in=object_ids).values_list("path")
-            list_folders = Folder.objects.filter(
-                path__startswith=f'{folder_paths}/').values_list("id")
-            new_list = [x[0] for x in list_folders]
-            qs = qs.filter(**{f"{self.field_name}__id__in": new_list}).distinct()
+            folders = Folder.objects.filter(id__in=object_ids)
+            folder_paths = []
+            for f in folders:
+                if f.type == Folder.FOLDER:
+                    folder_paths.append(f'{f.path}/')
+                    continue
+                folder_paths.append(f.path)
+            query = Q()
+            for path in folder_paths:
+                query |= Q(path__startswith=path)
+
+            list_folders = Folder.objects.filter(query).values_list("id",
+                                                                    flat=True)
+
+            qs = qs.filter(
+                **{f"{self.field_name}_id__in": list_folders}).distinct()
         else:
             for obj_id in object_ids:
                 if self.exclude:
