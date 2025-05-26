@@ -13,6 +13,7 @@ from celery.signals import task_failure
 from celery.signals import task_postrun
 from celery.signals import task_prerun
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.db import DatabaseError
 from django.db import close_old_connections
@@ -38,6 +39,7 @@ from documents.models import MatchingModel
 from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import Tag
+from documents.models import UiSettings
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowRun
@@ -579,6 +581,51 @@ def cleanup_custom_field_deletion(sender, instance: CustomField, **kwargs):
         logger.debug(
             f"Removing custom field {instance} from sort field of {views_with_sort_updated} views",
         )
+
+
+@receiver(models.signals.post_delete, sender=User)
+@receiver(models.signals.post_delete, sender=Group)
+def cleanup_user_deletion(sender, instance: User | Group, **kwargs):
+    """
+    When a user or group is deleted, remove non-cascading references.
+    At the moment, just the default permission settings in UiSettings.
+    """
+    # Remove the user permission settings e.g.
+    #   DEFAULT_PERMS_OWNER: 'general-settings:permissions:default-owner',
+    #   DEFAULT_PERMS_VIEW_USERS: 'general-settings:permissions:default-view-users',
+    #   DEFAULT_PERMS_VIEW_GROUPS: 'general-settings:permissions:default-view-groups',
+    #   DEFAULT_PERMS_EDIT_USERS: 'general-settings:permissions:default-edit-users',
+    #   DEFAULT_PERMS_EDIT_GROUPS: 'general-settings:permissions:default-edit-groups',
+    for ui_settings in UiSettings.objects.all():
+        try:
+            permissions = ui_settings.settings.get("permissions", {})
+            updated = False
+            if isinstance(instance, User):
+                if permissions.get("default_owner") == instance.pk:
+                    permissions["default_owner"] = None
+                    updated = True
+                if instance.pk in permissions.get("default_view_users", []):
+                    permissions["default_view_users"].remove(instance.pk)
+                    updated = True
+                if instance.pk in permissions.get("default_change_users", []):
+                    permissions["default_change_users"].remove(instance.pk)
+                    updated = True
+            elif isinstance(instance, Group):
+                if instance.pk in permissions.get("default_view_groups", []):
+                    permissions["default_view_groups"].remove(instance.pk)
+                    updated = True
+                if instance.pk in permissions.get("default_change_groups", []):
+                    permissions["default_change_groups"].remove(instance.pk)
+                    updated = True
+            if updated:
+                ui_settings.settings["permissions"] = permissions
+                ui_settings.save(update_fields=["settings"])
+        except Exception as e:
+            logger.error(
+                f"Error while cleaning up user {instance.pk} ({instance.username}) from ui_settings: {e}"
+                if isinstance(instance, User)
+                else f"Error while cleaning up group {instance.pk} ({instance.name}) from ui_settings: {e}",
+            )
 
 
 def add_to_index(sender, document, **kwargs):
