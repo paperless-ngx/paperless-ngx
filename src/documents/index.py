@@ -489,16 +489,20 @@ class StatisticElasticSearch():
             "selected_tags": [
                 {"id": bucket["key"], "document_count": bucket["doc_count"]}
                 for bucket in response["aggregations"]["tags_stats"]["buckets"]
+                if bucket["key"] != -1
             ],
             "selected_document_types": [
                 {"id": bucket["key"], "document_count": bucket["doc_count"]}
                 for bucket in
-                response["aggregations"]["document_type_stats"]["buckets"]
+                response["aggregations"]["document_type_stats"]["buckets"] if
+                bucket["key"] != -1
+
             ],
             "selected_warehouses": [
                 {"id": bucket["key"], "document_count": bucket["doc_count"]}
                 for bucket in
-                response["aggregations"]["warehouse_stats"]["buckets"]
+                response["aggregations"]["warehouse_stats"]["buckets"] if
+                bucket["key"] != -1
             ]
         }
 
@@ -806,15 +810,18 @@ class DelayedElasticSearch(DelayedQuery):
         statistics = {
             "selected_tags": [
                 {"id": bucket["key"], "document_count": bucket["doc_count"]}
-                for bucket in response.aggregations.tags_stats.buckets
+                for bucket in response.aggregations.tags_stats.buckets if
+                bucket["key"] != -1
             ],
             "selected_document_types": [
                 {"id": bucket["key"], "document_count": bucket["doc_count"]}
                 for bucket in response.aggregations.document_type_stats.buckets
+                if bucket["key"] != -1
             ],
             "selected_warehouses": [
                 {"id": bucket["key"], "document_count": bucket["doc_count"]}
-                for bucket in response.aggregations.warehouse_stats.buckets
+                for bucket in response.aggregations.warehouse_stats.buckets if
+                bucket["key"] != -1
             ]
         }
         return statistics

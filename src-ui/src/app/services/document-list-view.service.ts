@@ -7,7 +7,7 @@ import { Document } from '../data/document'
 import { SavedView } from '../data/saved-view'
 import { SETTINGS_KEYS } from '../data/ui-settings'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
-import { paramsFromViewState, paramsToViewState } from '../utils/query-params'
+import { paramsFromViewState, paramsToViewState, queryParamsFromFilterRules } from '../utils/query-params'
 import { DOCUMENT_SORT_FIELDS, DocumentService, SelectionData } from './rest/document.service'
 import { SettingsService } from './settings.service'
 
@@ -242,14 +242,34 @@ export class DocumentListViewService {
           //       this.selectionData = null
           //     },
           //   })
+
+          // this.documentService
+          //   .StatisticFiltered(
+          //     activeListViewState.currentPage,
+          //     this.currentPageSize,
+          //     activeListViewState.sortField,
+          //     activeListViewState.sortReverse,
+          //     activeListViewState.filterRules,
+          //     { truncate_content: true },
+          //   )
+          //   .pipe(first())
+          //   .subscribe({
+          //     next: (selectionData) => {
+          //       console.log('selectionData', selectionData)
+          //       this.selectionData = selectionData
+          //     },
+          //     error: () => {
+          //       this.selectionData = null
+          //     },
+          //   })
+          Object.assign({}, queryParamsFromFilterRules(activeListViewState.filterRules))
           this.documentService
-            .StatisticFiltered(
+            .statistic_filter(
               activeListViewState.currentPage,
               this.currentPageSize,
               activeListViewState.sortField,
               activeListViewState.sortReverse,
-              activeListViewState.filterRules,
-              { truncate_content: true },
+              Object.assign({}, queryParamsFromFilterRules(activeListViewState.filterRules)),
             )
             .pipe(first())
             .subscribe({

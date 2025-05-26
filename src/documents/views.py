@@ -555,7 +555,6 @@ class DocumentViewSet(
         )
 
     def get_serializer_class(self):
-        print('pk----------------')
         if 'pk' in self.kwargs:
             return DocumentDetailSerializer
         return DocumentSerializer
@@ -1276,7 +1275,7 @@ class SearchResultElasticSearchSerializer(DocumentSerializer, PassUserMixin):
             # highlight_note = instance.meta.highlight.note[0]
         r["warehouse_w"] = instance.warehouse_path.split('/')[0] if instance.warehouse_path else None
         r["warehouse_s"] = instance.warehouse_path.split('/')[1] if instance.warehouse_path else None
-        r["tags"] = list(instance.tag_id) if getattr(instance, 'tag_id')!=[-1] else []
+        r["tags"] = [tag for tag in instance.tag_id if tag != -1]
         r["custom_fields"] = list(instance.custom_fields) if getattr(instance, 'custom_fields') !=1 else []
         r["notes"] = list(instance.notes) if getattr(instance, 'notes') != [''] else []
         r["__search_hit__"] = {
@@ -1607,13 +1606,16 @@ class SelectQueryViewSet(
             # ],
             "selected_tags": [
                 {"id": t.id, "document_count": t.document_count} for t in tags
+                if t.id != -1
             ],
             "selected_document_types": [
                 {"id": t.id, "document_count": t.document_count} for t in types
+                if t.id != -1
             ],
             "selected_warehouses": [
                 {"id": t.id, "document_count": t.document_count} for t in
-                warehouses
+                warehouses if t.id != -1
+
             ],
             # "selected_storage_paths": [
             #     {"id": t.id, "document_count": t.document_count} for t in storage_paths
