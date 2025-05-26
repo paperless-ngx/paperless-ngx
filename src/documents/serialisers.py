@@ -802,7 +802,7 @@ class DocumentSerializer(
         return None
 
     def get_tags(self, obj):
-        return []
+        return obj.tags.all().values_list("id", flat=True)
 
     def get_warehouse_w(self, obj):
         return None
