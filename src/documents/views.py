@@ -3667,7 +3667,8 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
             if not user_can_change:
                 return Response(
                     data={
-                        "detail": "You do not have permission to perform this action.",
+                        "detail": _(
+                            "You do not have permission to perform this action."),
                     },
                     status=status.HTTP_403_FORBIDDEN,
                 )
