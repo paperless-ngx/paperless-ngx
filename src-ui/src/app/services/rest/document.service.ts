@@ -16,14 +16,9 @@ import { queryParamsFromFilterRules } from '../../utils/query-params'
 import { StoragePathService } from './storage-path.service'
 
 
-
-import {
-  PermissionAction,
-  PermissionType,
-  PermissionsService,
-} from '../permissions.service'
+import { PermissionAction, PermissionsService, PermissionType } from '../permissions.service'
 import { SettingsService } from '../settings.service'
-import { SETTINGS, SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { WarehouseService } from './warehouse.service'
 
 export const DOCUMENT_SORT_FIELDS = [
@@ -53,14 +48,14 @@ export interface SelectionDataItem {
 }
 
 export interface SelectionData {
-  selected_storage_paths: SelectionDataItem[]
-  selected_correspondents: SelectionDataItem[]
-  selected_tags: SelectionDataItem[]
-  selected_document_types: SelectionDataItem[]
-  selected_archive_fonts: SelectionDataItem[]
-  selected_warehouses: SelectionDataItem[]
-  selected_shelfs: SelectionDataItem[]
-  selected_boxcases: SelectionDataItem[]
+  selected_storage_paths?: SelectionDataItem[]
+  selected_correspondents?: SelectionDataItem[]
+  selected_tags?: SelectionDataItem[]
+  selected_document_types?: SelectionDataItem[]
+  selected_archive_fonts?: SelectionDataItem[]
+  selected_warehouses?: SelectionDataItem[]
+  selected_shelfs?: SelectionDataItem[]
+  selected_boxcases?: SelectionDataItem[]
 
 
 }
