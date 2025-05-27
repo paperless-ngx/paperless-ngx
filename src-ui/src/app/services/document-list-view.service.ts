@@ -376,6 +376,7 @@ export class DocumentListViewService {
   set hasNextPage(next: string) {
     if (next != null)
       this.nextPage = true
+    else this.nextPage = false
   }
 
   get hasNextPage(): boolean {

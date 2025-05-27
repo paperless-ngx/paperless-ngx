@@ -97,9 +97,11 @@ class CustomLimitOffsetPagination(LimitOffsetPagination):
     limit_query_param = "page_size"
     offset_query_param = 'page'
 
-    # def get_count(self, queryset):
-    #     print('-----query',queryset.count())
-    #     return 999999
+    def get_count(self, queryset):
+        # print('-----query',queryset.count())
+        # return 999999
+        return queryset.count()
+        # self.get_count(queryset)
 
     def get_offset(self, request):
         page = super().get_offset(request)
