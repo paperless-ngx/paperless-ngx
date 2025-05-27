@@ -1,4 +1,4 @@
-import { NgTemplateOutlet } from '@angular/common'
+import { LocationStrategy, NgTemplateOutlet } from '@angular/common'
 import {
   Component,
   ElementRef,
@@ -99,7 +99,8 @@ export class GlobalSearchComponent implements OnInit {
     private permissionsService: PermissionsService,
     private toastService: ToastService,
     private hotkeyService: HotKeyService,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private locationStrategy: LocationStrategy
   ) {
     this.queryDebounce = new Subject<string>()
 
@@ -421,10 +422,13 @@ export class GlobalSearchComponent implements OnInit {
     extras: Object = {}
   ) {
     if (newWindow) {
-      const url = this.router.serializeUrl(
+      const serializedUrl = this.router.serializeUrl(
         this.router.createUrlTree(commands, extras)
       )
-      window.open(url, '_blank')
+      const baseHref = this.locationStrategy.getBaseHref()
+      const fullUrl =
+        baseHref.replace(/\/+$/, '') + '/' + serializedUrl.replace(/^\/+/, '')
+      window.open(fullUrl, '_blank')
     } else {
       this.router.navigate(commands, extras)
     }
