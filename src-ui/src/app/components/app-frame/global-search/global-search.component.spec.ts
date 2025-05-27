@@ -529,6 +529,17 @@ describe('GlobalSearchComponent', () => {
     expect(dispatchSpy).toHaveBeenCalledTimes(2) // once for keydown, second for click
   })
 
+  it('should support using base href in navigateOrOpenInNewWindow', () => {
+    jest
+      .spyOn(component['locationStrategy'], 'getBaseHref')
+      .mockReturnValue('/base/')
+    const openSpy = jest.spyOn(window, 'open')
+    const event = new Event('click')
+    event['ctrlKey'] = true
+    component.primaryAction(DataType.Document, { id: 1 }, event as any)
+    expect(openSpy).toHaveBeenCalledWith('/base/documents/1', '_blank')
+  })
+
   it('should support title content search and advanced search', () => {
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
     component.query = 'test'
