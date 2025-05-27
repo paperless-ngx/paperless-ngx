@@ -125,9 +125,10 @@ export class ConsumerStatusService {
     let status = new FileStatus()
     status.filename = filename
     status.exist = true
-    if (!existing) {
-      this.consumerStatus.push(status)
-    }
+    // if (!existing) {
+    //   this.consumerStatus.push(status)
+    // }
+    this.consumerStatus.push(status)
     return status
   }
 

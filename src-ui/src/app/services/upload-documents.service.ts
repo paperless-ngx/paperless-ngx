@@ -1,10 +1,7 @@
 import { Injectable } from '@angular/core'
 import { HttpEventType } from '@angular/common/http'
 import { FileSystemFileEntry, NgxFileDropEntry } from 'ngx-file-drop'
-import {
-  ConsumerStatusService,
-  FileStatusPhase,
-} from './consumer-status.service'
+import { ConsumerStatusService, FileStatusPhase } from './consumer-status.service'
 import { DocumentService } from './rest/document.service'
 import { Subscription } from 'rxjs'
 
@@ -35,7 +32,7 @@ export class UploadDocumentsService {
   }
 
   private uploadFile(file: File, payload) {
-    // console.log("payload",payload)
+
     let formData = new FormData()
     formData.append('document', file, file.name)
     if (payload?.folder!='' && payload?.folder!='root' && payload?.folder!=undefined){
