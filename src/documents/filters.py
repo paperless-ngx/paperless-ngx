@@ -105,14 +105,12 @@ class ObjectFilter(Filter):
 
         if self.in_list:
             qs = qs.filter(**{f"{self.field_name}__id__in": object_ids}).distinct()
-            print('ksdlfjs',qs)
         else:
             for obj_id in object_ids:
                 if self.exclude:
                     qs = qs.exclude(**{f"{self.field_name}__id": obj_id})
                 else:
                     qs = qs.filter(**{f"{self.field_name}__id": obj_id})
-
         return qs
 
 
