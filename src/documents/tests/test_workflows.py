@@ -1610,7 +1610,7 @@ class TestWorkflows(
             doc.refresh_from_db()
             self.assertIsNone(doc.owner)
 
-    def test_workflow_scheduled_trigger_negative_offset(self):
+    def test_workflow_scheduled_trigger_negative_offset_customfield(self):
         """
         GIVEN:
             - Existing workflow with SCHEDULED trigger and negative offset of -7 days (so 7 days after date)
@@ -1661,6 +1661,55 @@ class TestWorkflows(
         tasks.check_scheduled_workflows()
         doc.refresh_from_db()
         self.assertEqual(doc.owner, self.user2)
+
+    def test_workflow_scheduled_trigger_negative_offset_created(self):
+        """
+        GIVEN:
+            - Existing workflow with SCHEDULED trigger and negative offset of -7 days (so 7 days after date)
+            - Created date set to 8 days ago → trigger time = 1 day ago and 5 days ago
+        WHEN:
+            - Scheduled workflows are checked for document
+        THEN:
+            - Workflow runs and document owner is updated for the first document, not the second
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_offset_days=-7,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.CREATED,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+            checksum="1",
+            created=timezone.now().date() - timedelta(days=8),
+        )
+
+        doc2 = Document.objects.create(
+            title="sample test 2",
+            correspondent=self.c,
+            original_filename="sample2.pdf",
+            checksum="2",
+            created=timezone.now().date() - timedelta(days=5),
+        )
+
+        tasks.check_scheduled_workflows()
+        doc.refresh_from_db()
+        self.assertEqual(doc.owner, self.user2)
+        doc2.refresh_from_db()
+        self.assertIsNone(doc2.owner)  # has not triggered yet
 
     def test_workflow_enabled_disabled(self):
         trigger = WorkflowTrigger.objects.create(
