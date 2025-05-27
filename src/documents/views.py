@@ -553,7 +553,7 @@ class DocumentViewSet(
                 "owner",
 
             )
-            # .prefetch_related('tags')
+            .prefetch_related("tags")
         )
 
     def get_serializer_class(self):
@@ -1627,6 +1627,11 @@ class SelectQueryViewSet(
                 warehouses if t.id != -1
 
             ],
+            "selected_storage_paths": [],
+            "selected_correspondents": [],
+            "selected_archive_fonts": [],
+            "selected_shelfs": [],
+            "selected_boxcases": []
             # "selected_storage_paths": [
             #     {"id": t.id, "document_count": t.document_count} for t in storage_paths
             # ],
@@ -1716,6 +1721,9 @@ class SelectionDataView(GenericAPIView):
                     {"id": t.id, "document_count": t.document_count}
                     for t in storage_paths
                 ],
+                "selected_archive_fonts": [],
+                "selected_shelfs": [],
+                "selected_boxcases": []
             },
         )
 

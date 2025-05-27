@@ -43,7 +43,8 @@ from whoosh.util.times import timespan
 from whoosh.writing import AsyncWriter
 
 from documents.documents import DocumentDocument
-from documents.models import CustomFieldInstance, Warehouse, Folder
+from documents.models import CustomFieldInstance, Warehouse, Folder, Tag, \
+    DocumentType
 from documents.models import Document
 from documents.models import Note
 from documents.models import User
@@ -790,7 +791,7 @@ class DelayedElasticSearch(DelayedQuery):
                 "terms": {"field": "tag_id", "size": 100}
             },
             "document_type_stats": {
-                "terms": {"field": "document_type_id", "size": 100}
+                "terms": {"field": "type_id", "size": 100}
             },
             "warehouse_stats": {
                 "terms": {"field": "warehouse_id", "size": 100}
@@ -805,24 +806,50 @@ class DelayedElasticSearch(DelayedQuery):
         # Thực hiện query
         response = Search().from_dict(statistics_query).index(
             ELASTIC_SEARCH_DOCUMENT_INDEX).execute()
+        tags = Tag.objects.all()
+        selected_tags_dict = {}
+        selected_tags = []
+        for bucket in response["aggregations"]["tags_stats"]["buckets"]:
+            selected_tags_dict[bucket["key"]] = bucket["doc_count"]
+        for t in tags:
+            selected_tags.append({
+                "id": t.id,
+                "document_count": selected_tags_dict.get(t.id, 0)
+            })
+
+        document_types = DocumentType.objects.all()
+        select_document_types_dict = {}
+        select_document_types = []
+        for bucket in response["aggregations"]["document_type_stats"][
+            "buckets"]:
+            select_document_types_dict[bucket["key"]] = bucket["doc_count"]
+        for dt in document_types:
+            select_document_types.append({
+                "id": dt.id,
+                "document_count": select_document_types_dict.get(dt.id, 0)
+            })
+
+        warehouses = Warehouse.objects.all()
+        select_warehouses_dict = {}
+        select_warehouses = []
+        for bucket in response["aggregations"]["warehouse_stats"]["buckets"]:
+            select_warehouses_dict[bucket["key"]] = bucket["doc_count"]
+        for w in warehouses:
+            select_warehouses.append({
+                "id": w.id,
+                "document_count": select_warehouses_dict.get(w.id, 0)
+            })
 
         # Xử lý kết quả từ aggregations
         statistics = {
-            "selected_tags": [
-                {"id": bucket["key"], "document_count": bucket["doc_count"]}
-                for bucket in response.aggregations.tags_stats.buckets if
-                bucket["key"] != -1
-            ],
-            "selected_document_types": [
-                {"id": bucket["key"], "document_count": bucket["doc_count"]}
-                for bucket in response.aggregations.document_type_stats.buckets
-                if bucket["key"] != -1
-            ],
-            "selected_warehouses": [
-                {"id": bucket["key"], "document_count": bucket["doc_count"]}
-                for bucket in response.aggregations.warehouse_stats.buckets if
-                bucket["key"] != -1
-            ]
+            "selected_tags": selected_tags,
+            "selected_document_types": select_document_types,
+            "selected_warehouses": select_warehouses,
+            "selected_storage_paths": [],
+            "selected_correspondents": [],
+            "selected_archive_fonts": [],
+            "selected_shelfs": [],
+            "selected_boxcases": []
         }
         return statistics
 
