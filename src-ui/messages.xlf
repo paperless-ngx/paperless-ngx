@@ -988,7 +988,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
-          <context context-type="linenumber">325</context>
+          <context context-type="linenumber">335</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/font-language-list/font-language-list.component.html</context>
@@ -1281,7 +1281,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/permissions.service.ts</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">85</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8831459317888986184" datatype="html">
@@ -1603,7 +1603,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
-          <context context-type="linenumber">283</context>
+          <context context-type="linenumber">293</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/font-language-list/font-language-list.component.html</context>
@@ -1750,11 +1750,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">910</context>
+          <context context-type="linenumber">913</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">945</context>
+          <context context-type="linenumber">948</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -1835,7 +1835,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">865</context>
+          <context context-type="linenumber">868</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/custom-dossier-form-list/custom-dossier-form-list.component.ts</context>
@@ -2798,15 +2798,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">167</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">182</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">197</context>
+          <context context-type="linenumber">145</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5260584511980773458" datatype="html">
@@ -3012,7 +3004,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">888</context>
+          <context context-type="linenumber">891</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7266264608936522311" datatype="html">
@@ -3199,7 +3191,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
-          <context context-type="linenumber">277</context>
+          <context context-type="linenumber">287</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/font-language-list/font-language-list.component.html</context>
@@ -3319,19 +3311,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">912</context>
+          <context context-type="linenumber">915</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">947</context>
+          <context context-type="linenumber">950</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1257</context>
+          <context context-type="linenumber">1260</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1295</context>
+          <context context-type="linenumber">1298</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3478,7 +3470,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/permissions.service.ts</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">82</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6570363013146073520" datatype="html">
@@ -3508,7 +3500,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">98</context>
+          <context context-type="linenumber">82</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/archive-font-list/archive-font-list.component.html</context>
@@ -3551,7 +3543,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/permissions.service.ts</context>
-          <context context-type="linenumber">68</context>
+          <context context-type="linenumber">67</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8917911254278029230" datatype="html">
@@ -3823,21 +3815,21 @@
         <source>Sidebar views updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">340</context>
+          <context context-type="linenumber">318</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3547923076537026828" datatype="html">
         <source>Error updating sidebar views</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">343</context>
+          <context context-type="linenumber">321</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2526035785704676448" datatype="html">
         <source>An error occurred while saving update checking settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">364</context>
+          <context context-type="linenumber">342</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8700121026680200191" datatype="html">
@@ -4425,7 +4417,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/permissions.service.ts</context>
-          <context context-type="linenumber">76</context>
+          <context context-type="linenumber">75</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2656329676292524585" datatype="html">
@@ -4641,7 +4633,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/permissions.service.ts</context>
-          <context context-type="linenumber">70</context>
+          <context context-type="linenumber">69</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
@@ -6390,7 +6382,7 @@
         <source>Inherited from group</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.ts</context>
-          <context context-type="linenumber">61</context>
+          <context context-type="linenumber">56</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6418218602775540217" datatype="html">
@@ -6916,7 +6908,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
-          <context context-type="linenumber">201</context>
+          <context context-type="linenumber">204</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3099741642167775297" datatype="html">
@@ -7284,7 +7276,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/permissions.service.ts</context>
-          <context context-type="linenumber">77</context>
+          <context context-type="linenumber">76</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8623978917681527907" datatype="html">
@@ -7295,7 +7287,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/permissions.service.ts</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">77</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6071316570146376916" datatype="html">
@@ -7377,7 +7369,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1313</context>
+          <context context-type="linenumber">1316</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
@@ -7639,85 +7631,85 @@
         <source>An error occurred loading content: <x id="PH" equiv-text="err.message ?? err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">419,420</context>
+          <context context-type="linenumber">422,423</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3200733026060976258" datatype="html">
         <source>Document changes detected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">444</context>
+          <context context-type="linenumber">447</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2887155916749964" datatype="html">
         <source>The version of this document in your browser session appears older than the existing version.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">445</context>
+          <context context-type="linenumber">448</context>
         </context-group>
       </trans-unit>
       <trans-unit id="237142428785956348" datatype="html">
         <source>Saving the document here may overwrite other changes that were made. To restore the existing version, discard your changes or close the document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">446</context>
+          <context context-type="linenumber">449</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8720977247725652816" datatype="html">
         <source>Ok</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">448</context>
+          <context context-type="linenumber">451</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5758784066858623886" datatype="html">
         <source>Error retrieving metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">595</context>
+          <context context-type="linenumber">598</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3456881259945295697" datatype="html">
         <source>Error retrieving suggestions.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">620</context>
+          <context context-type="linenumber">623</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8348337312757497317" datatype="html">
         <source>Document saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">782</context>
+          <context context-type="linenumber">785</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">793</context>
+          <context context-type="linenumber">796</context>
         </context-group>
       </trans-unit>
       <trans-unit id="448882439049417053" datatype="html">
         <source>Error saving document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">797</context>
+          <context context-type="linenumber">800</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">838</context>
+          <context context-type="linenumber">841</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5382975254277698192" datatype="html">
         <source>Do you really want to delete document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">866</context>
+          <context context-type="linenumber">869</context>
         </context-group>
       </trans-unit>
       <trans-unit id="282586936710748252" datatype="html">
         <source>Documents can be restored prior to permanent deletion.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">867</context>
+          <context context-type="linenumber">870</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7728,7 +7720,7 @@
         <source>Move to trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">869</context>
+          <context context-type="linenumber">872</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7739,39 +7731,39 @@
         <source>Auto OCR Field confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">908</context>
+          <context context-type="linenumber">911</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8990765262268253327" datatype="html">
         <source>This operation will permanently auto OCR Field for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">909</context>
+          <context context-type="linenumber">912</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6237847546081194336" datatype="html">
         <source>Auto OCR Field operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">920</context>
+          <context context-type="linenumber">923</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4409560272830824468" datatype="html">
         <source>Error executing operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">931</context>
+          <context context-type="linenumber">934</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">966</context>
+          <context context-type="linenumber">969</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7362691899087997122" datatype="html">
         <source>Redo OCR confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">943</context>
+          <context context-type="linenumber">946</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7782,56 +7774,56 @@
         <source>This operation will permanently redo OCR for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">944</context>
+          <context context-type="linenumber">947</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5729001209753056399" datatype="html">
         <source>Redo OCR operation will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">955</context>
+          <context context-type="linenumber">958</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4458954481601077369" datatype="html">
         <source>Page Fit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1035</context>
+          <context context-type="linenumber">1038</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1217563727923422413" datatype="html">
         <source>Split confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1255</context>
+          <context context-type="linenumber">1258</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2805304563009985503" datatype="html">
         <source>This operation will split the selected document(s) into new documents.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1256</context>
+          <context context-type="linenumber">1259</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4158171846914923744" datatype="html">
         <source>Split operation will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1271</context>
+          <context context-type="linenumber">1274</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3235014591864339926" datatype="html">
         <source>Error executing split operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1280</context>
+          <context context-type="linenumber">1283</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6555329262222566158" datatype="html">
         <source>Rotate confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1292</context>
+          <context context-type="linenumber">1295</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7842,14 +7834,14 @@
         <source>This operation will permanently rotate the original version of the current document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1293</context>
+          <context context-type="linenumber">1296</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4233432423256408453" datatype="html">
         <source>This will alter the original copy.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1294</context>
+          <context context-type="linenumber">1297</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7860,14 +7852,14 @@
         <source>Rotation will begin in the background. Close and re-open the document after the operation has completed to see the changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1310</context>
+          <context context-type="linenumber">1313</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2962674215361798818" datatype="html">
         <source>Error executing rotate operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1322</context>
+          <context context-type="linenumber">1325</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6857598786757174736" datatype="html">
@@ -8483,6 +8475,13 @@
           <context context-type="linenumber">110</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="6600548268163632449" datatype="html">
+        <source>{VAR_PLURAL, plural, =1 {One document} other {<x id="INTERPOLATION"/> documents}}</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">114</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="2243770355958919528" datatype="html">
         <source>(filtered)</source>
         <context-group purpose="location">
@@ -8659,14 +8658,14 @@
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">213</context>
+          <context context-type="linenumber">197</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6837554170707123455" datatype="html">
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">253</context>
+          <context context-type="linenumber">237</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6904053157270858713" datatype="html">
@@ -9112,7 +9111,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
-          <context context-type="linenumber">256,257</context>
+          <context context-type="linenumber">266,267</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/shelf/shelf.component.html</context>
@@ -9135,7 +9134,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
-          <context context-type="linenumber">261,262</context>
+          <context context-type="linenumber">271,272</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/shelf/shelf.component.html</context>
@@ -9170,7 +9169,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
-          <context context-type="linenumber">322</context>
+          <context context-type="linenumber">332</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/font-language-list/font-language-list.component.html</context>
@@ -9226,11 +9225,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
-          <context context-type="linenumber">251,252</context>
+          <context context-type="linenumber">261,262</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
-          <context context-type="linenumber">270,271</context>
+          <context context-type="linenumber">280,281</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/shelf/shelf.component.html</context>
@@ -9789,7 +9788,7 @@
         <source>No files defined.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
-          <context context-type="linenumber">294</context>
+          <context context-type="linenumber">304</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3346091623266062200" datatype="html">
@@ -10692,84 +10691,84 @@
         <source>Tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/permissions.service.ts</context>
-          <context context-type="linenumber">69</context>
+          <context context-type="linenumber">68</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8294482152044404440" datatype="html">
         <source>Documenttype</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/permissions.service.ts</context>
-          <context context-type="linenumber">71</context>
+          <context context-type="linenumber">70</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2968770767739298530" datatype="html">
         <source>Savedview</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/permissions.service.ts</context>
-          <context context-type="linenumber">72</context>
+          <context context-type="linenumber">71</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1778344477356564049" datatype="html">
         <source>Edoctask</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/permissions.service.ts</context>
-          <context context-type="linenumber">73</context>
+          <context context-type="linenumber">72</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5457042139476462739" datatype="html">
         <source>Appconfig</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/permissions.service.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">73</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7640540603383428450" datatype="html">
         <source>Uisettings</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/permissions.service.ts</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">74</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2390328922772020607" datatype="html">
         <source>Sharelink</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/permissions.service.ts</context>
-          <context context-type="linenumber">79</context>
+          <context context-type="linenumber">78</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9155483859671135323" datatype="html">
         <source>Customfield</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/permissions.service.ts</context>
-          <context context-type="linenumber">80</context>
+          <context context-type="linenumber">79</context>
         </context-group>
       </trans-unit>
       <trans-unit id="957358589600652803" datatype="html">
         <source>Workflow</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/permissions.service.ts</context>
-          <context context-type="linenumber">81</context>
+          <context context-type="linenumber">80</context>
         </context-group>
       </trans-unit>
       <trans-unit id="63679568923579290" datatype="html">
         <source>Approval</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/permissions.service.ts</context>
-          <context context-type="linenumber">82</context>
+          <context context-type="linenumber">81</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6925901033288192736" datatype="html">
         <source>Fontlanguage</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/permissions.service.ts</context>
-          <context context-type="linenumber">84</context>
+          <context context-type="linenumber">83</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8791630264427075128" datatype="html">
         <source>Archivefont</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/permissions.service.ts</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">84</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7517688192215738656" datatype="html">
