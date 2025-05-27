@@ -3717,8 +3717,8 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
 
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-
-        serializer.validated_data["name"] = get_unique_name(Folder,
+        if serializer.validated_data["name"] != instance.name:
+            serializer.validated_data["name"] = get_unique_name(Folder,
                                                             serializer.validated_data[
                                                                 "name"], int(
                 request.data["parent_folder"]))
