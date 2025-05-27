@@ -542,7 +542,8 @@ class DocumentViewSet(
                     "warehouse",
                     "owner",
                 )
-                .prefetch_related("tags", "custom_fields", "notes")
+                .prefetch_related("tags", "custom_fields", "notes").distinct()
+
             )
         return (
             Document.objects.select_related(
@@ -551,7 +552,7 @@ class DocumentViewSet(
                 "owner",
 
             )
-            .prefetch_related("tags")
+            .prefetch_related("tags").distinct()
         )
 
     def get_serializer_class(self):
