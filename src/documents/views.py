@@ -206,7 +206,7 @@ from documents.tasks import consume_file
 from documents.tasks import deleted_backup
 from documents.tasks import empty_trash
 from documents.tasks import restore_documents
-from documents.utils import check_storage
+from documents.utils import check_storage, get_unique_name
 from documents.utils import generate_unique_name
 from documents.utils import get_directory_size
 from edoc import version
@@ -3699,6 +3699,13 @@ class FolderViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
+        if serializer.validated_data["name"] != instance.name:
+            serializer.validated_data["name"] = get_unique_name(Folder,
+                                                                serializer.validated_data[
+                                                                    "name"],
+                                                                int(
+                                                                    request.data[
+                                                                        "parent_folder"]))
         serializer.validated_data["updated"] = timezone.now()
 
         old_parent_folder = instance.parent_folder
