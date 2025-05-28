@@ -29,6 +29,7 @@ def copy_basic_file_stats(source: Path | str, dest: Path | str) -> None:
     """
     source, dest = _coerce_to_path(source, dest)
     src_stat = source.stat()
+
     try:
         utime(dest, ns=(src_stat.st_atime_ns, src_stat.st_mtime_ns))
     except PermissionError:
