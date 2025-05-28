@@ -263,7 +263,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-button/upload-file-btn.component.html</context>
-          <context context-type="linenumber">71</context>
+          <context context-type="linenumber">73</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
@@ -710,7 +710,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
-          <context context-type="linenumber">35</context>
+          <context context-type="linenumber">30</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8037476586059399916" datatype="html">
@@ -2388,7 +2388,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
-          <context context-type="linenumber">38</context>
+          <context context-type="linenumber">33</context>
         </context-group>
       </trans-unit>
       <trans-unit id="293524471897878391" datatype="html">
@@ -4637,7 +4637,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
-          <context context-type="linenumber">34</context>
+          <context context-type="linenumber">29</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3651872608237086516" datatype="html">
@@ -5934,7 +5934,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
-          <context context-type="linenumber">39</context>
+          <context context-type="linenumber">34</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5502398334173581061" datatype="html">
@@ -6867,7 +6867,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-button/upload-file-btn.component.html</context>
-          <context context-type="linenumber">38</context>
+          <context context-type="linenumber">40</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
@@ -6890,7 +6890,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">27</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2691296884221415710" datatype="html">
@@ -7158,18 +7158,18 @@
           <context context-type="linenumber">107</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="5321728948071221061" datatype="html">
-        <source><x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;i-bs name=&quot;upload&quot;&gt;"/><x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;/i-bs&gt;"/>  Upload file</source>
+      <trans-unit id="1021905083822944902" datatype="html">
+        <source><x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;i-bs name=&quot;upload&quot;&gt;"/><x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;/i-bs&gt;"/>  Upload file </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-button/upload-file-btn.component.html</context>
-          <context context-type="linenumber">4</context>
+          <context context-type="linenumber">5,6</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1749180330008942007" datatype="html">
         <source>Dismiss completed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-button/upload-file-btn.component.html</context>
-          <context context-type="linenumber">19</context>
+          <context context-type="linenumber">21</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
@@ -7181,7 +7181,7 @@
         <source>{VAR_PLURAL, plural, =1 {One more document} other {<x id="INTERPOLATION"/> more documents}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-button/upload-file-btn.component.html</context>
-          <context context-type="linenumber">36</context>
+          <context context-type="linenumber">38</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
@@ -7193,7 +7193,7 @@
         <source>Processing: <x id="PH" equiv-text="countUploadingAndProcessing"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-button/upload-file-btn.component.ts</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">46</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
@@ -7204,7 +7204,7 @@
         <source>Failed: <x id="PH" equiv-text="countFailed"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-button/upload-file-btn.component.ts</context>
-          <context context-type="linenumber">50</context>
+          <context context-type="linenumber">49</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
@@ -7215,7 +7215,7 @@
         <source>Added: <x id="PH" equiv-text="countSuccess"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-button/upload-file-btn.component.ts</context>
-          <context context-type="linenumber">53</context>
+          <context context-type="linenumber">52</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
@@ -7226,7 +7226,7 @@
         <source>, </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-button/upload-file-btn.component.ts</context>
-          <context context-type="linenumber">56</context>
+          <context context-type="linenumber">55</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
@@ -7432,7 +7432,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
-          <context context-type="linenumber">33</context>
+          <context context-type="linenumber">28</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8028672003040609970" datatype="html">
@@ -8253,7 +8253,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">274</context>
+          <context context-type="linenumber">275</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2784168796433474565" datatype="html">
@@ -8264,7 +8264,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">282</context>
+          <context context-type="linenumber">283</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7348085454325957725" datatype="html">
@@ -8308,7 +8308,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">304</context>
+          <context context-type="linenumber">305</context>
         </context-group>
       </trans-unit>
       <trans-unit id="157572966557284263" datatype="html">
@@ -8319,7 +8319,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">311</context>
+          <context context-type="linenumber">312</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7093229782215400036" datatype="html">
@@ -8330,7 +8330,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">319</context>
+          <context context-type="linenumber">320</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3727324658595204357" datatype="html">
@@ -8491,21 +8491,21 @@
         <source>{VAR_PLURAL, plural, =1 {One document} other {<x id="INTERPOLATION"/> documents}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">114</context>
+          <context context-type="linenumber">115</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2243770355958919528" datatype="html">
         <source>(filtered)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">117</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6849725902312323996" datatype="html">
         <source>Reset filters</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">122</context>
+          <context context-type="linenumber">123</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
@@ -8516,154 +8516,154 @@
         <source>Error while loading documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">143</context>
+          <context context-type="linenumber">144</context>
         </context-group>
       </trans-unit>
       <trans-unit id="494022736054110363" datatype="html">
         <source>Sort by ASN</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">166</context>
+          <context context-type="linenumber">167</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1160542129605090661" datatype="html">
         <source>ASN </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">170,171</context>
+          <context context-type="linenumber">171,172</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6954625430271090777" datatype="html">
         <source>Sort by correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">175</context>
+          <context context-type="linenumber">176</context>
         </context-group>
       </trans-unit>
       <trans-unit id="228847440663812315" datatype="html">
         <source>Correspondent </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">179,180</context>
+          <context context-type="linenumber">180,181</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2066713941761361709" datatype="html">
         <source>Sort by title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">184</context>
+          <context context-type="linenumber">185</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3581741760108989931" datatype="html">
         <source>Title </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">189,190</context>
+          <context context-type="linenumber">190,191</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6232673011753681091" datatype="html">
         <source>Sort by owner</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">193</context>
+          <context context-type="linenumber">194</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6458143961145916640" datatype="html">
         <source>Owner </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">197,198</context>
+          <context context-type="linenumber">198,199</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3557446856808034218" datatype="html">
         <source>Sort by notes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">202</context>
+          <context context-type="linenumber">203</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6895481799762150429" datatype="html">
         <source>Notes </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">206,207</context>
+          <context context-type="linenumber">207,208</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5499001829734502606" datatype="html">
         <source>Sort by document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">212</context>
+          <context context-type="linenumber">213</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4920410558923834927" datatype="html">
         <source>Document type </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">216,217</context>
+          <context context-type="linenumber">217,218</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6213829731736042759" datatype="html">
         <source>Sort by storage path</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">222</context>
+          <context context-type="linenumber">223</context>
         </context-group>
       </trans-unit>
       <trans-unit id="418006527450676672" datatype="html">
         <source>Storage path </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">226,227</context>
+          <context context-type="linenumber">227,228</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5332701850174928097" datatype="html">
         <source>Sort by warehouse</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">232</context>
+          <context context-type="linenumber">233</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6611329670333684203" datatype="html">
         <source>Warehouse </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">236,237</context>
+          <context context-type="linenumber">237,238</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3406167410329973166" datatype="html">
         <source>Sort by created date</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">241</context>
+          <context context-type="linenumber">242</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5460298821396217667" datatype="html">
         <source>Created </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">245,246</context>
+          <context context-type="linenumber">246,247</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3769035778779263084" datatype="html">
         <source>Sort by added date</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">249</context>
+          <context context-type="linenumber">250</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6552510702788001335" datatype="html">
         <source>Added </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">253,254</context>
+          <context context-type="linenumber">254,255</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2179847500064178686" datatype="html">
         <source>Edit document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">279</context>
+          <context context-type="linenumber">280</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2155249406916744630" datatype="html">
@@ -8702,7 +8702,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
-          <context context-type="linenumber">36</context>
+          <context context-type="linenumber">31</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3100631071441658964" datatype="html">
@@ -9071,10 +9071,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/boxcase/boxcase.component.html</context>
           <context context-type="linenumber">82,83</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/folder-list/folder-list.component.html</context>
-          <context context-type="linenumber">151,152</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/shelf/shelf.component.html</context>
@@ -10794,14 +10790,14 @@
         <source>ASN</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">25</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3553216189604488439" datatype="html">
         <source>Modified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">32</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1206520795340730278" datatype="html">
@@ -10850,28 +10846,28 @@
         <source>Connecting...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
-          <context context-type="linenumber">52</context>
+          <context context-type="linenumber">49</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1245343823699368872" datatype="html">
         <source>Uploading...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
-          <context context-type="linenumber">64</context>
+          <context context-type="linenumber">61</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7446520539098045935" datatype="html">
         <source>Upload complete, waiting...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
-          <context context-type="linenumber">67</context>
+          <context context-type="linenumber">64</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1405142710727603568" datatype="html">
         <source>HTTP error: <x id="PH" equiv-text="error.status"/> <x id="PH_1" equiv-text="error.statusText"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/upload-documents.service.ts</context>
-          <context context-type="linenumber">80</context>
+          <context context-type="linenumber">77</context>
         </context-group>
       </trans-unit>
     </body>
