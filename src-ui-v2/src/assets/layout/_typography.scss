@@ -1,0 +1,68 @@
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 1.5rem 0 1rem 0;
+    font-family: inherit;
+    font-weight: 700;
+    line-height: 1.5;
+    color: var(--text-color);
+
+    &:first-child {
+        margin-top: 0;
+    }
+}
+
+h1 {
+    font-size: 2.5rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.75rem;
+}
+
+h4 {
+    font-size: 1.5rem;
+}
+
+h5 {
+    font-size: 1.25rem;
+}
+
+h6 {
+    font-size: 1rem;
+}
+
+mark {
+    background: #fff8e1;
+    padding: 0.25rem 0.4rem;
+    border-radius: var(--content-border-radius);
+    font-family: monospace;
+}
+
+blockquote {
+    margin: 1rem 0;
+    padding: 0 2rem;
+    border-left: 4px solid #90a4ae;
+}
+
+hr {
+    border-top: solid var(--surface-border);
+    border-width: 1px 0 0 0;
+    margin: 1rem 0;
+}
+
+p {
+    margin: 0 0 1rem 0;
+    line-height: 1.5;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}

@@ -1,0 +1,17 @@
+pre.app-code {
+    background-color: var(--code-background);
+    margin: 0 0 1rem 0;
+    padding: 0;
+    border-radius: var(--content-border-radius);
+    overflow: auto;
+
+    code {
+        color: var(--code-color);
+        padding: 1rem;
+        margin: 0;
+        line-height: 1.5;
+        display: block;
+        font-weight: semibold;
+        font-family: monaco, Consolas, monospace;
+    }
+}
