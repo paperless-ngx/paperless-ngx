@@ -698,6 +698,7 @@ export class DocumentDetailComponent
       .subscribe(({ newDocumentType, documentTypes }) => {
         this.documentTypes = documentTypes.results
         this.documentForm.get('document_type').setValue(newDocumentType.id)
+        this.documentForm.get('document_type').markAsDirty()
       })
   }
 
@@ -721,6 +722,7 @@ export class DocumentDetailComponent
       .subscribe(({ newCorrespondent, correspondents }) => {
         this.correspondents = correspondents.results
         this.documentForm.get('correspondent').setValue(newCorrespondent.id)
+        this.documentForm.get('correspondent').markAsDirty()
       })
   }
 
@@ -742,6 +744,7 @@ export class DocumentDetailComponent
       .subscribe(({ newStoragePath, storagePaths }) => {
         this.storagePaths = storagePaths.results
         this.documentForm.get('storage_path').setValue(newStoragePath.id)
+        this.documentForm.get('storage_path').markAsDirty()
       })
   }
 
