@@ -27,6 +27,9 @@ export class FolderEditDialogComponent
 
   ngOnInit(): void {
     super.ngOnInit()
+    if (this.object?.type === 'folder') {
+      this.form.patchValue({ merge: true })
+    }
     if (this.typeFieldDisabled) {
     }
   }
@@ -43,7 +46,7 @@ export class FolderEditDialogComponent
     this.form = new FormGroup({
       name: new FormControl(null),
       permissions_form: new FormControl(null),
-      merge: new FormControl(true),
+      merge: new FormControl(false),
     })
     return this.form
   }
