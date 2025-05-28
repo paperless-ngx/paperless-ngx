@@ -8,7 +8,6 @@ from django.core.management import BaseCommand
 from documents.index import update_index_document
 from documents.management.commands.mixins import ProgressBarMixin
 from documents.models import Folder
-from documents.tasks import update_document_count_folder_path
 
 logger = logging.getLogger("edoc.duplicate_document")
 
@@ -49,8 +48,9 @@ def update_document_count_filesize(batch_size: object = 10000, ) -> object:
                       batch_idx * batch_size: (batch_idx + 1) * batch_size]:
             start_time_doc = time.time()
             try:
-                if folder.type == Folder.FOLDER:
-                    update_document_count_folder_path(folder.path)
+                # NOTE: update document count for folder
+                # if folder.type == Folder.FOLDER:
+                #     update_document_count_folder_path(folder.path)
 
                 if folder.documents.count() == 0:
                     continue

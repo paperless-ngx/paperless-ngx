@@ -2655,7 +2655,7 @@ class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 class FolderSerializer(OwnedObjectSerializer):
     name = AdjustedNameFieldFolder()
     document = serializers.SerializerMethodField(read_only=True)
-    document_count = serializers.IntegerField(read_only=True)
+    # document_count = serializers.IntegerField(read_only=True)
     merge = serializers.BooleanField(
         default=False,
         write_only=True,
@@ -2709,7 +2709,7 @@ class FolderSerializer(OwnedObjectSerializer):
             "path",
             "type",
             "document",
-            "document_count",
+            # "document_count",
             "filesize",
             "modified",
             "created",

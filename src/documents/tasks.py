@@ -1087,10 +1087,10 @@ def update_child_folder_paths(folder, old_path):
     # reindex document update folder_path for document
     documents = Document.objects.filter(folder__in=file_ids)
     index.update_index_bulk_documents(documents, 100)
-    # update the document count for the old folder.
-    update_document_count_folder_path(folder.path)
+    # NOTE: update the document count for the old folder.
+    # update_document_count_folder_path(folder.path)
     # update the document count for the new folder.
-    update_document_count_folder_path(old_path)
+    # update_document_count_folder_path(old_path)
 
 
 def update_document_count_folder_path(path):

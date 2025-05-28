@@ -201,8 +201,7 @@ from documents.signals import document_updated
 from documents.tasks import backup_documents, \
     bulk_update_custom_field_form_document_type_to_document, bulk_delete_file, \
     update_ocr_document, update_child_folder_paths, \
-    update_child_folder_permisisons, update_folder_permisisons, \
-    update_document_count_folder_path
+    update_child_folder_permisisons, update_folder_permisisons
 from documents.tasks import consume_file
 from documents.tasks import deleted_backup
 from documents.tasks import empty_trash
@@ -657,7 +656,8 @@ class DocumentViewSet(
         if folder is not None:
             folder.delete()
         # index.remove_document_from_index(self.get_object())
-        update_document_count_folder_path(folder.path)
+        # NOTE: update document count for document
+        # update_document_count_folder_path(folder.path)
         instance.delete()
         instance_deleted = Document.deleted_objects.get(id=instance.id)
         index.delete_document_with_index(instance_deleted.id)
@@ -3114,7 +3114,8 @@ class TrashView(ListModelMixin, PassUserMixin):
             folders_restore = Folder.deleted_objects.filter(id__in=list(folder_set))
             for f in folders_restore:
                 f.restore(strict=False)
-                update_document_count_folder_path(f.path)
+                # NOTE: update document count for document
+                # update_document_count_folder_path(f.path)
             for doc in deleted_docs:
                 doc.restore(strict=False)
                 # if doc.folder is not None:
@@ -3819,7 +3820,8 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
         for doc in documents:
             index.delete_document_with_index(doc_id=doc.id)
         folders.delete()
-        update_document_count_folder_path(folder.path)
+        # NOTE: update document count for parent folder
+        # update_document_count_folder_path(folder.path)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 

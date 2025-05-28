@@ -19,8 +19,7 @@ from documents.models import StoragePath
 from documents.models import Warehouse
 from documents.permissions import set_permissions_for_object
 from documents.tasks import bulk_update_documents, update_document_field, \
-    bulk_update_custom_field_form_document_type_to_document, \
-    update_document_count_folder_path
+    bulk_update_custom_field_form_document_type_to_document
 from documents.tasks import consume_file
 from documents.tasks import update_document_archive_file
 
@@ -230,8 +229,8 @@ def delete(doc_ids):
     docs.delete()
     set_folder_ids = {int(id) for id in set_folder_ids}
     folders = Folder.objects.filter(id__in=set_folder_ids, type=Folder.FOLDER)
-    for folder in folders:
-        update_document_count_folder_path(folder.path)
+    # for folder in folders:
+    #     update_document_count_folder_path(folder.path)
 
 
     # delete the document from the index

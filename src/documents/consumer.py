@@ -1005,7 +1005,8 @@ class Consumer(LoggingMixin):
                     new_file.path = f"{new_file.id}"
                 new_file.save()
                 from documents.tasks import update_document_count_folder_path
-                update_document_count_folder_path(new_file.path)
+                # NOTE: update document count for folder
+                # update_document_count_folder_path(new_file.path)
                 document.folder = new_file
 
                 # If we get here, it was successful. Proceed with post-consume

@@ -147,9 +147,9 @@
               [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name
           </th>
           <!-- <th scope="col" class="fw-normal d-none d-sm-table-cell" pngxSortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th> -->
-          <th scope="col" class="d-xl-table-cell" pngxSortable="document_count" [currentSortField]="sortField"
-              [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Document count
-          </th>
+          <!--          <th scope="col" class="d-xl-table-cell" pngxSortable="document_count" [currentSortField]="sortField"-->
+          <!--              [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Document count-->
+          <!--          </th>-->
           @for (column of extraColumns; track column) {
             <th scope="col" class="d-xl-table-cell" pngxSortable="{{column.key}}" [currentSortField]="sortField"
                 [currentSortReverse]="sortReverse" (sort)="onSort($event)">{{ column.name }}
@@ -230,14 +230,14 @@
               }
               <!-- <td scope="row" class="d-none d-sm-table-cell">{{ getMatching(object) }}</td> -->
 
-              <td scope="row" class="d-md-table-cell">
-                @if (object.type == "folder") {
-                  {{ object.document_count }}
-                } @else {
-                  <!-- {{ object.document_count }} -->
+              <!--              <td scope="row" class="d-md-table-cell">-->
+              <!--                @if (object.type == "folder") {-->
+              <!--                  {{ object.document_count }}-->
+              <!--                } @else {-->
+              <!--                  &lt;!&ndash; {{ object.document_count }} &ndash;&gt;-->
 
-                }
-              </td>
+              <!--                }-->
+              <!--              </td>-->
               @for (column of extraColumns; track column) {
                 <td scope="row" class="d-md-table-cell">
                   @if (column.rendersHtml) {
