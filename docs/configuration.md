@@ -200,7 +200,7 @@ and watch out for indentation if editing the YAML file.
 
 ### Email Parsing
 
-#### [`PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT=<int>`(#PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT) {#PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT}
+#### [`PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT=<int>`](#PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT) {#PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT}
 
 : The default layout to use for emails that are consumed as documents. Must be one of the integer choices below. Note that mail
 rules can specify this setting, thus this fallback is used for the default selection and for .eml files consumed by other means.
