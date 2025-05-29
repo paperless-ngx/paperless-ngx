@@ -2010,7 +2010,6 @@ class StatisticsCustomView(APIView):
             .annotate(document_count=Count("id"))
             .order_by("-document_count")[:10]
         )
-        print('top_tags', documents)
         for entry in top_tags:
             if entry["tags__name"] is None:
                 # entry['tags__name'] = _('Other')
