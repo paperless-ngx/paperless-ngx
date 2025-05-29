@@ -1921,7 +1921,7 @@ class StatisticsCustomView(APIView):
 
         documents = (
             Document.objects.all().defer('content')
-            if user is None
+            if user.is_superuser
             else get_objects_for_user_owner_aware(
                 user,
                 "documents.view_document",
@@ -1960,9 +1960,12 @@ class StatisticsCustomView(APIView):
                 )
                 .order_by("created_date")
             )
+            doc_ids = documents.values_list('id')
+
 
             request_count = (
-                EdocTask.objects.filter(date_done__range=(from_date, to_date))
+                EdocTask.objects.filter(date_done__range=(from_date, to_date),
+                                        result__icontains=str(doc_ids))
                 .annotate(date_done_date=TruncDate("date_done"))
                 .values("date_done_date")
                 .annotate(
@@ -2007,6 +2010,7 @@ class StatisticsCustomView(APIView):
             .annotate(document_count=Count("id"))
             .order_by("-document_count")[:10]
         )
+        print('top_tags', documents)
         for entry in top_tags:
             if entry["tags__name"] is None:
                 # entry['tags__name'] = _('Other')
