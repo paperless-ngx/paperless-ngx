@@ -4,6 +4,7 @@ import logging
 import pickle
 import re
 import warnings
+from hashlib import blake2b
 from hashlib import sha256
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -17,6 +18,7 @@ if TYPE_CHECKING:
 from django.conf import settings
 from django.core.cache import cache
 
+from documents.caching import CACHE_5_MINUTES
 from documents.caching import CACHE_50_MINUTES
 from documents.caching import CLASSIFIER_HASH_KEY
 from documents.caching import CLASSIFIER_MODIFIED_KEY
@@ -92,6 +94,7 @@ class DocumentClassifier:
         self.last_auto_type_hash: bytes | None = None
 
         self.data_vectorizer = None
+        self.data_vectorizer_hash = None
         self.tags_binarizer = None
         self.tags_classifier = None
         self.correspondent_classifier = None
@@ -100,6 +103,12 @@ class DocumentClassifier:
 
         self._stemmer = None
         self._stop_words = None
+
+    def _update_data_vectorizer_hash(self):
+        self.data_vectorizer_hash = blake2b(
+            pickle.dumps(self.data_vectorizer),
+            digest_size=20,
+        ).hexdigest()
 
     def load(self) -> None:
         from sklearn.exceptions import InconsistentVersionWarning
@@ -119,6 +128,7 @@ class DocumentClassifier:
                         self.last_auto_type_hash = pickle.load(f)
 
                         self.data_vectorizer = pickle.load(f)
+                        self._update_data_vectorizer_hash()
                         self.tags_binarizer = pickle.load(f)
 
                         self.tags_classifier = pickle.load(f)
@@ -353,7 +363,7 @@ class DocumentClassifier:
         cache.set(CLASSIFIER_MODIFIED_KEY, self.last_doc_change_time, CACHE_50_MINUTES)
         cache.set(CLASSIFIER_HASH_KEY, hasher.hexdigest(), CACHE_50_MINUTES)
         cache.set(CLASSIFIER_VERSION_KEY, self.FORMAT_VERSION, CACHE_50_MINUTES)
-
+        self._update_data_vectorizer_hash()
         return True
 
     def preprocess_content(self, content: str) -> str:  # pragma: no cover
@@ -362,12 +372,10 @@ class DocumentClassifier:
         words which are meaningful to the content
         """
 
-        # Lower case the document
-        content = content.lower().strip()
-        # Reduce spaces
-        content = re.sub(r"\s+", " ", content)
-        # Get only the letters
-        content = re.sub(r"[^\w\s]", " ", content)
+        # Lower case the document, reduce space,
+        # and keep only letters and digits.
+        WORD_RE = re.compile(r"\b[\w\d]+\b")
+        content = " ".join(match.group().lower() for match in WORD_RE.finditer(content))
 
         # If the NLTK language is supported, do further processing
         if settings.NLTK_LANGUAGE is not None and settings.NLTK_ENABLED:
@@ -398,30 +406,38 @@ class DocumentClassifier:
                     content,
                     language=settings.NLTK_LANGUAGE,
                 )
-
-                meaningful_words = []
-                for word in words:
-                    # Skip stop words
-                    # These are words like "a", "and", "the" which add little meaning
-                    if word in self._stop_words:
-                        continue
-                    # Stem the words
-                    # This reduces the words to their stems.
-                    # "amazement" returns "amaz"
-                    # "amaze" returns "amaz
-                    # "amazed" returns "amaz"
-                    meaningful_words.append(self._stemmer.stem(word))
-
-                return " ".join(meaningful_words)
+                # Stem the words
+                # This reduces the words to their stems.
+                # "amazement" returns "amaz"
+                # "amaze" returns "amaz
+                # "amazed" returns "amaz"
+                # Skip also stop words.
+                return " ".join(
+                    [self._stemmer.stem(w) for w in words if w not in self._stop_words],
+                )
 
             except AttributeError:
                 return content
-
         return content
+
+    def _vectorize(self, content: str):
+        hash = blake2b(content.encode(), digest_size=20)
+        hash.update(
+            f"|{settings.NLTK_LANGUAGE}|{settings.NLTK_ENABLED}|{self.data_vectorizer_hash}".encode(),
+        )
+        key = f"classifier_{hash.hexdigest()}"
+        serialized_result = cache.get(key)
+        if serialized_result is None:
+            result = self.data_vectorizer.transform([self.preprocess_content(content)])
+            cache.set(key, pickle.dumps(result), CACHE_5_MINUTES)
+        else:
+            cache.touch(key, CACHE_5_MINUTES)
+            result = pickle.loads(serialized_result)
+        return result
 
     def predict_correspondent(self, content: str) -> int | None:
         if self.correspondent_classifier:
-            X = self.data_vectorizer.transform([self.preprocess_content(content)])
+            X = self._vectorize(content)
             correspondent_id = self.correspondent_classifier.predict(X)
             if correspondent_id != -1:
                 return correspondent_id
@@ -432,7 +448,7 @@ class DocumentClassifier:
 
     def predict_document_type(self, content: str) -> int | None:
         if self.document_type_classifier:
-            X = self.data_vectorizer.transform([self.preprocess_content(content)])
+            X = self._vectorize(content)
             document_type_id = self.document_type_classifier.predict(X)
             if document_type_id != -1:
                 return document_type_id
@@ -445,7 +461,7 @@ class DocumentClassifier:
         from sklearn.utils.multiclass import type_of_target
 
         if self.tags_classifier:
-            X = self.data_vectorizer.transform([self.preprocess_content(content)])
+            X = self._vectorize(content)
             y = self.tags_classifier.predict(X)
             tags_ids = self.tags_binarizer.inverse_transform(y)[0]
             if type_of_target(y).startswith("multilabel"):
@@ -464,7 +480,7 @@ class DocumentClassifier:
 
     def predict_storage_path(self, content: str) -> int | None:
         if self.storage_path_classifier:
-            X = self.data_vectorizer.transform([self.preprocess_content(content)])
+            X = self._vectorize(content)
             storage_path_id = self.storage_path_classifier.predict(X)
             if storage_path_id != -1:
                 return storage_path_id

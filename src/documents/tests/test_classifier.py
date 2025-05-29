@@ -223,24 +223,47 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.generate_test_data()
         self.classifier.train()
 
-        self.assertEqual(
-            self.classifier.predict_correspondent(self.doc1.content),
-            self.c1.pk,
-        )
-        self.assertEqual(self.classifier.predict_correspondent(self.doc2.content), None)
-        self.assertListEqual(
-            self.classifier.predict_tags(self.doc1.content),
-            [self.t1.pk],
-        )
-        self.assertListEqual(
-            self.classifier.predict_tags(self.doc2.content),
-            [self.t1.pk, self.t3.pk],
-        )
-        self.assertEqual(
-            self.classifier.predict_document_type(self.doc1.content),
-            self.dt.pk,
-        )
-        self.assertEqual(self.classifier.predict_document_type(self.doc2.content), None)
+        with (
+            mock.patch.object(
+                self.classifier.data_vectorizer,
+                "transform",
+                wraps=self.classifier.data_vectorizer.transform,
+            ) as mock_transform,
+            mock.patch.object(
+                self.classifier,
+                "preprocess_content",
+                wraps=self.classifier.preprocess_content,
+            ) as mock_preprocess_content,
+        ):
+            self.assertEqual(
+                self.classifier.predict_correspondent(self.doc1.content),
+                self.c1.pk,
+            )
+            self.assertEqual(
+                self.classifier.predict_correspondent(self.doc2.content),
+                None,
+            )
+            self.assertListEqual(
+                self.classifier.predict_tags(self.doc1.content),
+                [self.t1.pk],
+            )
+            self.assertListEqual(
+                self.classifier.predict_tags(self.doc2.content),
+                [self.t1.pk, self.t3.pk],
+            )
+            self.assertEqual(
+                self.classifier.predict_document_type(self.doc1.content),
+                self.dt.pk,
+            )
+            self.assertEqual(
+                self.classifier.predict_document_type(self.doc2.content),
+                None,
+            )
+
+            # Check that the classifier vectorized content and text preprocessing has been cached
+            # It should be called once per document (doc1 and doc2)
+            self.assertEqual(mock_preprocess_content.call_count, 2)
+            self.assertEqual(mock_transform.call_count, 2)
 
     def test_no_retrain_if_no_change(self):
         """
