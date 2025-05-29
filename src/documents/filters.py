@@ -30,7 +30,8 @@ from documents.models import Warehouse
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
 INT_KWARGS = ["exact", "gt", "gte", "lt", "lte", "isnull"]
-DATE_KWARGS = ["year", "month", "day", "date__gt", "gt", "date__lt", "lt"]
+DATE_KWARGS = ["year", "month", "day", "date__gt", "date__gte", "gt", "gte",
+               "date__lt", "date__lt", "lt", "lte"]
 
 
 class CorrespondentFilterSet(FilterSet):

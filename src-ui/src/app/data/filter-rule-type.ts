@@ -278,13 +278,13 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
   },
   {
     id: FILTER_CREATED_BEFORE,
-    filtervar: 'created__date__lt',
+    filtervar: 'created__date__lte',
     datatype: 'date',
     multi: false,
   },
   {
     id: FILTER_CREATED_AFTER,
-    filtervar: 'created__date__gt',
+    filtervar: 'created__date__gte',
     datatype: 'date',
     multi: false,
   },
