@@ -856,7 +856,8 @@ export class DocumentDetailComponent
             this.documentListViewService.activeSavedViewId,
           ])
         } else {
-          this.location.back()
+          this.router.navigate(['folders', this.parent_folder])
+          // this.location.back()
         }
       })
   }
