@@ -1,4 +1,4 @@
-import hashlib
+import itertools
 import itertools
 import json
 import logging
@@ -3478,7 +3478,7 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
                 output_field=IntegerField(),
             ),
         ).select_related("owner")
-        .order_by("type_order", Lower("name"))
+        .order_by("type_order", "name_order", Lower("name"))
         .prefetch_related("documents")
     )
 
@@ -3662,9 +3662,6 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
         if parent_folder == None:
             folder = serializer.save(owner=request.user)
             folder.path = str(folder.id)
-            folder.checksum = hashlib.md5(
-                f"{folder.id}.{folder.name}".encode(),
-            ).hexdigest()
             folder.save()
         elif parent_folder:
             user_can_change = check_user_can_change_folder(request.user, parent_folder)
@@ -3680,9 +3677,6 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
             merge = serializer.validated_data.get("merge", True)
             folder = serializer.save(parent_folder=parent_folder, owner=owner)
             folder.path = f"{parent_folder.path}/{folder.id}"
-            folder.checksum = hashlib.md5(
-                f"{folder.id}.{folder.name}".encode(),
-            ).hexdigest()
             folder.save()
             permission_parent_folder = get_permissions(obj=parent_folder)
             if permission_parent_folder:

@@ -979,7 +979,6 @@ class Consumer(LoggingMixin):
                     filename=document.filename
 
                 )
-                new_file.checksum = document.checksum
                 if document.folder:
                     permissions = get_permissions(document.folder)
                     set_permissions(permissions, document)

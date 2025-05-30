@@ -274,15 +274,9 @@ class Folder(SoftDeleteModel, MatchingModel):
     parent_folder = models.ForeignKey(
         "self", on_delete=models.DO_NOTHING, null=True, blank=True
     )
-    path = models.TextField(_("path"), null=True, blank=True)
-    checksum = models.CharField(
-        _("checksum"),
-        max_length=32,
-        editable=False,
-        unique=False,
-        null=True,
-        help_text=_("The checksum of the original folder."),
-    )
+    path = models.CharField(_("path"), null=True, blank=True, max_length=256,
+                            db_index=True)
+    name_order = models.IntegerField(null=True, blank=True)
 
     FOLDER = "folder"
     FILE = "file"
@@ -381,6 +375,12 @@ class Folder(SoftDeleteModel, MatchingModel):
     #     folder.checksum = hashlib.md5(f'{folder.id}.{folder.name}'.encode()).hexdigest()
     #     folder.save()
     #     return folder
+    def save(self, *args, **kwargs):
+        # Lấy số đầu tiên từ name
+        match = re.match(r"^\d+", self.name)
+        self.name_order = int(match.group()) if match else 2147483647
+
+        super().save(*args, **kwargs)
 
 
 class DossierForm(MatchingModel):
