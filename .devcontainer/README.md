@@ -56,7 +56,15 @@ VSCode will build and start the DevContainer environment.
 
 ### Step 2: Initial Setup
 
-Once the DevContainer is up and running, perform the following steps:
+Once the DevContainer is up and running, perform the following step:
+
+- Open the command palette:
+  - **Windows/Linux**: `Ctrl+Shift+P`
+  - **Mac**: `Cmd+Shift+P`
+- Select `Tasks: Run Task`.
+- Choose `Project Setup: Run all Init Tasks`.
+
+Alternative the Project Setup can be done with these individual Init tasks:
 
 1. **Compile Frontend Assets**:
 
@@ -64,7 +72,7 @@ Once the DevContainer is up and running, perform the following steps:
      - **Windows/Linux**: `Ctrl+Shift+P`
      - **Mac**: `Cmd+Shift+P`
    - Select `Tasks: Run Task`.
-   - Choose `Frontend Compile`.
+   - Choose `Maintenance: Compile frontend for production`.
 
 2. **Run Database Migrations**:
 
@@ -72,14 +80,14 @@ Once the DevContainer is up and running, perform the following steps:
      - **Windows/Linux**: `Ctrl+Shift+P`
      - **Mac**: `Cmd+Shift+P`
    - Select `Tasks: Run Task`.
-   - Choose `Migrate Database`.
+   - Choose `Maintenance: manage.py migrate`.
 
 3. **Create Superuser**:
    - Open the command palette:
      - **Windows/Linux**: `Ctrl+Shift+P`
      - **Mac**: `Cmd+Shift+P`
    - Select `Tasks: Run Task`.
-   - Choose `Create Superuser`.
+   - Choose `Maintenance: manage.py createsuperuser`.
 
 ### Debugging and Running Services
 
