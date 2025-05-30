@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
+import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import { FormArray, FormControl, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { NgbDateStruct, NgbModal, NgbNav, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
@@ -116,6 +116,18 @@ enum ZoomSetting {
 export class DocumentDetailComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy, DirtyComponent {
+  @HostListener('window:beforeunload', ['$event'])
+  onBeforeUnload(event: Event): void {
+    // Add your logic here, e.g., show a confirmation dialog
+    this.openDocumentService.closeDocumentWithoutAlert(this.document).subscribe((result) => {
+      if (result) {
+        console.log('Document closed successfully without alert.')
+      } else {
+        console.log('Failed to close the document.')
+      }
+    })
+    event.preventDefault()
+  }
   @ViewChild('inputTitle')
   titleInput: TextComponent
 
@@ -856,6 +868,9 @@ export class DocumentDetailComponent
             this.documentListViewService.activeSavedViewId,
           ])
         } else {
+          if (this.parent_folder === null) {
+            this.router.navigate(['folders', 'root'])
+          }
           this.router.navigate(['folders', this.parent_folder])
           // this.location.back()
         }

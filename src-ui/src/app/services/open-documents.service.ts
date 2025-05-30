@@ -4,7 +4,7 @@ import { OPEN_DOCUMENT_SERVICE } from '../data/storage-keys'
 import { DocumentService } from './rest/document.service'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
-import { Observable, Subject, of } from 'rxjs'
+import { Observable, of, Subject } from 'rxjs'
 import { first } from 'rxjs/operators'
 
 @Injectable({
@@ -15,12 +15,12 @@ export class OpenDocumentsService {
 
   constructor(
     private documentService: DocumentService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
   ) {
     if (sessionStorage.getItem(OPEN_DOCUMENT_SERVICE.DOCUMENTS)) {
       try {
         this.openDocuments = JSON.parse(
-          sessionStorage.getItem(OPEN_DOCUMENT_SERVICE.DOCUMENTS)
+          sessionStorage.getItem(OPEN_DOCUMENT_SERVICE.DOCUMENTS),
         )
       } catch (e) {
         sessionStorage.removeItem(OPEN_DOCUMENT_SERVICE.DOCUMENTS)
@@ -90,6 +90,16 @@ export class OpenDocumentsService {
     return this.dirtyDocuments.size > 0
   }
 
+  closeDocumentWithoutAlert(doc: Document): Observable<boolean> {
+    let index = this.openDocuments.findIndex((d) => d.id == doc.id)
+    if (index == -1) return of(true)
+    if (!this.dirtyDocuments.has(doc.id)) {
+      this.openDocuments.splice(index, 1)
+      this.save()
+      return of(true)
+    }
+  }
+
   closeDocument(doc: Document): Observable<boolean> {
     let index = this.openDocuments.findIndex((d) => d.id == doc.id)
     if (index == -1) return of(true)
@@ -155,7 +165,7 @@ export class OpenDocumentsService {
     try {
       sessionStorage.setItem(
         OPEN_DOCUMENT_SERVICE.DOCUMENTS,
-        JSON.stringify(this.openDocuments)
+        JSON.stringify(this.openDocuments),
       )
     } catch (e) {
       console.error('Error saving open documents to session storage', e)
