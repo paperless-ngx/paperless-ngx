@@ -1215,29 +1215,37 @@ class UnifiedSearchViewSet(DocumentViewSet):
 class LogViewSet(ViewSet):
     permission_classes = (IsAuthenticated, PaperlessAdminPermissions)
 
-    log_files = ["paperless", "mail", "celery"]
+    ALLOWED_LOG_FILES = {
+        "paperless": "paperless.log",
+        "mail": "mail.log",
+        "celery": "celery.log",
+    }
 
-    def get_log_filename(self, log) -> Path:
-        return Path(settings.LOGGING_DIR) / f"{log}.log"
+    def get_log_filename(self, log_key: str) -> Path:
+        return Path(settings.LOGGING_DIR) / self.ALLOWED_LOG_FILES[log_key]
 
     def retrieve(self, request, *args, **kwargs):
-        log_file = kwargs.get("pk")
-        if log_file not in self.log_files:
+        log_key = kwargs.get("pk")
+        if log_key not in self.ALLOWED_LOG_FILES:
             raise Http404
 
-        filename = self.get_log_filename(log_file)
+        filename = self.get_log_filename(log_key)
 
-        if not Path(filename).is_file():
+        if not filename.is_file():
             raise Http404
 
-        with Path(filename).open() as f:
+        with filename.open() as f:
             lines = [line.rstrip() for line in f.readlines()]
 
         return Response(lines)
 
     def list(self, request, *args, **kwargs):
-        exist = [log for log in self.log_files if self.get_log_filename(log).is_file()]
-        return Response(exist)
+        existing_logs = [
+            log_key
+            for log_key in self.ALLOWED_LOG_FILES
+            if self.get_log_filename(log_key).is_file()
+        ]
+        return Response(existing_logs)
 
 
 class SavedViewViewSet(ModelViewSet, PassUserMixin):
