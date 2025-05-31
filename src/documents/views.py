@@ -1,10 +1,10 @@
-import itertools
 import logging
 import os
 import platform
 import re
 import tempfile
 import zipfile
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
 from time import mktime
@@ -128,7 +128,7 @@ from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.parsers import get_parser_class_for_mime_type
-from documents.parsers import parse_date_generator
+from documents.parsers import parse_date_set
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessNotePermissions
 from documents.permissions import PaperlessObjectPermissions
@@ -739,26 +739,34 @@ class DocumentViewSet(
         classifier = load_classifier()
 
         dates = []
-        if settings.NUMBER_OF_SUGGESTED_DATES > 0:
-            gen = parse_date_generator(doc.filename, doc.content)
-            dates = sorted(
-                {i for i in itertools.islice(gen, settings.NUMBER_OF_SUGGESTED_DATES)},
-            )
+        with ThreadPoolExecutor() as executor:
+            if settings.NUMBER_OF_SUGGESTED_DATES > 0:
+                future_dates = executor.submit(
+                    parse_date_set,
+                    doc.filename,
+                    doc.content,
+                    settings.NUMBER_OF_SUGGESTED_DATES,
+                )
 
-        resp_data = {
-            "correspondents": [
-                c.id for c in match_correspondents(doc, classifier, request.user)
-            ],
-            "tags": [t.id for t in match_tags(doc, classifier, request.user)],
-            "document_types": [
-                dt.id for dt in match_document_types(doc, classifier, request.user)
-            ],
-            "storage_paths": [
-                dt.id for dt in match_storage_paths(doc, classifier, request.user)
-            ],
-            "dates": [date.strftime("%Y-%m-%d") for date in dates if date is not None],
-        }
-
+            resp_data = {
+                "correspondents": [
+                    c.id for c in match_correspondents(doc, classifier, request.user)
+                ],
+                "tags": [t.id for t in match_tags(doc, classifier, request.user)],
+                "document_types": [
+                    dt.id for dt in match_document_types(doc, classifier, request.user)
+                ],
+                "storage_paths": [
+                    dt.id for dt in match_storage_paths(doc, classifier, request.user)
+                ],
+                "dates": [],
+            }
+            if settings.NUMBER_OF_SUGGESTED_DATES > 0:
+                dates = future_dates.result()
+                if dates:
+                    resp_data["dates"] = [
+                        date.strftime("%Y-%m-%d") for date in dates if date is not None
+                    ]
         # Cache the suggestions and the classifier hash for later
         set_suggestions_cache(doc.pk, resp_data, classifier)
 

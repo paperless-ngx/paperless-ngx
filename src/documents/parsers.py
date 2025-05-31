@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import tempfile
 from functools import lru_cache
+from itertools import islice
 from pathlib import Path
 from re import Match
 from typing import TYPE_CHECKING
@@ -259,6 +260,10 @@ def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None) -> Path:
 
 def parse_date(filename, text) -> datetime.datetime | None:
     return next(parse_date_generator(filename, text), None)
+
+
+def parse_date_set(filename, text, nb_elems):
+    return sorted(set(islice(parse_date_generator(filename, text), nb_elems)))
 
 
 def parse_date_generator(filename, text) -> Iterator[datetime.datetime]:
