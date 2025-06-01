@@ -1273,6 +1273,18 @@ NLTK_ENABLED: Final[bool] = __get_boolean("PAPERLESS_ENABLE_NLTK", "yes")
 
 NLTK_LANGUAGE: str | None = _get_nltk_language_setting(OCR_LANGUAGE)
 
+SUGGESTION_CONTENT_LENGTH_LIMIT = max(
+    0,
+    __get_int("PAPERLESS_SUGGESTION_CONTENT_LENGTH_LIMIT", 0),
+)
+if SUGGESTION_CONTENT_LENGTH_LIMIT > 0:
+    SUGGESTION_CONTENT_LENGTH_LIMIT = max(1000, SUGGESTION_CONTENT_LENGTH_LIMIT)
+
+SUGGESTION_CONTENT_TAIL_RATIO = min(
+    1,
+    max(0, __get_float("PAPERLESS_SUGGESTION_CONTENT_TAIL_RATIO", 0.2)),
+)
+
 ###############################################################################
 # Email Preprocessors                                                         #
 ###############################################################################

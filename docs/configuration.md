@@ -966,6 +966,27 @@ still perform some basic text pre-processing before matching.
 
     Defaults to 1.
 
+#### [`PAPERLESS_SUGGESTION_CONTENT_LENGTH_LIMIT=<int>`](#PAPERLESS_SUGGESTION_CONTENT_LENGTH_LIMIT) {#PAPERLESS_SUGGESTION_CONTENT_LENGTH_LIMIT}
+
+: Limits the amount of document content used for generating suggestions (e.g., matching predictions or date parsing) by cropping it to N characters.
+To preserve relevant context, the system keeps the beginning and end of the content and removes the middle portion.
+
+This improves performance and reduces memory usage, especially for very large documents, at the cost of some accuracy.
+
+    Defaults to 0, which disable this feature (the full content is used). If enabled, minimum of 1000.
+
+    !!! note
+
+        A good starting point is between 10000 characters (for slower devices) and 1000000 (for faster ones).
+
+#### [`PAPERLESS_SUGGESTION_CONTENT_TAIL_RATIO=<float>`](#PAPERLESS_SUGGESTION_CONTENT_TAIL_RATIO) {#PAPERLESS_SUGGESTION_CONTENT_TAIL_RATIO}
+
+: When content cropping is enabled (PAPERLESS_SUGGESTION_CONTENT_LENGTH_LIMIT > 0), this setting determines how much of the tail (end) of the content is kept.
+Must be a float between 0 and 1.
+
+    Defaults to 0.2. For example, if the content limit is 10000 characters and the tail ratio is 0.2,
+    the system will keep the first 8000 characters and the last 2000 characters of the document.
+
 #### [`PAPERLESS_EMAIL_TASK_CRON=<cron expression>`](#PAPERLESS_EMAIL_TASK_CRON) {#PAPERLESS_EMAIL_TASK_CRON}
 
 : Configures the scheduled email fetching frequency. The value

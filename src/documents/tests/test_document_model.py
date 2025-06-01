@@ -4,6 +4,7 @@ from datetime import date
 from pathlib import Path
 from unittest import mock
 
+import pytest
 from django.test import TestCase
 from django.test import override_settings
 
@@ -107,3 +108,39 @@ class TestDocument(TestCase):
             created=date(2020, 12, 25),
         )
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test")
+
+
+@pytest.mark.parametrize(
+    ("content_limit", "tail_ratio", "expected_content"),
+    [
+        (10, 0.2, "This is  e."),
+        (10, 0, "This is th"),
+        (10, 1, " the date."),
+        (20, 0.2, "This is the docu ate."),
+    ],
+)
+def test_suggestion_content(content_limit, tail_ratio, expected_content):
+    long_content = """This is the document content. It is quite long, so we ought to crop it when computing suggestions and parsing the date."""
+    other_long_content = (
+        "Another document content, used to test property cache invalidation."
+    )
+    short_content = "test"
+    with override_settings(
+        SUGGESTION_CONTENT_LENGTH_LIMIT=content_limit,
+        SUGGESTION_CONTENT_TAIL_RATIO=tail_ratio,
+    ):
+        doc = Document(
+            title="test",
+            created=date(2025, 6, 1),
+            content=other_long_content,
+        )
+        # call the property once to cache it
+        assert doc.suggestion_content
+
+        # Test property cache invalidation and limit
+        doc.content = long_content
+        assert doc.suggestion_content == expected_content
+
+        # Test with content shorter than the limit
+        doc.content = short_content
+        assert doc.suggestion_content == short_content

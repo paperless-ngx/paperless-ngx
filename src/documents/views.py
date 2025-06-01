@@ -744,7 +744,7 @@ class DocumentViewSet(
                 future_dates = executor.submit(
                     parse_date_set,
                     doc.filename,
-                    doc.content,
+                    doc.suggestion_content,
                     settings.NUMBER_OF_SUGGESTED_DATES,
                 )
 

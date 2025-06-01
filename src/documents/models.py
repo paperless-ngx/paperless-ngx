@@ -306,6 +306,27 @@ class Document(SoftDeleteModel, ModelWithOwner):
         return res
 
     @property
+    def suggestion_content(self):
+        """Cropped document content to accelerate matchings."""
+        limit = settings.SUGGESTION_CONTENT_LENGTH_LIMIT
+        ratio = settings.SUGGESTION_CONTENT_TAIL_RATIO
+
+        # Add an arbitrary margin ratio for the limit e.g., 25%,
+        # as processing the full content directly
+        # will be faster than cropping it before.
+        if not self.content or not limit or len(self.content) <= limit * 1.25:
+            return self.content
+
+        if ratio == 0:
+            return self.content[:limit]
+        if ratio == 1:
+            return self.content[-limit:]
+
+        head_len = int((1 - ratio) * limit)
+        tail_len = limit - head_len
+        return " ".join((self.content[:head_len], self.content[-tail_len:]))
+
+    @property
     def source_path(self) -> Path:
         if self.filename:
             fname = str(self.filename)
