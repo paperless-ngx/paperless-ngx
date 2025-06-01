@@ -69,6 +69,7 @@
     "ts-node": "~10.9.1",
     "typescript": "^5.5.4"
   },
+  "packageManager": "pnpm@10.8.1",
   "pnpm": {
     "onlyBuiltDependencies": [
       "@parcel/watcher",
