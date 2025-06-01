@@ -47,39 +47,19 @@ To start the DevContainer:
 
 1. Open VSCode.
 2. Open the project folder.
-3. Open the command palette:
-   - **Windows/Linux**: `Ctrl+Shift+P`
-   - **Mac**: `Cmd+Shift+P`
-4. Type and select `Dev Containers: Rebuild and Reopen in Container`.
+3. Open the command palette and choose `Dev Containers: Rebuild and Reopen in Container`.
 
 VSCode will build and start the DevContainer environment.
 
 ### Step 2: Initial Setup
 
-Once the DevContainer is up and running, perform the following steps:
+Once the DevContainer is up and running, run the `Project Setup: Run all Init Tasks` task to initialize the project.
 
-1. **Compile Frontend Assets**:
+Alternatively, the Project Setup can be done with individual tasks:
 
-   - Open the command palette:
-     - **Windows/Linux**: `Ctrl+Shift+P`
-     - **Mac**: `Cmd+Shift+P`
-   - Select `Tasks: Run Task`.
-   - Choose `Frontend Compile`.
-
-2. **Run Database Migrations**:
-
-   - Open the command palette:
-     - **Windows/Linux**: `Ctrl+Shift+P`
-     - **Mac**: `Cmd+Shift+P`
-   - Select `Tasks: Run Task`.
-   - Choose `Migrate Database`.
-
-3. **Create Superuser**:
-   - Open the command palette:
-     - **Windows/Linux**: `Ctrl+Shift+P`
-     - **Mac**: `Cmd+Shift+P`
-   - Select `Tasks: Run Task`.
-   - Choose `Create Superuser`.
+1. **Compile Frontend Assets**: `Maintenance: Compile frontend for production`.
+2. **Run Database Migrations**: `Maintenance: manage.py migrate`.
+3. **Create Superuser**: `Maintenance: manage.py createsuperuser`.
 
 ### Debugging and Running Services
 
@@ -95,11 +75,8 @@ You can start and debug backend services either as debugging sessions via `launc
 
 #### Using Tasks
 
-1. Open the command palette:
-   - **Windows/Linux**: `Ctrl+Shift+P`
-   - **Mac**: `Cmd+Shift+P`
-2. Select `Tasks: Run Task`.
-3. Choose the desired task:
+1. Open the command palette and select `Tasks: Run Task`.
+2. Choose the desired task:
    - `Runserver`
    - `Document Consumer`
    - `Celery`
