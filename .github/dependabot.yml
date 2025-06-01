@@ -84,7 +84,9 @@ updates:
           - "patch"
   # Update Dockerfile in root directory
   - package-ecosystem: "docker"
-    directory: "/"
+    directories:
+      - "/"
+      - "/.devcontainer/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
