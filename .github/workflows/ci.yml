@@ -161,6 +161,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install pnpm
         uses: pnpm/action-setup@v4
+        with:
+          package_json_file: 'src-ui/package.json'
       - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
@@ -192,6 +194,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install pnpm
         uses: pnpm/action-setup@v4
+        with:
+          package_json_file: 'src-ui/package.json'
       - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
@@ -240,6 +244,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install pnpm
         uses: pnpm/action-setup@v4
+        with:
+          package_json_file: 'src-ui/package.json'
       - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
@@ -281,6 +287,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install pnpm
         uses: pnpm/action-setup@v4
+        with:
+          package_json_file: 'src-ui/package.json'
       - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
