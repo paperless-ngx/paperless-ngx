@@ -221,7 +221,7 @@ def delete(doc_ids):
         # doc.dossier = None
         doc.save()
         if doc_folder is not None:
-            set_folder_ids.update(doc_folder.path.split("/"))
+            set_folder_ids.update(doc_folder.path.rstrip("/").split("/"))
             doc_folder.delete()
         # if doc_dossier is not None:
         #     doc_dossier.delete()
