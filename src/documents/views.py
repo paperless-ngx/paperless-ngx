@@ -3589,6 +3589,7 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
         if request.method == "GET":
             try:
                 fol = Folder.objects.get(pk=pk)
+                print('folder_path', fol.path)
                 folder_path = fol.path.rstrip("/").split("/")
                 folders = Folder.objects.filter(id__in=folder_path)
                 folders_dict = {}
@@ -3664,7 +3665,7 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
 
         if parent_folder == None:
             folder = serializer.save(owner=request.user)
-            folder.path = str(folder.id)
+            folder.path = f'{folder.id}/'
             folder.save()
         elif parent_folder:
             user_can_change = check_user_can_change_folder(request.user, parent_folder)
@@ -3679,7 +3680,7 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
             owner = serializer.validated_data.get("owner")
             merge = serializer.validated_data.get("merge", True)
             folder = serializer.save(parent_folder=parent_folder, owner=owner)
-            folder.path = f"{parent_folder.path}/{folder.id}/"
+            folder.path = f"{parent_folder.path}{folder.id}/"
             folder.save()
             permission_parent_folder = get_permissions(obj=parent_folder)
             if permission_parent_folder:
