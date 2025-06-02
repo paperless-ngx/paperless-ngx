@@ -42,7 +42,7 @@
   "devDependencies": {
     "@angular-builders/custom-webpack": "^19.0.1",
     "@angular-builders/jest": "^19.0.1",
-    "@angular-devkit/build-angular": "^19.2.10",
+    "@angular-devkit/build-angular": "^19.2.14",
     "@angular-devkit/core": "^19.2.10",
     "@angular-devkit/schematics": "^19.2.10",
     "@angular-eslint/builder": "19.3.0",
