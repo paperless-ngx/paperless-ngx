@@ -162,7 +162,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10
+          package_json_file: 'src-ui/package.json'
       - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
@@ -195,7 +195,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10
+          package_json_file: 'src-ui/package.json'
       - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
@@ -245,7 +245,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10
+          package_json_file: 'src-ui/package.json'
       - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
@@ -288,7 +288,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10
+          package_json_file: 'src-ui/package.json'
       - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
