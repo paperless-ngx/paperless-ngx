@@ -13,8 +13,8 @@
   "dependencies": {
     "@angular/cdk": "^19.2.14",
     "@angular/common": "~19.2.9",
-    "@angular/compiler": "~19.2.9",
-    "@angular/core": "~19.2.9",
+    "@angular/compiler": "~19.2.14",
+    "@angular/core": "~19.2.14",
     "@angular/forms": "~19.2.9",
     "@angular/localize": "~19.2.9",
     "@angular/platform-browser": "~19.2.9",
