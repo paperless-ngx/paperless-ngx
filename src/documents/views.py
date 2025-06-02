@@ -3814,9 +3814,9 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
         folder = Folder.objects.get(id=pk)
         folders = Folder.objects.filter(path__startswith=folder.path)
         documents = Document.objects.filter(folder__in=folders).defer('content')
-        documents.delete()
         for doc in documents:
             index.delete_document_with_index(doc_id=doc.id)
+        documents.delete()
         folders.delete()
         # NOTE: update document count for parent folder
         # update_document_count_folder_path(folder.path)
