@@ -3113,7 +3113,7 @@ class TrashView(ListModelMixin, PassUserMixin):
             # dossiers = {doc.dossier for doc in deleted_docs}
             folder_set = set()
             for doc in deleted_docs:
-                folder_set.update(doc.folder.path.split("/"))
+                folder_set.update(doc.folder.path.rstrip("/").split("/"))
             # restore folder
             folders_restore = Folder.deleted_objects.filter(id__in=list(folder_set))
             for f in folders_restore:
@@ -3587,7 +3587,7 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
         if request.method == "GET":
             try:
                 fol = Folder.objects.get(pk=pk)
-                folder_path = fol.path.split("/")
+                folder_path = fol.path.rstrip("/").split("/")
                 folders = Folder.objects.filter(id__in=folder_path)
                 folders_dict = {}
                 for f in folders:
@@ -3677,7 +3677,7 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
             owner = serializer.validated_data.get("owner")
             merge = serializer.validated_data.get("merge", True)
             folder = serializer.save(parent_folder=parent_folder, owner=owner)
-            folder.path = f"{parent_folder.path}/{folder.id}"
+            folder.path = f"{parent_folder.path}/{folder.id}/"
             folder.save()
             permission_parent_folder = get_permissions(obj=parent_folder)
             if permission_parent_folder:
@@ -3807,16 +3807,20 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
 
         return Response(serializer.data)
 
-
-
-
-    def destroy(self, request, pk, *args, **kwargs):
-        folder = Folder.objects.get(id=pk)
-        folders = Folder.objects.filter(path__startswith=folder.path)
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        folders = Folder.objects.filter(path__startswith=instance.path)
         documents = Document.objects.filter(folder__in=folders).defer('content')
-        for doc in documents:
-            index.delete_document_with_index(doc_id=doc.id)
+        logger.info(f"Deleting {documents} documents in folder {instance.id}")
         documents.delete()
+
+        documents_deleted = Document.deleted_objects.filter(
+            folder__in=folders).defer(
+            'content')
+
+        for doc in documents_deleted:
+            # index.delete_document_index(doc=doc)
+            index.delete_document_with_index(doc_id=doc.id)
         folders.delete()
         # NOTE: update document count for parent folder
         # update_document_count_folder_path(folder.path)
@@ -3989,7 +3993,7 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         if request.method == "GET":
             try:
                 fol = Dossier.objects.get(pk=pk)
-                dossier_path = fol.path.split("/")
+                dossier_path = fol.path.rstrip("/").split("/")
                 dossiers = Dossier.objects.filter(id__in=dossier_path)
                 dossiers_dict = {}
                 for f in dossiers:

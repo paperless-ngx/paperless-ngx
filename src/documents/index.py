@@ -166,6 +166,13 @@ def delete_document_with_index(doc_id, es_client=None):
 
         # Delete the document
         es_client.delete(index=ELASTIC_SEARCH_DOCUMENT_INDEX, id=doc_id)
+        doc_exists_after_deletion = es_client.exists(
+            index=ELASTIC_SEARCH_DOCUMENT_INDEX, id=doc_id)
+        if doc_exists_after_deletion:
+            logger.warning(
+                f"Tài liệu với ID {doc_id} vẫn tồn tại sau khi xóa.")
+        else:
+            logger.info(f"Tài liệu với ID {doc_id} đã được xóa hoàn toàn.")
         logger.info(
             f"Successfully deleted document with ID {doc_id} from Elasticsearch")
     except Exception as e:

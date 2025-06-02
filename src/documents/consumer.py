@@ -701,7 +701,7 @@ class Consumer(LoggingMixin):
                         )
 
                 # get dossier_form by document_form
-                lst_id_dossier = dossier_file.path.split("/")
+                lst_id_dossier = dossier_file.path.rstrip("/").split("/")
                 lst_id_dossier = [int(num) for num in lst_id_dossier]
                 lst_dossiers = Dossier.objects.filter(
                     id__in=lst_id_dossier, type="DOSSIER"
@@ -986,22 +986,25 @@ class Consumer(LoggingMixin):
                     # add_or_update_document(document)
                     folder_path = get_content_before_last_number(document.folder.path)
                     if document.folder.type == Folder.FILE:
-                        if len(document.folder.path.split("/")) == 1:
-                            new_file.path = f"{new_file.id}"
+                        if len(
+                            document.folder.path.rstrip("/").split("/")) == 1:
+                            new_file.path = f"{new_file.id}/"
                             new_file.parent_folder_id = None
-                        elif len(document.folder.path.split("/")) > 1:
-                            new_file.path = f"{folder_path}/{new_file.id}"
-                            new_file.parent_folder_id = int(folder_path.split("/")[-1])
+                        elif len(
+                            document.folder.path.rstrip("/").split("/")) > 1:
+                            new_file.path = f"{folder_path}/{new_file.id}/"
+                            new_file.parent_folder_id = int(
+                                folder_path.rstrip("/").split("/")[-1])
                     elif document.folder.type == Folder.FOLDER:
-                        new_file.path = f"{document.folder.path}/{new_file.id}"
+                        new_file.path = f"{document.folder.path}{new_file.id}/"
                         # self.log.debug("parent_folder_id___1",folder_path , document.folder.path)
                         new_file.parent_folder_id = int(
-                            document.folder.path.split("/")[-1]
+                            document.folder.path.rstrip("/").split("/")[-1]
                         )
 
 
                 else:
-                    new_file.path = f"{new_file.id}"
+                    new_file.path = f"{new_file.id}/"
                 new_file.save()
                 from documents.tasks import update_document_count_folder_path
                 # NOTE: update document count for folder

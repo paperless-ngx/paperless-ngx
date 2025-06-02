@@ -177,10 +177,8 @@ class FolderFilter(Filter):
             folders = Folder.objects.filter(id__in=object_ids)
             folder_paths = []
             for f in folders:
-                if f.type == Folder.FOLDER:
-                    folder_paths.append(f'{f.path}/')
-                    continue
                 folder_paths.append(f.path)
+                continue
             query = Q()
             for path in folder_paths:
                 query |= Q(path__startswith=path)
