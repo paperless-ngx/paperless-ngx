@@ -1019,6 +1019,10 @@ def run_workflow_approval(
                             object=obj,
                             merge=True,
                         )
+                        # update the view folder parent permissions
+                        update_view_folder_parent_permissions.delay(
+                            obj.folder,
+                            permissions)
 
                 elif action.type == WorkflowAction.WorkflowActionType.REMOVAL_WITH_APPROVAL:
 

@@ -619,19 +619,21 @@ class DocumentViewSet(
         self.update_time_archive_font(self.get_object())
         self.update_name_folder(self.get_object(), serializer)
         permissions = serializer.validated_data.get("set_permissions")
-        permissions_copy = permissions.copy()
+        if permissions is not None:
+            permissions_copy = permissions.copy()
         if instance.folder is not None:
             update_view_folder_parent_permissions.delay(instance.folder,
                                                         permissions_copy)
-        owner = serializer.validated_data.get("owner")
-        merge = serializer.validated_data.get("merge", False)
-        owner_exist = "owner" in serializer.validated_data
-        set_permissions_exist = "set_permissions" in serializer.validated_data
-        update_folder_permisisons.delay(instance=self.get_object(),
-                                        permissions=permissions_copy,
-                                        owner=owner, owner_exist=owner_exist,
-                                        merge=merge,
-                                        set_permissions_exist=set_permissions_exist)
+            owner = serializer.validated_data.get("owner")
+            merge = serializer.validated_data.get("merge", False)
+            owner_exist = "owner" in serializer.validated_data
+            set_permissions_exist = "set_permissions" in serializer.validated_data
+            update_folder_permisisons.delay(instance=self.get_object(),
+                                            permissions=permissions_copy,
+                                            owner=owner,
+                                            owner_exist=owner_exist,
+                                            merge=merge,
+                                            set_permissions_exist=set_permissions_exist)
         response = super().update(request, *args, **kwargs)
         from documents import index
 
