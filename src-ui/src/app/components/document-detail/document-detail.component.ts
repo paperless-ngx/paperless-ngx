@@ -76,8 +76,6 @@ import {
 } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { WarehouseService } from 'src/app/services/rest/warehouse.service'
 
-import { DocumentApproval } from 'src/app/data/document-approval'
-
 enum DocumentDetailNavIDs {
   Details = 1,
   Content = 2,
@@ -85,7 +83,7 @@ enum DocumentDetailNavIDs {
   Preview = 4,
   Notes = 5,
   Permissions = 6,
-  Approvals = 7
+  // Approvals = 7
 }
 
 enum ContentRenderType {
@@ -1098,24 +1096,25 @@ export class DocumentDetailComponent
     )
   }
 
-  get approvalsEnabled(): boolean {
-    return (
-      this.settings.get(SETTINGS_KEYS.APPROVALS_ENABLED) &&
-      this.permissionsService.currentUserCan(
-        PermissionAction.View,
-        PermissionType.Approval
-      )
-    )
-  }
+  // get approvalsEnabled(): boolean {
+  //   return (
+  //     this.settings.get(SETTINGS_KEYS.APPROVALS_ENABLED) &&
+  //     this.permissionsService.currentUserCan(
+  //       PermissionAction.View,
+  //       PermissionType.Approval
+  //     )
+  //   )
+  // }
 
   notesUpdated(notes: DocumentNote[]) {
     this.document.notes = notes
     this.openDocumentService.refreshDocument(this.documentId)
   }
-  approvalsUpdated(approvals: DocumentApproval[]) {
-    this.document.approvals = approvals
-    this.openDocumentService.refreshDocument(this.documentId)
-  }
+
+  // approvalsUpdated(approvals: DocumentApproval[]) {
+  //   this.document.approvals = approvals
+  //   this.openDocumentService.refreshDocument(this.documentId)
+  // }
 
   get userIsOwner(): boolean {
     let doc: Document = Object.assign({}, this.document)
