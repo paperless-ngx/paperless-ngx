@@ -604,7 +604,7 @@ class DocumentViewSet(
 
         serializer = self.get_serializer(instance, data=data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        response = super().update(request, *args, **kwargs)
+
         document_type = serializer.validated_data.get("document_type")
         update_document_field = True
         if document_type and  instance.document_type:
@@ -632,6 +632,7 @@ class DocumentViewSet(
                                         owner=owner, owner_exist=owner_exist,
                                         merge=merge,
                                         set_permissions_exist=set_permissions_exist)
+        response = super().update(request, *args, **kwargs)
         from documents import index
 
         index.add_or_update_document(self.get_object())
