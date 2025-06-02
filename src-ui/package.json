@@ -69,11 +69,11 @@
     "ts-node": "~10.9.1",
     "typescript": "^5.5.4"
   },
-  "packageManager": "pnpm@10.8.1",
+  "packageManager": "pnpm@10.11.1",
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
-      "version": "10.8.1"
+      "version": "10.11.1"
     }
   },
   "pnpm": {
