@@ -1,11 +1,9 @@
 import tempfile
 from pathlib import Path
 
-import pytest
 from django.conf import settings
 
 
-@pytest.mark.django_db
 def test_favicon_view(client):
     with tempfile.TemporaryDirectory() as tmpdir:
         static_dir = Path(tmpdir)
