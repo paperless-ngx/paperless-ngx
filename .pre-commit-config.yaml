@@ -29,7 +29,7 @@ repos:
       - id: check-case-conflict
       - id: detect-private-key
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.0
+    rev: v2.4.1
     hooks:
       - id: codespell
         exclude: "(^src-ui/src/locale/)|(^src-ui/pnpm-lock.yaml)|(^src-ui/e2e/)|(^src/paperless_mail/tests/samples/)"
