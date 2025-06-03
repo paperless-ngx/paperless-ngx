@@ -1227,6 +1227,20 @@ class TestWorkflows(
         superuser = User.objects.create_superuser("superuser")
         self.client.force_authenticate(user=superuser)
 
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+            created=timezone.now().replace(
+                month=6,
+                day=1,
+                hour=0,
+                minute=0,
+                second=0,
+                microsecond=0,
+            ),
+        )
+
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
             filter_has_document_type=self.dt,
@@ -1243,20 +1257,6 @@ class TestWorkflows(
         w.actions.add(action)
         w.save()
 
-        doc = Document.objects.create(
-            title="sample test",
-            correspondent=self.c,
-            original_filename="sample.pdf",
-            created=timezone.now().replace(
-                month=6,
-                day=1,
-                hour=0,
-                minute=0,
-                second=0,
-                microsecond=0,
-            ),
-        )
-
         self.client.patch(
             f"/api/documents/{doc.id}/",
             {"document_type": self.dt.id},
@@ -1264,9 +1264,6 @@ class TestWorkflows(
         )
 
         doc.refresh_from_db()
-        self.skipTest(
-            "Skipping test for month placeholder in title due to language settings",
-        )
 
         self.assertEqual(doc.title, "Doc created in Juni")  # codespell:ignore
 
