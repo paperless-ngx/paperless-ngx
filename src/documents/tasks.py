@@ -26,6 +26,7 @@ from documents.caching import clear_document_caches
 from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
 from documents.consumer import ConsumerPlugin
+from documents.consumer import ConsumerPreflightPlugin
 from documents.consumer import WorkflowTriggerPlugin
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
@@ -144,6 +145,7 @@ def consume_file(
         overrides = DocumentMetadataOverrides()
 
     plugins: list[type[ConsumeTaskPlugin]] = [
+        ConsumerPreflightPlugin,
         CollatePlugin,
         BarcodePlugin,
         WorkflowTriggerPlugin,
