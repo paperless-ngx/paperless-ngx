@@ -283,7 +283,7 @@ def convert_japanese_era_to_western(date_string: str) -> str:
     import re
 
     era_pattern = re.compile(
-        r"(令和|平成|昭和)([0-9]{1,2})年([0-9]{1,2})月([0-9]{1,2})日"
+        r"(令和|平成|昭和)([0-9]{1,2})年([0-9]{1,2})月([0-9]{1,2})日",
     )
     match = era_pattern.match(date_string)
 
