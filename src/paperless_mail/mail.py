@@ -323,7 +323,7 @@ def error_callback(
         folder=rule.folder,
         uid=message_uid,
         subject=message_subject,
-        received=message_date,
+        received=make_aware(message_date) if is_naive(message_date) else message_date,
         status="FAILED",
         error=traceback.format_exc(),
     )
@@ -887,7 +887,9 @@ class MailAccountHandler(LoggingMixin):
                     folder=rule.folder,
                     uid=message.uid,
                     subject=message.subject,
-                    received=message.date,
+                    received=make_aware(message.date)
+                    if is_naive(message.date)
+                    else message.date,
                     status="PROCESSED_WO_CONSUMPTION",
                 )
 
