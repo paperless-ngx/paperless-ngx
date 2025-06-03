@@ -33,6 +33,7 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
+from documents.matching import prefilter_documents_by_workflowtrigger
 from documents.models import Correspondent
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -472,6 +473,12 @@ def check_scheduled_workflows():
                         ]
 
                         documents = Document.objects.filter(id__in=matched_ids)
+
+                if documents.count() > 0:
+                    documents = prefilter_documents_by_workflowtrigger(
+                        documents,
+                        trigger,
+                    )
 
                 if documents.count() > 0:
                     logger.debug(
