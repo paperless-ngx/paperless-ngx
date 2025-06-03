@@ -221,15 +221,6 @@ lint.per-file-ignores."src/documents/parsers.py" = [
 lint.per-file-ignores."src/documents/signals/handlers.py" = [
   "PTH",
 ] # TODO Enable & remove
-lint.per-file-ignores."src/documents/tests/test_consumer.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/documents/tests/test_file_handling.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/documents/tests/test_migration_archive_files.py" = [
-  "PTH",
-] # TODO Enable & remove
 lint.per-file-ignores."src/documents/views.py" = [
   "PTH",
 ] # TODO Enable & remove
