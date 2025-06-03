@@ -757,6 +757,9 @@ class EdocTask(models.Model):
         ),
     )
 
+    id_reference = models.BigIntegerField(null=True, blank=True,
+                                          verbose_name=_("ID Reference"))
+
     api_call_count = models.IntegerField(
         null=True,
         default=0,
@@ -774,6 +777,17 @@ class EdocTask(models.Model):
         help_text="Select the type of OCR task to execute."
     )
 
+    def extract_document_id(self):
+        if not self.result:
+            return None  # Return None if result is empty
+
+        match = re.search(r"document id (\d+)", self.result, re.IGNORECASE)
+        return int(
+            match.group(1)) if match else None  # Convert to integer if found
+
+    def save(self, *args, **kwargs):
+        self.id_reference = self.extract_document_id()  # Extract and assign document ID
+        super().save(*args, **kwargs)
     def __str__(self) -> str:
         return f"Task {self.task_id}"
 

@@ -1963,12 +1963,13 @@ class StatisticsCustomView(APIView):
                 )
                 .order_by("created_date")
             )
-            doc_ids = documents.values_list('id')
+            doc_ids = documents.values_list('id', flat=True)
+
 
 
             request_count = (
                 EdocTask.objects.filter(date_done__range=(from_date, to_date),
-                                        result__icontains=str(doc_ids))
+                                        id_reference__in=doc_ids)
                 .annotate(date_done_date=TruncDate("date_done"))
                 .values("date_done_date")
                 .annotate(
@@ -1977,6 +1978,7 @@ class StatisticsCustomView(APIView):
                 )
                 .order_by("date_done_date")
             )
+            print('request_count:', request_count)
 
             for entry in request_count:
                 target_date_str = entry["date_done_date"].strftime("%Y-%m-%d")
