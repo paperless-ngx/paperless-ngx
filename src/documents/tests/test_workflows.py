@@ -1268,7 +1268,7 @@ class TestWorkflows(
             "Skipping test for month placeholder in title due to language settings",
         )
 
-        self.assertEqual(doc.title, "Doc created in June")  # noqa:
+        self.assertEqual(doc.title, "Doc created in Juni")  # codespell:ignore
 
     def test_document_updated_workflow_existing_custom_field(self):
         """
