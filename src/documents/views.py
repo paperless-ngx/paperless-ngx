@@ -2727,15 +2727,22 @@ class BulkEditObjectsView(PassUserMixin):
                 if old_parent_folder != folder.parent_folder:
                     old_path = folder.path
                     if folder.parent_folder:
-                        folder.path = f"{folder.parent_folder.path}/{folder.id}"
+                        folder.path = f"{folder.parent_folder.path}{folder.id}/"
                         folder.parent_folder = parent_folder_obj
 
                     else:
-                        folder.path = f"{folder.id}"
+                        folder.path = f"{folder.id}/"
 
-                    permissions = get_permissions(parent_folder_obj)
+                    destination_folder = get_permissions(parent_folder_obj)
                     update_view_folder_parent_permissions.delay(folder,
-                                                                permissions)
+                                                                destination_folder)
+                    permission_move_folder = get_permissions(folder)
+                    destination_folder = get_permissions(parent_folder_obj)
+                    update_view_folder_parent_permissions.delay(folder,
+                                                                destination_folder)
+                    update_view_folder_parent_permissions.delay(
+                        parent_folder_obj,
+                        permission_move_folder)
                     folder.save()
                     update_child_folder_paths.delay(folder, old_path)
 
@@ -3589,7 +3596,6 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
         if request.method == "GET":
             try:
                 fol = Folder.objects.get(pk=pk)
-                print('folder_path', fol.path)
                 folder_path = fol.path.rstrip("/").split("/")
                 folders = Folder.objects.filter(id__in=folder_path)
                 folders_dict = {}
