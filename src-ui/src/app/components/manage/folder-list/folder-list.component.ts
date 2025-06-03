@@ -260,7 +260,7 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
         queryParams: getQueryParams,
       },
     )
-    this.reloadData()
+    // this.reloadData()
 
   }
 
