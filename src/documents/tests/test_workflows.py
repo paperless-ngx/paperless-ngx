@@ -44,7 +44,6 @@ from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
-from paperless.models import ApplicationConfiguration
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
@@ -1221,9 +1220,6 @@ class TestWorkflows(
         self.assertEqual(doc.custom_fields.all().count(), 1)
 
     def test_document_updated_workflow_month_placeholder(self):
-        config = ApplicationConfiguration.objects.first()
-        config.lang = "de_de"
-        config.save()
         superuser = User.objects.create_superuser("superuser")
         self.client.force_authenticate(user=superuser)
 
@@ -1261,11 +1257,19 @@ class TestWorkflows(
             f"/api/documents/{doc.id}/",
             {"document_type": self.dt.id},
             format="json",
+            headers={"Accept-Language": "de"},
         )
-
         doc.refresh_from_db()
-
         self.assertEqual(doc.title, "Doc created in Juni")  # codespell:ignore
+
+        self.client.patch(
+            f"/api/documents/{doc.id}/",
+            {"document_type": self.dt.id},
+            format="json",
+            headers={"Accept-Language": "en"},
+        )
+        doc.refresh_from_db()
+        self.assertEqual(doc.title, "Doc created in June")
 
     def test_document_updated_workflow_existing_custom_field(self):
         """
