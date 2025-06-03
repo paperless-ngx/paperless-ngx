@@ -484,8 +484,8 @@ class TestConsumer(
         self._assert_first_last_send_progress()
 
     def testNotAFile(self):
-        with self.get_consumer(Path("non-existing-file")) as consumer:
-            with self.assertRaisesMessage(ConsumerError, "File not found"):
+        with self.assertRaisesMessage(ConsumerError, "File not found"):
+            with self.get_consumer(Path("non-existing-file")) as consumer:
                 consumer.run()
         self._assert_first_last_send_progress(last_status="FAILED")
 
@@ -493,8 +493,8 @@ class TestConsumer(
         with self.get_consumer(self.get_test_file()) as consumer:
             consumer.run()
 
-        with self.get_consumer(self.get_test_file()) as consumer:
-            with self.assertRaisesMessage(ConsumerError, "It is a duplicate"):
+        with self.assertRaisesMessage(ConsumerError, "It is a duplicate"):
+            with self.get_consumer(self.get_test_file()) as consumer:
                 consumer.run()
 
         self._assert_first_last_send_progress(last_status="FAILED")
@@ -503,8 +503,8 @@ class TestConsumer(
         with self.get_consumer(self.get_test_file()) as consumer:
             consumer.run()
 
-        with self.get_consumer(self.get_test_archive_file()) as consumer:
-            with self.assertRaisesMessage(ConsumerError, "It is a duplicate"):
+        with self.assertRaisesMessage(ConsumerError, "It is a duplicate"):
+            with self.get_consumer(self.get_test_archive_file()) as consumer:
                 consumer.run()
 
         self._assert_first_last_send_progress(last_status="FAILED")
@@ -521,8 +521,8 @@ class TestConsumer(
 
         Document.objects.all().delete()
 
-        with self.get_consumer(self.get_test_file()) as consumer:
-            with self.assertRaisesMessage(ConsumerError, "document is in the trash"):
+        with self.assertRaisesMessage(ConsumerError, "document is in the trash"):
+            with self.get_consumer(self.get_test_file()) as consumer:
                 consumer.run()
 
     def testAsnExists(self):
@@ -532,11 +532,11 @@ class TestConsumer(
         ) as consumer:
             consumer.run()
 
-        with self.get_consumer(
-            self.get_test_file2(),
-            DocumentMetadataOverrides(asn=123),
-        ) as consumer:
-            with self.assertRaisesMessage(ConsumerError, "ASN 123 already exists"):
+        with self.assertRaisesMessage(ConsumerError, "ASN 123 already exists"):
+            with self.get_consumer(
+                self.get_test_file2(),
+                DocumentMetadataOverrides(asn=123),
+            ) as consumer:
                 consumer.run()
 
     def testAsnExistsInTrash(self):
@@ -549,22 +549,22 @@ class TestConsumer(
             document = Document.objects.first()
             document.delete()
 
-        with self.get_consumer(
-            self.get_test_file2(),
-            DocumentMetadataOverrides(asn=123),
-        ) as consumer:
-            with self.assertRaisesMessage(ConsumerError, "document is in the trash"):
+        with self.assertRaisesMessage(ConsumerError, "document is in the trash"):
+            with self.get_consumer(
+                self.get_test_file2(),
+                DocumentMetadataOverrides(asn=123),
+            ) as consumer:
                 consumer.run()
 
     @mock.patch("documents.parsers.document_consumer_declaration.send")
     def testNoParsers(self, m):
         m.return_value = []
 
-        with self.get_consumer(self.get_test_file()) as consumer:
-            with self.assertRaisesMessage(
-                ConsumerError,
-                "sample.pdf: Unsupported mime type application/pdf",
-            ):
+        with self.assertRaisesMessage(
+            ConsumerError,
+            "sample.pdf: Unsupported mime type application/pdf",
+        ):
+            with self.get_consumer(self.get_test_file()) as consumer:
                 consumer.run()
 
         self._assert_first_last_send_progress(last_status="FAILED")
@@ -726,8 +726,8 @@ class TestConsumer(
         dst = self.get_test_file()
         self.assertIsFile(dst)
 
-        with self.get_consumer(dst) as consumer:
-            with self.assertRaises(ConsumerError):
+        with self.assertRaises(ConsumerError):
+            with self.get_consumer(dst) as consumer:
                 consumer.run()
 
         self.assertIsNotFile(dst)
@@ -751,11 +751,11 @@ class TestConsumer(
         dst = self.get_test_file()
         self.assertIsFile(dst)
 
-        with self.get_consumer(dst) as consumer:
-            with self.assertRaisesRegex(
-                ConsumerError,
-                r"sample\.pdf: Not consuming sample\.pdf: It is a duplicate of sample \(#\d+\)",
-            ):
+        with self.assertRaisesRegex(
+            ConsumerError,
+            r"sample\.pdf: Not consuming sample\.pdf: It is a duplicate of sample \(#\d+\)",
+        ):
+            with self.get_consumer(dst) as consumer:
                 consumer.run()
 
         self.assertIsFile(dst)
