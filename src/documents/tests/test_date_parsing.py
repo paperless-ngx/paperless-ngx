@@ -356,6 +356,87 @@ class TestDate:
             tzinfo=settings_timezone,
         )
 
+    def test_japanese_dates(self, settings_timezone: ZoneInfo):
+        # Standard Japanese date format YYYY年MM月DD日
+        assert parse_date("", "2024年3月15日") == datetime.datetime(
+            2024,
+            3,
+            15,
+            0,
+            0,
+            tzinfo=settings_timezone,
+        )
+        
+        # Japanese date with full-width numbers
+        assert parse_date("", "２０２４年３月１５日") == datetime.datetime(
+            2024,
+            3,
+            15,
+            0,
+            0,
+            tzinfo=settings_timezone,
+        )
+        
+        # Japanese date without day
+        assert parse_date("", "2024年3月") == datetime.datetime(
+            2024,
+            3,
+            1,
+            0,
+            0,
+            tzinfo=settings_timezone,
+        )
+        
+        # Mixed half-width and full-width
+        assert parse_date("", "2024年０３月１５日") == datetime.datetime(
+            2024,
+            3,
+            15,
+            0,
+            0,
+            tzinfo=settings_timezone,
+        )
+        
+        # Reiwa era date
+        assert parse_date("", "令和6年3月15日") == datetime.datetime(
+            2024,
+            3,
+            15,
+            0,
+            0,
+            tzinfo=settings_timezone,
+        )
+        
+        # Heisei era date
+        assert parse_date("", "平成31年4月30日") == datetime.datetime(
+            2019,
+            4,
+            30,
+            0,
+            0,
+            tzinfo=settings_timezone,
+        )
+        
+        # Showa era date
+        assert parse_date("", "昭和64年1月7日") == datetime.datetime(
+            1989,
+            1,
+            7,
+            0,
+            0,
+            tzinfo=settings_timezone,
+        )
+        
+        # Reiwa with full-width numbers
+        assert parse_date("", "令和６年３月１５日") == datetime.datetime(
+            2024,
+            3,
+            15,
+            0,
+            0,
+            tzinfo=settings_timezone,
+        )
+
     def test_multiple_dates(self, settings_timezone: ZoneInfo):
         text = """This text has multiple dates.
                   For example 02.02.2018, 22 July 2022 and December 2021.
@@ -381,6 +462,42 @@ class TestDate:
                 tzinfo=settings_timezone,
             ),
         ]
+
+    def test_multiple_dates_with_japanese(self, settings_timezone: ZoneInfo):
+        text = """This invoice has multiple dates.
+                  Invoice date: 2024年3月15日
+                  Due date: April 15, 2024
+                  Created on 令和6年3月1日"""
+        dates = list(parse_date_generator("", text))
+        
+        assert dates == [
+            datetime.datetime(2024, 3, 15, 0, 0, tzinfo=settings_timezone),
+            datetime.datetime(2024, 4, 15, 0, 0, tzinfo=settings_timezone),
+            datetime.datetime(2024, 3, 1, 0, 0, tzinfo=settings_timezone),
+        ]
+    
+    def test_japanese_dates_in_context(self, settings_timezone: ZoneInfo):
+        # Test dates within larger text blocks
+        text = """
+        株式会社テスト
+        請求書
+        
+        発行日: 2024年3月15日
+        
+        お客様番号: 12345
+        金額: ¥50,000
+        
+        支払期限: 2024年4月15日までにお支払いください。
+        """
+        
+        assert parse_date("", text) == datetime.datetime(
+            2024,
+            3,
+            15,
+            0,
+            0,
+            tzinfo=settings_timezone,
+        )
 
     def test_filename_date_parse_valid_ymd(
         self,

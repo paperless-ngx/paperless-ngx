@@ -37,6 +37,12 @@ if TYPE_CHECKING:
 # - MONTH XX, ZZZZ with XX being 1 or 2 and ZZZZ being 4 digits
 # - XX MON ZZZZ with XX being 1 or 2 and ZZZZ being 4 digits. MONTH is 3 letters
 # - XXPP MONTH ZZZZ with XX being 1 or 2 and PP being 2 letters and ZZZZ being 4 digits
+# - YYYY年MM月DD日 Japanese date format with year, month, day markers
+# - YYYY年MM月 Japanese date format with year and month markers
+# - 令和Y年MM月DD日 Japanese Reiwa era format
+# - 平成Y年MM月DD日 Japanese Heisei era format
+# - 昭和Y年MM月DD日 Japanese Showa era format
+# All Japanese formats support both half-width (0-9) and full-width (０-９) numbers
 
 # TODO: isn't there a date parsing library for this?
 
@@ -47,7 +53,12 @@ DATE_REGEX = re.compile(
     r"(\b|(?!=([_-])))([^\W\d_]{3,9} \d{1,2}, (\d{4}))(\b|(?=([_-])))|"
     r"(\b|(?!=([_-])))([^\W\d_]{3,9} \d{4})(\b|(?=([_-])))|"
     r"(\b|(?!=([_-])))(\d{1,2}[^ 0-9]{2}[\. ]+[^ ]{3,9}[ \.\/-]\d{4})(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))(\b\d{1,2}[ \.\/-][a-zéûäëčžúřěáíóńźçŞğü]{3}[ \.\/-]\d{4})(\b|(?=([_-])))",
+    r"(\b|(?!=([_-])))(\b\d{1,2}[ \.\/-][a-zéûäëčžúřěáíóńźçŞğü]{3}[ \.\/-]\d{4})(\b|(?=([_-])))|"
+    r"([０-９0-9]{4}年[０-９0-9]{1,2}月[０-９0-9]{1,2}日)|"
+    r"([０-９0-9]{4}年[０-９0-9]{1,2}月)|"
+    r"(令和[０-９0-9]{1,2}年[０-９0-9]{1,2}月[０-９0-9]{1,2}日)|"
+    r"(平成[０-９0-9]{1,2}年[０-９0-9]{1,2}月[０-９0-9]{1,2}日)|"
+    r"(昭和[０-９0-9]{1,2}年[０-９0-9]{1,2}月[０-９0-9]{1,2}日)",
     re.IGNORECASE,
 )
 
@@ -257,6 +268,39 @@ def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None) -> Path:
     return out_path
 
 
+def convert_japanese_era_to_western(date_string: str) -> str:
+    """
+    Convert Japanese era dates to Western calendar dates.
+    Supports Reiwa (令和), Heisei (平成), and Showa (昭和) eras.
+    """
+    # Define era start years
+    era_offsets = {
+        "令和": 2018,  # Reiwa started May 1, 2019 (Reiwa 1 = 2019)
+        "平成": 1988,  # Heisei started Jan 8, 1989 (Heisei 1 = 1989)
+        "昭和": 1925,  # Showa started Dec 25, 1926 (Showa 1 = 1926)
+    }
+    
+    # Try to match Japanese era pattern
+    import re
+    era_pattern = re.compile(r'(令和|平成|昭和)([０-９0-9]{1,2})年([０-９0-9]{1,2})月([０-９0-9]{1,2})日')
+    match = era_pattern.match(date_string)
+    
+    if match:
+        era = match.group(1)
+        # Convert full-width numbers to half-width
+        year_str = match.group(2).translate(str.maketrans('０１２３４５６７８９', '0123456789'))
+        month_str = match.group(3).translate(str.maketrans('０１２３４５６７８９', '0123456789'))
+        day_str = match.group(4).translate(str.maketrans('０１２３４５６７８９', '0123456789'))
+        
+        era_year = int(year_str)
+        western_year = era_offsets[era] + era_year
+        
+        # Return in Japanese format but with western year
+        return f"{western_year}年{month_str}月{day_str}日"
+    
+    return date_string
+
+
 def parse_date(filename, text) -> datetime.datetime | None:
     return next(parse_date_generator(filename, text), None)
 
@@ -271,6 +315,9 @@ def parse_date_generator(filename, text) -> Iterator[datetime.datetime]:
         Call dateparser.parse with a particular date ordering
         """
         import dateparser
+        
+        # Convert Japanese era dates to western calendar
+        ds = convert_japanese_era_to_western(ds)
 
         return dateparser.parse(
             ds,
