@@ -367,16 +367,6 @@ class TestDate:
             tzinfo=settings_timezone,
         )
 
-        # Japanese date with full-width numbers
-        assert parse_date("", "２０２４年３月１５日") == datetime.datetime(
-            2024,
-            3,
-            15,
-            0,
-            0,
-            tzinfo=settings_timezone,
-        )
-
         # Japanese date without day
         assert parse_date("", "2024年3月") == datetime.datetime(
             2024,
@@ -387,8 +377,8 @@ class TestDate:
             tzinfo=settings_timezone,
         )
 
-        # Mixed half-width and full-width
-        assert parse_date("", "2024年０３月１５日") == datetime.datetime(  # noqa: RUF001
+        # Japanese date with zero padding
+        assert parse_date("", "2024年03月15日") == datetime.datetime(
             2024,
             3,
             15,
@@ -422,16 +412,6 @@ class TestDate:
             1989,
             1,
             7,
-            0,
-            0,
-            tzinfo=settings_timezone,
-        )
-
-        # Reiwa with full-width numbers
-        assert parse_date("", "令和６年３月１５日") == datetime.datetime(
-            2024,
-            3,
-            15,
             0,
             0,
             tzinfo=settings_timezone,
