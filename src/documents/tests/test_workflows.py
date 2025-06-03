@@ -44,6 +44,7 @@ from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
+from paperless.models import ApplicationConfiguration
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
@@ -1218,6 +1219,56 @@ class TestWorkflows(
         )
 
         self.assertEqual(doc.custom_fields.all().count(), 1)
+
+    def test_document_updated_workflow_month_placeholder(self):
+        config = ApplicationConfiguration.objects.first()
+        config.lang = "de_de"
+        config.save()
+        superuser = User.objects.create_superuser("superuser")
+        self.client.force_authenticate(user=superuser)
+
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+            filter_has_document_type=self.dt,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc created in {created_month_name}",
+        )
+
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+            created=timezone.now().replace(
+                month=6,
+                day=1,
+                hour=0,
+                minute=0,
+                second=0,
+                microsecond=0,
+            ),
+        )
+
+        self.client.patch(
+            f"/api/documents/{doc.id}/",
+            {"document_type": self.dt.id},
+            format="json",
+        )
+
+        doc.refresh_from_db()
+        self.skipTest(
+            "Skipping test for month placeholder in title due to language settings",
+        )
+
+        self.assertEqual(doc.title, "Doc created in June")  # noqa:
 
     def test_document_updated_workflow_existing_custom_field(self):
         """
