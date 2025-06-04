@@ -2097,6 +2097,7 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
             "set_permissions",
             "delete",
             "update",
+            "download"
         ],
         label="Operation",
         required=True,
