@@ -1126,7 +1126,19 @@ class UnifiedSearchViewSet(DocumentViewSet):
             try:
                 with index.open_index_searcher() as s:
                     self.searcher = s
-                    return super().list(request)
+                    queryset = self.filter_queryset(self.get_queryset())
+                    page = self.paginate_queryset(queryset)
+
+                    serializer = self.get_serializer(page, many=True)
+                    response = self.get_paginated_response(serializer.data)
+
+                    response.data["corrected_query"] = (
+                        queryset.suggested_correction
+                        if hasattr(queryset, "suggested_correction")
+                        else None
+                    )
+
+                    return response
             except NotFound:
                 raise
             except Exception as e:

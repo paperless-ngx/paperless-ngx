@@ -2,7 +2,6 @@ import datetime
 from datetime import timedelta
 from unittest import mock
 
-import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
@@ -623,8 +622,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0], b"auto")
 
-    @pytest.mark.skip(reason="Not implemented yet")
-    def test_search_spelling_correction(self):
+    def test_search_spelling_suggestion(self):
         with AsyncWriter(index.open_index()) as writer:
             for i in range(55):
                 doc = Document.objects.create(
@@ -635,12 +633,12 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
                 )
                 index.update_document(writer, doc)
 
-        response = self.client.get("/api/search/?query=thing")
+        response = self.client.get("/api/documents/?query=thing")
         correction = response.data["corrected_query"]
 
         self.assertEqual(correction, "things")
 
-        response = self.client.get("/api/search/?query=things")
+        response = self.client.get("/api/documents/?query=things")
         correction = response.data["corrected_query"]
 
         self.assertEqual(correction, None)
