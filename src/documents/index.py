@@ -362,9 +362,16 @@ class DelayedFullTextQuery(DelayedQuery):
         )
         q = qp.parse(q_str)
 
-        corrected = self.searcher.correct_query(q, q_str)
-        if corrected.query != q:
-            corrected.query = corrected.string
+        try:
+            corrected = self.searcher.correct_query(q, q_str)
+            if corrected.query != q:
+                corrected.query = corrected.string
+        except Exception as e:
+            logger.info(
+                "Error while correcting query %s: %s",
+                f"{q_str!r}",
+                e,
+            )
 
         return q, None
 

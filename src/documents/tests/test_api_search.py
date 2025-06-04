@@ -645,6 +645,26 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(correction, None)
 
+    @mock.patch(
+        "whoosh.searching.Searcher.correct_query",
+        side_effect=Exception("Test error"),
+    )
+    def test_corrected_query_error(self, mock_correct_query):
+        """
+        GIVEN:
+            - A query that raises an error on correction
+        WHEN:
+            - API request for search with that query
+        THEN:
+            - The error is logged and the search proceeds
+        """
+        with self.assertLogs("paperless.index", level="INFO") as cm:
+            response = self.client.get("/api/documents/?query=2025-06-04")
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            error_str = cm.output[0]
+            expected_str = "Error while correcting query '2025-06-04': Test error"
+            self.assertIn(expected_str, error_str)
+
     def test_search_more_like(self):
         """
         GIVEN:
