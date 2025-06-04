@@ -396,7 +396,7 @@ class DelayedMoreLikeThisQuery(DelayedQuery):
         )
         mask: set = {docnum}
 
-        return q, mask
+        return q, mask, None
 
 
 def autocomplete(
