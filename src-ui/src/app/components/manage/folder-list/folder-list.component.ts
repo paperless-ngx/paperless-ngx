@@ -136,9 +136,12 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
       this.id = params.get('id') !== 'root' ? Number(params.get('id')) : null
     })
     // this.id = this.route.snapshot.params['id'] !== 'root' ? this.route.snapshot.params['id'] :  null;
-
+    console.log('Reloading data for folder ID:', this.id)
     if (this.id != this.preFolder)
       this.page = 1
+    if (this.id === null || this.id === undefined) {
+      this.folderPath = []
+    }
     this.selectedObjects.clear()
     let listFolderPath
     if (this.id) {
@@ -292,7 +295,7 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
       queryParams: getQueryParams,
     })
 
-    this.reloadData()
+    // this.reloadData()
 
   }
 
