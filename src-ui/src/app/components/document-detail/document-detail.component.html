@@ -310,16 +310,16 @@
           </li>
         }
 
-        @if (approvalsEnabled) {
-          <li [ngbNavItem]="DocumentDetailNavIDs.Approvals">
-            <a class="text-nowrap" ngbNavLink i18n>Approvals @if (document?.approvals?.length) {
-              <span class="badge text-bg-secondary ms-1">{{document.approvals.length}}</span>
-            }</a>
-            <ng-template ngbNavContent>
-              <pngx-document-approvals [documentId]="documentId" [approvals]="document?.approvals" [addDisabled]="!userCanEdit" (updated)="notesUpdated($event)"></pngx-document-approvals>
-            </ng-template>
-          </li>
-        }
+        <!--        @if (approvalsEnabled) {-->
+        <!--          <li [ngbNavItem]="DocumentDetailNavIDs.Approvals">-->
+        <!--            <a class="text-nowrap" ngbNavLink i18n>Approvals @if (document?.approvals?.length) {-->
+        <!--              <span class="badge text-bg-secondary ms-1">{{document.approvals.length}}</span>-->
+        <!--            }</a>-->
+        <!--            <ng-template ngbNavContent>-->
+        <!--              <pngx-document-approvals [documentId]="documentId" [approvals]="document?.approvals" [addDisabled]="!userCanEdit" (updated)="notesUpdated($event)"></pngx-document-approvals>-->
+        <!--            </ng-template>-->
+        <!--          </li>-->
+        <!--        }-->
 
         @if (showPermissions) {
           <li [ngbNavItem]="DocumentDetailNavIDs.Permissions">

@@ -470,9 +470,9 @@ def bulk_delete_file(folder_list = None):
 
     for f in folder_list:
         f: Folder
-        path = ''
+        # path = ''
+        path = f.path
         if f.type == Folder.FOLDER:
-            path = f.path + '/'
             folders_f_ids = Folder.objects.filter(
                 path__startswith=path).values_list('id', flat=True)
             folders_ids.extend(folders_f_ids)
@@ -1074,7 +1074,7 @@ def update_child_folder_paths(folder, old_path):
     file_ids = []
     for child_folder in child_folders:
         if folder.path:
-            child_folder.path = f"{folder.path}/{child_folder.id}"
+            child_folder.path = f"{folder.path}{child_folder.id}"
         else:
             child_folder.path = f"{child_folder.id}"
         if folder.type == Folder.FILE:
@@ -1095,11 +1095,11 @@ def update_child_folder_paths(folder, old_path):
 
 def update_document_count_folder_path(path):
     # update document count
-    folder_ids = path.split('/')
+    folder_ids = path.rstrip("/").split('/')
     folders = Folder.objects.filter(id__in=folder_ids, type=Folder.FOLDER)
     for folder in folders:
         folder.document_count = Folder.objects.filter(
-            path__startswith=f'{folder.path}/', type=Folder.FILE).only(
+            path__startswith=f'{folder.path}', type=Folder.FILE).only(
             'id').count()
         folder.save()
 
@@ -1112,8 +1112,6 @@ def update_document_count_folder_path(path):
 def update_child_folder_permisisons(self, folder, permissions, owner, merge,
                                     owner_exist, set_permissions_exist):
     path = folder.path
-    if folder.type == Folder.FOLDER:
-        path = f"{folder.path}/"
 
     child_folders = Folder.objects.filter(path__startswith=path)
     folder_ids = child_folders.values_list('id', flat=True)

@@ -1015,7 +1015,8 @@ class DocumentDetailSerializer(
     created_date = serializers.DateField(required=False)
 
     def get_folder_path(self, obj):
-        folder_path = obj.folder.path.split("/")  # Danh sách ID đầu vào
+        folder_path = obj.folder.path.rstrip("/").split(
+            "/")  # Danh sách ID đầu vào
         # bỏ qua phần tử cuối cùng
         folder_path = folder_path[:-1]
         order_cases = [When(id=id, then=index) for index, id in

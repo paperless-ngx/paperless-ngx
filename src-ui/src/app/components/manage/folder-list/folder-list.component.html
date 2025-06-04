@@ -92,12 +92,12 @@
 
   <div *ngFor="let folder of folderPath; let i = index" class="fs-5"
        style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center;">
-    <ng-container *ngIf="i >= folderPath.length - 3 || i < 3">
+    <ng-container *ngIf="i >= folderPath.length - 2 || i < 2">
       <i-bs class="" name="chevron-right"></i-bs>&nbsp;<a class="me custom-cursor" (click)="goToFolder(folder)">
       {{ folder.name }}
     </a>
     </ng-container>
-    <ng-container *ngIf="i === 2&&folderPath.length>i+1 ">
+    <ng-container *ngIf="i == 2&&folderPath.length>i+2 ">
       <i-bs class="" name="chevron-right"></i-bs>&nbsp;<a class="me custom-cursor">
       ...
     </a>

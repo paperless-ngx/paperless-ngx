@@ -1,4 +1,4 @@
-import hashlib
+import itertools
 import itertools
 import json
 import logging
@@ -604,7 +604,7 @@ class DocumentViewSet(
 
         serializer = self.get_serializer(instance, data=data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        response = super().update(request, *args, **kwargs)
+
         document_type = serializer.validated_data.get("document_type")
         update_document_field = True
         if document_type and  instance.document_type:
@@ -619,19 +619,22 @@ class DocumentViewSet(
         self.update_time_archive_font(self.get_object())
         self.update_name_folder(self.get_object(), serializer)
         permissions = serializer.validated_data.get("set_permissions")
-        permissions_copy = permissions.copy()
+        if permissions is not None:
+            permissions_copy = permissions.copy()
         if instance.folder is not None:
             update_view_folder_parent_permissions.delay(instance.folder,
                                                         permissions_copy)
-        owner = serializer.validated_data.get("owner")
-        merge = serializer.validated_data.get("merge")
-        owner_exist = "owner" in serializer.validated_data
-        set_permissions_exist = "set_permissions" in serializer.validated_data
-        update_folder_permisisons.delay(instance=self.get_object(),
-                                        permissions=permissions_copy,
-                                        owner=owner, owner_exist=owner_exist,
-                                        merge=merge,
-                                        set_permissions_exist=set_permissions_exist)
+            owner = serializer.validated_data.get("owner")
+            merge = serializer.validated_data.get("merge", False)
+            owner_exist = "owner" in serializer.validated_data
+            set_permissions_exist = "set_permissions" in serializer.validated_data
+            update_folder_permisisons.delay(instance=self.get_object(),
+                                            permissions=permissions_copy,
+                                            owner=owner,
+                                            owner_exist=owner_exist,
+                                            merge=merge,
+                                            set_permissions_exist=set_permissions_exist)
+        response = super().update(request, *args, **kwargs)
         from documents import index
 
         index.add_or_update_document(self.get_object())
@@ -1960,12 +1963,13 @@ class StatisticsCustomView(APIView):
                 )
                 .order_by("created_date")
             )
-            doc_ids = documents.values_list('id')
+            doc_ids = documents.values_list('id', flat=True)
+
 
 
             request_count = (
                 EdocTask.objects.filter(date_done__range=(from_date, to_date),
-                                        result__icontains=str(doc_ids))
+                                        id_reference__in=doc_ids)
                 .annotate(date_done_date=TruncDate("date_done"))
                 .values("date_done_date")
                 .annotate(
@@ -1974,6 +1978,7 @@ class StatisticsCustomView(APIView):
                 )
                 .order_by("date_done_date")
             )
+            print('request_count:', request_count)
 
             for entry in request_count:
                 target_date_str = entry["date_done_date"].strftime("%Y-%m-%d")
@@ -2724,15 +2729,22 @@ class BulkEditObjectsView(PassUserMixin):
                 if old_parent_folder != folder.parent_folder:
                     old_path = folder.path
                     if folder.parent_folder:
-                        folder.path = f"{folder.parent_folder.path}/{folder.id}"
+                        folder.path = f"{folder.parent_folder.path}{folder.id}/"
                         folder.parent_folder = parent_folder_obj
 
                     else:
-                        folder.path = f"{folder.id}"
+                        folder.path = f"{folder.id}/"
 
-                    permissions = get_permissions(parent_folder_obj)
+                    destination_folder = get_permissions(parent_folder_obj)
                     update_view_folder_parent_permissions.delay(folder,
-                                                                permissions)
+                                                                destination_folder)
+                    permission_move_folder = get_permissions(folder)
+                    destination_folder = get_permissions(parent_folder_obj)
+                    update_view_folder_parent_permissions.delay(folder,
+                                                                destination_folder)
+                    update_view_folder_parent_permissions.delay(
+                        parent_folder_obj,
+                        permission_move_folder)
                     folder.save()
                     update_child_folder_paths.delay(folder, old_path)
 
@@ -3112,7 +3124,7 @@ class TrashView(ListModelMixin, PassUserMixin):
             # dossiers = {doc.dossier for doc in deleted_docs}
             folder_set = set()
             for doc in deleted_docs:
-                folder_set.update(doc.folder.path.split("/"))
+                folder_set.update(doc.folder.path.rstrip("/").split("/"))
             # restore folder
             folders_restore = Folder.deleted_objects.filter(id__in=list(folder_set))
             for f in folders_restore:
@@ -3478,7 +3490,7 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
                 output_field=IntegerField(),
             ),
         ).select_related("owner")
-        .order_by("type_order", Lower("name"))
+        .order_by("type_order", "name_order", Lower("name"))
         .prefetch_related("documents")
     )
 
@@ -3586,7 +3598,7 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
         if request.method == "GET":
             try:
                 fol = Folder.objects.get(pk=pk)
-                folder_path = fol.path.split("/")
+                folder_path = fol.path.rstrip("/").split("/")
                 folders = Folder.objects.filter(id__in=folder_path)
                 folders_dict = {}
                 for f in folders:
@@ -3661,10 +3673,7 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
 
         if parent_folder == None:
             folder = serializer.save(owner=request.user)
-            folder.path = str(folder.id)
-            folder.checksum = hashlib.md5(
-                f"{folder.id}.{folder.name}".encode(),
-            ).hexdigest()
+            folder.path = f'{folder.id}/'
             folder.save()
         elif parent_folder:
             user_can_change = check_user_can_change_folder(request.user, parent_folder)
@@ -3679,10 +3688,7 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
             owner = serializer.validated_data.get("owner")
             merge = serializer.validated_data.get("merge", True)
             folder = serializer.save(parent_folder=parent_folder, owner=owner)
-            folder.path = f"{parent_folder.path}/{folder.id}"
-            folder.checksum = hashlib.md5(
-                f"{folder.id}.{folder.name}".encode(),
-            ).hexdigest()
+            folder.path = f"{parent_folder.path}{folder.id}/"
             folder.save()
             permission_parent_folder = get_permissions(obj=parent_folder)
             if permission_parent_folder:
@@ -3812,15 +3818,19 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
 
         return Response(serializer.data)
 
-
-
-
-    def destroy(self, request, pk, *args, **kwargs):
-        folder = Folder.objects.get(id=pk)
-        folders = Folder.objects.filter(path__startswith=folder.path)
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        folders = Folder.objects.filter(path__startswith=instance.path)
         documents = Document.objects.filter(folder__in=folders).defer('content')
+        logger.info(f"Deleting {documents} documents in folder {instance.id}")
         documents.delete()
-        for doc in documents:
+
+        documents_deleted = Document.deleted_objects.filter(
+            folder__in=folders).defer(
+            'content')
+
+        for doc in documents_deleted:
+            # index.delete_document_index(doc=doc)
             index.delete_document_with_index(doc_id=doc.id)
         folders.delete()
         # NOTE: update document count for parent folder
@@ -3994,7 +4004,7 @@ class DossierViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         if request.method == "GET":
             try:
                 fol = Dossier.objects.get(pk=pk)
-                dossier_path = fol.path.split("/")
+                dossier_path = fol.path.rstrip("/").split("/")
                 dossiers = Dossier.objects.filter(id__in=dossier_path)
                 dossiers_dict = {}
                 for f in dossiers:

@@ -76,8 +76,8 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
           key: 'modified',
           name: $localize`modified`,
           valueFn: (item) => this.customDatePipe.transform(item.modified),
-        rendersHtml: true,
-      }],
+          rendersHtml: true,
+        }],
     )
   }
 
@@ -96,9 +96,13 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
     }
     // this.reloadData()
     super.ngOnInit()
+
+    this.route.paramMap.subscribe(() => {
+      this.reloadData() // Gọi hàm để tải lại dữ liệu
+    })
     this.sharedService.reloadData$.subscribe(() => {
-      this.reloadData(); // Gọi hàm để tải lại dữ liệu
-    });
+      this.reloadData() // Gọi hàm để tải lại dữ liệu
+    })
 
 
   }
@@ -111,7 +115,7 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
     localStorage.setItem('folder-list:displayMode', this.displayMode)
   }
 
-  selectAll(){
+  selectAll() {
 
     this.selectedObjects = new Set(this.data.map((o) => o.id))
   }
@@ -132,9 +136,12 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
       this.id = params.get('id') !== 'root' ? Number(params.get('id')) : null
     })
     // this.id = this.route.snapshot.params['id'] !== 'root' ? this.route.snapshot.params['id'] :  null;
-
+    console.log('Reloading data for folder ID:', this.id)
     if (this.id != this.preFolder)
       this.page = 1
+    if (this.id === null || this.id === undefined) {
+      this.folderPath = []
+    }
     this.selectedObjects.clear()
     let listFolderPath
     if (this.id) {
@@ -256,7 +263,7 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
         queryParams: getQueryParams,
       },
     )
-    this.reloadData()
+    // this.reloadData()
 
   }
 
@@ -288,7 +295,7 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
       queryParams: getQueryParams,
     })
 
-    this.reloadData()
+    // this.reloadData()
 
   }
 
@@ -394,16 +401,17 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
     activeModal.componentInstance.succeeded.subscribe(() => {
       this.reloadData()
       this.getToastService().showInfo(
-        $localize`Successfully created ${this.typeName}.`
+        $localize`Successfully created ${this.typeName}.`,
       )
     })
     activeModal.componentInstance.failed.subscribe((e) => {
       this.getToastService().showError(
         $localize`Error occurred while creating ${this.typeName}.`,
-        e
+        e,
       )
     })
   }
+
   getDeleteMessage(object: Folder) {
     if (object.type == 'folder')
       return $localize`Do you really want to delete the folder "${object.name}"?`
