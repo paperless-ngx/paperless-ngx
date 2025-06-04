@@ -987,6 +987,19 @@ Must be a float between 0 and 1.
     Defaults to 0.2. For example, if the content limit is 10000 characters and the tail ratio is 0.2,
     the system will keep the first 8000 characters and the last 2000 characters of the document.
 
+#### [`PAPERLESS_DATE_PARSER_LANGUAGES=<comma-separated-list>`](#PAPERLESS_DATE_PARSER_LANGUAGES) {#PAPERLESS_DATE_PARSER_LANGUAGES}
+
+: Customize the language that paperless will attempt to use when
+parsing dates.
+
+    It should be a list of  ISO 639-1 codes, see the [list of languages supported by dateparser](https://dateparser.readthedocs.io/en/latest/supported_locales.html) for valid values.
+
+    Set this to the languages most of your documents are written in, for example: `["en", "de"]`. Providing this list can significantly improve date parsing performance.
+
+    !!! note
+
+        The format is different from the `PAPERLESS_OCR_LANGUAGES` setting used for Tesseract OCR.
+
 #### [`PAPERLESS_EMAIL_TASK_CRON=<cron expression>`](#PAPERLESS_EMAIL_TASK_CRON) {#PAPERLESS_EMAIL_TASK_CRON}
 
 : Configures the scheduled email fetching frequency. The value
