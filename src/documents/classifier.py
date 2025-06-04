@@ -4,6 +4,7 @@ import logging
 import pickle
 import re
 import warnings
+from functools import lru_cache
 from hashlib import blake2b
 from hashlib import sha256
 from pathlib import Path
@@ -17,6 +18,8 @@ if TYPE_CHECKING:
 
 from django.conf import settings
 from django.core.cache import cache
+from sklearn.exceptions import InconsistentVersionWarning
+from sklearn.utils.multiclass import type_of_target
 
 from documents.caching import CACHE_5_MINUTES
 from documents.caching import CACHE_50_MINUTES
@@ -27,6 +30,47 @@ from documents.models import Document
 from documents.models import MatchingModel
 
 logger = logging.getLogger("paperless.classifier")
+
+
+ADVANCED_TEXT_PROCESSING_ENABLED = (
+    settings.NLTK_LANGUAGE is not None and settings.NLTK_ENABLED
+)
+
+
+@lru_cache(maxsize=1)
+def _load_ntlk_resources():
+    import nltk
+    from nltk.corpus import stopwords
+    from nltk.stem import SnowballStemmer
+    from nltk.tokenize import word_tokenize
+
+    # Not really hacky, since it isn't private and is documented, but
+    # set the search path for NLTK data to the single location it should be in
+    nltk.data.path = [settings.NLTK_DIR]
+
+    # Do some one time setup
+    # Sometimes, somehow, there's multiple threads loading the corpus
+    # and it's not thread safe, raising an AttributeError
+    stemmer = SnowballStemmer(settings.NLTK_LANGUAGE)
+    stopwords.ensure_loaded()
+    stop_words = frozenset(stopwords.words(settings.NLTK_LANGUAGE))
+    return stemmer, stop_words, word_tokenize
+
+
+@lru_cache(maxsize=20000)
+def stem_and_skip_stop_word(word: str):
+    """
+    Reduce a given word to its stem. If it's a stop word, return an empty string.
+
+    E.g. "amazement", "amaze" and "amazed" all return "amaz".
+    """
+    stemmer, stop_words, _ = _load_ntlk_resources()
+    return stemmer.stem(word) if word not in stop_words else ""
+
+
+def tokenize(text: str):
+    _, _, word_tokenize = _load_ntlk_resources()
+    return word_tokenize(text, language=settings.NLTK_LANGUAGE)
 
 
 class IncompatibleClassifierVersionError(Exception):
@@ -81,6 +125,9 @@ def load_classifier(*, raise_exception: bool = False) -> DocumentClassifier | No
     return classifier
 
 
+WORD_RE = re.compile(r"\b[\w]+\b")
+
+
 class DocumentClassifier:
     # v7 - Updated scikit-learn package version
     # v8 - Added storage path classifier
@@ -101,9 +148,6 @@ class DocumentClassifier:
         self.document_type_classifier = None
         self.storage_path_classifier = None
 
-        self._stemmer = None
-        self._stop_words = None
-
     def _update_data_vectorizer_hash(self):
         self.data_vectorizer_hash = blake2b(
             pickle.dumps(self.data_vectorizer),
@@ -111,8 +155,6 @@ class DocumentClassifier:
         ).hexdigest()
 
     def load(self) -> None:
-        from sklearn.exceptions import InconsistentVersionWarning
-
         # Catch warnings for processing
         with warnings.catch_warnings(record=True) as w:
             with Path(settings.MODEL_FILE).open("rb") as f:
@@ -354,7 +396,7 @@ class DocumentClassifier:
             logger.debug(
                 "There are no storage paths. Not training storage path classifier.",
             )
-
+        stem_and_skip_stop_word.cache_clear()
         self.last_doc_change_time = latest_doc_change
         self.last_auto_type_hash = hasher.digest()
 
@@ -374,47 +416,20 @@ class DocumentClassifier:
 
         # Lower case the document, reduce space,
         # and keep only letters and digits.
-        WORD_RE = re.compile(r"\b[\w\d]+\b")
         content = " ".join(match.group().lower() for match in WORD_RE.finditer(content))
 
         # If the NLTK language is supported, do further processing
-        if settings.NLTK_LANGUAGE is not None and settings.NLTK_ENABLED:
-            import nltk
-            from nltk.corpus import stopwords
-            from nltk.stem import SnowballStemmer
-            from nltk.tokenize import word_tokenize
-
-            # Not really hacky, since it isn't private and is documented, but
-            # set the search path for NLTK data to the single location it should be in
-            nltk.data.path = [settings.NLTK_DIR]
-
+        if ADVANCED_TEXT_PROCESSING_ENABLED:
             try:
                 # Preload the corpus early, to force the lazy loader to transform
-                stopwords.ensure_loaded()
-
-                # Do some one time setup
-                # Sometimes, somehow, there's multiple threads loading the corpus
-                # and it's not thread safe, raising an AttributeError
-                if self._stemmer is None:
-                    self._stemmer = SnowballStemmer(settings.NLTK_LANGUAGE)
-                if self._stop_words is None:
-                    self._stop_words = set(stopwords.words(settings.NLTK_LANGUAGE))
 
                 # Tokenize
                 # This splits the content into tokens, roughly words
-                words: list[str] = word_tokenize(
-                    content,
-                    language=settings.NLTK_LANGUAGE,
-                )
-                # Stem the words
-                # This reduces the words to their stems.
-                # "amazement" returns "amaz"
-                # "amaze" returns "amaz
-                # "amazed" returns "amaz"
-                # Skip also stop words.
-                return " ".join(
-                    [self._stemmer.stem(w) for w in words if w not in self._stop_words],
-                )
+                words = tokenize(content)
+                # Stem the words and skip stop words
+                result = " ".join([stem_and_skip_stop_word(w) for w in words])
+
+                return result
 
             except AttributeError:
                 return content
@@ -458,8 +473,6 @@ class DocumentClassifier:
             return None
 
     def predict_tags(self, content: str) -> list[int]:
-        from sklearn.utils.multiclass import type_of_target
-
         if self.tags_classifier:
             X = self._vectorize(content)
             y = self.tags_classifier.predict(X)

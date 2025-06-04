@@ -13,6 +13,7 @@ from pathlib import Path
 from re import Match
 from typing import TYPE_CHECKING
 
+import dateparser
 from django.conf import settings
 from django.utils import timezone
 
@@ -275,7 +276,6 @@ def parse_date_generator(filename, text) -> Iterator[datetime.datetime]:
         """
         Call dateparser.parse with a particular date ordering
         """
-        import dateparser
 
         return dateparser.parse(
             ds,
