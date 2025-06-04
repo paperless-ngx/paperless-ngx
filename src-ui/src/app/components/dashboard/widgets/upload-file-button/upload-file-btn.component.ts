@@ -139,9 +139,9 @@ export class UploadFileButtonComponent extends ComponentWithPermissions {
     )
   }
 
-  resetFileInput() {
-    this.fileUpload.nativeElement.value = ''
-  }
+  // resetFileInput() {
+  //   this.fileUpload.nativeElement.value = ''
+  // }
 
   get slimSidebarEnabled(): boolean {
     return this.settingsService.get(SETTINGS_KEYS.SLIM_SIDEBAR)
