@@ -57,7 +57,7 @@ from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
 from documents.utils import copy_basic_file_stats, \
     check_digital_signature, \
-    pdf_has_text_pdftotext
+    pdf_has_text_pdftotext, get_unique_name
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import get_content_before_last_number
 from documents.utils import run_subprocess
@@ -701,7 +701,7 @@ class Consumer(LoggingMixin):
                         )
 
                 # get dossier_form by document_form
-                lst_id_dossier = dossier_file.path.split("/")
+                lst_id_dossier = dossier_file.path.rstrip("/").split("/")
                 lst_id_dossier = [int(num) for num in lst_id_dossier]
                 lst_dossiers = Dossier.objects.filter(
                     id__in=lst_id_dossier, type="DOSSIER"
@@ -962,16 +962,23 @@ class Consumer(LoggingMixin):
                         copy_file_with_basic_stats(self.working_copy,
                                                self.original_path)
                 new_file = None
-
+                print("gia tri document",
+                      get_unique_name(Folder, document.title,
+                                      document.folder))
                 new_file = Folder.objects.create(
-                    name=document.title,
+                    name=get_unique_name(Folder, document.title,
+                                         document.folder),
                     parent_folder=document.folder,
                     type=Folder.FILE,
                     owner=document.owner,
                     created=document.created,
                     updated=document.modified,
+                    filesize=os.path.getsize(self.original_path),
+                    archive_filename=document.archive_filename,
+                    original_filename=document.original_filename,
+                    filename=document.filename
+
                 )
-                new_file.checksum = document.checksum
                 if document.folder:
                     permissions = get_permissions(document.folder)
                     set_permissions(permissions, document)
@@ -979,23 +986,29 @@ class Consumer(LoggingMixin):
                     # add_or_update_document(document)
                     folder_path = get_content_before_last_number(document.folder.path)
                     if document.folder.type == Folder.FILE:
-                        if len(document.folder.path.split("/")) == 1:
-                            new_file.path = f"{new_file.id}"
+                        if len(
+                            document.folder.path.rstrip("/").split("/")) == 1:
+                            new_file.path = f"{new_file.id}/"
                             new_file.parent_folder_id = None
-                        elif len(document.folder.path.split("/")) > 1:
-                            new_file.path = f"{folder_path}/{new_file.id}"
-                            new_file.parent_folder_id = int(folder_path.split("/")[-1])
+                        elif len(
+                            document.folder.path.rstrip("/").split("/")) > 1:
+                            new_file.path = f"{folder_path}/{new_file.id}/"
+                            new_file.parent_folder_id = int(
+                                folder_path.rstrip("/").split("/")[-1])
                     elif document.folder.type == Folder.FOLDER:
-                        new_file.path = f"{document.folder.path}/{new_file.id}"
+                        new_file.path = f"{document.folder.path}{new_file.id}/"
                         # self.log.debug("parent_folder_id___1",folder_path , document.folder.path)
                         new_file.parent_folder_id = int(
-                            document.folder.path.split("/")[-1]
+                            document.folder.path.rstrip("/").split("/")[-1]
                         )
 
 
                 else:
-                    new_file.path = f"{new_file.id}"
+                    new_file.path = f"{new_file.id}/"
                 new_file.save()
+                from documents.tasks import update_document_count_folder_path
+                # NOTE: update document count for folder
+                # update_document_count_folder_path(new_file.path)
                 document.folder = new_file
 
                 # If we get here, it was successful. Proceed with post-consume

@@ -291,13 +291,14 @@ class RasterisedDocumentCustomParser(DocumentParser):
 
             with open(path_file, 'rb') as file:
                 pdf_data = file.read()
-            payload = {'title': (str(path_file).split("/")[-1]),
+            payload = {'title': (str(path_file).rstrip("/").split("/")[-1]),
                        'folder': settings.FOLDER_UPLOAD,
                        'extract': '1'}
             response_upload = requests.post(api_upload_file_ocr, data=payload,
                                             files={
                                                 'file': (
-                                                    str(path_file).split("/")[
+                                                    str(path_file).rstrip(
+                                                        "/").split("/")[
                                                         -1],
                                                     pdf_data)},
                                             headers=headers)
@@ -330,12 +331,16 @@ class RasterisedDocumentCustomParser(DocumentParser):
                 with open(path_file, 'rb') as file:
                     pdf_data = file.read()
 
-                payload = {'title': (str(path_file).split("/")[-1]),
+                payload = {
+                    'title': (str(path_file).rstrip("/").split("/")[-1]),
                            'folder': settings.FOLDER_UPLOAD,
                            'extract': '1'}
                 response_upload = requests.post(api_upload_file_ocr,
                                                 data=payload,
-                                                files={'file': (str(path_file).split("/")[-1], pdf_data)},
+                                                files={'file': (
+                                                    str(path_file).rstrip(
+                                                        "/").split("/")[-1],
+                                                    pdf_data)},
                                                 headers=headers)
 
             if response_upload.status_code == 201:

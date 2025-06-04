@@ -166,6 +166,13 @@ def delete_document_with_index(doc_id, es_client=None):
 
         # Delete the document
         es_client.delete(index=ELASTIC_SEARCH_DOCUMENT_INDEX, id=doc_id)
+        doc_exists_after_deletion = es_client.exists(
+            index=ELASTIC_SEARCH_DOCUMENT_INDEX, id=doc_id)
+        if doc_exists_after_deletion:
+            logger.warning(
+                f"Tài liệu với ID {doc_id} vẫn tồn tại sau khi xóa.")
+        else:
+            logger.info(f"Tài liệu với ID {doc_id} đã được xóa hoàn toàn.")
         logger.info(
             f"Successfully deleted document with ID {doc_id} from Elasticsearch")
     except Exception as e:
@@ -621,12 +628,15 @@ class DelayedElasticSearch(DelayedQuery):
         q_str = self.query_params.get("query", "")
         added = re.search(r'added:\[(.*?)\]', q_str)
         created = re.search(r'created:\[(.*?)\]', q_str)
-        map_created = {'-1 week to now': "now-7d/d", '-1 month to now': "now-1M/M", '-3 month to now': "now-3M/M", '-1 year to now': "now-1y/y",}
+        map_created = {'-1 week to now': "now-7d/d",
+                       '-1 month to now': "now-1M",
+                       '-3 month to now': "now-3M/M",
+                       '-1 year to now': "now-1y", }
         if added is not None:
-            criterias.append(Q("range", **{'added': {"lt": "now/d"}}))
+            criterias.append(Q("range", **{'added': {"lte": "now/d"}}))
             criterias.append(Q("range", **{'added': {"gte": map_created[added.group(1)]}}))
         if created is not None:
-            criterias.append(Q("range", **{'created': {"lt": "now/d"}}))
+            criterias.append(Q("range", **{'created': {"lte": "now/d"}}))
             criterias.append(Q("range", **{'created': {"gte": map_created[created.group(1)]}}))
 
         for key, value in self.query_params.items():
@@ -718,6 +728,12 @@ class DelayedElasticSearch(DelayedQuery):
                 criterias.append(Q("range", **{field: {"lt": isoparse(value)}}))
             elif query_filter == "date__gt":
                 criterias.append(Q("range", **{field: {"gt": isoparse(value)}}))
+            elif query_filter == "date__lte":
+                criterias.append(
+                    Q("range", **{field: {"lte": isoparse(value)}}))
+            elif query_filter == "date__gte":
+                criterias.append(
+                    Q("range", **{field: {"gte": isoparse(value)}}))
             elif query_filter == "icontains":
                 criterias.append(Q("match", **{field: value}))
             elif query_filter == "istartswith":

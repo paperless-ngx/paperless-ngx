@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
+import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import { FormArray, FormControl, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { NgbDateStruct, NgbModal, NgbNav, NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap'
@@ -76,8 +76,6 @@ import {
 } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { WarehouseService } from 'src/app/services/rest/warehouse.service'
 
-import { DocumentApproval } from 'src/app/data/document-approval'
-
 enum DocumentDetailNavIDs {
   Details = 1,
   Content = 2,
@@ -85,7 +83,7 @@ enum DocumentDetailNavIDs {
   Preview = 4,
   Notes = 5,
   Permissions = 6,
-  Approvals = 7
+  // Approvals = 7
 }
 
 enum ContentRenderType {
@@ -116,6 +114,18 @@ enum ZoomSetting {
 export class DocumentDetailComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy, DirtyComponent {
+  @HostListener('window:beforeunload', ['$event'])
+  onBeforeUnload(event: Event): void {
+    // Add your logic here, e.g., show a confirmation dialog
+    this.openDocumentService.closeDocumentWithoutAlert(this.document).subscribe((result) => {
+      if (result) {
+        console.log('Document closed successfully without alert.')
+      } else {
+        console.log('Failed to close the document.')
+      }
+    })
+    event.preventDefault()
+  }
   @ViewChild('inputTitle')
   titleInput: TextComponent
 
@@ -856,7 +866,11 @@ export class DocumentDetailComponent
             this.documentListViewService.activeSavedViewId,
           ])
         } else {
-          this.location.back()
+          if (this.parent_folder === null) {
+            this.router.navigate(['folders', 'root'])
+          }
+          this.router.navigate(['folders', this.parent_folder])
+          // this.location.back()
         }
       })
   }
@@ -1082,24 +1096,25 @@ export class DocumentDetailComponent
     )
   }
 
-  get approvalsEnabled(): boolean {
-    return (
-      this.settings.get(SETTINGS_KEYS.APPROVALS_ENABLED) &&
-      this.permissionsService.currentUserCan(
-        PermissionAction.View,
-        PermissionType.Approval
-      )
-    )
-  }
+  // get approvalsEnabled(): boolean {
+  //   return (
+  //     this.settings.get(SETTINGS_KEYS.APPROVALS_ENABLED) &&
+  //     this.permissionsService.currentUserCan(
+  //       PermissionAction.View,
+  //       PermissionType.Approval
+  //     )
+  //   )
+  // }
 
   notesUpdated(notes: DocumentNote[]) {
     this.document.notes = notes
     this.openDocumentService.refreshDocument(this.documentId)
   }
-  approvalsUpdated(approvals: DocumentApproval[]) {
-    this.document.approvals = approvals
-    this.openDocumentService.refreshDocument(this.documentId)
-  }
+
+  // approvalsUpdated(approvals: DocumentApproval[]) {
+  //   this.document.approvals = approvals
+  //   this.openDocumentService.refreshDocument(this.documentId)
+  // }
 
   get userIsOwner(): boolean {
     let doc: Document = Object.assign({}, this.document)

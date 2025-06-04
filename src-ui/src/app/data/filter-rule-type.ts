@@ -278,13 +278,13 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
   },
   {
     id: FILTER_CREATED_BEFORE,
-    filtervar: 'created__date__lt',
+    filtervar: 'created__date__lte',
     datatype: 'date',
     multi: false,
   },
   {
     id: FILTER_CREATED_AFTER,
-    filtervar: 'created__date__gt',
+    filtervar: 'created__date__gte',
     datatype: 'date',
     multi: false,
   },
@@ -309,25 +309,25 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
 
   {
     id: FILTER_ADDED_BEFORE,
-    filtervar: 'added__date__lt',
+    filtervar: 'added__date__lte',
     datatype: 'date',
     multi: false,
   },
   {
     id: FILTER_ADDED_AFTER,
-    filtervar: 'added__date__gt',
+    filtervar: 'added__date__gte',
     datatype: 'date',
     multi: false,
   },
   {
     id: FILTER_MODIFIED_BEFORE,
-    filtervar: 'modified__date__lt',
+    filtervar: 'modified__date__lte',
     datatype: 'date',
     multi: false,
   },
   {
     id: FILTER_MODIFIED_AFTER,
-    filtervar: 'modified__date__gt',
+    filtervar: 'modified__date__gte',
     datatype: 'date',
     multi: false,
   },

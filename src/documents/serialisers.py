@@ -1,7 +1,6 @@
 import datetime
 import logging
 import math
-import os
 import re
 import zoneinfo
 from decimal import Decimal
@@ -289,15 +288,17 @@ class OwnedObjectSerializer(
             self._set_permissions(validated_data["set_permissions"], instance)
         if "owner" in validated_data and "name" in self.Meta.fields:
             name = validated_data.get("name", instance.name)
-            not_unique = (
-                self.Meta.model.objects.exclude(pk=instance.pk)
-                .filter(owner=validated_data["owner"], name=name)
-                .exists()
-            )
-            if not_unique:
-                raise serializers.ValidationError(
-                    {"error": "Object violates owner / name unique constraint"},
+            if "parent_folder" not in validated_data:
+                not_unique = (
+                    self.Meta.model.objects.exclude(pk=instance.pk)
+                    .filter(owner=validated_data["owner"], name=name)
+                    .exists()
                 )
+                if not_unique:
+                    raise serializers.ValidationError(
+                        {
+                            "error": "Object violates owner / name unique constraint"},
+                    )
         return super().update(instance, validated_data)
 
 
@@ -1014,7 +1015,8 @@ class DocumentDetailSerializer(
     created_date = serializers.DateField(required=False)
 
     def get_folder_path(self, obj):
-        folder_path = obj.folder.path.split("/")  # Danh sách ID đầu vào
+        folder_path = obj.folder.path.rstrip("/").split(
+            "/")  # Danh sách ID đầu vào
         # bỏ qua phần tử cuối cùng
         folder_path = folder_path[:-1]
         order_cases = [When(id=id, then=index) for index, id in
@@ -2483,7 +2485,7 @@ def generate_unique_name(name, existing_names):
     i = 1
     new_name = name
     while new_name in existing_names:
-        new_name = f"{name}({i})"
+        new_name = f"{name} ({i})"
         i += 1
     return new_name
 
@@ -2651,25 +2653,29 @@ class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             return 0
 
 
-class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+class FolderSerializer(OwnedObjectSerializer):
     name = AdjustedNameFieldFolder()
-    document_count = serializers.SerializerMethodField(read_only=True)
-    filesize = serializers.SerializerMethodField(read_only=True)
     document = serializers.SerializerMethodField(read_only=True)
+    # document_count = serializers.IntegerField(read_only=True)
+    merge = serializers.BooleanField(
+        default=False,
+        write_only=True,
+        required=False,
+    )
 
-    def get_filesize(self, obj):
-        if obj.type == Folder.FOLDER:
-            return 0
-        path = getattr(obj.documents.first(), "archive_path", "")
-        return os.path.getsize(path) if path != "" and os.path.exists(path) else 0
+    # def get_filesize(self, obj):
+    #     if obj.type == Folder.FOLDER:
+    #         return 0
+    #     path = getattr(obj.documents.first(), "archive_path", "")
+    #     return os.path.getsize(path) if path != "" and os.path.exists(path) else 0
 
-    def get_document_count(self, obj):
-        if obj.type == Folder.FOLDER:
-            folders = Folder.objects.filter(path__startswith=f'{obj.path}/',
-                                            type=Folder.FILE)
-            # documents = Document.objects.filter(folder__in=folders)
-            return folders.count()
-        return 0
+    # def get_document_count(self, obj):
+    #     if obj.type == Folder.FOLDER:
+    #         folders = Folder.objects.filter(path__startswith=f'{obj.path}/',
+    #                                         type=Folder.FILE)
+    #         # documents = Document.objects.filter(folder__in=folders)
+    #         return folders.count()
+    #     return 0
 
     def get_document(self, obj):
         if obj.type == Folder.FILE:
@@ -2678,15 +2684,45 @@ class FolderSerializer(MatchingModelSerializer, OwnedObjectSerializer):
                 return DocumentFolderSerializer(document).data
         return None
 
-    def validate(self, data):
-        return data
+    def create(self, validated_data):
+        # default to current user if not set
+        if "owner" not in validated_data and self.user:
+            validated_data["owner"] = self.user
+        permissions = None
+        if "set_permissions" in validated_data:
+            permissions = validated_data.pop("set_permissions")
+            validated_data.pop("merge")
+        instance = super().create(validated_data)
+        if permissions is not None:
+            self._set_permissions(permissions, instance)
+        return instance
 
-    def update(self, instance, validated_data):
-        return super().update(instance, validated_data)
+    # def validate(self, data):
+    #     return data
+
+    # def update(self, instance, validated_data):
+    #     return super().update(instance, validated_data)
 
     class Meta:
         model = Folder
-        fields = "__all__"
+        fields = [
+            "id",
+            "name",
+            "parent_folder",
+            "path",
+            "type",
+            "document",
+            # "document_count",
+            "filesize",
+            "modified",
+            "created",
+            "owner",
+            "permissions",
+            "user_can_change",
+            "is_shared_by_requester",
+            "set_permissions",
+            "merge"
+        ]
 
 
 class ExportDocumentFromFolderSerializer(serializers.Serializer):

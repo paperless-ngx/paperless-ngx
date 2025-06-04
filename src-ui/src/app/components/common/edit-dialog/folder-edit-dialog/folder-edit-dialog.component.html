@@ -16,6 +16,12 @@
     <div *pngxIfOwner="object">
       <pngx-permissions-form [users]="users" accordion="true" formControlName="permissions_form"></pngx-permissions-form>
     </div>
+    <div *pngxIfOwner="object">
+      @if (object?.type == 'folder') {
+        <pngx-input-switch i18n-title title="Merge with existing permissions" [horizontal]="true" [hint]="hint"
+                           formControlName="merge"></pngx-input-switch>
+      }
+    </div>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>

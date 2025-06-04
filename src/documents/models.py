@@ -274,15 +274,9 @@ class Folder(SoftDeleteModel, MatchingModel):
     parent_folder = models.ForeignKey(
         "self", on_delete=models.DO_NOTHING, null=True, blank=True
     )
-    path = models.TextField(_("path"), null=True, blank=True)
-    checksum = models.CharField(
-        _("checksum"),
-        max_length=32,
-        editable=False,
-        unique=True,
-        null=True,
-        help_text=_("The checksum of the original folder."),
-    )
+    path = models.CharField(_("path"), null=True, blank=True, max_length=256,
+                            db_index=True)
+    name_order = models.IntegerField(null=True, blank=True)
 
     FOLDER = "folder"
     FILE = "file"
@@ -298,6 +292,62 @@ class Folder(SoftDeleteModel, MatchingModel):
 
     updated = models.DateTimeField(
         _("updated"), null=True, default=timezone.now, editable=False, db_index=True
+    )
+
+    modified = models.DateTimeField(
+        _("modified"),
+        auto_now=True,
+        editable=False,
+        db_index=True,
+    )
+
+    filesize = models.BigIntegerField(
+        _("size"),
+        null=True,
+        blank=True,
+        default=0,
+        help_text=_("Size of the folder in bytes"),
+    )
+
+    filename = models.FilePathField(
+        _("filename"),
+        max_length=1024,
+        editable=False,
+        default=None,
+        unique=True,
+        null=True,
+        help_text=_("Current filename in storage"),
+    )
+
+    document_count = models.PositiveIntegerField(
+        _("document count"),
+        blank=False,
+        default=0,
+        null=True,
+        validators=[MinValueValidator(1)],
+        help_text=_(
+            "The number of document of the folder.",
+        ),
+    )
+
+    archive_filename = models.FilePathField(
+        _("archive filename"),
+        max_length=1024,
+        editable=False,
+        default=None,
+        unique=True,
+        null=True,
+        help_text=_("Current archive filename in storage"),
+    )
+
+    original_filename = models.CharField(
+        _("original filename"),
+        max_length=1024,
+        editable=False,
+        default=None,
+        unique=False,
+        null=True,
+        help_text=_("The original name of the file when it was uploaded"),
     )
 
     class Meta(MatchingModel.Meta):
@@ -324,6 +374,12 @@ class Folder(SoftDeleteModel, MatchingModel):
     #     folder.checksum = hashlib.md5(f'{folder.id}.{folder.name}'.encode()).hexdigest()
     #     folder.save()
     #     return folder
+    def save(self, *args, **kwargs):
+        # Lấy số đầu tiên từ name
+        match = re.match(r"^\d+", self.name)
+        self.name_order = int(match.group()) if match else 2147483647
+
+        super().save(*args, **kwargs)
 
 
 class DossierForm(MatchingModel):
@@ -700,6 +756,9 @@ class EdocTask(models.Model):
         ),
     )
 
+    id_reference = models.BigIntegerField(null=True, blank=True,
+                                          verbose_name=_("ID Reference"))
+
     api_call_count = models.IntegerField(
         null=True,
         default=0,
@@ -717,6 +776,17 @@ class EdocTask(models.Model):
         help_text="Select the type of OCR task to execute."
     )
 
+    def extract_document_id(self):
+        if not self.result:
+            return None  # Return None if result is empty
+
+        match = re.search(r"document id (\d+)", self.result, re.IGNORECASE)
+        return int(
+            match.group(1)) if match else None  # Convert to integer if found
+
+    def save(self, *args, **kwargs):
+        self.id_reference = self.extract_document_id()  # Extract and assign document ID
+        super().save(*args, **kwargs)
     def __str__(self) -> str:
         return f"Task {self.task_id}"
 
@@ -906,7 +976,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
         _("checksum"),
         max_length=32,
         editable=False,
-        unique=True,
+        unique=False,
         help_text=_("The checksum of the original document."),
     )
 

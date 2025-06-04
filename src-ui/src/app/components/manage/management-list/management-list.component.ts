@@ -1,43 +1,20 @@
-import {
-  Directive,
-  OnDestroy,
-  OnInit,
-  QueryList,
-  ViewChildren,
-} from '@angular/core'
+import { Directive, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject } from 'rxjs'
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators'
-import {
-  MatchingModel,
-  MATCHING_ALGORITHMS,
-  MATCH_AUTO,
-  MATCH_NONE,
-} from 'src/app/data/matching-model'
+import { MATCH_AUTO, MATCH_NONE, MATCHING_ALGORITHMS, MatchingModel } from 'src/app/data/matching-model'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
-import {
-  SortableDirective,
-  SortEvent,
-} from 'src/app/directives/sortable.directive'
+import { SortableDirective, SortEvent } from 'src/app/directives/sortable.directive'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import {
-  PermissionAction,
-  PermissionsService,
-  PermissionType,
-} from 'src/app/services/permissions.service'
-import {
-  AbstractNameFilterService,
-  BulkEditObjectOperation,
-} from 'src/app/services/rest/abstract-name-filter-service'
+import { PermissionAction, PermissionsService, PermissionType } from 'src/app/services/permissions.service'
+import { AbstractNameFilterService, BulkEditObjectOperation } from 'src/app/services/rest/abstract-name-filter-service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogComponent, EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 import { ShareLink } from 'src/app/data/share-link'
-import { environment } from 'src/environments/environment'
-import { Router } from '@angular/router'
 
 export interface ManagementListColumn {
   key: string
@@ -201,6 +178,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
   }
 
   filterDocuments(object: ObjectWithId) {
+    console.log(object)
     this.documentListViewService.quickFilter([
       { rule_type: this.filterRuleType, value: object.id.toString() },
     ])

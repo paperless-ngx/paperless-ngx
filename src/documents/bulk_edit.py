@@ -213,6 +213,7 @@ def modify_tags(doc_ids, add_tags, remove_tags):
 
 def delete(doc_ids):
     docs = Document.objects.filter(id__in=doc_ids)
+    set_folder_ids = set()
     for doc in docs:
         doc_folder = doc.folder
         # doc.folder = None
@@ -220,10 +221,18 @@ def delete(doc_ids):
         # doc.dossier = None
         doc.save()
         if doc_folder is not None:
+            set_folder_ids.update(doc_folder.path.rstrip("/").split("/"))
             doc_folder.delete()
         # if doc_dossier is not None:
         #     doc_dossier.delete()
+
     docs.delete()
+    set_folder_ids = {int(id) for id in set_folder_ids}
+    folders = Folder.objects.filter(id__in=set_folder_ids, type=Folder.FOLDER)
+    # for folder in folders:
+    #     update_document_count_folder_path(folder.path)
+
+
     # delete the document from the index
     from documents import index
     # doc_deleted=Document.deleted_objects.filter(doc)

@@ -470,9 +470,9 @@ def bulk_delete_file(folder_list = None):
 
     for f in folder_list:
         f: Folder
-        path = ''
+        # path = ''
+        path = f.path
         if f.type == Folder.FOLDER:
-            path = f.path + '/'
             folders_f_ids = Folder.objects.filter(
                 path__startswith=path).values_list('id', flat=True)
             folders_ids.extend(folders_f_ids)
@@ -1071,16 +1071,39 @@ def update_ocr_document(document, task_instance: EdocTask, data_ocr):
 @shared_task()
 def update_child_folder_paths(folder, old_path):
     child_folders = Folder.objects.filter(path__startswith=f'{old_path}/')
+    file_ids = []
     for child_folder in child_folders:
         if folder.path:
-            child_folder.path = f"{folder.path}/{child_folder.id}"
+            child_folder.path = f"{folder.path}{child_folder.id}"
         else:
             child_folder.path = f"{child_folder.id}"
+        if folder.type == Folder.FILE:
+            file_ids.append(folder.id)
         # child_folder.save()
         #
         # update_child_folder_paths(child_folder)
 
     Folder.objects.bulk_update(child_folders, ['path'], batch_size=1000)
+    # reindex document update folder_path for document
+    documents = Document.objects.filter(folder__in=file_ids)
+    index.update_index_bulk_documents(documents, 100)
+    # NOTE: update the document count for the old folder.
+    # update_document_count_folder_path(folder.path)
+    # update the document count for the new folder.
+    # update_document_count_folder_path(old_path)
+
+
+def update_document_count_folder_path(path):
+    # update document count
+    folder_ids = path.rstrip("/").split('/')
+    folders = Folder.objects.filter(id__in=folder_ids, type=Folder.FOLDER)
+    for folder in folders:
+        folder.document_count = Folder.objects.filter(
+            path__startswith=f'{folder.path}', type=Folder.FILE).only(
+            'id').count()
+        folder.save()
+
+
 
 
 
@@ -1089,11 +1112,11 @@ def update_child_folder_paths(folder, old_path):
 def update_child_folder_permisisons(self, folder, permissions, owner, merge,
                                     owner_exist, set_permissions_exist):
     path = folder.path
-    if folder.type == Folder.FOLDER:
-        path = f"{folder.path}/"
+
     child_folders = Folder.objects.filter(path__startswith=path)
+    folder_ids = child_folders.values_list('id', flat=True)
     documents_list = Document.objects.filter(
-        folder__in=child_folders,
+        folder_id__in=folder_ids
     )
     # documents_list = []
     # for child in child_folders:
@@ -1112,6 +1135,7 @@ def update_child_folder_permisisons(self, folder, permissions, owner, merge,
             # if merge is true, we dont want to overwrite the owner
             qs_owner_update = qs.filter(owner__isnull=True) if merge else qs
             qs_owner_update.update(owner=owner)
+            documents_list.update(owner=owner)
         if set_permissions_exist:
             for obj in qs:
                 set_permissions_for_object(
@@ -1119,6 +1143,7 @@ def update_child_folder_permisisons(self, folder, permissions, owner, merge,
                     object=obj,
                     merge=merge,
                 )
+            print('merge----', merge, permissions)
             for obj in documents_list:
                 set_permissions_for_object(
                     permissions=permissions,

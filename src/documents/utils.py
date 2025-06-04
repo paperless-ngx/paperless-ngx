@@ -120,6 +120,8 @@ def run_subprocess(
 
 
 def get_content_before_last_number(input_string):
+    input_string = input_string.rstrip("/")
+
     match = re.search(r"(.*)/\d+$", input_string)
     if match:
         return match.group(1)  # Trả về nhóm trước số cuối cùng

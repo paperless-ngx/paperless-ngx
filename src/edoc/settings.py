@@ -1187,6 +1187,7 @@ FOLDER_UPLOAD = os.getenv("FOLDER_UPLOAD", "")
 DELAY_OCR = os.getenv("DELAY_OCR", 1)
 EDOC_SECRET_KEY_OCR = os.getenv("EDOC_SECRET_KEY_OCR", "")
 METHOD_OCR = os.getenv("METHOD_OCR", "RETRY")
+EDOC_PEEL_FIELD = os.getenv("EDOC_PEEL_FIELD", "false")
 
 ###############################################################################
 # Elastic search                                                              #

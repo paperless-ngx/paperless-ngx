@@ -11,5 +11,6 @@ export interface Folder extends MatchingModel {
     owner: number;
     type: string;
     document?: Document;
+  modified?: Date;
 
 }

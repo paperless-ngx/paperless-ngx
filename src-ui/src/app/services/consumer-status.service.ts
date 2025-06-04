@@ -128,6 +128,7 @@ export class ConsumerStatusService {
     if (!existing) {
       this.consumerStatus.push(status)
     }
+    // this.consumerStatus.push(status)
     return status
   }
 

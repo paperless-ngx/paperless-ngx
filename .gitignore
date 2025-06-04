@@ -98,3 +98,6 @@ scripts/nuke
 # celery schedule file
 celerybeat-schedule*
 /src/data_dump.json
+
+/src-ui-v2/.angular/
+/src-ui-v2/node_modules/

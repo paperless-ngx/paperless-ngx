@@ -30,7 +30,8 @@ from documents.models import Warehouse
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
 INT_KWARGS = ["exact", "gt", "gte", "lt", "lte", "isnull"]
-DATE_KWARGS = ["year", "month", "day", "date__gt", "gt", "date__lt", "lt"]
+DATE_KWARGS = ["year", "month", "day", "date__gt", "date__gte", "gt", "gte",
+               "date__lt", "date__lte", "lt", "lte"]
 
 
 class CorrespondentFilterSet(FilterSet):
@@ -176,10 +177,8 @@ class FolderFilter(Filter):
             folders = Folder.objects.filter(id__in=object_ids)
             folder_paths = []
             for f in folders:
-                if f.type == Folder.FOLDER:
-                    folder_paths.append(f'{f.path}/')
-                    continue
                 folder_paths.append(f.path)
+                continue
             query = Q()
             for path in folder_paths:
                 query |= Q(path__startswith=path)

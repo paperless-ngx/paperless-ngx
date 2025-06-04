@@ -160,7 +160,7 @@ def check_user_can_change_folder(user, obj):
 
 @shared_task()
 def update_view_folder_parent_permissions(folder, permissions):
-    list_folder_ids = folder.path.split("/")
+    list_folder_ids = folder.path.rstrip("/").split("/")
     folders_list = Folder.objects.filter(id__in = list_folder_ids)
     permission_copy = permissions
     permission_copy["change"] = {
