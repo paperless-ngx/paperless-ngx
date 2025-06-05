@@ -98,6 +98,9 @@ export class OpenDocumentsService {
       this.save()
       return of(true)
     }
+    this.openDocuments.splice(index, 1)
+    this.dirtyDocuments.delete(doc.id)
+    this.save()
   }
 
   closeDocument(doc: Document): Observable<boolean> {
