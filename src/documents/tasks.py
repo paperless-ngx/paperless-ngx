@@ -26,12 +26,14 @@ from documents.caching import clear_document_caches
 from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
 from documents.consumer import ConsumerPlugin
+from documents.consumer import ConsumerPreflightPlugin
 from documents.consumer import WorkflowTriggerPlugin
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
+from documents.matching import prefilter_documents_by_workflowtrigger
 from documents.models import Correspondent
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -144,6 +146,7 @@ def consume_file(
         overrides = DocumentMetadataOverrides()
 
     plugins: list[type[ConsumeTaskPlugin]] = [
+        ConsumerPreflightPlugin,
         CollatePlugin,
         BarcodePlugin,
         WorkflowTriggerPlugin,
@@ -387,6 +390,18 @@ def empty_trash(doc_ids=None):
 
 @shared_task
 def check_scheduled_workflows():
+    """
+    Check and run all enabled scheduled workflows.
+
+    Scheduled triggers are evaluated based on a target date field (e.g. added, created, modified, or a custom date field),
+    combined with a day offset.
+
+    The offset is mathematically negated resulting in the following behavior:
+        - Positive offsets mean the workflow should trigger BEFORE the specified date (e.g., offset = +7 → trigger 7 days before)
+        - Negative offsets mean the workflow should trigger AFTER the specified date (e.g., offset = -7 → trigger 7 days after)
+
+    Once a document satisfies this condition, and recurring/non-recurring constraints are met, the workflow is run.
+    """
     scheduled_workflows: list[Workflow] = (
         Workflow.objects.filter(
             triggers__type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
@@ -458,6 +473,12 @@ def check_scheduled_workflows():
                         ]
 
                         documents = Document.objects.filter(id__in=matched_ids)
+
+                if documents.count() > 0:
+                    documents = prefilter_documents_by_workflowtrigger(
+                        documents,
+                        trigger,
+                    )
 
                 if documents.count() > 0:
                     logger.debug(

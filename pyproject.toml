@@ -78,7 +78,7 @@ optional-dependencies.postgres = [
   "psycopg-c==3.2.5",
 ]
 optional-dependencies.webserver = [
-  "granian[uvloop]~=2.2.0",
+  "granian[uvloop]~=2.3.2",
 ]
 
 [dependency-groups]
@@ -221,15 +221,6 @@ lint.per-file-ignores."src/documents/parsers.py" = [
 lint.per-file-ignores."src/documents/signals/handlers.py" = [
   "PTH",
 ] # TODO Enable & remove
-lint.per-file-ignores."src/documents/tests/test_consumer.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/documents/tests/test_file_handling.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/documents/tests/test_migration_archive_files.py" = [
-  "PTH",
-] # TODO Enable & remove
 lint.per-file-ignores."src/documents/views.py" = [
   "PTH",
 ] # TODO Enable & remove
@@ -237,9 +228,6 @@ lint.per-file-ignores."src/paperless/checks.py" = [
   "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/paperless/settings.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/paperless/views.py" = [
   "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/paperless_mail/mail.py" = [
