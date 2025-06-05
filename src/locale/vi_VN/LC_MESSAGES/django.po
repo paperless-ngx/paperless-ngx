@@ -2031,3 +2031,10 @@ msgstr "Khác"
 
 msgid "The username and/or password you specified are not correct."
 msgstr "Tên người dùng/mật khẩu của bạn không chính xác."
+
+
+
+msgid "Too many failed login attempts. Try again later."
+msgstr "Quá nhiều nỗ lực đăng nhập thất bại. Hãy thử lại sau"
+
+

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMAGE_NAME="nexus.tcgroup.vn/tc-edoc"
+IMAGE_NAME="nexus.tcgroup.vn/tc-edoc-prod"
 
 # Lọc chỉ những tag hợp lệ dạng x.y.z
 versions=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "$IMAGE_NAME" | cut -d ':' -f2 | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V)
