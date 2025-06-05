@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-24 17:14+0000\n"
-"PO-Revision-Date: 2025-05-24 17:17\n"
+"PO-Revision-Date: 2025-05-31 00:34\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -23,7 +23,7 @@ msgstr "المستندات"
 
 #: documents/filters.py:384
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "يجب أن تكون القيمة JSON."
 
 #: documents/filters.py:403
 msgid "Invalid custom field query expression"
@@ -39,11 +39,11 @@ msgstr ""
 
 #: documents/filters.py:448
 msgid "Maximum number of query conditions exceeded."
-msgstr ""
+msgstr "تجاوز الحد الأقصى لعدد شروط الاستعلام."
 
 #: documents/filters.py:513
 msgid "{name!r} is not a valid custom field."
-msgstr ""
+msgstr "{name!r} حقل مخصص غير صالح."
 
 #: documents/filters.py:550
 msgid "{data_type} does not support query expr {expr!r}."
@@ -55,7 +55,7 @@ msgstr ""
 
 #: documents/filters.py:843
 msgid "Custom field not found"
-msgstr ""
+msgstr "لم يتم العثور على حقل مخصص"
 
 #: documents/models.py:36 documents/models.py:713
 msgid "owner"
@@ -196,11 +196,11 @@ msgstr "بصمة المِلَفّ للمستند ‏المحفوظ."
 
 #: documents/models.py:205
 msgid "page count"
-msgstr ""
+msgstr "عدد الصفحات"
 
 #: documents/models.py:212
 msgid "The number of pages of the document."
-msgstr ""
+msgstr "2 - عدد صفحات الوثيقة."
 
 #: documents/models.py:217 documents/models.py:633 documents/models.py:671
 #: documents/models.py:742 documents/models.py:800
@@ -318,7 +318,7 @@ msgstr "ASN"
 
 #: documents/models.py:398
 msgid "Pages"
-msgstr ""
+msgstr "الصفحات"
 
 #: documents/models.py:404
 msgid "show on dashboard"
@@ -538,15 +538,15 @@ msgstr ""
 
 #: documents/models.py:495
 msgid "added to"
-msgstr ""
+msgstr "تمت الإضافة إلى"
 
 #: documents/models.py:496
 msgid "added from"
-msgstr ""
+msgstr "تمت الإضافة من"
 
 #: documents/models.py:497
 msgid "mime type is"
-msgstr ""
+msgstr "نوع الـ mime"
 
 #: documents/models.py:507
 msgid "rule type"
@@ -566,23 +566,23 @@ msgstr "تصفية القواعد"
 
 #: documents/models.py:537
 msgid "Auto Task"
-msgstr ""
+msgstr "مهمة تلقائية"
 
 #: documents/models.py:538
 msgid "Scheduled Task"
-msgstr ""
+msgstr "مهمة مجدولة"
 
 #: documents/models.py:539
 msgid "Manual Task"
-msgstr ""
+msgstr "مهمة يدوية"
 
 #: documents/models.py:542
 msgid "Consume File"
-msgstr ""
+msgstr "‏مِلَفّ الاستهلاك"
 
 #: documents/models.py:543
 msgid "Train Classifier"
-msgstr ""
+msgstr "تصنيف التدريب"
 
 #: documents/models.py:544
 msgid "Check Sanity"
@@ -590,7 +590,7 @@ msgstr ""
 
 #: documents/models.py:545
 msgid "Index Optimize"
-msgstr ""
+msgstr "تحسين الفهرسة"
 
 #: documents/models.py:550
 msgid "Task ID"
@@ -622,7 +622,7 @@ msgstr "اسم المهمة"
 
 #: documents/models.py:572
 msgid "Name of the task that was run"
-msgstr ""
+msgstr "اسم المهمة التي تم تشغيلها"
 
 #: documents/models.py:579
 msgid "Task State"
@@ -790,7 +790,7 @@ msgstr "تم تحديث المستند"
 
 #: documents/models.py:935
 msgid "Scheduled"
-msgstr ""
+msgstr "مجدول"
 
 #: documents/models.py:938
 msgid "Consume Folder"
@@ -810,11 +810,11 @@ msgstr ""
 
 #: documents/models.py:946
 msgid "Modified"
-msgstr ""
+msgstr "التعديل"
 
 #: documents/models.py:947
 msgid "Custom Field"
-msgstr ""
+msgstr "حقل مخصص"
 
 #: documents/models.py:950
 msgid "Workflow Trigger Type"
@@ -906,7 +906,7 @@ msgstr ""
 
 #: documents/models.py:1088
 msgid "email body"
-msgstr ""
+msgstr "نص البريد الالكتروني"
 
 #: documents/models.py:1091
 msgid "The body (message) of the email, can include some placeholders, see documentation."
@@ -922,7 +922,7 @@ msgstr ""
 
 #: documents/models.py:1106
 msgid "include document in email"
-msgstr ""
+msgstr "تضمين المستند في البريد الإلكتروني"
 
 #: documents/models.py:1117
 msgid "webhook url"
@@ -930,7 +930,7 @@ msgstr ""
 
 #: documents/models.py:1120
 msgid "The destination URL for the notification."
-msgstr ""
+msgstr "عنوان URL وجهة الإشعار."
 
 #: documents/models.py:1125
 msgid "use parameters"
@@ -1366,7 +1366,7 @@ msgstr ""
 
 #: documents/templates/mfa/authenticate.html:24
 msgid "Cancel"
-msgstr ""
+msgstr "إلغاء"
 
 #: documents/templates/paperless-ngx/base.html:58
 msgid "Share link was not found."
@@ -1573,15 +1573,15 @@ msgstr "شعار التطبيق"
 
 #: paperless/models.py:197
 msgid "Enables barcode scanning"
-msgstr ""
+msgstr "تمكين مسح الباركود"
 
 #: paperless/models.py:203
 msgid "Enables barcode TIFF support"
-msgstr ""
+msgstr "تمكين دعم الباركود TIFF"
 
 #: paperless/models.py:209
 msgid "Sets the barcode string"
-msgstr ""
+msgstr "تعيين سلسلة الباركود"
 
 #: paperless/models.py:217
 msgid "Retains split pages"

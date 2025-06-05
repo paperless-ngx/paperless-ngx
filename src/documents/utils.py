@@ -23,11 +23,17 @@ def copy_basic_file_stats(source: Path | str, dest: Path | str) -> None:
 
     The extended attribute copy does weird things with SELinux and files
     copied from temporary directories and copystat doesn't allow disabling
-    these copies
+    these copies.
+
+    If there is a PermissionError, skip copying file stats.
     """
     source, dest = _coerce_to_path(source, dest)
     src_stat = source.stat()
-    utime(dest, ns=(src_stat.st_atime_ns, src_stat.st_mtime_ns))
+
+    try:
+        utime(dest, ns=(src_stat.st_atime_ns, src_stat.st_mtime_ns))
+    except PermissionError:
+        pass
 
 
 def copy_file_with_basic_stats(

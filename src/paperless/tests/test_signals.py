@@ -6,6 +6,7 @@ from django.http import HttpRequest
 from django.test import TestCase
 from django.test import override_settings
 
+from documents.models import UiSettings
 from paperless.signals import handle_failed_login
 from paperless.signals import handle_social_account_updated
 
@@ -190,3 +191,76 @@ class TestSyncSocialLoginGroups(TestCase):
             sociallogin=sociallogin,
         )
         self.assertEqual(list(user.groups.all()), [])
+
+
+class TestUserGroupDeletionCleanup(TestCase):
+    """
+    Test that when a user or group is deleted, references are cleaned up properly
+    from ui_settings
+    """
+
+    def test_user_group_deletion_cleanup(self):
+        """
+        GIVEN:
+            - Existing user
+            - Existing group
+        WHEN:
+            - The user is deleted
+            - The group is deleted
+        THEN:
+            - References in ui_settings are cleaned up
+        """
+        user = User.objects.create_user(username="testuser")
+        user2 = User.objects.create_user(username="testuser2")
+        group = Group.objects.create(name="testgroup")
+
+        ui_settings = UiSettings.objects.create(
+            user=user,
+            settings={
+                "permissions": {
+                    "default_owner": user2.id,
+                    "default_view_users": [user2.id],
+                    "default_change_users": [user2.id],
+                    "default_view_groups": [group.id],
+                    "default_change_groups": [group.id],
+                },
+            },
+        )
+
+        user2.delete()
+        ui_settings.refresh_from_db()
+        permissions = ui_settings.settings.get("permissions", {})
+        self.assertIsNone(permissions.get("default_owner"))
+        self.assertEqual(permissions.get("default_view_users"), [])
+        self.assertEqual(permissions.get("default_change_users"), [])
+
+        group.delete()
+        ui_settings.refresh_from_db()
+        permissions = ui_settings.settings.get("permissions", {})
+        self.assertEqual(permissions.get("default_view_groups"), [])
+        self.assertEqual(permissions.get("default_change_groups"), [])
+
+    def test_user_group_deletion_error_handling(self):
+        """
+        GIVEN:
+            - Existing user and group
+        WHEN:
+            - The user is deleted and an error occurs during the signal handling
+        THEN:
+            - Error is logged and the system remains stable
+        """
+        user = User.objects.create_user(username="testuser")
+        user2 = User.objects.create_user(username="testuser2")
+        user2_id = user2.id
+        Group.objects.create(name="testgroup")
+
+        UiSettings.objects.create(
+            user=user,
+        )  # invalid, no settings, this probably should not happen in production
+
+        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+            user2.delete()
+            self.assertIn(
+                f"Error while cleaning up user {user2_id}",
+                cm.output[0],
+            )

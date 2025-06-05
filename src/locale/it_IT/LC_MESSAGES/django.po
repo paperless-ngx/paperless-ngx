@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-24 17:14+0000\n"
-"PO-Revision-Date: 2025-05-24 17:17\n"
+"PO-Revision-Date: 2025-05-28 12:13\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -51,11 +51,11 @@ msgstr "{data_type} Non supporta la jQuery Expo {Expo!r}."
 
 #: documents/filters.py:658
 msgid "Maximum nesting depth exceeded."
-msgstr ""
+msgstr "Superata la profondità massima di nidificazione."
 
 #: documents/filters.py:843
 msgid "Custom field not found"
-msgstr ""
+msgstr "Campo personalizzato non trovato"
 
 #: documents/models.py:36 documents/models.py:713
 msgid "owner"
@@ -196,7 +196,7 @@ msgstr "Il checksum del documento archiviato."
 
 #: documents/models.py:205
 msgid "page count"
-msgstr ""
+msgstr "numero di pagine"
 
 #: documents/models.py:212
 msgid "The number of pages of the document."
@@ -266,11 +266,11 @@ msgstr "Tabella"
 
 #: documents/models.py:383
 msgid "Small Cards"
-msgstr ""
+msgstr "Schede piccole"
 
 #: documents/models.py:384
 msgid "Large Cards"
-msgstr ""
+msgstr "Schede grandi"
 
 #: documents/models.py:387
 msgid "Title"
@@ -342,7 +342,7 @@ msgstr "Visualizza dimensione pagina"
 
 #: documents/models.py:427
 msgid "View display mode"
-msgstr ""
+msgstr "Visualizza modalità display"
 
 #: documents/models.py:434
 msgid "Document display fields"
@@ -530,19 +530,19 @@ msgstr "interrogazione campi personalizzati"
 
 #: documents/models.py:493
 msgid "created to"
-msgstr ""
+msgstr "Creato per"
 
 #: documents/models.py:494
 msgid "created from"
-msgstr ""
+msgstr "Creato da"
 
 #: documents/models.py:495
 msgid "added to"
-msgstr ""
+msgstr "Aggiunto a"
 
 #: documents/models.py:496
 msgid "added from"
-msgstr ""
+msgstr "Aggiunto da"
 
 #: documents/models.py:497
 msgid "mime type is"
@@ -566,7 +566,7 @@ msgstr "regole filtro"
 
 #: documents/models.py:537
 msgid "Auto Task"
-msgstr ""
+msgstr "Task Automatica"
 
 #: documents/models.py:538
 msgid "Scheduled Task"
@@ -574,7 +574,7 @@ msgstr ""
 
 #: documents/models.py:539
 msgid "Manual Task"
-msgstr ""
+msgstr "Attività manuale"
 
 #: documents/models.py:542
 msgid "Consume File"
@@ -666,7 +666,7 @@ msgstr "I dati restituiti dall'attività"
 
 #: documents/models.py:617
 msgid "Task Type"
-msgstr ""
+msgstr "Tipo di Task"
 
 #: documents/models.py:618
 msgid "The type of task that was run"
@@ -758,7 +758,7 @@ msgstr "dati aggiuntivi"
 
 #: documents/models.py:762
 msgid "Extra data for the custom field, such as select options"
-msgstr ""
+msgstr "Dati extra per il campo personalizzato, come le opzioni di selezione"
 
 #: documents/models.py:768
 msgid "custom field"
@@ -806,7 +806,7 @@ msgstr "Recupero Posta"
 
 #: documents/models.py:941
 msgid "Web UI"
-msgstr ""
+msgstr "Web UI"
 
 #: documents/models.py:946
 msgid "Modified"
@@ -898,7 +898,7 @@ msgstr ""
 
 #: documents/models.py:1078
 msgid "email subject"
-msgstr ""
+msgstr "Oggetto email"
 
 #: documents/models.py:1082
 msgid "The subject of the email, can include some placeholders, see documentation."
@@ -926,11 +926,11 @@ msgstr "includi documento nell'email"
 
 #: documents/models.py:1117
 msgid "webhook url"
-msgstr ""
+msgstr "Url del webhook"
 
 #: documents/models.py:1120
 msgid "The destination URL for the notification."
-msgstr ""
+msgstr "L'URL di destinazione per la notifica."
 
 #: documents/models.py:1125
 msgid "use parameters"
@@ -982,11 +982,11 @@ msgstr "Email"
 
 #: documents/models.py:1179
 msgid "Webhook"
-msgstr ""
+msgstr "Webhook"
 
 #: documents/models.py:1183
 msgid "Workflow Action Type"
-msgstr ""
+msgstr "Tipo Azione Workflow"
 
 #: documents/models.py:1189
 msgid "assign title"
@@ -1118,7 +1118,7 @@ msgstr "email"
 
 #: documents/models.py:1407
 msgid "webhook"
-msgstr ""
+msgstr "webhook"
 
 #: documents/models.py:1411
 msgid "workflow action"
