@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-24 17:14+0000\n"
-"PO-Revision-Date: 2025-06-05 20:08\n"
+"PO-Revision-Date: 2025-06-06 07:25\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Language: he_IL\n"
@@ -1412,12 +1412,12 @@ msgstr ": כצעד אחרון, אנא מלא את הטופס הבא:"
 #: documents/validators.py:24
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "לא ניתן לנתח את כתובת ה-URI ‏{value}"
 
 #: documents/validators.py:29
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "לא ניתן לנתח את כתובת ה-URI ‏{value}, חסרה מיקום רשת או נתיב"
 
 #: documents/validators.py:36
 msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
@@ -1426,7 +1426,7 @@ msgstr "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(
 #: documents/validators.py:45
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "לא ניתן לנתח את כתובת ה-URI ‏{value}, חסרה הסכימה"
 
 #: paperless/apps.py:11
 msgid "Paperless"
