@@ -7,6 +7,9 @@ from pathlib import Path
 
 from django.utils import dates
 from django.utils.translation import get_language
+from django.utils.translation import override
+
+from paperless.config import GeneralConfig
 
 logger = logging.getLogger("paperless.templating")
 
@@ -28,9 +31,6 @@ def parse_w_workflow_placeholders(
     e.g. for pre-consumption triggers created will not have been parsed yet, but it will
     for added / updated triggers
     """
-    lang = get_language()
-    logger.debug("using language %s", lang)
-    logger.debug("Extracted month %d", int(local_added.month))
 
     formatting = {
         "correspondent": correspondent_name,
@@ -47,7 +47,6 @@ def parse_w_workflow_placeholders(
         "original_filename": Path(original_filename).stem,
         "filename": Path(filename).stem,
     }
-
     if created is not None:
         formatting.update(
             {
@@ -65,4 +64,10 @@ def parse_w_workflow_placeholders(
         formatting.update({"doc_title": doc_title})
     if doc_url is not None:
         formatting.update({"doc_url": doc_url})
-    return text.format(**formatting).strip()
+
+    config = GeneralConfig()
+    lang = config.language_code_workflow
+
+    with override(lang):
+        logger.debug("using language %s", get_language())
+        return text.format(**formatting).strip()

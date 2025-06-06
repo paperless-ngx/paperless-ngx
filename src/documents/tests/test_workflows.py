@@ -1237,10 +1237,11 @@ class TestWorkflows(
             ),
         )
 
-        trigger = WorkflowTrigger.objects.create(
+        trigger1 = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
             filter_has_document_type=self.dt,
         )
+
         action = WorkflowAction.objects.create(
             assign_title="Doc created in {created_month_name}",
         )
@@ -1249,24 +1250,33 @@ class TestWorkflows(
             name="Workflow 1",
             order=0,
         )
-        w.triggers.add(trigger)
+        w.triggers.add(trigger1)
         w.actions.add(action)
         w.save()
 
-        self.client.patch(
-            f"/api/documents/{doc.id}/",
-            {"document_type": self.dt.id},
-            format="json",
-            headers={"Accept-Language": "de"},
-        )
+        with override_settings(LANGUAGE_CODE_WORKFLOWS="de"):
+            self.client.patch(
+                f"/api/documents/{doc.id}/",
+                {"document_type": self.dt.id},
+                format="json",
+                headers={"Accept-Language": "es"},
+            )
         doc.refresh_from_db()
         self.assertEqual(doc.title, "Doc created in Juni")  # codespell:ignore
+
+        with override_settings(LANGUAGE_CODE_WORKFLOWS="fr"):
+            self.client.patch(
+                f"/api/documents/{doc.id}/",
+                {"document_type": self.dt.id},
+                format="json",
+            )
+        doc.refresh_from_db()
+        self.assertEqual(doc.title, "Doc created in juin")
 
         self.client.patch(
             f"/api/documents/{doc.id}/",
             {"document_type": self.dt.id},
             format="json",
-            headers={"Accept-Language": "en"},
         )
         doc.refresh_from_db()
         self.assertEqual(doc.title, "Doc created in June")

@@ -163,9 +163,13 @@ class GeneralConfig(BaseConfig):
 
     app_title: str = dataclasses.field(init=False)
     app_logo: str = dataclasses.field(init=False)
+    language_code_workflow: str = dataclasses.field(init=False)
 
     def __post_init__(self) -> None:
         app_config = self._get_config_instance()
 
         self.app_title = app_config.app_title or None
         self.app_logo = app_config.app_logo.url if app_config.app_logo else None
+        self.language_code_workflow = (
+            app_config.language_code_workflow or settings.LANGUAGE_CODE_WORKFLOWS
+        )

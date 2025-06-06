@@ -2133,7 +2133,13 @@ class UiSettingsView(GenericAPIView):
         ui_settings["app_logo"] = settings.APP_LOGO
         if general_config.app_logo is not None and len(general_config.app_logo) > 0:
             ui_settings["app_logo"] = general_config.app_logo
-
+        if (
+            general_config.language_code_workflow is not None
+            and len(general_config.language_code_workflow) > 0
+        ):
+            ui_settings["language_code_workflow"] = (
+                general_config.language_code_workflow
+            )
         ui_settings["auditlog_enabled"] = settings.AUDIT_LOG_ENABLED
 
         if settings.GMAIL_OAUTH_ENABLED or settings.OUTLOOK_OAUTH_ENABLED:
