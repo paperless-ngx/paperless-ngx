@@ -2639,7 +2639,21 @@ class BulkEditObjectsView(PassUserMixin):
             )
 
             if not has_perms:
-                return HttpResponseForbidden("Insufficient permissions")
+                if model_name == "folder":
+                    parent_folder_ids = objs.first().path.rstrip("/").split(
+                        "/")
+                    parent_folder = Folder.objects.filter(
+                        id__in=parent_folder_ids,
+                    )
+                    folder_owner = None
+                    for f in parent_folder:
+                        if f.owner == user or user.is_superuser or f.owner is None:
+                            folder_owner = f.owner
+                    if folder_owner is None:
+                        return HttpResponseForbidden(
+                            _("Insufficient permissions"))
+                else:
+                    return HttpResponseForbidden(_("Insufficient permissions"))
 
         if operation == "set_permissions":
             permissions = serializer.validated_data.get("permissions")
@@ -2702,12 +2716,14 @@ class BulkEditObjectsView(PassUserMixin):
                     return Response(status=status.HTTP_400_BAD_REQUEST)
                 elif "parent_folder" in request.data:
                     if parent_folder_obj.owner != user:
-                        return HttpResponseForbidden("Insufficient permissions")
+                        return HttpResponseForbidden(
+                            _("Insufficient permissions"))
                     if new_parent_folder.path.startswith(folder.path):
                         return Response(
                             status=status.HTTP_400_BAD_REQUEST,
                             data={
-                                "error": "Cannot move a folder into one of its child folders.",
+                                "error": _(
+                                    "Cannot move a folder into one of its child folders."),
                             },
                         )
                     elif new_parent_folder.type == "file":
@@ -2733,17 +2749,17 @@ class BulkEditObjectsView(PassUserMixin):
 
                     else:
                         folder.path = f"{folder.id}/"
-
-                    destination_folder = get_permissions(parent_folder_obj)
-                    update_view_folder_parent_permissions.delay(folder,
-                                                                destination_folder)
-                    permission_move_folder = get_permissions(folder)
-                    destination_folder = get_permissions(parent_folder_obj)
-                    update_view_folder_parent_permissions.delay(folder,
-                                                                destination_folder)
-                    update_view_folder_parent_permissions.delay(
-                        parent_folder_obj,
-                        permission_move_folder)
+                    if parent_folder_obj is not None:
+                        destination_folder = get_permissions(parent_folder_obj)
+                        update_view_folder_parent_permissions.delay(folder,
+                                                                    destination_folder)
+                        permission_move_folder = get_permissions(folder)
+                        destination_folder = get_permissions(parent_folder_obj)
+                        update_view_folder_parent_permissions.delay(folder,
+                                                                    destination_folder)
+                        update_view_folder_parent_permissions.delay(
+                            parent_folder_obj,
+                            permission_move_folder)
                     folder.save()
                     update_child_folder_paths.delay(folder, old_path)
 
