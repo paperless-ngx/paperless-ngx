@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PNGX_BOT_PAT }}
       - name: crowdin action
         uses: crowdin/github-action@v2
         with:
