@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PNGX_BOT_PAT }}
       - name: crowdin action
         uses: crowdin/github-action@v2
         with:
@@ -23,6 +25,6 @@ jobs:
           localization_branch_name: l10n_dev
           pull_request_labels: 'skip-changelog, translation'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PNGX_BOT_PAT }}
           CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
           CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
