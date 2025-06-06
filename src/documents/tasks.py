@@ -1143,7 +1143,7 @@ def update_child_folder_permisisons(self, folder, permissions, owner, merge,
                     object=obj,
                     merge=merge,
                 )
-            print('merge----', merge, permissions)
+
             for obj in documents_list:
                 set_permissions_for_object(
                     permissions=permissions,

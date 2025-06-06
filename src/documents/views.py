@@ -2715,7 +2715,8 @@ class BulkEditObjectsView(PassUserMixin):
                 elif int(request.data["parent_folder"]) == folder.id:
                     return Response(status=status.HTTP_400_BAD_REQUEST)
                 elif "parent_folder" in request.data:
-                    if parent_folder_obj.owner != user:
+                    if not has_perms_owner_aware(user, 'change_folder',
+                                                 parent_folder_obj):
                         return HttpResponseForbidden(
                             _("Insufficient permissions"))
                     if new_parent_folder.path.startswith(folder.path):
@@ -3707,6 +3708,12 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
             folder.save()
             permission_parent_folder = get_permissions(obj=parent_folder)
             if permission_parent_folder:
+                user_ids = User.objects.filter(
+                    pk=parent_folder.owner.id).values_list(
+                    "id", flat=True)
+
+                permission_parent_folder['change']['users'] = \
+                permission_parent_folder['change']['users'].union(user_ids)
                 set_permissions(permissions=permission_parent_folder,
                                 object=folder)
         else:
