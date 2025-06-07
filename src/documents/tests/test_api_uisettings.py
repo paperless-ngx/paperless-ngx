@@ -42,6 +42,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
                 "app_title": None,
                 "app_logo": None,
                 "auditlog_enabled": True,
+                "language_code_workflow": "en-us",
                 "trash_delay": 30,
                 "update_checking": {
                     "backend_setting": "default",
