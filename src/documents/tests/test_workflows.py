@@ -1367,6 +1367,44 @@ class TestWorkflows(
         doc.refresh_from_db()
         self.assertEqual(doc.title, "Doc added in Februar")  # codespell:ignore
 
+    def test_document_consumption_workflow_month_placeholder_addded(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            sources=f"{DocumentSource.ApiUpload}",
+            filter_filename="simple*",
+        )
+
+        action = WorkflowAction.objects.create(
+            assign_title="Doc added in {added_month_name_short}",
+        )
+
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        superuser = User.objects.create_superuser("superuser")
+        self.client.force_authenticate(user=superuser)
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
+        tasks.consume_file(
+            ConsumableDocument(
+                source=DocumentSource.ApiUpload,
+                original_file=test_file,
+            ),
+            None,
+        )
+        document = Document.objects.first()
+        self.assertRegex(
+            document.title,
+            r"Doc added in \w{3,}",
+        )  # Match any 3-letter month name
+
     def test_document_updated_workflow_existing_custom_field(self):
         """
         GIVEN:
