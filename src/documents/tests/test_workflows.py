@@ -1393,18 +1393,19 @@ class TestWorkflows(
             self.SAMPLE_DIR / "simple.pdf",
             self.dirs.scratch_dir / "simple.pdf",
         )
-        tasks.consume_file(
-            ConsumableDocument(
-                source=DocumentSource.ApiUpload,
-                original_file=test_file,
-            ),
-            None,
-        )
-        document = Document.objects.first()
-        self.assertRegex(
-            document.title,
-            r"Doc added in \w{3,}",
-        )  # Match any 3-letter month name
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ApiUpload,
+                    original_file=test_file,
+                ),
+                None,
+            )
+            document = Document.objects.first()
+            self.assertRegex(
+                document.title,
+                r"Doc added in \w{3,}",
+            )  # Match any 3-letter month name
 
     def test_document_updated_workflow_existing_custom_field(self):
         """
