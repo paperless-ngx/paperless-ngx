@@ -1708,3 +1708,12 @@ password. All of these options come from their similarly-named [Django settings]
 #### [`PAPERLESS_EMAIL_USE_SSL=<bool>`](#PAPERLESS_EMAIL_USE_SSL) {#PAPERLESS_EMAIL_USE_SSL}
 
 : Defaults to false.
+
+## Workflow settings
+
+settings to modify workflow behaviour.
+
+#### [`LANGUAGE_CODE_WORKFLOWS=<lang>`](#PAPERLESS_LANGUAGE_CODE_WORKFLOWS) {#PAPERLESS_LANGUAGE_CODE_WORKFLOWS}
+
+: Customize the language that paperless will use when processing workflow remplacments for month names.
+Defaults to LANGUAGE_CODE which is `en-en`.
