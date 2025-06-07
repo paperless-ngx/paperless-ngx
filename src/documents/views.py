@@ -3785,6 +3785,17 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
             instance.save()
 
             update_child_folder_paths.delay(folder=instance)
+        permission_parent_folder = get_permissions(obj=instance.parent_folder)
+        if permission_parent_folder:
+            user_ids = User.objects.filter(
+                pk=instance.parent_folder.owner.id).values_list(
+                "id", flat=True)
+
+            permission_parent_folder['change']['users'] = \
+                permission_parent_folder['change']['users'].union(user_ids)
+            permission_parent_folder['view']['users'] = []
+            set_permissions(permissions=permission_parent_folder,
+                            object=instance)
 
         return Response(serializer.data)
 

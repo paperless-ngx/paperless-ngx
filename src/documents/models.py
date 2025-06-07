@@ -378,7 +378,11 @@ class Folder(SoftDeleteModel, MatchingModel):
     def save(self, *args, **kwargs):
         # Lấy số đầu tiên từ name
         match = re.match(r"^\d+", self.name)
-        self.name_order = int(match.group()) if match else 2147483647
+
+        try:
+            self.name_order = int(match.group()) if match else 2147483647
+        except ValueError:
+            self.name_order = 2147483647  # Giá trị mặc định nếu số quá lớn
 
         super().save(*args, **kwargs)
 
