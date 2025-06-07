@@ -25,6 +25,7 @@ from documents import tasks
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
 from documents.matching import document_matches_workflow
+from documents.matching import prefilter_documents_by_workflowtrigger
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -1896,6 +1897,55 @@ class TestWorkflows(
         self.assertEqual(doc.owner, self.user2)
         doc2.refresh_from_db()
         self.assertIsNone(doc2.owner)  # has not triggered yet
+
+    def test_workflow_scheduled_filters_queryset(self):
+        """
+        GIVEN:
+            - Existing workflow with scheduled trigger
+        WHEN:
+            - Workflows run and matching documents are found
+        THEN:
+            - prefilter_documents_by_workflowtrigger appropriately filters
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_offset_days=-7,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.CREATED,
+            filter_filename="*sample*",
+            filter_has_document_type=self.dt,
+            filter_has_correspondent=self.c,
+        )
+        trigger.filter_has_tags.set([self.t1])
+        trigger.save()
+        action = WorkflowAction.objects.create(
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        # create 10 docs with half having the document type
+        for i in range(10):
+            doc = Document.objects.create(
+                title=f"sample test {i}",
+                checksum=f"checksum{i}",
+                correspondent=self.c,
+                original_filename=f"sample_{i}.pdf",
+                document_type=self.dt if i % 2 == 0 else None,
+            )
+            doc.tags.set([self.t1])
+            doc.save()
+
+        documents = Document.objects.all()
+        filtered_docs = prefilter_documents_by_workflowtrigger(
+            documents,
+            trigger,
+        )
+        self.assertEqual(filtered_docs.count(), 5)
 
     def test_workflow_enabled_disabled(self):
         trigger = WorkflowTrigger.objects.create(

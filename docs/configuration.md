@@ -50,47 +50,48 @@ matcher.
 
 ### Database
 
+By default, Paperless uses **SQLite** with a database stored at `data/db.sqlite3`.
+To switch to **PostgreSQL** or **MariaDB**, set [`PAPERLESS_DBHOST`](#PAPERLESS_DBHOST) and optionally configure other
+database-related environment variables.
+
+#### [`PAPERLESS_DBHOST=<hostname>`](#PAPERLESS_DBHOST) {#PAPERLESS_DBHOST}
+
+: If unset, Paperless uses **SQLite** by default.
+
+    Set `PAPERLESS_DBHOST` to switch to PostgreSQL or MariaDB instead.
+
 #### [`PAPERLESS_DBENGINE=<engine_name>`](#PAPERLESS_DBENGINE) {#PAPERLESS_DBENGINE}
 
-: Optional, gives the ability to choose Postgres or MariaDB for
-database engine. Available options are `postgresql` and
-`mariadb`.
+: Optional. Specifies the database engine to use when connecting to a remote database.
+Available options are `postgresql` and `mariadb`.
 
-    Default is `postgresql`.
+    Defaults to `postgresql` if `PAPERLESS_DBHOST` is set.
 
     !!! warning
 
         Using MariaDB comes with some caveats. See [MySQL Caveats](advanced_usage.md#mysql-caveats).
 
-#### [`PAPERLESS_DBHOST=<hostname>`](#PAPERLESS_DBHOST) {#PAPERLESS_DBHOST}
-
-: By default, sqlite is used as the database backend. This can be
-changed here.
-
-    Set PAPERLESS_DBHOST and another database will be used instead of
-    sqlite.
-
 #### [`PAPERLESS_DBPORT=<port>`](#PAPERLESS_DBPORT) {#PAPERLESS_DBPORT}
 
-: Adjust port if necessary.
+: Port to use when connecting to PostgreSQL or MariaDB.
 
-    Default is 5432.
+    Default is `5432` for PostgreSQL and `3306` for MariaDB.
 
 #### [`PAPERLESS_DBNAME=<name>`](#PAPERLESS_DBNAME) {#PAPERLESS_DBNAME}
 
-: Database name in PostgreSQL or MariaDB.
+: Name of the database to connect to when using PostgreSQL or MariaDB.
 
     Defaults to "paperless".
 
 #### [`PAPERLESS_DBUSER=<name>`](#PAPERLESS_DBUSER) {#PAPERLESS_DBUSER}
 
-: Database user in PostgreSQL or MariaDB.
+: Username for authenticating with the PostgreSQL or MariaDB database.
 
     Defaults to "paperless".
 
 #### [`PAPERLESS_DBPASS=<password>`](#PAPERLESS_DBPASS) {#PAPERLESS_DBPASS}
 
-: Database password for PostgreSQL or MariaDB.
+: Password for the PostgreSQL or MariaDB database user.
 
     Defaults to "paperless".
 
@@ -110,20 +111,20 @@ changed here.
 
 #### [`PAPERLESS_DBSSLROOTCERT=<ca-path>`](#PAPERLESS_DBSSLROOTCERT) {#PAPERLESS_DBSSLROOTCERT}
 
-: SSL root certificate path
+: Path to the SSL root certificate used to verify the database server.
 
     See [the official documentation about
     sslmode for PostgreSQL](https://www.postgresql.org/docs/current/libpq-ssl.html).
-    Changes path of `root.crt`.
+    Changes the location of `root.crt`.
 
     See [the official documentation about
     sslmode for MySQL and MariaDB](https://dev.mysql.com/doc/refman/8.0/en/connection-options.html#option_general_ssl-ca).
 
-    Defaults to unset, using the documented path in the home directory.
+    Defaults to unset, using the standard location in the home directory.
 
 #### [`PAPERLESS_DBSSLCERT=<client-cert-path>`](#PAPERLESS_DBSSLCERT) {#PAPERLESS_DBSSLCERT}
 
-: SSL client certificate path
+: Path to the client SSL certificate used when connecting securely.
 
     See [the official documentation about
     sslmode for PostgreSQL](https://www.postgresql.org/docs/current/libpq-ssl.html).
@@ -131,13 +132,13 @@ changed here.
     See [the official documentation about
     sslmode for MySQL and MariaDB](https://dev.mysql.com/doc/refman/8.0/en/connection-options.html#option_general_ssl-cert).
 
-    Changes path of `postgresql.crt`.
+    Changes the location of `postgresql.crt`.
 
-    Defaults to unset, using the documented path in the home directory.
+    Defaults to unset, using the standard location in the home directory.
 
 #### [`PAPERLESS_DBSSLKEY=<client-cert-key>`](#PAPERLESS_DBSSLKEY) {#PAPERLESS_DBSSLKEY}
 
-: SSL client key path
+: Path to the client SSL private key used when connecting securely.
 
     See [the official documentation about
     sslmode for PostgreSQL](https://www.postgresql.org/docs/current/libpq-ssl.html).
@@ -145,17 +146,18 @@ changed here.
     See [the official documentation about
     sslmode for MySQL and MariaDB](https://dev.mysql.com/doc/refman/8.0/en/connection-options.html#option_general_ssl-key).
 
-    Changes path of `postgresql.key`.
+    Changes the location of `postgresql.key`.
 
-    Defaults to unset, using the documented path in the home directory.
+    Defaults to unset, using the standard location in the home directory.
 
 #### [`PAPERLESS_DB_TIMEOUT=<int>`](#PAPERLESS_DB_TIMEOUT) {#PAPERLESS_DB_TIMEOUT}
 
-: Amount of time for a database connection to wait for the database to
-unlock. Mostly applicable for sqlite based installation. Consider changing
-to postgresql if you are having concurrency problems with sqlite.
+: Sets how long a database connection should wait before timing out.
 
-    Defaults to unset, keeping the Django defaults.
+    For SQLite, this sets how long to wait if the database is locked.
+    For PostgreSQL or MariaDB, this sets the connection timeout.
+
+    Defaults to unset, which uses Django’s built-in defaults.
 
 ## Optional Services
 
