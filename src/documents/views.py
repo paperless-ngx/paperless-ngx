@@ -519,6 +519,28 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             404: None,
         },
     ),
+    email=extend_schema(
+        description="Email the document to one or more recipients as an attachment.",
+        request=inline_serializer(
+            name="EmailRequest",
+            fields={
+                "addresses": serializers.CharField(),
+                "subject": serializers.CharField(),
+                "message": serializers.CharField(),
+                "use_archive_version": serializers.BooleanField(default=True),
+            },
+        ),
+        responses={
+            200: inline_serializer(
+                name="EmailResponse",
+                fields={"message": serializers.CharField()},
+            ),
+            400: None,
+            403: None,
+            404: None,
+            500: None,
+        },
+    ),
 )
 class DocumentViewSet(
     PassUserMixin,
