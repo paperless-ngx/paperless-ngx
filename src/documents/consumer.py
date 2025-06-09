@@ -811,6 +811,9 @@ class Consumer(LoggingMixin):
     def try_consume_folder(self, task: Task, folder_name, files, paths,
                            input_doc_overrides: Optional[
                                DocumentMetadataOverrides] = None):
+        parent_folder_id_init = input_doc_overrides.folder_id if input_doc_overrides else None
+        parent_folder = Folder.objects.get(
+            pk=parent_folder_id_init) if parent_folder_id_init else None
         self._send_progress_folder(
             task=task,
             filename=folder_name,
@@ -819,7 +822,7 @@ class Consumer(LoggingMixin):
             status=ConsumerFilePhase.STARTED,
             message=ConsumerStatusShortMessage.NEW_FOLDER,
             input_doc_overrides=input_doc_overrides,
-            folder_id=input_doc_overrides.folder_id if input_doc_overrides else None,
+            folder_id=parent_folder_id_init,
             document_id=None,
             current_file=0,
             total_file=len(files),
@@ -835,16 +838,16 @@ class Consumer(LoggingMixin):
                 filename=folder_name,
                 current_progress=count * proportion,
                 max_progress=100,
-                status=ConsumerFilePhase.STARTED,
+                status=ConsumerFilePhase.WORKING,
                 message=ConsumerStatusShortMessage.PARSING_DOCUMENT,
                 input_doc_overrides=input_doc_overrides,
-                folder_id=input_doc_overrides.folder_id if input_doc_overrides else None,
+                folder_id=parent_folder_id_init,
                 document_id=None,
                 current_file=count,
                 total_file=total_file,
             )
 
-            folder_dict_created = create_folder_by_path(path,
+            folder_dict_created = create_folder_by_path(parent_folder, path,
                                                         input_doc_overrides,
                                                         folder_dict)
 
@@ -866,7 +869,7 @@ class Consumer(LoggingMixin):
             status=ConsumerFilePhase.SUCCESS,
             message=ConsumerStatusShortMessage.FINISHED,
             input_doc_overrides=input_doc_overrides,
-            folder_id=input_doc_overrides.folder_id if input_doc_overrides else None,
+            folder_id=parent_folder_id_init,
             document_id=None,
             current_file=count,
             total_file=total_file,

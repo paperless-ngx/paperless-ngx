@@ -332,7 +332,7 @@ export class FoldersComponent extends ManagementListComponent<Folder> {
   }
 
   cancelFolder() {
-    this.reloadData()
+    // this.reloadData()
     this.folderCut = []
     this.isFolderCutClicked = false
     if (this.router.url.includes('/folders/')) {

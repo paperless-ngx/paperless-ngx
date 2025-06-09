@@ -54,6 +54,10 @@ export class FileStatus {
 
   exist: boolean
 
+  current_file?: number
+
+  total_files?: number
+
   getProgress(): number {
     switch (this.phase) {
       case FileStatusPhase.STARTED:
