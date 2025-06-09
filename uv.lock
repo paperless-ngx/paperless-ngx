@@ -626,15 +626,15 @@ wheels = [
 
 [[package]]
 name = "django"
-version = "5.1.8"
+version = "5.2.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asgiref", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "sqlparse", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/00/40/45adc1b93435d1b418654a734b68351bb6ce0a0e5e37b2f0e9aeb1a2e233/Django-5.1.8.tar.gz", hash = "sha256:42e92a1dd2810072bcc40a39a212b693f94406d0ba0749e68eb642f31dc770b4", size = 10723602, upload-time = "2025-04-02T11:19:56.028Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/39/17/4567ee12bb84114c544d5c4a792e7226db517ac78f552111e9dc62d1de14/django-5.2.2.tar.gz", hash = "sha256:85852e517f84435e9b13421379cd6c43ef5b48a9c8b391d29a26f7900967e952", size = 10827542, upload-time = "2025-06-04T13:52:40.879Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ec/0d/e6dd0ed898b920fec35c6eeeb9acbeb831fff19ad21c5e684744df1d4a36/Django-5.1.8-py3-none-any.whl", hash = "sha256:11b28fa4b00e59d0def004e9ee012fefbb1065a5beb39ee838983fd24493ad4f", size = 8277130, upload-time = "2025-04-02T11:19:51.591Z" },
+    { url = "https://files.pythonhosted.org/packages/b4/5c/5d00acab6c062b154e5a0f092938ae5a0c698dbc4362b68e23200960f32c/django-5.2.2-py3-none-any.whl", hash = "sha256:997ef2162d04ead6869551b22cde4e06da1f94cf595f4af3f3d3afeae1f3f6fe", size = 8302562, upload-time = "2025-06-04T13:52:33.14Z" },
 ]
 
 [[package]]
@@ -888,14 +888,14 @@ wheels = [
 
 [[package]]
 name = "drf-spectacular-sidecar"
-version = "2025.4.1"
+version = "2025.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5d/b6/ce857d73b65b86a9034d0604b5dc1a002f7fa218e32c4dba479a197acd70/drf_spectacular_sidecar-2025.4.1.tar.gz", hash = "sha256:ea7dc4e674174616589d258b5c9676f3c451ec422e62b79e31234d39db53922d", size = 2402076, upload-time = "2025-04-01T11:23:30.627Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f3/30/ddb202c3599bd44709ec93eb5393550dbded011c8732d15bb074c96134c5/drf_spectacular_sidecar-2025.6.1.tar.gz", hash = "sha256:ee6752c73d712265a61b9e2ca6f71c3b2bd89f30f39cf9f8cda98e7f371fcbcf", size = 2407117, upload-time = "2025-06-01T11:22:51.537Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cf/c3/d2f31ef748f89d68121aa3d4a71f7dfd44ea54957b84602d70cda2491c43/drf_spectacular_sidecar-2025.4.1-py3-none-any.whl", hash = "sha256:343a24b0d03125fa76d07685072f55779c5c4124d90c10b14e315fdc143ad9b9", size = 2422415, upload-time = "2025-04-01T11:23:28.797Z" },
+    { url = "https://files.pythonhosted.org/packages/8c/c8/7a484fe8ce14e147fbd7d363e7a13aaaa62a1ec6d9f77510f08e1839bf06/drf_spectacular_sidecar-2025.6.1-py3-none-any.whl", hash = "sha256:c7c4768c03faa3d2f7afacd1464f67732e7d6866d2cf2e8f649175c27318745c", size = 2427208, upload-time = "2025-06-01T11:22:49.39Z" },
 ]
 
 [[package]]
@@ -2019,7 +2019,7 @@ requires-dist = [
     { name = "channels-redis", specifier = "~=4.2" },
     { name = "concurrent-log-handler", specifier = "~=0.9.25" },
     { name = "dateparser", specifier = "~=1.2" },
-    { name = "django", specifier = "~=5.1.7" },
+    { name = "django", specifier = "~=5.2.2" },
     { name = "django-allauth", extras = ["socialaccount", "mfa"], specifier = "~=65.4.0" },
     { name = "django-auditlog", specifier = "~=3.1.2" },
     { name = "django-celery-results", specifier = "~=2.6.0" },
@@ -2033,7 +2033,7 @@ requires-dist = [
     { name = "djangorestframework", specifier = "~=3.15" },
     { name = "djangorestframework-guardian", specifier = "~=0.3.0" },
     { name = "drf-spectacular", specifier = "~=0.28" },
-    { name = "drf-spectacular-sidecar", specifier = "~=2025.4.1" },
+    { name = "drf-spectacular-sidecar", specifier = "~=2025.6.1" },
     { name = "drf-writable-nested", specifier = "~=0.7.1" },
     { name = "filelock", specifier = "~=3.18.0" },
     { name = "flower", specifier = "~=2.0.1" },
