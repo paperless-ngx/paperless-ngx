@@ -3802,7 +3802,8 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
             serializer.validated_data["name"] = get_unique_name(Folder,
                                                             serializer.validated_data[
                                                                 "name"], int(
-                request.data["parent_folder"]))
+                    request.data["parent_folder"]) if request.data[
+                    "parent_folder"] else None)
         serializer.validated_data["updated"] = timezone.now()
 
         old_parent_folder = instance.parent_folder
