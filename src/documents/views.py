@@ -1099,6 +1099,12 @@ class DocumentViewSet(
             200: DocumentSerializer(many=True, all_fields=True),
         },
     ),
+    next_asn=extend_schema(
+        description="Get the next available Archive Serial Number (ASN) for a new document",
+        responses={
+            200: OpenApiTypes.INT,
+        },
+    ),
 )
 class UnifiedSearchViewSet(DocumentViewSet):
     def __init__(self, *args, **kwargs):
