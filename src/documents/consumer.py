@@ -5,15 +5,18 @@ import tempfile
 import uuid
 from enum import Enum
 from pathlib import Path
+from time import mktime
 from typing import Optional
 from typing import TYPE_CHECKING
 
 import magic
+import pathvalidate
 from asgiref.sync import async_to_sync
-from celery import shared_task
+from celery import shared_task, Task
 from channels.layers import get_channel_layer
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.files.uploadedfile import TemporaryUploadedFile
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
@@ -22,7 +25,8 @@ from rest_framework.reverse import reverse
 
 from documents.classifier import load_classifier
 from documents.compress import smart_compress
-from documents.data_models import DocumentMetadataOverrides
+from documents.data_models import DocumentMetadataOverrides, \
+    ConsumableDocument, DocumentSource
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.loggers import LoggingMixin
@@ -57,7 +61,7 @@ from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
 from documents.utils import copy_basic_file_stats, \
     check_digital_signature, \
-    pdf_has_text_pdftotext, get_unique_name
+    pdf_has_text_pdftotext, get_unique_name, create_folder_by_path
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import get_content_before_last_number
 from documents.utils import run_subprocess
@@ -251,6 +255,7 @@ class ConsumerStatusShortMessage(str, Enum):
     POST_CONSUME_SCRIPT_NOT_FOUND = "post_consume_script_not_found"
     POST_CONSUME_SCRIPT_ERROR = "post_consume_script_error"
     NEW_FILE = "new_file"
+    NEW_FOLDER = "new_folder"
     UNSUPPORTED_TYPE = "unsupported_type"
     PARSING_DOCUMENT = "parsing_document"
     GENERATING_THUMBNAIL = "generating_thumbnail"
@@ -299,8 +304,67 @@ def get_config_dossier_form(override_dossier_id):
     return dossier.dossier_form
 
 
+
 class Consumer(LoggingMixin):
     logging_name = "edoc.consumer"
+
+    def process_file(self, doc_data: TemporaryUploadedFile,
+                     input_doc_overrides: Optional[
+                         DocumentMetadataOverrides] = None):
+
+        from datetime import datetime
+        t = int(mktime(datetime.now().timetuple()))
+        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
+
+        temp_file_path = Path(
+            tempfile.mkdtemp(dir=settings.SCRATCH_DIR)) / Path(
+            pathvalidate.sanitize_filename(doc_data.name),
+        )
+        temp_file_path.write_bytes(doc_data.file.read())
+
+        os.utime(temp_file_path, times=(t, t))
+        input_doc = ConsumableDocument(
+            source=DocumentSource.ApiUpload,
+            original_file=temp_file_path,
+        )
+        input_doc_overrides.filename = doc_data.name
+        input_doc_overrides.title = doc_data.name
+        from documents.tasks import consume_file
+        async_task = consume_file.apply(
+            args=[input_doc, input_doc_overrides],
+        )
+
+    def _send_progress_folder(
+        self,
+        filename: str,
+        task: Task,
+        current_progress: int,
+        max_progress: int,
+        status: ConsumerFilePhase,
+        current_file: int,
+        total_file: int,
+        message: Optional[ConsumerStatusShortMessage] = None,
+        document_id=None,
+        folder_id=None,
+        input_doc_overrides: Optional[DocumentMetadataOverrides] = None,
+    ):  # pragma: no cover
+        payload = {
+            "filename": os.path.basename(filename) if filename else None,
+            "task_id": task.request.id,
+            "current_progress": current_progress,
+            "max_progress": max_progress,
+            "status": status,
+            "message": message,
+            "document_id": document_id,
+            "owner_id": input_doc_overrides.owner_id if input_doc_overrides.owner_id else None,
+            "folder_id": folder_id,
+            "current_file": current_file,
+            "total_file": total_file,
+        }
+        async_to_sync(self.channel_layer.group_send)(
+            "status_updates",
+            {"type": "status_update", "data": payload},
+        )
 
     def _send_progress(
         self,
@@ -743,6 +807,71 @@ class Consumer(LoggingMixin):
                     CustomFieldInstance.objects.bulk_update(
                         dict_custom_fields_dossier_reference.values(), ["value_text"]
                     )
+
+    def try_consume_folder(self, task: Task, folder_name, files, paths,
+                           input_doc_overrides: Optional[
+                               DocumentMetadataOverrides] = None):
+        self._send_progress_folder(
+            task=task,
+            filename=folder_name,
+            current_progress=0,
+            max_progress=100,
+            status=ConsumerFilePhase.STARTED,
+            message=ConsumerStatusShortMessage.NEW_FOLDER,
+            input_doc_overrides=input_doc_overrides,
+            folder_id=input_doc_overrides.folder_id if input_doc_overrides else None,
+            document_id=None,
+            current_file=0,
+            total_file=len(files),
+        )
+        folder_dict = dict()
+        count = 0
+        total_file = len(files)
+        proportion = int(90 / total_file)
+        for file, path in zip(files, paths):
+            count += 1
+            self._send_progress_folder(
+                task=task,
+                filename=folder_name,
+                current_progress=count * proportion,
+                max_progress=100,
+                status=ConsumerFilePhase.STARTED,
+                message=ConsumerStatusShortMessage.PARSING_DOCUMENT,
+                input_doc_overrides=input_doc_overrides,
+                folder_id=input_doc_overrides.folder_id if input_doc_overrides else None,
+                document_id=None,
+                current_file=count,
+                total_file=total_file,
+            )
+
+            folder_dict_created = create_folder_by_path(path,
+                                                        input_doc_overrides,
+                                                        folder_dict)
+
+            folder_dict.update(folder_dict_created)
+
+            # split the path to get the folder name ex: test/test/test/vanban.pdf -> - ["test/test/test", "vanban.pdf"]
+            folder_path = path.rsplit("/", 1)[0]
+            folder_path = f'{folder_path}/'
+            # print(
+            #     f"folder_dict_created: {folder_dict_created}, folder_dict: {folder_dict}, folder_path: {folder_path}, path:{path}")
+            if folder_path in folder_dict:
+                input_doc_overrides.folder_id = folder_dict[folder_path][0]
+            self.process_file(file, input_doc_overrides)
+        self._send_progress_folder(
+            task=task,
+            filename=folder_name,
+            current_progress=100,
+            max_progress=100,
+            status=ConsumerFilePhase.SUCCESS,
+            message=ConsumerStatusShortMessage.FINISHED,
+            input_doc_overrides=input_doc_overrides,
+            folder_id=input_doc_overrides.folder_id if input_doc_overrides else None,
+            document_id=None,
+            current_file=count,
+            total_file=total_file,
+        )
+
 
     def try_consume_file(
         self,

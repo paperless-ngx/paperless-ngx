@@ -165,7 +165,7 @@ from documents.permissions import update_view_folder_parent_permissions
 from documents.permissions import \
     update_view_warehouse_shelf_boxcase_permissions
 from documents.serialisers import AcknowledgeTasksViewSerializer, \
-    DocumentDocumentSerializer, DocumentDetailSerializer
+    DocumentDocumentSerializer, DocumentDetailSerializer, PostFolderSerializer
 from documents.serialisers import ApprovalSerializer
 from documents.serialisers import ApprovalViewSerializer
 from documents.serialisers import ArchiveFontSerializer
@@ -201,7 +201,7 @@ from documents.signals import document_updated
 from documents.tasks import backup_documents, \
     bulk_update_custom_field_form_document_type_to_document, bulk_delete_file, \
     update_ocr_document, update_child_folder_paths, \
-    update_child_folder_permisisons, update_folder_permisisons
+    update_child_folder_permisisons, update_folder_permisisons, consume_folder
 from documents.tasks import consume_file
 from documents.tasks import deleted_backup
 from documents.tasks import empty_trash
@@ -1531,6 +1531,54 @@ class PostDocumentView(GenericAPIView):
         )
 
         return Response(async_task.id)
+
+
+class PostFolderView(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PostFolderSerializer
+    parser_classes = (parsers.MultiPartParser,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        files = serializer.validated_data["files"]
+        paths = serializer.validated_data["paths"]
+        folder_name = serializer.validated_data.get("folder_name")
+
+        correspondent_id = serializer.validated_data.get("correspondent")
+        document_type_id = serializer.validated_data.get("document_type")
+        storage_path_id = serializer.validated_data.get("storage_path")
+        warehouse_id = serializer.validated_data.get("warehouse")
+        folder_id = serializer.validated_data.get("folder")
+        tag_ids = serializer.validated_data.get("tags")
+        title = serializer.validated_data.get("title")
+        created = serializer.validated_data.get("created")
+        archive_serial_number = serializer.validated_data.get(
+            "archive_serial_number")
+        custom_field_ids = serializer.validated_data.get("custom_fields")
+
+        input_doc_overrides = DocumentMetadataOverrides(
+            filename='',
+            title='',
+            correspondent_id=correspondent_id,
+            document_type_id=document_type_id,
+            storage_path_id=storage_path_id,
+            warehouse_id=warehouse_id,
+            folder_id=folder_id,
+            tag_ids=tag_ids,
+            created=created,
+            asn=archive_serial_number,
+            owner_id=request.user.id,
+            custom_field_ids=custom_field_ids,
+
+        )
+
+        async_task = consume_folder.apply(
+            args=[folder_name, files, paths, input_doc_overrides],
+        )
+
+        return Response(async_task.id)
+
 
 class SelectQueryViewSet(
     ListModelMixin,

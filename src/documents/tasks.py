@@ -197,6 +197,26 @@ def train_classifier():
 
 
 @shared_task(bind=True)
+def consume_folder(
+    self: Task,
+    folder_name: str,
+    files,
+    paths,
+    input_doc_overrides: Optional[DocumentMetadataOverrides] = None,
+):
+    """
+    Consume all documents in a folder.
+    """
+
+    Consumer().try_consume_folder(self, folder_name, files, paths,
+                                  input_doc_overrides)
+
+
+
+
+
+
+@shared_task(bind=True)
 def consume_file(
     self: Task,
     input_doc: ConsumableDocument,
