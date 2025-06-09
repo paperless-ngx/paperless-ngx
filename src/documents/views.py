@@ -145,6 +145,7 @@ from documents.serialisers import CustomFieldSerializer
 from documents.serialisers import DocumentListSerializer
 from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
+from documents.serialisers import NotesSerializer
 from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import RunTaskViewSerializer
 from documents.serialisers import SavedViewSerializer
@@ -433,27 +434,24 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     ),
     notes=extend_schema(
         description="View, add, or delete notes for the document",
-        responses={
-            200: {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "id": {"type": "integer"},
-                        "note": {"type": "string"},
-                        "created": {"type": "string", "format": "date-time"},
-                        "user": {
-                            "type": "object",
-                            "properties": {
-                                "id": {"type": "integer"},
-                                "username": {"type": "string"},
-                                "first_name": {"type": "string"},
-                                "last_name": {"type": "string"},
-                            },
-                        },
-                    },
-                },
+        methods=["GET", "POST", "DELETE"],
+        request=inline_serializer(
+            name="NoteCreateRequest",
+            fields={
+                "note": serializers.CharField(),
             },
+        ),
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Note ID to delete (used only for DELETE requests)",
+            ),
+        ],
+        responses={
+            200: NotesSerializer(many=True),
             400: None,
             403: None,
             404: None,
@@ -517,6 +515,28 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             400: None,
             403: None,
             404: None,
+        },
+    ),
+    email=extend_schema(
+        description="Email the document to one or more recipients as an attachment.",
+        request=inline_serializer(
+            name="EmailRequest",
+            fields={
+                "addresses": serializers.CharField(),
+                "subject": serializers.CharField(),
+                "message": serializers.CharField(),
+                "use_archive_version": serializers.BooleanField(default=True),
+            },
+        ),
+        responses={
+            200: inline_serializer(
+                name="EmailResponse",
+                fields={"message": serializers.CharField()},
+            ),
+            400: None,
+            403: None,
+            404: None,
+            500: None,
         },
     ),
 )
