@@ -58,7 +58,7 @@ from documents.views import WorkflowActionViewSet
 from documents.views import WorkflowTriggerViewSet
 from documents.views import WorkflowViewSet
 from edoc.consumers import StatusConsumer
-from edoc.views import ApplicationConfigurationViewSet
+from edoc.views import ApplicationConfigurationViewSet, expired_view
 from edoc.views import ContentTypeViewSet
 from edoc.views import DisconnectSocialAccountView
 from edoc.views import FaviconView
@@ -244,6 +244,8 @@ urlpatterns = [
         ),
     ),
     re_path(r"share/(?P<slug>\w+)/?$", SharedLinkView.as_view()),
+    re_path(r"expired/", expired_view),
+    # re_path(r"check_expiration", CheckExpirationDate.as_view()),
     re_path(r"^favicon.ico$", FaviconView.as_view(), name="favicon"),
     re_path(r"admin/", admin.site.urls),
     re_path(

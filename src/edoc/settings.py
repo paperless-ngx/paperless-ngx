@@ -368,6 +368,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "edoc.middleware.LicenseExpiryMiddleware",
 ]
 
 # Optional to enable compression
@@ -1208,6 +1209,30 @@ ELASTICSEARCH_DSL = {
         # Đường dẫn đến chứng chỉ CA
     },
 }
+
+raw_expiration = os.getenv("EDOC_LICENSE_EXPIRATION_DATE",
+                           "2000-12-31T23:59:59Z")
+
+from datetime import datetime
+from django.utils.timezone import make_aware
+
+
+def convert_iso_to_datetime(iso_str: str) -> datetime:
+    """Chuyển đổi chuỗi ISO 8601 sang đối tượng datetime."""
+    try:
+        dt = datetime.fromisoformat(iso_str.replace("Z", "+00:00"))
+        dt_naive = dt.replace(tzinfo=None)
+        print(f"Converted ISO string '{iso_str}' to datetime: {dt_naive}")
+        return make_aware(dt_naive)
+    except ValueError:
+        raise ValueError(f"Invalid ISO 8601 date string: {iso_str}")
+
+
+LICENSE_EXPIRATION_DATE = convert_iso_to_datetime(raw_expiration)
+
+
+
+
 
 INTERNAL_IPS = [
     # ...

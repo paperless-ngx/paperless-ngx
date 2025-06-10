@@ -10,6 +10,7 @@ from django.core.paginator import Paginator
 from django.db.models.functions import Lower
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
+from django.shortcuts import render
 from django.utils.functional import cached_property
 from django.views.generic import View
 from django_filters.rest_framework import DjangoFilterBackend
@@ -341,3 +342,8 @@ class SocialAccountProvidersView(APIView):
             ]
 
         return Response(sorted(resp, key=lambda p: p["name"]))
+
+
+def expired_view(request):
+    return render(request, 'expired.html', {
+        "message": "Phần mềm đã hết hạn, vui lòng liên hệ quản trị viên."})
