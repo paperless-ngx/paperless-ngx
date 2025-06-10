@@ -354,6 +354,9 @@ import {
 import { NodeFileWidgetComponent } from './components/dashboard/widgets/folder-node-widget/node-tree-widget.component'
 import { UploadFileButtonComponent } from './components/dashboard/widgets/upload-file-button/upload-file-btn.component'
 import {
+  UploadFolderButtonComponent,
+} from './components/dashboard/widgets/upload-folder-button/upload-folder-btn.component'
+import {
   FontLanguageEditDialogComponent,
 } from './components/common/edit-dialog/font-language-edit-dialog/font-language-edit-dialog.component'
 import {
@@ -580,6 +583,7 @@ function initializeApp(settings: SettingsService) {
     StatisticsCustomWidgetComponent,
     UploadFileWidgetComponent,
     UploadFileButtonComponent,
+    UploadFolderButtonComponent,
     WidgetFrameComponent,
     FileTreeWidgetComponent,
     WarehouseTreeWidgetComponent,

@@ -245,6 +245,14 @@ export class DocumentService extends AbstractEdocService<Document> {
     )
   }
 
+  uploadFolder(formData) {
+    return this.http.post(
+      this.getResourceUrl(null, 'post_folder'),
+      formData,
+      { reportProgress: true, observe: 'events' },
+    )
+  }
+
   getMetadata(id: number): Observable<DocumentMetadata> {
     return this.http.get<DocumentMetadata>(this.getResourceUrl(id, 'metadata'))
   }

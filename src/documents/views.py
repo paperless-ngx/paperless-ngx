@@ -165,7 +165,7 @@ from documents.permissions import update_view_folder_parent_permissions
 from documents.permissions import \
     update_view_warehouse_shelf_boxcase_permissions
 from documents.serialisers import AcknowledgeTasksViewSerializer, \
-    DocumentDocumentSerializer, DocumentDetailSerializer
+    DocumentDocumentSerializer, DocumentDetailSerializer, PostFolderSerializer
 from documents.serialisers import ApprovalSerializer
 from documents.serialisers import ApprovalViewSerializer
 from documents.serialisers import ArchiveFontSerializer
@@ -201,7 +201,7 @@ from documents.signals import document_updated
 from documents.tasks import backup_documents, \
     bulk_update_custom_field_form_document_type_to_document, bulk_delete_file, \
     update_ocr_document, update_child_folder_paths, \
-    update_child_folder_permisisons, update_folder_permisisons
+    update_child_folder_permisisons, update_folder_permisisons, consume_folder
 from documents.tasks import consume_file
 from documents.tasks import deleted_backup
 from documents.tasks import empty_trash
@@ -635,16 +635,15 @@ class DocumentViewSet(
                                             merge=merge,
                                             set_permissions_exist=set_permissions_exist)
         response = super().update(request, *args, **kwargs)
+        # serializer.save()
+        doc_updated = Document.objects.get(id=serializer.data["id"])
         from documents import index
-
-        index.add_or_update_document(self.get_object())
-
+        index.add_or_update_document(doc_updated)
         document_updated.send(
             sender=self.__class__,
-            document=self.get_object()
+            document=doc_updated
         )
-
-        return response
+        return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
         from documents import index
@@ -1532,6 +1531,54 @@ class PostDocumentView(GenericAPIView):
         )
 
         return Response(async_task.id)
+
+
+class PostFolderView(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PostFolderSerializer
+    parser_classes = (parsers.MultiPartParser,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        files = serializer.validated_data["files"]
+        paths = serializer.validated_data["paths"]
+        folder_name = serializer.validated_data.get("folder_name")
+
+        correspondent_id = serializer.validated_data.get("correspondent")
+        document_type_id = serializer.validated_data.get("document_type")
+        storage_path_id = serializer.validated_data.get("storage_path")
+        warehouse_id = serializer.validated_data.get("warehouse")
+        folder_id = serializer.validated_data.get("folder")
+        tag_ids = serializer.validated_data.get("tags")
+        title = serializer.validated_data.get("title")
+        created = serializer.validated_data.get("created")
+        archive_serial_number = serializer.validated_data.get(
+            "archive_serial_number")
+        custom_field_ids = serializer.validated_data.get("custom_fields")
+
+        input_doc_overrides = DocumentMetadataOverrides(
+            filename='',
+            title='',
+            correspondent_id=correspondent_id,
+            document_type_id=document_type_id,
+            storage_path_id=storage_path_id,
+            warehouse_id=warehouse_id,
+            folder_id=folder_id,
+            tag_ids=tag_ids,
+            created=created,
+            asn=archive_serial_number,
+            owner_id=request.user.id,
+            custom_field_ids=custom_field_ids,
+
+        )
+
+        async_task = consume_folder.apply(
+            args=[folder_name, files, paths, input_doc_overrides],
+        )
+
+        return Response(async_task.id)
+
 
 class SelectQueryViewSet(
     ListModelMixin,
@@ -2640,7 +2687,22 @@ class BulkEditObjectsView(PassUserMixin):
             )
 
             if not has_perms:
-                return HttpResponseForbidden("Insufficient permissions")
+                if model_name == "folder":
+                    parent_folder_ids = objs.first().path.rstrip("/").split(
+                        "/")
+                    parent_folder = Folder.objects.filter(
+                        id__in=parent_folder_ids,
+                    )
+                    folder_owner = None
+                    for f in parent_folder:
+                        if has_perms_owner_aware(user, 'change_folder',
+                                                 f):
+                            folder_owner = f.owner
+                    if folder_owner is None:
+                        return HttpResponseForbidden(
+                            _("Insufficient permissions"))
+                else:
+                    return HttpResponseForbidden(_("Insufficient permissions"))
 
         if operation == "set_permissions":
             permissions = serializer.validated_data.get("permissions")
@@ -2702,13 +2764,16 @@ class BulkEditObjectsView(PassUserMixin):
                 elif int(request.data["parent_folder"]) == folder.id:
                     return Response(status=status.HTTP_400_BAD_REQUEST)
                 elif "parent_folder" in request.data:
-                    if parent_folder_obj.owner != user:
-                        return HttpResponseForbidden("Insufficient permissions")
+                    if not has_perms_owner_aware(user, 'change_folder',
+                                                 parent_folder_obj):
+                        return HttpResponseForbidden(
+                            _("Insufficient permissions"))
                     if new_parent_folder.path.startswith(folder.path):
                         return Response(
                             status=status.HTTP_400_BAD_REQUEST,
                             data={
-                                "error": "Cannot move a folder into one of its child folders.",
+                                "error": _(
+                                    "Cannot move a folder into one of its child folders."),
                             },
                         )
                     elif new_parent_folder.type == "file":
@@ -2734,17 +2799,17 @@ class BulkEditObjectsView(PassUserMixin):
 
                     else:
                         folder.path = f"{folder.id}/"
-
-                    destination_folder = get_permissions(parent_folder_obj)
-                    update_view_folder_parent_permissions.delay(folder,
-                                                                destination_folder)
-                    permission_move_folder = get_permissions(folder)
-                    destination_folder = get_permissions(parent_folder_obj)
-                    update_view_folder_parent_permissions.delay(folder,
-                                                                destination_folder)
-                    update_view_folder_parent_permissions.delay(
-                        parent_folder_obj,
-                        permission_move_folder)
+                    if parent_folder_obj is not None:
+                        destination_folder = get_permissions(parent_folder_obj)
+                        update_view_folder_parent_permissions.delay(folder,
+                                                                    destination_folder)
+                        permission_move_folder = get_permissions(folder)
+                        destination_folder = get_permissions(parent_folder_obj)
+                        update_view_folder_parent_permissions.delay(folder,
+                                                                    destination_folder)
+                        update_view_folder_parent_permissions.delay(
+                            parent_folder_obj,
+                            permission_move_folder)
                     folder.save()
                     update_child_folder_paths.delay(folder, old_path)
 
@@ -3141,7 +3206,7 @@ class TrashView(ListModelMixin, PassUserMixin):
         elif action == "empty":
             if doc_ids is None:
                 doc_ids = [doc.id for doc in docs]
-            empty_trash(doc_ids=doc_ids)
+            empty_trash.delay(doc_ids=doc_ids)
         return Response({"result": "OK", "doc_ids": doc_ids})
 
 
@@ -3693,6 +3758,12 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
             folder.save()
             permission_parent_folder = get_permissions(obj=parent_folder)
             if permission_parent_folder:
+                user_ids = User.objects.filter(
+                    pk=parent_folder.owner.id).values_list(
+                    "id", flat=True)
+
+                permission_parent_folder['change']['users'] = \
+                    permission_parent_folder['change']['users'].union(user_ids)
                 set_permissions(permissions=permission_parent_folder,
                                 object=folder)
         else:
@@ -3766,6 +3837,19 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
             instance.save()
 
             update_child_folder_paths.delay(folder=instance)
+        # update permission parent folder
+        permission_parent_folder = get_permissions(
+            obj=instance.parent_folder) if instance.parent_folder else None
+        if permission_parent_folder:
+            user_ids = User.objects.filter(
+                pk=instance.parent_folder.owner.id).values_list(
+                "id", flat=True)
+
+            permission_parent_folder['change']['users'] = \
+                permission_parent_folder['change']['users'].union(user_ids)
+            permission_parent_folder['view']['users'] = []
+            set_permissions(permissions=permission_parent_folder,
+                            object=instance)
 
         return Response(serializer.data)
 

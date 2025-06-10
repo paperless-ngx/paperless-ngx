@@ -16,7 +16,7 @@ from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
 from documents.views import AcknowledgeTasksView, DocumentElasticSearch, \
-    WebhookViewSet, SelectQueryViewSet
+    WebhookViewSet, SelectQueryViewSet, PostFolderView
 from documents.views import ApprovalUpdateMutipleView
 from documents.views import ApprovalViewSet
 from documents.views import ArchiveFontViewSet
@@ -141,6 +141,11 @@ urlpatterns = [
                     "^documents/post_document/",
                     PostDocumentView.as_view(),
                     name="post_document",
+                ),
+                re_path(
+                    "^documents/post_folder/",
+                    PostFolderView.as_view(),
+                    name="post_folder",
                 ),
                 re_path(
                     "^documents/bulk_edit/",

@@ -13,8 +13,9 @@ export class UploadDocumentsService {
 
   constructor(
     private documentService: DocumentService,
-    private consumerStatusService: ConsumerStatusService
-  ) {}
+    private consumerStatusService: ConsumerStatusService,
+  ) {
+  }
 
   onNgxFileDrop(files: NgxFileDropEntry[], payload) {
     for (const droppedFile of files) {
@@ -27,7 +28,71 @@ export class UploadDocumentsService {
 
   uploadFiles(files: FileList, payload) {
     for (let index = 0; index < files.length; index++) {
-      this.uploadFile(files.item(index),payload)
+      this.uploadFile(files.item(index), payload)
+    }
+  }
+
+
+  uploadFolder(files: FileList, payload) {
+    const folderName = files[0].webkitRelativePath.split('/')[0]
+    const formData = new FormData()
+    formData.append('folder_name', folderName) // Gửi tên thư mục
+    // for (const file of Array.from(files)) {
+    //   formData.append('files', file, file.webkitRelativePath) // Giữ đường dẫn thư mục]
+    // }
+    for (let i = 0; i < files.length; i++) {
+      formData.append('files', files[i])
+      formData.append('paths', files[i].webkitRelativePath)
+    }
+
+
+    if (payload?.folder != '' && payload?.folder != 'root' && payload?.folder != undefined) {
+      formData.append('folder', payload.folder)
+    }
+    if (payload?.dossiers != '' && payload?.dossiers != undefined) {
+      formData.append('dossier', payload.dossiers)
+    }
+
+    let status = this.consumerStatusService.newFileUpload(folderName)
+
+    status.message = $localize`Connecting...`
+
+    this.uploadSubscriptions[folderName] = this.documentService
+      .uploadFolder(formData)
+      .subscribe({
+        next: (event) => {
+          if (event.type == HttpEventType.UploadProgress) {
+            status.updateProgress(
+              FileStatusPhase.UPLOADING,
+              event.loaded,
+              event.total,
+            )
+            status.message = $localize`Uploading...`
+          } else if (event.type == HttpEventType.Response) {
+            status.taskId = event.body['task_id']
+            status.message = $localize`Upload complete, waiting...`
+            this.uploadSubscriptions[folderName]?.complete()
+          }
+        },
+        error: (error) => {
+          switch (error.status) {
+            case 400: {
+              this.consumerStatusService.fail(status, error.error.document)
+              break
+            }
+            default: {
+              this.consumerStatusService.fail(
+                status,
+                $localize`HTTP error: ${error.status} ${error.statusText}`,
+              )
+              break
+            }
+          }
+          this.uploadSubscriptions[folderName]?.complete()
+        },
+      })
+    if (status.exist) {
+      status = null
     }
   }
 
@@ -35,11 +100,11 @@ export class UploadDocumentsService {
 
     let formData = new FormData()
     formData.append('document', file, file.name)
-    if (payload?.folder!='' && payload?.folder!='root' && payload?.folder!=undefined){
-      formData.append('folder',payload.folder)
+    if (payload?.folder != '' && payload?.folder != 'root' && payload?.folder != undefined) {
+      formData.append('folder', payload.folder)
     }
-    if (payload?.dossiers!='' && payload?.dossiers!=undefined){
-      formData.append('dossier',payload.dossiers)
+    if (payload?.dossiers != '' && payload?.dossiers != undefined) {
+      formData.append('dossier', payload.dossiers)
 
 
     }
@@ -56,7 +121,7 @@ export class UploadDocumentsService {
             status.updateProgress(
               FileStatusPhase.UPLOADING,
               event.loaded,
-              event.total
+              event.total,
             )
             status.message = $localize`Uploading...`
           } else if (event.type == HttpEventType.Response) {
@@ -74,7 +139,7 @@ export class UploadDocumentsService {
             default: {
               this.consumerStatusService.fail(
                 status,
-                $localize`HTTP error: ${error.status} ${error.statusText}`
+                $localize`HTTP error: ${error.status} ${error.statusText}`,
               )
               break
             }
@@ -82,7 +147,7 @@ export class UploadDocumentsService {
           this.uploadSubscriptions[file.name]?.complete()
         },
       })
-    if (status.exist){
+    if (status.exist) {
       status = null
     }
   }

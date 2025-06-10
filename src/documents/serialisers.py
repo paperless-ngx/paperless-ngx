@@ -1785,6 +1785,153 @@ class PostDocumentSerializer(serializers.Serializer):
             return None
 
 
+class PostFolderSerializer(serializers.Serializer):
+    created = serializers.DateTimeField(
+        label="Created",
+        allow_null=True,
+        write_only=True,
+        required=False,
+    )
+
+    files = serializers.ListField(
+        child=serializers.FileField()
+    )
+
+    paths = serializers.ListField(
+        child=serializers.CharField()
+    )
+
+    folder_name = serializers.CharField(
+        label="Folder name",
+        write_only=True,
+        required=False,
+    )
+
+    title = serializers.CharField(
+        label="Title",
+        write_only=True,
+        required=False,
+    )
+
+    correspondent = serializers.PrimaryKeyRelatedField(
+        queryset=Correspondent.objects.all(),
+        label="Correspondent",
+        allow_null=True,
+        write_only=True,
+        required=False,
+    )
+
+    document_type = serializers.PrimaryKeyRelatedField(
+        queryset=DocumentType.objects.all(),
+        label="Document type",
+        allow_null=True,
+        write_only=True,
+        required=False,
+    )
+
+    folder = serializers.PrimaryKeyRelatedField(
+        queryset=Folder.objects.all(),
+        label="Folder",
+        allow_null=True,
+        write_only=True,
+        required=False,
+    )
+
+    warehouse = serializers.PrimaryKeyRelatedField(
+        queryset=Warehouse.objects.all(),
+        label="Warehouse",
+        allow_null=True,
+        write_only=True,
+        required=False,
+    )
+
+    storage_path = serializers.PrimaryKeyRelatedField(
+        queryset=StoragePath.objects.all(),
+        label="Storage path",
+        allow_null=True,
+        write_only=True,
+        required=False,
+    )
+
+    tags = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Tag.objects.all(),
+        label="Tags",
+        write_only=True,
+        required=False,
+    )
+
+    archive_serial_number = serializers.IntegerField(
+        label="ASN",
+        write_only=True,
+        required=False,
+        min_value=Document.ARCHIVE_SERIAL_NUMBER_MIN,
+        max_value=Document.ARCHIVE_SERIAL_NUMBER_MAX,
+    )
+
+    custom_fields = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=CustomField.objects.all(),
+        label="Custom fields",
+        write_only=True,
+        required=False,
+    )
+
+    # def validate_files(self, files):
+    #     for file in files:
+    #         mime_type = magic.from_buffer(file.file.read(), mime=True)
+    #         file.file.seek(0)
+    #         if not is_mime_type_supported(mime_type):
+    #             raise serializers.ValidationError(
+    #                 _("File type %(type)s not supported") % {
+    #                     "type": mime_type},
+    #             )
+    #
+    #     return files
+
+    def validate_correspondent(self, correspondent):
+        if correspondent:
+            return correspondent.id
+        else:
+            return None
+
+    def validate_document_type(self, document_type):
+        if document_type:
+            return document_type.id
+        else:
+            return None
+
+    def validate_storage_path(self, storage_path):
+        if storage_path:
+            return storage_path.id
+        else:
+            return None
+
+    def validate_folder(self, folder):
+        if folder:
+            return folder.id
+        else:
+            return None
+
+    def validate_warehouse(self, warehouse):
+        if warehouse.type == "Boxcase":
+            return warehouse.id
+        else:
+            return None
+
+    def validate_tags(self, tags):
+        if tags:
+            return [tag.id for tag in tags]
+        else:
+            return None
+
+    def validate_custom_fields(self, custom_fields):
+        if custom_fields:
+            return [custom_field.id for custom_field in custom_fields]
+        else:
+            return None
+
+
 class BulkDownloadSerializer(DocumentListSerializer):
     content = serializers.ChoiceField(
         choices=["archive", "originals", "both"],
@@ -2497,6 +2644,8 @@ class AdjustedNameFieldFolder(serializers.CharField):
 
         if hasattr(model, "name"):
             parent_folder = self.parent.initial_data.get("parent_folder")
+            if parent_folder == 'root':
+                parent_folder = None
             type = self.parent.initial_data.get("type")
 
             if type == "file":

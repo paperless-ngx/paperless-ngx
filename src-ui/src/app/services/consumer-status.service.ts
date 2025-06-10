@@ -22,6 +22,7 @@ export const FILE_STATUS_MESSAGES = {
   post_consume_script_not_found: $localize`:Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation:Post-consume script does not exist.`,
   post_consume_script_error: $localize`:Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation:Error while executing post-consume script.`,
   new_file: $localize`Received new file.`,
+  new_folder: $localize`Received new folder.`,
   unsupported_type: $localize`File type not supported.`,
   parsing_document: $localize`Processing document...`,
   generating_thumbnail: $localize`Generating thumbnail...`,
@@ -52,6 +53,10 @@ export class FileStatus {
   ownerId: number
 
   exist: boolean
+
+  current_file?: number
+
+  total_files?: number
 
   getProgress(): number {
     switch (this.phase) {

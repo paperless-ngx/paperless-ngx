@@ -197,6 +197,26 @@ def train_classifier():
 
 
 @shared_task(bind=True)
+def consume_folder(
+    self: Task,
+    folder_name: str,
+    files,
+    paths,
+    input_doc_overrides: Optional[DocumentMetadataOverrides] = None,
+):
+    """
+    Consume all documents in a folder.
+    """
+
+    Consumer().try_consume_folder(self, folder_name, files, paths,
+                                  input_doc_overrides)
+
+
+
+
+
+
+@shared_task(bind=True)
 def consume_file(
     self: Task,
     input_doc: ConsumableDocument,
@@ -704,7 +724,7 @@ def empty_trash(doc_ids=None):
         deleted_documents = documents.values("id", "folder_id", "dossier_id")
         deleted_document_ids = [doc["id"] for doc in deleted_documents]
         deleted_folder_ids = [doc["folder_id"] for doc in deleted_documents]
-        deleted_dossier_ids = [doc["dossier_id"] for doc in deleted_documents]
+
         # print('deleted folder',deleted_folder_ids)
         # print('deleted dossier',deleted_dossier_ids)
         # Temporarily connect the cleanup handler
@@ -716,9 +736,6 @@ def empty_trash(doc_ids=None):
         folders.delete()
 
         # delete Dossier
-        dossiers = Dossier.deleted_objects.filter(id__in=deleted_dossier_ids)
-
-        dossiers.delete()
 
         logger.info(f"Deleted {len(deleted_document_ids)} documents from trash")
 
@@ -1143,7 +1160,7 @@ def update_child_folder_permisisons(self, folder, permissions, owner, merge,
                     object=obj,
                     merge=merge,
                 )
-            print('merge----', merge, permissions)
+
             for obj in documents_list:
                 set_permissions_for_object(
                     permissions=permissions,

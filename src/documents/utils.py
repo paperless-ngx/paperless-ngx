@@ -16,6 +16,9 @@ import PyPDF2
 import pathvalidate
 from PIL import Image
 from django.conf import settings
+from guardian.shortcuts import assign_perm
+
+from documents.data_models import DocumentMetadataOverrides
 
 
 def _coerce_to_path(
@@ -244,3 +247,58 @@ def get_unique_name(model, base_name, parent_folder=None):
     #
     # return unique_name
     return generate_unique_name(base_name, existing_names)
+
+
+def create_folder_by_path(parent_folder, path: str, overrides: Optional[
+    DocumentMetadataOverrides] = None, folder_dict=None):
+    from documents.models import Folder
+    from documents.permissions import get_permissions, \
+        update_view_folder_parent_permissions, set_permissions_for_object
+    destination_folder = Folder.objects.get(
+        pk=overrides.folder_id) if overrides and overrides.folder_id else None
+    permissions_destination_folder = get_permissions(
+        obj=destination_folder) if destination_folder else None
+    folder_names = path.split('/')[:-1]
+    results = dict()
+    folders_path = ''
+
+    for i, name in enumerate(folder_names):
+        if name == '':
+            continue
+
+        folders_parent_path = folders_path
+        folders_path += f"{name}/"
+
+        if folder_dict and folders_path in folder_dict:
+            continue
+        if i == 0 and destination_folder is not None:
+            name = get_unique_name(Folder, name, destination_folder)
+        folder = Folder.objects.create(
+            name=name,
+            type=Folder.FOLDER,
+
+            owner_id=overrides.owner_id if overrides and overrides.owner_id else None,
+        )
+        if folder:
+            folder.path = f'{folder.id}/'
+            folder.parent_folder_id = destination_folder.id if destination_folder else None
+            if i == 0 and destination_folder is not None:
+                folder.path = f'{destination_folder.path}{folder.id}/'
+                folder.parent_folder_id = destination_folder.id
+            if folders_parent_path in folder_dict:
+                folder.parent_folder_id = folder_dict[folders_parent_path][0]
+                folder.path = f'{folder_dict[folders_parent_path][1]}{folder.id}/'
+            elif folders_parent_path in results:
+                folder.parent_folder_id = results[folders_parent_path][0]
+                folder.path = f'{results[folders_parent_path][1]}{folder.id}/'
+
+            folder.save()
+            if parent_folder:
+                assign_perm('change_folder', parent_folder.owner, folder)
+            if permissions_destination_folder is not None:
+                set_permissions_for_object(permissions_destination_folder,
+                                           folder)
+                update_view_folder_parent_permissions(folder,
+                                                      permissions_destination_folder)
+        results[folders_path] = (folder.id, folder.path)
+    return results
