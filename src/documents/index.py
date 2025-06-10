@@ -15,6 +15,7 @@ from django.conf import settings
 from django.db.models.functions import Substr
 from django.utils import timezone as django_timezone
 from elasticsearch import Elasticsearch
+from elasticsearch.helpers import bulk
 from elasticsearch_dsl import Search, Q
 from guardian.shortcuts import get_users_with_perms
 from whoosh import classify
@@ -178,6 +179,20 @@ def delete_document_with_index(doc_id, es_client=None):
     except Exception as e:
         logger.error(f"Failed to delete document with ID {doc_id}: {str(e)}")
         raise
+
+
+def bulk_delete_document(doc_ids, es_client=None):
+    if es_client is None:
+        es_client = Elasticsearch([ELASTIC_SEARCH_HOST],
+                                  timeout=30)
+    actions = [
+        {"_op_type": "delete", "_index": "my_index", "_id": str(doc_ids)}
+        # Danh sách ID cần xóa
+    ]
+    bulk(es_client, actions)
+    logger.info(
+        f"Successfully deleted document with ID {doc_ids} from Elasticsearch using bulk delete")
+
 
 def update_document(writer: AsyncWriter, doc: Document):
     tags = ",".join([t.name for t in doc.tags.all()])

@@ -2695,7 +2695,8 @@ class BulkEditObjectsView(PassUserMixin):
                     )
                     folder_owner = None
                     for f in parent_folder:
-                        if f.owner == user or user.is_superuser or f.owner is None:
+                        if has_perms_owner_aware(user, 'change_folder',
+                                                 f):
                             folder_owner = f.owner
                     if folder_owner is None:
                         return HttpResponseForbidden(
@@ -3205,7 +3206,7 @@ class TrashView(ListModelMixin, PassUserMixin):
         elif action == "empty":
             if doc_ids is None:
                 doc_ids = [doc.id for doc in docs]
-            empty_trash(doc_ids=doc_ids)
+            empty_trash.delay(doc_ids=doc_ids)
         return Response({"result": "OK", "doc_ids": doc_ids})
 
 

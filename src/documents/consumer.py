@@ -437,6 +437,38 @@ class Consumer(LoggingMixin):
                     )
         return
 
+    def pre_check_permission_folder(self, task: Task, parent_folder_id,
+                                    user_id, folder_name, files,
+                                    parent_folder_id_init,
+                                    input_doc_overrides: Optional[
+                                        DocumentMetadataOverrides] = None):
+        # check folder when uploading documents
+        if parent_folder_id is None:
+            return
+        if parent_folder_id:
+            folder = Folder.objects.filter(id=parent_folder_id).first()
+            user = User.objects.get(id=user_id)
+            if folder:
+                user_can_change = check_user_can_change_folder(user, folder)
+                if not user_can_change:
+                    self._send_progress_folder(
+                        task=task,
+                        filename=folder_name,
+                        current_progress=100,
+                        max_progress=100,
+                        status=ConsumerFilePhase.FAILED,
+                        message=ConsumerStatusShortMessage.NO_UPLOAD_PERMISSION_TO_FOLDER,
+                        input_doc_overrides=input_doc_overrides,
+                        folder_id=parent_folder_id_init,
+                        document_id=None,
+                        current_file=0,
+                        total_file=len(files),
+                    )
+                    self.log.error(folder_name, exc_info=None)
+                    raise ConsumerError(
+                        f"{self.filename}: Cannot consume {folder_name}: no upload permission to folder") from None
+        return
+
     def pre_check_file_exists(self):
         """
         Confirm the input file still exists where it should
@@ -811,6 +843,17 @@ class Consumer(LoggingMixin):
     def try_consume_folder(self, task: Task, folder_name, files, paths,
                            input_doc_overrides: Optional[
                                DocumentMetadataOverrides] = None):
+        self.pre_check_backup_restore()
+        self.pre_check_permission_folder(
+            task=task,
+            parent_folder_id=input_doc_overrides.folder_id if input_doc_overrides else None,
+            user_id=input_doc_overrides.owner_id if input_doc_overrides else None,
+            folder_name=folder_name,
+            files=files,
+            parent_folder_id_init=input_doc_overrides.folder_id if input_doc_overrides else None,
+            input_doc_overrides=input_doc_overrides,
+
+        )
         parent_folder_id_init = input_doc_overrides.folder_id if input_doc_overrides else None
         parent_folder = Folder.objects.get(
             pk=parent_folder_id_init) if parent_folder_id_init else None

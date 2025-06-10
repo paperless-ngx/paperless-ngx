@@ -724,7 +724,7 @@ def empty_trash(doc_ids=None):
         deleted_documents = documents.values("id", "folder_id", "dossier_id")
         deleted_document_ids = [doc["id"] for doc in deleted_documents]
         deleted_folder_ids = [doc["folder_id"] for doc in deleted_documents]
-        deleted_dossier_ids = [doc["dossier_id"] for doc in deleted_documents]
+
         # print('deleted folder',deleted_folder_ids)
         # print('deleted dossier',deleted_dossier_ids)
         # Temporarily connect the cleanup handler
@@ -736,9 +736,6 @@ def empty_trash(doc_ids=None):
         folders.delete()
 
         # delete Dossier
-        dossiers = Dossier.deleted_objects.filter(id__in=deleted_dossier_ids)
-
-        dossiers.delete()
 
         logger.info(f"Deleted {len(deleted_document_ids)} documents from trash")
 

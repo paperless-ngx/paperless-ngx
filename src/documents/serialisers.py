@@ -1877,17 +1877,17 @@ class PostFolderSerializer(serializers.Serializer):
         required=False,
     )
 
-    def validate_files(self, files):
-        for file in files:
-            mime_type = magic.from_buffer(file.file.read(), mime=True)
-            file.file.seek(0)
-            if not is_mime_type_supported(mime_type):
-                raise serializers.ValidationError(
-                    _("File type %(type)s not supported") % {
-                        "type": mime_type},
-                )
-
-        return files
+    # def validate_files(self, files):
+    #     for file in files:
+    #         mime_type = magic.from_buffer(file.file.read(), mime=True)
+    #         file.file.seek(0)
+    #         if not is_mime_type_supported(mime_type):
+    #             raise serializers.ValidationError(
+    #                 _("File type %(type)s not supported") % {
+    #                     "type": mime_type},
+    #             )
+    #
+    #     return files
 
     def validate_correspondent(self, correspondent):
         if correspondent:
@@ -2643,6 +2643,8 @@ class AdjustedNameFieldFolder(serializers.CharField):
 
         if hasattr(model, "name"):
             parent_folder = self.parent.initial_data.get("parent_folder")
+            if parent_folder == 'root':
+                parent_folder = None
             type = self.parent.initial_data.get("type")
 
             if type == "file":
