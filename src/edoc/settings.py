@@ -1211,7 +1211,7 @@ ELASTICSEARCH_DSL = {
 }
 
 raw_expiration = os.getenv("EDOC_LICENSE_EXPIRATION_DATE",
-                           "2000-12-31T23:59:59Z")
+                           "2026-06-10T23:59:59Z")
 
 from datetime import datetime
 from django.utils.timezone import make_aware
