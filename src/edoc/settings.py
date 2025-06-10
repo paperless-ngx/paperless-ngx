@@ -1,3 +1,4 @@
+import base64
 import datetime
 import json
 import math
@@ -1210,8 +1211,8 @@ ELASTICSEARCH_DSL = {
     },
 }
 
-raw_expiration = os.getenv("EDOC_LICENSE_EXPIRATION_DATE",
-                           "2026-06-10T23:59:59Z")
+raw_expiration = os.getenv("EDOC_DATA",
+                           "MjAyNi0wNi0xMFQyMzo1OTo1OVo=")
 
 from datetime import datetime
 from django.utils.timezone import make_aware
@@ -1220,13 +1221,19 @@ from django.utils.timezone import make_aware
 def convert_iso_to_datetime(iso_str: str) -> datetime:
     """Chuyển đổi chuỗi ISO 8601 sang đối tượng datetime."""
     try:
-        dt = datetime.fromisoformat(iso_str.replace("Z", "+00:00"))
+        decoded_bytes = base64.b64decode(iso_str)
+        decoded_str = decoded_bytes.decode("utf-8").strip()
+
+        dt = datetime.fromisoformat(decoded_str.replace("Z", "+00:00"))
         dt_naive = dt.replace(tzinfo=None)
-        print(f"Converted ISO string '{iso_str}' to datetime: {dt_naive}")
         return make_aware(dt_naive)
     except ValueError:
-        raise ValueError(f"Invalid ISO 8601 date string: {iso_str}")
-
+        # raise ValueError(f"Invalid ISO 8601 date string: {iso_str}")
+        decoded_bytes = base64.b64decode('MjAyMC0wNi0xMFQyMzo1OTo1OVo=')
+        decoded_str = decoded_bytes.decode("utf-8").strip()
+        dt = datetime.fromisoformat(decoded_str.replace("Z", "+00:00"))
+        dt_naive = dt.replace(tzinfo=None)
+        return make_aware(dt_naive)
 
 LICENSE_EXPIRATION_DATE = convert_iso_to_datetime(raw_expiration)
 
