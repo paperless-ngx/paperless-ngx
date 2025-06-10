@@ -35,6 +35,7 @@ from paperless_mail.tasks import process_mail_accounts
 @extend_schema_view(
     test=extend_schema(
         operation_id="mail_account_test",
+        request=MailAccountSerializer,
         description="Test a mail account",
         responses={
             200: inline_serializer(
