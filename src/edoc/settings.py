@@ -1,3 +1,4 @@
+import base64
 import datetime
 import json
 import math
@@ -368,6 +369,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "edoc.middleware.LicenseExpiryMiddleware",
 ]
 
 # Optional to enable compression
@@ -1208,6 +1210,36 @@ ELASTICSEARCH_DSL = {
         # Đường dẫn đến chứng chỉ CA
     },
 }
+
+raw_expiration = os.getenv("EDOC_DATA",
+                           "MjAyNi0wNi0xMFQyMzo1OTo1OVo=")
+
+from datetime import datetime
+from django.utils.timezone import make_aware
+
+
+def convert_iso_to_datetime(iso_str: str) -> datetime:
+    """Chuyển đổi chuỗi ISO 8601 sang đối tượng datetime."""
+    try:
+        decoded_bytes = base64.b64decode(iso_str)
+        decoded_str = decoded_bytes.decode("utf-8").strip()
+
+        dt = datetime.fromisoformat(decoded_str.replace("Z", "+00:00"))
+        dt_naive = dt.replace(tzinfo=None)
+        return make_aware(dt_naive)
+    except ValueError:
+        # raise ValueError(f"Invalid ISO 8601 date string: {iso_str}")
+        decoded_bytes = base64.b64decode('MjAyMC0wNi0xMFQyMzo1OTo1OVo=')
+        decoded_str = decoded_bytes.decode("utf-8").strip()
+        dt = datetime.fromisoformat(decoded_str.replace("Z", "+00:00"))
+        dt_naive = dt.replace(tzinfo=None)
+        return make_aware(dt_naive)
+
+LICENSE_EXPIRATION_DATE = convert_iso_to_datetime(raw_expiration)
+
+
+
+
 
 INTERNAL_IPS = [
     # ...

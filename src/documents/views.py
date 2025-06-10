@@ -2621,6 +2621,26 @@ class SharedLinkView(View):
         )
 
 
+# class CheckExpirationDate(View):
+#     authentication_classes = []
+#     permission_classes = []
+#
+#     # def get(self, request, slug):
+#     #     share_link = ShareLink.objects.filter(slug=slug).first()
+#     #     if share_link is None:
+#     #         return HttpResponseRedirect("/accounts/login/?sharelink_notfound=1")
+#     #     if share_link.expiration is not None and share_link.expiration < timezone.now():
+#     #         return HttpResponseRedirect("/accounts/login/?sharelink_expired=1")
+#     #     return HttpResponse("OK")
+#
+#     def get(self, request):
+#         expiration_date = getattr(settings, "LICENSE_EXPIRATION_DATE", None)
+#         if expiration_date and expiration_date < now():
+#             return HttpResponseRedirect({"error": "Phần mềm đã hết hạn!"}, status=403)
+#
+#         return HttpResponseRedirect({"message": "Phần mềm vẫn còn hiệu lực."})
+
+
 def serve_file(doc: Document, use_archive: bool, disposition: str):
     if use_archive:
         file_handle = doc.archive_file
