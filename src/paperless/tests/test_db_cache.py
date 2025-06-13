@@ -32,7 +32,7 @@ class TestDbCacheSettings:
     def test_cachalot_default_settings(self):
         # Cachalot must be installed even if disabled,
         # so the cache can be invalidated anytime
-        assert "cachalot" in settings.INSTALLED_APPS
+        assert "cachalot" not in settings.INSTALLED_APPS
         cachalot_settings = _parse_cachalot_settings()
         caches = _parse_caches()
 
@@ -63,8 +63,8 @@ class TestDbCacheSettings:
         },
     )
     def test_cachalot_custom_settings(self):
-        assert "cachalot" in settings.INSTALLED_APPS
         cachalot_settings = _parse_cachalot_settings()
+        assert "cachalot" in settings.INSTALLED_APPS
         caches = _parse_caches()
 
         # Modifiable settings
@@ -117,7 +117,6 @@ def test_cache_hit_when_enabled():
 
     assert cachalot_settings.CACHALOT_ENABLED
     assert cachalot_settings.CACHALOT_TIMEOUT == 1
-    assert "cachalot" in settings.INSTALLED_APPS
     assert settings.CACHALOT_TIMEOUT == 1
 
     # Read a table to populate the cache

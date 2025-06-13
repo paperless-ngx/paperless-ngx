@@ -330,7 +330,6 @@ INSTALLED_APPS = [
     "allauth.mfa",
     "drf_spectacular",
     "drf_spectacular_sidecar",
-    "cachalot",
     *env_apps,
 ]
 
@@ -908,6 +907,7 @@ CELERY_BEAT_SCHEDULE_FILENAME = str(DATA_DIR / "celerybeat-schedule.db")
 
 # Cachalot: Database read cache.
 def _parse_cachalot_settings():
+    global INSTALLED_APPS
     ttl = __get_int("PAPERLESS_READ_CACHE_TTL", 3600)
     ttl = min(ttl, 31536000) if ttl > 0 else 3600
     _, redis_url = _parse_redis_url(
@@ -925,6 +925,8 @@ def _parse_cachalot_settings():
         "CACHALOT_REDIS_URL": redis_url,
         "CACHALOT_TIMEOUT": ttl,
     }
+    if result["CACHALOT_ENABLED"]:
+        INSTALLED_APPS.append("cachalot")
     return result
 
 
@@ -935,6 +937,7 @@ CACHALOT_TIMEOUT = _cachalot_settings["CACHALOT_TIMEOUT"]
 CACHALOT_QUERY_KEYGEN = _cachalot_settings["CACHALOT_QUERY_KEYGEN"]
 CACHALOT_TABLE_KEYGEN = _cachalot_settings["CACHALOT_TABLE_KEYGEN"]
 CACHALOT_FINAL_SQL_CHECK = _cachalot_settings["CACHALOT_FINAL_SQL_CHECK"]
+
 
 # Django default & Cachalot cache configuration
 _CACHE_BACKEND = os.environ.get(
