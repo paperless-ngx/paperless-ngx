@@ -448,14 +448,14 @@ wheels = [
 
 [[package]]
 name = "concurrent-log-handler"
-version = "0.9.26"
+version = "0.9.27"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "portalocker", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c2/d1/5a2c5aed6d39610e8936273dfd3ac7789cb70a3f55ae835701f182a1c027/concurrent_log_handler-0.9.26.tar.gz", hash = "sha256:8f22bf79724a0152b9e97d9c2dcf4ecb339607c80bf312f68066070243006b49", size = 29958, upload-time = "2025-05-09T19:52:01.633Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ca/09/43c708ad4007aef96ef72aa84dc2d83da093ba2508aeece761e4117be165/concurrent_log_handler-0.9.27.tar.gz", hash = "sha256:db652de155d9ec1e970ef37797ff6d80b39b0968856b5bfaf9acda280bf6f464", size = 32670, upload-time = "2025-06-06T02:21:24.39Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d4/f6/a6a9f45769e955ed52fb2c1e06599c37f481028530a405793a7de5ba2625/concurrent_log_handler-0.9.26-py3-none-any.whl", hash = "sha256:0b03a8f1dcb1a03ad292647ee4930b3f9ba2bdb45e55bf2699d2c053f8e6531f", size = 28348, upload-time = "2025-05-09T19:52:00.147Z" },
+    { url = "https://files.pythonhosted.org/packages/b5/16/220353eabcd1c282706cb8c89afd261eba246fd6861fff6dc45e76abb53c/concurrent_log_handler-0.9.27-py3-none-any.whl", hash = "sha256:09fa2f0d988d19e388c6489b7086227f21af953a98829fb906fa92f6acb12d6d", size = 31144, upload-time = "2025-06-06T02:21:23.327Z" },
 ]
 
 [[package]]
