@@ -217,7 +217,7 @@
           <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Decrementar minuts</target>
+        <target state="translated">Disminuir minuts</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.SS" datatype="html">
         <source>SS</source>
@@ -241,7 +241,7 @@
           <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Incrementa segons</target>
+        <target state="translated">Incrementar segons</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.decrement-seconds" datatype="html">
         <source>Decrement seconds</source>
@@ -249,7 +249,7 @@
           <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Disminueix segons</target>
+        <target state="translated">Disminuir segons</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.PM" datatype="html">
         <source>
