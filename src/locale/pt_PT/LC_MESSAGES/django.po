@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-24 17:14+0000\n"
-"PO-Revision-Date: 2025-05-24 17:17\n"
+"PO-Revision-Date: 2025-06-14 00:35\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -530,7 +530,7 @@ msgstr ""
 
 #: documents/models.py:493
 msgid "created to"
-msgstr ""
+msgstr "criado até"
 
 #: documents/models.py:494
 msgid "created from"
@@ -866,7 +866,7 @@ msgstr ""
 
 #: documents/models.py:1037
 msgid "If the schedule should be recurring."
-msgstr ""
+msgstr "Se o horário deve ser recorrente."
 
 #: documents/models.py:1042
 msgid "schedule recurring delay in days"
@@ -930,7 +930,7 @@ msgstr ""
 
 #: documents/models.py:1120
 msgid "The destination URL for the notification."
-msgstr ""
+msgstr "."
 
 #: documents/models.py:1125
 msgid "use parameters"
