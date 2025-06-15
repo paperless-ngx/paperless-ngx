@@ -173,6 +173,12 @@ const LANGUAGE_OPTIONS = [
     dateInputFormat: 'dd.mm.yyyy',
   },
   {
+    code: 'fa-ir',
+    name: $localize`Persian`,
+    englishName: 'Persian',
+    dateInputFormat: 'yyyy-mm-dd',
+  },
+  {
     code: 'pl-pl',
     name: $localize`Polish`,
     englishName: 'Polish',

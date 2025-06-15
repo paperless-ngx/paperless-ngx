@@ -763,6 +763,7 @@ LANGUAGES = [
     ("el-gr", _("Greek")),
     ("en-gb", _("English (GB)")),
     ("es-es", _("Spanish")),
+    ("fa-ir", _("Persian")),
     ("fi-fi", _("Finnish")),
     ("fr-fr", _("French")),
     ("hu-hu", _("Hungarian")),
