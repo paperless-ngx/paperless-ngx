@@ -27,6 +27,7 @@
           "el-GR": "src/locale/messages.el_GR.xlf",
           "en-GB": "src/locale/messages.en_GB.xlf",
           "es-ES": "src/locale/messages.es_ES.xlf",
+          "fa-IR": "src/locale/messages.fa_IR.xlf",
           "fi-FI": "src/locale/messages.fi_FI.xlf",
           "fr-FR": "src/locale/messages.fr_FR.xlf",
           "hu-HU": "src/locale/messages.hu_HU.xlf",
