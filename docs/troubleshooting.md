@@ -130,7 +130,7 @@ command:
     - 'gotenberg'
     - '--chromium-disable-javascript=true'
     - '--chromium-allow-list=file:///tmp/.*'
-    - '--api-timeout=60'
+    - '--api-timeout=60s'
 ```
 
 ## Permission denied errors in the consumption directory
