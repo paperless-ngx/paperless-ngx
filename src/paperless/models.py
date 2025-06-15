@@ -188,6 +188,13 @@ class ApplicationConfiguration(AbstractSingletonModel):
         upload_to="logo/",
     )
 
+    language_code_workflow = models.CharField(
+        verbose_name=_("Language settings for workflows (language code)"),
+        null=True,
+        blank=True,
+        max_length=6,
+    )
+
     """
     Settings for the barcode scanner
     """
