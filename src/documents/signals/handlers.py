@@ -1021,7 +1021,7 @@ def run_workflows(
 
         if action.remove_all_custom_fields:
             if not use_overrides:
-                CustomFieldInstance.objects.filter(document=document).delete()
+                CustomFieldInstance.objects.filter(document=document).hard_delete()
             else:
                 overrides.custom_fields = None
         elif action.remove_custom_fields.exists():
@@ -1029,7 +1029,7 @@ def run_workflows(
                 CustomFieldInstance.objects.filter(
                     field__in=action.remove_custom_fields.all(),
                     document=document,
-                ).delete()
+                ).hard_delete()
             elif overrides.custom_fields:
                 for field in action.remove_custom_fields.filter(
                     pk__in=overrides.custom_fields.keys(),
