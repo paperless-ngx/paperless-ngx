@@ -1822,3 +1822,66 @@ class TestMailAccountProcess(APITestCase):
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
+
+
+class TestMailRuleAPI(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_superuser(
+            username="testuser",
+            password="testpassword",
+        )
+        self.client.force_authenticate(user=self.user)
+        self.account = MailAccount.objects.create(
+            imap_server="imap.example.com",
+            imap_port=993,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            username="admin",
+            password="secret",
+            account_type=MailAccount.MailAccountType.IMAP,
+            owner=self.user,
+        )
+        self.url = "/api/mail_rules/"
+
+    def test_create_mail_rule(self):
+        """
+        GIVEN:
+            - Valid data for creating a mail rule
+        WHEN:
+            - A POST request is made to the mail rules endpoint
+        THEN:
+            - The rule should be created successfully
+            - The response should contain the created rule's details
+        """
+        data = {
+            "name": "Test Rule",
+            "account": self.account.pk,
+            "action": MailRule.MailAction.MOVE,
+            "action_parameter": "inbox",
+        }
+        response = self.client.post(self.url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(MailRule.objects.count(), 1)
+        rule = MailRule.objects.first()
+        self.assertEqual(rule.name, "Test Rule")
+
+    def test_mail_rule_action_parameter_required_for_tag_or_move(self):
+        """
+        GIVEN:
+            - Valid data for creating a mail rule without action_parameter
+        WHEN:
+            - A POST request is made to the mail rules endpoint
+        THEN:
+            - The request should fail with a 400 Bad Request status
+            - The response should indicate that action_parameter is required
+        """
+        data = {
+            "name": "Test Rule",
+            "account": self.account.pk,
+            "action": MailRule.MailAction.MOVE,
+        }
+        response = self.client.post(self.url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            "action parameter is required",
+            str(response.data["non_field_errors"]),
+        )

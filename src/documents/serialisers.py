@@ -2021,7 +2021,8 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             attrs["filter_path"] = None
 
         if (
-            attrs["type"] == WorkflowTrigger.WorkflowTriggerType.CONSUMPTION
+            hasattr(attrs, "type")
+            and attrs["type"] == WorkflowTrigger.WorkflowTriggerType.CONSUMPTION
             and "filter_mailrule" not in attrs
             and ("filter_filename" not in attrs or attrs["filter_filename"] is None)
             and ("filter_path" not in attrs or attrs["filter_path"] is None)
