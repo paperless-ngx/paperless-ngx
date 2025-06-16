@@ -167,3 +167,25 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 },
             )
         self.assertFalse(Path(old_logo.path).exists())
+
+    def test_create_not_allowed(self):
+        """
+        GIVEN:
+            - API request to create a new app config
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+            - No new config is created
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "output_type": "pdf",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(ApplicationConfiguration.objects.count(), 1)
