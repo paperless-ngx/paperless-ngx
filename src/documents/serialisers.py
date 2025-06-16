@@ -1189,7 +1189,6 @@ class SavedViewSerializer(OwnedObjectSerializer):
             "owner",
             "permissions",
             "user_can_change",
-            "set_permissions",
         ]
 
     def validate(self, attrs):
