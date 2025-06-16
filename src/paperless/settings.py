@@ -1,5 +1,7 @@
 import datetime
 import json
+import logging
+import logging.config
 import math
 import multiprocessing
 import os
@@ -10,11 +12,14 @@ from platform import machine
 from typing import Final
 from urllib.parse import urlparse
 
+import pycountry
 from celery.schedules import crontab
 from concurrent_log_handler.queue import setup_logging_queues
 from dateparser.languages.loader import LocaleDataLoader
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
+
+logger = logging.getLogger("paperless.settings")
 
 # Tap paperless.conf if it's available
 for path in [
@@ -865,6 +870,10 @@ LOGGING = {
     },
 }
 
+# Configure logging before calling any logger in settings.py so it will respect the log format, even if Django has not parsed the settings yet.
+logging.config.dictConfig(LOGGING)
+
+
 ###############################################################################
 # Task queue                                                                  #
 ###############################################################################
@@ -1166,11 +1175,74 @@ POST_CONSUME_SCRIPT = os.getenv("PAPERLESS_POST_CONSUME_SCRIPT")
 # Specify the default date order (for autodetected dates)
 DATE_ORDER = os.getenv("PAPERLESS_DATE_ORDER", "DMY")
 FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
-DATE_PARSER_LANGUAGES = list(
-    LocaleDataLoader().get_locale_map(
-        languages=json.loads(os.getenv("PAPERLESS_DATE_PARSER_LANGUAGES", "[]")),
-    ),
-)
+
+
+def _ocr_to_dateparser_languages(ocr_languages: str) -> list[str]:
+    """
+    Convert ISO 639-2 Alpha-3 languages (e.g., "eng+fra"), optionally with script (e.g., "eng_Latn"),
+    to a list of languages compatible with the dateparser library.
+    If a script can be converted, the language without script is used (eg: "deu_frak" -> "de").
+
+    Returns the list of languages for the dateparser library, or an empty list if any language can't be converted.
+    """
+    loader = LocaleDataLoader()
+    result = []
+    try:
+        for ocr_language in ocr_languages.split("+"):
+            # Split into language and optional script
+            ocr_lang_part, *script = ocr_language.split("_")
+            ocr_script_part = script[0] if script else None
+
+            parts = ocr_language.split("_")
+            ocr_lang_part = parts[0]
+            ocr_script_part = parts[1] if len(parts) > 1 else None
+            language = pycountry.languages.get(alpha_3=ocr_lang_part)
+            if language is None:
+                raise ValueError(
+                    f'The language "{ocr_language}" doesn\'t have an ISO 639-1 equivalent code.',
+                )
+            try:
+                language_part = language.alpha_2
+            except Exception:
+                language_part = ocr_lang_part
+
+            # Ensure base language is supported by dateparser
+            loader.get_locale_map(locales=[language_part])
+
+            # Try to add the script part if it's supported by dateparser
+            if ocr_script_part:
+                dateparser_language = f"{language_part}-{ocr_script_part.title()}"
+                try:
+                    loader.get_locale_map(locales=[dateparser_language])
+                except Exception:
+                    logger.warning(
+                        f"{dateparser_language} is not supported for date parsing. Default to {language_part}.",
+                    )
+                    dateparser_language = language_part
+            else:
+                dateparser_language = language_part
+            if dateparser_language not in result:
+                result.append(dateparser_language)
+    except Exception as e:
+        logger.warning(
+            f"Could not configure dateparser languages. Set PAPERLESS_DATE_PARSER_LANGUAGES parameter to avoid this. Detail: {e}",
+        )
+        return []
+    return result
+
+
+def _parse_dateparser_languages(languages: str | None):
+    language_list = languages.split("+") if languages else []
+    return list(LocaleDataLoader().get_locale_map(locales=language_list))
+
+
+if os.getenv("PAPERLESS_DATE_PARSER_LANGUAGES"):
+    DATE_PARSER_LANGUAGES = _parse_dateparser_languages(
+        os.getenv("PAPERLESS_DATE_PARSER_LANGUAGES"),
+    )
+else:
+    DATE_PARSER_LANGUAGES = _ocr_to_dateparser_languages(OCR_LANGUAGE)
+
 
 # Maximum number of dates taken from document start to end to show as suggestions for
 # `created` date in the frontend. Duplicates are removed, which can result in
