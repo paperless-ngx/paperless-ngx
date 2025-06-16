@@ -1753,6 +1753,8 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 
 
 class UiSettingsViewSerializer(serializers.ModelSerializer):
+    settings = serializers.DictField(required=False, allow_null=True)
+
     class Meta:
         model = UiSettings
         depth = 1
