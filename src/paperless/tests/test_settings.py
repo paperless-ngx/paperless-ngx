@@ -5,8 +5,10 @@ from unittest import mock
 
 from celery.schedules import crontab
 
+from paperless.settings import _ocr_to_dateparser_languages
 from paperless.settings import _parse_base_paths
 from paperless.settings import _parse_beat_schedule
+from paperless.settings import _parse_dateparser_languages
 from paperless.settings import _parse_db_settings
 from paperless.settings import _parse_ignore_dates
 from paperless.settings import _parse_paperless_url
@@ -471,3 +473,45 @@ class TestPathSettings(TestCase):
         base_paths = _parse_base_paths()
         self.assertEqual("/paperless/", base_paths[1])  # BASE_URL
         self.assertEqual("/foobar/", base_paths[4])  # LOGOUT_REDIRECT_URL
+
+
+class TestPaperlessLanguageSettings(TestCase):
+    def test_ocr_to_dateparser_languages(self):
+        # One language
+        self.assertEqual(_ocr_to_dateparser_languages("eng"), ["en"])
+
+        # Multiple languages
+        self.assertEqual(
+            _ocr_to_dateparser_languages("fra+ita+lao"),
+            ["fr", "it", "lo"],
+        )
+
+        # Languages that don't have a two-letter equivalent
+        self.assertEqual(_ocr_to_dateparser_languages("bem"), ["bem"])
+
+        # Languages with a script part supported by dateparser
+        self.assertEqual(
+            _ocr_to_dateparser_languages("aze_cyrl+srp_latn"),
+            ["az-Cyrl", "sr-Latn"],
+        )
+
+        # Languages with a script part not supported by dateparser
+        # In this case, default to the language without script
+        self.assertEqual(_ocr_to_dateparser_languages("deu_frak"), ["de"])
+
+    def test_parser_date_parser_languages(self):
+        self.assertEqual(_parse_dateparser_languages("de"), ["de"])
+        self.assertEqual(_parse_dateparser_languages("en+fr"), ["en", "fr"])
+
+        # Locales must be supported
+        self.assertEqual(
+            _parse_dateparser_languages("en-001+fr-CA"),
+            ["en-001", "fr-CA"],
+        )
+        self.assertEqual(_parse_dateparser_languages("zh-Hans-HK"), ["zh-Hans-HK"])
+
+        # One language without brackets should be converted
+        self.assertEqual(_parse_dateparser_languages("es"), ["es"])
+
+        # Several languages separated by a "+" should be converted as well
+        self.assertEqual(_parse_dateparser_languages("en-001+fr"), ["en-001", "fr"])
