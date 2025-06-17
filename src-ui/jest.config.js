@@ -8,7 +8,7 @@ module.exports = {
     'abstract-paperless-service',
   ],
   transformIgnorePatterns: [
-    `<rootDir>/node_modules/.pnpm/(?!.*\\.mjs$|lodash-es)`,
+    `<rootDir>/node_modules/.pnpm/(?!.*\\.mjs$|lodash-es|@angular\\+common.*locales)`,
   ],
   moduleNameMapper: {
     '^src/(.*)': '<rootDir>/src/$1',
