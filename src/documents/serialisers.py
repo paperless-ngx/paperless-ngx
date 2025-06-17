@@ -20,6 +20,7 @@ from django.core.validators import integer_validator
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
+from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
 from drf_spectacular.utils import extend_schema_serializer
 from drf_writable_nested.serializers import NestedUpdateMixin
@@ -424,6 +425,10 @@ class OwnedObjectListSerializer(serializers.ListSerializer):
 
 class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     last_correspondence = serializers.DateField(read_only=True, required=False)
+
+    @extend_schema_field([OpenApiTypes.DATE, OpenApiTypes.NONE])
+    def get_last_correspondence(self, obj: Correspondent):
+        return getattr(obj, "last_correspondence", None)
 
     class Meta:
         model = Correspondent
