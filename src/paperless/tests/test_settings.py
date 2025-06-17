@@ -487,7 +487,7 @@ class TestPaperlessLanguageSettings(TestCase):
         )
 
         # Languages that don't have a two-letter equivalent
-        self.assertEqual(_ocr_to_dateparser_languages("bem"), ["bem"])
+        self.assertEqual(_ocr_to_dateparser_languages("fil"), ["fil"])
 
         # Languages with a script part supported by dateparser
         self.assertEqual(
