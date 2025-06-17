@@ -21,7 +21,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_softdelete.models import SoftDeleteModel
 from multiselectfield import MultiSelectField
-
+#
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
 
