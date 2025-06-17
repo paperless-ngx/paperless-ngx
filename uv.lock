@@ -1930,7 +1930,6 @@ dependencies = [
     { name = "ocrmypdf", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "pathvalidate", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "pdf2image", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
-    { name = "pycountry", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "python-dateutil", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "python-dotenv", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "python-gnupg", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -2068,7 +2067,6 @@ requires-dist = [
     { name = "psycopg-c", marker = "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'postgres'", url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.5/psycopg_c-3.2.5-cp312-cp312-linux_aarch64.whl" },
     { name = "psycopg-c", marker = "python_full_version == '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'postgres'", url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.5/psycopg_c-3.2.5-cp312-cp312-linux_x86_64.whl" },
     { name = "psycopg-c", marker = "(python_full_version != '3.12.*' and platform_machine == 'aarch64' and extra == 'postgres') or (python_full_version != '3.12.*' and platform_machine == 'x86_64' and extra == 'postgres') or (platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'postgres') or (sys_platform != 'linux' and extra == 'postgres')", specifier = "==3.2.5" },
-    { name = "pycountry", specifier = "~=24.6.1" },
     { name = "python-dateutil", specifier = "~=2.9.0" },
     { name = "python-dotenv", specifier = "~=1.1.0" },
     { name = "python-gnupg", specifier = "~=0.5.4" },
@@ -2471,15 +2469,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/1d/67/6afbf0d507f73c32d21084a79946bfcfca5fbc62a72057e9c23797a737c9/pyasn1_modules-0.4.1.tar.gz", hash = "sha256:c28e2dbf9c06ad61c71a075c7e0f9fd0f1b0bb2d2ad4377f240d33ac2ab60a7c", size = 310028, upload-time = "2024-09-10T22:42:08.349Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/77/89/bc88a6711935ba795a679ea6ebee07e128050d6382eaa35a0a47c8032bdc/pyasn1_modules-0.4.1-py3-none-any.whl", hash = "sha256:49bfa96b45a292b711e986f222502c1c9a5e1f4e568fc30e2574a6c7d07838fd", size = 181537, upload-time = "2024-09-11T16:02:10.336Z" },
-]
-
-[[package]]
-name = "pycountry"
-version = "24.6.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/76/57/c389fa68c50590881a75b7883eeb3dc15e9e73a0fdc001cdd45c13290c92/pycountry-24.6.1.tar.gz", hash = "sha256:b61b3faccea67f87d10c1f2b0fc0be714409e8fcdcc1315613174f6466c10221", size = 6043910, upload_time = "2024-06-01T04:12:15.05Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b1/ec/1fb891d8a2660716aadb2143235481d15ed1cbfe3ad669194690b0604492/pycountry-24.6.1-py3-none-any.whl", hash = "sha256:f1a4fb391cd7214f8eefd39556d740adcc233c778a27f8942c8dca351d6ce06f", size = 6335189, upload_time = "2024-06-01T04:11:49.711Z" },
 ]
 
 [[package]]
