@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.tests.utils import DirectoriesMixin
+from paperless.version import __full_version_str__
 
 
 class TestApiUiSettings(DirectoriesMixin, APITestCase):
@@ -39,6 +40,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
         self.assertDictEqual(
             response.data["settings"],
             {
+                "version": __full_version_str__,
                 "app_title": None,
                 "app_logo": None,
                 "auditlog_enabled": True,

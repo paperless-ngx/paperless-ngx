@@ -21,7 +21,7 @@ ARG PNGX_TAG_VERSION=
 RUN set -eux && \
 case "${PNGX_TAG_VERSION}" in \
   dev|beta|fix*|feature*) \
-    sed -i -E "s/version: '([0-9\.]+)'/version: '\1 #${PNGX_TAG_VERSION}'/g" /src/src-ui/src/environments/environment.prod.ts \
+    sed -i -E "s/tag: '([a-z\.]+)'/tag: '${PNGX_TAG_VERSION}'/g" /src/src-ui/src/environments/environment.prod.ts \
     ;; \
 esac
 
