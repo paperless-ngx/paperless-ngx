@@ -361,9 +361,9 @@ class OwnedObjectSerializer(
             shared_object_pks = self.get_shared_object_pks([obj])
         return obj.owner == self.user and obj.id in shared_object_pks
 
-    permissions = SerializerMethodField(read_only=True)
-    user_can_change = SerializerMethodField(read_only=True)
-    is_shared_by_requester = SerializerMethodField(read_only=True)
+    permissions = SerializerMethodField(read_only=True, required=False)
+    user_can_change = SerializerMethodField(read_only=True, required=False)
+    is_shared_by_requester = SerializerMethodField(read_only=True, required=False)
 
     set_permissions = SetPermissionsSerializer(
         label="Set permissions",
