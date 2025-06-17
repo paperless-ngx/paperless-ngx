@@ -6,6 +6,7 @@ import re
 import tempfile
 import zipfile
 from datetime import datetime
+from distutils.util import strtobool
 from pathlib import Path
 from time import mktime
 from unicodedata import normalize
@@ -236,9 +237,15 @@ class PassUserMixin(GenericAPIView):
 
     def get_serializer(self, *args, **kwargs):
         kwargs.setdefault("user", self.request.user)
+        try:
+            full_perms = bool(
+                strtobool(str(self.request.query_params.get("full_perms", "false"))),
+            )
+        except ValueError:
+            full_perms = False
         kwargs.setdefault(
             "full_perms",
-            self.request.query_params.get("full_perms", False),
+            full_perms,
         )
         return super().get_serializer(*args, **kwargs)
 
@@ -592,9 +599,15 @@ class DocumentViewSet(
         kwargs.setdefault("context", self.get_serializer_context())
         kwargs.setdefault("fields", fields)
         kwargs.setdefault("truncate_content", truncate_content.lower() in ["true", "1"])
+        try:
+            full_perms = bool(
+                strtobool(str(self.request.query_params.get("full_perms", "false"))),
+            )
+        except ValueError:
+            full_perms = False
         kwargs.setdefault(
             "full_perms",
-            self.request.query_params.get("full_perms", False),
+            full_perms,
         )
         return super().get_serializer(*args, **kwargs)
 
