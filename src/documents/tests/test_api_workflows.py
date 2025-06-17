@@ -630,3 +630,35 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                 content_type="application/json",
             )
             self.assertEqual(response.status_code, expected_resp_code)
+
+    def test_patch_trigger_cannot_change_id(self):
+        """
+        GIVEN:
+            - An existing workflow trigger
+            - An existing workflow action
+        WHEN:
+            - PATCHing the trigger with a different 'id' in the body
+            - PATCHing the action with a different 'id' in the body
+        THEN:
+            - HTTP 400 error is returned
+        """
+        response = self.client.patch(
+            f"/api/workflow_triggers/{self.trigger.id}/",
+            {
+                "id": self.trigger.id + 1,
+                "filter_filename": "patched.pdf",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        response = self.client.patch(
+            f"/api/workflow_actions/{self.action.id}/",
+            {
+                "id": self.action.id + 1,
+                "assign_title": "Patched Title",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

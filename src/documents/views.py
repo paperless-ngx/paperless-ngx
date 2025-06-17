@@ -2536,6 +2536,13 @@ class WorkflowTriggerViewSet(ModelViewSet):
 
     queryset = WorkflowTrigger.objects.all()
 
+    def partial_update(self, request, *args, **kwargs):
+        if "id" in request.data and str(request.data["id"]) != str(kwargs["pk"]):
+            return HttpResponseBadRequest(
+                "ID in body does not match URL",
+            )
+        return super().partial_update(request, *args, **kwargs)
+
 
 class WorkflowActionViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
@@ -2553,6 +2560,13 @@ class WorkflowActionViewSet(ModelViewSet):
         "assign_change_groups",
         "assign_custom_fields",
     )
+
+    def partial_update(self, request, *args, **kwargs):
+        if "id" in request.data and str(request.data["id"]) != str(kwargs["pk"]):
+            return HttpResponseBadRequest(
+                "ID in body does not match URL",
+            )
+        return super().partial_update(request, *args, **kwargs)
 
 
 class WorkflowViewSet(ModelViewSet):
