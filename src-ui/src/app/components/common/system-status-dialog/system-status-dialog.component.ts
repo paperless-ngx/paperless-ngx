@@ -1,5 +1,5 @@
 import { Clipboard, ClipboardModule } from '@angular/cdk/clipboard'
-import { Component } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 import {
   NgbActiveModal,
   NgbModalModule,
@@ -18,6 +18,7 @@ import { PermissionsService } from 'src/app/services/permissions.service'
 import { SystemStatusService } from 'src/app/services/system-status.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { environment } from 'src/environments/environment'
 
 @Component({
   selector: 'pngx-system-status-dialog',
@@ -33,10 +34,12 @@ import { ToastService } from 'src/app/services/toast.service'
     NgxBootstrapIconsModule,
   ],
 })
-export class SystemStatusDialogComponent {
+export class SystemStatusDialogComponent implements OnInit {
   public SystemStatusItemStatus = SystemStatusItemStatus
   public PaperlessTaskName = PaperlessTaskName
   public status: SystemStatus
+  public frontendVersion: string = environment.version
+  public versionMismatch: boolean = false
 
   public copied: boolean = false
 
@@ -54,6 +57,17 @@ export class SystemStatusDialogComponent {
     private toastService: ToastService,
     private permissionsService: PermissionsService
   ) {}
+
+  public ngOnInit() {
+    this.versionMismatch =
+      environment.production &&
+      this.status.pngx_version &&
+      this.frontendVersion &&
+      this.status.pngx_version !== this.frontendVersion
+    if (this.versionMismatch) {
+      this.status.pngx_version = `${this.status.pngx_version} (frontend: ${this.frontendVersion})`
+    }
+  }
 
   public close() {
     this.activeModal.close()

@@ -142,18 +142,7 @@ export class AppFrameComponent
   }
 
   get versionString(): string {
-    const backendVersion = this.settingsService.get(SETTINGS_KEYS.VERSION)
-    const frontendVersion = environment.version
-    const mismatch =
-      environment.production &&
-      backendVersion &&
-      frontendVersion &&
-      backendVersion !== frontendVersion
-    const tag = environment.tag !== 'prod' ? ` #${environment.tag}` : ''
-
-    return mismatch
-      ? `${environment.appTitle} v${frontendVersion} (FE) / v${backendVersion}${tag} (BE) ⚠️`
-      : `${environment.appTitle} v${backendVersion}${tag}`
+    return `${environment.appTitle} v${this.settingsService.get(SETTINGS_KEYS.VERSION)}${environment.production ? '' : ` #${environment.tag}`}`
   }
 
   get customAppTitle(): string {
