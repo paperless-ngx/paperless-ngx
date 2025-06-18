@@ -652,6 +652,20 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.trigger.refresh_from_db()
+        self.assertNotEqual(self.trigger.filter_filename, "patched.pdf")
+
+        response = self.client.patch(
+            f"/api/workflow_triggers/{self.trigger.id}/",
+            {
+                "id": self.trigger.id,
+                "filter_filename": "patched.pdf",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.trigger.refresh_from_db()
+        self.assertEqual(self.trigger.filter_filename, "patched.pdf")
 
         response = self.client.patch(
             f"/api/workflow_actions/{self.action.id}/",
@@ -662,3 +676,17 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.action.refresh_from_db()
+        self.assertNotEqual(self.action.assign_title, "Patched Title")
+
+        response = self.client.patch(
+            f"/api/workflow_actions/{self.action.id}/",
+            {
+                "id": self.action.id,
+                "assign_title": "Patched Title",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.action.refresh_from_db()
+        self.assertEqual(self.action.assign_title, "Patched Title")
