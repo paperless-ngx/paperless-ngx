@@ -470,6 +470,35 @@ class FolderOwnedOrAccessibleFilter(BaseFilterBackend):
         ).distinct()
 
 
+class DocumentOwnedOrAccessibleFilter(FolderOwnedOrAccessibleFilter):
+    """
+    Lọc các thư mục mà người dùng:
+    - Là chủ sở hữu.
+    - Hoặc có quyền truy cập (bao gồm kế thừa từ thư mục cha).
+    - Hoặc chưa có chủ sở hữu.
+    """
+
+    def filter_queryset(self, request, queryset, view):
+        user = request.user
+
+        # Loại quyền: view_folder (mặc định) hoặc change_folder
+        perm = getattr(view, 'permission_required', 'view_folder')
+
+        # Lấy danh sách thư mục mà user có quyền (bao gồm kế thừa và loại trừ bị chặn)
+        permitted_folders_qs = get_objects_folder_for_user(user, perm,
+                                                           with_group_users=True)
+        documents = queryset.filter(folder__in=permitted_folders_qs)
+
+        # Trả về các thư mục thỏa mãn:
+        # - Được cấp quyền
+        # - Hoặc là chủ sở hữu
+        # - Hoặc chưa có chủ sở hữu
+        return queryset.filter(
+            Q(pk__in=documents.values_list('pk', flat=True)) |
+            Q(owner=user) |
+            Q(owner__isnull=True)
+        ).distinct()
+
 
 
 

@@ -51,7 +51,7 @@ from documents.parsers import ParseError
 from documents.parsers import custom_get_parser_class_for_mime_type
 from documents.parsers import parse_date
 from documents.permissions import check_user_can_change_folder, \
-    set_permissions, get_permission_folder
+    has_perms_owner_aware_for_folder
 from documents.permissions import set_permissions_for_object
 from documents.plugins.base import AlwaysRunPluginMixin
 from documents.plugins.base import ConsumeTaskPlugin
@@ -449,7 +449,9 @@ class Consumer(LoggingMixin):
             folder = Folder.objects.filter(id=parent_folder_id).first()
             user = User.objects.get(id=user_id)
             if folder:
-                user_can_change = check_user_can_change_folder(user, folder)
+                user_can_change = has_perms_owner_aware_for_folder(user,
+                                                                   'change_folder',
+                                                                   folder)
                 if not user_can_change:
                     self._send_progress_folder(
                         task=task,
@@ -1153,9 +1155,9 @@ class Consumer(LoggingMixin):
 
                 )
                 if document.folder:
-                    permissions = get_permission_folder(document.folder)
-                    set_permissions(permissions, document)
-                    set_permissions_for_object(permissions, new_file)
+                    # permissions = get_permission_folder(document.folder)
+                    # set_permissions(permissions, document)
+                    # set_permissions_for_object(permissions, new_file)
                     # add_or_update_document(document)
                     folder_path = get_content_before_last_number(document.folder.path)
                     if document.folder.type == Folder.FILE:

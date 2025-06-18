@@ -339,6 +339,41 @@ class FolderOwnedObjectSerializer(OwnedObjectSerializer):
                                                          validated_data)
 
 
+class DocumentOwnedObjectSerializer(OwnedObjectSerializer):
+    def get_permissions(self, obj):
+        return get_permission_folder(obj.folder)
+
+    def get_user_can_change(self, obj):
+        return (
+            self.user
+            and has_perms_owner_aware_for_folder(self.user, "change_folder",
+                                                 obj.folder)
+        )
+
+    def get_is_shared_by_requester(self, obj):
+        return obj.owner == self.user and FolderPermission.objects.filter(
+            path=obj.folder.path).exists()
+
+    def create(self, validated_data):
+        if "owner" not in validated_data and self.user:
+            validated_data["owner"] = self.user
+        permissions = validated_data.pop("set_permissions", None)
+        instance = super(OwnedObjectSerializer, self).create(validated_data)
+
+        if permissions:
+            set_permissions_for_object_folder(instance.folder, permissions)
+
+        return instance
+
+    def update(self, instance, validated_data):
+        if "set_permissions" in validated_data:
+            set_permissions_for_object_folder(instance.folder, validated_data[
+                "set_permissions"])
+
+        return super(OwnedObjectSerializer, self).update(instance,
+                                                         validated_data)
+
+
 class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     last_correspondence = serializers.DateTimeField(read_only=True)
 
@@ -808,7 +843,7 @@ class WebhookSerializer(serializers.Serializer):
         fields = '__all__'
 
 class DocumentSerializer(
-    OwnedObjectSerializer,
+    DocumentOwnedObjectSerializer,
     NestedUpdateMixin,
     DynamicFieldsModelSerializer,
 ):
@@ -886,10 +921,10 @@ class DocumentSerializer(
     def get_exploit(self, obj):
         current_user = self.context.get("request").user
 
-        if current_user is not None and has_perms_owner_aware(
+        if current_user is not None and has_perms_owner_aware_for_folder(
             current_user,
-            "view_document",
-            obj,
+            "view_folder",
+            obj.folder,
         ):
             return 1
         elif Approval.objects.filter(
@@ -1029,7 +1064,7 @@ class DocumentSerializer(
 
 
 class DocumentDetailSerializer(
-    OwnedObjectSerializer,
+    DocumentOwnedObjectSerializer,
     NestedUpdateMixin,
     DynamicFieldsModelSerializer,
 ):

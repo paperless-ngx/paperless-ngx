@@ -14,8 +14,6 @@ from guardian.shortcuts import remove_perm
 from rest_framework.permissions import BasePermission
 from rest_framework.permissions import DjangoObjectPermissions
 
-from documents.models import Folder, Warehouse, FolderPermission
-
 
 class EdocObjectPermissions(DjangoObjectPermissions):
     """
@@ -34,6 +32,8 @@ class EdocObjectPermissions(DjangoObjectPermissions):
     }
 
     def has_object_permission(self, request, view, obj):
+        print(
+            f"Checking object permission for {obj} with request {request.method}")
         if hasattr(obj, "owner") and obj.owner is not None:
             if request.user == obj.owner:
                 return True
@@ -160,6 +160,7 @@ def check_user_can_change_folder(user, obj):
 
 @shared_task()
 def update_view_folder_parent_permissions(folder, permissions):
+    from documents.models import Folder
     list_folder_ids = folder.path.rstrip("/").split("/")
     folders_list = Folder.objects.filter(id__in = list_folder_ids)
     permission_copy = permissions
@@ -175,6 +176,7 @@ def update_view_folder_parent_permissions(folder, permissions):
         )
 
 def update_view_warehouse_shelf_boxcase_permissions(warehouse, permission_copy):
+    from documents.models import Warehouse
     list_warehouse_ids = warehouse.path.split("/")
     warehouses_list = Warehouse.objects.filter(id__in = list_warehouse_ids)
 
@@ -330,6 +332,7 @@ def get_permission_folder(obj):
     Nếu user/group được gán quyền sửa thì cũng được xem,
     và nếu đang bị chặn xem/sửa thì sẽ được gỡ chặn.
     """
+    from documents.models import FolderPermission
     permissions = {
         "view": {"users": set(), "groups": set()},
         "change": {"users": set(), "groups": set()}
@@ -412,6 +415,7 @@ def set_permissions_for_object_folder(obj, perm):
     Nếu user/group từng kế thừa quyền nhưng giờ không còn được phép, thì thêm vào danh sách bị chặn.
     Nếu user/group được gán quyền sửa thì không được chặn quyền xem, và bỏ chặn nếu có.
     """
+    from documents.models import FolderPermission, User
     parts = obj.path.rstrip("/").split("/")
     parent_paths = ["/".join(parts[:i]) + "/" for i in range(len(parts), 0, -1)
                     if "/".join(parts[:i]) + "/" != obj.path]
@@ -510,7 +514,7 @@ def set_permissions_for_object_folder(obj, perm):
 
 
 def has_perms_owner_aware_for_folder(user, perm, obj):
-
+    from documents.models import FolderPermission
     if perm not in ["view_folder", "change_folder"]:
         raise ValueError(
             "Perm phải là 'view_folder' hoặc 'change_folder'.")
@@ -575,6 +579,7 @@ def get_objects_folder_for_user(user, perm, with_group_users=False):
     :param with_group_users: Nếu True, sẽ lấy theo cả group của user.
     :return: QuerySet chứa các thư mục user có quyền.
     """
+    from documents.models import Folder, FolderPermission
     if perm not in ["view_folder", "change_folder"]:
         raise ValueError("Perm phải là 'view_folder' hoặc 'change_folder'.")
 
@@ -638,6 +643,7 @@ def get_objects_folder_for_user_owner_aware(user, perm):
     :param perm: 'view_folder' hoặc 'change_folder'.
     :return: QuerySet chứa các thư mục user có quyền.
     """
+    from documents.models import Folder
     owned_folders = Folder.objects.filter(owner=user)
     unowned_folders = Folder.objects.filter(owner__isnull=True)
     folders_with_perms = get_objects_folder_for_user(

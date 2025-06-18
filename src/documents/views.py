@@ -106,7 +106,8 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.documents import DocumentDocument
 from documents.filters import ArchiveFontFilterSet, EdocTaskFilterSet, \
-    ApprovalFilterSet, FolderOwnedOrAccessibleFilter
+    ApprovalFilterSet, FolderOwnedOrAccessibleFilter, \
+    DocumentOwnedOrAccessibleFilter
 from documents.filters import BackupRecordFilterSet
 from documents.filters import CorrespondentFilterSet
 from documents.filters import CustomFieldFilterSet
@@ -512,7 +513,7 @@ class DocumentViewSet(
         DjangoFilterBackend,
         SearchFilter,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        DocumentOwnedOrAccessibleFilter,
     )
     filterset_class = DocumentFilterSet
     search_fields = ("title", "correspondent__name", "content", "warehouse", "folder")
@@ -592,6 +593,13 @@ class DocumentViewSet(
     #     serializer = self.get_serializer(queryset, many=True)
     #     return Response(serializer.data)
 
+    def check_object_permissions(self, request, obj):
+        if not has_perms_owner_aware_for_folder(request.user, 'view_folder',
+                                                obj.folder):
+            self.permission_denied(
+                request,
+                message=None,
+                code=None)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
@@ -674,10 +682,10 @@ class DocumentViewSet(
 
     def file_response(self, pk, request, disposition):
         doc = Document.objects.get(id=pk)
-        if request.user is not None and not has_perms_owner_aware(
+        if request.user is not None and not has_perms_owner_aware_for_folder(
             request.user,
-            "view_document",
-            doc,
+            "view_folder",
+            doc.folder,
         ):
             return HttpResponseForbidden("Insufficient permissions")
         return serve_file(
@@ -718,10 +726,10 @@ class DocumentViewSet(
     def metadata(self, request, pk=None):
         try:
             doc = Document.objects.get(pk=pk)
-            if request.user is not None and not has_perms_owner_aware(
+            if request.user is not None and not has_perms_owner_aware_for_folder(
                 request.user,
-                "view_document",
-                doc,
+                "view_folder",
+                doc.folder,
             ):
                 return HttpResponseForbidden("Insufficient permissions")
         except Document.DoesNotExist:
@@ -780,8 +788,8 @@ class DocumentViewSet(
         doc = get_object_or_404(Document, pk=pk)
         if request.user is not None and not has_perms_owner_aware(
             request.user,
-            "view_document",
-            doc,
+            "view_folder",
+            doc.folder,
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
@@ -926,10 +934,10 @@ class DocumentViewSet(
         currentUser = request.user
         try:
             doc = Document.objects.get(pk=pk)
-            if currentUser is not None and not has_perms_owner_aware(
+            if currentUser is not None and not has_perms_owner_aware_for_folder(
                 currentUser,
-                "view_document",
-                doc,
+                "view_folder",
+                doc.folder,
             ):
                 return HttpResponseForbidden("Insufficient permissions to view notes")
         except Document.DoesNotExist:
@@ -945,9 +953,9 @@ class DocumentViewSet(
                 )
         elif request.method == "POST":
             try:
-                if currentUser is not None and not has_perms_owner_aware(
+                if currentUser is not None and not has_perms_owner_aware_for_folder(
                     currentUser,
-                    "change_document",
+                    "change_folder",
                     doc,
                 ):
                     return HttpResponseForbidden(
@@ -989,10 +997,10 @@ class DocumentViewSet(
                     },
                 )
         elif request.method == "DELETE":
-            if currentUser is not None and not has_perms_owner_aware(
+            if currentUser is not None and not has_perms_owner_aware_for_folder(
                 currentUser,
-                "change_document",
-                doc,
+                "change_folder",
+                doc.folder,
             ):
                 return HttpResponseForbidden("Insufficient permissions to delete notes")
 
@@ -1148,10 +1156,10 @@ class DocumentViewSet(
         currentUser = request.user
         try:
             doc = Document.objects.get(pk=pk)
-            if currentUser is not None and not has_perms_owner_aware(
+            if currentUser is not None and not has_perms_owner_aware_for_folder(
                 currentUser,
-                "change_document",
-                doc,
+                "change_folder",
+                doc.folder,
             ):
                 return HttpResponseForbidden(
                     "Insufficient permissions to add share link",
@@ -1451,7 +1459,8 @@ class BulkEditView(PassUserMixin):
                 if method
                 in [bulk_edit.set_permissions, bulk_edit.delete, bulk_edit.rotate]
                 else all(
-                    has_perms_owner_aware(user, "change_document", doc)
+                    has_perms_owner_aware_for_folder(user, "change_folder",
+                                                     doc.folder)
                     for doc in document_objs
                 )
             )
@@ -2593,7 +2602,7 @@ class ShareLinkViewSet(ModelViewSet, PassUserMixin):
 
     serializer_class = ShareLinkSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, EdocObjectPermissions)
+    permission_classes = (IsAuthenticated,)
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
