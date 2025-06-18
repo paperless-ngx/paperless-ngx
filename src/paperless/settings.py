@@ -1,6 +1,5 @@
 import datetime
 import json
-import logging
 import math
 import multiprocessing
 import os
@@ -15,8 +14,6 @@ from celery.schedules import crontab
 from concurrent_log_handler.queue import setup_logging_queues
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
-
-from paperless.version import __full_version_str__
 
 # Tap paperless.conf if it's available
 configuration_path = os.getenv("PAPERLESS_CONFIGURATION_PATH")
@@ -1280,6 +1277,3 @@ OUTLOOK_OAUTH_ENABLED = bool(
     and OUTLOOK_OAUTH_CLIENT_ID
     and OUTLOOK_OAUTH_CLIENT_SECRET,
 )
-
-logger = logging.getLogger("paperless.settings")
-logger.info(f"[init] Paperless-ngx version: v{__full_version_str__}")
