@@ -3801,9 +3801,7 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
                 code=None)
 
     def update(self, request, *args, **kwargs):
-
         partial = kwargs.pop("partial", False)
-        print("serializer.validated_data", self.get_object())
         instance = self.get_object()
         if request.data.get("parent_folder") is None:
             pass
