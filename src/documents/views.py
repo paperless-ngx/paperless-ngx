@@ -1221,7 +1221,7 @@ class LogViewSet(ViewSet):
         "celery": "celery.log",
     }
 
-    def get_log_filename(self, log_key: str) -> Path:
+    def get_log_file(self, log_key: str) -> Path:
         return Path(settings.LOGGING_DIR) / self.ALLOWED_LOG_FILES[log_key]
 
     def retrieve(self, request, *args, **kwargs):
@@ -1229,12 +1229,12 @@ class LogViewSet(ViewSet):
         if log_key not in self.ALLOWED_LOG_FILES:
             raise Http404
 
-        filename = self.get_log_filename(log_key)
+        log_file = self.get_log_file(log_key)
 
-        if not filename.is_file():
+        if not log_file.is_file():
             raise Http404
 
-        with filename.open() as f:
+        with log_file.open() as f:
             lines = [line.rstrip() for line in f.readlines()]
 
         return Response(lines)
@@ -1243,7 +1243,7 @@ class LogViewSet(ViewSet):
         existing_logs = [
             log_key
             for log_key in self.ALLOWED_LOG_FILES
-            if self.get_log_filename(log_key).is_file()
+            if self.get_log_file(log_key).is_file()
         ]
         return Response(existing_logs)
 
