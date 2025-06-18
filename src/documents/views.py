@@ -650,7 +650,7 @@ class DocumentViewSet(
         )
 
     def get_metadata(self, file, mime_type):
-        if not os.path.isfile(file):
+        if not Path(file).is_file():
             return None
 
         parser_class = get_parser_class_for_mime_type(mime_type)
@@ -668,8 +668,8 @@ class DocumentViewSet(
             return []
 
     def get_filesize(self, filename):
-        if os.path.isfile(filename):
-            return os.stat(filename).st_size
+        if Path(filename).is_file():
+            return Path(filename).stat().st_size
         else:
             return None
 
@@ -1215,31 +1215,37 @@ class UnifiedSearchViewSet(DocumentViewSet):
 class LogViewSet(ViewSet):
     permission_classes = (IsAuthenticated, PaperlessAdminPermissions)
 
-    log_files = ["paperless", "mail", "celery"]
+    ALLOWED_LOG_FILES = {
+        "paperless": "paperless.log",
+        "mail": "mail.log",
+        "celery": "celery.log",
+    }
 
-    def get_log_filename(self, log):
-        return os.path.join(settings.LOGGING_DIR, f"{log}.log")
+    def get_log_file(self, log_key: str) -> Path:
+        return Path(settings.LOGGING_DIR) / self.ALLOWED_LOG_FILES[log_key]
 
     def retrieve(self, request, *args, **kwargs):
-        log_file = kwargs.get("pk")
-        if log_file not in self.log_files:
+        log_key = kwargs.get("pk")
+        if log_key not in self.ALLOWED_LOG_FILES:
             raise Http404
 
-        filename = self.get_log_filename(log_file)
+        log_file = self.get_log_file(log_key)
 
-        if not os.path.isfile(filename):
+        if not log_file.is_file():
             raise Http404
 
-        with open(filename) as f:
+        with log_file.open() as f:
             lines = [line.rstrip() for line in f.readlines()]
 
         return Response(lines)
 
     def list(self, request, *args, **kwargs):
-        exist = [
-            log for log in self.log_files if os.path.isfile(self.get_log_filename(log))
+        existing_logs = [
+            log_key
+            for log_key in self.ALLOWED_LOG_FILES
+            if self.get_log_file(log_key).is_file()
         ]
-        return Response(exist)
+        return Response(existing_logs)
 
 
 class SavedViewViewSet(ModelViewSet, PassUserMixin):
@@ -2073,7 +2079,7 @@ class BulkDownloadView(GenericAPIView):
                 strategy.add_document(document)
 
         # TODO(stumpylog): Investigate using FileResponse here
-        with open(temp.name, "rb") as f:
+        with Path(temp.name).open("rb") as f:
             response = HttpResponse(f, content_type="application/zip")
             response["Content-Disposition"] = '{}; filename="{}"'.format(
                 "attachment",
