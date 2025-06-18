@@ -653,25 +653,15 @@ class DocumentViewSet(
         return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
-        from documents import index
-
         instance = self.get_object()
         folder = instance.folder
-
-        dossier = instance.dossier
-        # instance.folder = None
-        # instance.dossier = None
-        # instance.save()
         if folder is not None:
             folder.delete()
-        # index.remove_document_from_index(self.get_object())
-        # NOTE: update document count for document
-        # update_document_count_folder_path(folder.path)
         instance.delete()
-        instance_deleted = Document.deleted_objects.get(id=instance.id)
-        index.delete_document_with_index(instance_deleted.id)
+        DocumentDocument.search().filter("terms",
+                                         _id=[str(instance.id)]).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-        # return super().destroy(request, *args, **kwargs)
+
 
     @staticmethod
     def original_requested(request):
@@ -2033,7 +2023,6 @@ class StatisticsCustomView(APIView):
                 )
                 .order_by("date_done_date")
             )
-            print('request_count:', request_count)
 
             for entry in request_count:
                 target_date_str = entry["date_done_date"].strftime("%Y-%m-%d")
@@ -3954,14 +3943,12 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
         documents = Document.objects.filter(folder__in=folders).defer('content')
         logger.info(f"Deleting {documents} documents in folder {instance.id}")
         documents.delete()
+        document_ids = []
 
-        documents_deleted = Document.deleted_objects.filter(
-            folder__in=folders).defer(
-            'content')
+        for d in documents:
+            document_ids.append(str(d.id))
 
-        for doc in documents_deleted:
-            # index.delete_document_index(doc=doc)
-            index.delete_document_with_index(doc_id=doc.id)
+        DocumentDocument.search().filter("terms", _id=document_ids)
         folders.delete()
         # NOTE: update document count for parent folder
         # update_document_count_folder_path(folder.path)

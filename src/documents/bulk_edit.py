@@ -11,6 +11,7 @@ from django.db.models import Q, Max, Min
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
+from documents.documents import DocumentDocument
 from documents.models import Correspondent, Dossier, ArchiveFont
 from documents.models import Document
 from documents.models import DocumentType
@@ -213,35 +214,18 @@ def modify_tags(doc_ids, add_tags, remove_tags):
 
 def delete(doc_ids):
     docs = Document.objects.filter(id__in=doc_ids)
+    set_document_ids = set()
     set_folder_ids = set()
     for doc in docs:
-        doc_folder = doc.folder
-        # doc.folder = None
-        # doc_dossier = doc.dossier
-        # doc.dossier = None
-        doc.save()
-        if doc_folder is not None:
-            set_folder_ids.update(doc_folder.path.rstrip("/").split("/"))
-            doc_folder.delete()
-        # if doc_dossier is not None:
-        #     doc_dossier.delete()
+        set_document_ids.add(str(doc.id))
+        if doc.folder is not None:
+            # set_folder_ids.add(doc_folder.path.rstrip("/").split("/"))
+            set_folder_ids.add(doc.folder.id)
+    Folder.objects.filter(id__in=set_folder_ids).delete()
+    Document.objects.filter(id__in=doc_ids).delete()
 
-    docs.delete()
-    set_folder_ids = {int(id) for id in set_folder_ids}
-    folders = Folder.objects.filter(id__in=set_folder_ids, type=Folder.FOLDER)
-    # for folder in folders:
-    #     update_document_count_folder_path(folder.path)
-
-
-    # delete the document from the index
-    from documents import index
-    # doc_deleted=Document.deleted_objects.filter(doc)
-    for doc in docs:
-        index.delete_document_with_index(doc.id)
-    with index.open_index_writer() as writer:
-        for id in doc_ids:
-            index.remove_document_by_id(writer, id)
-
+    DocumentDocument.search().filter("terms",
+                                     _id=list(set_document_ids)).delete()
     return "OK"
 
 
