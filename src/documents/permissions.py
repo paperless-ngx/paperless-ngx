@@ -622,12 +622,10 @@ def get_objects_folder_for_user(user, perm, with_group_users=False):
         folders = Folder.objects.filter(allow_q)
 
     if blocked_paths:
-        folders = Folder.objects.all()
         block_q = Q()
         for p in blocked_paths:
             block_q |= Q(path__startswith=p)
         folders = folders.exclude(block_q)
-    # print('folder', folders)
     return folders.distinct()
 
 
