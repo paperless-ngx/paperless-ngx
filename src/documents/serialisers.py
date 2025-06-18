@@ -33,7 +33,7 @@ from rest_framework.fields import SerializerMethodField
 
 from documents import bulk_edit
 from documents.data_models import DocumentSource
-from documents.models import ArchiveFont
+from documents.models import ArchiveFont, FolderPermission
 from documents.models import BackupRecord
 from documents.models import Correspondent
 from documents.models import CustomField
@@ -57,7 +57,9 @@ from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
-from documents.permissions import get_groups_with_only_permission
+from documents.permissions import get_groups_with_only_permission, \
+    set_permissions_for_object_folder, get_permission_folder, \
+    has_perms_owner_aware_for_folder
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.validators import uri_validator
@@ -300,6 +302,41 @@ class OwnedObjectSerializer(
                             "error": "Object violates owner / name unique constraint"},
                     )
         return super().update(instance, validated_data)
+
+
+class FolderOwnedObjectSerializer(OwnedObjectSerializer):
+    def get_permissions(self, obj):
+        return get_permission_folder(obj)
+
+    def get_user_can_change(self, obj):
+        return (
+            self.user
+            and has_perms_owner_aware_for_folder(self.user, "change_folder",
+                                                 obj)
+        )
+
+    def get_is_shared_by_requester(self, obj):
+        return obj.owner == self.user and FolderPermission.objects.filter(
+            path=obj.path).exists()
+
+    def create(self, validated_data):
+        if "owner" not in validated_data and self.user:
+            validated_data["owner"] = self.user
+        permissions = validated_data.pop("set_permissions", None)
+        instance = super(OwnedObjectSerializer, self).create(validated_data)
+
+        if permissions:
+            set_permissions_for_object_folder(instance, permissions)
+
+        return instance
+
+    def update(self, instance, validated_data):
+        if "set_permissions" in validated_data:
+            set_permissions_for_object_folder(instance, validated_data[
+                "set_permissions"])
+
+        return super(OwnedObjectSerializer, self).update(instance,
+                                                         validated_data)
 
 
 class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
@@ -2803,7 +2840,7 @@ class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             return 0
 
 
-class FolderSerializer(OwnedObjectSerializer):
+class FolderSerializer(FolderOwnedObjectSerializer):
     name = AdjustedNameFieldFolder()
     document = serializers.SerializerMethodField(read_only=True)
     # document_count = serializers.IntegerField(read_only=True)

@@ -13,6 +13,7 @@ from django_filters.rest_framework import Filter
 from django_filters.rest_framework import FilterSet
 from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
+from rest_framework.filters import BaseFilterBackend
 from rest_framework_guardian.filters import ObjectPermissionsFilter
 
 from documents.models import Approval, Correspondent, Dossier, DossierForm, \
@@ -26,6 +27,7 @@ from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import Warehouse
+from documents.permissions import get_objects_folder_for_user
 
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
@@ -437,6 +439,36 @@ class ObjectOwnedOrGrantedPermissionsFilter(ObjectPermissionsFilter):
         objects_owned = queryset.filter(owner=request.user)
         objects_unowned = queryset.filter(owner__isnull=True)
         return objects_with_perms | objects_owned | objects_unowned
+
+
+class FolderOwnedOrAccessibleFilter(BaseFilterBackend):
+    """
+    Lọc các thư mục mà người dùng:
+    - Là chủ sở hữu.
+    - Hoặc có quyền truy cập (bao gồm kế thừa từ thư mục cha).
+    - Hoặc chưa có chủ sở hữu.
+    """
+
+    def filter_queryset(self, request, queryset, view):
+        user = request.user
+
+        # Loại quyền: view_folder (mặc định) hoặc change_folder
+        perm = getattr(view, 'permission_required', 'view_folder')
+
+        # Lấy danh sách thư mục mà user có quyền (bao gồm kế thừa và loại trừ bị chặn)
+        permitted_folders_qs = get_objects_folder_for_user(user, perm,
+                                                           with_group_users=True)
+
+        # Trả về các thư mục thỏa mãn:
+        # - Được cấp quyền
+        # - Hoặc là chủ sở hữu
+        # - Hoặc chưa có chủ sở hữu
+        return queryset.filter(
+            Q(pk__in=permitted_folders_qs.values_list('pk', flat=True)) |
+            Q(owner=user) |
+            Q(owner__isnull=True)
+        ).distinct()
+
 
 
 

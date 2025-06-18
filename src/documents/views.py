@@ -106,7 +106,7 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.documents import DocumentDocument
 from documents.filters import ArchiveFontFilterSet, EdocTaskFilterSet, \
-    ApprovalFilterSet
+    ApprovalFilterSet, FolderOwnedOrAccessibleFilter
 from documents.filters import BackupRecordFilterSet
 from documents.filters import CorrespondentFilterSet
 from documents.filters import CustomFieldFilterSet
@@ -155,7 +155,7 @@ from documents.models import WorkflowTrigger
 from documents.parsers import custom_get_parser_class_for_mime_type
 from documents.parsers import parse_date_generator
 from documents.permissions import EdocAdminPermissions, get_permissions, \
-    set_permissions
+    set_permissions, set_permissions_for_object_folder, get_permission_folder
 from documents.permissions import EdocObjectPermissions
 from documents.permissions import check_user_can_change_folder
 from documents.permissions import get_objects_for_user_owner_aware
@@ -3585,7 +3585,7 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        FolderOwnedOrAccessibleFilter,
     )
     filterset_class = FolderFilterSet
     ordering_fields = (
@@ -3776,16 +3776,16 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
             folder = serializer.save(parent_folder=parent_folder, owner=owner)
             folder.path = f"{parent_folder.path}{folder.id}/"
             folder.save()
-            permission_parent_folder = get_permissions(obj=parent_folder)
-            if permission_parent_folder:
-                user_ids = User.objects.filter(
-                    pk=parent_folder.owner.id).values_list(
-                    "id", flat=True)
-
-                permission_parent_folder['change']['users'] = \
-                    permission_parent_folder['change']['users'].union(user_ids)
-                set_permissions(permissions=permission_parent_folder,
-                                object=folder)
+            # permission_parent_folder = get_permission_folder(obj=parent_folder)
+            #
+            # if permission_parent_folder:
+            #     user_ids = User.objects.filter(
+            #         pk=parent_folder.owner.id).values_list(
+            #         "id", flat=True)
+            #     permission_parent_folder['change']['users'] = \
+            #         permission_parent_folder['change']['users'].union(user_ids)
+            #     set_permissions_for_object_folder(perm=permission_parent_folder,
+            #                     obj=folder)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 

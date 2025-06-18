@@ -5,6 +5,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
 from guardian.core import ObjectPermissionChecker
 from guardian.models import GroupObjectPermission
 from guardian.shortcuts import assign_perm
@@ -13,8 +14,10 @@ from guardian.shortcuts import get_users_with_perms
 from guardian.shortcuts import remove_perm
 from rest_framework.permissions import BasePermission
 from rest_framework.permissions import DjangoObjectPermissions
+from django.db import models
 
-from documents.models import Folder, Warehouse
+
+from documents.models import Folder, Warehouse, FolderPermission
 
 
 class EdocObjectPermissions(DjangoObjectPermissions):
@@ -264,3 +267,300 @@ def get_permissions(obj):
 
 def set_permissions(permissions, object):
     set_permissions_for_object(permissions, object)
+
+def get_users_with_perms_folder(obj, perm, with_group_users=False):
+    if perm not in ["view_folder", "change_folder"]:
+        raise ValueError("Perm phải là 'view_folder' hoặc 'change_folder'.")
+
+    users = set()
+    parts = obj.path.rstrip("/").split("/")
+    all_paths = ["/".join(parts[:i]) + "/" for i in range(len(parts), 0, -1)]
+
+    # Lấy folder permission đầu tiên từ sâu nhất lên
+    fps = (
+        FolderPermission.objects
+        .filter(path__in=all_paths)
+        .prefetch_related(
+            'view_users',
+            'view_groups__user_set',
+            'can_not_view_users',
+            'can_not_view_groups__user_set',
+            'edit_users',
+            'edit_groups__user_set',
+            'can_not_edit_users',
+            'can_not_edit_groups__user_set',
+        )
+    )
+    fp_dict = {fp.path: fp for fp in fps}
+
+    for path in all_paths:
+        fp = fp_dict.get(path)
+        if not fp:
+            continue
+
+        if perm == "view_folder":
+            users.update(fp.view_users.all())
+            if with_group_users:
+                for group in fp.view_groups.all():
+                    users.update(group.user_set.all())
+
+            users.difference_update(fp.can_not_view_users.all())
+            if with_group_users:
+                for group in fp.can_not_view_groups.all():
+                    users.difference_update(group.user_set.all())
+
+        elif perm == "change_folder":
+            users.update(fp.edit_users.all())
+            if with_group_users:
+                for group in fp.edit_groups.all():
+                    users.update(group.user_set.all())
+
+            users.difference_update(fp.can_not_edit_users.all())
+            if with_group_users:
+                for group in fp.can_not_edit_groups.all():
+                    users.difference_update(group.user_set.all())
+
+        break  # Dừng ở folder đầu tiên có permission
+
+    return users
+
+
+
+def get_permission_folder(obj):
+    """
+    Lấy danh sách quyền xem/sửa của thư mục, hợp nhất quyền từ tất cả thư mục cha.
+    :param obj: Folder cần kiểm tra.
+    :return: Dictionary chứa quyền xem & sửa từ tất cả các thư mục cha.
+    """
+    permissions = {
+        "view": {"users": set(), "groups": set()},
+        "change": {"users": set(), "groups": set()}
+    }
+
+    # Lấy danh sách path từ sâu nhất đến gốc
+    parts = obj.path.rstrip("/").split("/")
+    all_paths = ["/".join(parts[:i]) + "/" for i in range(len(parts), 0, -1)]
+
+    # Truy vấn 1 lần tất cả FolderPermission liên quan
+    fps = FolderPermission.objects.filter(path__in=all_paths).prefetch_related(
+        'view_users',
+        'view_groups',
+        'edit_users',
+        'edit_groups',
+    )
+
+    for fp in fps:
+        permissions["view"]["users"].update(user.id for user in fp.view_users.all())
+        permissions["view"]["groups"].update(group.id for group in fp.view_groups.all())
+        permissions["change"]["users"].update(user.id for user in fp.edit_users.all())
+        permissions["change"]["groups"].update(group.id for group in fp.edit_groups.all())
+
+    return {
+
+            "view": {
+                "users": set(permissions["view"]["users"]),
+                "groups": set(permissions["view"]["groups"])
+            },
+            "change": {
+                "users": set(permissions["change"]["users"]),
+                "groups": set(permissions["change"]["groups"])
+            }
+
+    }
+
+
+
+def set_permissions_for_object_folder(obj, perm):
+    """
+    Gán quyền xem/sửa cho thư mục, nhưng bỏ qua nếu user/group đã có quyền ở thư mục cha.
+    """
+    parts = obj.path.rstrip("/").split("/")
+    parent_paths = ["/".join(parts[:i]) + "/" for i in range(len(parts), 0, -1) if "/".join(parts[:i]) + "/" != obj.path]
+
+    parent_permissions = FolderPermission.objects.filter(path__in=parent_paths).prefetch_related(
+        'view_users', 'view_groups__user_set',
+        'edit_users', 'edit_groups__user_set'
+    )
+
+    inherited = {
+        "view": {"users": set(), "groups": set()},
+        "change": {"users": set(), "groups": set()}
+    }
+
+    for fp in parent_permissions:
+        inherited["view"]["users"].update(fp.view_users.all())
+        inherited["view"]["groups"].update(fp.view_groups.all())
+        inherited["change"]["users"].update(fp.edit_users.all())
+        inherited["change"]["groups"].update(fp.edit_groups.all())
+
+    # Convert user IDs to User objects if needed
+    def ensure_user_objects(user_list):
+        user_list = list(user_list)
+        if user_list and isinstance(user_list[0], int):
+            return list(User.objects.filter(id__in=user_list))
+        return user_list
+
+    perm["view"]["users"] = ensure_user_objects(perm["view"]["users"])
+    perm["change"]["users"] = ensure_user_objects(perm["change"]["users"])
+
+    user_list = list(perm["view"]["users"]) + list(perm["change"]["users"])
+    user_to_groups = {u.id: set(u.groups.all()) for u in user_list}
+
+    def is_user_redundant(user, action):
+        if user in inherited[action]["users"]:
+            return True
+        for g in user_to_groups.get(user.id, []):
+            if g in inherited[action]["groups"]:
+                return True
+        return False
+
+    view_users = [u for u in perm["view"]["users"] if not is_user_redundant(u, "view")]
+    view_groups = perm["view"]["groups"]
+
+    edit_users = [u for u in perm["change"]["users"] if not is_user_redundant(u, "change")]
+    edit_groups = perm["change"]["groups"]
+
+    fp, _ = FolderPermission.objects.get_or_create(path=obj.path)
+    fp.view_users.set(view_users)
+    fp.view_groups.set(view_groups)
+    fp.edit_users.set(edit_users)
+    fp.edit_groups.set(edit_groups)
+    fp.save()
+
+
+def has_perms_owner_aware_for_folder(user, perm, obj):
+    if perm not in ["view_folder", "change_folder"]:
+        raise ValueError(
+            "Perm phải là 'view_folder' hoặc 'change_folder'.")
+
+    # 1. Tạo list tất cả folder_path từ sâu nhất đến gốc
+    parts = obj.path.rstrip("/").split("/")
+    all_paths = ["/".join(parts[:i]) + "/" for i in range(len(parts), 0, -1)]
+
+    # Truy vấn tất cả FolderPermission trong 1 lần
+    fps = FolderPermission.objects.filter(path__in=all_paths)
+
+    # Tạo dict để tra nhanh
+    fp_dict = {fp.path: fp for fp in fps}
+
+    # Cache lại nhóm của user
+    user_groups = set(user.groups.all())
+
+    for path in all_paths:
+        fp = fp_dict.get(path)
+        if not fp:
+            continue
+
+        if user == fp.owner:
+            return True
+
+        if perm == "view_folder":
+            if (
+                user in fp.view_users.all() or
+                fp.view_groups.filter(user__in=user_groups).exists()
+            ):
+                if (
+                    user in fp.can_not_view_users.all() or
+                    fp.can_not_view_groups.filter(
+                        user__in=user_groups).exists()
+                ):
+                    return False
+                return True
+
+        if perm == "change_folder":
+            if (
+                user in fp.edit_users.all() or
+                fp.edit_groups.filter(user__in=user_groups).exists()
+            ):
+                if (
+                    user in fp.can_not_edit_users.all() or
+                    fp.can_not_edit_groups.filter(
+                        user__in=user_groups).exists()
+                ):
+                    return False
+                return True
+
+        break
+
+    return False
+
+
+from django.db.models import Q
+
+def get_objects_folder_for_user(user, perm, with_group_users=False):
+    """
+    Lấy danh sách thư mục mà user có quyền xem hoặc sửa, kế thừa từ thư mục cha và loại trừ bị chặn.
+
+    :param user: Đối tượng User.
+    :param perm: 'view_folder' hoặc 'change_folder'.
+    :param with_group_users: Nếu True, sẽ lấy theo cả group của user.
+    :return: QuerySet chứa các thư mục user có quyền.
+    """
+    if perm not in ["view_folder", "change_folder"]:
+        raise ValueError("Perm phải là 'view_folder' hoặc 'change_folder'.")
+
+    group_ids = list(user.groups.values_list("id", flat=True)) if with_group_users else []
+
+    allowed_q = Q()
+    blocked_q = Q()
+
+    if perm == "view_folder":
+        allowed_q |= Q(view_users=user)
+        if group_ids:
+            allowed_q |= Q(view_groups__in=group_ids)
+
+        blocked_q |= Q(can_not_view_users=user)
+        if group_ids:
+            blocked_q |= Q(can_not_view_groups__in=group_ids)
+
+    else:  # perm == "change_folder"
+        allowed_q |= Q(edit_users=user)
+        if group_ids:
+            allowed_q |= Q(edit_groups__in=group_ids)
+
+        blocked_q |= Q(can_not_edit_users=user)
+        if group_ids:
+            blocked_q |= Q(can_not_edit_groups__in=group_ids)
+
+    # Lấy tất cả path cho phép và bị chặn
+    allowed_paths = set(
+        FolderPermission.objects.filter(allowed_q).values_list("path", flat=True)
+    )
+    blocked_paths = set(
+        FolderPermission.objects.filter(blocked_q).values_list("path", flat=True)
+    )
+
+    # Truy vấn thư mục dựa trên path được cho phép và loại trừ path bị chặn
+    folders = Folder.objects.all()
+
+    if allowed_paths:
+        allow_q = Q()
+        for p in allowed_paths:
+            allow_q |= Q(path__startswith=p)
+        folders = folders.filter(allow_q)
+
+    if blocked_paths:
+        block_q = Q()
+        for p in blocked_paths:
+            block_q |= Q(path__startswith=p)
+        folders = folders.exclude(block_q)
+
+    return folders.distinct()
+
+
+def get_objects_folder_for_user_owner_aware(user, perm):
+    """
+    Lấy danh sách thư mục mà user có quyền xem hoặc sửa, bao gồm cả thư mục do user sở hữu.
+
+    :param user: Đối tượng User.
+    :param perm: 'view_folder' hoặc 'change_folder'.
+    :return: QuerySet chứa các thư mục user có quyền.
+    """
+    owned_folders = Folder.objects.filter(owner=user)
+    unowned_folders = Folder.objects.filter(owner__isnull=True)
+    folders_with_perms = get_objects_folder_for_user(
+        user=user,
+        perm=perm,
+        with_group_users=False,
+    )
+    return owned_folders | unowned_folders | folders_with_perms
