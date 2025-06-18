@@ -154,10 +154,9 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.parsers import custom_get_parser_class_for_mime_type
 from documents.parsers import parse_date_generator
-from documents.permissions import EdocAdminPermissions, get_permissions, \
-    set_permissions, set_permissions_for_object_folder, get_permission_folder
+from documents.permissions import EdocAdminPermissions, \
+    has_perms_owner_aware_for_folder
 from documents.permissions import EdocObjectPermissions
-from documents.permissions import check_user_can_change_folder
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
@@ -201,7 +200,7 @@ from documents.signals import document_updated
 from documents.tasks import backup_documents, \
     bulk_update_custom_field_form_document_type_to_document, bulk_delete_file, \
     update_ocr_document, update_child_folder_paths, \
-    update_child_folder_permisisons, update_folder_permisisons, consume_folder
+    update_folder_permisisons, consume_folder
 from documents.tasks import consume_file
 from documents.tasks import deleted_backup
 from documents.tasks import empty_trash
@@ -2715,7 +2714,8 @@ class BulkEditObjectsView(PassUserMixin):
                     )
                     folder_owner = None
                     for f in parent_folder:
-                        if has_perms_owner_aware(user, 'change_folder',
+                        if has_perms_owner_aware_for_folder(user,
+                                                            'change_folder',
                                                  f):
                             folder_owner = f.owner
                     if folder_owner is None:
@@ -2784,7 +2784,8 @@ class BulkEditObjectsView(PassUserMixin):
                 elif int(request.data["parent_folder"]) == folder.id:
                     return Response(status=status.HTTP_400_BAD_REQUEST)
                 elif "parent_folder" in request.data:
-                    if not has_perms_owner_aware(user, 'change_folder',
+                    if not has_perms_owner_aware_for_folder(user,
+                                                            'change_folder',
                                                  parent_folder_obj):
                         return HttpResponseForbidden(
                             _("Insufficient permissions"))
@@ -2819,19 +2820,19 @@ class BulkEditObjectsView(PassUserMixin):
 
                     else:
                         folder.path = f"{folder.id}/"
-                    if parent_folder_obj is not None:
-                        destination_folder = get_permissions(parent_folder_obj)
-                        update_view_folder_parent_permissions.delay(folder,
-                                                                    destination_folder)
-                        permission_move_folder = get_permissions(folder)
-                        destination_folder = get_permissions(parent_folder_obj)
-                        update_view_folder_parent_permissions.delay(folder,
-                                                                    destination_folder)
-                        update_view_folder_parent_permissions.delay(
-                            parent_folder_obj,
-                            permission_move_folder)
+                    # if parent_folder_obj is not None:
+                    # destination_folder = get_permissions(parent_folder_obj)
+                    # update_view_folder_parent_permissions.delay(folder,
+                    #                                             destination_folder)
+                    # permission_move_folder = get_permission_folder(folder)
+                    # destination_folder = get_permission_folder(parent_folder_obj)
+                    # update_view_folder_parent_permissions.delay(folder,
+                    #                                             destination_folder)
+                    # update_view_folder_parent_permissions.delay(
+                    #     parent_folder_obj,
+                    #     permission_move_folder)
                     folder.save()
-                    update_child_folder_paths.delay(folder, old_path)
+                    # update_child_folder_paths.delay(folder, old_path)
 
             return Response(status=status.HTTP_204_NO_CONTENT)
         # elif operation == "update" and object_type == "archive_fonts":
@@ -3762,7 +3763,9 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
             folder.path = f'{folder.id}/'
             folder.save()
         elif parent_folder:
-            user_can_change = check_user_can_change_folder(request.user, parent_folder)
+            user_can_change = has_perms_owner_aware_for_folder(request.user,
+                                                               'change_folder',
+                                                               parent_folder)
             if not user_can_change:
                 return Response(
                     data={
@@ -3791,8 +3794,18 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    def check_object_permissions(self, request, obj):
+        if not has_perms_owner_aware_for_folder(request.user, 'change_folder',
+                                                obj):
+            self.permission_denied(
+                request,
+                message=None,
+                code=None)
+
     def update(self, request, *args, **kwargs):
+
         partial = kwargs.pop("partial", False)
+        print("serializer.validated_data", self.get_object())
         instance = self.get_object()
         if request.data.get("parent_folder") is None:
             pass
@@ -3820,6 +3833,7 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
 
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
+
         if serializer.validated_data["name"] != instance.name:
             serializer.validated_data["name"] = get_unique_name(Folder,
                                                                 serializer.validated_data[
@@ -3835,19 +3849,19 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
         self.update_document_name(instance, serializer)
         # update permission document
         # update permission folder child
-        permissions = serializer.validated_data.get("set_permissions")
-        permissions_copy = permissions.copy()
-        update_view_folder_parent_permissions.delay(instance, permissions_copy)
-        owner = serializer.validated_data.get("owner")
-        merge = serializer.validated_data.get("merge", True)
+        # permissions = serializer.validated_data.get("set_permissions")
+        # permissions_copy = permissions.copy()
+        # update_view_folder_parent_permissions.delay(instance, permissions_copy)
+        # owner = serializer.validated_data.get("owner")
+        # merge = serializer.validated_data.get("merge", True)
 
-        owner_exist = "owner" in serializer.validated_data
-        set_permissions_exist = "set_permissions" in serializer.validated_data
-        update_child_folder_permisisons.delay(folder=instance,
-                                              permissions=permissions,
-                                              owner=owner, merge=merge,
-                                              owner_exist=owner_exist,
-                                              set_permissions_exist=set_permissions_exist)
+        # owner_exist = "owner" in serializer.validated_data
+        # set_permissions_exist = "set_permissions" in serializer.validated_data
+        # update_child_folder_permisisons.delay(folder=instance,
+        #                                       permissions=permissions,
+        #                                       owner=owner, merge=merge,
+        #                                       owner_exist=owner_exist,
+        #                                       set_permissions_exist=set_permissions_exist)
         if old_parent_folder != instance.parent_folder:
             if instance.parent_folder:
                 instance.path = f"{instance.parent_folder.path}/{instance.id}"
@@ -3858,18 +3872,18 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
 
             update_child_folder_paths.delay(folder=instance)
         # update permission parent folder
-        permission_parent_folder = get_permissions(
-            obj=instance.parent_folder) if instance.parent_folder else None
-        if permission_parent_folder:
-            user_ids = User.objects.filter(
-                pk=instance.parent_folder.owner.id).values_list(
-                "id", flat=True)
-
-            permission_parent_folder['change']['users'] = \
-                permission_parent_folder['change']['users'].union(user_ids)
-            permission_parent_folder['view']['users'] = []
-            set_permissions(permissions=permission_parent_folder,
-                            object=instance)
+        # permission_parent_folder = get_permissions(
+        #     obj=instance.parent_folder) if instance.parent_folder else None
+        # if permission_parent_folder:
+        #     user_ids = User.objects.filter(
+        #         pk=instance.parent_folder.owner.id).values_list(
+        #         "id", flat=True)
+        #
+        #     permission_parent_folder['change']['users'] = \
+        #         permission_parent_folder['change']['users'].union(user_ids)
+        #     permission_parent_folder['view']['users'] = []
+        #     set_permissions(permissions=permission_parent_folder,
+        #                     object=instance)
 
         return Response(serializer.data)
 
@@ -3921,7 +3935,7 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
                 instance.path = f"{instance.id}"
             instance.save()
 
-            self.update_child_folder_paths(instance)
+            # self.update_child_folder_paths(instance)
 
         return Response(serializer.data)
 

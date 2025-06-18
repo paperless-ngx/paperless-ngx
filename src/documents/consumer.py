@@ -51,7 +51,7 @@ from documents.parsers import ParseError
 from documents.parsers import custom_get_parser_class_for_mime_type
 from documents.parsers import parse_date
 from documents.permissions import check_user_can_change_folder, \
-    get_permissions, set_permissions
+    set_permissions, get_permission_folder
 from documents.permissions import set_permissions_for_object
 from documents.plugins.base import AlwaysRunPluginMixin
 from documents.plugins.base import ConsumeTaskPlugin
@@ -1153,9 +1153,9 @@ class Consumer(LoggingMixin):
 
                 )
                 if document.folder:
-                    permissions = get_permissions(document.folder)
+                    permissions = get_permission_folder(document.folder)
                     set_permissions(permissions, document)
-                    set_permissions(permissions, new_file)
+                    set_permissions_for_object(permissions, new_file)
                     # add_or_update_document(document)
                     folder_path = get_content_before_last_number(document.folder.path)
                     if document.folder.type == Folder.FILE:

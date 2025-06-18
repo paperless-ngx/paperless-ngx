@@ -5,7 +5,6 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Q
 from guardian.core import ObjectPermissionChecker
 from guardian.models import GroupObjectPermission
 from guardian.shortcuts import assign_perm
@@ -14,8 +13,6 @@ from guardian.shortcuts import get_users_with_perms
 from guardian.shortcuts import remove_perm
 from rest_framework.permissions import BasePermission
 from rest_framework.permissions import DjangoObjectPermissions
-from django.db import models
-
 
 from documents.models import Folder, Warehouse, FolderPermission
 
@@ -268,6 +265,7 @@ def get_permissions(obj):
 def set_permissions(permissions, object):
     set_permissions_for_object(permissions, object)
 
+
 def get_users_with_perms_folder(obj, perm, with_group_users=False):
     if perm not in ["view_folder", "change_folder"]:
         raise ValueError("Perm phải là 'view_folder' hoặc 'change_folder'.")
@@ -325,12 +323,12 @@ def get_users_with_perms_folder(obj, perm, with_group_users=False):
     return users
 
 
-
 def get_permission_folder(obj):
     """
-    Lấy danh sách quyền xem/sửa của thư mục, hợp nhất quyền từ tất cả thư mục cha.
-    :param obj: Folder cần kiểm tra.
-    :return: Dictionary chứa quyền xem & sửa từ tất cả các thư mục cha.
+    Lấy danh sách quyền xem/sửa của thư mục, hợp nhất quyền từ tất cả thư mục cha,
+    và loại bỏ các user/group bị chặn trong chính thư mục hiện tại.
+    Nếu user/group được gán quyền sửa thì cũng được xem,
+    và nếu đang bị chặn xem/sửa thì sẽ được gỡ chặn.
     """
     permissions = {
         "view": {"users": set(), "groups": set()},
@@ -341,45 +339,89 @@ def get_permission_folder(obj):
     parts = obj.path.rstrip("/").split("/")
     all_paths = ["/".join(parts[:i]) + "/" for i in range(len(parts), 0, -1)]
 
-    # Truy vấn 1 lần tất cả FolderPermission liên quan
+    # Truy vấn toàn bộ FolderPermission của cha và thư mục hiện tại
     fps = FolderPermission.objects.filter(path__in=all_paths).prefetch_related(
-        'view_users',
-        'view_groups',
-        'edit_users',
-        'edit_groups',
+        'view_users', 'view_groups', 'edit_users', 'edit_groups',
+        'can_not_view_users', 'can_not_view_groups',
+        'can_not_edit_users', 'can_not_edit_groups',
     )
 
+    # Gom quyền từ cha + chính mình
     for fp in fps:
-        permissions["view"]["users"].update(user.id for user in fp.view_users.all())
-        permissions["view"]["groups"].update(group.id for group in fp.view_groups.all())
-        permissions["change"]["users"].update(user.id for user in fp.edit_users.all())
-        permissions["change"]["groups"].update(group.id for group in fp.edit_groups.all())
+        permissions["view"]["users"].update(
+            user.id for user in fp.view_users.all())
+        permissions["view"]["groups"].update(
+            group.id for group in fp.view_groups.all())
+        permissions["change"]["users"].update(
+            user.id for user in fp.edit_users.all())
+        permissions["change"]["groups"].update(
+            group.id for group in fp.edit_groups.all())
+
+    # Tự động: quyền sửa => có quyền xem
+    permissions["view"]["users"].update(permissions["change"]["users"])
+    permissions["view"]["groups"].update(permissions["change"]["groups"])
+
+    try:
+        obj_fp = next(fp for fp in fps if fp.path == obj.path)
+    except StopIteration:
+        obj_fp = None
+
+    if obj_fp:
+        # --- Người dùng bị chặn xem ---
+        blocked_view_user_ids = set(
+            user.id for user in obj_fp.can_not_view_users.all())
+        blocked_view_group_ids = set(
+            group.id for group in obj_fp.can_not_view_groups.all())
+
+        # Nếu user/group có quyền sửa → gỡ chặn
+        unblocked_users = permissions["change"][
+                              "users"] & blocked_view_user_ids
+        unblocked_groups = permissions["change"][
+                               "groups"] & blocked_view_group_ids
+
+        blocked_view_user_ids -= unblocked_users
+        blocked_view_group_ids -= unblocked_groups
+
+        # Gỡ chặn chỉnh sửa nếu đang bị chặn mà được sửa
+        blocked_edit_user_ids = set(user.id for user in
+                                    obj_fp.can_not_edit_users.all()) - unblocked_users
+        blocked_edit_group_ids = set(group.id for group in
+                                     obj_fp.can_not_edit_groups.all()) - unblocked_groups
+
+        # Loại khỏi quyền
+        permissions["view"]["users"] -= blocked_view_user_ids
+        permissions["view"]["groups"] -= blocked_view_group_ids
+        permissions["change"]["users"] -= blocked_edit_user_ids
+        permissions["change"]["groups"] -= blocked_edit_group_ids
 
     return {
-
-            "view": {
-                "users": set(permissions["view"]["users"]),
-                "groups": set(permissions["view"]["groups"])
-            },
-            "change": {
-                "users": set(permissions["change"]["users"]),
-                "groups": set(permissions["change"]["groups"])
-            }
-
+        "view": {
+            "users": permissions["view"]["users"],
+            "groups": permissions["view"]["groups"]
+        },
+        "change": {
+            "users": permissions["change"]["users"],
+            "groups": permissions["change"]["groups"]
+        }
     }
-
 
 
 def set_permissions_for_object_folder(obj, perm):
     """
-    Gán quyền xem/sửa cho thư mục, nhưng bỏ qua nếu user/group đã có quyền ở thư mục cha.
+    Gán quyền xem/sửa cho thư mục, bỏ qua nếu user/group đã có quyền ở thư mục cha.
+    Nếu user/group từng kế thừa quyền nhưng giờ không còn được phép, thì thêm vào danh sách bị chặn.
+    Nếu user/group được gán quyền sửa thì không được chặn quyền xem, và bỏ chặn nếu có.
     """
     parts = obj.path.rstrip("/").split("/")
-    parent_paths = ["/".join(parts[:i]) + "/" for i in range(len(parts), 0, -1) if "/".join(parts[:i]) + "/" != obj.path]
+    parent_paths = ["/".join(parts[:i]) + "/" for i in range(len(parts), 0, -1)
+                    if "/".join(parts[:i]) + "/" != obj.path]
 
-    parent_permissions = FolderPermission.objects.filter(path__in=parent_paths).prefetch_related(
+    parent_permissions = FolderPermission.objects.filter(
+        path__in=parent_paths).prefetch_related(
         'view_users', 'view_groups__user_set',
-        'edit_users', 'edit_groups__user_set'
+        'edit_users', 'edit_groups__user_set',
+        'can_not_view_users', 'can_not_edit_users',
+        'can_not_view_groups', 'can_not_edit_groups',
     )
 
     inherited = {
@@ -393,20 +435,27 @@ def set_permissions_for_object_folder(obj, perm):
         inherited["change"]["users"].update(fp.edit_users.all())
         inherited["change"]["groups"].update(fp.edit_groups.all())
 
-    # Convert user IDs to User objects if needed
     def ensure_user_objects(user_list):
         user_list = list(user_list)
         if user_list and isinstance(user_list[0], int):
             return list(User.objects.filter(id__in=user_list))
         return user_list
 
+    def ensure_group_objects(group_list):
+        group_list = list(group_list)
+        if group_list and isinstance(group_list[0], int):
+            return list(Group.objects.filter(id__in=group_list))
+        return group_list
+
     perm["view"]["users"] = ensure_user_objects(perm["view"]["users"])
     perm["change"]["users"] = ensure_user_objects(perm["change"]["users"])
+    perm["view"]["groups"] = ensure_group_objects(perm["view"]["groups"])
+    perm["change"]["groups"] = ensure_group_objects(perm["change"]["groups"])
 
-    user_list = list(perm["view"]["users"]) + list(perm["change"]["users"])
+    user_list = list(set(perm["view"]["users"]) | set(perm["change"]["users"]))
     user_to_groups = {u.id: set(u.groups.all()) for u in user_list}
 
-    def is_user_redundant(user, action):
+    def is_user_inherited(user, action):
         if user in inherited[action]["users"]:
             return True
         for g in user_to_groups.get(user.id, []):
@@ -414,21 +463,54 @@ def set_permissions_for_object_folder(obj, perm):
                 return True
         return False
 
-    view_users = [u for u in perm["view"]["users"] if not is_user_redundant(u, "view")]
-    view_groups = perm["view"]["groups"]
+    def is_group_inherited(group, action):
+        return group in inherited[action]["groups"]
 
-    edit_users = [u for u in perm["change"]["users"] if not is_user_redundant(u, "change")]
-    edit_groups = perm["change"]["groups"]
+    # Danh sách gán quyền mới (trừ đi quyền đã kế thừa)
+    view_users = [u for u in perm["view"]["users"] if
+                  not is_user_inherited(u, "view")]
+    view_groups = [g for g in perm["view"]["groups"] if
+                   not is_group_inherited(g, "view")]
+    edit_users = [u for u in perm["change"]["users"] if
+                  not is_user_inherited(u, "change")]
+    edit_groups = [g for g in perm["change"]["groups"] if
+                   not is_group_inherited(g, "change")]
 
+    # Danh sách bị chặn (từng được kế thừa nhưng giờ không còn trong quyền mới)
+    inherited_view_users = inherited["view"]["users"]
+    inherited_change_users = inherited["change"]["users"]
+    inherited_view_groups = inherited["view"]["groups"]
+    inherited_change_groups = inherited["change"]["groups"]
+
+    current_view_users = set(perm["view"]["users"])
+    current_change_users = set(perm["change"]["users"])
+    current_view_groups = set(perm["view"]["groups"])
+    current_change_groups = set(perm["change"]["groups"])
+
+    blocked_view_users = inherited_view_users - current_view_users
+    blocked_change_users = inherited_change_users - current_change_users
+    blocked_view_groups = inherited_view_groups - current_view_groups
+    blocked_change_groups = inherited_change_groups - current_change_groups
+
+    # ❗ Nếu được gán quyền chỉnh sửa thì không được chặn xem
+    blocked_view_users -= current_change_users
+    blocked_view_groups -= current_change_groups
+
+    # Gán vào DB
     fp, _ = FolderPermission.objects.get_or_create(path=obj.path)
     fp.view_users.set(view_users)
     fp.view_groups.set(view_groups)
     fp.edit_users.set(edit_users)
     fp.edit_groups.set(edit_groups)
+    fp.can_not_view_users.set(blocked_view_users)
+    fp.can_not_edit_users.set(blocked_change_users)
+    fp.can_not_view_groups.set(blocked_view_groups)
+    fp.can_not_edit_groups.set(blocked_change_groups)
     fp.save()
 
 
 def has_perms_owner_aware_for_folder(user, perm, obj):
+
     if perm not in ["view_folder", "change_folder"]:
         raise ValueError(
             "Perm phải là 'view_folder' hoặc 'change_folder'.")
@@ -436,7 +518,6 @@ def has_perms_owner_aware_for_folder(user, perm, obj):
     # 1. Tạo list tất cả folder_path từ sâu nhất đến gốc
     parts = obj.path.rstrip("/").split("/")
     all_paths = ["/".join(parts[:i]) + "/" for i in range(len(parts), 0, -1)]
-
     # Truy vấn tất cả FolderPermission trong 1 lần
     fps = FolderPermission.objects.filter(path__in=all_paths)
 
@@ -466,7 +547,6 @@ def has_perms_owner_aware_for_folder(user, perm, obj):
                 ):
                     return False
                 return True
-
         if perm == "change_folder":
             if (
                 user in fp.edit_users.all() or
@@ -480,12 +560,11 @@ def has_perms_owner_aware_for_folder(user, perm, obj):
                     return False
                 return True
 
-        break
-
     return False
 
 
 from django.db.models import Q
+
 
 def get_objects_folder_for_user(user, perm, with_group_users=False):
     """
@@ -499,7 +578,8 @@ def get_objects_folder_for_user(user, perm, with_group_users=False):
     if perm not in ["view_folder", "change_folder"]:
         raise ValueError("Perm phải là 'view_folder' hoặc 'change_folder'.")
 
-    group_ids = list(user.groups.values_list("id", flat=True)) if with_group_users else []
+    group_ids = list(
+        user.groups.values_list("id", flat=True)) if with_group_users else []
 
     allowed_q = Q()
     blocked_q = Q()
@@ -524,10 +604,12 @@ def get_objects_folder_for_user(user, perm, with_group_users=False):
 
     # Lấy tất cả path cho phép và bị chặn
     allowed_paths = set(
-        FolderPermission.objects.filter(allowed_q).values_list("path", flat=True)
+        FolderPermission.objects.filter(allowed_q).values_list("path",
+                                                               flat=True)
     )
     blocked_paths = set(
-        FolderPermission.objects.filter(blocked_q).values_list("path", flat=True)
+        FolderPermission.objects.filter(blocked_q).values_list("path",
+                                                               flat=True)
     )
 
     # Truy vấn thư mục dựa trên path được cho phép và loại trừ path bị chặn
