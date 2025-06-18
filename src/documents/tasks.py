@@ -420,7 +420,7 @@ def check_scheduled_workflows():
             trigger: WorkflowTrigger
             for trigger in schedule_triggers:
                 documents = Document.objects.none()
-                offset_td = datetime.timedelta(days=-trigger.schedule_offset_days)
+                offset_td = datetime.timedelta(days=trigger.schedule_offset_days)
                 threshold = now - offset_td
                 logger.debug(
                     f"Trigger {trigger.id}: checking if (date + {offset_td}) <= now ({now})",
