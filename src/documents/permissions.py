@@ -615,11 +615,11 @@ def get_objects_folder_for_user(user, perm, with_group_users=False):
     folders = Folder.objects.none()
 
     if allowed_paths:
-        folders = Folder.objects.all()
+        # folders = Folder.objects.all()
         allow_q = Q()
         for p in allowed_paths:
             allow_q |= Q(path__startswith=p)
-        folders = folders.filter(allow_q)
+        folders = Folder.objects.filter(allow_q)
 
     if blocked_paths:
         folders = Folder.objects.all()
