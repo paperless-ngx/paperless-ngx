@@ -188,7 +188,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
     @override_settings(
         FILENAME_FORMAT="{correspondent}/{correspondent}",
-        EMPTY_TRASH_DIR=tempfile.mkdtemp(),
+        EMPTY_TRASH_DIR=Path(tempfile.mkdtemp()),
     )
     def test_document_delete_trash_dir(self):
         document = Document()
