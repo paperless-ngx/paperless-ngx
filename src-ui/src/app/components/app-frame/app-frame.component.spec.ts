@@ -121,6 +121,7 @@ describe('AppFrameComponent', () => {
                 results: saved_views,
               }),
             sidebarViews: saved_views.filter((v) => v.show_in_sidebar),
+            getDocumentCount: (view: SavedView) => 5,
           },
         },
         PermissionsService,

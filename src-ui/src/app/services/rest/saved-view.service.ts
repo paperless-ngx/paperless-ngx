@@ -7,6 +7,7 @@ import { SavedView } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { SettingsService } from '../settings.service'
 import { AbstractPaperlessService } from './abstract-paperless-service'
+import { DocumentService } from './document.service'
 
 @Injectable({
   providedIn: 'root',
@@ -14,10 +15,12 @@ import { AbstractPaperlessService } from './abstract-paperless-service'
 export class SavedViewService extends AbstractPaperlessService<SavedView> {
   public loading: boolean = true
   private savedViews: SavedView[] = []
+  private savedViewDocumentCounts: Map<number, number> = new Map()
 
   constructor(
     protected http: HttpClient,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private documentService: DocumentService
   ) {
     super(http, 'saved_views')
   }
@@ -45,8 +48,16 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
     )
   }
 
-  public reload() {
-    this.listAll().subscribe()
+  public reload(callback: any = null) {
+    this.listAll()
+      .pipe(
+        tap((r) => {
+          if (callback) {
+            callback(r)
+          }
+        })
+      )
+      .subscribe()
   }
 
   get allViews() {
@@ -108,5 +119,26 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
 
   delete(o: SavedView) {
     return super.delete(o).pipe(tap(() => this.reload()))
+  }
+
+  getDocumentCounts(views: SavedView[]) {
+    views.forEach((view) => {
+      this.documentService
+        .listFiltered(
+          1,
+          1,
+          view.sort_field,
+          view.sort_reverse,
+          view.filter_rules,
+          { fields: 'id', truncate_content: true }
+        )
+        .subscribe((results: Results<Document>) => {
+          this.savedViewDocumentCounts.set(view.id, results.count)
+        })
+    })
+  }
+
+  public getDocumentCount(view: SavedView): number {
+    return this.savedViewDocumentCounts.get(view.id)
   }
 }
