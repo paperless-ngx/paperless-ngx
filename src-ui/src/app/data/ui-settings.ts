@@ -20,6 +20,7 @@ export enum GlobalSearchType {
 export const PAPERLESS_GREEN_HEX = '#17541f'
 
 export const SETTINGS_KEYS = {
+  VERSION: 'version',
   LANGUAGE: 'language',
   APP_LOGO: 'app_logo',
   APP_TITLE: 'app_title',
@@ -76,6 +77,11 @@ export const SETTINGS_KEYS = {
 }
 
 export const SETTINGS: UiSetting[] = [
+  {
+    key: SETTINGS_KEYS.VERSION,
+    type: 'string',
+    default: '',
+  },
   {
     key: SETTINGS_KEYS.LANGUAGE,
     type: 'string',
