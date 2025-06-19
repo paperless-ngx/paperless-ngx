@@ -134,6 +134,13 @@ class UserViewSet(ModelViewSet):
             )
         return super().update(request, *args, **kwargs)
 
+    @extend_schema(
+        request=None,
+        responses={
+            200: OpenApiTypes.BOOL,
+            404: OpenApiTypes.STR,
+        },
+    )
     @action(detail=True, methods=["post"])
     def deactivate_totp(self, request, pk=None):
         request_user = request.user
