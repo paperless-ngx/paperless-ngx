@@ -408,7 +408,7 @@ Currently, there are three events that correspond to workflow trigger 'types':
    tags, doc type, or correspondent.
 4. **Scheduled**: a scheduled trigger that can be used to run workflows at a specific time. The date used can be either the document
    added, created, updated date or you can specify a (date) custom field. You can also specify a day offset from the date (positive
-   offsets will trigger before the date, negative offsets will trigger after).
+   offsets will trigger after the date, negative offsets will trigger before).
 
 The following flow diagram illustrates the three document trigger types:
 
