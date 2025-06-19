@@ -6,7 +6,6 @@ import re
 import tempfile
 import zipfile
 from datetime import datetime
-from distutils.util import strtobool
 from pathlib import Path
 from time import mktime
 from unicodedata import normalize
@@ -169,6 +168,7 @@ from documents.tasks import index_optimize
 from documents.tasks import sanity_check
 from documents.tasks import train_classifier
 from documents.templating.filepath import validate_filepath_template_and_render
+from documents.utils import get_boolean
 from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import GeneralConfig
@@ -238,8 +238,8 @@ class PassUserMixin(GenericAPIView):
     def get_serializer(self, *args, **kwargs):
         kwargs.setdefault("user", self.request.user)
         try:
-            full_perms = bool(
-                strtobool(str(self.request.query_params.get("full_perms", "false"))),
+            full_perms = get_boolean(
+                str(self.request.query_params.get("full_perms", "false")),
             )
         except ValueError:
             full_perms = False
@@ -600,8 +600,8 @@ class DocumentViewSet(
         kwargs.setdefault("fields", fields)
         kwargs.setdefault("truncate_content", truncate_content.lower() in ["true", "1"])
         try:
-            full_perms = bool(
-                strtobool(str(self.request.query_params.get("full_perms", "false"))),
+            full_perms = get_boolean(
+                str(self.request.query_params.get("full_perms", "false")),
             )
         except ValueError:
             full_perms = False

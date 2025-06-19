@@ -121,3 +121,10 @@ def run_subprocess(
         completed_proc.check_returncode()
 
     return completed_proc
+
+
+def get_boolean(boolstr: str) -> bool:
+    """
+    Return a boolean value from a string representation.
+    """
+    return bool(boolstr.lower() in ("yes", "y", "1", "t", "true"))
