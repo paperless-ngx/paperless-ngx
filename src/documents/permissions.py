@@ -532,9 +532,6 @@ def has_perms_owner_aware_for_folder(user: User, perm, obj: Folder):
         if not fp:
             continue
 
-        if user == fp.owner:
-            return True
-
         if perm == "view_folder":
             if (
                 user in fp.view_users.all() or
