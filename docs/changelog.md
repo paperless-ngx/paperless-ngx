@@ -1,5 +1,54 @@
 # Changelog
 
+## paperless-ngx 2.17.0
+
+### Breaking Changes
+
+-   Fix: restore expected pre-2.16 scheduled workflow offset behavior [@shamoon](https://github.com/shamoon) ([#10218](https://github.com/paperless-ngx/paperless-ngx/pull/10218))
+
+### Features / Enhancements
+
+-   QoL: log version at startup, show backend vs frontend mismatch in system status [@shamoon](https://github.com/shamoon) ([#10214](https://github.com/paperless-ngx/paperless-ngx/pull/10214))
+-   Feature: add Persian translation [@shamoon](https://github.com/shamoon) ([#10183](https://github.com/paperless-ngx/paperless-ngx/pull/10183))
+-   Enhancement: support import of zipped export [@kaerbr](https://github.com/kaerbr) ([#10073](https://github.com/paperless-ngx/paperless-ngx/pull/10073))
+
+### Bug Fixes
+
+-   Fix: more api fixes [@shamoon](https://github.com/shamoon) ([#10204](https://github.com/paperless-ngx/paperless-ngx/pull/10204))
+-   Fix: restore expected pre-2.16 scheduled workflow offset behavior [@shamoon](https://github.com/shamoon) ([#10218](https://github.com/paperless-ngx/paperless-ngx/pull/10218))
+-   Fix: fix some API crashes [@shamoon](https://github.com/shamoon) ([#10196](https://github.com/paperless-ngx/paperless-ngx/pull/10196))
+-   Fix: remove duplicate base path in websocket urls [@robertmx](https://github.com/robertmx) ([#10194](https://github.com/paperless-ngx/paperless-ngx/pull/10194))
+-   Fix: use hard delete for custom fields with workflow removal [@shamoon](https://github.com/shamoon) ([#10191](https://github.com/paperless-ngx/paperless-ngx/pull/10191))
+-   Fix: fix mail account test api schema [@shamoon](https://github.com/shamoon) ([#10164](https://github.com/paperless-ngx/paperless-ngx/pull/10164))
+-   Fix: correct api schema for mail_account process [@shamoon](https://github.com/shamoon) ([#10157](https://github.com/paperless-ngx/paperless-ngx/pull/10157))
+-   Fix: correct api schema for next_asn [@shamoon](https://github.com/shamoon) ([#10151](https://github.com/paperless-ngx/paperless-ngx/pull/10151))
+-   Fix: fix email and notes endpoints api spec [@shamoon](https://github.com/shamoon) ([#10148](https://github.com/paperless-ngx/paperless-ngx/pull/10148))
+
+### Dependencies
+
+-   Chore: bump angular/common to 19.12.14 [@shamoon](https://github.com/shamoon) ([#10212](https://github.com/paperless-ngx/paperless-ngx/pull/10212))
+
+### All App Changes
+
+<details>
+<summary>14 changes</summary>
+
+-   QoL: log version at startup, show backend vs frontend mismatch in system status [@shamoon](https://github.com/shamoon) ([#10214](https://github.com/paperless-ngx/paperless-ngx/pull/10214))
+-   Fix: more api fixes [@shamoon](https://github.com/shamoon) ([#10204](https://github.com/paperless-ngx/paperless-ngx/pull/10204))
+-   Fix: restore expected pre-2.16 scheduled workflow offset behavior [@shamoon](https://github.com/shamoon) ([#10218](https://github.com/paperless-ngx/paperless-ngx/pull/10218))
+-   Chore: switch from os.path to pathlib.Path [@gothicVI](https://github.com/gothicVI) ([#9933](https://github.com/paperless-ngx/paperless-ngx/pull/9933))
+-   Chore: bump angular/common to 19.12.14 [@shamoon](https://github.com/shamoon) ([#10212](https://github.com/paperless-ngx/paperless-ngx/pull/10212))
+-   Fix: fix some API crashes [@shamoon](https://github.com/shamoon) ([#10196](https://github.com/paperless-ngx/paperless-ngx/pull/10196))
+-   Fix: remove duplicate base path in websocket urls [@robertmx](https://github.com/robertmx) ([#10194](https://github.com/paperless-ngx/paperless-ngx/pull/10194))
+-   Fix: use hard delete for custom fields with workflow removal [@shamoon](https://github.com/shamoon) ([#10191](https://github.com/paperless-ngx/paperless-ngx/pull/10191))
+-   Feature: add Persian translation [@shamoon](https://github.com/shamoon) ([#10183](https://github.com/paperless-ngx/paperless-ngx/pull/10183))
+-   Enhancement: support import of zipped export [@kaerbr](https://github.com/kaerbr) ([#10073](https://github.com/paperless-ngx/paperless-ngx/pull/10073))
+-   Fix: fix mail account test api schema [@shamoon](https://github.com/shamoon) ([#10164](https://github.com/paperless-ngx/paperless-ngx/pull/10164))
+-   Fix: correct api schema for mail_account process [@shamoon](https://github.com/shamoon) ([#10157](https://github.com/paperless-ngx/paperless-ngx/pull/10157))
+-   Fix: correct api schema for next_asn [@shamoon](https://github.com/shamoon) ([#10151](https://github.com/paperless-ngx/paperless-ngx/pull/10151))
+-   Fix: fix email and notes endpoints api spec [@shamoon](https://github.com/shamoon) ([#10148](https://github.com/paperless-ngx/paperless-ngx/pull/10148))
+</details>
+
 ## paperless-ngx 2.16.3
 
 ### Features / Enhancements
