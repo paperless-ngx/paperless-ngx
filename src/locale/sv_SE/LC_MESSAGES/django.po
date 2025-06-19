@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-24 17:14+0000\n"
-"PO-Revision-Date: 2025-05-24 17:17\n"
+"POT-Creation-Date: 2025-06-17 05:45+0000\n"
+"PO-Revision-Date: 2025-06-17 05:49\n"
 "Last-Translator: \n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -55,7 +55,7 @@ msgstr "Maximalt antal nästlade nivåer överskrids."
 
 #: documents/filters.py:843
 msgid "Custom field not found"
-msgstr ""
+msgstr "Anpassat fält hittades inte"
 
 #: documents/models.py:36 documents/models.py:713
 msgid "owner"
@@ -578,7 +578,7 @@ msgstr ""
 
 #: documents/models.py:542
 msgid "Consume File"
-msgstr ""
+msgstr "Konsumera fil"
 
 #: documents/models.py:543
 msgid "Train Classifier"
@@ -810,11 +810,11 @@ msgstr "Web UI"
 
 #: documents/models.py:946
 msgid "Modified"
-msgstr ""
+msgstr "Ändrad"
 
 #: documents/models.py:947
 msgid "Custom Field"
-msgstr ""
+msgstr "Anpassat fält"
 
 #: documents/models.py:950
 msgid "Workflow Trigger Type"
@@ -898,7 +898,7 @@ msgstr ""
 
 #: documents/models.py:1078
 msgid "email subject"
-msgstr ""
+msgstr "e-post ämne"
 
 #: documents/models.py:1082
 msgid "The subject of the email, can include some placeholders, see documentation."
@@ -938,7 +938,7 @@ msgstr ""
 
 #: documents/models.py:1130
 msgid "send as JSON"
-msgstr ""
+msgstr "skicka som JSON"
 
 #: documents/models.py:1134
 msgid "webhook parameters"
@@ -1018,7 +1018,7 @@ msgstr "tilldela denna ägare"
 
 #: documents/models.py:1246
 msgid "grant view permissions to these users"
-msgstr ""
+msgstr "bevilja visningsbehörighet för dessa användare"
 
 #: documents/models.py:1253
 msgid "grant view permissions to these groups"
@@ -1026,7 +1026,7 @@ msgstr ""
 
 #: documents/models.py:1260
 msgid "grant change permissions to these users"
-msgstr ""
+msgstr "bevilja behörighet att ändra till dessa användare"
 
 #: documents/models.py:1267
 msgid "grant change permissions to these groups"
@@ -1173,12 +1173,12 @@ msgstr "Ogiltigt reguljärt uttryck: %(error)s"
 msgid "Invalid color."
 msgstr "Ogiltig färg."
 
-#: documents/serialisers.py:1646
+#: documents/serialisers.py:1645
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Filtypen %(type)s stöds inte"
 
-#: documents/serialisers.py:1740
+#: documents/serialisers.py:1739
 msgid "Invalid variable detected."
 msgstr "Ogiltig variabel upptäckt."
 
@@ -1188,26 +1188,27 @@ msgstr ""
 
 #: documents/templates/account/account_inactive.html:9
 msgid "Account inactive."
-msgstr ""
+msgstr "Konto inaktivt."
 
 #: documents/templates/account/account_inactive.html:14
 msgid "This account is inactive."
-msgstr ""
+msgstr "Detta konto är inaktiverat."
 
 #: documents/templates/account/account_inactive.html:16
 msgid "Return to login"
-msgstr ""
+msgstr "Återgå till inloggning"
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr ""
+msgstr "Hej från %(site_name)s!"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
 msgid "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
-msgstr ""
+msgstr "Tack för att du använder %(site_name)s!\n"
+"%(site_domain)s"
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
@@ -1245,23 +1246,23 @@ msgstr "Glömt ditt lösenord?"
 #: documents/templates/account/login.html:51
 #: documents/templates/account/signup.html:57
 msgid "or sign in via"
-msgstr ""
+msgstr "eller logga in via"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "Paperless-ngx begäran om återställning av lösenord"
 
 #: documents/templates/account/password_reset.html:9
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr ""
+msgstr "Ange din e-postadress nedan, så skickar vi instruktioner för hur du ställer in ett nytt."
 
 #: documents/templates/account/password_reset.html:12
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "Ett fel uppstod. Vänligen försök igen."
 
 #: documents/templates/account/password_reset.html:21
 msgid "Send me instructions!"
-msgstr ""
+msgstr "Skicka mig instruktioner!"
 
 #: documents/templates/account/password_reset_done.html:5
 msgid "Paperless-ngx reset password sent"
@@ -1269,11 +1270,11 @@ msgstr ""
 
 #: documents/templates/account/password_reset_done.html:9
 msgid "Check your inbox."
-msgstr ""
+msgstr "Kontrollera din inkorg."
 
 #: documents/templates/account/password_reset_done.html:13
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr ""
+msgstr "Vi har mejlat dig instruktioner för hur du anger ditt lösenord. Du bör få e-postmeddelandet inom kort!"
 
 #: documents/templates/account/password_reset_from_key.html:5
 msgid "Paperless-ngx reset password confirmation"
@@ -1285,7 +1286,7 @@ msgstr "Ange ett nytt lösenord."
 
 #: documents/templates/account/password_reset_from_key.html:15
 msgid "request a new password reset"
-msgstr ""
+msgstr "begär en ny lösenordsåterställning"
 
 #: documents/templates/account/password_reset_from_key.html:17
 msgid "New Password"
@@ -1328,11 +1329,11 @@ msgstr ""
 #: documents/templates/account/signup.html:23
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
-msgstr ""
+msgstr "E-post (valfritt)"
 
 #: documents/templates/account/signup.html:25
 msgid "Password (again)"
-msgstr ""
+msgstr "Lösenord (igen)"
 
 #: documents/templates/account/signup.html:43
 #: documents/templates/socialaccount/signup.html:27
@@ -1410,7 +1411,7 @@ msgstr ""
 #: documents/validators.py:24
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "Det går inte att tolka URI {value}, schema saknas"
 
 #: documents/validators.py:29
 #, python-brace-format
@@ -1424,7 +1425,7 @@ msgstr ""
 #: documents/validators.py:45
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "Det gick inte att tolka URI {value}"
 
 #: paperless/apps.py:11
 msgid "Paperless"
@@ -1628,7 +1629,7 @@ msgstr "Arabiska"
 
 #: paperless/settings.py:756
 msgid "Afrikaans"
-msgstr ""
+msgstr "Afrikaans"
 
 #: paperless/settings.py:757
 msgid "Belarusian"
@@ -1667,92 +1668,96 @@ msgid "Spanish"
 msgstr "Spanska"
 
 #: paperless/settings.py:766
+msgid "Persian"
+msgstr ""
+
+#: paperless/settings.py:767
 msgid "Finnish"
 msgstr "Finska"
 
-#: paperless/settings.py:767
+#: paperless/settings.py:768
 msgid "French"
 msgstr "Franska"
 
-#: paperless/settings.py:768
+#: paperless/settings.py:769
 msgid "Hungarian"
 msgstr ""
 
-#: paperless/settings.py:769
+#: paperless/settings.py:770
 msgid "Italian"
 msgstr "Italienska"
 
-#: paperless/settings.py:770
+#: paperless/settings.py:771
 msgid "Japanese"
 msgstr "Japanska"
 
-#: paperless/settings.py:771
+#: paperless/settings.py:772
 msgid "Korean"
 msgstr "Koreanska"
 
-#: paperless/settings.py:772
+#: paperless/settings.py:773
 msgid "Luxembourgish"
 msgstr "Luxemburgiska"
 
-#: paperless/settings.py:773
+#: paperless/settings.py:774
 msgid "Norwegian"
 msgstr "Norska"
 
-#: paperless/settings.py:774
+#: paperless/settings.py:775
 msgid "Dutch"
 msgstr "Holländska"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:776
 msgid "Polish"
 msgstr "Polska"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:777
 msgid "Portuguese (Brazil)"
 msgstr "Portugisiska (Brasilien)"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:778
 msgid "Portuguese"
 msgstr "Portugisiska"
 
-#: paperless/settings.py:778
+#: paperless/settings.py:779
 msgid "Romanian"
 msgstr "Rumänska"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:780
 msgid "Russian"
 msgstr "Ryska"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:781
 msgid "Slovak"
 msgstr "Slovakiska"
 
-#: paperless/settings.py:781
+#: paperless/settings.py:782
 msgid "Slovenian"
 msgstr "Slovenska"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:783
 msgid "Serbian"
 msgstr "Serbiska"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:784
 msgid "Swedish"
 msgstr "Svenska"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:785
 msgid "Turkish"
 msgstr "Turkiska"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:786
 msgid "Ukrainian"
 msgstr "Ukrainiska"
 
-#: paperless/settings.py:786
+#: paperless/settings.py:787
 msgid "Chinese Simplified"
 msgstr "Kinesiska (förenklad)"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:788
 msgid "Chinese Traditional"
-msgstr ""
+msgstr "Kinesiska traditionell"
 
 #: paperless/urls.py:374
 msgid "Paperless-ngx administration"
@@ -1820,11 +1825,11 @@ msgstr "IMAP"
 
 #: paperless_mail/models.py:20
 msgid "Gmail OAuth"
-msgstr ""
+msgstr "Gmail OAuth"
 
 #: paperless_mail/models.py:21
 msgid "Outlook OAuth"
-msgstr ""
+msgstr "Outlook OAuth"
 
 #: paperless_mail/models.py:25
 msgid "IMAP server"
@@ -1908,19 +1913,19 @@ msgstr ""
 
 #: paperless_mail/models.py:120
 msgid "Text, then HTML"
-msgstr ""
+msgstr "Text, sedan HTML"
 
 #: paperless_mail/models.py:121
 msgid "HTML, then text"
-msgstr ""
+msgstr "HTML, sedan text"
 
 #: paperless_mail/models.py:122
 msgid "HTML only"
-msgstr ""
+msgstr "Endast HTML"
 
 #: paperless_mail/models.py:123
 msgid "Text only"
-msgstr ""
+msgstr "Endast text"
 
 #: paperless_mail/models.py:126
 msgid "Delete"
