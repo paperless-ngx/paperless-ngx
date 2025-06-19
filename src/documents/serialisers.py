@@ -360,9 +360,9 @@ class OwnedObjectSerializer(
             shared_object_pks = self.get_shared_object_pks([obj])
         return obj.owner == self.user and obj.id in shared_object_pks
 
-    permissions = SerializerMethodField(read_only=True)
-    user_can_change = SerializerMethodField(read_only=True)
-    is_shared_by_requester = SerializerMethodField(read_only=True)
+    permissions = SerializerMethodField(read_only=True, required=False)
+    user_can_change = SerializerMethodField(read_only=True, required=False)
+    is_shared_by_requester = SerializerMethodField(read_only=True, required=False)
 
     set_permissions = SetPermissionsSerializer(
         label="Set permissions",
@@ -2195,7 +2195,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
         set_triggers = []
         set_actions = []
 
-        if triggers is not None:
+        if triggers is not None and triggers is not serializers.empty:
             for trigger in triggers:
                 filter_has_tags = trigger.pop("filter_has_tags", None)
                 trigger_instance, _ = WorkflowTrigger.objects.update_or_create(
@@ -2206,7 +2206,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
                     trigger_instance.filter_has_tags.set(filter_has_tags)
                 set_triggers.append(trigger_instance)
 
-        if actions is not None:
+        if actions is not None and actions is not serializers.empty:
             for action in actions:
                 assign_tags = action.pop("assign_tags", None)
                 assign_view_users = action.pop("assign_view_users", None)
@@ -2288,14 +2288,16 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
                 set_actions.append(action_instance)
 
-        instance.triggers.set(set_triggers)
-        instance.actions.set(set_actions)
+        if triggers is not serializers.empty:
+            instance.triggers.set(set_triggers)
+        if actions is not serializers.empty:
+            instance.actions.set(set_actions)
         instance.save()
 
     def prune_triggers_and_actions(self):
         """
         ManyToMany fields dont support e.g. on_delete so we need to discard unattached
-        triggers and actionas manually
+        triggers and actions manually
         """
         for trigger in WorkflowTrigger.objects.all():
             if trigger.workflows.all().count() == 0:
@@ -2322,16 +2324,12 @@ class WorkflowSerializer(serializers.ModelSerializer):
         return instance
 
     def update(self, instance: Workflow, validated_data) -> Workflow:
-        if "triggers" in validated_data:
-            triggers = validated_data.pop("triggers")
-
-        if "actions" in validated_data:
-            actions = validated_data.pop("actions")
+        triggers = validated_data.pop("triggers", serializers.empty)
+        actions = validated_data.pop("actions", serializers.empty)
 
         instance = super().update(instance, validated_data)
 
         self.update_triggers_and_actions(instance, triggers, actions)
-
         self.prune_triggers_and_actions()
 
         return instance
