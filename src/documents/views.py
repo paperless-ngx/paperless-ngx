@@ -130,7 +130,7 @@ from documents.matching import match_folders
 from documents.matching import match_storage_paths
 from documents.matching import match_tags
 from documents.matching import match_warehouses
-from documents.models import Approval
+from documents.models import Approval, FolderPermission
 from documents.models import ArchiveFont
 from documents.models import BackupRecord
 from documents.models import Correspondent
@@ -2799,14 +2799,12 @@ class BulkEditObjectsView(PassUserMixin):
                         return Response(status=status.HTTP_400_BAD_REQUEST)
                 else:
                     request.data["parent_folder"] = None
+            folder_document_ids_reindex = set()
 
             for folder in folder_list:
-                # folder.parent_folder = parent_folder_obj
-                # folder.path = f"{folder.parent_folder.path}/{folder.id}"
-                # folder.save()
+                if folder.type == Folder.FILE:
+                    folder_document_ids_reindex.add(folder.id)
 
-                # print(folder.id)
-                # print(int(request.data['parent_folder'][0]))
                 old_parent_folder = folder.parent_folder
                 folder.parent_folder = parent_folder_obj
 
@@ -2818,19 +2816,16 @@ class BulkEditObjectsView(PassUserMixin):
 
                     else:
                         folder.path = f"{folder.id}/"
-                    # if parent_folder_obj is not None:
-                    # destination_folder = get_permissions(parent_folder_obj)
-                    # update_view_folder_parent_permissions.delay(folder,
-                    #                                             destination_folder)
-                    # permission_move_folder = get_permission_folder(folder)
-                    # destination_folder = get_permission_folder(parent_folder_obj)
-                    # update_view_folder_parent_permissions.delay(folder,
-                    #                                             destination_folder)
-                    # update_view_folder_parent_permissions.delay(
-                    #     parent_folder_obj,
-                    #     permission_move_folder)
+
+                    FolderPermission.objects.filter(
+                        path__startswith=old_path).update(path=folder.path)
+
                     folder.save()
-                    # update_child_folder_paths.delay(folder, old_path)
+            docs = Document.objects.filter(id__in=folder_document_ids_reindex)
+            index.update_index_bulk_documents(docs, 1000)
+
+
+
 
             return Response(status=status.HTTP_204_NO_CONTENT)
         # elif operation == "update" and object_type == "archive_fonts":

@@ -564,7 +564,7 @@ def has_perms_owner_aware_for_folder(user: User, perm, obj: Folder):
 from django.db.models import Q
 
 
-def get_objects_folder_for_user(user, perm, with_group_users=False):
+def get_objects_folder_for_user(user: User, perm, with_group_users=False):
     """
     Lấy danh sách thư mục mà user có quyền xem hoặc sửa, kế thừa từ thư mục cha và loại trừ bị chặn.
 
@@ -576,7 +576,8 @@ def get_objects_folder_for_user(user, perm, with_group_users=False):
     from documents.models import Folder, FolderPermission
     if perm not in ["view_folder", "change_folder"]:
         raise ValueError("Perm phải là 'view_folder' hoặc 'change_folder'.")
-
+    if user.is_superuser:
+        return Folder.objects.all()
     group_ids = list(
         user.groups.values_list("id", flat=True)) if with_group_users else []
 
@@ -606,6 +607,7 @@ def get_objects_folder_for_user(user, perm, with_group_users=False):
         FolderPermission.objects.filter(allowed_q).values_list("path",
                                                                flat=True)
     )
+
     blocked_paths = set(
         FolderPermission.objects.filter(blocked_q).values_list("path",
                                                                flat=True)
@@ -614,18 +616,31 @@ def get_objects_folder_for_user(user, perm, with_group_users=False):
     # Truy vấn thư mục dựa trên path được cho phép và loại trừ path bị chặn
     folders = Folder.objects.none()
 
+    folder_paths_owner = Folder.objects.filter(owner=user).values_list('path',
+                                                                       flat=True)
+    owner_path_q = Q()
+    folders_owner = Folder.objects.none()
     if allowed_paths:
         # folders = Folder.objects.all()
         allow_q = Q()
+        allow_ids = set()
+        for f in folder_paths_owner:
+            ids = (int(id) for id in f.rstrip("/").split("/"))
+            allow_ids.update(ids)
+            owner_path_q |= Q(path__startswith=f)
+        folders_owner = Folder.objects.filter(owner_path_q)
         for p in allowed_paths:
+            ids = (int(id) for id in p.rstrip("/").split("/"))
+            allow_ids.update(ids)
             allow_q |= Q(path__startswith=p)
-        folders = Folder.objects.filter(allow_q)
+        folders = Folder.objects.filter(allow_q | Q(id__in=allow_ids))
 
     if blocked_paths:
         block_q = Q()
         for p in blocked_paths:
             block_q |= Q(path__startswith=p)
-        folders = folders.exclude(block_q)
+        folders = folders.exclude(block_q) | folders_owner
+
     return folders.distinct()
 
 
