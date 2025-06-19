@@ -35,6 +35,7 @@ import {
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
 import {
   AppRemoteVersion,
   RemoteVersionService,
@@ -91,7 +92,8 @@ export class AppFrameComponent
     private readonly toastService: ToastService,
     private modalService: NgbModal,
     public permissionsService: PermissionsService,
-    private djangoMessagesService: DjangoMessagesService
+    private djangoMessagesService: DjangoMessagesService,
+    private documentService: DocumentService
   ) {
     super()
 
@@ -101,7 +103,11 @@ export class AppFrameComponent
         PermissionType.SavedView
       )
     ) {
-      this.savedViewService.reload()
+      this.savedViewService.reload(() => {
+        this.savedViewService.getDocumentCounts(
+          this.savedViewService.sidebarViews
+        )
+      })
     }
   }
 
