@@ -14,9 +14,11 @@ from django.views.generic import RedirectView
 from django.views.static import serve
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
-
-from documents.views import AcknowledgeTasksView, DocumentElasticSearch, \
-    WebhookViewSet, SelectQueryViewSet, PostFolderView
+from documents.views import CreatedDepartmentViewSet
+from documents.views import ManageDepartmentViewSet
+from documents.views import AcknowledgeTasksView, DocumentElasticSearch
+from documents.views import (WebhookViewSet, SelectQueryViewSet, PostFolderView, MovedHistoryViewSet)
+from documents.views import ContainerMoveHistoryViewSet
 from documents.views import ApprovalUpdateMutipleView
 from documents.views import ApprovalViewSet
 from documents.views import ArchiveFontViewSet
@@ -107,6 +109,10 @@ api_router.register(r'process_ocr', WebhookViewSet, basename='webhook')
 # api_router.register(r"approvals", ApprovalViewSet)
 api_router.register(r"content_types", ContentTypeViewSet,
                     basename="content_types")
+api_router.register(r"history", MovedHistoryViewSet, basename='history')
+api_router.register(r"container",ContainerMoveHistoryViewSet)
+api_router.register(r"created_dpm", CreatedDepartmentViewSet)
+api_router.register(r"manage_dpm", ManageDepartmentViewSet)
 
 urlpatterns = [
     re_path(

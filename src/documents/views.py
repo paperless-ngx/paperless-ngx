@@ -1,5 +1,4 @@
 import itertools
-import itertools
 import json
 import logging
 import os
@@ -129,7 +128,8 @@ from documents.matching import match_folders
 from documents.matching import match_storage_paths
 from documents.matching import match_tags
 from documents.matching import match_warehouses
-from documents.models import Approval
+from documents.models import Approval, MovedHistory, ContainerMoveHistory, \
+    ManageDepartment, CreatedDepartment
 from documents.models import ArchiveFont
 from documents.models import BackupRecord
 from documents.models import Correspondent
@@ -165,7 +165,9 @@ from documents.permissions import update_view_folder_parent_permissions
 from documents.permissions import \
     update_view_warehouse_shelf_boxcase_permissions
 from documents.serialisers import AcknowledgeTasksViewSerializer, \
-    DocumentDocumentSerializer, DocumentDetailSerializer, PostFolderSerializer
+    DocumentDocumentSerializer, DocumentDetailSerializer, PostFolderSerializer, \
+    MovedHistorySerializer, ContainerMoveHistorySerializer, \
+    ManageDepartmentSerializer, CreatedDepartmentSerializer
 from documents.serialisers import ApprovalSerializer
 from documents.serialisers import ApprovalViewSerializer
 from documents.serialisers import ArchiveFontSerializer
@@ -220,7 +222,6 @@ if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
 
 logger = logging.getLogger("edoc.api")
-
 
 class IndexView(TemplateView):
     template_name = "index.html"
@@ -3402,7 +3403,8 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer = self.get_serializer(instance, data=request.data,
+                                         partial=partial)
         serializer.is_valid(raise_exception=True)
 
         old_parent_warehouse = instance.parent_warehouse
@@ -3416,7 +3418,8 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 and getattr(instance.parent_warehouse, "type", "")
                 == Warehouse.WAREHOUSE
                 or instance.type == Warehouse.BOXCASE
-                and getattr(instance.parent_warehouse, "type", "") == Warehouse.SHELF
+                and getattr(instance.parent_warehouse, "type",
+                            "") == Warehouse.SHELF
             ):
                 instance.path = f"{instance.parent_warehouse.path}/{instance.id}"
             elif instance.type == Warehouse.WAREHOUSE and not instance.parent_warehouse:
@@ -3434,6 +3437,7 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 boxcase_warehouse.save()
 
         return Response(serializer.data)
+
 
     def update_shelf_boxcase_permisisons(self, warehouse, serializer):
         child_shelf_boxcase = Warehouse.objects.filter(path__startswith=warehouse.path)
@@ -3474,8 +3478,6 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                         object=obj,
                         merge=merge,
                     )
-
-
         except Exception as e:
             logger.warning(
                 f"An error occurred performing bulk permissions edit: {e!s}",
@@ -3486,11 +3488,62 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
 
     def partial_update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", True)
+
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
 
         old_parent_warehouse = instance.parent_warehouse
+        # ---new--- #
+        new_parent_warehouse = serializer.validated_data.get(
+            "parent_warehouse", old_parent_warehouse)
+        # --- cập nhật ngày bàn giao tự động nếu bàn giao cho đơn vị khác--- #
+        new_department = serializer.validated_data.get(
+            "handover_to_department")
+        if "handover_to_department" in serializer.validated_data and new_department is not None:
+            serializer.validated_data["recived_date"] = timezone.now()
+        if old_parent_warehouse == new_parent_warehouse:
+            self.perform_update(serializer)
+            return Response(serializer.data)
+        # ------ #
+        reason = request.data.get("move_reason")
+        if not reason or not reason.strip():
+            return Response({"error": "Phải cung cấp lý do di chuyển khi thay đổi vị trí."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        # ---new--- #
+        if instance.type in [Warehouse.BOXCASE, Warehouse.SHELF]:
+            ContainerMoveHistory.objects.create(
+                container=instance,
+                old_parent=old_parent_warehouse,
+                new_parent=new_parent_warehouse,
+                moved_by=request.user,
+                move_reason=reason
+            )
+            # 2. Ghi lịch sử di chuyển cho các tài liệu bên trong (nếu có)
+        documents_to_log = Document.objects.none()
+        reason = ""
+        if instance.type == Warehouse.BOXCASE:
+            documents_to_log = Document.objects.filter(warehouse=instance)
+            reason = f"Container '{instance.name}' was moved."
+        elif instance.type == Warehouse.SHELF:
+            child_boxcases = Warehouse.objects.filter(
+                path__startswith=instance.path, type=Warehouse.BOXCASE)
+            documents_to_log = Document.objects.filter(
+                warehouse__in=child_boxcases)
+            reason = f"Parent container '{instance.name}' was moved."
+
+        if documents_to_log.exists():
+            history_records_to_create = [
+                MovedHistory(
+                    document=doc,
+                    old_location=old_parent_warehouse,
+                    new_location=new_parent_warehouse,
+                    moved_by=request.user,
+                    move_reason=reason
+                ) for doc in documents_to_log
+            ]
+            MovedHistory.objects.bulk_create(history_records_to_create)
+        # ------ #
 
         self.perform_update(serializer)
 
@@ -3534,7 +3587,9 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         if request.method == "GET":
             try:
                 warehouse = Warehouse.objects.get(pk=pk)
-                warehouse_path_ids = warehouse.path.split("/")
+                # warehouse_path_ids = warehouse.path.split("/")
+                warehouse_path_ids = [path_id for path_id in
+                                      warehouse.path.split("/") if path_id]
                 warehouses = Warehouse.objects.filter(id__in=warehouse_path_ids)
                 warehouse_dict = {}
                 for f in warehouses:
@@ -4394,3 +4449,76 @@ class BackupRecordViewSet(ModelViewSet):
             return Response(async_task_restore.id)
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404
+
+
+class MovedHistoryViewSet(ReadOnlyModelViewSet):
+    """
+    Provides a read-only API endpoint for viewing document location movement history.
+
+    Results are automatically filtered to only include records for documents
+    that the requesting user has permission to view.
+    """
+    serializer_class = MovedHistorySerializer
+    permission_classes = (IsAuthenticated,)
+    pagination_class = StandardPagination
+
+    # Enable filtering and ordering
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+    )
+
+    # Define the fields that can be used for filtering
+    filterset_fields = (
+        'document',
+        'old_location',
+        'new_location',
+        'moved_by',
+        'move_timestamp',
+    )
+    ordering_fields = ('move_timestamp',)
+
+    def get_queryset(self):
+        """
+        This view returns a list of all movement history records for documents
+        that the current user has permission to see.
+        """
+        # Get all Document objects the user is allowed to view
+        viewable_docs = get_objects_for_user_owner_aware(
+            self.request.user,
+            "documents.view_document",
+            Document,
+        )
+        return MovedHistory.objects.filter(
+            document__in=viewable_docs
+        ).select_related(
+            'document',
+            'old_location',
+            'new_location',
+            'moved_by'
+        ).order_by('-move_timestamp')
+
+class ContainerMoveHistoryViewSet(ReadOnlyModelViewSet):
+    queryset = ContainerMoveHistory.objects.select_related('container', 'old_parent', 'new_parent', 'moved_by')
+    serializer_class = ContainerMoveHistorySerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardPagination
+    filterset_fields = ['container', 'old_parent', 'new_parent', 'moved_by']
+    ordering_fields = ['move_timestamp']
+
+class ManageDepartmentViewSet(ModelViewSet):
+    queryset = ManageDepartment.objects.all()
+    serializer_class = ManageDepartmentSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardPagination
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ["name", "email", "phone_number"]
+
+class CreatedDepartmentViewSet(ModelViewSet):
+    queryset = CreatedDepartment.objects.all().order_by('name')
+    serializer_class = CreatedDepartmentSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardPagination
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['name', 'department_type']
+    ordering_fields = ['name']

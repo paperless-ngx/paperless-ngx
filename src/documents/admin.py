@@ -3,7 +3,7 @@ from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
 
 from documents.index import delete_document_index
-from documents.models import Correspondent
+from documents.models import Correspondent, MovedHistory
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -17,7 +17,7 @@ from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import Warehouse
-
+from documents.models import ContainerMoveHistory
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.admin import LogEntryAdmin
     from auditlog.models import LogEntry
@@ -46,6 +46,19 @@ class WarehouseAdmin(GuardedModelAdmin):
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
 
+class LocationHistoryAdmin(admin.ModelAdmin):
+    list_display = (
+        'id', 'document', 'old_location', 'new_location',
+        'moved_by', 'move_timestamp', 'move_reason'
+    )
+    list_filter = (
+        'move_timestamp', 'moved_by', 'old_location__type', 'new_location__type'
+    )
+    search_fields = (
+        'document__name', 'old_location__name', 'new_location__name',
+        'moved_by__username', 'move_reason'
+    )
+    raw_id_fields = ('document', 'old_location', 'new_location', 'moved_by')
 class FolderAdmin(GuardedModelAdmin):
     list_display = ("name", "path", "parent_folder", "match", "matching_algorithm")
     list_filter = ("matching_algorithm",)
@@ -198,8 +211,9 @@ class CustomFieldInstancesAdmin(GuardedModelAdmin):
             .get_queryset(request)
             .select_related("field", "document__correspondent")
         )
-
-
+class ContainerMoveHistoryAdmin(GuardedModelAdmin):
+    list_display = ("id", "container", "old_parent", "new_parent", "moved_by", "move_timestamp" )
+admin.site.register(ContainerMoveHistory, ContainerMoveHistoryAdmin)
 admin.site.register(Correspondent, CorrespondentAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(DocumentType, DocumentTypeAdmin)
@@ -213,6 +227,7 @@ admin.site.register(Note, NotesAdmin)
 admin.site.register(ShareLink, ShareLinksAdmin)
 admin.site.register(CustomField, CustomFieldsAdmin)
 admin.site.register(CustomFieldInstance, CustomFieldInstancesAdmin)
+admin.site.register(MovedHistory, LocationHistoryAdmin)
 
 if settings.AUDIT_LOG_ENABLED:
 

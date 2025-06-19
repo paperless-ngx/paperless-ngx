@@ -27,13 +27,15 @@ from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import get_users_with_perms
 from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
+from pkg_resources import require
 from rest_framework import fields
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from documents import bulk_edit
 from documents.data_models import DocumentSource
-from documents.models import ArchiveFont
+from documents.models import ArchiveFont, MovedHistory, ManageDepartment, \
+    CreatedDepartment, ContainerMoveHistory
 from documents.models import BackupRecord
 from documents.models import Correspondent
 from documents.models import CustomField
@@ -1248,6 +1250,7 @@ class DocumentDetailSerializer(
             "page_count",
             "warehouse_s",
             "warehouse_w",
+            "moved_history"
         )
 
 class DocumentFolderSerializer(
@@ -3158,3 +3161,92 @@ class TrashSerializer(SerializerWithPerms):
                 "Some documents in the list have not yet been deleted.",
             )
         return documents
+class MovedHistorySerializer(serializers.ModelSerializer):
+    """
+    Serializer for the MovedHistory model.
+    Provides a read-only, human-readable representation of a document's
+    location change history.
+    """
+    # Use StringRelatedField for readable representations of foreign keys
+    document = serializers.StringRelatedField(read_only=True)
+    old_location = serializers.StringRelatedField(read_only=True)
+    new_location = serializers.StringRelatedField(read_only=True)
+    moved_by = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = MovedHistory
+        # List all fields you want to expose in the API
+        fields = [
+            'id',
+            'document',
+            'old_location',
+            'new_location',
+            'moved_by',
+            'move_timestamp',
+            'move_reason',
+        ]
+        # Make all fields read-only as this is a log
+        read_only_fields = fields
+class ManageDepartmentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+    """
+    Serializer for the ManageDepartment model.
+    """
+    class Meta:
+        model = ManageDepartment
+        fields = [
+            "id",
+            "slug",
+            "name",
+            "email",
+            "phone_number",
+            "location",
+            "match",
+            "matching_algorithm",
+            "is_insensitive",
+            "document_count",
+            "owner",
+            "permissions",
+            "user_can_change",
+            "set_permissions",
+        ]
+
+class CreatedDepartmentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+    """
+    Serializer for the CreatedDepartment model.
+    """
+    class Meta:
+        model = CreatedDepartment
+        fields = [
+            "id",
+            "slug",
+            "name",
+            "department_type",
+            "main_pos",
+            "phone_number",
+            "match",
+            "matching_algorithm",
+            "is_insensitive",
+            "document_count",
+            "owner",
+            "permissions",
+            "user_can_change",
+            "set_permissions",
+        ]
+class ContainerMoveHistorySerializer(serializers.ModelSerializer):
+    container_id = serializers.PrimaryKeyRelatedField(source="container", read_only=True)
+    old_parent_id = serializers.PrimaryKeyRelatedField(source="old_parent", read_only=True)
+    new_parent_id = serializers.PrimaryKeyRelatedField(source="new_parent", read_only=True)
+    moved_by_username = serializers.StringRelatedField(source="moved_by", read_only=True)
+
+    class Meta:
+        model = ContainerMoveHistory
+        fields = [
+            'id',
+            'container_id',
+            'old_parent_id',
+            'new_parent_id',
+            'moved_by_username',
+            'move_timestamp',
+            'move_reason',
+        ]
+

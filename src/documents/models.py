@@ -241,6 +241,47 @@ class StoragePath(MatchingModel):
         verbose_name = _("storage path")
         verbose_name_plural = _("storage paths")
 
+class ManageDepartment(MatchingModel):
+
+    email = models.EmailField(
+        _("email address"),
+        unique=True
+    )
+    phone_number=models.CharField(
+        _("phone number"), max_length=20,
+        unique=True
+    )
+    location = models.TextField(
+        _("location"),
+        max_length=102,
+        blank=True
+    )
+# --- --- --- --- --- --- --- #
+class  CreatedDepartment(MatchingModel):
+
+    location = models.TextField(
+        _("location"),
+        max_length=102,
+        blank=True
+    )
+    department_type = models.CharField(
+        _("Department Type"),
+        max_length=100,
+        blank=True
+    )
+    main_pos = models.CharField(_(
+        "main pos"),
+        max_length=20,
+        blank=True
+    )
+    phone_number = models.CharField(
+        _("phone number"),
+        max_length=20,
+        blank=True
+    )
+    def __str__(self):
+        return self.name
+
 
 class Warehouse(MatchingModel):
 
@@ -252,6 +293,22 @@ class Warehouse(MatchingModel):
         (SHELF, _("Shelf")),
         (BOXCASE, _("Boxcase")),
     )
+    # --- Trạn thái vận của hộp --- #
+    WAIT_FOR_DELIVERY = "wait_for_delivery"
+    DELIVERING = "delivering"
+    DELIVERED = "delivered"
+    STORED = "stored"
+    OPENED = "opened"
+    DESTROYED = "destroyed"
+    TYPE_DELIVERY = (
+        (WAIT_FOR_DELIVERY, _("Wait for Delivery")),
+        (DELIVERING, _("Delivering")),
+        (DESTROYED, _("Delivered")),
+        (STORED, _("Stored")),
+        (OPENED, _("Opened")),
+        (DESTROYED, _("Destroyed"))
+    )
+
 
     type = models.CharField(
         max_length=20, null=True, blank=True, choices=TYPE_WAREHOUSE, default=WAREHOUSE
@@ -260,6 +317,66 @@ class Warehouse(MatchingModel):
         "self", on_delete=models.CASCADE, null=True, blank=True
     )
     path = models.TextField(_("path"), null=True, blank=True)
+
+    main_pos = models.CharField(
+        _("main_pos"),
+        max_length=256,
+        null=True,
+        blank=True
+    )
+    description = models.TextField(
+        _("description"),
+        null=True,
+        blank=True
+    )
+    map = models.ImageField(
+        _("map"),
+        null=True,
+        blank=True
+    )
+    boxcase_status = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+        choices=TYPE_DELIVERY,
+        default=WAIT_FOR_DELIVERY,
+        db_index=True
+    )
+    manage_by_department = models.ForeignKey(
+        ManageDepartment,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("manage_by_department"),
+
+    )
+    is_manage_by_company = models.BooleanField(
+        _("is_manage_by_company"),
+        default=False,
+    )
+    code_in_box = models.CharField(
+        _("code_in_box"),
+        max_length=256,
+        null=True,
+    )
+    recived_date = models.DateTimeField(
+        _("recived_date"),
+        null=True,
+        db_index=True,
+    )
+    handover_date = models.DateTimeField(
+        _("handover_date"),
+        null=True,
+        db_index=True,
+    )
+    handover_to_department = models.ForeignKey(
+        CreatedDepartment,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="handover_to_department",
+        verbose_name=_("handover_to_department")
+    )
 
     class Meta(MatchingModel.Meta):
         verbose_name = _("warehouse")
@@ -1818,3 +1935,104 @@ class BackupRecord(ModelWithOwner):
 
     def __str__(self):
         return f"{self.filename} - {self.created_at}"
+
+class MovedHistory(models.Model):
+    document = models.ForeignKey(
+        Document,
+        on_delete=models.CASCADE,
+        related_name='moved_history',
+        verbose_name=_("Document moved history")
+    )
+    old_location = models.ForeignKey(
+        Warehouse,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='old_location_history',
+        verbose_name=_("Old location"),
+    )
+    new_location = models.ForeignKey(
+        Warehouse,
+        on_delete=models.SET_NULL,
+        # If new location is deleted, history record persists
+        null=True,
+        blank=True,
+        related_name='new_location_histories',
+        verbose_name=_("New Location")
+    )
+    moved_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='move_history',
+        verbose_name=_("Moved By")
+    )
+    move_timestamp = models.DateTimeField(
+        default=timezone.now,
+        db_index=True,
+        verbose_name=_("Move Timestamp")
+    )
+    move_reason = models.TextField(
+        _("Reason for Move"),
+        blank=True,
+        null=True
+    )
+
+    class Meta:
+        verbose_name = _("Location History")
+        verbose_name_plural = _("Location Histories")
+        ordering = ['-move_timestamp']  # Order by most recent move first
+
+    def __str__(self):
+        doc_name = self.document.name if self.document else "Unknown Document"
+        old_loc_name = self.old_location.name if self.old_location else "N/A"
+        new_loc_name = self.new_location.name if self.new_location else "N/A"
+        return f"Move of '{doc_name}' from '{old_loc_name}' to '{new_loc_name}' by {self.moved_by or 'System'} at {self.move_timestamp.strftime('%Y-%m-%d %H:%M')}"
+
+class ContainerMoveHistory(models.Model):
+    container = models.ForeignKey(
+        Warehouse,
+        on_delete=models.CASCADE,
+        related_name='container_moved_history',
+        verbose_name=_("Container moved history")
+    )
+    old_parent = models.ForeignKey(
+        Warehouse,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='old_parent_of',
+        verbose_name=_("Old parent")
+    )
+    new_parent = models.ForeignKey(
+        Warehouse,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='new_parent_of',
+        verbose_name=_("New parent")
+    )
+    moved_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_("Move By")
+    )
+    move_timestamp = models.DateTimeField(
+        default=timezone.now,
+        db_index=True,
+        verbose_name=_("Move Timestamp")
+    )
+    move_reason = models.TextField(
+        _("Reason for Move"),
+        blank=True,
+        null=True
+    )
+    class Meta:
+        verbose_name = _("Container Moved History")
+        verbose_name_plural = _("Container Moved Histories")
+        ordering = ['-move_timestamp']
+    def __str__(self):
+        return f"Container '{self.container.name}' move by {self.moved_by or 'System'} at {self.move_timestamp.strftime('%Y-%m-%d %H:%M')}"
