@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-24 17:14+0000\n"
-"PO-Revision-Date: 2025-05-24 17:17\n"
+"POT-Creation-Date: 2025-06-17 05:45+0000\n"
+"PO-Revision-Date: 2025-06-17 05:49\n"
 "Last-Translator: \n"
 "Language-Team: Luxembourgish\n"
 "Language: lb_LU\n"
@@ -1173,12 +1173,12 @@ msgstr "Ongëltege regulären Ausdrock: %(error)s"
 msgid "Invalid color."
 msgstr "Ongëlteg Faarf."
 
-#: documents/serialisers.py:1646
+#: documents/serialisers.py:1645
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Fichierstyp %(type)s net ënnerstëtzt"
 
-#: documents/serialisers.py:1740
+#: documents/serialisers.py:1739
 msgid "Invalid variable detected."
 msgstr "Ongëlteg Zeechen detektéiert."
 
@@ -1667,90 +1667,94 @@ msgid "Spanish"
 msgstr "Spuenesch"
 
 #: paperless/settings.py:766
-msgid "Finnish"
+msgid "Persian"
 msgstr ""
 
 #: paperless/settings.py:767
+msgid "Finnish"
+msgstr ""
+
+#: paperless/settings.py:768
 msgid "French"
 msgstr "Franséisch"
 
-#: paperless/settings.py:768
+#: paperless/settings.py:769
 msgid "Hungarian"
 msgstr ""
 
-#: paperless/settings.py:769
+#: paperless/settings.py:770
 msgid "Italian"
 msgstr "Italienesch"
 
-#: paperless/settings.py:770
+#: paperless/settings.py:771
 msgid "Japanese"
 msgstr ""
 
-#: paperless/settings.py:771
+#: paperless/settings.py:772
 msgid "Korean"
 msgstr ""
 
-#: paperless/settings.py:772
+#: paperless/settings.py:773
 msgid "Luxembourgish"
 msgstr "Lëtzebuergesch"
 
-#: paperless/settings.py:773
+#: paperless/settings.py:774
 msgid "Norwegian"
 msgstr ""
 
-#: paperless/settings.py:774
+#: paperless/settings.py:775
 msgid "Dutch"
 msgstr "Hollännesch"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:776
 msgid "Polish"
 msgstr "Polnesch"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:777
 msgid "Portuguese (Brazil)"
 msgstr "Portugisesch (Brasilien)"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:778
 msgid "Portuguese"
 msgstr "Portugisesch"
 
-#: paperless/settings.py:778
+#: paperless/settings.py:779
 msgid "Romanian"
 msgstr "Rumänesch"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:780
 msgid "Russian"
 msgstr "Russesch"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:781
 msgid "Slovak"
 msgstr ""
 
-#: paperless/settings.py:781
+#: paperless/settings.py:782
 msgid "Slovenian"
 msgstr "Slowenesch"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:783
 msgid "Serbian"
 msgstr "Serbesch"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:784
 msgid "Swedish"
 msgstr "Schwedesch"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:785
 msgid "Turkish"
 msgstr "Tierkesch"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:786
 msgid "Ukrainian"
 msgstr ""
 
-#: paperless/settings.py:786
+#: paperless/settings.py:787
 msgid "Chinese Simplified"
 msgstr "Chinesesch (Vereinfacht)"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:788
 msgid "Chinese Traditional"
 msgstr ""
 

@@ -5,7 +5,7 @@
       <trans-unit id="ngb.alert.close" datatype="html">
         <source>Close</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/alert/alert.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/alert/alert.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
         <target state="translated">Tanca</target>
@@ -13,7 +13,7 @@
       <trans-unit id="ngb.carousel.slide-number" datatype="html">
         <source> Slide <x id="INTERPOLATION" equiv-text="ueryList&lt;NgbSli"/> of <x id="INTERPOLATION_1" equiv-text="EventSource = N"/> </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/carousel/carousel.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/carousel/carousel.ts</context>
           <context context-type="linenumber">132,136</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
@@ -22,7 +22,7 @@
       <trans-unit id="ngb.carousel.previous" datatype="html">
         <source>Previous</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/carousel/carousel.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/carousel/carousel.ts</context>
           <context context-type="linenumber">158,160</context>
         </context-group>
         <target state="translated">Anterior</target>
@@ -30,7 +30,7 @@
       <trans-unit id="ngb.carousel.next" datatype="html">
         <source>Next</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/carousel/carousel.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/carousel/carousel.ts</context>
           <context context-type="linenumber">199</context>
         </context-group>
         <target state="translated">Següent</target>
@@ -38,11 +38,11 @@
       <trans-unit id="ngb.datepicker.previous-month" datatype="html">
         <source>Previous month</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">77,79</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">102</context>
         </context-group>
         <target state="translated">Mes anterior</target>
@@ -50,19 +50,19 @@
       <trans-unit id="ngb.datepicker.next-month" datatype="html">
         <source>Next month</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">102</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">102</context>
         </context-group>
-        <target state="translated">Proper mes</target>
+        <target state="translated">Mes següent</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.HH" datatype="html">
         <source>HH</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">HH</target>
@@ -70,7 +70,7 @@
       <trans-unit id="ngb.toast.close-aria" datatype="html">
         <source>Close</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Tanca</target>
@@ -78,11 +78,11 @@
       <trans-unit id="ngb.datepicker.select-month" datatype="html">
         <source>Select month</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Seleccioneu mes</target>
@@ -90,7 +90,7 @@
       <trans-unit id="ngb.pagination.first" datatype="html">
         <source>««</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">««</target>
@@ -98,7 +98,7 @@
       <trans-unit id="ngb.timepicker.hours" datatype="html">
         <source>Hours</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Hores</target>
@@ -106,7 +106,7 @@
       <trans-unit id="ngb.pagination.previous" datatype="html">
         <source>«</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">«</target>
@@ -114,7 +114,7 @@
       <trans-unit id="ngb.timepicker.MM" datatype="html">
         <source>MM</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">MM</target>
@@ -122,7 +122,7 @@
       <trans-unit id="ngb.pagination.next" datatype="html">
         <source>»</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">»</target>
@@ -130,11 +130,11 @@
       <trans-unit id="ngb.datepicker.select-year" datatype="html">
         <source>Select year</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Seleccioneu un any</target>
@@ -142,7 +142,7 @@
       <trans-unit id="ngb.timepicker.minutes" datatype="html">
         <source>Minutes</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Minuts</target>
@@ -150,7 +150,7 @@
       <trans-unit id="ngb.pagination.last" datatype="html">
         <source>»»</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">»»</target>
@@ -158,7 +158,7 @@
       <trans-unit id="ngb.pagination.first-aria" datatype="html">
         <source>First</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Primer</target>
@@ -166,7 +166,7 @@
       <trans-unit id="ngb.timepicker.increment-hours" datatype="html">
         <source>Increment hours</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Incrementa hores</target>
@@ -174,7 +174,7 @@
       <trans-unit id="ngb.pagination.previous-aria" datatype="html">
         <source>Previous</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Anterior</target>
@@ -182,7 +182,7 @@
       <trans-unit id="ngb.timepicker.decrement-hours" datatype="html">
         <source>Decrement hours</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Disminuir hores</target>
@@ -190,7 +190,7 @@
       <trans-unit id="ngb.pagination.next-aria" datatype="html">
         <source>Next</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Següent</target>
@@ -198,7 +198,7 @@
       <trans-unit id="ngb.timepicker.increment-minutes" datatype="html">
         <source>Increment minutes</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Incrementar minuts</target>
@@ -206,7 +206,7 @@
       <trans-unit id="ngb.pagination.last-aria" datatype="html">
         <source>Last</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Últim</target>
@@ -214,15 +214,15 @@
       <trans-unit id="ngb.timepicker.decrement-minutes" datatype="html">
         <source>Decrement minutes</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Decrementar minuts</target>
+        <target state="translated">Disminuir minuts</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.SS" datatype="html">
         <source>SS</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">SS</target>
@@ -230,7 +230,7 @@
       <trans-unit id="ngb.timepicker.seconds" datatype="html">
         <source>Seconds</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Segons</target>
@@ -238,25 +238,25 @@
       <trans-unit id="ngb.timepicker.increment-seconds" datatype="html">
         <source>Increment seconds</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Incrementa segons</target>
+        <target state="translated">Incrementar segons</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.decrement-seconds" datatype="html">
         <source>Decrement seconds</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Disminueix segons</target>
+        <target state="translated">Disminuir segons</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.PM" datatype="html">
         <source>
           <x id="INTERPOLATION"/>
         </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
@@ -265,7 +265,7 @@
           <x id="INTERPOLATION" equiv-text="barConfig);  pu"/>
         </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.13_@angular+core@19.2.14_rxjs@7._ce5a45f3b9d5ca136f928f24177f8d04/node_modules/src/progressbar/progressbar.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@18.0.0_@angular+common@19.2.14_@angular+core@19.2.14_rxjs@7._f368c1e2c12c71d00515f6f30d8f21d1/node_modules/src/progressbar/progressbar.ts</context>
           <context context-type="linenumber">41,42</context>
         </context-group>
         <target state="translated"><x id="INTERPOLATION" equiv-text="barConfig);  pu"/></target>
@@ -584,7 +584,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">123</context>
         </context-group>
-        <target state="translated">Habilita</target>
+        <target state="translated">Activa</target>
       </trans-unit>
       <trans-unit id="3823219296477075982" datatype="html">
         <source>Discard</source>
@@ -676,7 +676,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="translated">Error recuperant configuració</target>
+        <target state="translated">Error recuperant la configuració</target>
       </trans-unit>
       <trans-unit id="1172622527269118932" datatype="html">
         <source>Invalid JSON</source>
@@ -892,7 +892,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="translated">Obrir administració Django</target>
+        <target state="translated">Obrir l'administració Django</target>
       </trans-unit>
       <trans-unit id="6439365426343089851" datatype="html">
         <source>General</source>
@@ -988,7 +988,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">127</context>
         </context-group>
-        <target state="translated">Empra barra lateral 'slim' (només icones)</target>
+        <target state="translated">Empra barra lateral compacta (només icones)</target>
       </trans-unit>
       <trans-unit id="1356890996281769972" datatype="html">
         <source>Dark mode</source>
@@ -1012,7 +1012,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">138</context>
         </context-group>
-        <target state="translated">Activar mode fosc</target>
+        <target state="translated">Activar el mode fosc</target>
       </trans-unit>
       <trans-unit id="6336642923114460405" datatype="html">
         <source>Invert thumbnails in dark mode</source>
@@ -1044,7 +1044,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">157</context>
         </context-group>
-        <target state="translated">Comprovant actualització</target>
+        <target state="translated">Comprovació d'actualitzacions</target>
       </trans-unit>
       <trans-unit id="5070799004079086984" datatype="html">
         <source>Enable update checking</source>
@@ -1052,7 +1052,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">160</context>
         </context-group>
-        <target state="translated">Habilita la cerca d'actualitzacions</target>
+        <target state="translated">Activa la cerca d'actualitzacions</target>
       </trans-unit>
       <trans-unit id="5752465522295465624" datatype="html">
         <source>What&apos;s this?</source>
@@ -1076,7 +1076,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">165,167</context>
         </context-group>
-        <target state="translated"> La comprovació d'actualitzacions funciona fent ping a l'API pública de GitHub i obtenir la darrera versió per determinar si hi ha una versió nova disponible. L'actualització real de l'aplicació encara s'ha de fer manualment. </target>
+        <target state="translated"> La comprovació d'actualitzacions funciona fent &lt;em&gt;ping&lt;/em&gt; a l'API pública de GitHub i obtenint la darrera versió per determinar si hi ha una versió nova disponible. L'actualització de l'aplicació s'ha de fer manualment. </target>
       </trans-unit>
       <trans-unit id="8416061320800650487" datatype="html">
         <source>No tracking data is collected by the app in any way.</source>
@@ -1288,7 +1288,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">247</context>
         </context-group>
-        <target state="translated">Habilita les notes</target>
+        <target state="translated">Activa les notes</target>
       </trans-unit>
       <trans-unit id="7314814725704332646" datatype="html">
         <source>Permissions</source>
@@ -1660,7 +1660,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="translated">Error recuperant usuari</target>
+        <target state="translated">Error recuperant l'usuari</target>
       </trans-unit>
       <trans-unit id="3066660568529853846" datatype="html">
         <source>Error retrieving groups</source>
@@ -1672,7 +1672,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">71</context>
         </context-group>
-        <target state="translated">Error recuperant grups</target>
+        <target state="translated">Error recuperant els grups</target>
       </trans-unit>
       <trans-unit id="7217000812750597833" datatype="html">
         <source>Settings were saved successfully.</source>
@@ -1706,7 +1706,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">161</context>
+          <context context-type="linenumber">164</context>
         </context-group>
         <target state="translated">Error al guardar opcions.</target>
       </trans-unit>
@@ -2528,7 +2528,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">261</context>
         </context-group>
-        <target state="translated">Usuaris &amp; Grups</target>
+        <target state="translated">Usuaris i grups</target>
       </trans-unit>
       <trans-unit id="4569276013106377105" datatype="html">
         <source>Create, delete and edit users and groups.</source>
@@ -3150,7 +3150,7 @@
         <source>Sidebar views updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">245</context>
+          <context context-type="linenumber">248</context>
         </context-group>
         <target state="translated">Vistes laterals actualitzades</target>
       </trans-unit>
@@ -3158,7 +3158,7 @@
         <source>Error updating sidebar views</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">248</context>
+          <context context-type="linenumber">251</context>
         </context-group>
         <target state="translated">Error a l'actualitzar vistes laterals</target>
       </trans-unit>
@@ -3166,7 +3166,7 @@
         <source>An error occurred while saving update checking settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">269</context>
+          <context context-type="linenumber">272</context>
         </context-group>
         <target state="translated">S'ha produït un error en desar la configuració de comprovació d'actualitzacions.</target>
       </trans-unit>
@@ -4308,7 +4308,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="translated">Habilitat</target>
+        <target state="translated">Activat</target>
       </trans-unit>
       <trans-unit id="4348351765075925931" datatype="html">
         <source>Paperless will only process mails that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> of the criteria specified below.</source>
@@ -4518,15 +4518,15 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">175</context>
+          <context context-type="linenumber">186</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">209</context>
+          <context context-type="linenumber">220</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">243</context>
+          <context context-type="linenumber">254</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/toast/toast.component.html</context>
@@ -4908,7 +4908,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="translated">Registres Accés, Django backend</target>
+        <target state="translated">Registres Accés i administració Django</target>
       </trans-unit>
       <trans-unit id="1808271538028523977" datatype="html">
         <source>Superuser</source>
@@ -4960,7 +4960,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">170</context>
         </context-group>
-        <target state="translated">Deshabilitar l'Autenticació de doble factor</target>
+        <target state="translated">Desactivar l'autentificació de doble factor</target>
       </trans-unit>
       <trans-unit id="1436831433675346331" datatype="html">
         <source>Create new user account</source>
@@ -5052,7 +5052,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">75</context>
         </context-group>
-        <target state="translated">Afegir Acció</target>
+        <target state="translated">Afegir acció</target>
       </trans-unit>
       <trans-unit id="3288318211116868972" datatype="html">
         <source>Trigger type</source>
@@ -5078,13 +5078,13 @@
         </context-group>
         <target state="translated">Dies de compensació</target>
       </trans-unit>
-      <trans-unit id="1488741788768120127" datatype="html">
-        <source>Positive values will trigger the workflow before the date, negative values after.</source>
+      <trans-unit id="7715068346263636924" datatype="html">
+        <source>Positive values will trigger after the date, negative values before.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">132</context>
         </context-group>
-        <target state="translated">Valors positius activaran el flux de treball abans de la data, els valors negatius després.</target>
+        <target state="needs-translation">Positive values will trigger after the date, negative values before.</target>
       </trans-unit>
       <trans-unit id="3726450101884717309" datatype="html">
         <source>Relative to</source>
@@ -5857,7 +5857,7 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="translated">Suggerències:</target>
+        <target state="translated">Suggeriments:</target>
       </trans-unit>
       <trans-unit id="6344437738844463465" datatype="html">
         <source>Filter documents with this <x id="PH" equiv-text="this.title"/></source>
@@ -6152,7 +6152,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">45</context>
+          <context context-type="linenumber">56</context>
         </context-group>
         <target state="translated">Tipus</target>
       </trans-unit>
@@ -6240,7 +6240,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">261</context>
+          <context context-type="linenumber">272</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
@@ -6570,7 +6570,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dialog/share-links-dialog.component.ts</context>
           <context context-type="linenumber">85</context>
         </context-group>
-        <target state="translated">Error recuperant enllaços</target>
+        <target state="translated">Error recuperant els enllaços</target>
       </trans-unit>
       <trans-unit id="3242255798983858463" datatype="html">
         <source><x id="PH" equiv-text="days"/> days</source>
@@ -6616,7 +6616,7 @@
         <source>Install Type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">35</context>
         </context-group>
         <target state="translated">Tipus d'instal·lació</target>
       </trans-unit>
@@ -6624,15 +6624,15 @@
         <source>Server OS</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">26</context>
+          <context context-type="linenumber">37</context>
         </context-group>
-        <target state="translated">SO del Servidor</target>
+        <target state="translated">SO del servidor</target>
       </trans-unit>
       <trans-unit id="2903495470702110128" datatype="html">
         <source>Media Storage</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">39</context>
         </context-group>
         <target state="translated">Emmagatzematge de mitjans</target>
       </trans-unit>
@@ -6640,7 +6640,7 @@
         <source>available</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">42</context>
         </context-group>
         <target state="translated">disponible</target>
       </trans-unit>
@@ -6648,7 +6648,7 @@
         <source>total</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">42</context>
         </context-group>
         <target state="translated">total</target>
       </trans-unit>
@@ -6656,7 +6656,7 @@
         <source>Database</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">52</context>
         </context-group>
         <target state="translated">Base de dades</target>
       </trans-unit>
@@ -6664,7 +6664,7 @@
         <source>Status</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">58</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/toast/toast.component.html</context>
@@ -6684,7 +6684,7 @@
         <source>Migration Status</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">65</context>
+          <context context-type="linenumber">76</context>
         </context-group>
         <target state="translated">Estat de la migració</target>
       </trans-unit>
@@ -6692,7 +6692,7 @@
         <source>Up to date</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">69</context>
+          <context context-type="linenumber">80</context>
         </context-group>
         <target state="translated">Actualitzat</target>
       </trans-unit>
@@ -6700,7 +6700,7 @@
         <source>Latest Migration</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">85</context>
         </context-group>
         <target state="translated">Última migració</target>
       </trans-unit>
@@ -6708,7 +6708,7 @@
         <source>Pending Migrations</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">76</context>
+          <context context-type="linenumber">87</context>
         </context-group>
         <target state="translated">Migracions Pendents</target>
       </trans-unit>
@@ -6716,7 +6716,7 @@
         <source>Tasks Queue</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">94</context>
+          <context context-type="linenumber">105</context>
         </context-group>
         <target state="translated">Cua de tasques</target>
       </trans-unit>
@@ -6724,7 +6724,7 @@
         <source>Redis Status</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">98</context>
+          <context context-type="linenumber">109</context>
         </context-group>
         <target state="translated">Estat de Redis</target>
       </trans-unit>
@@ -6732,7 +6732,7 @@
         <source>Celery Status</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">127</context>
         </context-group>
         <target state="translated">Estat de Celery</target>
       </trans-unit>
@@ -6740,7 +6740,7 @@
         <source>Health</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">142</context>
+          <context context-type="linenumber">153</context>
         </context-group>
         <target state="translated">Salut</target>
       </trans-unit>
@@ -6748,7 +6748,7 @@
         <source>Search Index</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">146</context>
+          <context context-type="linenumber">157</context>
         </context-group>
         <target state="translated">Índex de cerca</target>
       </trans-unit>
@@ -6756,15 +6756,15 @@
         <source>Run Task</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">166</context>
+          <context context-type="linenumber">177</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">200</context>
+          <context context-type="linenumber">211</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">234</context>
+          <context context-type="linenumber">245</context>
         </context-group>
         <target state="translated">Executa Tasca</target>
       </trans-unit>
@@ -6772,7 +6772,7 @@
         <source>Last Updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">173</context>
+          <context context-type="linenumber">184</context>
         </context-group>
         <target state="translated">Darrera actualització</target>
       </trans-unit>
@@ -6780,7 +6780,7 @@
         <source>Classifier</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">178</context>
+          <context context-type="linenumber">189</context>
         </context-group>
         <target state="translated">Classificador</target>
       </trans-unit>
@@ -6788,7 +6788,7 @@
         <source>Last Trained</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">207</context>
+          <context context-type="linenumber">218</context>
         </context-group>
         <target state="translated">Darrer entrenament</target>
       </trans-unit>
@@ -6796,7 +6796,7 @@
         <source>Sanity Checker</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">212</context>
+          <context context-type="linenumber">223</context>
         </context-group>
         <target state="translated">Verificador</target>
       </trans-unit>
@@ -6804,7 +6804,7 @@
         <source>Last Run</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">241</context>
+          <context context-type="linenumber">252</context>
         </context-group>
         <target state="translated">Darrera execució</target>
       </trans-unit>
@@ -6990,7 +6990,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="translated">Total documents</target>
+        <target state="translated">Documents totals</target>
       </trans-unit>
       <trans-unit id="6503529145162789855" datatype="html">
         <source>Total characters</source>
@@ -7030,7 +7030,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="translated">o deixa anar arxius enlloc</target>
+        <target state="translated">o deixa anar arxius arreu</target>
       </trans-unit>
       <trans-unit id="1749180330008942007" datatype="html">
         <source>Dismiss completed</source>
@@ -7604,7 +7604,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">633</context>
         </context-group>
-        <target state="translated">Error recuperant metadada</target>
+        <target state="translated">Error recuperant les metadades</target>
       </trans-unit>
       <trans-unit id="3456881259945295697" datatype="html">
         <source>Error retrieving suggestions.</source>
@@ -7612,7 +7612,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">662</context>
         </context-group>
-        <target state="translated">Error recuperant suggerències.</target>
+        <target state="translated">Error recuperant els suggeriments.</target>
       </trans-unit>
       <trans-unit id="2194092841814123758" datatype="html">
         <source>Document &quot;<x id="PH" equiv-text="newValues.title"/>&quot; saved successfully.</source>
@@ -8820,7 +8820,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">180</context>
         </context-group>
-        <target state="translated">Títol &amp; contingut</target>
+        <target state="translated">Títol i contingut</target>
       </trans-unit>
       <trans-unit id="7408932238599462499" datatype="html">
         <source>File type</source>
@@ -9364,7 +9364,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="translated">Deshabilitat</target>
+        <target state="translated">Desactivat</target>
       </trans-unit>
       <trans-unit id="6751234988479444294" datatype="html">
         <source>No mail rules defined.</source>
@@ -9380,7 +9380,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">108</context>
         </context-group>
-        <target state="translated">Error recuperant comptes de correu</target>
+        <target state="translated">Error recuperant els comptes de correu</target>
       </trans-unit>
       <trans-unit id="5241231471117657636" datatype="html">
         <source>Error retrieving mail rules</source>
@@ -9388,7 +9388,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">130</context>
         </context-group>
-        <target state="translated">Error recuperant regles de correu</target>
+        <target state="translated">Error recuperant les regles del correu</target>
       </trans-unit>
       <trans-unit id="763945516325093575" datatype="html">
         <source>OAuth2 authentication success</source>
@@ -9492,7 +9492,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">277</context>
         </context-group>
-        <target state="translated">Regla "<x id="PH" equiv-text="rule.name"/>" habilitada.</target>
+        <target state="translated">Regla "<x id="PH" equiv-text="rule.name"/>" activada.</target>
       </trans-unit>
       <trans-unit id="7171685227222299542" datatype="html">
         <source>Rule &quot;<x id="PH" equiv-text="rule.name"/>&quot; disabled.</source>
@@ -9500,7 +9500,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">278</context>
         </context-group>
-        <target state="translated">Regla "<x id="PH" equiv-text="rule.name"/>" deshabilitada.</target>
+        <target state="translated">Regla "<x id="PH" equiv-text="rule.name"/>" desactivada.</target>
       </trans-unit>
       <trans-unit id="7238791203524413596" datatype="html">
         <source>Error toggling rule &quot;<x id="PH" equiv-text="rule.name"/>&quot;.</source>
@@ -9888,7 +9888,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="translated">Afegir Flux</target>
+        <target state="translated">Afegir flux</target>
       </trans-unit>
       <trans-unit id="1624023882313260402" datatype="html">
         <source>No workflows defined.</source>
@@ -9952,7 +9952,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">166</context>
         </context-group>
-        <target state="translated">Flux "<x id="PH" equiv-text="workflow.name"/>" habilitat</target>
+        <target state="translated">Flux "<x id="PH" equiv-text="workflow.name"/>" activat</target>
       </trans-unit>
       <trans-unit id="7404075898344576079" datatype="html">
         <source>Disabled workflow &quot;<x id="PH" equiv-text="workflow.name"/>&quot;</source>
@@ -9960,7 +9960,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">167</context>
         </context-group>
-        <target state="translated">Flux deshabilitat "<x id="PH" equiv-text="workflow.name"/>"</target>
+        <target state="translated">Flux "<x id="PH" equiv-text="workflow.name"/>" desactivat</target>
       </trans-unit>
       <trans-unit id="6597823365851861961" datatype="html">
         <source>Error toggling workflow &quot;<x id="PH" equiv-text="workflow.name"/>&quot;.</source>
@@ -10241,7 +10241,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="translated">Cap: Deshabilita coincidències</target>
+        <target state="translated">Cap: Desactiva les coincidències</target>
       </trans-unit>
       <trans-unit id="432834967329800065" datatype="html">
         <source>General Settings</source>
@@ -10385,7 +10385,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">186</context>
         </context-group>
-        <target state="translated">Habilita codi de barres</target>
+        <target state="translated">Activa els codis de barres</target>
       </trans-unit>
       <trans-unit id="5111693440737450705" datatype="html">
         <source>Enable TIFF Support</source>
@@ -10393,7 +10393,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">193</context>
         </context-group>
-        <target state="translated">Habilita compatibilitat TIFF</target>
+        <target state="translated">Activa la compatibilitat amb TIFF</target>
       </trans-unit>
       <trans-unit id="7024102701648099736" datatype="html">
         <source>Barcode String</source>
@@ -10417,7 +10417,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">214</context>
         </context-group>
-        <target state="translated">Habilita ASN</target>
+        <target state="translated">Activa l'ASN</target>
       </trans-unit>
       <trans-unit id="2563883192247717052" datatype="html">
         <source>ASN Prefix</source>
@@ -10457,7 +10457,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">249</context>
         </context-group>
-        <target state="translated">Habilita detecció d'Etiquetes</target>
+        <target state="translated">Activa la detecció d'etiquetes</target>
       </trans-unit>
       <trans-unit id="3723784143052004117" datatype="html">
         <source>Tag Mapping</source>
@@ -10859,11 +10859,19 @@
         </context-group>
         <target state="translated">Norueg</target>
       </trans-unit>
+      <trans-unit id="4977087909184008115" datatype="html">
+        <source>Persian</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">177</context>
+        </context-group>
+        <target state="translated">Persa</target>
+      </trans-unit>
       <trans-unit id="792060551707690640" datatype="html">
         <source>Polish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">177</context>
+          <context context-type="linenumber">183</context>
         </context-group>
         <target state="translated">Polac</target>
       </trans-unit>
@@ -10871,7 +10879,7 @@
         <source>Portuguese (Brazil)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">183</context>
+          <context context-type="linenumber">189</context>
         </context-group>
         <target state="translated">Portuguès (Brasil)</target>
       </trans-unit>
@@ -10879,7 +10887,7 @@
         <source>Portuguese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">189</context>
+          <context context-type="linenumber">195</context>
         </context-group>
         <target state="translated">Portuguès</target>
       </trans-unit>
@@ -10887,7 +10895,7 @@
         <source>Romanian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">201</context>
         </context-group>
         <target state="translated">Romanès</target>
       </trans-unit>
@@ -10895,7 +10903,7 @@
         <source>Russian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">201</context>
+          <context context-type="linenumber">207</context>
         </context-group>
         <target state="translated">Rus</target>
       </trans-unit>
@@ -10903,7 +10911,7 @@
         <source>Slovak</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">207</context>
+          <context context-type="linenumber">213</context>
         </context-group>
         <target state="translated">Eslovac</target>
       </trans-unit>
@@ -10911,7 +10919,7 @@
         <source>Slovenian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">213</context>
+          <context context-type="linenumber">219</context>
         </context-group>
         <target state="translated">Eslovè</target>
       </trans-unit>
@@ -10919,7 +10927,7 @@
         <source>Serbian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">219</context>
+          <context context-type="linenumber">225</context>
         </context-group>
         <target state="translated">Serbi</target>
       </trans-unit>
@@ -10927,7 +10935,7 @@
         <source>Swedish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">225</context>
+          <context context-type="linenumber">231</context>
         </context-group>
         <target state="translated">Suec</target>
       </trans-unit>
@@ -10935,7 +10943,7 @@
         <source>Turkish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">231</context>
+          <context context-type="linenumber">237</context>
         </context-group>
         <target state="translated">Turc</target>
       </trans-unit>
@@ -10943,7 +10951,7 @@
         <source>Ukrainian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">237</context>
+          <context context-type="linenumber">243</context>
         </context-group>
         <target state="translated">Ucranià</target>
       </trans-unit>
@@ -10951,7 +10959,7 @@
         <source>Chinese Simplified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">243</context>
+          <context context-type="linenumber">249</context>
         </context-group>
         <target state="translated">Xinès Simplificat</target>
       </trans-unit>
@@ -10959,7 +10967,7 @@
         <source>Chinese Traditional</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">249</context>
+          <context context-type="linenumber">255</context>
         </context-group>
         <target state="translated">Xinès tradicional</target>
       </trans-unit>
@@ -10967,7 +10975,7 @@
         <source>ISO 8601</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">257</context>
+          <context context-type="linenumber">263</context>
         </context-group>
         <target state="translated">ISO 8601</target>
       </trans-unit>
@@ -10975,7 +10983,7 @@
         <source>Successfully completed one-time migratration of settings to the database!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">590</context>
+          <context context-type="linenumber">596</context>
         </context-group>
         <target state="translated">Completat correctament la migració de la configuració de la base de dades!</target>
       </trans-unit>
@@ -10983,7 +10991,7 @@
         <source>Unable to migrate settings to the database, please try saving manually.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">591</context>
+          <context context-type="linenumber">597</context>
         </context-group>
         <target state="translated">No es pot migrar la configuració de la base de dades, prova manualment.</target>
       </trans-unit>
@@ -10991,7 +10999,7 @@
         <source>You can restart the tour from the settings page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">664</context>
+          <context context-type="linenumber">670</context>
         </context-group>
         <target state="translated">Pots reiniciar el tour des de les opcions.</target>
       </trans-unit>
@@ -11141,7 +11149,7 @@
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="translated">Recuperant data del document...</target>
+        <target state="translated">Recuperant la data del document...</target>
       </trans-unit>
       <trans-unit id="7162102384876037296" datatype="html">
         <source>Saving document...</source>

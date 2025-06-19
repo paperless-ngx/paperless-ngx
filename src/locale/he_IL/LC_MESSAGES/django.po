@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-24 17:14+0000\n"
-"PO-Revision-Date: 2025-06-05 20:08\n"
+"POT-Creation-Date: 2025-06-17 05:45+0000\n"
+"PO-Revision-Date: 2025-06-17 05:49\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Language: he_IL\n"
@@ -1174,12 +1174,12 @@ msgstr "ביטוי רגולרי בלתי חוקי: %(error)s"
 msgid "Invalid color."
 msgstr "צבע לא חוקי."
 
-#: documents/serialisers.py:1646
+#: documents/serialisers.py:1645
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "סוג קובץ %(type)s לא נתמך"
 
-#: documents/serialisers.py:1740
+#: documents/serialisers.py:1739
 msgid "Invalid variable detected."
 msgstr "משתנה לא חוקי זוהה."
 
@@ -1412,12 +1412,12 @@ msgstr ": כצעד אחרון, אנא מלא את הטופס הבא:"
 #: documents/validators.py:24
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "לא ניתן לנתח את כתובת ה-URI ‏{value}"
 
 #: documents/validators.py:29
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "לא ניתן לנתח את כתובת ה-URI ‏{value}, חסרה מיקום רשת או נתיב"
 
 #: documents/validators.py:36
 msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
@@ -1426,7 +1426,7 @@ msgstr "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(
 #: documents/validators.py:45
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "לא ניתן לנתח את כתובת ה-URI ‏{value}, חסרה הסכימה"
 
 #: paperless/apps.py:11
 msgid "Paperless"
@@ -1669,90 +1669,94 @@ msgid "Spanish"
 msgstr "ספרדית"
 
 #: paperless/settings.py:766
+msgid "Persian"
+msgstr ""
+
+#: paperless/settings.py:767
 msgid "Finnish"
 msgstr "פינית"
 
-#: paperless/settings.py:767
+#: paperless/settings.py:768
 msgid "French"
 msgstr "צרפתית"
 
-#: paperless/settings.py:768
+#: paperless/settings.py:769
 msgid "Hungarian"
 msgstr "הונגרית"
 
-#: paperless/settings.py:769
+#: paperless/settings.py:770
 msgid "Italian"
 msgstr "איטלקית"
 
-#: paperless/settings.py:770
+#: paperless/settings.py:771
 msgid "Japanese"
 msgstr "יפנית"
 
-#: paperless/settings.py:771
+#: paperless/settings.py:772
 msgid "Korean"
 msgstr "קוריאנית"
 
-#: paperless/settings.py:772
+#: paperless/settings.py:773
 msgid "Luxembourgish"
 msgstr "לוקסמבורגית"
 
-#: paperless/settings.py:773
+#: paperless/settings.py:774
 msgid "Norwegian"
 msgstr "נורווגית"
 
-#: paperless/settings.py:774
+#: paperless/settings.py:775
 msgid "Dutch"
 msgstr "הולנדית"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:776
 msgid "Polish"
 msgstr "פולנית"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:777
 msgid "Portuguese (Brazil)"
 msgstr "פורטוגלית ברזילאית"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:778
 msgid "Portuguese"
 msgstr "פורטוגלית"
 
-#: paperless/settings.py:778
+#: paperless/settings.py:779
 msgid "Romanian"
 msgstr "רומנית"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:780
 msgid "Russian"
 msgstr "רוסית"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:781
 msgid "Slovak"
 msgstr "סלובקית"
 
-#: paperless/settings.py:781
+#: paperless/settings.py:782
 msgid "Slovenian"
 msgstr "סלובנית"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:783
 msgid "Serbian"
 msgstr "סרבית"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:784
 msgid "Swedish"
 msgstr "שוודית"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:785
 msgid "Turkish"
 msgstr "טורקית"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:786
 msgid "Ukrainian"
 msgstr "אוקראינית"
 
-#: paperless/settings.py:786
+#: paperless/settings.py:787
 msgid "Chinese Simplified"
 msgstr "סינית מפושטת"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:788
 msgid "Chinese Traditional"
 msgstr "סינית מסורתית"
 
