@@ -89,6 +89,8 @@ export class AppFrameComponent
   appRemoteVersion: AppRemoteVersion
 
   isMenuCollapsed: boolean = true
+  isManageMenuCollapsed: boolean = false
+  isAdminMenuCollapsed: boolean = false
 
   slimSidebarAnimating: boolean = false
 
