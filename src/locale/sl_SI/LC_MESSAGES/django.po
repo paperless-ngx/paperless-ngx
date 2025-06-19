@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-24 17:14+0000\n"
-"PO-Revision-Date: 2025-05-24 17:17\n"
+"POT-Creation-Date: 2025-06-17 05:45+0000\n"
+"PO-Revision-Date: 2025-06-17 12:14\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -1173,12 +1173,12 @@ msgstr "Neveljaven splošen izraz: %(error)s"
 msgid "Invalid color."
 msgstr "Napačna barva."
 
-#: documents/serialisers.py:1646
+#: documents/serialisers.py:1645
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Vrsta datoteke %(type)s ni podprta"
 
-#: documents/serialisers.py:1740
+#: documents/serialisers.py:1739
 msgid "Invalid variable detected."
 msgstr "Zaznani neveljavni znaki."
 
@@ -1668,90 +1668,94 @@ msgid "Spanish"
 msgstr "Španščina"
 
 #: paperless/settings.py:766
+msgid "Persian"
+msgstr "Perzijščina"
+
+#: paperless/settings.py:767
 msgid "Finnish"
 msgstr "Finščina"
 
-#: paperless/settings.py:767
+#: paperless/settings.py:768
 msgid "French"
 msgstr "Francoščina"
 
-#: paperless/settings.py:768
+#: paperless/settings.py:769
 msgid "Hungarian"
 msgstr "Madžarščina"
 
-#: paperless/settings.py:769
+#: paperless/settings.py:770
 msgid "Italian"
 msgstr "Italijanščina"
 
-#: paperless/settings.py:770
+#: paperless/settings.py:771
 msgid "Japanese"
 msgstr "japonščina"
 
-#: paperless/settings.py:771
+#: paperless/settings.py:772
 msgid "Korean"
 msgstr "Korejščina"
 
-#: paperless/settings.py:772
+#: paperless/settings.py:773
 msgid "Luxembourgish"
 msgstr "Luksemburški"
 
-#: paperless/settings.py:773
+#: paperless/settings.py:774
 msgid "Norwegian"
 msgstr "Norveščina"
 
-#: paperless/settings.py:774
+#: paperless/settings.py:775
 msgid "Dutch"
 msgstr "Nizozemščina"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:776
 msgid "Polish"
 msgstr "Poljščina"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:777
 msgid "Portuguese (Brazil)"
 msgstr "Portugalščina (Brazilija)"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:778
 msgid "Portuguese"
 msgstr "Portugalščina"
 
-#: paperless/settings.py:778
+#: paperless/settings.py:779
 msgid "Romanian"
 msgstr "Romunščina"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:780
 msgid "Russian"
 msgstr "Ruščina"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:781
 msgid "Slovak"
 msgstr "Slovaščina"
 
-#: paperless/settings.py:781
+#: paperless/settings.py:782
 msgid "Slovenian"
 msgstr "Slovenščina"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:783
 msgid "Serbian"
 msgstr "Srbščina"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:784
 msgid "Swedish"
 msgstr "Švedščina"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:785
 msgid "Turkish"
 msgstr "Turščina"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:786
 msgid "Ukrainian"
 msgstr "Ukrajinščina"
 
-#: paperless/settings.py:786
+#: paperless/settings.py:787
 msgid "Chinese Simplified"
 msgstr "Poenostavljena kitajščina"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:788
 msgid "Chinese Traditional"
 msgstr "Tradicionalna kitajščina"
 
