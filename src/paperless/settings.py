@@ -270,9 +270,10 @@ DATA_DIR = __get_path("PAPERLESS_DATA_DIR", BASE_DIR.parent / "data")
 NLTK_DIR = __get_path("PAPERLESS_NLTK_DIR", "/usr/share/nltk_data")
 
 # Check deprecated setting first
-EMPTY_TRASH_DIR = os.getenv(
-    "PAPERLESS_TRASH_DIR",
-    os.getenv("PAPERLESS_EMPTY_TRASH_DIR"),
+EMPTY_TRASH_DIR = (
+    __get_path("PAPERLESS_TRASH_DIR", os.getenv("PAPERLESS_EMPTY_TRASH_DIR"))
+    if os.getenv("PAPERLESS_TRASH_DIR") or os.getenv("PAPERLESS_EMPTY_TRASH_DIR")
+    else None
 )
 
 # Lock file for synchronizing changes to the MEDIA directory across multiple

@@ -331,9 +331,8 @@ def cleanup_document_deletion(sender, instance, **kwargs):
             (old_filebase, old_fileext) = os.path.splitext(old_filename)
 
             while True:
-                new_file_path = os.path.join(
-                    settings.EMPTY_TRASH_DIR,
-                    old_filebase + (f"_{counter:02}" if counter else "") + old_fileext,
+                new_file_path = settings.EMPTY_TRASH_DIR / (
+                    old_filebase + (f"_{counter:02}" if counter else "") + old_fileext
                 )
 
                 if os.path.exists(new_file_path):
