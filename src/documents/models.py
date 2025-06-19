@@ -369,13 +369,13 @@ class Warehouse(MatchingModel):
         null=True,
         db_index=True,
     )
-    handover_to_department = models.ForeignKey(
+    source_department = models.ForeignKey(
         CreatedDepartment,
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        related_name="handover_to_department",
-        verbose_name=_("handover_to_department")
+        related_name="source_department",
+        verbose_name=_("source_department")
     )
 
     class Meta(MatchingModel.Meta):

@@ -11,6 +11,7 @@ import urllib
 import zipfile
 from datetime import datetime
 from datetime import timedelta
+from functools import partial
 from pathlib import Path
 from time import mktime
 from unicodedata import normalize
@@ -44,6 +45,7 @@ from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.autoreload import raise_last_exception
 from django.utils.decorators import method_decorator
 from django.utils.timezone import make_aware
 from django.utils.translation import get_language
@@ -56,6 +58,7 @@ from django.views.decorators.vary import vary_on_cookie
 from django.views.generic import TemplateView
 from django_elasticsearch_dsl_drf.pagination import LimitOffsetPagination
 from django_filters.rest_framework import DjangoFilterBackend
+from elasticsearch_dsl.serializer import serializer
 from langdetect import detect
 from packaging import version as packaging_version
 from redis import Redis
@@ -3486,92 +3489,192 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 "Error performing bulk permissions edit, check logs for more detail.",
             )
 
-    def partial_update(self, request, *args, **kwargs):
-        partial = kwargs.pop("partial", True)
+# # --- --- --- --- --- --- Hàm partial_update chưa refactor --- --- --- --- --- --- #
+#     def partial_update(self, request, *args, **kwargs):
+#         partial = kwargs.pop("partial", True)
+#
+#         instance = self.get_object()
+#         serializer = self.get_serializer(instance, data=request.data, partial=partial)
+#         serializer.is_valid(raise_exception=True)
+#
+#         old_parent_warehouse = instance.parent_warehouse
+#         # ---new--- #
+#         new_parent_warehouse = serializer.validated_data.get(
+#             "parent_warehouse", old_parent_warehouse)
+#         # --- cập nhật ngày bàn giao tự động nếu bàn giao cho đơn vị khác--- #
+#         new_department = serializer.validated_data.get(
+#             "handover_to_department")
+#         if "handover_to_department" in serializer.validated_data and new_department is not None:
+#             serializer.validated_data["recived_date"] = timezone.now()
+#         if old_parent_warehouse == new_parent_warehouse:
+#             self.perform_update(serializer)
+#             return Response(serializer.data)
+#         # ------ #
+#         reason = request.data.get("move_reason")
+#         if not reason or not reason.strip():
+#             return Response({"error": "Phải cung cấp lý do di chuyển khi thay đổi vị trí."},
+#                             status=status.HTTP_400_BAD_REQUEST)
+#         # ---new--- #
+#         if instance.type in [Warehouse.BOXCASE, Warehouse.SHELF]:
+#             ContainerMoveHistory.objects.create(
+#                 container=instance,
+#                 old_parent=old_parent_warehouse,
+#                 new_parent=new_parent_warehouse,
+#                 moved_by=request.user,
+#                 move_reason=reason
+#             )
+#             # 2. Ghi lịch sử di chuyển cho các tài liệu bên trong (nếu có)
+#         documents_to_log = Document.objects.none()
+#         reason = ""
+#         if instance.type == Warehouse.BOXCASE:
+#             documents_to_log = Document.objects.filter(warehouse=instance)
+#             reason = f"Container '{instance.name}' was moved."
+#         elif instance.type == Warehouse.SHELF:
+#             child_boxcases = Warehouse.objects.filter(
+#                 path__startswith=instance.path, type=Warehouse.BOXCASE)
+#             documents_to_log = Document.objects.filter(
+#                 warehouse__in=child_boxcases)
+#             reason = f"Parent container '{instance.name}' was moved."
+#
+#         if documents_to_log.exists():
+#             history_records_to_create = [
+#                 MovedHistory(
+#                     document=doc,
+#                     old_location=old_parent_warehouse,
+#                     new_location=new_parent_warehouse,
+#                     moved_by=request.user,
+#                     move_reason=reason
+#                 ) for doc in documents_to_log
+#             ]
+#             MovedHistory.objects.bulk_create(history_records_to_create)
+#         # ------ #
+#
+#         self.perform_update(serializer)
+#
+#         if old_parent_warehouse != instance.parent_warehouse:
+#
+#             if (
+#                 instance.type == Warehouse.SHELF
+#                 and getattr(instance.parent_warehouse, "type", "")
+#                 == Warehouse.WAREHOUSE
+#                 or instance.type == Warehouse.BOXCASE
+#                 and getattr(instance.parent_warehouse, "type", "") == Warehouse.SHELF
+#             ):
+#                 instance.path = f"{instance.parent_warehouse.path}/{instance.id}"
+#             elif instance.type == Warehouse.WAREHOUSE and not instance.parent_warehouse:
+#                 instance.path = str(instance.id)
+#             else:
+#                 return Response(status=status.HTTP_400_BAD_REQUEST)
+#             instance.save()
+#
+#             boxcase_warehouses = Warehouse.objects.filter(
+#                 type=Warehouse.BOXCASE,
+#                 parent_warehouse=instance,
+#             )
+#             for boxcase_warehouse in boxcase_warehouses:
+#                 boxcase_warehouse.path = f"{instance.path}/{boxcase_warehouse.id}"
+#                 boxcase_warehouse.save()
+#
+#         return Response(serializer.data)
+#
+# # --- --- --- --- --- --- Hàm partial_update chưa refactor --- --- --- --- --- --- #
 
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
 
-        old_parent_warehouse = instance.parent_warehouse
-        # ---new--- #
-        new_parent_warehouse = serializer.validated_data.get(
-            "parent_warehouse", old_parent_warehouse)
-        # --- cập nhật ngày bàn giao tự động nếu bàn giao cho đơn vị khác--- #
-        new_department = serializer.validated_data.get(
-            "handover_to_department")
-        if "handover_to_department" in serializer.validated_data and new_department is not None:
-            serializer.validated_data["recived_date"] = timezone.now()
-        if old_parent_warehouse == new_parent_warehouse:
-            self.perform_update(serializer)
-            return Response(serializer.data)
-        # ------ #
-        reason = request.data.get("move_reason")
-        if not reason or not reason.strip():
-            return Response({"error": "Phải cung cấp lý do di chuyển khi thay đổi vị trí."},
-                            status=status.HTTP_400_BAD_REQUEST)
-        # ---new--- #
+
+    def _handle_handover_date(self, instance, validated_data):
+        """
+        Tự động thêm ngày nhận hàng nếu một phòng ban nguồn được gán
+        """
+        if "source_department" in validated_data:
+            new_department = validated_data.get("source_department")
+            if new_department is not None and new_department != instance.source_department:
+                validated_data["recived_date"] = timezone.now()
+    def _created_move_history(self, instance, old_parent, new_parent, reason, user):
+        """
+        Tạo các bản ghi lịch sử cho cả container và các tài liệu bên trong.
+        """
+        #1. Lịch sử di chuyển hộp hoặc di chuyển kệ
         if instance.type in [Warehouse.BOXCASE, Warehouse.SHELF]:
             ContainerMoveHistory.objects.create(
                 container=instance,
-                old_parent=old_parent_warehouse,
-                new_parent=new_parent_warehouse,
-                moved_by=request.user,
+                old_parent=old_parent,
+                new_parent=new_parent,
+                moved_by=user,
                 move_reason=reason
             )
-            # 2. Ghi lịch sử di chuyển cho các tài liệu bên trong (nếu có)
+        #2. Lịch sử di chuyển tài liệu
         documents_to_log = Document.objects.none()
-        reason = ""
         if instance.type == Warehouse.BOXCASE:
             documents_to_log = Document.objects.filter(warehouse=instance)
-            reason = f"Container '{instance.name}' was moved."
         elif instance.type == Warehouse.SHELF:
-            child_boxcases = Warehouse.objects.filter(
-                path__startswith=instance.path, type=Warehouse.BOXCASE)
-            documents_to_log = Document.objects.filter(
-                warehouse__in=child_boxcases)
-            reason = f"Parent container '{instance.name}' was moved."
-
+            child_boxcases = Warehouse.objects.filter(path__startwith=instance.path, type=Warehouse.BOXCASE)
+            documents_to_log = Document.objects.filter(warehouse__in=child_boxcases)
         if documents_to_log.exists():
-            history_records_to_create = [
+            history_record = [
                 MovedHistory(
                     document=doc,
-                    old_location=old_parent_warehouse,
-                    new_location=new_parent_warehouse,
-                    moved_by=request.user,
-                    move_reason=reason
+                    old_location=old_parent,
+                    new_location=new_parent,
+                    moved_by=user
                 ) for doc in documents_to_log
             ]
-            MovedHistory.objects.bulk_create(history_records_to_create)
-        # ------ #
+            MovedHistory.objects.bulk_create(history_record)
+    def _update_paths_after_move(self, instance):
+        """
+        Cập nhật lại trường 'path' cho instance và tất cả các con của nó một cách đệ quy.
+        """
+        if instance.parent_warehouse:
+            instance.path = f"{instance.parent_warehouse.path}{instance.id}/"
+        else:
+            instance.path=f"{instance.id}/"
+        instance.save(update_fields=["path"])
+        if instance.type in [Warehouse.WAREHOUSE, Warehouse.SHELF]:
+            children = Warehouse.objects.filter(parent_warehouse=instance)
+            for child in children:
+                self._update_paths_after_move(child)
 
-        self.perform_update(serializer)
+    def partial_update(self, request, *args, **kwargs):
+        with transaction.atomic():
+            instance = self.get_object()
+            old_parent_warehouse = instance.parent_warehouse
+            serializer = self.get_serializer(instance, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
 
-        if old_parent_warehouse != instance.parent_warehouse:
+            #1. Xử lý ngày bàn giao tự động
+            self._handle_handover_date(instance, serializer.validated_data)
+            new_parent_warehouse = serializer.validated_data.get("parent_warehouse", old_parent_warehouse)
 
-            if (
-                instance.type == Warehouse.SHELF
-                and getattr(instance.parent_warehouse, "type", "")
-                == Warehouse.WAREHOUSE
-                or instance.type == Warehouse.BOXCASE
-                and getattr(instance.parent_warehouse, "type", "") == Warehouse.SHELF
-            ):
-                instance.path = f"{instance.parent_warehouse.path}/{instance.id}"
-            elif instance.type == Warehouse.WAREHOUSE and not instance.parent_warehouse:
-                instance.path = str(instance.id)
-            else:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-            instance.save()
+            if old_parent_warehouse != new_parent_warehouse:
+                reason = request.data.get("move_reason")
+                if not reason or not reason.strip():
+                    return Response(
+                        {"error": "Phải cung cấp lý do di chuyển khi thay đổi vị trí."},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                if not (
+                    (instance.type == Warehouse.SHELF and getattr(
+                        new_parent_warehouse, "type",
+                        "") == Warehouse.WAREHOUSE) or
+                    (instance.type == Warehouse.BOXCASE and getattr(
+                        new_parent_warehouse, "type",
+                        "") == Warehouse.SHELF) or
+                    (
+                        instance.type == Warehouse.WAREHOUSE and not new_parent_warehouse)
+                ):
+                    return Response(
+                        {"error": "Invalid parent for this warehouse type."},
+                        status=status.HTTP_400_BAD_REQUEST)
+                self._created_move_history(instance, old_parent_warehouse,
+                                          new_parent_warehouse, reason,
+                                          request.user)
+                self.perform_update(serializer)
+            if old_parent_warehouse != new_parent_warehouse:
+                instance.refresh_from_db()  # Tải lại instance để đảm bảo có parent mới nhất
+                self._update_paths_after_move(instance)
+            final_serializer = self.get_serializer(instance)
+            return Response(final_serializer.data)
 
-            boxcase_warehouses = Warehouse.objects.filter(
-                type=Warehouse.BOXCASE,
-                parent_warehouse=instance,
-            )
-            for boxcase_warehouse in boxcase_warehouses:
-                boxcase_warehouse.path = f"{instance.path}/{boxcase_warehouse.id}"
-                boxcase_warehouse.save()
 
-        return Response(serializer.data)
 
     def destroy(self, request, pk, *args, **kwargs):
         warehouse = Warehouse.objects.get(id=pk)
