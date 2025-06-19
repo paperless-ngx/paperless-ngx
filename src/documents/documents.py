@@ -211,7 +211,6 @@ class DocumentDocument(Document):
         custom_fields = ",".join([str(c) for c in CustomFieldInstance.objects.filter(document=doc)],)
         permissions = cls().get_permission_folder(doc.folder)
         viewer_ids = [u for u in permissions['view']['users']]
-
         # document_data['id'] = doc.id or None
         document_data['title'] = doc.title or ''
         document_data['content'] = doc.content or ''

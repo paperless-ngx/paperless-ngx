@@ -1406,15 +1406,6 @@ class FolderPermission(models.Model):
         verbose_name="Path",
         help_text="The path of the folder."
     )
-    owner = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="owned_folders",
-        verbose_name="Owner",
-        help_text="The owner of the folder."
-    )
     # Người dùng và nhóm có quyền xem
     view_users = models.ManyToManyField(
         User,

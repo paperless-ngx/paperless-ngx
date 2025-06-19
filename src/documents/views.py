@@ -776,7 +776,7 @@ class DocumentViewSet(
     )
     def suggestions(self, request, pk=None):
         doc = get_object_or_404(Document, pk=pk)
-        if request.user is not None and not has_perms_owner_aware(
+        if request.user is not None and not has_perms_owner_aware_for_folder(
             request.user,
             "view_folder",
             doc.folder,
@@ -3831,7 +3831,9 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
                                                                     "name"],
                                                                 int(
                                                                     request.data[
-                                                                        "parent_folder"]))
+                                                                        "parent_folder"]) if
+                                                                request.data[
+                                                                    "parent_folder"] else None)
         serializer.validated_data["updated"] = timezone.now()
 
         old_parent_folder = instance.parent_folder
@@ -3862,20 +3864,13 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
             instance.save()
 
             update_child_folder_paths.delay(folder=instance)
-        # update permission parent folder
-        # permission_parent_folder = get_permissions(
-        #     obj=instance.parent_folder) if instance.parent_folder else None
-        # if permission_parent_folder:
-        #     user_ids = User.objects.filter(
-        #         pk=instance.parent_folder.owner.id).values_list(
-        #         "id", flat=True)
-        #
-        #     permission_parent_folder['change']['users'] = \
-        #         permission_parent_folder['change']['users'].union(user_ids)
-        #     permission_parent_folder['view']['users'] = []
-        #     set_permissions(permissions=permission_parent_folder,
-        #                     object=instance)
-
+        if instance.type == Folder.FILE:
+            doc = Document.objects.filter(folder_id=instance.id).first()
+            if doc is not None:
+                doc.owner = instance.owner
+                doc.save()
+                from documents import index
+                index.add_or_update_document(doc)
         return Response(serializer.data)
 
     def update_document_name(self, instance, serializer):

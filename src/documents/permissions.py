@@ -395,12 +395,12 @@ def get_permission_folder(obj):
 
     return {
         "view": {
-            "users": permissions["view"]["users"],
-            "groups": permissions["view"]["groups"]
+            "users": list(permissions["view"]["users"]),
+            "groups": list(permissions["view"]["groups"])
         },
         "change": {
-            "users": permissions["change"]["users"],
-            "groups": permissions["change"]["groups"]
+            "users": list(permissions["change"]["users"]),
+            "groups": list(permissions["change"]["groups"])
         }
     }
 
