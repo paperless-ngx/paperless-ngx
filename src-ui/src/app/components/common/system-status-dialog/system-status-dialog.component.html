@@ -20,7 +20,18 @@
           <div class="card-body">
             <dl class="card-text">
               <dt i18n>Paperless-ngx Version</dt>
-              <dd>{{status.pngx_version}}</dd>
+              <dd>
+                {{status.pngx_version}}
+                @if (versionMismatch) {
+                    <button class="btn btn-sm d-inline align-items-center btn-dark text-uppercase small" [ngbPopover]="versionPopover" triggers="click mouseenter:mouseleave">
+                      <i-bs name="exclamation-triangle-fill" class="text-danger lh-1"></i-bs>
+                    </button>
+                }
+                <ng-template #versionPopover>
+                  Frontend version: {{frontendVersion}}<br>
+                  Backend version: {{status.pngx_version}}
+                </ng-template>
+              </dd>
               <dt i18n>Install Type</dt>
               <dd>{{status.install_type}}</dd>
               <dt i18n>Server OS</dt>

@@ -74,7 +74,6 @@ export class AppFrameComponent
   extends ComponentWithPermissions
   implements OnInit, ComponentCanDeactivate
 {
-  versionString = `${environment.appTitle} ${environment.version}`
   appRemoteVersion: AppRemoteVersion
 
   isMenuCollapsed: boolean = true
@@ -140,6 +139,10 @@ export class AppFrameComponent
     setTimeout(() => {
       this.slimSidebarAnimating = false
     }, 200) // slightly longer than css animation for slim sidebar
+  }
+
+  get versionString(): string {
+    return `${environment.appTitle} v${this.settingsService.get(SETTINGS_KEYS.VERSION)}${environment.production ? '' : ` #${environment.tag}`}`
   }
 
   get customAppTitle(): string {

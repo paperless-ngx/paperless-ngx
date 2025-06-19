@@ -2184,6 +2184,8 @@ class UiSettingsView(GenericAPIView):
 
         general_config = GeneralConfig()
 
+        ui_settings["version"] = version.__full_version_str__
+
         ui_settings["app_title"] = settings.APP_TITLE
         if general_config.app_title is not None and len(general_config.app_title) > 0:
             ui_settings["app_title"] = general_config.app_title
