@@ -1,5 +1,15 @@
 # Changelog
 
+## paperless-ngx 2.17.1
+
+### Bug Fixes
+
+-   Fix: correct PAPERLESS_EMPTY_TRASH_DIR to Path [@shamoon](https://github.com/shamoon) ([#10227](https://github.com/paperless-ngx/paperless-ngx/pull/10227))
+
+### All App Changes
+
+-   Fix: correct PAPERLESS_EMPTY_TRASH_DIR to Path [@shamoon](https://github.com/shamoon) ([#10227](https://github.com/paperless-ngx/paperless-ngx/pull/10227))
+
 ## paperless-ngx 2.17.0
 
 ### Breaking Changes
