@@ -521,9 +521,12 @@ def has_perms_owner_aware_for_folder(user: User, perm, obj: Folder):
     parts = obj.path.rstrip("/").split("/")
     all_paths = ["/".join(parts[:i]) + "/" for i in range(len(parts), 0, -1)]
     fps = FolderPermission.objects.filter(path__in=all_paths)
+    folders = Folder.objects.filter(path__in=all_paths)
     fp_dict = {fp.path: fp for fp in fps}
     user_group_ids = {g.id for g in user.groups.all()}
-
+    for f in folders:
+        if user == f.owner:
+            return True
     for path in all_paths:
         fp = fp_dict.get(path)
         if not fp:
