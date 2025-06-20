@@ -113,11 +113,11 @@
                     [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave"
                     popoverClass="popover-slim">
                     <i-bs class="me-1" name="funnel"></i-bs><span>&nbsp;{{view.name}}
-                      @if (!slimSidebarEnabled) {
+                      @if (showSidebarCounts && !slimSidebarEnabled) {
                         <span><span class="badge bg-info text-dark ms-2 d-inline">{{ savedViewService.getDocumentCount(view) }}</span></span>
                       }
                     </span>
-                    @if (slimSidebarEnabled) {
+                    @if (showSidebarCounts && slimSidebarEnabled) {
                       <span class="badge bg-info text-dark position-absolute top-0 end-0 d-none d-md-block">{{ savedViewService.getDocumentCount(view) }}</span>
                     }
                   </a>
