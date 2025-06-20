@@ -984,6 +984,10 @@ Specifies which language Paperless should use when parsing dates from documents.
 !!! note
 This format differs from the `PAPERLESS_OCR_LANGUAGE` setting, which uses ISO 639-2 codes (3 letters, e.g., "eng+deu" for Tesseract OCR).
 
+!!! note
+There is a known [issue](https://github.com/scrapinghub/dateparser/issues/875) with `dateparser` related to Chinese locales: many dates are not correctly detected.
+To work around this, if you specify a Chinese locale such as `"zh-Hant"` or `"zh-Hans-HK"`, the generic Chinese language code `"zh"` will also be added automatically.
+
 #### [`PAPERLESS_EMAIL_TASK_CRON=<cron expression>`](#PAPERLESS_EMAIL_TASK_CRON) {#PAPERLESS_EMAIL_TASK_CRON}
 
 : Configures the scheduled email fetching frequency. The value
