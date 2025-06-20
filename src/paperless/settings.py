@@ -18,6 +18,8 @@ from dateparser.languages.loader import LocaleDataLoader
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
+from paperless.utils import ocr_to_dateparser_languages
+
 logger = logging.getLogger("paperless.settings")
 
 # Tap paperless.conf if it's available
@@ -1178,112 +1180,15 @@ FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
 
 def _ocr_to_dateparser_languages(ocr_languages: str) -> list[str]:
     """
-    Convert ISO 639-2 Alpha-3 languages (e.g., "eng+fra"), optionally with script (e.g., "eng_Latn"),
-    to a list of languages compatible with the dateparser library.
-    If a script can be converted, the language without script is used (eg: "deu_frak" -> "de").
+    Convert Tesseract OCR_LANGUAGE codes (ISO 639-2, e.g. "eng+fra", with optional scripts like "aze_Cyrl")
+    into a list of locales compatible with the `dateparser` library.
 
-    Returns the list of languages for the dateparser library, or an empty list if any language can't be converted.
+    - If a script is provided (e.g., "aze_Cyrl"), attempts to use the full locale (e.g., "az-Cyrl").
+    Falls back to the base language (e.g., "az") if needed.
+    - If a language cannot be mapped or validated, it is skipped with a warning.
+    - Returns a list of valid locales, or an empty list if none could be converted.
     """
-    # TODO check these Dateparser languages as they are not referenced on the ISO639-2 standard:
-    # agq, asa, bez, brx, cgg, ckb, dav, dje, dyo, ebu, guz, jgo, jmc, kde, kea, khq, kln,
-    # ksb, ksf, ksh, lag, lkt, lrc, luy, mer, mfe, mgh, mgo, mua, mzn, naq, nmg, nnh, nus,
-    # rof, rwk, saq, sbp, she, ses, shi, teo, twq, tzm, vun, wae, xog, yav, yue
-    # See https://www.loc.gov/standards/iso639-2/php/code_list.php
-    ocr_to_dateparser = {
-        "afr": "af",
-        "amh": "am",
-        "ara": "ar",
-        "asm": "as",
-        "ast": "ast",
-        "aze": "az",
-        "bel": "be",
-        "bul": "bg",
-        "ben": "bn",
-        "bod": "bo",
-        "bre": "br",
-        "bos": "bs",
-        "cat": "ca",
-        "cher": "chr",
-        "ces": "cs",
-        "cym": "cy",
-        "dan": "da",
-        "deu": "de",
-        "dzo": "dz",
-        "ell": "el",
-        "eng": "en",
-        "epo": "eo",
-        "spa": "es",
-        "est": "et",
-        "eus": "eu",
-        "fas": "fa",
-        "fin": "fi",
-        "fil": "fil",
-        "fao": "fo",  # codespell:ignore
-        "fra": "fr",
-        "fry": "fy",
-        "gle": "ga",
-        "gla": "gd",
-        "glg": "gl",
-        "guj": "gu",
-        "heb": "he",
-        "hin": "hi",
-        "hrv": "hr",
-        "hun": "hu",
-        "hye": "hy",
-        "ind": "id",
-        "isl": "is",
-        "ita": "it",
-        "jpn": "ja",
-        "kat": "ka",
-        "kaz": "kk",
-        "khm": "km",
-        "knda": "kn",
-        "kor": "ko",
-        "kir": "ky",
-        "ltz": "lb",
-        "lao": "lo",
-        "lit": "lt",
-        "lav": "lv",
-        "mal": "ml",
-        "mon": "mn",
-        "mar": "mr",
-        "msa": "ms",
-        "mlt": "mt",
-        "mya": "my",
-        "nep": "ne",
-        "nld": "nl",
-        "ori": "or",
-        "pan": "pa",
-        "pol": "pl",
-        "pus": "ps",
-        "por": "pt",
-        "que": "qu",
-        "ron": "ro",
-        "rus": "ru",
-        "sin": "si",
-        "slk": "sk",
-        "slv": "sl",
-        "sqi": "sq",
-        "srp": "sr",
-        "swe": "sv",
-        "swa": "sw",
-        "tam": "ta",
-        "tel": "te",  # codespell:ignore
-        "tha": "th",  # codespell:ignore
-        "tir": "ti",
-        "tgl": "tl",
-        "ton": "to",
-        "tur": "tr",
-        "uig": "ug",
-        "ukr": "uk",
-        "urd": "ur",
-        "uzb": "uz",
-        "via": "vi",
-        "yid": "yi",
-        "yor": "yo",
-        "chi": "zh",
-    }
-
+    ocr_to_dateparser = ocr_to_dateparser_languages()
     loader = LocaleDataLoader()
     result = []
     try:
@@ -1292,14 +1197,12 @@ def _ocr_to_dateparser_languages(ocr_languages: str) -> list[str]:
             ocr_lang_part, *script = ocr_language.split("_")
             ocr_script_part = script[0] if script else None
 
-            parts = ocr_language.split("_")
-            ocr_lang_part = parts[0]
-            ocr_script_part = parts[1] if len(parts) > 1 else None
             language_part = ocr_to_dateparser.get(ocr_lang_part)
             if language_part is None:
-                raise ValueError(
-                    f'The language "{ocr_language}" doesn\'t have an dateparser equivalent code.',
+                logger.warning(
+                    f'Skipping unknown OCR language "{ocr_language}" — no dateparser equivalent.',
                 )
+                continue
 
             # Ensure base language is supported by dateparser
             loader.get_locale_map(locales=[language_part])
@@ -1311,7 +1214,7 @@ def _ocr_to_dateparser_languages(ocr_languages: str) -> list[str]:
                     loader.get_locale_map(locales=[dateparser_language])
                 except Exception:
                     logger.warning(
-                        f"{dateparser_language} is not supported for date parsing. Default to {language_part}.",
+                        f"Language variant '{dateparser_language}' not supported by dateparser; falling back to base language '{language_part}'. You can manually set PAPERLESS_DATE_PARSER_LANGUAGES if needed.",
                     )
                     dateparser_language = language_part
             else:
@@ -1323,11 +1226,24 @@ def _ocr_to_dateparser_languages(ocr_languages: str) -> list[str]:
             f"Could not configure dateparser languages. Set PAPERLESS_DATE_PARSER_LANGUAGES parameter to avoid this. Detail: {e}",
         )
         return []
+    if not result:
+        logger.warning(
+            "Could not configure any dateparser languages from OCR_LANGUAGE — fallback to autodetection.",
+        )
     return result
 
 
 def _parse_dateparser_languages(languages: str | None):
     language_list = languages.split("+") if languages else []
+    # There is an unfixed issue in zh-Hant and zh-Hans locales in the dateparser lib.
+    # See: https://github.com/scrapinghub/dateparser/issues/875
+    for index, language in enumerate(language_list):
+        if language.startswith("zh-") and "zh" not in language_list:
+            logger.warning(
+                f'Chinese locale detected: {language}. dateparser might fail to parse some dates with this locale, so Chinese ("zh") will be used as a fallback.',
+            )
+            language_list.append("zh")
+
     return list(LocaleDataLoader().get_locale_map(locales=language_list))
 
 
