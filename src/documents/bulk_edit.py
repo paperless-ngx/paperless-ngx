@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import itertools
 import logging
+import re
 import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -579,3 +580,235 @@ def remove_doclink(
         target_doc_field_instance.value.remove(document.id)
         target_doc_field_instance.save()
     Document.objects.filter(id=target_doc_id).update(modified=timezone.now())
+
+
+def get_reorganized_title(original_title: str, suffix_word: str = "reorganized") -> str:
+    """
+    Generate a smart title for reorganized documents that handles incremental numbering.
+
+    Args:
+        original_title: The original document title
+        suffix_word: The word to use for the suffix (default: "reorganized")
+
+    Returns:
+        A title with an appropriate reorganized suffix
+
+    Examples:
+        "Document" -> "Document (reorganized)"
+        "Document (reorganized)" -> "Document (reorganized 1)"
+        "Document (reorganized 1)" -> "Document (reorganized 2)"
+        "Document (reorganized 5)" -> "Document (reorganized 6)"
+    """
+    # Create regex pattern to match existing reorganized suffixes
+    pattern = rf"\s+\({re.escape(suffix_word)}(?:\s+(\d+))?\)$"
+
+    match = re.search(pattern, original_title)
+
+    if match:
+        # Extract the base title without the suffix
+        base_title = original_title[: match.start()]
+
+        # Get the current number (None if no number exists)
+        current_num_str = match.group(1)
+
+        new_num = 1 if current_num_str is None else int(current_num_str) + 1
+
+        return f"{base_title} ({suffix_word} {new_num})"
+    else:
+        # No existing suffix, add "(reorganized)"
+        return f"{original_title} ({suffix_word})"
+
+
+def reorganize(
+    doc_ids: list[int],
+    processing_instruction: dict,
+    *,
+    delete_original: bool = False,
+    user: User | None = None,
+) -> Literal["OK"]:
+    """
+    Reorganize a PDF document according to pdf-reorganizer processing instructions.
+
+    The processing_instruction should have the format:
+    {
+        "src": ["filename.pdf"],
+        "docs": [
+            [1, 2],  # Simple page numbers
+            [3, {"p": 5, "r": 90}],  # Page with rotation
+            [{"p": 6, "c": "Comment"}]  # Page with comment
+        ]
+    }
+
+    Where each doc in "docs" represents a new document to be created,
+    and each page can be either a simple number or an object with:
+    - p: page number (required)
+    - r: rotation in degrees (optional, 90/180/270)
+    - c: comment (optional, currently not used)
+    - s: source document index (optional, defaults to 0)
+    """
+    if len(doc_ids) != 1:
+        raise ValueError("Reorganize method only supports one document")
+
+    logger.info(
+        f"Attempting to reorganize document {doc_ids[0]} with processing instruction",
+    )
+    doc = Document.objects.get(id=doc_ids[0])
+
+    import pikepdf
+
+    # Validate processing instruction format
+    if not isinstance(processing_instruction, dict):
+        raise ValueError("Processing instruction must be a dictionary")
+    if "docs" not in processing_instruction:
+        raise ValueError("Processing instruction must contain 'docs' array")
+    if not isinstance(processing_instruction["docs"], list):
+        raise ValueError("'docs' must be an array")
+    if len(processing_instruction["docs"]) == 0:
+        raise ValueError("'docs' array cannot be empty")
+
+    docs_to_create = processing_instruction["docs"]
+    consume_tasks = []
+
+    try:
+        # Use archive version if available (contains already processed content),
+        # otherwise fall back to source path
+        doc_path = doc.archive_path if doc.has_archive_version else doc.source_path
+        with pikepdf.open(doc_path) as source_pdf:
+            total_pages = len(source_pdf.pages)
+
+            # Process each document to be created
+            for doc_idx, doc_pages in enumerate(docs_to_create):
+                if not isinstance(doc_pages, list) or len(doc_pages) == 0:
+                    logger.warning(
+                        f"Skipping empty or invalid document at index {doc_idx}",
+                    )
+                    continue
+
+                # Create new PDF for this document
+                dst_pdf = pikepdf.new()
+                doc_title_pages = []
+
+                for page_spec in doc_pages:
+                    # Handle both simple page numbers and page objects
+                    if isinstance(page_spec, int):
+                        page_num = page_spec
+                        rotation = 0
+                        # comment = None
+                    elif isinstance(page_spec, dict):
+                        if "p" not in page_spec:
+                            logger.warning(
+                                f"Page specification missing 'p' field: {page_spec}",
+                            )
+                            continue
+                        page_num = page_spec["p"]
+                        rotation = page_spec.get("r", 0)
+                        # comment = page_spec.get("c", None)
+                        # source_idx = page_spec.get("s", 0)  # Currently unused, assumes single source
+                    else:
+                        logger.warning(f"Invalid page specification: {page_spec}")
+                        continue
+
+                    # Validate page number
+                    if (
+                        not isinstance(page_num, int)
+                        or page_num < 1
+                        or page_num > total_pages
+                    ):
+                        logger.warning(
+                            f"Invalid page number {page_num}, total pages: {total_pages}",
+                        )
+                        continue
+
+                    # Copy the page from source
+                    source_page = source_pdf.pages[
+                        page_num - 1
+                    ]  # Convert to 0-based index
+                    dst_pdf.pages.append(source_page)
+
+                    # Apply rotation if specified
+                    if rotation and rotation in [90, 180, 270]:
+                        dst_pdf.pages[-1].rotate(rotation, relative=False)
+                        logger.debug(f"Applied rotation {rotation}° to page {page_num}")
+                    elif rotation != 0:
+                        logger.warning(
+                            f"Invalid rotation {rotation}° for page {page_num}, skipping rotation",
+                        )
+
+                    # Store page info for filename generation
+                    doc_title_pages.append(str(page_num))
+
+                    # Note: comments are not currently processed but could be added as metadata
+                    # if comment:
+                    #    logger.debug(f"Page {page_num} has comment: {comment}")
+
+                if len(dst_pdf.pages) == 0:
+                    logger.warning(
+                        f"No valid pages found for document {doc_idx}, skipping",
+                    )
+                    dst_pdf.close()
+                    continue
+
+                # Generate filename and save
+                page_range = (
+                    f"{doc_title_pages[0]}-{doc_title_pages[-1]}"
+                    if len(doc_title_pages) > 1
+                    else doc_title_pages[0]
+                )
+                filepath = (
+                    Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
+                    / f"{doc.id}_{page_range}_reorganized.pdf"
+                )
+
+                dst_pdf.remove_unreferenced_resources()
+                dst_pdf.save(filepath)
+                dst_pdf.close()
+
+                # Prepare metadata for new document
+                overrides = DocumentMetadataOverrides().from_document(doc)
+                if len(docs_to_create) == 1:
+                    # Single document - keep original title with suffix if reorganized differently
+                    overrides.title = get_reorganized_title(doc.title)
+                else:
+                    # Multiple documents - add part number
+                    overrides.title = f"{doc.title} (part {doc_idx + 1})"
+
+                if user is not None:
+                    overrides.owner_id = user.id
+
+                logger.info(
+                    f"Adding reorganized document part {doc_idx + 1} with pages {doc_title_pages} to the task queue",
+                )
+                consume_tasks.append(
+                    consume_file.s(
+                        ConsumableDocument(
+                            source=DocumentSource.ConsumeFolder,
+                            original_file=filepath,
+                        ),
+                        overrides,
+                    ),
+                )
+
+        # Execute all consume tasks
+        if consume_tasks:
+            if delete_original:
+                logger.info(
+                    "Queueing removal of original document after consumption of the reorganized documents",
+                )
+                chord(header=consume_tasks, body=delete.si([doc.id])).delay()
+            else:
+                for task in consume_tasks:
+                    task.delay()
+
+            logger.info(
+                f"Successfully reorganized document {doc.id} into {len(consume_tasks)} new documents",
+            )
+        else:
+            logger.warning(
+                f"No valid documents were created from reorganization of document {doc.id}",
+            )
+
+    except Exception as e:
+        logger.exception(f"Error reorganizing document {doc.id}: {e}")
+        raise
+
+    return "OK"

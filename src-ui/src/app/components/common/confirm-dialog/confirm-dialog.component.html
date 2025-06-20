@@ -12,6 +12,14 @@
   }
 </div>
 <div class="modal-footer">
+  @if (showDeleteOriginalOption) {
+    <div class="form-check form-switch me-auto">
+      <input class="form-check-input" type="checkbox" id="deleteOriginal" [(ngModel)]="deleteOriginal">
+      <label class="form-check-label" for="deleteOriginal" i18n>
+        Delete original document after successful reorganization
+      </label>
+    </div>
+  }
   <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">
         <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
       </button>

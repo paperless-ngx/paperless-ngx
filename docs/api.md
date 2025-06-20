@@ -303,6 +303,28 @@ The following methods are supported:
     -   Requires `parameters`:
         -   `"pages": [..]` The list should be a list of integers e.g. `"[2,3,4]"`
     -   The delete_pages operation only accepts a single document.
+-   `reorganize`
+    -   Requires `parameters`:
+        -   `"processing_instruction": PROCESSING_INSTRUCTION_OBJ` A pdf-reorganizer processing instruction object
+    -   Optional `parameters`:
+        -   `"delete_original": true` to delete the original document after reorganization. This requires the calling user being the owner of the document.
+    -   The reorganize operation only accepts a single document.
+    -   The processing instruction should have the format:
+        ```json
+        {
+            "src": ["filename.pdf"],
+            "docs": [
+                [1, 2], // Simple page numbers
+                [3, { "p": 5, "r": 90 }], // Page with rotation
+                [{ "p": 6, "c": "Comment" }] // Page with comment
+            ]
+        }
+        ```
+        Where each doc in "docs" represents a new document to be created, and each page can be either a simple number or an object with:
+        -   `p`: page number (required)
+        -   `r`: rotation in degrees (optional, 90/180/270)
+        -   `c`: comment (optional, currently logged but not stored)
+        -   `s`: source document index (optional, defaults to 0)
 -   `modify_custom_fields`
     -   Requires `parameters`:
         -   `"add_custom_fields": { CUSTOM_FIELD_ID: VALUE }`: JSON object consisting of custom field id:value pairs to add to the document, can also be a list of custom field IDs

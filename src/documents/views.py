@@ -1314,6 +1314,7 @@ class BulkEditView(PassUserMixin):
         "delete_pages": "checksum",
         "split": None,
         "merge": None,
+        "reorganize": None,
         "reprocess": "checksum",
     }
 

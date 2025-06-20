@@ -799,3 +799,23 @@ canvas.hiddenCanvasElement {
     display: block;
   }
 }
+
+// PDF Reorganizer CSS variables to match paperless-ngx theme
+pdf-reorganizer {
+  background-color: var(--bs-border-color-translucent);
+  --pdfro-main-color: var(--bs-body-color);
+  --pdfro-selected-bg-color: var(--bs-primary);
+  --pdfro-selected-color: var(--bs-info);
+  --pdfro-split-marker-border-color: var(--pngx-primary-lighten-10);
+  --pdfro-split-marker-bg-color: var(--pngx-primary-lighten-30);
+  --pdfro-split-marker-counter-color: var(--bs-light);
+  --pdfro-loader-color: var(--pdfro-selected-bg-color);
+  --pdfro-removed-bg-color: var(--bs-secondary);
+  --pdfro-hover-bg-color: var(--bs-info);
+  --pdfro-dragged-color: var(--pngx-primary-lighten-10);
+  --pdfro-nav-color: var(--pdfro-main-color);
+  --pdfro-nav-bg-color: var(--bs-light);
+  --pdfro-comment-color: var(--pdfro-main-color);
+  --pdfro-comment-border-color: var(--bs-border-color);
+  --pdfro-comment-bg-color: var(--bs-warning);
+}

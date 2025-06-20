@@ -69,6 +69,10 @@
       <button ngbDropdownItem (click)="deletePages()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
         <i-bs name="file-earmark-minus"></i-bs>&nbsp;<ng-container i18n>Delete page(s)</ng-container>
       </button>
+
+      <button ngbDropdownItem (click)="reorganizeDocument()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
+        <i-bs name="shuffle"></i-bs>&nbsp;<ng-container i18n>Reorganize</ng-container>
+      </button>
     </div>
   </div>
 
@@ -387,22 +391,41 @@
   @if (document) {
     @switch (archiveContentRenderType) {
       @case (ContentRenderType.PDF) {
-        @if (!useNativePdfViewer) {
-          <div class="preview-sticky pdf-viewer-container">
-            <pdf-viewer
-              [src]="{ url: previewUrl, password: password }"
-              [original-size]="false"
-              [show-borders]="true"
-              [show-all]="true"
-              [(page)]="previewCurrentPage"
-              [zoom-scale]="previewZoomScale"
-              [zoom]="previewZoomSetting"
-              (error)="onError($event)"
-              (after-load-complete)="pdfPreviewLoaded($event)">
-            </pdf-viewer>
+        @if (showReorganizer) {
+          <div class="preview-sticky reorganizer-container">
+            <div class="reorganizer-header">
+              <h5 i18n>Reorganize PDF</h5>
+              <button type="button" class="btn btn-sm btn-outline-secondary" (click)="exitReorganizer()" i18n>
+                <i-bs name="x"></i-bs> Exit Reorganizer
+              </button>
+            </div>
+            <div class="reorganizer-content">
+              <pdf-reorganizer
+                #pdfReorganizer
+                [filename]="document?.title"
+                (processed)="onDocumentReorganized($event)"
+                fit>
+              </pdf-reorganizer>
+            </div>
           </div>
         } @else {
-          <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
+          @if (!useNativePdfViewer) {
+            <div class="preview-sticky pdf-viewer-container">
+              <pdf-viewer
+                [src]="{ url: previewUrl, password: password }"
+                [original-size]="false"
+                [show-borders]="true"
+                [show-all]="true"
+                [(page)]="previewCurrentPage"
+                [zoom-scale]="previewZoomScale"
+                [zoom]="previewZoomSetting"
+                (error)="onError($event)"
+                (after-load-complete)="pdfPreviewLoaded($event)">
+              </pdf-viewer>
+            </div>
+          } @else {
+            <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
+          }
         }
       }
       @case (ContentRenderType.Text) {

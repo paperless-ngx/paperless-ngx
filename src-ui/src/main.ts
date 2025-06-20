@@ -184,9 +184,15 @@ import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
 import localeZh from '@angular/common/locales/zh'
 import localeZhHant from '@angular/common/locales/zh-Hant'
+import PDFReorganizer from 'pdf-reorganizer'
 import { CorrespondentNamePipe } from './app/pipes/correspondent-name.pipe'
 import { DocumentTypeNamePipe } from './app/pipes/document-type-name.pipe'
 import { StoragePathNamePipe } from './app/pipes/storage-path-name.pipe'
+
+// Register the pdf-reorganizer web component
+if (!customElements.get('pdf-reorganizer')) {
+  customElements.define('pdf-reorganizer', PDFReorganizer)
+}
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)

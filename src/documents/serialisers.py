@@ -1289,6 +1289,7 @@ class BulkEditSerializer(
             "merge",
             "split",
             "delete_pages",
+            "reorganize",
         ],
         label="Method",
         write_only=True,
@@ -1362,6 +1363,8 @@ class BulkEditSerializer(
             return bulk_edit.split
         elif method == "delete_pages":
             return bulk_edit.delete_pages
+        elif method == "reorganize":
+            return bulk_edit.reorganize
         else:
             raise serializers.ValidationError("Unsupported method.")
 
@@ -1516,6 +1519,83 @@ class BulkEditSerializer(
         else:
             parameters["archive_fallback"] = False
 
+    def _validate_parameters_reorganize(self, parameters):
+        if "processing_instruction" not in parameters:
+            raise serializers.ValidationError("processing_instruction not specified")
+
+        instruction = parameters["processing_instruction"]
+        if not isinstance(instruction, dict):
+            raise serializers.ValidationError(
+                "processing_instruction must be a dictionary",
+            )
+
+        if "docs" not in instruction:
+            raise serializers.ValidationError(
+                "processing_instruction must contain 'docs' array",
+            )
+
+        docs = instruction["docs"]
+        if not isinstance(docs, list):
+            raise serializers.ValidationError("'docs' must be an array")
+
+        if len(docs) == 0:
+            raise serializers.ValidationError("'docs' array cannot be empty")
+
+        # Validate each document in the docs array
+        for doc_idx, doc_pages in enumerate(docs):
+            if not isinstance(doc_pages, list):
+                raise serializers.ValidationError(
+                    f"Document {doc_idx} must be an array of pages",
+                )
+
+            if len(doc_pages) == 0:
+                raise serializers.ValidationError(
+                    f"Document {doc_idx} cannot have empty pages array",
+                )
+
+            # Validate each page specification
+            for page_idx, page_spec in enumerate(doc_pages):
+                if isinstance(page_spec, int):
+                    if page_spec < 1:
+                        raise serializers.ValidationError(
+                            f"Page number must be positive (doc {doc_idx}, page {page_idx})",
+                        )
+                elif isinstance(page_spec, dict):
+                    if "p" not in page_spec:
+                        raise serializers.ValidationError(
+                            f"Page object must contain 'p' field (doc {doc_idx}, page {page_idx})",
+                        )
+                    if not isinstance(page_spec["p"], int) or page_spec["p"] < 1:
+                        raise serializers.ValidationError(
+                            f"Page number 'p' must be positive integer (doc {doc_idx}, page {page_idx})",
+                        )
+                    if "r" in page_spec:
+                        rotation = page_spec["r"]
+                        if not isinstance(rotation, int) or rotation not in [
+                            0,
+                            90,
+                            180,
+                            270,
+                        ]:
+                            raise serializers.ValidationError(
+                                f"Rotation 'r' must be 0, 90, 180, or 270 degrees (doc {doc_idx}, page {page_idx})",
+                            )
+                    if "c" in page_spec and not isinstance(page_spec["c"], str):
+                        raise serializers.ValidationError(
+                            f"Comment 'c' must be a string (doc {doc_idx}, page {page_idx})",
+                        )
+                else:
+                    raise serializers.ValidationError(
+                        f"Page specification must be integer or object (doc {doc_idx}, page {page_idx})",
+                    )
+
+        # Validate optional delete_original parameter
+        if "delete_original" in parameters and not isinstance(
+            parameters["delete_original"],
+            bool,
+        ):
+            raise serializers.ValidationError("delete_original must be a boolean")
+
     def validate(self, attrs):
         method = attrs["method"]
         parameters = attrs["parameters"]
@@ -1550,6 +1630,12 @@ class BulkEditSerializer(
             self._validate_parameters_delete_pages(parameters)
         elif method == bulk_edit.merge:
             self._validate_parameters_merge(parameters)
+        elif method == bulk_edit.reorganize:
+            if len(attrs["documents"]) > 1:
+                raise serializers.ValidationError(
+                    "Reorganize method only supports one document",
+                )
+            self._validate_parameters_reorganize(parameters)
 
         return attrs
 

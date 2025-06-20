@@ -1,6 +1,14 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
 import { HttpClient, HttpResponse } from '@angular/common/http'
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
+import {
+  AfterViewInit,
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core'
 import {
   FormArray,
   FormControl,
@@ -171,13 +179,16 @@ export enum ZoomSetting {
     NgxBootstrapIconsModule,
     PdfViewerModule,
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class DocumentDetailComponent
   extends ComponentWithPermissions
-  implements OnInit, OnDestroy, DirtyComponent
+  implements OnInit, OnDestroy, AfterViewInit, DirtyComponent
 {
   @ViewChild('inputTitle')
   titleInput: TextComponent
+
+  @ViewChild('pdfReorganizer', { static: false }) pdfReorganizer: ElementRef
 
   expandOriginalMetadata = false
   expandArchivedMetadata = false
@@ -236,6 +247,8 @@ export class DocumentDetailComponent
   customFields: CustomField[]
 
   public downloading: boolean = false
+
+  public showReorganizer: boolean = false
 
   public readonly CustomFieldDataType = CustomFieldDataType
 
@@ -1478,6 +1491,38 @@ export class DocumentDetailComponent
       !!this.document?.archived_file_name
   }
 
+  reorganizeDocument() {
+    this.showReorganizer = true
+
+    // Use setTimeout to ensure the pdf-reorganizer element is rendered
+    setTimeout(() => {
+      if (!this.pdfReorganizer?.nativeElement) {
+        return
+      }
+      const url = this.documentsService.getPreviewUrl(this.documentId)
+      const filename = this.document?.title || 'document.pdf'
+
+      try {
+        // Call the loadDocument method directly on the web component
+        this.pdfReorganizer.nativeElement.loadDocument(url, filename)
+      } catch (error) {
+        this.toastService.showError(
+          $localize`Failed to load PDF for reorganization`
+        )
+      }
+    }, 100)
+  }
+
+  ngAfterViewInit() {}
+
+  exitReorganizer() {
+    this.showReorganizer = false
+  }
+
+  get reorganizerPdfUrl(): string {
+    return this.documentsService.getPreviewUrl(this.documentId)
+  }
+
   private tryRenderTiff() {
     this.http.get(this.previewUrl, { responseType: 'arraybuffer' }).subscribe({
       next: (res) => {
@@ -1517,5 +1562,76 @@ export class DocumentDetailComponent
         this.tiffError = $localize`An error occurred loading tiff: ${err.toString()}`
       },
     })
+  }
+
+  onDocumentReorganized(event: CustomEvent) {
+    // The event.detail contains the reorganized document data
+    const reorganizedData = event.detail
+
+    // Check if there are any changes to process
+    if (!reorganizedData.docs || reorganizedData.docs.length === 0) {
+      this.toastService.showError(
+        $localize`No documents to process from reorganization`
+      )
+      return
+    }
+
+    // Show confirmation dialog
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Reorganize confirm`
+    modal.componentInstance.messageBold = $localize`This operation will reorganize the document according to your changes.`
+    modal.componentInstance.message =
+      reorganizedData.docs.length === 1
+        ? $localize`The document will be reorganized`
+        : $localize`The document will be reorganized into ${reorganizedData.docs.length} new documents.`
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.btnClass = 'btn-primary'
+
+    // Always show delete original option if user has permissions
+    modal.componentInstance.showDeleteOriginalOption = this.userCanEdit
+    modal.componentInstance.deleteOriginal = false
+
+    modal.componentInstance.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        modal.componentInstance.buttonsEnabled = false
+
+        // Get delete original option from the dialog component
+        const deleteOriginal = modal.componentInstance.deleteOriginal
+
+        // Prepare parameters for the backend
+        const parameters = {
+          processing_instruction: reorganizedData,
+          delete_original: deleteOriginal,
+        }
+
+        this.documentsService
+          .bulkEdit([this.document.id], 'reorganize', parameters)
+          .pipe(first(), takeUntil(this.unsubscribeNotifier))
+          .subscribe({
+            next: () => {
+              const successMessage = $localize`Document reorganization completed successfully.`
+
+              this.toastService.showInfo(successMessage)
+              this.exitReorganizer()
+
+              // If original was deleted or single document was reorganized, close the detail view
+              if (deleteOriginal || reorganizedData.docs.length === 1) {
+                this.close()
+              }
+            },
+            error: (error) => {
+              if (modal) {
+                modal.componentInstance.buttonsEnabled = true
+              }
+              this.toastService.showError(
+                $localize`Error executing reorganize operation`,
+                error
+              )
+            },
+          })
+      })
   }
 }

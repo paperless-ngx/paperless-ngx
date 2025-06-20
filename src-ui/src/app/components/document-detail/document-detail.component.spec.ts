@@ -1219,6 +1219,41 @@ describe('DocumentDetailComponent', () => {
     req.flush(true)
   })
 
+  it('should support reorganize document', () => {
+    initNormally()
+    expect(component.showReorganizer).toBe(false)
+    component.reorganizeDocument()
+    expect(component.showReorganizer).toBe(true)
+  })
+
+  it('should exit reorganizer', () => {
+    initNormally()
+    component.showReorganizer = true
+    component.exitReorganizer()
+    expect(component.showReorganizer).toBe(false)
+  })
+
+  it('should handle document reorganized event', () => {
+    initNormally()
+    component.showReorganizer = true
+    const modalSpy = jest.spyOn(modalService, 'open')
+    const mockEvent = new CustomEvent('processed', {
+      detail: {
+        src: ['test.pdf'],
+        docs: [
+          [1, 2, 3], // First document with pages 1, 2, 3
+          [4, 5], // Second document with pages 4, 5
+        ],
+      },
+    })
+
+    component.onDocumentReorganized(mockEvent)
+
+    expect(modalSpy).toHaveBeenCalled()
+    // The reorganizer remains open until user confirms the modal
+    expect(component.showReorganizer).toBe(true)
+  })
+
   it('should support keyboard shortcuts', () => {
     initNormally()
 
