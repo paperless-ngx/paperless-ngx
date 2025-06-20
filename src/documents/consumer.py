@@ -2,6 +2,7 @@ import datetime
 import hashlib
 import os
 import tempfile
+import time
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -765,11 +766,18 @@ class ConsumerPreflightPlugin(
             assert isinstance(self.input_doc.original_file, Path), (
                 self.input_doc.original_file
             )
-        if not self.input_doc.original_file.is_file():
-            self._fail(
-                ConsumerStatusShortMessage.FILE_NOT_FOUND,
-                f"Cannot consume {self.input_doc.original_file}: File not found.",
+        # Retry briefly in case file creation is delayed
+        for _ in range(10):
+            if self.input_doc.original_file.is_file():
+                return
+            self.log.debug(
+                f"Waiting for file {self.input_doc.original_file} to appear...",
             )
+            time.sleep(0.1)
+        self._fail(
+            ConsumerStatusShortMessage.FILE_NOT_FOUND,
+            f"Cannot consume {self.input_doc.original_file}: File not found.",
+        )
 
     def pre_check_duplicate(self):
         """
