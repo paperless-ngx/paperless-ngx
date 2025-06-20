@@ -221,9 +221,6 @@ lint.per-file-ignores."src/documents/parsers.py" = [
 lint.per-file-ignores."src/documents/signals/handlers.py" = [
   "PTH",
 ] # TODO Enable & remove
-lint.per-file-ignores."src/paperless/settings.py" = [
-  "PTH",
-] # TODO Enable & remove
 lint.per-file-ignores."src/paperless_tesseract/tests/test_parser.py" = [
   "RUF001",
 ]

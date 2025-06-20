@@ -16,15 +16,15 @@ from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
 # Tap paperless.conf if it's available
-configuration_path = os.getenv("PAPERLESS_CONFIGURATION_PATH")
-if configuration_path and os.path.exists(configuration_path):
-    load_dotenv(configuration_path)
-elif os.path.exists("../paperless.conf"):
-    load_dotenv("../paperless.conf")
-elif os.path.exists("/etc/paperless.conf"):
-    load_dotenv("/etc/paperless.conf")
-elif os.path.exists("/usr/local/etc/paperless.conf"):
-    load_dotenv("/usr/local/etc/paperless.conf")
+for path in [
+    os.getenv("PAPERLESS_CONFIGURATION_PATH"),
+    "../paperless.conf",
+    "/etc/paperless.conf",
+    "/usr/local/etc/paperless.conf",
+]:
+    if path and Path(path).exists():
+        load_dotenv(path)
+        break
 
 # There are multiple levels of concurrency in paperless:
 #  - Multiple consumers may be run in parallel.
@@ -674,7 +674,7 @@ def _parse_db_settings() -> dict:
     databases = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": os.path.join(DATA_DIR, "db.sqlite3"),
+            "NAME": str(DATA_DIR / "db.sqlite3"),
             "OPTIONS": {},
         },
     }
@@ -789,7 +789,7 @@ LANGUAGES = [
     ("zh-tw", _("Chinese Traditional")),
 ]
 
-LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
+LOCALE_PATHS = [str(BASE_DIR / "locale")]
 
 TIME_ZONE = os.getenv("PAPERLESS_TIME_ZONE", "UTC")
 
@@ -832,21 +832,21 @@ LOGGING = {
         "file_paperless": {
             "class": "concurrent_log_handler.ConcurrentRotatingFileHandler",
             "formatter": "verbose",
-            "filename": os.path.join(LOGGING_DIR, "paperless.log"),
+            "filename": str(LOGGING_DIR / "paperless.log"),
             "maxBytes": LOGROTATE_MAX_SIZE,
             "backupCount": LOGROTATE_MAX_BACKUPS,
         },
         "file_mail": {
             "class": "concurrent_log_handler.ConcurrentRotatingFileHandler",
             "formatter": "verbose",
-            "filename": os.path.join(LOGGING_DIR, "mail.log"),
+            "filename": str(LOGGING_DIR / "mail.log"),
             "maxBytes": LOGROTATE_MAX_SIZE,
             "backupCount": LOGROTATE_MAX_BACKUPS,
         },
         "file_celery": {
             "class": "concurrent_log_handler.ConcurrentRotatingFileHandler",
             "formatter": "verbose",
-            "filename": os.path.join(LOGGING_DIR, "celery.log"),
+            "filename": str(LOGGING_DIR / "celery.log"),
             "maxBytes": LOGROTATE_MAX_SIZE,
             "backupCount": LOGROTATE_MAX_BACKUPS,
         },
@@ -901,7 +901,7 @@ CELERY_ACCEPT_CONTENT = ["application/json", "application/x-python-serialize"]
 CELERY_BEAT_SCHEDULE = _parse_beat_schedule()
 
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#beat-schedule-filename
-CELERY_BEAT_SCHEDULE_FILENAME = os.path.join(DATA_DIR, "celerybeat-schedule.db")
+CELERY_BEAT_SCHEDULE_FILENAME = str(DATA_DIR / "celerybeat-schedule.db")
 
 # django setting.
 CACHES = {
