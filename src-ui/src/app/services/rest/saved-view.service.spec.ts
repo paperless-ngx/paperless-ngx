@@ -235,7 +235,7 @@ describe(`Additional service tests for SavedViewService`, () => {
   })
 
   it('should support getting document counts for views', () => {
-    service.getDocumentCounts(saved_views)
+    service.maybeRefreshDocumentCounts(saved_views)
     saved_views.forEach((saved_view) => {
       const req = httpTestingController.expectOne(
         `${environment.apiBaseUrl}documents/?page=1&page_size=1&ordering=-${saved_view.sort_field}&fields=id&truncate_content=true`

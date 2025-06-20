@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { combineLatest, Observable } from 'rxjs'
-import { tap } from 'rxjs/operators'
+import { combineLatest, Observable, Subject } from 'rxjs'
+import { takeUntil, tap } from 'rxjs/operators'
 import { Results } from 'src/app/data/results'
 import { SavedView } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
@@ -16,6 +16,7 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
   public loading: boolean = true
   private savedViews: SavedView[] = []
   private savedViewDocumentCounts: Map<number, number> = new Map()
+  private unsubscribeNotifier: Subject<void> = new Subject<void>()
 
   constructor(
     protected http: HttpClient,
@@ -121,7 +122,11 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
     return super.delete(o).pipe(tap(() => this.reload()))
   }
 
-  getDocumentCounts(views: SavedView[]) {
+  public maybeRefreshDocumentCounts(views: SavedView[] = this.sidebarViews) {
+    if (!this.settingsService.get(SETTINGS_KEYS.SIDEBAR_VIEWS_SHOW_COUNT)) {
+      return
+    }
+    this.unsubscribeNotifier.next() // clear previous subscriptions
     views.forEach((view) => {
       this.documentService
         .listFiltered(
@@ -132,6 +137,7 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
           view.filter_rules,
           { fields: 'id', truncate_content: true }
         )
+        .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe((results: Results<Document>) => {
           this.savedViewDocumentCounts.set(view.id, results.count)
         })

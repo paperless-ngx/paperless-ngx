@@ -32,6 +32,7 @@ import {
   DocumentService,
   SelectionDataItem,
 } from 'src/app/services/rest/document.service'
+import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -106,7 +107,8 @@ export class BulkEditorComponent
     private toastService: ToastService,
     private storagePathService: StoragePathService,
     private customFieldService: CustomFieldsService,
-    private permissionService: PermissionsService
+    private permissionService: PermissionsService,
+    public savedViewService: SavedViewService
   ) {
     super()
   }
@@ -274,6 +276,7 @@ export class BulkEditorComponent
           this.list.selected.forEach((id) => {
             this.openDocumentService.refreshDocument(id)
           })
+          this.savedViewService.maybeRefreshDocumentCounts()
           if (modal) {
             modal.close()
           }
