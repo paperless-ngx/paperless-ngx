@@ -271,6 +271,7 @@ def set_permissions(permissions, object):
 
 
 def get_users_with_perms_folder(obj, perm, with_group_users=False):
+    from documents.models import FolderPermission
     if perm not in ["view_folder", "change_folder"]:
         raise ValueError("Perm phải là 'view_folder' hoặc 'change_folder'.")
 

@@ -50,8 +50,7 @@ from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import custom_get_parser_class_for_mime_type
 from documents.parsers import parse_date
-from documents.permissions import check_user_can_change_folder, \
-    has_perms_owner_aware_for_folder
+from documents.permissions import has_perms_owner_aware_for_folder
 from documents.permissions import set_permissions_for_object
 from documents.plugins.base import AlwaysRunPluginMixin
 from documents.plugins.base import ConsumeTaskPlugin
@@ -429,7 +428,10 @@ class Consumer(LoggingMixin):
             folder = Folder.objects.filter(id=self.override_folder_id).first()
             user = User.objects.get(id=self.override_owner_id)
             if folder:
-                user_can_change = check_user_can_change_folder(user, folder)
+                print(f'folder:{folder} user:{user}')
+                user_can_change = has_perms_owner_aware_for_folder(user,
+                                                                   "change_folder",
+                                                                   folder)
                 if not user_can_change:
                     self._fail(
                         ConsumerStatusShortMessage.NO_UPLOAD_PERMISSION_TO_FOLDER,
