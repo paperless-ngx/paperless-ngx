@@ -8,7 +8,8 @@ from guardian.shortcuts import get_users_with_perms
 
 from edoc.settings import ELASTIC_SEARCH_DOCUMENT_INDEX
 from .models import Document as DocumentModel, Note, CustomFieldInstance
-from .permissions import get_groups_with_only_permission, get_permission_folder
+from .permissions import get_groups_with_only_permission, \
+    get_permission_folder_for_index
 
 logger = logging.getLogger("edoc.document_elasticsearch")
 @registry.register_document
@@ -159,7 +160,7 @@ class DocumentDocument(Document):
 
     @staticmethod
     def get_permission_folder(instance):
-        permission = get_permission_folder(instance)
+        permission = get_permission_folder_for_index(instance)
         return permission
 
 

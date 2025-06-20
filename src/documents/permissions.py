@@ -326,7 +326,6 @@ def get_users_with_perms_folder(obj, perm, with_group_users=False):
 
     return users
 
-
 def get_permission_folder(obj):
     """
     Lấy danh sách quyền xem/sửa của thư mục, hợp nhất quyền từ tất cả thư mục cha,
@@ -403,6 +402,96 @@ def get_permission_folder(obj):
             "groups": list(permissions["change"]["groups"])
         }
     }
+
+
+def get_permission_folder_for_index(obj):
+    """
+    Lấy danh sách quyền xem/sửa của thư mục, hợp nhất quyền từ tất cả thư mục cha,
+    và loại bỏ các user/group bị chặn ở bất kỳ thư mục nào.
+    Nếu user/group được gán quyền sửa thì cũng được xem,
+    và nếu đang bị chặn xem/sửa thì sẽ được gỡ chặn.
+    Đồng thời thêm owner của các folder cha vào quyền chỉnh sửa.
+    """
+    from documents.models import Folder, FolderPermission
+    permissions = {
+        "view": {"users": set(), "groups": set()},
+        "change": {"users": set(), "groups": set()}
+    }
+
+    # Parse path thành các ID thư mục và path cha
+    parts = obj.path.rstrip("/").split("/")
+    folder_ids = [int(id_p) for id_p in parts if id_p.isdigit()]
+    all_paths = ["/".join(parts[:i]) + "/" for i in range(len(parts), 0, -1)]
+
+    # Query FolderPermission
+    fps = FolderPermission.objects.filter(path__in=all_paths).prefetch_related(
+        'view_users', 'view_groups', 'edit_users', 'edit_groups',
+        'can_not_view_users', 'can_not_view_groups',
+        'can_not_edit_users', 'can_not_edit_groups',
+    )
+
+    # Query Folder owners
+    owners = Folder.objects.filter(id__in=folder_ids).values_list("owner_id",
+                                                                  flat=True)
+    permissions["change"]["users"].update(owners)
+
+    # Gom quyền xem/sửa từ các FolderPermission
+    for fp in fps:
+        permissions["view"]["users"].update(
+            user.id for user in fp.view_users.all())
+        permissions["view"]["groups"].update(
+            group.id for group in fp.view_groups.all())
+        permissions["change"]["users"].update(
+            user.id for user in fp.edit_users.all())
+        permissions["change"]["groups"].update(
+            group.id for group in fp.edit_groups.all())
+
+    # Quyền sửa bao gồm quyền xem
+    permissions["view"]["users"].update(permissions["change"]["users"])
+    permissions["view"]["groups"].update(permissions["change"]["groups"])
+
+    # Gom danh sách chặn từ các thư mục
+    blocked_view_user_ids = set()
+    blocked_view_group_ids = set()
+    blocked_edit_user_ids = set()
+    blocked_edit_group_ids = set()
+
+    for fp in fps:
+        blocked_view_user_ids.update(
+            user.id for user in fp.can_not_view_users.all())
+        blocked_view_group_ids.update(
+            group.id for group in fp.can_not_view_groups.all())
+        blocked_edit_user_ids.update(
+            user.id for user in fp.can_not_edit_users.all())
+        blocked_edit_group_ids.update(
+            group.id for group in fp.can_not_edit_groups.all())
+
+    # Gỡ chặn nếu có quyền sửa
+    unblocked_users = permissions["change"]["users"] & blocked_view_user_ids
+    unblocked_groups = permissions["change"]["groups"] & blocked_view_group_ids
+
+    blocked_view_user_ids -= unblocked_users
+    blocked_view_group_ids -= unblocked_groups
+    blocked_edit_user_ids -= unblocked_users
+    blocked_edit_group_ids -= unblocked_groups
+
+    # Xoá khỏi quyền nếu bị chặn
+    permissions["view"]["users"] -= blocked_view_user_ids
+    permissions["view"]["groups"] -= blocked_view_group_ids
+    permissions["change"]["users"] -= blocked_edit_user_ids
+    permissions["change"]["groups"] -= blocked_edit_group_ids
+
+    return {
+        "view": {
+            "users": list(permissions["view"]["users"]),
+            "groups": list(permissions["view"]["groups"])
+        },
+        "change": {
+            "users": list(permissions["change"]["users"]),
+            "groups": list(permissions["change"]["groups"])
+        }
+    }
+
 
 
 

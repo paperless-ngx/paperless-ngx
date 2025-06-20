@@ -2712,49 +2712,52 @@ def generate_unique_name(name, existing_names):
 
 class AdjustedNameFieldFolder(serializers.CharField):
     def to_internal_value(self, data):
+        name = data.strip()
         model = self.parent.Meta.model
 
-        if hasattr(model, "name"):
-            parent_folder = self.parent.initial_data.get("parent_folder")
-            if parent_folder == 'root':
-                parent_folder = None
-            type = self.parent.initial_data.get("type")
+        if not hasattr(model, "name"):
+            return name
 
-            if type == "file":
-                return data.strip()
+        parent_folder = self.parent.initial_data.get("parent_folder")
+        if parent_folder == "root":
+            parent_folder = None
+        folder_type = self.parent.initial_data.get("type")
+        instance = getattr(self.parent, "instance", None)
 
-            if type and not parent_folder:
-                existing_names = model.objects.filter(type=type).values_list(
-                    "name", flat=True
-                )
-                if getattr(self.parent, "instance") is None:
-                    pass
-                elif data == getattr(self.parent.instance, "name"):
-                    return data.strip()
+        # Không cần xử lý trùng nếu là type file
+        if folder_type == "file":
+            return name
 
-            elif parent_folder:
-                existing_names = (
-                    model.objects.filter(parent_folder=parent_folder)
-                    .order_by("name")
-                    .values_list("name", flat=True)
-                )
-                if getattr(self.parent, "instance") is None:
-                    pass
-                elif data == getattr(self.parent.instance, "name"):
-                    return data.strip()
+        # Nếu người dùng nhập lại base name của instance → giữ nguyên
+        if instance:
+            current_name = instance.name.strip()
+            base_current_name = self._extract_base_name(current_name)
+            if name == base_current_name:
+                return current_name
 
-            else:
-                existing_names = (
-                    model.objects.filter(
-                        name__startswith=data.strip(), parent_folder=None
-                    )
-                    .order_by("name")
-                    .values_list("name", flat=True)
-                )
+        # Lấy danh sách tên đã tồn tại
+        if folder_type and not parent_folder:
+            existing_names = model.objects.filter(
+                type=folder_type).values_list("name", flat=True)
+        elif parent_folder:
+            existing_names = model.objects.filter(parent_folder=parent_folder) \
+                .order_by("name") \
+                .values_list("name", flat=True)
+        else:
+            existing_names = model.objects.filter(name__startswith=name,
+                                                  parent_folder=None) \
+                .order_by("name") \
+                .values_list("name", flat=True)
 
-            if data.strip() in existing_names:
-                data = generate_unique_name(data.strip(), existing_names)
-        return data.strip()
+        # Nếu trùng thì generate tên mới
+        if name in existing_names:
+            name = generate_unique_name(name, existing_names)
+
+        return name
+
+    def _extract_base_name(self, name):
+        # Loại bỏ hậu tố " (1)", " (2)"... nếu có
+        return re.sub(r" \(\d+\)$", "", name).strip()
 
 
 class AdjustedNameFieldWarehouse(serializers.CharField):

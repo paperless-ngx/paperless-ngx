@@ -1100,8 +1100,14 @@ def update_child_folder_paths(folder, old_path):
     Folder.objects.bulk_update(child_folders, ['path'], batch_size=1000)
     # reindex document update folder_path for document
     documents = Document.objects.filter(folder__in=file_ids)
+    print(documents)
     index.update_index_bulk_documents(documents, 100)
+    reindex_document_list(documents, batch_size=100)
 
+
+@shared_task()
+def reindex_document_list(docs, batch_size):
+    index.update_index_bulk_documents(docs, batch_size)
 
 def update_document_count_folder_path(path):
     # update document count

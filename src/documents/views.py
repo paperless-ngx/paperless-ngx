@@ -201,7 +201,7 @@ from documents.signals import document_updated
 from documents.tasks import backup_documents, \
     bulk_update_custom_field_form_document_type_to_document, bulk_delete_file, \
     update_ocr_document, update_child_folder_paths, \
-    update_folder_permisisons, consume_folder
+    update_folder_permisisons, consume_folder, reindex_document_list
 from documents.tasks import consume_file
 from documents.tasks import deleted_backup
 from documents.tasks import empty_trash
@@ -3837,24 +3837,12 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
         serializer.validated_data["updated"] = timezone.now()
 
         old_parent_folder = instance.parent_folder
+        old_path = instance.path
 
         self.perform_update(serializer)
         self.update_document_name(instance, serializer)
-        # update permission document
-        # update permission folder child
-        # permissions = serializer.validated_data.get("set_permissions")
-        # permissions_copy = permissions.copy()
-        # update_view_folder_parent_permissions.delay(instance, permissions_copy)
-        # owner = serializer.validated_data.get("owner")
-        # merge = serializer.validated_data.get("merge", True)
 
-        # owner_exist = "owner" in serializer.validated_data
-        # set_permissions_exist = "set_permissions" in serializer.validated_data
-        # update_child_folder_permisisons.delay(folder=instance,
-        #                                       permissions=permissions,
-        #                                       owner=owner, merge=merge,
-        #                                       owner_exist=owner_exist,
-        #                                       set_permissions_exist=set_permissions_exist)
+
         if old_parent_folder != instance.parent_folder:
             if instance.parent_folder:
                 instance.path = f"{instance.parent_folder.path}/{instance.id}"
@@ -3863,7 +3851,13 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
                 instance.path = f"{instance.id}"
             instance.save()
 
-            update_child_folder_paths.delay(folder=instance)
+            update_child_folder_paths.delay(folder=instance, old_path=old_path)
+        else:
+            folder_ids = Folder.objects.filter(path__startswith=instance.path,
+                                               type=Folder.FILE).values_list(
+                'id', flat=True)
+            documents = Document.objects.filter(folder_id__in=folder_ids)
+            reindex_document_list(documents, 100)
         if instance.type == Folder.FILE:
             doc = Document.objects.filter(folder_id=instance.id).first()
             if doc is not None:
