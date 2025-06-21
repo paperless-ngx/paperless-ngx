@@ -799,6 +799,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+LANGUAGE_CODE_WORKFLOWS = os.getenv("PAPERLESS_LANGUAGE_CODE_WORKFLOWS", LANGUAGE_CODE)
+
 ###############################################################################
 # Logging                                                                     #
 ###############################################################################
@@ -1199,6 +1201,7 @@ if ENABLE_UPDATE_CHECK != "default":
 
 APP_TITLE = os.getenv("PAPERLESS_APP_TITLE", None)
 APP_LOGO = os.getenv("PAPERLESS_APP_LOGO", None)
+
 
 ###############################################################################
 # Machine Learning                                                            #
