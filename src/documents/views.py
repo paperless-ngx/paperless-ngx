@@ -161,7 +161,6 @@ from documents.permissions import EdocObjectPermissions
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
-from documents.permissions import update_view_folder_parent_permissions
 from documents.permissions import \
     update_view_warehouse_shelf_boxcase_permissions
 from documents.serialisers import AcknowledgeTasksViewSerializer, \
@@ -201,7 +200,7 @@ from documents.signals import document_updated
 from documents.tasks import backup_documents, \
     bulk_update_custom_field_form_document_type_to_document, bulk_delete_file, \
     update_ocr_document, update_child_folder_paths, \
-    update_folder_permisisons, consume_folder, reindex_document_list
+    consume_folder, reindex_document_list
 from documents.tasks import consume_file
 from documents.tasks import deleted_backup
 from documents.tasks import empty_trash
@@ -625,22 +624,22 @@ class DocumentViewSet(
         # logger.debug(response)
         self.update_time_archive_font(self.get_object())
         self.update_name_folder(self.get_object(), serializer)
-        permissions = serializer.validated_data.get("set_permissions")
-        if permissions is not None:
-            permissions_copy = permissions.copy()
-        if instance.folder is not None:
-            update_view_folder_parent_permissions.delay(instance.folder,
-                                                        permissions_copy)
-            owner = serializer.validated_data.get("owner")
-            merge = serializer.validated_data.get("merge", False)
-            owner_exist = "owner" in serializer.validated_data
-            set_permissions_exist = "set_permissions" in serializer.validated_data
-            update_folder_permisisons.delay(instance=self.get_object(),
-                                            permissions=permissions_copy,
-                                            owner=owner,
-                                            owner_exist=owner_exist,
-                                            merge=merge,
-                                            set_permissions_exist=set_permissions_exist)
+        # permissions = serializer.validated_data.get("set_permissions")
+        # if permissions is not None:
+        #     permissions_copy = permissions.copy()
+        # if instance.folder is not None:
+        #     update_view_folder_parent_permissions.delay(instance.folder,
+        #                                                 permissions_copy)
+        #     owner = serializer.validated_data.get("owner")
+        #     merge = serializer.validated_data.get("merge", False)
+        #     owner_exist = "owner" in serializer.validated_data
+        #     set_permissions_exist = "set_permissions" in serializer.validated_data
+        #     update_folder_permisisons.delay(instance=self.get_object(),
+        #                                     permissions=permissions_copy,
+        #                                     owner=owner,
+        #                                     owner_exist=owner_exist,
+        #                                     merge=merge,
+        #                                     set_permissions_exist=set_permissions_exist)
         response = super().update(request, *args, **kwargs)
         # serializer.save()
         doc_updated = Document.objects.get(id=serializer.data["id"])

@@ -428,7 +428,6 @@ class Consumer(LoggingMixin):
             folder = Folder.objects.filter(id=self.override_folder_id).first()
             user = User.objects.get(id=self.override_owner_id)
             if folder:
-                print(f'folder:{folder} user:{user}')
                 user_can_change = has_perms_owner_aware_for_folder(user,
                                                                    "change_folder",
                                                                    folder)
