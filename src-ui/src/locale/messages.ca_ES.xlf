@@ -3292,7 +3292,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">117</context>
         </context-group>
-        <target state="translated">Tipus document</target>
+        <target state="translated">Tipus de document</target>
       </trans-unit>
       <trans-unit id="searchResults.storagePaths" datatype="html">
         <source>Storage paths</source>
@@ -3340,7 +3340,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">159</context>
         </context-group>
-        <target state="translated">Normes correu</target>
+        <target state="translated">Normes del correu</target>
       </trans-unit>
       <trans-unit id="searchResults.workflows" datatype="html">
         <source>Workflows</source>
@@ -4252,7 +4252,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-account-edit-dialog/mail-account-edit-dialog.component.ts</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="translated">Edita compte correu</target>
+        <target state="translated">Edita el compte de correu</target>
       </trans-unit>
       <trans-unit id="7726734777863565313" datatype="html">
         <source>Successfully connected to the mail server</source>
@@ -4680,7 +4680,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">130</context>
         </context-group>
-        <target state="translated">Utilitza adreça correu</target>
+        <target state="translated">Utilitza l'adreça de correu</target>
       </trans-unit>
       <trans-unit id="445154175758965852" datatype="html">
         <source>Use name (or mail address if not available)</source>
@@ -4712,7 +4712,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">194</context>
         </context-group>
-        <target state="translated">Edita regla correu</target>
+        <target state="translated">Edita la regla del correu</target>
       </trans-unit>
       <trans-unit id="8911059720204770105" datatype="html">
         <source>Path</source>
@@ -5084,7 +5084,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">132</context>
         </context-group>
-        <target state="needs-translation">Positive values will trigger after the date, negative values before.</target>
+        <target state="translated">Els valors positius s'activaran després de la data, els valors negatius abans.</target>
       </trans-unit>
       <trans-unit id="3726450101884717309" datatype="html">
         <source>Relative to</source>
@@ -5532,7 +5532,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">73</context>
         </context-group>
-        <target state="translated">Recollida Correu</target>
+        <target state="translated">Recollida de correu</target>
       </trans-unit>
       <trans-unit id="235571817610183244" datatype="html">
         <source>Web UI</source>
@@ -7006,7 +7006,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="translated">ASN Actual</target>
+        <target state="translated">ASN actual</target>
       </trans-unit>
       <trans-unit id="8693603235657020323" datatype="html">
         <source>Other</source>
@@ -9268,7 +9268,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="translated">Configuració correu</target>
+        <target state="translated">Configuració del correu</target>
       </trans-unit>
       <trans-unit id="8913167930428886792" datatype="html">
         <source>Mail accounts</source>
@@ -9276,7 +9276,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">Comptes correu</target>
+        <target state="translated">Comptes de correu</target>
       </trans-unit>
       <trans-unit id="1259421956660976189" datatype="html">
         <source>Add Account</source>
@@ -9336,7 +9336,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="translated">Normes correu</target>
+        <target state="translated">Normes del correu</target>
       </trans-unit>
       <trans-unit id="1372022816709469401" datatype="html">
         <source>Add Rule</source>
@@ -9372,7 +9372,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">177</context>
         </context-group>
-        <target state="translated">Sense regles de correu definides.</target>
+        <target state="translated">Sense regles del correu definides.</target>
       </trans-unit>
       <trans-unit id="3178554336792037159" datatype="html">
         <source>Error retrieving mail accounts</source>
@@ -9428,7 +9428,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">193</context>
         </context-group>
-        <target state="translated">Confirma esborrat compte correu</target>
+        <target state="translated">Confirma l'esborrat del compte de correu</target>
       </trans-unit>
       <trans-unit id="7176985344323395435" datatype="html">
         <source>This operation will permanently delete this mail account.</source>
@@ -9516,7 +9516,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">294</context>
         </context-group>
-        <target state="translated">Confirma esborrat regla correu</target>
+        <target state="translated">Confirma l'esborrat de la regla del correu</target>
       </trans-unit>
       <trans-unit id="2250372580580310337" datatype="html">
         <source>This operation will permanently delete this mail rule.</source>
