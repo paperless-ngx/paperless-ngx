@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-06-19 18:51+0000\n"
-"PO-Revision-Date: 2025-06-19 18:52\n"
+"PO-Revision-Date: 2025-06-20 12:13\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -510,7 +510,7 @@ msgstr "è condiviso da me"
 
 #: documents/models.py:488
 msgid "has custom fields"
-msgstr ""
+msgstr "ha campi personalizzati"
 
 #: documents/models.py:489
 msgid "has custom field in"
@@ -570,7 +570,7 @@ msgstr "Task Automatica"
 
 #: documents/models.py:538
 msgid "Scheduled Task"
-msgstr ""
+msgstr "Attività pianificata"
 
 #: documents/models.py:539
 msgid "Manual Task"
@@ -578,7 +578,7 @@ msgstr "Attività manuale"
 
 #: documents/models.py:542
 msgid "Consume File"
-msgstr ""
+msgstr "Elabora File"
 
 #: documents/models.py:543
 msgid "Train Classifier"
@@ -586,11 +586,11 @@ msgstr ""
 
 #: documents/models.py:544
 msgid "Check Sanity"
-msgstr ""
+msgstr "Verifica integrità"
 
 #: documents/models.py:545
 msgid "Index Optimize"
-msgstr ""
+msgstr "Ottimizza Indice"
 
 #: documents/models.py:550
 msgid "Task ID"
@@ -670,7 +670,7 @@ msgstr "Tipo di Task"
 
 #: documents/models.py:618
 msgid "The type of task that was run"
-msgstr ""
+msgstr "Il tipo di attività che è stata eseguita"
 
 #: documents/models.py:629
 msgid "Note for the document"
@@ -790,7 +790,7 @@ msgstr "Documento aggiornato"
 
 #: documents/models.py:935
 msgid "Scheduled"
-msgstr ""
+msgstr "Pianificato"
 
 #: documents/models.py:938
 msgid "Consume Folder"
@@ -1146,7 +1146,7 @@ msgstr "abilitato"
 
 #: documents/models.py:1448
 msgid "workflow"
-msgstr ""
+msgstr "flusso di lavoro"
 
 #: documents/models.py:1452
 msgid "workflow trigger type"
@@ -1184,11 +1184,11 @@ msgstr "Variabile non valida rilevata."
 
 #: documents/templates/account/account_inactive.html:5
 msgid "Paperless-ngx account inactive"
-msgstr ""
+msgstr "Account Paperless-ngx inattivo"
 
 #: documents/templates/account/account_inactive.html:9
 msgid "Account inactive."
-msgstr ""
+msgstr "Account inattivo."
 
 #: documents/templates/account/account_inactive.html:14
 msgid "This account is inactive."
@@ -1196,7 +1196,7 @@ msgstr ""
 
 #: documents/templates/account/account_inactive.html:16
 msgid "Return to login"
-msgstr ""
+msgstr "Torna all’accesso"
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
@@ -1669,7 +1669,7 @@ msgstr "Spagnolo"
 
 #: paperless/settings.py:767
 msgid "Persian"
-msgstr ""
+msgstr "Persiano"
 
 #: paperless/settings.py:768
 msgid "Finnish"
@@ -1757,7 +1757,7 @@ msgstr "Cinese semplificato"
 
 #: paperless/settings.py:789
 msgid "Chinese Traditional"
-msgstr ""
+msgstr "Cinese Tradizionale"
 
 #: paperless/urls.py:374
 msgid "Paperless-ngx administration"
@@ -1825,11 +1825,11 @@ msgstr "IMAP"
 
 #: paperless_mail/models.py:20
 msgid "Gmail OAuth"
-msgstr ""
+msgstr "Gmail OAuth"
 
 #: paperless_mail/models.py:21
 msgid "Outlook OAuth"
-msgstr ""
+msgstr "Outlook OAuth"
 
 #: paperless_mail/models.py:25
 msgid "IMAP server"
@@ -1909,23 +1909,23 @@ msgstr "Elabora tutti i file, inclusi gli allegati nel corpo."
 
 #: paperless_mail/models.py:119
 msgid "System default"
-msgstr ""
+msgstr "Predefinito di sistema"
 
 #: paperless_mail/models.py:120
 msgid "Text, then HTML"
-msgstr ""
+msgstr "Testo, poi HTML"
 
 #: paperless_mail/models.py:121
 msgid "HTML, then text"
-msgstr ""
+msgstr "HTML, poi testo"
 
 #: paperless_mail/models.py:122
 msgid "HTML only"
-msgstr ""
+msgstr "Solo HTML"
 
 #: paperless_mail/models.py:123
 msgid "Text only"
-msgstr ""
+msgstr "Solo testo"
 
 #: paperless_mail/models.py:126
 msgid "Delete"
@@ -2037,7 +2037,7 @@ msgstr "ambito di applicazione"
 
 #: paperless_mail/models.py:241
 msgid "pdf layout"
-msgstr ""
+msgstr "layout PDF"
 
 #: paperless_mail/models.py:247
 msgid "action"

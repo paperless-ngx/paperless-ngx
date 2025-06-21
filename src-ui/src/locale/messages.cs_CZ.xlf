@@ -5084,7 +5084,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">132</context>
         </context-group>
-        <target state="needs-translation">Positive values will trigger after the date, negative values before.</target>
+        <target state="translated">Kladné hodnoty spustí plán po vybraném datu, záporné před.</target>
       </trans-unit>
       <trans-unit id="3726450101884717309" datatype="html">
         <source>Relative to</source>
