@@ -1401,81 +1401,39 @@ if settings.AUDIT_LOG_ENABLED:
 
 
 class FolderPermission(models.Model):
+    user = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="folder_permissions",
+        verbose_name="User"
+    )
+    group = models.ForeignKey(
+        Group,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="folder_permissions",
+        verbose_name="Group"
+    )
     path = models.CharField(
         max_length=512,
         verbose_name="Path",
         help_text="The path of the folder."
     )
-    # Người dùng và nhóm có quyền xem
-    view_users = models.ManyToManyField(
-        User,
-        blank=True,
-        related_name="viewable_folders",
-        verbose_name="View Users",
-        help_text="Users who have view permissions for the folder."
-    )
-    view_groups = models.ManyToManyField(
-        Group,
-        blank=True,
-        related_name="viewable_folders",
-        verbose_name="View Groups",
-        help_text="Groups that have view permissions for the folder."
-    )
-
-    # Người dùng và nhóm có quyền chỉnh sửa
-    edit_users = models.ManyToManyField(
-        User,
-        blank=True,
-        related_name="editable_folders",
-        verbose_name="Edit Users",
-        help_text="Users who have edit permissions for the folder."
-    )
-    edit_groups = models.ManyToManyField(
-        Group,
-        blank=True,
-        related_name="editable_folders",
-        verbose_name="Edit Groups",
-        help_text="Groups that have edit permissions for the folder."
-    )
-
-    # Người dùng và nhóm **bị chặn** quyền xem
-    can_not_view_users = models.ManyToManyField(
-        User,
-        blank=True,
-        related_name="restricted_view_folders",
-        verbose_name="Restricted View Users",
-        help_text="Users who are restricted from viewing the folder."
-    )
-    can_not_view_groups = models.ManyToManyField(
-        Group,
-        blank=True,
-        related_name="restricted_view_folders",
-        verbose_name="Restricted View Groups",
-        help_text="Groups that are restricted from viewing the folder."
-    )
-
-    # Người dùng và nhóm **bị chặn** quyền chỉnh sửa
-    can_not_edit_users = models.ManyToManyField(
-        User,
-        blank=True,
-        related_name="restricted_edit_folders",
-        verbose_name="Restricted Edit Users",
-        help_text="Users who are restricted from editing the folder."
-    )
-    can_not_edit_groups = models.ManyToManyField(
-        Group,
-        blank=True,
-        related_name="restricted_edit_folders",
-        verbose_name="Restricted Edit Groups",
-        help_text="Groups that are restricted from editing the folder."
-    )
+    view = models.BooleanField(default=False, verbose_name="Can View")
+    edit = models.BooleanField(default=False, verbose_name="Can Edit")
+    delete = models.BooleanField(default=False, verbose_name="Can Delete")
+    download = models.BooleanField(default=False, verbose_name="Can Download")
 
     class Meta:
         verbose_name = "Folder Permission"
         verbose_name_plural = "Folder Permissions"
+        unique_together = (("user", "group", "path"),)
 
     def __str__(self):
-        return f"FolderPermission for path: {self.path}"
+        return f"Permission for {self.user or self.group} on {self.path}"
 
 class WorkflowTrigger(models.Model):
     class WorkflowTriggerMatching(models.IntegerChoices):
