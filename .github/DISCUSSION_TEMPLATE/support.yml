@@ -1,6 +1,4 @@
-name: Support request
-description: Questions or help needed with installing, configuring, or using Paperless-ngx
-title: "[SUPPORT] Concise summary of your question or issue"
+title: "[Support] "
 body:
   - type: textarea
     id: description
