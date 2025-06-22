@@ -699,7 +699,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
             imap_security=MailAccount.ImapSecurity.SSL,
             character_set="UTF-8",
         )
-    
+
         rule_data = {
             "name": "Rule1",
             "account": account.pk,
@@ -716,8 +716,8 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
             "order": 0,
             "attachment_type": MailRule.AttachmentProcessing.ATTACHMENTS_ONLY,
         }
-    
+
         response = self.client.post(self.ENDPOINT, data=rule_data, format="json")
-    
+
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("maximum_age", response.data)
