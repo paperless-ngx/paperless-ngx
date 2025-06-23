@@ -827,11 +827,11 @@ def run_workflow(
                         #     object=document,
                         #     merge=True,
                         # )
-                        add_or_update_document(document)
                         set_permissions_for_object_folder(
                             perm=permissions,
                             obj=document.folder
                         )
+                        add_or_update_document(document)
 
                     if action.assign_custom_fields is not None:
                         for field in action.assign_custom_fields.all():
@@ -906,12 +906,12 @@ def run_workflow(
                             },
                         }
 
-                        add_or_update_document(document)
                         set_permissions_for_object_folder(
                             perm=permissions,
                             obj=document.folder,
 
                         )
+                        add_or_update_document(document)
                         # set_permissions_for_object(
                         #     permissions=permissions,
                         #     object=document.dossier,
