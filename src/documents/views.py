@@ -28,14 +28,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import connections, transaction
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
-from django.db.models import Case
+from django.db.models import Case, F, Value
 from django.db.models import Count
 from django.db.models import IntegerField
 from django.db.models import Max
 from django.db.models import Q
 from django.db.models import Sum
 from django.db.models import When
-from django.db.models.functions import Length
+from django.db.models.functions import Length, Replace
 from django.db.models.functions import Lower
 from django.db.models.functions import TruncDate
 from django.http import Http404
@@ -2806,20 +2806,30 @@ class BulkEditObjectsView(PassUserMixin):
 
                 old_parent_folder = folder.parent_folder
                 folder.parent_folder = parent_folder_obj
-
+                new_path_parent_folder = ''
+                old_path_parent_folder = folder.path
                 if old_parent_folder != folder.parent_folder:
                     old_path = folder.path
                     if folder.parent_folder:
                         folder.path = f"{folder.parent_folder.path}{folder.id}/"
                         folder.parent_folder = parent_folder_obj
+                        new_path_parent_folder = f"{folder.parent_folder.path}{folder.id}/"
 
                     else:
                         folder.path = f"{folder.id}/"
+                        new_path_parent_folder = f"{folder.id}/"
 
                     FolderPermission.objects.filter(
                         path__startswith=old_path).update(path=folder.path)
 
                     folder.save()
+                    if folder.type == Folder.FOLDER:
+                        Folder.objects.filter(
+                            path__startswith=old_path_parent_folder).update(
+                            path=Replace(F('path'),
+                                         Value(old_path_parent_folder),
+                                         Value(new_path_parent_folder)))
+
             docs = Document.objects.filter(id__in=folder_document_ids_reindex)
             index.update_index_bulk_documents(docs, 1000)
 
@@ -3740,51 +3750,34 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
                 )
 
     def create(self, request, *args, **kwargs):
-        # try:
         serializer = FolderSerializer(data=request.data)
-        parent_folder = None
-        if serializer.is_valid(raise_exception=True):
-            parent_folder = serializer.validated_data.get("parent_folder", None)
+        serializer.is_valid(raise_exception=True)
+        parent_folder = serializer.validated_data.get("parent_folder", None)
 
-        parent_folder = Folder.objects.filter(
-            id=parent_folder.id if parent_folder else 0,
+        parent_folder_obj = Folder.objects.filter(
+            id=parent_folder.id if parent_folder else 0
         ).first()
 
-        if parent_folder == None:
-            folder = serializer.save(owner=request.user)
-            folder.path = f'{folder.id}/'
-            folder.save()
-        elif parent_folder:
-            user_can_change = has_perms_owner_aware_for_folder(request.user,
-                                                               'change_folder',
-                                                               parent_folder)
-            if not user_can_change:
-                return Response(
-                    data={
-                        "detail": _(
-                            "You do not have permission to perform this action."),
-                    },
-                    status=status.HTTP_403_FORBIDDEN,
-                )
-            owner = serializer.validated_data.get("owner")
-            merge = serializer.validated_data.get("merge", True)
-            folder = serializer.save(parent_folder=parent_folder, owner=owner)
-            folder.path = f"{parent_folder.path}{folder.id}/"
-            folder.save()
-            # permission_parent_folder = get_permission_folder(obj=parent_folder)
-            #
-            # if permission_parent_folder:
-            #     user_ids = User.objects.filter(
-            #         pk=parent_folder.owner.id).values_list(
-            #         "id", flat=True)
-            #     permission_parent_folder['change']['users'] = \
-            #         permission_parent_folder['change']['users'].union(user_ids)
-            #     set_permissions_for_object_folder(perm=permission_parent_folder,
-            #                     obj=folder)
-        else:
+        if parent_folder_obj is None and parent_folder is not None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if parent_folder_obj:
+            if not has_perms_owner_aware_for_folder(request.user,
+                                                    'change_folder',
+                                                    parent_folder_obj):
+                return Response(
+                    data={"detail": _(
+                        "You do not have permission to perform this action.")},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+            owner = serializer.validated_data.get("owner", request.user)
+            folder = serializer.save(parent_folder=parent_folder_obj,
+                                     owner=owner)
+        else:
+            folder = serializer.save(owner=request.user)
+
+        return Response(FolderSerializer(folder).data,
+                        status=status.HTTP_201_CREATED)
 
     def check_object_permissions(self, request, obj):
         if not has_perms_owner_aware_for_folder(request.user, 'change_folder',

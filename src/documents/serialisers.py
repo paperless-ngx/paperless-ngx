@@ -315,6 +315,9 @@ class FolderOwnedObjectSerializer(OwnedObjectSerializer):
                                                  obj)
         )
 
+    def _set_permissions(self, permissions, object):
+        set_permissions_for_object_folder(object, permissions)
+
     def get_is_shared_by_requester(self, obj):
         return obj.owner == self.user and FolderPermission.objects.filter(
             path=obj.path).exists()
@@ -323,10 +326,19 @@ class FolderOwnedObjectSerializer(OwnedObjectSerializer):
         if "owner" not in validated_data and self.user:
             validated_data["owner"] = self.user
         permissions = validated_data.pop("set_permissions", None)
+        parent_folder = validated_data.get("parent_folder", None)
+
         instance = super(OwnedObjectSerializer, self).create(validated_data)
 
+        # Set path logic here
+        if parent_folder is None:
+            instance.path = f"{instance.id}/"
+        else:
+            instance.path = f"{parent_folder.path}{instance.id}/"
+        instance.save()
+
         if permissions:
-            set_permissions_for_object_folder(instance, permissions)
+            self._set_permissions(permissions, instance)
 
         return instance
 
@@ -2712,52 +2724,49 @@ def generate_unique_name(name, existing_names):
 
 class AdjustedNameFieldFolder(serializers.CharField):
     def to_internal_value(self, data):
-        name = data.strip()
         model = self.parent.Meta.model
 
-        if not hasattr(model, "name"):
-            return name
+        if hasattr(model, "name"):
+            parent_folder = self.parent.initial_data.get("parent_folder")
+            if parent_folder == 'root':
+                parent_folder = None
+            type = self.parent.initial_data.get("type")
 
-        parent_folder = self.parent.initial_data.get("parent_folder")
-        if parent_folder == "root":
-            parent_folder = None
-        folder_type = self.parent.initial_data.get("type")
-        instance = getattr(self.parent, "instance", None)
+            if type == "file":
+                return data.strip()
 
-        # Không cần xử lý trùng nếu là type file
-        if folder_type == "file":
-            return name
+            if type and not parent_folder:
+                existing_names = model.objects.filter(type=type).values_list(
+                    "name", flat=True
+                )
+                if getattr(self.parent, "instance") is None:
+                    pass
+                elif data == getattr(self.parent.instance, "name"):
+                    return data.strip()
 
-        # Nếu người dùng nhập lại base name của instance → giữ nguyên
-        if instance:
-            current_name = instance.name.strip()
-            base_current_name = self._extract_base_name(current_name)
-            if name == base_current_name:
-                return current_name
+            elif parent_folder:
+                existing_names = (
+                    model.objects.filter(parent_folder=parent_folder)
+                    .order_by("name")
+                    .values_list("name", flat=True)
+                )
+                if getattr(self.parent, "instance") is None:
+                    pass
+                elif data == getattr(self.parent.instance, "name"):
+                    return data.strip()
 
-        # Lấy danh sách tên đã tồn tại
-        if folder_type and not parent_folder:
-            existing_names = model.objects.filter(
-                type=folder_type).values_list("name", flat=True)
-        elif parent_folder:
-            existing_names = model.objects.filter(parent_folder=parent_folder) \
-                .order_by("name") \
-                .values_list("name", flat=True)
-        else:
-            existing_names = model.objects.filter(name__startswith=name,
-                                                  parent_folder=None) \
-                .order_by("name") \
-                .values_list("name", flat=True)
+            else:
+                existing_names = (
+                    model.objects.filter(
+                        name__startswith=data.strip(), parent_folder=None
+                    )
+                    .order_by("name")
+                    .values_list("name", flat=True)
+                )
 
-        # Nếu trùng thì generate tên mới
-        if name in existing_names:
-            name = generate_unique_name(name, existing_names)
-
-        return name
-
-    def _extract_base_name(self, name):
-        # Loại bỏ hậu tố " (1)", " (2)"... nếu có
-        return re.sub(r" \(\d+\)$", "", name).strip()
+            if data.strip() in existing_names:
+                data = generate_unique_name(data.strip(), existing_names)
+        return data.strip()
 
 
 class AdjustedNameFieldWarehouse(serializers.CharField):
