@@ -35,7 +35,7 @@ from rest_framework.fields import SerializerMethodField
 from documents import bulk_edit
 from documents.data_models import DocumentSource
 from documents.models import ArchiveFont, MovedHistory, ManageDepartment, \
-    CreatedDepartment, ContainerMoveHistory
+    CreatedDepartment, ContainerMoveHistory, WarehouseMoveRequest
 from documents.models import BackupRecord
 from documents.models import Correspondent
 from documents.models import CustomField
@@ -3250,3 +3250,51 @@ class ContainerMoveHistorySerializer(serializers.ModelSerializer):
             'move_reason',
         ]
 
+class WarehouseMoveRequestSerializer(serializers.ModelSerializer):
+    requester = serializers.StringRelatedField(read_only=True)
+    container_to_move = serializers.StringRelatedField(read_only=True)
+    source_location = serializers.StringRelatedField(read_only=True)
+    destination_location = serializers.StringRelatedField(read_only=True)
+    approver = serializers.StringRelatedField(read_only=True)
+    confirmed_by_sender = serializers.StringRelatedField(read_only=True)
+    confirmed_by_receiver = serializers.StringRelatedField(read_only=True)
+    container_to_move_id = serializers.PrimaryKeyRelatedField(
+        queryset=Warehouse.objects.all(),
+        source='container_to_move',
+        write_only=True
+    )
+    destination_location_id = serializers.PrimaryKeyRelatedField(
+        queryset=Warehouse.objects.all(),
+        source='destination_location',
+        write_only=True
+    )
+    def validate(self, data):
+        container = data.get("container_to_move")
+        destination = data.get("destination_location")
+
+        if not container or not destination:
+            return data
+        source = container.parent_warehouse
+        source_root = source.get_root_warehouse() if source else None
+        destination_root = destination.get_root_warehouse()
+        if source_root == destination_root:
+            raise serializers.ValidationError(
+                "Di chuyển trong cùng 1 kho không cần tạo yêu cầu."
+            )
+        return data
+
+    class Meta:
+        model = WarehouseMoveRequest
+        fields = '__all__'
+        read_only_fields = (
+            'request_code',
+            'status',
+            'requester',
+            'source_location',
+            'approved_at',
+            'approver',
+            'actual_shipping_date',
+            'confirmed_by_sender',
+            'actual_receive_date',
+            'confirmed_by_receiver'
+        )

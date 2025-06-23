@@ -60,6 +60,7 @@ from django_elasticsearch_dsl_drf.pagination import LimitOffsetPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from elasticsearch_dsl.serializer import serializer
 from langdetect import detect
+from numpy.ma.core import mvoid
 from packaging import version as packaging_version
 from redis import Redis
 from rest_framework import parsers
@@ -132,7 +133,7 @@ from documents.matching import match_storage_paths
 from documents.matching import match_tags
 from documents.matching import match_warehouses
 from documents.models import Approval, MovedHistory, ContainerMoveHistory, \
-    ManageDepartment, CreatedDepartment
+    ManageDepartment, CreatedDepartment, WarehouseMoveRequest
 from documents.models import ArchiveFont
 from documents.models import BackupRecord
 from documents.models import Correspondent
@@ -170,7 +171,8 @@ from documents.permissions import \
 from documents.serialisers import AcknowledgeTasksViewSerializer, \
     DocumentDocumentSerializer, DocumentDetailSerializer, PostFolderSerializer, \
     MovedHistorySerializer, ContainerMoveHistorySerializer, \
-    ManageDepartmentSerializer, CreatedDepartmentSerializer
+    ManageDepartmentSerializer, CreatedDepartmentSerializer, \
+    WarehouseMoveRequestSerializer
 from documents.serialisers import ApprovalSerializer
 from documents.serialisers import ApprovalViewSerializer
 from documents.serialisers import ArchiveFontSerializer
@@ -3607,7 +3609,7 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         if instance.type == Warehouse.BOXCASE:
             documents_to_log = Document.objects.filter(warehouse=instance)
         elif instance.type == Warehouse.SHELF:
-            child_boxcases = Warehouse.objects.filter(path__startwith=instance.path, type=Warehouse.BOXCASE)
+            child_boxcases = Warehouse.objects.filter(path__startswith=instance.path, type=Warehouse.BOXCASE)
             documents_to_log = Document.objects.filter(warehouse__in=child_boxcases)
         if documents_to_log.exists():
             history_record = [
@@ -3624,56 +3626,146 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         Cập nhật lại trường 'path' cho instance và tất cả các con của nó một cách đệ quy.
         """
         if instance.parent_warehouse:
-            instance.path = f"{instance.parent_warehouse.path}{instance.id}/"
+            # Lấy các biến ra để kiểm tra
+            parent_path = instance.parent_warehouse.path
+            child_id = instance.id
+
+            # Thực hiện nối chuỗi theo đúng quy ước không có "/" ở cuối
+            new_path = f"{parent_path}/{child_id}"
+            instance.path = new_path
         else:
-            instance.path=f"{instance.id}/"
+            # Trường hợp là một Kho gốc
+            instance.path = str(instance.id)
         instance.save(update_fields=["path"])
+
+        # Cập nhật đệ quy cho các con nếu là Shelf hoặc Warehouse
         if instance.type in [Warehouse.WAREHOUSE, Warehouse.SHELF]:
             children = Warehouse.objects.filter(parent_warehouse=instance)
             for child in children:
                 self._update_paths_after_move(child)
+    def _try_to_complete_move_request(self, instance, new_status, user):
+        if new_status == Warehouse.STORED and instance.boxcase_status != new_status:
+            move_request = WarehouseMoveRequest.objects.filter(
+                container_to_move=instance,
+                status=WarehouseMoveRequest.Status.IN_TRANSIT
+            ).first()
+            if move_request:
+                move_request.status = WarehouseMoveRequest.Status.RECEIVED
+                move_request.actual_receive_date = timezone.now()
+                move_request.confirmed_by_receiver = user
+                move_request.save()
 
+                reason_from_request = move_request.reason
+                user_who_approved = move_request.approver
+                self._created_move_history(
+                    instance,
+                    move_request.source_location,
+                    move_request.destination_location,
+                    reason_from_request,
+                    user_who_approved
+                )
+    def _check_for_active_move_lock(self, instance, request_data, user):
+        """
+        Kiểm tra xem đối tượng có đang bị khóa bởi một Yêu cầu Di chuyển đang hoạt động không.
+        Nếu có và người dùng đang cố di chuyển trực tiếp, trả về một Response lỗi.
+        Nếu không, trả về None.
+        """
+        if "parent-warehouse" in request_data:
+            active_statuses = [
+                WarehouseMoveRequest.Status.APPROVED,
+                WarehouseMoveRequest.Status.IN_TRANSIT
+            ]
+            active_move_requests = WarehouseMoveRequest.objects.filter(
+                container_to_move=instance,
+                status__in=active_statuses
+            ).first()
+            if active_move_requests:
+                logger.warning(
+                    f"Người dùng '{user}' đã cố gắng di chuyển trực tiếp đối tượng pk={instance.pk} "
+                    f"đang bị khóa bởi Yêu cầu #{active_move_requests.pk}."
+                )
+                # Nếu bị khóa, trả về một Response lỗi để dừng thực thi
+                return Response(
+                    {
+                        "error": f"Đối tượng '{instance.name}' đang trong một quy trình di chuyển đang hoạt động (Yêu cầu #{active_move_requests.request_code}). "
+                                 "Không thể di chuyển trực tiếp. Vui lòng hoàn tất hoặc hủy yêu cầu cũ."},
+                    status=status.HTTP_409_CONFLICT
+                )
+        return None
+
+    # def _get_root_warehouse(self, warehouse_object):
+    #     """
+    #     Lấy về kho gốc của kệ hoặc hộp bằng cách phân tích trường 'path'.
+    #     Tối ưu hiệu năng
+    #     """
+    #     if not warehouse_object:
+    #         return None
+    #
+    #     # Nếu đối tượng là kho gốc thì trả về chính nó
+    #     if not warehouse_object.parent_warehouse:
+    #         return warehouse_object
+    #
+    #     # Nếu không có path thì không thể xác định
+    #     if not warehouse_object.path:
+    #         logger.error(f"Warehouse object pk={warehouse_object.pk} is missing a path.")
+    #         return None # Hoặc bạn có thể duyệt ngược như cách cũ ở đây làm phương án dự phòng
+    #
+    #     try:
+    #         # Lấy phần tử đầu tiên của path, đó chính là ID của kho gốc
+    #         root_id = warehouse_object.path.split('/')[0]
+    #         # Chỉ thực hiện một truy vấn duy nhất để lấy kho gốc
+    #         return Warehouse.objects.get(pk=root_id)
+    #     except (IndexError, Warehouse.DoesNotExist, ValueError):
+    #         # Xử lý trường hợp path có định dạng không mong muốn hoặc không tìm thấy ID
+    #         logger.exception(f"Could not find root warehouse for object pk={warehouse_object.pk} with path: {warehouse_object.path}")
+    #         return None
     def partial_update(self, request, *args, **kwargs):
         with transaction.atomic():
             instance = self.get_object()
+            lock_response = self._check_for_active_move_lock(instance, request.data, request.user)
+            if lock_response:
+                return lock_response
+
             old_parent_warehouse = instance.parent_warehouse
             serializer = self.get_serializer(instance, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
 
-            #1. Xử lý ngày bàn giao tự động
-            self._handle_handover_date(instance, serializer.validated_data)
             new_parent_warehouse = serializer.validated_data.get("parent_warehouse", old_parent_warehouse)
+            new_boxcase_status = serializer.validated_data.get("boxcase_status")
 
-            if old_parent_warehouse != new_parent_warehouse:
-                reason = request.data.get("move_reason")
-                if not reason or not reason.strip():
-                    return Response(
-                        {"error": "Phải cung cấp lý do di chuyển khi thay đổi vị trí."},
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-                if not (
-                    (instance.type == Warehouse.SHELF and getattr(
-                        new_parent_warehouse, "type",
-                        "") == Warehouse.WAREHOUSE) or
-                    (instance.type == Warehouse.BOXCASE and getattr(
-                        new_parent_warehouse, "type",
-                        "") == Warehouse.SHELF) or
-                    (
-                        instance.type == Warehouse.WAREHOUSE and not new_parent_warehouse)
-                ):
-                    return Response(
-                        {"error": "Invalid parent for this warehouse type."},
-                        status=status.HTTP_400_BAD_REQUEST)
-                self._created_move_history(instance, old_parent_warehouse,
-                                          new_parent_warehouse, reason,
-                                          request.user)
+            if new_boxcase_status:
+                self._try_to_complete_move_request(instance, new_boxcase_status, request.user)
+
+            # 1. Xử lý ngày bàn giao tự động
+            self._handle_handover_date(instance, serializer.validated_data)
+
+            if old_parent_warehouse == new_parent_warehouse:
                 self.perform_update(serializer)
-            if old_parent_warehouse != new_parent_warehouse:
-                instance.refresh_from_db()  # Tải lại instance để đảm bảo có parent mới nhất
-                self._update_paths_after_move(instance)
-            final_serializer = self.get_serializer(instance)
-            return Response(final_serializer.data)
+                return Response(self.get_serializer(instance).data)
 
+
+            old_root = old_parent_warehouse.get_root_warehouse() if old_parent_warehouse else None
+            new_root = new_parent_warehouse.get_root_warehouse() if new_parent_warehouse else None
+            if old_root != new_root:
+                return Response(
+                    {
+                        "error": "Không được phép di chuyển trực tiếp giữa các kho chính. Vui lòng sử dụng hệ thống 'Yêu cầu Di chuyển'."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            reason = request.data.get("move_reason")
+            if not reason or not reason.strip():
+                return Response({"error": "Phải cung cấp lý do khi di chuyển nội bộ."}, status=status.HTTP_400_BAD_REQUEST)
+            if not (
+                (instance.type == Warehouse.SHELF and getattr(new_parent_warehouse, "type", "") == Warehouse.WAREHOUSE) or
+                (instance.type == Warehouse.BOXCASE and getattr(new_parent_warehouse, "type", "") == Warehouse.SHELF) or
+                (instance.type == Warehouse.WAREHOUSE and not new_parent_warehouse)
+            ):
+                return Response({"error": "Invalid parent for this warehouse type."}, status=status.HTTP_400_BAD_REQUEST)
+            self._created_move_history(instance, old_parent_warehouse, new_parent_warehouse, reason, request.user)
+            self.perform_update(serializer)
+            instance.refresh_from_db()
+        self._update_paths_after_move(instance)
+        return Response(self.get_serializer(instance).data)
 
 
     def destroy(self, request, pk, *args, **kwargs):
@@ -4602,11 +4694,21 @@ class MovedHistoryViewSet(ReadOnlyModelViewSet):
         ).order_by('-move_timestamp')
 
 class ContainerMoveHistoryViewSet(ReadOnlyModelViewSet):
-    queryset = ContainerMoveHistory.objects.select_related('container', 'old_parent', 'new_parent', 'moved_by')
+    queryset = ContainerMoveHistory.objects.select_related(
+        'container',
+        'old_parent',
+        'new_parent',
+        'moved_by'
+    )
     serializer_class = ContainerMoveHistorySerializer
     permission_classes = [IsAuthenticated]
     pagination_class = StandardPagination
-    filterset_fields = ['container', 'old_parent', 'new_parent', 'moved_by']
+    filterset_fields = [
+        'container',
+        'old_parent',
+        'new_parent',
+        'moved_by'
+    ]
     ordering_fields = ['move_timestamp']
 
 class ManageDepartmentViewSet(ModelViewSet):
@@ -4625,3 +4727,126 @@ class CreatedDepartmentViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['name', 'department_type']
     ordering_fields = ['name']
+
+class WarehouseMoveRequestViewSet(ModelViewSet):
+
+    queryset = WarehouseMoveRequest.objects.select_related(
+        "requester",
+        "container_to_move",
+        "source_location",
+        "destination_location",
+        "approver",
+        "confirmed_by_sender",
+        "confirmed_by_receiver"
+    ).all()
+
+    serializer_class = WarehouseMoveRequestSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardPagination
+
+    def _execute_database_move(self, move_request: WarehouseMoveRequest):
+        instance_to_move = move_request.container_to_move
+        new_parent = move_request.destination_location
+        instance_to_move.parent_warehouse = new_parent
+        instance_to_move.save(update_fields=['parent_warehouse'])
+        instance_to_move.refresh_from_db()
+        warehouse_view = WarehouseViewSet()
+        warehouse_view._update_paths_after_move(instance_to_move)
+
+    def _create_final_move_history(self, move_request: WarehouseMoveRequest):
+        instance_to_log = move_request.container_to_move
+        old_parent = move_request.source_location
+        new_parent = move_request.destination_location
+        reason_from_request = move_request.reason
+        user_who_approved = move_request.approver
+        warehouse_view = WarehouseViewSet()
+        warehouse_view._created_move_history(instance_to_log, old_parent, new_parent, reason_from_request, user_who_approved)
+    def perform_create(self, serializer):
+        container = serializer.validated_data.get("container_to_move")
+        serializer.save(requester=self.request.user, source_location=container.parent_warehouse)
+
+    @action(detail=True, methods=["post"], url_path="approve")
+    def approve(self, request, pk=None):
+        move_request = self.get_object()
+        if move_request.status != "pending":
+            return Response(
+                {"error": "Yêu cầu này đã được xử lý."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        move_request.status = WarehouseMoveRequest.Status.APPROVED
+        move_request.approver = request.user
+        move_request.approved_at = timezone.now()
+        move_request.notes = request.data.get(
+            'notes',
+            'Approved without notes.'
+        )
+        move_request.save()
+
+        self._execute_database_move(move_request)
+        return Response(self.get_serializer(move_request).data)
+    @action(detail=True, methods=["post"], url_path="reject")
+    def reject(self, request, pk=None):
+        move_request = self.get_object()
+        if move_request.status != "pending":
+            return Response(
+                {"error": "Yêu cầu này đã được xử lý"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        move_request.status = WarehouseMoveRequest.Status.REJECTED
+        move_request.approver = request.user
+        move_request.approved_at = timezone.now()
+        move_request.notes = request.data.get(
+            'notes',
+            'Rejected without notes.'
+        )
+        move_request.save()
+        return Response(self.get_serializer(move_request).data)
+    @action(detail=True, methods=["post"], url_path="cancel")
+    def cancel(self, request, pk=None):
+        move_request = self.get_object()
+        if move_request.status != "pending":
+            return Response(
+                {"error":"Chỉ có thể hủy yêu cầu đang chờ duyệt"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if request.user != move_request.requester and not request.user.is_superuser:
+            return Response(
+                {"error":"Bạn không có quyền hủy yêu cầu này"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        move_request.status = WarehouseMoveRequest.Status.CANCELLED
+        move_request.approver = request.user
+        move_request.approved_at = timezone.now()
+        move_request.notes = f"Request cancelled by requester ({request.user.username})."
+        return Response(self.get_serializer(move_request).data)
+    @action(detail=True, methods=["post"], url_path="ship")
+    def ship(self, request, pk=None):
+        move_request = self.get_object()
+        if move_request.status != 'approved':
+            return Response(
+                {"error": "Yêu cầu phải được duyệt trước khi vận chuyển."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        move_request.status = WarehouseMoveRequest.Status.IN_TRANSIT
+        move_request.confirmed_by_sender = request.user
+        move_request.actual_ship_date = timezone.now()
+        move_request.external_shipper = request.data.get("external_shipper", move_request.external_shipper)
+        move_request.tracking_number = request.data.get("tracking_number", move_request.tracking_number)
+        move_request.save()
+        return Response(self.get_serializer(move_request).data)
+    #----------------------------------------------------------------#
+    # @action(detail=True, methods=["post"], url_path="receive")
+    # def receive(self, request, pk=None):
+    #     move_request = self.get_object()
+    #     if move_request.status != "in_transit":
+    #         return Response(
+    #             {"error":"Yêu cầu phải đang trong trạng thái vận chuyển"},
+    #             status=status.HTTP_400_BAD_REQUEST
+    #         )
+    #     move_request.status = WarehouseMoveRequest.Status.RECEIVED
+    #     move_request.confirmed_by_receiver = request.user
+    #     move_request.actual_receive_date = timezone.now()
+    #     move_request.save()
+    #     self._create_final_move_history(move_request)
+    #     return Response(self.get_serializer(move_request).data)
+    #----------------------------------------------------------------#

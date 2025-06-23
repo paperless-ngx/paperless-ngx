@@ -14,6 +14,7 @@ from django.views.generic import RedirectView
 from django.views.static import serve
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
+from documents.views import WarehouseMoveRequestViewSet
 from documents.views import CreatedDepartmentViewSet
 from documents.views import ManageDepartmentViewSet
 from documents.views import AcknowledgeTasksView, DocumentElasticSearch
@@ -113,6 +114,7 @@ api_router.register(r"history", MovedHistoryViewSet, basename='history')
 api_router.register(r"container",ContainerMoveHistoryViewSet)
 api_router.register(r"created_dpm", CreatedDepartmentViewSet)
 api_router.register(r"manage_dpm", ManageDepartmentViewSet)
+api_router.register(r"move", WarehouseMoveRequestViewSet, basename="moverequest")
 
 urlpatterns = [
     re_path(

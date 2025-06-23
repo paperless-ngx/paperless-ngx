@@ -378,10 +378,26 @@ class Warehouse(MatchingModel):
         verbose_name=_("source_department")
     )
 
+
+
     class Meta(MatchingModel.Meta):
         verbose_name = _("warehouse")
         verbose_name_plural = _("warehouses")
         constraints = []
+
+    def get_root_warehouse(self):
+        if not self.parent_warehouse:
+            return self
+        if not self.path:
+            current = self
+            while current and current.parent_warehouse:
+                current = current.parent_warehouse
+                return current
+        try:
+            root_id = self.path.split("/")[0]
+            return Warehouse.objects.get(id=root_id)
+        except (IndexError, Warehouse.DoesNotExist, ValueError):
+            return None
 
     def __str__(self):
         return self.name
@@ -2036,3 +2052,185 @@ class ContainerMoveHistory(models.Model):
         ordering = ['-move_timestamp']
     def __str__(self):
         return f"Container '{self.container.name}' move by {self.moved_by or 'System'} at {self.move_timestamp.strftime('%Y-%m-%d %H:%M')}"
+
+class WarehouseMoveRequest(models.Model):
+    class Status(models.TextChoices):
+        PENDING = (
+            "pending",
+            _("Pending Approval"),
+        )
+        APPROVED = (
+            "approved",
+            _("Approved"),
+        )
+        REJECTED = (
+            "rejected",
+            _("Rejected"),
+        )
+        CANCELLED = (
+            "cancelled",
+            _("Cancelled"),
+        )
+        IN_TRANSIT = (
+            "in_transit",
+            _("In Transit"),
+        )
+        RECEIVED = (
+            "received",
+            _("Received"),
+        )
+    reason = models.TextField(
+        _("reason"),
+        blank=True
+    )
+    request_code = models.CharField(
+        _("Mã yêu cầu"),
+        max_length=20,
+        unique=True,
+        blank=True
+    )
+    status = models.CharField(
+        _("Trạng thái yêu cầu"),
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING,
+        db_index=True
+    )
+    notes = models.TextField(
+        _("Ghi chú"),
+        blank=True
+    )
+    created_at = models.DateTimeField(
+        _("Ngày tạo yêu cầu"),
+        default=timezone.now,
+        editable=False
+    )
+    requester = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        related_name='move_requests_made',
+        verbose_name=_("Người tạo yêu cầu")
+    )
+    container_to_move = models.ForeignKey(
+        Warehouse,
+        on_delete=models.CASCADE,
+        related_name='move_requests',
+        verbose_name=_("Kho nguồn")
+    )
+    source_location = models.ForeignKey(
+        Warehouse,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='+',
+        verbose_name=_("Vị trí nguồn")
+    )
+    destination_location = models.ForeignKey(
+        Warehouse,
+        on_delete=models.PROTECT,
+        related_name='+',
+        verbose_name=_("Kho đích")
+    )
+    external_shipper = models.CharField(
+        _("Tên đơn vị vận chuyển ngoài"),
+        max_length=255,
+        blank=True
+    )
+    tracking_number = models.CharField(
+        _("Mã vận đơn"),
+        max_length=100,
+        blank=True
+    )
+    expected_receive_date = models.DateField(
+        _("Ngày nhận dự kiến"),
+        null=True,
+        blank=True
+    )
+    actual_shipping_date = models.DateTimeField(
+        _("Ngày gửi thực tế"),
+        null=True,
+        blank=True
+    )
+    confirmed_by_sender = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='move_requests_sent',
+        verbose_name=_("Người xác nhận gửi")
+    )
+    actual_receive_date = models.DateTimeField(
+        _("Ngày nhận thực tế"),
+        null=True,
+        blank=True
+    )
+    confirmed_by_receiver = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='move_requests_received',
+        verbose_name=_("Người xác nhận nhận")
+    )
+    approver = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='move_requests_approved',
+        verbose_name=_("Người duyệt")
+    )
+    approved_at = models.DateTimeField(
+        _("Ngày duyệt"),
+        null=True,
+        blank=True
+    )
+    class Meta:
+        ordering = ['-created_at']
+
+    def save(self, *args, **kwargs):
+        if not self.request_code:
+            self.request_code = f"YCCK-{int(timezone.now().timestamp())}"
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Yêu cầu {self.request_code}: Di chuyển '{self.container_to_move.name}'"
+class WarehouseMoveRequesDetail(models.Model):
+    request = models.ForeignKey(
+        WarehouseMoveRequest,
+        on_delete=models.CASCADE,
+        related_name="details"
+    )
+    boxcase = models.ForeignKey(
+        Warehouse,
+        on_delete=models.PROTECT,
+        limit_choices_to={"type": "Boxcase"},
+    )
+    destination_location = models.ForeignKey(
+        Warehouse,
+        on_delete=models.PROTECT,
+        related_name="+",
+    )
+    condition_on_receipt = models.TextField(
+        _("Mô tả tình trạng lúc nhận"),
+        blank=True
+    )
+    notes = models.TextField(
+        _("Ghi chú chi tiết"),
+        blank=True
+    )
+    photo_on_ship = models.ImageField(
+        _("Ảnh khi giao"),
+        # upload_to='move_requests/ship/',
+        null=True,
+        blank=True
+    )
+    photo_on_receive = models.ImageField(
+        _("Ảnh lúc nhận"),
+        # upload_to='move_requests/receive/',
+        null=True,
+        blank=True
+    )
+    class Meta:
+        unique_together = ("request", "boxcase")
+
+
