@@ -268,86 +268,19 @@ def set_permissions(permissions, object):
     set_permissions_for_object(permissions, object)
 
 
-from django.core.cache import cache
 from django.db.models import Q
 
-# Constants cho cache
-CACHE_TIMEOUT = 60  # thời gian cache (giây)
-CACHE_KEYS_KEY = "my_cached_keys"  # key dùng để lưu danh sách các key cache đã set
-
-
-# --- Các hàm hỗ trợ quản lý key cache ----
-
-def add_cache_key(key):
-    """
-    Thêm key vào danh sách các key cache được quản lý.
-    """
-    keys = cache.get(CACHE_KEYS_KEY)
-    if keys is None:
-        keys = set()
-    else:
-        # Nếu lưu dưới dạng list, chuyển về set để thao tác
-        keys = set(keys)
-    keys.add(key)
-    # Lưu lại dưới dạng list (vì serialization của cache thường dùng list)
-    cache.set(CACHE_KEYS_KEY, list(keys), timeout=CACHE_TIMEOUT)
-
-
-def set_cache_value(key, value, timeout=CACHE_TIMEOUT):
-    """
-    Lưu giá trị vào cache với key truyền vào và ghi nhận key đó trong danh sách quản lý.
-    """
-    cache.set(key, value, timeout=timeout)
-    add_cache_key(key)
-
-
-def get_cache_value(key):
-    """
-    Lấy giá trị từ cache theo key.
-    """
-    return cache.get(key)
-
-
-def delete_cache_pattern(pattern):
-    """
-    Xóa các key cache mà chứa chuỗi 'pattern', dựa vào danh sách key được quản lý.
-    """
-    keys = cache.get(CACHE_KEYS_KEY) or []
-    # Lọc các key thỏa mãn điều kiện (ở đây đơn giản là kiểm tra xem pattern có trong key hay không)
-    keys_to_delete = [k for k in keys if pattern in k]
-    for key in keys_to_delete:
-        cache.delete(key)
-    # Cập nhật lại danh sách key
-    remaining_keys = [k for k in keys if k not in keys_to_delete]
-    cache.set(CACHE_KEYS_KEY, remaining_keys, timeout=CACHE_TIMEOUT)
-
-
-# --- Các hàm nghiệp vụ phân quyền (có cache cho query DB) ----
 
 def _get_invalid_paths():
-    """
-    Query DB lấy danh sách các path của FolderPermission mà các quyền (view, edit, delete, download)
-    đều False. Kết quả được cache với key "invalid_folder_paths".
-    """
-    key = "invalid_folder_paths"
-    cached = get_cache_value(key)
-    if cached is not None:
-        return cached
-
     from documents.models import FolderPermission
-    invalid_paths = list(
+    return list(
         FolderPermission.objects.filter(
             view=False, edit=False, delete=False, download=False
         ).values_list("path", flat=True)
     )
-    set_cache_value(key, invalid_paths, timeout=CACHE_TIMEOUT)
-    return invalid_paths
 
 
 def _exclude_invalid_paths_q(invalid_paths):
-    """
-    Xây dựng Q object để loại trừ các folder có path bắt đầu bởi bất kỳ đường dẫn nào trong invalid_paths.
-    """
     q = Q()
     for p in invalid_paths:
         q |= Q(path__startswith=p)
@@ -355,36 +288,19 @@ def _exclude_invalid_paths_q(invalid_paths):
 
 
 def get_users_with_perms_folder(obj, perm, with_group_users=False):
-    """
-    Lấy tập hợp user có quyền (view hoặc edit, tùy biến theo perm) cho folder (obj).
-    Ưu tiên lấy quyền từ folder cha gần nhất.
-
-    Nếu with_group_users=True, ngoài user trực tiếp còn lấy user thuộc group có quyền.
-    Kết quả được cache theo key dựa trên obj.path, perm và with_group_users.
-    """
     from documents.models import FolderPermission
     if perm not in ["view_folder", "change_folder"]:
         raise ValueError("Perm must be 'view_folder' or 'change_folder'.")
-
-    cache_key = f"get_users_with_perms_folder::{obj.path}::{perm}::{with_group_users}"
-    cached = get_cache_value(cache_key)
-    if cached is not None:
-        return cached
-
     perm_field = "view" if perm == "view_folder" else "edit"
     parts = obj.path.rstrip("/").split("/")
     all_paths = ["/".join(parts[:i]) + "/" for i in range(len(parts), 0, -1)]
-
     invalid_paths = _get_invalid_paths()
     exclude_q = _exclude_invalid_paths_q(invalid_paths)
-
     fps = FolderPermission.objects.filter(path__in=all_paths).exclude(
         exclude_q)
-    # Gom nhóm các bản ghi theo path
-    fp_dict = {}
+    fp_dict = {fp.path: [] for fp in fps}
     for fp in fps:
-        fp_dict.setdefault(fp.path, []).append(fp)
-
+        fp_dict[fp.path].append(fp)
     users = set()
     for path in all_paths:
         fps_at_path = fp_dict.get(path, [])
@@ -394,35 +310,19 @@ def get_users_with_perms_folder(obj, perm, with_group_users=False):
             if with_group_users and fp.group and getattr(fp, perm_field):
                 users.update(fp.group.user_set.all())
         if fps_at_path:
-            # Nếu có bản ghi tại một folder, ưu tiên lấy quyền từ đó
             break
-
-    set_cache_value(cache_key, users, timeout=CACHE_TIMEOUT)
     return users
 
-
 def get_permission_folder(obj):
-    """
-    Hợp nhất quyền view và edit cho folder (obj) (edit ngụ ý view).
-    Kết quả trả về là dict gồm danh sách user và group có quyền.
-    Cache kết quả theo key "get_permission_folder::{obj.path}".
-    """
     from documents.models import FolderPermission
-    cache_key = f"get_permission_folder::{obj.path}"
-    cached = get_cache_value(cache_key)
-    if cached is not None:
-        return cached
-
     permissions = {
         "view": {"users": set(), "groups": set()},
         "change": {"users": set(), "groups": set()}
     }
     parts = obj.path.rstrip("/").split("/")
     all_paths = ["/".join(parts[:i]) + "/" for i in range(len(parts), 0, -1)]
-
     invalid_paths = _get_invalid_paths()
     exclude_q = _exclude_invalid_paths_q(invalid_paths)
-
     fps = FolderPermission.objects.filter(path__in=all_paths).exclude(
         exclude_q)
     for fp in fps:
@@ -436,12 +336,9 @@ def get_permission_folder(obj):
                 permissions["view"]["groups"].add(fp.group.id)
             if fp.edit:
                 permissions["change"]["groups"].add(fp.group.id)
-
-    # Edit always implies view permission
     permissions["view"]["users"].update(permissions["change"]["users"])
     permissions["view"]["groups"].update(permissions["change"]["groups"])
-
-    result = {
+    return {
         "view": {
             "users": list(permissions["view"]["users"]),
             "groups": list(permissions["view"]["groups"])
@@ -451,45 +348,47 @@ def get_permission_folder(obj):
             "groups": list(permissions["change"]["groups"])
         }
     }
-    set_cache_value(cache_key, result, timeout=CACHE_TIMEOUT)
-    print(result)
-    return result
 
 
 def get_permission_folder_for_index(obj):
     """
-    Lấy quyền view/edit cho folder (obj) bằng cách tổng hợp quyền từ các folder cha,
-    loại trừ các folder không hợp lệ (những folder có tất cả quyền = False) và thêm owner
-    của các folder cha vào quyền edit.
-    Cache kết quả theo key "get_permission_folder_for_index::{obj.path}".
+    Get view/edit permissions for a folder, merging from all parent folders,
+    and excluding any user/group under folders with all permissions set to False.
+    Also, add owners of parent folders to edit permission.
     """
     from documents.models import Folder, FolderPermission
-
-    cache_key = f"get_permission_folder_for_index::{obj.path}"
-    cached = get_cache_value(cache_key)
-    if cached is not None:
-        return cached
+    from django.db.models import Q
 
     permissions = {
         "view": {"users": set(), "groups": set()},
         "change": {"users": set(), "groups": set()}
     }
+
+    # Parse path to get all parent paths and folder IDs
     parts = obj.path.rstrip("/").split("/")
     folder_ids = [int(id_p) for id_p in parts if id_p.isdigit()]
     all_paths = ["/".join(parts[:i]) + "/" for i in range(len(parts), 0, -1)]
 
-    invalid_paths = _get_invalid_paths()
+    # Exclude invalid paths (all perms False)
+    invalid_paths = list(
+        FolderPermission.objects.filter(
+            view=False, edit=False, delete=False, download=False
+        ).values_list("path", flat=True)
+    )
     exclude_q = Q()
     for p in invalid_paths:
         exclude_q |= Q(path__startswith=p)
 
+    # Query FolderPermission, exclude invalid
     fps = FolderPermission.objects.filter(path__in=all_paths).exclude(
         exclude_q)
-    # Thêm owner của các folder cha vào quyền edit
+
+    # Add owners of parent folders to edit permission
     owners = Folder.objects.filter(id__in=folder_ids).values_list("owner_id",
                                                                   flat=True)
     permissions["change"]["users"].update(owners)
 
+    # Collect permissions
     for fp in fps:
         if fp.user:
             if fp.view:
@@ -502,10 +401,11 @@ def get_permission_folder_for_index(obj):
             if fp.edit:
                 permissions["change"]["groups"].add(fp.group.id)
 
+    # Edit implies view
     permissions["view"]["users"].update(permissions["change"]["users"])
     permissions["view"]["groups"].update(permissions["change"]["groups"])
 
-    result = {
+    return {
         "view": {
             "users": list(permissions["view"]["users"]),
             "groups": list(permissions["view"]["groups"])
@@ -515,28 +415,17 @@ def get_permission_folder_for_index(obj):
             "groups": list(permissions["change"]["groups"])
         }
     }
-    set_cache_value(cache_key, result, timeout=CACHE_TIMEOUT)
-    return result
+
 
 
 def set_permissions_for_object_folder(obj, perm):
-    """
-    Cập nhật phân quyền cho folder (obj) theo dữ liệu từ perm.
-    Sau khi update DB, invalidate các cache liên quan (xóa cache theo key đã quản lý).
-    """
     from documents.models import FolderPermission
     path = obj.path
-
-    # Xóa phân quyền cũ
     FolderPermission.objects.filter(path=path).delete()
-
-    # Tạo mới quyền view
     for user in set(perm["view"]["users"]):
         FolderPermission.objects.create(user=user, path=path, view=True)
     for group in set(perm["view"]["groups"]):
         FolderPermission.objects.create(group=group, path=path, view=True)
-
-    # Cập nhật quyền edit (edit luôn ngụ ý view)
     for user in set(perm["change"]["users"]):
         fp, _ = FolderPermission.objects.get_or_create(user=user, path=path)
         fp.edit = True
@@ -548,19 +437,8 @@ def set_permissions_for_object_folder(obj, perm):
         fp.view = True
         fp.save()
 
-    # Invalidate cache sau khi update
-    cache.delete("invalid_folder_paths")
-    cache.delete(f"get_permission_folder::{obj.path}")
-    cache.delete(f"get_permission_folder_for_index::{obj.path}")
-    # Xóa cache của các key chứa obj.path cho get_users_with_perms_folder
-    delete_cache_pattern(f"get_users_with_perms_folder::{obj.path}::")
-
 
 def has_perms_owner_aware_for_folder(user, perm, obj):
-    """
-    Kiểm tra xem user có quyền (view hoặc edit) đối với folder (obj) hay không, bao gồm cả quyền kế thừa.
-    Superuser hoặc owner của obj luôn có quyền.
-    """
     from documents.models import FolderPermission
     if user.is_superuser or user == getattr(obj, "owner", None):
         return True
@@ -583,10 +461,6 @@ def has_perms_owner_aware_for_folder(user, perm, obj):
 
 
 def get_objects_folder_for_user(user, perm, with_group_users=False):
-    """
-    Trả về queryset các folder mà user có quyền (view hoặc edit) dựa trên dữ liệu từ FolderPermission.
-    Dựa vào các filter theo path (startswith) và các ID trích ra từ path.
-    """
     from documents.models import Folder, FolderPermission
     if perm not in ["view_folder", "change_folder"]:
         raise ValueError("Perm must be 'view_folder' or 'change_folder'.")
@@ -604,9 +478,7 @@ def get_objects_folder_for_user(user, perm, with_group_users=False):
     allow_q = Q()
     allow_ids = set()
     for p in allowed_paths:
-        # Giả sử path có dạng "1/2/3/4/" (các thành phần là số)
-        ids = {int(id_str) for id_str in p.rstrip("/").split("/") if
-               id_str.isdigit()}
+        ids = (int(id) for id in p.rstrip("/").split("/") if id.isdigit())
         allow_ids.update(ids)
         allow_q |= Q(path__startswith=p)
     folders = Folder.objects.filter(allow_q | Q(id__in=allow_ids))
