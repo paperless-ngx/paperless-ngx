@@ -67,7 +67,8 @@
     "jest-websocket-mock": "^2.5.0",
     "prettier-plugin-organize-imports": "^4.1.0",
     "ts-node": "~10.9.1",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "webpack": "^5.98.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
