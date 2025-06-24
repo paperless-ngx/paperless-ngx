@@ -247,7 +247,8 @@ def render_pdf_ocr(input_path, output_path,
         for page_num, page in enumerate(input_pdf.pages):
             image = convert_from_path(input_path,
                                       first_page=page_num + 1,
-                                      last_page=page_num + 2)[0]
+                                      last_page=page_num + 2, use_cropbox=True,
+                                      strict=False)[0]
 
             page_height = page.mediabox.getHeight()
             page_width = page.mediabox.getWidth()
@@ -298,7 +299,6 @@ def render_pdf_ocr(input_path, output_path,
                                            page_height) - y_center_coordinates - (
                                                font_size / 2)) + 2,
                                        value)
-
             can.drawImage(ImageReader(byte_image),
                           0, 0,
                           width=float(page_width),
