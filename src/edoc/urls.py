@@ -108,13 +108,12 @@ api_router.register(r"dossier_forms", DossierFormViewSet)
 api_router.register(r"backup_records", BackupRecordViewSet)
 api_router.register(r'process_ocr', WebhookViewSet, basename='webhook')
 # api_router.register(r"approvals", ApprovalViewSet)
-api_router.register(r"content_types", ContentTypeViewSet,
-                    basename="content_types")
-api_router.register(r"history", MovedHistoryViewSet, basename='history')
-api_router.register(r"container",ContainerMoveHistoryViewSet)
-api_router.register(r"created_dpm", CreatedDepartmentViewSet)
-api_router.register(r"manage_dpm", ManageDepartmentViewSet)
-api_router.register(r"move", WarehouseMoveRequestViewSet, basename="moverequest")
+api_router.register(r"content_types", ContentTypeViewSet, basename="content_types")
+api_router.register(r"document_move_history", MovedHistoryViewSet, basename='history')
+api_router.register(r"container_move_history",ContainerMoveHistoryViewSet)
+api_router.register(r"created_department", CreatedDepartmentViewSet)
+api_router.register(r"manage_department", ManageDepartmentViewSet)
+api_router.register(r"move_request", WarehouseMoveRequestViewSet, basename="moverequest")
 
 urlpatterns = [
     re_path(
