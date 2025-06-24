@@ -477,6 +477,12 @@ def get_objects_folder_for_user(user, perm, with_group_users=False):
         exclude_q).values_list("path", flat=True)
     allow_q = Q()
     allow_ids = set()
+    folder_owner_paths = Folder.objects.filter(owner=user).values_list("path",
+                                                                       flat=True)
+    for p in folder_owner_paths:
+        ids = (int(id) for id in p.rstrip("/").split("/") if id.isdigit())
+        allow_ids.update(ids)
+
     for p in allowed_paths:
         ids = (int(id) for id in p.rstrip("/").split("/") if id.isdigit())
         allow_ids.update(ids)
