@@ -350,9 +350,10 @@ class Warehouse(MatchingModel):
         verbose_name=_("manage_by_department"),
 
     )
+    # Phân biệt kho nội bộ hoặc kho ngoài
     is_manage_by_company = models.BooleanField(
         _("is_manage_by_company"),
-        default=False,
+        default=False, # mặc định là kho ngoài
     )
     code_in_box = models.CharField(
         _("code_in_box"),
@@ -2054,6 +2055,9 @@ class ContainerMoveHistory(models.Model):
         return f"Container '{self.container.name}' move by {self.moved_by or 'System'} at {self.move_timestamp.strftime('%Y-%m-%d %H:%M')}"
 
 class WarehouseMoveRequest(models.Model):
+    """
+    Model chính: Phiếu Yêu cầu Di chuyển cho một lô hàng.
+    """
     class Status(models.TextChoices):
         PENDING = (
             "pending",
@@ -2080,8 +2084,7 @@ class WarehouseMoveRequest(models.Model):
             _("Received"),
         )
     reason = models.TextField(
-        _("reason"),
-        blank=True
+        _("reason")
     )
     request_code = models.CharField(
         _("Mã yêu cầu"),
@@ -2133,7 +2136,8 @@ class WarehouseMoveRequest(models.Model):
     external_shipper = models.CharField(
         _("Tên đơn vị vận chuyển ngoài"),
         max_length=255,
-        blank=True
+        blank=True,
+        null=True
     )
     tracking_number = models.CharField(
         _("Mã vận đơn"),

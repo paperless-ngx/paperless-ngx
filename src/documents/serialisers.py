@@ -3283,6 +3283,21 @@ class WarehouseMoveRequestSerializer(serializers.ModelSerializer):
             )
         return data
 
+    def update(self, instance, validated_data):
+        """
+        Ghi đè hàm update để kiểm tra trạng thái của yêu cầu trước khi cho phép sửa.
+        """
+        # `instance` ở đây là đối tượng Yêu cầu Di chuyển đang được sửa.
+
+        # Quy tắc: Chỉ cho phép sửa khi trạng thái là 'pending'.
+        if instance.status != WarehouseMoveRequest.Status.PENDING:
+            raise serializers.ValidationError(
+                f"Không thể sửa yêu cầu này vì nó đang ở trạng thái '{instance.status}'. "
+                "Bạn cần hủy yêu cầu này và tạo một yêu cầu mới nếu muốn thay đổi."
+            )
+        return super().update(instance, validated_data)
+
+
     class Meta:
         model = WarehouseMoveRequest
         fields = '__all__'

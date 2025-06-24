@@ -4111,15 +4111,10 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
         permission_parent_folder = get_permissions(
             obj=instance.parent_folder) if instance.parent_folder else None
         if permission_parent_folder:
-            user_ids = User.objects.filter(
-                pk=instance.parent_folder.owner.id).values_list(
-                "id", flat=True)
-
-            permission_parent_folder['change']['users'] = \
-                permission_parent_folder['change']['users'].union(user_ids)
+            user_ids = User.objects.filter(pk=instance.parent_folder.owner.id).values_list("id", flat=True)
+            permission_parent_folder['change']['users'] = permission_parent_folder['change']['users'].union(user_ids)
             permission_parent_folder['view']['users'] = []
-            set_permissions(permissions=permission_parent_folder,
-                            object=instance)
+            set_permissions(permissions=permission_parent_folder, object=instance)
 
         return Response(serializer.data)
 

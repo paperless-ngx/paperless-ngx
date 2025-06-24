@@ -776,7 +776,7 @@ LOGGING = {
     },
     "root": {"handlers": ["console"]},
     "loggers": {
-        "edoc": {"handlers": ["file_edoc"], "level": "DEBUG"},
+        "edoc": {"handlers": ["file_edoc", "console"], "level": "DEBUG"},
         "edoc_mail": {"handlers": ["file_mail"], "level": "DEBUG"},
         "ocrmypdf": {"handlers": ["file_edoc"], "level": "INFO"},
         "celery": {"handlers": ["file_celery"], "level": "DEBUG"},

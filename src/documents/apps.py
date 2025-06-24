@@ -1,6 +1,9 @@
 from django.apps import AppConfig
 from django.conf import settings
+from django.db.models.signals import post_save
 from django.utils.translation import gettext_lazy as _
+
+
 
 
 class DocumentsConfig(AppConfig):
@@ -9,6 +12,8 @@ class DocumentsConfig(AppConfig):
     verbose_name = _("Documents")
 
     def ready(self):
+        from django.db.models.signals import post_save
+        from documents.models import Warehouse
         from documents.signals import document_consumption_finished
         from documents.signals import document_updated
         from documents.signals import approval_added
@@ -26,6 +31,7 @@ class DocumentsConfig(AppConfig):
         from documents.signals.handlers import set_tags
         from documents.signals.handlers import run_workflow_approval_added
         from documents.signals.handlers import run_workflow_approval_updated
+        # from documents.signals.update_move_request import update_move_request_on_box_status_change
 
         document_consumption_finished.connect(add_inbox_tags)
         document_consumption_finished.connect(set_correspondent)
@@ -40,6 +46,11 @@ class DocumentsConfig(AppConfig):
         document_updated.connect(run_workflow_updated)
         approval_added.connect(run_workflow_approval_added)
         approval_updated.connect(run_workflow_approval_updated)
+        # post_save.connect(
+        #     update_move_request_on_box_status_change,
+        #     sender=Warehouse,
+        #     dispatch_uid="update_move_request_on_warehouse_save"
+        # )
 
         # if settings.SCHEDULER_DEFAULT:
         #     from edoc import operator
