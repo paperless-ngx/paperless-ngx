@@ -36,6 +36,7 @@ from documents import bulk_edit
 from documents.data_models import DocumentSource
 from documents.models import ArchiveFont, MovedHistory, ManageDepartment, \
     CreatedDepartment, ContainerMoveHistory, WarehouseMoveRequest
+from documents.models import ArchiveFont, FolderPermission
 from documents.models import BackupRecord
 from documents.models import Correspondent
 from documents.models import CustomField
@@ -59,7 +60,9 @@ from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
-from documents.permissions import get_groups_with_only_permission
+from documents.permissions import get_groups_with_only_permission, \
+    set_permissions_for_object_folder, get_permission_folder, \
+    has_perms_owner_aware_for_folder
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.validators import uri_validator
@@ -302,6 +305,88 @@ class OwnedObjectSerializer(
                             "error": "Object violates owner / name unique constraint"},
                     )
         return super().update(instance, validated_data)
+
+
+class FolderOwnedObjectSerializer(OwnedObjectSerializer):
+    def get_permissions(self, obj):
+        return get_permission_folder(obj)
+
+    def get_user_can_change(self, obj):
+        return (
+            self.user
+            and has_perms_owner_aware_for_folder(self.user, "change_folder",
+                                                 obj)
+        )
+
+    def _set_permissions(self, permissions, object):
+        set_permissions_for_object_folder(object, permissions)
+
+    def get_is_shared_by_requester(self, obj):
+        return obj.owner == self.user and FolderPermission.objects.filter(
+            path=obj.path).exists()
+
+    def create(self, validated_data):
+        if "owner" not in validated_data and self.user:
+            validated_data["owner"] = self.user
+        permissions = validated_data.pop("set_permissions", None)
+        parent_folder = validated_data.get("parent_folder", None)
+
+        instance = super(OwnedObjectSerializer, self).create(validated_data)
+
+        # Set path logic here
+        if parent_folder is None:
+            instance.path = f"{instance.id}/"
+        else:
+            instance.path = f"{parent_folder.path}{instance.id}/"
+        instance.save()
+
+        if permissions:
+            self._set_permissions(permissions, instance)
+
+        return instance
+
+    def update(self, instance, validated_data):
+        if "set_permissions" in validated_data:
+            set_permissions_for_object_folder(instance, validated_data[
+                "set_permissions"])
+
+        return super(OwnedObjectSerializer, self).update(instance,
+                                                         validated_data)
+
+
+class DocumentOwnedObjectSerializer(OwnedObjectSerializer):
+    def get_permissions(self, obj):
+        return get_permission_folder(obj.folder)
+
+    def get_user_can_change(self, obj):
+        return (
+            self.user
+            and has_perms_owner_aware_for_folder(self.user, "change_folder",
+                                                 obj.folder)
+        )
+
+    def get_is_shared_by_requester(self, obj):
+        return obj.owner == self.user and FolderPermission.objects.filter(
+            path=obj.folder.path).exists()
+
+    def create(self, validated_data):
+        if "owner" not in validated_data and self.user:
+            validated_data["owner"] = self.user
+        permissions = validated_data.pop("set_permissions", None)
+        instance = super(OwnedObjectSerializer, self).create(validated_data)
+
+        if permissions:
+            set_permissions_for_object_folder(instance.folder, permissions)
+
+        return instance
+
+    def update(self, instance, validated_data):
+        if "set_permissions" in validated_data:
+            set_permissions_for_object_folder(instance.folder, validated_data[
+                "set_permissions"])
+
+        return super(OwnedObjectSerializer, self).update(instance,
+                                                         validated_data)
 
 
 class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
@@ -773,7 +858,7 @@ class WebhookSerializer(serializers.Serializer):
         fields = '__all__'
 
 class DocumentSerializer(
-    OwnedObjectSerializer,
+    DocumentOwnedObjectSerializer,
     NestedUpdateMixin,
     DynamicFieldsModelSerializer,
 ):
@@ -851,10 +936,10 @@ class DocumentSerializer(
     def get_exploit(self, obj):
         current_user = self.context.get("request").user
 
-        if current_user is not None and has_perms_owner_aware(
+        if current_user is not None and has_perms_owner_aware_for_folder(
             current_user,
-            "view_document",
-            obj,
+            "view_folder",
+            obj.folder,
         ):
             return 1
         elif Approval.objects.filter(
@@ -994,7 +1079,7 @@ class DocumentSerializer(
 
 
 class DocumentDetailSerializer(
-    OwnedObjectSerializer,
+    DocumentOwnedObjectSerializer,
     NestedUpdateMixin,
     DynamicFieldsModelSerializer,
 ):
@@ -1250,7 +1335,6 @@ class DocumentDetailSerializer(
             "page_count",
             "warehouse_s",
             "warehouse_w",
-            "moved_history"
         )
 
 class DocumentFolderSerializer(
@@ -2806,7 +2890,7 @@ class WarehouseSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             return 0
 
 
-class FolderSerializer(OwnedObjectSerializer):
+class FolderSerializer(FolderOwnedObjectSerializer):
     name = AdjustedNameFieldFolder()
     document = serializers.SerializerMethodField(read_only=True)
     # document_count = serializers.IntegerField(read_only=True)
@@ -3161,155 +3245,3 @@ class TrashSerializer(SerializerWithPerms):
                 "Some documents in the list have not yet been deleted.",
             )
         return documents
-class MovedHistorySerializer(serializers.ModelSerializer):
-    """
-    Serializer for the MovedHistory model.
-    Provides a read-only, human-readable representation of a document's
-    location change history.
-    """
-    # Use StringRelatedField for readable representations of foreign keys
-    document = serializers.StringRelatedField(read_only=True)
-    old_location = serializers.StringRelatedField(read_only=True)
-    new_location = serializers.StringRelatedField(read_only=True)
-    moved_by = serializers.StringRelatedField(read_only=True)
-
-    class Meta:
-        model = MovedHistory
-        # List all fields you want to expose in the API
-        fields = [
-            'id',
-            'document',
-            'old_location',
-            'new_location',
-            'moved_by',
-            'move_timestamp',
-            'move_reason',
-        ]
-        # Make all fields read-only as this is a log
-        read_only_fields = fields
-class ManageDepartmentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
-    """
-    Serializer for the ManageDepartment model.
-    """
-    class Meta:
-        model = ManageDepartment
-        fields = [
-            "id",
-            "slug",
-            "name",
-            "email",
-            "phone_number",
-            "location",
-            "match",
-            "matching_algorithm",
-            "is_insensitive",
-            "document_count",
-            "owner",
-            "permissions",
-            "user_can_change",
-            "set_permissions",
-        ]
-
-class CreatedDepartmentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
-    """
-    Serializer for the CreatedDepartment model.
-    """
-    class Meta:
-        model = CreatedDepartment
-        fields = [
-            "id",
-            "slug",
-            "name",
-            "department_type",
-            "main_pos",
-            "phone_number",
-            "match",
-            "matching_algorithm",
-            "is_insensitive",
-            "document_count",
-            "owner",
-            "permissions",
-            "user_can_change",
-            "set_permissions",
-        ]
-class ContainerMoveHistorySerializer(serializers.ModelSerializer):
-    container_id = serializers.PrimaryKeyRelatedField(source="container", read_only=True)
-    old_parent_id = serializers.PrimaryKeyRelatedField(source="old_parent", read_only=True)
-    new_parent_id = serializers.PrimaryKeyRelatedField(source="new_parent", read_only=True)
-    moved_by_username = serializers.StringRelatedField(source="moved_by", read_only=True)
-
-    class Meta:
-        model = ContainerMoveHistory
-        fields = [
-            'id',
-            'container_id',
-            'old_parent_id',
-            'new_parent_id',
-            'moved_by_username',
-            'move_timestamp',
-            'move_reason',
-        ]
-
-class WarehouseMoveRequestSerializer(serializers.ModelSerializer):
-    requester = serializers.StringRelatedField(read_only=True)
-    container_to_move = serializers.StringRelatedField(read_only=True)
-    source_location = serializers.StringRelatedField(read_only=True)
-    destination_location = serializers.StringRelatedField(read_only=True)
-    approver = serializers.StringRelatedField(read_only=True)
-    confirmed_by_sender = serializers.StringRelatedField(read_only=True)
-    confirmed_by_receiver = serializers.StringRelatedField(read_only=True)
-    container_to_move_id = serializers.PrimaryKeyRelatedField(
-        queryset=Warehouse.objects.all(),
-        source='container_to_move',
-        write_only=True
-    )
-    destination_location_id = serializers.PrimaryKeyRelatedField(
-        queryset=Warehouse.objects.all(),
-        source='destination_location',
-        write_only=True
-    )
-    def validate(self, data):
-        container = data.get("container_to_move")
-        destination = data.get("destination_location")
-
-        if not container or not destination:
-            return data
-        source = container.parent_warehouse
-        source_root = source.get_root_warehouse() if source else None
-        destination_root = destination.get_root_warehouse()
-        if source_root == destination_root:
-            raise serializers.ValidationError(
-                "Di chuyển trong cùng 1 kho không cần tạo yêu cầu."
-            )
-        return data
-
-    def update(self, instance, validated_data):
-        """
-        Ghi đè hàm update để kiểm tra trạng thái của yêu cầu trước khi cho phép sửa.
-        """
-        # `instance` ở đây là đối tượng Yêu cầu Di chuyển đang được sửa.
-
-        # Quy tắc: Chỉ cho phép sửa khi trạng thái là 'pending'.
-        if instance.status != WarehouseMoveRequest.Status.PENDING:
-            raise serializers.ValidationError(
-                f"Không thể sửa yêu cầu này vì nó đang ở trạng thái '{instance.status}'. "
-                "Bạn cần hủy yêu cầu này và tạo một yêu cầu mới nếu muốn thay đổi."
-            )
-        return super().update(instance, validated_data)
-
-
-    class Meta:
-        model = WarehouseMoveRequest
-        fields = '__all__'
-        read_only_fields = (
-            'request_code',
-            'status',
-            'requester',
-            'source_location',
-            'approved_at',
-            'approver',
-            'actual_shipping_date',
-            'confirmed_by_sender',
-            'actual_receive_date',
-            'confirmed_by_receiver'
-        )

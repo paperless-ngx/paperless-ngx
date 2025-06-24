@@ -1534,6 +1534,41 @@ if settings.AUDIT_LOG_ENABLED:
     auditlog.register(CustomFieldInstance)
 
 
+class FolderPermission(models.Model):
+    user = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="folder_permissions",
+        verbose_name="User"
+    )
+    group = models.ForeignKey(
+        Group,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="folder_permissions",
+        verbose_name="Group"
+    )
+    path = models.CharField(
+        max_length=512,
+        verbose_name="Path",
+        help_text="The path of the folder."
+    )
+    view = models.BooleanField(default=False, verbose_name="Can View")
+    edit = models.BooleanField(default=False, verbose_name="Can Edit")
+    delete = models.BooleanField(default=False, verbose_name="Can Delete")
+    download = models.BooleanField(default=False, verbose_name="Can Download")
+
+    class Meta:
+        verbose_name = "Folder Permission"
+        verbose_name_plural = "Folder Permissions"
+        unique_together = (("user", "group", "path"),)
+
+    def __str__(self):
+        return f"Permission for {self.user or self.group} on {self.path}"
+
 class WorkflowTrigger(models.Model):
     class WorkflowTriggerMatching(models.IntegerChoices):
         # No auto matching

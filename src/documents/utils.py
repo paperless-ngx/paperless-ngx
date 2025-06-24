@@ -16,7 +16,6 @@ import PyPDF2
 import pathvalidate
 from PIL import Image
 from django.conf import settings
-from guardian.shortcuts import assign_perm
 
 from documents.data_models import DocumentMetadataOverrides
 
@@ -252,12 +251,8 @@ def get_unique_name(model, base_name, parent_folder=None):
 def create_folder_by_path(parent_folder, path: str, overrides: Optional[
     DocumentMetadataOverrides] = None, folder_dict=None):
     from documents.models import Folder
-    from documents.permissions import get_permissions, \
-        update_view_folder_parent_permissions, set_permissions_for_object
     destination_folder = Folder.objects.get(
         pk=overrides.folder_id) if overrides and overrides.folder_id else None
-    permissions_destination_folder = get_permissions(
-        obj=destination_folder) if destination_folder else None
     folder_names = path.split('/')[:-1]
     results = dict()
     folders_path = ''
@@ -293,12 +288,5 @@ def create_folder_by_path(parent_folder, path: str, overrides: Optional[
                 folder.path = f'{results[folders_parent_path][1]}{folder.id}/'
 
             folder.save()
-            if parent_folder:
-                assign_perm('change_folder', parent_folder.owner, folder)
-            if permissions_destination_folder is not None:
-                set_permissions_for_object(permissions_destination_folder,
-                                           folder)
-                update_view_folder_parent_permissions(folder,
-                                                      permissions_destination_folder)
         results[folders_path] = (folder.id, folder.path)
     return results

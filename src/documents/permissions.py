@@ -14,8 +14,6 @@ from guardian.shortcuts import remove_perm
 from rest_framework.permissions import BasePermission
 from rest_framework.permissions import DjangoObjectPermissions
 
-from documents.models import Folder, Warehouse
-
 
 class EdocObjectPermissions(DjangoObjectPermissions):
     """
@@ -34,6 +32,8 @@ class EdocObjectPermissions(DjangoObjectPermissions):
     }
 
     def has_object_permission(self, request, view, obj):
+        print(
+            f"Checking object permission for {obj} with request {request.method}")
         if hasattr(obj, "owner") and obj.owner is not None:
             if request.user == obj.owner:
                 return True
@@ -160,6 +160,7 @@ def check_user_can_change_folder(user, obj):
 
 @shared_task()
 def update_view_folder_parent_permissions(folder, permissions):
+    from documents.models import Folder
     list_folder_ids = folder.path.rstrip("/").split("/")
     folders_list = Folder.objects.filter(id__in = list_folder_ids)
     permission_copy = permissions
@@ -175,6 +176,7 @@ def update_view_folder_parent_permissions(folder, permissions):
         )
 
 def update_view_warehouse_shelf_boxcase_permissions(warehouse, permission_copy):
+    from documents.models import Warehouse
     list_warehouse_ids = warehouse.path.split("/")
     warehouses_list = Warehouse.objects.filter(id__in = list_warehouse_ids)
 
@@ -264,3 +266,226 @@ def get_permissions(obj):
 
 def set_permissions(permissions, object):
     set_permissions_for_object(permissions, object)
+
+
+from django.db.models import Q
+
+
+def _get_invalid_paths():
+    from documents.models import FolderPermission
+    return list(
+        FolderPermission.objects.filter(
+            view=False, edit=False, delete=False, download=False
+        ).values_list("path", flat=True)
+    )
+
+
+def _exclude_invalid_paths_q(invalid_paths):
+    q = Q()
+    for p in invalid_paths:
+        q |= Q(path__startswith=p)
+    return q
+
+
+def get_users_with_perms_folder(obj, perm, with_group_users=False):
+    from documents.models import FolderPermission
+    if perm not in ["view_folder", "change_folder"]:
+        raise ValueError("Perm must be 'view_folder' or 'change_folder'.")
+    perm_field = "view" if perm == "view_folder" else "edit"
+    parts = obj.path.rstrip("/").split("/")
+    all_paths = ["/".join(parts[:i]) + "/" for i in range(len(parts), 0, -1)]
+    invalid_paths = _get_invalid_paths()
+    exclude_q = _exclude_invalid_paths_q(invalid_paths)
+    fps = FolderPermission.objects.filter(path__in=all_paths).exclude(
+        exclude_q)
+    fp_dict = {fp.path: [] for fp in fps}
+    for fp in fps:
+        fp_dict[fp.path].append(fp)
+    users = set()
+    for path in all_paths:
+        fps_at_path = fp_dict.get(path, [])
+        for fp in fps_at_path:
+            if fp.user and getattr(fp, perm_field):
+                users.add(fp.user)
+            if with_group_users and fp.group and getattr(fp, perm_field):
+                users.update(fp.group.user_set.all())
+        if fps_at_path:
+            break
+    return users
+
+def get_permission_folder(obj):
+    from documents.models import FolderPermission
+    permissions = {
+        "view": {"users": set(), "groups": set()},
+        "change": {"users": set(), "groups": set()}
+    }
+    parts = obj.path.rstrip("/").split("/")
+    all_paths = ["/".join(parts[:i]) + "/" for i in range(len(parts), 0, -1)]
+    invalid_paths = _get_invalid_paths()
+    exclude_q = _exclude_invalid_paths_q(invalid_paths)
+    fps = FolderPermission.objects.filter(path__in=all_paths).exclude(
+        exclude_q)
+    for fp in fps:
+        if fp.user:
+            if fp.view:
+                permissions["view"]["users"].add(fp.user.id)
+            if fp.edit:
+                permissions["change"]["users"].add(fp.user.id)
+        if fp.group:
+            if fp.view:
+                permissions["view"]["groups"].add(fp.group.id)
+            if fp.edit:
+                permissions["change"]["groups"].add(fp.group.id)
+    permissions["view"]["users"].update(permissions["change"]["users"])
+    permissions["view"]["groups"].update(permissions["change"]["groups"])
+    return {
+        "view": {
+            "users": list(permissions["view"]["users"]),
+            "groups": list(permissions["view"]["groups"])
+        },
+        "change": {
+            "users": list(permissions["change"]["users"]),
+            "groups": list(permissions["change"]["groups"])
+        }
+    }
+
+
+def get_permission_folder_for_index(obj):
+    """
+    Get view/edit permissions for a folder, merging from all parent folders,
+    and excluding any user/group under folders with all permissions set to False.
+    Also, add owners of parent folders to edit permission.
+    """
+    from documents.models import Folder, FolderPermission
+    from django.db.models import Q
+
+    permissions = {
+        "view": {"users": set(), "groups": set()},
+        "change": {"users": set(), "groups": set()}
+    }
+
+    # Parse path to get all parent paths and folder IDs
+    parts = obj.path.rstrip("/").split("/")
+    folder_ids = [int(id_p) for id_p in parts if id_p.isdigit()]
+    all_paths = ["/".join(parts[:i]) + "/" for i in range(len(parts), 0, -1)]
+
+    # Exclude invalid paths (all perms False)
+    invalid_paths = list(
+        FolderPermission.objects.filter(
+            view=False, edit=False, delete=False, download=False
+        ).values_list("path", flat=True)
+    )
+    exclude_q = Q()
+    for p in invalid_paths:
+        exclude_q |= Q(path__startswith=p)
+
+    # Query FolderPermission, exclude invalid
+    fps = FolderPermission.objects.filter(path__in=all_paths).exclude(
+        exclude_q)
+
+    # Add owners of parent folders to edit permission
+    owners = Folder.objects.filter(id__in=folder_ids).values_list("owner_id",
+                                                                  flat=True)
+    permissions["change"]["users"].update(owners)
+
+    # Collect permissions
+    for fp in fps:
+        if fp.user:
+            if fp.view:
+                permissions["view"]["users"].add(fp.user.id)
+            if fp.edit:
+                permissions["change"]["users"].add(fp.user.id)
+        if fp.group:
+            if fp.view:
+                permissions["view"]["groups"].add(fp.group.id)
+            if fp.edit:
+                permissions["change"]["groups"].add(fp.group.id)
+
+    # Edit implies view
+    permissions["view"]["users"].update(permissions["change"]["users"])
+    permissions["view"]["groups"].update(permissions["change"]["groups"])
+
+    return {
+        "view": {
+            "users": list(permissions["view"]["users"]),
+            "groups": list(permissions["view"]["groups"])
+        },
+        "change": {
+            "users": list(permissions["change"]["users"]),
+            "groups": list(permissions["change"]["groups"])
+        }
+    }
+
+
+
+def set_permissions_for_object_folder(obj, perm):
+    from documents.models import FolderPermission
+    path = obj.path
+    FolderPermission.objects.filter(path=path).delete()
+    for user in set(perm["view"]["users"]):
+        FolderPermission.objects.create(user=user, path=path, view=True)
+    for group in set(perm["view"]["groups"]):
+        FolderPermission.objects.create(group=group, path=path, view=True)
+    for user in set(perm["change"]["users"]):
+        fp, _ = FolderPermission.objects.get_or_create(user=user, path=path)
+        fp.edit = True
+        fp.view = True
+        fp.save()
+    for group in set(perm["change"]["groups"]):
+        fp, _ = FolderPermission.objects.get_or_create(group=group, path=path)
+        fp.edit = True
+        fp.view = True
+        fp.save()
+
+
+def has_perms_owner_aware_for_folder(user, perm, obj):
+    from documents.models import FolderPermission
+    if user.is_superuser or user == getattr(obj, "owner", None):
+        return True
+    if perm not in ["view_folder", "change_folder"]:
+        raise ValueError("Perm must be 'view_folder' or 'change_folder'.")
+    perm_field = "view" if perm == "view_folder" else "edit"
+    parts = obj.path.rstrip("/").split("/")
+    all_paths = ["/".join(parts[:i]) + "/" for i in range(len(parts), 0, -1)]
+    group_ids = set(user.groups.values_list("id", flat=True))
+    invalid_paths = _get_invalid_paths()
+    exclude_q = _exclude_invalid_paths_q(invalid_paths)
+    fps = FolderPermission.objects.filter(path__in=all_paths).exclude(
+        exclude_q)
+    for fp in fps:
+        if fp.user == user and getattr(fp, perm_field):
+            return True
+        if fp.group and fp.group.id in group_ids and getattr(fp, perm_field):
+            return True
+    return False
+
+
+def get_objects_folder_for_user(user, perm, with_group_users=False):
+    from documents.models import Folder, FolderPermission
+    if perm not in ["view_folder", "change_folder"]:
+        raise ValueError("Perm must be 'view_folder' or 'change_folder'.")
+    if user.is_superuser:
+        return Folder.objects.all()
+    perm_field = "view" if perm == "view_folder" else "edit"
+    q = Q(user=user) & Q(**{perm_field: True})
+    if with_group_users:
+        group_ids = list(user.groups.values_list("id", flat=True))
+        q |= Q(group__in=group_ids) & Q(**{perm_field: True})
+    invalid_paths = _get_invalid_paths()
+    exclude_q = _exclude_invalid_paths_q(invalid_paths)
+    allowed_paths = FolderPermission.objects.filter(q).exclude(
+        exclude_q).values_list("path", flat=True)
+    allow_q = Q()
+    allow_ids = set()
+    folder_owner_paths = Folder.objects.filter(owner=user).values_list("path",
+                                                                       flat=True)
+    for p in folder_owner_paths:
+        ids = (int(id) for id in p.rstrip("/").split("/") if id.isdigit())
+        allow_ids.update(ids)
+        allow_q |= Q(path__startswith=p)
+    for p in allowed_paths:
+        ids = (int(id) for id in p.rstrip("/").split("/") if id.isdigit())
+        allow_ids.update(ids)
+        allow_q |= Q(path__startswith=p)
+    folders = Folder.objects.filter(allow_q | Q(id__in=allow_ids))
+    return folders.distinct()

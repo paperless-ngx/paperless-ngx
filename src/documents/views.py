@@ -28,14 +28,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import connections, transaction
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
-from django.db.models import Case
+from django.db.models import Case, F, Value
 from django.db.models import Count
 from django.db.models import IntegerField
 from django.db.models import Max
 from django.db.models import Q
 from django.db.models import Sum
 from django.db.models import When
-from django.db.models.functions import Length
+from django.db.models.functions import Length, Replace
 from django.db.models.functions import Lower
 from django.db.models.functions import TruncDate
 from django.http import Http404
@@ -109,7 +109,8 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.documents import DocumentDocument
 from documents.filters import ArchiveFontFilterSet, EdocTaskFilterSet, \
-    ApprovalFilterSet
+    ApprovalFilterSet, FolderOwnedOrAccessibleFilter, \
+    DocumentOwnedOrAccessibleFilter
 from documents.filters import BackupRecordFilterSet
 from documents.filters import CorrespondentFilterSet
 from documents.filters import CustomFieldFilterSet
@@ -134,6 +135,7 @@ from documents.matching import match_tags
 from documents.matching import match_warehouses
 from documents.models import Approval, MovedHistory, ContainerMoveHistory, \
     ManageDepartment, CreatedDepartment, WarehouseMoveRequest
+from documents.models import Approval, FolderPermission
 from documents.models import ArchiveFont
 from documents.models import BackupRecord
 from documents.models import Correspondent
@@ -158,14 +160,12 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.parsers import custom_get_parser_class_for_mime_type
 from documents.parsers import parse_date_generator
-from documents.permissions import EdocAdminPermissions, get_permissions, \
-    set_permissions
+from documents.permissions import EdocAdminPermissions, \
+    has_perms_owner_aware_for_folder
 from documents.permissions import EdocObjectPermissions
-from documents.permissions import check_user_can_change_folder
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
-from documents.permissions import update_view_folder_parent_permissions
 from documents.permissions import \
     update_view_warehouse_shelf_boxcase_permissions
 from documents.serialisers import AcknowledgeTasksViewSerializer, \
@@ -208,7 +208,7 @@ from documents.signals import document_updated
 from documents.tasks import backup_documents, \
     bulk_update_custom_field_form_document_type_to_document, bulk_delete_file, \
     update_ocr_document, update_child_folder_paths, \
-    update_child_folder_permisisons, update_folder_permisisons, consume_folder
+    consume_folder, reindex_document_list
 from documents.tasks import consume_file
 from documents.tasks import deleted_backup
 from documents.tasks import empty_trash
@@ -519,7 +519,7 @@ class DocumentViewSet(
         DjangoFilterBackend,
         SearchFilter,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        DocumentOwnedOrAccessibleFilter,
     )
     filterset_class = DocumentFilterSet
     search_fields = ("title", "correspondent__name", "content", "warehouse", "folder")
@@ -599,6 +599,13 @@ class DocumentViewSet(
     #     serializer = self.get_serializer(queryset, many=True)
     #     return Response(serializer.data)
 
+    def check_object_permissions(self, request, obj):
+        if not has_perms_owner_aware_for_folder(request.user, 'view_folder',
+                                                obj.folder):
+            self.permission_denied(
+                request,
+                message=None,
+                code=None)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
@@ -624,22 +631,22 @@ class DocumentViewSet(
         # logger.debug(response)
         self.update_time_archive_font(self.get_object())
         self.update_name_folder(self.get_object(), serializer)
-        permissions = serializer.validated_data.get("set_permissions")
-        if permissions is not None:
-            permissions_copy = permissions.copy()
-        if instance.folder is not None:
-            update_view_folder_parent_permissions.delay(instance.folder,
-                                                        permissions_copy)
-            owner = serializer.validated_data.get("owner")
-            merge = serializer.validated_data.get("merge", False)
-            owner_exist = "owner" in serializer.validated_data
-            set_permissions_exist = "set_permissions" in serializer.validated_data
-            update_folder_permisisons.delay(instance=self.get_object(),
-                                            permissions=permissions_copy,
-                                            owner=owner,
-                                            owner_exist=owner_exist,
-                                            merge=merge,
-                                            set_permissions_exist=set_permissions_exist)
+        # permissions = serializer.validated_data.get("set_permissions")
+        # if permissions is not None:
+        #     permissions_copy = permissions.copy()
+        # if instance.folder is not None:
+        #     update_view_folder_parent_permissions.delay(instance.folder,
+        #                                                 permissions_copy)
+        #     owner = serializer.validated_data.get("owner")
+        #     merge = serializer.validated_data.get("merge", False)
+        #     owner_exist = "owner" in serializer.validated_data
+        #     set_permissions_exist = "set_permissions" in serializer.validated_data
+        #     update_folder_permisisons.delay(instance=self.get_object(),
+        #                                     permissions=permissions_copy,
+        #                                     owner=owner,
+        #                                     owner_exist=owner_exist,
+        #                                     merge=merge,
+        #                                     set_permissions_exist=set_permissions_exist)
         response = super().update(request, *args, **kwargs)
         # serializer.save()
         doc_updated = Document.objects.get(id=serializer.data["id"])
@@ -652,25 +659,15 @@ class DocumentViewSet(
         return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
-        from documents import index
-
         instance = self.get_object()
         folder = instance.folder
-
-        dossier = instance.dossier
-        # instance.folder = None
-        # instance.dossier = None
-        # instance.save()
         if folder is not None:
             folder.delete()
-        # index.remove_document_from_index(self.get_object())
-        # NOTE: update document count for document
-        # update_document_count_folder_path(folder.path)
         instance.delete()
-        instance_deleted = Document.deleted_objects.get(id=instance.id)
-        index.delete_document_with_index(instance_deleted.id)
+        DocumentDocument.search().filter("terms",
+                                         _id=[str(instance.id)]).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-        # return super().destroy(request, *args, **kwargs)
+
 
     @staticmethod
     def original_requested(request):
@@ -681,10 +678,10 @@ class DocumentViewSet(
 
     def file_response(self, pk, request, disposition):
         doc = Document.objects.get(id=pk)
-        if request.user is not None and not has_perms_owner_aware(
+        if request.user is not None and not has_perms_owner_aware_for_folder(
             request.user,
-            "view_document",
-            doc,
+            "view_folder",
+            doc.folder,
         ):
             return HttpResponseForbidden("Insufficient permissions")
         return serve_file(
@@ -725,10 +722,10 @@ class DocumentViewSet(
     def metadata(self, request, pk=None):
         try:
             doc = Document.objects.get(pk=pk)
-            if request.user is not None and not has_perms_owner_aware(
+            if request.user is not None and not has_perms_owner_aware_for_folder(
                 request.user,
-                "view_document",
-                doc,
+                "view_folder",
+                doc.folder,
             ):
                 return HttpResponseForbidden("Insufficient permissions")
         except Document.DoesNotExist:
@@ -785,10 +782,10 @@ class DocumentViewSet(
     )
     def suggestions(self, request, pk=None):
         doc = get_object_or_404(Document, pk=pk)
-        if request.user is not None and not has_perms_owner_aware(
+        if request.user is not None and not has_perms_owner_aware_for_folder(
             request.user,
-            "view_document",
-            doc,
+            "view_folder",
+            doc.folder,
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
@@ -933,10 +930,10 @@ class DocumentViewSet(
         currentUser = request.user
         try:
             doc = Document.objects.get(pk=pk)
-            if currentUser is not None and not has_perms_owner_aware(
+            if currentUser is not None and not has_perms_owner_aware_for_folder(
                 currentUser,
-                "view_document",
-                doc,
+                "view_folder",
+                doc.folder,
             ):
                 return HttpResponseForbidden("Insufficient permissions to view notes")
         except Document.DoesNotExist:
@@ -952,9 +949,9 @@ class DocumentViewSet(
                 )
         elif request.method == "POST":
             try:
-                if currentUser is not None and not has_perms_owner_aware(
+                if currentUser is not None and not has_perms_owner_aware_for_folder(
                     currentUser,
-                    "change_document",
+                    "change_folder",
                     doc,
                 ):
                     return HttpResponseForbidden(
@@ -996,10 +993,10 @@ class DocumentViewSet(
                     },
                 )
         elif request.method == "DELETE":
-            if currentUser is not None and not has_perms_owner_aware(
+            if currentUser is not None and not has_perms_owner_aware_for_folder(
                 currentUser,
-                "change_document",
-                doc,
+                "change_folder",
+                doc.folder,
             ):
                 return HttpResponseForbidden("Insufficient permissions to delete notes")
 
@@ -1155,10 +1152,10 @@ class DocumentViewSet(
         currentUser = request.user
         try:
             doc = Document.objects.get(pk=pk)
-            if currentUser is not None and not has_perms_owner_aware(
+            if currentUser is not None and not has_perms_owner_aware_for_folder(
                 currentUser,
-                "change_document",
-                doc,
+                "change_folder",
+                doc.folder,
             ):
                 return HttpResponseForbidden(
                     "Insufficient permissions to add share link",
@@ -1458,7 +1455,8 @@ class BulkEditView(PassUserMixin):
                 if method
                 in [bulk_edit.set_permissions, bulk_edit.delete, bulk_edit.rotate]
                 else all(
-                    has_perms_owner_aware(user, "change_document", doc)
+                    has_perms_owner_aware_for_folder(user, "change_folder",
+                                                     doc.folder)
                     for doc in document_objs
                 )
             )
@@ -2031,7 +2029,6 @@ class StatisticsCustomView(APIView):
                 )
                 .order_by("date_done_date")
             )
-            print('request_count:', request_count)
 
             for entry in request_count:
                 target_date_str = entry["date_done_date"].strftime("%Y-%m-%d")
@@ -2600,7 +2597,7 @@ class ShareLinkViewSet(ModelViewSet, PassUserMixin):
 
     serializer_class = ShareLinkSerializer
     pagination_class = StandardPagination
-    permission_classes = (IsAuthenticated, EdocObjectPermissions)
+    permission_classes = (IsAuthenticated,)
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
@@ -2721,7 +2718,8 @@ class BulkEditObjectsView(PassUserMixin):
                     )
                     folder_owner = None
                     for f in parent_folder:
-                        if has_perms_owner_aware(user, 'change_folder',
+                        if has_perms_owner_aware_for_folder(user,
+                                                            'change_folder',
                                                  f):
                             folder_owner = f.owner
                     if folder_owner is None:
@@ -2790,7 +2788,8 @@ class BulkEditObjectsView(PassUserMixin):
                 elif int(request.data["parent_folder"]) == folder.id:
                     return Response(status=status.HTTP_400_BAD_REQUEST)
                 elif "parent_folder" in request.data:
-                    if not has_perms_owner_aware(user, 'change_folder',
+                    if not has_perms_owner_aware_for_folder(user,
+                                                            'change_folder',
                                                  parent_folder_obj):
                         return HttpResponseForbidden(
                             _("Insufficient permissions"))
@@ -2806,38 +2805,43 @@ class BulkEditObjectsView(PassUserMixin):
                         return Response(status=status.HTTP_400_BAD_REQUEST)
                 else:
                     request.data["parent_folder"] = None
+            folder_document_ids_reindex = set()
 
             for folder in folder_list:
-                # folder.parent_folder = parent_folder_obj
-                # folder.path = f"{folder.parent_folder.path}/{folder.id}"
-                # folder.save()
+                if folder.type == Folder.FILE:
+                    folder_document_ids_reindex.add(folder.id)
 
-                # print(folder.id)
-                # print(int(request.data['parent_folder'][0]))
                 old_parent_folder = folder.parent_folder
                 folder.parent_folder = parent_folder_obj
-
+                new_path_parent_folder = ''
+                old_path_parent_folder = folder.path
                 if old_parent_folder != folder.parent_folder:
                     old_path = folder.path
                     if folder.parent_folder:
                         folder.path = f"{folder.parent_folder.path}{folder.id}/"
                         folder.parent_folder = parent_folder_obj
+                        new_path_parent_folder = f"{folder.parent_folder.path}{folder.id}/"
 
                     else:
                         folder.path = f"{folder.id}/"
-                    if parent_folder_obj is not None:
-                        destination_folder = get_permissions(parent_folder_obj)
-                        update_view_folder_parent_permissions.delay(folder,
-                                                                    destination_folder)
-                        permission_move_folder = get_permissions(folder)
-                        destination_folder = get_permissions(parent_folder_obj)
-                        update_view_folder_parent_permissions.delay(folder,
-                                                                    destination_folder)
-                        update_view_folder_parent_permissions.delay(
-                            parent_folder_obj,
-                            permission_move_folder)
+                        new_path_parent_folder = f"{folder.id}/"
+
+                    FolderPermission.objects.filter(
+                        path__startswith=old_path).update(path=folder.path)
+
                     folder.save()
-                    update_child_folder_paths.delay(folder, old_path)
+                    if folder.type == Folder.FOLDER:
+                        Folder.objects.filter(
+                            path__startswith=old_path_parent_folder).update(
+                            path=Replace(F('path'),
+                                         Value(old_path_parent_folder),
+                                         Value(new_path_parent_folder)))
+
+            docs = Document.objects.filter(id__in=folder_document_ids_reindex)
+            index.update_index_bulk_documents(docs, 1000)
+
+
+
 
             return Response(status=status.HTTP_204_NO_CONTENT)
         # elif operation == "update" and object_type == "archive_fonts":
@@ -3835,7 +3839,7 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        FolderOwnedOrAccessibleFilter,
     )
     filterset_class = FolderFilterSet
     ordering_fields = (
@@ -3997,49 +4001,42 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
                 )
 
     def create(self, request, *args, **kwargs):
-        # try:
         serializer = FolderSerializer(data=request.data)
-        parent_folder = None
-        if serializer.is_valid(raise_exception=True):
-            parent_folder = serializer.validated_data.get("parent_folder", None)
+        serializer.is_valid(raise_exception=True)
+        parent_folder = serializer.validated_data.get("parent_folder", None)
 
-        parent_folder = Folder.objects.filter(
-            id=parent_folder.id if parent_folder else 0,
+        parent_folder_obj = Folder.objects.filter(
+            id=parent_folder.id if parent_folder else 0
         ).first()
 
-        if parent_folder == None:
-            folder = serializer.save(owner=request.user)
-            folder.path = f'{folder.id}/'
-            folder.save()
-        elif parent_folder:
-            user_can_change = check_user_can_change_folder(request.user, parent_folder)
-            if not user_can_change:
-                return Response(
-                    data={
-                        "detail": _(
-                            "You do not have permission to perform this action."),
-                    },
-                    status=status.HTTP_403_FORBIDDEN,
-                )
-            owner = serializer.validated_data.get("owner")
-            merge = serializer.validated_data.get("merge", True)
-            folder = serializer.save(parent_folder=parent_folder, owner=owner)
-            folder.path = f"{parent_folder.path}{folder.id}/"
-            folder.save()
-            permission_parent_folder = get_permissions(obj=parent_folder)
-            if permission_parent_folder:
-                user_ids = User.objects.filter(
-                    pk=parent_folder.owner.id).values_list(
-                    "id", flat=True)
-
-                permission_parent_folder['change']['users'] = \
-                    permission_parent_folder['change']['users'].union(user_ids)
-                set_permissions(permissions=permission_parent_folder,
-                                object=folder)
-        else:
+        if parent_folder_obj is None and parent_folder is not None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if parent_folder_obj:
+            if not has_perms_owner_aware_for_folder(request.user,
+                                                    'change_folder',
+                                                    parent_folder_obj):
+                return Response(
+                    data={"detail": _(
+                        "You do not have permission to perform this action.")},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+            owner = serializer.validated_data.get("owner", request.user)
+            folder = serializer.save(parent_folder=parent_folder_obj,
+                                     owner=owner)
+        else:
+            folder = serializer.save(owner=request.user)
+
+        return Response(FolderSerializer(folder).data,
+                        status=status.HTTP_201_CREATED)
+
+    def check_object_permissions(self, request, obj):
+        if not has_perms_owner_aware_for_folder(request.user, 'change_folder',
+                                                obj):
+            self.permission_denied(
+                request,
+                message=None,
+                code=None)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
@@ -4070,34 +4067,25 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
 
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
+
         if serializer.validated_data["name"] != instance.name:
             serializer.validated_data["name"] = get_unique_name(Folder,
                                                                 serializer.validated_data[
                                                                     "name"],
                                                                 int(
                                                                     request.data[
-                                                                        "parent_folder"]))
+                                                                        "parent_folder"]) if
+                                                                request.data[
+                                                                    "parent_folder"] else None)
         serializer.validated_data["updated"] = timezone.now()
 
         old_parent_folder = instance.parent_folder
+        old_path = instance.path
 
         self.perform_update(serializer)
         self.update_document_name(instance, serializer)
-        # update permission document
-        # update permission folder child
-        permissions = serializer.validated_data.get("set_permissions")
-        permissions_copy = permissions.copy()
-        update_view_folder_parent_permissions.delay(instance, permissions_copy)
-        owner = serializer.validated_data.get("owner")
-        merge = serializer.validated_data.get("merge", True)
 
-        owner_exist = "owner" in serializer.validated_data
-        set_permissions_exist = "set_permissions" in serializer.validated_data
-        update_child_folder_permisisons.delay(folder=instance,
-                                              permissions=permissions,
-                                              owner=owner, merge=merge,
-                                              owner_exist=owner_exist,
-                                              set_permissions_exist=set_permissions_exist)
+
         if old_parent_folder != instance.parent_folder:
             if instance.parent_folder:
                 instance.path = f"{instance.parent_folder.path}/{instance.id}"
@@ -4106,16 +4094,20 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
                 instance.path = f"{instance.id}"
             instance.save()
 
-            update_child_folder_paths.delay(folder=instance)
-        # update permission parent folder
-        permission_parent_folder = get_permissions(
-            obj=instance.parent_folder) if instance.parent_folder else None
-        if permission_parent_folder:
-            user_ids = User.objects.filter(pk=instance.parent_folder.owner.id).values_list("id", flat=True)
-            permission_parent_folder['change']['users'] = permission_parent_folder['change']['users'].union(user_ids)
-            permission_parent_folder['view']['users'] = []
-            set_permissions(permissions=permission_parent_folder, object=instance)
-
+            update_child_folder_paths.delay(folder=instance, old_path=old_path)
+        else:
+            folder_ids = Folder.objects.filter(path__startswith=instance.path,
+                                               type=Folder.FILE).values_list(
+                'id', flat=True)
+            documents = Document.objects.filter(folder_id__in=folder_ids)
+            reindex_document_list(documents, 100)
+        if instance.type == Folder.FILE:
+            doc = Document.objects.filter(folder_id=instance.id).first()
+            if doc is not None:
+                doc.owner = instance.owner
+                doc.save()
+                from documents import index
+                index.add_or_update_document(doc)
         return Response(serializer.data)
 
     def update_document_name(self, instance, serializer):
@@ -4166,7 +4158,7 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
                 instance.path = f"{instance.id}"
             instance.save()
 
-            self.update_child_folder_paths(instance)
+            # self.update_child_folder_paths(instance)
 
         return Response(serializer.data)
 
@@ -4176,14 +4168,12 @@ class FolderViewSet(PassUserMixin, RetrieveModelMixin,
         documents = Document.objects.filter(folder__in=folders).defer('content')
         logger.info(f"Deleting {documents} documents in folder {instance.id}")
         documents.delete()
+        document_ids = []
 
-        documents_deleted = Document.deleted_objects.filter(
-            folder__in=folders).defer(
-            'content')
+        for d in documents:
+            document_ids.append(str(d.id))
 
-        for doc in documents_deleted:
-            # index.delete_document_index(doc=doc)
-            index.delete_document_with_index(doc_id=doc.id)
+        DocumentDocument.search().filter("terms", _id=document_ids)
         folders.delete()
         # NOTE: update document count for parent folder
         # update_document_count_folder_path(folder.path)

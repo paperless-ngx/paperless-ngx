@@ -8,7 +8,8 @@ from guardian.shortcuts import get_users_with_perms
 
 from edoc.settings import ELASTIC_SEARCH_DOCUMENT_INDEX
 from .models import Document as DocumentModel, Note, CustomFieldInstance
-from .permissions import get_groups_with_only_permission
+from .permissions import get_groups_with_only_permission, \
+    get_permission_folder_for_index
 
 logger = logging.getLogger("edoc.document_elasticsearch")
 @registry.register_document
@@ -158,6 +159,12 @@ class DocumentDocument(Document):
         )
 
     @staticmethod
+    def get_permission_folder(instance):
+        permission = get_permission_folder_for_index(instance)
+        return permission
+
+
+    @staticmethod
     def get_permissions(instance):
         """Kết hợp kết quả hai truy vấn vào một dictionary."""
         return {
@@ -203,9 +210,8 @@ class DocumentDocument(Document):
         tags_ids = [t.id for t in doc.tags.all()]
         notes = list(Note.objects.filter(document=doc).values_list('note', flat=True))
         custom_fields = ",".join([str(c) for c in CustomFieldInstance.objects.filter(document=doc)],)
-        permissions = cls().get_permissions(doc)
+        permissions = cls().get_permission_folder(doc.folder)
         viewer_ids = [u for u in permissions['view']['users']]
-
         # document_data['id'] = doc.id or None
         document_data['title'] = doc.title or ''
         document_data['content'] = doc.content or ''
@@ -343,7 +349,8 @@ class DocumentDocument(Document):
 
             # Suggest content (bigram and trigram logic)
 
-            permissions = DocumentDocument.get_permissions(instance)
+            permissions = DocumentDocument.get_permission_folder(
+                instance.folder)
             viewer_ids = [u for u in permissions['view']['users']]
             document_data["view_users"] = permissions['view']['users'] or [-1]
             document_data["view_groups"] = permissions['view']['groups'] or [

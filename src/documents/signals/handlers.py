@@ -42,7 +42,7 @@ from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware, \
-    update_view_folder_parent_permissions
+    update_view_folder_parent_permissions, set_permissions_for_object_folder
 from documents.permissions import set_permissions_for_object
 from edoc.settings import EDOC_PEEL_FIELD
 
@@ -822,25 +822,16 @@ def run_workflow(
                                 or [],
                             },
                         }
-                        set_permissions_for_object(
-                            permissions=permissions,
-                            object=document,
-                            merge=True,
-                        )
-                        add_or_update_document(document)
-                        set_permissions_for_object(
-                            permissions=permissions,
-                            object=document.folder,
-                            merge=True,
-                        )
-                        update_view_folder_parent_permissions.delay(
-                            document.folder,
-                            permissions)
                         # set_permissions_for_object(
                         #     permissions=permissions,
-                        #     object=document.dossier,
+                        #     object=document,
                         #     merge=True,
                         # )
+                        set_permissions_for_object_folder(
+                            perm=permissions,
+                            obj=document.folder
+                        )
+                        add_or_update_document(document)
 
                     if action.assign_custom_fields is not None:
                         for field in action.assign_custom_fields.all():
@@ -914,17 +905,13 @@ def run_workflow(
                                 "groups": [],
                             },
                         }
-                        set_permissions_for_object(
-                            permissions=permissions,
-                            object=document,
-                            merge=False,
+
+                        set_permissions_for_object_folder(
+                            perm=permissions,
+                            obj=document.folder,
+
                         )
                         add_or_update_document(document)
-                        set_permissions_for_object(
-                            permissions=permissions,
-                            object=document.folder,
-                            merge=True,
-                        )
                         # set_permissions_for_object(
                         #     permissions=permissions,
                         #     object=document.dossier,
