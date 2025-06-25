@@ -14,6 +14,7 @@ from django.views.generic import RedirectView
 from django.views.static import serve
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
+from documents.views import BoxOpeningReportViewSet
 from documents.views import WarehouseMoveRequestViewSet
 from documents.views import CreatedDepartmentViewSet
 from documents.views import ManageDepartmentViewSet
@@ -114,6 +115,7 @@ api_router.register(r"container_move_history",ContainerMoveHistoryViewSet)
 api_router.register(r"created_department", CreatedDepartmentViewSet)
 api_router.register(r"manage_department", ManageDepartmentViewSet)
 api_router.register(r"move_request", WarehouseMoveRequestViewSet, basename="moverequest")
+api_router.register(r"box_opening_report", BoxOpeningReportViewSet, basename="boxopeningreport")
 
 urlpatterns = [
     re_path(

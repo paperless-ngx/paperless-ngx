@@ -135,7 +135,8 @@ from documents.matching import match_storage_paths
 from documents.matching import match_tags
 from documents.matching import match_warehouses
 from documents.models import Approval, MovedHistory, ContainerMoveHistory, \
-    ManageDepartment, CreatedDepartment, WarehouseMoveRequest
+    ManageDepartment, CreatedDepartment, WarehouseMoveRequest, \
+    BoxOpeningReport, DocumentVerification
 from documents.models import Approval, FolderPermission
 from documents.models import ArchiveFont
 from documents.models import BackupRecord
@@ -173,7 +174,8 @@ from documents.serialisers import AcknowledgeTasksViewSerializer, \
     DocumentDocumentSerializer, DocumentDetailSerializer, PostFolderSerializer, \
     MovedHistorySerializer, ContainerMoveHistorySerializer, \
     ManageDepartmentSerializer, CreatedDepartmentSerializer, \
-    WarehouseMoveRequestSerializer
+    WarehouseMoveRequestSerializer, BoxOpeningReportSerializer, \
+    DocumentVerificationSerializer
 from documents.serialisers import ApprovalSerializer
 from documents.serialisers import ApprovalViewSerializer
 from documents.serialisers import ArchiveFontSerializer
@@ -3649,7 +3651,7 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             for child in children:
                 self._update_paths_after_move(child)
     def _try_to_complete_move_request(self, instance, new_status, user):
-        if new_status == Warehouse.STORED and instance.boxcase_status != new_status:
+        if new_status == Warehouse.DELIVERED and instance.boxcase_status != new_status:
             move_request = WarehouseMoveRequest.objects.filter(
                 container_to_move=instance,
                 status=WarehouseMoveRequest.Status.IN_TRANSIT
@@ -3813,6 +3815,35 @@ class WarehouseViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                         "error": "Error retrieving warehouses, check logs for more detail.",
                     },
                 )
+
+    @action(detail=True, methods=["post"], url_path='open-for-verification')
+    def open_for_verification(self, request, pk=None):
+        instance = self.get_object()
+        if instance.type != 'Boxcase':
+            return Response(
+                {"error": "Chỉ có thể mở các đối tượng là Thùng hàng (Boxcase)."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if hasattr(instance, 'opening_report'):
+            return Response(
+                {"error": "Thùng hàng này đã có báo cáo kiểm kê được tạo trước đó."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        with transaction.atomic():
+            instance.status = 'opened'
+            instance.save(update_fields=['boxcase_status'])
+
+            report = BoxOpeningReport.objects.create(boxcase=instance, verifier=request.user)
+
+            docs_in_box = instance.documents.all()
+            verifications_to_create = [
+                DocumentVerification(report=report, document=doc) for doc in docs_in_box
+            ]
+            DocumentVerification.objects.bulk_create(verifications_to_create)
+            logger.info(f"Đã tạo Báo cáo Kiểm kê #{report.id} cho Thùng #{instance.id}")
+        return Response(
+            BoxOpeningReportSerializer(report).data,
+            status=status.HTTP_201_CREATED)
 
 
 class FolderViewSet(PassUserMixin, RetrieveModelMixin,
@@ -4839,3 +4870,26 @@ class WarehouseMoveRequestViewSet(ModelViewSet):
     #     self._create_final_move_history(move_request)
     #     return Response(self.get_serializer(move_request).data)
     #----------------------------------------------------------------#
+class BoxOpeningReportViewSet(ModelViewSet):
+    queryset = BoxOpeningReport.objects.prefetch_related("verifications__document", "move_request_box__boxcase_object").all()
+    serializer_class = BoxOpeningReportSerializer
+    permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'patch', 'post', 'head', 'options']
+
+    @action(detail=True, methods=["patch"], url_path="verify_document")
+    def verify_document(self, request, pk=None):
+        report =self.get_object()
+        verification_id = request.data.get("verification_id")
+        verification = get_object_or_404(report.verifications, id=verification_id)
+        serializer = DocumentVerificationSerializer(verification, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    @action(detail=True, methods=["post"], url_path="complete")
+    def complete_report(self, request, pk=None):
+        report = self.get_object()
+        report.status = BoxOpeningReport.Status.COMPLETED
+        report.notes = request.data.get("notes", report.notes)
+        report.save()
+
+        return Response(self.get_serializer(report).data)

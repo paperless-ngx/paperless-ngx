@@ -303,7 +303,7 @@ class Warehouse(MatchingModel):
     TYPE_DELIVERY = (
         (WAIT_FOR_DELIVERY, _("Wait for Delivery")),
         (DELIVERING, _("Delivering")),
-        (DESTROYED, _("Delivered")),
+        (DELIVERED, _("Delivered")),
         (STORED, _("Stored")),
         (OPENED, _("Opened")),
         (DESTROYED, _("Destroyed"))
@@ -2271,5 +2271,84 @@ class WarehouseMoveRequesDetail(models.Model):
     )
     class Meta:
         unique_together = ("request", "boxcase")
+class BoxOpeningReport(models.Model):
+    class Status(models.TextChoices):
+        DRAFT = 'draft', _('Draft')
+        COMPLETED = 'completed', _('Completed')
 
+    boxcase = models.OneToOneField(
+        Warehouse,
+        on_delete=models.PROTECT,
+        related_name='opening_report',
+        limit_choices_to={"type": "Boxcase"},
+    )
+    report_code = models.CharField(
+        _("Mã báo cáo"),
+        max_length=20,
+        unique=True,
+        blank=True
+    )
+    status = models.CharField(
+        _("Trạng thái báo cáo"),
+        max_length=20,
+        choices=Status.choices,
+        default=Status.DRAFT
+    )
+    verifier = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name=_("Người kiểm kê")
+    )
+    notes = models.TextField(
+        _("Ghi chú kiểm kê"),
+        blank=True
+    )
+    opened_at = models.DateTimeField(
+        _("Ngày mở thùng"),
+        default=timezone.now
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.report_code:
+            self.report_code = f"BCMT-{int(timezone.now().timestamp())}"  # Báo cáo mở thùng
+        super().save(*args, **kwargs)
+
+class DocumentVerification(models.Model):
+    """Model chi tiết: Kết quả kiểm kê cho một tài liệu cụ thể."""
+    class Status(models.TextChoices):
+        NOT_CHECKED = 'not_checked', _('Chưa kiểm tra')
+        PRESENT = 'present', _('Có mặt, tình trạng tốt')
+        MISSING = 'missing', _('Thất lạc')
+        DAMAGED = 'damaged', _('Hư hỏng')
+
+    report = models.ForeignKey(
+        BoxOpeningReport,
+        on_delete=models.CASCADE,
+        related_name='verifications'
+    )
+    document = models.ForeignKey(
+        'Document',
+        on_delete=models.PROTECT
+    )
+    status = models.CharField(
+        _("Trạng thái kiểm kê"),
+        max_length=20,
+        choices=Status.choices,
+        default=Status.NOT_CHECKED
+    )
+    is_quantity_confirmed = models.BooleanField(
+        _("Xác nhận đủ số lượng"),
+        default=False
+    )
+    condition_notes = models.TextField(
+        _("Mô tả tình trạng"),
+        blank=True
+    )
+    condition_photo = models.ImageField(
+        _("Ảnh tình trạng"),
+        # upload_to='verifications/damaged/',
+        null=True,
+        blank=True
+    )
 

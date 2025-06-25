@@ -35,7 +35,8 @@ from rest_framework.fields import SerializerMethodField
 from documents import bulk_edit
 from documents.data_models import DocumentSource
 from documents.models import ArchiveFont, MovedHistory, ManageDepartment, \
-    CreatedDepartment, ContainerMoveHistory, WarehouseMoveRequest
+    CreatedDepartment, ContainerMoveHistory, WarehouseMoveRequest, \
+    DocumentVerification, BoxOpeningReport
 from documents.models import ArchiveFont, FolderPermission
 from documents.models import BackupRecord
 from documents.models import Correspondent
@@ -3374,3 +3375,25 @@ class WarehouseMoveRequestSerializer(serializers.ModelSerializer):
             'actual_receive_date',
             'confirmed_by_receiver'
         )
+
+
+class DocumentVerificationSerializer(serializers.ModelSerializer):
+    """Serializer cho một dòng kiểm kê tài liệu."""
+    document_name = serializers.CharField(source='document.title',
+                                          read_only=True)
+
+    class Meta:
+        model = DocumentVerification
+        fields = '__all__'
+
+
+class BoxOpeningReportSerializer(serializers.ModelSerializer):
+    """Serializer cho Báo cáo Mở thùng."""
+    verifications = DocumentVerificationSerializer(many=True, read_only=True)
+    boxcase_name = serializers.CharField(source='boxcase.name', read_only=True)
+    verifier_name = serializers.CharField(source='verifier.username',
+                                          read_only=True)
+
+    class Meta:
+        model = BoxOpeningReport
+        fields = '__all__'
