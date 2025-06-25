@@ -1,6 +1,8 @@
 from functools import reduce
 from operator import or_
 
+import django_filters
+from celery.app.defaults import find_deprecated_settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import CharField
 from django.db.models import Count
@@ -17,7 +19,8 @@ from rest_framework.filters import BaseFilterBackend
 from rest_framework_guardian.filters import ObjectPermissionsFilter
 
 from documents.models import Approval, Correspondent, Dossier, DossierForm, \
-    ArchiveFont, FontLanguage, BackupRecord, EdocTask
+    ArchiveFont, FontLanguage, BackupRecord, EdocTask, WarehouseMoveRequest, \
+    ContainerMoveHistory
 from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
@@ -592,4 +595,39 @@ class ApprovalFilterSet(FilterSet):
         fields = {
             "id": ID_KWARGS,
             "status": CHAR_KWARGS,
+        }
+class WarehouseMoveRequestFilterSet(FilterSet):
+    class Meta:
+        model = WarehouseMoveRequest
+        fields = {
+            'status': ['exact', 'in'],          # Lọc theo trạng thái, ví dụ: ?status=pending hoặc ?status__in=pending,approved
+            'requester': ['exact'],             # Lọc theo ID người yêu cầu
+            'approver': ['exact'],              # Lọc theo ID người duyệt
+            'container_to_move': ['exact'],     # Lọc theo ID của thùng hàng/kệ được di chuyển
+            'source_location': ['exact'],       # Lọc theo ID vị trí nguồn
+            'destination_location': ['exact'],  # Lọc theo ID vị trí đích
+            'request_code': ['icontains'],      # Tìm kiếm theo mã yêu cầu
+        }
+class ContainerMoveHistoryFilterSet(FilterSet):
+    """
+    Bộ lọc cho model Lịch sử Di chuyển Container.
+    """
+    # Cho phép lọc theo khoảng thời gian di chuyển
+    # Ví dụ: ?moved_after=2025-06-25T00:00:00Z
+    moved_after = django_filters.DateTimeFilter(field_name="move_timestamp",
+                                                lookup_expr='gte')
+
+    # Ví dụ: ?moved_before=2025-06-26T00:00:00Z
+    moved_before = django_filters.DateTimeFilter(field_name="move_timestamp",
+                                                 lookup_expr='lte')
+
+    class Meta:
+        model = ContainerMoveHistory
+        fields = {
+            'container': ['exact'],  # Lọc theo ID của container được di chuyển
+            'old_parent': ['exact'],  # Lọc theo ID của vị trí nguồn cũ
+            'new_parent': ['exact'],  # Lọc theo ID của vị trí đích mới
+            'moved_by': ['exact'],  # Lọc theo ID của người thực hiện
+            'move_reason': ['icontains'],
+            # Tìm kiếm (không phân biệt hoa thường) trong lý do di chuyển
         }

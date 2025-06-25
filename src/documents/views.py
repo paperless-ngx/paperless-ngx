@@ -110,7 +110,8 @@ from documents.data_models import DocumentSource
 from documents.documents import DocumentDocument
 from documents.filters import ArchiveFontFilterSet, EdocTaskFilterSet, \
     ApprovalFilterSet, FolderOwnedOrAccessibleFilter, \
-    DocumentOwnedOrAccessibleFilter
+    DocumentOwnedOrAccessibleFilter, WarehouseMoveRequestFilterSet, \
+    ContainerMoveHistoryFilterSet
 from documents.filters import BackupRecordFilterSet
 from documents.filters import CorrespondentFilterSet
 from documents.filters import CustomFieldFilterSet
@@ -4688,13 +4689,9 @@ class ContainerMoveHistoryViewSet(ReadOnlyModelViewSet):
     serializer_class = ContainerMoveHistorySerializer
     permission_classes = [IsAuthenticated]
     pagination_class = StandardPagination
-    filterset_fields = [
-        'container',
-        'old_parent',
-        'new_parent',
-        'moved_by'
-    ]
-    ordering_fields = ['move_timestamp']
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ContainerMoveHistoryFilterSet
 
 class ManageDepartmentViewSet(ModelViewSet):
     queryset = ManageDepartment.objects.all()
@@ -4728,6 +4725,9 @@ class WarehouseMoveRequestViewSet(ModelViewSet):
     serializer_class = WarehouseMoveRequestSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = StandardPagination
+    filterset_class = WarehouseMoveRequestFilterSet
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    ordering_fields = ('created_at', 'status')
 
     def _execute_database_move(self, move_request: WarehouseMoveRequest):
         instance_to_move = move_request.container_to_move
@@ -4746,6 +4746,7 @@ class WarehouseMoveRequestViewSet(ModelViewSet):
         user_who_approved = move_request.approver
         warehouse_view = WarehouseViewSet()
         warehouse_view._created_move_history(instance_to_log, old_parent, new_parent, reason_from_request, user_who_approved)
+
     def perform_create(self, serializer):
         container = serializer.validated_data.get("container_to_move")
         serializer.save(requester=self.request.user, source_location=container.parent_warehouse)
@@ -4769,6 +4770,7 @@ class WarehouseMoveRequestViewSet(ModelViewSet):
 
         self._execute_database_move(move_request)
         return Response(self.get_serializer(move_request).data)
+
     @action(detail=True, methods=["post"], url_path="reject")
     def reject(self, request, pk=None):
         move_request = self.get_object()
@@ -4786,6 +4788,7 @@ class WarehouseMoveRequestViewSet(ModelViewSet):
         )
         move_request.save()
         return Response(self.get_serializer(move_request).data)
+
     @action(detail=True, methods=["post"], url_path="cancel")
     def cancel(self, request, pk=None):
         move_request = self.get_object()
@@ -4804,6 +4807,7 @@ class WarehouseMoveRequestViewSet(ModelViewSet):
         move_request.approved_at = timezone.now()
         move_request.notes = f"Request cancelled by requester ({request.user.username})."
         return Response(self.get_serializer(move_request).data)
+
     @action(detail=True, methods=["post"], url_path="ship")
     def ship(self, request, pk=None):
         move_request = self.get_object()
