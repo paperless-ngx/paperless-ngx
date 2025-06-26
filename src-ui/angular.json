@@ -54,11 +54,13 @@
       },
       "architect": {
         "build": {
-          "builder": "@angular/build:application",
+          "builder": "@angular-builders/custom-webpack:browser",
           "options": {
-            "outputPath": {
-              "base": "dist/paperless-ui"
+            "customWebpackConfig": {
+                "path": "./extra-webpack.config.ts"
             },
+            "outputPath": "dist/paperless-ui",
+            "main": "src/main.ts",
             "outputHashing": "none",
             "index": "src/index.html",
             "polyfills": [
@@ -90,7 +92,6 @@
             "sourceMap": true,
             "optimization": false,
             "namedChunks": true,
-            "browser": "src/main.ts",
             "stylePreprocessorOptions": {
               "includePaths": [
                 "."
@@ -105,9 +106,7 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ],
-              "outputPath": {
-                "base": "../src/documents/static/frontend/"
-              },
+              "outputPath": "../src/documents/static/frontend/",
               "optimization": true,
               "outputHashing": "none",
               "sourceMap": false,
@@ -135,7 +134,7 @@
           "defaultConfiguration": ""
         },
         "serve": {
-          "builder": "@angular/build:dev-server",
+          "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
             "buildTarget": "paperless-ui:build:en-US"
           },
@@ -146,7 +145,7 @@
           }
         },
         "extract-i18n": {
-          "builder": "@angular/build:extract-i18n",
+          "builder": "@angular-builders/custom-webpack:extract-i18n",
           "options": {
             "buildTarget": "paperless-ui:build"
           }

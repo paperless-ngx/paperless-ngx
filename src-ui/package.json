@@ -40,7 +40,7 @@
     "zone.js": "^0.15.1"
   },
   "devDependencies": {
-    "@angular-builders/custom-webpack": "^19.0.1",
+    "@angular-builders/custom-webpack": "^20.0.0",
     "@angular-builders/jest": "^20.0.0",
     "@angular-devkit/core": "^20.0.4",
     "@angular-devkit/schematics": "^20.0.4",
