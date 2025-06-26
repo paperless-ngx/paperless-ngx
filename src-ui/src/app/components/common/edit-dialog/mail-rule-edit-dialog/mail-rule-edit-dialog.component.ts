@@ -5,7 +5,6 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { first } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Correspondent } from 'src/app/data/correspondent'
@@ -166,7 +165,6 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
   constructor() {
     super()
     this.service = inject(MailRuleService)
-    this.activeModal = inject(NgbActiveModal)
     this.accountService = inject(MailAccountService)
     this.correspondentService = inject(CorrespondentService)
     this.documentTypeService = inject(DocumentTypeService)

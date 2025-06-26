@@ -5,7 +5,6 @@ import {
 } from '@angular/cdk/drag-drop'
 import { Component, OnInit, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { takeUntil } from 'rxjs'
 import { Document } from 'src/app/data/document'
@@ -43,7 +42,6 @@ export class MergeConfirmDialogComponent
 
   constructor() {
     super()
-    this.activeModal = inject(NgbActiveModal)
   }
 
   ngOnInit() {

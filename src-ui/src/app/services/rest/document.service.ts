@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
@@ -60,9 +59,8 @@ export class DocumentService extends AbstractPaperlessService<Document> {
   private customFields: CustomField[] = []
 
   constructor() {
-    const http = inject(HttpClient)
-
-    super(http, 'documents')
+    super()
+    this.resourceName = 'documents'
     this.reload()
   }
 

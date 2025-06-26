@@ -1,17 +1,21 @@
 import { HttpClient, HttpParams } from '@angular/common/http'
+import { inject, Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
 import { map, publishReplay, refCount } from 'rxjs/operators'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { Results } from 'src/app/data/results'
 import { environment } from 'src/environments/environment'
-
+@Injectable({
+  providedIn: 'root',
+})
 export abstract class AbstractPaperlessService<T extends ObjectWithId> {
   protected baseUrl: string = environment.apiBaseUrl
+  protected http: HttpClient
+  protected resourceName: string
 
-  constructor(
-    protected http: HttpClient,
-    protected resourceName: string
-  ) {}
+  constructor() {
+    this.http = inject(HttpClient)
+  }
 
   protected getResourceUrl(id: number = null, action: string = null): string {
     let url = `${this.baseUrl}${this.resourceName}/`

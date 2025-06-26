@@ -5,7 +5,6 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Correspondent } from 'src/app/data/correspondent'
 import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
@@ -34,7 +33,6 @@ export class CorrespondentEditDialogComponent extends EditDialogComponent<Corres
   constructor() {
     super()
     this.service = inject(CorrespondentService)
-    this.activeModal = inject(NgbActiveModal)
     this.userService = inject(UserService)
     this.settingsService = inject(SettingsService)
   }

@@ -5,11 +5,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import {
-  NgbActiveModal,
-  NgbAlert,
-  NgbAlertModule,
-} from '@ng-bootstrap/ng-bootstrap'
+import { NgbAlert, NgbAlertModule } from '@ng-bootstrap/ng-bootstrap'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { IMAPSecurity, MailAccount } from 'src/app/data/mail-account'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
@@ -50,7 +46,6 @@ export class MailAccountEditDialogComponent extends EditDialogComponent<MailAcco
   constructor() {
     super()
     this.service = inject(MailAccountService)
-    this.activeModal = inject(NgbActiveModal)
     this.userService = inject(UserService)
     this.settingsService = inject(SettingsService)
   }

@@ -5,7 +5,6 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { first } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Group } from 'src/app/data/group'
@@ -48,7 +47,6 @@ export class UserEditDialogComponent
   constructor() {
     super()
     this.service = inject(UserService)
-    this.activeModal = inject(NgbActiveModal)
     this.groupsService = inject(GroupService)
     this.settingsService = inject(SettingsService)
 

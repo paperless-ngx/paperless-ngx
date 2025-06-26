@@ -1,6 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { PDFDocumentProxy, PdfViewerModule } from 'ng2-pdf-viewer'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Document } from 'src/app/data/document'
@@ -67,7 +66,6 @@ export class SplitConfirmDialogComponent
 
   constructor() {
     super()
-    this.activeModal = inject(NgbActiveModal)
     this.confirmButtonEnabled = this.pages.size > 0
   }
 

@@ -19,11 +19,8 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
   private savedViews: SavedView[] = []
 
   constructor() {
-    const http = inject(HttpClient)
-
-    super(http, 'saved_views')
-
-    this.http = http
+    super()
+    this.resourceName = 'saved_views'
   }
 
   public list(

@@ -14,7 +14,6 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { takeUntil } from 'rxjs'
 import {
@@ -58,7 +57,6 @@ export class CustomFieldEditDialogComponent
   constructor() {
     super()
     this.service = inject(CustomFieldsService)
-    this.activeModal = inject(NgbActiveModal)
     this.userService = inject(UserService)
     this.settingsService = inject(SettingsService)
   }

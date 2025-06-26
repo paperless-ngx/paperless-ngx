@@ -1,6 +1,5 @@
 import { NgStyle } from '@angular/common'
 import { Component, inject } from '@angular/core'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -29,7 +28,6 @@ export class RotateConfirmDialogComponent extends ConfirmDialogComponent {
 
   constructor() {
     super()
-    this.activeModal = inject(NgbActiveModal)
   }
 
   rotate(clockwise: boolean = true) {

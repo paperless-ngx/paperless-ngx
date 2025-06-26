@@ -12,7 +12,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { NgbAccordionModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
@@ -192,7 +192,6 @@ export class WorkflowEditDialogComponent
   constructor() {
     super()
     this.service = inject(WorkflowService)
-    this.activeModal = inject(NgbActiveModal)
     this.correspondentService = inject(CorrespondentService)
     this.documentTypeService = inject(DocumentTypeService)
     this.storagePathService = inject(StoragePathService)

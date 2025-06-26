@@ -6,7 +6,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { NgbAccordionModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectComponent } from '@ng-select/ng-select'
 import {
   Observable,
@@ -73,7 +73,6 @@ export class StoragePathEditDialogComponent
   constructor() {
     super()
     this.service = inject(StoragePathService)
-    this.activeModal = inject(NgbActiveModal)
     this.userService = inject(UserService)
     this.settingsService = inject(SettingsService)
     this.initPathObservables()

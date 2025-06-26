@@ -1,5 +1,4 @@
-import { HttpClient } from '@angular/common/http'
-import { Injectable, inject } from '@angular/core'
+import { Injectable } from '@angular/core'
 import { Correspondent } from 'src/app/data/correspondent'
 import { AbstractNameFilterService } from './abstract-name-filter-service'
 
@@ -8,8 +7,7 @@ import { AbstractNameFilterService } from './abstract-name-filter-service'
 })
 export class CorrespondentService extends AbstractNameFilterService<Correspondent> {
   constructor() {
-    const http = inject(HttpClient)
-
-    super(http, 'correspondents')
+    super()
+    this.resourceName = 'correspondents'
   }
 }

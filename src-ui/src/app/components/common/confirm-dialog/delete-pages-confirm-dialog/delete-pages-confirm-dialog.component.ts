@@ -1,6 +1,5 @@
 import { Component, TemplateRef, ViewChild, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import {
   PDFDocumentProxy,
   PdfViewerComponent,
@@ -38,7 +37,6 @@ export class DeletePagesConfirmDialogComponent extends ConfirmDialogComponent {
 
   constructor() {
     super()
-    this.activeModal = inject(NgbActiveModal)
   }
 
   public pdfPreviewLoaded(pdf: PDFDocumentProxy) {

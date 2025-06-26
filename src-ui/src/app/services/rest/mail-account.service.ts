@@ -1,5 +1,4 @@
-import { HttpClient } from '@angular/common/http'
-import { Injectable, inject } from '@angular/core'
+import { Injectable } from '@angular/core'
 import { tap } from 'rxjs/operators'
 import { MailAccount } from 'src/app/data/mail-account'
 import { AbstractPaperlessService } from './abstract-paperless-service'
@@ -11,9 +10,8 @@ export class MailAccountService extends AbstractPaperlessService<MailAccount> {
   loading: boolean
 
   constructor() {
-    const http = inject(HttpClient)
-
-    super(http, 'mail_accounts')
+    super()
+    this.resourceName = 'mail_accounts'
   }
 
   private reload() {
