@@ -3,7 +3,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
-import { Component, inject as inject_1 } from '@angular/core'
+import { Component } from '@angular/core'
 import {
   ComponentFixture,
   TestBed,
@@ -42,12 +42,8 @@ import { EditDialogComponent, EditDialogMode } from './edit-dialog.component'
 })
 class TestComponent extends EditDialogComponent<Tag> {
   constructor() {
-    const service = inject_1(TagService)
-    const activeModal = inject_1(NgbActiveModal)
-    const userService = inject_1(UserService)
-    const settingsService = inject_1(SettingsService)
-
-    super(service, activeModal, userService, settingsService)
+    super()
+    this.service = TestBed.inject(TagService)
   }
 
   getForm(): FormGroup<any> {

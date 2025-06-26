@@ -7,7 +7,6 @@ import { PermissionsService } from '../services/permissions.service'
 import { AbstractNameFilterService } from '../services/rest/abstract-name-filter-service'
 import { CorrespondentService } from '../services/rest/correspondent.service'
 import { CorrespondentNamePipe } from './correspondent-name.pipe'
-import { ObjectNamePipe } from './object-name.pipe'
 
 describe('ObjectNamePipe', () => {
   /*
@@ -21,7 +20,9 @@ describe('ObjectNamePipe', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        ObjectNamePipe,
+        CorrespondentNamePipe,
+        { provide: PermissionsService },
+        { provide: CorrespondentService },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
@@ -29,7 +30,7 @@ describe('ObjectNamePipe', () => {
 
     permissionsService = TestBed.inject(PermissionsService)
     objectService = TestBed.inject(CorrespondentService)
-    pipe = new CorrespondentNamePipe(permissionsService, objectService)
+    pipe = TestBed.inject(CorrespondentNamePipe)
   })
 
   it('should return object name if user has permission', (done) => {

@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing'
 import { EventManager } from '@angular/platform-browser'
 
+import { DOCUMENT } from '@angular/core'
 import { NgbModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap'
 import { HotKeyService } from './hot-key.service'
 

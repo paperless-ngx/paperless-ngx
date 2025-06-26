@@ -17,6 +17,10 @@ export class OpenDocumentsService {
   private MAX_OPEN_DOCUMENTS = 5
 
   constructor() {
+    this.load()
+  }
+
+  public load() {
     if (sessionStorage.getItem(OPEN_DOCUMENT_SERVICE.DOCUMENTS)) {
       try {
         this.openDocuments = JSON.parse(
