@@ -56,9 +56,6 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "customWebpackConfig": {
-                "path": "./extra-webpack.config.ts"
-            },
             "outputPath": {
               "base": "dist/paperless-ui"
             },

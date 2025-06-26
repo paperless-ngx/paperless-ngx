@@ -78,6 +78,5 @@
       "lmdb",
       "msgpackr-extract"
     ]
-  },
-  "typings": "./src/typings.d.ts"
+  }
 }
