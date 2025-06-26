@@ -28,9 +28,8 @@ export class RotateConfirmDialogComponent extends ConfirmDialogComponent {
   }
 
   constructor() {
-    const activeModal = inject(NgbActiveModal)
-
-    super(activeModal)
+    super()
+    this.activeModal = inject(NgbActiveModal)
   }
 
   rotate(clockwise: boolean = true) {

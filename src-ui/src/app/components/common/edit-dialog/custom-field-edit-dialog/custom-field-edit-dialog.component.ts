@@ -56,12 +56,11 @@ export class CustomFieldEditDialogComponent
   }
 
   constructor() {
-    const service = inject(CustomFieldsService)
-    const activeModal = inject(NgbActiveModal)
-    const userService = inject(UserService)
-    const settingsService = inject(SettingsService)
-
-    super(service, activeModal, userService, settingsService)
+    super()
+    this.service = inject(CustomFieldsService)
+    this.activeModal = inject(NgbActiveModal)
+    this.userService = inject(UserService)
+    this.settingsService = inject(SettingsService)
   }
 
   ngOnInit(): void {

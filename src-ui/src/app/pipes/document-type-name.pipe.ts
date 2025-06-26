@@ -14,9 +14,9 @@ export class DocumentTypeNamePipe
   implements PipeTransform
 {
   constructor() {
-    const permissionsService = inject(PermissionsService)
-    const objectService = inject(DocumentTypeService)
-
-    super(permissionsService, PermissionType.DocumentType, objectService)
+    super()
+    this.permissionsService = inject(PermissionsService)
+    this.permissionType = PermissionType.DocumentType
+    this.objectService = inject(DocumentTypeService)
   }
 }

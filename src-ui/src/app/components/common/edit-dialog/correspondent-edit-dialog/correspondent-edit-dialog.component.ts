@@ -32,12 +32,11 @@ import { TextComponent } from '../../input/text/text.component'
 })
 export class CorrespondentEditDialogComponent extends EditDialogComponent<Correspondent> {
   constructor() {
-    const service = inject(CorrespondentService)
-    const activeModal = inject(NgbActiveModal)
-    const userService = inject(UserService)
-    const settingsService = inject(SettingsService)
-
-    super(service, activeModal, userService, settingsService)
+    super()
+    this.service = inject(CorrespondentService)
+    this.activeModal = inject(NgbActiveModal)
+    this.userService = inject(UserService)
+    this.settingsService = inject(SettingsService)
   }
 
   getCreateTitle() {

@@ -37,12 +37,11 @@ import { TextComponent } from '../../input/text/text.component'
 })
 export class TagEditDialogComponent extends EditDialogComponent<Tag> {
   constructor() {
-    const service = inject(TagService)
-    const activeModal = inject(NgbActiveModal)
-    const userService = inject(UserService)
-    const settingsService = inject(SettingsService)
-
-    super(service, activeModal, userService, settingsService)
+    super()
+    this.service = inject(TagService)
+    this.activeModal = inject(NgbActiveModal)
+    this.userService = inject(UserService)
+    this.settingsService = inject(SettingsService)
   }
 
   getCreateTitle() {

@@ -155,32 +155,35 @@ const METADATA_CORRESPONDENT_OPTIONS = [
   ],
 })
 export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
+  private accountService: MailAccountService
+  private correspondentService: CorrespondentService
+  private documentTypeService: DocumentTypeService
+
   accounts: MailAccount[]
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
 
   constructor() {
-    const service = inject(MailRuleService)
-    const activeModal = inject(NgbActiveModal)
-    const accountService = inject(MailAccountService)
-    const correspondentService = inject(CorrespondentService)
-    const documentTypeService = inject(DocumentTypeService)
-    const userService = inject(UserService)
-    const settingsService = inject(SettingsService)
+    super()
+    this.service = inject(MailRuleService)
+    this.activeModal = inject(NgbActiveModal)
+    this.accountService = inject(MailAccountService)
+    this.correspondentService = inject(CorrespondentService)
+    this.documentTypeService = inject(DocumentTypeService)
+    this.userService = inject(UserService)
+    this.settingsService = inject(SettingsService)
 
-    super(service, activeModal, userService, settingsService)
-
-    accountService
+    this.accountService
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.accounts = result.results))
 
-    correspondentService
+    this.correspondentService
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.correspondents = result.results))
 
-    documentTypeService
+    this.documentTypeService
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.documentTypes = result.results))

@@ -13,7 +13,7 @@ import { AbstractNameFilterService } from '../services/rest/abstract-name-filter
 })
 export abstract class ObjectNamePipe implements PipeTransform {
   protected permissionsService = inject(PermissionsService)
-  protected permissionType = inject(PermissionType)
+  protected permissionType: PermissionType
   protected objectService = inject<AbstractNameFilterService<MatchingModel>>(
     AbstractNameFilterService
   )

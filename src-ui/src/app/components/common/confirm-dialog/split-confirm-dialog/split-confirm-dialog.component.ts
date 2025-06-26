@@ -66,9 +66,8 @@ export class SplitConfirmDialogComponent
   }
 
   constructor() {
-    const activeModal = inject(NgbActiveModal)
-
-    super(activeModal)
+    super()
+    this.activeModal = inject(NgbActiveModal)
     this.confirmButtonEnabled = this.pages.size > 0
   }
 

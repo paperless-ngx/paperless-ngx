@@ -42,9 +42,8 @@ export class MergeConfirmDialogComponent
   public metadataDocumentID: number = -1
 
   constructor() {
-    const activeModal = inject(NgbActiveModal)
-
-    super(activeModal)
+    super()
+    this.activeModal = inject(NgbActiveModal)
   }
 
   ngOnInit() {

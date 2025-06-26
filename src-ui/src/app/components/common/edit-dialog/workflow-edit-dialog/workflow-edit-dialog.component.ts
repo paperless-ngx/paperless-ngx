@@ -171,6 +171,12 @@ export class WorkflowEditDialogComponent
   public WorkflowTriggerType = WorkflowTriggerType
   public WorkflowActionType = WorkflowActionType
 
+  private correspondentService: CorrespondentService
+  private documentTypeService: DocumentTypeService
+  private storagePathService: StoragePathService
+  private mailRuleService: MailRuleService
+  private customFieldsService: CustomFieldsService
+
   templates: Workflow[]
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
@@ -184,39 +190,38 @@ export class WorkflowEditDialogComponent
   private allowedActionTypes = []
 
   constructor() {
-    const service = inject(WorkflowService)
-    const activeModal = inject(NgbActiveModal)
-    const correspondentService = inject(CorrespondentService)
-    const documentTypeService = inject(DocumentTypeService)
-    const storagePathService = inject(StoragePathService)
-    const mailRuleService = inject(MailRuleService)
-    const userService = inject(UserService)
-    const settingsService = inject(SettingsService)
-    const customFieldsService = inject(CustomFieldsService)
+    super()
+    this.service = inject(WorkflowService)
+    this.activeModal = inject(NgbActiveModal)
+    this.correspondentService = inject(CorrespondentService)
+    this.documentTypeService = inject(DocumentTypeService)
+    this.storagePathService = inject(StoragePathService)
+    this.mailRuleService = inject(MailRuleService)
+    this.userService = inject(UserService)
+    this.settingsService = inject(SettingsService)
+    this.customFieldsService = inject(CustomFieldsService)
 
-    super(service, activeModal, userService, settingsService)
-
-    correspondentService
+    this.correspondentService
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.correspondents = result.results))
 
-    documentTypeService
+    this.documentTypeService
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.documentTypes = result.results))
 
-    storagePathService
+    this.storagePathService
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.storagePaths = result.results))
 
-    mailRuleService
+    this.mailRuleService
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.mailRules = result.results))
 
-    customFieldsService
+    this.customFieldsService
       .listAll()
       .pipe(first())
       .subscribe((result) => {

@@ -37,9 +37,8 @@ export class DeletePagesConfirmDialogComponent extends ConfirmDialogComponent {
   }
 
   constructor() {
-    const activeModal = inject(NgbActiveModal)
-
-    super(activeModal)
+    super()
+    this.activeModal = inject(NgbActiveModal)
   }
 
   public pdfPreviewLoaded(pdf: PDFDocumentProxy) {

@@ -14,9 +14,9 @@ export class CorrespondentNamePipe
   implements PipeTransform
 {
   constructor() {
-    const permissionsService = inject(PermissionsService)
-    const objectService = inject(CorrespondentService)
-
-    super(permissionsService, PermissionType.Correspondent, objectService)
+    super()
+    this.permissionsService = inject(PermissionsService)
+    this.permissionType = PermissionType.Correspondent
+    this.objectService = inject(CorrespondentService)
   }
 }

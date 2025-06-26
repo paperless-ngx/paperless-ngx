@@ -39,8 +39,8 @@ export abstract class EditDialogComponent<
   protected service = inject<AbstractPaperlessService<T>>(
     AbstractPaperlessService
   )
-  private activeModal = inject(NgbActiveModal)
-  private userService = inject(UserService)
+  protected activeModal = inject(NgbActiveModal)
+  protected userService = inject(UserService)
   protected settingsService = inject(SettingsService)
 
   users: User[]

@@ -71,12 +71,11 @@ export class StoragePathEditDialogComponent
   public testLoading = false
 
   constructor() {
-    const service = inject(StoragePathService)
-    const activeModal = inject(NgbActiveModal)
-    const userService = inject(UserService)
-    const settingsService = inject(SettingsService)
-
-    super(service, activeModal, userService, settingsService)
+    super()
+    this.service = inject(StoragePathService)
+    this.activeModal = inject(NgbActiveModal)
+    this.userService = inject(UserService)
+    this.settingsService = inject(SettingsService)
     this.initPathObservables()
   }
 

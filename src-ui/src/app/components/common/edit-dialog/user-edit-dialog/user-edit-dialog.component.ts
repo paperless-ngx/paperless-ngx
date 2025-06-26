@@ -39,20 +39,20 @@ export class UserEditDialogComponent
 {
   private toastService = inject(ToastService)
   private permissionsService = inject(PermissionsService)
+  private groupsService: GroupService
 
   groups: Group[]
   passwordIsSet: boolean = false
   public totpLoading: boolean = false
 
   constructor() {
-    const service = inject(UserService)
-    const activeModal = inject(NgbActiveModal)
-    const groupsService = inject(GroupService)
-    const settingsService = inject(SettingsService)
+    super()
+    this.service = inject(UserService)
+    this.activeModal = inject(NgbActiveModal)
+    this.groupsService = inject(GroupService)
+    this.settingsService = inject(SettingsService)
 
-    super(service, activeModal, service, settingsService)
-
-    groupsService
+    this.groupsService
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.groups = result.results))

@@ -14,9 +14,9 @@ export class StoragePathNamePipe
   implements PipeTransform
 {
   constructor() {
-    const permissionsService = inject(PermissionsService)
-    const objectService = inject(StoragePathService)
-
-    super(permissionsService, PermissionType.StoragePath, objectService)
+    super()
+    this.permissionsService = inject(PermissionsService)
+    this.permissionType = PermissionType.StoragePath
+    this.objectService = inject(StoragePathService)
   }
 }
