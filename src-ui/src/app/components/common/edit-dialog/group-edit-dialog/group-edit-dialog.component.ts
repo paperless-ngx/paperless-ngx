@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -26,12 +26,12 @@ import { PermissionsSelectComponent } from '../../permissions-select/permissions
   ],
 })
 export class GroupEditDialogComponent extends EditDialogComponent<Group> {
-  constructor(
-    service: GroupService,
-    activeModal: NgbActiveModal,
-    userService: UserService,
-    settingsService: SettingsService
-  ) {
+  constructor() {
+    const service = inject(GroupService)
+    const activeModal = inject(NgbActiveModal)
+    const userService = inject(UserService)
+    const settingsService = inject(SettingsService)
+
     super(service, activeModal, userService, settingsService)
   }
 

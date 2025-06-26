@@ -4,7 +4,7 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
 import { NgTemplateOutlet } from '@angular/common'
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, inject } from '@angular/core'
 import {
   FormArray,
   FormControl,
@@ -183,17 +183,17 @@ export class WorkflowEditDialogComponent
 
   private allowedActionTypes = []
 
-  constructor(
-    service: WorkflowService,
-    activeModal: NgbActiveModal,
-    correspondentService: CorrespondentService,
-    documentTypeService: DocumentTypeService,
-    storagePathService: StoragePathService,
-    mailRuleService: MailRuleService,
-    userService: UserService,
-    settingsService: SettingsService,
-    customFieldsService: CustomFieldsService
-  ) {
+  constructor() {
+    const service = inject(WorkflowService)
+    const activeModal = inject(NgbActiveModal)
+    const correspondentService = inject(CorrespondentService)
+    const documentTypeService = inject(DocumentTypeService)
+    const storagePathService = inject(StoragePathService)
+    const mailRuleService = inject(MailRuleService)
+    const userService = inject(UserService)
+    const settingsService = inject(SettingsService)
+    const customFieldsService = inject(CustomFieldsService)
+
     super(service, activeModal, userService, settingsService)
 
     correspondentService

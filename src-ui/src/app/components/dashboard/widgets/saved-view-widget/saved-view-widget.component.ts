@@ -1,6 +1,7 @@
 import { AsyncPipe, NgClass, NgStyle } from '@angular/common'
 import {
   Component,
+  inject,
   Input,
   OnDestroy,
   OnInit,
@@ -84,25 +85,21 @@ export class SavedViewWidgetComponent
   extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy
 {
+  private documentService = inject(DocumentService)
+  private router = inject(Router)
+  private list = inject(DocumentListViewService)
+  private websocketStatusService = inject(WebsocketStatusService)
+  openDocumentsService = inject(OpenDocumentsService)
+  documentListViewService = inject(DocumentListViewService)
+  permissionsService = inject(PermissionsService)
+  private settingsService = inject(SettingsService)
+  private customFieldService = inject(CustomFieldsService)
+
   public DisplayMode = DisplayMode
   public DisplayField = DisplayField
   public CustomFieldDataType = CustomFieldDataType
 
   private customFields: CustomField[] = []
-
-  constructor(
-    private documentService: DocumentService,
-    private router: Router,
-    private list: DocumentListViewService,
-    private websocketStatusService: WebsocketStatusService,
-    public openDocumentsService: OpenDocumentsService,
-    public documentListViewService: DocumentListViewService,
-    public permissionsService: PermissionsService,
-    private settingsService: SettingsService,
-    private customFieldService: CustomFieldsService
-  ) {
-    super()
-  }
 
   @Input()
   savedView: SavedView

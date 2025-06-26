@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { PDFDocumentProxy, PdfViewerModule } from 'ng2-pdf-viewer'
@@ -23,6 +23,9 @@ export class SplitConfirmDialogComponent
   extends ConfirmDialogComponent
   implements OnInit
 {
+  private documentService = inject(DocumentService)
+  private permissionService = inject(PermissionsService)
+
   public get pagesString(): string {
     let pagesStr = ''
 
@@ -62,11 +65,9 @@ export class SplitConfirmDialogComponent
     return this.documentService.getPreviewUrl(this.documentID)
   }
 
-  constructor(
-    activeModal: NgbActiveModal,
-    private documentService: DocumentService,
-    private permissionService: PermissionsService
-  ) {
+  constructor() {
+    const activeModal = inject(NgbActiveModal)
+
     super(activeModal)
     this.confirmButtonEnabled = this.pages.size > 0
   }

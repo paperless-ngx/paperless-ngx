@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -36,12 +36,12 @@ import { TextComponent } from '../../input/text/text.component'
   ],
 })
 export class TagEditDialogComponent extends EditDialogComponent<Tag> {
-  constructor(
-    service: TagService,
-    activeModal: NgbActiveModal,
-    userService: UserService,
-    settingsService: SettingsService
-  ) {
+  constructor() {
+    const service = inject(TagService)
+    const activeModal = inject(NgbActiveModal)
+    const userService = inject(UserService)
+    const settingsService = inject(SettingsService)
+
     super(service, activeModal, userService, settingsService)
   }
 

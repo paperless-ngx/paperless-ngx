@@ -2,6 +2,7 @@ import { NgTemplateOutlet } from '@angular/common'
 import {
   Component,
   EventEmitter,
+  inject,
   Input,
   Output,
   QueryList,
@@ -178,6 +179,8 @@ export class CustomFieldQueriesModel {
   ],
 })
 export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPermissions {
+  protected customFieldsService = inject(CustomFieldsService)
+
   public CustomFieldQueryComponentType = CustomFieldQueryElementType
   public CustomFieldQueryOperator = CustomFieldQueryOperator
   public CustomFieldDataType = CustomFieldDataType
@@ -245,7 +248,7 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
 
   public readonly today: string = new Date().toISOString().split('T')[0]
 
-  constructor(protected customFieldsService: CustomFieldsService) {
+  constructor() {
     super()
     this.selectionModel = new CustomFieldQueriesModel()
     this.getFields()

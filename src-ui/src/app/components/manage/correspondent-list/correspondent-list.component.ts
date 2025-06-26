@@ -1,5 +1,5 @@
 import { NgClass, TitleCasePipe } from '@angular/common'
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
   NgbDropdownModule,
@@ -42,14 +42,15 @@ import { ManagementListComponent } from '../management-list/management-list.comp
   ],
 })
 export class CorrespondentListComponent extends ManagementListComponent<Correspondent> {
-  constructor(
-    correspondentsService: CorrespondentService,
-    modalService: NgbModal,
-    toastService: ToastService,
-    documentListViewService: DocumentListViewService,
-    permissionsService: PermissionsService,
-    private datePipe: CustomDatePipe
-  ) {
+  private datePipe = inject(CustomDatePipe)
+
+  constructor() {
+    const correspondentsService = inject(CorrespondentService)
+    const modalService = inject(NgbModal)
+    const toastService = inject(ToastService)
+    const documentListViewService = inject(DocumentListViewService)
+    const permissionsService = inject(PermissionsService)
+
     super(
       correspondentsService,
       modalService,

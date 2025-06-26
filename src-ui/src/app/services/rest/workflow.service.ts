@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { tap } from 'rxjs'
 import { Workflow } from 'src/app/data/workflow'
 import { AbstractPaperlessService } from './abstract-paperless-service'
@@ -10,7 +10,9 @@ import { AbstractPaperlessService } from './abstract-paperless-service'
 export class WorkflowService extends AbstractPaperlessService<Workflow> {
   loading: boolean
 
-  constructor(http: HttpClient) {
+  constructor() {
+    const http = inject(HttpClient)
+
     super(http, 'workflows')
   }
 

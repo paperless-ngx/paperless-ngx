@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common'
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, OnDestroy, OnInit, inject } from '@angular/core'
 import {
   AbstractControl,
   FormControl,
@@ -57,6 +57,10 @@ export class ConfigComponent
   extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy, DirtyComponent
 {
+  private configService = inject(ConfigService)
+  private toastService = inject(ToastService)
+  private settingsService = inject(SettingsService)
+
   public readonly ConfigOptionType = ConfigOptionType
 
   // generated dynamically
@@ -77,11 +81,7 @@ export class ConfigComponent
   storeSub: Subscription
   isDirty$: Observable<boolean>
 
-  constructor(
-    private configService: ConfigService,
-    private toastService: ToastService,
-    private settingsService: SettingsService
-  ) {
+  constructor() {
     super()
     this.configForm.addControl('id', new FormControl())
     PaperlessConfigOptions.forEach((option) => {

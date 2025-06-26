@@ -7,6 +7,7 @@ import {
   OnInit,
   Output,
   ViewChild,
+  inject,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
@@ -434,6 +435,9 @@ export class FilterableDropdownComponent
   extends LoadingComponentWithPermissions
   implements OnInit
 {
+  private filterPipe = inject(FilterPipe)
+  private hotkeyService = inject(HotKeyService)
+
   @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
   @ViewChild('dropdown') dropdown: NgbDropdown
   @ViewChild('buttonItems') buttonItems: ElementRef
@@ -536,10 +540,7 @@ export class FilterableDropdownComponent
 
   private keyboardIndex: number
 
-  constructor(
-    private filterPipe: FilterPipe,
-    private hotkeyService: HotKeyService
-  ) {
+  constructor() {
     super()
     this.selectionModelChange.subscribe((updatedModel) => {
       this.modelIsDirty = updatedModel.isDirty()

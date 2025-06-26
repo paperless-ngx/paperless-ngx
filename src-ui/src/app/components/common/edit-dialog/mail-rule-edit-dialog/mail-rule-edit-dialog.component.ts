@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -159,15 +159,15 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
 
-  constructor(
-    service: MailRuleService,
-    activeModal: NgbActiveModal,
-    accountService: MailAccountService,
-    correspondentService: CorrespondentService,
-    documentTypeService: DocumentTypeService,
-    userService: UserService,
-    settingsService: SettingsService
-  ) {
+  constructor() {
+    const service = inject(MailRuleService)
+    const activeModal = inject(NgbActiveModal)
+    const accountService = inject(MailAccountService)
+    const correspondentService = inject(CorrespondentService)
+    const documentTypeService = inject(DocumentTypeService)
+    const userService = inject(UserService)
+    const settingsService = inject(SettingsService)
+
     super(service, activeModal, userService, settingsService)
 
     accountService

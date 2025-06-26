@@ -1,5 +1,5 @@
 import { NgClass, TitleCasePipe } from '@angular/common'
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
   NgbDropdownModule,
@@ -40,13 +40,13 @@ import { ManagementListComponent } from '../management-list/management-list.comp
   ],
 })
 export class DocumentTypeListComponent extends ManagementListComponent<DocumentType> {
-  constructor(
-    documentTypeService: DocumentTypeService,
-    modalService: NgbModal,
-    toastService: ToastService,
-    documentListViewService: DocumentListViewService,
-    permissionsService: PermissionsService
-  ) {
+  constructor() {
+    const documentTypeService = inject(DocumentTypeService)
+    const modalService = inject(NgbModal)
+    const toastService = inject(ToastService)
+    const documentListViewService = inject(DocumentListViewService)
+    const permissionsService = inject(PermissionsService)
+
     super(
       documentTypeService,
       modalService,

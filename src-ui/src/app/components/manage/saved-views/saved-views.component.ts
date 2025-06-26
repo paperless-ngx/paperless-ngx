@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common'
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, OnDestroy, OnInit, inject } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -40,6 +40,10 @@ export class SavedViewsComponent
   extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy
 {
+  private savedViewService = inject(SavedViewService)
+  private settings = inject(SettingsService)
+  private toastService = inject(ToastService)
+
   DisplayMode = DisplayMode
 
   public savedViews: SavedView[]
@@ -55,11 +59,7 @@ export class SavedViewsComponent
     return this.settings.allDisplayFields
   }
 
-  constructor(
-    private savedViewService: SavedViewService,
-    private settings: SettingsService,
-    private toastService: ToastService
-  ) {
+  constructor() {
     super()
     this.settings.organizingSidebarSavedViews = true
   }

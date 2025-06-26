@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -31,12 +31,12 @@ import { TextComponent } from '../../input/text/text.component'
   ],
 })
 export class CorrespondentEditDialogComponent extends EditDialogComponent<Correspondent> {
-  constructor(
-    service: CorrespondentService,
-    activeModal: NgbActiveModal,
-    userService: UserService,
-    settingsService: SettingsService
-  ) {
+  constructor() {
+    const service = inject(CorrespondentService)
+    const activeModal = inject(NgbActiveModal)
+    const userService = inject(UserService)
+    const settingsService = inject(SettingsService)
+
     super(service, activeModal, userService, settingsService)
   }
 

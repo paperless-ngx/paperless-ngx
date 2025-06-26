@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, inject } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -37,18 +37,19 @@ export class UserEditDialogComponent
   extends EditDialogComponent<User>
   implements OnInit
 {
+  private toastService = inject(ToastService)
+  private permissionsService = inject(PermissionsService)
+
   groups: Group[]
   passwordIsSet: boolean = false
   public totpLoading: boolean = false
 
-  constructor(
-    service: UserService,
-    activeModal: NgbActiveModal,
-    groupsService: GroupService,
-    settingsService: SettingsService,
-    private toastService: ToastService,
-    private permissionsService: PermissionsService
-  ) {
+  constructor() {
+    const service = inject(UserService)
+    const activeModal = inject(NgbActiveModal)
+    const groupsService = inject(GroupService)
+    const settingsService = inject(SettingsService)
+
     super(service, activeModal, service, settingsService)
 
     groupsService

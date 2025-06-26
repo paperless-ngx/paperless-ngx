@@ -1,5 +1,5 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
-import { Component, OnDestroy } from '@angular/core'
+import { Component, OnDestroy, inject } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -60,6 +60,8 @@ export class StoragePathEditDialogComponent
   extends EditDialogComponent<StoragePath>
   implements OnDestroy
 {
+  private documentsService = inject(DocumentService)
+
   public documentsInput$ = new Subject<string>()
   public foundDocuments$: Observable<Document[]>
   private testDocument: Document
@@ -68,13 +70,12 @@ export class StoragePathEditDialogComponent
   public loading = false
   public testLoading = false
 
-  constructor(
-    service: StoragePathService,
-    activeModal: NgbActiveModal,
-    userService: UserService,
-    settingsService: SettingsService,
-    private documentsService: DocumentService
-  ) {
+  constructor() {
+    const service = inject(StoragePathService)
+    const activeModal = inject(NgbActiveModal)
+    const userService = inject(UserService)
+    const settingsService = inject(SettingsService)
+
     super(service, activeModal, userService, settingsService)
     this.initPathObservables()
   }

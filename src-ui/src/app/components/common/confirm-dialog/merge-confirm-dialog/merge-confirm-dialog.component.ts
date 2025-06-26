@@ -3,7 +3,7 @@ import {
   DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -28,6 +28,9 @@ export class MergeConfirmDialogComponent
   extends ConfirmDialogComponent
   implements OnInit
 {
+  private documentService = inject(DocumentService)
+  private permissionService = inject(PermissionsService)
+
   public documentIDs: number[] = []
   public archiveFallback: boolean = false
   public deleteOriginals: boolean = false
@@ -38,11 +41,9 @@ export class MergeConfirmDialogComponent
 
   public metadataDocumentID: number = -1
 
-  constructor(
-    activeModal: NgbActiveModal,
-    private documentService: DocumentService,
-    private permissionService: PermissionsService
-  ) {
+  constructor() {
+    const activeModal = inject(NgbActiveModal)
+
     super(activeModal)
   }
 

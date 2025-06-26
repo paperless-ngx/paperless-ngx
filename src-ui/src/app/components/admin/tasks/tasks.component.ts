@@ -1,5 +1,5 @@
 import { NgTemplateOutlet, SlicePipe } from '@angular/common'
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, inject, OnDestroy, OnInit } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
 import {
@@ -69,6 +69,10 @@ export class TasksComponent
   extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy
 {
+  tasksService = inject(TasksService)
+  private modalService = inject(NgbModal)
+  private readonly router = inject(Router)
+
   public activeTab: TaskTab
   public selectedTasks: Set<number> = new Set()
   public togggleAll: boolean = false
@@ -103,14 +107,6 @@ export class TasksComponent
     return this.selectedTasks.size > 0
       ? $localize`Dismiss selected`
       : $localize`Dismiss all`
-  }
-
-  constructor(
-    public tasksService: TasksService,
-    private modalService: NgbModal,
-    private readonly router: Router
-  ) {
-    super()
   }
 
   ngOnInit() {

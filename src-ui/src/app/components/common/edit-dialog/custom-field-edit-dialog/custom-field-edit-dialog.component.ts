@@ -5,6 +5,7 @@ import {
   OnInit,
   QueryList,
   ViewChildren,
+  inject,
 } from '@angular/core'
 import {
   FormArray,
@@ -54,12 +55,12 @@ export class CustomFieldEditDialogComponent
       .select_options as FormArray
   }
 
-  constructor(
-    service: CustomFieldsService,
-    activeModal: NgbActiveModal,
-    userService: UserService,
-    settingsService: SettingsService
-  ) {
+  constructor() {
+    const service = inject(CustomFieldsService)
+    const activeModal = inject(NgbActiveModal)
+    const userService = inject(UserService)
+    const settingsService = inject(SettingsService)
+
     super(service, activeModal, userService, settingsService)
   }
 

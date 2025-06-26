@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core'
+import { Component, ViewChild, inject } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -47,12 +47,12 @@ export class MailAccountEditDialogComponent extends EditDialogComponent<MailAcco
 
   @ViewChild('testResultAlert', { static: false }) testResultAlert: NgbAlert
 
-  constructor(
-    service: MailAccountService,
-    activeModal: NgbActiveModal,
-    userService: UserService,
-    settingsService: SettingsService
-  ) {
+  constructor() {
+    const service = inject(MailAccountService)
+    const activeModal = inject(NgbActiveModal)
+    const userService = inject(UserService)
+    const settingsService = inject(SettingsService)
+
     super(service, activeModal, userService, settingsService)
   }
 
