@@ -12,6 +12,7 @@ import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { CheckComponent } from '../../input/check/check.component'
 import { PermissionsFormComponent } from '../../input/permissions/permissions-form/permissions-form.component'
 import { SelectComponent } from '../../input/select/select.component'
 import { TextComponent } from '../../input/text/text.component'
@@ -21,6 +22,7 @@ import { TextComponent } from '../../input/text/text.component'
   templateUrl: './correspondent-edit-dialog.component.html',
   styleUrls: ['./correspondent-edit-dialog.component.scss'],
   imports: [
+    CheckComponent,
     SelectComponent,
     PermissionsFormComponent,
     TextComponent,

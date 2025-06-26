@@ -12,6 +12,7 @@ import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { CheckComponent } from '../../input/check/check.component'
 import { PermissionsFormComponent } from '../../input/permissions/permissions-form/permissions-form.component'
 import { SelectComponent } from '../../input/select/select.component'
 import { TextComponent } from '../../input/text/text.component'
@@ -21,6 +22,7 @@ import { TextComponent } from '../../input/text/text.component'
   templateUrl: './document-type-edit-dialog.component.html',
   styleUrls: ['./document-type-edit-dialog.component.scss'],
   imports: [
+    CheckComponent,
     SelectComponent,
     PermissionsFormComponent,
     TextComponent,
