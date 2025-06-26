@@ -3,7 +3,6 @@ import { Component, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
   NgbDropdownModule,
-  NgbModal,
   NgbPaginationModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -12,13 +11,8 @@ import { StoragePath } from 'src/app/data/storage-path'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SortableDirective } from 'src/app/directives/sortable.directive'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import {
-  PermissionsService,
-  PermissionType,
-} from 'src/app/services/permissions.service'
+import { PermissionType } from 'src/app/services/permissions.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
-import { ToastService } from 'src/app/services/toast.service'
 import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { ManagementListComponent } from '../management-list/management-list.component'
@@ -43,35 +37,24 @@ import { ManagementListComponent } from '../management-list/management-list.comp
 })
 export class StoragePathListComponent extends ManagementListComponent<StoragePath> {
   constructor() {
-    const directoryService = inject(StoragePathService)
-    const modalService = inject(NgbModal)
-    const toastService = inject(ToastService)
-    const documentListViewService = inject(DocumentListViewService)
-    const permissionsService = inject(PermissionsService)
-
-    super(
-      directoryService,
-      modalService,
-      StoragePathEditDialogComponent,
-      toastService,
-      documentListViewService,
-      permissionsService,
-      FILTER_HAS_STORAGE_PATH_ANY,
-      $localize`storage path`,
-      $localize`storage paths`,
-      PermissionType.StoragePath,
-      [
-        {
-          key: 'path',
-          name: $localize`Path`,
-          rendersHtml: true,
-          hideOnMobile: true,
-          valueFn: (c: StoragePath) => {
-            return `<code>${c.path?.slice(0, 49)}${c.path?.length > 50 ? '...' : ''}</code>`
-          },
+    super()
+    this.service = inject(StoragePathService)
+    this.editDialogComponent = StoragePathEditDialogComponent
+    this.filterRuleType = FILTER_HAS_STORAGE_PATH_ANY
+    this.typeName = $localize`storage path`
+    this.typeNamePlural = $localize`storage paths`
+    this.permissionType = PermissionType.StoragePath
+    this.extraColumns = [
+      {
+        key: 'path',
+        name: $localize`Path`,
+        rendersHtml: true,
+        hideOnMobile: true,
+        valueFn: (c: StoragePath) => {
+          return `<code>${c.path?.slice(0, 49)}${c.path?.length > 50 ? '...' : ''}</code>`
         },
-      ]
-    )
+      },
+    ]
   }
 
   getDeleteMessage(object: StoragePath) {
