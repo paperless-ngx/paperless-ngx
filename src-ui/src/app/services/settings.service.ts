@@ -1,6 +1,6 @@
-import { DOCUMENT } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import {
+  DOCUMENT,
   EventEmitter,
   Inject,
   Injectable,

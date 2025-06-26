@@ -9,7 +9,7 @@ $form-file-button-hover-bg: var(--pngx-bg-alt);
 
 @import "node_modules/bootstrap/dist/css/bootstrap.css";
 @include meta.load-css("theme");
-@import "~@ng-select/ng-select/themes/default.theme.css";
+@import "@ng-select/ng-select/themes/default.theme.css";
 @include meta.load-css("print");
 
 // re-created bootstrap styles
