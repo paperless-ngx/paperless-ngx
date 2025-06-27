@@ -6,7 +6,7 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
 import { NgClass } from '@angular/common'
-import { Component, HostListener, OnInit } from '@angular/core'
+import { Component, HostListener, inject, OnInit } from '@angular/core'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
 import {
   NgbCollapseModule,
@@ -75,27 +75,27 @@ export class AppFrameComponent
   extends ComponentWithPermissions
   implements OnInit, ComponentCanDeactivate
 {
+  router = inject(Router)
+  private activatedRoute = inject(ActivatedRoute)
+  private openDocumentsService = inject(OpenDocumentsService)
+  savedViewService = inject(SavedViewService)
+  private remoteVersionService = inject(RemoteVersionService)
+  settingsService = inject(SettingsService)
+  tasksService = inject(TasksService)
+  private readonly toastService = inject(ToastService)
+  private modalService = inject(NgbModal)
+  permissionsService = inject(PermissionsService)
+  private djangoMessagesService = inject(DjangoMessagesService)
+
   appRemoteVersion: AppRemoteVersion
 
   isMenuCollapsed: boolean = true
 
   slimSidebarAnimating: boolean = false
 
-  constructor(
-    public router: Router,
-    private activatedRoute: ActivatedRoute,
-    private openDocumentsService: OpenDocumentsService,
-    public savedViewService: SavedViewService,
-    private remoteVersionService: RemoteVersionService,
-    public settingsService: SettingsService,
-    public tasksService: TasksService,
-    private readonly toastService: ToastService,
-    private modalService: NgbModal,
-    public permissionsService: PermissionsService,
-    private djangoMessagesService: DjangoMessagesService,
-    private documentService: DocumentService
-  ) {
+  constructor() {
     super()
+    const permissionsService = this.permissionsService
 
     if (
       permissionsService.currentUserCan(

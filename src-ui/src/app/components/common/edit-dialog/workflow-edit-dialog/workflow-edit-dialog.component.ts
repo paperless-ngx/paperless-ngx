@@ -4,7 +4,7 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
 import { NgTemplateOutlet } from '@angular/common'
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, inject } from '@angular/core'
 import {
   FormArray,
   FormControl,
@@ -12,7 +12,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { NgbAccordionModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
@@ -171,6 +171,12 @@ export class WorkflowEditDialogComponent
   public WorkflowTriggerType = WorkflowTriggerType
   public WorkflowActionType = WorkflowActionType
 
+  private correspondentService: CorrespondentService
+  private documentTypeService: DocumentTypeService
+  private storagePathService: StoragePathService
+  private mailRuleService: MailRuleService
+  private customFieldsService: CustomFieldsService
+
   templates: Workflow[]
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
@@ -183,40 +189,38 @@ export class WorkflowEditDialogComponent
 
   private allowedActionTypes = []
 
-  constructor(
-    service: WorkflowService,
-    activeModal: NgbActiveModal,
-    correspondentService: CorrespondentService,
-    documentTypeService: DocumentTypeService,
-    storagePathService: StoragePathService,
-    mailRuleService: MailRuleService,
-    userService: UserService,
-    settingsService: SettingsService,
-    customFieldsService: CustomFieldsService
-  ) {
-    super(service, activeModal, userService, settingsService)
+  constructor() {
+    super()
+    this.service = inject(WorkflowService)
+    this.correspondentService = inject(CorrespondentService)
+    this.documentTypeService = inject(DocumentTypeService)
+    this.storagePathService = inject(StoragePathService)
+    this.mailRuleService = inject(MailRuleService)
+    this.userService = inject(UserService)
+    this.settingsService = inject(SettingsService)
+    this.customFieldsService = inject(CustomFieldsService)
 
-    correspondentService
+    this.correspondentService
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.correspondents = result.results))
 
-    documentTypeService
+    this.documentTypeService
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.documentTypes = result.results))
 
-    storagePathService
+    this.storagePathService
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.storagePaths = result.results))
 
-    mailRuleService
+    this.mailRuleService
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.mailRules = result.results))
 
-    customFieldsService
+    this.customFieldsService
       .listAll()
       .pipe(first())
       .subscribe((result) => {

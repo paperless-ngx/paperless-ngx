@@ -1,6 +1,6 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
 import { HttpClient, HttpResponse } from '@angular/common/http'
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import {
   FormArray,
   FormControl,
@@ -177,6 +177,27 @@ export class DocumentDetailComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy, DirtyComponent
 {
+  private documentsService = inject(DocumentService)
+  private route = inject(ActivatedRoute)
+  private correspondentService = inject(CorrespondentService)
+  private documentTypeService = inject(DocumentTypeService)
+  private router = inject(Router)
+  private modalService = inject(NgbModal)
+  private openDocumentService = inject(OpenDocumentsService)
+  private documentListViewService = inject(DocumentListViewService)
+  private documentTitlePipe = inject(DocumentTitlePipe)
+  private toastService = inject(ToastService)
+  private settings = inject(SettingsService)
+  private storagePathService = inject(StoragePathService)
+  private permissionsService = inject(PermissionsService)
+  private userService = inject(UserService)
+  private customFieldsService = inject(CustomFieldsService)
+  private http = inject(HttpClient)
+  private hotKeyService = inject(HotKeyService)
+  private componentRouterService = inject(ComponentRouterService)
+  private deviceDetectorService = inject(DeviceDetectorService)
+  private savedViewService = inject(SavedViewService)
+
   @ViewChild('inputTitle')
   titleInput: TextComponent
 
@@ -259,31 +280,6 @@ export class DocumentDetailComponent
 
   DocumentDetailNavIDs = DocumentDetailNavIDs
   activeNavID: number
-
-  constructor(
-    private documentsService: DocumentService,
-    private route: ActivatedRoute,
-    private correspondentService: CorrespondentService,
-    private documentTypeService: DocumentTypeService,
-    private router: Router,
-    private modalService: NgbModal,
-    private openDocumentService: OpenDocumentsService,
-    private documentListViewService: DocumentListViewService,
-    private documentTitlePipe: DocumentTitlePipe,
-    private toastService: ToastService,
-    private settings: SettingsService,
-    private storagePathService: StoragePathService,
-    private permissionsService: PermissionsService,
-    private userService: UserService,
-    private customFieldsService: CustomFieldsService,
-    private http: HttpClient,
-    private hotKeyService: HotKeyService,
-    private componentRouterService: ComponentRouterService,
-    private deviceDetectorService: DeviceDetectorService,
-    private savedViewService: SavedViewService
-  ) {
-    super()
-  }
 
   titleKeyUp(event) {
     this.titleSubject.next(event.target?.value)

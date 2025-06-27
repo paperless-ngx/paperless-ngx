@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { inject, Injectable } from '@angular/core'
 import { combineLatest, Observable, Subject } from 'rxjs'
 import { takeUntil, tap } from 'rxjs/operators'
 import { Results } from 'src/app/data/results'
@@ -13,17 +13,18 @@ import { DocumentService } from './document.service'
   providedIn: 'root',
 })
 export class SavedViewService extends AbstractPaperlessService<SavedView> {
+  protected http: HttpClient
+  private settingsService = inject(SettingsService)
+  private documentService = inject(DocumentService)
+
   public loading: boolean = true
   private savedViews: SavedView[] = []
   private savedViewDocumentCounts: Map<number, number> = new Map()
   private unsubscribeNotifier: Subject<void> = new Subject<void>()
 
-  constructor(
-    protected http: HttpClient,
-    private settingsService: SettingsService,
-    private documentService: DocumentService
-  ) {
-    super(http, 'saved_views')
+  constructor() {
+    super()
+    this.resourceName = 'saved_views'
   }
 
   public list(

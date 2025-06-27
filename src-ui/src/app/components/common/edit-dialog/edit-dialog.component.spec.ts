@@ -41,13 +41,9 @@ import { EditDialogComponent, EditDialogMode } from './edit-dialog.component'
   imports: [FormsModule, ReactiveFormsModule],
 })
 class TestComponent extends EditDialogComponent<Tag> {
-  constructor(
-    service: TagService,
-    activeModal: NgbActiveModal,
-    userService: UserService,
-    settingsService: SettingsService
-  ) {
-    super(service, activeModal, userService, settingsService)
+  constructor() {
+    super()
+    this.service = TestBed.inject(TagService)
   }
 
   getForm(): FormGroup<any> {

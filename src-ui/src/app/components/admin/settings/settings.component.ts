@@ -2,10 +2,10 @@ import { AsyncPipe, ViewportScroller } from '@angular/common'
 import {
   AfterViewInit,
   Component,
-  Inject,
   LOCALE_ID,
   OnDestroy,
   OnInit,
+  inject,
 } from '@angular/core'
 import {
   FormControl,
@@ -105,6 +105,21 @@ export class SettingsComponent
   extends ComponentWithPermissions
   implements OnInit, AfterViewInit, OnDestroy, DirtyComponent
 {
+  private documentListViewService = inject(DocumentListViewService)
+  private toastService = inject(ToastService)
+  private settings = inject(SettingsService)
+  currentLocale = inject(LOCALE_ID)
+  private viewportScroller = inject(ViewportScroller)
+  private activatedRoute = inject(ActivatedRoute)
+  readonly tourService = inject(TourService)
+  private usersService = inject(UserService)
+  private groupsService = inject(GroupService)
+  private router = inject(Router)
+  permissionsService = inject(PermissionsService)
+  private modalService = inject(NgbModal)
+  private systemStatusService = inject(SystemStatusService)
+  private savedViewsService = inject(SavedViewService)
+
   activeNavID: number
 
   settingsForm = new FormGroup({
@@ -181,22 +196,7 @@ export class SettingsComponent
     )
   }
 
-  constructor(
-    private documentListViewService: DocumentListViewService,
-    private toastService: ToastService,
-    private settings: SettingsService,
-    @Inject(LOCALE_ID) public currentLocale: string,
-    private viewportScroller: ViewportScroller,
-    private activatedRoute: ActivatedRoute,
-    public readonly tourService: TourService,
-    private usersService: UserService,
-    private groupsService: GroupService,
-    private router: Router,
-    public permissionsService: PermissionsService,
-    private modalService: NgbModal,
-    private systemStatusService: SystemStatusService,
-    private savedViewsService: SavedViewService
-  ) {
+  constructor() {
     super()
     this.settings.settingsSaved.subscribe(() => {
       if (!this.savePending) this.initialize()

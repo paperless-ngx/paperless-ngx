@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { Observable, first, map } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import { PaperlessConfig } from '../data/paperless-config'
@@ -8,9 +8,9 @@ import { PaperlessConfig } from '../data/paperless-config'
   providedIn: 'root',
 })
 export class ConfigService {
-  protected baseUrl: string = environment.apiBaseUrl + 'config/'
+  protected http = inject(HttpClient)
 
-  constructor(protected http: HttpClient) {}
+  protected baseUrl: string = environment.apiBaseUrl + 'config/'
 
   getConfig(): Observable<PaperlessConfig> {
     return this.http.get<[PaperlessConfig]>(this.baseUrl).pipe(

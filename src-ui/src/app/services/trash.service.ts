@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { Observable } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import { Document } from '../data/document'
@@ -9,7 +9,7 @@ import { Results } from '../data/results'
   providedIn: 'root',
 })
 export class TrashService {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient)
 
   public getTrash(page: number = 1): Observable<Results<Document>> {
     const httpParams = new HttpParams().set('page', page.toString())

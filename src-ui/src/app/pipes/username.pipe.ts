@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core'
+import { inject, Pipe, PipeTransform } from '@angular/core'
 import { catchError, map, Observable, of } from 'rxjs'
 import { User } from '../data/user'
 import {
@@ -12,12 +12,10 @@ import { UserService } from '../services/rest/user.service'
   name: 'username',
 })
 export class UsernamePipe implements PipeTransform {
-  users: User[]
+  private permissionsService = inject(PermissionsService)
+  private userService = inject(UserService)
 
-  constructor(
-    private permissionsService: PermissionsService,
-    private userService: UserService
-  ) {}
+  users: User[]
 
   transform(userID: number): Observable<string> {
     if (
