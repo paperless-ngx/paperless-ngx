@@ -1,6 +1,6 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { DecimalPipe } from '@angular/common'
-import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core'
 import {
   NgbProgressbarModule,
   NgbToastModule,
@@ -21,6 +21,8 @@ import { Toast } from 'src/app/services/toast.service'
   styleUrl: './toast.component.scss',
 })
 export class ToastComponent {
+  private clipboard = inject(Clipboard)
+
   @Input() toast: Toast
 
   @Input() autohide: boolean = true
@@ -30,8 +32,6 @@ export class ToastComponent {
   @Output() closed: EventEmitter<Toast> = new EventEmitter<Toast>()
 
   public copied: boolean = false
-
-  constructor(private clipboard: Clipboard) {}
 
   onShown(toast: Toast) {
     if (!this.autohide) return

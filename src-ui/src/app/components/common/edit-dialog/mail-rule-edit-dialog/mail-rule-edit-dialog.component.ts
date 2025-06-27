@@ -1,11 +1,10 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import {
   FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { first } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Correspondent } from 'src/app/data/correspondent'
@@ -155,32 +154,34 @@ const METADATA_CORRESPONDENT_OPTIONS = [
   ],
 })
 export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
+  private accountService: MailAccountService
+  private correspondentService: CorrespondentService
+  private documentTypeService: DocumentTypeService
+
   accounts: MailAccount[]
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
 
-  constructor(
-    service: MailRuleService,
-    activeModal: NgbActiveModal,
-    accountService: MailAccountService,
-    correspondentService: CorrespondentService,
-    documentTypeService: DocumentTypeService,
-    userService: UserService,
-    settingsService: SettingsService
-  ) {
-    super(service, activeModal, userService, settingsService)
+  constructor() {
+    super()
+    this.service = inject(MailRuleService)
+    this.accountService = inject(MailAccountService)
+    this.correspondentService = inject(CorrespondentService)
+    this.documentTypeService = inject(DocumentTypeService)
+    this.userService = inject(UserService)
+    this.settingsService = inject(SettingsService)
 
-    accountService
+    this.accountService
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.accounts = result.results))
 
-    correspondentService
+    this.correspondentService
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.correspondents = result.results))
 
-    documentTypeService
+    this.documentTypeService
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.documentTypes = result.results))

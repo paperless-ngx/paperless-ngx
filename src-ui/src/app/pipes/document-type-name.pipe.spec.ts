@@ -2,7 +2,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { TestBed } from '@angular/core/testing'
 import { PermissionsService } from '../services/permissions.service'
-import { DocumentTypeService } from '../services/rest/document-type.service'
+import { AbstractNameFilterService } from '../services/rest/abstract-name-filter-service'
 import { DocumentTypeNamePipe } from './document-type-name.pipe'
 
 describe('DocumentTypeNamePipe', () => {
@@ -11,6 +11,9 @@ describe('DocumentTypeNamePipe', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
+        DocumentTypeNamePipe,
+        { provide: PermissionsService },
+        { provide: AbstractNameFilterService },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
@@ -19,10 +22,7 @@ describe('DocumentTypeNamePipe', () => {
 
   // The pipe is a simple wrapper around ObjectNamePipe, see ObjectNamePipe for the actual tests.
   it('should be created', () => {
-    pipe = new DocumentTypeNamePipe(
-      TestBed.inject(PermissionsService),
-      TestBed.inject(DocumentTypeService)
-    )
+    pipe = TestBed.inject(DocumentTypeNamePipe)
     expect(pipe).toBeTruthy()
   })
 })

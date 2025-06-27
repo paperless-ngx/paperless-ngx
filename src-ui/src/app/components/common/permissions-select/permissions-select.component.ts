@@ -1,5 +1,5 @@
 import { KeyValuePipe } from '@angular/common'
-import { Component, forwardRef, Input, OnInit } from '@angular/core'
+import { Component, forwardRef, inject, Input, OnInit } from '@angular/core'
 import {
   AbstractControl,
   ControlValueAccessor,
@@ -43,6 +43,9 @@ export class PermissionsSelectComponent
   extends ComponentWithPermissions
   implements OnInit, ControlValueAccessor
 {
+  private readonly permissionsService = inject(PermissionsService)
+  private readonly settingsService = inject(SettingsService)
+
   @Input()
   title: string = 'Permissions'
 
@@ -76,10 +79,7 @@ export class PermissionsSelectComponent
 
   public allowedTypes = Object.keys(PermissionType)
 
-  constructor(
-    private readonly permissionsService: PermissionsService,
-    private readonly settingsService: SettingsService
-  ) {
+  constructor() {
     super()
     if (!this.settingsService.get(SETTINGS_KEYS.AUDITLOG_ENABLED)) {
       this.allowedTypes.splice(this.allowedTypes.indexOf('History'), 1)

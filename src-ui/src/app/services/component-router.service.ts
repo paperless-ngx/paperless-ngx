@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { ActivationStart, Event, Router } from '@angular/router'
 import { filter } from 'rxjs'
 
@@ -8,10 +8,12 @@ const EXCLUDE_COMPONENTS = ['AppFrameComponent']
   providedIn: 'root',
 })
 export class ComponentRouterService {
+  private router = inject(Router)
+
   private history: string[] = []
   private componentHistory: any[] = []
 
-  constructor(private router: Router) {
+  constructor() {
     this.router.events
       .pipe(filter((event: Event) => event instanceof ActivationStart))
       .subscribe((event: ActivationStart) => {

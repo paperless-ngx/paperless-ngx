@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core'
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -71,6 +71,19 @@ export class BulkEditorComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy
 {
+  private documentTypeService = inject(DocumentTypeService)
+  private tagService = inject(TagService)
+  private correspondentService = inject(CorrespondentService)
+  list = inject(DocumentListViewService)
+  private documentService = inject(DocumentService)
+  private modalService = inject(NgbModal)
+  private openDocumentService = inject(OpenDocumentsService)
+  private settings = inject(SettingsService)
+  private toastService = inject(ToastService)
+  private storagePathService = inject(StoragePathService)
+  private customFieldService = inject(CustomFieldsService)
+  private permissionService = inject(PermissionsService)
+
   tagSelectionModel = new FilterableDropdownSelectionModel(true)
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
@@ -93,23 +106,6 @@ export class BulkEditorComponent
 
   @Input()
   public disabled: boolean = false
-
-  constructor(
-    private documentTypeService: DocumentTypeService,
-    private tagService: TagService,
-    private correspondentService: CorrespondentService,
-    public list: DocumentListViewService,
-    private documentService: DocumentService,
-    private modalService: NgbModal,
-    private openDocumentService: OpenDocumentsService,
-    private settings: SettingsService,
-    private toastService: ToastService,
-    private storagePathService: StoragePathService,
-    private customFieldService: CustomFieldsService,
-    private permissionService: PermissionsService
-  ) {
-    super()
-  }
 
   applyOnClose: boolean = this.settings.get(
     SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE
