@@ -533,10 +533,14 @@ class ConsumerPlugin(
                 document.save()
 
                 # Delete the file only if it was successfully consumed
-                self.log.debug(f"Deleting file {self.working_copy}")
+                self.log.debug(f"Deleting original file {self.input_doc.original_file}")
                 self.input_doc.original_file.unlink()
+                self.log.debug(f"Deleting working copy {self.working_copy}")
                 self.working_copy.unlink()
                 if self.unmodified_original is not None:  # pragma: no cover
+                    self.log.debug(
+                        f"Deleting unmodified original file {self.unmodified_original}",
+                    )
                     self.unmodified_original.unlink()
 
                 # https://github.com/jonaswinkler/paperless-ng/discussions/1037
@@ -546,7 +550,7 @@ class ConsumerPlugin(
                 )
 
                 if Path(shadow_file).is_file():
-                    self.log.debug(f"Deleting file {shadow_file}")
+                    self.log.debug(f"Deleting shadow file {shadow_file}")
                     Path(shadow_file).unlink()
 
         except Exception as e:
