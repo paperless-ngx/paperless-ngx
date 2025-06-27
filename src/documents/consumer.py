@@ -43,6 +43,7 @@ from documents.plugins.helpers import ProgressStatusOptions
 from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
 from documents.signals.handlers import run_workflows
+from documents.skip_import import SkipImportException
 from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
@@ -430,6 +431,32 @@ class ConsumerPlugin(
             archive_path = document_parser.get_archive_path()
             page_count = document_parser.get_page_count(self.working_copy, mime_type)
 
+        except SkipImportException:
+            document_parser.cleanup()
+            if tempdir:
+                tempdir.cleanup()
+            # Explicitly delete the original file and all working copies, but only if they exist
+            try:
+                self.log.debug(f"Deleting file {self.working_copy}")
+                if self.input_doc.original_file.exists():
+                    self.input_doc.original_file.unlink()
+                if self.working_copy.exists():
+                    self.working_copy.unlink()
+                if (
+                    self.unmodified_original is not None
+                    and self.unmodified_original.exists()
+                ):  # pragma: no cover
+                    self.unmodified_original.unlink()
+            except Exception as e:
+                self.log.warning(f"Could not delete skipped file: {e}")
+            # Mark progress as finished for dashboard/task system
+            self._send_progress(
+                100,
+                100,
+                ProgressStatusOptions.SUCCESS,
+                ConsumerStatusShortMessage.FINISHED,
+            )
+            return f"Success. File {self.filename} was processed."
         except ParseError as e:
             document_parser.cleanup()
             if tempdir:
