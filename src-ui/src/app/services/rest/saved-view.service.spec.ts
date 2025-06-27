@@ -249,6 +249,16 @@ describe(`Additional service tests for SavedViewService`, () => {
     expect(service.getDocumentCount(saved_views[0])).toEqual(1)
   })
 
+  it('should not refresh document counts if setting is disabled', () => {
+    jest.spyOn(settingsService, 'get').mockImplementation((key) => {
+      if (key === SETTINGS_KEYS.SIDEBAR_VIEWS_SHOW_COUNT) return false
+    })
+    service.maybeRefreshDocumentCounts(saved_views)
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=1&ordering=-${saved_views[0].sort_field}&fields=id&truncate_content=true`
+    )
+  })
+
   beforeEach(() => {
     // Dont need to setup again
 
