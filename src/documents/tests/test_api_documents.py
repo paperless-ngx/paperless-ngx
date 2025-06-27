@@ -1192,7 +1192,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.consume_file_mock.assert_not_called()
 
-    def test_upload_invalid_file(self):
+    def test_upload_zip_file(self):
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1202,8 +1202,19 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
                 "/api/documents/post_document/",
                 {"document": f},
             )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.consume_file_mock.assert_not_called()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.consume_file_mock.assert_called_once()
+
+        input_doc, overrides = self.get_last_consume_delay_call_args()
+
+        self.assertEqual(input_doc.original_file.name, "simple.zip")
+        self.assertIn(Path(settings.SCRATCH_DIR), input_doc.original_file.parents)
+        self.assertIsNone(overrides.title)
+        self.assertIsNone(overrides.correspondent_id)
+        self.assertIsNone(overrides.document_type_id)
+        self.assertIsNone(overrides.storage_path_id)
+        self.assertIsNone(overrides.tag_ids)
 
     def test_upload_with_title(self):
         self.consume_file_mock.return_value = celery.result.AsyncResult(
