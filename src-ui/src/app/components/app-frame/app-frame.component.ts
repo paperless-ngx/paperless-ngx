@@ -35,7 +35,6 @@ import {
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
-import { DocumentService } from 'src/app/services/rest/document.service'
 import {
   AppRemoteVersion,
   RemoteVersionService,
