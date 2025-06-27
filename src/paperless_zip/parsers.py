@@ -23,6 +23,8 @@ class ZipDocumentParser(DocumentParser):
     * Does not add the ZIP itself as a document.
     """
 
+    logging_name = "paperless.parsing.zip"
+
     def get_settings(self):
         return settings
 
@@ -43,16 +45,22 @@ class ZipDocumentParser(DocumentParser):
                     extracted_path = temp_extract_dir / member.filename
                     try:
                         abs_extracted_path = extracted_path.resolve()
-                    except Exception:
+                    except Exception as e:
+                        self.log.warning(
+                            f"Skipping invalid path in ZIP: {extracted_path} ({e})",
+                        )
                         continue  # Skip invalid paths
                     if not str(abs_extracted_path).startswith(
                         str(temp_extract_dir.resolve()),
                     ):
+                        self.log.warning(
+                            f"Skipping unsafe path in ZIP: {abs_extracted_path}",
+                        )
                         continue  # Unsafe path, skip
                     zip_ref.extract(member, temp_extract_dir)
             for file in temp_extract_dir.rglob("*"):
                 if file.is_file():
-                    # Skip hidden files (dotfiles, AppleDouble, etc.)
+                    # Skip hidden files
                     if file.name.startswith("."):
                         continue
                     mime = mimetypes.guess_type(str(file))[0]
