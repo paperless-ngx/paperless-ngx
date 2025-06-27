@@ -1,7 +1,10 @@
 import datetime
 import hashlib
+import mimetypes
 import os
+import shutil
 import tempfile
+import zipfile
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -43,7 +46,6 @@ from documents.plugins.helpers import ProgressStatusOptions
 from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
 from documents.signals.handlers import run_workflows
-from documents.skip_import import SkipImportException
 from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
@@ -305,6 +307,64 @@ class ConsumerPlugin(
 
             self.log.debug(f"Detected mime type: {mime_type}")
 
+            # check if mime_type is zip
+            if mime_type == "application/zip":
+                filesToProcess = extract_zip_to_tempdir(
+                    self.working_copy,
+                    Path(tempdir.name),
+                    self.log,
+                )
+                zip_name = self.working_copy.name
+                persistent_dir = Path(settings.SCRATCH_DIR)
+                persistent_dir.mkdir(parents=True, exist_ok=True)
+                for file in filesToProcess:
+                    mime = mimetypes.guess_type(str(file))[0]
+                    parser_class = (
+                        get_parser_class_for_mime_type(mime) if mime else None
+                    )
+                    if parser_class is not None:
+                        # Rename file to zipname#originalname before moving
+                        new_name = f"{zip_name}#{file.name}"
+                        dest = persistent_dir / new_name
+                        shutil.move(str(file), str(dest))
+                        source = getattr(self, "source", None)
+                        pdf_title = Path(file.name).stem
+                        overrides = DocumentMetadataOverrides(
+                            filename=new_name,
+                            title=pdf_title,
+                        )
+                        input_doc = ConsumableDocument(
+                            source=source,
+                            original_file=dest,
+                        )
+                        # Import here to avoid circular import
+                        from documents.tasks import consume_file
+
+                        consume_file.delay(input_doc, overrides)
+                if tempdir:
+                    tempdir.cleanup()
+                # Explicitly delete the original file and all working copies, but only if they exist
+                try:
+                    if self.input_doc.original_file.exists():
+                        self.input_doc.original_file.unlink()
+                    if self.working_copy.exists():
+                        self.working_copy.unlink()
+                    if (
+                        self.unmodified_original is not None
+                        and self.unmodified_original.exists()
+                    ):  # pragma: no cover
+                        self.unmodified_original.unlink()
+                except Exception as e:
+                    self.log.warning(f"Could not delete skipped file: {e}")
+                # Mark progress as finished for dashboard/task system
+                self._send_progress(
+                    100,
+                    100,
+                    ProgressStatusOptions.SUCCESS,
+                    ConsumerStatusShortMessage.FINISHED,
+                )
+                return f"Success. File {self.filename} was processed."
+
             if (
                 Path(self.filename).suffix.lower() == ".pdf"
                 and mime_type in settings.CONSUMER_PDF_RECOVERABLE_MIME_TYPES
@@ -431,32 +491,6 @@ class ConsumerPlugin(
             archive_path = document_parser.get_archive_path()
             page_count = document_parser.get_page_count(self.working_copy, mime_type)
 
-        except SkipImportException:
-            document_parser.cleanup()
-            if tempdir:
-                tempdir.cleanup()
-            # Explicitly delete the original file and all working copies, but only if they exist
-            try:
-                self.log.debug(f"Deleting file {self.working_copy}")
-                if self.input_doc.original_file.exists():
-                    self.input_doc.original_file.unlink()
-                if self.working_copy.exists():
-                    self.working_copy.unlink()
-                if (
-                    self.unmodified_original is not None
-                    and self.unmodified_original.exists()
-                ):  # pragma: no cover
-                    self.unmodified_original.unlink()
-            except Exception as e:
-                self.log.warning(f"Could not delete skipped file: {e}")
-            # Mark progress as finished for dashboard/task system
-            self._send_progress(
-                100,
-                100,
-                ProgressStatusOptions.SUCCESS,
-                ConsumerStatusShortMessage.FINISHED,
-            )
-            return f"Success. File {self.filename} was processed."
         except ParseError as e:
             document_parser.cleanup()
             if tempdir:
@@ -881,3 +915,44 @@ class ConsumerPreflightPlugin(
         self.pre_check_duplicate()
         self.pre_check_directories()
         self.pre_check_asn_value()
+
+
+def extract_zip_to_tempdir(zip_path, temp_extract_dir, log):
+    """
+    Extracts supported files from a ZIP to temp_extract_dir, returns list of files in the zip.
+    Skips hidden files
+    """
+
+    extracted_files = []
+    try:
+        with zipfile.ZipFile(zip_path, "r") as zip_ref:
+            for member in zip_ref.infolist():
+                if (
+                    member.is_dir()
+                    or member.filename.startswith(".")
+                    or "/." in member.filename
+                ):
+                    continue
+                # try to resolve the path to prevent directory traversal attacks
+                extracted_path = temp_extract_dir / member.filename
+                try:
+                    abs_extracted_path = extracted_path.resolve()
+                except Exception as e:
+                    log.warning(f"Skipping invalid path in ZIP: {extracted_path} ({e})")
+                    continue
+                if not str(abs_extracted_path).startswith(
+                    str(temp_extract_dir.resolve()),
+                ):
+                    log.warning(f"Skipping unsafe path in ZIP: {abs_extracted_path}")
+                    continue
+                zip_ref.extract(member, temp_extract_dir)
+                extracted_files.append(extracted_path)
+
+    except zipfile.BadZipFile as e:
+        log.error(f"Error extracting ZIP file {zip_path}: {e}")
+        raise ConsumerError(f"Error extracting ZIP file {zip_path}: {e}")
+    except Exception as e:
+        log.error(f"Unexpected error extracting ZIP file {zip_path}: {e}")
+        raise ConsumerError(f"Unexpected error extracting ZIP file {zip_path}: {e}")
+
+    return extracted_files
