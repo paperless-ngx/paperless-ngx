@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, OnDestroy, OnInit, inject } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, first, takeUntil } from 'rxjs'
@@ -31,21 +31,17 @@ export class UsersAndGroupsComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy
 {
+  private usersService = inject(UserService)
+  private groupsService = inject(GroupService)
+  private toastService = inject(ToastService)
+  private modalService = inject(NgbModal)
+  permissionsService = inject(PermissionsService)
+  private settings = inject(SettingsService)
+
   users: User[]
   groups: Group[]
 
   unsubscribeNotifier: Subject<any> = new Subject()
-
-  constructor(
-    private usersService: UserService,
-    private groupsService: GroupService,
-    private toastService: ToastService,
-    private modalService: NgbModal,
-    public permissionsService: PermissionsService,
-    private settings: SettingsService
-  ) {
-    super()
-  }
 
   ngOnInit(): void {
     this.usersService

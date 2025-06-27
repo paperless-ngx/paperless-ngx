@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core'
+import { Component, inject, Input } from '@angular/core'
 import { Tag } from 'src/app/data/tag'
 import {
   PermissionAction,
@@ -13,13 +13,11 @@ import { TagService } from 'src/app/services/rest/tag.service'
   styleUrls: ['./tag.component.scss'],
 })
 export class TagComponent {
+  private permissionsService = inject(PermissionsService)
+  private tagService = inject(TagService)
+
   private _tag: Tag
   private _tagID: number
-
-  constructor(
-    private permissionsService: PermissionsService,
-    private tagService: TagService
-  ) {}
 
   @Input()
   public set tag(tag: Tag) {

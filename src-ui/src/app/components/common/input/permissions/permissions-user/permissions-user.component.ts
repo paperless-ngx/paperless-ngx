@@ -1,4 +1,4 @@
-import { Component, forwardRef } from '@angular/core'
+import { Component, forwardRef, inject } from '@angular/core'
 import {
   FormsModule,
   NG_VALUE_ACCESSOR,
@@ -8,7 +8,6 @@ import { NgSelectComponent } from '@ng-select/ng-select'
 import { first } from 'rxjs/operators'
 import { User } from 'src/app/data/user'
 import { UserService } from 'src/app/services/rest/user.service'
-import { SettingsService } from 'src/app/services/settings.service'
 import { AbstractInputComponent } from '../../abstract-input'
 
 @Component({
@@ -27,7 +26,9 @@ import { AbstractInputComponent } from '../../abstract-input'
 export class PermissionsUserComponent extends AbstractInputComponent<User[]> {
   users: User[]
 
-  constructor(userService: UserService, settings: SettingsService) {
+  constructor() {
+    const userService = inject(UserService)
+
     super()
     userService
       .listAll()

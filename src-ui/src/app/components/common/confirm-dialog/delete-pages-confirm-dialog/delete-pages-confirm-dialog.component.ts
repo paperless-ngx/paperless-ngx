@@ -1,6 +1,5 @@
-import { Component, TemplateRef, ViewChild } from '@angular/core'
+import { Component, TemplateRef, ViewChild, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import {
   PDFDocumentProxy,
   PdfViewerComponent,
@@ -17,6 +16,8 @@ import { ConfirmDialogComponent } from '../confirm-dialog.component'
   imports: [PdfViewerModule, FormsModule, ReactiveFormsModule, SafeHtmlPipe],
 })
 export class DeletePagesConfirmDialogComponent extends ConfirmDialogComponent {
+  private documentService = inject(DocumentService)
+
   public documentID: number
   public pages: number[] = []
   public currentPage: number = 1
@@ -34,11 +35,8 @@ export class DeletePagesConfirmDialogComponent extends ConfirmDialogComponent {
     return this.documentService.getPreviewUrl(this.documentID)
   }
 
-  constructor(
-    activeModal: NgbActiveModal,
-    private documentService: DocumentService
-  ) {
-    super(activeModal)
+  constructor() {
+    super()
   }
 
   public pdfPreviewLoaded(pdf: PDFDocumentProxy) {

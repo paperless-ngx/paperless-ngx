@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core'
+import { Component, HostListener, inject } from '@angular/core'
 import {
   PermissionAction,
   PermissionsService,
@@ -15,16 +15,14 @@ import { UploadDocumentsService } from 'src/app/services/upload-documents.servic
   imports: [],
 })
 export class FileDropComponent {
+  private settings = inject(SettingsService)
+  private toastService = inject(ToastService)
+  private uploadDocumentsService = inject(UploadDocumentsService)
+  private permissionsService = inject(PermissionsService)
+
   private fileLeaveTimeoutID: any
   fileIsOver: boolean = false
   hidden: boolean = true
-
-  constructor(
-    private settings: SettingsService,
-    private toastService: ToastService,
-    private uploadDocumentsService: UploadDocumentsService,
-    private permissionsService: PermissionsService
-  ) {}
 
   public get dragDropEnabled(): boolean {
     return (

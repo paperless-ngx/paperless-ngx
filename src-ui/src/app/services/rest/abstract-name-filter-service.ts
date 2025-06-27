@@ -1,3 +1,4 @@
+import { Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { PermissionsObject } from 'src/app/data/object-with-permissions'
@@ -7,7 +8,9 @@ export enum BulkEditObjectOperation {
   SetPermissions = 'set_permissions',
   Delete = 'delete',
 }
-
+@Injectable({
+  providedIn: 'root',
+})
 export abstract class AbstractNameFilterService<
   T extends ObjectWithId,
 > extends AbstractPaperlessService<T> {

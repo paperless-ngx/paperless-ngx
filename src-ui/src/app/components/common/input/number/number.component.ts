@@ -1,4 +1,4 @@
-import { Component, forwardRef, Input } from '@angular/core'
+import { Component, forwardRef, inject, Input } from '@angular/core'
 import {
   FormsModule,
   NG_VALUE_ACCESSOR,
@@ -22,15 +22,13 @@ import { AbstractInputComponent } from '../abstract-input'
   imports: [FormsModule, ReactiveFormsModule, NgxBootstrapIconsModule],
 })
 export class NumberComponent extends AbstractInputComponent<number> {
+  private documentService = inject(DocumentService)
+
   @Input()
   showAdd: boolean = true
 
   @Input()
   step: number = 1
-
-  constructor(private documentService: DocumentService) {
-    super()
-  }
 
   nextAsn() {
     if (this.value) {
