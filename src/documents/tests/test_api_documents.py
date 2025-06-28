@@ -203,6 +203,14 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["created"], "2023-01-01")
 
+        response = self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            {"created": "2023-02-01T23:00:00Z"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["created"], "2023-02-01")
+
     def test_document_update_legacy_created_format(self):
         """
         GIVEN:
