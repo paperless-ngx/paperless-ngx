@@ -20,6 +20,9 @@ from django.core.validators import integer_validator
 from django.utils.crypto import get_random_string
 from django.utils.dateparse import parse_datetime
 from django.utils.text import slugify
+from django.utils.timezone import get_current_timezone
+from django.utils.timezone import is_naive
+from django.utils.timezone import make_aware
 from django.utils.translation import gettext as _
 from drf_spectacular.utils import extend_schema_field
 from drf_spectacular.utils import extend_schema_serializer
@@ -975,6 +978,8 @@ class DocumentSerializer(
             # Handle old format of isoformat datetime string
             parsed = parse_datetime(data["created"])
             if parsed:
+                if is_naive(parsed):
+                    parsed = make_aware(parsed, get_current_timezone())
                 data["created"] = parsed.astimezone().date()
         return super().to_internal_value(data)
 
