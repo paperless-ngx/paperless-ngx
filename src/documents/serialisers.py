@@ -18,6 +18,7 @@ from django.core.validators import MaxLengthValidator
 from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
 from django.utils.crypto import get_random_string
+from django.utils.dateparse import parse_datetime
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 from drf_spectacular.utils import extend_schema_field
@@ -972,11 +973,9 @@ class DocumentSerializer(
             and ":" in data["created"]
         ):
             # Handle old format of isoformat datetime string
-            try:
-                data["created"] = datetime.fromisoformat(data["created"]).date()
-            except ValueError:  # pragma: no cover
-                # Just pass, validation will catch it
-                pass
+            parsed = parse_datetime(data["created"])
+            if parsed:
+                data["created"] = parsed.astimezone().date()
         return super().to_internal_value(data)
 
     def validate(self, attrs):
