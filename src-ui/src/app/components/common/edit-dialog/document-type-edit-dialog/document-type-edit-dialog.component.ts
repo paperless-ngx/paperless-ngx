@@ -1,11 +1,10 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import {
   FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { DocumentType } from 'src/app/data/document-type'
 import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
@@ -13,6 +12,7 @@ import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { CheckComponent } from '../../input/check/check.component'
 import { PermissionsFormComponent } from '../../input/permissions/permissions-form/permissions-form.component'
 import { SelectComponent } from '../../input/select/select.component'
 import { TextComponent } from '../../input/text/text.component'
@@ -22,6 +22,7 @@ import { TextComponent } from '../../input/text/text.component'
   templateUrl: './document-type-edit-dialog.component.html',
   styleUrls: ['./document-type-edit-dialog.component.scss'],
   imports: [
+    CheckComponent,
     SelectComponent,
     PermissionsFormComponent,
     TextComponent,
@@ -31,13 +32,11 @@ import { TextComponent } from '../../input/text/text.component'
   ],
 })
 export class DocumentTypeEditDialogComponent extends EditDialogComponent<DocumentType> {
-  constructor(
-    service: DocumentTypeService,
-    activeModal: NgbActiveModal,
-    userService: UserService,
-    settingsService: SettingsService
-  ) {
-    super(service, activeModal, userService, settingsService)
+  constructor() {
+    super()
+    this.service = inject(DocumentTypeService)
+    this.userService = inject(UserService)
+    this.settingsService = inject(SettingsService)
   }
 
   getCreateTitle() {

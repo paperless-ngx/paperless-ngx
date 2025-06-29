@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core'
+import { Component, Input, inject } from '@angular/core'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { SettingsService } from 'src/app/services/settings.service'
 import { environment } from 'src/environments/environment'
@@ -9,6 +9,8 @@ import { environment } from 'src/environments/environment'
   styleUrls: ['./logo.component.scss'],
 })
 export class LogoComponent {
+  private settingsService = inject(SettingsService)
+
   @Input()
   extra_classes: string
 
@@ -23,8 +25,6 @@ export class LogoComponent {
         )
       : null
   }
-
-  constructor(private settingsService: SettingsService) {}
 
   getClasses() {
     return ['logo'].concat(this.extra_classes).join(' ')

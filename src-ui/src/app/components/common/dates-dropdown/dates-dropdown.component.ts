@@ -6,6 +6,7 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  inject,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
@@ -63,7 +64,9 @@ export enum RelativeDate {
 export class DatesDropdownComponent implements OnInit, OnDestroy {
   public popperOptions = pngxPopperOptions
 
-  constructor(settings: SettingsService) {
+  constructor() {
+    const settings = inject(SettingsService)
+
     this.datePlaceHolder = settings.getLocalizedDateInputFormat()
   }
 
