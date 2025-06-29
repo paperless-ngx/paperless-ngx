@@ -1218,7 +1218,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             id=str(uuid.uuid4()),
         )
 
-        with (Path(__file__).parent / "samples" / "simple.foo").open("rb") as f:
+        with (Path(__file__).parent / "samples" / "simple.bin").open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f},
