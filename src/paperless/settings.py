@@ -318,7 +318,6 @@ INSTALLED_APPS = [
     "paperless_tesseract.apps.PaperlessTesseractConfig",
     "paperless_text.apps.PaperlessTextConfig",
     "paperless_mail.apps.PaperlessMailConfig",
-    "paperless_zip.apps.PaperlessZipConfig",
     "django.contrib.admin",
     "rest_framework",
     "rest_framework.authtoken",

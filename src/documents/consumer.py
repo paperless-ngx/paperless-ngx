@@ -307,7 +307,7 @@ class ConsumerPlugin(
 
             self.log.debug(f"Detected mime type: {mime_type}")
 
-            # check if mime_type is zip
+            # special zip handling
             if mime_type == "application/zip":
                 filesToProcess = extract_zip_to_tempdir(
                     self.working_copy,
