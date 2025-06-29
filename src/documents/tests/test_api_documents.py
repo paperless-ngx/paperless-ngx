@@ -1213,6 +1213,19 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.consume_file_mock.assert_not_called()
 
+    def test_upload_invalid_file(self):
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
+
+        with (Path(__file__).parent / "samples" / "simple.foo").open("rb") as f:
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {"document": f},
+            )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.consume_file_mock.assert_not_called()
+
     def test_upload_zip_file(self):
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
