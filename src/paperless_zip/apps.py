@@ -1,6 +1,24 @@
 from django.apps import AppConfig
 
-from paperless_zip.signals import zip_consumer_declaration
+from documents.parsers import ParseError
+
+# dummy registration of the zip mime type
+# This is necessary to ensure that the zip parser is recognized by the system.
+# The actual handling of ZIP files is done in the consumer.py, not here.
+
+
+def get_parser(*args, **kwargs):
+    raise ParseError("ZIP archive needs to be handled directly.")
+
+
+def zip_consumer_declaration(sender, **kwargs):
+    return {
+        "parser": get_parser,
+        "weight": 10,
+        "mime_types": {
+            "application/zip": ".zip",
+        },
+    }
 
 
 class PaperlessZipConfig(AppConfig):
