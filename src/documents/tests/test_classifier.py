@@ -694,3 +694,15 @@ class TestClassifier(DirectoriesMixin, TestCase):
         mock_load.side_effect = Exception()
         with self.assertRaises(Exception):
             load_classifier(raise_exception=True)
+
+
+def test_preprocess_content():
+    with (Path(__file__).parent / "samples" / "content.txt").open("r") as f:
+        content = f.read()
+    with (Path(__file__).parent / "samples" / "preprocessed_content.txt").open(
+        "r",
+    ) as f:
+        expected_preprocess_content = f.read().rstrip()
+    classifier = DocumentClassifier()
+    result = classifier.preprocess_content(content)
+    assert result == expected_preprocess_content
