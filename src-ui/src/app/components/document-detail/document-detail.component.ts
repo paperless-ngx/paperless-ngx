@@ -101,6 +101,7 @@ import { TagsComponent } from '../common/input/tags/tags.component'
 import { TextComponent } from '../common/input/text/text.component'
 import { UrlComponent } from '../common/input/url/url.component'
 import { PageHeaderComponent } from '../common/page-header/page-header.component'
+import { PDFEditorComponent } from '../common/pdf-editor/pdf-editor.component'
 import { ShareLinksDialogComponent } from '../common/share-links-dialog/share-links-dialog.component'
 import { DocumentHistoryComponent } from '../document-history/document-history.component'
 import { DocumentNotesComponent } from '../document-notes/document-notes.component'
@@ -1410,6 +1411,45 @@ export class DocumentDetailComponent
               }
               this.toastService.showError(
                 $localize`Error executing rotate operation`,
+                error
+              )
+            },
+          })
+      })
+  }
+
+  editPdf() {
+    let modal = this.modalService.open(PDFEditorComponent, {
+      backdrop: 'static',
+      size: 'xl',
+      scrollable: true,
+    })
+    modal.componentInstance.title = $localize`Edit PDF`
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.documentID = this.document.id
+    modal.componentInstance.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        modal.componentInstance.buttonsEnabled = false
+        this.documentsService
+          .bulkEdit([this.document.id], 'edit_pdf', {
+            operations: modal.componentInstance.getOperations(),
+            delete_original: modal.componentInstance.deleteOriginal,
+          })
+          .pipe(first(), takeUntil(this.unsubscribeNotifier))
+          .subscribe({
+            next: () => {
+              this.toastService.showInfo(
+                $localize`PDF edit operation for "${this.document.title}" will begin in the background.`
+              )
+              modal.close()
+            },
+            error: (error) => {
+              if (modal) {
+                modal.componentInstance.buttonsEnabled = true
+              }
+              this.toastService.showError(
+                $localize`Error executing PDF edit operation`,
                 error
               )
             },

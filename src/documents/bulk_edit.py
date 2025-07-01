@@ -497,6 +497,77 @@ def delete_pages(doc_ids: list[int], pages: list[int]) -> Literal["OK"]:
     return "OK"
 
 
+def edit_pdf(
+    doc_ids: list[int],
+    operations: list[dict],
+    *,
+    delete_original: bool = False,
+    user: User | None = None,
+) -> Literal["OK"]:
+    """
+    Operations is a list of dictionaries describing the final PDF pages.
+    Each entry must contain the original page number in `page` and may
+    specify `rotate` in degrees and `doc` indicating the output
+    document index (for splitting). Pages omitted from the list are
+    discarded.
+    """
+
+    logger.info(
+        f"Editing PDF of document {doc_ids[0]} with {len(operations)} operations",
+    )
+    doc = Document.objects.get(id=doc_ids[0])
+    import pikepdf
+
+    pdf_docs: list[pikepdf.Pdf] = []
+
+    try:
+        with pikepdf.open(doc.source_path) as src:
+            # prepare output documents
+            max_idx = max(op.get("doc", 0) for op in operations)
+            pdf_docs = [pikepdf.new() for _ in range(max_idx + 1)]
+
+            for op in operations:
+                dst = pdf_docs[op.get("doc", 0)]
+                page = src.pages[op["page"] - 1]
+                dst.pages.append(page)
+                if op.get("rotate"):
+                    dst.pages[-1].rotate(op["rotate"], relative=True)
+
+            consume_tasks = []
+            overrides: DocumentMetadataOverrides = (
+                DocumentMetadataOverrides().from_document(doc)
+            )
+            if user is not None:
+                overrides.owner_id = user.id
+
+            for idx, pdf in enumerate(pdf_docs, start=1):
+                filepath: Path = (
+                    Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
+                    / f"{doc.id}_edit_{idx}.pdf"
+                )
+                pdf.remove_unreferenced_resources()
+                pdf.save(filepath)
+                consume_tasks.append(
+                    consume_file.s(
+                        ConsumableDocument(
+                            source=DocumentSource.ConsumeFolder,
+                            original_file=filepath,
+                        ),
+                        overrides,
+                    ),
+                )
+
+            if delete_original:
+                chord(header=consume_tasks, body=delete.si([doc.id])).delay()
+            else:
+                group(consume_tasks).delay()
+
+    except Exception as e:
+        logger.exception(f"Error editing document {doc.id}: {e}")
+
+    return "OK"
+
+
 def reflect_doclinks(
     document: Document,
     field: CustomField,

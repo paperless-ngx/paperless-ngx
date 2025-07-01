@@ -1219,6 +1219,29 @@ describe('DocumentDetailComponent', () => {
     req.flush(true)
   })
 
+  it('should support pdf editor', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    initNormally()
+    component.editPdf()
+    expect(modal).not.toBeUndefined()
+    modal.componentInstance.documentID = doc.id
+    modal.componentInstance.pages = [{ page: 1, rotate: 0, splitAfter: false }]
+    modal.componentInstance.confirm()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    expect(req.request.body).toEqual({
+      documents: [doc.id],
+      method: 'edit_pdf',
+      parameters: {
+        operations: [{ page: 1, rotate: 0, doc: 0 }],
+        delete_original: false,
+      },
+    })
+    req.flush(true)
+  })
+
   it('should support keyboard shortcuts', () => {
     initNormally()
 

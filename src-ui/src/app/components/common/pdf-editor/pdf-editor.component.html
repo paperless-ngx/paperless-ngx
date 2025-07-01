@@ -1,0 +1,29 @@
+<pdf-viewer [src]="pdfSrc" [render-text]="false" zoom="0.4" (after-load-complete)="pdfLoaded($event)"></pdf-viewer>
+<div class="modal-header">
+  <h4 class="modal-title">{{ title }}</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="cancel()"></button>
+</div>
+<div class="modal-body">
+  <div cdkDropList (cdkDropListDropped)="drop($event)" cdkDropListOrientation="mixed" class="d-flex flex-wrap row-cols-5">
+    @for (p of pages; track p.page; let i = $index) {
+      <div class="page-item p-2" cdkDrag>
+        <div class="btn-group mb-1">
+          <button class="btn btn-sm btn-secondary" (click)="rotate(i)"><i-bs name="arrow-clockwise"></i-bs></button>
+          <button class="btn btn-sm btn-outline-secondary" (click)="toggleSplit(i)"><i-bs name="scissors"></i-bs></button>
+          <button class="btn btn-sm btn-danger" (click)="remove(i)"><i-bs name="trash"></i-bs></button>
+        </div>
+        <div class="pdf-viewer-container w-100 mt-3">
+          <pdf-viewer [src]="pdfSrc" [page]="p.page" [rotation]="p.rotate" [original-size]="false" [show-all]="false" [render-text]="false"></pdf-viewer>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+<div class="modal-footer">
+  <div class="form-check form-switch me-auto">
+    <input class="form-check-input" type="checkbox" id="deleteSwitch" [(ngModel)]="deleteOriginal">
+    <label class="form-check-label" for="deleteSwitch" i18n>Delete original after edit</label>
+  </div>
+  <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">{{ cancelBtnCaption }}</button>
+  <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="pages.length === 0">{{ btnCaption }}</button>
+</div>
