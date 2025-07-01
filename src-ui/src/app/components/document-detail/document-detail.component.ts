@@ -81,9 +81,6 @@ import { getFilenameFromContentDisposition } from 'src/app/utils/http'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
-import { DeletePagesConfirmDialogComponent } from '../common/confirm-dialog/delete-pages-confirm-dialog/delete-pages-confirm-dialog.component'
-import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
-import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
@@ -1337,87 +1334,6 @@ export class DocumentDetailComponent
     this.documentForm.updateValueAndValidity()
   }
 
-  splitDocument() {
-    let modal = this.modalService.open(SplitConfirmDialogComponent, {
-      backdrop: 'static',
-      size: 'lg',
-    })
-    modal.componentInstance.title = $localize`Split confirm`
-    modal.componentInstance.messageBold = $localize`This operation will split the selected document(s) into new documents.`
-    modal.componentInstance.btnCaption = $localize`Proceed`
-    modal.componentInstance.documentID = this.document.id
-    modal.componentInstance.confirmClicked
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(() => {
-        modal.componentInstance.buttonsEnabled = false
-        this.documentsService
-          .bulkEdit([this.document.id], 'split', {
-            pages: modal.componentInstance.pagesString,
-            delete_originals: modal.componentInstance.deleteOriginal,
-          })
-          .pipe(first(), takeUntil(this.unsubscribeNotifier))
-          .subscribe({
-            next: () => {
-              this.toastService.showInfo(
-                $localize`Split operation for "${this.document.title}" will begin in the background.`
-              )
-              modal.close()
-            },
-            error: (error) => {
-              if (modal) {
-                modal.componentInstance.buttonsEnabled = true
-              }
-              this.toastService.showError(
-                $localize`Error executing split operation`,
-                error
-              )
-            },
-          })
-      })
-  }
-
-  rotateDocument() {
-    let modal = this.modalService.open(RotateConfirmDialogComponent, {
-      backdrop: 'static',
-      size: 'lg',
-    })
-    modal.componentInstance.title = $localize`Rotate confirm`
-    modal.componentInstance.messageBold = $localize`This operation will permanently rotate the original version of the current document.`
-    modal.componentInstance.btnCaption = $localize`Proceed`
-    modal.componentInstance.documentID = this.document.id
-    modal.componentInstance.showPDFNote = false
-    modal.componentInstance.confirmClicked
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(() => {
-        modal.componentInstance.buttonsEnabled = false
-        this.documentsService
-          .bulkEdit([this.document.id], 'rotate', {
-            degrees: modal.componentInstance.degrees,
-          })
-          .pipe(first(), takeUntil(this.unsubscribeNotifier))
-          .subscribe({
-            next: () => {
-              this.toastService.show({
-                content: $localize`Rotation of "${this.document.title}" will begin in the background. Close and re-open the document after the operation has completed to see the changes.`,
-                delay: 8000,
-                action: this.close.bind(this),
-                actionName: $localize`Close`,
-              })
-              modal.close()
-            },
-            error: (error) => {
-              if (modal) {
-                modal.componentInstance.buttonsEnabled = true
-              }
-              this.toastService.showError(
-                $localize`Error executing rotate operation`,
-                error
-              )
-            },
-          })
-      })
-  }
-
   editPdf() {
     let modal = this.modalService.open(PDFEditorComponent, {
       backdrop: 'static',
@@ -1450,43 +1366,6 @@ export class DocumentDetailComponent
               }
               this.toastService.showError(
                 $localize`Error executing PDF edit operation`,
-                error
-              )
-            },
-          })
-      })
-  }
-
-  deletePages() {
-    let modal = this.modalService.open(DeletePagesConfirmDialogComponent, {
-      backdrop: 'static',
-    })
-    modal.componentInstance.title = $localize`Delete pages confirm`
-    modal.componentInstance.messageBold = $localize`This operation will permanently delete the selected pages from the original document.`
-    modal.componentInstance.btnCaption = $localize`Proceed`
-    modal.componentInstance.documentID = this.document.id
-    modal.componentInstance.confirmClicked
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(() => {
-        modal.componentInstance.buttonsEnabled = false
-        this.documentsService
-          .bulkEdit([this.document.id], 'delete_pages', {
-            pages: modal.componentInstance.pages,
-          })
-          .pipe(first(), takeUntil(this.unsubscribeNotifier))
-          .subscribe({
-            next: () => {
-              this.toastService.showInfo(
-                $localize`Delete pages operation for "${this.document.title}" will begin in the background. Close and re-open or reload this document after the operation has completed to see the changes.`
-              )
-              modal.close()
-            },
-            error: (error) => {
-              if (modal) {
-                modal.componentInstance.buttonsEnabled = true
-              }
-              this.toastService.showError(
-                $localize`Error executing delete pages operation`,
                 error
               )
             },
