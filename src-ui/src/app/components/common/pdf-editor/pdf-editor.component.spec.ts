@@ -23,13 +23,19 @@ describe('PDFEditorComponent', () => {
     fixture.detectChanges()
   })
 
-  it('should rotate and reorder pages', () => {
+  it('should rotate, delete and reorder pages', () => {
     component.pages = [
-      { page: 1, rotate: 0, splitAfter: false },
-      { page: 2, rotate: 0, splitAfter: false },
+      { page: 1, rotate: 0, splitAfter: false, selected: false },
+      { page: 2, rotate: 0, splitAfter: false, selected: false },
     ]
-    component.rotate(0)
+    component.toggleSelection(0)
+    component.rotateSelected(90)
     expect(component.pages[0].rotate).toBe(90)
+    component.toggleSelection(0) // deselect
+    component.toggleSelection(1)
+    component.deleteSelected()
+    expect(component.pages.length).toBe(1)
+    component.pages.push({ page: 2, rotate: 0, splitAfter: false })
     component.drop({ previousIndex: 0, currentIndex: 1 } as any)
     expect(component.pages[0].page).toBe(2)
   })
