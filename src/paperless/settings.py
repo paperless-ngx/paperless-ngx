@@ -941,13 +941,13 @@ def _parse_cachalot_settings():
     return result
 
 
-_cachalot_settings = _parse_cachalot_settings()
-CACHALOT_ENABLED = _cachalot_settings["CACHALOT_ENABLED"]
-CACHALOT_CACHE = _cachalot_settings["CACHALOT_CACHE"]
-CACHALOT_TIMEOUT = _cachalot_settings["CACHALOT_TIMEOUT"]
-CACHALOT_QUERY_KEYGEN = _cachalot_settings["CACHALOT_QUERY_KEYGEN"]
-CACHALOT_TABLE_KEYGEN = _cachalot_settings["CACHALOT_TABLE_KEYGEN"]
-CACHALOT_FINAL_SQL_CHECK = _cachalot_settings["CACHALOT_FINAL_SQL_CHECK"]
+cachalot_settings = _parse_cachalot_settings()
+CACHALOT_ENABLED = cachalot_settings["CACHALOT_ENABLED"]
+CACHALOT_CACHE = cachalot_settings["CACHALOT_CACHE"]
+CACHALOT_TIMEOUT = cachalot_settings["CACHALOT_TIMEOUT"]
+CACHALOT_QUERY_KEYGEN = cachalot_settings["CACHALOT_QUERY_KEYGEN"]
+CACHALOT_TABLE_KEYGEN = cachalot_settings["CACHALOT_TABLE_KEYGEN"]
+CACHALOT_FINAL_SQL_CHECK = cachalot_settings["CACHALOT_FINAL_SQL_CHECK"]
 
 
 # Django default & Cachalot cache configuration
@@ -968,16 +968,13 @@ def _parse_caches():
         },
         "read-cache": {
             "BACKEND": _CACHE_BACKEND,
-            "LOCATION": _parse_cachalot_settings()["CACHALOT_REDIS_URL"],
+            "LOCATION": cachalot_settings["CACHALOT_REDIS_URL"],
             "KEY_PREFIX": _REDIS_KEY_PREFIX,
         },
     }
 
 
 CACHES = _parse_caches()
-
-
-del _cachalot_settings
 
 
 def default_threads_per_worker(task_workers) -> int:
