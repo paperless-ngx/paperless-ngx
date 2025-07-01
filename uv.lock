@@ -626,15 +626,15 @@ wheels = [
 
 [[package]]
 name = "django"
-version = "5.1.8"
+version = "5.2.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asgiref", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "sqlparse", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/00/40/45adc1b93435d1b418654a734b68351bb6ce0a0e5e37b2f0e9aeb1a2e233/Django-5.1.8.tar.gz", hash = "sha256:42e92a1dd2810072bcc40a39a212b693f94406d0ba0749e68eb642f31dc770b4", size = 10723602, upload-time = "2025-04-02T11:19:56.028Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c6/af/77b403926025dc6f7fd7b31256394d643469418965eb528eab45d0505358/django-5.2.3.tar.gz", hash = "sha256:335213277666ab2c5cac44a792a6d2f3d58eb79a80c14b6b160cd4afc3b75684", size = 10850303, upload-time = "2025-06-10T10:14:05.174Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ec/0d/e6dd0ed898b920fec35c6eeeb9acbeb831fff19ad21c5e684744df1d4a36/Django-5.1.8-py3-none-any.whl", hash = "sha256:11b28fa4b00e59d0def004e9ee012fefbb1065a5beb39ee838983fd24493ad4f", size = 8277130, upload-time = "2025-04-02T11:19:51.591Z" },
+    { url = "https://files.pythonhosted.org/packages/1b/11/7aff961db37e1ea501a2bb663d27a8ce97f3683b9e5b83d3bfead8b86fa4/django-5.2.3-py3-none-any.whl", hash = "sha256:c517a6334e0fd940066aa9467b29401b93c37cec2e61365d663b80922542069d", size = 8301935, upload-time = "2025-06-10T10:13:58.993Z" },
 ]
 
 [[package]]
@@ -660,15 +660,15 @@ socialaccount = [
 
 [[package]]
 name = "django-auditlog"
-version = "3.1.2"
+version = "3.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "python-dateutil", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/0e/3a/61bfb180019d08db3f7a2e4097bda14ee32bd57f5dffda0c84b2d4c26304/django_auditlog-3.1.2.tar.gz", hash = "sha256:435345b4055d16abfb4ada4bf11320f9e2f6d343874464471fa0041f13f3a474", size = 69359, upload-time = "2025-04-26T11:01:56.553Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/3e/d3/16b3a4b4fc2974067263182065d90c04770d6bcf4e6cfa45af196c2a7ed5/django_auditlog-3.2.0.tar.gz", hash = "sha256:66cf3945977ba60e0687fc264ac178f0c7b0eee013f25e1c63561d8ceb6a5c41", size = 72579, upload-time = "2025-06-26T11:32:20.038Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/af/34/47edd758abcb4426953b5ff2fa4dd9956c2304e96160ab1b95c3a1ab6e61/django_auditlog-3.1.2-py3-none-any.whl", hash = "sha256:6432a83fdf4397a726488d101fedcb62daafd6d4b825a0fc4c50e3657f5883cd", size = 37312, upload-time = "2025-04-26T11:01:16.776Z" },
+    { url = "https://files.pythonhosted.org/packages/41/11/f5a7323b7fc88e7248bbc26c80fc7dfed98d7deef4ef7f70b7a7c57f5797/django_auditlog-3.2.0-py3-none-any.whl", hash = "sha256:63d02326c5b069cd5ae390c4729076f1d935c3a9cefc27893e79a01c42cd1a78", size = 38279, upload-time = "2025-06-26T11:32:30.542Z" },
 ]
 
 [[package]]
@@ -678,9 +678,9 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f5/53/1f781e58028a43028d6c799f2eab15eff65e841e3e288d6f2953e36f01a4/django_cachalot-2.8.0.tar.gz", hash = "sha256:30456720ac9f3fabeb90ce898530fe01130c25a1eca911cd016cfaeab251d627", size = 74673 }
+sdist = { url = "https://files.pythonhosted.org/packages/f5/53/1f781e58028a43028d6c799f2eab15eff65e841e3e288d6f2953e36f01a4/django_cachalot-2.8.0.tar.gz", hash = "sha256:30456720ac9f3fabeb90ce898530fe01130c25a1eca911cd016cfaeab251d627", size = 74673, upload-time = "2025-04-17T00:05:36.387Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9a/05/f5846fd186189ac0a1deddb9c67450c838e5c8ceceb35b5260c61f622599/django_cachalot-2.8.0-py3-none-any.whl", hash = "sha256:315da766a5356c7968318326f7b0579f64571ad909f64cad0601f38153ca4e16", size = 55671 },
+    { url = "https://files.pythonhosted.org/packages/9a/05/f5846fd186189ac0a1deddb9c67450c838e5c8ceceb35b5260c61f622599/django_cachalot-2.8.0-py3-none-any.whl", hash = "sha256:315da766a5356c7968318326f7b0579f64571ad909f64cad0601f38153ca4e16", size = 55671, upload-time = "2025-04-17T00:05:34.641Z" },
 ]
 
 [[package]]
@@ -764,38 +764,38 @@ wheels = [
 
 [[package]]
 name = "django-guardian"
-version = "2.4.0"
+version = "3.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6f/4c/d1f6923a0ad7f16c403a54c09e94acb76ac6c3765e02523fb09b2b03e1a8/django-guardian-2.4.0.tar.gz", hash = "sha256:c58a68ae76922d33e6bdc0e69af1892097838de56e93e78a8361090bcd9f89a0", size = 159008, upload-time = "2021-05-23T22:11:26.23Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/30/c2/3ed43813dd7313f729dbaa829b4f9ed4a647530151f672cfb5f843c12edf/django_guardian-3.0.3.tar.gz", hash = "sha256:4e59eab4d836da5a027cf0c176d14bc2a4e22cbbdf753159a03946c08c8a196d", size = 85410, upload-time = "2025-06-25T20:42:17.475Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a2/25/869df12e544b51f583254aadbba6c1a95e11d2d08edeb9e58dd715112db5/django_guardian-2.4.0-py3-none-any.whl", hash = "sha256:440ca61358427e575323648b25f8384739e54c38b3d655c81d75e0cd0d61b697", size = 106107, upload-time = "2021-05-23T22:11:22.75Z" },
+    { url = "https://files.pythonhosted.org/packages/8b/13/e6f629a978ef5fab8b8d2760cacc3e451016cef952cf4c049d672c5c6b07/django_guardian-3.0.3-py3-none-any.whl", hash = "sha256:d2164cea9f03c369d7ade21802710f3ab23ca6734bcc7dfcfb385906783916c7", size = 118198, upload-time = "2025-06-25T20:42:15.377Z" },
 ]
 
 [[package]]
 name = "django-multiselectfield"
-version = "0.1.13"
+version = "1.0.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/dd/c3/1a326cc669fea63f22e63f6e2b2b014534a15966506e8d7fa3c232aced42/django_multiselectfield-0.1.13.tar.gz", hash = "sha256:437d72632f4c0ca416951917632529c3d1d42b62bb6c3c03e3396fa50265be94", size = 11704, upload-time = "2024-07-01T05:40:39.456Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/04/9a/27060e8aa491ff2d286054df2e89df481a8dfe0e5e459fa36c0f48e3c10c/django_multiselectfield-1.0.1.tar.gz", hash = "sha256:3f8b4fff3e07d4a91c8bb4b809bc35caeb22b41769b606f4c9edc53b8d72a667", size = 22025, upload-time = "2025-06-12T14:41:21.599Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/be/9e/3ed6f072f1e806516dbc8c95e4ecae7b87af6757eb5d428857ea0a097e76/django_multiselectfield-0.1.13-py3-none-any.whl", hash = "sha256:f146ef568c823a409f4021b98781666ec2debabfceca9176116d749dc39cb8b3", size = 14804, upload-time = "2024-07-01T05:40:37.549Z" },
+    { url = "https://files.pythonhosted.org/packages/6d/10/23c0644cf67567bbe4e3a2eeeec0e9c79b701990c0e07c5ee4a4f8897f91/django_multiselectfield-1.0.1-py3-none-any.whl", hash = "sha256:18dc14801f7eca844a48e21cba6d8ec35b9b581f2373bbb2cb75e6994518259a", size = 20481, upload-time = "2025-06-12T14:41:20.107Z" },
 ]
 
 [[package]]
 name = "django-soft-delete"
-version = "1.0.18"
+version = "1.0.19"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ec/7e/89cba723dd5d34ccb6003f4812de7f5c69ba32bd73ab37f2bb21ff344c6c/django_soft_delete-1.0.18.tar.gz", hash = "sha256:d2f9db449a4f008e9786f82fa4bafbe4075f7a0b3284844735007e988b2a4df6", size = 11979, upload-time = "2025-02-01T13:43:53.804Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ce/77/44a6615a7da3ca0ddc624039d399d17d6c3503e1c2dad08b443f8d4a3570/django_soft_delete-1.0.19.tar.gz", hash = "sha256:c67ee8920e1456eca84cc59b3304ef27fa9d476b516be726ce7e1fc558502908", size = 11993, upload-time = "2025-06-19T20:32:20.373Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f7/d0/6dcca209e48081213854088fc7014e9dbdcd24f4ec2118f8ee29d11c8623/django_soft_delete-1.0.18-py3-none-any.whl", hash = "sha256:603a29e82bbb7a5bada69f2754fad225ccd8cd7f485320ec06d0fc4e9dfddcf0", size = 10876, upload-time = "2025-02-01T13:43:52.109Z" },
+    { url = "https://files.pythonhosted.org/packages/96/9e/f8b5a02cdcba606eb40fbe30fe0c9c7493a2c18f83ec3b4620e4e86a34d3/django_soft_delete-1.0.19-py3-none-any.whl", hash = "sha256:46aa5fab513db566d3d7a832529ed27245b5900eaaa705535bc7674055801a46", size = 10889, upload-time = "2025-06-19T20:32:19.083Z" },
 ]
 
 [[package]]
@@ -900,14 +900,14 @@ wheels = [
 
 [[package]]
 name = "drf-spectacular-sidecar"
-version = "2025.4.1"
+version = "2025.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5d/b6/ce857d73b65b86a9034d0604b5dc1a002f7fa218e32c4dba479a197acd70/drf_spectacular_sidecar-2025.4.1.tar.gz", hash = "sha256:ea7dc4e674174616589d258b5c9676f3c451ec422e62b79e31234d39db53922d", size = 2402076, upload-time = "2025-04-01T11:23:30.627Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f3/30/ddb202c3599bd44709ec93eb5393550dbded011c8732d15bb074c96134c5/drf_spectacular_sidecar-2025.6.1.tar.gz", hash = "sha256:ee6752c73d712265a61b9e2ca6f71c3b2bd89f30f39cf9f8cda98e7f371fcbcf", size = 2407117, upload-time = "2025-06-01T11:22:51.537Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cf/c3/d2f31ef748f89d68121aa3d4a71f7dfd44ea54957b84602d70cda2491c43/drf_spectacular_sidecar-2025.4.1-py3-none-any.whl", hash = "sha256:343a24b0d03125fa76d07685072f55779c5c4124d90c10b14e315fdc143ad9b9", size = 2422415, upload-time = "2025-04-01T11:23:28.797Z" },
+    { url = "https://files.pythonhosted.org/packages/8c/c8/7a484fe8ce14e147fbd7d363e7a13aaaa62a1ec6d9f77510f08e1839bf06/drf_spectacular_sidecar-2025.6.1-py3-none-any.whl", hash = "sha256:c7c4768c03faa3d2f7afacd1464f67732e7d6866d2cf2e8f649175c27318745c", size = 2427208, upload-time = "2025-06-01T11:22:49.39Z" },
 ]
 
 [[package]]
@@ -2032,22 +2032,22 @@ requires-dist = [
     { name = "channels-redis", specifier = "~=4.2" },
     { name = "concurrent-log-handler", specifier = "~=0.9.25" },
     { name = "dateparser", specifier = "~=1.2" },
-    { name = "django", specifier = "~=5.1.7" },
+    { name = "django", specifier = "~=5.2.3" },
     { name = "django-allauth", extras = ["socialaccount", "mfa"], specifier = "~=65.4.0" },
-    { name = "django-auditlog", specifier = "~=3.1.2" },
+    { name = "django-auditlog", specifier = "~=3.2.0" },
     { name = "django-cachalot", specifier = "~=2.8.0" },
     { name = "django-celery-results", specifier = "~=2.6.0" },
     { name = "django-compression-middleware", specifier = "~=0.5.0" },
     { name = "django-cors-headers", specifier = "~=4.7.0" },
     { name = "django-extensions", specifier = "~=4.1" },
     { name = "django-filter", specifier = "~=25.1" },
-    { name = "django-guardian", specifier = "~=2.4.0" },
-    { name = "django-multiselectfield", specifier = "~=0.1.13" },
+    { name = "django-guardian", specifier = "~=3.0.3" },
+    { name = "django-multiselectfield", specifier = "~=1.0.1" },
     { name = "django-soft-delete", specifier = "~=1.0.18" },
     { name = "djangorestframework", specifier = "~=3.15" },
     { name = "djangorestframework-guardian", specifier = "~=0.3.0" },
     { name = "drf-spectacular", specifier = "~=0.28" },
-    { name = "drf-spectacular-sidecar", specifier = "~=2025.4.1" },
+    { name = "drf-spectacular-sidecar", specifier = "~=2025.6.1" },
     { name = "drf-writable-nested", specifier = "~=0.7.1" },
     { name = "filelock", specifier = "~=3.18.0" },
     { name = "flower", specifier = "~=2.0.1" },
