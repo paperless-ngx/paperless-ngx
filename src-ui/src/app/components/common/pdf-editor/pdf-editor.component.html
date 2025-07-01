@@ -47,6 +47,9 @@
         <div class="pdf-viewer-container w-100" [class.selected]="p.selected">
           <pdf-viewer [src]="pdfSrc" [page]="p.page" [rotation]="p.rotate" [original-size]="false" [show-all]="false" [render-text]="false"></pdf-viewer>
         </div>
+        @if (p.splitAfter) {
+          <div class="split-after rounded position-absolute top-0 end-0 bg-dark text-uppercase text-center h-100 px-1 small fw-bold">&mdash; <span i18n>Split here</span> &mdash;</div>
+        }
       </div>
     }
   </div>
