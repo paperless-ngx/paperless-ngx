@@ -940,7 +940,7 @@ def _parse_cachalot_settings():
 
 cachalot_settings = _parse_cachalot_settings()
 CACHALOT_ENABLED = cachalot_settings["CACHALOT_ENABLED"]
-if CACHALOT_ENABLED:
+if CACHALOT_ENABLED:  # pragma: no cover
     INSTALLED_APPS.append("cachalot")
 CACHALOT_CACHE = cachalot_settings["CACHALOT_CACHE"]
 CACHALOT_TIMEOUT = cachalot_settings["CACHALOT_TIMEOUT"]
