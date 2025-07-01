@@ -1293,6 +1293,7 @@ class BulkEditSerializer(
             "merge",
             "split",
             "delete_pages",
+            "edit_pdf",
         ],
         label="Method",
         write_only=True,
