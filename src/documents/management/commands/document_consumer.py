@@ -97,9 +97,10 @@ def _consume(filepath: str) -> None:
         logger.warning(f"Not consuming file {filepath}: Unknown file extension.")
         return
 
-    # Total wait time: up to 500ms
-    os_error_retry_count: Final[int] = 50
-    os_error_retry_wait: Final[float] = 0.01
+    # Total wait time: up to PAPERLESS_CONSUMER_WAIT_FILE_CLOSED
+    os_error_retry_wait = 0.01
+    os_error_retry_count = int(settings.CONSUMER_WAIT_FILE_CLOSED /
+                               os_error_retry_wait)
 
     read_try_count = 0
     file_open_ok = False
