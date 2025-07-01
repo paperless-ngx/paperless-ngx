@@ -3,6 +3,7 @@ import {
   DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
+import { CommonModule } from '@angular/common'
 import { Component, OnInit, inject } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
@@ -15,6 +16,7 @@ interface PageOperation {
   page: number
   rotate: number
   splitAfter: boolean
+  selected?: boolean
 }
 
 @Component({
@@ -22,6 +24,7 @@ interface PageOperation {
   templateUrl: './pdf-editor.component.html',
   styleUrl: './pdf-editor.component.scss',
   imports: [
+    CommonModule,
     DragDropModule,
     FormsModule,
     PdfViewerModule,
@@ -52,11 +55,16 @@ export class PDFEditorComponent
       page: i + 1,
       rotate: 0,
       splitAfter: false,
+      selected: false,
     }))
   }
 
-  rotate(i: number) {
-    this.pages[i].rotate = (this.pages[i].rotate + 90) % 360
+  rotateSelected(dir: number) {
+    for (let p of this.pages) {
+      if (p.selected) {
+        p.rotate = (p.rotate + dir + 360) % 360
+      }
+    }
   }
 
   remove(i: number) {
@@ -65,6 +73,18 @@ export class PDFEditorComponent
 
   toggleSplit(i: number) {
     this.pages[i].splitAfter = !this.pages[i].splitAfter
+  }
+
+  toggleSelection(i: number) {
+    this.pages[i].selected = !this.pages[i].selected
+  }
+
+  deleteSelected() {
+    this.pages = this.pages.filter((p) => !p.selected)
+  }
+
+  hasSelection(): boolean {
+    return this.pages.some((p) => p.selected)
   }
 
   drop(event: CdkDragDrop<PageOperation[]>) {

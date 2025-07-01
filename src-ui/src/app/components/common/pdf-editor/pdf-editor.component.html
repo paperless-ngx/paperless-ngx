@@ -4,15 +4,37 @@
   <button type="button" class="btn-close" aria-label="Close" (click)="cancel()"></button>
 </div>
 <div class="modal-body">
+  <div class="btn-group toolbar mb-2">
+    <button class="btn btn-sm btn-secondary" (click)="rotateSelected(-90)" [disabled]="!hasSelection()">
+      <i-bs name="arrow-counterclockwise"></i-bs>
+    </button>
+    <button class="btn btn-sm btn-secondary" (click)="rotateSelected(90)" [disabled]="!hasSelection()">
+      <i-bs name="arrow-clockwise"></i-bs>
+    </button>
+    <button class="btn btn-sm btn-danger" (click)="deleteSelected()" [disabled]="!hasSelection()">
+      <i-bs name="trash"></i-bs>
+    </button>
+  </div>
   <div cdkDropList (cdkDropListDropped)="drop($event)" cdkDropListOrientation="mixed" class="d-flex flex-wrap row-cols-5">
     @for (p of pages; track p.page; let i = $index) {
-      <div class="page-item p-2" cdkDrag>
-        <div class="btn-group mb-1">
-          <button class="btn btn-sm btn-secondary" (click)="rotate(i)"><i-bs name="arrow-clockwise"></i-bs></button>
-          <button class="btn btn-sm btn-outline-secondary" (click)="toggleSplit(i)"><i-bs name="scissors"></i-bs></button>
-          <button class="btn btn-sm btn-danger" (click)="remove(i)"><i-bs name="trash"></i-bs></button>
+      <div class="page-item rounded p-2" cdkDrag (click)="toggleSelection(i)" [class.selected]="p.selected">
+        <div class="btn-toolbar hover-actions z-10">
+          <div class="btn-group">
+            <button class="btn btn-sm btn-dark text-danger" (click)="remove(i); $event.stopPropagation()">
+              <i-bs name="trash"></i-bs>
+            </button>
+            <button class="btn btn-sm btn-dark" (click)="toggleSplit(i); $event.stopPropagation()">
+              <i-bs name="scissors"></i-bs>
+            </button>
+          </div>
         </div>
-        <div class="pdf-viewer-container w-100 mt-3">
+        <div class="border-end border-bottom bg-light py-1 px-2 document-check z-10">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="page{{i}}"  [checked]="p.selected" (click)="toggleSelection(i); $event.stopPropagation()">
+            <label class="form-check-label" for="page{{i}}"></label>
+          </div>
+        </div>
+        <div class="pdf-viewer-container w-100" [class.selected]="p.selected">
           <pdf-viewer [src]="pdfSrc" [page]="p.page" [rotation]="p.rotate" [original-size]="false" [show-all]="false" [render-text]="false"></pdf-viewer>
         </div>
       </div>
