@@ -38,5 +38,7 @@ describe('PDFEditorComponent', () => {
     component.pages.push({ page: 2, rotate: 0, splitAfter: false })
     component.drop({ previousIndex: 0, currentIndex: 1 } as any)
     expect(component.pages[0].page).toBe(2)
+    component.rotate(0)
+    expect(component.pages[0].rotate).toBe(90)
   })
 })

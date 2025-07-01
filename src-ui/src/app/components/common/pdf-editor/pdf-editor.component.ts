@@ -54,6 +54,14 @@ export class PDFEditorComponent extends ConfirmDialogComponent {
     }))
   }
 
+  toggleSelection(i: number) {
+    this.pages[i].selected = !this.pages[i].selected
+  }
+
+  rotate(i: number) {
+    this.pages[i].rotate = (this.pages[i].rotate + 90) % 360
+  }
+
   rotateSelected(dir: number) {
     for (let p of this.pages) {
       if (p.selected) {
@@ -68,10 +76,6 @@ export class PDFEditorComponent extends ConfirmDialogComponent {
 
   toggleSplit(i: number) {
     this.pages[i].splitAfter = !this.pages[i].splitAfter
-  }
-
-  toggleSelection(i: number) {
-    this.pages[i].selected = !this.pages[i].selected
   }
 
   selectAll() {
