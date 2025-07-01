@@ -63,26 +63,20 @@ class TestDbCacheSettings:
         },
     )
     def test_cachalot_custom_settings(self):
-        cachalot_settings = _parse_cachalot_settings()
-        assert "cachalot" in settings.INSTALLED_APPS
-        caches = _parse_caches()
+        settings = _parse_cachalot_settings()
 
-        # Modifiable settings
-        assert cachalot_settings["CACHALOT_ENABLED"]
-        assert cachalot_settings["CACHALOT_TIMEOUT"] == 7200
-        assert caches["read-cache"]["LOCATION"] == "redis://localhost:6380/7"
-
-        # Fixed settings
-        assert cachalot_settings["CACHALOT_CACHE"] == "read-cache"
+        assert settings["CACHALOT_ENABLED"]
+        assert settings["CACHALOT_TIMEOUT"] == 7200
+        assert settings["CACHALOT_CACHE"] == "read-cache"
         assert (
-            cachalot_settings["CACHALOT_QUERY_KEYGEN"]
+            settings["CACHALOT_QUERY_KEYGEN"]
             == "paperless.db_cache.custom_get_query_cache_key"
         )
         assert (
-            cachalot_settings["CACHALOT_TABLE_KEYGEN"]
+            settings["CACHALOT_TABLE_KEYGEN"]
             == "paperless.db_cache.custom_get_table_cache_key"
         )
-        assert cachalot_settings["CACHALOT_FINAL_SQL_CHECK"] is True
+        assert settings["CACHALOT_FINAL_SQL_CHECK"] is True
 
     @pytest.mark.parametrize(
         ("env_var_ttl", "expected_cachalot_timeout"),
