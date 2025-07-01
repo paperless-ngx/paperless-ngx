@@ -159,6 +159,41 @@ Available options are `postgresql` and `mariadb`.
 
     Defaults to unset, which uses Django’s built-in defaults.
 
+#### [`PAPERLESS_DB_READ_CACHE_ENABLED=<bool>`](#PAPERLESS_DB_READ_CACHE_ENABLED) {#PAPERLESS_DB_READ_CACHE_ENABLED}
+
+: Caches the database read query results into Redis. This can significantly improve application response times by caching database queries, at the cost of slightly increased memory usage.
+
+    Defaults to `false`.
+
+    !!! danger
+
+    **Do not modify the database outside the application while it is running.**
+    This includes actions such as restoring a backup, upgrading the database, or performing manual inserts. All external modifications must be done **only when the application is stopped**.
+    After making any such changes, you **must invalidate the DB read cache** using the `invalidate_cachalot` management command.
+
+#### [`PAPERLESS_READ_CACHE_TTL=<int>`](#PAPERLESS_READ_CACHE_TTL) {#PAPERLESS_READ_CACHE_TTL}
+
+: Specifies how long (in seconds) read data should be cached.
+
+    Allowed values are between `1` (one second) and `31536000` (one year). Defaults to `3600` (one hour).
+
+    !!! warning
+
+    A high TTL increases memory usage over time. Memory may be used until end of TTL, even if the cache is invalidated with the `invalidate_cachalot` command.
+
+In case of an out-of-memory (OOM) situation, Redis may stop accepting new data — including cache entries, scheduled tasks, and documents to consume.
+If your system has limited RAM, consider configuring a dedicated Redis instance for the read cache, with a memory limit and the eviction policy set to `allkeys-lru`.
+For more details, refer to the [Redis eviction policy documentation](https://redis.io/docs/latest/develop/reference/eviction/), and see the `PAPERLESS_READ_CACHE_REDIS_URL` setting to specify a separate Redis broker.
+
+#### [`PAPERLESS_READ_CACHE_REDIS_URL=<url>`](#PAPERLESS_READ_CACHE_REDIS_URL) {#PAPERLESS_READ_CACHE_REDIS_URL}
+
+: Defines the Redis instance used for the read cache.
+
+    Defaults to `None`.
+
+    !!! Note
+    If this value is not set, the same Redis instance used for scheduled tasks will be used for caching as well.
+
 ## Optional Services
 
 ### Tika {#tika}
