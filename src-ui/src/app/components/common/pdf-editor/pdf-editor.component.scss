@@ -21,6 +21,10 @@
   }
 }
 
+::ng-deep .ng2-pdf-viewer-container {
+  overflow: hidden;
+}
+
 .hover-actions {
   position: absolute;
   top: 0;
