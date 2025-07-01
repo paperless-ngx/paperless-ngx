@@ -936,7 +936,7 @@ def _parse_cachalot_settings():
         "CACHALOT_REDIS_URL": redis_url,
         "CACHALOT_TIMEOUT": ttl,
     }
-    if result["CACHALOT_ENABLED"] and "cachalot" not in INSTALLED_APPS:
+    if result["CACHALOT_ENABLED"]:
         INSTALLED_APPS.append("cachalot")
     return result
 
