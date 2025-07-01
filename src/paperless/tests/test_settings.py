@@ -3,10 +3,13 @@ import os
 from unittest import TestCase
 from unittest import mock
 
+import pytest
 from celery.schedules import crontab
 
+from paperless.settings import _ocr_to_dateparser_languages
 from paperless.settings import _parse_base_paths
 from paperless.settings import _parse_beat_schedule
+from paperless.settings import _parse_dateparser_languages
 from paperless.settings import _parse_db_settings
 from paperless.settings import _parse_ignore_dates
 from paperless.settings import _parse_paperless_url
@@ -471,3 +474,50 @@ class TestPathSettings(TestCase):
         base_paths = _parse_base_paths()
         self.assertEqual("/paperless/", base_paths[1])  # BASE_URL
         self.assertEqual("/foobar/", base_paths[4])  # LOGOUT_REDIRECT_URL
+
+
+@pytest.mark.parametrize(
+    ("ocr_language", "expected"),
+    [
+        # One language
+        ("eng", ["en"]),
+        # Multiple languages
+        ("fra+ita+lao", ["fr", "it", "lo"]),
+        # Languages that don't have a two-letter equivalent
+        ("fil", ["fil"]),
+        # Languages with a script part supported by dateparser
+        ("aze_cyrl+srp_latn", ["az-Cyrl", "sr-Latn"]),
+        # Languages with a script part not supported by dateparser
+        # In this case, default to the language without script
+        ("deu_frak", ["de"]),
+        # Traditional and simplified chinese don't have the same name in dateparser,
+        # so they're converted to the general chinese language
+        ("chi_tra+chi_sim", ["zh"]),
+        # If a language is not supported by dateparser, fallback to the supported ones
+        ("eng+unsupported_language+por", ["en", "pt"]),
+        # If no language is supported, fallback to default
+        ("unsupported1+unsupported2", []),
+    ],
+)
+def test_ocr_to_dateparser_languages(ocr_language, expected):
+    assert sorted(_ocr_to_dateparser_languages(ocr_language)) == sorted(expected)
+
+
+@pytest.mark.parametrize(
+    ("languages", "expected"),
+    [
+        ("de", ["de"]),
+        ("zh", ["zh"]),
+        ("fr+en", ["fr", "en"]),
+        # Locales must be supported
+        ("en-001+fr-CA", ["en-001", "fr-CA"]),
+        ("en-001+fr", ["en-001", "fr"]),
+        # Special case for Chinese: variants seem to miss some dates,
+        # so we always add "zh" as a fallback.
+        ("en+zh-Hans-HK", ["en", "zh-Hans-HK", "zh"]),
+        ("en+zh-Hans", ["en", "zh-Hans", "zh"]),
+        ("en+zh-Hans+zh-Hant", ["en", "zh-Hans", "zh-Hant", "zh"]),
+    ],
+)
+def test_parser_date_parser_languages(languages, expected):
+    assert sorted(_parse_dateparser_languages(languages)) == sorted(expected)

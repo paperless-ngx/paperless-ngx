@@ -1,5 +1,7 @@
 import datetime
 import json
+import logging
+import logging.config
 import math
 import multiprocessing
 import os
@@ -12,8 +14,13 @@ from urllib.parse import urlparse
 
 from celery.schedules import crontab
 from concurrent_log_handler.queue import setup_logging_queues
+from dateparser.languages.loader import LocaleDataLoader
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
+
+from paperless.utils import ocr_to_dateparser_languages
+
+logger = logging.getLogger("paperless.settings")
 
 # Tap paperless.conf if it's available
 for path in [
@@ -864,6 +871,10 @@ LOGGING = {
     },
 }
 
+# Configure logging before calling any logger in settings.py so it will respect the log format, even if Django has not parsed the settings yet.
+logging.config.dictConfig(LOGGING)
+
+
 ###############################################################################
 # Task queue                                                                  #
 ###############################################################################
@@ -1165,6 +1176,84 @@ POST_CONSUME_SCRIPT = os.getenv("PAPERLESS_POST_CONSUME_SCRIPT")
 # Specify the default date order (for autodetected dates)
 DATE_ORDER = os.getenv("PAPERLESS_DATE_ORDER", "DMY")
 FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
+
+
+def _ocr_to_dateparser_languages(ocr_languages: str) -> list[str]:
+    """
+    Convert Tesseract OCR_LANGUAGE codes (ISO 639-2, e.g. "eng+fra", with optional scripts like "aze_Cyrl")
+    into a list of locales compatible with the `dateparser` library.
+
+    - If a script is provided (e.g., "aze_Cyrl"), attempts to use the full locale (e.g., "az-Cyrl").
+    Falls back to the base language (e.g., "az") if needed.
+    - If a language cannot be mapped or validated, it is skipped with a warning.
+    - Returns a list of valid locales, or an empty list if none could be converted.
+    """
+    ocr_to_dateparser = ocr_to_dateparser_languages()
+    loader = LocaleDataLoader()
+    result = []
+    try:
+        for ocr_language in ocr_languages.split("+"):
+            # Split into language and optional script
+            ocr_lang_part, *script = ocr_language.split("_")
+            ocr_script_part = script[0] if script else None
+
+            language_part = ocr_to_dateparser.get(ocr_lang_part)
+            if language_part is None:
+                logger.warning(
+                    f'Skipping unknown OCR language "{ocr_language}" — no dateparser equivalent.',
+                )
+                continue
+
+            # Ensure base language is supported by dateparser
+            loader.get_locale_map(locales=[language_part])
+
+            # Try to add the script part if it's supported by dateparser
+            if ocr_script_part:
+                dateparser_language = f"{language_part}-{ocr_script_part.title()}"
+                try:
+                    loader.get_locale_map(locales=[dateparser_language])
+                except Exception:
+                    logger.warning(
+                        f"Language variant '{dateparser_language}' not supported by dateparser; falling back to base language '{language_part}'. You can manually set PAPERLESS_DATE_PARSER_LANGUAGES if needed.",
+                    )
+                    dateparser_language = language_part
+            else:
+                dateparser_language = language_part
+            if dateparser_language not in result:
+                result.append(dateparser_language)
+    except Exception as e:
+        logger.warning(
+            f"Could not configure dateparser languages. Set PAPERLESS_DATE_PARSER_LANGUAGES parameter to avoid this. Detail: {e}",
+        )
+        return []
+    if not result:
+        logger.warning(
+            "Could not configure any dateparser languages from OCR_LANGUAGE — fallback to autodetection.",
+        )
+    return result
+
+
+def _parse_dateparser_languages(languages: str | None):
+    language_list = languages.split("+") if languages else []
+    # There is an unfixed issue in zh-Hant and zh-Hans locales in the dateparser lib.
+    # See: https://github.com/scrapinghub/dateparser/issues/875
+    for index, language in enumerate(language_list):
+        if language.startswith("zh-") and "zh" not in language_list:
+            logger.warning(
+                f'Chinese locale detected: {language}. dateparser might fail to parse some dates with this locale, so Chinese ("zh") will be used as a fallback.',
+            )
+            language_list.append("zh")
+
+    return list(LocaleDataLoader().get_locale_map(locales=language_list))
+
+
+if os.getenv("PAPERLESS_DATE_PARSER_LANGUAGES"):
+    DATE_PARSER_LANGUAGES = _parse_dateparser_languages(
+        os.getenv("PAPERLESS_DATE_PARSER_LANGUAGES"),
+    )
+else:
+    DATE_PARSER_LANGUAGES = _ocr_to_dateparser_languages(OCR_LANGUAGE)
+
 
 # Maximum number of dates taken from document start to end to show as suggestions for
 # `created` date in the frontend. Duplicates are removed, which can result in
