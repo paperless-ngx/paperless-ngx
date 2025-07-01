@@ -4,7 +4,7 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
 import { CommonModule } from '@angular/common'
-import { Component, OnInit, inject } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { PDFDocumentProxy, PdfViewerModule } from 'ng2-pdf-viewer'
@@ -31,10 +31,7 @@ interface PageOperation {
     NgxBootstrapIconsModule,
   ],
 })
-export class PDFEditorComponent
-  extends ConfirmDialogComponent
-  implements OnInit
-{
+export class PDFEditorComponent extends ConfirmDialogComponent {
   private documentService = inject(DocumentService)
   activeModal = inject(NgbActiveModal)
 
@@ -46,8 +43,6 @@ export class PDFEditorComponent
   get pdfSrc(): string {
     return this.documentService.getPreviewUrl(this.documentID)
   }
-
-  ngOnInit() {}
 
   pdfLoaded(pdf: PDFDocumentProxy) {
     this.totalPages = pdf.numPages
