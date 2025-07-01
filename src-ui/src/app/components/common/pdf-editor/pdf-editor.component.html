@@ -4,16 +4,26 @@
   <button type="button" class="btn-close" aria-label="Close" (click)="cancel()"></button>
 </div>
 <div class="modal-body">
-  <div class="btn-group toolbar mb-2">
-    <button class="btn btn-sm btn-secondary" (click)="rotateSelected(-90)" [disabled]="!hasSelection()">
-      <i-bs name="arrow-counterclockwise"></i-bs>
-    </button>
-    <button class="btn btn-sm btn-secondary" (click)="rotateSelected(90)" [disabled]="!hasSelection()">
-      <i-bs name="arrow-clockwise"></i-bs>
-    </button>
-    <button class="btn btn-sm btn-danger" (click)="deleteSelected()" [disabled]="!hasSelection()">
-      <i-bs name="trash"></i-bs>
-    </button>
+  <div class="btn-toolbar mb-2">
+    <div class="btn-group me-3">
+      <button class="btn btn-sm btn-secondary" (click)="selectAll()">
+        <i-bs name="check-all"></i-bs>
+      </button>
+      <button class="btn btn-sm btn-secondary" (click)="deselectAll()" [disabled]="!hasSelection()">
+        <i-bs name="x"></i-bs>
+      </button>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-sm btn-secondary" (click)="rotateSelected(-90)" [disabled]="!hasSelection()">
+        <i-bs name="arrow-counterclockwise"></i-bs>
+      </button>
+      <button class="btn btn-sm btn-secondary" (click)="rotateSelected(90)" [disabled]="!hasSelection()">
+        <i-bs name="arrow-clockwise"></i-bs>
+      </button>
+      <button class="btn btn-sm btn-danger" (click)="deleteSelected()" [disabled]="!hasSelection()">
+        <i-bs name="trash"></i-bs>
+      </button>
+    </div>
   </div>
   <div cdkDropList (cdkDropListDropped)="drop($event)" cdkDropListOrientation="mixed" class="d-flex flex-wrap row-cols-5">
     @for (p of pages; track p.page; let i = $index) {

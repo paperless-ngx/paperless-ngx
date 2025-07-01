@@ -79,6 +79,14 @@ export class PDFEditorComponent
     this.pages[i].selected = !this.pages[i].selected
   }
 
+  selectAll() {
+    this.pages.forEach((p) => (p.selected = true))
+  }
+
+  deselectAll() {
+    this.pages.forEach((p) => (p.selected = false))
+  }
+
   deleteSelected() {
     this.pages = this.pages.filter((p) => !p.selected)
   }
