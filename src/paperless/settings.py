@@ -918,7 +918,6 @@ CELERY_BEAT_SCHEDULE_FILENAME = str(DATA_DIR / "celerybeat-schedule.db")
 
 # Cachalot: Database read cache.
 def _parse_cachalot_settings():
-    global INSTALLED_APPS
     ttl = __get_int("PAPERLESS_READ_CACHE_TTL", 3600)
     ttl = min(ttl, 31536000) if ttl > 0 else 3600
     _, redis_url = _parse_redis_url(
@@ -936,12 +935,12 @@ def _parse_cachalot_settings():
         "CACHALOT_REDIS_URL": redis_url,
         "CACHALOT_TIMEOUT": ttl,
     }
-    if result["CACHALOT_ENABLED"]:
-        INSTALLED_APPS.append("cachalot")
     return result
 
 
 cachalot_settings = _parse_cachalot_settings()
+if cachalot_settings["CACHALOT_ENABLED"]:
+    INSTALLED_APPS.append("cachalot")
 CACHALOT_ENABLED = cachalot_settings["CACHALOT_ENABLED"]
 CACHALOT_CACHE = cachalot_settings["CACHALOT_CACHE"]
 CACHALOT_TIMEOUT = cachalot_settings["CACHALOT_TIMEOUT"]
