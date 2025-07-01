@@ -66,6 +66,10 @@
         <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
       </button>
 
+      <button ngbDropdownItem (click)="editPdf()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
+        <i-bs name="pencil"></i-bs>&nbsp;<ng-container i18n>Edit PDF</ng-container>
+      </button>
+
       <button ngbDropdownItem (click)="deletePages()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
         <i-bs name="file-earmark-minus"></i-bs>&nbsp;<ng-container i18n>Delete page(s)</ng-container>
       </button>

@@ -1366,6 +1366,8 @@ class BulkEditSerializer(
             return bulk_edit.split
         elif method == "delete_pages":
             return bulk_edit.delete_pages
+        elif method == "edit_pdf":
+            return bulk_edit.edit_pdf
         else:
             raise serializers.ValidationError("Unsupported method.")
 
@@ -1520,6 +1522,26 @@ class BulkEditSerializer(
         else:
             parameters["archive_fallback"] = False
 
+    def _validate_parameters_edit_pdf(self, parameters):
+        if "operations" not in parameters:
+            raise serializers.ValidationError("operations not specified")
+        if not isinstance(parameters["operations"], list):
+            raise serializers.ValidationError("operations must be a list")
+        for op in parameters["operations"]:
+            if not isinstance(op, dict):
+                raise serializers.ValidationError("invalid operation entry")
+            if "page" not in op or not isinstance(op["page"], int):
+                raise serializers.ValidationError("page must be an integer")
+            if "rotate" in op and not isinstance(op["rotate"], int):
+                raise serializers.ValidationError("rotate must be an integer")
+            if "doc" in op and not isinstance(op["doc"], int):
+                raise serializers.ValidationError("doc must be an integer")
+        if "delete_original" in parameters:
+            if not isinstance(parameters["delete_original"], bool):
+                raise serializers.ValidationError("delete_original must be a boolean")
+        else:
+            parameters["delete_original"] = False
+
     def validate(self, attrs):
         method = attrs["method"]
         parameters = attrs["parameters"]
@@ -1554,6 +1576,12 @@ class BulkEditSerializer(
             self._validate_parameters_delete_pages(parameters)
         elif method == bulk_edit.merge:
             self._validate_parameters_merge(parameters)
+        elif method == bulk_edit.edit_pdf:
+            if len(attrs["documents"]) > 1:
+                raise serializers.ValidationError(
+                    "Edit PDF method only supports one document",
+                )
+            self._validate_parameters_edit_pdf(parameters)
 
         return attrs
 
