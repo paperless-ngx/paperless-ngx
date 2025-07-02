@@ -921,7 +921,7 @@ def _parse_cachalot_settings():
     ttl = __get_int("PAPERLESS_READ_CACHE_TTL", 3600)
     ttl = min(ttl, 31536000) if ttl > 0 else 3600
     _, redis_url = _parse_redis_url(
-        os.getenv("PAPERLESS_READ_CACHE_REDIS_URL", None),
+        os.getenv("PAPERLESS_READ_CACHE_REDIS_URL", _CHANNELS_REDIS_URL),
     )
     result = {
         "CACHALOT_CACHE": "read-cache",
