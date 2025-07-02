@@ -3,7 +3,7 @@ import {
   HttpDownloadProgressEvent,
   HttpEventType,
 } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { inject, Injectable } from '@angular/core'
 import { filter, map, Observable } from 'rxjs'
 import { environment } from 'src/environments/environment'
 
@@ -17,7 +17,7 @@ export interface ChatMessage {
   providedIn: 'root',
 })
 export class ChatService {
-  constructor(private http: HttpClient) {}
+  private http: HttpClient = inject(HttpClient)
 
   streamChat(documentId: number, prompt: string): Observable<string> {
     return this.http

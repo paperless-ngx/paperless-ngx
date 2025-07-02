@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
+import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NavigationEnd, Router } from '@angular/router'
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
@@ -23,6 +23,9 @@ export class ChatComponent implements OnInit {
   public input: string = ''
   public documentId!: number
 
+  private chatService: ChatService = inject(ChatService)
+  private router: Router = inject(Router)
+
   @ViewChild('scrollAnchor') scrollAnchor!: ElementRef<HTMLDivElement>
   @ViewChild('chatInput') chatInput!: ElementRef<HTMLInputElement>
 
@@ -35,11 +38,6 @@ export class ChatComponent implements OnInit {
       : $localize`Ask a question about a document...`
   }
 
-  constructor(
-    private chatService: ChatService,
-    private router: Router
-  ) {}
-
   ngOnInit(): void {
     this.updateDocumentId(this.router.url)
     this.router.events
@@ -48,8 +46,6 @@ export class ChatComponent implements OnInit {
         map((event) => (event as NavigationEnd).url)
       )
       .subscribe((url) => {
-        console.log('URL changed:', url)
-
         this.updateDocumentId(url)
       })
   }
