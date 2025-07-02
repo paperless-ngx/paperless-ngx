@@ -41,14 +41,14 @@
             <button class="btn btn-sm btn-dark text-danger" (click)="remove(i); $event.stopPropagation()" title="Delete page" i18n-title>
               <i-bs name="trash"></i-bs>
             </button>
-            <button class="btn btn-sm btn-dark" (click)="toggleSplit(i); $event.stopPropagation()" title="Split document here" i18n-title>
+            <button class="btn btn-sm btn-dark" (click)="toggleSplit(i); $event.stopPropagation()" title="Add / remove document split here" i18n-title>
               <i-bs name="scissors"></i-bs>
             </button>
           </div>
         </div>
         <div class="border-end border-bottom bg-light py-1 px-2 document-check z-10">
           <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="page{{i}}"  [checked]="p.selected" (click)="toggleSelection(i); $event.stopPropagation()">
+            <input type="checkbox" class="form-check-input" id="page{{i}}" [checked]="p.selected" (click)="toggleSelection(i); $event.stopPropagation()">
             <label class="form-check-label" for="page{{i}}"></label>
           </div>
         </div>
@@ -68,11 +68,31 @@
     }
   </div>
 </div>
-<div class="modal-footer">
-  <div class="form-check form-switch me-auto">
-    <input class="form-check-input" type="checkbox" id="deleteSwitch" [(ngModel)]="deleteOriginal">
-    <label class="form-check-label" for="deleteSwitch" i18n>Delete original after edit</label>
+<div class="modal-footer flex-column">
+  <div class="d-flex w-100 justify-content-between align-items-center">
+    <div class="btn-group" role="group">
+      <input type="radio" class="btn-check" [(ngModel)]="editMode" [value]="EditMode.Create" id="editModeCreate" name="editmode">
+      <label for="editModeCreate" class="btn btn-outline-primary btn-sm">
+        <i-bs name="plus"></i-bs>
+        <span class="form-check-label ms-1" i18n>Create new document(s)</span>
+      </label>
+      <input type="radio" class="btn-check" [(ngModel)]="editMode" [value]="EditMode.Update" id="editModeUpdate" name="editmode" [disabled]="hasSplit()">
+      <label for="editModeUpdate" class="btn btn-outline-primary btn-sm">
+        <i-bs name="pencil"></i-bs>
+        <span class="form-check-label ms-2" i18n>Update existing document</span>
+      </label>
+    </div>
+    @if (editMode === EditMode.Create) {
+      <div class="form-check ms-3">
+        <input class="form-check-input" type="checkbox" id="copyMeta" [(ngModel)]="includeMetadata">
+        <label class="form-check-label" for="copyMeta" i18n>Copy metadata</label>
+      </div>
+      <div class="form-check ms-3">
+        <input class="form-check-input" type="checkbox" id="deleteOriginal" [(ngModel)]="deleteOriginal">
+        <label class="form-check-label" for="deleteOriginal" i18n>Delete original</label>
+      </div>
+    }
+    <button type="button" class="btn ms-auto me-2" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">{{ cancelBtnCaption }}</button>
+    <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="pages.length === 0">{{ btnCaption }}</button>
   </div>
-  <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">{{ cancelBtnCaption }}</button>
-  <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="pages.length === 0">{{ btnCaption }}</button>
 </div>

@@ -502,6 +502,8 @@ def edit_pdf(
     operations: list[dict],
     *,
     delete_original: bool = False,
+    update_document: bool = False,
+    include_metadata: bool = True,
     user: User | None = None,
 ) -> Literal["OK"]:
     """
@@ -533,9 +535,25 @@ def edit_pdf(
                 if op.get("rotate"):
                     dst.pages[-1].rotate(op["rotate"], relative=True)
 
+        if update_document:
+            if len(pdf_docs) != 1:
+                logger.error(
+                    "Update requested but multiple output documents specified",
+                )
+                return "ERROR"
+            pdf = pdf_docs[0]
+            pdf.remove_unreferenced_resources()
+            pdf.save(doc.source_path)
+            doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
+            doc.page_count = len(pdf.pages)
+            doc.save()
+            update_document_content_maybe_archive_file.delay(document_id=doc.id)
+        else:
             consume_tasks = []
-            overrides: DocumentMetadataOverrides = (
+            overrides = (
                 DocumentMetadataOverrides().from_document(doc)
+                if include_metadata
+                else DocumentMetadataOverrides()
             )
             if user is not None:
                 overrides.owner_id = user.id
@@ -564,6 +582,7 @@ def edit_pdf(
 
     except Exception as e:
         logger.exception(f"Error editing document {doc.id}: {e}")
+        return "ERROR"
 
     return "OK"
 

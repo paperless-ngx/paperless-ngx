@@ -1537,11 +1537,23 @@ class BulkEditSerializer(
                 raise serializers.ValidationError("rotate must be an integer")
             if "doc" in op and not isinstance(op["doc"], int):
                 raise serializers.ValidationError("doc must be an integer")
-        if "delete_original" in parameters:
-            if not isinstance(parameters["delete_original"], bool):
-                raise serializers.ValidationError("delete_original must be a boolean")
+        if "update_document" in parameters:
+            if not isinstance(parameters["update_document"], bool):
+                raise serializers.ValidationError("update_document must be a boolean")
         else:
-            parameters["delete_original"] = False
+            parameters["update_document"] = False
+        if "include_metadata" in parameters:
+            if not isinstance(parameters["include_metadata"], bool):
+                raise serializers.ValidationError("include_metadata must be a boolean")
+        else:
+            parameters["include_metadata"] = True
+
+        if parameters["update_document"]:
+            max_idx = max(op.get("doc", 0) for op in parameters["operations"])
+            if max_idx > 0:
+                raise serializers.ValidationError(
+                    "update_document only allowed with a single output document",
+                )
 
     def validate(self, attrs):
         method = attrs["method"]

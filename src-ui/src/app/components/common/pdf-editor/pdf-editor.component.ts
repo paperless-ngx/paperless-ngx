@@ -19,6 +19,11 @@ interface PageOperation {
   loaded?: boolean
 }
 
+enum EditMode {
+  Update = 'update',
+  Create = 'create',
+}
+
 @Component({
   selector: 'pngx-pdf-editor',
   templateUrl: './pdf-editor.component.html',
@@ -31,13 +36,18 @@ interface PageOperation {
   ],
 })
 export class PDFEditorComponent extends ConfirmDialogComponent {
+  public EditMode = EditMode
+
   private documentService = inject(DocumentService)
-  activeModal = inject(NgbActiveModal)
+  activeModal: NgbActiveModal = inject(NgbActiveModal)
 
   documentID: number
   pages: PageOperation[] = []
   totalPages = 0
-  deleteOriginal = false
+  editMode: EditMode = EditMode.Create
+  deleteOriginal: boolean = false
+  updateDocument: boolean = false
+  includeMetadata: boolean = true
 
   get pdfSrc(): string {
     return this.documentService.getPreviewUrl(this.documentID)
@@ -76,6 +86,10 @@ export class PDFEditorComponent extends ConfirmDialogComponent {
 
   toggleSplit(i: number) {
     this.pages[i].splitAfter = !this.pages[i].splitAfter
+    if (this.pages[i].splitAfter) {
+      // force create mode
+      this.editMode = EditMode.Create
+    }
   }
 
   selectAll() {
@@ -92,6 +106,10 @@ export class PDFEditorComponent extends ConfirmDialogComponent {
 
   hasSelection(): boolean {
     return this.pages.some((p) => p.selected)
+  }
+
+  hasSplit(): boolean {
+    return this.pages.some((p) => p.splitAfter)
   }
 
   drop(event: CdkDragDrop<PageOperation[]>) {
