@@ -53,7 +53,13 @@
           </div>
         </div>
         <div class="pdf-viewer-container w-100" [class.selected]="p.selected">
-          <pdf-viewer [src]="pdfSrc" [page]="p.page" [rotation]="p.rotate" [original-size]="false" [show-all]="false" [render-text]="false"></pdf-viewer>
+          @defer (on viewport) {
+            <pdf-viewer [class.opacity-0]="!p.loaded" [src]="pdfSrc" [page]="p.page" [rotation]="p.rotate" [original-size]="false" [show-all]="false" [render-text]="false" (page-rendered)="p.loaded = true"></pdf-viewer>
+          } @placeholder {
+            <div class="placeholder-glow w-100 h-100 z-10">
+              <span class="placeholder w-100"></span>
+            </div>
+          }
         </div>
         @if (p.splitAfter) {
           <div class="split-after rounded position-absolute top-0 end-0 bg-dark text-uppercase text-center h-100 px-1 small fw-bold">&mdash; <span i18n>Split here</span> &mdash;</div>
