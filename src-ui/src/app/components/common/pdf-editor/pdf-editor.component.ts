@@ -3,7 +3,6 @@ import {
   DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
-import { CommonModule } from '@angular/common'
 import { Component, inject } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
@@ -25,7 +24,6 @@ interface PageOperation {
   templateUrl: './pdf-editor.component.html',
   styleUrl: './pdf-editor.component.scss',
   imports: [
-    CommonModule,
     DragDropModule,
     FormsModule,
     PdfViewerModule,
