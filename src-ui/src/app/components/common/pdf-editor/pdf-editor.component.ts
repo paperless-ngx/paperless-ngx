@@ -17,6 +17,7 @@ interface PageOperation {
   rotate: number
   splitAfter: boolean
   selected?: boolean
+  loaded?: boolean
 }
 
 @Component({
@@ -51,6 +52,7 @@ export class PDFEditorComponent extends ConfirmDialogComponent {
       rotate: 0,
       splitAfter: false,
       selected: false,
+      loaded: false,
     }))
   }
 
