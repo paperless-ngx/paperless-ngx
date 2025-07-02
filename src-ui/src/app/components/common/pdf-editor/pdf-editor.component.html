@@ -54,10 +54,15 @@
         </div>
         <div class="pdf-viewer-container w-100" [class.selected]="p.selected">
           @defer (on viewport) {
-            <pdf-viewer [class.opacity-0]="!p.loaded" [src]="pdfSrc" [page]="p.page" [rotation]="p.rotate" [original-size]="false" [show-all]="false" [render-text]="false" (page-rendered)="p.loaded = true"></pdf-viewer>
+            @if (!p.loaded) {
+              <div class="placeholder-glow w-100 h-100 z-10">
+                <span class="placeholder w-100 h-100"></span>
+              </div>
+            }
+            <pdf-viewer class="fade" [class.show]="p.loaded" [src]="pdfSrc" [page]="p.page" [rotation]="p.rotate" [original-size]="false" [show-all]="false" [render-text]="false" (page-rendered)="p.loaded = true"></pdf-viewer>
           } @placeholder {
             <div class="placeholder-glow w-100 h-100 z-10">
-              <span class="placeholder w-100"></span>
+              <span class="placeholder w-100 h-100"></span>
             </div>
           }
         </div>
