@@ -1350,7 +1350,8 @@ export class DocumentDetailComponent
         this.documentsService
           .bulkEdit([this.document.id], 'edit_pdf', {
             operations: modal.componentInstance.getOperations(),
-            delete_original: modal.componentInstance.deleteOriginal,
+            update_document: modal.componentInstance.updateDocument,
+            include_metadata: modal.componentInstance.includeMetadata,
           })
           .pipe(first(), takeUntil(this.unsubscribeNotifier))
           .subscribe({

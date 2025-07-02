@@ -68,11 +68,21 @@
     }
   </div>
 </div>
-<div class="modal-footer">
-  <div class="form-check form-switch me-auto">
-    <input class="form-check-input" type="checkbox" id="deleteSwitch" [(ngModel)]="deleteOriginal">
-    <label class="form-check-label" for="deleteSwitch" i18n>Delete original after edit</label>
+<div class="modal-footer flex-column">
+  <div class="form-check">
+    <input class="form-check-input" type="radio" id="modeUpdate" name="editmode" [(ngModel)]="updateDocument" [ngValue]="true">
+    <label class="form-check-label" for="modeUpdate" i18n>Update this document</label>
   </div>
-  <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">{{ cancelBtnCaption }}</button>
-  <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="pages.length === 0">{{ btnCaption }}</button>
+  <div class="form-check mb-2">
+    <input class="form-check-input" type="radio" id="modeCreate" name="editmode" [(ngModel)]="updateDocument" [ngValue]="false">
+    <label class="form-check-label" for="modeCreate" i18n>Create a new document</label>
+  </div>
+  <div class="form-check ms-3 mb-2" *ngIf="!updateDocument">
+    <input class="form-check-input" type="checkbox" id="copyMeta" [(ngModel)]="includeMetadata">
+    <label class="form-check-label" for="copyMeta" i18n>Copy metadata from existing document</label>
+  </div>
+  <div class="d-flex w-100 justify-content-end">
+    <button type="button" class="btn me-2" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">{{ cancelBtnCaption }}</button>
+    <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="pages.length === 0">{{ btnCaption }}</button>
+  </div>
 </div>

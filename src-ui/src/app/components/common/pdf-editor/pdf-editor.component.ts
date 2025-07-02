@@ -39,7 +39,8 @@ export class PDFEditorComponent extends ConfirmDialogComponent {
   documentID: number
   pages: PageOperation[] = []
   totalPages = 0
-  deleteOriginal = false
+  updateDocument = false
+  includeMetadata = true
 
   get pdfSrc(): string {
     return this.documentService.getPreviewUrl(this.documentID)
