@@ -4,7 +4,6 @@ import logging
 import pickle
 import re
 import warnings
-from collections import OrderedDict
 from functools import lru_cache
 from hashlib import sha256
 from pathlib import Path
@@ -27,6 +26,7 @@ from documents.caching import CACHE_50_MINUTES
 from documents.caching import CLASSIFIER_HASH_KEY
 from documents.caching import CLASSIFIER_MODIFIED_KEY
 from documents.caching import CLASSIFIER_VERSION_KEY
+from documents.caching import StoredLRUCache
 from documents.models import Document
 from documents.models import MatchingModel
 
@@ -141,6 +141,13 @@ class DocumentClassifier:
         self.storage_path_classifier = None
 
         self._stemmer = None
+        # 10000 elements is about 200 to 500 KB shared Redis cache
+        # Keep this cache small to avoid read/write delays
+        self._stem_cache = StoredLRUCache(
+            f"pngx_stem_cache_v{self.FORMAT_VERSION}",
+            capacity=10000,
+            backend_ttl=3600,
+        )
         self._stop_words = None
 
     def _update_data_vectorizer_hash(self):
@@ -403,56 +410,36 @@ class DocumentClassifier:
 
         return True
 
-    def _get_stemmer_cache_key(self) -> str:
-        """
-        Returns the basic key for a document's metadata
-        """
-        return f"pngx_stemmer_cache_v{self.FORMAT_VERSION}"
-
-    def _get_stemmer_cache(self) -> OrderedDict[str, str]:
-        key = self._get_stemmer_cache_key()
-        stemmer_pickle = read_cache.get(key)
-        stemmer_data = pickle.loads(stemmer_pickle) if stemmer_pickle else OrderedDict()
-        return stemmer_data
-
-    def _set_stemmer_cache(self, stemmer_data: OrderedDict) -> None:
-        key = self._get_stemmer_cache_key()
-        stemmer_pickle = pickle.dumps(stemmer_data)
-        read_cache.set(key, stemmer_pickle, timeout=CACHE_50_MINUTES)
-
     def stem_and_skip_stop_words(self, words: list[str], *, shared_cache=True):
         """
         Reduce a list of words to their stem. Stop words are converted to empty strings.
         :param words: the list of words to stem
         """
-        stem_cache = self._get_stemmer_cache()
-        # 10000 elements is about 200 to 500 KB shared Redis cache
-        # Keep this cache small to avoid read/write delays
-        cache_limit = 10000
 
-        def _stem_and_skip_stop_word(word: str, stem_cache, cache_limit=cache_limit):
+        def _stem_and_skip_stop_word(word: str):
             """
             Reduce a given word to its stem. If it's a stop word, return an empty string.
             E.g. "amazement", "amaze" and "amazed" all return "amaz".
             """
-            if word in stem_cache:
-                stem_cache.move_to_end(word)
-                result = stem_cache[word]
+            result = self._stem_cache.get(word)
+            if result:
+                pass
             # Assumption: words that contain numbers are never stemmed
             elif RE_DIGIT.search(word):
                 return word
             else:
                 stemmer, stop_words, _ = _load_ntlk_resources()
                 result = stemmer.stem(word) if word not in stop_words else ""
-                stem_cache[word] = result
-                stem_cache.move_to_end(word)
-                while len(stem_cache) > cache_limit:
-                    stem_cache.popitem(last=False)  # remove oldest entry
+                self._stem_cache.set(word, result)
+
             return result
+
+        if shared_cache:
+            self._stem_cache.load()
 
         # Stem the words and skip stop words
         result = " ".join(
-            filter(None, (_stem_and_skip_stop_word(w, stem_cache) for w in words)),
+            filter(None, (_stem_and_skip_stop_word(w) for w in words)),
         )
         if shared_cache:
             self._stem_cache.save()
