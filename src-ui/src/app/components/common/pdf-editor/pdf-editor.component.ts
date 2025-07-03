@@ -19,7 +19,7 @@ interface PageOperation {
   loaded?: boolean
 }
 
-enum EditMode {
+export enum PdfEditorEditMode {
   Update = 'update',
   Create = 'create',
 }
@@ -36,7 +36,7 @@ enum EditMode {
   ],
 })
 export class PDFEditorComponent extends ConfirmDialogComponent {
-  public EditMode = EditMode
+  public PdfEditorEditMode = PdfEditorEditMode
 
   private documentService = inject(DocumentService)
   activeModal: NgbActiveModal = inject(NgbActiveModal)
@@ -44,9 +44,8 @@ export class PDFEditorComponent extends ConfirmDialogComponent {
   documentID: number
   pages: PageOperation[] = []
   totalPages = 0
-  editMode: EditMode = EditMode.Create
+  editMode: PdfEditorEditMode = PdfEditorEditMode.Create
   deleteOriginal: boolean = false
-  updateDocument: boolean = false
   includeMetadata: boolean = true
 
   get pdfSrc(): string {
@@ -88,7 +87,7 @@ export class PDFEditorComponent extends ConfirmDialogComponent {
     this.pages[i].splitAfter = !this.pages[i].splitAfter
     if (this.pages[i].splitAfter) {
       // force create mode
-      this.editMode = EditMode.Create
+      this.editMode = PdfEditorEditMode.Create
     }
   }
 
@@ -117,12 +116,11 @@ export class PDFEditorComponent extends ConfirmDialogComponent {
   }
 
   getOperations() {
-    const operations = this.pages.map((p, idx) => ({
+    return this.pages.map((p, idx) => ({
       page: p.page,
       rotate: p.rotate,
       doc: this.computeDocIndex(idx),
     }))
-    return operations
   }
 
   private computeDocIndex(index: number): number {

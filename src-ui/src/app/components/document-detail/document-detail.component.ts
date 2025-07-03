@@ -99,7 +99,10 @@ import { TagsComponent } from '../common/input/tags/tags.component'
 import { TextComponent } from '../common/input/text/text.component'
 import { UrlComponent } from '../common/input/url/url.component'
 import { PageHeaderComponent } from '../common/page-header/page-header.component'
-import { PDFEditorComponent } from '../common/pdf-editor/pdf-editor.component'
+import {
+  PDFEditorComponent,
+  PdfEditorEditMode,
+} from '../common/pdf-editor/pdf-editor.component'
 import { ShareLinksDialogComponent } from '../common/share-links-dialog/share-links-dialog.component'
 import { DocumentHistoryComponent } from '../document-history/document-history.component'
 import { DocumentNotesComponent } from '../document-notes/document-notes.component'
@@ -1363,7 +1366,9 @@ export class DocumentDetailComponent
         this.documentsService
           .bulkEdit([this.document.id], 'edit_pdf', {
             operations: modal.componentInstance.getOperations(),
-            update_document: modal.componentInstance.updateDocument,
+            delete_original: modal.componentInstance.deleteOriginal,
+            update_document:
+              modal.componentInstance.editMode == PdfEditorEditMode.Update,
             include_metadata: modal.componentInstance.includeMetadata,
           })
           .pipe(first(), takeUntil(this.unsubscribeNotifier))

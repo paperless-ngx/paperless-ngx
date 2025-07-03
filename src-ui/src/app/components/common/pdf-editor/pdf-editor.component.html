@@ -76,18 +76,18 @@
 <div class="modal-footer flex-column">
   <div class="d-flex w-100 justify-content-between align-items-center">
     <div class="btn-group" role="group">
-      <input type="radio" class="btn-check" [(ngModel)]="editMode" [value]="EditMode.Create" id="editModeCreate" name="editmode">
+      <input type="radio" class="btn-check" [(ngModel)]="editMode" [value]="PdfEditorEditMode.Create" id="editModeCreate" name="editmode">
       <label for="editModeCreate" class="btn btn-outline-primary btn-sm">
         <i-bs name="plus"></i-bs>
         <span class="form-check-label ms-1" i18n>Create new document(s)</span>
       </label>
-      <input type="radio" class="btn-check" [(ngModel)]="editMode" [value]="EditMode.Update" id="editModeUpdate" name="editmode" [disabled]="hasSplit()">
+      <input type="radio" class="btn-check" [(ngModel)]="editMode" [value]="PdfEditorEditMode.Update" id="editModeUpdate" name="editmode" [disabled]="hasSplit()">
       <label for="editModeUpdate" class="btn btn-outline-primary btn-sm">
         <i-bs name="pencil"></i-bs>
         <span class="form-check-label ms-2" i18n>Update existing document</span>
       </label>
     </div>
-    @if (editMode === EditMode.Create) {
+    @if (editMode === PdfEditorEditMode.Create) {
       <div class="form-check ms-3">
         <input class="form-check-input" type="checkbox" id="copyMeta" [(ngModel)]="includeMetadata">
         <label class="form-check-label" for="copyMeta" i18n>Copy metadata</label>

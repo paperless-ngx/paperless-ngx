@@ -1175,6 +1175,7 @@ describe('DocumentDetailComponent', () => {
       method: 'edit_pdf',
       parameters: {
         operations: [{ page: 1, rotate: 0, doc: 0 }],
+        delete_original: false,
         update_document: false,
         include_metadata: true,
       },
