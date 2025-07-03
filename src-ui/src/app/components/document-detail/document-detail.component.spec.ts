@@ -1158,7 +1158,7 @@ describe('DocumentDetailComponent', () => {
     ).not.toBeUndefined()
   })
 
-  it('should support pdf editor', () => {
+  it('should support pdf editor, handle error', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[0]))
     initNormally()
@@ -1167,7 +1167,7 @@ describe('DocumentDetailComponent', () => {
     modal.componentInstance.documentID = doc.id
     modal.componentInstance.pages = [{ page: 1, rotate: 0, splitAfter: false }]
     modal.componentInstance.confirm()
-    const req = httpTestingController.expectOne(
+    let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/bulk_edit/`
     )
     expect(req.request.body).toEqual({
@@ -1181,6 +1181,17 @@ describe('DocumentDetailComponent', () => {
       },
     })
     req.flush(true)
+
+    component.editPdf()
+    modal.componentInstance.documentID = doc.id
+    modal.componentInstance.pages = [{ page: 1, rotate: 0, splitAfter: true }]
+    modal.componentInstance.confirm()
+    const errorSpy = jest.spyOn(toastService, 'showError')
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.error(new ErrorEvent('failed'))
+    expect(errorSpy).toHaveBeenCalled()
   })
 
   it('should support keyboard shortcuts', () => {
