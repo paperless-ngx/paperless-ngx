@@ -1369,7 +1369,8 @@ class BulkEditSerializer(
             return bulk_edit.delete_pages
         elif method == "edit_pdf":
             return bulk_edit.edit_pdf
-        else:
+        else:  # pragma: no cover
+            # This will never happen as it is handled by the ChoiceField
             raise serializers.ValidationError("Unsupported method.")
 
     def _validate_parameters_tags(self, parameters):
