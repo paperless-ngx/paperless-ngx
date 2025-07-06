@@ -258,66 +258,66 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
     def test_is_ignored(self):
         test_paths = [
             {
-                "path": (Path(self.dirs.consumption_dir) / "foo.pdf").as_posix(),
+                "path": str(Path(self.dirs.consumption_dir) / "foo.pdf"),
                 "ignore": False,
             },
             {
-                "path": (
-                    Path(self.dirs.consumption_dir) / "foo" / "bar.pdf"
-                ).as_posix(),
+                "path": str(
+                    Path(self.dirs.consumption_dir) / "foo" / "bar.pdf",
+                ),
                 "ignore": False,
             },
             {
-                "path": (Path(self.dirs.consumption_dir) / ".DS_STORE").as_posix(),
+                "path": str(Path(self.dirs.consumption_dir) / ".DS_STORE"),
                 "ignore": True,
             },
             {
-                "path": (Path(self.dirs.consumption_dir) / ".DS_Store").as_posix(),
+                "path": str(Path(self.dirs.consumption_dir) / ".DS_Store"),
                 "ignore": True,
             },
             {
-                "path": (
-                    Path(self.dirs.consumption_dir) / ".stfolder" / "foo.pdf"
-                ).as_posix(),
+                "path": str(
+                    Path(self.dirs.consumption_dir) / ".stfolder" / "foo.pdf",
+                ),
                 "ignore": True,
             },
             {
-                "path": (Path(self.dirs.consumption_dir) / ".stfolder.pdf").as_posix(),
+                "path": str(Path(self.dirs.consumption_dir) / ".stfolder.pdf"),
                 "ignore": False,
             },
             {
-                "path": (
-                    Path(self.dirs.consumption_dir) / ".stversions" / "foo.pdf"
-                ).as_posix(),
+                "path": str(
+                    Path(self.dirs.consumption_dir) / ".stversions" / "foo.pdf",
+                ),
                 "ignore": True,
             },
             {
-                "path": (
-                    Path(self.dirs.consumption_dir) / ".stversions.pdf"
-                ).as_posix(),
+                "path": str(
+                    Path(self.dirs.consumption_dir) / ".stversions.pdf",
+                ),
                 "ignore": False,
             },
             {
-                "path": (Path(self.dirs.consumption_dir) / "._foo.pdf").as_posix(),
+                "path": str(Path(self.dirs.consumption_dir) / "._foo.pdf"),
                 "ignore": True,
             },
             {
-                "path": (Path(self.dirs.consumption_dir) / "my_foo.pdf").as_posix(),
+                "path": str(Path(self.dirs.consumption_dir) / "my_foo.pdf"),
                 "ignore": False,
             },
             {
-                "path": (
-                    Path(self.dirs.consumption_dir) / "._foo" / "bar.pdf"
-                ).as_posix(),
+                "path": str(
+                    Path(self.dirs.consumption_dir) / "._foo" / "bar.pdf",
+                ),
                 "ignore": True,
             },
             {
-                "path": (
+                "path": str(
                     Path(self.dirs.consumption_dir)
                     / "@eaDir"
                     / "SYNO@.fileindexdb"
-                    / "_1jk.fnm"
-                ).as_posix(),
+                    / "_1jk.fnm",
+                ),
                 "ignore": True,
             },
         ]
@@ -330,7 +330,7 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
                 f'_is_ignored("{filepath}") != {expected_ignored_result}',
             )
 
-    @mock.patch("documents.management.commands.document_consumer.open")
+    @mock.patch("documents.management.commands.document_consumer.Path.open")
     def test_consume_file_busy(self, open_mock):
         # Calling this mock always raises this
         open_mock.side_effect = OSError
