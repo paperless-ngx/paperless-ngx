@@ -230,9 +230,9 @@ class TestExportImport(
 
         for element in manifest:
             if element["model"] == "documents.document":
-                fname = (
-                    self.target / element[document_exporter.EXPORTER_FILE_NAME]
-                ).as_posix()
+                fname = str(
+                    self.target / element[document_exporter.EXPORTER_FILE_NAME],
+                )
                 self.assertIsFile(fname)
                 self.assertIsFile(
                     self.target / element[document_exporter.EXPORTER_THUMBNAIL_NAME],
@@ -462,9 +462,9 @@ class TestExportImport(
 
         call_command(*args)
 
-        expected_file = (
-            self.target / f"export-{timezone.localdate().isoformat()}.zip"
-        ).as_posix()
+        expected_file = str(
+            self.target / f"export-{timezone.localdate().isoformat()}.zip",
+        )
 
         self.assertIsFile(expected_file)
 
@@ -498,9 +498,9 @@ class TestExportImport(
         ):
             call_command(*args)
 
-        expected_file = (
-            self.target / f"export-{timezone.localdate().isoformat()}.zip"
-        ).as_posix()
+        expected_file = str(
+            self.target / f"export-{timezone.localdate().isoformat()}.zip",
+        )
 
         self.assertIsFile(expected_file)
 
@@ -544,9 +544,9 @@ class TestExportImport(
 
         call_command(*args)
 
-        expected_file = (
-            self.target / f"export-{timezone.localdate().isoformat()}.zip"
-        ).as_posix()
+        expected_file = str(
+            self.target / f"export-{timezone.localdate().isoformat()}.zip",
+        )
 
         self.assertIsFile(expected_file)
         self.assertIsNotFile(existing_file)
