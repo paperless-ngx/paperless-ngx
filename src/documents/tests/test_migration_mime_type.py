@@ -20,7 +20,7 @@ def source_path_before(self):
         if self.storage_type == STORAGE_TYPE_GPG:
             fname += ".gpg"
 
-    return (Path(settings.ORIGINALS_DIR) / fname).as_posix()
+    return Path(settings.ORIGINALS_DIR) / fname
 
 
 def file_type_after(self):
@@ -35,7 +35,7 @@ def source_path_after(doc):
         if doc.storage_type == STORAGE_TYPE_GPG:
             fname += ".gpg"  # pragma: no cover
 
-    return (Path(settings.ORIGINALS_DIR) / fname).as_posix()
+    return Path(settings.ORIGINALS_DIR) / fname
 
 
 @override_settings(PASSPHRASE="test")
