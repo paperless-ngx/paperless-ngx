@@ -69,13 +69,13 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         parser = RasterisedDocumentParser(uuid.uuid4())
         page_count = parser.get_page_count(
-            (self.SAMPLE_FILES / "simple-digital.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "simple-digital.pdf"),
             "application/pdf",
         )
         self.assertEqual(page_count, 1)
 
         page_count = parser.get_page_count(
-            (self.SAMPLE_FILES / "multi-page-mixed.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "multi-page-mixed.pdf"),
             "application/pdf",
         )
         self.assertEqual(page_count, 6)
@@ -92,7 +92,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         parser = RasterisedDocumentParser(uuid.uuid4())
         with self.assertLogs("paperless.parsing.tesseract", level="WARNING") as cm:
             page_count = parser.get_page_count(
-                (self.SAMPLE_FILES / "password-protected.pdf").as_posix(),
+                str(self.SAMPLE_FILES / "password-protected.pdf"),
                 "application/pdf",
             )
             self.assertEqual(page_count, None)
@@ -101,7 +101,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_thumbnail(self):
         parser = RasterisedDocumentParser(uuid.uuid4())
         thumb = parser.get_thumbnail(
-            (self.SAMPLE_FILES / "simple-digital.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "simple-digital.pdf"),
             "application/pdf",
         )
         self.assertIsFile(thumb)
@@ -109,7 +109,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @mock.patch("documents.parsers.run_convert")
     def test_thumbnail_fallback(self, m):
         def call_convert(input_file, output_file, **kwargs):
-            if ".pdf" in input_file:
+            if ".pdf" in str(input_file):
                 raise ParseError("Does not compute.")
             else:
                 run_convert(input_file=input_file, output_file=output_file, **kwargs)
@@ -118,7 +118,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         parser = RasterisedDocumentParser(uuid.uuid4())
         thumb = parser.get_thumbnail(
-            (self.SAMPLE_FILES / "simple-digital.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "simple-digital.pdf"),
             "application/pdf",
         )
         self.assertIsFile(thumb)
@@ -126,7 +126,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_thumbnail_encrypted(self):
         parser = RasterisedDocumentParser(uuid.uuid4())
         thumb = parser.get_thumbnail(
-            (self.SAMPLE_FILES / "encrypted.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "encrypted.pdf"),
             "application/pdf",
         )
         self.assertIsFile(thumb)
@@ -134,17 +134,17 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_get_dpi(self):
         parser = RasterisedDocumentParser(None)
 
-        dpi = parser.get_dpi((self.SAMPLE_FILES / "simple-no-dpi.png").as_posix())
+        dpi = parser.get_dpi(str(self.SAMPLE_FILES / "simple-no-dpi.png"))
         self.assertEqual(dpi, None)
 
-        dpi = parser.get_dpi((self.SAMPLE_FILES / "simple.png").as_posix())
+        dpi = parser.get_dpi(str(self.SAMPLE_FILES / "simple.png"))
         self.assertEqual(dpi, 72)
 
     def test_simple_digital(self):
         parser = RasterisedDocumentParser(None)
 
         parser.parse(
-            (self.SAMPLE_FILES / "simple-digital.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "simple-digital.pdf"),
             "application/pdf",
         )
 
@@ -156,7 +156,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         parser = RasterisedDocumentParser(None)
 
         parser.parse(
-            (self.SAMPLE_FILES / "with-form.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "with-form.pdf"),
             "application/pdf",
         )
 
@@ -172,7 +172,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         parser = RasterisedDocumentParser(None)
 
         parser.parse(
-            (self.SAMPLE_FILES / "with-form.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "with-form.pdf"),
             "application/pdf",
         )
 
@@ -186,7 +186,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_signed(self):
         parser = RasterisedDocumentParser(None)
 
-        parser.parse((self.SAMPLE_FILES / "signed.pdf").as_posix(), "application/pdf")
+        parser.parse(str(self.SAMPLE_FILES / "signed.pdf"), "application/pdf")
 
         self.assertIsNone(parser.archive_path)
         self.assertContainsStrings(
@@ -202,7 +202,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         parser = RasterisedDocumentParser(None)
 
         parser.parse(
-            (self.SAMPLE_FILES / "encrypted.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "encrypted.pdf"),
             "application/pdf",
         )
 
@@ -213,7 +213,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_with_form_error_notext(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "with-form.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "with-form.pdf"),
             "application/pdf",
         )
 
@@ -227,7 +227,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         parser = RasterisedDocumentParser(None)
 
         parser.parse(
-            (self.SAMPLE_FILES / "with-form.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "with-form.pdf"),
             "application/pdf",
         )
 
@@ -239,7 +239,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_image_simple(self):
         parser = RasterisedDocumentParser(None)
 
-        parser.parse((self.SAMPLE_FILES / "simple.png").as_posix(), "image/png")
+        parser.parse(str(self.SAMPLE_FILES / "simple.png"), "image/png")
 
         self.assertIsFile(parser.archive_path)
 
@@ -255,7 +255,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             dest_file = Path(tempdir) / "simple-alpha.png"
             shutil.copy(sample_file, dest_file)
 
-            parser.parse(dest_file.as_posix(), "image/png")
+            parser.parse(str(dest_file), "image/png")
 
             self.assertIsFile(parser.archive_path)
 
@@ -265,7 +265,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         parser = RasterisedDocumentParser(None)
 
         dpi = parser.calculate_a4_dpi(
-            (self.SAMPLE_FILES / "simple-no-dpi.png").as_posix(),
+            str(self.SAMPLE_FILES / "simple-no-dpi.png"),
         )
 
         self.assertEqual(dpi, 62)
@@ -277,7 +277,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         def f():
             parser.parse(
-                (self.SAMPLE_FILES / "simple-no-dpi.png").as_posix(),
+                str(self.SAMPLE_FILES / "simple-no-dpi.png"),
                 "image/png",
             )
 
@@ -287,7 +287,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_image_no_dpi_default(self):
         parser = RasterisedDocumentParser(None)
 
-        parser.parse((self.SAMPLE_FILES / "simple-no-dpi.png").as_posix(), "image/png")
+        parser.parse(str(self.SAMPLE_FILES / "simple-no-dpi.png"), "image/png")
 
         self.assertIsFile(parser.archive_path)
 
@@ -299,7 +299,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_multi_page(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "multi-page-digital.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "multi-page-digital.pdf"),
             "application/pdf",
         )
         self.assertIsFile(parser.archive_path)
@@ -312,7 +312,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_multi_page_pages_skip(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "multi-page-digital.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "multi-page-digital.pdf"),
             "application/pdf",
         )
         self.assertIsFile(parser.archive_path)
@@ -325,7 +325,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_multi_page_pages_redo(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "multi-page-digital.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "multi-page-digital.pdf"),
             "application/pdf",
         )
         self.assertIsFile(parser.archive_path)
@@ -338,7 +338,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_multi_page_pages_force(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "multi-page-digital.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "multi-page-digital.pdf"),
             "application/pdf",
         )
         self.assertIsFile(parser.archive_path)
@@ -351,7 +351,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_multi_page_analog_pages_skip(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "multi-page-images.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "multi-page-images.pdf"),
             "application/pdf",
         )
         self.assertIsFile(parser.archive_path)
@@ -375,7 +375,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "multi-page-images.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "multi-page-images.pdf"),
             "application/pdf",
         )
         self.assertIsFile(parser.archive_path)
@@ -397,7 +397,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "multi-page-images.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "multi-page-images.pdf"),
             "application/pdf",
         )
         self.assertIsFile(parser.archive_path)
@@ -419,7 +419,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "multi-page-digital.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "multi-page-digital.pdf"),
             "application/pdf",
         )
         self.assertIsNone(parser.archive_path)
@@ -442,7 +442,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "multi-page-images.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "multi-page-images.pdf"),
             "application/pdf",
         )
 
@@ -467,7 +467,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "multi-page-digital.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "multi-page-digital.pdf"),
             "application/pdf",
         )
         self.assertIsNotNone(parser.archive_path)
@@ -490,7 +490,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "multi-page-images.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "multi-page-images.pdf"),
             "application/pdf",
         )
         self.assertIsNotNone(parser.archive_path)
@@ -513,7 +513,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "multi-page-digital.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "multi-page-digital.pdf"),
             "application/pdf",
         )
         self.assertIsNone(parser.archive_path)
@@ -536,7 +536,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "multi-page-images.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "multi-page-images.pdf"),
             "application/pdf",
         )
         self.assertIsNotNone(parser.archive_path)
@@ -559,7 +559,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "multi-page-digital.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "multi-page-digital.pdf"),
             "application/pdf",
         )
         self.assertIsNone(parser.archive_path)
@@ -582,7 +582,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "multi-page-images.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "multi-page-images.pdf"),
             "application/pdf",
         )
         self.assertIsNone(parser.archive_path)
@@ -605,7 +605,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "multi-page-mixed.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "multi-page-mixed.pdf"),
             "application/pdf",
         )
         self.assertIsNotNone(parser.archive_path)
@@ -636,7 +636,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "single-page-mixed.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "single-page-mixed.pdf"),
             "application/pdf",
         )
         self.assertIsNotNone(parser.archive_path)
@@ -673,7 +673,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "multi-page-mixed.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "multi-page-mixed.pdf"),
             "application/pdf",
         )
         self.assertIsNone(parser.archive_path)
@@ -685,7 +685,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @override_settings(OCR_MODE="skip", OCR_ROTATE_PAGES=True)
     def test_rotate(self):
         parser = RasterisedDocumentParser(None)
-        parser.parse((self.SAMPLE_FILES / "rotated.pdf").as_posix(), "application/pdf")
+        parser.parse(str(self.SAMPLE_FILES / "rotated.pdf"), "application/pdf")
         self.assertContainsStrings(
             parser.get_text(),
             [
@@ -707,7 +707,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "multi-page-images.tiff").as_posix(),
+            str(self.SAMPLE_FILES / "multi-page-images.tiff"),
             "image/tiff",
         )
         self.assertIsFile(parser.archive_path)
@@ -752,9 +752,9 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             - Text from all pages extracted
         """
         parser = RasterisedDocumentParser(None)
-        sample_file = (
-            self.SAMPLE_FILES / "multi-page-images-alpha-rgb.tiff"
-        ).as_posix()
+        sample_file = str(
+            self.SAMPLE_FILES / "multi-page-images-alpha-rgb.tiff",
+        )
         with tempfile.NamedTemporaryFile() as tmp_file:
             shutil.copy(sample_file, tmp_file.name)
             parser.parse(
@@ -843,7 +843,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         parser = RasterisedDocumentParser(None)
 
         parser.parse(
-            (self.SAMPLE_FILES / "rtl-test.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "rtl-test.pdf"),
             "application/pdf",
         )
 
@@ -858,7 +858,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertRaises(
             ParseError,
             parser.parse,
-            (self.SAMPLE_FILES / "simple-digital.pdf").as_posix(),
+            str(self.SAMPLE_FILES / "simple-digital.pdf"),
             "application/pdf",
         )
 
@@ -868,32 +868,32 @@ class TestParserFileTypes(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
     def test_bmp(self):
         parser = RasterisedDocumentParser(None)
-        parser.parse((self.SAMPLE_FILES / "simple.bmp").as_posix(), "image/bmp")
+        parser.parse(str(self.SAMPLE_FILES / "simple.bmp"), "image/bmp")
         self.assertIsFile(parser.archive_path)
         self.assertIn("this is a test document", parser.get_text().lower())
 
     def test_jpg(self):
         parser = RasterisedDocumentParser(None)
-        parser.parse((self.SAMPLE_FILES / "simple.jpg").as_posix(), "image/jpeg")
+        parser.parse(str(self.SAMPLE_FILES / "simple.jpg"), "image/jpeg")
         self.assertIsFile(parser.archive_path)
         self.assertIn("this is a test document", parser.get_text().lower())
 
     def test_heic(self):
         parser = RasterisedDocumentParser(None)
-        parser.parse((self.SAMPLE_FILES / "simple.heic").as_posix(), "image/heic")
+        parser.parse(str(self.SAMPLE_FILES / "simple.heic"), "image/heic")
         self.assertIsFile(parser.archive_path)
         self.assertIn("pizza", parser.get_text().lower())
 
     @override_settings(OCR_IMAGE_DPI=200)
     def test_gif(self):
         parser = RasterisedDocumentParser(None)
-        parser.parse((self.SAMPLE_FILES / "simple.gif").as_posix(), "image/gif")
+        parser.parse(str(self.SAMPLE_FILES / "simple.gif"), "image/gif")
         self.assertIsFile(parser.archive_path)
         self.assertIn("this is a test document", parser.get_text().lower())
 
     def test_tiff(self):
         parser = RasterisedDocumentParser(None)
-        parser.parse((self.SAMPLE_FILES / "simple.tif").as_posix(), "image/tiff")
+        parser.parse(str(self.SAMPLE_FILES / "simple.tif"), "image/tiff")
         self.assertIsFile(parser.archive_path)
         self.assertIn("this is a test document", parser.get_text().lower())
 
@@ -901,7 +901,7 @@ class TestParserFileTypes(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_webp(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(
-            (self.SAMPLE_FILES / "document.webp").as_posix(),
+            str(self.SAMPLE_FILES / "document.webp"),
             "image/webp",
         )
         self.assertIsFile(parser.archive_path)
