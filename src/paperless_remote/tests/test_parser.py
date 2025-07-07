@@ -8,6 +8,7 @@ from django.test import override_settings
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from paperless_remote.parsers import RemoteDocumentParser
+from paperless_remote.signals import get_parser
 
 
 class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
@@ -56,7 +57,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             REMOTE_OCR_API_KEY="somekey",
             REMOTE_OCR_ENDPOINT="https://endpoint.cognitiveservices.azure.com",
         ):
-            parser = RemoteDocumentParser(uuid.uuid4())
+            parser = get_parser(uuid.uuid4())
             parser.parse(
                 self.SAMPLE_FILES / "simple-digital.pdf",
                 "application/pdf",
@@ -86,7 +87,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(parser.supported_mime_types(), expected_types)
 
     def test_supported_mime_types_invalid_config(self):
-        parser = RemoteDocumentParser(uuid.uuid4())
+        parser = get_parser(uuid.uuid4())
         # with override_settings(
         #     REMOTE_OCR_ENGINE=None,
         #     REMOTE_OCR_API_KEY=None,
@@ -100,6 +101,6 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         REMOTE_OCR_ENDPOINT=None,
     )
     def test_parse_with_invalid_config(self):
-        parser = RemoteDocumentParser(uuid.uuid4())
+        parser = get_parser(uuid.uuid4())
         parser.parse(self.SAMPLE_FILES / "simple-digital.pdf", "application/pdf")
         self.assertEqual(parser.text, "")

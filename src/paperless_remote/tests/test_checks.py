@@ -18,7 +18,7 @@ class TestChecks(TestCase):
         self.assertEqual(len(msgs), 1)
         self.assertTrue(
             msgs[0].msg.startswith(
-                "Azure AI Vision remote parser requires endpoint to be configured.",
+                "Azure AI remote parser requires endpoint to be configured.",
             ),
         )
 
