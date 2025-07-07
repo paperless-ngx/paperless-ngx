@@ -23,7 +23,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 self.fail(f"'{s}' is not in '{content}'")
         self.assertListEqual(indices, sorted(indices))
 
-    @mock.patch("paperless_remote.parsers.subprocess.run")
+    @mock.patch("paperless_tesseract.parsers.run_subprocess")
     @mock.patch("azure.ai.documentintelligence.DocumentIntelligenceClient")
     def test_get_text_with_azure(self, mock_client_cls, mock_subprocess):
         # Arrange mock Azure client
@@ -35,6 +35,7 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         mock_poller.wait.return_value = None
         mock_poller.details = {"operation_id": "fake-op-id"}
         mock_client.begin_analyze_document.return_value = mock_poller
+        mock_poller.result.return_value.content = "This is a test document."
 
         # Return dummy PDF bytes
         mock_client.get_analyze_result_pdf.return_value = [
