@@ -240,6 +240,7 @@ testpaths = [
   "src/paperless_mail/tests/",
   "src/paperless_tesseract/tests/",
   "src/paperless_tika/tests",
+  "src/paperless_remote/tests/",
 ]
 addopts = [
   "--pythonwarnings=all",
