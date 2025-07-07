@@ -21,7 +21,6 @@
 #
 # For more extensive installation and update instructions, refer to the
 # documentation.
-
 services:
   broker:
     image: docker.io/library/redis:8

@@ -44,7 +44,7 @@ def move_documents_and_create_thumbnails(apps, schema_editor):
         exist_ok=True,
     )
 
-    documents: list[str] = os.listdir(Path(settings.MEDIA_ROOT) / "documents")
+    documents: list[str] = os.listdir(Path(settings.MEDIA_ROOT) / "documents")  # noqa: PTH208
 
     if set(documents) == {"originals", "thumbnails"}:
         return

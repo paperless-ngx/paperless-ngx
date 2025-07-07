@@ -25,11 +25,9 @@
 #   and '.env' into a folder.
 # - Run 'docker compose pull'.
 # - Run 'docker compose up -d'.
-
 #
 # For more extensive installation and update instructions, refer to the
 # documentation.
-
 services:
   broker:
     image: docker.io/library/redis:8

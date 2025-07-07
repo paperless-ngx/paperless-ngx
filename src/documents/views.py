@@ -2138,7 +2138,7 @@ class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         # perform the deletion so renaming/moving can happen
         response = super().destroy(request, *args, **kwargs)
 
-        if len(doc_ids):
+        if doc_ids:
             bulk_edit.bulk_update_documents.delay(doc_ids)
 
         return response

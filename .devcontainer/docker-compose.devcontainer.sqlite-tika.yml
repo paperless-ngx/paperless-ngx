@@ -20,7 +20,6 @@
 #
 # This file is intended only to be used through VSCOde devcontainers. See README.md
 # in the folder .devcontainer.
-
 services:
   broker:
     image: docker.io/library/redis:7
