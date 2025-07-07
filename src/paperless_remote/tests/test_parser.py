@@ -66,3 +66,40 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 parser.text.strip(),
                 ["This is a test document."],
             )
+
+    @override_settings(
+        REMOTE_OCR_ENGINE="azureai",
+        REMOTE_OCR_API_KEY="key",
+        REMOTE_OCR_ENDPOINT="https://endpoint.cognitiveservices.azure.com",
+    )
+    def test_supported_mime_types_valid_config(self):
+        parser = RemoteDocumentParser(uuid.uuid4())
+        expected_types = [
+            "application/pdf",
+            "image/png",
+            "image/jpeg",
+            "image/tiff",
+            "image/bmp",
+            "image/gif",
+            "image/webp",
+        ]
+        self.assertEqual(parser.supported_mime_types(), expected_types)
+
+    def test_supported_mime_types_invalid_config(self):
+        parser = RemoteDocumentParser(uuid.uuid4())
+        # with override_settings(
+        #     REMOTE_OCR_ENGINE=None,
+        #     REMOTE_OCR_API_KEY=None,
+        #     REMOTE_OCR_ENDPOINT=None,
+        # ):
+        self.assertEqual(parser.supported_mime_types(), [])
+
+    @override_settings(
+        REMOTE_OCR_ENGINE=None,
+        REMOTE_OCR_API_KEY=None,
+        REMOTE_OCR_ENDPOINT=None,
+    )
+    def test_parse_with_invalid_config(self):
+        parser = RemoteDocumentParser(uuid.uuid4())
+        parser.parse(self.SAMPLE_FILES / "simple-digital.pdf", "application/pdf")
+        self.assertEqual(parser.text, "")
