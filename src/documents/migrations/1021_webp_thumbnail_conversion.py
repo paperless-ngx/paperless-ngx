@@ -70,7 +70,7 @@ def _convert_thumbnails_to_webp(apps, schema_editor):
                 (existing_thumbnail, converted_thumbnail),
             )
 
-        if len(work_packages):
+        if work_packages:
             logger.info(
                 "\n\n"
                 "  This is a one-time only migration to convert thumbnails for all of your\n"

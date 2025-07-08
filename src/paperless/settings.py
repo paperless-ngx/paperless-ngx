@@ -14,7 +14,6 @@ from urllib.parse import urlparse
 
 from celery.schedules import crontab
 from compression_middleware.middleware import CompressionMiddleware
-from concurrent_log_handler.queue import setup_logging_queues
 from dateparser.languages.loader import LocaleDataLoader
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
@@ -843,8 +842,6 @@ USE_TZ = True
 # Logging                                                                     #
 ###############################################################################
 
-setup_logging_queues()
-
 LOGGING_DIR.mkdir(parents=True, exist_ok=True)
 
 LOGROTATE_MAX_SIZE = os.getenv("PAPERLESS_LOGROTATE_MAX_SIZE", 1024 * 1024)
@@ -954,7 +951,7 @@ def _parse_cachalot_settings():
     ttl = __get_int("PAPERLESS_READ_CACHE_TTL", 3600)
     ttl = min(ttl, 31536000) if ttl > 0 else 3600
     _, redis_url = _parse_redis_url(
-        os.getenv("PAPERLESS_READ_CACHE_REDIS_URL", None),
+        os.getenv("PAPERLESS_READ_CACHE_REDIS_URL", _CHANNELS_REDIS_URL),
     )
     result = {
         "CACHALOT_CACHE": "read-cache",

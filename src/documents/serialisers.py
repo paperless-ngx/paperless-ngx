@@ -1750,7 +1750,7 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         using it require a rename/move
         """
         doc_ids = [doc.id for doc in instance.documents.all()]
-        if len(doc_ids):
+        if doc_ids:
             bulk_edit.bulk_update_documents.delay(doc_ids)
 
         return super().update(instance, validated_data)
