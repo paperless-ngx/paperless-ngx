@@ -2,7 +2,6 @@
 # and Tika containers for a more end to end test of the Tika related functionality
 # Can be used locally or by the CI to start the necessary containers with the
 # correct networking for the tests
-
 services:
   gotenberg:
     image: docker.io/gotenberg/gotenberg:8.20
