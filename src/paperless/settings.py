@@ -792,6 +792,7 @@ LANGUAGES = [
     ("sv-se", _("Swedish")),
     ("tr-tr", _("Turkish")),
     ("uk-ua", _("Ukrainian")),
+    ("vi-vn", _("Vietnamese")),
     ("zh-cn", _("Chinese Simplified")),
     ("zh-tw", _("Chinese Traditional")),
 ]
