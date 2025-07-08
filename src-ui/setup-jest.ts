@@ -40,6 +40,7 @@ import localeSr from '@angular/common/locales/sr'
 import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
+import localeVi from '@angular/common/locales/vi'
 import localeZh from '@angular/common/locales/zh'
 import localeZhHant from '@angular/common/locales/zh-Hant'
 
@@ -75,6 +76,7 @@ registerLocaleData(localeSr)
 registerLocaleData(localeSv)
 registerLocaleData(localeTr)
 registerLocaleData(localeUk)
+registerLocaleData(localeVi)
 registerLocaleData(localeZh)
 registerLocaleData(localeZhHant)
 
