@@ -400,7 +400,7 @@ def make_criterias(rule: MailRule, *, supports_gmail_labels: bool):
         supports_gmail_labels=supports_gmail_labels,
     ).get_criteria()
     if isinstance(rule_query, dict):
-        if len(rule_query) or len(criterias):
+        if len(rule_query) or criterias:
             return AND(**rule_query, **criterias)
         else:
             return "ALL"
