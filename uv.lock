@@ -1971,10 +1971,12 @@ mariadb = [
     { name = "mysqlclient", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
 postgres = [
-    { name = "psycopg", extra = ["c"], marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "psycopg", extra = ["c", "pool"], marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "psycopg-c", version = "3.2.9", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version != '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux') or (python_full_version != '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux') or (platform_machine != 'aarch64' and platform_machine != 'x86_64' and sys_platform == 'linux') or sys_platform == 'darwin'" },
     { name = "psycopg-c", version = "3.2.9", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_c-3.2.9-cp312-cp312-linux_aarch64.whl" }, marker = "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux'" },
     { name = "psycopg-c", version = "3.2.9", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_c-3.2.9-cp312-cp312-linux_x86_64.whl" }, marker = "python_full_version == '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "psycopg-pool", version = "3.2.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version != '3.12.*' and sys_platform == 'linux') or sys_platform == 'darwin'" },
+    { name = "psycopg-pool", version = "3.2.6", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_pool-3.2.6-py3-none-any.whl" }, marker = "python_full_version == '3.12.*' and sys_platform == 'linux'" },
 ]
 webserver = [
     { name = "granian", extra = ["uvloop"], marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -2079,10 +2081,12 @@ requires-dist = [
     { name = "ocrmypdf", specifier = "~=16.10.0" },
     { name = "pathvalidate", specifier = "~=3.3.1" },
     { name = "pdf2image", specifier = "~=1.17.0" },
-    { name = "psycopg", extras = ["c"], marker = "extra == 'postgres'", specifier = "==3.2.9" },
+    { name = "psycopg", extras = ["c", "pool"], marker = "extra == 'postgres'", specifier = "==3.2.9" },
     { name = "psycopg-c", marker = "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'postgres'", url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_c-3.2.9-cp312-cp312-linux_aarch64.whl" },
     { name = "psycopg-c", marker = "python_full_version == '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'postgres'", url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_c-3.2.9-cp312-cp312-linux_x86_64.whl" },
     { name = "psycopg-c", marker = "(python_full_version != '3.12.*' and platform_machine == 'aarch64' and extra == 'postgres') or (python_full_version != '3.12.*' and platform_machine == 'x86_64' and extra == 'postgres') or (platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'postgres') or (sys_platform != 'linux' and extra == 'postgres')", specifier = "==3.2.9" },
+    { name = "psycopg-pool", marker = "python_full_version == '3.12.*' and sys_platform == 'linux' and extra == 'postgres'", url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_pool-3.2.6-py3-none-any.whl" },
+    { name = "psycopg-pool", marker = "(python_full_version != '3.12.*' and extra == 'postgres') or (sys_platform != 'linux' and extra == 'postgres')", specifier = "==3.2.6" },
     { name = "python-dateutil", specifier = "~=2.9.0" },
     { name = "python-dotenv", specifier = "~=1.1.0" },
     { name = "python-gnupg", specifier = "~=0.5.4" },
@@ -2433,6 +2437,10 @@ c = [
     { name = "psycopg-c", version = "3.2.9", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_c-3.2.9-cp312-cp312-linux_aarch64.whl" }, marker = "python_full_version == '3.12.*' and implementation_name != 'pypy' and platform_machine == 'aarch64' and sys_platform == 'linux'" },
     { name = "psycopg-c", version = "3.2.9", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_c-3.2.9-cp312-cp312-linux_x86_64.whl" }, marker = "python_full_version == '3.12.*' and implementation_name != 'pypy' and platform_machine == 'x86_64' and sys_platform == 'linux'" },
 ]
+pool = [
+    { name = "psycopg-pool", version = "3.2.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version != '3.12.*' and implementation_name != 'pypy' and sys_platform == 'linux') or (implementation_name != 'pypy' and sys_platform == 'darwin')" },
+    { name = "psycopg-pool", version = "3.2.6", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_pool-3.2.6-py3-none-any.whl" }, marker = "python_full_version == '3.12.*' and implementation_name != 'pypy' and sys_platform == 'linux'" },
+]
 
 [[package]]
 name = "psycopg-c"
@@ -2464,6 +2472,28 @@ resolution-markers = [
 ]
 wheels = [
     { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_c-3.2.9-cp312-cp312-linux_x86_64.whl", hash = "sha256:250c357319242da102047b04c5cc78af872dbf85c2cb05abf114e1fb5f207917" },
+]
+
+[[package]]
+name = "psycopg-pool"
+version = "3.2.6"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "sys_platform == 'darwin'",
+    "python_full_version != '3.12.*' and sys_platform == 'linux'",
+]
+sdist = { url = "https://files.pythonhosted.org/packages/cf/13/1e7850bb2c69a63267c3dbf37387d3f71a00fd0e2fa55c5db14d64ba1af4/psycopg_pool-3.2.6.tar.gz", hash = "sha256:0f92a7817719517212fbfe2fd58b8c35c1850cdd2a80d36b581ba2085d9148e5", size = 29770, upload-time = "2025-02-26T16:11:19.856Z" }
+
+
+[[package]]
+name = "psycopg-pool"
+version = "3.2.6"
+source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_pool-3.2.6-py3-none-any.whl" }
+resolution-markers = [
+    "python_full_version == '3.12.*' and sys_platform == 'linux'",
+]
+wheels = [
+    { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-3.2.9/psycopg_pool-3.2.6-py3-none-any.whl", hash = "sha256:d9ddb088d889b21525cb4a67772c146b30d7a8bc7b4926547fa13d2f84df19a3" },
 ]
 
 [[package]]
