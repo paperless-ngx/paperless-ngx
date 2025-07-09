@@ -27,7 +27,8 @@ physical documents into a searchable online archive so you can keep, well, _less
 -   **Organize and index** your scanned documents with tags, correspondents, types, and more.
 -   _Your_ data is stored locally on _your_ server and is never transmitted or shared in any way.
 -   Performs **OCR** on your documents, adding searchable and selectable text, even to documents scanned with only images.
--   Utilizes the open-source Tesseract engine to recognize more than 100 languages.
+    -   Utilizes the open-source Tesseract engine to recognize more than 100 languages.
+    -   _New!_ Supports remote OCR with Azure AI (opt-in).
 -   Documents are saved as PDF/A format which is designed for long term storage, alongside the unaltered originals.
 -   Uses machine-learning to automatically add tags, correspondents and document types to your documents.
 -   Supports PDF documents, images, plain text files, Office documents (Word, Excel, Powerpoint, and LibreOffice equivalents)[^1] and more.

@@ -841,7 +841,7 @@ how regularly you intend to scan documents and use paperless.
     performed the task associated with the document, move it to the
     inbox.
 
-## Remove OCR
+## Remote OCR
 
 !!! important
 
