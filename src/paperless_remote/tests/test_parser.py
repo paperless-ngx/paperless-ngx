@@ -88,11 +88,6 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
     def test_supported_mime_types_invalid_config(self):
         parser = get_parser(uuid.uuid4())
-        # with override_settings(
-        #     REMOTE_OCR_ENGINE=None,
-        #     REMOTE_OCR_API_KEY=None,
-        #     REMOTE_OCR_ENDPOINT=None,
-        # ):
         self.assertEqual(parser.supported_mime_types(), [])
 
     @override_settings(
