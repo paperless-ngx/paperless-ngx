@@ -4,7 +4,6 @@ import logging
 import pickle
 import re
 import warnings
-from functools import lru_cache
 from hashlib import sha256
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -39,33 +38,8 @@ ADVANCED_TEXT_PROCESSING_ENABLED = (
 read_cache = caches["read-cache"]
 
 
-@lru_cache(maxsize=1)
-def _load_ntlk_resources():
-    import nltk
-    from nltk.corpus import stopwords
-    from nltk.stem import SnowballStemmer
-    from nltk.tokenize import word_tokenize
-
-    # Not really hacky, since it isn't private and is documented, but
-    # set the search path for NLTK data to the single location it should be in
-    nltk.data.path = [settings.NLTK_DIR]
-
-    # Do some one time setup
-    # Sometimes, somehow, there's multiple threads loading the corpus
-    # and it's not thread safe, raising an AttributeError
-    stemmer = SnowballStemmer(settings.NLTK_LANGUAGE)
-    stopwords.ensure_loaded()
-    stop_words = frozenset(stopwords.words(settings.NLTK_LANGUAGE))
-    return stemmer, stop_words, word_tokenize
-
-
 RE_DIGIT = re.compile(r"\d")
 RE_WORD = re.compile(r"\b[\w]+\b")  # words that may contain digits
-
-
-def tokenize(text: str):
-    _, _, word_tokenize = _load_ntlk_resources()
-    return word_tokenize(text, language=settings.NLTK_LANGUAGE)
 
 
 class IncompatibleClassifierVersionError(Exception):
@@ -139,15 +113,16 @@ class DocumentClassifier:
         self.correspondent_classifier = None
         self.document_type_classifier = None
         self.storage_path_classifier = None
-
         self._stemmer = None
-        # 10000 elements is about 200 to 500 KB shared Redis cache
-        # Keep this cache small to avoid read/write delays
-        self._stem_cache = StoredLRUCache(
-            f"pngx_stem_cache_v{self.FORMAT_VERSION}",
-            capacity=10000,
-            backend_ttl=3600,
-        )
+        # 10,000 elements roughly use 200 to 500 KB per worker,
+        # and also in the shared Redis cache,
+        # Keep this cache small to minimize lookup and I/O latency.
+        if ADVANCED_TEXT_PROCESSING_ENABLED:
+            self._stem_cache = StoredLRUCache(
+                f"stem_cache_v{self.FORMAT_VERSION}",
+                capacity=10000,
+                backend_ttl=3600,
+            )
         self._stop_words = None
 
     def _update_data_vectorizer_hash(self):
@@ -410,6 +385,29 @@ class DocumentClassifier:
 
         return True
 
+    def _init_advanced_text_processing(self):
+        if self._stop_words is None or self._stemmer is None:
+            import nltk
+            from nltk.corpus import stopwords
+            from nltk.stem import SnowballStemmer
+
+            # Not really hacky, since it isn't private and is documented, but
+            # set the search path for NLTK data to the single location it should be in
+            nltk.data.path = [settings.NLTK_DIR]
+            try:
+                # Preload the corpus early, to force the lazy loader to transform
+                stopwords.ensure_loaded()
+
+                # Do some one time setup
+                # Sometimes, somehow, there's multiple threads loading the corpus
+                # and it's not thread safe, raising an AttributeError
+                self._stemmer = SnowballStemmer(settings.NLTK_LANGUAGE)
+                self._stop_words = frozenset(stopwords.words(settings.NLTK_LANGUAGE))
+            except AttributeError:
+                logger.debug("Could not initialize NLTK for advanced text processing.")
+                return False
+        return True
+
     def stem_and_skip_stop_words(self, words: list[str], *, shared_cache=True):
         """
         Reduce a list of words to their stem. Stop words are converted to empty strings.
@@ -421,18 +419,16 @@ class DocumentClassifier:
             Reduce a given word to its stem. If it's a stop word, return an empty string.
             E.g. "amazement", "amaze" and "amazed" all return "amaz".
             """
-            result = self._stem_cache.get(word)
-            if result:
-                pass
+            cached = self._stem_cache.get(word)
+            if cached is not None:
+                return cached
             # Assumption: words that contain numbers are never stemmed
             elif RE_DIGIT.search(word):
                 return word
             else:
-                stemmer, stop_words, _ = _load_ntlk_resources()
-                result = stemmer.stem(word) if word not in stop_words else ""
+                result = "" if word in self._stop_words else self._stemmer.stem(word)
                 self._stem_cache.set(word, result)
-
-            return result
+                return result
 
         if shared_cache:
             self._stem_cache.load()
@@ -450,7 +446,7 @@ class DocumentClassifier:
         content: str,
         *,
         shared_cache=True,
-    ) -> str:  # pragma: no cover
+    ) -> str:
         """
         Process to contents of a document, distilling it down into
         words which are meaningful to the content.
@@ -464,9 +460,13 @@ class DocumentClassifier:
         content = " ".join(match.group().lower() for match in RE_WORD.finditer(content))
 
         if ADVANCED_TEXT_PROCESSING_ENABLED:
+            from nltk.tokenize import word_tokenize
+
+            if not self._init_advanced_text_processing():
+                return content
             # Tokenize
             # This splits the content into tokens, roughly words
-            words = tokenize(content)
+            words = word_tokenize(content, language=settings.NLTK_LANGUAGE)
             # Stem the words and skip stop words
             content = self.stem_and_skip_stop_words(words, shared_cache=shared_cache)
 
@@ -477,7 +477,7 @@ class DocumentClassifier:
         hash.update(
             f"|{self.FORMAT_VERSION}|{settings.NLTK_LANGUAGE}|{settings.NLTK_ENABLED}|{self.data_vectorizer_hash}".encode(),
         )
-        return f"pngx_vectorizer_{hash.hexdigest()}"
+        return f"vectorized_content_{hash.hexdigest()}"
 
     def _vectorize(self, content: str):
         key = self._get_vectorizer_cache_key(content)

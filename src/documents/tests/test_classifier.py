@@ -720,6 +720,34 @@ class TestClassifier(DirectoriesMixin, TestCase):
 
 
 def test_preprocess_content():
+    """
+    GIVEN:
+        - Advanced text processing is enabled (default)
+    WHEN:
+        - Classifier preprocesses a document's content
+    THEN:
+        - Processed content matches the expected output (stemmed words)
+    """
+    with (Path(__file__).parent / "samples" / "content.txt").open("r") as f:
+        content = f.read()
+    with (Path(__file__).parent / "samples" / "preprocessed_content_advanced.txt").open(
+        "r",
+    ) as f:
+        expected_preprocess_content = f.read().rstrip()
+    classifier = DocumentClassifier()
+    result = classifier.preprocess_content(content)
+    assert result == expected_preprocess_content
+
+
+def test_preprocess_content_nltk_disabled():
+    """
+    GIVEN:
+        - Advanced text processing is disabled
+    WHEN:
+        - Classifier preprocesses a document's content
+    THEN:
+        - Processed content matches the expected output (unstemmed words)
+    """
     with (Path(__file__).parent / "samples" / "content.txt").open("r") as f:
         content = f.read()
     with (Path(__file__).parent / "samples" / "preprocessed_content.txt").open(
@@ -727,5 +755,29 @@ def test_preprocess_content():
     ) as f:
         expected_preprocess_content = f.read().rstrip()
     classifier = DocumentClassifier()
+    with mock.patch("documents.classifier.ADVANCED_TEXT_PROCESSING_ENABLED", new=False):
+        result = classifier.preprocess_content(content)
+    assert result == expected_preprocess_content
+
+
+def test_preprocess_content_nltk_load_fail(mocker):
+    """
+    GIVEN:
+        - NLTK stop words fail to load
+    WHEN:
+        - Classifier preprocesses a document's content
+    THEN:
+        - Processed content matches the expected output (unstemmed words)
+    """
+    _module = mocker.MagicMock(name="nltk_corpus_mock")
+    _module.stopwords.words.side_effect = AttributeError()
+    mocker.patch.dict("sys.modules", {"nltk.corpus": _module})
+    classifier = DocumentClassifier()
+    with (Path(__file__).parent / "samples" / "content.txt").open("r") as f:
+        content = f.read()
+    with (Path(__file__).parent / "samples" / "preprocessed_content.txt").open(
+        "r",
+    ) as f:
+        expected_preprocess_content = f.read().rstrip()
     result = classifier.preprocess_content(content)
     assert result == expected_preprocess_content
