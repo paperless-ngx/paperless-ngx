@@ -25,14 +25,15 @@ class RemoteEngineConfig:
 
 class RemoteDocumentParser(RasterisedDocumentParser):
     """
-    This parser uses a remote ocr engine to parse documents
+    This parser uses a remote OCR engine to parse documents. Currently, it supports Azure AI Vision
+    as this is the only service that provides a remote OCR API with text-embedded PDF output.
     """
 
     logging_name = "paperless.parsing.remote"
 
     def get_settings(self) -> RemoteEngineConfig:
         """
-        This parser uses the OCR configuration settings to parse documents
+        Returns the configuration for the remote OCR engine, loaded from Django settings.
         """
         return RemoteEngineConfig(
             engine=settings.REMOTE_OCR_ENGINE,
@@ -59,7 +60,11 @@ class RemoteDocumentParser(RasterisedDocumentParser):
         file: Path,
     ) -> str | None:
         """
-        This method uses the Azure AI Vision API to parse documents
+        Uses Azure AI Vision to parse the document and return the text content.
+        It requests a searchable PDF output with embedded text.
+        The PDF is saved to the archive_path attribute.
+        Returns the text content extracted from the document.
+        If the parsing fails, it returns None.
         """
         from azure.ai.documentintelligence import DocumentIntelligenceClient
         from azure.ai.documentintelligence.models import AnalyzeDocumentRequest
