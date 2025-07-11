@@ -8,6 +8,7 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
 from django.contrib.contenttypes.models import ContentType
+from django.db import connection
 from django.db.models import Case
 from django.db.models import CharField
 from django.db.models import Count
@@ -19,6 +20,7 @@ from django.db.models import Subquery
 from django.db.models import Sum
 from django.db.models import Value
 from django.db.models import When
+from django.db.models.expressions import RawSQL
 from django.db.models.functions import Cast
 from django.utils.translation import gettext_lazy as _
 from django_filters import DateFilter
@@ -41,6 +43,8 @@ from documents.models import PaperlessTask
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.utils import FULLTEXT_MINIMAL_TOKEN_LENGTH
+from documents.utils import split_tokens
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -154,10 +158,59 @@ class InboxFilter(Filter):
 @extend_schema_field(serializers.CharField)
 class TitleContentFilter(Filter):
     def filter(self, qs, value):
-        if value:
-            return qs.filter(Q(title__icontains=value) | Q(content__icontains=value))
-        else:
+        if not value:
             return qs
+        tokens = split_tokens(value)
+        fulltext_tokens = [t for t in tokens if len(t) >= FULLTEXT_MINIMAL_TOKEN_LENGTH]
+        limit = 1000  # Limit subquery results for performance reasons
+        vendor = connection.vendor
+        if vendor == "postgresql" and tokens:
+            ft_search_exp = " & ".join(tokens) + ":*"
+            # Django SearchQuery produces a "coalesce" SQL clause which doesn't use the fulltext index.
+            # so we use raw SQL instead. See issue: https://code.djangoproject.com/ticket/31304
+            id_query = RawSQL(
+                "SELECT id FROM documents_document WHERE to_tsvector('simple', title) @@ to_tsquery('simple', %s) OR to_tsvector('simple', content) @@ to_tsquery('simple', %s) limit %s",
+                params=(ft_search_exp, ft_search_exp, limit),
+            )
+            return qs.filter(id__in=(id_query))
+        elif vendor in {"mysql", "mariadb"} and fulltext_tokens:
+            ft_search_exp = "+" + " +".join(fulltext_tokens) + "*"
+            like_search_exp = "%" + "_%".join(tokens) + "%"
+            # MariaDB has limitations: it can use fulltext search only for at least 3-char long tokens.
+            # Do a fulltext prefiltering on title and content to use fulltext index,
+            # then apply the actual search query (LIKE "%A_%B%") to refine the results.
+            # Note: MariaDB Doesn't support the LIMIT clause in subqueries
+            # https://dba.stackexchange.com/questions/346009/why-is-limit-disallowed-in-in-subqueries-in-mysql
+            id_query = RawSQL(
+                "SELECT id FROM documents_document WHERE (MATCH(title) AGAINST(%s IN BOOLEAN MODE) OR MATCH(content) AGAINST(%s IN BOOLEAN MODE)) AND (title LIKE %s OR content LIKE %s)",
+                params=(
+                    ft_search_exp,
+                    ft_search_exp,
+                    like_search_exp,
+                    like_search_exp,
+                ),
+            )
+            return qs.filter(id__in=(id_query))
+        elif vendor == "sqlite" and tokens:
+            # SQLite fulltext works for any token size
+            ft_search_exp = "+".join(tokens) + "*"
+            id_query = (
+                Document.objects.filter(
+                    id__in=(
+                        RawSQL(
+                            "SELECT rowid FROM documents_document_fts WHERE title MATCH %s OR content MATCH %s LIMIT %s",
+                            params=(ft_search_exp, ft_search_exp, limit),
+                        )
+                    ),
+                )
+                .order_by()  # disables Django default ordering, we don't need it
+                .values_list("id", flat=True)
+            )
+            # In SQLite, finding IDs in a separate query first seems faster compared to in a subquery.
+            ids = [id for id in id_query.all()]
+            return qs.filter(id__in=ids)
+        else:
+            return qs.filter(Q(title__icontains=value) | Q(content__icontains=value))
 
 
 @extend_schema_field(serializers.BooleanField)

@@ -128,3 +128,75 @@ def get_boolean(boolstr: str) -> bool:
     Return a boolean value from a string representation.
     """
     return bool(boolstr.lower() in ("yes", "y", "1", "t", "true"))
+
+
+# Helpers related to SQL
+def _remove_double_spaces(text: str) -> str | None:
+    """Remove any multiple following space in a string."""
+    if not isinstance(text, str):
+        return None
+    result = ""
+    while result != text:
+        result = text
+        text = text.replace("  ", " ")
+    return result
+
+
+# All special characters that may be present in a ASCII-646 string
+sql_forbidden_patterns: set[str] = {
+    "?",
+    "!",
+    '"',
+    "%",
+    "&",
+    ",",
+    ".",
+    "/",
+    ":",
+    ";",
+    "<",
+    "=",
+    ">",
+    "\\",
+    "#",
+    "$",
+    "@",
+    "`",
+    "{",
+    "}",
+    "^",
+    "~",
+    "[",
+    "]",
+    "_",
+    "|",
+    "*",
+    "(",
+    ")",
+    "+",
+    "-",
+    "’",  # noqa
+    "ʼ",  # noqa
+    "‘",  # noqa
+}
+
+
+def sanitize_fulltext_string(search_string: str) -> str:
+    """Escape all special characters in SQL Fulltext "match against" requests"""
+    for char in sql_forbidden_patterns:
+        search_string = search_string.replace(char, " ")
+    return _remove_double_spaces(search_string).lower()
+
+
+# Default keyword length to trigger fulltext search in MariaDB.
+# Default used to be 4 (ft_min_word_length) for MyISAM storage engine,
+# but it is 3 (innodb_ft_min_token_size) for InnoDB.
+FULLTEXT_MINIMAL_TOKEN_LENGTH = 3
+
+
+def split_tokens(text: str) -> list[str]:
+    """
+    Cleans the input text by removing special and disallowed characters,
+    then splits it into a list of tokens suitable for SQL search queries.
+    """
+    return [token for token in sanitize_fulltext_string(text).split()]
