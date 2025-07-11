@@ -165,7 +165,7 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
   @Input()
   placement: string = 'bottom-start'
 
-  public readonly today: string = new Date().toISOString().split('T')[0]
+  public readonly today: string = new Date().toLocaleDateString('en-CA')
 
   get isActive(): boolean {
     return (
