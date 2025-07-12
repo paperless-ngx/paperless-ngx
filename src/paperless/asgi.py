@@ -2,6 +2,8 @@ import os
 
 from django.core.asgi import get_asgi_application
 
+from django_mcp import mount_mcp_server
+
 # Fetch Django ASGI application early to ensure AppRegistry is populated
 # before importing consumers and AuthMiddlewareStack that may import ORM
 # models.
@@ -17,7 +19,7 @@ from paperless.urls import websocket_urlpatterns  # noqa: E402
 
 application = ProtocolTypeRouter(
     {
-        "http": get_asgi_application(),
+        "http": mount_mcp_server(django_http_app=django_asgi_app, mcp_base_path='/mcp'),
         "websocket": AuthMiddlewareStack(URLRouter(websocket_urlpatterns)),
     },
 )

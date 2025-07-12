@@ -336,8 +336,13 @@ INSTALLED_APPS = [
     "allauth.mfa",
     "drf_spectacular",
     "drf_spectacular_sidecar",
+    "django_mcp",
     *env_apps,
 ]
+
+# Conditionally add paperless_mcp app
+if __get_boolean("PAPERLESS_MCP_ENABLED", "true"):
+    INSTALLED_APPS.append("paperless_mcp.apps.PaperlessMcpConfig")
 
 if DEBUG:
     INSTALLED_APPS.append("channels")
@@ -1409,3 +1414,17 @@ OUTLOOK_OAUTH_ENABLED = bool(
     and OUTLOOK_OAUTH_CLIENT_ID
     and OUTLOOK_OAUTH_CLIENT_SECRET,
 )
+
+###############################################################################
+# Django MCP Settings                                                        #
+###############################################################################
+
+MCP_LOG_LEVEL = os.getenv("PAPERLESS_MCP_LOG_LEVEL", "INFO")
+MCP_LOG_TOOL_REGISTRATION = __get_boolean("PAPERLESS_MCP_LOG_TOOL_REGISTRATION", "true")
+MCP_LOG_TOOL_DESCRIPTIONS = __get_boolean("PAPERLESS_MCP_LOG_TOOL_DESCRIPTIONS", "false")
+MCP_SERVER_INSTRUCTIONS = os.getenv("PAPERLESS_MCP_SERVER_INSTRUCTIONS", "Provides MCP tools for Paperless-ngx document management")
+MCP_SERVER_TITLE = os.getenv("PAPERLESS_MCP_SERVER_TITLE", "Paperless-ngx MCP Server")
+MCP_SERVER_VERSION = os.getenv("PAPERLESS_MCP_SERVER_VERSION", "0.1.0")
+MCP_DIRS = __get_list("PAPERLESS_MCP_DIRS")
+MCP_PATCH_SDK_TOOL_LOGGING = __get_boolean("PAPERLESS_MCP_PATCH_SDK_TOOL_LOGGING", "true")
+MCP_PATCH_SDK_GET_CONTEXT = __get_boolean("PAPERLESS_MCP_PATCH_SDK_GET_CONTEXT", "true")
