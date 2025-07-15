@@ -1,4 +1,3 @@
-import json
 import logging
 
 from django.contrib.auth.models import User
@@ -76,18 +75,14 @@ def get_context_for_document(
 
 
 def parse_ai_response(raw: dict) -> dict:
-    try:
-        return {
-            "title": raw.get("title", ""),
-            "tags": raw.get("tags", []),
-            "correspondents": raw.get("correspondents", []),
-            "document_types": raw.get("document_types", []),
-            "storage_paths": raw.get("storage_paths", []),
-            "dates": raw.get("dates", []),
-        }
-    except (ValueError, json.JSONDecodeError):
-        logger.exception("Failed to parse AI response")
-        return {}
+    return {
+        "title": raw.get("title", ""),
+        "tags": raw.get("tags", []),
+        "correspondents": raw.get("correspondents", []),
+        "document_types": raw.get("document_types", []),
+        "storage_paths": raw.get("storage_paths", []),
+        "dates": raw.get("dates", []),
+    }
 
 
 def get_ai_document_classification(
