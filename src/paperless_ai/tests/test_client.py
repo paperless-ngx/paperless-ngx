@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 import pytest
 from llama_index.core.llms import ChatMessage
+from llama_index.core.llms.llm import ToolSelection
 
 from paperless_ai.client import AIClient
 
@@ -69,13 +70,27 @@ def test_run_llm_query(mock_ai_config, mock_ollama_llm):
     mock_ai_config.llm_url = "http://test-url"
 
     mock_llm_instance = mock_ollama_llm.return_value
-    mock_llm_instance.complete.return_value = "test_result"
+
+    tool_selection = ToolSelection(
+        tool_id="call_test",
+        tool_name="DocumentClassifierSchema",
+        tool_kwargs={
+            "title": "Test Title",
+            "tags": ["test", "document"],
+            "correspondents": ["John Doe"],
+            "document_types": ["report"],
+            "storage_paths": ["Reports"],
+            "dates": ["2023-01-01"],
+        },
+    )
+
+    mock_llm_instance.chat_with_tools.return_value = MagicMock()
+    mock_llm_instance.get_tool_calls_from_response.return_value = [tool_selection]
 
     client = AIClient()
     result = client.run_llm_query("test_prompt")
 
-    mock_llm_instance.complete.assert_called_once_with("test_prompt")
-    assert result == "test_result"
+    assert result["title"] == "Test Title"
 
 
 def test_run_chat(mock_ai_config, mock_ollama_llm):
