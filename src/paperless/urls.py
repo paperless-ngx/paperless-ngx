@@ -82,6 +82,7 @@ api_router.register(r"config", ApplicationConfigurationViewSet)
 
 
 urlpatterns = [
+    path("", include("mcp_server.urls")),
     re_path(
         r"^api/",
         include(
