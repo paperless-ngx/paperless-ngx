@@ -341,7 +341,7 @@ class TestRegexPlaceholders(TestCase):
         self.assertEqual(result, "12_2023_statement")
 
     def test_original_filename_full_placeholder(self):
-        """Test the new original_filename_full placeholder with whole file content."""
+        """Test the new original_filename_full placeholder with whole filename including extension."""
         template = r"{original_filename_full}"
         result = parse_w_workflow_placeholders(
             template,
@@ -353,6 +353,38 @@ class TestRegexPlaceholders(TestCase):
             self.test_filename,
         )
         self.assertEqual(result, self.test_original_filename)
+
+    def test_content_placeholder(self):
+        """Test the new content placeholder with document content."""
+        test_content = "This is the extracted content of the PDF document."
+        template = r"{content}"
+        result = parse_w_workflow_placeholders(
+            template,
+            self.test_correspondent,
+            self.test_doc_type,
+            self.test_owner,
+            self.test_added,
+            self.test_original_filename,
+            self.test_filename,
+            content=test_content,
+        )
+        self.assertEqual(result, test_content)
+
+    def test_content_placeholder_with_regex(self):
+        """Test regex transformation on content placeholder."""
+        test_content = "Account Number: 123456789 Statement Date: 2023-12"
+        template = r"{content:s/Account Number: (\d+)/Konto $1/}"
+        result = parse_w_workflow_placeholders(
+            template,
+            self.test_correspondent,
+            self.test_doc_type,
+            self.test_owner,
+            self.test_added,
+            self.test_original_filename,
+            self.test_filename,
+            content=test_content,
+        )
+        self.assertEqual(result, "Konto 123456789 Statement Date: 2023-12")
 
     def test_original_filename_full_with_regex(self):
         """Test regex transformation on original_filename_full placeholder."""

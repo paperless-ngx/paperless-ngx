@@ -15,6 +15,7 @@ def parse_w_workflow_placeholders(
     created: date | None = None,
     doc_title: str | None = None,
     doc_url: str | None = None,
+    content: str | None = None,
 ) -> str:
     """
     Available title placeholders for Workflows depend on what has already been assigned,
@@ -41,6 +42,7 @@ def parse_w_workflow_placeholders(
         "original_filename": Path(original_filename).stem,
         "original_filename_full": original_filename,
         "filename": Path(filename).stem,
+        "content": content or "",
     }
     if created is not None:
         formatting.update(
@@ -65,48 +67,42 @@ def parse_w_workflow_placeholders(
         """Replace a single placeholder match with its processed value."""
         placeholder_content = match.group(1)  # Content inside the braces
         
-        # Check if this is a regex transformation placeholder using proper regex
-        if re.search(r':\s*s/', placeholder_content):
-            parts = re.split(r':\s*s/', placeholder_content, 1)
-            if len(parts) == 2:
-                field_name = parts[0]
-                regex_part = parts[1]
-                
-                # Parse the regex pattern: s/pattern/replacement/flags or s/pattern/replacement
-                # Support both with and without trailing slash for convenience
-                if regex_part.count('/') >= 1:
-                    # Split by '/' but handle the case where there might be more than expected
-                    pattern_parts = regex_part.split('/')
-                    if len(pattern_parts) >= 2:
-                        pattern = pattern_parts[0]
-                        replacement = pattern_parts[1]
-                        flags_str = pattern_parts[2] if len(pattern_parts) > 2 else ''
-                        
-                        # Convert flags string to re flags
-                        flags = 0
-                        if 'i' in flags_str:
-                            flags |= re.IGNORECASE
-                        if 's' in flags_str:
-                            flags |= re.DOTALL
-                        
-                        # Get the original value
-                        original_value = formatting.get(field_name, '')
-                        if isinstance(original_value, str):
-                            try:
-                                # Convert sed-style backreferences ($1, $2) to Python style (\1, \2)
-                                python_replacement = re.sub(r'\$(\d+)', r'\\\1', replacement)
-                                
-                                # Perform regex substitution
-                                return re.sub(pattern, python_replacement, original_value, flags=flags)
-                            except re.error:
-                                # Fall back to original value for invalid regex
-                                return original_value
-                            except Exception:
-                                # Catch any other unexpected errors
-                                return original_value
-                        else:
-                            # Non-string values can't be regex processed
-                            return str(original_value) if original_value is not None else ''
+        # Use a comprehensive regex to parse enhanced placeholder syntax
+        # Pattern: field_name:s/pattern/replacement/flags (flags optional, trailing slash optional)
+        # Supports escaped slashes in pattern/replacement
+        regex_match = re.match(r'^([^:]+):\s*s/((?:[^/\\]|\\.)*)/((?:[^/\\]|\\.)*)(?:/([is]*))?/?$', placeholder_content)
+        
+        if regex_match:
+            field_name = regex_match.group(1)
+            pattern = regex_match.group(2)
+            replacement = regex_match.group(3)
+            flags_str = regex_match.group(4) or ''
+            
+            # Convert flags string to re flags
+            flags = 0
+            if 'i' in flags_str:
+                flags |= re.IGNORECASE
+            if 's' in flags_str:
+                flags |= re.DOTALL
+            
+            # Get the original value
+            original_value = formatting.get(field_name, '')
+            if isinstance(original_value, str):
+                try:
+                    # Convert sed-style backreferences ($1, $2) to Python style (\1, \2)
+                    python_replacement = re.sub(r'\$(\d+)', r'\\\1', replacement)
+                    
+                    # Perform regex substitution (Python's re.sub is global by default)
+                    return re.sub(pattern, python_replacement, original_value, flags=flags)
+                except re.error:
+                    # Fall back to original value for invalid regex
+                    return original_value
+                except Exception:
+                    # Catch any other unexpected errors
+                    return original_value
+            else:
+                # Non-string values can't be regex processed
+                return str(original_value) if original_value is not None else ''
         
         # Fallback to original field value (backward compatibility)
         field_name = placeholder_content.split(':')[0]
