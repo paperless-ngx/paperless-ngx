@@ -609,6 +609,7 @@ class ConsumerPlugin(
             local_added,
             self.filename,
             self.filename,
+            content=None,
         )
 
     def _store(
