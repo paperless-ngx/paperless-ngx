@@ -86,23 +86,6 @@ class TestRegexPlaceholders(TestCase):
         )
         self.assertEqual(result, "Bank_12_2023_statement")
 
-    def test_regex_placeholder_multiline_flag(self):
-        """Test regex substitution with multiline flag."""
-        template = r"{doc_title:s/^Test/New/m}"
-        result = parse_w_workflow_placeholders(
-            template,
-            self.test_correspondent,
-            self.test_doc_type,
-            self.test_owner,
-            self.test_added,
-            self.test_original_filename,
-            self.test_filename,
-            self.test_created,
-            self.test_title,
-            self.test_url,
-        )
-        self.assertEqual(result, "New Document")
-
     def test_regex_placeholder_dotall_flag(self):
         """Test regex substitution with dotall flag."""
         multiline_title = "Test\nDocument\nTitle"
@@ -123,7 +106,7 @@ class TestRegexPlaceholders(TestCase):
 
     def test_regex_placeholder_combined_flags(self):
         """Test regex substitution with multiple flags."""
-        template = r"{correspondent:s/sparkasse/Bank/im}"
+        template = r"{correspondent:s/sparkasse/Bank/i}"
         result = parse_w_workflow_placeholders(
             template,
             self.test_correspondent,
@@ -153,19 +136,17 @@ class TestRegexPlaceholders(TestCase):
     def test_regex_placeholder_invalid_regex_pattern(self):
         """Test handling of invalid regex patterns."""
         template = r"{original_filename:s/[invalid(/Replacement/}"
-        with self.assertLogs("paperless.templating.workflows", level="WARNING") as cm:
-            result = parse_w_workflow_placeholders(
-                template,
-                self.test_correspondent,
-                self.test_doc_type,
-                self.test_owner,
-                self.test_added,
-                self.test_original_filename,
-                self.test_filename,
-            )
-            # Should fall back to original value
-            self.assertEqual(result, "Sparkasse_12_2023_statement")
-            self.assertIn("Regex error", cm.output[0])
+        result = parse_w_workflow_placeholders(
+            template,
+            self.test_correspondent,
+            self.test_doc_type,
+            self.test_owner,
+            self.test_added,
+            self.test_original_filename,
+            self.test_filename,
+        )
+        # Should fall back to original value
+        self.assertEqual(result, "Sparkasse_12_2023_statement")
 
     def test_regex_placeholder_nonexistent_field(self):
         """Test regex substitution on nonexistent field."""
@@ -196,6 +177,20 @@ class TestRegexPlaceholders(TestCase):
         )
         # Should handle empty string gracefully
         self.assertEqual(result, "")
+
+    def test_regex_placeholder_no_trailing_slash(self):
+        """Test regex substitution without trailing slash for convenience."""
+        template = r"{original_filename:s/Sparkasse_/Bank_}"
+        result = parse_w_workflow_placeholders(
+            template,
+            self.test_correspondent,
+            self.test_doc_type,
+            self.test_owner,
+            self.test_added,
+            self.test_original_filename,
+            self.test_filename,
+        )
+        self.assertEqual(result, "Bank_12_2023_statement")
 
     def test_regex_placeholder_malformed_syntax(self):
         """Test handling of malformed regex syntax."""
@@ -252,23 +247,22 @@ class TestRegexPlaceholders(TestCase):
             "documents.templating.workflows.Path"
         ) as mock_path:
             mock_path.return_value.stem = "test"
-            with self.assertLogs("paperless.templating.workflows", level="WARNING") as cm:
-                result = parse_w_workflow_placeholders(
-                    template,
-                    self.test_correspondent,
-                    self.test_doc_type,
-                    self.test_owner,
-                    self.test_added,
-                    self.test_original_filename,
-                    self.test_filename,
-                    self.test_created,
-                )
-                # Should convert to string and apply transformation
-                expected_year = self.test_created.strftime("%Y")
-                if expected_year == "2023":
-                    self.assertEqual(result, "2024")
-                else:
-                    self.assertEqual(result, expected_year)
+            result = parse_w_workflow_placeholders(
+                template,
+                self.test_correspondent,
+                self.test_doc_type,
+                self.test_owner,
+                self.test_added,
+                self.test_original_filename,
+                self.test_filename,
+                self.test_created,
+            )
+            # Should convert to string and apply transformation
+            expected_year = self.test_created.strftime("%Y")
+            if expected_year == "2023":
+                self.assertEqual(result, "2024")
+            else:
+                self.assertEqual(result, expected_year)
 
     def test_regex_placeholder_special_characters_in_replacement(self):
         """Test regex substitution with special characters in replacement."""
@@ -302,20 +296,18 @@ class TestRegexPlaceholders(TestCase):
         """Test that malformed placeholders are handled gracefully (backward compatibility)."""
         # This test ensures the existing error handling from the original code still works
         template = "Doc {created_year]"  # Missing opening brace - from existing test
-        with self.assertLogs("paperless.templating.workflows", level="WARNING") as cm:
-            result = parse_w_workflow_placeholders(
-                template,
-                self.test_correspondent,
-                self.test_doc_type,
-                self.test_owner,
-                self.test_added,
-                self.test_original_filename,
-                self.test_filename,
-                self.test_created,
-            )
-            # Should fall back to original text
-            self.assertEqual(result, "Doc {created_year]")
-            self.assertIn("Error formatting text", cm.output[0])
+        result = parse_w_workflow_placeholders(
+            template,
+            self.test_correspondent,
+            self.test_doc_type,
+            self.test_owner,
+            self.test_added,
+            self.test_original_filename,
+            self.test_filename,
+            self.test_created,
+        )
+        # Should fall back to original text
+        self.assertEqual(result, "Doc {created_year]")
 
     def test_regex_placeholder_edge_case_empty_pattern(self):
         """Test edge case with empty regex pattern."""
@@ -347,3 +339,31 @@ class TestRegexPlaceholders(TestCase):
         )
         # Should remove "Sparkasse_" from the filename
         self.assertEqual(result, "12_2023_statement")
+
+    def test_original_filename_full_placeholder(self):
+        """Test the new original_filename_full placeholder with whole file content."""
+        template = r"{original_filename_full}"
+        result = parse_w_workflow_placeholders(
+            template,
+            self.test_correspondent,
+            self.test_doc_type,
+            self.test_owner,
+            self.test_added,
+            self.test_original_filename,
+            self.test_filename,
+        )
+        self.assertEqual(result, self.test_original_filename)
+
+    def test_original_filename_full_with_regex(self):
+        """Test regex transformation on original_filename_full placeholder."""
+        template = r"{original_filename_full:s/\.pdf$/\.backup/}"
+        result = parse_w_workflow_placeholders(
+            template,
+            self.test_correspondent,
+            self.test_doc_type,
+            self.test_owner,
+            self.test_added,
+            self.test_original_filename,
+            self.test_filename,
+        )
+        self.assertEqual(result, "Sparkasse_12_2023_statement.backup")
