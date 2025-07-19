@@ -340,20 +340,6 @@ class TestRegexPlaceholders(TestCase):
         # Should remove "Sparkasse_" from the filename
         self.assertEqual(result, "12_2023_statement")
 
-    def test_original_filename_full_placeholder(self):
-        """Test the new original_filename_full placeholder with whole filename including extension."""
-        template = r"{original_filename_full}"
-        result = parse_w_workflow_placeholders(
-            template,
-            self.test_correspondent,
-            self.test_doc_type,
-            self.test_owner,
-            self.test_added,
-            self.test_original_filename,
-            self.test_filename,
-        )
-        self.assertEqual(result, self.test_original_filename)
-
     def test_content_placeholder(self):
         """Test the new content placeholder with document content."""
         test_content = "This is the extracted content of the PDF document."
@@ -385,17 +371,3 @@ class TestRegexPlaceholders(TestCase):
             content=test_content,
         )
         self.assertEqual(result, "Konto 123456789 Statement Date: 2023-12")
-
-    def test_original_filename_full_with_regex(self):
-        """Test regex transformation on original_filename_full placeholder."""
-        template = r"{original_filename_full:s/\.pdf$/\.backup/}"
-        result = parse_w_workflow_placeholders(
-            template,
-            self.test_correspondent,
-            self.test_doc_type,
-            self.test_owner,
-            self.test_added,
-            self.test_original_filename,
-            self.test_filename,
-        )
-        self.assertEqual(result, "Sparkasse_12_2023_statement.backup")

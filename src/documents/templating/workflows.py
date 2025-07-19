@@ -40,7 +40,6 @@ def parse_w_workflow_placeholders(
         "added_time": local_added.strftime("%H:%M"),
         "owner_username": owner_username,
         "original_filename": Path(original_filename).stem,
-        "original_filename_full": original_filename,
         "filename": Path(filename).stem,
         "content": content or "",
     }
