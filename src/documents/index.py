@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import logging
 import math
+import re
 from collections import Counter
 from contextlib import contextmanager
 from datetime import datetime
 from datetime import time
+from datetime import timedelta
 from datetime import timezone
 from shutil import rmtree
 from typing import TYPE_CHECKING
@@ -13,6 +15,8 @@ from typing import Literal
 
 from django.conf import settings
 from django.utils import timezone as django_timezone
+from django.utils.timezone import get_current_timezone
+from django.utils.timezone import now
 from guardian.shortcuts import get_users_with_perms
 from whoosh import classify
 from whoosh import highlight
@@ -344,6 +348,7 @@ class LocalDateParser(English):
 class DelayedFullTextQuery(DelayedQuery):
     def _get_query(self) -> tuple:
         q_str = self.query_params["query"]
+        q_str = rewrite_natural_date_keywords(q_str)
         qp = MultifieldParser(
             [
                 "content",
@@ -450,3 +455,47 @@ def get_permissions_criterias(user: User | None = None) -> list:
                 query.Term("viewer_id", str(user.id)),
             )
     return user_criterias
+
+
+def rewrite_natural_date_keywords(query_string: str) -> str:
+    """
+    Rewrites `added:today`, `created:yesterday` into whoosh datetime ranges.
+    This prevents UTC confusion when searching with natural language date keywords.
+    """
+
+    replacements = {}
+    patterns = [
+        ("added:today", "added"),
+        ("added:yesterday", "added"),
+        ("created:today", "created"),
+        ("created:yesterday", "created"),
+    ]
+
+    tz = get_current_timezone()
+    local_now = now().astimezone(tz)
+
+    today_start_local = datetime.combine(local_now.date(), time.min).replace(tzinfo=tz)
+    today_end_local = datetime.combine(local_now.date(), time.max).replace(tzinfo=tz)
+    yesterday_start_local = today_start_local - timedelta(days=1)
+    yesterday_end_local = today_end_local - timedelta(days=1)
+
+    for pattern, field in patterns:
+        if pattern in query_string:
+            if pattern.endswith("today"):
+                start = today_start_local
+                end = today_end_local
+            else:
+                start = yesterday_start_local
+                end = yesterday_end_local
+
+            start_str = start.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S")
+            end_str = end.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S")
+
+            range_expr = f"{field}:[{start_str} TO {end_str}]"
+            logger.warning(f"RANGE: {range_expr}")
+            replacements[pattern] = range_expr
+
+    for match, replacement in replacements.items():
+        query_string = re.sub(rf"\b{re.escape(match)}\b", replacement, query_string)
+
+    return query_string
