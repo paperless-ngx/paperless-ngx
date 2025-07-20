@@ -51,6 +51,21 @@ as the Python linting and formatting tool `ruff`, will format failing
 files, so all you need to do is `git add` those files again
 and retry your commit.
 
+!!! tip "Running pre-commit manually"
+
+    You can run pre-commit hooks manually on all files or specific files:
+
+    ```bash
+    # Run on all files
+    $ pre-commit run --all-files
+
+    # Run on specific files
+    $ pre-commit run --files src/documents/models.py
+
+    # Run specific hook
+    $ pre-commit run ruff --all-files
+    ```
+
 ## General setup
 
 After you forked and cloned the code from GitHub you need to perform a
@@ -59,6 +74,15 @@ first-time setup.
 !!! note
 
       Every command is executed directly from the root folder of the project unless specified otherwise.
+
+!!! warning "Prerequisites"
+
+      Make sure you have the following installed before proceeding:
+      
+      - Python 3.10 or higher
+      - Node.js 14.15+ and `pnpm` (for frontend development)
+      - Redis server (or Docker to run Redis in a container)
+      - Git for version control
 
 1.  Install prerequisites + [uv](https://github.com/astral-sh/uv) as mentioned in
     [Bare metal route](setup.md#bare_metal).
@@ -77,6 +101,16 @@ first-time setup.
     ```bash
     $ uv sync --group dev
     ```
+
+    !!! note "Alternative without uv"
+
+        If `uv` is not available on your system or you prefer using pip, you can install dependencies manually:
+
+        ```bash
+        $ pip install --user -e .[dev]
+        ```
+
+        However, note that `uv` is the recommended package manager for this project and provides better dependency resolution and faster installations.
 
 5.  Install pre-commit hooks:
 
@@ -151,6 +185,24 @@ $ ng build --configuration production
     is loaded as well. However, the tests rely on the default
     configuration. This is not ideal. But for now, make sure no settings
     except for DEBUG are overridden when testing.
+
+-   To run specific test categories:
+    ```bash
+    # Run only unit tests
+    $ pytest -m "not slow"
+    
+    # Run integration tests
+    $ pytest tests/test_
+    
+    # Run with coverage report
+    $ pytest --cov=paperless --cov-report=html
+    ```
+
+-   For faster test iterations during development, consider running tests for
+    specific modules you're working on:
+    ```bash
+    $ pytest src/documents/tests/test_parsers.py::TestSpecificParser
+    ```
 
 !!! note
 
@@ -476,3 +528,52 @@ To get started:
 
 4. The project is ready for debugging, start either run the fullstack debug or individual debug
    processes. Yo spin up the project without debugging run the task **Project Start: Run all Services**
+
+## Common Development Issues
+
+### Database Issues
+
+If you encounter database-related errors:
+
+```bash
+# Reset the database (WARNING: This will delete all data)
+$ rm -f src/db.sqlite3
+$ cd src && python manage.py migrate
+$ python manage.py createsuperuser
+```
+
+### Redis Connection Issues
+
+If Redis is not running or accessible:
+
+```bash
+# Start Redis with Docker
+$ docker run -d -p 6379:6379 --restart unless-stopped redis:latest
+
+# Or check if Redis is running locally
+$ redis-cli ping
+```
+
+### Frontend Build Issues
+
+If the frontend fails to build:
+
+```bash
+# Clear npm/pnpm cache and reinstall
+$ cd src-ui
+$ rm -rf node_modules pnpm-lock.yaml
+$ pnpm install
+```
+
+### Permission Issues
+
+If you encounter permission issues with file operations:
+
+```bash
+# Ensure proper ownership of the project directory
+$ sudo chown -R $(whoami):$(whoami) /path/to/paperless-ngx
+
+# Create required directories with proper permissions
+$ mkdir -p consume media export
+$ chmod 755 consume media export
+```
