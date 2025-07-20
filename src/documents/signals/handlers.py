@@ -769,6 +769,7 @@ def run_workflows(
                         document.original_filename or "",
                         document.filename or "",
                         document.created,
+                        content=document.content,
                     )
                 except Exception:
                     logger.exception(
@@ -1092,6 +1093,7 @@ def run_workflows(
                 created,
                 title,
                 doc_url,
+                content=document.content,
             )
             if action.email.subject
             else ""
@@ -1108,6 +1110,7 @@ def run_workflows(
                 created,
                 title,
                 doc_url,
+                content=document.content,
             )
             if action.email.body
             else ""
@@ -1185,6 +1188,7 @@ def run_workflows(
                                 created,
                                 title,
                                 doc_url,
+                                content=document.content,
                             )
                     except Exception as e:
                         logger.error(
@@ -1203,6 +1207,7 @@ def run_workflows(
                     created,
                     title,
                     doc_url,
+                    content=document.content,
                 )
             headers = {}
             if action.webhook.headers:
