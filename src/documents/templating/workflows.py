@@ -70,10 +70,20 @@ def parse_w_workflow_placeholders(
         # - {field_name:s/pattern/replacement/flags}
         # - Supports escaped slashes in pattern/replacement
         # - Flags (optional): any characters, but only i and s are supported
-        regex_match = re.match(
-            r'^(?P<field_name>[^:]+):\s*s/(?P<pattern>(?:[^/\\]|\\.)*)/(?P<replacement>(?:[^/\\]|\\.)*)(?:/(?P<flags>[a-zA-Z]*))?/?$',
-            placeholder_content
+        # Define components of the regex pattern for readability
+        field_name_pattern = r'(?P<field_name>[^:]+)'  # Matches the field name before the colon
+        sed_command_pattern = r's'  # Matches the 's' command in sed-like syntax
+        pattern_group = r'(?P<pattern>(?:[^/\\]|\\.)*)'  # Matches the search pattern, allowing escaped slashes
+        replacement_group = r'(?P<replacement>(?:[^/\\]|\\.)*)'  # Matches the replacement string, allowing escaped slashes
+        flags_group = r'(?P<flags>[a-zA-Z]*)'  # Matches optional flags (e.g., 'i', 's')
+        
+        # Combine components into the final regex pattern
+        enhanced_placeholder_regex = (
+            rf'^{field_name_pattern}:\s*{sed_command_pattern}/{pattern_group}/{replacement_group}(?:/{flags_group})?/?$'
         )
+        
+        # Match the placeholder content against the regex
+        regex_match = re.match(enhanced_placeholder_regex, placeholder_content)
         
         if regex_match:
             field_name = regex_match.group("field_name")
