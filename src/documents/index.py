@@ -459,43 +459,33 @@ def get_permissions_criterias(user: User | None = None) -> list:
 
 def rewrite_natural_date_keywords(query_string: str) -> str:
     """
-    Rewrites `added:today`, `created:yesterday` into whoosh datetime ranges.
-    This prevents UTC confusion when searching with natural language date keywords.
+    Rewrites natural date keywords (e.g. added:today or added:"yesterday") to UTC range syntax for Whoosh.
     """
-
-    replacements = {}
-    patterns = [
-        ("added:today", "added"),
-        ("added:yesterday", "added"),
-        ("created:today", "created"),
-        ("created:yesterday", "created"),
-    ]
 
     tz = get_current_timezone()
     local_now = now().astimezone(tz)
 
-    today_start_local = datetime.combine(local_now.date(), time.min).replace(tzinfo=tz)
-    today_end_local = datetime.combine(local_now.date(), time.max).replace(tzinfo=tz)
-    yesterday_start_local = today_start_local - timedelta(days=1)
-    yesterday_end_local = today_end_local - timedelta(days=1)
+    today = local_now.date()
+    yesterday = today - timedelta(days=1)
 
-    for pattern, field in patterns:
-        if pattern in query_string:
-            if pattern.endswith("today"):
-                start = today_start_local
-                end = today_end_local
-            else:
-                start = yesterday_start_local
-                end = yesterday_end_local
+    ranges = {
+        "today": (
+            datetime.combine(today, time.min, tzinfo=tz),
+            datetime.combine(today, time.max, tzinfo=tz),
+        ),
+        "yesterday": (
+            datetime.combine(yesterday, time.min, tzinfo=tz),
+            datetime.combine(yesterday, time.max, tzinfo=tz),
+        ),
+    }
 
-            start_str = start.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S")
-            end_str = end.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S")
+    pattern = r"(\b(?:added|created))\s*:\s*[\"']?(today|yesterday)[\"']?"
 
-            range_expr = f"{field}:[{start_str} TO {end_str}]"
-            logger.warning(f"RANGE: {range_expr}")
-            replacements[pattern] = range_expr
+    def repl(m):
+        field, keyword = m.group(1), m.group(2)
+        start, end = ranges[keyword]
+        start_str = start.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S")
+        end_str = end.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S")
+        return f"{field}:[{start_str} TO {end_str}]"
 
-    for match, replacement in replacements.items():
-        query_string = re.sub(rf"\b{re.escape(match)}\b", replacement, query_string)
-
-    return query_string
+    return re.sub(pattern, repl, query_string)
