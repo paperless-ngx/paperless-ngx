@@ -147,7 +147,7 @@ $ ng build --configuration production
 ### Testing
 
 -   Run `pytest` in the `src/` directory to execute all tests. This also
-    generates a HTML coverage report. When runnings test, `paperless.conf`
+    generates a HTML coverage report. When running tests, `paperless.conf`
     is loaded as well. However, the tests rely on the default
     configuration. This is not ideal. But for now, make sure no settings
     except for DEBUG are overridden when testing.
