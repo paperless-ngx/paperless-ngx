@@ -528,6 +528,49 @@ The following placeholders are only available for "added" or "updated" triggers
 -   `{created_time}`: created time in HH:MM format
 -   `{doc_url}`: URL to the document in the web UI. Requires the `PAPERLESS_URL` setting to be set.
 
+##### Enhanced placeholder transformations
+
+Workflow placeholders support advanced regex-based transformations to modify placeholder values. This allows you to extract specific parts of text, perform substitutions, or reformat values using regular expressions.
+
+**Syntax:**
+-   `{field_name}` - Simple field replacement (standard behavior)
+-   `{field_name:s/pattern/replacement/}` - Regex substitution
+-   `{field_name:s/pattern/replacement/flags}` - Regex substitution with flags
+
+**Supported flags:**
+-   `i` - Case insensitive matching
+-   `s` - Dot matches newlines (dotall mode)
+
+**Examples:**
+
+Replace text in the original filename:
+```
+{original_filename:s/Invoice_/Bill_/}
+```
+If `original_filename` is "Invoice_2024_March", this becomes "Bill_2024_March".
+
+Extract parts using capture groups:
+```
+{original_filename:s/(\d{4})_(\w+)/Statement $2 $1/}
+```
+If `original_filename` is "2024_March_Report", this becomes "Statement March 2024".
+
+Case insensitive replacement:
+```
+{correspondent:s/bank/BANK/i}
+```
+Replaces "bank", "Bank", "BANK", etc. with "BANK".
+
+Combine multiple transformations in workflow text:
+```
+Document from {correspondent:s/\s+/_/} - {original_filename:s/^.*_(\d{4}).*/$1/}
+```
+This replaces spaces in correspondent name with underscores and extracts a year from the filename.
+
+!!! note
+    
+    Regex transformations use Python's `re.sub()` function. Invalid regex patterns will fall back to the original placeholder value. Capture groups use `$1`, `$2`, etc. syntax for replacements.
+
 ### Workflow permissions
 
 All users who have application permissions for editing workflows can see the same set
