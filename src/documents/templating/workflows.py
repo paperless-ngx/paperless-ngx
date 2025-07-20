@@ -66,22 +66,31 @@ def parse_w_workflow_placeholders(
         """Replace a single placeholder match with its processed value."""
         placeholder_content = match.group(1)  # Content inside the braces
         
-        # Use a comprehensive regex to parse enhanced placeholder syntax
-        # Pattern: field_name:s/pattern/replacement/flags (flags optional, trailing slash optional)
-        # Supports escaped slashes in pattern/replacement
-        regex_match = re.match(r'^([^:]+):\s*s/((?:[^/\\]|\\.)*)/((?:[^/\\]|\\.)*)(?:/([is]*))?/?$', placeholder_content)
+        # Regex pattern to parse enhanced placeholder syntax:
+        # - {field_name:s/pattern/replacement/flags}
+        # - Supports escaped slashes in pattern/replacement
+        # - Flags (optional): any characters, but only i and s are supported
+        regex_match = re.match(
+            r'^(?P<field_name>[^:]+):\s*s/(?P<pattern>(?:[^/\\]|\\.)*)/(?P<replacement>(?:[^/\\]|\\.)*)(?:/(?P<flags>[a-zA-Z]*))?/?$',
+            placeholder_content
+        )
         
         if regex_match:
-            field_name = regex_match.group(1)
-            pattern = regex_match.group(2)
-            replacement = regex_match.group(3)
-            flags_str = regex_match.group(4) or ''
+            field_name = regex_match.group("field_name")
+            pattern = regex_match.group("pattern")
+            replacement = regex_match.group("replacement")
+            flags_str = regex_match.group("flags") or ''
+            
+            # Validate flags and filter out unsupported ones
+            supported_flags = {'i', 's'}
+            # Only use supported flags, silently ignore unsupported ones
+            valid_flags = ''.join(char for char in flags_str if char in supported_flags)
             
             # Convert flags string to re flags
             flags = 0
-            if 'i' in flags_str:
+            if 'i' in valid_flags:
                 flags |= re.IGNORECASE
-            if 's' in flags_str:
+            if 's' in valid_flags:
                 flags |= re.DOTALL
             
             # Get the original value
