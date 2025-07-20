@@ -225,7 +225,7 @@ class TestRegexPlaceholders(TestCase):
 
     def test_regex_placeholder_complex_example_from_problem_statement(self):
         """Test the specific example from the problem statement."""
-        # The example: {filename:s/^+?Sparkasse_(\d\d)$/Kontoauszug $1}
+        # The example: {original_filename:s/^+?Sparkasse_(\d\d)$/Kontoauszug $1}
         # Note: The original example has an error (^+?) - fixing to be a valid regex
         template = r"{original_filename:s/^.*Sparkasse_(\d\d).*$/Kontoauszug $1/}"
         result = parse_w_workflow_placeholders(
@@ -290,7 +290,7 @@ class TestRegexPlaceholders(TestCase):
             self.test_original_filename,
             self.test_filename,
         )
-        self.assertEqual(result, r"Bank_12_2023_statement")
+        self.assertEqual(result, "Bank_12_2023_statement")
 
     def test_legacy_malformed_placeholder_handling(self):
         """Test that malformed placeholders are handled gracefully (backward compatibility)."""
@@ -371,3 +371,18 @@ class TestRegexPlaceholders(TestCase):
             content=test_content,
         )
         self.assertEqual(result, "Konto 123456789 Statement Date: 2023-12")
+
+    def test_regex_placeholder_unsupported_flags(self):
+        """Test that unsupported flags are silently ignored."""
+        template = r"{original_filename:s/Sparkasse/Bank/ig}"  # 'g' flag is unsupported
+        result = parse_w_workflow_placeholders(
+            template,
+            self.test_correspondent,
+            self.test_doc_type,
+            self.test_owner,
+            self.test_added,
+            self.test_original_filename,
+            self.test_filename,
+        )
+        # Should still work with the 'i' flag, ignoring the unsupported 'g' flag
+        self.assertEqual(result, "Bank_12_2023_statement")
