@@ -181,6 +181,10 @@ from paperless_mail.models import MailRule
 from paperless_mail.oauth import PaperlessMailOAuth2Manager
 from paperless_mail.serialisers import MailAccountSerializer
 from paperless_mail.serialisers import MailRuleSerializer
+from rest_framework import generics
+
+from documents.serialisers import customeDocumentSerializer
+from documents.serialisers import Cust_CustomFieldSerializer 
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -2918,3 +2922,68 @@ class TrashView(ListModelMixin, PassUserMixin):
                 doc_ids = [doc.id for doc in docs]
             empty_trash(doc_ids=doc_ids)
         return Response({"result": "OK", "doc_ids": doc_ids})
+
+
+class CustomFieldValueView(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    queryset = Document.objects.all()
+    serializer_class = customeDocumentSerializer
+
+    @action(detail=False, methods=['get'])
+    def get(self, request):
+    
+        custom_field_name = request.query_params.get('custom_field_name', 'name')
+
+        
+        documents = Document.objects.filter(custom_fields__field__name=custom_field_name).distinct()
+
+        result = []
+        list_customeField= []
+        seen_values = set()
+        for doc in documents:
+           
+            for custom_field in doc.custom_fields.all():
+                
+                
+                if custom_field.field.name == custom_field_name:
+
+                    print("custom_field.data_type=>", custom_field.field.data_type)
+                    if custom_field.field.data_type == 'select':
+                        select_label = str(custom_field)
+                        select_label_name = select_label.split(':', 2)
+                        select_label = select_label_name[1].strip()
+                        result.append({ 
+                            "document_id": doc.id,
+                            "label": select_label,
+                            "value": custom_field.value
+                        })
+                        
+                        if custom_field.value not in seen_values:
+                            list_customeField.append(select_label)    
+                            seen_values.add(custom_field.value)
+                    else:
+                        result.append({ 
+                            "document_id": doc.id,
+                            "value": custom_field.value
+                        })
+                        if custom_field.value not in seen_values:
+                            list_customeField.append(custom_field.value)    
+                            seen_values.add(custom_field.value)
+
+        DATA={
+            "CustomeField_Value": list_customeField,
+            "Details" : result,
+        }
+        return Response(DATA)
+
+
+   
+class Customefileddata(generics.GenericAPIView):
+    serializer_class = Cust_CustomFieldSerializer
+    permission_classes = (IsAuthenticated,)
+    queryset = CustomField.objects.all()  
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

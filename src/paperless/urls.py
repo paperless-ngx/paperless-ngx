@@ -60,6 +60,9 @@ from paperless_mail.views import MailAccountViewSet
 from paperless_mail.views import MailRuleViewSet
 from paperless_mail.views import OauthCallbackView
 
+from documents.views import CustomFieldValueView
+from documents.views import Customefileddata
+
 api_router = DefaultRouter()
 api_router.register(r"correspondents", CorrespondentViewSet)
 api_router.register(r"document_types", DocumentTypeViewSet)
@@ -92,6 +95,17 @@ urlpatterns = [
                         ("rest_framework.urls", "rest_framework"),
                         namespace="rest_framework",
                     ),
+                ),
+                re_path(
+                    "^CustomFieldValueView/",
+                    CustomFieldValueView.as_view(),
+                    name="CustomFieldValueView filed data",
+                ),
+                
+                re_path(
+                    "^Customefileddata/",
+                    Customefileddata.as_view(),
+                    name="Customefileddata filed data",
                 ),
                 re_path(
                     "^search/",

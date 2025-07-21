@@ -2375,3 +2375,25 @@ class StoragePathTestSerializer(SerializerWithPerms):
         label="Document",
         write_only=True,
     )
+
+
+class customeDocumentSerializer(serializers.ModelSerializer):
+    custom_fields = CustomFieldInstanceSerializer(
+        many=True,
+        allow_null=False,
+        required=False,
+    )
+    
+    class Meta:
+        model = Document
+        fields = ['title','id','document_type','custom_fields'],
+
+class Cust_CustomFieldSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomField
+        fields = ['id', 'name', 'data_type', 'extra_data']
+
+    def validate(self, attrs):
+        if attrs['field_type'] == CustomField.FieldType.CHOICE and not attrs.get('choices'):
+            raise serializers.ValidationError("Choices are required for choice fields.")
+        return attrs
