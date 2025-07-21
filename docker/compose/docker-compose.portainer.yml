@@ -57,8 +57,8 @@ services:
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBHOST: db
-    env_file:
-      - stack.env
+      PAPERLESS_DBUSER: paperless
+      PAPERLESS_DBPASS: paperless
 volumes:
   data:
   media:
