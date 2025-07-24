@@ -31,6 +31,7 @@ import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
+import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { SystemStatusService } from 'src/app/services/system-status.service'
@@ -72,6 +73,7 @@ describe('SettingsComponent', () => {
   let groupService: GroupService
   let modalService: NgbModal
   let systemStatusService: SystemStatusService
+  let savedViewsService: SavedViewService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -122,6 +124,7 @@ describe('SettingsComponent', () => {
     permissionsService = TestBed.inject(PermissionsService)
     modalService = TestBed.inject(NgbModal)
     systemStatusService = TestBed.inject(SystemStatusService)
+    savedViewsService = TestBed.inject(SavedViewService)
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     jest
       .spyOn(permissionsService, 'currentUserHasObjectPermissions')
@@ -212,7 +215,7 @@ describe('SettingsComponent', () => {
     expect(toastErrorSpy).toHaveBeenCalled()
     expect(storeSpy).toHaveBeenCalled()
     expect(appearanceSettingsSpy).not.toHaveBeenCalled()
-    expect(setSpy).toHaveBeenCalledTimes(29)
+    expect(setSpy).toHaveBeenCalledTimes(30)
 
     // succeed
     storeSpy.mockReturnValueOnce(of(true))
@@ -344,5 +347,15 @@ describe('SettingsComponent', () => {
     component.settingsForm.get('themeColor').setValue('#ff0000')
     component.reset()
     expect(component.settingsForm.get('themeColor').value).toEqual('')
+  })
+
+  it('should trigger maybeRefreshDocumentCounts on settings save', () => {
+    completeSetup()
+    const maybeRefreshSpy = jest.spyOn(
+      savedViewsService,
+      'maybeRefreshDocumentCounts'
+    )
+    settingsService.settingsSaved.emit(true)
+    expect(maybeRefreshSpy).toHaveBeenCalled()
   })
 })

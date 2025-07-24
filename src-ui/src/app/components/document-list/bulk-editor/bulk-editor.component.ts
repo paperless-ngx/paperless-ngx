@@ -32,6 +32,7 @@ import {
   DocumentService,
   SelectionDataItem,
 } from 'src/app/services/rest/document.service'
+import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -83,6 +84,7 @@ export class BulkEditorComponent
   private storagePathService = inject(StoragePathService)
   private customFieldService = inject(CustomFieldsService)
   private permissionService = inject(PermissionsService)
+  private savedViewService = inject(SavedViewService)
 
   tagSelectionModel = new FilterableDropdownSelectionModel(true)
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
@@ -270,6 +272,7 @@ export class BulkEditorComponent
           this.list.selected.forEach((id) => {
             this.openDocumentService.refreshDocument(id)
           })
+          this.savedViewService.maybeRefreshDocumentCounts()
           if (modal) {
             modal.close()
           }
