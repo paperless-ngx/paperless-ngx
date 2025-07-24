@@ -1776,7 +1776,8 @@ class GlobalSearchView(PassUserMixin):
         elif len(query) < 3:
             return HttpResponseBadRequest("Query must be at least 3 characters")
 
-        db_only = request.query_params.get("db_only", False)
+        # TODO: the "db_only" field is probably not needed anymore,
+        # as the full-text DB index will return results faster than Whoosh.
 
         OBJECT_LIMIT = 3
         docs = []
@@ -1787,23 +1788,26 @@ class GlobalSearchView(PassUserMixin):
                 Document,
             )
             # First search by title
-            docs = all_docs.filter(title__icontains=query)
-            if not db_only and len(docs) < OBJECT_LIMIT:
-                # If we don't have enough results, search by content
-                from documents import index
+            docs = all_docs.filter(Q(title__ftcontains=query))
 
-                with index.open_index_searcher() as s:
-                    fts_query = index.DelayedFullTextQuery(
-                        s,
-                        request.query_params,
-                        OBJECT_LIMIT,
-                        filter_queryset=all_docs,
-                    )
-                    results = fts_query[0:1]
-                    docs = docs | Document.objects.filter(
-                        id__in=[r["id"] for r in results],
-                    )
-            docs = docs[:OBJECT_LIMIT]
+            # If not enough results, search also by content
+            if len(docs) < OBJECT_LIMIT:
+                doc_ids = docs.values_list("id", flat=True)
+                other_doc_ids = (
+                    all_docs.filter(content__ftcontains=query)
+                    .exclude(id__in=doc_ids)[: OBJECT_LIMIT - len(doc_ids)]
+                    .values_list("id", flat=True)
+                )
+                all_ids = list(doc_ids) + list(other_doc_ids)
+                # Documents found by title are ranked above
+                docs = all_docs.filter(id__in=all_ids).order_by(
+                    Case(
+                        *[When(id=pk, then=pos) for pos, pk in enumerate(all_ids)],
+                        output_field=IntegerField(),
+                    ),
+                )
+            else:
+                docs = docs[:OBJECT_LIMIT]
         saved_views = (
             SavedView.objects.filter(owner=request.user, name__icontains=query)
             if request.user.has_perm("documents.view_savedview")
