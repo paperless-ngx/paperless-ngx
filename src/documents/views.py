@@ -1095,7 +1095,14 @@ class DocumentViewSet(
 
 @extend_schema_view(
     list=extend_schema(
+        description="Document views including search",
         parameters=[
+            OpenApiParameter(
+                name="query",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                description="Advanced search query string",
+            ),
             OpenApiParameter(
                 name="full_perms",
                 type=OpenApiTypes.BOOL,
