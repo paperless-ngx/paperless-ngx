@@ -121,7 +121,6 @@ class DocumentClassifier:
             self._stem_cache = StoredLRUCache(
                 f"stem_cache_v{self.FORMAT_VERSION}",
                 capacity=10000,
-                backend_ttl=3600,
             )
         self._stop_words = None
 

@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 from typing import Any
 from typing import Final
 
+from django.conf import settings
 from django.core.cache import cache
 from django.core.cache import caches
 
@@ -83,7 +84,7 @@ class StoredLRUCache(LRUCache):
         backend_key: str,
         capacity: int = 128,
         backend: BaseCache = read_cache,
-        backend_ttl=CACHE_50_MINUTES,
+        backend_ttl=settings.CACHALOT_TIMEOUT,
     ):
         if backend_key is None:
             raise ValueError("backend_key is mandatory")
