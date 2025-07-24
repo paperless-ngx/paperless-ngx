@@ -49,6 +49,7 @@ import {
   PermissionsService,
 } from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
+import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import {
   LanguageOption,
@@ -117,6 +118,7 @@ export class SettingsComponent
   permissionsService = inject(PermissionsService)
   private modalService = inject(NgbModal)
   private systemStatusService = inject(SystemStatusService)
+  private savedViewsService = inject(SavedViewService)
 
   activeNavID: number
 
@@ -152,6 +154,7 @@ export class SettingsComponent
     notificationsConsumerSuppressOnDashboard: new FormControl(null),
 
     savedViewsWarnOnUnsavedChange: new FormControl(null),
+    sidebarViewsShowCount: new FormControl(null),
   })
 
   SettingsNavIDs = SettingsNavIDs
@@ -197,6 +200,7 @@ export class SettingsComponent
     super()
     this.settings.settingsSaved.subscribe(() => {
       if (!this.savePending) this.initialize()
+      this.savedViewsService.maybeRefreshDocumentCounts()
     })
   }
 
@@ -307,6 +311,9 @@ export class SettingsComponent
       ),
       savedViewsWarnOnUnsavedChange: this.settings.get(
         SETTINGS_KEYS.SAVED_VIEWS_WARN_ON_UNSAVED_CHANGE
+      ),
+      sidebarViewsShowCount: this.settings.get(
+        SETTINGS_KEYS.SIDEBAR_VIEWS_SHOW_COUNT
       ),
       defaultPermsOwner: this.settings.get(SETTINGS_KEYS.DEFAULT_PERMS_OWNER),
       defaultPermsViewUsers: this.settings.get(
@@ -484,6 +491,10 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.SAVED_VIEWS_WARN_ON_UNSAVED_CHANGE,
       this.settingsForm.value.savedViewsWarnOnUnsavedChange
+    )
+    this.settings.set(
+      SETTINGS_KEYS.SIDEBAR_VIEWS_SHOW_COUNT,
+      this.settingsForm.value.sidebarViewsShowCount
     )
     this.settings.set(
       SETTINGS_KEYS.DEFAULT_PERMS_OWNER,

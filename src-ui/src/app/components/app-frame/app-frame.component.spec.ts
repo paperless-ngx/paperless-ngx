@@ -92,6 +92,7 @@ describe('AppFrameComponent', () => {
   let router: Router
   let savedViewSpy
   let modalService: NgbModal
+  let maybeRefreshSpy
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -113,7 +114,11 @@ describe('AppFrameComponent', () => {
         {
           provide: SavedViewService,
           useValue: {
-            reload: () => {},
+            reload: (fn: any) => {
+              if (fn) {
+                fn()
+              }
+            },
             listAll: () =>
               of({
                 all: [saved_views.map((v) => v.id)],
@@ -121,6 +126,8 @@ describe('AppFrameComponent', () => {
                 results: saved_views,
               }),
             sidebarViews: saved_views.filter((v) => v.show_in_sidebar),
+            getDocumentCount: (view: SavedView) => 5,
+            maybeRefreshDocumentCounts: () => {},
           },
         },
         PermissionsService,
@@ -169,6 +176,7 @@ describe('AppFrameComponent', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
 
     savedViewSpy = jest.spyOn(savedViewService, 'reload')
+    maybeRefreshSpy = jest.spyOn(savedViewService, 'maybeRefreshDocumentCounts')
 
     fixture = TestBed.createComponent(AppFrameComponent)
     component = fixture.componentInstance
@@ -358,5 +366,9 @@ describe('AppFrameComponent', () => {
     component.ngOnInit()
     expect(toastErrorSpy).toHaveBeenCalledTimes(2)
     expect(toastInfoSpy).toHaveBeenCalledTimes(3)
+  })
+
+  it('should call maybeRefreshDocumentCounts after saved views reload', () => {
+    expect(maybeRefreshSpy).toHaveBeenCalled()
   })
 })

@@ -118,6 +118,8 @@ export class SavedViewWidgetComponent
 
   displayFields: DisplayField[] = DEFAULT_DASHBOARD_DISPLAY_FIELDS
 
+  count: number
+
   ngOnInit(): void {
     this.reload()
     this.displayMode = this.savedView.display_mode ?? DisplayMode.TABLE
@@ -178,6 +180,7 @@ export class SavedViewWidgetComponent
         tap((result) => {
           this.show = true
           this.documents = result.results
+          this.count = result.count
         }),
         delay(500)
       )

@@ -112,7 +112,14 @@
                     routerLinkActive="active" (click)="closeMenu()" [ngbPopover]="view.name"
                     [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave"
                     popoverClass="popover-slim">
-                    <i-bs class="me-1" name="funnel"></i-bs><span>&nbsp;{{view.name}}</span>
+                    <i-bs class="me-1" name="funnel"></i-bs><span>&nbsp;{{view.name}}
+                      @if (showSidebarCounts && !slimSidebarEnabled) {
+                        <span><span class="badge bg-info text-dark ms-2 d-inline">{{ savedViewService.getDocumentCount(view) }}</span></span>
+                      }
+                    </span>
+                    @if (showSidebarCounts && slimSidebarEnabled) {
+                      <span class="badge bg-info text-dark position-absolute top-0 end-0 d-none d-md-block">{{ savedViewService.getDocumentCount(view) }}</span>
+                    }
                   </a>
                   @if (settingsService.organizingSidebarSavedViews) {
                     <div class="position-absolute end-0 top-0 px-3 py-2" [class.me-n3]="slimSidebarEnabled" cdkDragHandle>

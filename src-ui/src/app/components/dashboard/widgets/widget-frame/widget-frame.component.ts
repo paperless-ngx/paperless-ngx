@@ -30,6 +30,9 @@ export class WidgetFrameComponent
   @Input()
   cardless: boolean = false
 
+  @Input()
+  badge: string
+
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.show = true

@@ -73,6 +73,7 @@ import { CorrespondentService } from 'src/app/services/rest/correspondent.servic
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -195,6 +196,7 @@ export class DocumentDetailComponent
   private hotKeyService = inject(HotKeyService)
   private componentRouterService = inject(ComponentRouterService)
   private deviceDetectorService = inject(DeviceDetectorService)
+  private savedViewService = inject(SavedViewService)
 
   @ViewChild('inputTitle')
   titleInput: TextComponent
@@ -841,6 +843,7 @@ export class DocumentDetailComponent
           } else {
             this.openDocumentService.refreshDocument(this.documentId)
           }
+          this.savedViewService.maybeRefreshDocumentCounts()
         },
         error: (error) => {
           this.networkActive = false
@@ -1188,6 +1191,7 @@ export class DocumentDetailComponent
   notesUpdated(notes: DocumentNote[]) {
     this.document.notes = notes
     this.openDocumentService.refreshDocument(this.documentId)
+    this.savedViewService.maybeRefreshDocumentCounts()
   }
 
   get userIsOwner(): boolean {
