@@ -10,20 +10,77 @@ from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models.lookups import IContains
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from multiselectfield import MultiSelectField
+
+from documents.utils import FULLTEXT_MINIMAL_TOKEN_LENGTH
+from documents.utils import split_tokens
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
 
 from django.db.models import Case
+from django.db.models import Lookup
+from django.db.models.fields import CharField
+from django.db.models.fields import TextField
 from django.db.models.functions import Cast
 from django.db.models.functions import Substr
 from django_softdelete.models import SoftDeleteModel
 
 from documents.data_models import DocumentSource
 from documents.parsers import get_default_file_extension
+
+
+@CharField.register_lookup
+@TextField.register_lookup
+class FulltextContains(Lookup):
+    """
+    Check if a field contains the specified text. A full-text index is needed.
+
+    If multiple words are provided, only records where those words appear in the same
+    order, and without other words in between, will match. For example, searching for
+    "John Doe" will not match "Doe John" or "John Jr Doe".
+
+    Note: Actual behavior may vary depending on the database backend.
+    """
+
+    lookup_name = "ftcontains"
+
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)  # "table.column"
+        rhs, rhs_params = self.process_rhs(compiler, connection)  # search string
+        tokens = split_tokens(rhs_params[0])
+        fulltext_tokens = [t for t in tokens if len(t) >= FULLTEXT_MINIMAL_TOKEN_LENGTH]
+        if connection.vendor == "postgresql" and tokens:
+            # Django SearchQuery produces a "coalesce" SQL clause which doesn't use the fulltext index.
+            # so we use raw SQL instead. See issue: https://code.djangoproject.com/ticket/31304
+            ft_search_exp = " & ".join(tokens) + ":*"
+            sql = f"to_tsvector('simple', {lhs}) @@ to_tsquery('simple', %s)"
+            return sql, [ft_search_exp]
+        elif connection.vendor in {"mysql", "mariadb"} and fulltext_tokens:
+            # MariaDB has limitations: it can use fulltext search only for at least 3-char long tokens.
+            # Do a fulltext prefiltering on title and content to use fulltext index,
+            # then apply the actual search query (LIKE "%A_%B%") to refine the results.
+            ft_search_exp = "+" + " +".join(fulltext_tokens) + "*"
+            like_search_exp = "%" + "_%".join(tokens) + "%"
+            sql = f"MATCH({lhs}) AGAINST (%s IN BOOLEAN MODE) AND {lhs} LIKE %s"
+            return sql, [ft_search_exp, like_search_exp]
+        elif connection.vendor == "sqlite" and tokens:
+            # SQLite fulltext works for any token size
+            ft_search_exp = "+".join(tokens) + "*"
+            # Get FTS virtual table name, usually the main table name with a "_fts" suffix
+            # Eg: for 'documents_document', the FTS table should be ''documents_document_fts'
+            main_table = self.lhs.output_field.model._meta.db_table
+            fts_table = f"{main_table}_fts"
+            column = self.lhs.target.column
+            sql = f"{compiler.quote_name_unless_alias(main_table)}.id IN (SELECT rowid FROM {compiler.quote_name_unless_alias(fts_table)} WHERE {column} MATCH %s)"
+            return sql, [ft_search_exp]
+        else:
+            # Fallback to icontains
+            fallback_lookup = IContains(self.lhs, self.rhs)
+            return fallback_lookup.as_sql(compiler, connection)
 
 
 class ModelWithOwner(models.Model):
