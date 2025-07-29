@@ -1030,6 +1030,21 @@ describe('DocumentDetailComponent', () => {
     })
   })
 
+  it('should restore changed fields and mark as dirty', () => {
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
+    jest.spyOn(documentService, 'get').mockReturnValueOnce(of(doc))
+    const docWithChanges = Object.assign({}, doc)
+    docWithChanges.__changedFields = ['title', 'tags']
+    jest
+      .spyOn(openDocumentsService, 'getOpenDocument')
+      .mockReturnValue(docWithChanges)
+    fixture.detectChanges() // calls ngOnInit
+    expect(component.documentForm.get('title').dirty).toBeTruthy()
+    expect(component.documentForm.get('tags').dirty).toBeTruthy()
+  })
+
   it('should show custom field errors', () => {
     initNormally()
     component.error = {

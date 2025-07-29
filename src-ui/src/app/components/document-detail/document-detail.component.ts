@@ -451,6 +451,11 @@ export class DocumentDetailComponent
                 ]
               delete openDocument['permissions_form']
             }
+            if (openDocument.__changedFields) {
+              openDocument.__changedFields.forEach((field) => {
+                this.documentForm.get(field)?.markAsDirty()
+              })
+            }
             this.updateComponent(openDocument)
           } else {
             this.openDocumentService.openDocument(doc)
@@ -514,7 +519,7 @@ export class DocumentDetailComponent
       )
       .subscribe({
         next: ({ doc, dirty }) => {
-          this.openDocumentService.setDirty(doc, dirty)
+          this.openDocumentService.setDirty(doc, dirty, this.getChangedFields())
         },
         error: (error) => {
           this.router.navigate(['404'], {
