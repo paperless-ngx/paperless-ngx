@@ -1036,13 +1036,14 @@ describe('DocumentDetailComponent', () => {
       .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
     jest.spyOn(documentService, 'get').mockReturnValueOnce(of(doc))
     const docWithChanges = Object.assign({}, doc)
-    docWithChanges.__changedFields = ['title', 'tags']
+    docWithChanges.__changedFields = ['title', 'tags', 'owner']
     jest
       .spyOn(openDocumentsService, 'getOpenDocument')
       .mockReturnValue(docWithChanges)
     fixture.detectChanges() // calls ngOnInit
     expect(component.documentForm.get('title').dirty).toBeTruthy()
     expect(component.documentForm.get('tags').dirty).toBeTruthy()
+    expect(component.documentForm.get('permissions_form').dirty).toBeTruthy()
   })
 
   it('should show custom field errors', () => {

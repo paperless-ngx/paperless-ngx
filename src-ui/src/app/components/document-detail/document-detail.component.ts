@@ -453,7 +453,11 @@ export class DocumentDetailComponent
             }
             if (openDocument.__changedFields) {
               openDocument.__changedFields.forEach((field) => {
-                this.documentForm.get(field)?.markAsDirty()
+                if (field === 'owner' || field === 'set_permissions') {
+                  this.documentForm.get('permissions_form').markAsDirty()
+                } else {
+                  this.documentForm.get(field)?.markAsDirty()
+                }
               })
             }
             this.updateComponent(openDocument)
