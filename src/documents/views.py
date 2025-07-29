@@ -2322,6 +2322,17 @@ class RemoteVersionView(GenericAPIView):
         },
     ),
 )
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="task_id",
+            type=str,
+            location=OpenApiParameter.QUERY,
+            required=False,
+            description="Filter tasks by Celery UUID",
+        ),
+    ],
+)
 class TasksViewSet(ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     serializer_class = TasksViewSerializer
