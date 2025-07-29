@@ -249,7 +249,6 @@ export class DocumentDetailComponent
   isDirty$: Observable<boolean>
   unsubscribeNotifier: Subject<any> = new Subject()
   docChangeNotifier: Subject<any> = new Subject()
-  private wasRestoredFromStorage = false
 
   requiresPassword: boolean = false
   password: string
@@ -457,8 +456,6 @@ export class DocumentDetailComponent
             this.openDocumentService.openDocument(doc)
             this.updateComponent(doc)
           }
-
-          this.wasRestoredFromStorage = !!openDocument
 
           this.titleSubject
             .pipe(
@@ -803,10 +800,8 @@ export class DocumentDetailComponent
     const changes = {
       id: this.document.id,
     }
-
     Object.keys(this.documentForm.controls).forEach((key) => {
-      // If restored from sessionStorage, always send full patch
-      if (this.wasRestoredFromStorage || this.documentForm.get(key).dirty) {
+      if (this.documentForm.get(key).dirty) {
         if (key === 'permissions_form') {
           changes['owner'] =
             this.documentForm.get('permissions_form').value['owner']
