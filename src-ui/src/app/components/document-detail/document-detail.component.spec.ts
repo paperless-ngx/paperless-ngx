@@ -518,6 +518,35 @@ describe('DocumentDetailComponent', () => {
     )
   })
 
+  it('should perform full patch if document was restored from local storage', () => {
+    currentUserHasObjectPermissions = true
+    initNormally()
+    const patchSpy = jest.spyOn(documentService, 'patch')
+    component['wasRestoredFromStorage'] = true
+    component.save()
+    expect(patchSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 3,
+        title: 'Doc 3',
+        content: 'text content',
+        correspondent: 11,
+        document_type: 21,
+        storage_path: 31,
+        archive_serial_number: null,
+        remove_inbox_tags: false,
+        tags: [41, 42, 43],
+        owner: null,
+        set_permissions: undefined,
+        custom_fields: [
+          {
+            field: 0,
+            value: 'custom foo bar',
+          },
+        ],
+      })
+    )
+  })
+
   it('should allow save and next', () => {
     initNormally()
     const nextDocId = 100
