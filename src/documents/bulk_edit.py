@@ -528,6 +528,12 @@ def edit_pdf(
             max_idx = max(op.get("doc", 0) for op in operations)
             pdf_docs = [pikepdf.new() for _ in range(max_idx + 1)]
 
+            if update_document and len(pdf_docs) > 1:
+                logger.error(
+                    "Update requested but multiple output documents specified",
+                )
+                return "ERROR"
+
             for op in operations:
                 dst = pdf_docs[op.get("doc", 0)]
                 page = src.pages[op["page"] - 1]
@@ -536,11 +542,6 @@ def edit_pdf(
                     dst.pages[-1].rotate(op["rotate"], relative=True)
 
         if update_document:
-            if len(pdf_docs) != 1:
-                logger.error(
-                    "Update requested but multiple output documents specified",
-                )
-                return "ERROR"
             pdf = pdf_docs[0]
             pdf.remove_unreferenced_resources()
             pdf.save(doc.source_path)
