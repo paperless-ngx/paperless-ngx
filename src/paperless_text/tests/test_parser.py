@@ -1,3 +1,4 @@
+import tempfile
 from pathlib import Path
 
 from paperless_text.parsers import TextDocumentParser
@@ -35,3 +36,21 @@ class TestTextParser:
 
         assert text_parser.get_text() == "Pantothens�ure\n"
         assert text_parser.get_archive_path() is None
+
+    def test_thumbnail_large_file(self, text_parser: TextDocumentParser):
+        """
+        GIVEN:
+            - A very large text file (>50MB)
+        WHEN:
+            - A thumbnail is requested
+        THEN:
+            - A thumbnail is created without reading the entire file into memory
+        """
+        large_file = Path(tempfile.mktemp(suffix=".txt"))
+        with Path(large_file).open("w") as f:
+            f.write("A" * (51 * 1024 * 1024))  # 51 MB of 'A'
+
+        thumb = text_parser.get_thumbnail(large_file, "text/plain")
+        assert thumb.exists()
+        assert thumb.is_file()
+        large_file.unlink()
