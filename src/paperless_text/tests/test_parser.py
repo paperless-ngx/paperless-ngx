@@ -46,11 +46,16 @@ class TestTextParser:
         THEN:
             - A thumbnail is created without reading the entire file into memory
         """
-        large_file = Path(tempfile.mktemp(suffix=".txt"))
-        with Path(large_file).open("w") as f:
-            f.write("A" * (51 * 1024 * 1024))  # 51 MB of 'A'
+        with tempfile.NamedTemporaryFile(
+            delete=False,
+            mode="w",
+            encoding="utf-8",
+            suffix=".txt",
+        ) as tmp:
+            tmp.write("A" * (51 * 1024 * 1024))  # 51 MB of 'A'
+            large_file = Path(tmp.name)
 
-        thumb = text_parser.get_thumbnail(large_file, "text/plain")
-        assert thumb.exists()
-        assert thumb.is_file()
-        large_file.unlink()
+            thumb = text_parser.get_thumbnail(large_file, "text/plain")
+            assert thumb.exists()
+            assert thumb.is_file()
+            large_file.unlink()
