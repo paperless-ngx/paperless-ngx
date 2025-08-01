@@ -1776,8 +1776,7 @@ class GlobalSearchView(PassUserMixin):
         elif len(query) < 3:
             return HttpResponseBadRequest("Query must be at least 3 characters")
 
-        # TODO: the "db_only" field is probably not needed anymore,
-        # as the full-text DB index will return results faster than Whoosh.
+        db_only = request.query_params.get("db_only", False)
 
         OBJECT_LIMIT = 3
         docs = []
@@ -1792,20 +1791,37 @@ class GlobalSearchView(PassUserMixin):
 
             # If not enough results, search also by content
             if len(docs) < OBJECT_LIMIT:
-                doc_ids = docs.values_list("id", flat=True)
-                other_doc_ids = (
-                    all_docs.filter(content__fticontains=query)
-                    .exclude(id__in=doc_ids)[: OBJECT_LIMIT - len(doc_ids)]
-                    .values_list("id", flat=True)
-                )
-                all_ids = list(doc_ids) + list(other_doc_ids)
-                # Documents found by title are ranked above
-                docs = all_docs.filter(id__in=all_ids).order_by(
-                    Case(
-                        *[When(id=pk, then=pos) for pos, pk in enumerate(all_ids)],
-                        output_field=IntegerField(),
-                    ),
-                )
+                if db_only:
+                    # Complete by a full-text content search in the DB
+                    doc_ids = docs.values_list("id", flat=True)
+                    other_doc_ids = (
+                        all_docs.filter(content__fticontains=query)
+                        .exclude(id__in=doc_ids)[: OBJECT_LIMIT - len(doc_ids)]
+                        .values_list("id", flat=True)
+                    )
+                    all_ids = list(doc_ids) + list(other_doc_ids)
+                    # Documents found by title are ranked above
+                    docs = all_docs.filter(id__in=all_ids).order_by(
+                        Case(
+                            *[When(id=pk, then=pos) for pos, pk in enumerate(all_ids)],
+                            output_field=IntegerField(),
+                        ),
+                    )
+                else:
+                    # Complete by a content search in the Whoosh index
+                    from documents import index
+
+                    with index.open_index_searcher() as s:
+                        fts_query = index.DelayedFullTextQuery(
+                            s,
+                            request.query_params,
+                            OBJECT_LIMIT,
+                            filter_queryset=all_docs,
+                        )
+                        results = fts_query[0:1]
+                        docs = docs | Document.objects.filter(
+                            id__in=[r["id"] for r in results],
+                        )
             else:
                 docs = docs[:OBJECT_LIMIT]
         saved_views = (
