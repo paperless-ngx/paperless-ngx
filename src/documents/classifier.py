@@ -17,8 +17,6 @@ if TYPE_CHECKING:
 from django.conf import settings
 from django.core.cache import cache
 from django.core.cache import caches
-from sklearn.exceptions import InconsistentVersionWarning
-from sklearn.utils.multiclass import type_of_target
 
 from documents.caching import CACHE_5_MINUTES
 from documents.caching import CACHE_50_MINUTES
@@ -130,6 +128,8 @@ class DocumentClassifier:
         ).hexdigest()
 
     def load(self) -> None:
+        from sklearn.exceptions import InconsistentVersionWarning
+
         # Catch warnings for processing
         with warnings.catch_warnings(record=True) as w:
             with Path(settings.MODEL_FILE).open("rb") as f:
@@ -421,11 +421,13 @@ class DocumentClassifier:
             cached = self._stem_cache.get(word)
             if cached is not None:
                 return cached
+            elif word in self._stop_words:
+                return ""
             # Assumption: words that contain numbers are never stemmed
             elif RE_DIGIT.search(word):
                 return word
             else:
-                result = "" if word in self._stop_words else self._stemmer.stem(word)
+                result = self._stemmer.stem(word)
                 self._stem_cache.set(word, result)
                 return result
 
@@ -447,7 +449,7 @@ class DocumentClassifier:
         shared_cache=True,
     ) -> str:
         """
-        Process to contents of a document, distilling it down into
+        Process the contents of a document, distilling it down into
         words which are meaningful to the content.
 
         A stemmer cache is shared across workers with the parameter "shared_cache".
@@ -512,6 +514,8 @@ class DocumentClassifier:
             return None
 
     def predict_tags(self, content: str) -> list[int]:
+        from sklearn.utils.multiclass import type_of_target
+
         if self.tags_classifier:
             X = self._vectorize(content)
             y = self.tags_classifier.predict(X)
