@@ -155,7 +155,9 @@ class InboxFilter(Filter):
 class TitleContentFilter(Filter):
     def filter(self, qs, value):
         if value:
-            return qs.filter(Q(title__ftcontains=value) | Q(content__ftcontains=value))
+            return qs.filter(
+                Q(title__fticontains=value) | Q(content__fticontains=value),
+            )
         else:
             return qs
 

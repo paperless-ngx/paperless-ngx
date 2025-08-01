@@ -1788,13 +1788,13 @@ class GlobalSearchView(PassUserMixin):
                 Document,
             )
             # First search by title
-            docs = all_docs.filter(Q(title__ftcontains=query))
+            docs = all_docs.filter(Q(title__fticontains=query))
 
             # If not enough results, search also by content
             if len(docs) < OBJECT_LIMIT:
                 doc_ids = docs.values_list("id", flat=True)
                 other_doc_ids = (
-                    all_docs.filter(content__ftcontains=query)
+                    all_docs.filter(content__fticontains=query)
                     .exclude(id__in=doc_ids)[: OBJECT_LIMIT - len(doc_ids)]
                     .values_list("id", flat=True)
                 )

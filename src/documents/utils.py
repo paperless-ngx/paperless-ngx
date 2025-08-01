@@ -1,4 +1,5 @@
 import logging
+import re
 import shutil
 from os import utime
 from pathlib import Path
@@ -6,6 +7,7 @@ from subprocess import CompletedProcess
 from subprocess import run
 
 from django.conf import settings
+from django.db import connection
 from PIL import Image
 
 
@@ -130,73 +132,55 @@ def get_boolean(boolstr: str) -> bool:
     return bool(boolstr.lower() in ("yes", "y", "1", "t", "true"))
 
 
-# Helpers related to SQL
-def _remove_double_spaces(text: str) -> str | None:
-    """Remove any multiple following space in a string."""
-    if not isinstance(text, str):
-        return None
-    result = ""
-    while result != text:
-        result = text
-        text = text.replace("  ", " ")
-    return result
+def escape_like_pattern(value, escape_char="\\"):
+    return re.sub(r"([\\%_])", lambda m: escape_char + m.group(1), value)
 
 
-# All special characters that may be present in a ASCII-646 string
-sql_forbidden_patterns: set[str] = {
-    "?",
-    "!",
-    '"',
-    "%",
-    "&",
-    ",",
-    ".",
-    "/",
-    ":",
-    ";",
-    "<",
-    "=",
-    ">",
-    "\\",
-    "#",
-    "$",
-    "@",
-    "`",
-    "{",
-    "}",
-    "^",
-    "~",
-    "[",
-    "]",
-    "_",
-    "|",
-    "*",
-    "(",
-    ")",
-    "+",
-    "-",
-    "’",  # noqa
-    "ʼ",  # noqa
-    "‘",  # noqa
-}
+ESCAPE_SQL_RE = re.compile(r"[:\";_\}>ʼ\\\.‘\[/<'\?%’,@\&=\*\~\|\{\)`\+\^\(\#\]!\-\$]")  # noqa: RUF001
 
 
-def sanitize_fulltext_string(search_string: str) -> str:
-    """Escape all special characters in SQL Fulltext "match against" requests"""
-    for char in sql_forbidden_patterns:
-        search_string = search_string.replace(char, " ")
-    return _remove_double_spaces(search_string).lower()
+def escape_fulltext(value):
+    if connection.vendor == "postgresql":
+        # In PostgreSQL, escape tsquery special characters: & | ! : * ( ) ' " \
+        # WIP: Not needed for phraseto_tsquery
+        return value
+    else:
+        return ESCAPE_SQL_RE.sub(" ", value)
+
+
+def split_fulltext_tokens(value):
+    return [token for token in escape_fulltext(value).split()]
+
+
+NOT_FT_COMPATIBLE = re.compile(
+    # CJK ideographs
+    r"[\u4E00-\u9FFF"  # CJK Unified Ideographs
+    r"\u3400-\u4DBF"  # CJK Extension A
+    r"\u3040-\u30ff"  # Hiragana / Japanese
+    r"\uAC00-\uD7AF"  # Hangul / Korean
+    r"]",
+)
+
+
+def fulltext_compatible(text: str, threshold=0.5):
+    """
+    Check that a given text can be searched against a classic full-text SQL index.
+
+    The text must have a ratio of supported characters above the given threshold.
+    For instance, CJK characters are not natively supported by most SQL databases.
+    """
+    text = escape_fulltext(text)
+    incompatible_chars = len(NOT_FT_COMPATIBLE.findall(text))
+    total_relevant_chars = (
+        sum(1 for c in text if not c.isspace() and not NOT_FT_COMPATIBLE.match(c))
+        + incompatible_chars
+    )
+    if total_relevant_chars == 0:
+        return False
+    return (incompatible_chars / total_relevant_chars) < threshold
 
 
 # Default keyword length to trigger fulltext search in MariaDB.
 # Default used to be 4 (ft_min_word_length) for MyISAM storage engine,
 # but it is 3 (innodb_ft_min_token_size) for InnoDB.
 FULLTEXT_MINIMAL_TOKEN_LENGTH = 3
-
-
-def split_tokens(text: str) -> list[str]:
-    """
-    Cleans the input text by removing special and disallowed characters,
-    then splits it into a list of tokens suitable for SQL search queries.
-    """
-    return [token for token in sanitize_fulltext_string(text).split()]
