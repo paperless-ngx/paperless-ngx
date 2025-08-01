@@ -59,15 +59,12 @@ class Migration(migrations.Migration):
         ]
     else:
         operations += [
-            # SQLite indexes all words with prefix indexes to speed up wildcard searches.
-            # Prefix length (e.g., 3) helps queries like 'joh*' use the index efficiently.
-            # Shorter wildcards like 'jo*' without a 2-char prefix index require scanning all matching 3-char prefixes,
-            # which still uses the index but is slower.
-            # More prefix indexes increase DB size and slow writes, so balance is needed.
+            # Avoid prefixes in the SQLite FTS table to limit disk usage.
+            # Queries will work even without indexing the prefixes.
             migrations.RunSQL(
                 """
                 CREATE VIRTUAL TABLE IF NOT EXISTS documents_document_fts
-                USING fts5(title, content, prefix='3,4,5,6,7');
+                USING fts5(title, content, content='', contentless_delete=1);
                 """,
                 reverse_sql="DROP TABLE IF EXISTS documents_document_fts;",
             ),
