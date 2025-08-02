@@ -102,7 +102,9 @@ export class AppFrameComponent
         PermissionType.SavedView
       )
     ) {
-      this.savedViewService.reload()
+      this.savedViewService.reload(() => {
+        this.savedViewService.maybeRefreshDocumentCounts()
+      })
     }
   }
 
@@ -282,5 +284,9 @@ export class AppFrameComponent
 
   onLogout() {
     this.openDocumentsService.closeAll()
+  }
+
+  get showSidebarCounts(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.SIDEBAR_VIEWS_SHOW_COUNT)
   }
 }

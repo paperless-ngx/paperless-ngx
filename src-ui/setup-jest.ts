@@ -1,12 +1,16 @@
 import '@angular/localize/init'
 import { jest } from '@jest/globals'
 import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone'
-import { TextDecoder, TextEncoder } from 'util'
+import { TextDecoder, TextEncoder } from 'node:util'
 if (process.env.NODE_ENV === 'test') {
   setupZoneTestEnv()
 }
-global.TextEncoder = TextEncoder
-global.TextDecoder = TextDecoder
+;(globalThis as any).TextEncoder = TextEncoder as unknown as {
+  new (): TextEncoder
+}
+;(globalThis as any).TextDecoder = TextDecoder as unknown as {
+  new (): TextDecoder
+}
 
 import { registerLocaleData } from '@angular/common'
 import localeAf from '@angular/common/locales/af'
@@ -116,10 +120,6 @@ if (!URL.revokeObjectURL) {
   Object.defineProperty(window.URL, 'revokeObjectURL', { value: jest.fn() })
 }
 Object.defineProperty(window, 'ResizeObserver', { value: mock() })
-Object.defineProperty(window, 'location', {
-  configurable: true,
-  value: { reload: jest.fn() },
-})
 
 HTMLCanvasElement.prototype.getContext = <
   typeof HTMLCanvasElement.prototype.getContext

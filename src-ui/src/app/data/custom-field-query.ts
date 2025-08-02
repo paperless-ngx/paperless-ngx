@@ -85,7 +85,10 @@ export const CUSTOM_FIELD_QUERY_OPERATOR_GROUPS_BY_TYPE = {
     CustomFieldQueryOperatorGroups.Exact,
     CustomFieldQueryOperatorGroups.Date,
   ],
-  [CustomFieldDataType.Boolean]: [CustomFieldQueryOperatorGroups.Basic],
+  [CustomFieldDataType.Boolean]: [
+    CustomFieldQueryOperatorGroups.Basic,
+    CustomFieldQueryOperatorGroups.Exact,
+  ],
   [CustomFieldDataType.Integer]: [
     CustomFieldQueryOperatorGroups.Basic,
     CustomFieldQueryOperatorGroups.Exact,

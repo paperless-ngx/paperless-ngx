@@ -100,8 +100,8 @@ testing = [
   "daphne",
   "factory-boy~=3.3.1",
   "imagehash",
-  "pytest~=8.3.3",
-  "pytest-cov~=6.0.0",
+  "pytest~=8.4.1",
+  "pytest-cov~=6.2.1",
   "pytest-django~=4.10.0",
   "pytest-env",
   "pytest-httpx",
@@ -112,7 +112,7 @@ testing = [
 ]
 
 lint = [
-  "pre-commit~=4.1.0",
+  "pre-commit~=4.2.0",
   "pre-commit-uv~=4.1.3",
   "ruff~=0.12.2",
 ]
@@ -240,6 +240,7 @@ testpaths = [
   "src/paperless_mail/tests/",
   "src/paperless_tesseract/tests/",
   "src/paperless_tika/tests",
+  "src/paperless_text/tests/",
   "src/paperless_remote/tests/",
 ]
 addopts = [

@@ -59,7 +59,7 @@ export class DateComponent
   @Output()
   filterDocuments = new EventEmitter<NgbDateStruct[]>()
 
-  public readonly today: string = new Date().toISOString().split('T')[0]
+  public readonly today: string = new Date().toLocaleDateString('en-CA')
 
   getSuggestions() {
     return this.suggestions == null
