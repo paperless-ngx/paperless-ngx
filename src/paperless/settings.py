@@ -1183,6 +1183,17 @@ POST_CONSUME_SCRIPT = os.getenv("PAPERLESS_POST_CONSUME_SCRIPT")
 DATE_ORDER = os.getenv("PAPERLESS_DATE_ORDER", "DMY")
 FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
 
+# When detecting date of the document, when only month and year are set (i.e. "Aug 2025"),
+# determine how full date should be resolved:
+# first (default) - first day of the month (2025-08-01)
+# last - last day of the month (2025-08-31)
+# current - current day as is now - i.e. if today is 3rd od Septempber,
+# the date will be resolved to 2025-08-03, regardless of parsed month being August
+DATE_PARSER_PREFER_DAY_OF_MONTH = os.getenv(
+    "PAPERLESS_DATE_PARSER_PREFER_DAY_OF_MONTH",
+    "first",
+)
+
 
 def _ocr_to_dateparser_languages(ocr_languages: str) -> list[str]:
     """
@@ -1259,7 +1270,6 @@ if os.getenv("PAPERLESS_DATE_PARSER_LANGUAGES"):
     )
 else:
     DATE_PARSER_LANGUAGES = _ocr_to_dateparser_languages(OCR_LANGUAGE)
-
 
 # Maximum number of dates taken from document start to end to show as suggestions for
 # `created` date in the frontend. Duplicates are removed, which can result in

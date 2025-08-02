@@ -1036,6 +1036,29 @@ Specifies which language Paperless should use when parsing dates from documents.
 !!! note
 This format differs from the `PAPERLESS_OCR_LANGUAGE` setting, which uses ISO 639-2 codes (3 letters, e.g., "eng+deu" for Tesseract OCR).
 
+#### [`PAPERLESS_DATE_PARSER_PREFER_DAY_OF_MONTH=<first|last|current>`](#PAPERLESS_DATE_PARSER_PREFER_DAY_OF_MONTH) {#PAPERLESS_DATE_PARSER_PREFER_DAY_OF_MONTH}
+
+: Date resolution for Month+Year only inputs
+
+: When determining the document date from inputs that specify only the month
+and year (e.g., "Jul 2025"), the full date should be resolved according to the
+configured strategy:
+
+    - first - Resolves to the first day of the specified month (e.g., "2025-07-01").
+    - last - Resolves to the last day of the specified month (e.g., "2025-07-31").
+    - current - Resolves to the current day of the month, based on today's date.
+      For example, if today's date is September 3rd, the resolved date will be
+      2025-07-03, using the same day with the specified month and year.
+
+    For more information refer to [dateparser documentation](https://dateparser.readthedocs.io/en/latest/settings.html#handling-incomplete-dates).
+
+    Defaults to `first`
+
+!!! note
+If set to "last" and the resolved date falls in the future, the parsed date will
+be ignored. This behavior is intentional, as Paperless only uses past and current
+dates for setting timestamps.
+
 #### [`PAPERLESS_EMAIL_TASK_CRON=<cron expression>`](#PAPERLESS_EMAIL_TASK_CRON) {#PAPERLESS_EMAIL_TASK_CRON}
 
 : Configures the scheduled email fetching frequency. The value

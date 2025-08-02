@@ -276,7 +276,7 @@ def parse_date_generator(filename, text) -> Iterator[datetime.datetime]:
             ds,
             settings={
                 "DATE_ORDER": date_order,
-                "PREFER_DAY_OF_MONTH": "first",
+                "PREFER_DAY_OF_MONTH": settings.DATE_PARSER_PREFER_DAY_OF_MONTH,
                 "RETURN_AS_TIMEZONE_AWARE": True,
                 "TIMEZONE": settings.TIME_ZONE,
             },

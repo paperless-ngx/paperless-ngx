@@ -402,6 +402,38 @@ class TestDate:
             ),
         ]
 
+    def test_month_year_only_with_first(
+        self,
+        settings: SettingsWrapper,
+        settings_timezone: ZoneInfo,
+    ):
+        settings.DATE_PARSER_PREFER_DAY_OF_MONTH = "first"
+        text = "lorem ipsum\\Feb 2024\ndolor sit amet"
+        assert parse_date("", text) == datetime.datetime(
+            2024,
+            2,
+            1,
+            0,
+            0,
+            tzinfo=settings_timezone,
+        )
+
+    def test_month_year_only_with_last(
+        self,
+        settings: SettingsWrapper,
+        settings_timezone: ZoneInfo,
+    ):
+        settings.DATE_PARSER_PREFER_DAY_OF_MONTH = "last"
+        text = "lorem ipsum\\Feb 2024\ndolor sit amet"
+        assert parse_date("", text) == datetime.datetime(
+            2024,
+            2,
+            29,
+            0,
+            0,
+            tzinfo=settings_timezone,
+        )
+
     def test_filename_date_parse_valid_ymd(
         self,
         settings: SettingsWrapper,
