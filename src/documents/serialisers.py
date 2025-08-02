@@ -1524,7 +1524,7 @@ class BulkEditSerializer(
         else:
             parameters["archive_fallback"] = False
 
-    def _validate_parameters_edit_pdf(self, parameters):
+    def _validate_parameters_edit_pdf(self, parameters, document_id):
         if "operations" not in parameters:
             raise serializers.ValidationError("operations not specified")
         if not isinstance(parameters["operations"], list):
@@ -1555,6 +1555,15 @@ class BulkEditSerializer(
                 raise serializers.ValidationError(
                     "update_document only allowed with a single output document",
                 )
+
+        doc = Document.objects.get(id=document_id)
+        # doc existence is already validated
+        if doc.page_count:
+            for op in parameters["operations"]:
+                if op["page"] < 1 or op["page"] > doc.page_count:
+                    raise serializers.ValidationError(
+                        f"Page {op['page']} is out of bounds for document with {doc.page_count} pages.",
+                    )
 
     def validate(self, attrs):
         method = attrs["method"]
@@ -1595,7 +1604,7 @@ class BulkEditSerializer(
                 raise serializers.ValidationError(
                     "Edit PDF method only supports one document",
                 )
-            self._validate_parameters_edit_pdf(parameters)
+            self._validate_parameters_edit_pdf(parameters, attrs["documents"][0])
 
         return attrs
 

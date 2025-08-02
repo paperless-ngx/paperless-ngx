@@ -41,6 +41,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             title="B",
             correspondent=self.c1,
             document_type=self.dt1,
+            page_count=5,
         )
         self.doc3 = Document.objects.create(
             checksum="C",
@@ -1554,6 +1555,32 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             b"update_document only allowed with a single output document",
             response.content,
         )
+
+    @mock.patch("documents.serialisers.bulk_edit.edit_pdf")
+    def test_edit_pdf_page_out_of_bounds(self, m):
+        """
+        GIVEN:
+            - API data for editing PDF is called
+            - The page number is out of bounds
+        WHEN:
+            - API is called
+        THEN:
+            - The API fails with a correct error code
+        """
+        self.setup_mock(m, "edit_pdf")
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "edit_pdf",
+                    "parameters": {"operations": [{"page": 99}]},
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"out of bounds", response.content)
 
     @override_settings(AUDIT_LOG_ENABLED=True)
     def test_bulk_edit_audit_log_enabled_simple_field(self):
