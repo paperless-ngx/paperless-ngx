@@ -359,6 +359,12 @@ a.btn-link:focus-visible,
   }
 }
 
+input.form-control {
+  autocapitalize: off;
+  autocomplete: off;
+  spellcheck: false;
+}
+
 .form-control:not(.btn),
 input,
 select,

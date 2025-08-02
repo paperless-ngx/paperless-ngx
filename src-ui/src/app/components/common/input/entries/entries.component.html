@@ -11,8 +11,8 @@
     <div class="position-relative">
       @for (entry of entries; let i = $index; track entry[0]) {
         <div class="input-group mb-3">
-          <input type="text" class="form-control" [(ngModel)]="entry[0]" (change)="inputChange()" [disabled]="disabled" autocomplete="off">
-          <input type="text" class="form-control" [(ngModel)]="entry[1]" (change)="inputChange()" [disabled]="disabled" autocomplete="off">
+          <input type="text" class="form-control" [(ngModel)]="entry[0]" (change)="inputChange()" [disabled]="disabled">
+          <input type="text" class="form-control" [(ngModel)]="entry[1]" (change)="inputChange()" [disabled]="disabled">
           <button type="button" class="btn btn-outline-secondary" (click)="removeEntry(i)">
             <i-bs class="text-danger" name="trash"></i-bs>
           </button>

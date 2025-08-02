@@ -1,4 +1,4 @@
-<form [formGroup]="objectForm" (ngSubmit)="save()" autocomplete="off">
+<form [formGroup]="objectForm" (ngSubmit)="save()">
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
     @if (object?.id) {
@@ -9,7 +9,7 @@
   </div>
   <div class="modal-body">
 
-    <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
+    <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></pngx-input-text>
     <pngx-input-textarea i18n-title title="Path" formControlName="path" [error]="error?.path" hint="See <a target='_blank' href='https://docs.paperless-ngx.com/advanced_usage/#file-name-handling'>the documentation</a>." i18n-hint [monospace]="true"></pngx-input-textarea>
 
     <div ngbAccordion>

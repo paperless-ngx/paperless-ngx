@@ -1,4 +1,4 @@
-<form [formGroup]="objectForm" (ngSubmit)="save()" autocomplete="off">
+<form [formGroup]="objectForm" (ngSubmit)="save()">
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
     @if (object?.id) {
@@ -8,7 +8,7 @@
     </button>
   </div>
   <div class="modal-body">
-    <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
+    <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></pngx-input-text>
 
     <pngx-input-color i18n-title title="Color" formControlName="color" [error]="error?.color"></pngx-input-color>
 

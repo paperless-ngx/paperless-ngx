@@ -1,4 +1,4 @@
-<form [formGroup]="objectForm" (ngSubmit)="save()" autocomplete="off">
+<form [formGroup]="objectForm" (ngSubmit)="save()">
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
     @if (object?.id) {
@@ -8,7 +8,7 @@
     </button>
   </div>
   <div class="modal-body">
-    <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
+    <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></pngx-input-text>
     <pngx-input-select i18n-title title="Data type" [items]="getDataTypes()" formControlName="data_type"></pngx-input-select>
     @if (typeFieldDisabled) {
       <small class="d-block mt-n2" i18n>Data type cannot be changed after a field is created</small>
@@ -22,7 +22,7 @@
           <div formArrayName="select_options">
             @for (option of objectForm.controls.extra_data.controls.select_options.controls; track option; let i = $index) {
               <div class="input-group input-group-sm my-2" [formGroup]="objectForm.controls.extra_data.controls.select_options.controls[i]">
-                <input #selectOption type="text" class="form-control" formControlName="label" autocomplete="off">
+                <input #selectOption type="text" class="form-control" formControlName="label">
                 <input type="hidden" formControlName="id">
                 <button type="button" class="btn btn-outline-danger" (click)="removeSelectOption(i)" i18n>Delete</button>
               </div>
@@ -34,7 +34,7 @@
         }
         @case (CustomFieldDataType.Monetary) {
           <div class="my-3">
-            <pngx-input-text i18n-title title="Default Currency" hint="3-character currency code" i18n-hint formControlName="default_currency" placeholder="Use locale" i18n-placeholder autocomplete="off"></pngx-input-text>
+            <pngx-input-text i18n-title title="Default Currency" hint="3-character currency code" i18n-hint formControlName="default_currency" placeholder="Use locale" i18n-placeholder></pngx-input-text>
           </div>
         }
       }
