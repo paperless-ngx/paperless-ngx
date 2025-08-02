@@ -542,9 +542,13 @@ def edit_pdf(
                     dst.pages[-1].rotate(op["rotate"], relative=True)
 
         if update_document:
+            temp_path = doc.source_path.with_suffix(".tmp.pdf")
             pdf = pdf_docs[0]
             pdf.remove_unreferenced_resources()
-            pdf.save(doc.source_path)
+            # save the edited PDF to a temporary file in case of errors
+            pdf.save(temp_path)
+            # replace the original document with the edited one
+            temp_path.replace(doc.source_path)
             doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
             doc.page_count = len(pdf.pages)
             doc.save()
