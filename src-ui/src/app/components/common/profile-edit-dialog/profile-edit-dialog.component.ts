@@ -194,7 +194,9 @@ export class ProfileEditDialogComponent
               $localize`Password has been changed, you will be logged out momentarily.`
             )
             setTimeout(() => {
-              window.location.href = `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
+              window.location.assign(
+                `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
+              )
             }, 2500)
           }
           this.activeModal.close()

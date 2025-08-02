@@ -225,6 +225,9 @@ describe('SettingsComponent', () => {
   })
 
   it('should offer reload if settings changes require', () => {
+    // JSDOM does not support window.location.assign, so silence the error
+    const originalError = console.error
+    console.error = jest.fn()
     completeSetup()
     let toast: Toast
     toastService.getToasts().subscribe((t) => (toast = t[0]))
@@ -241,6 +244,7 @@ describe('SettingsComponent', () => {
 
     expect(toast.actionName).toEqual('Reload now')
     toast.action()
+    console.error = originalError // restore after test
   })
 
   it('should allow setting theme color, visually apply change immediately but not save', () => {
@@ -269,7 +273,7 @@ describe('SettingsComponent', () => {
       )
     completeSetup(userService)
     fixture.detectChanges()
-    expect(toastErrorSpy).toBeCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
   })
 
   it('should show errors on load if load groups failure', () => {
@@ -281,7 +285,7 @@ describe('SettingsComponent', () => {
       )
     completeSetup(groupService)
     fixture.detectChanges()
-    expect(toastErrorSpy).toBeCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
   })
 
   it('should load system status on initialize, show errors if needed', () => {

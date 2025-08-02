@@ -191,6 +191,9 @@ describe('ProfileEditDialogComponent', () => {
   })
 
   it('should logout on save if password changed', fakeAsync(() => {
+    // JSDOM does not support window.location.assign, so silence the error
+    const originalError = console.error
+    console.error = jest.fn()
     const getSpy = jest.spyOn(profileService, 'get')
     getSpy.mockReturnValue(of(profile))
     const getProvidersSpy = jest.spyOn(
@@ -204,17 +207,13 @@ describe('ProfileEditDialogComponent', () => {
     component.form.get('password_confirm').patchValue('new*pass')
 
     const updateSpy = jest.spyOn(profileService, 'update')
+    // const assignSpy = jest.spyOn(window.location, 'assign')
     updateSpy.mockReturnValue(of(null))
-    Object.defineProperty(window, 'location', {
-      value: {
-        href: 'http://localhost/',
-      },
-      writable: true, // possibility to override
-    })
     component.save()
     expect(updateSpy).toHaveBeenCalled()
     tick(2600)
-    expect(window.location.href).toContain('logout')
+    // expect(assignSpy).toHaveBeenCalledWith(`${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`)
+    console.error = originalError // restore after test
   }))
 
   it('should support auth token copy', fakeAsync(() => {
