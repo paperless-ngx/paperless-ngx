@@ -1427,7 +1427,6 @@ class BulkEditView(PassUserMixin):
                     )
                 }
 
-            # TODO: parameter validation
             result = method(documents, **parameters)
 
             if settings.AUDIT_LOG_ENABLED and modified_field:

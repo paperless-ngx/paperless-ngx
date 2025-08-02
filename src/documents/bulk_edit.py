@@ -532,7 +532,7 @@ def edit_pdf(
                 logger.error(
                     "Update requested but multiple output documents specified",
                 )
-                return "ERROR"
+                raise ValueError("Multiple output documents specified")
 
             for op in operations:
                 dst = pdf_docs[op.get("doc", 0)]
@@ -583,7 +583,9 @@ def edit_pdf(
 
     except Exception as e:
         logger.exception(f"Error editing document {doc.id}: {e}")
-        return "ERROR"
+        raise ValueError(
+            f"An error occurred while editing the document: {e}",
+        ) from e
 
     return "OK"
 

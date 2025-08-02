@@ -1032,8 +1032,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             {"page": 9999},  # invalid page, forces error during PDF load
         ]
         with self.assertLogs("paperless.bulk_edit", level="ERROR"):
-            result = bulk_edit.edit_pdf(doc_ids, operations)
-            self.assertEqual(result, "ERROR")
+            with self.assertRaises(Exception):
+                bulk_edit.edit_pdf(doc_ids, operations)
         mock_group.assert_not_called()
         mock_consume_file.assert_not_called()
 
@@ -1058,7 +1058,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             {"page": 2, "doc": 1},
         ]
         with self.assertLogs("paperless.bulk_edit", level="ERROR"):
-            result = bulk_edit.edit_pdf(doc_ids, operations, update_document=True)
-            self.assertEqual(result, "ERROR")
+            with self.assertRaises(ValueError):
+                bulk_edit.edit_pdf(doc_ids, operations, update_document=True)
         mock_group.assert_not_called()
         mock_consume_file.assert_not_called()
