@@ -57,6 +57,7 @@ import {
 } from 'src/app/services/settings.service'
 import { SystemStatusService } from 'src/app/services/system-status.service'
 import { Toast, ToastService } from 'src/app/services/toast.service'
+import { locationReload } from 'src/app/utils/navigation'
 import { CheckComponent } from '../../common/input/check/check.component'
 import { ColorComponent } from '../../common/input/color/color.component'
 import { PermissionsGroupComponent } from '../../common/input/permissions/permissions-group/permissions-group.component'
@@ -550,7 +551,7 @@ export class SettingsComponent
             savedToast.content = $localize`Settings were saved successfully. Reload is required to apply some changes.`
             savedToast.actionName = $localize`Reload now`
             savedToast.action = () => {
-              location.reload()
+              locationReload()
             }
           }
 

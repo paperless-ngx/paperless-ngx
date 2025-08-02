@@ -19,6 +19,7 @@ import { GroupService } from 'src/app/services/rest/group.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import * as navUtils from 'src/app/utils/navigation'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { GroupEditDialogComponent } from '../../common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
 import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
@@ -138,21 +139,22 @@ describe('UsersAndGroupsComponent', () => {
   })
 
   it('should logout current user if password changed, after delay', fakeAsync(() => {
-    // JSDOM does not support window.location.assign, so silence the error
-    const originalError = console.error
-    console.error = jest.fn()
     completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
     component.editUser(users[0])
+    const navSpy = jest
+      .spyOn(navUtils, 'setLocationHref')
+      .mockImplementation(() => {})
     const editDialog = modal.componentInstance as UserEditDialogComponent
     editDialog.passwordIsSet = true
     settingsService.currentUser = users[0] // simulate logged in as same user
     editDialog.succeeded.emit(users[0])
     fixture.detectChanges()
     tick(2600)
-    // expect(window.location.href).toContain('logout')
-    console.error = originalError
+    expect(navSpy).toHaveBeenCalledWith(
+      `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
+    )
   }))
 
   it('should support edit / create group, show error if needed', () => {

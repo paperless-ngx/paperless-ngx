@@ -18,6 +18,7 @@ import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { ProfileService } from 'src/app/services/profile.service'
 import { ToastService } from 'src/app/services/toast.service'
+import * as navUtils from 'src/app/utils/navigation'
 import { ConfirmButtonComponent } from '../confirm-button/confirm-button.component'
 import { PasswordComponent } from '../input/password/password.component'
 import { TextComponent } from '../input/text/text.component'
@@ -191,9 +192,6 @@ describe('ProfileEditDialogComponent', () => {
   })
 
   it('should logout on save if password changed', fakeAsync(() => {
-    // JSDOM does not support window.location.assign, so silence the error
-    const originalError = console.error
-    console.error = jest.fn()
     const getSpy = jest.spyOn(profileService, 'get')
     getSpy.mockReturnValue(of(profile))
     const getProvidersSpy = jest.spyOn(
@@ -207,13 +205,16 @@ describe('ProfileEditDialogComponent', () => {
     component.form.get('password_confirm').patchValue('new*pass')
 
     const updateSpy = jest.spyOn(profileService, 'update')
-    // const assignSpy = jest.spyOn(window.location, 'assign')
     updateSpy.mockReturnValue(of(null))
+    const navSpy = jest
+      .spyOn(navUtils, 'setLocationHref')
+      .mockImplementation(() => {})
     component.save()
     expect(updateSpy).toHaveBeenCalled()
     tick(2600)
-    // expect(assignSpy).toHaveBeenCalledWith(`${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`)
-    console.error = originalError // restore after test
+    expect(navSpy).toHaveBeenCalledWith(
+      `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
+    )
   }))
 
   it('should support auth token copy', fakeAsync(() => {

@@ -36,6 +36,7 @@ import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { SystemStatusService } from 'src/app/services/system-status.service'
 import { Toast, ToastService } from 'src/app/services/toast.service'
+import * as navUtils from 'src/app/utils/navigation'
 import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { CheckComponent } from '../../common/input/check/check.component'
@@ -225,9 +226,9 @@ describe('SettingsComponent', () => {
   })
 
   it('should offer reload if settings changes require', () => {
-    // JSDOM does not support window.location.assign, so silence the error
-    const originalError = console.error
-    console.error = jest.fn()
+    const reloadSpy = jest
+      .spyOn(navUtils, 'locationReload')
+      .mockImplementation(() => {})
     completeSetup()
     let toast: Toast
     toastService.getToasts().subscribe((t) => (toast = t[0]))
@@ -244,7 +245,7 @@ describe('SettingsComponent', () => {
 
     expect(toast.actionName).toEqual('Reload now')
     toast.action()
-    console.error = originalError // restore after test
+    expect(reloadSpy).toHaveBeenCalled()
   })
 
   it('should allow setting theme color, visually apply change immediately but not save', () => {
