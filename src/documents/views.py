@@ -1222,7 +1222,14 @@ class ChatStreamingView(View):
 
 @extend_schema_view(
     list=extend_schema(
+        description="Document views including search",
         parameters=[
+            OpenApiParameter(
+                name="query",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                description="Advanced search query string",
+            ),
             OpenApiParameter(
                 name="full_perms",
                 type=OpenApiTypes.BOOL,
@@ -2446,6 +2453,17 @@ class RemoteVersionView(GenericAPIView):
         },
     ),
 )
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="task_id",
+            type=str,
+            location=OpenApiParameter.QUERY,
+            required=False,
+            description="Filter tasks by Celery UUID",
+        ),
+    ],
+)
 class TasksViewSet(ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     serializer_class = TasksViewSerializer
@@ -2625,7 +2643,7 @@ class BulkEditObjectsView(PassUserMixin):
         objs = object_class.objects.select_related("owner").filter(pk__in=object_ids)
 
         if not user.is_superuser:
-            model_name = object_class._meta.verbose_name
+            model_name = object_class._meta.model_name
             perm = (
                 f"documents.change_{model_name}"
                 if operation == "set_permissions"

@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import logging
 import math
+import re
 from collections import Counter
 from contextlib import contextmanager
 from datetime import datetime
 from datetime import time
+from datetime import timedelta
 from datetime import timezone
 from shutil import rmtree
 from typing import TYPE_CHECKING
@@ -13,6 +15,8 @@ from typing import Literal
 
 from django.conf import settings
 from django.utils import timezone as django_timezone
+from django.utils.timezone import get_current_timezone
+from django.utils.timezone import now
 from guardian.shortcuts import get_users_with_perms
 from whoosh import classify
 from whoosh import highlight
@@ -344,6 +348,7 @@ class LocalDateParser(English):
 class DelayedFullTextQuery(DelayedQuery):
     def _get_query(self) -> tuple:
         q_str = self.query_params["query"]
+        q_str = rewrite_natural_date_keywords(q_str)
         qp = MultifieldParser(
             [
                 "content",
@@ -450,3 +455,37 @@ def get_permissions_criterias(user: User | None = None) -> list:
                 query.Term("viewer_id", str(user.id)),
             )
     return user_criterias
+
+
+def rewrite_natural_date_keywords(query_string: str) -> str:
+    """
+    Rewrites natural date keywords (e.g. added:today or added:"yesterday") to UTC range syntax for Whoosh.
+    """
+
+    tz = get_current_timezone()
+    local_now = now().astimezone(tz)
+
+    today = local_now.date()
+    yesterday = today - timedelta(days=1)
+
+    ranges = {
+        "today": (
+            datetime.combine(today, time.min, tzinfo=tz),
+            datetime.combine(today, time.max, tzinfo=tz),
+        ),
+        "yesterday": (
+            datetime.combine(yesterday, time.min, tzinfo=tz),
+            datetime.combine(yesterday, time.max, tzinfo=tz),
+        ),
+    }
+
+    pattern = r"(\b(?:added|created))\s*:\s*[\"']?(today|yesterday)[\"']?"
+
+    def repl(m):
+        field, keyword = m.group(1), m.group(2)
+        start, end = ranges[keyword]
+        start_str = start.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S")
+        end_str = end.astimezone(timezone.utc).strftime("%Y%m%d%H%M%S")
+        return f"{field}:[{start_str} TO {end_str}]"
+
+    return re.sub(pattern, repl, query_string)

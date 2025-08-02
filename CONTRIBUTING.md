@@ -141,7 +141,7 @@ The admins occasionally invite contributors directly if we believe having them o
 # Automatic Repository Maintenance
 
 The Paperless-ngx team appreciates all effort and interest from the community in filing bug reports, creating feature requests, sharing ideas and helping other
-community members. That said, in an effort to keep the repository organized and managebale the project uses automatic handling of certain areas:
+community members. That said, in an effort to keep the repository organized and manageable the project uses automatic handling of certain areas:
 
 - Issues that cannot be reproduced will be marked 'stale' after 7 days of inactivity and closed after 14 further days of inactivity.
 - Issues, pull requests and discussions that are closed will be locked after 30 days of inactivity.
