@@ -1356,7 +1356,7 @@ export class DocumentDetailComponent
       size: 'xl',
       scrollable: true,
     })
-    modal.componentInstance.title = $localize`Edit PDF`
+    modal.componentInstance.title = $localize`PDF Editor`
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.documentID = this.document.id
     modal.componentInstance.confirmClicked
