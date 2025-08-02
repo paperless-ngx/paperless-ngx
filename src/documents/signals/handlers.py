@@ -12,11 +12,13 @@ from celery.signals import before_task_publish
 from celery.signals import task_failure
 from celery.signals import task_postrun
 from celery.signals import task_prerun
+from celery.signals import worker_process_init
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.db import DatabaseError
 from django.db import close_old_connections
+from django.db import connections
 from django.db import models
 from django.db.models import Q
 from django.dispatch import receiver
@@ -1439,3 +1441,18 @@ def task_failure_handler(
             task_instance.save()
     except Exception:  # pragma: no cover
         logger.exception("Updating PaperlessTask failed")
+
+
+@worker_process_init.connect
+def close_connection_pool_on_worker_init(**kwargs):
+    """
+    Close the DB connection pool for each Celery child process after it starts.
+
+    This is necessary because the parent process parse the Django configuration,
+    initializes connection pools then forks.
+
+    Closing these pools after forking ensures child processes have a valid connection.
+    """
+    for conn in connections.all(initialized_only=True):
+        if conn.alias == "default" and hasattr(conn, "pool") and conn.pool:
+            conn.close_pool()

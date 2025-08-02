@@ -52,6 +52,7 @@ dependencies = [
   "ocrmypdf~=16.10.0",
   "pathvalidate~=3.3.1",
   "pdf2image~=1.17.0",
+  "psycopg-pool",
   "python-dateutil~=2.9.0",
   "python-dotenv~=1.1.0",
   "python-gnupg~=0.5.4",
@@ -74,9 +75,10 @@ optional-dependencies.mariadb = [
   "mysqlclient~=2.2.7",
 ]
 optional-dependencies.postgres = [
-  "psycopg[c]==3.2.9",
+  "psycopg[c,pool]==3.2.9",
   # Direct dependency for proper resolution of the pre-built wheels
   "psycopg-c==3.2.9",
+  "psycopg-pool==3.2.6",
 ]
 optional-dependencies.webserver = [
   "granian[uvloop]~=2.4.1",
