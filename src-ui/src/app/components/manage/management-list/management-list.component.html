@@ -1,4 +1,5 @@
-<pngx-page-header title="{{ typeNamePlural | titlecase }}">
+<pngx-page-header title="{{ typeNamePlural | titlecase }}" info="View, add, edit and delete {{ typeNamePlural }}." infoLink="usage/#terms-and-definitions">
+
   <button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()" [hidden]="selectedObjects.size === 0">
     <i-bs  name="x"></i-bs>&nbsp;<ng-container i18n>Clear selection</ng-container>
     </button>
