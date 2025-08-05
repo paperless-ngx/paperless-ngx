@@ -30,6 +30,9 @@ Each document has data fields that you can assign to them:
 -   A _document type_ is used to demarcate the type of a document such
     as letter, bank statement, invoice, contract, etc. It is used to
     identify what a document is about.
+-   The document _storage path_ is the location where the document files
+    are stored. See [Storage Paths](advanced_usage.md#storage-paths) for
+    more information.
 -   The _date added_ of a document is the date the document was scanned
     into paperless. You cannot and should not change this date.
 -   The _date created_ of a document is the date the document was
