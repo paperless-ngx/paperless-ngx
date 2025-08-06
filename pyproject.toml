@@ -204,13 +204,7 @@ lint.per-file-ignores."docker/wait-for-redis.py" = [
   "INP001",
   "T201",
 ]
-lint.per-file-ignores."src/documents/file_handling.py" = [
-  "PTH",
-] # TODO Enable & remove
 lint.per-file-ignores."src/documents/management/commands/document_consumer.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/documents/management/commands/document_exporter.py" = [
   "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/migrations/1012_fix_archive_files.py" = [
@@ -220,9 +214,6 @@ lint.per-file-ignores."src/documents/models.py" = [
   "SIM115",
 ]
 lint.per-file-ignores."src/documents/parsers.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/documents/signals/handlers.py" = [
   "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/paperless_tesseract/tests/test_parser.py" = [
