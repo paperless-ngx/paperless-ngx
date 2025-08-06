@@ -27,6 +27,7 @@ def settings(request):
         "domain": getattr(django_settings, "PAPERLESS_URL", request.get_host()),
         "APP_TITLE": app_title,
         "APP_LOGO": app_logo,
+        "LANGUAGE_CODE_WORKFLOW": general_config.language_code_workflow,
         "FIRST_INSTALL": User.objects.exclude(
             username__in=["consumer", "AnonymousUser"],
         ).count()

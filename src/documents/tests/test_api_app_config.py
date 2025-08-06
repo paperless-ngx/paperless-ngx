@@ -41,6 +41,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 "output_type": None,
                 "pages": None,
                 "language": None,
+                "language_code_workflow": None,
                 "mode": None,
                 "skip_archive_file": None,
                 "image_dpi": None,
