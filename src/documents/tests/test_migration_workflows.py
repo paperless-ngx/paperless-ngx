@@ -104,7 +104,7 @@ class TestReverseMigrateWorkflow(TestMigrations):
 
         trigger = WorkflowTrigger.objects.create(
             type=0,
-            sources=[DocumentSource.ConsumeFolder],
+            sources=[str(DocumentSource.ConsumeFolder)],
             filter_path="*/path/*",
             filter_filename="*file*",
         )
