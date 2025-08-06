@@ -1,0 +1,55 @@
+title: "[Support] "
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What's your question or issue?
+      description: Provide a clear and concise description of what you're trying to do, and what's going wrong.
+      placeholder: |
+        I'm trying to...
+
+        [Include screenshots if helpful]
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: What have you tried?
+      description: Describe any steps you've already taken to troubleshoot or solve the issue.
+      placeholder: |
+        - I checked the logs and saw...
+        - I followed the install guide and tried...
+  - type: input
+    id: version
+    attributes:
+      label: Paperless-ngx version
+      placeholder: e.g. 1.14.0
+    validations:
+      required: true
+  - type: input
+    id: host-os
+    attributes:
+      label: Host OS
+      description: Include architecture if relevant.
+      placeholder: e.g. Ubuntu 22.04 / Raspberry Pi arm64
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: Installation method
+      options:
+        - Docker - official image
+        - Docker - linuxserver.io image
+        - Bare metal
+        - Other (please describe above)
+  - type: textarea
+    id: system-status
+    attributes:
+      label: System status
+      description: If available, copy & paste the system status output from Settings > System Status > Copy
+      render: json
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or output
+      description: If you have logs, errors that might help, paste it here.
+      render: bash

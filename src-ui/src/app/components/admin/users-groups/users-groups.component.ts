@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, OnDestroy, OnInit, inject } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, first, takeUntil } from 'rxjs'
@@ -10,6 +10,7 @@ import { GroupService } from 'src/app/services/rest/group.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { setLocationHref } from 'src/app/utils/navigation'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { GroupEditDialogComponent } from '../../common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
@@ -31,21 +32,17 @@ export class UsersAndGroupsComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy
 {
+  private usersService = inject(UserService)
+  private groupsService = inject(GroupService)
+  private toastService = inject(ToastService)
+  private modalService = inject(NgbModal)
+  permissionsService = inject(PermissionsService)
+  private settings = inject(SettingsService)
+
   users: User[]
   groups: Group[]
 
   unsubscribeNotifier: Subject<any> = new Subject()
-
-  constructor(
-    private usersService: UserService,
-    private groupsService: GroupService,
-    private toastService: ToastService,
-    private modalService: NgbModal,
-    public permissionsService: PermissionsService,
-    private settings: SettingsService
-  ) {
-    super()
-  }
 
   ngOnInit(): void {
     this.usersService
@@ -97,7 +94,9 @@ export class UsersAndGroupsComponent
             $localize`Password has been changed, you will be logged out momentarily.`
           )
           setTimeout(() => {
-            window.location.href = `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
+            setLocationHref(
+              `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
+            )
           }, 2500)
         } else {
           this.toastService.showInfo(

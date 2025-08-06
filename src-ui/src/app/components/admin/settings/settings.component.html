@@ -176,6 +176,7 @@
             <div class="row">
               <div class="col">
                 <pngx-input-check i18n-title title="Show warning when closing saved views with unsaved changes" formControlName="savedViewsWarnOnUnsavedChange"></pngx-input-check>
+                <pngx-input-check i18n-title title="Show document counts in sidebar saved views" formControlName="sidebarViewsShowCount"></pngx-input-check>
               </div>
             </div>
 
@@ -357,6 +358,6 @@
 
   <div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>
 
-  <button type="submit" class="btn btn-primary mb-2" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
-  <button type="button" (click)="reset()" class="btn btn-secondary ms-2 mb-2" [disabled]="(isDirty$ | async) === false" i18n>Cancel</button>
+  <button type="button" (click)="reset()" class="btn btn-outline-secondary mb-2" [disabled]="(isDirty$ | async) === false" i18n>Cancel</button>
+  <button type="submit" class="btn btn-primary ms-2 mb-2" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
 </form>

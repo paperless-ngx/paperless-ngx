@@ -50,7 +50,7 @@
     <div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>
     <div class="btn-toolbar" role="toolbar">
         <div class="btn-group me-2">
-            <button type="button" (click)="discardChanges()" class="btn btn-secondary" [disabled]="loading || (isDirty$ | async) === false" i18n>Discard</button>
+            <button type="button" (click)="discardChanges()" class="btn btn-outline-secondary" [disabled]="loading || (isDirty$ | async) === false" i18n>Discard</button>
         </div>
         <div class="btn-group">
             <button type="submit" class="btn btn-primary" [disabled]="loading || !configForm.valid || (isDirty$ | async) === false" i18n>Save</button>

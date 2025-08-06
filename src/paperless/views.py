@@ -134,6 +134,13 @@ class UserViewSet(ModelViewSet):
             )
         return super().update(request, *args, **kwargs)
 
+    @extend_schema(
+        request=None,
+        responses={
+            200: OpenApiTypes.BOOL,
+            404: OpenApiTypes.STR,
+        },
+    )
     @action(detail=True, methods=["post"])
     def deactivate_totp(self, request, pk=None):
         request_user = request.user
@@ -341,6 +348,10 @@ class ApplicationConfigurationViewSet(ModelViewSet):
 
     serializer_class = ApplicationConfigurationSerializer
     permission_classes = (IsAuthenticated, DjangoModelPermissions)
+
+    @extend_schema(exclude=True)
+    def create(self, request, *args, **kwargs):
+        return Response(status=405)  # Not Allowed
 
 
 @extend_schema_view(

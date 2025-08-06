@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-24 17:14+0000\n"
-"PO-Revision-Date: 2025-05-24 17:17\n"
+"POT-Creation-Date: 2025-06-19 18:51+0000\n"
+"PO-Revision-Date: 2025-06-19 18:52\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -47,7 +47,7 @@ msgstr "{name!r} nie jest prawidłowym polem niestandardowym."
 
 #: documents/filters.py:550
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr "{data_type} nie obsługuje rozszerzenia zapytania {expr!r}."
+msgstr "{data_type} nie obsługuje wyrażenia zapytania {expr!r}."
 
 #: documents/filters.py:658
 msgid "Maximum nesting depth exceeded."
@@ -55,7 +55,7 @@ msgstr "Przekroczono maksymalną głębokość zagnieżdżenia."
 
 #: documents/filters.py:843
 msgid "Custom field not found"
-msgstr "Pole dodatkowe nie zostało znalezione"
+msgstr "Nie znaleziono pola niestandardowego"
 
 #: documents/models.py:36 documents/models.py:713
 msgid "owner"
@@ -530,23 +530,23 @@ msgstr "zapytanie o niestandardowe pola"
 
 #: documents/models.py:493
 msgid "created to"
-msgstr ""
+msgstr "utworzono w"
 
 #: documents/models.py:494
 msgid "created from"
-msgstr ""
+msgstr "utworzono z"
 
 #: documents/models.py:495
 msgid "added to"
-msgstr ""
+msgstr "dodano do"
 
 #: documents/models.py:496
 msgid "added from"
-msgstr ""
+msgstr "dodano z"
 
 #: documents/models.py:497
 msgid "mime type is"
-msgstr ""
+msgstr "typ MIME to"
 
 #: documents/models.py:507
 msgid "rule type"
@@ -566,7 +566,7 @@ msgstr "reguły filtrowania"
 
 #: documents/models.py:537
 msgid "Auto Task"
-msgstr ""
+msgstr "Zadanie automatyczne"
 
 #: documents/models.py:538
 msgid "Scheduled Task"
@@ -574,23 +574,23 @@ msgstr "Zaplanowane zadanie"
 
 #: documents/models.py:539
 msgid "Manual Task"
-msgstr ""
+msgstr "Zadanie ręczne"
 
 #: documents/models.py:542
 msgid "Consume File"
-msgstr ""
+msgstr "Przetwórz plik"
 
 #: documents/models.py:543
 msgid "Train Classifier"
-msgstr ""
+msgstr "Wytrenuj klasyfikator"
 
 #: documents/models.py:544
 msgid "Check Sanity"
-msgstr ""
+msgstr "Sprawdź poprawność"
 
 #: documents/models.py:545
 msgid "Index Optimize"
-msgstr ""
+msgstr "Optymalizuj indeks"
 
 #: documents/models.py:550
 msgid "Task ID"
@@ -622,7 +622,7 @@ msgstr "Nazwa zadania"
 
 #: documents/models.py:572
 msgid "Name of the task that was run"
-msgstr ""
+msgstr "Nazwa uruchomionego zadania"
 
 #: documents/models.py:579
 msgid "Task State"
@@ -666,11 +666,11 @@ msgstr "Dane zwrócone przez zadanie"
 
 #: documents/models.py:617
 msgid "Task Type"
-msgstr ""
+msgstr "Typ zadania"
 
 #: documents/models.py:618
 msgid "The type of task that was run"
-msgstr ""
+msgstr "Typ uruchomionego zadania"
 
 #: documents/models.py:629
 msgid "Note for the document"
@@ -806,7 +806,7 @@ msgstr "Pobieranie E-mail"
 
 #: documents/models.py:941
 msgid "Web UI"
-msgstr ""
+msgstr "Interfejs webowy"
 
 #: documents/models.py:946
 msgid "Modified"
@@ -854,35 +854,35 @@ msgstr "posiada wskazanego nadawcę"
 
 #: documents/models.py:1026
 msgid "schedule offset days"
-msgstr ""
+msgstr "liczba dni przesunięcia harmonogramu"
 
 #: documents/models.py:1029
 msgid "The number of days to offset the schedule trigger by."
-msgstr ""
+msgstr "Liczba dni, o którą należy przesunąć wyzwalacz harmonogramu."
 
 #: documents/models.py:1034
 msgid "schedule is recurring"
-msgstr ""
+msgstr "harmonogram jest cykliczny"
 
 #: documents/models.py:1037
 msgid "If the schedule should be recurring."
-msgstr ""
+msgstr "Czy harmonogram ma być cykliczny."
 
 #: documents/models.py:1042
 msgid "schedule recurring delay in days"
-msgstr ""
+msgstr "opóźnienie cyklicznego harmonogramu w dniach"
 
 #: documents/models.py:1046
 msgid "The number of days between recurring schedule triggers."
-msgstr ""
+msgstr "Liczba dni między kolejnymi wyzwalaczami cyklicznego harmonogramu."
 
 #: documents/models.py:1051
 msgid "schedule date field"
-msgstr ""
+msgstr "pole daty harmonogramu"
 
 #: documents/models.py:1056
 msgid "The field to check for a schedule trigger."
-msgstr ""
+msgstr "Pole do sprawdzenia pod kątem wyzwalacza harmonogramu."
 
 #: documents/models.py:1065
 msgid "schedule date custom field"
@@ -902,35 +902,35 @@ msgstr "temat wiadomości e-mail"
 
 #: documents/models.py:1082
 msgid "The subject of the email, can include some placeholders, see documentation."
-msgstr ""
+msgstr "Temat wiadomości e-mail, może zawierać znaczniki zastępcze; zobacz dokumentację."
 
 #: documents/models.py:1088
 msgid "email body"
-msgstr ""
+msgstr "treść e-maila"
 
 #: documents/models.py:1091
 msgid "The body (message) of the email, can include some placeholders, see documentation."
-msgstr ""
+msgstr "Treść (wiadomość) e-maila, może zawierać znaczniki zastępcze; zobacz dokumentację."
 
 #: documents/models.py:1097
 msgid "emails to"
-msgstr ""
+msgstr "adresaci e-maila"
 
 #: documents/models.py:1100
 msgid "The destination email addresses, comma separated."
-msgstr ""
+msgstr "Docelowe adresy e-mail oddzielone przecinkami."
 
 #: documents/models.py:1106
 msgid "include document in email"
-msgstr ""
+msgstr "dołącz dokument do e-maila"
 
 #: documents/models.py:1117
 msgid "webhook url"
-msgstr ""
+msgstr "adres URL webhooka"
 
 #: documents/models.py:1120
 msgid "The destination URL for the notification."
-msgstr ""
+msgstr "Docelowy adres URL powiadomienia."
 
 #: documents/models.py:1125
 msgid "use parameters"
@@ -942,31 +942,31 @@ msgstr "wyślij jako JSON"
 
 #: documents/models.py:1134
 msgid "webhook parameters"
-msgstr ""
+msgstr "parametry webhooka"
 
 #: documents/models.py:1137
 msgid "The parameters to send with the webhook URL if body not used."
-msgstr ""
+msgstr "Parametry wysyłane z adresem URL webhooka, gdy treść nie jest używana."
 
 #: documents/models.py:1141
 msgid "webhook body"
-msgstr ""
+msgstr "treść webhooka"
 
 #: documents/models.py:1144
 msgid "The body to send with the webhook URL if parameters not used."
-msgstr ""
+msgstr "Treść wysyłana z adresem URL webhooka, gdy parametry nie są używane."
 
 #: documents/models.py:1148
 msgid "webhook headers"
-msgstr ""
+msgstr "nagłówki webhooka"
 
 #: documents/models.py:1151
 msgid "The headers to send with the webhook URL."
-msgstr ""
+msgstr "Nagłówki wysyłane z adresem URL webhooka."
 
 #: documents/models.py:1156
 msgid "include document in webhook"
-msgstr ""
+msgstr "dołącz dokument w webhooku"
 
 #: documents/models.py:1167
 msgid "Assignment"
@@ -982,7 +982,7 @@ msgstr "Adres e-mail"
 
 #: documents/models.py:1179
 msgid "Webhook"
-msgstr ""
+msgstr "Webhook"
 
 #: documents/models.py:1183
 msgid "Workflow Action Type"
@@ -1038,11 +1038,11 @@ msgstr "przypisz te pola dodatkowe"
 
 #: documents/models.py:1278
 msgid "custom field values"
-msgstr ""
+msgstr "wartości pól niestandardowych"
 
 #: documents/models.py:1282
 msgid "Optional values to assign to the custom fields."
-msgstr ""
+msgstr "Opcjonalne wartości do przypisania polom niestandardowym."
 
 #: documents/models.py:1291
 msgid "remove these tag(s)"
@@ -1150,19 +1150,19 @@ msgstr "procesy"
 
 #: documents/models.py:1452
 msgid "workflow trigger type"
-msgstr ""
+msgstr "typ wyzwalacza przepływu pracy"
 
 #: documents/models.py:1466
 msgid "date run"
-msgstr ""
+msgstr "data uruchomienia"
 
 #: documents/models.py:1472
 msgid "workflow run"
-msgstr ""
+msgstr "uruchomienie przepływu pracy"
 
 #: documents/models.py:1473
 msgid "workflow runs"
-msgstr ""
+msgstr "uruchomienia przepływu pracy"
 
 #: documents/serialisers.py:135
 #, python-format
@@ -1173,26 +1173,26 @@ msgstr "Nieprawidłowe wyrażenie regularne: %(error)s"
 msgid "Invalid color."
 msgstr "Nieprawidłowy kolor."
 
-#: documents/serialisers.py:1646
+#: documents/serialisers.py:1645
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Typ pliku %(type)s nie jest obsługiwany"
 
-#: documents/serialisers.py:1740
+#: documents/serialisers.py:1739
 msgid "Invalid variable detected."
 msgstr "Wykryto nieprawidłową zmienną."
 
 #: documents/templates/account/account_inactive.html:5
 msgid "Paperless-ngx account inactive"
-msgstr ""
+msgstr "Konto Paperless-ngx nieaktywne"
 
 #: documents/templates/account/account_inactive.html:9
 msgid "Account inactive."
-msgstr ""
+msgstr "Konto nieaktywne."
 
 #: documents/templates/account/account_inactive.html:14
 msgid "This account is inactive."
-msgstr ""
+msgstr "To konto jest nieaktywne."
 
 #: documents/templates/account/account_inactive.html:16
 msgid "Return to login"
@@ -1324,7 +1324,7 @@ msgstr "Masz już konto? <a href=\"%(login_url)s\">Zaloguj się</a>"
 
 #: documents/templates/account/signup.html:19
 msgid "Note: This is the first user account for this installation and will be granted superuser privileges."
-msgstr ""
+msgstr "Uwaga: To jest pierwsze konto użytkownika w tej instalacji i otrzyma uprawnienia superużytkownika."
 
 #: documents/templates/account/signup.html:23
 #: documents/templates/socialaccount/signup.html:14
@@ -1411,21 +1411,21 @@ msgstr "Na koniec należy wypełnić poniższy formularz:"
 #: documents/validators.py:24
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "Nie można przeanalizować URI {value}, brak schematu."
 
 #: documents/validators.py:29
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "Nie można przeanalizować URI {value}, brak lokalizacji sieciowej lub ścieżki"
 
 #: documents/validators.py:36
 msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
-msgstr ""
+msgstr "Schemat URI '{parts.scheme}' jest niedozwolony. Dozwolone schematy: {', '.join(allowed_schemes)}."
 
 #: documents/validators.py:45
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "Nie można przeanalizować URI {value}."
 
 #: paperless/apps.py:11
 msgid "Paperless"
@@ -1573,187 +1573,191 @@ msgstr "Logo aplikacji"
 
 #: paperless/models.py:197
 msgid "Enables barcode scanning"
-msgstr ""
+msgstr "Umożliwia skanowanie kodów kreskowych"
 
 #: paperless/models.py:203
 msgid "Enables barcode TIFF support"
-msgstr ""
+msgstr "Włącza obsługę TIFF dla kodów kreskowych"
 
 #: paperless/models.py:209
 msgid "Sets the barcode string"
-msgstr ""
+msgstr "Ustawia ciąg kodu kreskowego"
 
 #: paperless/models.py:217
 msgid "Retains split pages"
-msgstr ""
+msgstr "Zachowuje podzielone strony"
 
 #: paperless/models.py:223
 msgid "Enables ASN barcode"
-msgstr ""
+msgstr "Włącza kod kreskowy ASN"
 
 #: paperless/models.py:229
 msgid "Sets the ASN barcode prefix"
-msgstr ""
+msgstr "Ustawia prefiks kodu kreskowego ASN"
 
 #: paperless/models.py:237
 msgid "Sets the barcode upscale factor"
-msgstr ""
+msgstr "Ustawia współczynnik skalowania kodu kreskowego"
 
 #: paperless/models.py:244
 msgid "Sets the barcode DPI"
-msgstr ""
+msgstr "Ustawia DPI kodu kreskowego"
 
 #: paperless/models.py:251
 msgid "Sets the maximum pages for barcode"
-msgstr ""
+msgstr "Ustawia maksymalną liczbę stron dla kodu kreskowego"
 
 #: paperless/models.py:258
 msgid "Enables tag barcode"
-msgstr ""
+msgstr "Włącza kod kreskowy tagu"
 
 #: paperless/models.py:264
 msgid "Sets the tag barcode mapping"
-msgstr ""
+msgstr "Ustawia mapowanie kodu kreskowego tagu"
 
 #: paperless/models.py:269
 msgid "paperless application settings"
 msgstr "paperless ustawienia aplikacji"
 
-#: paperless/settings.py:754
+#: paperless/settings.py:755
 msgid "English (US)"
 msgstr "Angielski (USA)"
 
-#: paperless/settings.py:755
+#: paperless/settings.py:756
 msgid "Arabic"
 msgstr "arabski"
 
-#: paperless/settings.py:756
+#: paperless/settings.py:757
 msgid "Afrikaans"
 msgstr "Afrykanerski"
 
-#: paperless/settings.py:757
+#: paperless/settings.py:758
 msgid "Belarusian"
 msgstr "Białoruski"
 
-#: paperless/settings.py:758
+#: paperless/settings.py:759
 msgid "Bulgarian"
 msgstr "Bułgarski"
 
-#: paperless/settings.py:759
+#: paperless/settings.py:760
 msgid "Catalan"
 msgstr "Kataloński"
 
-#: paperless/settings.py:760
+#: paperless/settings.py:761
 msgid "Czech"
 msgstr "Czeski"
 
-#: paperless/settings.py:761
+#: paperless/settings.py:762
 msgid "Danish"
 msgstr "Duński"
 
-#: paperless/settings.py:762
+#: paperless/settings.py:763
 msgid "German"
 msgstr "Niemiecki"
 
-#: paperless/settings.py:763
+#: paperless/settings.py:764
 msgid "Greek"
 msgstr "Grecki"
 
-#: paperless/settings.py:764
+#: paperless/settings.py:765
 msgid "English (GB)"
 msgstr "Angielski (Wielka Brytania)"
 
-#: paperless/settings.py:765
+#: paperless/settings.py:766
 msgid "Spanish"
 msgstr "Hiszpański"
 
-#: paperless/settings.py:766
+#: paperless/settings.py:767
+msgid "Persian"
+msgstr "perski"
+
+#: paperless/settings.py:768
 msgid "Finnish"
 msgstr "Fiński"
 
-#: paperless/settings.py:767
+#: paperless/settings.py:769
 msgid "French"
 msgstr "Francuski"
 
-#: paperless/settings.py:768
+#: paperless/settings.py:770
 msgid "Hungarian"
 msgstr "Węgierski"
 
-#: paperless/settings.py:769
+#: paperless/settings.py:771
 msgid "Italian"
 msgstr "Włoski"
 
-#: paperless/settings.py:770
+#: paperless/settings.py:772
 msgid "Japanese"
 msgstr "Japoński"
 
-#: paperless/settings.py:771
+#: paperless/settings.py:773
 msgid "Korean"
 msgstr "Koreański"
 
-#: paperless/settings.py:772
+#: paperless/settings.py:774
 msgid "Luxembourgish"
 msgstr "Luksemburski"
 
-#: paperless/settings.py:773
+#: paperless/settings.py:775
 msgid "Norwegian"
 msgstr "Norweski"
 
-#: paperless/settings.py:774
+#: paperless/settings.py:776
 msgid "Dutch"
 msgstr "Holenderski"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:777
 msgid "Polish"
 msgstr "Polski"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:778
 msgid "Portuguese (Brazil)"
 msgstr "Portugalski (Brazylia)"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:779
 msgid "Portuguese"
 msgstr "Portugalski"
 
-#: paperless/settings.py:778
+#: paperless/settings.py:780
 msgid "Romanian"
 msgstr "Rumuński"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:781
 msgid "Russian"
 msgstr "Rosyjski"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:782
 msgid "Slovak"
 msgstr "Słowacki"
 
-#: paperless/settings.py:781
+#: paperless/settings.py:783
 msgid "Slovenian"
 msgstr "Słoweński"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:784
 msgid "Serbian"
 msgstr "Serbski"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:785
 msgid "Swedish"
 msgstr "Szwedzki"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:786
 msgid "Turkish"
 msgstr "Turecki"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:787
 msgid "Ukrainian"
 msgstr "Ukraiński"
 
-#: paperless/settings.py:786
+#: paperless/settings.py:788
 msgid "Chinese Simplified"
 msgstr "Chiński uproszczony"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:789
 msgid "Chinese Traditional"
-msgstr ""
+msgstr "chiński tradycyjny"
 
 #: paperless/urls.py:374
 msgid "Paperless-ngx administration"
@@ -1905,23 +1909,23 @@ msgstr "Przetwarzaj wszystkie pliki, łącznie z załącznikami „inline”."
 
 #: paperless_mail/models.py:119
 msgid "System default"
-msgstr ""
+msgstr "Domyślne systemowe"
 
 #: paperless_mail/models.py:120
 msgid "Text, then HTML"
-msgstr ""
+msgstr "Tekst, a następnie HTML"
 
 #: paperless_mail/models.py:121
 msgid "HTML, then text"
-msgstr ""
+msgstr "HTML, a następnie tekst"
 
 #: paperless_mail/models.py:122
 msgid "HTML only"
-msgstr ""
+msgstr "Tylko HTML"
 
 #: paperless_mail/models.py:123
 msgid "Text only"
-msgstr ""
+msgstr "Tylko tekst"
 
 #: paperless_mail/models.py:126
 msgid "Delete"
@@ -2033,7 +2037,7 @@ msgstr "zakres pobierania"
 
 #: paperless_mail/models.py:241
 msgid "pdf layout"
-msgstr ""
+msgstr "układ PDF"
 
 #: paperless_mail/models.py:247
 msgid "action"

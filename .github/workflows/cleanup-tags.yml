@@ -4,7 +4,6 @@
 # Requires a PAT with the correct scope set in the secrets.
 #
 # This workflow will not trigger runs on forked repos.
-
 name: Cleanup Image Tags
 on:
   delete:

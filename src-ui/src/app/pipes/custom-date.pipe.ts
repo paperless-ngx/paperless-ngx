@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common'
-import { Inject, LOCALE_ID, Pipe, PipeTransform } from '@angular/core'
+import { LOCALE_ID, Pipe, PipeTransform, inject } from '@angular/core'
 import { SETTINGS_KEYS } from '../data/ui-settings'
 import { SettingsService } from '../services/settings.service'
 
@@ -46,13 +46,14 @@ const INTERVALS = {
   name: 'customDate',
 })
 export class CustomDatePipe implements PipeTransform {
+  private datePipe = inject(DatePipe)
+  private settings = inject(SettingsService)
+
   private defaultLocale: string
 
-  constructor(
-    @Inject(LOCALE_ID) locale: string,
-    private datePipe: DatePipe,
-    private settings: SettingsService
-  ) {
+  constructor() {
+    const locale = inject(LOCALE_ID)
+
     this.defaultLocale = locale
   }
 

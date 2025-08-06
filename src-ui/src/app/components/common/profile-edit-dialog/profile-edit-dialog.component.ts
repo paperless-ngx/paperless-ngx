@@ -1,5 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard'
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, inject } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -21,6 +21,7 @@ import {
 import { SafeHtmlPipe } from 'src/app/pipes/safehtml.pipe'
 import { ProfileService } from 'src/app/services/profile.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { setLocationHref } from 'src/app/utils/navigation'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 import { ConfirmButtonComponent } from '../confirm-button/confirm-button.component'
 import { PasswordComponent } from '../input/password/password.component'
@@ -46,6 +47,11 @@ export class ProfileEditDialogComponent
   extends LoadingComponentWithPermissions
   implements OnInit
 {
+  private profileService = inject(ProfileService)
+  activeModal = inject(NgbActiveModal)
+  private toastService = inject(ToastService)
+  private clipboard = inject(Clipboard)
+
   public networkActive: boolean = false
   public error: any
 
@@ -82,15 +88,6 @@ export class ProfileEditDialogComponent
 
   public socialAccounts: SocialAccount[] = []
   public socialAccountProviders: SocialAccountProvider[] = []
-
-  constructor(
-    private profileService: ProfileService,
-    public activeModal: NgbActiveModal,
-    private toastService: ToastService,
-    private clipboard: Clipboard
-  ) {
-    super()
-  }
 
   ngOnInit(): void {
     this.networkActive = true
@@ -198,7 +195,9 @@ export class ProfileEditDialogComponent
               $localize`Password has been changed, you will be logged out momentarily.`
             )
             setTimeout(() => {
-              window.location.href = `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
+              setLocationHref(
+                `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
+              )
             }, 2500)
           }
           this.activeModal.close()

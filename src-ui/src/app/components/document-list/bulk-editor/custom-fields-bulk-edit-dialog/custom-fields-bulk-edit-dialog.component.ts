@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core'
+import { Component, EventEmitter, Output, inject } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -38,6 +38,9 @@ import { DocumentService } from 'src/app/services/rest/document.service'
   ],
 })
 export class CustomFieldsBulkEditDialogComponent {
+  private activeModal = inject(NgbActiveModal)
+  private documentService = inject(DocumentService)
+
   CustomFieldDataType = CustomFieldDataType
 
   @Output()
@@ -72,11 +75,6 @@ export class CustomFieldsBulkEditDialogComponent {
   public form: FormGroup = new FormGroup({})
 
   public documents: number[] = []
-
-  constructor(
-    private activeModal: NgbActiveModal,
-    private documentService: DocumentService
-  ) {}
 
   initForm() {
     Object.keys(this.form.controls).forEach((key) => {

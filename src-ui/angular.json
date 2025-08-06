@@ -27,6 +27,7 @@
           "el-GR": "src/locale/messages.el_GR.xlf",
           "en-GB": "src/locale/messages.en_GB.xlf",
           "es-ES": "src/locale/messages.es_ES.xlf",
+          "fa-IR": "src/locale/messages.fa_IR.xlf",
           "fi-FI": "src/locale/messages.fi_FI.xlf",
           "fr-FR": "src/locale/messages.fr_FR.xlf",
           "hu-HU": "src/locale/messages.hu_HU.xlf",
@@ -47,6 +48,7 @@
           "sv-SE": "src/locale/messages.sv_SE.xlf",
           "tr-TR": "src/locale/messages.tr_TR.xlf",
           "uk-UA": "src/locale/messages.uk_UA.xlf",
+          "vi-VN": "src/locale/messages.vi_VN.xlf",
           "zh-CN": "src/locale/messages.zh_CN.xlf",
           "zh-TW": "src/locale/messages.zh_TW.xlf"
         }
@@ -59,10 +61,12 @@
                 "path": "./extra-webpack.config.ts"
             },
             "outputPath": "dist/paperless-ui",
+            "main": "src/main.ts",
             "outputHashing": "none",
             "index": "src/index.html",
-            "main": "src/main.ts",
-            "polyfills": "src/polyfills.ts",
+            "polyfills": [
+              "src/polyfills.ts"
+            ],
             "tsConfig": "tsconfig.app.json",
             "localize": true,
             "assets": [
@@ -85,12 +89,15 @@
               "file-saver",
               "utif"
             ],
-            "vendorChunk": true,
             "extractLicenses": false,
-            "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "."
+              ]
+            }
           },
           "configurations": {
             "production": {
@@ -106,8 +113,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -187,6 +192,30 @@
     },
     "@angular-eslint/schematics:library": {
       "setParserOptionsProject": true
+    },
+    "@schematics/angular:component": {
+      "type": "component"
+    },
+    "@schematics/angular:directive": {
+      "type": "directive"
+    },
+    "@schematics/angular:service": {
+      "type": "service"
+    },
+    "@schematics/angular:guard": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:interceptor": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:module": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:pipe": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:resolver": {
+      "typeSeparator": "."
     }
   }
 }

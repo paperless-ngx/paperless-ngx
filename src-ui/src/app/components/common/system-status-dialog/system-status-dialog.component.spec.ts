@@ -1,3 +1,18 @@
+// Mock production environment for testing
+jest.mock('src/environments/environment', () => ({
+  environment: {
+    production: true,
+    apiBaseUrl: 'http://localhost:8000/api/',
+    apiVersion: '9',
+    appTitle: 'Paperless-ngx',
+    tag: 'prod',
+    version: '2.4.3',
+    webSocketHost: 'localhost:8000',
+    webSocketProtocol: 'ws:',
+    webSocketBaseUrl: '/ws/',
+  },
+}))
+
 import { Clipboard } from '@angular/cdk/clipboard'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
@@ -141,5 +156,16 @@ describe('SystemStatusDialogComponent', () => {
     expect(toastSpy).toHaveBeenCalledWith(
       `Task ${PaperlessTaskName.IndexOptimize} started`
     )
+  })
+
+  it('shoduld handle version mismatch', () => {
+    component.frontendVersion = '2.4.2'
+    component.ngOnInit()
+    expect(component.versionMismatch).toBeTruthy()
+    expect(component.status.pngx_version).toContain('(frontend: 2.4.2)')
+    component.frontendVersion = '2.4.3'
+    component.status.pngx_version = '2.4.3'
+    component.ngOnInit()
+    expect(component.versionMismatch).toBeFalsy()
   })
 })

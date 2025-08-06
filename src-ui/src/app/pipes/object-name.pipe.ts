@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core'
+import { inject, Pipe, PipeTransform } from '@angular/core'
 import { catchError, map, Observable, of } from 'rxjs'
 import { MatchingModel } from '../data/matching-model'
 import {
@@ -12,18 +12,18 @@ import { AbstractNameFilterService } from '../services/rest/abstract-name-filter
   name: 'objectName',
 })
 export abstract class ObjectNamePipe implements PipeTransform {
+  protected permissionsService = inject(PermissionsService)
+  protected permissionType: PermissionType
+  protected objectService = inject<AbstractNameFilterService<MatchingModel>>(
+    AbstractNameFilterService
+  )
+
   /*
     ObjectNamePipe is an abstract class to prevent instantiation,
     object-specific pipes extend this class and provide the
     correct permission type, and object service.
   */
   protected objects: MatchingModel[]
-
-  constructor(
-    protected permissionsService: PermissionsService,
-    protected permissionType: PermissionType,
-    protected objectService: AbstractNameFilterService<MatchingModel>
-  ) {}
 
   transform(obejctId: number): Observable<string> {
     if (

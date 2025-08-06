@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, OnDestroy, OnInit, inject } from '@angular/core'
 import {
   NgbAccordionModule,
   NgbProgressbarModule,
@@ -20,7 +20,7 @@ import { ToastComponent } from '../toast/toast.component'
   ],
 })
 export class ToastsComponent implements OnInit, OnDestroy {
-  constructor(public toastService: ToastService) {}
+  toastService = inject(ToastService)
 
   private subscription: Subscription
 

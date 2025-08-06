@@ -2,6 +2,7 @@ import {
   Component,
   EventEmitter,
   forwardRef,
+  inject,
   Input,
   OnInit,
   Output,
@@ -45,13 +46,9 @@ export class DateComponent
   extends AbstractInputComponent<string>
   implements OnInit
 {
-  constructor(
-    private settings: SettingsService,
-    private ngbDateParserFormatter: NgbDateParserFormatter,
-    private isoDateAdapter: NgbDateAdapter<string>
-  ) {
-    super()
-  }
+  private settings = inject(SettingsService)
+  private ngbDateParserFormatter = inject(NgbDateParserFormatter)
+  private isoDateAdapter = inject<NgbDateAdapter<string>>(NgbDateAdapter)
 
   @Input()
   suggestions: string[]
@@ -62,7 +59,7 @@ export class DateComponent
   @Output()
   filterDocuments = new EventEmitter<NgbDateStruct[]>()
 
-  public readonly today: string = new Date().toISOString().split('T')[0]
+  public readonly today: string = new Date().toLocaleDateString('en-CA')
 
   getSuggestions() {
     return this.suggestions == null

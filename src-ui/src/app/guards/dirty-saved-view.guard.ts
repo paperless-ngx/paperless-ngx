@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { inject, Injectable } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { first, Observable, Subject } from 'rxjs'
 import { ConfirmDialogComponent } from '../components/common/confirm-dialog/confirm-dialog.component'
@@ -8,10 +8,8 @@ import { SettingsService } from '../services/settings.service'
 
 @Injectable()
 export class DirtySavedViewGuard {
-  constructor(
-    private modalService: NgbModal,
-    private settings: SettingsService
-  ) {}
+  private modalService = inject(NgbModal)
+  private settings = inject(SettingsService)
 
   canDeactivate(
     component: DocumentListComponent

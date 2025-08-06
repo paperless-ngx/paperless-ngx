@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-24 17:14+0000\n"
-"PO-Revision-Date: 2025-05-24 17:17\n"
+"POT-Creation-Date: 2025-06-19 18:51+0000\n"
+"PO-Revision-Date: 2025-06-19 18:52\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -23,39 +23,39 @@ msgstr "Dokumenty"
 
 #: documents/filters.py:384
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "Hodnota musí byť vo validnom formáte JSON."
 
 #: documents/filters.py:403
 msgid "Invalid custom field query expression"
-msgstr ""
+msgstr "Neplatný výraz požiadavky na vlastné pole"
 
 #: documents/filters.py:413
 msgid "Invalid expression list. Must be nonempty."
-msgstr ""
+msgstr "Neplatný zoznam výrazov. Nesmie byť prázdny."
 
 #: documents/filters.py:434
 msgid "Invalid logical operator {op!r}"
-msgstr ""
+msgstr "Neplatný logický operátor {op!r}"
 
 #: documents/filters.py:448
 msgid "Maximum number of query conditions exceeded."
-msgstr ""
+msgstr "Prekročili ste maximálny počet podmienok požiadavky."
 
 #: documents/filters.py:513
 msgid "{name!r} is not a valid custom field."
-msgstr ""
+msgstr "{name!r} nie je platné vlastné pole."
 
 #: documents/filters.py:550
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr ""
+msgstr "{data_type} nepodporuje výraz požiadavky {expr!r}."
 
 #: documents/filters.py:658
 msgid "Maximum nesting depth exceeded."
-msgstr ""
+msgstr "Bola prekročená maximálna hĺbka vetvenia."
 
 #: documents/filters.py:843
 msgid "Custom field not found"
-msgstr ""
+msgstr "Vlastné pole nebolo nájdené"
 
 #: documents/models.py:36 documents/models.py:713
 msgid "owner"
@@ -83,11 +83,11 @@ msgstr "Regulárny výraz"
 
 #: documents/models.py:58 documents/models.py:929
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Podobné slovo"
 
 #: documents/models.py:59
 msgid "Automatic"
-msgstr ""
+msgstr "Automaticky"
 
 #: documents/models.py:62 documents/models.py:401 documents/models.py:1419
 #: paperless_mail/models.py:23 paperless_mail/models.py:143
@@ -196,11 +196,11 @@ msgstr "Kontrolný súčet archivovaného dokumentu."
 
 #: documents/models.py:205
 msgid "page count"
-msgstr ""
+msgstr "počet strán"
 
 #: documents/models.py:212
 msgid "The number of pages of the document."
-msgstr ""
+msgstr "Počet stránok dokumentu."
 
 #: documents/models.py:217 documents/models.py:633 documents/models.py:671
 #: documents/models.py:742 documents/models.py:800
@@ -262,55 +262,55 @@ msgstr "dokumenty"
 
 #: documents/models.py:382
 msgid "Table"
-msgstr ""
+msgstr "Tabuľka"
 
 #: documents/models.py:383
 msgid "Small Cards"
-msgstr ""
+msgstr "Malé karty"
 
 #: documents/models.py:384
 msgid "Large Cards"
-msgstr ""
+msgstr "Veľké karty"
 
 #: documents/models.py:387
 msgid "Title"
-msgstr ""
+msgstr "Názov"
 
 #: documents/models.py:388 documents/models.py:945
 msgid "Created"
-msgstr ""
+msgstr "Vytvorené"
 
 #: documents/models.py:389 documents/models.py:944
 msgid "Added"
-msgstr ""
+msgstr "Pridané"
 
 #: documents/models.py:390
 msgid "Tags"
-msgstr ""
+msgstr "Štítky"
 
 #: documents/models.py:391
 msgid "Correspondent"
-msgstr ""
+msgstr "Korešpondent"
 
 #: documents/models.py:392
 msgid "Document Type"
-msgstr ""
+msgstr "Typ dokumentu"
 
 #: documents/models.py:393
 msgid "Storage Path"
-msgstr ""
+msgstr "Cesta k úložisku"
 
 #: documents/models.py:394
 msgid "Note"
-msgstr ""
+msgstr "Poznámka"
 
 #: documents/models.py:395
 msgid "Owner"
-msgstr ""
+msgstr "Vlastník"
 
 #: documents/models.py:396
 msgid "Shared"
-msgstr ""
+msgstr "Zdieľané"
 
 #: documents/models.py:397
 msgid "ASN"
@@ -318,7 +318,7 @@ msgstr ""
 
 #: documents/models.py:398
 msgid "Pages"
-msgstr ""
+msgstr "Stránok"
 
 #: documents/models.py:404
 msgid "show on dashboard"
@@ -338,15 +338,15 @@ msgstr "zoradiť opačne"
 
 #: documents/models.py:419
 msgid "View page size"
-msgstr ""
+msgstr "Zobraziť veľkosť stránky"
 
 #: documents/models.py:427
 msgid "View display mode"
-msgstr ""
+msgstr "Zobraziť režim zobrazenia"
 
 #: documents/models.py:434
 msgid "Document display fields"
-msgstr ""
+msgstr "Polia zobrazenia dokumentu"
 
 #: documents/models.py:441 documents/models.py:504
 msgid "saved view"
@@ -442,7 +442,7 @@ msgstr "fulltextový dopyt"
 
 #: documents/models.py:471
 msgid "more like this"
-msgstr ""
+msgstr "viac podobných"
 
 #: documents/models.py:472
 msgid "has tags in"
@@ -462,91 +462,91 @@ msgstr "cesta k úložisku je"
 
 #: documents/models.py:476
 msgid "has correspondent in"
-msgstr ""
+msgstr "má korešpondenta v"
 
 #: documents/models.py:477
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "nemá korešpondenta v"
 
 #: documents/models.py:478
 msgid "has document type in"
-msgstr ""
+msgstr "má typ dokumentu v"
 
 #: documents/models.py:479
 msgid "does not have document type in"
-msgstr ""
+msgstr "nemá typ dokumentu v"
 
 #: documents/models.py:480
 msgid "has storage path in"
-msgstr ""
+msgstr "má cestu k úložisku v"
 
 #: documents/models.py:481
 msgid "does not have storage path in"
-msgstr ""
+msgstr "nemá cestu k úložisku v"
 
 #: documents/models.py:482
 msgid "owner is"
-msgstr ""
+msgstr "vlastníkom je"
 
 #: documents/models.py:483
 msgid "has owner in"
-msgstr ""
+msgstr "má vlastníka v"
 
 #: documents/models.py:484
 msgid "does not have owner"
-msgstr ""
+msgstr "nemá vlastníka"
 
 #: documents/models.py:485
 msgid "does not have owner in"
-msgstr ""
+msgstr "nemá vlastníka v"
 
 #: documents/models.py:486
 msgid "has custom field value"
-msgstr ""
+msgstr "má hodnotu vlastného poľa"
 
 #: documents/models.py:487
 msgid "is shared by me"
-msgstr ""
+msgstr "je zdieľaný mnou"
 
 #: documents/models.py:488
 msgid "has custom fields"
-msgstr ""
+msgstr "má vlastné polia"
 
 #: documents/models.py:489
 msgid "has custom field in"
-msgstr ""
+msgstr "má vlastné pole v"
 
 #: documents/models.py:490
 msgid "does not have custom field in"
-msgstr ""
+msgstr "nemá vlastné pole v"
 
 #: documents/models.py:491
 msgid "does not have custom field"
-msgstr ""
+msgstr "nemá vlastné pole"
 
 #: documents/models.py:492
 msgid "custom fields query"
-msgstr ""
+msgstr "požiadavky na vlastné polia"
 
 #: documents/models.py:493
 msgid "created to"
-msgstr ""
+msgstr "vytvorené do"
 
 #: documents/models.py:494
 msgid "created from"
-msgstr ""
+msgstr "vytvorené z"
 
 #: documents/models.py:495
 msgid "added to"
-msgstr ""
+msgstr "pridané do"
 
 #: documents/models.py:496
 msgid "added from"
-msgstr ""
+msgstr "pridané z"
 
 #: documents/models.py:497
 msgid "mime type is"
-msgstr ""
+msgstr "typ mime je"
 
 #: documents/models.py:507
 msgid "rule type"
@@ -566,31 +566,31 @@ msgstr "pravidlá filtra"
 
 #: documents/models.py:537
 msgid "Auto Task"
-msgstr ""
+msgstr "Automatická úloha"
 
 #: documents/models.py:538
 msgid "Scheduled Task"
-msgstr ""
+msgstr "Plánovaná úloha"
 
 #: documents/models.py:539
 msgid "Manual Task"
-msgstr ""
+msgstr "Manuálna úloha"
 
 #: documents/models.py:542
 msgid "Consume File"
-msgstr ""
+msgstr "Súbor spracovania"
 
 #: documents/models.py:543
 msgid "Train Classifier"
-msgstr ""
+msgstr "Trénovací klasifikátor"
 
 #: documents/models.py:544
 msgid "Check Sanity"
-msgstr ""
+msgstr "Skontrolovať zdravie"
 
 #: documents/models.py:545
 msgid "Index Optimize"
-msgstr ""
+msgstr "Optimalizácia indexu"
 
 #: documents/models.py:550
 msgid "Task ID"
@@ -622,7 +622,7 @@ msgstr "Názov úlohy"
 
 #: documents/models.py:572
 msgid "Name of the task that was run"
-msgstr ""
+msgstr "Názov úlohy, ktorá bola spustená"
 
 #: documents/models.py:579
 msgid "Task State"
@@ -666,23 +666,23 @@ msgstr "Výsledné dáta úlohy"
 
 #: documents/models.py:617
 msgid "Task Type"
-msgstr ""
+msgstr "Typ úlohy"
 
 #: documents/models.py:618
 msgid "The type of task that was run"
-msgstr ""
+msgstr "Typ úlohy, ktorá bola spustená"
 
 #: documents/models.py:629
 msgid "Note for the document"
-msgstr ""
+msgstr "Poznámka k dokumentu"
 
 #: documents/models.py:653
 msgid "user"
-msgstr "užívateľ"
+msgstr "používateľ"
 
 #: documents/models.py:658
 msgid "note"
-msgstr ""
+msgstr "poznámka"
 
 #: documents/models.py:659
 msgid "notes"
@@ -690,15 +690,15 @@ msgstr "poznámky"
 
 #: documents/models.py:667
 msgid "Archive"
-msgstr ""
+msgstr "Archív"
 
 #: documents/models.py:668
 msgid "Original"
-msgstr ""
+msgstr "Originál"
 
 #: documents/models.py:679 paperless_mail/models.py:75
 msgid "expiration"
-msgstr ""
+msgstr "vypršanie"
 
 #: documents/models.py:686
 msgid "slug"
@@ -706,127 +706,127 @@ msgstr ""
 
 #: documents/models.py:718
 msgid "share link"
-msgstr ""
+msgstr "odkaz pre zdieľanie"
 
 #: documents/models.py:719
 msgid "share links"
-msgstr ""
+msgstr "odkazy pre zdieľanie"
 
 #: documents/models.py:731
 msgid "String"
-msgstr ""
+msgstr "Reťazec"
 
 #: documents/models.py:732
 msgid "URL"
-msgstr ""
+msgstr "Adresa URL"
 
 #: documents/models.py:733
 msgid "Date"
-msgstr ""
+msgstr "Dátum"
 
 #: documents/models.py:734
 msgid "Boolean"
-msgstr ""
+msgstr "Logická hodnota"
 
 #: documents/models.py:735
 msgid "Integer"
-msgstr ""
+msgstr "Celé číslo"
 
 #: documents/models.py:736
 msgid "Float"
-msgstr ""
+msgstr "Plávajúce číslo"
 
 #: documents/models.py:737
 msgid "Monetary"
-msgstr ""
+msgstr "Peňažný"
 
 #: documents/models.py:738
 msgid "Document Link"
-msgstr ""
+msgstr "Odkaz na dokument"
 
 #: documents/models.py:739
 msgid "Select"
-msgstr ""
+msgstr "Vybrať"
 
 #: documents/models.py:751
 msgid "data type"
-msgstr ""
+msgstr "dátový typ"
 
 #: documents/models.py:758
 msgid "extra data"
-msgstr ""
+msgstr "dodatočné údaje"
 
 #: documents/models.py:762
 msgid "Extra data for the custom field, such as select options"
-msgstr ""
+msgstr "Dodatočné údaje pre vlastné pole, ako sú napr. možnosti výberu"
 
 #: documents/models.py:768
 msgid "custom field"
-msgstr ""
+msgstr "vlastné pole"
 
 #: documents/models.py:769
 msgid "custom fields"
-msgstr ""
+msgstr "vlastné polia"
 
 #: documents/models.py:866
 msgid "custom field instance"
-msgstr ""
+msgstr "inštancia vlastného poľa"
 
 #: documents/models.py:867
 msgid "custom field instances"
-msgstr ""
+msgstr "inštancie vlastných polí"
 
 #: documents/models.py:932
 msgid "Consumption Started"
-msgstr ""
+msgstr "Spustené spracovanie"
 
 #: documents/models.py:933
 msgid "Document Added"
-msgstr ""
+msgstr "Dokument pridaný"
 
 #: documents/models.py:934
 msgid "Document Updated"
-msgstr ""
+msgstr "Dokument aktualizovaný"
 
 #: documents/models.py:935
 msgid "Scheduled"
-msgstr ""
+msgstr "Plánované"
 
 #: documents/models.py:938
 msgid "Consume Folder"
-msgstr ""
+msgstr "Priečinok spracovania"
 
 #: documents/models.py:939
 msgid "Api Upload"
-msgstr ""
+msgstr "Nahrať pomocou API"
 
 #: documents/models.py:940
 msgid "Mail Fetch"
-msgstr ""
+msgstr "Načítať poštu"
 
 #: documents/models.py:941
 msgid "Web UI"
-msgstr ""
+msgstr "Webové rozhranie"
 
 #: documents/models.py:946
 msgid "Modified"
-msgstr ""
+msgstr "Upravené"
 
 #: documents/models.py:947
 msgid "Custom Field"
-msgstr ""
+msgstr "Vlastné pole"
 
 #: documents/models.py:950
 msgid "Workflow Trigger Type"
-msgstr ""
+msgstr "Typ spúšťača pracovného postupu"
 
 #: documents/models.py:962
 msgid "filter path"
-msgstr ""
+msgstr "filter cesty"
 
 #: documents/models.py:967
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
+msgstr "Spracovávať iba dokumenty s cestou, ktorá zodpovedá tomuto výrazu (ak je zadaný). Sú povolené zástupné znaky ako napr. *. Medzi malými a veľkými písmenami sa nerozlišuje."
 
 #: documents/models.py:974
 msgid "filter filename"
@@ -1034,7 +1034,7 @@ msgstr ""
 
 #: documents/models.py:1274
 msgid "assign these custom fields"
-msgstr ""
+msgstr "priradiť tieto vlastné polia"
 
 #: documents/models.py:1278
 msgid "custom field values"
@@ -1042,7 +1042,7 @@ msgstr ""
 
 #: documents/models.py:1282
 msgid "Optional values to assign to the custom fields."
-msgstr ""
+msgstr "Voliteľné hodnoty na priradenie k vlastným poliam."
 
 #: documents/models.py:1291
 msgid "remove these tag(s)"
@@ -1050,83 +1050,83 @@ msgstr ""
 
 #: documents/models.py:1296
 msgid "remove all tags"
-msgstr ""
+msgstr "odstrániť všetky štítky"
 
 #: documents/models.py:1303
 msgid "remove these document type(s)"
-msgstr ""
+msgstr "odstrániť tieto typy dokumentov"
 
 #: documents/models.py:1308
 msgid "remove all document types"
-msgstr ""
+msgstr "odstrániť všetky typy dokumentov"
 
 #: documents/models.py:1315
 msgid "remove these correspondent(s)"
-msgstr ""
+msgstr "odstrániť týchto korešpondentov"
 
 #: documents/models.py:1320
 msgid "remove all correspondents"
-msgstr ""
+msgstr "odstrániť všetkých korešpondentov"
 
 #: documents/models.py:1327
 msgid "remove these storage path(s)"
-msgstr ""
+msgstr "odstrániť tieto cesty k úložisku"
 
 #: documents/models.py:1332
 msgid "remove all storage paths"
-msgstr ""
+msgstr "odstrániť všetky cesty k úložisku"
 
 #: documents/models.py:1339
 msgid "remove these owner(s)"
-msgstr ""
+msgstr "odstrániť týchto vlastníkov"
 
 #: documents/models.py:1344
 msgid "remove all owners"
-msgstr ""
+msgstr "odstrániť všetkých vlastníkov"
 
 #: documents/models.py:1351
 msgid "remove view permissions for these users"
-msgstr ""
+msgstr "odstrániť povolenia na zobrazenie pre týchto používateľov"
 
 #: documents/models.py:1358
 msgid "remove view permissions for these groups"
-msgstr ""
+msgstr "odstrániť povolenia na zobrazenie pre tieto skupiny"
 
 #: documents/models.py:1365
 msgid "remove change permissions for these users"
-msgstr ""
+msgstr "odstrániť povolenia na úpravy pre týchto používateľov"
 
 #: documents/models.py:1372
 msgid "remove change permissions for these groups"
-msgstr ""
+msgstr "odstrániť povolenia na úpravy pre tieto skupiny"
 
 #: documents/models.py:1377
 msgid "remove all permissions"
-msgstr ""
+msgstr "odstrániť všetky povolenia"
 
 #: documents/models.py:1384
 msgid "remove these custom fields"
-msgstr ""
+msgstr "odstrániť tieto vlastné polia"
 
 #: documents/models.py:1389
 msgid "remove all custom fields"
-msgstr ""
+msgstr "odstrániť všetky vlastné polia"
 
 #: documents/models.py:1398
 msgid "email"
-msgstr ""
+msgstr "e-mail"
 
 #: documents/models.py:1407
 msgid "webhook"
-msgstr ""
+msgstr "webhook"
 
 #: documents/models.py:1411
 msgid "workflow action"
-msgstr ""
+msgstr "akcia pracovného postupu"
 
 #: documents/models.py:1412
 msgid "workflow actions"
-msgstr ""
+msgstr "akcie pracovného postupu"
 
 #: documents/models.py:1421 paperless_mail/models.py:145
 msgid "order"
@@ -1134,35 +1134,35 @@ msgstr "poradie"
 
 #: documents/models.py:1427
 msgid "triggers"
-msgstr ""
+msgstr "spúšťače"
 
 #: documents/models.py:1434
 msgid "actions"
-msgstr ""
+msgstr "akcie"
 
 #: documents/models.py:1437 paperless_mail/models.py:154
 msgid "enabled"
-msgstr ""
+msgstr "povolené"
 
 #: documents/models.py:1448
 msgid "workflow"
-msgstr ""
+msgstr "pracovný postup"
 
 #: documents/models.py:1452
 msgid "workflow trigger type"
-msgstr ""
+msgstr "typ spúšťača pracovného postupu"
 
 #: documents/models.py:1466
 msgid "date run"
-msgstr ""
+msgstr "dátum spustenia"
 
 #: documents/models.py:1472
 msgid "workflow run"
-msgstr ""
+msgstr "spustenie pracovného postupu"
 
 #: documents/models.py:1473
 msgid "workflow runs"
-msgstr ""
+msgstr "spustenia pracovných postupov"
 
 #: documents/serialisers.py:135
 #, python-format
@@ -1173,41 +1173,42 @@ msgstr "Neplatný regulárny výraz: %(error)s"
 msgid "Invalid color."
 msgstr "Neplatná farba."
 
-#: documents/serialisers.py:1646
+#: documents/serialisers.py:1645
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Typ súboru %(type)s nie je podporovaný"
 
-#: documents/serialisers.py:1740
+#: documents/serialisers.py:1739
 msgid "Invalid variable detected."
 msgstr "Zistená neplatná premenná."
 
 #: documents/templates/account/account_inactive.html:5
 msgid "Paperless-ngx account inactive"
-msgstr ""
+msgstr "Účet Paperless-ngx nie je aktívny"
 
 #: documents/templates/account/account_inactive.html:9
 msgid "Account inactive."
-msgstr ""
+msgstr "Účet nie je aktívny."
 
 #: documents/templates/account/account_inactive.html:14
 msgid "This account is inactive."
-msgstr ""
+msgstr "Tento účet nie je aktívny."
 
 #: documents/templates/account/account_inactive.html:16
 msgid "Return to login"
-msgstr ""
+msgstr "Vrátiť sa na prihlásenie"
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr ""
+msgstr "Pozdravujeme z %(site_name)s!"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
 msgid "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
-msgstr ""
+msgstr "Ďakujeme, že používate %(site_name)s!\n"
+"%(site_domain)s"
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
@@ -1220,13 +1221,13 @@ msgstr "Prihláste sa, prosím."
 #: documents/templates/account/login.html:12
 #, python-format
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
-msgstr ""
+msgstr "Ešte nemáte účet? <a href=\"%(signup_url)s\">Zaregistrujte sa</a>"
 
 #: documents/templates/account/login.html:25
 #: documents/templates/account/signup.html:22
 #: documents/templates/socialaccount/signup.html:13
 msgid "Username"
-msgstr "Užívateľské meno"
+msgstr "Meno používateľa"
 
 #: documents/templates/account/login.html:26
 #: documents/templates/account/signup.html:24
@@ -1240,81 +1241,81 @@ msgstr "Prihlásiť sa"
 
 #: documents/templates/account/login.html:40
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Zabudli ste heslo?"
 
 #: documents/templates/account/login.html:51
 #: documents/templates/account/signup.html:57
 msgid "or sign in via"
-msgstr ""
+msgstr "alebo sa prihláste pomocou"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "Žiadosť o obnovu hesla v Paperless-ngx"
 
 #: documents/templates/account/password_reset.html:9
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr ""
+msgstr "Zadajte svoju e-mailovú adresu nižšie a my vám pošleme pokyny na nastavenie nového."
 
 #: documents/templates/account/password_reset.html:12
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "Nastala chyba. Prosím, skús to znova."
 
 #: documents/templates/account/password_reset.html:21
 msgid "Send me instructions!"
-msgstr ""
+msgstr "Pošlite mi pokyny!"
 
 #: documents/templates/account/password_reset_done.html:5
 msgid "Paperless-ngx reset password sent"
-msgstr ""
+msgstr "Žiadosť o obnovu hesla do Paperless-ngx bola odoslaná"
 
 #: documents/templates/account/password_reset_done.html:9
 msgid "Check your inbox."
-msgstr ""
+msgstr "Skontrolujte si vašu poštu."
 
 #: documents/templates/account/password_reset_done.html:13
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr ""
+msgstr "Postup na nastavenie hesla sme vám zaslali e-mailom. Mali by ste ho dostať už o chvíľku!"
 
 #: documents/templates/account/password_reset_from_key.html:5
 msgid "Paperless-ngx reset password confirmation"
-msgstr ""
+msgstr "Potvrdenie obnovenia hesla do Paperless-ngx"
 
 #: documents/templates/account/password_reset_from_key.html:9
 msgid "Set a new password."
-msgstr ""
+msgstr "Nastaviť nové heslo."
 
 #: documents/templates/account/password_reset_from_key.html:15
 msgid "request a new password reset"
-msgstr ""
+msgstr "požiadať o obnovenie hesla"
 
 #: documents/templates/account/password_reset_from_key.html:17
 msgid "New Password"
-msgstr ""
+msgstr "Nové heslo"
 
 #: documents/templates/account/password_reset_from_key.html:18
 msgid "Confirm Password"
-msgstr ""
+msgstr "Potvrdenie hesla"
 
 #: documents/templates/account/password_reset_from_key.html:28
 msgid "Change my password"
-msgstr ""
+msgstr "Zmeniť moje heslo"
 
 #: documents/templates/account/password_reset_from_key_done.html:5
 msgid "Paperless-ngx reset password complete"
-msgstr ""
+msgstr "Obnovenie hesla do Paperless-ngx bolo dokončené"
 
 #: documents/templates/account/password_reset_from_key_done.html:9
 msgid "Password reset complete."
-msgstr ""
+msgstr "Obnovenie hesla bolo dokončené."
 
 #: documents/templates/account/password_reset_from_key_done.html:14
 #, python-format
 msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
-msgstr ""
+msgstr "Vaše nové heslo bolo nastavené. Teraz sa možete <a href=\"%(login_url)s\">prihlásiť</a>"
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr ""
+msgstr "Registrácia do Paperless-ngx"
 
 #: documents/templates/account/signup.html:11
 #, python-format
@@ -1618,145 +1619,149 @@ msgstr ""
 msgid "paperless application settings"
 msgstr ""
 
-#: paperless/settings.py:754
+#: paperless/settings.py:755
 msgid "English (US)"
 msgstr "Angličtina (US)"
 
-#: paperless/settings.py:755
+#: paperless/settings.py:756
 msgid "Arabic"
 msgstr "Arabčina"
 
-#: paperless/settings.py:756
+#: paperless/settings.py:757
 msgid "Afrikaans"
 msgstr ""
 
-#: paperless/settings.py:757
+#: paperless/settings.py:758
 msgid "Belarusian"
 msgstr "Bieloruština"
 
-#: paperless/settings.py:758
+#: paperless/settings.py:759
 msgid "Bulgarian"
 msgstr ""
 
-#: paperless/settings.py:759
+#: paperless/settings.py:760
 msgid "Catalan"
 msgstr "Catalan"
 
-#: paperless/settings.py:760
+#: paperless/settings.py:761
 msgid "Czech"
 msgstr "Čeština"
 
-#: paperless/settings.py:761
+#: paperless/settings.py:762
 msgid "Danish"
 msgstr "Dánčina"
 
-#: paperless/settings.py:762
+#: paperless/settings.py:763
 msgid "German"
 msgstr "Nemčina"
 
-#: paperless/settings.py:763
+#: paperless/settings.py:764
 msgid "Greek"
 msgstr ""
 
-#: paperless/settings.py:764
+#: paperless/settings.py:765
 msgid "English (GB)"
 msgstr "Angličtina (GB)"
 
-#: paperless/settings.py:765
+#: paperless/settings.py:766
 msgid "Spanish"
 msgstr "Španielčina"
 
-#: paperless/settings.py:766
+#: paperless/settings.py:767
+msgid "Persian"
+msgstr ""
+
+#: paperless/settings.py:768
 msgid "Finnish"
 msgstr "Finnish"
 
-#: paperless/settings.py:767
+#: paperless/settings.py:769
 msgid "French"
 msgstr "Francúzština"
 
-#: paperless/settings.py:768
+#: paperless/settings.py:770
 msgid "Hungarian"
 msgstr ""
 
-#: paperless/settings.py:769
+#: paperless/settings.py:771
 msgid "Italian"
 msgstr "Taliančina"
 
-#: paperless/settings.py:770
+#: paperless/settings.py:772
 msgid "Japanese"
 msgstr ""
 
-#: paperless/settings.py:771
+#: paperless/settings.py:773
 msgid "Korean"
 msgstr ""
 
-#: paperless/settings.py:772
+#: paperless/settings.py:774
 msgid "Luxembourgish"
 msgstr "Luxemburčina"
 
-#: paperless/settings.py:773
+#: paperless/settings.py:775
 msgid "Norwegian"
 msgstr ""
 
-#: paperless/settings.py:774
+#: paperless/settings.py:776
 msgid "Dutch"
 msgstr "Holandčina"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:777
 msgid "Polish"
 msgstr "Polština"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:778
 msgid "Portuguese (Brazil)"
 msgstr "Portugalčina (Brazília)"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:779
 msgid "Portuguese"
 msgstr "Portugalčina"
 
-#: paperless/settings.py:778
+#: paperless/settings.py:780
 msgid "Romanian"
 msgstr "Rumunčina"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:781
 msgid "Russian"
 msgstr "Ruština"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:782
 msgid "Slovak"
 msgstr "Slovenčina"
 
-#: paperless/settings.py:781
+#: paperless/settings.py:783
 msgid "Slovenian"
 msgstr "Slovinčina"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:784
 msgid "Serbian"
 msgstr "Srbčina"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:785
 msgid "Swedish"
 msgstr "Švédčina"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:786
 msgid "Turkish"
 msgstr "Turečtina"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:787
 msgid "Ukrainian"
 msgstr ""
 
-#: paperless/settings.py:786
+#: paperless/settings.py:788
 msgid "Chinese Simplified"
 msgstr "Čínština (zjednodušená)"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:789
 msgid "Chinese Traditional"
 msgstr ""
 
 #: paperless/urls.py:374
 msgid "Paperless-ngx administration"
-msgstr "Správa Paperless-ngx"
+msgstr "Administrácia Paperless-ngx"
 
 #: paperless_mail/admin.py:39
 msgid "Authentication"

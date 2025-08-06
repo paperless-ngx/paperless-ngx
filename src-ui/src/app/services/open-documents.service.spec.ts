@@ -176,22 +176,16 @@ describe('OpenDocumentsService', () => {
       OPEN_DOCUMENT_SERVICE.DOCUMENTS,
       JSON.stringify(documents)
     )
-    const testOpenDocumentsService = new OpenDocumentsService(
-      null,
-      modalService
-    )
-    expect(testOpenDocumentsService.getOpenDocuments()).toHaveLength(
+    openDocumentsService.load()
+    expect(openDocumentsService.getOpenDocuments()).toHaveLength(
       documents.length
     )
   })
 
   it('should remove open documents from localStorage on error', () => {
     sessionStorage.setItem(OPEN_DOCUMENT_SERVICE.DOCUMENTS, 'hello world')
-    const testOpenDocumentsService = new OpenDocumentsService(
-      null,
-      modalService
-    )
-    expect(testOpenDocumentsService.getOpenDocuments()).toHaveLength(0)
+    openDocumentsService.load()
+    expect(openDocumentsService.getOpenDocuments()).toHaveLength(0)
     expect(sessionStorage.getItem(OPEN_DOCUMENT_SERVICE.DOCUMENTS)).toBeNull()
   })
 
@@ -246,5 +240,16 @@ describe('OpenDocumentsService', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
     openDocumentsService.openDocument(doc)
     expect(consoleSpy).toHaveBeenCalled()
+  })
+
+  it('should set dirty status with changed fields', () => {
+    subscriptions.push(
+      openDocumentsService.openDocument(documents[0]).subscribe()
+    )
+    const changedFields = { title: 'foo', content: 'bar' }
+    openDocumentsService.setDirty(documents[0], true, changedFields)
+    expect(
+      openDocumentsService.getOpenDocument(documents[0].id).__changedFields
+    ).toEqual(['title', 'content'])
   })
 })

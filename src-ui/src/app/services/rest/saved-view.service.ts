@@ -1,25 +1,30 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
-import { combineLatest, Observable } from 'rxjs'
-import { tap } from 'rxjs/operators'
+import { inject, Injectable } from '@angular/core'
+import { combineLatest, Observable, Subject } from 'rxjs'
+import { takeUntil, tap } from 'rxjs/operators'
 import { Results } from 'src/app/data/results'
 import { SavedView } from 'src/app/data/saved-view'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { SettingsService } from '../settings.service'
 import { AbstractPaperlessService } from './abstract-paperless-service'
+import { DocumentService } from './document.service'
 
 @Injectable({
   providedIn: 'root',
 })
 export class SavedViewService extends AbstractPaperlessService<SavedView> {
+  protected http: HttpClient
+  private settingsService = inject(SettingsService)
+  private documentService = inject(DocumentService)
+
   public loading: boolean = true
   private savedViews: SavedView[] = []
+  private savedViewDocumentCounts: Map<number, number> = new Map()
+  private unsubscribeNotifier: Subject<void> = new Subject<void>()
 
-  constructor(
-    protected http: HttpClient,
-    private settingsService: SettingsService
-  ) {
-    super(http, 'saved_views')
+  constructor() {
+    super()
+    this.resourceName = 'saved_views'
   }
 
   public list(
@@ -45,8 +50,16 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
     )
   }
 
-  public reload() {
-    this.listAll().subscribe()
+  public reload(callback: any = null) {
+    this.listAll()
+      .pipe(
+        tap((r) => {
+          if (callback) {
+            callback(r)
+          }
+        })
+      )
+      .subscribe()
   }
 
   get allViews() {
@@ -108,5 +121,31 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
 
   delete(o: SavedView) {
     return super.delete(o).pipe(tap(() => this.reload()))
+  }
+
+  public maybeRefreshDocumentCounts(views: SavedView[] = this.sidebarViews) {
+    if (!this.settingsService.get(SETTINGS_KEYS.SIDEBAR_VIEWS_SHOW_COUNT)) {
+      return
+    }
+    this.unsubscribeNotifier.next() // clear previous subscriptions
+    views.forEach((view) => {
+      this.documentService
+        .listFiltered(
+          1,
+          1,
+          view.sort_field,
+          view.sort_reverse,
+          view.filter_rules,
+          { fields: 'id', truncate_content: true }
+        )
+        .pipe(takeUntil(this.unsubscribeNotifier))
+        .subscribe((results: Results<Document>) => {
+          this.savedViewDocumentCounts.set(view.id, results.count)
+        })
+    })
+  }
+
+  public getDocumentCount(view: SavedView): number {
+    return this.savedViewDocumentCounts.get(view.id)
   }
 }

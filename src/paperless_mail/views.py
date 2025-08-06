@@ -35,6 +35,7 @@ from paperless_mail.tasks import process_mail_accounts
 @extend_schema_view(
     test=extend_schema(
         operation_id="mail_account_test",
+        request=MailAccountSerializer,
         description="Test a mail account",
         responses={
             200: inline_serializer(
@@ -42,6 +43,17 @@ from paperless_mail.tasks import process_mail_accounts
                 fields={"success": serializers.BooleanField()},
             ),
             400: OpenApiTypes.STR,
+        },
+    ),
+    process=extend_schema(
+        operation_id="mail_account_process",
+        description="Manually process the selected mail account for new messages.",
+        responses={
+            200: inline_serializer(
+                name="MailAccountProcessResponse",
+                fields={"result": serializers.CharField(default="OK")},
+            ),
+            404: None,
         },
     ),
 )
