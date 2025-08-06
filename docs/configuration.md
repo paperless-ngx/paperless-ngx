@@ -159,6 +159,23 @@ Available options are `postgresql` and `mariadb`.
 
     Defaults to unset, which uses Django’s built-in defaults.
 
+#### [`PAPERLESS_DB_POOLSIZE=<int>`](#PAPERLESS_DB_POOLSIZE) {#PAPERLESS_DB_POOLSIZE}
+
+: Defines the maximum number of database connections to keep in the pool.
+
+    Only applies to PostgreSQL. This setting is ignored for other database engines.
+
+    The value must be greater than or equal to 1 to be used.
+    Defaults to unset, which disables connection pooling.
+
+    !!! note
+
+    A small pool is typically sufficient — for example, a size of 4.
+    Make sure your PostgreSQL server's max_connections setting is large enough to handle:
+    ```(Paperless workers + Celery workers) × pool size + safety margin```
+    For example, with 4 Paperless workers and 2 Celery workers, and a pool size of 4:
+    (4 + 2) × 4 + 10 = 34 connections required.
+
 #### [`PAPERLESS_DB_READ_CACHE_ENABLED=<bool>`](#PAPERLESS_DB_READ_CACHE_ENABLED) {#PAPERLESS_DB_READ_CACHE_ENABLED}
 
 : Caches the database read query results into Redis. This can significantly improve application response times by caching database queries, at the cost of slightly increased memory usage.

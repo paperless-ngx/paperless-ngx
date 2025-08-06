@@ -704,6 +704,9 @@ def _parse_db_settings() -> dict:
         # Leave room for future extensibility
         if os.getenv("PAPERLESS_DBENGINE") == "mariadb":
             engine = "django.db.backends.mysql"
+            # Contrary to Postgres, Django does not natively support connection pooling for MariaDB.
+            # However, since MariaDB uses threads instead of forks, establishing connections is significantly faster
+            # compared to PostgreSQL, so the lack of pooling is not an issue
             options = {
                 "read_default_file": "/etc/mysql/my.cnf",
                 "charset": "utf8mb4",
@@ -723,6 +726,15 @@ def _parse_db_settings() -> dict:
                 "sslcert": os.getenv("PAPERLESS_DBSSLCERT", None),
                 "sslkey": os.getenv("PAPERLESS_DBSSLKEY", None),
             }
+            if int(os.getenv("PAPERLESS_DB_POOLSIZE", 0)) > 0:
+                options.update(
+                    {
+                        "pool": {
+                            "min_size": 1,
+                            "max_size": int(os.getenv("PAPERLESS_DB_POOLSIZE")),
+                        },
+                    },
+                )
 
         databases["default"]["ENGINE"] = engine
         databases["default"]["OPTIONS"].update(options)

@@ -53,6 +53,7 @@ dependencies = [
   "ocrmypdf~=16.10.0",
   "pathvalidate~=3.3.1",
   "pdf2image~=1.17.0",
+  "psycopg-pool",
   "python-dateutil~=2.9.0",
   "python-dotenv~=1.1.0",
   "python-gnupg~=0.5.4",
@@ -63,7 +64,7 @@ dependencies = [
   "redis[hiredis]~=5.2.1",
   "scikit-learn~=1.7.0",
   "setproctitle~=1.3.4",
-  "tika-client~=0.9.0",
+  "tika-client~=0.10.0",
   "tqdm~=4.67.1",
   "watchdog~=6.0",
   "whitenoise~=6.9",
@@ -75,9 +76,10 @@ optional-dependencies.mariadb = [
   "mysqlclient~=2.2.7",
 ]
 optional-dependencies.postgres = [
-  "psycopg[c]==3.2.9",
+  "psycopg[c,pool]==3.2.9",
   # Direct dependency for proper resolution of the pre-built wheels
   "psycopg-c==3.2.9",
+  "psycopg-pool==3.2.6",
 ]
 optional-dependencies.webserver = [
   "granian[uvloop]~=2.4.1",
@@ -203,13 +205,7 @@ lint.per-file-ignores."docker/wait-for-redis.py" = [
   "INP001",
   "T201",
 ]
-lint.per-file-ignores."src/documents/file_handling.py" = [
-  "PTH",
-] # TODO Enable & remove
 lint.per-file-ignores."src/documents/management/commands/document_consumer.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/documents/management/commands/document_exporter.py" = [
   "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/documents/migrations/1012_fix_archive_files.py" = [
@@ -219,9 +215,6 @@ lint.per-file-ignores."src/documents/models.py" = [
   "SIM115",
 ]
 lint.per-file-ignores."src/documents/parsers.py" = [
-  "PTH",
-] # TODO Enable & remove
-lint.per-file-ignores."src/documents/signals/handlers.py" = [
   "PTH",
 ] # TODO Enable & remove
 lint.per-file-ignores."src/paperless_tesseract/tests/test_parser.py" = [
