@@ -236,10 +236,7 @@ class Command(CryptMixin, BaseCommand):
                 # now make an archive in the original target, with all files stored
                 if self.zip_export and temp_dir is not None:
                     shutil.make_archive(
-                        os.path.join(
-                            self.original_target,
-                            options["zip_name"],
-                        ),
+                        self.original_target / options["zip_name"],
                         format="zip",
                         root_dir=temp_dir.name,
                     )
@@ -342,7 +339,7 @@ class Command(CryptMixin, BaseCommand):
                 )
 
             if self.split_manifest:
-                manifest_name = Path(base_name + "-manifest.json")
+                manifest_name = base_name.with_name(f"{base_name.stem}-manifest.json")
                 if self.use_folder_prefix:
                     manifest_name = Path("json") / manifest_name
                 manifest_name = (self.target / manifest_name).resolve()
@@ -416,7 +413,7 @@ class Command(CryptMixin, BaseCommand):
                     else:
                         item.unlink()
 
-    def generate_base_name(self, document: Document) -> str:
+    def generate_base_name(self, document: Document) -> Path:
         """
         Generates a unique name for the document, one which hasn't already been exported (or will be)
         """
@@ -436,12 +433,12 @@ class Command(CryptMixin, BaseCommand):
                 break
             else:
                 filename_counter += 1
-        return base_name
+        return Path(base_name)
 
     def generate_document_targets(
         self,
         document: Document,
-        base_name: str,
+        base_name: Path,
         document_dict: dict,
     ) -> tuple[Path, Path | None, Path | None]:
         """
@@ -449,25 +446,25 @@ class Command(CryptMixin, BaseCommand):
         """
         original_name = base_name
         if self.use_folder_prefix:
-            original_name = os.path.join("originals", original_name)
-        original_target = (self.target / Path(original_name)).resolve()
-        document_dict[EXPORTER_FILE_NAME] = original_name
+            original_name = Path("originals") / original_name
+        original_target = (self.target / original_name).resolve()
+        document_dict[EXPORTER_FILE_NAME] = str(original_name)
 
         if not self.no_thumbnail:
-            thumbnail_name = base_name + "-thumbnail.webp"
+            thumbnail_name = base_name.parent / (base_name.stem + "-thumbnail.webp")
             if self.use_folder_prefix:
-                thumbnail_name = os.path.join("thumbnails", thumbnail_name)
-            thumbnail_target = (self.target / Path(thumbnail_name)).resolve()
-            document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
+                thumbnail_name = Path("thumbnails") / thumbnail_name
+            thumbnail_target = (self.target / thumbnail_name).resolve()
+            document_dict[EXPORTER_THUMBNAIL_NAME] = str(thumbnail_name)
         else:
             thumbnail_target = None
 
         if not self.no_archive and document.has_archive_version:
-            archive_name = base_name + "-archive.pdf"
+            archive_name = base_name.parent / (base_name.stem + "-archive.pdf")
             if self.use_folder_prefix:
-                archive_name = os.path.join("archive", archive_name)
-            archive_target = (self.target / Path(archive_name)).resolve()
-            document_dict[EXPORTER_ARCHIVE_NAME] = archive_name
+                archive_name = Path("archive") / archive_name
+            archive_target = (self.target / archive_name).resolve()
+            document_dict[EXPORTER_ARCHIVE_NAME] = str(archive_name)
         else:
             archive_target = None
 
@@ -572,7 +569,7 @@ class Command(CryptMixin, BaseCommand):
         perform_copy = False
 
         if target.exists():
-            source_stat = os.stat(source)
+            source_stat = source.stat()
             target_stat = target.stat()
             if self.compare_checksums and source_checksum:
                 target_checksum = hashlib.md5(target.read_bytes()).hexdigest()
