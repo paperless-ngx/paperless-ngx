@@ -1774,23 +1774,43 @@ class GlobalSearchView(PassUserMixin):
                 Document,
             )
             # First search by title
-            docs = all_docs.filter(title__icontains=query)
-            if not db_only and len(docs) < OBJECT_LIMIT:
-                # If we don't have enough results, search by content
-                from documents import index
+            docs = all_docs.filter(Q(title__fticontains=query))
 
-                with index.open_index_searcher() as s:
-                    fts_query = index.DelayedFullTextQuery(
-                        s,
-                        request.query_params,
-                        OBJECT_LIMIT,
-                        filter_queryset=all_docs,
+            # If not enough results, search also by content
+            if len(docs) < OBJECT_LIMIT:
+                if db_only:
+                    # Complete by a full-text content search in the DB
+                    doc_ids = docs.values_list("id", flat=True)
+                    other_doc_ids = (
+                        all_docs.filter(content__fticontains=query)
+                        .exclude(id__in=doc_ids)[: OBJECT_LIMIT - len(doc_ids)]
+                        .values_list("id", flat=True)
                     )
-                    results = fts_query[0:1]
-                    docs = docs | Document.objects.filter(
-                        id__in=[r["id"] for r in results],
+                    all_ids = list(doc_ids) + list(other_doc_ids)
+                    # Documents found by title are ranked above
+                    docs = all_docs.filter(id__in=all_ids).order_by(
+                        Case(
+                            *[When(id=pk, then=pos) for pos, pk in enumerate(all_ids)],
+                            output_field=IntegerField(),
+                        ),
                     )
-            docs = docs[:OBJECT_LIMIT]
+                else:
+                    # Complete by a content search in the Whoosh index
+                    from documents import index
+
+                    with index.open_index_searcher() as s:
+                        fts_query = index.DelayedFullTextQuery(
+                            s,
+                            request.query_params,
+                            OBJECT_LIMIT,
+                            filter_queryset=all_docs,
+                        )
+                        results = fts_query[0:1]
+                        docs = docs | Document.objects.filter(
+                            id__in=[r["id"] for r in results],
+                        )
+            else:
+                docs = docs[:OBJECT_LIMIT]
         saved_views = (
             SavedView.objects.filter(owner=request.user, name__icontains=query)
             if request.user.has_perm("documents.view_savedview")

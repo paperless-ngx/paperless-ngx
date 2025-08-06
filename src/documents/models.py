@@ -10,20 +10,119 @@ from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models.lookups import IContains
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from multiselectfield import MultiSelectField
+
+from documents.utils import FULLTEXT_MINIMAL_TOKEN_LENGTH
+from documents.utils import escape_like_pattern
+from documents.utils import fulltext_compatible
+from documents.utils import split_fulltext_tokens
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
 
 from django.db.models import Case
+from django.db.models import Lookup
+from django.db.models.fields import CharField
+from django.db.models.fields import TextField
 from django.db.models.functions import Cast
 from django.db.models.functions import Substr
 from django_softdelete.models import SoftDeleteModel
 
 from documents.data_models import DocumentSource
 from documents.parsers import get_default_file_extension
+
+
+@CharField.register_lookup
+@TextField.register_lookup
+class FulltextContains(Lookup):
+    """
+    Check if a field contains (or almost contains) the specified text with a high probability.
+    Actual behavior may vary depending on the database backend.
+    Some false positive might be returned: performance is prioritized over accuracy.
+
+    This lookup needs a full-text index for each field it applies on.
+    See migration n°1069 file as an example.
+    """
+
+    lookup_name = "fticontains"
+
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)  # "table.column"
+        rhs, rhs_params = self.process_rhs(compiler, connection)  # search string
+        like_search_exp = f"%{escape_like_pattern(rhs_params[0])}%"
+        tokens = split_fulltext_tokens(rhs_params[0])
+        if not tokens:
+            return "FALSE", []
+
+        if connection.vendor == "postgresql" and fulltext_compatible(rhs_params[0]):
+            # PostgreSQL phraseto_tsquery can directly search for the exact lemme sequence.
+            # Just make sure to fail silently when no token can be used for the full-text search (empty query).
+            sql = rf"to_tsvector('simple', {lhs}) @@ CASE WHEN length(regexp_replace(phraseto_tsquery('simple', %s)::text, '\s', '', 'g')) > 0 THEN (phraseto_tsquery('simple', %s)::text || ':*')::tsquery ELSE NULL END"
+            return sql, [rhs_params[0], rhs_params[0]]
+
+        elif connection.vendor in {"mysql", "mariadb"} and fulltext_compatible(
+            rhs_params[0],
+        ):
+            mysql_ft_tokens = [
+                t for t in tokens if len(t) >= FULLTEXT_MINIMAL_TOKEN_LENGTH
+            ]
+            if mysql_ft_tokens:
+                # MariaDB has limitations: it can use fulltext search only for at least 3-char long tokens.
+                # Do a fulltext prefiltering to use fulltext index,
+                # then apply the actual search query (LIKE "%A%") to refine the results.
+                ft_search_exp = "+" + " +".join(mysql_ft_tokens) + "*"
+                sql = f"MATCH({lhs}) AGAINST (%s IN BOOLEAN MODE) AND {lhs} LIKE %s"
+                return sql, [ft_search_exp, like_search_exp]
+            else:
+                # If there is no long enough token (3+ char long),
+                # MariaDB can still look at the fulltext index for prefixes.
+                # So we check prefixes for all tokens, e.g. "cv*", 'mr*", "d*".
+                # Limitation: full words less than 3 chars won't be found.
+                # Example: ["cv", 'mr", "d"]. will match "CV Mr Doe", not "CV Mr D".
+                # even if they're less than 3-char long (e.g., "av").
+                # Compared to a simple "LIKE %A%", it may return less results, but it avoids a full scan.
+                prefilter_subclauses = []
+                params = []
+                for token in tokens:
+                    prefilter_subclauses.append(
+                        f"MATCH({lhs}) AGAINST (%s IN BOOLEAN MODE)",
+                    )
+                    params.append(f"{token}*")
+
+                # We add a "LIKE A%" clause with the first token to help adding some results
+                # Example: ["cv", 'mr", "d"] -> "LIKE cv%" will match "CV Mr D".
+                prefilter_subclauses.append(f"{lhs} LIKE %s")
+                params.append(f"{tokens[0]}%")
+
+                # Still append the full query with "LIKE %A%" to refine results.
+                sql = f"({' OR '.join(prefilter_subclauses)}) AND {lhs} LIKE %s"
+                params.append(like_search_exp)
+
+                return sql, params
+
+        elif (
+            connection.vendor == "sqlite"
+            and tokens
+            and fulltext_compatible(rhs_params[0])
+        ):
+            # SQLite fulltext works for any token size, similar to PostgreSQL
+            ft_search_exp = "+".join(tokens) + "*"
+            # Get FTS virtual table name, usually the main table name with a "_fts" suffix
+            # Eg: for 'documents_document', the FTS table should be ''documents_document_fts'
+            main_table = self.lhs.output_field.model._meta.db_table
+            fts_table = f"{main_table}_fts"
+            column = self.lhs.target.column
+
+            subquery = f"SELECT rowid FROM {compiler.quote_name_unless_alias(fts_table)} WHERE {column} MATCH %s"
+            sql = f"{compiler.quote_name_unless_alias(main_table)}.id IN ({subquery})"
+            return sql, [ft_search_exp]
+        else:
+            # Fallback to icontains
+            fallback_lookup = IContains(self.lhs, self.rhs)
+            return fallback_lookup.as_sql(compiler, connection)
 
 
 class ModelWithOwner(models.Model):
