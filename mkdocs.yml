@@ -47,6 +47,7 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.inlinehilite
   - pymdownx.snippets
+  - pymdownx.tilde
   - footnotes
   - pymdownx.superfences:
       custom_fences:

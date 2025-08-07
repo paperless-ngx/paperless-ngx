@@ -5423,9 +5423,6 @@ This release contains new database migrations.
     Paperless will continue to work with WSGI, but you will not get any
     status notifications.
 
-    Apache `mod_wsgi` users, see
-    [this note](faq.md#how-do-i-get-websocket-support-with-apache-mod_wsgi).
-
 -   Paperless now offers suggestions for tags, correspondents and types
     on the document detail page.
 
@@ -6228,11 +6225,12 @@ primarily.
         who are doing active development on Paperless using the Docker
         environment:
         [#376](https://github.com/the-paperless-project/paperless/pull/376).
--   You now also have the ability to customise the interface to your
+-   ~~You now also have the ability to customise the interface to your
     heart's content by creating a file called `overrides.css` and/or
     `overrides.js` in the root of your media directory. Thanks to [Mark
     McFate](https://github.com/SummittDweller) for this idea:
-    [#371](https://github.com/the-paperless-project/paperless/issues/371)
+    [#371](https://github.com/the-paperless-project/paperless/issues/371)~~
+    (Not supported by Paperless-ngx)
 
 ### 2.0.0
 
