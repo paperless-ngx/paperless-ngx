@@ -3954,5 +3954,5 @@ resolution-markers = [
     "python_full_version == '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux'",
 ]
 wheels = [
-    { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_x86_64.whl", hash = "sha256:12ab08ffed947504ef01c103576c738725f3c1044ddc5b2b1fa524e664d94117" },
+    { url = "https://github.com/paperless-ngx/builder/releases/download/zxing-2.3.0/zxing_cpp-2.3.0-cp312-cp312-linux_x86_64.whl", hash = "sha256:15c6b1b6975a2a7d3dc679a05f6aed435753e39a105f37bed11098d00e0b5e79" },
 ]
