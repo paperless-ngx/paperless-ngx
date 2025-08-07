@@ -38,6 +38,9 @@
                                                     @case (ConfigOptionType.Password) { <pngx-input-password [formControlName]="option.key" [error]="errors[option.key]"></pngx-input-password> }
                                                 }
                                             </div>
+                                            @if (option.note) {
+                                                <div class="form-text fst-italic">{{option.note}}</div>
+                                            }
                                         </div>
                                     </div>
                                 </div>

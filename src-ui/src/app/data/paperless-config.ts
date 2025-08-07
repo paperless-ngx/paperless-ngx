@@ -71,6 +71,7 @@ export interface ConfigOption {
   choices?: Array<{ id: string; name: string }>
   config_key?: string
   category: string
+  note?: string
 }
 
 function mapToItems(enumObj: Object): Array<{ id: string; name: string }> {
@@ -276,6 +277,7 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     type: ConfigOptionType.Boolean,
     config_key: 'PAPERLESS_AI_ENABLED',
     category: ConfigCategory.AI,
+    note: $localize`Consider privacy implications when enabling AI features, especially if using a remote model.`,
   },
   {
     key: 'llm_embedding_backend',
