@@ -1,0 +1,34 @@
+Sample textual document content.
+Include as many characters as possible, to check the classifier's vectorization.
+
+Hey 00, this is "a" test0707 content.
+This is an example document — created on 2025-06-25.
+
+Digits: 0123456789
+Punctuation: . , ; : ! ? ' " ( ) [ ] { } — – …
+English text: The quick brown fox jumps over the lazy dog.
+English stop words: We’ve been doing it before.
+Accented Latin (diacritics): àâäæçéèêëîïôœùûüÿñ
+Arabic: لقد قام المترجم بعمل جيد
+Greek: Αλφα, Βήτα, Γάμμα, Δέλτα, Ωμέγα
+Cyrillic: Привет, как дела? Добро пожаловать!
+Chinese (Simplified): 你好，世界！今天的天气很好。
+Chinese (Traditional): 歡迎來到世界，今天天氣很好。
+Japanese (Kanji, Hiragana, Katakana): 東京へ行きます。カタカナ、ひらがな、漢字。
+Korean (Hangul): 안녕하세요. 오늘 날씨 어때요?
+Arabic: مرحبًا، كيف حالك؟
+Hebrew: שלום, מה שלומך?
+Emoji: 😀 🐍 📘 ✅ ©️ 🇺🇳
+Symbols: © ® ™ § ¶ † ‡ ∞ µ ∑ ∆ √
+Math: ∫₀^∞ x² dx = ∞, π ≈ 3.14159, ∇·E = ρ/ε₀
+Currency: 1$ € ¥ £ ₹
+Date formats: 25/06/2025, June 25, 2025, 2025年6月25日
+Quote in French: « Bonjour, ça va ? »
+Quote in German: „Guten Tag! Wie geht's?“
+Newline test:
+\r\n
+\r
+
+Tab\ttest\tspacing
+/ = +) ( []) ~ * #192 +33601010101 § ¤
+End of document.

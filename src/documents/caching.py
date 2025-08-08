@@ -1,16 +1,23 @@
 from __future__ import annotations
 
 import logging
+import pickle
 from binascii import hexlify
+from collections import OrderedDict
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
+from typing import Any
 from typing import Final
 
+from django.conf import settings
 from django.core.cache import cache
+from django.core.cache import caches
 
 from documents.models import Document
 
 if TYPE_CHECKING:
+    from django.core.cache.backends.base import BaseCache
+
     from documents.classifier import DocumentClassifier
 
 logger = logging.getLogger("paperless.caching")
@@ -38,6 +45,80 @@ CLASSIFIER_MODIFIED_KEY: Final[str] = "classifier_modified"
 CACHE_1_MINUTE: Final[int] = 60
 CACHE_5_MINUTES: Final[int] = 5 * CACHE_1_MINUTE
 CACHE_50_MINUTES: Final[int] = 50 * CACHE_1_MINUTE
+
+read_cache = caches["read-cache"]
+
+
+class LRUCache:
+    def __init__(self, capacity: int = 128):
+        self._data = OrderedDict()
+        self.capacity = capacity
+
+    def get(self, key, default=None) -> Any | None:
+        if key in self._data:
+            self._data.move_to_end(key)
+            return self._data[key]
+        return default
+
+    def set(self, key, value) -> None:
+        self._data[key] = value
+        self._data.move_to_end(key)
+        while len(self._data) > self.capacity:
+            self._data.popitem(last=False)
+
+
+class StoredLRUCache(LRUCache):
+    """
+    LRU cache that can persist its entire contents as a single entry in a backend cache.
+
+    Useful for sharing a cache across multiple workers or processes.
+
+    Workflow:
+        1. Load the cache state from the backend using `load()`.
+        2. Use `get()` and `set()` locally as usual.
+        3. Persist changes back to the backend using `save()`.
+    """
+
+    def __init__(
+        self,
+        backend_key: str,
+        capacity: int = 128,
+        backend: BaseCache = read_cache,
+        backend_ttl=settings.CACHALOT_TIMEOUT,
+    ):
+        if backend_key is None:
+            raise ValueError("backend_key is mandatory")
+        super().__init__(capacity)
+        self._backend_key = backend_key
+        self._backend = backend
+        self.backend_ttl = backend_ttl
+
+    def load(self) -> None:
+        """
+        Load the whole cache content from backend storage.
+
+        If no valid cached data exists in the backend, the local cache is cleared.
+        """
+        serialized_data = self._backend.get(self._backend_key)
+        try:
+            self._data = (
+                pickle.loads(serialized_data) if serialized_data else OrderedDict()
+            )
+        except pickle.PickleError:
+            logger.warning(
+                "Cache exists in backend but could not be read (possibly invalid format)",
+            )
+
+    def save(self) -> None:
+        """Save the entire local cache to the backend as a serialized object.
+
+        The backend entry will expire after the configured TTL.
+        """
+        self._backend.set(
+            self._backend_key,
+            pickle.dumps(self._data),
+            self.backend_ttl,
+        )
 
 
 def get_suggestion_cache_key(document_id: int) -> str:
