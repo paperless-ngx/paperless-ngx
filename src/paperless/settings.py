@@ -1460,10 +1460,10 @@ OUTLOOK_OAUTH_ENABLED = bool(
 ################################################################################
 AI_ENABLED = __get_boolean("PAPERLESS_AI_ENABLED", "NO")
 LLM_EMBEDDING_BACKEND = os.getenv(
-    "PAPERLESS_LLM_EMBEDDING_BACKEND",
+    "PAPERLESS_AI_LLM_EMBEDDING_BACKEND",
 )  # "huggingface" or "openai"
-LLM_EMBEDDING_MODEL = os.getenv("PAPERLESS_LLM_EMBEDDING_MODEL")
-LLM_BACKEND = os.getenv("PAPERLESS_LLM_BACKEND")  # "ollama" or "openai"
-LLM_MODEL = os.getenv("PAPERLESS_LLM_MODEL")
-LLM_API_KEY = os.getenv("PAPERLESS_LLM_API_KEY")
-LLM_URL = os.getenv("PAPERLESS_LLM_URL")
+LLM_EMBEDDING_MODEL = os.getenv("PAPERLESS_AI_LLM_EMBEDDING_MODEL")
+LLM_BACKEND = os.getenv("PAPERLESS_AI_LLM_BACKEND")  # "ollama" or "openai"
+LLM_MODEL = os.getenv("PAPERLESS_AI_LLM_MODEL")
+LLM_API_KEY = os.getenv("PAPERLESS_AI_LLM_API_KEY")
+LLM_ENDPOINT = os.getenv("PAPERLESS_AI_LLM_ENDPOINT")

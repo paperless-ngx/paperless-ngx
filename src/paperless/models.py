@@ -326,8 +326,8 @@ class ApplicationConfiguration(AbstractSingletonModel):
         max_length=128,
     )
 
-    llm_url = models.CharField(
-        verbose_name=_("Sets the LLM URL, optional"),
+    llm_endpoint = models.CharField(
+        verbose_name=_("Sets the LLM endpoint, optional"),
         null=True,
         blank=True,
         max_length=128,

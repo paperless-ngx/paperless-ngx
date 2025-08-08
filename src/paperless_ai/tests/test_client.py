@@ -31,7 +31,7 @@ def mock_openai_llm():
 def test_get_llm_ollama(mock_ai_config, mock_ollama_llm):
     mock_ai_config.llm_backend = "ollama"
     mock_ai_config.llm_model = "test_model"
-    mock_ai_config.llm_url = "http://test-url"
+    mock_ai_config.llm_endpoint = "http://test-url"
 
     client = AIClient()
 
@@ -67,7 +67,7 @@ def test_get_llm_unsupported_backend(mock_ai_config):
 def test_run_llm_query(mock_ai_config, mock_ollama_llm):
     mock_ai_config.llm_backend = "ollama"
     mock_ai_config.llm_model = "test_model"
-    mock_ai_config.llm_url = "http://test-url"
+    mock_ai_config.llm_endpoint = "http://test-url"
 
     mock_llm_instance = mock_ollama_llm.return_value
 
@@ -96,7 +96,7 @@ def test_run_llm_query(mock_ai_config, mock_ollama_llm):
 def test_run_chat(mock_ai_config, mock_ollama_llm):
     mock_ai_config.llm_backend = "ollama"
     mock_ai_config.llm_model = "test_model"
-    mock_ai_config.llm_url = "http://test-url"
+    mock_ai_config.llm_endpoint = "http://test-url"
 
     mock_llm_instance = mock_ollama_llm.return_value
     mock_llm_instance.chat.return_value = "test_chat_result"

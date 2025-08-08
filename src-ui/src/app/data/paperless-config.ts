@@ -284,14 +284,14 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     title: $localize`LLM Embedding Backend`,
     type: ConfigOptionType.Select,
     choices: mapToItems(LLMEmbeddingBackendConfig),
-    config_key: 'PAPERLESS_LLM_EMBEDDING_BACKEND',
+    config_key: 'PAPERLESS_AI_LLM_EMBEDDING_BACKEND',
     category: ConfigCategory.AI,
   },
   {
     key: 'llm_embedding_model',
     title: $localize`LLM Embedding Model`,
     type: ConfigOptionType.String,
-    config_key: 'PAPERLESS_LLM_EMBEDDING_MODEL',
+    config_key: 'PAPERLESS_AI_LLM_EMBEDDING_MODEL',
     category: ConfigCategory.AI,
   },
   {
@@ -299,28 +299,28 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     title: $localize`LLM Backend`,
     type: ConfigOptionType.Select,
     choices: mapToItems(LLMBackendConfig),
-    config_key: 'PAPERLESS_LLM_BACKEND',
+    config_key: 'PAPERLESS_AI_LLM_BACKEND',
     category: ConfigCategory.AI,
   },
   {
     key: 'llm_model',
     title: $localize`LLM Model`,
     type: ConfigOptionType.String,
-    config_key: 'PAPERLESS_LLM_MODEL',
+    config_key: 'PAPERLESS_AI_LLM_MODEL',
     category: ConfigCategory.AI,
   },
   {
     key: 'llm_api_key',
     title: $localize`LLM API Key`,
     type: ConfigOptionType.Password,
-    config_key: 'PAPERLESS_LLM_API_KEY',
+    config_key: 'PAPERLESS_AI_LLM_API_KEY',
     category: ConfigCategory.AI,
   },
   {
-    key: 'llm_url',
-    title: $localize`LLM URL`,
+    key: 'llm_endpoint',
+    title: $localize`LLM Endpoint`,
     type: ConfigOptionType.String,
-    config_key: 'PAPERLESS_LLM_URL',
+    config_key: 'PAPERLESS_AI_LLM_ENDPOINT',
     category: ConfigCategory.AI,
   },
 ]
@@ -358,5 +358,5 @@ export interface PaperlessConfig extends ObjectWithId {
   llm_backend: string
   llm_model: string
   llm_api_key: string
-  llm_url: string
+  llm_endpoint: string
 }

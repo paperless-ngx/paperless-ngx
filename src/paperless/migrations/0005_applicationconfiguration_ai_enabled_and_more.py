@@ -73,12 +73,12 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="applicationconfiguration",
-            name="llm_url",
+            name="llm_endpoint",
             field=models.CharField(
                 blank=True,
                 max_length=128,
                 null=True,
-                verbose_name="Sets the LLM URL, optional",
+                verbose_name="Sets the LLM endpoint, optional",
             ),
         ),
     ]

@@ -71,7 +71,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 "llm_backend": None,
                 "llm_model": None,
                 "llm_api_key": None,
-                "llm_url": None,
+                "llm_endpoint": None,
             },
         )
 

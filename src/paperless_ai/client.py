@@ -6,7 +6,7 @@ from llama_index.llms.ollama import Ollama
 from llama_index.llms.openai import OpenAI
 
 from paperless.config import AIConfig
-from paperless_ai.tools import DocumentClassifierSchema
+from paperless_ai.base_model import DocumentClassifierSchema
 
 logger = logging.getLogger("paperless_ai.client")
 
@@ -24,7 +24,7 @@ class AIClient:
         if self.settings.llm_backend == "ollama":
             return Ollama(
                 model=self.settings.llm_model or "llama3",
-                base_url=self.settings.llm_url or "http://localhost:11434",
+                base_url=self.settings.llm_endpoint or "http://localhost:11434",
                 request_timeout=120,
             )
         elif self.settings.llm_backend == "openai":

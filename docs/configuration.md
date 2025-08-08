@@ -1779,20 +1779,20 @@ password. All of these options come from their similarly-named [Django settings]
 
 ## AI {#ai}
 
-#### [`PAPERLESS_ENABLE_AI=<bool>`](#PAPERLESS_ENABLE_AI) {#PAPERLESS_ENABLE_AI}
+#### [`PAPERLESS_AI_ENABLED=<bool>`](#PAPERLESS_AI_ENABLED) {#PAPERLESS_AI_ENABLED}
 
 : Enables the AI features in Paperless. This includes the AI-based
 suggestions. This setting is required to be set to true in order to use the AI features.
 
     Defaults to false.
 
-#### [`PAPERLESS_LLM_EMBEDDING_BACKEND=<str>`](#PAPERLESS_LLM_EMBEDDING_BACKEND) {#PAPERLESS_LLM_EMBEDDING_BACKEND}
+#### [`PAPERLESS_AI_LLM_EMBEDDING_BACKEND=<str>`](#PAPERLESS_AI_LLM_EMBEDDING_BACKEND) {#PAPERLESS_AI_LLM_EMBEDDING_BACKEND}
 
 : The embedding backend to use for RAG. This can be either "openai" or "huggingface".
 
     Defaults to None.
 
-#### [`PAPERLESS_LLM_EMBEDDING_MODEL=<str>`](#PAPERLESS_LLM_EMBEDDING_MODEL) {#PAPERLESS_LLM_EMBEDDING_MODEL}
+#### [`PAPERLESS_AI_LLM_EMBEDDING_MODEL=<str>`](#PAPERLESS_AI_LLM_EMBEDDING_MODEL) {#PAPERLESS_AI_LLM_EMBEDDING_MODEL}
 
 : The model to use for the embedding backend for RAG. This can be set to any of the embedding models supported by the current embedding backend. If not supplied, defaults to "text-embedding-3-small" for OpenAI and "sentence-transformers/all-MiniLM-L6-v2" for Huggingface.
 
@@ -1815,26 +1815,26 @@ using the OpenAI API. This setting is required to be set to use the AI features.
 
         Refer to the OpenAI terms of service, and use at your own risk.
 
-#### [`PAPERLESS_LLM_MODEL=<str>`](#PAPERLESS_LLM_MODEL) {#PAPERLESS_LLM_MODEL}
+#### [`PAPERLESS_AI_LLM_MODEL=<str>`](#PAPERLESS_AI_LLM_MODEL) {#PAPERLESS_AI_LLM_MODEL}
 
 : The model to use for the AI backend, i.e. "gpt-3.5-turbo", "gpt-4" or any of the models supported by the
 current backend. If not supplied, defaults to "gpt-3.5-turbo" for OpenAI and "llama3" for Ollama.
 
     Defaults to None.
 
-#### [`PAPERLESS_LLM_API_KEY=<str>`](#PAPERLESS_LLM_API_KEY) {#PAPERLESS_LLM_API_KEY}
+#### [`PAPERLESS_AI_LLM_API_KEY=<str>`](#PAPERLESS_AI_LLM_API_KEY) {#PAPERLESS_AI_LLM_API_KEY}
 
 : The API key to use for the AI backend. This is required for the OpenAI backend only.
 
     Defaults to None.
 
-#### [`PAPERLESS_LLM_URL=<str>`](#PAPERLESS_LLM_URL) {#PAPERLESS_LLM_URL}
+#### [`PAPERLESS_AI_LLM_ENDPOINT=<str>`](#PAPERLESS_AI_LLM_ENDPOINT) {#PAPERLESS_AI_LLM_ENDPOINT}
 
-: The URL to use for the AI backend. This is required for the Ollama backend only.
+: The endpoint / url to use for the AI backend. This is required for the Ollama backend only.
 
     Defaults to None.
 
-#### [`PAPERLESS_LLM_INDEX_TASK_CRON=<cron expression>`](#PAPERLESS_LLM_INDEX_TASK_CRON) {#PAPERLESS_LLM_INDEX_TASK_CRON}
+#### [`PAPERLESS_AI_LLM_INDEX_TASK_CRON=<cron expression>`](#PAPERLESS_AI_LLM_INDEX_TASK_CRON) {#PAPERLESS_AI_LLM_INDEX_TASK_CRON}
 
 : Configures the schedule to update the AI embeddings of text content and metadata for all documents. Only performed if
 AI is enabled and the LLM embedding backend is set.
