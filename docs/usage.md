@@ -266,7 +266,7 @@ for details.
 
 ## Document Suggestions
 
-Paperless-ngx can suggest tags, correspondents, document types and storage paths for documents based on the content of the document. This is done using a machine learning model that is trained on the documents in your database. The suggestions are shown in the document detail page and can be accepted or rejected by the user.
+Paperless-ngx can suggest tags, correspondents, document types and storage paths for documents based on the content of the document. This is done using a (non-LLM) machine learning model that is trained on the documents in your database. The suggestions are shown in the document detail page and can be accepted or rejected by the user.
 
 ## AI Features
 
@@ -276,13 +276,15 @@ Paperless-ngx includes several features that use AI to enhance the document mana
 
     Remember that Paperless-ngx will send document content to the AI provider you have configured, so consider the privacy implications of using these features, especially if using a remote model (e.g. OpenAI), instead of the default local model.
 
-### Document Chat
-
-Paperless-ngx can use an AI LLM model to answer questions about a document or across multiple documents. Again, this feature works best when RAG is enabled. The chat feature is available in the upper app toolbar and will switch between chatting across multiple documents or a single document based on the current view.
+The AI features work by creating an embedding of the text content and metadata of documents, which is then used for various tasks such as similarity search and question answering. This uses the FAISS vector store.
 
 ### AI-Enhanced Suggestions
 
 If enabled, Paperless-ngx can use an AI LLM model to suggest document titles, dates, tags, correspondents and document types for documents. This feature will always be "opt-in" and does not disable the existing classifier-based suggestion system. Currently, both remote (via the OpenAI API) and local (via Ollama) models are supported, see [configuration](configuration.md#ai) for details.
+
+### Document Chat
+
+Paperless-ngx can use an AI LLM model to answer questions about a document or across multiple documents. Again, this feature works best when RAG is enabled. The chat feature is available in the upper app toolbar and will switch between chatting across multiple documents or a single document based on the current view.
 
 ## Sharing documents from Paperless-ngx
 

@@ -1836,7 +1836,7 @@ current backend. If not supplied, defaults to "gpt-3.5-turbo" for OpenAI and "ll
 
 #### [`PAPERLESS_LLM_INDEX_TASK_CRON=<cron expression>`](#PAPERLESS_LLM_INDEX_TASK_CRON) {#PAPERLESS_LLM_INDEX_TASK_CRON}
 
-: Configures the schedule to update the AI embeddings for all documents. Only performed if
+: Configures the schedule to update the AI embeddings of text content and metadata for all documents. Only performed if
 AI is enabled and the LLM embedding backend is set.
 
     Defaults to `10 2 * * *`, once per day.
