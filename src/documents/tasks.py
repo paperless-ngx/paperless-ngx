@@ -570,6 +570,8 @@ def llmindex_index(
 
         task.date_done = timezone.now()
         task.save(update_fields=["status", "result", "date_done"])
+    else:
+        logger.info("LLM index is disabled, skipping update.")
 
 
 @shared_task

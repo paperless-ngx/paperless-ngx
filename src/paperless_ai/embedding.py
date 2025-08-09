@@ -1,3 +1,10 @@
+import json
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+from django.conf import settings
 from llama_index.core.base.embeddings.base import BaseEmbedding
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.embeddings.openai import OpenAIEmbedding
@@ -6,11 +13,6 @@ from documents.models import Document
 from documents.models import Note
 from paperless.config import AIConfig
 from paperless.models import LLMEmbeddingBackend
-
-EMBEDDING_DIMENSIONS = {
-    "text-embedding-3-small": 1536,
-    "sentence-transformers/all-MiniLM-L6-v2": 384,
-}
 
 
 def get_embedding_model() -> BaseEmbedding:
@@ -34,15 +36,36 @@ def get_embedding_model() -> BaseEmbedding:
 
 
 def get_embedding_dim() -> int:
+    """
+    Loads embedding dimension from meta.json if available, otherwise infers it
+    from a dummy embedding and stores it for future use.
+    """
     config = AIConfig()
     model = config.llm_embedding_model or (
         "text-embedding-3-small"
         if config.llm_embedding_backend == "openai"
         else "sentence-transformers/all-MiniLM-L6-v2"
     )
-    if model not in EMBEDDING_DIMENSIONS:
-        raise ValueError(f"Unknown embedding model: {model}")
-    return EMBEDDING_DIMENSIONS[model]
+
+    meta_path: Path = settings.LLM_INDEX_DIR / "meta.json"
+    if meta_path.exists():
+        with meta_path.open() as f:
+            meta = json.load(f)
+        if meta.get("embedding_model") != model:
+            raise RuntimeError(
+                f"Embedding model changed from {meta.get('embedding_model')} to {model}. "
+                "You must rebuild the index.",
+            )
+        return meta["dim"]
+
+    embedding_model = get_embedding_model()
+    test_embed = embedding_model.get_text_embedding("test")
+    dim = len(test_embed)
+
+    with meta_path.open("w") as f:
+        json.dump({"embedding_model": model, "dim": dim}, f)
+
+    return dim
 
 
 def build_llm_index_text(doc: Document) -> str:

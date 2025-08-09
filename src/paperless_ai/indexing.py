@@ -138,6 +138,8 @@ def update_llm_index(*, progress_bar_disable=False, rebuild=False) -> str:
         return msg
 
     if rebuild or not vector_store_file_exists():
+        # remove meta.json to force re-detection of embedding dim
+        (settings.LLM_INDEX_DIR / "meta.json").unlink(missing_ok=True)
         # Rebuild index from scratch
         logger.info("Rebuilding LLM index.")
         embed_model = get_embedding_model()
