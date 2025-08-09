@@ -264,3 +264,85 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
                 backend="mock_backend",
             ),
         )
+
+
+class TestAIChatStreamingView(DirectoriesMixin, TestCase):
+    ENDPOINT = "/api/documents/chat/"
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="pass")
+        self.client.force_login(user=self.user)
+        self.document = Document.objects.create(
+            title="Test Document",
+            filename="test.pdf",
+            mime_type="application/pdf",
+        )
+        super().setUp()
+
+    @override_settings(AI_ENABLED=False)
+    def test_post_ai_disabled(self):
+        response = self.client.post(
+            self.ENDPOINT,
+            data='{"q": "question"}',
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(b"AI is required for this feature", response.content)
+
+    @override_settings(AI_ENABLED=True)
+    def test_post_invalid_json(self):
+        response = self.client.post(
+            self.ENDPOINT,
+            data="invalid",
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(b"Invalid request", response.content)
+
+    @patch("documents.views.stream_chat_with_documents")
+    @patch("documents.views.get_objects_for_user_owner_aware")
+    @override_settings(AI_ENABLED=True)
+    def test_post_no_document_id(self, mock_get_objects, mock_stream_chat):
+        mock_get_objects.return_value = [self.document]
+        mock_stream_chat.return_value = iter([b"data"])
+        response = self.client.post(
+            self.ENDPOINT,
+            data='{"q": "question"}',
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/event-stream")
+
+    @patch("documents.views.stream_chat_with_documents")
+    @override_settings(AI_ENABLED=True)
+    def test_post_with_document_id(self, mock_stream_chat):
+        mock_stream_chat.return_value = iter([b"data"])
+        response = self.client.post(
+            self.ENDPOINT,
+            data=f'{{"q": "question", "document_id": {self.document.pk}}}',
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/event-stream")
+
+    @override_settings(AI_ENABLED=True)
+    def test_post_with_invalid_document_id(self):
+        response = self.client.post(
+            self.ENDPOINT,
+            data='{"q": "question", "document_id": 999999}',
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(b"Document not found", response.content)
+
+    @patch("documents.views.has_perms_owner_aware")
+    @override_settings(AI_ENABLED=True)
+    def test_post_with_document_id_no_permission(self, mock_has_perms):
+        mock_has_perms.return_value = False
+        response = self.client.post(
+            self.ENDPOINT,
+            data=f'{{"q": "question", "document_id": {self.document.pk}}}',
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertIn(b"Insufficient permissions", response.content)
