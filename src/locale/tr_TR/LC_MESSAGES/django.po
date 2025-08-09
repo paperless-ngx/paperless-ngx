@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-19 18:51+0000\n"
-"PO-Revision-Date: 2025-06-19 18:52\n"
+"POT-Creation-Date: 2025-08-02 12:55+0000\n"
+"PO-Revision-Date: 2025-08-02 12:56\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -27,35 +27,35 @@ msgstr "Değer geçerli bir JSON olmalıdır."
 
 #: documents/filters.py:403
 msgid "Invalid custom field query expression"
-msgstr ""
+msgstr "Geçersiz özel alan sorgu ifadesi"
 
 #: documents/filters.py:413
 msgid "Invalid expression list. Must be nonempty."
-msgstr ""
+msgstr "Geçersiz ifade listesi. Boş olmamalıdır."
 
 #: documents/filters.py:434
 msgid "Invalid logical operator {op!r}"
-msgstr ""
+msgstr "Geçersiz mantıksal işleç {op!r}"
 
 #: documents/filters.py:448
 msgid "Maximum number of query conditions exceeded."
-msgstr ""
+msgstr "En çok sorgu koşulu sayısı aşıldı."
 
 #: documents/filters.py:513
 msgid "{name!r} is not a valid custom field."
-msgstr ""
+msgstr "{name!r} geçerli bir özel alan değil."
 
 #: documents/filters.py:550
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr ""
+msgstr "{data_type}, {expr!r} sorgu ifadesini desteklemiyor."
 
 #: documents/filters.py:658
 msgid "Maximum nesting depth exceeded."
-msgstr ""
+msgstr "En çok iç içe geçme izni aşıldı."
 
 #: documents/filters.py:843
 msgid "Custom field not found"
-msgstr ""
+msgstr "Özel alan bulunamadı"
 
 #: documents/models.py:36 documents/models.py:713
 msgid "owner"
@@ -67,11 +67,11 @@ msgstr "Hiçbiri"
 
 #: documents/models.py:54 documents/models.py:925
 msgid "Any word"
-msgstr "Herhangi bir kelime"
+msgstr "Herhangi bir sözcük"
 
 #: documents/models.py:55 documents/models.py:926
 msgid "All words"
-msgstr "Tüm Kelimeler"
+msgstr "Tüm sözcükler"
 
 #: documents/models.py:56 documents/models.py:927
 msgid "Exact match"
@@ -83,7 +83,7 @@ msgstr "Düzenli ifade"
 
 #: documents/models.py:58 documents/models.py:929
 msgid "Fuzzy word"
-msgstr "Bulanık kelime"
+msgstr "Bulanık sözcük"
 
 #: documents/models.py:59
 msgid "Automatic"
@@ -96,7 +96,7 @@ msgstr "ad"
 
 #: documents/models.py:64 documents/models.py:993
 msgid "match"
-msgstr "eşleme"
+msgstr "eşleşme"
 
 #: documents/models.py:67 documents/models.py:996
 msgid "matching algorithm"
@@ -108,11 +108,11 @@ msgstr "duyarsızdır"
 
 #: documents/models.py:95 documents/models.py:146
 msgid "correspondent"
-msgstr "kâtip"
+msgstr "muhatap"
 
 #: documents/models.py:96
 msgid "correspondents"
-msgstr "kâtipler"
+msgstr "muhataplar"
 
 #: documents/models.py:100
 msgid "color"
@@ -120,11 +120,11 @@ msgstr "renk"
 
 #: documents/models.py:103
 msgid "is inbox tag"
-msgstr "gelen kutu etiketidir"
+msgstr "gelen kutusu künyesi"
 
 #: documents/models.py:106
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr "Bu etiketi, gelen kutusu etiketi olarak işaretle: Yeni aktarılan tüm dokümanlar gelen kutusu etiketi ile etiketlendirileceklerdir."
+msgstr "Bu künyeyi, gelen kutusu künyesi olarak imler: Yeni aktarılan tüm belgeler gelen kutusu künyesi ile künyeleneceklerdir."
 
 #: documents/models.py:112
 msgid "tag"
@@ -176,7 +176,7 @@ msgstr "Belgenin ham, yalnızca metin verileri. Bu alan öncelikle arama için k
 
 #: documents/models.py:178
 msgid "mime type"
-msgstr "mime türü"
+msgstr "MIME türü"
 
 #: documents/models.py:188
 msgid "checksum"
@@ -184,7 +184,7 @@ msgstr "sağlama toplamı"
 
 #: documents/models.py:192
 msgid "The checksum of the original document."
-msgstr "Orjinal belgenin sağlama toplamı."
+msgstr "Özgün belgenin sağlama toplamı."
 
 #: documents/models.py:196
 msgid "archive checksum"
@@ -200,7 +200,7 @@ msgstr "sayfa sayısı"
 
 #: documents/models.py:212
 msgid "The number of pages of the document."
-msgstr ""
+msgstr "Belgedeki sayfaların sayısı."
 
 #: documents/models.py:217 documents/models.py:633 documents/models.py:671
 #: documents/models.py:742 documents/models.py:800
@@ -209,7 +209,7 @@ msgstr "oluşturuldu"
 
 #: documents/models.py:223
 msgid "modified"
-msgstr "değiştirilmiş"
+msgstr "değiştirildi"
 
 #: documents/models.py:230
 msgid "storage type"
@@ -286,15 +286,15 @@ msgstr "Eklendi"
 
 #: documents/models.py:390
 msgid "Tags"
-msgstr "Etiketler"
+msgstr "Künyeler"
 
 #: documents/models.py:391
 msgid "Correspondent"
-msgstr "Muhabirler"
+msgstr "Muhatap"
 
 #: documents/models.py:392
 msgid "Document Type"
-msgstr "Döküman tipi"
+msgstr "Döküman Türü"
 
 #: documents/models.py:393
 msgid "Storage Path"
@@ -318,11 +318,11 @@ msgstr "ASN"
 
 #: documents/models.py:398
 msgid "Pages"
-msgstr ""
+msgstr "Sayfalar"
 
 #: documents/models.py:404
 msgid "show on dashboard"
-msgstr "kontrol panelinde göster"
+msgstr "gösterge tablosunda göster"
 
 #: documents/models.py:407
 msgid "show in sidebar"
@@ -338,15 +338,15 @@ msgstr "tersine sırala"
 
 #: documents/models.py:419
 msgid "View page size"
-msgstr "Dosya Boyutu"
+msgstr "Dosya boyutunu görüntüle"
 
 #: documents/models.py:427
 msgid "View display mode"
-msgstr "Ekran Modunu İzle"
+msgstr "Ekran kipini görüntüle"
 
 #: documents/models.py:434
 msgid "Document display fields"
-msgstr "Döküman izleme sahaları"
+msgstr "Belge görüntüleme alanları"
 
 #: documents/models.py:441 documents/models.py:504
 msgid "saved view"
@@ -370,7 +370,7 @@ msgstr "ASN ise"
 
 #: documents/models.py:453
 msgid "correspondent is"
-msgstr "muhatap ise"
+msgstr "muhatap"
 
 #: documents/models.py:454
 msgid "document type is"
@@ -378,15 +378,15 @@ msgstr "belge türü ise"
 
 #: documents/models.py:455
 msgid "is in inbox"
-msgstr "gelen kutusunun içinde"
+msgstr "gelen kutusunda"
 
 #: documents/models.py:456
 msgid "has tag"
-msgstr "etiketine sahip"
+msgstr "şu künyesi var"
 
 #: documents/models.py:457
 msgid "has any tag"
-msgstr "herhangi bir etiketine sahip"
+msgstr "herhangi bir künyesi var"
 
 #: documents/models.py:458
 msgid "created before"
@@ -398,15 +398,15 @@ msgstr "bu tarihten sonra oluşturuldu"
 
 #: documents/models.py:460
 msgid "created year is"
-msgstr "oluşturma yili ise"
+msgstr "oluşturma yılı"
 
 #: documents/models.py:461
 msgid "created month is"
-msgstr "oluşturma ayı ise"
+msgstr "oluşturulma ayı"
 
 #: documents/models.py:462
 msgid "created day is"
-msgstr "oluşturma günü ise"
+msgstr "oluşturma günü"
 
 #: documents/models.py:463
 msgid "added before"
@@ -426,15 +426,15 @@ msgstr "bu tarihten sonra değiştirldi"
 
 #: documents/models.py:467
 msgid "does not have tag"
-msgstr "etikete sahip değil"
+msgstr "künyeye sahip değil"
 
 #: documents/models.py:468
 msgid "does not have ASN"
-msgstr "ASN'ye sahip değil"
+msgstr "ASN yok"
 
 #: documents/models.py:469
 msgid "title or content contains"
-msgstr "başlik veya içerik içerir"
+msgstr "başlık veya içerik şunu içerir"
 
 #: documents/models.py:470
 msgid "fulltext query"
@@ -458,15 +458,15 @@ msgstr "ASN şundan daha küçük"
 
 #: documents/models.py:475
 msgid "storage path is"
-msgstr "depolama yolu ise"
+msgstr "depolama yolu"
 
 #: documents/models.py:476
 msgid "has correspondent in"
-msgstr "muhabiri var"
+msgstr "şurada muhatabı var"
 
 #: documents/models.py:477
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "şurada muhatabı yok"
 
 #: documents/models.py:478
 msgid "has document type in"
@@ -498,23 +498,23 @@ msgstr "sahipsiz"
 
 #: documents/models.py:485
 msgid "does not have owner in"
-msgstr "şurada sahibi yoktur"
+msgstr "şurada sahibi yok"
 
 #: documents/models.py:486
 msgid "has custom field value"
-msgstr "özel veritabanı sahası var"
+msgstr "özel alan değeri var"
 
 #: documents/models.py:487
 msgid "is shared by me"
-msgstr "bu benimle paylaşıldı"
+msgstr "benimle paylaşıldı"
 
 #: documents/models.py:488
 msgid "has custom fields"
-msgstr "özel veritabanı sahası var"
+msgstr "özel veritabanı alanı var"
 
 #: documents/models.py:489
 msgid "has custom field in"
-msgstr "içinde özel saha var"
+msgstr "içinde özel alan var"
 
 #: documents/models.py:490
 msgid "does not have custom field in"
@@ -522,31 +522,31 @@ msgstr "özel saha tanımlı değil"
 
 #: documents/models.py:491
 msgid "does not have custom field"
-msgstr ""
+msgstr "özel alan yok"
 
 #: documents/models.py:492
 msgid "custom fields query"
-msgstr ""
+msgstr "özel alan sorgusu"
 
 #: documents/models.py:493
 msgid "created to"
-msgstr ""
+msgstr "şuna oluşturuldu"
 
 #: documents/models.py:494
 msgid "created from"
-msgstr ""
+msgstr "şundan oluşturuldu"
 
 #: documents/models.py:495
 msgid "added to"
-msgstr ""
+msgstr "şuna eklendi"
 
 #: documents/models.py:496
 msgid "added from"
-msgstr ""
+msgstr "şundan eklendi"
 
 #: documents/models.py:497
 msgid "mime type is"
-msgstr ""
+msgstr "MIME türü şu"
 
 #: documents/models.py:507
 msgid "rule type"
@@ -558,23 +558,23 @@ msgstr "değer"
 
 #: documents/models.py:512
 msgid "filter rule"
-msgstr "filtreleme kuralı"
+msgstr "süzgeç kuralı"
 
 #: documents/models.py:513
 msgid "filter rules"
-msgstr "filtreleme kuralları"
+msgstr "süzgeç kuralları"
 
 #: documents/models.py:537
 msgid "Auto Task"
-msgstr ""
+msgstr "Otomatik Görev"
 
 #: documents/models.py:538
 msgid "Scheduled Task"
-msgstr ""
+msgstr "Planlı Görev"
 
 #: documents/models.py:539
 msgid "Manual Task"
-msgstr ""
+msgstr "Elle Ayarlı Görev"
 
 #: documents/models.py:542
 msgid "Consume File"
@@ -594,11 +594,11 @@ msgstr ""
 
 #: documents/models.py:550
 msgid "Task ID"
-msgstr "Görev kimliği"
+msgstr "Görev Kimliği"
 
 #: documents/models.py:551
 msgid "Celery ID for the Task that was run"
-msgstr "Görevler için yürütülen Celery ID"
+msgstr "Çalıştırılan görev için olan Celery kimliği"
 
 #: documents/models.py:556
 msgid "Acknowledged"
@@ -610,7 +610,7 @@ msgstr ""
 
 #: documents/models.py:563
 msgid "Task Filename"
-msgstr "Görev dosya adı"
+msgstr "Görev Dosya Adı"
 
 #: documents/models.py:564
 msgid "Name of the file which the Task was run for"
@@ -618,7 +618,7 @@ msgstr ""
 
 #: documents/models.py:571
 msgid "Task Name"
-msgstr "Görev adı"
+msgstr "Görev Adı"
 
 #: documents/models.py:572
 msgid "Name of the task that was run"
@@ -634,7 +634,7 @@ msgstr ""
 
 #: documents/models.py:586
 msgid "Created DateTime"
-msgstr "Oluşturulan tarih saat"
+msgstr "Oluşturulan Tarih ve Zaman"
 
 #: documents/models.py:587
 msgid "Datetime field when the task result was created in UTC"
@@ -642,7 +642,7 @@ msgstr ""
 
 #: documents/models.py:593
 msgid "Started DateTime"
-msgstr "Başlangıç saati zamanı"
+msgstr "Başlangıç Tarihi ve Zamanı"
 
 #: documents/models.py:594
 msgid "Datetime field when the task was started in UTC"
@@ -658,11 +658,11 @@ msgstr ""
 
 #: documents/models.py:607
 msgid "Result Data"
-msgstr "Sonuç veri"
+msgstr "Sonuç Verisi"
 
 #: documents/models.py:609
 msgid "The data returned by the task"
-msgstr "Gören veriyi geri çevirdi"
+msgstr "Görevin döndürdüğü veri"
 
 #: documents/models.py:617
 msgid "Task Type"
@@ -674,7 +674,7 @@ msgstr ""
 
 #: documents/models.py:629
 msgid "Note for the document"
-msgstr "Döküman için not"
+msgstr "Belge için olan not"
 
 #: documents/models.py:653
 msgid "user"
@@ -694,7 +694,7 @@ msgstr "Arşiv"
 
 #: documents/models.py:668
 msgid "Original"
-msgstr "Orjinal"
+msgstr "Özgün"
 
 #: documents/models.py:679 paperless_mail/models.py:75
 msgid "expiration"
@@ -714,7 +714,7 @@ msgstr "bağlantıları paylaş"
 
 #: documents/models.py:731
 msgid "String"
-msgstr "Değer"
+msgstr "Dizi"
 
 #: documents/models.py:732
 msgid "URL"
@@ -750,7 +750,7 @@ msgstr "Seç"
 
 #: documents/models.py:751
 msgid "data type"
-msgstr "veri tipi"
+msgstr "veri türü"
 
 #: documents/models.py:758
 msgid "extra data"
@@ -830,11 +830,11 @@ msgstr ""
 
 #: documents/models.py:974
 msgid "filter filename"
-msgstr "dosya adı ara"
+msgstr "dosya adını süz"
 
 #: documents/models.py:979 paperless_mail/models.py:200
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr "Yalnızca belirtilmişse bu dosya ismiyla tamamen eşleşen belgeleri tüket. *.pdf veya *fatura* gibi joker karakterlere izin verilir. Büyük küçük yazılımına duyarsız."
+msgstr "Yalnızca belirtilmişse bu dosya adıyla tamamen eşleşen belgeleri tüketin. *.pdf veya *fatura* gibi joker karakterlere izin verilir. BÜYÜK/küçük harf duyarsızdır."
 
 #: documents/models.py:990
 msgid "filter documents from this mail rule"
@@ -850,7 +850,7 @@ msgstr ""
 
 #: documents/models.py:1022
 msgid "has this correspondent"
-msgstr ""
+msgstr "bu muhatap var"
 
 #: documents/models.py:1026
 msgid "schedule offset days"
@@ -990,7 +990,7 @@ msgstr ""
 
 #: documents/models.py:1189
 msgid "assign title"
-msgstr "başlık at"
+msgstr "başlık ata"
 
 #: documents/models.py:1194
 msgid "Assign a document title, can include some placeholders, see documentation."
@@ -998,15 +998,15 @@ msgstr ""
 
 #: documents/models.py:1203 paperless_mail/models.py:274
 msgid "assign this tag"
-msgstr "bu etiketi atan"
+msgstr "bu künyeyi ata"
 
 #: documents/models.py:1212 paperless_mail/models.py:282
 msgid "assign this document type"
-msgstr "bu dosya türünü atan"
+msgstr "bu dosya türünü ata"
 
 #: documents/models.py:1221 paperless_mail/models.py:296
 msgid "assign this correspondent"
-msgstr "bu muhabiri atan"
+msgstr "bu muhatabı ata"
 
 #: documents/models.py:1230
 msgid "assign this storage path"
@@ -1046,11 +1046,11 @@ msgstr ""
 
 #: documents/models.py:1291
 msgid "remove these tag(s)"
-msgstr "bu etiket(ler)i kaldır"
+msgstr "bu künye(ler)i kaldır"
 
 #: documents/models.py:1296
 msgid "remove all tags"
-msgstr "tüm etiketleri kaldır"
+msgstr "tüm künyeleri kaldır"
 
 #: documents/models.py:1303
 msgid "remove these document type(s)"
@@ -1062,11 +1062,11 @@ msgstr ""
 
 #: documents/models.py:1315
 msgid "remove these correspondent(s)"
-msgstr ""
+msgstr "bu muhatapları kaldır"
 
 #: documents/models.py:1320
 msgid "remove all correspondents"
-msgstr ""
+msgstr "tüm muhatapları kaldır"
 
 #: documents/models.py:1327
 msgid "remove these storage path(s)"
@@ -1164,21 +1164,21 @@ msgstr ""
 msgid "workflow runs"
 msgstr ""
 
-#: documents/serialisers.py:135
+#: documents/serialisers.py:139
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr "Hatalı Düzenli İfade: %(error)s"
+msgstr "Hatalı düzenli ifade: %(error)s"
 
-#: documents/serialisers.py:561
+#: documents/serialisers.py:565
 msgid "Invalid color."
 msgstr "Geçersiz renk."
 
-#: documents/serialisers.py:1645
+#: documents/serialisers.py:1649
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Dosya türü %(type)s desteklenmiyor"
 
-#: documents/serialisers.py:1739
+#: documents/serialisers.py:1743
 msgid "Invalid variable detected."
 msgstr "Geçersiz değişken algılandı."
 
@@ -1249,7 +1249,7 @@ msgstr ""
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "Paperless-ngx parola sıfırlama isteği"
 
 #: documents/templates/account/password_reset.html:9
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
@@ -1257,11 +1257,11 @@ msgstr ""
 
 #: documents/templates/account/password_reset.html:12
 msgid "An error occurred. Please try again."
-msgstr "Bir hata oluştu. Lütfen tekrar deneyin."
+msgstr "Bir hata oluştu. Lütfen yeniden deneyin."
 
 #: documents/templates/account/password_reset.html:21
 msgid "Send me instructions!"
-msgstr "Talimatları gönder!"
+msgstr "Yönergeler gönder!"
 
 #: documents/templates/account/password_reset_done.html:5
 msgid "Paperless-ngx reset password sent"
@@ -1269,7 +1269,7 @@ msgstr "Paperless-ngx sıfırlama şifresi gönderildi"
 
 #: documents/templates/account/password_reset_done.html:9
 msgid "Check your inbox."
-msgstr "Gelen kutunuzu kontrol edin."
+msgstr "Gelen kutunuza bakın."
 
 #: documents/templates/account/password_reset_done.html:13
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
@@ -1618,143 +1618,147 @@ msgstr ""
 msgid "paperless application settings"
 msgstr ""
 
-#: paperless/settings.py:755
+#: paperless/settings.py:774
 msgid "English (US)"
 msgstr "İngilizce (Birleşik Devletler)"
 
-#: paperless/settings.py:756
+#: paperless/settings.py:775
 msgid "Arabic"
 msgstr "Arapça"
 
-#: paperless/settings.py:757
+#: paperless/settings.py:776
 msgid "Afrikaans"
 msgstr "Afrika dili"
 
-#: paperless/settings.py:758
+#: paperless/settings.py:777
 msgid "Belarusian"
 msgstr "Belarusça"
 
-#: paperless/settings.py:759
+#: paperless/settings.py:778
 msgid "Bulgarian"
 msgstr "Bulgarca"
 
-#: paperless/settings.py:760
+#: paperless/settings.py:779
 msgid "Catalan"
 msgstr "Katalanca"
 
-#: paperless/settings.py:761
+#: paperless/settings.py:780
 msgid "Czech"
 msgstr "Çekçe"
 
-#: paperless/settings.py:762
+#: paperless/settings.py:781
 msgid "Danish"
 msgstr "Danca"
 
-#: paperless/settings.py:763
+#: paperless/settings.py:782
 msgid "German"
 msgstr "Almanca"
 
-#: paperless/settings.py:764
+#: paperless/settings.py:783
 msgid "Greek"
 msgstr "Yunanca"
 
-#: paperless/settings.py:765
+#: paperless/settings.py:784
 msgid "English (GB)"
 msgstr "İngilizce (GB)"
 
-#: paperless/settings.py:766
+#: paperless/settings.py:785
 msgid "Spanish"
 msgstr "İspanyolca"
 
-#: paperless/settings.py:767
+#: paperless/settings.py:786
 msgid "Persian"
 msgstr ""
 
-#: paperless/settings.py:768
+#: paperless/settings.py:787
 msgid "Finnish"
 msgstr "Fince"
 
-#: paperless/settings.py:769
+#: paperless/settings.py:788
 msgid "French"
 msgstr "Fransızca"
 
-#: paperless/settings.py:770
+#: paperless/settings.py:789
 msgid "Hungarian"
 msgstr ""
 
-#: paperless/settings.py:771
+#: paperless/settings.py:790
 msgid "Italian"
 msgstr "İtalyanca"
 
-#: paperless/settings.py:772
+#: paperless/settings.py:791
 msgid "Japanese"
 msgstr ""
 
-#: paperless/settings.py:773
+#: paperless/settings.py:792
 msgid "Korean"
 msgstr ""
 
-#: paperless/settings.py:774
+#: paperless/settings.py:793
 msgid "Luxembourgish"
 msgstr "Lüksemburgca"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:794
 msgid "Norwegian"
 msgstr "Norveçce"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:795
 msgid "Dutch"
 msgstr "Hollandaca"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:796
 msgid "Polish"
 msgstr "Polonyaca"
 
-#: paperless/settings.py:778
+#: paperless/settings.py:797
 msgid "Portuguese (Brazil)"
 msgstr "Portekizce (Brezilya)"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:798
 msgid "Portuguese"
 msgstr "Portekizce"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:799
 msgid "Romanian"
 msgstr "Romence"
 
-#: paperless/settings.py:781
+#: paperless/settings.py:800
 msgid "Russian"
 msgstr "Rusça"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:801
 msgid "Slovak"
 msgstr "Slovakça"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:802
 msgid "Slovenian"
 msgstr "Slovakça"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:803
 msgid "Serbian"
 msgstr "Sırpça"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:804
 msgid "Swedish"
 msgstr "İsveççe"
 
-#: paperless/settings.py:786
+#: paperless/settings.py:805
 msgid "Turkish"
 msgstr "Türkçe"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:806
 msgid "Ukrainian"
 msgstr "Ukraynaca"
 
-#: paperless/settings.py:788
+#: paperless/settings.py:807
+msgid "Vietnamese"
+msgstr ""
+
+#: paperless/settings.py:808
 msgid "Chinese Simplified"
 msgstr "Basitleştirilmiş Çince"
 
-#: paperless/settings.py:789
+#: paperless/settings.py:809
 msgid "Chinese Traditional"
 msgstr ""
 
@@ -1792,7 +1796,7 @@ msgstr "Metaveri"
 
 #: paperless_mail/admin.py:92
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr "Bu kuraldan tüketilen belgelere otomatik olarak meta veriler atayın. Burada etiketler, türler veya muhabirler atamazsanız, paperless yinede tanımladığınız tüm eşleşen kuralları işlemeye devam eder."
+msgstr "Bu kuraldan tüketilen belgelere otomatik olarak meta veriler atayın. Burada künyeler, türler veya muhataplar atamazsanız paperless yine de tanımladığınız tüm eşleşen kuralları işlemeyi sürdürür."
 
 #: paperless_mail/apps.py:11
 msgid "Paperless mail"
@@ -1960,7 +1964,7 @@ msgstr "Kuraldan başlık atama"
 
 #: paperless_mail/models.py:138
 msgid "Do not assign a correspondent"
-msgstr "Muhabir atanma"
+msgstr "Muhatap atama"
 
 #: paperless_mail/models.py:139
 msgid "Use mail address"
@@ -1972,7 +1976,7 @@ msgstr "İsim kullan (veya yoksa e-posta adresini)"
 
 #: paperless_mail/models.py:141
 msgid "Use correspondent selected below"
-msgstr "Aşağıdaki seçili olan muhabiri kullan"
+msgstr "Aşağıdaki seçili olan muhatabı kullan"
 
 #: paperless_mail/models.py:151
 msgid "account"
@@ -2056,7 +2060,7 @@ msgstr "başlik atan"
 
 #: paperless_mail/models.py:286
 msgid "assign correspondent from"
-msgstr "muhabiri atan"
+msgstr "şuradan muhatap ata"
 
 #: paperless_mail/models.py:300
 msgid "Assign the rule owner to documents"
