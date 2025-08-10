@@ -43,17 +43,17 @@ class RemoteDocumentParser(RasterisedDocumentParser):
 
     def supported_mime_types(self):
         if self.settings.engine_is_valid():
-            return [
-                "application/pdf",
-                "image/png",
-                "image/jpeg",
-                "image/tiff",
-                "image/bmp",
-                "image/gif",
-                "image/webp",
-            ]
+            return {
+                "application/pdf": ".pdf",
+                "image/png": ".png",
+                "image/jpeg": ".jpg",
+                "image/tiff": ".tiff",
+                "image/bmp": ".bmp",
+                "image/gif": ".gif",
+                "image/webp": ".webp",
+            }
         else:
-            return []
+            return {}
 
     def azure_ai_vision_parse(
         self,

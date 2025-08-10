@@ -75,20 +75,20 @@ class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     )
     def test_supported_mime_types_valid_config(self):
         parser = RemoteDocumentParser(uuid.uuid4())
-        expected_types = [
-            "application/pdf",
-            "image/png",
-            "image/jpeg",
-            "image/tiff",
-            "image/bmp",
-            "image/gif",
-            "image/webp",
-        ]
+        expected_types = {
+            "application/pdf": ".pdf",
+            "image/png": ".png",
+            "image/jpeg": ".jpg",
+            "image/tiff": ".tiff",
+            "image/bmp": ".bmp",
+            "image/gif": ".gif",
+            "image/webp": ".webp",
+        }
         self.assertEqual(parser.supported_mime_types(), expected_types)
 
     def test_supported_mime_types_invalid_config(self):
         parser = get_parser(uuid.uuid4())
-        self.assertEqual(parser.supported_mime_types(), [])
+        self.assertEqual(parser.supported_mime_types(), {})
 
     @override_settings(
         REMOTE_OCR_ENGINE=None,
