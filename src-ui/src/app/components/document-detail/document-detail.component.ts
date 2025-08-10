@@ -1378,6 +1378,9 @@ export class DocumentDetailComponent
                 $localize`PDF edit operation for "${this.document.title}" will begin in the background.`
               )
               modal.close()
+              if (modal.componentInstance.deleteOriginal) {
+                this.openDocumentService.closeDocument(this.document)
+              }
             },
             error: (error) => {
               if (modal) {

@@ -1161,6 +1161,8 @@ describe('DocumentDetailComponent', () => {
   it('should support pdf editor, handle error', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    const closeSpy = jest.spyOn(openDocumentsService, 'closeDocument')
+    const errorSpy = jest.spyOn(toastService, 'showError')
     initNormally()
     component.editPdf()
     expect(modal).not.toBeUndefined()
@@ -1180,18 +1182,19 @@ describe('DocumentDetailComponent', () => {
         include_metadata: true,
       },
     })
-    req.flush(true)
+    req.error(new ErrorEvent('failed'))
+    expect(errorSpy).toHaveBeenCalled()
 
     component.editPdf()
     modal.componentInstance.documentID = doc.id
     modal.componentInstance.pages = [{ page: 1, rotate: 0, splitAfter: true }]
+    modal.componentInstance.deleteOriginal = true
     modal.componentInstance.confirm()
-    const errorSpy = jest.spyOn(toastService, 'showError')
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/bulk_edit/`
     )
-    req.error(new ErrorEvent('failed'))
-    expect(errorSpy).toHaveBeenCalled()
+    req.flush(true)
+    expect(closeSpy).toHaveBeenCalled()
   })
 
   it('should support keyboard shortcuts', () => {
