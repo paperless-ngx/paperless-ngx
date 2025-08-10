@@ -700,14 +700,14 @@ def send_webhook(
     as_json: bool = False,
 ):
     p = urlparse(url)
-    if p.scheme not in settings.WEBHOOKS_ALLOWED_SCHEMES or not p.hostname:
+    if p.scheme.lower() not in settings.WEBHOOKS_ALLOWED_SCHEMES or not p.hostname:
         logger.warning("Webhook blocked: invalid scheme/hostname")
         raise ValueError("Invalid URL scheme or hostname.")
 
     port = p.port or (443 if p.scheme == "https" else 80)
     if (
         len(settings.WEBHOOKS_ALLOWED_PORTS) > 0
-        and str(port) not in settings.WEBHOOKS_ALLOWED_PORTS
+        and port not in settings.WEBHOOKS_ALLOWED_PORTS
     ):
         logger.warning("Webhook blocked: port not permitted")
         raise ValueError("Destination port not permitted.")
