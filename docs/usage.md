@@ -499,6 +499,9 @@ The following workflow action types are available:
 -   Encoding for the request body, either JSON or form data
 -   The request headers as key-value pairs
 
+For security reasons, webhooks can be limited to specific ports and disallowed from connecting to local URLs. See the relevant
+[configuration settings](configuration.md#workflow-webhooks) to change this behavior.
+
 #### Workflow placeholders
 
 Some workflow text can include placeholders but the available options differ depending on the type of
