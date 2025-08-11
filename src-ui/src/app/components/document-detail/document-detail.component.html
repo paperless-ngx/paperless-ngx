@@ -58,16 +58,8 @@
         <i-bs width="1em" height="1em" name="diagram-3"></i-bs>&nbsp;<span i18n>More like this</span>
       </button>
 
-      <button ngbDropdownItem (click)="splitDocument()" [disabled]="!userCanAdd || originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
-        <i-bs width="1em" height="1em" name="scissors"></i-bs>&nbsp;<span i18n>Split</span>
-      </button>
-
-      <button ngbDropdownItem (click)="rotateDocument()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
-        <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
-      </button>
-
-      <button ngbDropdownItem (click)="deletePages()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
-        <i-bs name="file-earmark-minus"></i-bs>&nbsp;<ng-container i18n>Delete page(s)</ng-container>
+      <button ngbDropdownItem (click)="editPdf()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
+        <i-bs name="pencil"></i-bs>&nbsp;<ng-container i18n>PDF Editor</ng-container>
       </button>
     </div>
   </div>

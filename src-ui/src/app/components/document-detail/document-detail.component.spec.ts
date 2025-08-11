@@ -1213,81 +1213,43 @@ describe('DocumentDetailComponent', () => {
     ).not.toBeUndefined()
   })
 
-  it('should support split', () => {
+  it('should support pdf editor, handle error', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    const closeSpy = jest.spyOn(openDocumentsService, 'closeDocument')
+    const errorSpy = jest.spyOn(toastService, 'showError')
     initNormally()
-    component.splitDocument()
+    component.editPdf()
     expect(modal).not.toBeUndefined()
     modal.componentInstance.documentID = doc.id
-    modal.componentInstance.totalPages = 5
-    modal.componentInstance.page = 2
-    modal.componentInstance.addSplit()
+    modal.componentInstance.pages = [{ page: 1, rotate: 0, splitAfter: false }]
     modal.componentInstance.confirm()
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/bulk_edit/`
     )
     expect(req.request.body).toEqual({
       documents: [doc.id],
-      method: 'split',
-      parameters: { pages: '1-2,3-5', delete_originals: false },
+      method: 'edit_pdf',
+      parameters: {
+        operations: [{ page: 1, rotate: 0, doc: 0 }],
+        delete_original: false,
+        update_document: false,
+        include_metadata: true,
+      },
     })
-    req.error(new ProgressEvent('failed'))
-    modal.componentInstance.confirm()
-    req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
-    )
-    req.flush(true)
-  })
+    req.error(new ErrorEvent('failed'))
+    expect(errorSpy).toHaveBeenCalled()
 
-  it('should support rotate', () => {
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((m) => (modal = m[0]))
-    initNormally()
-    component.rotateDocument()
-    expect(modal).not.toBeUndefined()
+    component.editPdf()
     modal.componentInstance.documentID = doc.id
-    modal.componentInstance.rotate()
-    modal.componentInstance.confirm()
-    let req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
-    )
-    expect(req.request.body).toEqual({
-      documents: [doc.id],
-      method: 'rotate',
-      parameters: { degrees: 90 },
-    })
-    req.error(new ProgressEvent('failed'))
+    modal.componentInstance.pages = [{ page: 1, rotate: 0, splitAfter: true }]
+    modal.componentInstance.deleteOriginal = true
     modal.componentInstance.confirm()
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/bulk_edit/`
     )
     req.flush(true)
-  })
-
-  it('should support delete pages', () => {
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((m) => (modal = m[0]))
-    initNormally()
-    component.deletePages()
-    expect(modal).not.toBeUndefined()
-    modal.componentInstance.documentID = doc.id
-    modal.componentInstance.pages = [1, 2]
-    modal.componentInstance.confirm()
-    let req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
-    )
-    expect(req.request.body).toEqual({
-      documents: [doc.id],
-      method: 'delete_pages',
-      parameters: { pages: [1, 2] },
-    })
-    req.error(new ProgressEvent('failed'))
-    modal.componentInstance.confirm()
-    req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
-    )
-    req.flush(true)
+    expect(closeSpy).toHaveBeenCalled()
   })
 
   it('should support keyboard shortcuts', () => {

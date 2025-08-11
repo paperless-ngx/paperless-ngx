@@ -83,9 +83,6 @@ import { getFilenameFromContentDisposition } from 'src/app/utils/http'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
-import { DeletePagesConfirmDialogComponent } from '../common/confirm-dialog/delete-pages-confirm-dialog/delete-pages-confirm-dialog.component'
-import { RotateConfirmDialogComponent } from '../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
-import { SplitConfirmDialogComponent } from '../common/confirm-dialog/split-confirm-dialog/split-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
@@ -104,6 +101,10 @@ import { TagsComponent } from '../common/input/tags/tags.component'
 import { TextComponent } from '../common/input/text/text.component'
 import { UrlComponent } from '../common/input/url/url.component'
 import { PageHeaderComponent } from '../common/page-header/page-header.component'
+import {
+  PDFEditorComponent,
+  PdfEditorEditMode,
+} from '../common/pdf-editor/pdf-editor.component'
 import { ShareLinksDialogComponent } from '../common/share-links-dialog/share-links-dialog.component'
 import { SuggestionsDropdownComponent } from '../common/suggestions-dropdown/suggestions-dropdown.component'
 import { DocumentHistoryComponent } from '../document-history/document-history.component'
@@ -1410,13 +1411,13 @@ export class DocumentDetailComponent
     this.documentForm.updateValueAndValidity()
   }
 
-  splitDocument() {
-    let modal = this.modalService.open(SplitConfirmDialogComponent, {
+  editPdf() {
+    let modal = this.modalService.open(PDFEditorComponent, {
       backdrop: 'static',
-      size: 'lg',
+      size: 'xl',
+      scrollable: true,
     })
-    modal.componentInstance.title = $localize`Split confirm`
-    modal.componentInstance.messageBold = $localize`This operation will split the selected document(s) into new documents.`
+    modal.componentInstance.title = $localize`PDF Editor`
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.documentID = this.document.id
     modal.componentInstance.confirmClicked
@@ -1424,103 +1425,30 @@ export class DocumentDetailComponent
       .subscribe(() => {
         modal.componentInstance.buttonsEnabled = false
         this.documentsService
-          .bulkEdit([this.document.id], 'split', {
-            pages: modal.componentInstance.pagesString,
-            delete_originals: modal.componentInstance.deleteOriginal,
+          .bulkEdit([this.document.id], 'edit_pdf', {
+            operations: modal.componentInstance.getOperations(),
+            delete_original: modal.componentInstance.deleteOriginal,
+            update_document:
+              modal.componentInstance.editMode == PdfEditorEditMode.Update,
+            include_metadata: modal.componentInstance.includeMetadata,
           })
           .pipe(first(), takeUntil(this.unsubscribeNotifier))
           .subscribe({
             next: () => {
               this.toastService.showInfo(
-                $localize`Split operation for "${this.document.title}" will begin in the background.`
+                $localize`PDF edit operation for "${this.document.title}" will begin in the background.`
               )
               modal.close()
+              if (modal.componentInstance.deleteOriginal) {
+                this.openDocumentService.closeDocument(this.document)
+              }
             },
             error: (error) => {
               if (modal) {
                 modal.componentInstance.buttonsEnabled = true
               }
               this.toastService.showError(
-                $localize`Error executing split operation`,
-                error
-              )
-            },
-          })
-      })
-  }
-
-  rotateDocument() {
-    let modal = this.modalService.open(RotateConfirmDialogComponent, {
-      backdrop: 'static',
-      size: 'lg',
-    })
-    modal.componentInstance.title = $localize`Rotate confirm`
-    modal.componentInstance.messageBold = $localize`This operation will permanently rotate the original version of the current document.`
-    modal.componentInstance.btnCaption = $localize`Proceed`
-    modal.componentInstance.documentID = this.document.id
-    modal.componentInstance.showPDFNote = false
-    modal.componentInstance.confirmClicked
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(() => {
-        modal.componentInstance.buttonsEnabled = false
-        this.documentsService
-          .bulkEdit([this.document.id], 'rotate', {
-            degrees: modal.componentInstance.degrees,
-          })
-          .pipe(first(), takeUntil(this.unsubscribeNotifier))
-          .subscribe({
-            next: () => {
-              this.toastService.show({
-                content: $localize`Rotation of "${this.document.title}" will begin in the background. Close and re-open the document after the operation has completed to see the changes.`,
-                delay: 8000,
-                action: this.close.bind(this),
-                actionName: $localize`Close`,
-              })
-              modal.close()
-            },
-            error: (error) => {
-              if (modal) {
-                modal.componentInstance.buttonsEnabled = true
-              }
-              this.toastService.showError(
-                $localize`Error executing rotate operation`,
-                error
-              )
-            },
-          })
-      })
-  }
-
-  deletePages() {
-    let modal = this.modalService.open(DeletePagesConfirmDialogComponent, {
-      backdrop: 'static',
-    })
-    modal.componentInstance.title = $localize`Delete pages confirm`
-    modal.componentInstance.messageBold = $localize`This operation will permanently delete the selected pages from the original document.`
-    modal.componentInstance.btnCaption = $localize`Proceed`
-    modal.componentInstance.documentID = this.document.id
-    modal.componentInstance.confirmClicked
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(() => {
-        modal.componentInstance.buttonsEnabled = false
-        this.documentsService
-          .bulkEdit([this.document.id], 'delete_pages', {
-            pages: modal.componentInstance.pages,
-          })
-          .pipe(first(), takeUntil(this.unsubscribeNotifier))
-          .subscribe({
-            next: () => {
-              this.toastService.showInfo(
-                $localize`Delete pages operation for "${this.document.title}" will begin in the background. Close and re-open or reload this document after the operation has completed to see the changes.`
-              )
-              modal.close()
-            },
-            error: (error) => {
-              if (modal) {
-                modal.componentInstance.buttonsEnabled = true
-              }
-              this.toastService.showError(
-                $localize`Error executing delete pages operation`,
+                $localize`Error executing PDF edit operation`,
                 error
               )
             },

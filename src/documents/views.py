@@ -1448,6 +1448,7 @@ class BulkEditView(PassUserMixin):
         "delete_pages": "checksum",
         "split": None,
         "merge": None,
+        "edit_pdf": "checksum",
         "reprocess": "checksum",
     }
 
@@ -1466,6 +1467,7 @@ class BulkEditView(PassUserMixin):
         if method in [
             bulk_edit.split,
             bulk_edit.merge,
+            bulk_edit.edit_pdf,
         ]:
             parameters["user"] = user
 
@@ -1485,27 +1487,36 @@ class BulkEditView(PassUserMixin):
 
             # check ownership for methods that change original document
             if (
-                has_perms
-                and method
-                in [
-                    bulk_edit.set_permissions,
-                    bulk_edit.delete,
-                    bulk_edit.rotate,
-                    bulk_edit.delete_pages,
-                ]
-            ) or (
-                method in [bulk_edit.merge, bulk_edit.split]
-                and parameters["delete_originals"]
+                (
+                    has_perms
+                    and method
+                    in [
+                        bulk_edit.set_permissions,
+                        bulk_edit.delete,
+                        bulk_edit.rotate,
+                        bulk_edit.delete_pages,
+                        bulk_edit.edit_pdf,
+                    ]
+                )
+                or (
+                    method in [bulk_edit.merge, bulk_edit.split]
+                    and parameters["delete_originals"]
+                )
+                or (method == bulk_edit.edit_pdf and parameters["update_document"])
             ):
                 has_perms = user_is_owner_of_all_documents
 
             # check global add permissions for methods that create documents
             if (
                 has_perms
-                and method in [bulk_edit.split, bulk_edit.merge]
-                and not user.has_perm(
-                    "documents.add_document",
+                and (
+                    method in [bulk_edit.split, bulk_edit.merge]
+                    or (
+                        method == bulk_edit.edit_pdf
+                        and not parameters["update_document"]
+                    )
                 )
+                and not user.has_perm("documents.add_document")
             ):
                 has_perms = False
 
@@ -1543,7 +1554,6 @@ class BulkEditView(PassUserMixin):
                     )
                 }
 
-            # TODO: parameter validation
             result = method(documents, **parameters)
 
             if settings.AUDIT_LOG_ENABLED and modified_field:
