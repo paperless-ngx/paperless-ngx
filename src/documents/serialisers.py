@@ -2089,6 +2089,24 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
 
         return attrs
 
+    @staticmethod
+    def normalize_workflow_trigger_sources(trigger):
+        """
+        Convert sources to strings to handle django-multiselectfield v1.0 changes
+        """
+        if trigger and "sources" in trigger:
+            trigger["sources"] = [
+                str(s.value if hasattr(s, "value") else s) for s in trigger["sources"]
+            ]
+
+    def create(self, validated_data):
+        WorkflowTriggerSerializer.normalize_workflow_trigger_sources(validated_data)
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        WorkflowTriggerSerializer.normalize_workflow_trigger_sources(validated_data)
+        return super().update(instance, validated_data)
+
 
 class WorkflowActionEmailSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(allow_null=True, required=False)
@@ -2253,6 +2271,8 @@ class WorkflowSerializer(serializers.ModelSerializer):
         if triggers is not None and triggers is not serializers.empty:
             for trigger in triggers:
                 filter_has_tags = trigger.pop("filter_has_tags", None)
+                # Convert sources to strings to handle django-multiselectfield v1.0 changes
+                WorkflowTriggerSerializer.normalize_workflow_trigger_sources(trigger)
                 trigger_instance, _ = WorkflowTrigger.objects.update_or_create(
                     id=trigger.get("id"),
                     defaults=trigger,

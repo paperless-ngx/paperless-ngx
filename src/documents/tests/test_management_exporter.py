@@ -123,7 +123,7 @@ class TestExportImport(
 
         self.trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
-            sources=[1],
+            sources=[str(WorkflowTrigger.DocumentSourceChoices.CONSUME_FOLDER.value)],
             filter_filename="*",
         )
         self.action = WorkflowAction.objects.create(assign_title="new title")

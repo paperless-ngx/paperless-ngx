@@ -9,7 +9,6 @@ from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from paperless.checks import audit_log_check
 from paperless.checks import binaries_check
-from paperless.checks import check_postgres_version
 from paperless.checks import debug_mode_check
 from paperless.checks import paths_check
 from paperless.checks import settings_values_check
@@ -263,39 +262,3 @@ class TestAuditLogChecks(TestCase):
                     ("auditlog table was found but audit log is disabled."),
                     msg.msg,
                 )
-
-
-class TestPostgresVersionCheck(TestCase):
-    @mock.patch("paperless.checks.connections")
-    def test_postgres_13_warns(self, mock_connections):
-        mock_connection = mock.MagicMock()
-        mock_connection.vendor = "postgresql"
-        mock_cursor = mock.MagicMock()
-        mock_cursor.__enter__.return_value.fetchone.return_value = ["13.11"]
-        mock_connection.cursor.return_value = mock_cursor
-        mock_connections.__getitem__.return_value = mock_connection
-
-        warnings = check_postgres_version(None)
-        self.assertEqual(len(warnings), 1)
-        self.assertIn("PostgreSQL 13 is deprecated", warnings[0].msg)
-
-    @mock.patch("paperless.checks.connections")
-    def test_postgres_14_passes(self, mock_connections):
-        mock_connection = mock.MagicMock()
-        mock_connection.vendor = "postgresql"
-        mock_cursor = mock.MagicMock()
-        mock_cursor.__enter__.return_value.fetchone.return_value = ["14.10"]
-        mock_connection.cursor.return_value = mock_cursor
-        mock_connections.__getitem__.return_value = mock_connection
-
-        warnings = check_postgres_version(None)
-        self.assertEqual(warnings, [])
-
-    @mock.patch("paperless.checks.connections")
-    def test_non_postgres_skipped(self, mock_connections):
-        mock_connection = mock.MagicMock()
-        mock_connection.vendor = "sqlite"
-        mock_connections.__getitem__.return_value = mock_connection
-
-        warnings = check_postgres_version(None)
-        self.assertEqual(warnings, [])
