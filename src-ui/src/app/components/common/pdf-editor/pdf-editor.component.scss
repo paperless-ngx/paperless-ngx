@@ -1,0 +1,70 @@
+
+
+.page-item {
+  position: relative;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background-origin: border-box;
+
+  &.selected {
+    background-color: var(--pngx-primary-darken-5);
+  }
+}
+
+.pdf-viewer-container {
+  background-color: gray;
+  height: 240px;
+
+  pdf-viewer {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+::ng-deep .ng2-pdf-viewer-container {
+  overflow: hidden;
+}
+
+.hover-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: none;
+}
+
+.page-item:hover .hover-actions {
+  display: block;
+}
+
+.document-check {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0.5rem;
+  border-top-left-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+  pointer-events: none;
+
+  .form-check {
+    padding: 0;
+    min-height: 0;
+    margin-bottom: 0;
+
+    .form-check-input {
+      margin-left: 0;
+    }
+  }
+}
+
+.page-item:hover .document-check, .selected .document-check {
+  display: block;
+}
+
+.z-10 {
+    z-index: 10;
+}
+
+.split-after {
+  writing-mode: vertical-rl;
+}

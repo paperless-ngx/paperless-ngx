@@ -1293,6 +1293,7 @@ class BulkEditSerializer(
             "merge",
             "split",
             "delete_pages",
+            "edit_pdf",
         ],
         label="Method",
         write_only=True,
@@ -1366,7 +1367,10 @@ class BulkEditSerializer(
             return bulk_edit.split
         elif method == "delete_pages":
             return bulk_edit.delete_pages
-        else:
+        elif method == "edit_pdf":
+            return bulk_edit.edit_pdf
+        else:  # pragma: no cover
+            # This will never happen as it is handled by the ChoiceField
             raise serializers.ValidationError("Unsupported method.")
 
     def _validate_parameters_tags(self, parameters):
@@ -1520,6 +1524,47 @@ class BulkEditSerializer(
         else:
             parameters["archive_fallback"] = False
 
+    def _validate_parameters_edit_pdf(self, parameters, document_id):
+        if "operations" not in parameters:
+            raise serializers.ValidationError("operations not specified")
+        if not isinstance(parameters["operations"], list):
+            raise serializers.ValidationError("operations must be a list")
+        for op in parameters["operations"]:
+            if not isinstance(op, dict):
+                raise serializers.ValidationError("invalid operation entry")
+            if "page" not in op or not isinstance(op["page"], int):
+                raise serializers.ValidationError("page must be an integer")
+            if "rotate" in op and not isinstance(op["rotate"], int):
+                raise serializers.ValidationError("rotate must be an integer")
+            if "doc" in op and not isinstance(op["doc"], int):
+                raise serializers.ValidationError("doc must be an integer")
+        if "update_document" in parameters:
+            if not isinstance(parameters["update_document"], bool):
+                raise serializers.ValidationError("update_document must be a boolean")
+        else:
+            parameters["update_document"] = False
+        if "include_metadata" in parameters:
+            if not isinstance(parameters["include_metadata"], bool):
+                raise serializers.ValidationError("include_metadata must be a boolean")
+        else:
+            parameters["include_metadata"] = True
+
+        if parameters["update_document"]:
+            max_idx = max(op.get("doc", 0) for op in parameters["operations"])
+            if max_idx > 0:
+                raise serializers.ValidationError(
+                    "update_document only allowed with a single output document",
+                )
+
+        doc = Document.objects.get(id=document_id)
+        # doc existence is already validated
+        if doc.page_count:
+            for op in parameters["operations"]:
+                if op["page"] < 1 or op["page"] > doc.page_count:
+                    raise serializers.ValidationError(
+                        f"Page {op['page']} is out of bounds for document with {doc.page_count} pages.",
+                    )
+
     def validate(self, attrs):
         method = attrs["method"]
         parameters = attrs["parameters"]
@@ -1554,6 +1599,12 @@ class BulkEditSerializer(
             self._validate_parameters_delete_pages(parameters)
         elif method == bulk_edit.merge:
             self._validate_parameters_merge(parameters)
+        elif method == bulk_edit.edit_pdf:
+            if len(attrs["documents"]) > 1:
+                raise serializers.ValidationError(
+                    "Edit PDF method only supports one document",
+                )
+            self._validate_parameters_edit_pdf(parameters, attrs["documents"][0])
 
         return attrs
 

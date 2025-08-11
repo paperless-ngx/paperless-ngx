@@ -1421,3 +1421,25 @@ OUTLOOK_OAUTH_ENABLED = bool(
     and OUTLOOK_OAUTH_CLIENT_ID
     and OUTLOOK_OAUTH_CLIENT_SECRET,
 )
+
+###############################################################################
+# Webhooks
+###############################################################################
+WEBHOOKS_ALLOWED_SCHEMES = set(
+    s.lower()
+    for s in __get_list(
+        "PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES",
+        ["http", "https"],
+    )
+)
+WEBHOOKS_ALLOWED_PORTS = set(
+    int(p)
+    for p in __get_list(
+        "PAPERLESS_WEBHOOKS_ALLOWED_PORTS",
+        [],
+    )
+)
+WEBHOOKS_ALLOW_INTERNAL_REQUESTS = __get_boolean(
+    "PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS",
+    "true",
+)
