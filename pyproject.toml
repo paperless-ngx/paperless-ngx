@@ -15,6 +15,7 @@ classifiers = [
 # This will allow testing to not install a webserver, mysql, etc
 
 dependencies = [
+  "babel>=2.17",
   "bleach~=6.2.0",
   "celery[redis]~=5.5.1",
   "channels~=4.2",

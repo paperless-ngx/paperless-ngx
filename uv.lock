@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.10"
 resolution-markers = [
     "sys_platform == 'darwin'",
@@ -1911,6 +1911,7 @@ name = "paperless-ngx"
 version = "2.17.1"
 source = { virtual = "." }
 dependencies = [
+    { name = "babel", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "bleach", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "celery", extra = ["redis"], marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "channels", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -2044,6 +2045,7 @@ typing = [
 
 [package.metadata]
 requires-dist = [
+    { name = "babel", specifier = ">=2.17.0" },
     { name = "bleach", specifier = "~=6.2.0" },
     { name = "celery", extras = ["redis"], specifier = "~=5.5.1" },
     { name = "channels", specifier = "~=4.2" },

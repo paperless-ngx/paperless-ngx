@@ -2,10 +2,12 @@ import logging
 import os
 import re
 from collections.abc import Iterable
+from datetime import date
 from datetime import datetime
 from pathlib import PurePath
 
 import pathvalidate
+from babel import dates
 from django.utils import timezone
 from django.utils.dateparse import parse_date
 from django.utils.text import slugify as django_slugify
@@ -90,18 +92,45 @@ def get_cf_value(
     return None
 
 
-_template_environment.filters["get_cf_value"] = get_cf_value
-
-
 def format_datetime(value: str | datetime, format: str) -> str:
     if isinstance(value, str):
         value = parse_date(value)
     return value.strftime(format=format)
 
 
+def localize_date(value: date | datetime, format: str, locale: str) -> str:
+    """
+    Format a date or datetime object into a localized string using Babel.
+
+    Args:
+        value (date | datetime): The date or datetime to format. If a datetime
+            is provided, it should be timezone-aware (e.g., UTC from a Django DB object).
+        format (str): The format to use. Can be one of Babel's preset formats
+            ('short', 'medium', 'long', 'full') or a custom pattern string.
+        locale (str): The locale code (e.g., 'en_US', 'fr_FR') to use for
+            localization.
+
+    Returns:
+        str: The localized, formatted date string.
+
+    Raises:
+        TypeError: If `value` is not a date or datetime instance.
+    """
+    if isinstance(value, datetime):
+        return dates.format_datetime(value, format=format, locale=locale)
+    elif isinstance(value, date):
+        return dates.format_date(value, format=format, locale=locale)
+    else:
+        raise TypeError(f"Unsupported type {type(value)} for localize_date")
+
+
+_template_environment.filters["get_cf_value"] = get_cf_value
+
 _template_environment.filters["datetime"] = format_datetime
 
 _template_environment.filters["slugify"] = django_slugify
+
+_template_environment.filters["localize_date"] = localize_date
 
 
 def create_dummy_document():
