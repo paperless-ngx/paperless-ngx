@@ -224,7 +224,7 @@ lint.isort.force-single-line = true
 
 [tool.codespell]
 write-changes = true
-ignore-words-list = "criterias,afterall,valeu,ureue,equest,ure,assertIn"
+ignore-words-list = "criterias,afterall,valeu,ureue,equest,ure,assertIn,Oktober"
 skip = "src-ui/src/locale/*,src-ui/pnpm-lock.yaml,src-ui/e2e/*,src/paperless_mail/tests/samples/*,src/documents/tests/samples/*,*.po,*.json"
 
 [tool.pytest.ini_options]

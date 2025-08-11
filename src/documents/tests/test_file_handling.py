@@ -1636,7 +1636,7 @@ class TestDateLocalization:
                 TEST_DATE,
                 "MMMM",
                 "de_DE",
-                "October",
+                "Oktober",
                 id="month-de_DE",
             ),
             # French weekday and month name translation
