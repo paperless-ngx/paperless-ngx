@@ -580,12 +580,14 @@ The following custom field types are supported:
 
 ## PDF Actions
 
-Paperless-ngx supports four basic editing operations for PDFs (these operations currently cannot be performed on non-PDF files):
+Paperless-ngx supports basic editing operations for PDFs (these operations currently cannot be performed on non-PDF files). When viewing an individual document you can
+open the 'PDF Editor' to use a simple UI for re-arranging, rotating, deleting pages and splitting documents.
 
 -   Merging documents: available when selecting multiple documents for 'bulk editing'.
--   Rotating documents: available when selecting multiple documents for 'bulk editing' and from an individual document's details page.
--   Splitting documents: available from an individual document's details page.
--   Deleting pages: available from an individual document's details page.
+-   Rotating documents: available when selecting multiple documents for 'bulk editing' and via the pdf editor on an individual document's details page.
+-   Splitting documents: via the pdf editor on an individual document's details page.
+-   Deleting pages: via the pdf editor on an individual document's details page.
+-   Re-arranging pages: via the pdf editor on an individual document's details page.
 
 !!! important
 

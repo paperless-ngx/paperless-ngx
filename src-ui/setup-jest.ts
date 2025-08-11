@@ -121,6 +121,26 @@ if (!URL.revokeObjectURL) {
 }
 Object.defineProperty(window, 'ResizeObserver', { value: mock() })
 
+if (typeof IntersectionObserver === 'undefined') {
+  class MockIntersectionObserver {
+    constructor(
+      public callback: IntersectionObserverCallback,
+      public options?: IntersectionObserverInit
+    ) {}
+
+    observe = jest.fn()
+    unobserve = jest.fn()
+    disconnect = jest.fn()
+    takeRecords = jest.fn()
+  }
+
+  Object.defineProperty(window, 'IntersectionObserver', {
+    writable: true,
+    configurable: true,
+    value: MockIntersectionObserver,
+  })
+}
+
 HTMLCanvasElement.prototype.getContext = <
   typeof HTMLCanvasElement.prototype.getContext
 >jest.fn()
