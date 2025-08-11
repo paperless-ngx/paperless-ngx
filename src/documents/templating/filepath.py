@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import PurePath
 
 import pathvalidate
+from babel import Locale
 from babel import dates
 from django.utils import timezone
 from django.utils.dateparse import parse_date
@@ -116,6 +117,11 @@ def localize_date(value: date | datetime, format: str, locale: str) -> str:
     Raises:
         TypeError: If `value` is not a date or datetime instance.
     """
+    try:
+        Locale.parse(locale)
+    except Exception as e:
+        raise ValueError(f"Invalid locale identifier: {locale}") from e
+
     if isinstance(value, datetime):
         return dates.format_datetime(value, format=format, locale=locale)
     elif isinstance(value, date):

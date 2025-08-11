@@ -465,9 +465,6 @@ The `get_cf_value` filter retrieves a value from custom field data with optional
 
 <!-- With default value -->
 {{ custom_fields | get_cf_value('phone', 'Not provided') }}
-
-<!-- Handling missing fields -->
-{{ custom_fields | get_cf_value('optional_field', 'N/A') }}
 ```
 
 ##### Datetime Formatting
@@ -510,7 +507,7 @@ for the possible codes and their meanings.
 
 ##### Date Localization
 
-The `localize_date1 filter formats a date or datetime object into a localized string using Babel internationalization.
+The `localize_date` filter formats a date or datetime object into a localized string using Babel internationalization.
 This takes into account the provided locale for translation.
 
 ###### Syntax
@@ -558,7 +555,7 @@ This takes into account the provided locale for translation.
 <!-- Output: "15/01/2024" -->
 ```
 
-See the [supported locale codes]() for more options,
+See the [supported format codes](https://unicode.org/reports/tr35/tr35-dates.html#Date_Format_Patterns) for more options.
 
 ### Format Presets
 
@@ -566,18 +563,6 @@ See the [supported locale codes]() for more options,
 -   **medium**: Medium-length format (e.g., "Jan 15, 2024")
 -   **long**: Long format with full month name (e.g., "January 15, 2024")
 -   **full**: Full format including day of week (e.g., "Monday, January 15, 2024")
-
-## Usage Notes
-
--   All filters handle `None` values gracefully
--   Date strings are automatically parsed when needed
--   Timezone-aware datetime objects are recommended for `localize_date`
--   Custom field data should follow the expected dictionary structure for `get_cf_value`
--   Invalid format strings will raise appropriate Python exceptions
-
-````
-
-
 
 #### Additional Variables
 
@@ -606,7 +591,7 @@ somepath/
   {% endif %}
 {% endif %}
 /{{ title }}
-````
+```
 
 For a document with an ASN of 205, it would result in `somepath/asn-201-400/asn-2xx/Title.pdf`, but
 a document with an ASN of 355 would be placed in `somepath/asn-201-400/asn-3xx/Title.pdf`.
