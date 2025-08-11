@@ -1424,9 +1424,30 @@ OUTLOOK_OAUTH_ENABLED = bool(
 )
 
 ###############################################################################
+# Webhooks
+###############################################################################
+WEBHOOKS_ALLOWED_SCHEMES = set(
+    s.lower()
+    for s in __get_list(
+        "PAPERLESS_WEBHOOKS_ALLOWED_SCHEMES",
+        ["http", "https"],
+    )
+)
+WEBHOOKS_ALLOWED_PORTS = set(
+    int(p)
+    for p in __get_list(
+        "PAPERLESS_WEBHOOKS_ALLOWED_PORTS",
+        [],
+    )
+)
+WEBHOOKS_ALLOW_INTERNAL_REQUESTS = __get_boolean(
+    "PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS",
+    "true",
+)
+
+###############################################################################
 # Remote Parser                                                               #
 ###############################################################################
-
 REMOTE_OCR_ENGINE = os.getenv("PAPERLESS_REMOTE_OCR_ENGINE")
 REMOTE_OCR_API_KEY = os.getenv("PAPERLESS_REMOTE_OCR_API_KEY")
 REMOTE_OCR_ENDPOINT = os.getenv("PAPERLESS_REMOTE_OCR_ENDPOINT")
