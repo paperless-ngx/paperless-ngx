@@ -1020,6 +1020,20 @@ still perform some basic text pre-processing before matching.
 
     Defaults to 1.
 
+#### [`PAPERLESS_SUGGESTION_CONTENT_LENGTH_LIMIT=<int>`](#PAPERLESS_SUGGESTION_CONTENT_LENGTH_LIMIT) {#PAPERLESS_SUGGESTION_CONTENT_LENGTH_LIMIT}
+
+: Defines the maximum number of characters from a document’s content used when generating suggestions (e.g., tag prediction, correspondent detection, or date extraction).
+When set, Paperless-ngx keeps the beginning and end of the content and removes the middle.
+
+This improves performance for very large documents, but may slightly reduce matching accuracy.
+
+    Defaults to 0, (feature disabled, full content is used).
+    Minimum: 1000 (if enabled).
+
+    !!! note
+
+        For most environments, a recommended range is between 10 000 characters (on slower systems) and 1 000 000 characters (on faster ones).
+
 #### [`PAPERLESS_DATE_PARSER_LANGUAGES=<lang>`](#PAPERLESS_DATE_PARSER_LANGUAGES) {#PAPERLESS_DATE_PARSER_LANGUAGES}
 
 Specifies which language Paperless should use when parsing dates from documents.

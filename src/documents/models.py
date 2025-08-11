@@ -306,6 +306,28 @@ class Document(SoftDeleteModel, ModelWithOwner):
         return res
 
     @property
+    def suggestion_content(self):
+        """
+        Returns the document text used to generate suggestions.
+
+        If no limit is set in settings or the content length is below the limit,
+        the full content is returned. Otherwise, the text is cropped to
+        include the start and end segments.
+
+        This improves processing speed for large documents while keeping
+        enough context for accurate suggestions.
+        """
+        limit = settings.SUGGESTION_CONTENT_LENGTH_LIMIT
+        if not self.content or not limit or len(self.content) <= limit:
+            return self.content
+        # Use 80% of the limit from the start and 20% from the end
+        # to preserve both opening and closing context.
+        head_len = int(limit * 0.8)
+        tail_len = limit - head_len
+
+        return " ".join((self.content[:head_len], self.content[-tail_len:]))
+
+    @property
     def source_path(self) -> Path:
         if self.filename:
             fname = str(self.filename)
