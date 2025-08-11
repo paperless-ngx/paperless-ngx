@@ -179,7 +179,7 @@ following:
 
 ### Database Upgrades
 
-In general, Paperless-ngx supports current version of PostgreSQL and MariaDB and it is generally
+Paperless-ngx is compatible with Django-supported versions of PostgreSQL and MariaDB and it is generally
 safe to update them to newer versions. However, you should always take a backup and follow
 the instructions from your database's documentation for how to upgrade between major versions.
 
