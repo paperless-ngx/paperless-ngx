@@ -1054,10 +1054,10 @@ configured strategy:
 
     Defaults to `first`
 
-!!! note
-If set to "last" and the resolved date falls in the future, the parsed date will
-be ignored. This behavior is intentional, as Paperless only uses past and current
-dates for setting timestamps.
+    !!! note
+        If set to "last" and the resolved date falls in the future, the parsed date will
+        be ignored. This behavior is intentional, as Paperless only uses past and current
+        dates for setting timestamps.
 
 #### [`PAPERLESS_EMAIL_TASK_CRON=<cron expression>`](#PAPERLESS_EMAIL_TASK_CRON) {#PAPERLESS_EMAIL_TASK_CRON}
 
