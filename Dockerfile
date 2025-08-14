@@ -171,7 +171,7 @@ RUN set -eux \
     && apt-get install --yes --quiet --no-install-recommends ${RUNTIME_PACKAGES} \
     && echo "Installing pre-built updates" \
       && curl --fail --silent --no-progress-meter --show-error --location --remote-name-all \
-        https://github.com/paperless-ngx/builder/releases/download/jbig2enc-${JBIG2ENC_VERSION}/jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
+        https://github.com/paperless-ngx/builder/releases/download/jbig2enc-v${JBIG2ENC_VERSION}/jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
       && echo "Installing jbig2enc" \
         && dpkg --install ./jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
       && echo "Configuring imagemagick" \
