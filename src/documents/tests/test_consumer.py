@@ -254,7 +254,7 @@ class TestConsumer(
         # https://github.com/jonaswinkler/paperless-ng/discussions/1037
 
         filename = self.get_test_file()
-        shadow_file = Path(self.dirs.scratch_dir / "._sample.pdf")
+        shadow_file = Path(self.dirs.scratch_dir) / "._sample.pdf"
 
         shutil.copy(filename, shadow_file)
 
