@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-19 18:51+0000\n"
-"PO-Revision-Date: 2025-06-19 18:52\n"
+"POT-Creation-Date: 2025-08-16 14:34+0000\n"
+"PO-Revision-Date: 2025-08-16 14:36\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -526,23 +526,23 @@ msgstr "не имеет настраиваемого поля"
 
 #: documents/models.py:492
 msgid "custom fields query"
-msgstr ""
+msgstr "запрос пользовательских полей"
 
 #: documents/models.py:493
 msgid "created to"
-msgstr ""
+msgstr "создано в"
 
 #: documents/models.py:494
 msgid "created from"
-msgstr ""
+msgstr "создано из"
 
 #: documents/models.py:495
 msgid "added to"
-msgstr ""
+msgstr "добавлено в"
 
 #: documents/models.py:496
 msgid "added from"
-msgstr ""
+msgstr "добавлено из"
 
 #: documents/models.py:497
 msgid "mime type is"
@@ -582,7 +582,7 @@ msgstr "Получить файл"
 
 #: documents/models.py:543
 msgid "Train Classifier"
-msgstr ""
+msgstr "Тренировать Классификатор"
 
 #: documents/models.py:544
 msgid "Check Sanity"
@@ -854,23 +854,23 @@ msgstr "имеет этого корреспондента"
 
 #: documents/models.py:1026
 msgid "schedule offset days"
-msgstr ""
+msgstr "дни смещения расписания"
 
 #: documents/models.py:1029
 msgid "The number of days to offset the schedule trigger by."
-msgstr ""
+msgstr "Количество дней для смещения расписания триггера."
 
 #: documents/models.py:1034
 msgid "schedule is recurring"
-msgstr ""
+msgstr "расписание повторяется"
 
 #: documents/models.py:1037
 msgid "If the schedule should be recurring."
-msgstr ""
+msgstr "Если график должен быть повторяющимся."
 
 #: documents/models.py:1042
 msgid "schedule recurring delay in days"
-msgstr ""
+msgstr "задержка в повторении расписания в днях"
 
 #: documents/models.py:1046
 msgid "The number of days between recurring schedule triggers."
@@ -878,15 +878,15 @@ msgstr "Количество дней между триггерами перио
 
 #: documents/models.py:1051
 msgid "schedule date field"
-msgstr ""
+msgstr "поле даты расписания"
 
 #: documents/models.py:1056
 msgid "The field to check for a schedule trigger."
-msgstr ""
+msgstr "Поле для проверки триггера расписания."
 
 #: documents/models.py:1065
 msgid "schedule date custom field"
-msgstr ""
+msgstr "пользовательское поле даты расписания"
 
 #: documents/models.py:1069
 msgid "workflow trigger"
@@ -914,7 +914,7 @@ msgstr "Тело (сообщение) письма, может включать 
 
 #: documents/models.py:1097
 msgid "emails to"
-msgstr ""
+msgstr "e-mail-ы для"
 
 #: documents/models.py:1100
 msgid "The destination email addresses, comma separated."
@@ -1158,27 +1158,27 @@ msgstr "дата запуска"
 
 #: documents/models.py:1472
 msgid "workflow run"
-msgstr ""
+msgstr "запуск рабочего процесса"
 
 #: documents/models.py:1473
 msgid "workflow runs"
 msgstr "запуски рабочего процесса"
 
-#: documents/serialisers.py:135
+#: documents/serialisers.py:139
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "неверное регулярное выражение: %(error)s"
 
-#: documents/serialisers.py:561
+#: documents/serialisers.py:565
 msgid "Invalid color."
 msgstr "Неверный цвет."
 
-#: documents/serialisers.py:1645
+#: documents/serialisers.py:1700
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Тип файла %(type)s не поддерживается"
 
-#: documents/serialisers.py:1739
+#: documents/serialisers.py:1794
 msgid "Invalid variable detected."
 msgstr "Обнаружена неверная переменная."
 
@@ -1411,21 +1411,21 @@ msgstr "На завершение, пожалуйста заполните сл�
 #: documents/validators.py:24
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr "Не удается распознать URI {value}, отсутствует схема"
+msgstr ""
 
 #: documents/validators.py:29
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr "Не удалось распознать URI {value}, отсутствует сетевое расположение или путь"
+msgstr ""
 
 #: documents/validators.py:36
 msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
-msgstr "Недопустимая схема URI '{parts.scheme}'. Разрешенные схемы: {', '.join(allowed_schemes)}"
+msgstr ""
 
 #: documents/validators.py:45
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr "Невозможно распознать URI {value}"
+msgstr ""
 
 #: paperless/apps.py:11
 msgid "Paperless"
@@ -1573,11 +1573,11 @@ msgstr "Логотип приложения"
 
 #: paperless/models.py:197
 msgid "Enables barcode scanning"
-msgstr ""
+msgstr "Включает сканирование штрих-кода"
 
 #: paperless/models.py:203
 msgid "Enables barcode TIFF support"
-msgstr ""
+msgstr "Включает поддержку TIFF штрих-кода"
 
 #: paperless/models.py:209
 msgid "Sets the barcode string"
@@ -1585,23 +1585,23 @@ msgstr "Устанавливает строку штрих-кода"
 
 #: paperless/models.py:217
 msgid "Retains split pages"
-msgstr ""
+msgstr "Сохраняет разделённые страницы"
 
 #: paperless/models.py:223
 msgid "Enables ASN barcode"
-msgstr ""
+msgstr "Включает ASN штрих-код"
 
 #: paperless/models.py:229
 msgid "Sets the ASN barcode prefix"
-msgstr ""
+msgstr "Устанавливает префикс ASN штрих-кода"
 
 #: paperless/models.py:237
 msgid "Sets the barcode upscale factor"
-msgstr ""
+msgstr "Устанавливает коэффициент масштабирования штрих-кода"
 
 #: paperless/models.py:244
 msgid "Sets the barcode DPI"
-msgstr ""
+msgstr "Устанавливает DPI штрих-кода"
 
 #: paperless/models.py:251
 msgid "Sets the maximum pages for barcode"
@@ -1609,157 +1609,161 @@ msgstr "Устанавливает максимальное количество
 
 #: paperless/models.py:258
 msgid "Enables tag barcode"
-msgstr ""
+msgstr "Включает тег-штрих-код"
 
 #: paperless/models.py:264
 msgid "Sets the tag barcode mapping"
-msgstr ""
+msgstr "Устанавливает сопоставление тег-штрих-кода"
 
 #: paperless/models.py:269
 msgid "paperless application settings"
 msgstr "настройки приложения paperless"
 
-#: paperless/settings.py:755
+#: paperless/settings.py:774
 msgid "English (US)"
 msgstr "Английский (США)"
 
-#: paperless/settings.py:756
+#: paperless/settings.py:775
 msgid "Arabic"
 msgstr "Арабский"
 
-#: paperless/settings.py:757
+#: paperless/settings.py:776
 msgid "Afrikaans"
 msgstr "Африкаанс"
 
-#: paperless/settings.py:758
+#: paperless/settings.py:777
 msgid "Belarusian"
 msgstr "Белорусский"
 
-#: paperless/settings.py:759
+#: paperless/settings.py:778
 msgid "Bulgarian"
 msgstr "Болгарский"
 
-#: paperless/settings.py:760
+#: paperless/settings.py:779
 msgid "Catalan"
 msgstr "Каталонский"
 
-#: paperless/settings.py:761
+#: paperless/settings.py:780
 msgid "Czech"
 msgstr "Чешский"
 
-#: paperless/settings.py:762
+#: paperless/settings.py:781
 msgid "Danish"
 msgstr "Датский"
 
-#: paperless/settings.py:763
+#: paperless/settings.py:782
 msgid "German"
 msgstr "Немецкий"
 
-#: paperless/settings.py:764
+#: paperless/settings.py:783
 msgid "Greek"
 msgstr "Греческий"
 
-#: paperless/settings.py:765
+#: paperless/settings.py:784
 msgid "English (GB)"
 msgstr "Английский (Великобритании)"
 
-#: paperless/settings.py:766
+#: paperless/settings.py:785
 msgid "Spanish"
 msgstr "Испанский"
 
-#: paperless/settings.py:767
+#: paperless/settings.py:786
 msgid "Persian"
-msgstr ""
+msgstr "Персидский"
 
-#: paperless/settings.py:768
+#: paperless/settings.py:787
 msgid "Finnish"
 msgstr "Финский"
 
-#: paperless/settings.py:769
+#: paperless/settings.py:788
 msgid "French"
 msgstr "Французский"
 
-#: paperless/settings.py:770
+#: paperless/settings.py:789
 msgid "Hungarian"
 msgstr "Венгерский"
 
-#: paperless/settings.py:771
+#: paperless/settings.py:790
 msgid "Italian"
 msgstr "Итальянский"
 
-#: paperless/settings.py:772
+#: paperless/settings.py:791
 msgid "Japanese"
 msgstr "Японский"
 
-#: paperless/settings.py:773
+#: paperless/settings.py:792
 msgid "Korean"
 msgstr "Корейский"
 
-#: paperless/settings.py:774
+#: paperless/settings.py:793
 msgid "Luxembourgish"
 msgstr "Люксембургский"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:794
 msgid "Norwegian"
 msgstr "Норвежский"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:795
 msgid "Dutch"
 msgstr "Датский"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:796
 msgid "Polish"
 msgstr "Польский"
 
-#: paperless/settings.py:778
+#: paperless/settings.py:797
 msgid "Portuguese (Brazil)"
 msgstr "Португальский (Бразилия)"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:798
 msgid "Portuguese"
 msgstr "Португальский"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:799
 msgid "Romanian"
 msgstr "Румынский"
 
-#: paperless/settings.py:781
+#: paperless/settings.py:800
 msgid "Russian"
 msgstr "Русский"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:801
 msgid "Slovak"
 msgstr "Словацкий"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:802
 msgid "Slovenian"
 msgstr "Словенский"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:803
 msgid "Serbian"
 msgstr "Сербский"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:804
 msgid "Swedish"
 msgstr "Шведский"
 
-#: paperless/settings.py:786
+#: paperless/settings.py:805
 msgid "Turkish"
 msgstr "Турецкий"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:806
 msgid "Ukrainian"
 msgstr "Украинский"
 
-#: paperless/settings.py:788
+#: paperless/settings.py:807
+msgid "Vietnamese"
+msgstr "Вьетнамский"
+
+#: paperless/settings.py:808
 msgid "Chinese Simplified"
 msgstr "Китайский упрощенный"
 
-#: paperless/settings.py:789
+#: paperless/settings.py:809
 msgid "Chinese Traditional"
 msgstr "Китайский (традиционный)"
 
-#: paperless/urls.py:374
+#: paperless/urls.py:368
 msgid "Paperless-ngx administration"
 msgstr "Администрирование Paperless-ngx"
 
