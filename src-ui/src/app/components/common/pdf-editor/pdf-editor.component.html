@@ -25,7 +25,7 @@
       </button>
     </div>
   </div>
-  <div cdkDropList (cdkDropListDropped)="drop($event)" cdkDropListOrientation="mixed" class="d-flex flex-wrap row-cols-5">
+  <div cdkDropList (cdkDropListDropped)="drop($event)" cdkDropListOrientation="mixed" class="d-flex flex-wrap row-cols-2 row-cols-md-5">
     @for (p of pages; track p.page; let i = $index) {
       <div class="page-item rounded p-2" cdkDrag (click)="toggleSelection(i)" [class.selected]="p.selected">
         <div class="btn-toolbar hover-actions z-10">
@@ -73,8 +73,8 @@
     }
   </div>
 </div>
-<div class="modal-footer flex-column">
-  <div class="d-flex w-100 justify-content-between align-items-center">
+<div class="modal-footer">
+  <div class="d-flex flex-sm-column flex-md-row w-100 gap-2 align-items-center">
     <div class="btn-group" role="group">
       <input type="radio" class="btn-check" [(ngModel)]="editMode" [value]="PdfEditorEditMode.Create" id="editModeCreate" name="editmode">
       <label for="editModeCreate" class="btn btn-outline-primary btn-sm">
@@ -88,16 +88,20 @@
       </label>
     </div>
     @if (editMode === PdfEditorEditMode.Create) {
-      <div class="form-check ms-3">
-        <input class="form-check-input" type="checkbox" id="copyMeta" [(ngModel)]="includeMetadata">
-        <label class="form-check-label" for="copyMeta" i18n>Copy metadata</label>
-      </div>
-      <div class="form-check ms-3">
-        <input class="form-check-input" type="checkbox" id="deleteOriginal" [(ngModel)]="deleteOriginal">
-        <label class="form-check-label" for="deleteOriginal" i18n>Delete original</label>
+      <div class="form-group d-flex">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="copyMeta" [(ngModel)]="includeMetadata">
+          <label class="form-check-label" for="copyMeta" i18n>Copy metadata</label>
+        </div>
+        <div class="form-check ms-3">
+          <input class="form-check-input" type="checkbox" id="deleteOriginal" [(ngModel)]="deleteOriginal">
+          <label class="form-check-label" for="deleteOriginal" i18n>Delete original</label>
+        </div>
       </div>
     }
-    <button type="button" class="btn ms-auto me-2" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">{{ cancelBtnCaption }}</button>
-    <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="pages.length === 0">{{ btnCaption }}</button>
+    <div class="form-group ms-md-auto">
+      <button type="button" class="btn me-2" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">{{ cancelBtnCaption }}</button>
+      <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="pages.length === 0">{{ btnCaption }}</button>
+    </div>
   </div>
 </div>
