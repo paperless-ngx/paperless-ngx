@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-19 18:51+0000\n"
-"PO-Revision-Date: 2025-06-19 18:52\n"
+"POT-Creation-Date: 2025-08-16 14:34+0000\n"
+"PO-Revision-Date: 2025-08-16 14:36\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -1164,21 +1164,21 @@ msgstr "exécution du workflow"
 msgid "workflow runs"
 msgstr "le flux de travail s'exécute"
 
-#: documents/serialisers.py:135
+#: documents/serialisers.py:139
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Expression régulière incorrecte : %(error)s"
 
-#: documents/serialisers.py:561
+#: documents/serialisers.py:565
 msgid "Invalid color."
 msgstr "Couleur incorrecte."
 
-#: documents/serialisers.py:1645
+#: documents/serialisers.py:1700
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Type de fichier %(type)s non pris en charge"
 
-#: documents/serialisers.py:1739
+#: documents/serialisers.py:1794
 msgid "Invalid variable detected."
 msgstr "Variable invalide détectée."
 
@@ -1572,193 +1572,197 @@ msgstr "Nom de l'application"
 
 #: paperless/models.py:197
 msgid "Enables barcode scanning"
-msgstr ""
+msgstr "Active le scan des codes-barres"
 
 #: paperless/models.py:203
 msgid "Enables barcode TIFF support"
-msgstr ""
+msgstr "Active le support des codes-barres TIFF"
 
 #: paperless/models.py:209
 msgid "Sets the barcode string"
-msgstr ""
+msgstr "Définit la chaîne du code-barres"
 
 #: paperless/models.py:217
 msgid "Retains split pages"
-msgstr ""
+msgstr "Conserve les pages divisées"
 
 #: paperless/models.py:223
 msgid "Enables ASN barcode"
-msgstr ""
+msgstr "Active le code-barres ASN"
 
 #: paperless/models.py:229
 msgid "Sets the ASN barcode prefix"
-msgstr ""
+msgstr "Définit le préfixe du code-barres ASN"
 
 #: paperless/models.py:237
 msgid "Sets the barcode upscale factor"
-msgstr ""
+msgstr "Définit le facteur de mise à l'échelle du code-barres"
 
 #: paperless/models.py:244
 msgid "Sets the barcode DPI"
-msgstr ""
+msgstr "Définit le DPI du code-barres"
 
 #: paperless/models.py:251
 msgid "Sets the maximum pages for barcode"
-msgstr ""
+msgstr "Définit le nombre maximum de pages pour le code-barres"
 
 #: paperless/models.py:258
 msgid "Enables tag barcode"
-msgstr ""
+msgstr "Activer les étiquettes pour le code-barres"
 
 #: paperless/models.py:264
 msgid "Sets the tag barcode mapping"
-msgstr ""
+msgstr "Définit la correspondance des étiquettes de code-barres"
 
 #: paperless/models.py:269
 msgid "paperless application settings"
 msgstr "paramètres de l'application paperless"
 
-#: paperless/settings.py:755
+#: paperless/settings.py:774
 msgid "English (US)"
 msgstr "Anglais (US)"
 
-#: paperless/settings.py:756
+#: paperless/settings.py:775
 msgid "Arabic"
 msgstr "Arabe"
 
-#: paperless/settings.py:757
+#: paperless/settings.py:776
 msgid "Afrikaans"
 msgstr "Afrikaans"
 
-#: paperless/settings.py:758
+#: paperless/settings.py:777
 msgid "Belarusian"
 msgstr "Biélorusse"
 
-#: paperless/settings.py:759
+#: paperless/settings.py:778
 msgid "Bulgarian"
 msgstr "Bulgare"
 
-#: paperless/settings.py:760
+#: paperless/settings.py:779
 msgid "Catalan"
 msgstr "Catalan"
 
-#: paperless/settings.py:761
+#: paperless/settings.py:780
 msgid "Czech"
 msgstr "Tchèque"
 
-#: paperless/settings.py:762
+#: paperless/settings.py:781
 msgid "Danish"
 msgstr "Danois"
 
-#: paperless/settings.py:763
+#: paperless/settings.py:782
 msgid "German"
 msgstr "Allemand"
 
-#: paperless/settings.py:764
+#: paperless/settings.py:783
 msgid "Greek"
 msgstr "Grec"
 
-#: paperless/settings.py:765
+#: paperless/settings.py:784
 msgid "English (GB)"
 msgstr "Anglais (GB)"
 
-#: paperless/settings.py:766
+#: paperless/settings.py:785
 msgid "Spanish"
 msgstr "Espagnol"
 
-#: paperless/settings.py:767
+#: paperless/settings.py:786
 msgid "Persian"
-msgstr ""
+msgstr "Persan"
 
-#: paperless/settings.py:768
+#: paperless/settings.py:787
 msgid "Finnish"
 msgstr "Finnois"
 
-#: paperless/settings.py:769
+#: paperless/settings.py:788
 msgid "French"
 msgstr "Français"
 
-#: paperless/settings.py:770
+#: paperless/settings.py:789
 msgid "Hungarian"
 msgstr "Hongrois"
 
-#: paperless/settings.py:771
+#: paperless/settings.py:790
 msgid "Italian"
 msgstr "Italien"
 
-#: paperless/settings.py:772
+#: paperless/settings.py:791
 msgid "Japanese"
 msgstr "Japonais"
 
-#: paperless/settings.py:773
+#: paperless/settings.py:792
 msgid "Korean"
 msgstr "Coréen"
 
-#: paperless/settings.py:774
+#: paperless/settings.py:793
 msgid "Luxembourgish"
 msgstr "Luxembourgeois"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:794
 msgid "Norwegian"
 msgstr "Norvégien"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:795
 msgid "Dutch"
 msgstr "Néerlandais"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:796
 msgid "Polish"
 msgstr "Polonais"
 
-#: paperless/settings.py:778
+#: paperless/settings.py:797
 msgid "Portuguese (Brazil)"
 msgstr "Portugais (Brésil)"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:798
 msgid "Portuguese"
 msgstr "Portugais"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:799
 msgid "Romanian"
 msgstr "Roumain"
 
-#: paperless/settings.py:781
+#: paperless/settings.py:800
 msgid "Russian"
 msgstr "Russe"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:801
 msgid "Slovak"
 msgstr "Solvaque"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:802
 msgid "Slovenian"
 msgstr "Slovène"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:803
 msgid "Serbian"
 msgstr "Serbe"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:804
 msgid "Swedish"
 msgstr "Suédois"
 
-#: paperless/settings.py:786
+#: paperless/settings.py:805
 msgid "Turkish"
 msgstr "Turc"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:806
 msgid "Ukrainian"
 msgstr "Ukrainien"
 
-#: paperless/settings.py:788
+#: paperless/settings.py:807
+msgid "Vietnamese"
+msgstr "Vietnamien"
+
+#: paperless/settings.py:808
 msgid "Chinese Simplified"
 msgstr "Chinois simplifié"
 
-#: paperless/settings.py:789
+#: paperless/settings.py:809
 msgid "Chinese Traditional"
 msgstr "Chinois traditionnel"
 
-#: paperless/urls.py:374
+#: paperless/urls.py:368
 msgid "Paperless-ngx administration"
 msgstr "Administration de Paperless-ngx"
 

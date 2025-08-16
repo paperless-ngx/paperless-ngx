@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-19 18:51+0000\n"
-"PO-Revision-Date: 2025-06-19 18:52\n"
+"POT-Creation-Date: 2025-08-16 14:34+0000\n"
+"PO-Revision-Date: 2025-08-16 14:36\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -35,7 +35,7 @@ msgstr ""
 
 #: documents/filters.py:434
 msgid "Invalid logical operator {op!r}"
-msgstr ""
+msgstr "Operador lógico inválido {op!r}"
 
 #: documents/filters.py:448
 msgid "Maximum number of query conditions exceeded."
@@ -55,7 +55,7 @@ msgstr ""
 
 #: documents/filters.py:843
 msgid "Custom field not found"
-msgstr ""
+msgstr "Campo personalizado não encontrado"
 
 #: documents/models.py:36 documents/models.py:713
 msgid "owner"
@@ -196,11 +196,11 @@ msgstr "A soma de verificação do documento arquivado."
 
 #: documents/models.py:205
 msgid "page count"
-msgstr ""
+msgstr "número de páginas"
 
 #: documents/models.py:212
 msgid "The number of pages of the document."
-msgstr ""
+msgstr "O número de páginas do documento."
 
 #: documents/models.py:217 documents/models.py:633 documents/models.py:671
 #: documents/models.py:742 documents/models.py:800
@@ -318,7 +318,7 @@ msgstr "ASN"
 
 #: documents/models.py:398
 msgid "Pages"
-msgstr ""
+msgstr "Páginas"
 
 #: documents/models.py:404
 msgid "show on dashboard"
@@ -534,15 +534,15 @@ msgstr "criado até"
 
 #: documents/models.py:494
 msgid "created from"
-msgstr ""
+msgstr "criado a partir de"
 
 #: documents/models.py:495
 msgid "added to"
-msgstr ""
+msgstr "adicionado a"
 
 #: documents/models.py:496
 msgid "added from"
-msgstr ""
+msgstr "adicionado de"
 
 #: documents/models.py:497
 msgid "mime type is"
@@ -566,15 +566,15 @@ msgstr "regras de filtragem"
 
 #: documents/models.py:537
 msgid "Auto Task"
-msgstr ""
+msgstr "Tarefa Automática"
 
 #: documents/models.py:538
 msgid "Scheduled Task"
-msgstr ""
+msgstr "Tarefa Agendada"
 
 #: documents/models.py:539
 msgid "Manual Task"
-msgstr ""
+msgstr "Tarefa Manual"
 
 #: documents/models.py:542
 msgid "Consume File"
@@ -586,11 +586,11 @@ msgstr ""
 
 #: documents/models.py:544
 msgid "Check Sanity"
-msgstr ""
+msgstr "Verificar Sanidade"
 
 #: documents/models.py:545
 msgid "Index Optimize"
-msgstr ""
+msgstr "Otimizar Índice"
 
 #: documents/models.py:550
 msgid "Task ID"
@@ -622,7 +622,7 @@ msgstr "Nome da Tarefa"
 
 #: documents/models.py:572
 msgid "Name of the task that was run"
-msgstr ""
+msgstr "Nome da tarefa que foi executada"
 
 #: documents/models.py:579
 msgid "Task State"
@@ -666,11 +666,11 @@ msgstr "Os dados devolvidos pela tarefa"
 
 #: documents/models.py:617
 msgid "Task Type"
-msgstr ""
+msgstr "Tipo de Tarefa"
 
 #: documents/models.py:618
 msgid "The type of task that was run"
-msgstr ""
+msgstr "O tipo de tarefa que foi executada"
 
 #: documents/models.py:629
 msgid "Note for the document"
@@ -790,7 +790,7 @@ msgstr "Documento Atualizado"
 
 #: documents/models.py:935
 msgid "Scheduled"
-msgstr ""
+msgstr "Agendado"
 
 #: documents/models.py:938
 msgid "Consume Folder"
@@ -810,11 +810,11 @@ msgstr ""
 
 #: documents/models.py:946
 msgid "Modified"
-msgstr ""
+msgstr "Modificado"
 
 #: documents/models.py:947
 msgid "Custom Field"
-msgstr ""
+msgstr "Campo Personalizado"
 
 #: documents/models.py:950
 msgid "Workflow Trigger Type"
@@ -862,7 +862,7 @@ msgstr ""
 
 #: documents/models.py:1034
 msgid "schedule is recurring"
-msgstr ""
+msgstr "agendamento é recorrente"
 
 #: documents/models.py:1037
 msgid "If the schedule should be recurring."
@@ -870,7 +870,7 @@ msgstr "Se o horário deve ser recorrente."
 
 #: documents/models.py:1042
 msgid "schedule recurring delay in days"
-msgstr ""
+msgstr "agendar atraso recorrente em dias"
 
 #: documents/models.py:1046
 msgid "The number of days between recurring schedule triggers."
@@ -898,7 +898,7 @@ msgstr "acionadores do fluxo do trabalho"
 
 #: documents/models.py:1078
 msgid "email subject"
-msgstr ""
+msgstr "assunto do email"
 
 #: documents/models.py:1082
 msgid "The subject of the email, can include some placeholders, see documentation."
@@ -906,7 +906,7 @@ msgstr ""
 
 #: documents/models.py:1088
 msgid "email body"
-msgstr ""
+msgstr "corpo do email"
 
 #: documents/models.py:1091
 msgid "The body (message) of the email, can include some placeholders, see documentation."
@@ -922,7 +922,7 @@ msgstr ""
 
 #: documents/models.py:1106
 msgid "include document in email"
-msgstr ""
+msgstr "incluir documento no email"
 
 #: documents/models.py:1117
 msgid "webhook url"
@@ -938,7 +938,7 @@ msgstr ""
 
 #: documents/models.py:1130
 msgid "send as JSON"
-msgstr ""
+msgstr "enviar como JSON"
 
 #: documents/models.py:1134
 msgid "webhook parameters"
@@ -1164,21 +1164,21 @@ msgstr ""
 msgid "workflow runs"
 msgstr ""
 
-#: documents/serialisers.py:135
+#: documents/serialisers.py:139
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Expressão regular inválida: %(error)s"
 
-#: documents/serialisers.py:561
+#: documents/serialisers.py:565
 msgid "Invalid color."
 msgstr "Cor invalida."
 
-#: documents/serialisers.py:1645
+#: documents/serialisers.py:1700
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Tipo de arquivo %(type)s não suportado"
 
-#: documents/serialisers.py:1739
+#: documents/serialisers.py:1794
 msgid "Invalid variable detected."
 msgstr "Variável inválida detetada."
 
@@ -1619,147 +1619,151 @@ msgstr ""
 msgid "paperless application settings"
 msgstr "configurações do paperless"
 
-#: paperless/settings.py:755
+#: paperless/settings.py:774
 msgid "English (US)"
 msgstr "Inglês (EUA)"
 
-#: paperless/settings.py:756
+#: paperless/settings.py:775
 msgid "Arabic"
 msgstr "Árabe"
 
-#: paperless/settings.py:757
+#: paperless/settings.py:776
 msgid "Afrikaans"
 msgstr "Africano"
 
-#: paperless/settings.py:758
+#: paperless/settings.py:777
 msgid "Belarusian"
 msgstr "Bielorrusso"
 
-#: paperless/settings.py:759
+#: paperless/settings.py:778
 msgid "Bulgarian"
 msgstr "Búlgaro"
 
-#: paperless/settings.py:760
+#: paperless/settings.py:779
 msgid "Catalan"
 msgstr "Catalão"
 
-#: paperless/settings.py:761
+#: paperless/settings.py:780
 msgid "Czech"
 msgstr "Checo"
 
-#: paperless/settings.py:762
+#: paperless/settings.py:781
 msgid "Danish"
 msgstr "Dinamarquês"
 
-#: paperless/settings.py:763
+#: paperless/settings.py:782
 msgid "German"
 msgstr "Deutsch"
 
-#: paperless/settings.py:764
+#: paperless/settings.py:783
 msgid "Greek"
 msgstr "Grego"
 
-#: paperless/settings.py:765
+#: paperless/settings.py:784
 msgid "English (GB)"
 msgstr "Inglês (GB)"
 
-#: paperless/settings.py:766
+#: paperless/settings.py:785
 msgid "Spanish"
 msgstr "Espanhol"
 
-#: paperless/settings.py:767
+#: paperless/settings.py:786
 msgid "Persian"
 msgstr ""
 
-#: paperless/settings.py:768
+#: paperless/settings.py:787
 msgid "Finnish"
 msgstr "Finlandês"
 
-#: paperless/settings.py:769
+#: paperless/settings.py:788
 msgid "French"
 msgstr "Français"
 
-#: paperless/settings.py:770
+#: paperless/settings.py:789
 msgid "Hungarian"
 msgstr "Húngaro"
 
-#: paperless/settings.py:771
+#: paperless/settings.py:790
 msgid "Italian"
 msgstr "Italiano"
 
-#: paperless/settings.py:772
+#: paperless/settings.py:791
 msgid "Japanese"
 msgstr "Japonês"
 
-#: paperless/settings.py:773
+#: paperless/settings.py:792
 msgid "Korean"
 msgstr ""
 
-#: paperless/settings.py:774
+#: paperless/settings.py:793
 msgid "Luxembourgish"
 msgstr "Luxemburguês"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:794
 msgid "Norwegian"
 msgstr "Norueguês"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:795
 msgid "Dutch"
 msgstr "Nederlandse"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:796
 msgid "Polish"
 msgstr "Polaco"
 
-#: paperless/settings.py:778
+#: paperless/settings.py:797
 msgid "Portuguese (Brazil)"
 msgstr "Português (Brasil)"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:798
 msgid "Portuguese"
 msgstr "Português"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:799
 msgid "Romanian"
 msgstr "Romeno"
 
-#: paperless/settings.py:781
+#: paperless/settings.py:800
 msgid "Russian"
 msgstr "Russo"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:801
 msgid "Slovak"
 msgstr "Eslovaco"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:802
 msgid "Slovenian"
 msgstr "Esloveno"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:803
 msgid "Serbian"
 msgstr "Sérvio"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:804
 msgid "Swedish"
 msgstr "Sueco"
 
-#: paperless/settings.py:786
+#: paperless/settings.py:805
 msgid "Turkish"
 msgstr "Turco"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:806
 msgid "Ukrainian"
 msgstr "Ucraniano"
 
-#: paperless/settings.py:788
+#: paperless/settings.py:807
+msgid "Vietnamese"
+msgstr ""
+
+#: paperless/settings.py:808
 msgid "Chinese Simplified"
 msgstr "Chinês Simplificado"
 
-#: paperless/settings.py:789
+#: paperless/settings.py:809
 msgid "Chinese Traditional"
 msgstr ""
 
-#: paperless/urls.py:374
+#: paperless/urls.py:368
 msgid "Paperless-ngx administration"
 msgstr "Administração do Paperless-ngx"
 
