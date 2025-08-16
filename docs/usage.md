@@ -684,9 +684,7 @@ collection.
 
 The top search bar in the web UI performs a "global" search of the various
 objects Paperless-ngx uses, including documents, tags, workflows, etc. Only
-objects for which the user has appropriate permissions are returned. For
-documents, if there are < 3 results, "advanced" search results (which use
-the document index) will also be included. This can be disabled under settings.
+objects for which the user has appropriate permissions are returned.
 
 ### Document searches
 
