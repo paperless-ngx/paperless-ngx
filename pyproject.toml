@@ -1,6 +1,6 @@
 [project]
 name = "paperless-ngx"
-version = "2.17.1"
+version = "2.18.0"
 description = "A community-supported supercharged version of paperless: scan, index and archive all your physical documents"
 readme = "README.md"
 requires-python = ">=3.10"
