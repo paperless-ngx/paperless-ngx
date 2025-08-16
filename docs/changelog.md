@@ -38,7 +38,7 @@
 
 ### Security
 
--  Address XSS vulnerability GHSA-6p53-hqqw-8j62
+-   Address XSS vulnerability GHSA-6p53-hqqw-8j62
 
 ### Maintenance
 
