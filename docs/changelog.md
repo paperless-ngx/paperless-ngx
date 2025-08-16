@@ -9,27 +9,17 @@
 ### Features / Enhancements
 
 -   Feature: Add filter to localize dates for filepath templating [@stumpylog](https://github.com/stumpylog) ([#10559](https://github.com/paperless-ngx/paperless-ngx/pull/10559))
--   docker(deps): Bump astral-sh/uv from 0.8.4-python3.12-bookworm-slim to 0.8.8-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#10564](https://github.com/paperless-ngx/paperless-ngx/pull/10564))
--   Chore(deps): Bump the django group across 1 directory with 9 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10538](https://github.com/paperless-ngx/paperless-ngx/pull/10538))
 -   Feature: PDF editor [@shamoon](https://github.com/shamoon) ([#10318](https://github.com/paperless-ngx/paperless-ngx/pull/10318))
 -   Enhancement: support webhook restrictions [@shamoon](https://github.com/shamoon) ([#10555](https://github.com/paperless-ngx/paperless-ngx/pull/10555))
 -   Performance: Classifier performance optimizations [@Merinorus](https://github.com/Merinorus) ([#10363](https://github.com/paperless-ngx/paperless-ngx/pull/10363))
--   Chore: switch from os.path to pathlib.Path [@gothicVI](https://github.com/gothicVI) ([#10397](https://github.com/paperless-ngx/paperless-ngx/pull/10397))
--   Chore(deps): Bump the small-changes group with 3 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10528](https://github.com/paperless-ngx/paperless-ngx/pull/10528))
 -   Performance: add setting to enable DB connection pooling for PostgreSQL [@Merinorus](https://github.com/Merinorus) ([#10354](https://github.com/paperless-ngx/paperless-ngx/pull/10354))
 -   Fixhancement: improve text thumbnail generation for large files [@shamoon](https://github.com/shamoon) ([#10483](https://github.com/paperless-ngx/paperless-ngx/pull/10483))
 -   Enhancement: disable auto spellcheck on filtering dropdowns [@TheDodger](https://github.com/TheDodger) ([#10487](https://github.com/paperless-ngx/paperless-ngx/pull/10487))
--   Chore(deps): Bump the small-changes group across 1 directory with 8 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10481](https://github.com/paperless-ngx/paperless-ngx/pull/10481))
--   docker(deps): bump astral-sh/uv from 0.7.19-python3.12-bookworm-slim to 0.8.3-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#10465](https://github.com/paperless-ngx/paperless-ngx/pull/10465))
 -   Enhancement: display saved view counts [@shamoon](https://github.com/shamoon) ([#10246](https://github.com/paperless-ngx/paperless-ngx/pull/10246))
 -   Fixhancement: add missing exact operator for boolean CF queries [@shamoon](https://github.com/shamoon) ([#10402](https://github.com/paperless-ngx/paperless-ngx/pull/10402))
 -   Feature: add Vietnamese translation [@shamoon](https://github.com/shamoon) ([#10352](https://github.com/paperless-ngx/paperless-ngx/pull/10352))
--   docker(deps): Bump astral-sh/uv from 0.7.9-python3.12-bookworm-slim to 0.7.19-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#10343](https://github.com/paperless-ngx/paperless-ngx/pull/10343))
--   Chore(deps): Bump the small-changes group across 1 directory with 7 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10347](https://github.com/paperless-ngx/paperless-ngx/pull/10347))
--   Chore(deps-dev): Bump @types/node from 22.15.29 to 24.0.10 in /src-ui @[dependabot[bot]](https://github.com/apps/dependabot) ([#10306](https://github.com/paperless-ngx/paperless-ngx/pull/10306))
 -   Performance: Add support for configuring date parser languages [@Merinorus](https://github.com/Merinorus) ([#10181](https://github.com/paperless-ngx/paperless-ngx/pull/10181))
 -   Enhancement: Add a database caching for improved performance [@Merinorus](https://github.com/Merinorus) ([#9784](https://github.com/paperless-ngx/paperless-ngx/pull/9784))
--   Chore: reject absurd max age values [@shamoon](https://github.com/shamoon) ([#10243](https://github.com/paperless-ngx/paperless-ngx/pull/10243))
 
 ### Bug Fixes
 
@@ -42,14 +32,25 @@
 -   Fix: default to empty permissions for group creation [@shamoon](https://github.com/shamoon) ([#10337](https://github.com/paperless-ngx/paperless-ngx/pull/10337))
 -   Fix: correct api created coercion with timezone [@shamoon](https://github.com/shamoon) ([#10287](https://github.com/paperless-ngx/paperless-ngx/pull/10287))
 -   Fix: reset search query for preview on reset filter [@shamoon](https://github.com/shamoon) ([#10279](https://github.com/paperless-ngx/paperless-ngx/pull/10279))
-
-### Documentation
-
+-   Chore: reject absurd max age values [@shamoon](https://github.com/shamoon) ([#10243](https://github.com/paperless-ngx/paperless-ngx/pull/10243))
 -   Chore: add tasks task_id param to openapi spec [@shamoon](https://github.com/shamoon) ([#10469](https://github.com/paperless-ngx/paperless-ngx/pull/10469))
 -   Chore: include advanced search query param in API spec [@shamoon](https://github.com/shamoon) ([#10449](https://github.com/paperless-ngx/paperless-ngx/pull/10449))
 
+### Security
+
+-  Address XSS vulnerability GHSA-6p53-hqqw-8j62
+
 ### Maintenance
 
+-   docker(deps): Bump astral-sh/uv from 0.8.4-python3.12-bookworm-slim to 0.8.8-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#10564](https://github.com/paperless-ngx/paperless-ngx/pull/10564))
+-   docker(deps): Bump astral-sh/uv from 0.7.9-python3.12-bookworm-slim to 0.7.19-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#10343](https://github.com/paperless-ngx/paperless-ngx/pull/10343))
+-   Chore(deps): Bump the small-changes group across 1 directory with 7 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10347](https://github.com/paperless-ngx/paperless-ngx/pull/10347))
+-   Chore(deps-dev): Bump @types/node from 22.15.29 to 24.0.10 in /src-ui @[dependabot[bot]](https://github.com/apps/dependabot) ([#10306](https://github.com/paperless-ngx/paperless-ngx/pull/10306))
+-   Chore(deps): Bump the small-changes group across 1 directory with 8 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10481](https://github.com/paperless-ngx/paperless-ngx/pull/10481))
+-   docker(deps): bump astral-sh/uv from 0.7.19-python3.12-bookworm-slim to 0.8.3-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#10465](https://github.com/paperless-ngx/paperless-ngx/pull/10465))
+-   Chore: switch from os.path to pathlib.Path [@gothicVI](https://github.com/gothicVI) ([#10397](https://github.com/paperless-ngx/paperless-ngx/pull/10397))
+-   Chore(deps): Bump the small-changes group with 3 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10528](https://github.com/paperless-ngx/paperless-ngx/pull/10528))
+-   Chore(deps): Bump the django group across 1 directory with 9 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#10538](https://github.com/paperless-ngx/paperless-ngx/pull/10538))
 -   Chore(deps): Bump stefanzweifel/git-auto-commit-action from 5 to 6 in the actions group @[dependabot[bot]](https://github.com/apps/dependabot) ([#10302](https://github.com/paperless-ngx/paperless-ngx/pull/10302))
 
 ### Dependencies
