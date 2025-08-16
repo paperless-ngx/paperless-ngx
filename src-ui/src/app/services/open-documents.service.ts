@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Observable, Subject, of } from 'rxjs'
 import { first } from 'rxjs/operators'
@@ -11,12 +11,16 @@ import { DocumentService } from './rest/document.service'
   providedIn: 'root',
 })
 export class OpenDocumentsService {
+  private documentService = inject(DocumentService)
+  private modalService = inject(NgbModal)
+
   private MAX_OPEN_DOCUMENTS = 5
 
-  constructor(
-    private documentService: DocumentService,
-    private modalService: NgbModal
-  ) {
+  constructor() {
+    this.load()
+  }
+
+  public load() {
     if (sessionStorage.getItem(OPEN_DOCUMENT_SERVICE.DOCUMENTS)) {
       try {
         this.openDocuments = JSON.parse(
@@ -80,10 +84,20 @@ export class OpenDocumentsService {
     this.save()
   }
 
-  setDirty(doc: Document, dirty: boolean) {
-    if (!this.openDocuments.find((d) => d.id == doc.id)) return
-    if (dirty) this.dirtyDocuments.add(doc.id)
-    else this.dirtyDocuments.delete(doc.id)
+  setDirty(doc: Document, dirty: boolean, changedFields: object = {}) {
+    const existingDoc = this.getOpenDocument(doc.id)
+    if (!existingDoc) return
+    if (dirty) {
+      this.dirtyDocuments.add(doc.id)
+      existingDoc.__changedFields = Object.keys(changedFields).filter(
+        (key) => key !== 'id'
+      )
+    } else {
+      this.dirtyDocuments.delete(doc.id)
+      existingDoc.__changedFields = []
+    }
+
+    this.save()
   }
 
   hasDirty(): boolean {

@@ -4,6 +4,7 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
+import pytest
 from auditlog.context import disable_auditlog
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -22,6 +23,8 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.tasks import empty_trash
+from documents.templating.filepath import localize_date
+from documents.tests.factories import DocumentFactory
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 
@@ -34,12 +37,12 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
 
-        self.assertEqual(generate_filename(document), f"{document.pk:07d}.pdf")
+        self.assertEqual(generate_filename(document), Path(f"{document.pk:07d}.pdf"))
 
         document.storage_type = Document.STORAGE_TYPE_GPG
         self.assertEqual(
             generate_filename(document),
-            f"{document.pk:07d}.pdf.gpg",
+            Path(f"{document.pk:07d}.pdf.gpg"),
         )
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{correspondent}")
@@ -58,12 +61,12 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         document.filename = generate_filename(document)
 
         # Ensure that filename is properly generated
-        self.assertEqual(document.filename, "none/none.pdf")
+        self.assertEqual(document.filename, Path("none/none.pdf"))
 
         # Enable encryption and check again
         document.storage_type = Document.STORAGE_TYPE_GPG
         document.filename = generate_filename(document)
-        self.assertEqual(document.filename, "none/none.pdf.gpg")
+        self.assertEqual(document.filename, Path("none/none.pdf.gpg"))
 
         document.save()
 
@@ -96,7 +99,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         # Ensure that filename is properly generated
         document.filename = generate_filename(document)
-        self.assertEqual(document.filename, "none/none.pdf")
+        self.assertEqual(document.filename, Path("none/none.pdf"))
         create_source_path_directory(document.source_path)
         document.source_path.touch()
 
@@ -137,7 +140,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         # Ensure that filename is properly generated
         document.filename = generate_filename(document)
-        self.assertEqual(document.filename, "none/none.pdf")
+        self.assertEqual(document.filename, Path("none/none.pdf"))
         create_source_path_directory(document.source_path)
         Path(document.source_path).touch()
 
@@ -247,7 +250,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         # Ensure that filename is properly generated
         document.filename = generate_filename(document)
-        self.assertEqual(document.filename, "none/none.pdf")
+        self.assertEqual(document.filename, Path("none/none.pdf"))
 
         create_source_path_directory(document.source_path)
 
@@ -269,11 +272,11 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         dt = DocumentType.objects.create(name="my_doc_type")
         d = Document.objects.create(title="the_doc", mime_type="application/pdf")
 
-        self.assertEqual(generate_filename(d), "none - the_doc.pdf")
+        self.assertEqual(generate_filename(d), Path("none - the_doc.pdf"))
 
         d.document_type = dt
 
-        self.assertEqual(generate_filename(d), "my_doc_type - the_doc.pdf")
+        self.assertEqual(generate_filename(d), Path("my_doc_type - the_doc.pdf"))
 
     @override_settings(FILENAME_FORMAT="{asn} - {title}")
     def test_asn(self):
@@ -289,8 +292,8 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             archive_serial_number=None,
             checksum="B",
         )
-        self.assertEqual(generate_filename(d1), "652 - the_doc.pdf")
-        self.assertEqual(generate_filename(d2), "none - the_doc.pdf")
+        self.assertEqual(generate_filename(d1), Path("652 - the_doc.pdf"))
+        self.assertEqual(generate_filename(d2), Path("none - the_doc.pdf"))
 
     @override_settings(FILENAME_FORMAT="{title} {tag_list}")
     def test_tag_list(self):
@@ -298,7 +301,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         doc.tags.create(name="tag2")
         doc.tags.create(name="tag1")
 
-        self.assertEqual(generate_filename(doc), "doc1 tag1,tag2.pdf")
+        self.assertEqual(generate_filename(doc), Path("doc1 tag1,tag2.pdf"))
 
         doc = Document.objects.create(
             title="doc2",
@@ -306,7 +309,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             mime_type="application/pdf",
         )
 
-        self.assertEqual(generate_filename(doc), "doc2.pdf")
+        self.assertEqual(generate_filename(doc), Path("doc2.pdf"))
 
     @override_settings(FILENAME_FORMAT="//etc/something/{title}")
     def test_filename_relative(self):
@@ -330,11 +333,11 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             created=d1,
         )
 
-        self.assertEqual(generate_filename(doc1), "2020-03-06.pdf")
+        self.assertEqual(generate_filename(doc1), Path("2020-03-06.pdf"))
 
         doc1.created = datetime.date(2020, 11, 16)
 
-        self.assertEqual(generate_filename(doc1), "2020-11-16.pdf")
+        self.assertEqual(generate_filename(doc1), Path("2020-11-16.pdf"))
 
     @override_settings(
         FILENAME_FORMAT="{added_year}-{added_month}-{added_day}",
@@ -347,11 +350,11 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             added=d1,
         )
 
-        self.assertEqual(generate_filename(doc1), "232-01-09.pdf")
+        self.assertEqual(generate_filename(doc1), Path("232-01-09.pdf"))
 
         doc1.added = timezone.make_aware(datetime.datetime(2020, 11, 16, 1, 1, 1))
 
-        self.assertEqual(generate_filename(doc1), "2020-11-16.pdf")
+        self.assertEqual(generate_filename(doc1), Path("2020-11-16.pdf"))
 
     @override_settings(
         FILENAME_FORMAT="{correspondent}/{correspondent}/{correspondent}",
@@ -389,11 +392,11 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
-        self.assertEqual(generate_filename(document), "0000001.pdf")
+        self.assertEqual(generate_filename(document), Path("0000001.pdf"))
 
         document.pk = 13579
 
-        self.assertEqual(generate_filename(document), "0013579.pdf")
+        self.assertEqual(generate_filename(document), Path("0013579.pdf"))
 
     @override_settings(FILENAME_FORMAT=None)
     def test_format_none(self):
@@ -402,7 +405,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
-        self.assertEqual(generate_filename(document), "0000001.pdf")
+        self.assertEqual(generate_filename(document), Path("0000001.pdf"))
 
     def test_try_delete_empty_directories(self):
         # Create our working directory
@@ -428,7 +431,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
-        self.assertEqual(generate_filename(document), "0000001.pdf")
+        self.assertEqual(generate_filename(document), Path("0000001.pdf"))
 
     @override_settings(FILENAME_FORMAT="{created__year}")
     def test_invalid_format_key(self):
@@ -437,7 +440,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
-        self.assertEqual(generate_filename(document), "0000001.pdf")
+        self.assertEqual(generate_filename(document), Path("0000001.pdf"))
 
     @override_settings(FILENAME_FORMAT="{title}")
     def test_duplicates(self):
@@ -564,7 +567,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             value_select="abc123",
         )
 
-        self.assertEqual(generate_filename(doc), "document_apple.pdf")
+        self.assertEqual(generate_filename(doc), Path("document_apple.pdf"))
 
         # handler should not have been called
         self.assertEqual(m.call_count, 0)
@@ -576,7 +579,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             ],
         }
         cf.save()
-        self.assertEqual(generate_filename(doc), "document_aubergine.pdf")
+        self.assertEqual(generate_filename(doc), Path("document_aubergine.pdf"))
         # handler should have been called
         self.assertEqual(m.call_count, 1)
 
@@ -897,7 +900,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             pk=1,
             checksum="1",
         )
-        self.assertEqual(generate_filename(doc), "This. is the title.pdf")
+        self.assertEqual(generate_filename(doc), Path("This. is the title.pdf"))
 
         doc = Document.objects.create(
             title="my\\invalid/../title:yay",
@@ -905,7 +908,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             pk=2,
             checksum="2",
         )
-        self.assertEqual(generate_filename(doc), "my-invalid-..-title-yay.pdf")
+        self.assertEqual(generate_filename(doc), Path("my-invalid-..-title-yay.pdf"))
 
     @override_settings(FILENAME_FORMAT="{created}")
     def test_date(self):
@@ -916,7 +919,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             pk=2,
             checksum="2",
         )
-        self.assertEqual(generate_filename(doc), "2020-05-21.pdf")
+        self.assertEqual(generate_filename(doc), Path("2020-05-21.pdf"))
 
     def test_dynamic_path(self):
         """
@@ -935,7 +938,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             checksum="2",
             storage_path=StoragePath.objects.create(path="TestFolder/{{created}}"),
         )
-        self.assertEqual(generate_filename(doc), "TestFolder/2020-06-25.pdf")
+        self.assertEqual(generate_filename(doc), Path("TestFolder/2020-06-25.pdf"))
 
     def test_dynamic_path_with_none(self):
         """
@@ -956,7 +959,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             checksum="2",
             storage_path=StoragePath.objects.create(path="{{asn}} - {{created}}"),
         )
-        self.assertEqual(generate_filename(doc), "none - 2020-06-25.pdf")
+        self.assertEqual(generate_filename(doc), Path("none - 2020-06-25.pdf"))
 
     @override_settings(
         FILENAME_FORMAT_REMOVE_NONE=True,
@@ -984,7 +987,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             checksum="2",
             storage_path=sp,
         )
-        self.assertEqual(generate_filename(doc), "TestFolder/2020-06-25.pdf")
+        self.assertEqual(generate_filename(doc), Path("TestFolder/2020-06-25.pdf"))
 
         # Special case, undefined variable, then defined at the start of the template
         # This could lead to an absolute path after we remove the leading -none-, but leave the leading /
@@ -993,7 +996,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             "{{ owner_username }}/{{ created_year }}/{{ correspondent }}/{{ title }}"
         )
         sp.save()
-        self.assertEqual(generate_filename(doc), "2020/does not matter.pdf")
+        self.assertEqual(generate_filename(doc), Path("2020/does not matter.pdf"))
 
     def test_multiple_doc_paths(self):
         """
@@ -1028,8 +1031,14 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             ),
         )
 
-        self.assertEqual(generate_filename(doc_a), "ThisIsAFolder/4/2020-06-25.pdf")
-        self.assertEqual(generate_filename(doc_b), "SomeImportantNone/2020-07-25.pdf")
+        self.assertEqual(
+            generate_filename(doc_a),
+            Path("ThisIsAFolder/4/2020-06-25.pdf"),
+        )
+        self.assertEqual(
+            generate_filename(doc_b),
+            Path("SomeImportantNone/2020-07-25.pdf"),
+        )
 
     @override_settings(
         FILENAME_FORMAT=None,
@@ -1064,8 +1073,11 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             ),
         )
 
-        self.assertEqual(generate_filename(doc_a), "0000002.pdf")
-        self.assertEqual(generate_filename(doc_b), "SomeImportantNone/2020-07-25.pdf")
+        self.assertEqual(generate_filename(doc_a), Path("0000002.pdf"))
+        self.assertEqual(
+            generate_filename(doc_b),
+            Path("SomeImportantNone/2020-07-25.pdf"),
+        )
 
     @override_settings(
         FILENAME_FORMAT="{created_year_short}/{created_month_name_short}/{created_month_name}/{title}",
@@ -1078,7 +1090,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             pk=2,
             checksum="2",
         )
-        self.assertEqual(generate_filename(doc), "89/Dec/December/The Title.pdf")
+        self.assertEqual(generate_filename(doc), Path("89/Dec/December/The Title.pdf"))
 
     @override_settings(
         FILENAME_FORMAT="{added_year_short}/{added_month_name}/{added_month_name_short}/{title}",
@@ -1091,7 +1103,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             pk=2,
             checksum="2",
         )
-        self.assertEqual(generate_filename(doc), "84/August/Aug/The Title.pdf")
+        self.assertEqual(generate_filename(doc), Path("84/August/Aug/The Title.pdf"))
 
     @override_settings(
         FILENAME_FORMAT="{owner_username}/{title}",
@@ -1124,8 +1136,8 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             checksum="3",
         )
 
-        self.assertEqual(generate_filename(owned_doc), "user1/The Title.pdf")
-        self.assertEqual(generate_filename(no_owner_doc), "none/does matter.pdf")
+        self.assertEqual(generate_filename(owned_doc), Path("user1/The Title.pdf"))
+        self.assertEqual(generate_filename(no_owner_doc), Path("none/does matter.pdf"))
 
     @override_settings(
         FILENAME_FORMAT="{original_name}",
@@ -1171,17 +1183,20 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             original_filename="logs.txt",
         )
 
-        self.assertEqual(generate_filename(doc_with_original), "someepdf.pdf")
+        self.assertEqual(generate_filename(doc_with_original), Path("someepdf.pdf"))
 
         self.assertEqual(
             generate_filename(tricky_with_original),
-            "some pdf with spaces and stuff.pdf",
+            Path("some pdf with spaces and stuff.pdf"),
         )
 
-        self.assertEqual(generate_filename(no_original), "none.pdf")
+        self.assertEqual(generate_filename(no_original), Path("none.pdf"))
 
-        self.assertEqual(generate_filename(text_doc), "logs.txt")
-        self.assertEqual(generate_filename(text_doc, archive_filename=True), "logs.pdf")
+        self.assertEqual(generate_filename(text_doc), Path("logs.txt"))
+        self.assertEqual(
+            generate_filename(text_doc, archive_filename=True),
+            Path("logs.pdf"),
+        )
 
     @override_settings(
         FILENAME_FORMAT="XX{correspondent}/{title}",
@@ -1206,7 +1221,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
 
         # Ensure that filename is properly generated
         document.filename = generate_filename(document)
-        self.assertEqual(document.filename, "XX/doc1.pdf")
+        self.assertEqual(document.filename, Path("XX/doc1.pdf"))
 
     def test_complex_template_strings(self):
         """
@@ -1244,19 +1259,19 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
 
         self.assertEqual(
             generate_filename(doc_a),
-            "somepath/some where/2020-06-25/Does Matter.pdf",
+            Path("somepath/some where/2020-06-25/Does Matter.pdf"),
         )
         doc_a.checksum = "5"
 
         self.assertEqual(
             generate_filename(doc_a),
-            "somepath/2024-10-01/Does Matter.pdf",
+            Path("somepath/2024-10-01/Does Matter.pdf"),
         )
 
         sp.path = "{{ document.title|lower }}{{ document.archive_serial_number - 2 }}"
         sp.save()
 
-        self.assertEqual(generate_filename(doc_a), "does matter23.pdf")
+        self.assertEqual(generate_filename(doc_a), Path("does matter23.pdf"))
 
         sp.path = """
                  somepath/
@@ -1275,13 +1290,13 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         sp.save()
         self.assertEqual(
             generate_filename(doc_a),
-            "somepath/asn-000-200/Does Matter/Does Matter.pdf",
+            Path("somepath/asn-000-200/Does Matter/Does Matter.pdf"),
         )
         doc_a.archive_serial_number = 301
         doc_a.save()
         self.assertEqual(
             generate_filename(doc_a),
-            "somepath/asn-201-400/asn-3xx/Does Matter.pdf",
+            Path("somepath/asn-201-400/asn-3xx/Does Matter.pdf"),
         )
 
     @override_settings(
@@ -1310,7 +1325,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         with self.assertLogs(level=logging.WARNING) as capture:
             self.assertEqual(
                 generate_filename(doc_a),
-                "0000002.pdf",
+                Path("0000002.pdf"),
             )
 
             self.assertEqual(len(capture.output), 1)
@@ -1345,7 +1360,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         with self.assertLogs(level=logging.WARNING) as capture:
             self.assertEqual(
                 generate_filename(doc_a),
-                "0000002.pdf",
+                Path("0000002.pdf"),
             )
 
             self.assertEqual(len(capture.output), 1)
@@ -1413,7 +1428,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         ):
             self.assertEqual(
                 generate_filename(doc_a),
-                "invoices/1234.pdf",
+                Path("invoices/1234.pdf"),
             )
 
         with override_settings(
@@ -1427,7 +1442,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         ):
             self.assertEqual(
                 generate_filename(doc_a),
-                "Some Title_ChoiceOne.pdf",
+                Path("Some Title_ChoiceOne.pdf"),
             )
 
             # Check for handling Nones well
@@ -1436,7 +1451,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
 
             self.assertEqual(
                 generate_filename(doc_a),
-                "Some Title_Default Value.pdf",
+                Path("Some Title_Default Value.pdf"),
             )
 
         cf.name = "Invoice Number"
@@ -1449,7 +1464,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         ):
             self.assertEqual(
                 generate_filename(doc_a),
-                "invoices/4567.pdf",
+                Path("invoices/4567.pdf"),
             )
 
         with override_settings(
@@ -1457,7 +1472,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         ):
             self.assertEqual(
                 generate_filename(doc_a),
-                "invoices/0.pdf",
+                Path("invoices/0.pdf"),
             )
 
     def test_datetime_filter(self):
@@ -1496,7 +1511,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         ):
             self.assertEqual(
                 generate_filename(doc_a),
-                "2020/Some Title.pdf",
+                Path("2020/Some Title.pdf"),
             )
 
         with override_settings(
@@ -1504,7 +1519,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         ):
             self.assertEqual(
                 generate_filename(doc_a),
-                "2020-06-25/Some Title.pdf",
+                Path("2020-06-25/Some Title.pdf"),
             )
 
         with override_settings(
@@ -1512,7 +1527,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         ):
             self.assertEqual(
                 generate_filename(doc_a),
-                "2024-10-01/Some Title.pdf",
+                Path("2024-10-01/Some Title.pdf"),
             )
 
     def test_slugify_filter(self):
@@ -1539,7 +1554,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         ):
             self.assertEqual(
                 generate_filename(doc),
-                "some-title-with-special-characters.pdf",
+                Path("some-title-with-special-characters.pdf"),
             )
 
         # Test with correspondent name containing spaces and special chars
@@ -1553,7 +1568,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         ):
             self.assertEqual(
                 generate_filename(doc),
-                "johns-office-workplace/some-title-with-special-characters.pdf",
+                Path("johns-office-workplace/some-title-with-special-characters.pdf"),
             )
 
         # Test with custom fields
@@ -1572,5 +1587,198 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         ):
             self.assertEqual(
                 generate_filename(doc),
-                "brussels-belgium/some-title-with-special-characters.pdf",
+                Path("brussels-belgium/some-title-with-special-characters.pdf"),
             )
+
+
+class TestDateLocalization:
+    """
+    Groups all tests related to the `localize_date` function.
+    """
+
+    TEST_DATE = datetime.date(2023, 10, 26)
+
+    TEST_DATETIME = datetime.datetime(
+        2023,
+        10,
+        26,
+        14,
+        30,
+        5,
+        tzinfo=datetime.timezone.utc,
+    )
+
+    @pytest.mark.parametrize(
+        "value, format_style, locale_str, expected_output",
+        [
+            pytest.param(
+                TEST_DATE,
+                "EEEE, MMM d, yyyy",
+                "en_US",
+                "Thursday, Oct 26, 2023",
+                id="date-en_US-custom",
+            ),
+            pytest.param(
+                TEST_DATE,
+                "dd.MM.yyyy",
+                "de_DE",
+                "26.10.2023",
+                id="date-de_DE-custom",
+            ),
+            # German weekday and month name translation
+            pytest.param(
+                TEST_DATE,
+                "EEEE",
+                "de_DE",
+                "Donnerstag",
+                id="weekday-de_DE",
+            ),
+            pytest.param(
+                TEST_DATE,
+                "MMMM",
+                "de_DE",
+                "Oktober",
+                id="month-de_DE",
+            ),
+            # French weekday and month name translation
+            pytest.param(
+                TEST_DATE,
+                "EEEE",
+                "fr_FR",
+                "jeudi",
+                id="weekday-fr_FR",
+            ),
+            pytest.param(
+                TEST_DATE,
+                "MMMM",
+                "fr_FR",
+                "octobre",
+                id="month-fr_FR",
+            ),
+        ],
+    )
+    def test_localize_date_with_date_objects(
+        self,
+        value: datetime.date,
+        format_style: str,
+        locale_str: str,
+        expected_output: str,
+    ):
+        """
+        Tests `localize_date` with `date` objects across different locales and formats.
+        """
+        assert localize_date(value, format_style, locale_str) == expected_output
+
+    @pytest.mark.parametrize(
+        "value, format_style, locale_str, expected_output",
+        [
+            pytest.param(
+                TEST_DATETIME,
+                "yyyy.MM.dd G 'at' HH:mm:ss zzz",
+                "en_US",
+                "2023.10.26 AD at 14:30:05 UTC",
+                id="datetime-en_US-custom",
+            ),
+            pytest.param(
+                TEST_DATETIME,
+                "dd.MM.yyyy",
+                "fr_FR",
+                "26.10.2023",
+                id="date-fr_FR-custom",
+            ),
+            # Spanish weekday and month translation
+            pytest.param(
+                TEST_DATETIME,
+                "EEEE",
+                "es_ES",
+                "jueves",
+                id="weekday-es_ES",
+            ),
+            pytest.param(
+                TEST_DATETIME,
+                "MMMM",
+                "es_ES",
+                "octubre",
+                id="month-es_ES",
+            ),
+            # Italian weekday and month translation
+            pytest.param(
+                TEST_DATETIME,
+                "EEEE",
+                "it_IT",
+                "giovedì",
+                id="weekday-it_IT",
+            ),
+            pytest.param(
+                TEST_DATETIME,
+                "MMMM",
+                "it_IT",
+                "ottobre",
+                id="month-it_IT",
+            ),
+        ],
+    )
+    def test_localize_date_with_datetime_objects(
+        self,
+        value: datetime.datetime,
+        format_style: str,
+        locale_str: str,
+        expected_output: str,
+    ):
+        # To handle the non-breaking space in French and other locales
+        result = localize_date(value, format_style, locale_str)
+        assert result.replace("\u202f", " ") == expected_output.replace("\u202f", " ")
+
+    @pytest.mark.parametrize(
+        "invalid_value",
+        [
+            "2023-10-26",
+            1698330605,
+            None,
+            [],
+            {},
+        ],
+    )
+    def test_localize_date_raises_type_error_for_invalid_input(self, invalid_value):
+        with pytest.raises(TypeError) as excinfo:
+            localize_date(invalid_value, "medium", "en_US")
+
+        assert f"Unsupported type {type(invalid_value)}" in str(excinfo.value)
+
+    def test_localize_date_raises_error_for_invalid_locale(self):
+        with pytest.raises(ValueError) as excinfo:
+            localize_date(self.TEST_DATE, "medium", "invalid_locale_code")
+
+        assert "Invalid locale identifier" in str(excinfo.value)
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize(
+        "filename_format,expected_filename",
+        [
+            pytest.param(
+                "{{title}}_{{ document.created | localize_date('MMMM', 'es_ES')}}",
+                "My Document_octubre.pdf",
+                id="spanish_month_name",
+            ),
+            pytest.param(
+                "{{title}}_{{ document.created | localize_date('EEEE', 'fr_FR')}}",
+                "My Document_jeudi.pdf",
+                id="french_day_of_week",
+            ),
+            pytest.param(
+                "{{title}}_{{ document.created | localize_date('dd/MM/yyyy', 'en_GB')}}",
+                "My Document_26/10/2023.pdf",
+                id="uk_date_format",
+            ),
+        ],
+    )
+    def test_localize_date_path_building(self, filename_format, expected_filename):
+        document = DocumentFactory.create(
+            title="My Document",
+            mime_type="application/pdf",
+            storage_type=Document.STORAGE_TYPE_UNENCRYPTED,
+            created=self.TEST_DATE,  # 2023-10-26 (which is a Thursday)
+        )
+        with override_settings(FILENAME_FORMAT=filename_format):
+            filename = generate_filename(document)
+            assert filename == Path(expected_filename)

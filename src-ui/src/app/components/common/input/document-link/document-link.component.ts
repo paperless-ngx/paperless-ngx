@@ -1,5 +1,12 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
-import { Component, forwardRef, Input, OnDestroy, OnInit } from '@angular/core'
+import {
+  Component,
+  forwardRef,
+  inject,
+  Input,
+  OnDestroy,
+  OnInit,
+} from '@angular/core'
 import {
   FormsModule,
   NG_VALUE_ACCESSOR,
@@ -52,6 +59,8 @@ export class DocumentLinkComponent
   extends AbstractInputComponent<any[]>
   implements OnInit, OnDestroy
 {
+  private documentsService = inject(DocumentService)
+
   documentsInput$ = new Subject<string>()
   foundDocuments$: Observable<Document[]>
   loading = false
@@ -73,10 +82,6 @@ export class DocumentLinkComponent
 
   get selectedDocumentIDs(): number[] {
     return this.selectedDocuments.map((d) => d.id)
-  }
-
-  constructor(private documentsService: DocumentService) {
-    super()
   }
 
   ngOnInit() {

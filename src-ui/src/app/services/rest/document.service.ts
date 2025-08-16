@@ -1,5 +1,4 @@
-import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { AuditLogEntry } from 'src/app/data/auditlog-entry'
@@ -41,6 +40,10 @@ export interface SelectionData {
   providedIn: 'root',
 })
 export class DocumentService extends AbstractPaperlessService<Document> {
+  private permissionsService = inject(PermissionsService)
+  private settingsService = inject(SettingsService)
+  private customFieldService = inject(CustomFieldsService)
+
   private _searchQuery: string
 
   private _sortFields
@@ -55,13 +58,9 @@ export class DocumentService extends AbstractPaperlessService<Document> {
 
   private customFields: CustomField[] = []
 
-  constructor(
-    http: HttpClient,
-    private permissionsService: PermissionsService,
-    private settingsService: SettingsService,
-    private customFieldService: CustomFieldsService
-  ) {
-    super(http, 'documents')
+  constructor() {
+    super()
+    this.resourceName = 'documents'
     this.reload()
   }
 

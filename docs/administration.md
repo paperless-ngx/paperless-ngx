@@ -179,9 +179,13 @@ following:
 
 ### Database Upgrades
 
-In general, paperless does not require a specific version of PostgreSQL or MariaDB and it is
+Paperless-ngx is compatible with Django-supported versions of PostgreSQL and MariaDB and it is generally
 safe to update them to newer versions. However, you should always take a backup and follow
 the instructions from your database's documentation for how to upgrade between major versions.
+
+!!! note
+
+    As of Paperless-ngx v2.18, the minimum supported version of PostgreSQL is 13.
 
 For PostgreSQL, refer to [Upgrading a PostgreSQL Cluster](https://www.postgresql.org/docs/current/upgrading.html).
 
@@ -306,7 +310,7 @@ in dedicated folders according to their nature: `archive`, `originals`,
 If `-sm` or `--split-manifest` is provided, information about document
 will be placed in individual json files, instead of a single JSON file. The main
 manifest.json will still contain application wide information (e.g. tags, correspondent,
-documenttype, etc)
+document type, etc)
 
 If `-z` or `--zip` is provided, the export will be a zip file
 in the target directory, named according to the current local date or the
@@ -456,6 +460,22 @@ Specify `optimize` to optimize the index. This updates certain aspects
 of the index and usually makes queries faster and also ensures that the
 autocompletion works properly. This command is regularly invoked by the
 task scheduler.
+
+### Clearing the database read cache
+
+If the database read cache is enabled, **you must run this command** after making any changes to the database outside the application context.
+This includes operations such as restoring a database backup or executing SQL statements like UPDATE, INSERT, DELETE, ALTER, CREATE, or DROP.
+
+Failing to invalidate the cache after such modifications can lead to stale data being served from the cache, and **may cause data corruption** or inconsistent behavior in the application.
+
+Use the following management command to clear the cache:
+
+```
+invalidate_cachalot
+```
+
+!!! info
+The database read cache is based on Django-Cachalot. You can refer to their [documentation](https://django-cachalot.readthedocs.io/en/latest/quickstart.html#manage-py-command).
 
 ### Managing filenames {#renamer}
 

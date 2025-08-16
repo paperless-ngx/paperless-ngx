@@ -125,3 +125,8 @@ class MailRuleSerializer(OwnedObjectSerializer):
             raise serializers.ValidationError("An action parameter is required.")
 
         return attrs
+
+    def validate_maximum_age(self, value):
+        if value > 36500:  # ~100 years
+            raise serializers.ValidationError("Maximum mail age is unreasonably large.")
+        return value

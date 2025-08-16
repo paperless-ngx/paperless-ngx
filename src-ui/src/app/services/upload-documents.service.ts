@@ -1,5 +1,5 @@
 import { HttpEventType } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { Subscription } from 'rxjs'
 import { DocumentService } from './rest/document.service'
 import {
@@ -11,12 +11,10 @@ import {
   providedIn: 'root',
 })
 export class UploadDocumentsService {
-  private uploadSubscriptions: Array<Subscription> = []
+  private documentService = inject(DocumentService)
+  private websocketStatusService = inject(WebsocketStatusService)
 
-  constructor(
-    private documentService: DocumentService,
-    private websocketStatusService: WebsocketStatusService
-  ) {}
+  private uploadSubscriptions: Array<Subscription> = []
 
   public uploadFile(file: File) {
     let formData = new FormData()

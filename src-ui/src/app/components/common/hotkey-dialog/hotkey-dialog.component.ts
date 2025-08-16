@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 
 const SYMBOLS = {
@@ -19,10 +19,10 @@ const SYMBOLS = {
   styleUrl: './hotkey-dialog.component.scss',
 })
 export class HotkeyDialogComponent {
+  activeModal = inject(NgbActiveModal)
+
   public title: string = $localize`Keyboard shortcuts`
   public hotkeys: Map<string, string> = new Map()
-
-  constructor(public activeModal: NgbActiveModal) {}
 
   public close(): void {
     this.activeModal.close()

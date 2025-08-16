@@ -18,6 +18,7 @@ import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { ProfileService } from 'src/app/services/profile.service'
 import { ToastService } from 'src/app/services/toast.service'
+import * as navUtils from 'src/app/utils/navigation'
 import { ConfirmButtonComponent } from '../confirm-button/confirm-button.component'
 import { PasswordComponent } from '../input/password/password.component'
 import { TextComponent } from '../input/text/text.component'
@@ -205,16 +206,15 @@ describe('ProfileEditDialogComponent', () => {
 
     const updateSpy = jest.spyOn(profileService, 'update')
     updateSpy.mockReturnValue(of(null))
-    Object.defineProperty(window, 'location', {
-      value: {
-        href: 'http://localhost/',
-      },
-      writable: true, // possibility to override
-    })
+    const navSpy = jest
+      .spyOn(navUtils, 'setLocationHref')
+      .mockImplementation(() => {})
     component.save()
     expect(updateSpy).toHaveBeenCalled()
     tick(2600)
-    expect(window.location.href).toContain('logout')
+    expect(navSpy).toHaveBeenCalledWith(
+      `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
+    )
   }))
 
   it('should support auth token copy', fakeAsync(() => {

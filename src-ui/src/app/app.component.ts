@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core'
+import { Component, inject, OnDestroy, OnInit, Renderer2 } from '@angular/core'
 import { Router, RouterOutlet } from '@angular/router'
 import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { first, Subscription } from 'rxjs'
@@ -29,22 +29,22 @@ import { WebsocketStatusService } from './services/websocket-status.service'
   ],
 })
 export class AppComponent implements OnInit, OnDestroy {
+  private settings = inject(SettingsService)
+  private websocketStatusService = inject(WebsocketStatusService)
+  private toastService = inject(ToastService)
+  private router = inject(Router)
+  private tasksService = inject(TasksService)
+  tourService = inject(TourService)
+  private renderer = inject(Renderer2)
+  private permissionsService = inject(PermissionsService)
+  private hotKeyService = inject(HotKeyService)
+  private componentRouterService = inject(ComponentRouterService)
+
   newDocumentSubscription: Subscription
   successSubscription: Subscription
   failedSubscription: Subscription
 
-  constructor(
-    private settings: SettingsService,
-    private websocketStatusService: WebsocketStatusService,
-    private toastService: ToastService,
-    private router: Router,
-    private tasksService: TasksService,
-    public tourService: TourService,
-    private renderer: Renderer2,
-    private permissionsService: PermissionsService,
-    private hotKeyService: HotKeyService,
-    private componentRouterService: ComponentRouterService
-  ) {
+  constructor() {
     let anyWindow = window as any
     anyWindow.pdfWorkerSrc = 'assets/js/pdf.worker.min.mjs'
     this.settings.updateAppearanceSettings()

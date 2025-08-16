@@ -12,6 +12,7 @@ from tqdm import tqdm
 
 from documents.models import Document
 from documents.models import PaperlessTask
+from paperless.config import GeneralConfig
 
 
 class SanityCheckMessages:
@@ -82,8 +83,10 @@ def check_sanity(*, progress=False, scheduled=True) -> SanityCheckMessages:
     if lockfile in present_files:
         present_files.remove(lockfile)
 
-    if settings.APP_LOGO:
-        logo_file = Path(settings.MEDIA_ROOT / settings.APP_LOGO).resolve()
+    general_config = GeneralConfig()
+    app_logo = general_config.app_logo or settings.APP_LOGO
+    if app_logo:
+        logo_file = Path(settings.MEDIA_ROOT / Path(app_logo.lstrip("/"))).resolve()
         if logo_file in present_files:
             present_files.remove(logo_file)
 

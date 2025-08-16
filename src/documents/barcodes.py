@@ -304,7 +304,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
                     )
                     x, y = page.size
                     page = page.resize(
-                        (int(round(x * factor)), (int(round(y * factor)))),
+                        (round(x * factor), (round(y * factor))),
                     )
 
                 # Detect barcodes

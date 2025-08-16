@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from django.contrib.auth.models import User
+from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -149,24 +150,65 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         THEN:
             - old app_logo file is deleted
         """
-        with (Path(__file__).parent / "samples" / "simple.jpg").open("rb") as f:
-            self.client.patch(
-                f"{self.ENDPOINT}1/",
-                {
-                    "app_logo": f,
-                },
-            )
+        admin = User.objects.create_superuser(username="admin")
+        self.client.force_login(user=admin)
+        response = self.client.get("/logo/")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        self.client.patch(
+            f"{self.ENDPOINT}1/",
+            {
+                "app_logo": SimpleUploadedFile(
+                    name="simple.jpg",
+                    content=(
+                        Path(__file__).parent / "samples" / "simple.jpg"
+                    ).read_bytes(),
+                    content_type="image/jpeg",
+                ),
+            },
+        )
+
+        # Logo exists at /logo/simple.jpg
+        response = self.client.get("/logo/simple.jpg")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("image/jpeg", response["Content-Type"])
+
         config = ApplicationConfiguration.objects.first()
         old_logo = config.app_logo
         self.assertTrue(Path(old_logo.path).exists())
-        with (Path(__file__).parent / "samples" / "simple.png").open("rb") as f:
-            self.client.patch(
-                f"{self.ENDPOINT}1/",
-                {
-                    "app_logo": f,
-                },
-            )
+        self.client.patch(
+            f"{self.ENDPOINT}1/",
+            {
+                "app_logo": SimpleUploadedFile(
+                    name="simple.png",
+                    content=(
+                        Path(__file__).parent / "samples" / "simple.png"
+                    ).read_bytes(),
+                    content_type="image/png",
+                ),
+            },
+        )
         self.assertFalse(Path(old_logo.path).exists())
+
+    def test_api_rejects_malicious_svg_logo(self):
+        """
+        GIVEN:
+            - An SVG logo containing a <script> tag
+        WHEN:
+            - Uploaded via PATCH to app config
+        THEN:
+            - SVG is rejected with 400
+        """
+        path = Path(__file__).parent / "samples" / "malicious.svg"
+        with path.open("rb") as f:
+            response = self.client.patch(
+                f"{self.ENDPOINT}1/",
+                {"app_logo": f},
+                format="multipart",
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("disallowed", str(response.data).lower())
 
     def test_create_not_allowed(self):
         """

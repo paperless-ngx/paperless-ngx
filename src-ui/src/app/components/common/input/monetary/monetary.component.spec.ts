@@ -1,5 +1,6 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { LOCALE_ID } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NG_VALUE_ACCESSOR } from '@angular/forms'
 import { MonetaryComponent } from './monetary.component'
@@ -41,8 +42,6 @@ describe('MonetaryComponent', () => {
 
   it('should set the default currency code based on LOCALE_ID', () => {
     expect(component.defaultCurrencyCode).toEqual('USD') // default
-    component = new MonetaryComponent('pt-BR')
-    expect(component.defaultCurrencyCode).toEqual('BRL')
   })
 
   it('should support setting a default currency code', () => {
@@ -85,5 +84,30 @@ describe('MonetaryComponent', () => {
     component.monetaryValue = '0'
     component.monetaryValueChange()
     expect(component.value).toEqual('USD0.00')
+  })
+})
+
+describe('MonetaryComponent (Alternate Locale)', () => {
+  let component: MonetaryComponent
+  let fixture: ComponentFixture<MonetaryComponent>
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [MonetaryComponent],
+      providers: [
+        { provide: LOCALE_ID, useValue: 'pt-BR' }, // Brazilian Portuguese
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
+    }).compileComponents()
+
+    fixture = TestBed.createComponent(MonetaryComponent)
+    fixture.debugElement.injector.get(NG_VALUE_ACCESSOR)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  })
+
+  it('should set the default currency code based on LOCALE_ID', () => {
+    expect(component.defaultCurrencyCode).toEqual('BRL')
   })
 })

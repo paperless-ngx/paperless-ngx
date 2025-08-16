@@ -16,8 +16,8 @@
 # - Instead of SQLite (default), MariaDB is used as the database server.
 # - Apache Tika and Gotenberg servers are started with paperless and paperless
 #   is configured to use these services. These provide support for consuming
-#   Office documents (Word, Excel, Power Point and their LibreOffice counter-
-#   parts.
+#   Office documents (Word, Excel, PowerPoint and their LibreOffice counter-
+#   parts).
 #
 # To install and update paperless with this file, do the following:
 #
@@ -25,11 +25,9 @@
 #   and '.env' into a folder.
 # - Run 'docker compose pull'.
 # - Run 'docker compose up -d'.
-
 #
 # For more extensive installation and update instructions, refer to the
 # documentation.
-
 services:
   broker:
     image: docker.io/library/redis:8

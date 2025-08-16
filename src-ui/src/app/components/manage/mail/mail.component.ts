@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common'
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, OnDestroy, OnInit, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
@@ -47,6 +47,14 @@ export class MailComponent
   extends ComponentWithPermissions
   implements OnInit, OnDestroy
 {
+  mailAccountService = inject(MailAccountService)
+  mailRuleService = inject(MailRuleService)
+  private toastService = inject(ToastService)
+  private modalService = inject(NgbModal)
+  permissionsService = inject(PermissionsService)
+  private settingsService = inject(SettingsService)
+  private route = inject(ActivatedRoute)
+
   public MailAccountType = MailAccountType
 
   mailAccounts: MailAccount[] = []
@@ -67,18 +75,6 @@ export class MailComponent
   public showRules: boolean = false
   public loadingAccounts: boolean = true
   public showAccounts: boolean = false
-
-  constructor(
-    public mailAccountService: MailAccountService,
-    public mailRuleService: MailRuleService,
-    private toastService: ToastService,
-    private modalService: NgbModal,
-    public permissionsService: PermissionsService,
-    private settingsService: SettingsService,
-    private route: ActivatedRoute
-  ) {
-    super()
-  }
 
   ngOnInit(): void {
     this.mailAccountService

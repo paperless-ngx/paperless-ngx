@@ -282,6 +282,18 @@ The following methods are supported:
         -   `"merge": true or false` (defaults to false)
     -   The `merge` flag determines if the supplied permissions will overwrite all existing permissions (including
         removing them) or be merged with existing permissions.
+-   `edit_pdf`
+    -   Requires `parameters`:
+        -   `"doc_ids": [DOCUMENT_ID]` A list of a single document ID to edit.
+        -   `"operations": [OPERATION, ...]` A list of operations to perform on the documents. Each operation is a dictionary
+            with the following keys:
+            -   `"page": PAGE_NUMBER` The page number to edit (1-based).
+            -   `"rotate": DEGREES` Optional rotation in degrees (90, 180, 270).
+            -   `"doc": OUTPUT_DOCUMENT_INDEX` Optional index of the output document for split operations.
+    -   Optional `parameters`:
+        -   `"delete_original": true` to delete the original documents after editing.
+        -   `"update_document": true` to update the existing document with the edited PDF.
+        -   `"include_metadata": true` to copy metadata from the original document to the edited document.
 -   `merge`
     -   No additional `parameters` required.
     -   The ordering of the merged document is determined by the list of IDs.

@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
     "types": [
-      "jest"
+      "jest",
+      "node",
     ],
     "module": "commonjs",
     "emitDecoratorMetadata": true,

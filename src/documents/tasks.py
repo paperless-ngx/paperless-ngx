@@ -394,11 +394,9 @@ def check_scheduled_workflows():
     Check and run all enabled scheduled workflows.
 
     Scheduled triggers are evaluated based on a target date field (e.g. added, created, modified, or a custom date field),
-    combined with a day offset.
-
-    The offset is mathematically negated resulting in the following behavior:
-        - Positive offsets mean the workflow should trigger BEFORE the specified date (e.g., offset = +7 → trigger 7 days before)
-        - Negative offsets mean the workflow should trigger AFTER the specified date (e.g., offset = -7 → trigger 7 days after)
+    combined with a day offset:
+        - Positive offsets mean the workflow should trigger AFTER the specified date (e.g., offset = +7 → trigger 7 days after)
+        - Negative offsets mean the workflow should trigger BEFORE the specified date (e.g., offset = -7 → trigger 7 days before)
 
     Once a document satisfies this condition, and recurring/non-recurring constraints are met, the workflow is run.
     """

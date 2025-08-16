@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core'
+import { Component, OnDestroy, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
 import {
@@ -36,19 +36,19 @@ export class TrashComponent
   extends LoadingComponentWithPermissions
   implements OnDestroy
 {
+  private trashService = inject(TrashService)
+  private toastService = inject(ToastService)
+  private modalService = inject(NgbModal)
+  private settingsService = inject(SettingsService)
+  private router = inject(Router)
+
   public documentsInTrash: Document[] = []
   public selectedDocuments: Set<number> = new Set()
   public allToggled: boolean = false
   public page: number = 1
   public totalDocuments: number
 
-  constructor(
-    private trashService: TrashService,
-    private toastService: ToastService,
-    private modalService: NgbModal,
-    private settingsService: SettingsService,
-    private router: Router
-  ) {
+  constructor() {
     super()
     this.reload()
   }

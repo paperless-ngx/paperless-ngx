@@ -158,4 +158,7 @@ export interface Document extends ObjectWithPermissions {
   remove_inbox_tags?: boolean
 
   page_count?: number
+
+  // Frontend only
+  __changedFields?: string[]
 }

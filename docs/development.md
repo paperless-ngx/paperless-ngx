@@ -95,13 +95,13 @@ first-time setup.
 
 7.  You can now either ...
 
-    -   install redis or
+    -   install Redis or
 
-    -   use the included `scripts/start_services.sh` to use docker to fire
-        up a redis instance (and some other services such as tika,
-        gotenberg and a database server) or
+    -   use the included `scripts/start_services.sh` to use Docker to fire
+        up a Redis instance (and some other services such as Tika,
+        Gotenberg and a database server) or
 
-    -   spin up a bare redis container
+    -   spin up a bare Redis container
 
         ```
         docker run -d -p 6379:6379 --restart unless-stopped redis:latest
@@ -147,7 +147,7 @@ $ ng build --configuration production
 ### Testing
 
 -   Run `pytest` in the `src/` directory to execute all tests. This also
-    generates a HTML coverage report. When runnings test, `paperless.conf`
+    generates a HTML coverage report. When running tests, `paperless.conf`
     is loaded as well. However, the tests rely on the default
     configuration. This is not ideal. But for now, make sure no settings
     except for DEBUG are overridden when testing.

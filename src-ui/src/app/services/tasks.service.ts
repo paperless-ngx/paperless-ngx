@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { Observable, Subject } from 'rxjs'
 import { first, takeUntil } from 'rxjs/operators'
 import {
@@ -13,6 +13,8 @@ import { environment } from 'src/environments/environment'
   providedIn: 'root',
 })
 export class TasksService {
+  private http = inject(HttpClient)
+
   private baseUrl: string = environment.apiBaseUrl
   private endpoint: string = 'tasks'
 
@@ -47,8 +49,6 @@ export class TasksService {
   public get failedFileTasks(): PaperlessTask[] {
     return this.fileTasks.filter((t) => t.status == PaperlessTaskStatus.Failed)
   }
-
-  constructor(private http: HttpClient) {}
 
   public reload() {
     if (this.loading) return

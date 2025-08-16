@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core'
+import { Component, EventEmitter, Output, inject } from '@angular/core'
 import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 
@@ -9,7 +9,7 @@ import { TourService } from 'ngx-ui-tour-ng-bootstrap'
   imports: [NgbAlertModule],
 })
 export class WelcomeWidgetComponent {
-  constructor(public readonly tourService: TourService) {}
+  readonly tourService = inject(TourService)
 
   @Output()
   dismiss: EventEmitter<boolean> = new EventEmitter()

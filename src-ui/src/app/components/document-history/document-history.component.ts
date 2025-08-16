@@ -1,5 +1,5 @@
 import { AsyncPipe, KeyValuePipe, TitleCasePipe } from '@angular/common'
-import { Component, Input, OnInit } from '@angular/core'
+import { Component, Input, OnInit, inject } from '@angular/core'
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Observable, first, map, of } from 'rxjs'
@@ -26,6 +26,12 @@ import { UserService } from 'src/app/services/rest/user.service'
   ],
 })
 export class DocumentHistoryComponent implements OnInit {
+  private documentService = inject(DocumentService)
+  private correspondentService = inject(CorrespondentService)
+  private storagePathService = inject(StoragePathService)
+  private documentTypeService = inject(DocumentTypeService)
+  private userService = inject(UserService)
+
   public AuditLogAction = AuditLogAction
 
   private _documentId: number
@@ -37,14 +43,6 @@ export class DocumentHistoryComponent implements OnInit {
 
   public loading: boolean = true
   public entries: AuditLogEntry[] = []
-
-  constructor(
-    private documentService: DocumentService,
-    private correspondentService: CorrespondentService,
-    private storagePathService: StoragePathService,
-    private documentTypeService: DocumentTypeService,
-    private userService: UserService
-  ) {}
 
   ngOnInit(): void {
     if (this._documentId) {

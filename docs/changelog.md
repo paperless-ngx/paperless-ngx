@@ -6004,7 +6004,6 @@ primarily.
         a very good job at ocr'ing a document with the default
         language. Certain language specifics such as umlauts may not get
         picked up properly.
-    -   `PAPERLESS_DEBUG` defaults to `false`.
     -   The presence of `PAPERLESS_DBHOST` now determines whether to use
         PostgreSQL or SQLite.
     -   `PAPERLESS_OCR_THREADS` is gone and replaced with

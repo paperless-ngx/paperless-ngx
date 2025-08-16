@@ -280,6 +280,7 @@ def parse_date_generator(filename, text) -> Iterator[datetime.datetime]:
                 "RETURN_AS_TIMEZONE_AWARE": True,
                 "TIMEZONE": settings.TIME_ZONE,
             },
+            locales=settings.DATE_PARSER_LANGUAGES,
         )
 
     def __filter(date: datetime.datetime) -> datetime.datetime | None:
