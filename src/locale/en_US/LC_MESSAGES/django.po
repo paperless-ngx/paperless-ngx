@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-11 17:31+0000\n"
+"POT-Creation-Date: 2025-08-16 14:34+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1789,7 +1789,7 @@ msgstr ""
 msgid "Chinese Traditional"
 msgstr ""
 
-#: paperless/urls.py:374
+#: paperless/urls.py:368
 msgid "Paperless-ngx administration"
 msgstr ""
 
