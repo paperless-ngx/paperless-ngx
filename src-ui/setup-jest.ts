@@ -1,12 +1,16 @@
 import '@angular/localize/init'
 import { jest } from '@jest/globals'
 import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone'
-import { TextDecoder, TextEncoder } from 'util'
+import { TextDecoder, TextEncoder } from 'node:util'
 if (process.env.NODE_ENV === 'test') {
   setupZoneTestEnv()
 }
-global.TextEncoder = TextEncoder
-global.TextDecoder = TextDecoder
+;(globalThis as any).TextEncoder = TextEncoder as unknown as {
+  new (): TextEncoder
+}
+;(globalThis as any).TextDecoder = TextDecoder as unknown as {
+  new (): TextDecoder
+}
 
 import { registerLocaleData } from '@angular/common'
 import localeAf from '@angular/common/locales/af'
@@ -40,6 +44,7 @@ import localeSr from '@angular/common/locales/sr'
 import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeUk from '@angular/common/locales/uk'
+import localeVi from '@angular/common/locales/vi'
 import localeZh from '@angular/common/locales/zh'
 import localeZhHant from '@angular/common/locales/zh-Hant'
 
@@ -75,6 +80,7 @@ registerLocaleData(localeSr)
 registerLocaleData(localeSv)
 registerLocaleData(localeTr)
 registerLocaleData(localeUk)
+registerLocaleData(localeVi)
 registerLocaleData(localeZh)
 registerLocaleData(localeZhHant)
 
@@ -114,10 +120,26 @@ if (!URL.revokeObjectURL) {
   Object.defineProperty(window.URL, 'revokeObjectURL', { value: jest.fn() })
 }
 Object.defineProperty(window, 'ResizeObserver', { value: mock() })
-Object.defineProperty(window, 'location', {
-  configurable: true,
-  value: { reload: jest.fn() },
-})
+
+if (typeof IntersectionObserver === 'undefined') {
+  class MockIntersectionObserver {
+    constructor(
+      public callback: IntersectionObserverCallback,
+      public options?: IntersectionObserverInit
+    ) {}
+
+    observe = jest.fn()
+    unobserve = jest.fn()
+    disconnect = jest.fn()
+    takeRecords = jest.fn()
+  }
+
+  Object.defineProperty(window, 'IntersectionObserver', {
+    writable: true,
+    configurable: true,
+    value: MockIntersectionObserver,
+  })
+}
 
 HTMLCanvasElement.prototype.getContext = <
   typeof HTMLCanvasElement.prototype.getContext

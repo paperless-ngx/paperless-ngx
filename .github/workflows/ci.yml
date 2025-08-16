@@ -12,9 +12,10 @@ on:
     branches-ignore:
       - 'translations**'
 env:
-  DEFAULT_UV_VERSION: "0.7.x"
+  DEFAULT_UV_VERSION: "0.8.x"
   # This is the default version of Python to use in most steps which aren't specific
   DEFAULT_PYTHON_VERSION: "3.11"
+  NLTK_DATA: "/usr/share/nltk_data"
 jobs:
   pre-commit:
     # We want to run on external PRs, but not on our own internal PRs as they'll be run
@@ -121,8 +122,11 @@ jobs:
       - name: List installed Python dependencies
         run: |
           uv pip list
+      - name: Install or update NLTK dependencies
+        run: uv run python -m nltk.downloader punkt punkt_tab snowball_data stopwords -d ${{ env.NLTK_DATA }}
       - name: Tests
         env:
+          NLTK_DATA: ${{ env.NLTK_DATA }}
           PAPERLESS_CI_TEST: 1
           # Enable paperless_mail testing against real server
           PAPERLESS_MAIL_TEST_HOST: ${{ secrets.TEST_MAIL_HOST }}

@@ -1,5 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard'
-import { Component, Input, OnInit } from '@angular/core'
+import { Component, Input, OnInit, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -16,6 +16,11 @@ import { environment } from 'src/environments/environment'
   imports: [FormsModule, ReactiveFormsModule, NgxBootstrapIconsModule],
 })
 export class ShareLinksDialogComponent implements OnInit {
+  private activeModal = inject(NgbActiveModal)
+  private shareLinkService = inject(ShareLinkService)
+  private toastService = inject(ToastService)
+  private clipboard = inject(Clipboard)
+
   EXPIRATION_OPTIONS = [
     { label: $localize`1 day`, value: 1 },
     { label: $localize`7 days`, value: 7 },
@@ -57,13 +62,6 @@ export class ShareLinksDialogComponent implements OnInit {
   expirationDays: number = 7
 
   useArchiveVersion: boolean = true
-
-  constructor(
-    private activeModal: NgbActiveModal,
-    private shareLinkService: ShareLinkService,
-    private toastService: ToastService,
-    private clipboard: Clipboard
-  ) {}
 
   ngOnInit(): void {
     if (this._documentId !== undefined) this.refresh()

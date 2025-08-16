@@ -1,5 +1,5 @@
 import { Clipboard, ClipboardModule } from '@angular/cdk/clipboard'
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, inject } from '@angular/core'
 import {
   NgbActiveModal,
   NgbModalModule,
@@ -35,6 +35,13 @@ import { environment } from 'src/environments/environment'
   ],
 })
 export class SystemStatusDialogComponent implements OnInit {
+  activeModal = inject(NgbActiveModal)
+  private clipboard = inject(Clipboard)
+  private systemStatusService = inject(SystemStatusService)
+  private tasksService = inject(TasksService)
+  private toastService = inject(ToastService)
+  private permissionsService = inject(PermissionsService)
+
   public SystemStatusItemStatus = SystemStatusItemStatus
   public PaperlessTaskName = PaperlessTaskName
   public status: SystemStatus
@@ -48,15 +55,6 @@ export class SystemStatusDialogComponent implements OnInit {
   get currentUserIsSuperUser(): boolean {
     return this.permissionsService.isSuperUser()
   }
-
-  constructor(
-    public activeModal: NgbActiveModal,
-    private clipboard: Clipboard,
-    private systemStatusService: SystemStatusService,
-    private tasksService: TasksService,
-    private toastService: ToastService,
-    private permissionsService: PermissionsService
-  ) {}
 
   public ngOnInit() {
     this.versionMismatch =

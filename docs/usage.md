@@ -30,6 +30,9 @@ Each document has data fields that you can assign to them:
 -   A _document type_ is used to demarcate the type of a document such
     as letter, bank statement, invoice, contract, etc. It is used to
     identify what a document is about.
+-   The document _storage path_ is the location where the document files
+    are stored. See [Storage Paths](advanced_usage.md#storage-paths) for
+    more information.
 -   The _date added_ of a document is the date the document was scanned
     into paperless. You cannot and should not change this date.
 -   The _date created_ of a document is the date the document was
@@ -496,6 +499,10 @@ The following workflow action types are available:
 -   Encoding for the request body, either JSON or form data
 -   The request headers as key-value pairs
 
+For security reasons, webhooks can be limited to specific ports and disallowed from connecting to local URLs. See the relevant
+[configuration settings](configuration.md#workflow-webhooks) to change this behavior. If you are allowing non-admins to create workflows,
+you may want to adjust these settings to prevent abuse.
+
 #### Workflow placeholders
 
 Some workflow text can include placeholders but the available options differ depending on the type of
@@ -573,12 +580,14 @@ The following custom field types are supported:
 
 ## PDF Actions
 
-Paperless-ngx supports four basic editing operations for PDFs (these operations currently cannot be performed on non-PDF files):
+Paperless-ngx supports basic editing operations for PDFs (these operations currently cannot be performed on non-PDF files). When viewing an individual document you can
+open the 'PDF Editor' to use a simple UI for re-arranging, rotating, deleting pages and splitting documents.
 
 -   Merging documents: available when selecting multiple documents for 'bulk editing'.
--   Rotating documents: available when selecting multiple documents for 'bulk editing' and from an individual document's details page.
--   Splitting documents: available from an individual document's details page.
--   Deleting pages: available from an individual document's details page.
+-   Rotating documents: available when selecting multiple documents for 'bulk editing' and via the pdf editor on an individual document's details page.
+-   Splitting documents: via the pdf editor on an individual document's details page.
+-   Deleting pages: via the pdf editor on an individual document's details page.
+-   Re-arranging pages: via the pdf editor on an individual document's details page.
 
 !!! important
 

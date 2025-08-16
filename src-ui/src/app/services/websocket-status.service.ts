@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { Subject } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import { User } from '../data/user'
@@ -93,7 +93,7 @@ export class FileStatus {
   providedIn: 'root',
 })
 export class WebsocketStatusService {
-  constructor(private settingsService: SettingsService) {}
+  private settingsService = inject(SettingsService)
 
   private statusWebSocket: WebSocket
 

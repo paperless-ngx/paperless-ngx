@@ -13,6 +13,7 @@ from urllib.parse import quote
 from urllib.parse import urlparse
 
 import httpx
+import magic
 import pathvalidate
 from celery import states
 from django.conf import settings
@@ -32,6 +33,7 @@ from django.db.models import When
 from django.db.models.functions import Length
 from django.db.models.functions import Lower
 from django.db.models.manager import Manager
+from django.http import FileResponse
 from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
@@ -173,6 +175,7 @@ from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import GeneralConfig
 from paperless.db import GnuPG
+from paperless.models import ApplicationConfiguration
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
@@ -1095,7 +1098,14 @@ class DocumentViewSet(
 
 @extend_schema_view(
     list=extend_schema(
+        description="Document views including search",
         parameters=[
+            OpenApiParameter(
+                name="query",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                description="Advanced search query string",
+            ),
             OpenApiParameter(
                 name="full_perms",
                 type=OpenApiTypes.BOOL,
@@ -1314,6 +1324,7 @@ class BulkEditView(PassUserMixin):
         "delete_pages": "checksum",
         "split": None,
         "merge": None,
+        "edit_pdf": "checksum",
         "reprocess": "checksum",
     }
 
@@ -1332,6 +1343,7 @@ class BulkEditView(PassUserMixin):
         if method in [
             bulk_edit.split,
             bulk_edit.merge,
+            bulk_edit.edit_pdf,
         ]:
             parameters["user"] = user
 
@@ -1351,27 +1363,36 @@ class BulkEditView(PassUserMixin):
 
             # check ownership for methods that change original document
             if (
-                has_perms
-                and method
-                in [
-                    bulk_edit.set_permissions,
-                    bulk_edit.delete,
-                    bulk_edit.rotate,
-                    bulk_edit.delete_pages,
-                ]
-            ) or (
-                method in [bulk_edit.merge, bulk_edit.split]
-                and parameters["delete_originals"]
+                (
+                    has_perms
+                    and method
+                    in [
+                        bulk_edit.set_permissions,
+                        bulk_edit.delete,
+                        bulk_edit.rotate,
+                        bulk_edit.delete_pages,
+                        bulk_edit.edit_pdf,
+                    ]
+                )
+                or (
+                    method in [bulk_edit.merge, bulk_edit.split]
+                    and parameters["delete_originals"]
+                )
+                or (method == bulk_edit.edit_pdf and parameters["update_document"])
             ):
                 has_perms = user_is_owner_of_all_documents
 
             # check global add permissions for methods that create documents
             if (
                 has_perms
-                and method in [bulk_edit.split, bulk_edit.merge]
-                and not user.has_perm(
-                    "documents.add_document",
+                and (
+                    method in [bulk_edit.split, bulk_edit.merge]
+                    or (
+                        method == bulk_edit.edit_pdf
+                        and not parameters["update_document"]
+                    )
                 )
+                and not user.has_perm("documents.add_document")
             ):
                 has_perms = False
 
@@ -1409,7 +1430,6 @@ class BulkEditView(PassUserMixin):
                     )
                 }
 
-            # TODO: parameter validation
             result = method(documents, **parameters)
 
             if settings.AUDIT_LOG_ENABLED and modified_field:
@@ -2138,7 +2158,7 @@ class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         # perform the deletion so renaming/moving can happen
         response = super().destroy(request, *args, **kwargs)
 
-        if len(doc_ids):
+        if doc_ids:
             bulk_edit.bulk_update_documents.delay(doc_ids)
 
         return response
@@ -2315,6 +2335,17 @@ class RemoteVersionView(GenericAPIView):
         },
     ),
 )
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="task_id",
+            type=str,
+            location=OpenApiParameter.QUERY,
+            required=False,
+            description="Filter tasks by Celery UUID",
+        ),
+    ],
+)
 class TasksViewSet(ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     serializer_class = TasksViewSerializer
@@ -2490,7 +2521,7 @@ class BulkEditObjectsView(PassUserMixin):
         objs = object_class.objects.select_related("owner").filter(pk__in=object_ids)
 
         if not user.is_superuser:
-            model_name = object_class._meta.verbose_name
+            model_name = object_class._meta.model_name
             perm = (
                 f"documents.change_{model_name}"
                 if operation == "set_permissions"
@@ -2918,3 +2949,25 @@ class TrashView(ListModelMixin, PassUserMixin):
                 doc_ids = [doc.id for doc in docs]
             empty_trash(doc_ids=doc_ids)
         return Response({"result": "OK", "doc_ids": doc_ids})
+
+
+def serve_logo(request, filename=None):
+    """
+    Serves the configured logo file with Content-Disposition: attachment.
+    Prevents inline execution of SVGs. See GHSA-6p53-hqqw-8j62
+    """
+    config = ApplicationConfiguration.objects.first()
+    app_logo = config.app_logo
+
+    if not app_logo:
+        raise Http404("No logo configured")
+
+    path = app_logo.path
+    content_type = magic.from_file(path, mime=True) or "application/octet-stream"
+
+    return FileResponse(
+        app_logo.open("rb"),
+        content_type=content_type,
+        filename=app_logo.name,
+        as_attachment=True,
+    )

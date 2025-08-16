@@ -1,5 +1,6 @@
 import logging
 
+import magic
 from allauth.mfa.adapter import get_adapter as get_mfa_adapter
 from allauth.mfa.models import Authenticator
 from allauth.mfa.totp.internal.auth import TOTP
@@ -12,6 +13,7 @@ from rest_framework import serializers
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 from paperless.models import ApplicationConfiguration
+from paperless.validators import reject_dangerous_svg
 from paperless_mail.serialisers import ObfuscatedPasswordField
 
 logger = logging.getLogger("paperless.settings")
@@ -205,6 +207,11 @@ class ApplicationConfigurationSerializer(serializers.ModelSerializer):
         if instance.app_logo and "app_logo" in validated_data:
             instance.app_logo.delete()
         return super().update(instance, validated_data)
+
+    def validate_app_logo(self, file):
+        if magic.from_buffer(file.read(2048), mime=True) == "image/svg+xml":
+            reject_dangerous_svg(file)
+        return file
 
     class Meta:
         model = ApplicationConfiguration

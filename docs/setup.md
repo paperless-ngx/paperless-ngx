@@ -445,7 +445,7 @@ are released, dependency support is confirmed, etc.
 13. Configure ImageMagick to allow processing of PDF documents. Most
     distributions have this disabled by default, since PDF documents can
     contain malware. If you don't do this, paperless will fall back to
-    ghostscript for certain steps such as thumbnail generation.
+    Ghostscript for certain steps such as thumbnail generation.
 
     Edit `/etc/ImageMagick-6/policy.xml` and adjust
 

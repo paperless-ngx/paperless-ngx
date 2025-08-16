@@ -41,11 +41,9 @@ class TestDocument(TestCase):
         Path(file_path).touch()
         Path(thumb_path).touch()
 
-        with mock.patch("documents.signals.handlers.os.unlink") as mock_unlink:
+        with mock.patch("documents.signals.handlers.Path.unlink") as mock_unlink:
             document.delete()
             empty_trash([document.pk])
-            mock_unlink.assert_any_call(file_path)
-            mock_unlink.assert_any_call(thumb_path)
             self.assertEqual(mock_unlink.call_count, 2)
 
     def test_document_soft_delete(self):
@@ -63,7 +61,7 @@ class TestDocument(TestCase):
         Path(file_path).touch()
         Path(thumb_path).touch()
 
-        with mock.patch("documents.signals.handlers.os.unlink") as mock_unlink:
+        with mock.patch("documents.signals.handlers.Path.unlink") as mock_unlink:
             document.delete()
             self.assertEqual(mock_unlink.call_count, 0)
 

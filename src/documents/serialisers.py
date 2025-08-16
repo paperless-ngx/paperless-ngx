@@ -18,7 +18,11 @@ from django.core.validators import MaxLengthValidator
 from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
 from django.utils.crypto import get_random_string
+from django.utils.dateparse import parse_datetime
 from django.utils.text import slugify
+from django.utils.timezone import get_current_timezone
+from django.utils.timezone import is_naive
+from django.utils.timezone import make_aware
 from django.utils.translation import gettext as _
 from drf_spectacular.utils import extend_schema_field
 from drf_spectacular.utils import extend_schema_serializer
@@ -972,11 +976,11 @@ class DocumentSerializer(
             and ":" in data["created"]
         ):
             # Handle old format of isoformat datetime string
-            try:
-                data["created"] = datetime.fromisoformat(data["created"]).date()
-            except ValueError:  # pragma: no cover
-                # Just pass, validation will catch it
-                pass
+            parsed = parse_datetime(data["created"])
+            if parsed:
+                if is_naive(parsed):
+                    parsed = make_aware(parsed, get_current_timezone())
+                data["created"] = parsed.astimezone().date()
         return super().to_internal_value(data)
 
     def validate(self, attrs):
@@ -1289,6 +1293,7 @@ class BulkEditSerializer(
             "merge",
             "split",
             "delete_pages",
+            "edit_pdf",
         ],
         label="Method",
         write_only=True,
@@ -1362,7 +1367,10 @@ class BulkEditSerializer(
             return bulk_edit.split
         elif method == "delete_pages":
             return bulk_edit.delete_pages
-        else:
+        elif method == "edit_pdf":
+            return bulk_edit.edit_pdf
+        else:  # pragma: no cover
+            # This will never happen as it is handled by the ChoiceField
             raise serializers.ValidationError("Unsupported method.")
 
     def _validate_parameters_tags(self, parameters):
@@ -1516,6 +1524,47 @@ class BulkEditSerializer(
         else:
             parameters["archive_fallback"] = False
 
+    def _validate_parameters_edit_pdf(self, parameters, document_id):
+        if "operations" not in parameters:
+            raise serializers.ValidationError("operations not specified")
+        if not isinstance(parameters["operations"], list):
+            raise serializers.ValidationError("operations must be a list")
+        for op in parameters["operations"]:
+            if not isinstance(op, dict):
+                raise serializers.ValidationError("invalid operation entry")
+            if "page" not in op or not isinstance(op["page"], int):
+                raise serializers.ValidationError("page must be an integer")
+            if "rotate" in op and not isinstance(op["rotate"], int):
+                raise serializers.ValidationError("rotate must be an integer")
+            if "doc" in op and not isinstance(op["doc"], int):
+                raise serializers.ValidationError("doc must be an integer")
+        if "update_document" in parameters:
+            if not isinstance(parameters["update_document"], bool):
+                raise serializers.ValidationError("update_document must be a boolean")
+        else:
+            parameters["update_document"] = False
+        if "include_metadata" in parameters:
+            if not isinstance(parameters["include_metadata"], bool):
+                raise serializers.ValidationError("include_metadata must be a boolean")
+        else:
+            parameters["include_metadata"] = True
+
+        if parameters["update_document"]:
+            max_idx = max(op.get("doc", 0) for op in parameters["operations"])
+            if max_idx > 0:
+                raise serializers.ValidationError(
+                    "update_document only allowed with a single output document",
+                )
+
+        doc = Document.objects.get(id=document_id)
+        # doc existence is already validated
+        if doc.page_count:
+            for op in parameters["operations"]:
+                if op["page"] < 1 or op["page"] > doc.page_count:
+                    raise serializers.ValidationError(
+                        f"Page {op['page']} is out of bounds for document with {doc.page_count} pages.",
+                    )
+
     def validate(self, attrs):
         method = attrs["method"]
         parameters = attrs["parameters"]
@@ -1550,6 +1599,12 @@ class BulkEditSerializer(
             self._validate_parameters_delete_pages(parameters)
         elif method == bulk_edit.merge:
             self._validate_parameters_merge(parameters)
+        elif method == bulk_edit.edit_pdf:
+            if len(attrs["documents"]) > 1:
+                raise serializers.ValidationError(
+                    "Edit PDF method only supports one document",
+                )
+            self._validate_parameters_edit_pdf(parameters, attrs["documents"][0])
 
         return attrs
 
@@ -1746,7 +1801,7 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         using it require a rename/move
         """
         doc_ids = [doc.id for doc in instance.documents.all()]
-        if len(doc_ids):
+        if doc_ids:
             bulk_edit.bulk_update_documents.delay(doc_ids)
 
         return super().update(instance, validated_data)
@@ -2034,6 +2089,24 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
 
         return attrs
 
+    @staticmethod
+    def normalize_workflow_trigger_sources(trigger):
+        """
+        Convert sources to strings to handle django-multiselectfield v1.0 changes
+        """
+        if trigger and "sources" in trigger:
+            trigger["sources"] = [
+                str(s.value if hasattr(s, "value") else s) for s in trigger["sources"]
+            ]
+
+    def create(self, validated_data):
+        WorkflowTriggerSerializer.normalize_workflow_trigger_sources(validated_data)
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        WorkflowTriggerSerializer.normalize_workflow_trigger_sources(validated_data)
+        return super().update(instance, validated_data)
+
 
 class WorkflowActionEmailSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(allow_null=True, required=False)
@@ -2198,6 +2271,8 @@ class WorkflowSerializer(serializers.ModelSerializer):
         if triggers is not None and triggers is not serializers.empty:
             for trigger in triggers:
                 filter_has_tags = trigger.pop("filter_has_tags", None)
+                # Convert sources to strings to handle django-multiselectfield v1.0 changes
+                WorkflowTriggerSerializer.normalize_workflow_trigger_sources(trigger)
                 trigger_instance, _ = WorkflowTrigger.objects.update_or_create(
                     id=trigger.get("id"),
                     defaults=trigger,

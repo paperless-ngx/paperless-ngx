@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http'
 import {
   Directive,
+  inject,
   OnDestroy,
   OnInit,
   QueryList,
@@ -52,6 +53,8 @@ export interface ManagementListColumn {
   rendersHtml?: boolean
 
   hideOnMobile?: boolean
+
+  monospace?: boolean
 }
 
 @Directive()
@@ -59,21 +62,19 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy
 {
-  constructor(
-    protected service: AbstractNameFilterService<T>,
-    private modalService: NgbModal,
-    private editDialogComponent: any,
-    private toastService: ToastService,
-    private documentListViewService: DocumentListViewService,
-    private permissionsService: PermissionsService,
-    protected filterRuleType: number,
-    public typeName: string,
-    public typeNamePlural: string,
-    public permissionType: PermissionType,
-    public extraColumns: ManagementListColumn[]
-  ) {
-    super()
-  }
+  protected service: AbstractNameFilterService<T>
+  private modalService: NgbModal = inject(NgbModal)
+  protected editDialogComponent: any
+  private toastService: ToastService = inject(ToastService)
+  private documentListViewService: DocumentListViewService = inject(
+    DocumentListViewService
+  )
+  private permissionsService: PermissionsService = inject(PermissionsService)
+  protected filterRuleType: number
+  public typeName: string
+  public typeNamePlural: string
+  public permissionType: PermissionType
+  public extraColumns: ManagementListColumn[]
 
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
 

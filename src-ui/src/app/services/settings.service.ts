@@ -1,8 +1,8 @@
-import { DOCUMENT } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import {
+  DOCUMENT,
   EventEmitter,
-  Inject,
+  inject,
   Injectable,
   LOCALE_ID,
   Renderer2,
@@ -245,6 +245,12 @@ const LANGUAGE_OPTIONS = [
     dateInputFormat: 'dd.mm.yyyy',
   },
   {
+    code: 'vi-vn',
+    name: $localize`Vietnamese`,
+    englishName: 'Vietnamese',
+    dateInputFormat: 'dd/mm/yyyy',
+  },
+  {
     code: 'zh-cn',
     name: $localize`Chinese Simplified`,
     englishName: 'Chinese Simplified',
@@ -268,6 +274,15 @@ const ISO_LANGUAGE_OPTION: LanguageOption = {
   providedIn: 'root',
 })
 export class SettingsService {
+  private document = inject(DOCUMENT)
+  private cookieService = inject(CookieService)
+  private meta = inject(Meta)
+  private localeId = inject(LOCALE_ID)
+  protected http = inject(HttpClient)
+  private toastService = inject(ToastService)
+  private permissionsService = inject(PermissionsService)
+  private customFieldsService = inject(CustomFieldsService)
+
   protected baseUrl: string = environment.apiBaseUrl + 'ui_settings/'
 
   private settings: Object = {}
@@ -293,17 +308,9 @@ export class SettingsService {
   }
   public displayFieldsInit: EventEmitter<boolean> = new EventEmitter()
 
-  constructor(
-    rendererFactory: RendererFactory2,
-    @Inject(DOCUMENT) private document,
-    private cookieService: CookieService,
-    private meta: Meta,
-    @Inject(LOCALE_ID) private localeId: string,
-    protected http: HttpClient,
-    private toastService: ToastService,
-    private permissionsService: PermissionsService,
-    private customFieldsService: CustomFieldsService
-  ) {
+  constructor() {
+    const rendererFactory = inject(RendererFactory2)
+
     this._renderer = rendererFactory.createRenderer(null, null)
   }
 

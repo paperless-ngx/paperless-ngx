@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core'
+import { Component, Input, inject } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -13,6 +13,10 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
   imports: [FormsModule, NgxBootstrapIconsModule],
 })
 export class EmailDocumentDialogComponent extends LoadingComponentWithPermissions {
+  private activeModal = inject(NgbActiveModal)
+  private documentService = inject(DocumentService)
+  private toastService = inject(ToastService)
+
   @Input()
   title = $localize`Email Document`
 
@@ -37,11 +41,7 @@ export class EmailDocumentDialogComponent extends LoadingComponentWithPermission
   public emailSubject: string = ''
   public emailMessage: string = ''
 
-  constructor(
-    private activeModal: NgbActiveModal,
-    private documentService: DocumentService,
-    private toastService: ToastService
-  ) {
+  constructor() {
     super()
     this.loading = false
   }

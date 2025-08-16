@@ -1,6 +1,11 @@
+from datetime import datetime
 from unittest import mock
 
+from django.contrib.auth.models import User
 from django.test import TestCase
+from django.test import override_settings
+from django.utils.timezone import get_current_timezone
+from django.utils.timezone import timezone
 
 from documents import index
 from documents.models import Document
@@ -90,3 +95,35 @@ class TestAutoComplete(DirectoriesMixin, TestCase):
             _, kwargs = mocked_update_doc.call_args
 
             self.assertIsNone(kwargs["asn"])
+
+    @override_settings(TIME_ZONE="Pacific/Auckland")
+    def test_added_today_respects_local_timezone_boundary(self):
+        tz = get_current_timezone()
+        fixed_now = datetime(2025, 7, 20, 15, 0, 0, tzinfo=tz)
+
+        # Fake a time near the local boundary (1 AM NZT = 13:00 UTC on previous UTC day)
+        local_dt = datetime(2025, 7, 20, 1, 0, 0).replace(tzinfo=tz)
+        utc_dt = local_dt.astimezone(timezone.utc)
+
+        doc = Document.objects.create(
+            title="Time zone",
+            content="Testing added:today",
+            checksum="edgecase123",
+            added=utc_dt,
+        )
+
+        with index.open_index_writer() as writer:
+            index.update_document(writer, doc)
+
+        superuser = User.objects.create_superuser(username="testuser")
+        self.client.force_login(superuser)
+
+        with mock.patch("documents.index.now", return_value=fixed_now):
+            response = self.client.get("/api/documents/?query=added:today")
+            results = response.json()["results"]
+            self.assertEqual(len(results), 1)
+            self.assertEqual(results[0]["id"], doc.id)
+
+            response = self.client.get("/api/documents/?query=added:yesterday")
+            results = response.json()["results"]
+            self.assertEqual(len(results), 0)

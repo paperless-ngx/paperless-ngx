@@ -19,11 +19,18 @@ jobs:
         with:
           days-before-stale: 7
           days-before-close: 14
-          any-of-labels: 'stale,cant-reproduce,not a bug'
+          any-of-issue-labels: 'cant-reproduce,not a bug'
           stale-issue-label: stale
-          stale-pr-label: stale
           stale-issue-message: >
             This issue has been automatically marked as stale because it has not had recent activity. It will be closed if no further activity occurs. Thank you for your contributions. See our [contributing guidelines](https://github.com/paperless-ngx/paperless-ngx/blob/dev/CONTRIBUTING.md#automatic-repository-maintenance) for more details.
+
+          days-before-pr-stale: 14
+          days-before-pr-close: 7
+          stale-pr-message: ""
+          stale-pr-label: stale
+          exempt-pr-labels: 'notable'
+          close-pr-message: >
+            This pull request has been automatically closed because it has not had recent activity. Thank you for your contributions. Please open a new pull request or discussion if you would like to continue working on this change.
 
   lock-threads:
     name: 'Lock Old Threads'

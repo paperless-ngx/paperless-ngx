@@ -1,5 +1,5 @@
 import { NgClass, NgTemplateOutlet } from '@angular/common'
-import { Component, QueryList, ViewChildren } from '@angular/core'
+import { Component, QueryList, ViewChildren, inject } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import {
   NgbAlert,
@@ -37,15 +37,11 @@ import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
   ],
 })
 export class UploadFileWidgetComponent extends ComponentWithPermissions {
-  @ViewChildren(NgbAlert) alerts: QueryList<NgbAlert>
+  private websocketStatusService = inject(WebsocketStatusService)
+  private uploadDocumentsService = inject(UploadDocumentsService)
+  settingsService = inject(SettingsService)
 
-  constructor(
-    private websocketStatusService: WebsocketStatusService,
-    private uploadDocumentsService: UploadDocumentsService,
-    public settingsService: SettingsService
-  ) {
-    super()
-  }
+  @ViewChildren(NgbAlert) alerts: QueryList<NgbAlert>
 
   getStatus() {
     return this.websocketStatusService.getConsumerStatus()

@@ -8,6 +8,7 @@ import {
   OnInit,
   Output,
   ViewChild,
+  inject,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
@@ -240,6 +241,15 @@ export class FilterEditorComponent
   extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy, AfterViewInit
 {
+  private documentTypeService = inject(DocumentTypeService)
+  private tagService = inject(TagService)
+  private correspondentService = inject(CorrespondentService)
+  private documentService = inject(DocumentService)
+  private storagePathService = inject(StoragePathService)
+  permissionsService = inject(PermissionsService)
+  private customFieldService = inject(CustomFieldsService)
+  private searchService = inject(SearchService)
+
   generateFilterName() {
     if (this.filterRules.length == 1) {
       let rule = this.filterRules[0]
@@ -311,19 +321,6 @@ export class FilterEditorComponent
     }
 
     return ''
-  }
-
-  constructor(
-    private documentTypeService: DocumentTypeService,
-    private tagService: TagService,
-    private correspondentService: CorrespondentService,
-    private documentService: DocumentService,
-    private storagePathService: StoragePathService,
-    public permissionsService: PermissionsService,
-    private customFieldService: CustomFieldsService,
-    private searchService: SearchService
-  ) {
-    super()
   }
 
   @ViewChild('textFilterInput')
@@ -1219,6 +1216,7 @@ export class FilterEditorComponent
 
   resetSelected() {
     this.textFilterTarget = TEXT_FILTER_TARGET_TITLE_CONTENT
+    this.documentService.searchQuery = ''
     this.filterRules = this._unmodifiedFilterRules
     this.updateRules()
   }

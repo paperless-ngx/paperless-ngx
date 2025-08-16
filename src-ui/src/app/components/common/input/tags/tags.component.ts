@@ -2,6 +2,7 @@ import {
   Component,
   EventEmitter,
   forwardRef,
+  inject,
   Input,
   OnInit,
   Output,
@@ -45,10 +46,10 @@ import { TagComponent } from '../../tag/tag.component'
   ],
 })
 export class TagsComponent implements OnInit, ControlValueAccessor {
-  constructor(
-    private tagService: TagService,
-    private modalService: NgbModal
-  ) {
+  private tagService = inject(TagService)
+  private modalService = inject(NgbModal)
+
+  constructor() {
     this.createTagRef = this.createTag.bind(this)
   }
 

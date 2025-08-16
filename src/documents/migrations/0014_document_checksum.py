@@ -63,11 +63,11 @@ class Document:
             / "documents"
             / "originals"
             / f"{self.pk:07}.{self.file_type}.gpg"
-        ).as_posix()
+        )
 
     @property
     def source_file(self):
-        return Path(self.source_path).open("rb")
+        return self.source_path.open("rb")
 
     @property
     def file_name(self):
