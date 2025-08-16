@@ -7181,7 +7181,7 @@
         <source>Copy metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
-          <context context-type="linenumber">93</context>
+          <context context-type="linenumber">94</context>
         </context-group>
         <target state="needs-translation">Copy metadata</target>
       </trans-unit>
@@ -7189,7 +7189,7 @@
         <source>Delete original</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
-          <context context-type="linenumber">97</context>
+          <context context-type="linenumber">98</context>
         </context-group>
         <target state="needs-translation">Delete original</target>
       </trans-unit>
