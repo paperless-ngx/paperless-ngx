@@ -265,7 +265,7 @@ urlpatterns = [
         # TODO: with localization, this is even worse! :/
     ),
     # App logo
-    path("logo/<path:filename>", serve_logo, name="app_logo"),
+    re_path(r"^logo(?:/(?P<filename>.+))?/?$", serve_logo, name="app_logo"),
     # allauth
     path(
         "accounts/",
