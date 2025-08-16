@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from django.contrib.auth.models import User
+from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -154,13 +155,18 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         response = self.client.get("/logo/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-        with (Path(__file__).parent / "samples" / "simple.jpg").open("rb") as f:
-            self.client.patch(
-                f"{self.ENDPOINT}1/",
-                {
-                    "app_logo": f,
-                },
-            )
+        self.client.patch(
+            f"{self.ENDPOINT}1/",
+            {
+                "app_logo": SimpleUploadedFile(
+                    name="simple.jpg",
+                    content=(
+                        Path(__file__).parent / "samples" / "simple.jpg"
+                    ).read_bytes(),
+                    content_type="image/jpeg",
+                ),
+            },
+        )
 
         # Logo exists at /logo/simple.jpg
         response = self.client.get("/logo/simple.jpg")
@@ -170,13 +176,18 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         config = ApplicationConfiguration.objects.first()
         old_logo = config.app_logo
         self.assertTrue(Path(old_logo.path).exists())
-        with (Path(__file__).parent / "samples" / "simple.png").open("rb") as f:
-            self.client.patch(
-                f"{self.ENDPOINT}1/",
-                {
-                    "app_logo": f,
-                },
-            )
+        self.client.patch(
+            f"{self.ENDPOINT}1/",
+            {
+                "app_logo": SimpleUploadedFile(
+                    name="simple.png",
+                    content=(
+                        Path(__file__).parent / "samples" / "simple.png"
+                    ).read_bytes(),
+                    content_type="image/png",
+                ),
+            },
+        )
         self.assertFalse(Path(old_logo.path).exists())
 
     def test_api_rejects_malicious_svg_logo(self):

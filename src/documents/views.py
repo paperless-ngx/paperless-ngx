@@ -2951,16 +2951,13 @@ class TrashView(ListModelMixin, PassUserMixin):
         return Response({"result": "OK", "doc_ids": doc_ids})
 
 
-def serve_logo(request, filename):
+def serve_logo(request, filename=None):
     """
     Serves the configured logo file with Content-Disposition: attachment.
     Prevents inline execution of SVGs. See GHSA-6p53-hqqw-8j62
     """
-    logger.warning("Serving app logo...")
     config = ApplicationConfiguration.objects.first()
     app_logo = config.app_logo
-
-    logger.warning(f"Serving logo: {app_logo}")
 
     if not app_logo:
         raise Http404("No logo configured")
@@ -2972,4 +2969,5 @@ def serve_logo(request, filename):
         app_logo.open("rb"),
         content_type=content_type,
         filename=app_logo.name,
-    ).as_attachment()
+        as_attachment=True,
+    )
