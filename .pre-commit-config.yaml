@@ -31,6 +31,7 @@ repos:
     rev: v2.4.1
     hooks:
       - id: codespell
+        additional_dependencies: [tomli]
         exclude_types:
           - pofile
           - json
