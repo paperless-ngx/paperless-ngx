@@ -469,7 +469,7 @@ The `get_cf_value` filter retrieves a value from custom field data with optional
 
 ##### Datetime Formatting
 
-The `datetime`filter formats a datetime string or datetime object using Python's strftime formatting.
+The `datetime` filter formats a datetime string or datetime object using Python's strftime formatting.
 
 ###### Syntax
 
@@ -494,7 +494,7 @@ The `datetime`filter formats a datetime string or datetime object using Python's
 <!-- Output: "January 15, 2024 at 02:30 PM" -->
 
 <!-- Custom formatting -->
-{{ timestamp | datetime('%A, %B %d, %Y') }}
+{{ custom_fields | get_cf_value('Date Field') | datetime('%A, %B %d, %Y') }}
 <!-- Output: "Monday, January 15, 2024" -->
 ```
 
