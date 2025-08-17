@@ -209,7 +209,7 @@ class ApplicationConfigurationSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
     def validate_app_logo(self, file):
-        if magic.from_buffer(file.read(2048), mime=True) == "image/svg+xml":
+        if file and magic.from_buffer(file.read(2048), mime=True) == "image/svg+xml":
             reject_dangerous_svg(file)
         return file
 
