@@ -490,15 +490,15 @@ The `format_datetime`filter formats a datetime string or datetime object using P
 
 ```jinja2
 <!-- Format datetime object -->
-{{ created_at | format_datetime('%B %d, %Y at %I:%M %p') }}
+{{ created | datetime('%B %d, %Y at %I:%M %p') }}
 <!-- Output: "January 15, 2024 at 02:30 PM" -->
 
 <!-- Format datetime string -->
-{{ "2024-01-15T14:30:00" | format_datetime('%m/%d/%Y') }}
+{{ "2024-01-15T14:30:00" | datetime('%m/%d/%Y') }}
 <!-- Output: "01/15/2024" -->
 
 <!-- Custom formatting -->
-{{ timestamp | format_datetime('%A, %B %d, %Y') }}
+{{ timestamp | datetime('%A, %B %d, %Y') }}
 <!-- Output: "Monday, January 15, 2024" -->
 ```
 
@@ -531,27 +531,27 @@ This takes into account the provided locale for translation.
 
 ```jinja2
 <!-- Preset formats -->
-{{ created_date | localize_date('short', 'en_US') }}
+{{ document.created | localize_date('short', 'en_US') }}
 <!-- Output: "1/15/24" -->
 
-{{ created_date | localize_date('medium', 'en_US') }}
+{{ document.created | localize_date('medium', 'en_US') }}
 <!-- Output: "Jan 15, 2024" -->
 
-{{ created_date | localize_date('long', 'en_US') }}
+{{ document.created | localize_date('long', 'en_US') }}
 <!-- Output: "January 15, 2024" -->
 
-{{ created_date | localize_date('full', 'en_US') }}
+{{ document.created | localize_date('full', 'en_US') }}
 <!-- Output: "Monday, January 15, 2024" -->
 
 <!-- Different locales -->
-{{ created_date | localize_date('medium', 'fr_FR') }}
+{{ document.created | localize_date('medium', 'fr_FR') }}
 <!-- Output: "15 janv. 2024" -->
 
-{{ created_date | localize_date('medium', 'de_DE') }}
+{{ document.created | localize_date('medium', 'de_DE') }}
 <!-- Output: "15.01.2024" -->
 
 <!-- Custom patterns -->
-{{ created_date | localize_date('dd/MM/yyyy', 'en_GB') }}
+{{ document.created | localize_date('dd/MM/yyyy', 'en_GB') }}
 <!-- Output: "15/01/2024" -->
 ```
 
