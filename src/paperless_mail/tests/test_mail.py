@@ -1,6 +1,7 @@
 import dataclasses
 import email.contentmanager
 import random
+import time
 import uuid
 from collections import namedtuple
 from contextlib import AbstractContextManager
@@ -383,6 +384,20 @@ class MailMocker(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             message = kwargs["message"]
             rule = kwargs["rule"]
             apply_mail_action([], rule.pk, message.uid, message.subject, message.date)
+
+
+def assert_eventually_equals(getter_fn, expected_value, timeout=1.0, interval=0.05):
+    """
+    Repeatedly calls `getter_fn()` until the result equals `expected_value`,
+    or times out after `timeout` seconds.
+    """
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        if getter_fn() == expected_value:
+            return
+        time.sleep(interval)
+    actual = getter_fn()
+    raise AssertionError(f"Expected {expected_value}, but got {actual}")
 
 
 @mock.patch("paperless_mail.mail.magic.from_buffer", fake_magic_from_buffer)
@@ -818,7 +833,7 @@ class TestMail(
         self.mail_account_handler.handle_mail_account(account)
         self.mailMocker.apply_mail_actions()
 
-        self.assertEqual(len(self.mailMocker.bogus_mailbox.messages), 1)
+        assert_eventually_equals(lambda: len(self.mailMocker.bogus_mailbox.messages), 1)
 
     def test_handle_mail_account_delete_no_filters(self):
         account = MailAccount.objects.create(

@@ -68,6 +68,8 @@
             <td scope="row" [ngClass]="{ 'd-none d-sm-table-cell' : column.hideOnMobile }">
               @if (column.rendersHtml) {
                 <div [innerHtml]="column.valueFn.call(null, object) | safeHtml"></div>
+              } @else if (column.monospace) {
+                <span class="font-monospace">{{ column.valueFn.call(null, object) }}</span>
               } @else {
                 {{ column.valueFn.call(null, object) }}
               }
