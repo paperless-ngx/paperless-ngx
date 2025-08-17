@@ -469,12 +469,12 @@ The `get_cf_value` filter retrieves a value from custom field data with optional
 
 ##### Datetime Formatting
 
-The `format_datetime`filter formats a datetime string or datetime object using Python's strftime formatting.
+The `datetime`filter formats a datetime string or datetime object using Python's strftime formatting.
 
 ###### Syntax
 
 ```jinja2
-{{ datetime_value | format_datetime('%Y-%m-%d %H:%M:%S') }}
+{{ datetime_value | datetime('%Y-%m-%d %H:%M:%S') }}
 ```
 
 ###### Parameters
@@ -493,10 +493,6 @@ The `format_datetime`filter formats a datetime string or datetime object using P
 {{ created | datetime('%B %d, %Y at %I:%M %p') }}
 <!-- Output: "January 15, 2024 at 02:30 PM" -->
 
-<!-- Format datetime string -->
-{{ "2024-01-15T14:30:00" | datetime('%m/%d/%Y') }}
-<!-- Output: "01/15/2024" -->
-
 <!-- Custom formatting -->
 {{ timestamp | datetime('%A, %B %d, %Y') }}
 <!-- Output: "Monday, January 15, 2024" -->
@@ -508,7 +504,8 @@ for the possible codes and their meanings.
 ##### Date Localization
 
 The `localize_date` filter formats a date or datetime object into a localized string using Babel internationalization.
-This takes into account the provided locale for translation.
+This takes into account the provided locale for translation. Since this must be used on a date or datetime object,
+you must access the field directly, i.e. `document.created`.
 
 ###### Syntax
 
