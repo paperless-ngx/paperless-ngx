@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-16 14:34+0000\n"
-"PO-Revision-Date: 2025-08-17 12:12\n"
+"PO-Revision-Date: 2025-08-17 20:45\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -1201,14 +1201,13 @@ msgstr "Oturum açmaya geri dön"
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr "%(site_name) uygulamasından merhaba."
+msgstr ""
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
 msgid "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
-msgstr "%(site_name)s'i kullandığınız için teşekkürler!\n"
-"%(site_domain)s"
+msgstr ""
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
