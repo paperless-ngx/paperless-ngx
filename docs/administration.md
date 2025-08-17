@@ -185,7 +185,7 @@ the instructions from your database's documentation for how to upgrade between m
 
 !!! note
 
-    As of Paperless-ngx v2.18, the minimum supported version of PostgreSQL is 13.
+    As of Paperless-ngx v2.18, the minimum supported version of PostgreSQL is 14.
 
 For PostgreSQL, refer to [Upgrading a PostgreSQL Cluster](https://www.postgresql.org/docs/current/upgrading.html).
 
