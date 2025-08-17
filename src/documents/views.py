@@ -13,6 +13,7 @@ from urllib.parse import quote
 from urllib.parse import urlparse
 
 import httpx
+import magic
 import pathvalidate
 from celery import states
 from django.conf import settings
@@ -32,6 +33,7 @@ from django.db.models import When
 from django.db.models.functions import Length
 from django.db.models.functions import Lower
 from django.db.models.manager import Manager
+from django.http import FileResponse
 from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
@@ -173,6 +175,7 @@ from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import GeneralConfig
 from paperless.db import GnuPG
+from paperless.models import ApplicationConfiguration
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
@@ -2946,3 +2949,25 @@ class TrashView(ListModelMixin, PassUserMixin):
                 doc_ids = [doc.id for doc in docs]
             empty_trash(doc_ids=doc_ids)
         return Response({"result": "OK", "doc_ids": doc_ids})
+
+
+def serve_logo(request, filename=None):
+    """
+    Serves the configured logo file with Content-Disposition: attachment.
+    Prevents inline execution of SVGs. See GHSA-6p53-hqqw-8j62
+    """
+    config = ApplicationConfiguration.objects.first()
+    app_logo = config.app_logo
+
+    if not app_logo:
+        raise Http404("No logo configured")
+
+    path = app_logo.path
+    content_type = magic.from_file(path, mime=True) or "application/octet-stream"
+
+    return FileResponse(
+        app_logo.open("rb"),
+        content_type=content_type,
+        filename=app_logo.name,
+        as_attachment=True,
+    )

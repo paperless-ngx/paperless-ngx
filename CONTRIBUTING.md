@@ -37,6 +37,8 @@ Before you can run `pytest`, ensure to [properly set up your local environment](
 
 Once you have submitted a **P**ull **R**equest it will be reviewed, approved, and merged by one or more community members of any team. Automated code tests and formatting checks must be passed.
 
+Important: Pull requests that implement a new feature or enhancement _should almost always target an existing feature request_ with evidence of community interest and discussion. This is in order to balance the work of implementing and maintaining new features / enhancements. Instead of opening a PR which does not meet this requirement, please open a feature request instead, to gather feedback from both users and the project maintainers.
+
 ## Non-Trivial Requests
 
 PRs deemed `non-trivial` will go through a stricter review process before being merged into `dev`. This is to ensure code quality and complete functionality (free of side effects).
@@ -109,28 +111,12 @@ Paperless-ngx is a community project. We do our best to delegate permission and 
 
 ## Structure
 
-As of writing, there are 21 members in paperless-ngx. 4 of these people have complete administrative privileges to the repo:
+There are currently 2 members in paperless-ngx with complete administrative privileges to the repo:
 
 - [@shamoon](https://github.com/shamoon)
-- [@bauerj](https://github.com/bauerj)
-- [@qcasey](https://github.com/qcasey)
-- [@FrankStrieter](https://github.com/FrankStrieter)
+- [@stumpylog](https://github.com/stumpylog)
 
-There are 5 teams collaborating on specific tasks within paperless-ngx:
-
-- @paperless-ngx/backend (Python / django)
-- @paperless-ngx/frontend (JavaScript / Typescript)
-- @paperless-ngx/ci-cd (GitHub Actions / Deployment)
-- @paperless-ngx/issues (Issue triage)
-- @paperless-ngx/test (General testing for larger PRs)
-
-## Permissions
-
-All team members are notified when mentioned or assigned to a relevant issue or pull request. Additionally, each team has slightly different access to paperless-ngx:
-
-- The **test** team has no special permissions.
-- The **issues** team has `triage` access. This means they can organize issues and pull requests.
-- The **backend**, **frontend**, and **ci-cd** teams have `write` access. This means they can approve PRs and push code, containers, releases, and more.
+There are other members who occasionally contribute but we are actively seeking more dedicated maintainers of the project. Please reach out if you are interested.
 
 ## Joining
 

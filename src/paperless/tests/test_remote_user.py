@@ -1,6 +1,7 @@
 import os
 from unittest import mock
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import override_settings
 from rest_framework import status
@@ -91,6 +92,7 @@ class TestRemoteUser(DirectoriesMixin, APITestCase):
 
     @override_settings(
         REST_FRAMEWORK={
+            **settings.REST_FRAMEWORK,
             "DEFAULT_AUTHENTICATION_CLASSES": [
                 "rest_framework.authentication.BasicAuthentication",
                 "rest_framework.authentication.TokenAuthentication",

@@ -53,6 +53,8 @@ export interface ManagementListColumn {
   rendersHtml?: boolean
 
   hideOnMobile?: boolean
+
+  monospace?: boolean
 }
 
 @Directive()

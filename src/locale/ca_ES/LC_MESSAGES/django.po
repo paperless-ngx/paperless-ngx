@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-19 18:51+0000\n"
-"PO-Revision-Date: 2025-06-19 18:52\n"
+"POT-Creation-Date: 2025-08-16 14:34+0000\n"
+"PO-Revision-Date: 2025-08-16 14:36\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -31,7 +31,7 @@ msgstr "Expressió de camp de consulta invàlid"
 
 #: documents/filters.py:413
 msgid "Invalid expression list. Must be nonempty."
-msgstr "Expressió de lista invàlida. No ha d'estar buida."
+msgstr "Expressió de llista invàlida. No ha d'estar buida."
 
 #: documents/filters.py:434
 msgid "Invalid logical operator {op!r}"
@@ -43,7 +43,7 @@ msgstr "Condicions de consulta excedits."
 
 #: documents/filters.py:513
 msgid "{name!r} is not a valid custom field."
-msgstr "{name!r} no és un camp personaoitzat vàlid."
+msgstr "{name!r} no és un camp personalitzat vàlid."
 
 #: documents/filters.py:550
 msgid "{data_type} does not support query expr {expr!r}."
@@ -71,7 +71,7 @@ msgstr "Qualsevol paraula"
 
 #: documents/models.py:55 documents/models.py:926
 msgid "All words"
-msgstr "Totes paraules"
+msgstr "Totes les paraules"
 
 #: documents/models.py:56 documents/models.py:927
 msgid "Exact match"
@@ -266,11 +266,11 @@ msgstr "Taula"
 
 #: documents/models.py:383
 msgid "Small Cards"
-msgstr "Tarja Petita"
+msgstr "Targeta Petita"
 
 #: documents/models.py:384
 msgid "Large Cards"
-msgstr "Tarja Gran"
+msgstr "Targeta Gran"
 
 #: documents/models.py:387
 msgid "Title"
@@ -1164,21 +1164,21 @@ msgstr "data del flux"
 msgid "workflow runs"
 msgstr "flux corrents"
 
-#: documents/serialisers.py:135
+#: documents/serialisers.py:139
 #, python-format
 msgid "Invalid regular expression: %(error)s"
 msgstr "Expressió regular invàlida: %(error)s"
 
-#: documents/serialisers.py:561
+#: documents/serialisers.py:565
 msgid "Invalid color."
 msgstr "Color Invàlid."
 
-#: documents/serialisers.py:1645
+#: documents/serialisers.py:1700
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Tipus arxiu %(type)s no suportat"
 
-#: documents/serialisers.py:1739
+#: documents/serialisers.py:1794
 msgid "Invalid variable detected."
 msgstr "Variable detectada invàlida."
 
@@ -1619,147 +1619,151 @@ msgstr "Defineix el mapatge de l'etiqueta del codi de barres"
 msgid "paperless application settings"
 msgstr "configuració de l'aplicació paperless"
 
-#: paperless/settings.py:755
+#: paperless/settings.py:774
 msgid "English (US)"
 msgstr "Anglès (US)"
 
-#: paperless/settings.py:756
+#: paperless/settings.py:775
 msgid "Arabic"
 msgstr "Àrab"
 
-#: paperless/settings.py:757
+#: paperless/settings.py:776
 msgid "Afrikaans"
 msgstr "Africà"
 
-#: paperless/settings.py:758
+#: paperless/settings.py:777
 msgid "Belarusian"
 msgstr "Bielorús"
 
-#: paperless/settings.py:759
+#: paperless/settings.py:778
 msgid "Bulgarian"
 msgstr "Búlgar"
 
-#: paperless/settings.py:760
+#: paperless/settings.py:779
 msgid "Catalan"
 msgstr "Català"
 
-#: paperless/settings.py:761
+#: paperless/settings.py:780
 msgid "Czech"
 msgstr "Txec"
 
-#: paperless/settings.py:762
+#: paperless/settings.py:781
 msgid "Danish"
 msgstr "Danès"
 
-#: paperless/settings.py:763
+#: paperless/settings.py:782
 msgid "German"
 msgstr "Alemany"
 
-#: paperless/settings.py:764
+#: paperless/settings.py:783
 msgid "Greek"
 msgstr "Grec"
 
-#: paperless/settings.py:765
+#: paperless/settings.py:784
 msgid "English (GB)"
 msgstr "Anglès (GB)"
 
-#: paperless/settings.py:766
+#: paperless/settings.py:785
 msgid "Spanish"
 msgstr "Espanyol"
 
-#: paperless/settings.py:767
+#: paperless/settings.py:786
 msgid "Persian"
 msgstr "Persa"
 
-#: paperless/settings.py:768
+#: paperless/settings.py:787
 msgid "Finnish"
 msgstr "Finès"
 
-#: paperless/settings.py:769
+#: paperless/settings.py:788
 msgid "French"
 msgstr "Francès"
 
-#: paperless/settings.py:770
+#: paperless/settings.py:789
 msgid "Hungarian"
 msgstr "Hongarès"
 
-#: paperless/settings.py:771
+#: paperless/settings.py:790
 msgid "Italian"
 msgstr "Italià"
 
-#: paperless/settings.py:772
+#: paperless/settings.py:791
 msgid "Japanese"
 msgstr "Japonès"
 
-#: paperless/settings.py:773
+#: paperless/settings.py:792
 msgid "Korean"
 msgstr "Coreà"
 
-#: paperless/settings.py:774
+#: paperless/settings.py:793
 msgid "Luxembourgish"
 msgstr "Luxemburguès"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:794
 msgid "Norwegian"
 msgstr "Noruec"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:795
 msgid "Dutch"
 msgstr "Holandès"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:796
 msgid "Polish"
 msgstr "Polonès"
 
-#: paperless/settings.py:778
+#: paperless/settings.py:797
 msgid "Portuguese (Brazil)"
 msgstr "Portuguès (Brasil)"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:798
 msgid "Portuguese"
 msgstr "Portuguès"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:799
 msgid "Romanian"
 msgstr "Romanès"
 
-#: paperless/settings.py:781
+#: paperless/settings.py:800
 msgid "Russian"
 msgstr "Rus"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:801
 msgid "Slovak"
 msgstr "Eslovac"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:802
 msgid "Slovenian"
 msgstr "Eslovè"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:803
 msgid "Serbian"
 msgstr "Serbi"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:804
 msgid "Swedish"
 msgstr "Suec"
 
-#: paperless/settings.py:786
+#: paperless/settings.py:805
 msgid "Turkish"
 msgstr "Turc"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:806
 msgid "Ukrainian"
 msgstr "Ucranià"
 
-#: paperless/settings.py:788
+#: paperless/settings.py:807
+msgid "Vietnamese"
+msgstr "Vietnamita"
+
+#: paperless/settings.py:808
 msgid "Chinese Simplified"
 msgstr "Xinès Simplificat"
 
-#: paperless/settings.py:789
+#: paperless/settings.py:809
 msgid "Chinese Traditional"
 msgstr "Xinès tradicional"
 
-#: paperless/urls.py:374
+#: paperless/urls.py:368
 msgid "Paperless-ngx administration"
 msgstr "Administració Paperless-ngx"
 

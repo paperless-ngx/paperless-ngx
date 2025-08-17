@@ -48,10 +48,10 @@ export class StoragePathListComponent extends ManagementListComponent<StoragePat
       {
         key: 'path',
         name: $localize`Path`,
-        rendersHtml: true,
         hideOnMobile: true,
+        monospace: true,
         valueFn: (c: StoragePath) => {
-          return `<code>${c.path?.slice(0, 49)}${c.path?.length > 50 ? '...' : ''}</code>`
+          return `${c.path?.slice(0, 49)}${c.path?.length > 50 ? '...' : ''}`
         },
       },
     ]
