@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-16 14:34+0000\n"
-"PO-Revision-Date: 2025-08-16 14:36\n"
+"PO-Revision-Date: 2025-08-17 20:45\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -124,7 +124,7 @@ msgstr "gelen kutusu etiketi"
 
 #: documents/models.py:106
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr "Bu künyeyi, gelen kutusu künyesi olarak imler: Yeni aktarılan tüm belgeler gelen kutusu künyesi ile künyeleneceklerdir."
+msgstr "Bu etiketi, gelen kutusu etiketi olarak işaretle: Yeni aktarılan tüm dokümanlar gelen kutusu etiketi ile etiketlendirileceklerdir."
 
 #: documents/models.py:112
 msgid "tag"
@@ -914,7 +914,7 @@ msgstr "E-postanın konusu, bazı yer tutucular içerebilir, belgelere bakın."
 
 #: documents/models.py:1097
 msgid "emails to"
-msgstr ""
+msgstr "kime"
 
 #: documents/models.py:1100
 msgid "The destination email addresses, comma separated."
@@ -1162,7 +1162,7 @@ msgstr "iş akışı çalıştırma"
 
 #: documents/models.py:1473
 msgid "workflow runs"
-msgstr ""
+msgstr "iş akışı çalıştırma"
 
 #: documents/serialisers.py:139
 #, python-format
@@ -1184,7 +1184,7 @@ msgstr "Geçersiz değişken algılandı."
 
 #: documents/templates/account/account_inactive.html:5
 msgid "Paperless-ngx account inactive"
-msgstr ""
+msgstr "Paperless-ngx hesabı pasif"
 
 #: documents/templates/account/account_inactive.html:9
 msgid "Account inactive."
@@ -1220,7 +1220,7 @@ msgstr "Lütfen oturum açın."
 #: documents/templates/account/login.html:12
 #, python-format
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
-msgstr ""
+msgstr "Henüz hesabınız yok mu? <a href=\"%(signup_url)s\">Kaydol</a>"
 
 #: documents/templates/account/login.html:25
 #: documents/templates/account/signup.html:22
@@ -1245,7 +1245,7 @@ msgstr "Şifrenizi mi unuttunuz?"
 #: documents/templates/account/login.html:51
 #: documents/templates/account/signup.html:57
 msgid "or sign in via"
-msgstr ""
+msgstr "veya giriş yap"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
@@ -1253,7 +1253,7 @@ msgstr "Paperless-ngx parola sıfırlama isteği"
 
 #: documents/templates/account/password_reset.html:9
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr ""
+msgstr "Aşağıya e-posta adresinizi girin, yeni bir tane oluşturmak için gerekli talimatları e-posta ile gönderelim."
 
 #: documents/templates/account/password_reset.html:12
 msgid "An error occurred. Please try again."
@@ -1273,11 +1273,11 @@ msgstr "Gelen kutunuza bakın."
 
 #: documents/templates/account/password_reset_done.html:13
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr ""
+msgstr "Şifrenizi ayarlamak için gerekli talimatları size e-posta ile gönderdik. E-posta kısa süre içinde elinize ulaşacaktır!"
 
 #: documents/templates/account/password_reset_from_key.html:5
 msgid "Paperless-ngx reset password confirmation"
-msgstr ""
+msgstr "Paperless-ngx şifre sıfırlama onayı"
 
 #: documents/templates/account/password_reset_from_key.html:9
 msgid "Set a new password."
@@ -1301,7 +1301,7 @@ msgstr "Parolamı değiştir"
 
 #: documents/templates/account/password_reset_from_key_done.html:5
 msgid "Paperless-ngx reset password complete"
-msgstr ""
+msgstr "Paperless-ngx şifre sıfırlama işlemi tamamlandı"
 
 #: documents/templates/account/password_reset_from_key_done.html:9
 msgid "Password reset complete."
@@ -1310,11 +1310,11 @@ msgstr "Şifre sıfırlama tamamlandı."
 #: documents/templates/account/password_reset_from_key_done.html:14
 #, python-format
 msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
-msgstr ""
+msgstr "Yeni şifreniz ayarlandı. Artık <a href=\"%(login_url)s\">giriş </a> yapabilirsiniz"
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr ""
+msgstr "Paperless-ngx kaydolun"
 
 #: documents/templates/account/signup.html:11
 #, python-format
@@ -1323,7 +1323,7 @@ msgstr "Bir hesabınız mı var? <a href=\"%(login_url)s\">Giriş yapın</a>"
 
 #: documents/templates/account/signup.html:19
 msgid "Note: This is the first user account for this installation and will be granted superuser privileges."
-msgstr ""
+msgstr "Not: Bu, bu kurulum için ilk kullanıcı hesabıdır ve süper kullanıcı ayrıcalıkları verilecektir."
 
 #: documents/templates/account/signup.html:23
 #: documents/templates/socialaccount/signup.html:14
@@ -1349,7 +1349,7 @@ msgstr "Hâlâ burada mısınız? Hmm, bir şeyler yanlış olabilir."
 
 #: documents/templates/index.html:62
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "İşte belgelerin bağlantısı."
 
 #: documents/templates/mfa/authenticate.html:7
 msgid "Paperless-ngx Two-Factor Authentication"
@@ -1357,7 +1357,7 @@ msgstr "Paperless-ngx İki Aşamalı Doğrulama"
 
 #: documents/templates/mfa/authenticate.html:12
 msgid "Your account is protected by two-factor authentication. Please enter an authenticator code:"
-msgstr ""
+msgstr "Hesabınız iki faktörlü kimlik doğrulama ile korunmaktadır. Lütfen kimlik doğrulama kodunu girin:"
 
 #: documents/templates/mfa/authenticate.html:17
 msgid "Code"
@@ -1378,17 +1378,17 @@ msgstr "Bağlantının kullanım süresi doldu."
 #: documents/templates/socialaccount/authentication_error.html:5
 #: documents/templates/socialaccount/login.html:5
 msgid "Paperless-ngx social account sign in"
-msgstr ""
+msgstr "Paperless-ngx sosyal hesap giriş"
 
 #: documents/templates/socialaccount/authentication_error.html:10
 #, python-format
 msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
-msgstr ""
+msgstr "Sosyal ağ hesabınızla giriş yapmaya çalışırken bir hata oluştu. <a href=\"%(login_url)s\">giriş sayfasına</a> geri dönün"
 
 #: documents/templates/socialaccount/login.html:10
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
-msgstr ""
+msgstr "%(provider)s üzerinden yeni bir üçüncü taraf hesabı bağlamak üzeresiniz."
 
 #: documents/templates/socialaccount/login.html:13
 msgid "Continue"
@@ -1396,7 +1396,7 @@ msgstr "Devam et"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
-msgstr ""
+msgstr "Paperless-ngx sosyal hesap kaydı"
 
 #: documents/templates/socialaccount/signup.html:10
 #, python-format
@@ -1405,26 +1405,26 @@ msgstr "Giriş yapmak için %(provider_name)s hesabınızı kullanmak üzeresini
 
 #: documents/templates/socialaccount/signup.html:11
 msgid "As a final step, please complete the following form:"
-msgstr ""
+msgstr "Son adım olarak, lütfen aşağıdaki formu doldurun:"
 
 #: documents/validators.py:24
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "URI {value} ayrıştırılamıyor, şema eksik"
 
 #: documents/validators.py:29
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "URI {value} ayrıştırılamıyor, ağ konumu veya yol eksik"
 
 #: documents/validators.py:36
 msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
-msgstr ""
+msgstr "URI şeması ‘{parts.scheme}’ izin verilmez. İzin verilen şemalar: {‘, ’.join(allowed_schemes)}"
 
 #: documents/validators.py:45
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "URI {value} işlenemiyor"
 
 #: paperless/apps.py:11
 msgid "Paperless"
@@ -1464,7 +1464,7 @@ msgstr "zorla"
 
 #: paperless/models.py:42
 msgid "skip_noarchive"
-msgstr ""
+msgstr "skip_noarchive"
 
 #: paperless/models.py:50
 msgid "never"
@@ -1472,7 +1472,7 @@ msgstr "asla"
 
 #: paperless/models.py:51
 msgid "with_text"
-msgstr ""
+msgstr "with_text"
 
 #: paperless/models.py:52
 msgid "always"
@@ -1484,7 +1484,7 @@ msgstr "temizle"
 
 #: paperless/models.py:61
 msgid "clean-final"
-msgstr ""
+msgstr "clean-final"
 
 #: paperless/models.py:62
 msgid "none"
@@ -1492,7 +1492,7 @@ msgstr "hiçbiri"
 
 #: paperless/models.py:70
 msgid "LeaveColorUnchanged"
-msgstr ""
+msgstr "RenkleriDegistirme"
 
 #: paperless/models.py:71
 msgid "RGB"
@@ -1500,7 +1500,7 @@ msgstr "RGB"
 
 #: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
-msgstr ""
+msgstr "CihazBagimsizRenginiKullan"
 
 #: paperless/models.py:73
 msgid "Gray"
@@ -1512,15 +1512,15 @@ msgstr "CMYK"
 
 #: paperless/models.py:83
 msgid "Sets the output PDF type"
-msgstr ""
+msgstr "Çıktı PDF türünü ayarlar"
 
 #: paperless/models.py:95
 msgid "Do OCR from page 1 to this value"
-msgstr ""
+msgstr "Sayfa 1'den bu değere kadar OCR yapın"
 
 #: paperless/models.py:101
 msgid "Do OCR using these languages"
-msgstr ""
+msgstr "Bu dilleri kullanarak OCR yapın"
 
 #: paperless/models.py:108
 msgid "Sets the OCR mode"
@@ -1528,19 +1528,19 @@ msgstr ""
 
 #: paperless/models.py:116
 msgid "Controls the generation of an archive file"
-msgstr ""
+msgstr "Arşiv dosyasının oluşturulmasını kontrol eder"
 
 #: paperless/models.py:124
 msgid "Sets image DPI fallback value"
-msgstr ""
+msgstr "Görüntü DPI yedek değerini ayarlar"
 
 #: paperless/models.py:131
 msgid "Controls the unpaper cleaning"
-msgstr ""
+msgstr "Kağıt temizlemeyi kontrol eder"
 
 #: paperless/models.py:138
 msgid "Enables deskew"
-msgstr ""
+msgstr "Eğriliği düzeltir"
 
 #: paperless/models.py:141
 msgid "Enables page rotation"
@@ -1548,19 +1548,19 @@ msgstr "Sayfa döndürmeyi etkinleştir"
 
 #: paperless/models.py:146
 msgid "Sets the threshold for rotation of pages"
-msgstr ""
+msgstr "Sayfaların döndürülmesi için eşik değerini ayarlar"
 
 #: paperless/models.py:152
 msgid "Sets the maximum image size for decompression"
-msgstr ""
+msgstr "Sıkıştırmanın açılması için maksimum görüntü boyutunu ayarlar"
 
 #: paperless/models.py:158
 msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+msgstr "Ghostscript renk dönüştürme stratejisini ayarlar"
 
 #: paperless/models.py:166
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "OCRMyPDF için ek kullanıcı argümanları ekler"
 
 #: paperless/models.py:175
 msgid "Application title"
@@ -1572,39 +1572,39 @@ msgstr "Uygulama logosu"
 
 #: paperless/models.py:197
 msgid "Enables barcode scanning"
-msgstr ""
+msgstr "Barkod taramayı etkinleştirir"
 
 #: paperless/models.py:203
 msgid "Enables barcode TIFF support"
-msgstr ""
+msgstr "Barkod TIFF desteğini etkinleştirir"
 
 #: paperless/models.py:209
 msgid "Sets the barcode string"
-msgstr ""
+msgstr "Barkod yazısını ayarlar"
 
 #: paperless/models.py:217
 msgid "Retains split pages"
-msgstr ""
+msgstr "Bölünmüş sayfaları korur"
 
 #: paperless/models.py:223
 msgid "Enables ASN barcode"
-msgstr ""
+msgstr "ASN barkodunu etkinleştirir"
 
 #: paperless/models.py:229
 msgid "Sets the ASN barcode prefix"
-msgstr ""
+msgstr "ASN barkod önekini ayarlar"
 
 #: paperless/models.py:237
 msgid "Sets the barcode upscale factor"
-msgstr ""
+msgstr "Barkod ölçeklendirme faktörünü ayarlar"
 
 #: paperless/models.py:244
 msgid "Sets the barcode DPI"
-msgstr ""
+msgstr "Barkod DPI değerini ayarlar"
 
 #: paperless/models.py:251
 msgid "Sets the maximum pages for barcode"
-msgstr ""
+msgstr "Barkod için maksimum sayfa sayısını ayarlar"
 
 #: paperless/models.py:258
 msgid "Enables tag barcode"
@@ -2048,7 +2048,7 @@ msgstr "eylem"
 
 #: paperless_mail/models.py:253
 msgid "action parameter"
-msgstr "eylem parametreleri"
+msgstr "eylem parametresi"
 
 #: paperless_mail/models.py:258
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
