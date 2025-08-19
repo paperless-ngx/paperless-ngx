@@ -627,14 +627,17 @@ def run_workflows(
 
     def assignment_action():
         if action.assign_tags.exists():
+            tag_ids_to_add: set[int] = set()
+            for tag in action.assign_tags.all():
+                tag_ids_to_add.add(tag.pk)
+                tag_ids_to_add.update(t.pk for t in tag.get_all_ancestors())
+
             if not use_overrides:
-                doc_tag_ids.extend(action.assign_tags.values_list("pk", flat=True))
+                doc_tag_ids[:] = list(set(doc_tag_ids) | tag_ids_to_add)
             else:
                 if overrides.tag_ids is None:
                     overrides.tag_ids = []
-                overrides.tag_ids.extend(
-                    action.assign_tags.values_list("pk", flat=True),
-                )
+                overrides.tag_ids = list(set(overrides.tag_ids) | tag_ids_to_add)
 
         if action.assign_correspondent:
             if not use_overrides:
@@ -760,14 +763,17 @@ def run_workflows(
             else:
                 overrides.tag_ids = None
         else:
+            tag_ids_to_remove: set[int] = set()
+            for tag in action.remove_tags.all():
+                tag_ids_to_remove.add(tag.pk)
+                tag_ids_to_remove.update(t.pk for t in tag.get_all_descendants())
+
             if not use_overrides:
-                for tag in action.remove_tags.filter(
-                    pk__in=document.tags.values_list("pk", flat=True),
-                ):
-                    doc_tag_ids.remove(tag.pk)
+                doc_tag_ids[:] = [t for t in doc_tag_ids if t not in tag_ids_to_remove]
             elif overrides.tag_ids:
-                for tag in action.remove_tags.filter(pk__in=overrides.tag_ids):
-                    overrides.tag_ids.remove(tag.pk)
+                overrides.tag_ids = [
+                    t for t in overrides.tag_ids if t not in tag_ids_to_remove
+                ]
 
         if not use_overrides and (
             action.remove_all_correspondents
