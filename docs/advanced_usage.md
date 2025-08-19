@@ -179,6 +179,7 @@ variables:
 | ---------------------------- | ---------------------------------------------- |
 | `DOCUMENT_ID`                | Database primary key of the document           |
 | `DOCUMENT_FILE_NAME`         | Formatted filename, not including paths        |
+| `DOCUMENT_TYPE`              | The document type (if any)                     |
 | `DOCUMENT_CREATED`           | Date & time when document created              |
 | `DOCUMENT_MODIFIED`          | Date & time when document was last modified    |
 | `DOCUMENT_ADDED`             | Date & time when document was added            |
@@ -433,6 +434,133 @@ provided. The template is provided as a string, potentially multiline, and rende
 In addition, the entire Document instance is available to be utilized in a more advanced way, as well as some variables which only make sense to be accessed
 with more complex logic.
 
+#### Custom Jinja2 Filters
+
+##### Custom Field Access
+
+The `get_cf_value` filter retrieves a value from custom field data with optional default fallback.
+
+###### Syntax
+
+```jinja2
+{{ custom_fields | get_cf_value('field_name') }}
+{{ custom_fields | get_cf_value('field_name', 'default_value') }}
+```
+
+###### Parameters
+
+-   `custom_fields`: This _must_ be the provided custom field data
+-   `name` (str): Name of the custom field to retrieve
+-   `default` (str, optional): Default value to return if field is not found or has no value
+
+###### Returns
+
+-   `str | None`: The field value, default value, or `None` if neither exists
+
+###### Examples
+
+```jinja2
+<!-- Basic usage -->
+{{ custom_fields | get_cf_value('department') }}
+
+<!-- With default value -->
+{{ custom_fields | get_cf_value('phone', 'Not provided') }}
+```
+
+##### Datetime Formatting
+
+The `datetime` filter formats a datetime string or datetime object using Python's strftime formatting.
+
+###### Syntax
+
+```jinja2
+{{ datetime_value | datetime('%Y-%m-%d %H:%M:%S') }}
+```
+
+###### Parameters
+
+-   `value` (str | datetime): Date/time value to format (strings will be parsed automatically)
+-   `format` (str): Python strftime format string
+
+###### Returns
+
+-   `str`: Formatted datetime string
+
+###### Examples
+
+```jinja2
+<!-- Format datetime object -->
+{{ created | datetime('%B %d, %Y at %I:%M %p') }}
+<!-- Output: "January 15, 2024 at 02:30 PM" -->
+
+<!-- Custom formatting -->
+{{ custom_fields | get_cf_value('Date Field') | datetime('%A, %B %d, %Y') }}
+<!-- Output: "Monday, January 15, 2024" -->
+```
+
+See the [strftime format code documentation](https://docs.python.org/3.13/library/datetime.html#strftime-and-strptime-format-codes)
+for the possible codes and their meanings.
+
+##### Date Localization
+
+The `localize_date` filter formats a date or datetime object into a localized string using Babel internationalization.
+This takes into account the provided locale for translation. Since this must be used on a date or datetime object,
+you must access the field directly, i.e. `document.created`.
+
+###### Syntax
+
+```jinja2
+{{ date_value | localize_date('medium', 'en_US') }}
+{{ datetime_value | localize_date('short', 'fr_FR') }}
+```
+
+###### Parameters
+
+-   `value` (date | datetime): Date or datetime object to format (datetime should be timezone-aware)
+-   `format` (str): Format type - either a Babel preset ('short', 'medium', 'long', 'full') or custom pattern
+-   `locale` (str): Locale code for localization (e.g., 'en_US', 'fr_FR', 'de_DE')
+
+###### Returns
+
+-   `str`: Localized, formatted date string
+
+###### Examples
+
+```jinja2
+<!-- Preset formats -->
+{{ document.created | localize_date('short', 'en_US') }}
+<!-- Output: "1/15/24" -->
+
+{{ document.created | localize_date('medium', 'en_US') }}
+<!-- Output: "Jan 15, 2024" -->
+
+{{ document.created | localize_date('long', 'en_US') }}
+<!-- Output: "January 15, 2024" -->
+
+{{ document.created | localize_date('full', 'en_US') }}
+<!-- Output: "Monday, January 15, 2024" -->
+
+<!-- Different locales -->
+{{ document.created | localize_date('medium', 'fr_FR') }}
+<!-- Output: "15 janv. 2024" -->
+
+{{ document.created | localize_date('medium', 'de_DE') }}
+<!-- Output: "15.01.2024" -->
+
+<!-- Custom patterns -->
+{{ document.created | localize_date('dd/MM/yyyy', 'en_GB') }}
+<!-- Output: "15/01/2024" -->
+```
+
+See the [supported format codes](https://unicode.org/reports/tr35/tr35-dates.html#Date_Format_Patterns) for more options.
+
+### Format Presets
+
+-   **short**: Abbreviated format (e.g., "1/15/24")
+-   **medium**: Medium-length format (e.g., "Jan 15, 2024")
+-   **long**: Long format with full month name (e.g., "January 15, 2024")
+-   **full**: Full format including day of week (e.g., "Monday, January 15, 2024")
+
 #### Additional Variables
 
 -   `{{ tag_name_list }}`: A list of tag names applied to the document, ordered by the tag name. Note this is a list, not a single string
@@ -508,6 +636,12 @@ Invoice_{{ custom_fields|get_cf_value("Select Field") }}_{{ custom_fields|get_cf
 ```
 
 This will create a path like `invoices/2022/01/01/Invoice_OptionTwo_20220101.pdf` if the custom field "Date Field" is set to January 1, 2022 and "Select Field" is set to `OptionTwo`.
+
+You can also use a custom `slugify` filter to slufigy text:
+
+```jinja
+{{ title | slugify }}
+```
 
 ## Automatic recovery of invalid PDFs {#pdf-recovery}
 

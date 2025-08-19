@@ -5,5 +5,6 @@
 /src-ui/ @paperless-ngx/frontend
 
 /src/ @paperless-ngx/backend
-Pipfile* @paperless-ngx/backend
+pyproject.toml @paperless-ngx/backend
+uv.lock @paperless-ngx/backend
 *.py @paperless-ngx/backend

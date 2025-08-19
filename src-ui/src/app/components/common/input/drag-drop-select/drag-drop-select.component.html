@@ -1,8 +1,8 @@
 <div class="d-flex flex-row mt-2 align-items-center">
     <span class="me-2">{{title}}:</span>
-    <div class="d-flex flex-row gap-2 w-100 mh-1" style="min-height: 1em;"
+    <div class="d-flex flex-wrap flex-row gap-2 w-100 mh-1" style="min-height: 1em;"
         cdkDropList #selectedList="cdkDropList"
-        cdkDropListOrientation="horizontal"
+        cdkDropListOrientation="mixed"
         (cdkDropListDropped)="drop($event)"
         [cdkDropListConnectedTo]="[unselectedList]">
         @for (item of selectedItems; track item.id) {

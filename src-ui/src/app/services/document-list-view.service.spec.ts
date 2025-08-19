@@ -195,11 +195,7 @@ describe('DocumentListViewService', () => {
       { custom_field_999: ['Custom field not found'] },
       { status: 400, statusText: 'Unexpected error' }
     )
-    expect(documentListViewService.error).toEqual(
-      'custom_field_999: Custom field not found'
-    )
-    // reset the list
-    documentListViewService.sortField = 'created'
+    // resets itself
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
     )

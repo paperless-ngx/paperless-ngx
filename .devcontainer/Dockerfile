@@ -76,17 +76,15 @@ RUN set -eux \
     && apt-get update \
     && apt-get install --yes --quiet --no-install-recommends ${RUNTIME_PACKAGES}
 
-ARG PYTHON_PACKAGES="\
-  python3 \
-  python3-pip \
-  python3-wheel \
-  pipenv \
-  ca-certificates"
+ARG PYTHON_PACKAGES="ca-certificates"
 
 RUN set -eux \
   echo "Installing python packages" \
     && apt-get update \
     && apt-get install --yes --quiet ${PYTHON_PACKAGES}
+
+COPY --from=ghcr.io/astral-sh/uv:0.7.8 /uv /bin/uv
+
 
 RUN set -eux \
   && echo "Installing pre-built updates" \
@@ -123,13 +121,14 @@ RUN set -eux \
 WORKDIR /usr/src/paperless/src/docker/
 
 COPY [ \
-  "docker/imagemagick-policy.xml", \
+  "docker/rootfs/etc/ImageMagick-6/paperless-policy.xml", \
   "./" \
 ]
 
 RUN set -eux \
   && echo "Configuring ImageMagick" \
-    && mv imagemagick-policy.xml /etc/ImageMagick-6/policy.xml
+    && mv paperless-policy.xml /etc/ImageMagick-6/policy.xml
+
 
 # Packages needed only for building a few quick Python
 # dependencies
@@ -140,18 +139,17 @@ ARG BUILD_PACKAGES="\
   libpq-dev \
   # https://github.com/PyMySQL/mysqlclient#linux
   default-libmysqlclient-dev \
-  pkg-config \
-  pre-commit"
+  pkg-config"
 
 # hadolint ignore=DL3042
-RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
+RUN --mount=type=cache,target=/root/.cache/uv,id=pip-cache \
   set -eux \
   && echo "Installing build system packages" \
     && apt-get update \
     && apt-get install --yes --quiet ${BUILD_PACKAGES}
 
 RUN set -eux \
-  && npm update npm -g
+  && npm update -g pnpm
 
 # add users, setup scripts
 # Mount the compiled frontend to expected location
@@ -169,9 +167,6 @@ RUN set -eux \
     && mkdir --parents --verbose /usr/src/paperless/paperless-ngx/.venv \
   && echo "Adjusting all permissions" \
     && chown --from root:root --changes --recursive paperless:paperless /usr/src/paperless
-#  && echo "Collecting static files" \
-#    && gosu paperless python3 manage.py collectstatic --clear --no-input --link \
-#    && gosu paperless python3 manage.py compilemessages
 
 VOLUME ["/usr/src/paperless/paperless-ngx/data", \
         "/usr/src/paperless/paperless-ngx/media", \

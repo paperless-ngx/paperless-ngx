@@ -1,5 +1,6 @@
 import {
   Directive,
+  inject,
   Input,
   OnInit,
   TemplateRef,
@@ -15,21 +16,14 @@ import {
   selector: '[pngxIfPermissions]',
 })
 export class IfPermissionsDirective implements OnInit {
+  private viewContainerRef = inject(ViewContainerRef)
+  private templateRef = inject<TemplateRef<any>>(TemplateRef)
+  private permissionsService = inject(PermissionsService)
+
   @Input()
   pngxIfPermissions:
     | Array<{ action: PermissionAction; type: PermissionType }>
     | { action: PermissionAction; type: PermissionType }
-
-  /**
-   * @param {ViewContainerRef} viewContainerRef -- The location where we need to render the templateRef
-   * @param {TemplateRef<any>} templateRef -- The templateRef to be potentially rendered
-   * @param {PermissionsService} permissionsService -- Will give us access to the permissions a user has
-   */
-  constructor(
-    private viewContainerRef: ViewContainerRef,
-    private templateRef: TemplateRef<any>,
-    private permissionsService: PermissionsService
-  ) {}
 
   public ngOnInit(): void {
     if (

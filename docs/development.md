@@ -60,7 +60,7 @@ first-time setup.
 
       Every command is executed directly from the root folder of the project unless specified otherwise.
 
-1.  Install prerequisites + pipenv as mentioned in
+1.  Install prerequisites + [uv](https://github.com/astral-sh/uv) as mentioned in
     [Bare metal route](setup.md#bare_metal).
 
 2.  Copy `paperless.conf.example` to `paperless.conf` and enable debug
@@ -75,37 +75,33 @@ first-time setup.
 4.  Install the Python dependencies:
 
     ```bash
-    pipenv install --dev
+    $ uv sync --group dev
     ```
-
-    !!! note
-
-        Using a virtual environment is highly recommended. You can spawn one via `pipenv shell`.
 
 5.  Install pre-commit hooks:
 
     ```bash
-    pre-commit install
+    $ uv run pre-commit install
     ```
 
-6.  Apply migrations and create a superuser for your development instance:
+6.  Apply migrations and create a superuser (also can be done via the web UI) for your development instance:
 
     ```bash
     # src/
 
-    python3 manage.py migrate
-    python3 manage.py createsuperuser
+    $ uv run manage.py migrate
+    $ uv run manage.py createsuperuser
     ```
 
 7.  You can now either ...
 
-    -   install redis or
+    -   install Redis or
 
-    -   use the included `scripts/start_services.sh` to use docker to fire
-        up a redis instance (and some other services such as tika,
-        gotenberg and a database server) or
+    -   use the included `scripts/start_services.sh` to use Docker to fire
+        up a Redis instance (and some other services such as Tika,
+        Gotenberg and a database server) or
 
-    -   spin up a bare redis container
+    -   spin up a bare Redis container
 
         ```
         docker run -d -p 6379:6379 --restart unless-stopped redis:latest
@@ -144,14 +140,14 @@ To build the front end once use this command:
 ```bash
 # src-ui/
 
-$ npm install
+$ pnpm install
 $ ng build --configuration production
 ```
 
 ### Testing
 
 -   Run `pytest` in the `src/` directory to execute all tests. This also
-    generates a HTML coverage report. When runnings test, `paperless.conf`
+    generates a HTML coverage report. When running tests, `paperless.conf`
     is loaded as well. However, the tests rely on the default
     configuration. This is not ideal. But for now, make sure no settings
     except for DEBUG are overridden when testing.
@@ -164,10 +160,23 @@ $ ng build --configuration production
       complicated IF cases. Append `# noqa: E501` to disable this check
       for certain lines.
 
+### Package Management
+
+Paperless uses `uv` to manage packages and virtual environments for both development and production.
+To accomplish some common tasks using `uv`, follow the shortcuts below:
+
+To upgrade all locked packages to the latest allowed versions: `uv lock --upgrade`
+
+To upgrade a single locked package: `uv lock --upgrade-package <package>`
+
+To add a new package: `uv add <package>`
+
+To add a new development package `uv add --dev <package>`
+
 ## Front end development
 
 The front end is built using AngularJS. In order to get started, you need Node.js (version 14.15+) and
-`npm`.
+`pnpm`.
 
 !!! note
 
@@ -176,7 +185,7 @@ The front end is built using AngularJS. In order to get started, you need Node.j
 1.  Install the Angular CLI. You might need sudo privileges to perform this command:
 
     ```bash
-    npm install -g @angular/cli
+    pnpm install -g @angular/cli
     ```
 
 2.  Make sure that it's on your path.
@@ -184,7 +193,7 @@ The front end is built using AngularJS. In order to get started, you need Node.j
 3.  Install all necessary modules:
 
     ```bash
-    npm install
+    pnpm install
     ```
 
 4.  You can launch a development server by running:
@@ -198,7 +207,7 @@ The front end is built using AngularJS. In order to get started, you need Node.j
     restart it.
 
     By default, the development server is available on `http://localhost:4200/` and is configured to access the API at
-    `http://localhost:8000/api/`, which is the default of the backend. If you enabled `DEBUG` on the back end, several security overrides for allowed hosts, CORS and X-Frame-Options are in place so that the front end behaves exactly as in production.
+    `http://localhost:8000/api/`, which is the default of the backend. If you enabled `DEBUG` on the back end, several security overrides for allowed hosts and CORS are in place so that the front end behaves exactly as in production.
 
 ### Testing and code style
 
@@ -332,27 +341,21 @@ LANGUAGES = [
 The documentation is built using material-mkdocs, see their [documentation](https://squidfunk.github.io/mkdocs-material/reference/).
 If you want to build the documentation locally, this is how you do it:
 
-1.  Have an active pipenv shell (`pipenv shell`) and install Python dependencies:
+1.  Build the documentation
 
     ```bash
-    pipenv install --dev
-    ```
-
-2.  Build the documentation
-
-    ```bash
-    mkdocs build --config-file mkdocs.yml
+    $ uv run mkdocs build --config-file mkdocs.yml
     ```
 
     _alternatively..._
 
-3.  Serve the documentation. This will spin up a
+2.  Serve the documentation. This will spin up a
     copy of the documentation at http://127.0.0.1:8000
     that will automatically refresh every time you change
     something.
 
     ```bash
-    mkdocs serve
+    $ uv run mkdocs serve
     ```
 
 ## Building the Docker image

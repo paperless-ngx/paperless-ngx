@@ -1,5 +1,10 @@
 import { DatePipe } from '@angular/common'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import {
+  HttpHeaders,
+  HttpResponse,
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
@@ -451,11 +456,11 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     component.title = 'Foo Bar'
     const closeSpy = jest.spyOn(component, 'close')
-    const updateSpy = jest.spyOn(documentService, 'update')
+    const patchSpy = jest.spyOn(documentService, 'patch')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
-    updateSpy.mockImplementation((o) => of(doc))
+    patchSpy.mockImplementation((o) => of(doc))
     component.save(true)
-    expect(updateSpy).toHaveBeenCalled()
+    expect(patchSpy).toHaveBeenCalled()
     expect(closeSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith(
       'Document "Doc 3" saved successfully.'
@@ -466,11 +471,11 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     component.title = 'Foo Bar'
     const closeSpy = jest.spyOn(component, 'close')
-    const updateSpy = jest.spyOn(documentService, 'update')
+    const patchSpy = jest.spyOn(documentService, 'patch')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
-    updateSpy.mockImplementation((o) => of(doc))
+    patchSpy.mockImplementation((o) => of(doc))
     component.save()
-    expect(updateSpy).toHaveBeenCalled()
+    expect(patchSpy).toHaveBeenCalled()
     expect(closeSpy).not.toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith(
       'Document "Doc 3" saved successfully.'
@@ -482,12 +487,12 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     component.title = 'Foo Bar'
     const closeSpy = jest.spyOn(component, 'close')
-    const updateSpy = jest.spyOn(documentService, 'update')
+    const patchSpy = jest.spyOn(documentService, 'patch')
     const toastSpy = jest.spyOn(toastService, 'showError')
     const error = new Error('failed to save')
-    updateSpy.mockImplementation(() => throwError(() => error))
+    patchSpy.mockImplementation(() => throwError(() => error))
     component.save()
-    expect(updateSpy).toHaveBeenCalled()
+    expect(patchSpy).toHaveBeenCalled()
     expect(closeSpy).not.toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith(
       'Error saving document "Doc 3"',
@@ -500,13 +505,13 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     component.title = 'Foo Bar'
     const closeSpy = jest.spyOn(component, 'close')
-    const updateSpy = jest.spyOn(documentService, 'update')
+    const patchSpy = jest.spyOn(documentService, 'patch')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
-    updateSpy.mockImplementation(() =>
+    patchSpy.mockImplementation(() =>
       throwError(() => new Error('failed to save'))
     )
     component.save(true)
-    expect(updateSpy).toHaveBeenCalled()
+    expect(patchSpy).toHaveBeenCalled()
     expect(closeSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith(
       'Document "Doc 3" saved successfully.'
@@ -517,8 +522,8 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     const nextDocId = 100
     component.title = 'Foo Bar'
-    const updateSpy = jest.spyOn(documentService, 'update')
-    updateSpy.mockReturnValue(of(doc))
+    const patchSpy = jest.spyOn(documentService, 'patch')
+    patchSpy.mockReturnValue(of(doc))
     const nextSpy = jest.spyOn(documentListViewService, 'getNext')
     nextSpy.mockReturnValue(of(nextDocId))
     const closeSpy = jest.spyOn(openDocumentsService, 'closeDocument')
@@ -526,7 +531,7 @@ describe('DocumentDetailComponent', () => {
     const navigateSpy = jest.spyOn(router, 'navigate')
 
     component.saveEditNext()
-    expect(updateSpy).toHaveBeenCalled()
+    expect(patchSpy).toHaveBeenCalled()
     expect(navigateSpy).toHaveBeenCalledWith(['documents', nextDocId])
     expect
   })
@@ -536,12 +541,12 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     component.title = 'Foo Bar'
     const closeSpy = jest.spyOn(component, 'close')
-    const updateSpy = jest.spyOn(documentService, 'update')
+    const patchSpy = jest.spyOn(documentService, 'patch')
     const toastSpy = jest.spyOn(toastService, 'showError')
     const error = new Error('failed to save')
-    updateSpy.mockImplementation(() => throwError(() => error))
+    patchSpy.mockImplementation(() => throwError(() => error))
     component.saveEditNext()
-    expect(updateSpy).toHaveBeenCalled()
+    expect(patchSpy).toHaveBeenCalled()
     expect(closeSpy).not.toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith('Error saving document', error)
   })
@@ -786,14 +791,9 @@ describe('DocumentDetailComponent', () => {
   it('should select correct zoom setting in dropdown', () => {
     initNormally()
     component.setZoom(ZoomSetting.PageFit)
-    expect(component.isZoomSelected(ZoomSetting.PageFit)).toBeTruthy()
-    expect(component.isZoomSelected(ZoomSetting.One)).toBeFalsy()
-    component.setZoom(ZoomSetting.PageWidth)
-    expect(component.isZoomSelected(ZoomSetting.One)).toBeTruthy()
-    expect(component.isZoomSelected(ZoomSetting.PageFit)).toBeFalsy()
+    expect(component.currentZoom).toEqual(ZoomSetting.PageFit)
     component.setZoom(ZoomSetting.Quarter)
-    expect(component.isZoomSelected(ZoomSetting.Quarter)).toBeTruthy()
-    expect(component.isZoomSelected(ZoomSetting.PageFit)).toBeFalsy()
+    expect(component.currentZoom).toEqual(ZoomSetting.Quarter)
   })
 
   it('should support updating notes dynamically', () => {
@@ -965,10 +965,10 @@ describe('DocumentDetailComponent', () => {
     expect(fixture.debugElement.nativeElement.textContent).toContain(
       customFields[1].name
     )
-    const updateSpy = jest.spyOn(documentService, 'update')
+    const patchSpy = jest.spyOn(documentService, 'patch')
     component.save(true)
-    expect(updateSpy.mock.lastCall[0].custom_fields).toHaveLength(2)
-    expect(updateSpy.mock.lastCall[0].custom_fields[1]).toEqual({
+    expect(patchSpy.mock.lastCall[0].custom_fields).toHaveLength(2)
+    expect(patchSpy.mock.lastCall[0].custom_fields[1]).toEqual({
       field: customFields[1].id,
       value: null,
     })
@@ -985,11 +985,65 @@ describe('DocumentDetailComponent', () => {
     expect(
       fixture.debugElement.query(By.css('form')).nativeElement.textContent
     ).not.toContain('Field 1')
-    const updateSpy = jest.spyOn(documentService, 'update')
+    const patchSpy = jest.spyOn(documentService, 'patch')
     component.save(true)
-    expect(updateSpy.mock.lastCall[0].custom_fields).toHaveLength(
+    expect(patchSpy.mock.lastCall[0].custom_fields).toHaveLength(
       initialLength - 1
     )
+  })
+
+  it('should correctly determine changed fields', () => {
+    initNormally()
+    expect(component['getChangedFields']()).toEqual({
+      id: doc.id,
+    })
+    component.documentForm.get('title').setValue('Foo Bar')
+    component.documentForm.get('permissions_form').setValue({
+      owner: 1,
+      set_permissions: {
+        view: {
+          users: [2],
+          groups: [],
+        },
+        change: {
+          users: [3],
+          groups: [],
+        },
+      },
+    })
+    component.documentForm.get('title').markAsDirty()
+    component.documentForm.get('permissions_form').markAsDirty()
+    expect(component['getChangedFields']()).toEqual({
+      id: doc.id,
+      title: 'Foo Bar',
+      owner: 1,
+      set_permissions: {
+        view: {
+          users: [2],
+          groups: [],
+        },
+        change: {
+          users: [3],
+          groups: [],
+        },
+      },
+    })
+  })
+
+  it('should restore changed fields and mark as dirty', () => {
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
+    jest.spyOn(documentService, 'get').mockReturnValueOnce(of(doc))
+    const docWithChanges = Object.assign({}, doc)
+    docWithChanges.__changedFields = ['title', 'tags', 'owner']
+    jest
+      .spyOn(openDocumentsService, 'getOpenDocument')
+      .mockReturnValue(docWithChanges)
+    fixture.detectChanges() // calls ngOnInit
+    expect(component.documentForm.get('title').dirty).toBeTruthy()
+    expect(component.documentForm.get('tags').dirty).toBeTruthy()
+    expect(component.documentForm.get('permissions_form').dirty).toBeTruthy()
   })
 
   it('should show custom field errors', () => {
@@ -1104,81 +1158,43 @@ describe('DocumentDetailComponent', () => {
     ).not.toBeUndefined()
   })
 
-  it('should support split', () => {
+  it('should support pdf editor, handle error', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    const closeSpy = jest.spyOn(openDocumentsService, 'closeDocument')
+    const errorSpy = jest.spyOn(toastService, 'showError')
     initNormally()
-    component.splitDocument()
+    component.editPdf()
     expect(modal).not.toBeUndefined()
     modal.componentInstance.documentID = doc.id
-    modal.componentInstance.totalPages = 5
-    modal.componentInstance.page = 2
-    modal.componentInstance.addSplit()
+    modal.componentInstance.pages = [{ page: 1, rotate: 0, splitAfter: false }]
     modal.componentInstance.confirm()
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/bulk_edit/`
     )
     expect(req.request.body).toEqual({
       documents: [doc.id],
-      method: 'split',
-      parameters: { pages: '1-2,3-5', delete_originals: false },
+      method: 'edit_pdf',
+      parameters: {
+        operations: [{ page: 1, rotate: 0, doc: 0 }],
+        delete_original: false,
+        update_document: false,
+        include_metadata: true,
+      },
     })
-    req.error(new ProgressEvent('failed'))
-    modal.componentInstance.confirm()
-    req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
-    )
-    req.flush(true)
-  })
+    req.error(new ErrorEvent('failed'))
+    expect(errorSpy).toHaveBeenCalled()
 
-  it('should support rotate', () => {
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((m) => (modal = m[0]))
-    initNormally()
-    component.rotateDocument()
-    expect(modal).not.toBeUndefined()
+    component.editPdf()
     modal.componentInstance.documentID = doc.id
-    modal.componentInstance.rotate()
-    modal.componentInstance.confirm()
-    let req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
-    )
-    expect(req.request.body).toEqual({
-      documents: [doc.id],
-      method: 'rotate',
-      parameters: { degrees: 90 },
-    })
-    req.error(new ProgressEvent('failed'))
+    modal.componentInstance.pages = [{ page: 1, rotate: 0, splitAfter: true }]
+    modal.componentInstance.deleteOriginal = true
     modal.componentInstance.confirm()
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/bulk_edit/`
     )
     req.flush(true)
-  })
-
-  it('should support delete pages', () => {
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((m) => (modal = m[0]))
-    initNormally()
-    component.deletePages()
-    expect(modal).not.toBeUndefined()
-    modal.componentInstance.documentID = doc.id
-    modal.componentInstance.pages = [1, 2]
-    modal.componentInstance.confirm()
-    let req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
-    )
-    expect(req.request.body).toEqual({
-      documents: [doc.id],
-      method: 'delete_pages',
-      parameters: { pages: [1, 2] },
-    })
-    req.error(new ProgressEvent('failed'))
-    modal.componentInstance.confirm()
-    req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
-    )
-    req.flush(true)
+    expect(closeSpy).toHaveBeenCalled()
   })
 
   it('should support keyboard shortcuts', () => {
@@ -1329,5 +1345,47 @@ describe('DocumentDetailComponent', () => {
     expect(shareSpy).not.toHaveBeenCalled()
     expect(createSpy).toHaveBeenCalledWith('a')
     expect(urlRevokeSpy).toHaveBeenCalled()
+  })
+
+  it('should download a file with the correct filename', () => {
+    const mockBlob = new Blob(['test content'], { type: 'text/plain' })
+    const mockResponse = new HttpResponse({
+      body: mockBlob,
+      headers: new HttpHeaders({
+        'Content-Disposition': 'attachment; filename="test-file.txt"',
+      }),
+    })
+
+    const downloadUrl = 'http://example.com/download'
+    component.documentId = 123
+    jest.spyOn(documentService, 'getDownloadUrl').mockReturnValue(downloadUrl)
+
+    const createSpy = jest.spyOn(document, 'createElement')
+    const anchor: HTMLAnchorElement = {} as HTMLAnchorElement
+    createSpy.mockReturnValueOnce(anchor)
+
+    component.download(false)
+
+    httpTestingController
+      .expectOne(downloadUrl)
+      .flush(mockBlob, { headers: mockResponse.headers })
+
+    expect(createSpy).toHaveBeenCalledWith('a')
+    expect(anchor.download).toBe('test-file.txt')
+    createSpy.mockClear()
+  })
+
+  it('should get email enabled status from settings', () => {
+    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+    expect(component.emailEnabled).toBeTruthy()
+  })
+
+  it('should support open share links and email modals', () => {
+    const modalSpy = jest.spyOn(modalService, 'open')
+    initNormally()
+    component.openShareLinks()
+    expect(modalSpy).toHaveBeenCalled()
+    component.openEmailDocument()
+    expect(modalSpy).toHaveBeenCalled()
   })
 })

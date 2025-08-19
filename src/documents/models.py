@@ -1,12 +1,7 @@
 import datetime
-import logging
-import os
-import re
-from collections import OrderedDict
 from pathlib import Path
 from typing import Final
 
-import dateutil.parser
 import pathvalidate
 from celery import states
 from django.conf import settings
@@ -247,7 +242,11 @@ class Document(SoftDeleteModel, ModelWithOwner):
         ),
     )
 
-    created = models.DateTimeField(_("created"), default=timezone.now, db_index=True)
+    created = models.DateField(
+        _("created"),
+        default=datetime.date.today,
+        db_index=True,
+    )
 
     modified = models.DateTimeField(
         _("modified"),
@@ -325,8 +324,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
         verbose_name_plural = _("documents")
 
     def __str__(self) -> str:
-        # Convert UTC database time to local time
-        created = datetime.date.isoformat(timezone.localdate(self.created))
+        created = self.created.isoformat()
 
         res = f"{created}"
 
@@ -349,7 +347,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
 
     @property
     def source_file(self):
-        return open(self.source_path, "rb")
+        return Path(self.source_path).open("rb")
 
     @property
     def has_archive_version(self) -> bool:
@@ -364,7 +362,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
 
     @property
     def archive_file(self):
-        return open(self.archive_path, "rb")
+        return Path(self.archive_path).open("rb")
 
     def get_public_filename(self, *, archive=False, counter=0, suffix=None) -> str:
         """
@@ -401,47 +399,17 @@ class Document(SoftDeleteModel, ModelWithOwner):
 
     @property
     def thumbnail_file(self):
-        return open(self.thumbnail_path, "rb")
+        return Path(self.thumbnail_path).open("rb")
 
     @property
     def created_date(self):
-        return timezone.localdate(self.created)
+        return self.created
 
     def add_nested_tags(self, tags):
         for tag in tags:
             self.tags.add(tag)
             if tag.parent:
                 self.add_nested_tags([tag.parent])
-
-
-class Log(models.Model):
-    LEVELS = (
-        (logging.DEBUG, _("debug")),
-        (logging.INFO, _("information")),
-        (logging.WARNING, _("warning")),
-        (logging.ERROR, _("error")),
-        (logging.CRITICAL, _("critical")),
-    )
-
-    group = models.UUIDField(_("group"), blank=True, null=True)
-
-    message = models.TextField(_("message"))
-
-    level = models.PositiveIntegerField(
-        _("level"),
-        choices=LEVELS,
-        default=logging.INFO,
-    )
-
-    created = models.DateTimeField(_("created"), auto_now_add=True)
-
-    class Meta:
-        ordering = ("-created",)
-        verbose_name = _("log")
-        verbose_name_plural = _("logs")
-
-    def __str__(self):
-        return self.message
 
 
 class SavedView(ModelWithOwner):
@@ -583,91 +551,6 @@ class SavedViewFilterRule(models.Model):
         return f"SavedViewFilterRule: {self.rule_type} : {self.value}"
 
 
-# TODO: why is this in the models file?
-# TODO: how about, what is this and where is it documented?
-# It appears to parsing JSON from an environment variable to get a title and date from
-# the filename, if possible, as a higher priority than either document filename or
-# content parsing
-class FileInfo:
-    REGEXES = OrderedDict(
-        [
-            (
-                "created-title",
-                re.compile(
-                    r"^(?P<created>\d{8}(\d{6})?Z) - (?P<title>.*)$",
-                    flags=re.IGNORECASE,
-                ),
-            ),
-            ("title", re.compile(r"(?P<title>.*)$", flags=re.IGNORECASE)),
-        ],
-    )
-
-    def __init__(
-        self,
-        created=None,
-        correspondent=None,
-        title=None,
-        tags=(),
-        extension=None,
-    ):
-        self.created = created
-        self.title = title
-        self.extension = extension
-        self.correspondent = correspondent
-        self.tags = tags
-
-    @classmethod
-    def _get_created(cls, created):
-        try:
-            return dateutil.parser.parse(f"{created[:-1]:0<14}Z")
-        except ValueError:
-            return None
-
-    @classmethod
-    def _get_title(cls, title):
-        return title
-
-    @classmethod
-    def _mangle_property(cls, properties, name):
-        if name in properties:
-            properties[name] = getattr(cls, f"_get_{name}")(properties[name])
-
-    @classmethod
-    def from_filename(cls, filename) -> "FileInfo":
-        # Mutate filename in-place before parsing its components
-        # by applying at most one of the configured transformations.
-        for pattern, repl in settings.FILENAME_PARSE_TRANSFORMS:
-            (filename, count) = pattern.subn(repl, filename)
-            if count:
-                break
-
-        # do this after the transforms so that the transforms can do whatever
-        # with the file extension.
-        filename_no_ext = os.path.splitext(filename)[0]
-
-        if filename_no_ext == filename and filename.startswith("."):
-            # This is a very special case where there is no text before the
-            # file type.
-            # TODO: this should be handled better. The ext is not removed
-            #  because usually, files like '.pdf' are just hidden files
-            #  with the name pdf, but in our case, its more likely that
-            #  there's just no name to begin with.
-            filename = ""
-            # This isn't too bad either, since we'll just not match anything
-            # and return an empty title. TODO: actually, this is kinda bad.
-        else:
-            filename = filename_no_ext
-
-        # Parse filename components.
-        for regex in cls.REGEXES.values():
-            m = regex.match(filename)
-            if m:
-                properties = m.groupdict()
-                cls._mangle_property(properties, "created")
-                cls._mangle_property(properties, "title")
-                return cls(**properties)
-
-
 # Extending User Model Using a One-To-One Link
 class UiSettings(models.Model):
     user = models.OneToOneField(
@@ -684,6 +567,17 @@ class UiSettings(models.Model):
 class PaperlessTask(ModelWithOwner):
     ALL_STATES = sorted(states.ALL_STATES)
     TASK_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
+
+    class TaskType(models.TextChoices):
+        AUTO = ("auto_task", _("Auto Task"))
+        SCHEDULED_TASK = ("scheduled_task", _("Scheduled Task"))
+        MANUAL_TASK = ("manual_task", _("Manual Task"))
+
+    class TaskName(models.TextChoices):
+        CONSUME_FILE = ("consume_file", _("Consume File"))
+        TRAIN_CLASSIFIER = ("train_classifier", _("Train Classifier"))
+        CHECK_SANITY = ("check_sanity", _("Check Sanity"))
+        INDEX_OPTIMIZE = ("index_optimize", _("Index Optimize"))
 
     task_id = models.CharField(
         max_length=255,
@@ -708,8 +602,9 @@ class PaperlessTask(ModelWithOwner):
     task_name = models.CharField(
         null=True,
         max_length=255,
+        choices=TaskName.choices,
         verbose_name=_("Task Name"),
-        help_text=_("Name of the Task which was run"),
+        help_text=_("Name of the task that was run"),
     )
 
     status = models.CharField(
@@ -719,24 +614,28 @@ class PaperlessTask(ModelWithOwner):
         verbose_name=_("Task State"),
         help_text=_("Current state of the task being run"),
     )
+
     date_created = models.DateTimeField(
         null=True,
         default=timezone.now,
         verbose_name=_("Created DateTime"),
         help_text=_("Datetime field when the task result was created in UTC"),
     )
+
     date_started = models.DateTimeField(
         null=True,
         default=None,
         verbose_name=_("Started DateTime"),
         help_text=_("Datetime field when the task was started in UTC"),
     )
+
     date_done = models.DateTimeField(
         null=True,
         default=None,
         verbose_name=_("Completed DateTime"),
         help_text=_("Datetime field when the task was completed in UTC"),
     )
+
     result = models.TextField(
         null=True,
         default=None,
@@ -744,6 +643,14 @@ class PaperlessTask(ModelWithOwner):
         help_text=_(
             "The data returned by the task",
         ),
+    )
+
+    type = models.CharField(
+        max_length=30,
+        choices=TaskType.choices,
+        default=TaskType.AUTO,
+        verbose_name=_("Task Type"),
+        help_text=_("The type of task that was run"),
     )
 
     def __str__(self) -> str:
@@ -1066,6 +973,7 @@ class WorkflowTrigger(models.Model):
         CONSUME_FOLDER = DocumentSource.ConsumeFolder.value, _("Consume Folder")
         API_UPLOAD = DocumentSource.ApiUpload.value, _("Api Upload")
         MAIL_FETCH = DocumentSource.MailFetch.value, _("Mail Fetch")
+        WEB_UI = DocumentSource.WebUI.value, _("Web UI")
 
     class ScheduleDateField(models.TextChoices):
         ADDED = "added", _("Added")
@@ -1080,9 +988,9 @@ class WorkflowTrigger(models.Model):
     )
 
     sources = MultiSelectField(
-        max_length=5,
+        max_length=7,
         choices=DocumentSourceChoices.choices,
-        default=f"{DocumentSource.ConsumeFolder},{DocumentSource.ApiUpload},{DocumentSource.MailFetch}",
+        default=f"{DocumentSource.ConsumeFolder},{DocumentSource.ApiUpload},{DocumentSource.MailFetch},{DocumentSource.WebUI}",
     )
 
     filter_path = models.CharField(
@@ -1149,7 +1057,7 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has this correspondent"),
     )
 
-    schedule_offset_days = models.PositiveIntegerField(
+    schedule_offset_days = models.IntegerField(
         _("schedule offset days"),
         default=0,
         help_text=_(
@@ -1238,9 +1146,12 @@ class WorkflowActionEmail(models.Model):
 
 
 class WorkflowActionWebhook(models.Model):
-    url = models.URLField(
+    # We dont use the built-in URLField because it is not flexible enough
+    # validation is handled in the serializer
+    url = models.CharField(
         _("webhook url"),
         null=False,
+        max_length=256,
         help_text=_("The destination URL for the notification."),
     )
 
@@ -1396,6 +1307,16 @@ class WorkflowAction(models.Model):
         blank=True,
         related_name="+",
         verbose_name=_("assign these custom fields"),
+    )
+
+    assign_custom_fields_values = models.JSONField(
+        _("custom field values"),
+        null=True,
+        blank=True,
+        help_text=_(
+            "Optional values to assign to the custom fields.",
+        ),
+        default=dict,
     )
 
     remove_tags = models.ManyToManyField(

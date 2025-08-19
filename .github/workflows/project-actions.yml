@@ -1,5 +1,4 @@
 name: Project Automations
-
 on:
   pull_request_target: #_target allows access to secrets
     types:
@@ -8,10 +7,8 @@ on:
     branches:
       - main
       - dev
-
 permissions:
   contents: read
-
 jobs:
   pr_opened_or_reopened:
     name: pr_opened_or_reopened

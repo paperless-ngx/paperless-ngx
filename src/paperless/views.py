@@ -1,5 +1,5 @@
-import os
 from collections import OrderedDict
+from pathlib import Path
 
 from allauth.mfa import signals
 from allauth.mfa.adapter import get_adapter as get_mfa_adapter
@@ -11,8 +11,9 @@ from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db.models.functions import Lower
-from django.http import HttpResponse
+from django.http import FileResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseNotFound
@@ -32,6 +33,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from documents.index import DelayedQuery
 from documents.permissions import PaperlessObjectPermissions
 from paperless.filters import GroupFilterSet
 from paperless.filters import UserFilterSet
@@ -66,17 +68,17 @@ class StandardPagination(PageNumberPagination):
         )
 
     def get_all_result_ids(self):
-        ids = []
-        if hasattr(self.page.paginator.object_list, "saved_results"):
-            results_page = self.page.paginator.object_list.saved_results[0]
-            if results_page is not None:
-                for i in range(len(results_page.results.docs())):
-                    try:
-                        fields = results_page.results.fields(i)
-                        if "id" in fields:
-                            ids.append(fields["id"])
-                    except Exception:
-                        pass
+        query = self.page.paginator.object_list
+        if isinstance(query, DelayedQuery):
+            try:
+                ids = [
+                    query.searcher.ixreader.stored_fields(
+                        doc_num,
+                    )["id"]
+                    for doc_num in query.saved_results.get(0).results.docs()
+                ]
+            except Exception:
+                pass
         else:
             ids = self.page.paginator.object_list.values_list("pk", flat=True)
         return ids
@@ -91,16 +93,12 @@ class StandardPagination(PageNumberPagination):
 
 
 class FaviconView(View):
-    def get(self, request, *args, **kwargs):  # pragma: no cover
-        favicon = os.path.join(
-            os.path.dirname(__file__),
-            "static",
-            "paperless",
-            "img",
-            "favicon.ico",
-        )
-        with open(favicon, "rb") as f:
-            return HttpResponse(f, content_type="image/x-icon")
+    def get(self, request, *args, **kwargs):
+        try:
+            path = Path(staticfiles_storage.path("paperless/img/favicon.ico"))
+            return FileResponse(path.open("rb"), content_type="image/x-icon")
+        except FileNotFoundError:
+            return HttpResponseNotFound("favicon.ico not found")
 
 
 class UserViewSet(ModelViewSet):
@@ -136,6 +134,13 @@ class UserViewSet(ModelViewSet):
             )
         return super().update(request, *args, **kwargs)
 
+    @extend_schema(
+        request=None,
+        responses={
+            200: OpenApiTypes.BOOL,
+            404: OpenApiTypes.STR,
+        },
+    )
     @action(detail=True, methods=["post"])
     def deactivate_totp(self, request, pk=None):
         request_user = request.user
@@ -343,6 +348,10 @@ class ApplicationConfigurationViewSet(ModelViewSet):
 
     serializer_class = ApplicationConfigurationSerializer
     permission_classes = (IsAuthenticated, DjangoModelPermissions)
+
+    @extend_schema(exclude=True)
+    def create(self, request, *args, **kwargs):
+        return Response(status=405)  # Not Allowed
 
 
 @extend_schema_view(

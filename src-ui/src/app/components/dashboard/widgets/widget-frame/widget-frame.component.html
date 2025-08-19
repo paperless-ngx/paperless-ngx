@@ -1,23 +1,35 @@
-<div class="card shadow-sm bg-light fade" [class.show]="show" cdkDrag [cdkDragDisabled]="!draggable" cdkDragPreviewContainer="parent">
-  <div class="card-header">
-    <div class="d-flex justify-content-between align-items-center">
-      <div class="d-flex">
-        @if (draggable) {
-          <div class="ms-n2 me-1" cdkDragHandle>
-            <i-bs name="grip-vertical"></i-bs>
-          </div>
+@if (!cardless) {
+  <div class="card shadow-sm bg-light fade" [class.show]="show" cdkDrag [cdkDragDisabled]="!draggable" cdkDragPreviewContainer="parent">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          @if (draggable) {
+            <div class="ms-n2 me-1" cdkDragHandle>
+              <i-bs name="grip-vertical"></i-bs>
+            </div>
+          }
+          <h6 class="card-title mb-0">{{title}}</h6>
+          @if (badge) {
+            <span class="badge bg-info text-dark ms-2">{{badge}}</span>
+          }
+        </div>
+        @if (loading) {
+          <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
+          <div class="visually-hidden" i18n>Loading...</div>
         }
-        <h6 class="card-title mb-0">{{title}}</h6>
+        <ng-content select="[header-buttons]"></ng-content>
       </div>
-      @if (loading) {
-        <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
-        <div class="visually-hidden" i18n>Loading...</div>
-      }
-      <ng-content select="[header-buttons]"></ng-content>
     </div>
+    <div class="card-body text-dark">
+      <ng-container [ngTemplateOutlet]="content"></ng-container>
+    </div>
+  </div>
+} @else {
+  <div class="fade" [class.show]="show">
+    <ng-container [ngTemplateOutlet]="content"></ng-container>
+  </div>
+}
 
-  </div>
-  <div class="card-body text-dark">
-    <ng-content select="[content]"></ng-content>
-  </div>
-</div>
+<ng-template #content>
+  <ng-content select="[content]"></ng-content>
+</ng-template>

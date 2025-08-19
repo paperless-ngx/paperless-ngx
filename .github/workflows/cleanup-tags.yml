@@ -4,19 +4,15 @@
 # Requires a PAT with the correct scope set in the secrets.
 #
 # This workflow will not trigger runs on forked repos.
-
 name: Cleanup Image Tags
-
 on:
   delete:
   push:
     paths:
       - ".github/workflows/cleanup-tags.yml"
-
 concurrency:
   group: registry-tags-cleanup
   cancel-in-progress: false
-
 jobs:
   cleanup-images:
     name: Cleanup Image Tags for ${{ matrix.primary-name }}
@@ -30,10 +26,9 @@ jobs:
       # Requires a personal access token with the OAuth scope delete:packages
       TOKEN: ${{ secrets.GHA_CONTAINER_DELETE_TOKEN }}
     steps:
-      -
-        name: Clean temporary images
+      - name: Clean temporary images
         if: "${{ env.TOKEN != '' }}"
-        uses: stumpylog/image-cleaner-action/ephemeral@v0.9.0
+        uses: stumpylog/image-cleaner-action/ephemeral@v0.10.0
         with:
           token: "${{ env.TOKEN }}"
           owner: "${{ github.repository_owner }}"
@@ -43,7 +38,6 @@ jobs:
           repo_name: "paperless-ngx"
           match_regex: "(feature|fix)"
           do_delete: "true"
-
   cleanup-untagged-images:
     name: Cleanup Untagged Images Tags for ${{ matrix.primary-name }}
     if: github.repository_owner == 'paperless-ngx'
@@ -58,10 +52,9 @@ jobs:
       # Requires a personal access token with the OAuth scope delete:packages
       TOKEN: ${{ secrets.GHA_CONTAINER_DELETE_TOKEN }}
     steps:
-      -
-        name: Clean untagged images
+      - name: Clean untagged images
         if: "${{ env.TOKEN != '' }}"
-        uses: stumpylog/image-cleaner-action/untagged@v0.9.0
+        uses: stumpylog/image-cleaner-action/untagged@v0.10.0
         with:
           token: "${{ env.TOKEN }}"
           owner: "${{ github.repository_owner }}"

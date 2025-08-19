@@ -41,6 +41,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             title="B",
             correspondent=self.c1,
             document_type=self.dt1,
+            page_count=5,
         )
         self.doc3 = Document.objects.create(
             checksum="C",
@@ -211,7 +212,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
     def test_api_modify_tags_not_provided(self, m):
         """
         GIVEN:
-            - API data to modify tags is missing modify_tags field
+            - API data to modify tags is missing remove_tags field
         WHEN:
             - API to edit tags is called
         THEN:
@@ -1368,6 +1369,218 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(b"pages must be a list of integers", response.content)
+
+    @mock.patch("documents.serialisers.bulk_edit.edit_pdf")
+    def test_edit_pdf(self, m):
+        self.setup_mock(m, "edit_pdf")
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "edit_pdf",
+                    "parameters": {"operations": [{"page": 1}]},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertCountEqual(args[0], [self.doc2.id])
+        self.assertEqual(kwargs["operations"], [{"page": 1}])
+        self.assertEqual(kwargs["user"], self.user)
+
+    def test_edit_pdf_invalid_params(self):
+        # multiple documents
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id, self.doc3.id],
+                    "method": "edit_pdf",
+                    "parameters": {"operations": [{"page": 1}]},
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"Edit PDF method only supports one document", response.content)
+
+        # no operations specified
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "edit_pdf",
+                    "parameters": {},
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"operations not specified", response.content)
+
+        # operations not a list
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "edit_pdf",
+                    "parameters": {"operations": "not_a_list"},
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"operations must be a list", response.content)
+
+        # invalid operation
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "edit_pdf",
+                    "parameters": {"operations": ["invalid_operation"]},
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"invalid operation entry", response.content)
+
+        # page not an int
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "edit_pdf",
+                    "parameters": {"operations": [{"page": "not_an_int"}]},
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"page must be an integer", response.content)
+
+        # rotate not an int
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "edit_pdf",
+                    "parameters": {"operations": [{"page": 1, "rotate": "not_an_int"}]},
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"rotate must be an integer", response.content)
+
+        # doc not an int
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "edit_pdf",
+                    "parameters": {"operations": [{"page": 1, "doc": "not_an_int"}]},
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"doc must be an integer", response.content)
+
+        # update_document not a boolean
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "edit_pdf",
+                    "parameters": {
+                        "update_document": "not_a_bool",
+                        "operations": [{"page": 1}],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"update_document must be a boolean", response.content)
+
+        # include_metadata not a boolean
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "edit_pdf",
+                    "parameters": {
+                        "include_metadata": "not_a_bool",
+                        "operations": [{"page": 1}],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"include_metadata must be a boolean", response.content)
+
+        # update_document True but output would be multiple documents
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "edit_pdf",
+                    "parameters": {
+                        "update_document": True,
+                        "operations": [{"page": 1, "doc": 1}, {"page": 2, "doc": 2}],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            b"update_document only allowed with a single output document",
+            response.content,
+        )
+
+    @mock.patch("documents.serialisers.bulk_edit.edit_pdf")
+    def test_edit_pdf_page_out_of_bounds(self, m):
+        """
+        GIVEN:
+            - API data for editing PDF is called
+            - The page number is out of bounds
+        WHEN:
+            - API is called
+        THEN:
+            - The API fails with a correct error code
+        """
+        self.setup_mock(m, "edit_pdf")
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "edit_pdf",
+                    "parameters": {"operations": [{"page": 99}]},
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"out of bounds", response.content)
 
     @override_settings(AUDIT_LOG_ENABLED=True)
     def test_bulk_edit_audit_log_enabled_simple_field(self):

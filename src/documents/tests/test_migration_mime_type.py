@@ -1,5 +1,5 @@
-import os
 import shutil
+from pathlib import Path
 
 from django.conf import settings
 from django.test import override_settings
@@ -20,7 +20,7 @@ def source_path_before(self):
         if self.storage_type == STORAGE_TYPE_GPG:
             fname += ".gpg"
 
-    return os.path.join(settings.ORIGINALS_DIR, fname)
+    return Path(settings.ORIGINALS_DIR) / fname
 
 
 def file_type_after(self):
@@ -35,7 +35,7 @@ def source_path_after(doc):
         if doc.storage_type == STORAGE_TYPE_GPG:
             fname += ".gpg"  # pragma: no cover
 
-    return os.path.join(settings.ORIGINALS_DIR, fname)
+    return Path(settings.ORIGINALS_DIR) / fname
 
 
 @override_settings(PASSPHRASE="test")
@@ -52,7 +52,7 @@ class TestMigrateMimeType(DirectoriesMixin, TestMigrations):
         )
         self.doc_id = doc.id
         shutil.copy(
-            os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
+            Path(__file__).parent / "samples" / "simple.pdf",
             source_path_before(doc),
         )
 
@@ -63,12 +63,12 @@ class TestMigrateMimeType(DirectoriesMixin, TestMigrations):
         )
         self.doc2_id = doc2.id
         shutil.copy(
-            os.path.join(
-                os.path.dirname(__file__),
-                "samples",
-                "documents",
-                "originals",
-                "0000004.pdf.gpg",
+            (
+                Path(__file__).parent
+                / "samples"
+                / "documents"
+                / "originals"
+                / "0000004.pdf.gpg"
             ),
             source_path_before(doc2),
         )
@@ -97,7 +97,7 @@ class TestMigrateMimeTypeBackwards(DirectoriesMixin, TestMigrations):
         )
         self.doc_id = doc.id
         shutil.copy(
-            os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
+            Path(__file__).parent / "samples" / "simple.pdf",
             source_path_after(doc),
         )
 

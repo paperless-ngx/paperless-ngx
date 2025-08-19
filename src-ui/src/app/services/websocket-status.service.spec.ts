@@ -355,6 +355,50 @@ describe('ConsumerStatusService', () => {
     )
   })
 
+  it('should notify user if user can view or is in group', () => {
+    settingsService.currentUser = {
+      id: 1,
+      username: 'testuser',
+      is_superuser: false,
+      groups: [1],
+    }
+    websocketStatusService.connect()
+    server.send({
+      type: WebsocketStatusType.STATUS_UPDATE,
+      data: {
+        task_id: '1234',
+        filename: 'file1.pdf',
+        current_progress: 50,
+        max_progress: 100,
+        docuement_id: 12,
+        owner_id: 2,
+        status: 'WORKING',
+        users_can_view: [1],
+        groups_can_view: [],
+      },
+    })
+    expect(websocketStatusService.getConsumerStatusNotCompleted()).toHaveLength(
+      1
+    )
+    server.send({
+      type: WebsocketStatusType.STATUS_UPDATE,
+      data: {
+        task_id: '5678',
+        filename: 'file2.pdf',
+        current_progress: 50,
+        max_progress: 100,
+        docuement_id: 13,
+        owner_id: 2,
+        status: 'WORKING',
+        users_can_view: [],
+        groups_can_view: [1],
+      },
+    })
+    expect(websocketStatusService.getConsumerStatusNotCompleted()).toHaveLength(
+      2
+    )
+  })
+
   it('should trigger deleted subject on document deleted', () => {
     let deleted = false
     websocketStatusService.onDocumentDeleted().subscribe(() => {

@@ -8,7 +8,6 @@ import {
 } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { RouterTestingModule } from '@angular/router/testing'
-import { NgbAlert, NgbCollapse } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { routes } from 'src/app/app-routing.module'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
@@ -83,10 +82,20 @@ describe('UploadFileWidgetComponent', () => {
   })
 
   it('should upload files', () => {
-    const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFiles')
-    fixture.debugElement
-      .query(By.css('input'))
-      .nativeElement.dispatchEvent(new Event('change'))
+    const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFile')
+    const file = new File(
+      [new Blob(['testing'], { type: 'application/pdf' })],
+      'file.pdf'
+    )
+    const fileInput = fixture.debugElement.query(By.css('input'))
+    jest.spyOn(fileInput.nativeElement, 'files', 'get').mockReturnValue({
+      item: () => file,
+      length: 1,
+      [Symbol.iterator]: () => ({
+        next: () => ({ done: false, value: file }),
+      }),
+    } as any)
+    fileInput.nativeElement.dispatchEvent(new Event('change'))
     expect(uploadSpy).toHaveBeenCalled()
   })
 
@@ -116,20 +125,6 @@ describe('UploadFileWidgetComponent', () => {
     expect(component.getStatusColor(successStatus)).toEqual('success')
   })
 
-  it('should enforce a maximum number of alerts', () => {
-    mockConsumerStatuses(websocketStatusService)
-    fixture.detectChanges()
-    // 5 total, 1 hidden
-    expect(fixture.debugElement.queryAll(By.directive(NgbAlert))).toHaveLength(
-      6
-    )
-    expect(
-      fixture.debugElement
-        .query(By.directive(NgbCollapse))
-        .queryAll(By.directive(NgbAlert))
-    ).toHaveLength(1)
-  })
-
   it('should allow dismissing an alert', () => {
     const dismissSpy = jest.spyOn(websocketStatusService, 'dismiss')
     component.dismiss(new FileStatus())
@@ -138,7 +133,6 @@ describe('UploadFileWidgetComponent', () => {
 
   it('should allow dismissing completed alerts', fakeAsync(() => {
     mockConsumerStatuses(websocketStatusService)
-    component.alertsExpanded = true
     fixture.detectChanges()
     jest
       .spyOn(component, 'getStatusCompleted')

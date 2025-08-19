@@ -21,10 +21,12 @@
   --pngx-success-darken-10: hsl(152, 69%, 11%); // based on success #198754
   --pngx-bg-alt: #fff;
   --pngx-bg-darker: var(--bs-gray-100);
-  --pngx-bg-alt2: var(--bs-gray-200);
+  --pngx-bg-alt2: var(--bs-gray-200); // #e9ecef
   --pngx-bg-disabled: #f7f7f7;
   --pngx-focus-alpha: 0.3;
-  --pngx-toast-max-width: 360px;
+  --pngx-toast-max-width: 340px;
+  --bs-info: var(--pngx-bg-alt2);
+  --bs-info-rgb: 233, 236, 239;
   @media screen and (min-width: 1024px) {
     --pngx-toast-max-width: 450px;
   }
@@ -71,8 +73,15 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 }
 
 @mixin dark-mode {
-  --bs-body-color: #{$text-color-dark-bg};
   --pngx-body-color-accent: #{$text-color-dark-bg-accent};
+  --pngx-bg-alt: #242529;
+  --pngx-bg-alt2: #232323;
+  --pngx-bg-darker: #101216;
+  --pngx-bg-disabled: var(--pngx-bg-alt);
+  --pngx-focus-alpha: 0.6;
+  --pngx-primary-faded: var(--pngx-primary-darken-15);
+  --pngx-primary-text-contrast: var(--bs-body-color);
+  --bs-body-color: #{$text-color-dark-bg};
   --bs-secondary-color: #6c757d;
   --bs-danger: #b71631;
   --bs-danger-rgb: 183, 22, 49;
@@ -80,15 +89,10 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   --bs-body-bg-rgb: 22, 22, 24;
   --bs-light: #1c1c1f;
   --bs-light-rgb: 28, 28, 31;
+  --bs-info: var(--pngx-bg-alt);
+  --bs-info-rgb: 36, 36, 39;
   --bs-border-color: #47494f;
-  --pngx-bg-alt2: #232323;
-  --pngx-bg-darker: #101216;
   --bs-tertiary-bg: var(--pngx-bg-darker);
-  --pngx-bg-alt: #242529;
-  --pngx-bg-disabled: var(--pngx-bg-alt);
-  --pngx-focus-alpha: 0.6;
-  --pngx-primary-faded: var(--pngx-primary-darken-15);
-  --pngx-primary-text-contrast: var(--bs-body-color);
   --bs-dark-border-subtle: var(--pngx-bg-darker);
   --bs-border-color-translucent: rgba(0, 0, 0, .175); // override bs
 
@@ -190,6 +194,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     border-radius: 0;
     border-color: var(--bs-border-color);
     filter: invert(10%);
+    transform: translateZ(0); // fix for safari to force hw acceleration
 
     &.border-end {
       border-right: none !important;
@@ -202,28 +207,6 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 
   .card-selected .doc-img {
     mix-blend-mode: luminosity;
-  }
-
-  @supports (hanging-punctuation: first) and (font: -apple-system-body) and (-webkit-appearance: none) {
-    // Safari does not like the filters on the image, see https://github.com/paperless-ngx/paperless-ngx/pull/8121
-    .document-card:not(.placeholder-glow),
-    .document-card-large:not(.placeholder-glow) {
-      .doc-img-container {
-        transition: none;
-        background-color: #ffffff !important;
-      }
-
-      .doc-img {
-        filter: none !important;
-        box-shadow: inset 0px 0px 0px 10px rgba(0,0,0,1);
-      }
-
-      .doc-img.inverted {
-        filter: none !important;
-        mix-blend-mode: difference;
-        opacity: 0.95;
-      }
-    }
   }
 
   .paperless-input-select .ng-select .ng-dropdown-panel .ng-dropdown-panel-items .ng-option:not(.ng-option-selected):hover,
@@ -306,10 +289,6 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   .toast .btn,
   .toast .btn-close {
     color: var(--pngx-primary-text-contrast);
-  }
-
-  .toast .btn-outline-dark:hover {
-    color: var(--bs-body-color)
   }
 
   .dropdown-item {

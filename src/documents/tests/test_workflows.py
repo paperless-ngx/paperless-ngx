@@ -1,8 +1,10 @@
 import shutil
+import socket
 from datetime import timedelta
 from typing import TYPE_CHECKING
 from unittest import mock
 
+import pytest
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.test import override_settings
@@ -10,6 +12,7 @@ from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
+from httpx import HTTPError
 from httpx import HTTPStatusError
 from pytest_httpx import HTTPXMock
 from rest_framework.test import APITestCase
@@ -25,6 +28,7 @@ from documents import tasks
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
 from documents.matching import document_matches_workflow
+from documents.matching import prefilter_documents_by_workflowtrigger
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -133,6 +137,9 @@ class TestWorkflows(
         action.assign_change_groups.add(self.group1.pk)
         action.assign_custom_fields.add(self.cf1.pk)
         action.assign_custom_fields.add(self.cf2.pk)
+        action.assign_custom_fields_values = {
+            self.cf2.pk: 42,
+        }
         action.save()
         w = Workflow.objects.create(
             name="Workflow 1",
@@ -208,6 +215,10 @@ class TestWorkflows(
                 self.assertEqual(
                     list(document.custom_fields.all().values_list("field", flat=True)),
                     [self.cf1.pk, self.cf2.pk],
+                )
+                self.assertEqual(
+                    document.custom_fields.get(field=self.cf2.pk).value,
+                    42,
                 )
 
         info = cm.output[0]
@@ -1215,11 +1226,11 @@ class TestWorkflows(
     def test_document_updated_workflow_existing_custom_field(self):
         """
         GIVEN:
-            - Existing workflow with UPDATED trigger and action that adds a custom field
+            - Existing workflow with UPDATED trigger and action that assigns a custom field with a value
         WHEN:
             - Document is updated that already contains the field
         THEN:
-            - Document update succeeds without trying to re-create the field
+            - Document update succeeds and updates the field
         """
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
@@ -1227,6 +1238,8 @@ class TestWorkflows(
         )
         action = WorkflowAction.objects.create()
         action.assign_custom_fields.add(self.cf1)
+        action.assign_custom_fields_values = {self.cf1.pk: "new value"}
+        action.save()
         w = Workflow.objects.create(
             name="Workflow 1",
             order=0,
@@ -1250,6 +1263,9 @@ class TestWorkflows(
             {"document_type": self.dt.id},
             format="json",
         )
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.custom_fields.get(field=self.cf1).value, "new value")
 
     def test_document_updated_workflow_merge_permissions(self):
         """
@@ -1324,6 +1340,8 @@ class TestWorkflows(
         GIVEN:
             - Existing workflow with SCHEDULED trigger against the created field and action that assigns owner
             - Existing doc that matches the trigger
+            - Workflow set to trigger at (now - offset) = now - 1 day
+            - Document created date is 2 days ago → trigger condition met
         WHEN:
             - Scheduled workflows are checked
         THEN:
@@ -1347,7 +1365,7 @@ class TestWorkflows(
         w.save()
 
         now = timezone.localtime(timezone.now())
-        created = now - timedelta(weeks=520)
+        created = now - timedelta(days=2)
         doc = Document.objects.create(
             title="sample test",
             correspondent=self.c,
@@ -1365,6 +1383,8 @@ class TestWorkflows(
         GIVEN:
             - Existing workflow with SCHEDULED trigger against the added field and action that assigns owner
             - Existing doc that matches the trigger
+            - Workflow set to trigger at (now - offset) = now - 1 day
+            - Document added date is 365 days ago
         WHEN:
             - Scheduled workflows are checked
         THEN:
@@ -1406,6 +1426,8 @@ class TestWorkflows(
         GIVEN:
             - Existing workflow with SCHEDULED trigger against the modified field and action that assigns owner
             - Existing doc that matches the trigger
+            - Workflow set to trigger at (now - offset) = now - 1 day
+            - Document modified date is mocked as sufficiently in the past
         WHEN:
             - Scheduled workflows are checked
         THEN:
@@ -1446,6 +1468,8 @@ class TestWorkflows(
         GIVEN:
             - Existing workflow with SCHEDULED trigger against a custom field and action that assigns owner
             - Existing doc that matches the trigger
+            - Workflow set to trigger at (now - offset) = now - 1 day
+            - Custom field date is 2 days ago
         WHEN:
             - Scheduled workflows are checked
         THEN:
@@ -1490,6 +1514,7 @@ class TestWorkflows(
         GIVEN:
             - Existing workflow with SCHEDULED trigger
             - Existing doc that has already had the workflow run
+            - Document created 2 days ago, workflow offset = 1 day → trigger time = yesterday
         WHEN:
             - Scheduled workflows are checked
         THEN:
@@ -1540,6 +1565,7 @@ class TestWorkflows(
         GIVEN:
             - Existing workflow with SCHEDULED trigger and recurring interval of 7 days
             - Workflow run date is 6 days ago
+            - Document created 40 days ago, offset = 30 → trigger time = 10 days ago
         WHEN:
             - Scheduled workflows are checked
         THEN:
@@ -1587,6 +1613,202 @@ class TestWorkflows(
 
             doc.refresh_from_db()
             self.assertIsNone(doc.owner)
+
+    def test_workflow_scheduled_trigger_negative_offset_customfield(self):
+        """
+        GIVEN:
+            - Workflow with offset -7 (i.e., 7 days *before* the date)
+            - doc1: value_date = 5 days ago → trigger time = 12 days ago → triggers
+            - doc2: value_date = 9 days in future → trigger time = 2 days in future → does NOT trigger
+        WHEN:
+            - Scheduled workflows are checked
+        THEN:
+            - doc1 has owner assigned
+            - doc2 remains untouched
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_offset_days=-7,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.CUSTOM_FIELD,
+            schedule_date_custom_field=self.cf1,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc1 = Document.objects.create(
+            title="doc1",
+            correspondent=self.c,
+            original_filename="doc1.pdf",
+            checksum="doc1-checksum",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc1,
+            field=self.cf1,
+            value_date=timezone.now().date() - timedelta(days=5),
+        )
+
+        doc2 = Document.objects.create(
+            title="doc2",
+            correspondent=self.c,
+            original_filename="doc2.pdf",
+            checksum="doc2-checksum",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc2,
+            field=self.cf1,
+            value_date=timezone.now().date() + timedelta(days=9),
+        )
+
+        tasks.check_scheduled_workflows()
+
+        doc1.refresh_from_db()
+        self.assertEqual(doc1.owner, self.user2)
+
+        doc2.refresh_from_db()
+        self.assertIsNone(doc2.owner)
+
+    def test_workflow_scheduled_trigger_negative_offset_created(self):
+        """
+        GIVEN:
+            - Existing workflow with SCHEDULED trigger and negative offset of -7 days (so 7 days before date)
+            - doc created 8 days ago → trigger time = 15 days ago → triggers
+            - doc2 created 8 days *in the future* → trigger time = 1 day in future → does NOT trigger
+        WHEN:
+            - Scheduled workflows are checked for document
+        THEN:
+            - doc is matched and owner updated
+            - doc2 is untouched
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_offset_days=-7,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.CREATED,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+            checksum="1",
+            created=timezone.now().date() - timedelta(days=8),
+        )
+
+        doc2 = Document.objects.create(
+            title="sample test 2",
+            correspondent=self.c,
+            original_filename="sample2.pdf",
+            checksum="2",
+            created=timezone.now().date() + timedelta(days=8),
+        )
+
+        tasks.check_scheduled_workflows()
+        doc.refresh_from_db()
+        self.assertEqual(doc.owner, self.user2)
+        doc2.refresh_from_db()
+        self.assertIsNone(doc2.owner)  # has not triggered yet
+
+    def test_offset_positive_means_after(self):
+        """
+        GIVEN:
+            - Document created 30 days ago
+            - Workflow with offset +10
+        EXPECT:
+            - It triggers now, because created + 10 = 20 days ago < now
+        """
+        doc = Document.objects.create(
+            title="Test doc",
+            created=timezone.now() - timedelta(days=30),
+            correspondent=self.c,
+            original_filename="test.pdf",
+        )
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.CREATED,
+            schedule_offset_days=10,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+        tasks.check_scheduled_workflows()
+        doc.refresh_from_db()
+        self.assertEqual(doc.owner, self.user2)
+
+    def test_workflow_scheduled_filters_queryset(self):
+        """
+        GIVEN:
+            - Existing workflow with scheduled trigger
+        WHEN:
+            - Workflows run and matching documents are found
+        THEN:
+            - prefilter_documents_by_workflowtrigger appropriately filters
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_offset_days=-7,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.CREATED,
+            filter_filename="*sample*",
+            filter_has_document_type=self.dt,
+            filter_has_correspondent=self.c,
+        )
+        trigger.filter_has_tags.set([self.t1])
+        trigger.save()
+        action = WorkflowAction.objects.create(
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        # create 10 docs with half having the document type
+        for i in range(10):
+            doc = Document.objects.create(
+                title=f"sample test {i}",
+                checksum=f"checksum{i}",
+                correspondent=self.c,
+                original_filename=f"sample_{i}.pdf",
+                document_type=self.dt if i % 2 == 0 else None,
+            )
+            doc.tags.set([self.t1])
+            doc.save()
+
+        documents = Document.objects.all()
+        filtered_docs = prefilter_documents_by_workflowtrigger(
+            documents,
+            trigger,
+        )
+        self.assertEqual(filtered_docs.count(), 5)
 
     def test_workflow_enabled_disabled(self):
         trigger = WorkflowTrigger.objects.create(
@@ -2602,14 +2824,32 @@ class TestWorkflows(
             )
 
             mock_post.assert_called_once_with(
-                "http://paperless-ngx.com",
-                data="Test message",
+                url="http://paperless-ngx.com",
+                content="Test message",
                 headers={},
                 files=None,
+                follow_redirects=False,
+                timeout=5,
             )
 
             expected_str = "Webhook sent to http://paperless-ngx.com"
             self.assertIn(expected_str, cm.output[0])
+
+            # with dict
+            send_webhook(
+                url="http://paperless-ngx.com",
+                data={"message": "Test message"},
+                headers={},
+                files=None,
+            )
+            mock_post.assert_called_with(
+                url="http://paperless-ngx.com",
+                data={"message": "Test message"},
+                headers={},
+                files=None,
+                follow_redirects=False,
+                timeout=5,
+            )
 
     @mock.patch("httpx.post")
     def test_workflow_webhook_send_webhook_retry(self, mock_http):
@@ -2729,3 +2969,164 @@ class TestWebhookSend:
             as_json=True,
         )
         assert httpx_mock.get_request().headers["Content-Type"] == "application/json"
+
+
+@pytest.fixture
+def resolve_to(monkeypatch):
+    """
+    Force DNS resolution to a specific IP for any hostname.
+    """
+
+    def _set(ip: str):
+        def fake_getaddrinfo(host, *_args, **_kwargs):
+            return [(socket.AF_INET, None, None, "", (ip, 0))]
+
+        monkeypatch.setattr(socket, "getaddrinfo", fake_getaddrinfo)
+
+    return _set
+
+
+class TestWebhookSecurity:
+    def test_blocks_invalid_scheme_or_hostname(self, httpx_mock: HTTPXMock):
+        """
+        GIVEN:
+            - Invalid URL schemes or hostnames
+        WHEN:
+            - send_webhook is called with such URLs
+        THEN:
+            - ValueError is raised
+        """
+        with pytest.raises(ValueError):
+            send_webhook(
+                "ftp://example.com",
+                data="",
+                headers={},
+                files=None,
+                as_json=False,
+            )
+
+        with pytest.raises(ValueError):
+            send_webhook(
+                "http:///nohost",
+                data="",
+                headers={},
+                files=None,
+                as_json=False,
+            )
+
+    @override_settings(WEBHOOKS_ALLOWED_PORTS=[80, 443])
+    def test_blocks_disallowed_port(self, httpx_mock: HTTPXMock):
+        """
+        GIVEN:
+            - URL with a disallowed port
+        WHEN:
+            - send_webhook is called with such URL
+        THEN:
+            - ValueError is raised
+        """
+        with pytest.raises(ValueError):
+            send_webhook(
+                "http://paperless-ngx.com:8080",
+                data="",
+                headers={},
+                files=None,
+                as_json=False,
+            )
+
+        assert httpx_mock.get_request() is None
+
+    @override_settings(WEBHOOKS_ALLOW_INTERNAL_REQUESTS=False)
+    def test_blocks_private_loopback_linklocal(self, httpx_mock: HTTPXMock, resolve_to):
+        """
+        GIVEN:
+            - URL with a private, loopback, or link-local IP address
+            - WEBHOOKS_ALLOW_INTERNAL_REQUESTS is False
+        WHEN:
+            - send_webhook is called with such URL
+        THEN:
+            - ValueError is raised
+        """
+        resolve_to("127.0.0.1")
+        with pytest.raises(ValueError):
+            send_webhook(
+                "http://paperless-ngx.com",
+                data="",
+                headers={},
+                files=None,
+                as_json=False,
+            )
+
+    def test_allows_public_ip_and_sends(self, httpx_mock: HTTPXMock, resolve_to):
+        """
+        GIVEN:
+            - URL with a public IP address
+        WHEN:
+            - send_webhook is called with such URL
+        THEN:
+            - Request is sent successfully
+        """
+        resolve_to("52.207.186.75")
+        httpx_mock.add_response(content=b"ok")
+
+        send_webhook(
+            url="http://paperless-ngx.com",
+            data="hi",
+            headers={},
+            files=None,
+            as_json=False,
+        )
+
+        req = httpx_mock.get_request()
+        assert req.url.host == "paperless-ngx.com"
+
+    def test_follow_redirects_disabled(self, httpx_mock: HTTPXMock, resolve_to):
+        """
+        GIVEN:
+            - A URL that redirects
+        WHEN:
+            - send_webhook is called with follow_redirects=False
+        THEN:
+            - Request is made to the original URL and does not follow the redirect
+        """
+        resolve_to("52.207.186.75")
+        # Return a redirect and ensure we don't follow it (only one request recorded)
+        httpx_mock.add_response(
+            status_code=302,
+            headers={"location": "http://internal-service.local"},
+            content=b"",
+        )
+
+        with pytest.raises(HTTPError):
+            send_webhook(
+                "http://paperless-ngx.com",
+                data="",
+                headers={},
+                files=None,
+                as_json=False,
+            )
+
+        assert len(httpx_mock.get_requests()) == 1
+
+    def test_strips_user_supplied_host_header(self, httpx_mock: HTTPXMock, resolve_to):
+        """
+        GIVEN:
+            - A URL with a user-supplied Host header
+        WHEN:
+            - send_webhook is called with a malicious Host header
+        THEN:
+            - The Host header is stripped and replaced with the resolved hostname
+        """
+        resolve_to("52.207.186.75")
+        httpx_mock.add_response(content=b"ok")
+
+        send_webhook(
+            url="http://paperless-ngx.com",
+            data="ok",
+            headers={"Host": "evil.test"},
+            files=None,
+            as_json=False,
+        )
+
+        req = httpx_mock.get_request()
+        assert req.headers["Host"] == "paperless-ngx.com"
+        assert "evil.test" not in req.headers.get("Host", "")

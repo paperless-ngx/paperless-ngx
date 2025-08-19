@@ -1,11 +1,9 @@
 import itertools
-import json
 import logging
 import os
 import platform
 import re
 import tempfile
-import urllib
 import zipfile
 from datetime import datetime
 from pathlib import Path
@@ -14,7 +12,10 @@ from unicodedata import normalize
 from urllib.parse import quote
 from urllib.parse import urlparse
 
+import httpx
+import magic
 import pathvalidate
+from celery import states
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
@@ -32,11 +33,13 @@ from django.db.models import When
 from django.db.models.functions import Length
 from django.db.models.functions import Lower
 from django.db.models.manager import Manager
+from django.http import FileResponse
 from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
+from django.http import HttpResponseServerError
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -103,9 +106,11 @@ from documents.filters import DocumentsOrderingFilter
 from documents.filters import DocumentTypeFilterSet
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
 from documents.filters import ObjectOwnedPermissionsFilter
+from documents.filters import PaperlessTaskFilterSet
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
+from documents.mail import send_email
 from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_storage_paths
@@ -142,7 +147,9 @@ from documents.serialisers import CustomFieldSerializer
 from documents.serialisers import DocumentListSerializer
 from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
+from documents.serialisers import NotesSerializer
 from documents.serialisers import PostDocumentSerializer
+from documents.serialisers import RunTaskViewSerializer
 from documents.serialisers import SavedViewSerializer
 from documents.serialisers import SearchResultSerializer
 from documents.serialisers import ShareLinkSerializer
@@ -159,11 +166,16 @@ from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_updated
 from documents.tasks import consume_file
 from documents.tasks import empty_trash
+from documents.tasks import index_optimize
+from documents.tasks import sanity_check
+from documents.tasks import train_classifier
 from documents.templating.filepath import validate_filepath_template_and_render
+from documents.utils import get_boolean
 from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import GeneralConfig
 from paperless.db import GnuPG
+from paperless.models import ApplicationConfiguration
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
@@ -228,9 +240,15 @@ class PassUserMixin(GenericAPIView):
 
     def get_serializer(self, *args, **kwargs):
         kwargs.setdefault("user", self.request.user)
+        try:
+            full_perms = get_boolean(
+                str(self.request.query_params.get("full_perms", "false")),
+            )
+        except ValueError:
+            full_perms = False
         kwargs.setdefault(
             "full_perms",
-            self.request.query_params.get("full_perms", False),
+            full_perms,
         )
         return super().get_serializer(*args, **kwargs)
 
@@ -426,27 +444,24 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     ),
     notes=extend_schema(
         description="View, add, or delete notes for the document",
-        responses={
-            200: {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "id": {"type": "integer"},
-                        "note": {"type": "string"},
-                        "created": {"type": "string", "format": "date-time"},
-                        "user": {
-                            "type": "object",
-                            "properties": {
-                                "id": {"type": "integer"},
-                                "username": {"type": "string"},
-                                "first_name": {"type": "string"},
-                                "last_name": {"type": "string"},
-                            },
-                        },
-                    },
-                },
+        methods=["GET", "POST", "DELETE"],
+        request=inline_serializer(
+            name="NoteCreateRequest",
+            fields={
+                "note": serializers.CharField(),
             },
+        ),
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Note ID to delete (used only for DELETE requests)",
+            ),
+        ],
+        responses={
+            200: NotesSerializer(many=True),
             400: None,
             403: None,
             404: None,
@@ -512,6 +527,28 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             404: None,
         },
     ),
+    email=extend_schema(
+        description="Email the document to one or more recipients as an attachment.",
+        request=inline_serializer(
+            name="EmailRequest",
+            fields={
+                "addresses": serializers.CharField(),
+                "subject": serializers.CharField(),
+                "message": serializers.CharField(),
+                "use_archive_version": serializers.BooleanField(default=True),
+            },
+        ),
+        responses={
+            200: inline_serializer(
+                name="EmailResponse",
+                fields={"message": serializers.CharField()},
+            ),
+            400: None,
+            403: None,
+            404: None,
+            500: None,
+        },
+    ),
 )
 class DocumentViewSet(
     PassUserMixin,
@@ -565,9 +602,15 @@ class DocumentViewSet(
         kwargs.setdefault("context", self.get_serializer_context())
         kwargs.setdefault("fields", fields)
         kwargs.setdefault("truncate_content", truncate_content.lower() in ["true", "1"])
+        try:
+            full_perms = get_boolean(
+                str(self.request.query_params.get("full_perms", "false")),
+            )
+        except ValueError:
+            full_perms = False
         kwargs.setdefault(
             "full_perms",
-            self.request.query_params.get("full_perms", False),
+            full_perms,
         )
         return super().get_serializer(*args, **kwargs)
 
@@ -623,7 +666,7 @@ class DocumentViewSet(
         )
 
     def get_metadata(self, file, mime_type):
-        if not os.path.isfile(file):
+        if not Path(file).is_file():
             return None
 
         parser_class = get_parser_class_for_mime_type(mime_type)
@@ -641,8 +684,8 @@ class DocumentViewSet(
             return []
 
     def get_filesize(self, filename):
-        if os.path.isfile(filename):
-            return os.stat(filename).st_size
+        if Path(filename).is_file():
+            return Path(filename).stat().st_size
         else:
             return None
 
@@ -666,7 +709,9 @@ class DocumentViewSet(
         document_cached_metadata = get_metadata_cache(doc.pk)
 
         archive_metadata = None
-        archive_filesize = None
+        archive_filesize = (
+            self.get_filesize(doc.archive_path) if doc.has_archive_version else None
+        )
         if document_cached_metadata is not None:
             original_metadata = document_cached_metadata.original_metadata
             archive_metadata = document_cached_metadata.archive_metadata
@@ -675,7 +720,6 @@ class DocumentViewSet(
             original_metadata = self.get_metadata(doc.source_path, doc.mime_type)
 
             if doc.has_archive_version:
-                archive_filesize = self.get_filesize(doc.archive_path)
                 archive_metadata = self.get_metadata(
                     doc.archive_path,
                     "application/pdf",
@@ -796,33 +840,6 @@ class DocumentViewSet(
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404
 
-    def getNotes(self, doc):
-        return [
-            {
-                "id": c.pk,
-                "note": c.note,
-                "created": c.created,
-                "user": {
-                    "id": c.user.id,
-                    "username": c.user.username,
-                    "first_name": c.user.first_name,
-                    "last_name": c.user.last_name,
-                },
-            }
-            for c in Note.objects.select_related("user")
-            .only(
-                "pk",
-                "note",
-                "created",
-                "user__id",
-                "user__username",
-                "user__first_name",
-                "user__last_name",
-            )
-            .filter(document=doc)
-            .order_by("-created")
-        ]
-
     @action(
         methods=["get", "post", "delete"],
         detail=True,
@@ -847,9 +864,11 @@ class DocumentViewSet(
         except Document.DoesNotExist:
             raise Http404
 
+        serializer = self.get_serializer(doc)
+
         if request.method == "GET":
             try:
-                notes = self.getNotes(doc)
+                notes = serializer.to_representation(doc).get("notes")
                 return Response(notes)
             except Exception as e:
                 logger.warning(f"An error occurred retrieving notes: {e!s}")
@@ -890,7 +909,7 @@ class DocumentViewSet(
 
                 index.add_or_update_document(doc)
 
-                notes = self.getNotes(doc)
+                notes = serializer.to_representation(doc).get("notes")
 
                 return Response(notes)
             except Exception as e:
@@ -927,7 +946,9 @@ class DocumentViewSet(
 
             index.add_or_update_document(doc)
 
-            return Response(self.getNotes(doc))
+            notes = serializer.to_representation(doc).get("notes")
+
+            return Response(notes)
 
         return Response(
             {
@@ -1023,10 +1044,68 @@ class DocumentViewSet(
 
         return Response(sorted(entries, key=lambda x: x["timestamp"], reverse=True))
 
+    @action(methods=["post"], detail=True)
+    def email(self, request, pk=None):
+        try:
+            doc = Document.objects.select_related("owner").get(pk=pk)
+            if request.user is not None and not has_perms_owner_aware(
+                request.user,
+                "view_document",
+                doc,
+            ):
+                return HttpResponseForbidden("Insufficient permissions")
+        except Document.DoesNotExist:
+            raise Http404
+
+        try:
+            if (
+                "addresses" not in request.data
+                or "subject" not in request.data
+                or "message" not in request.data
+            ):
+                return HttpResponseBadRequest("Missing required fields")
+
+            use_archive_version = request.data.get("use_archive_version", True)
+
+            addresses = request.data.get("addresses").split(",")
+            if not all(
+                re.match(r"[^@]+@[^@]+\.[^@]+", address.strip())
+                for address in addresses
+            ):
+                return HttpResponseBadRequest("Invalid email address found")
+
+            send_email(
+                subject=request.data.get("subject"),
+                body=request.data.get("message"),
+                to=addresses,
+                attachment=(
+                    doc.archive_path
+                    if use_archive_version and doc.has_archive_version
+                    else doc.source_path
+                ),
+                attachment_mime_type=doc.mime_type,
+            )
+            logger.debug(
+                f"Sent document {doc.id} via email to {addresses}",
+            )
+            return Response({"message": "Email sent"})
+        except Exception as e:
+            logger.warning(f"An error occurred emailing document: {e!s}")
+            return HttpResponseServerError(
+                "Error emailing document, check logs for more detail.",
+            )
+
 
 @extend_schema_view(
     list=extend_schema(
+        description="Document views including search",
         parameters=[
+            OpenApiParameter(
+                name="query",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                description="Advanced search query string",
+            ),
             OpenApiParameter(
                 name="full_perms",
                 type=OpenApiTypes.BOOL,
@@ -1041,6 +1120,12 @@ class DocumentViewSet(
         ],
         responses={
             200: DocumentSerializer(many=True, all_fields=True),
+        },
+    ),
+    next_asn=extend_schema(
+        description="Get the next available Archive Serial Number (ASN) for a new document",
+        responses={
+            200: OpenApiTypes.INT,
         },
     ),
 )
@@ -1090,7 +1175,19 @@ class UnifiedSearchViewSet(DocumentViewSet):
             try:
                 with index.open_index_searcher() as s:
                     self.searcher = s
-                    return super().list(request)
+                    queryset = self.filter_queryset(self.get_queryset())
+                    page = self.paginate_queryset(queryset)
+
+                    serializer = self.get_serializer(page, many=True)
+                    response = self.get_paginated_response(serializer.data)
+
+                    response.data["corrected_query"] = (
+                        queryset.suggested_correction
+                        if hasattr(queryset, "suggested_correction")
+                        else None
+                    )
+
+                    return response
             except NotFound:
                 raise
             except Exception as e:
@@ -1141,31 +1238,37 @@ class UnifiedSearchViewSet(DocumentViewSet):
 class LogViewSet(ViewSet):
     permission_classes = (IsAuthenticated, PaperlessAdminPermissions)
 
-    log_files = ["paperless", "mail"]
+    ALLOWED_LOG_FILES = {
+        "paperless": "paperless.log",
+        "mail": "mail.log",
+        "celery": "celery.log",
+    }
 
-    def get_log_filename(self, log):
-        return os.path.join(settings.LOGGING_DIR, f"{log}.log")
+    def get_log_file(self, log_key: str) -> Path:
+        return Path(settings.LOGGING_DIR) / self.ALLOWED_LOG_FILES[log_key]
 
     def retrieve(self, request, *args, **kwargs):
-        log_file = kwargs.get("pk")
-        if log_file not in self.log_files:
+        log_key = kwargs.get("pk")
+        if log_key not in self.ALLOWED_LOG_FILES:
             raise Http404
 
-        filename = self.get_log_filename(log_file)
+        log_file = self.get_log_file(log_key)
 
-        if not os.path.isfile(filename):
+        if not log_file.is_file():
             raise Http404
 
-        with open(filename) as f:
+        with log_file.open() as f:
             lines = [line.rstrip() for line in f.readlines()]
 
         return Response(lines)
 
     def list(self, request, *args, **kwargs):
-        exist = [
-            log for log in self.log_files if os.path.isfile(self.get_log_filename(log))
+        existing_logs = [
+            log_key
+            for log_key in self.ALLOWED_LOG_FILES
+            if self.get_log_file(log_key).is_file()
         ]
-        return Response(exist)
+        return Response(existing_logs)
 
 
 class SavedViewViewSet(ModelViewSet, PassUserMixin):
@@ -1221,6 +1324,7 @@ class BulkEditView(PassUserMixin):
         "delete_pages": "checksum",
         "split": None,
         "merge": None,
+        "edit_pdf": "checksum",
         "reprocess": "checksum",
     }
 
@@ -1239,6 +1343,7 @@ class BulkEditView(PassUserMixin):
         if method in [
             bulk_edit.split,
             bulk_edit.merge,
+            bulk_edit.edit_pdf,
         ]:
             parameters["user"] = user
 
@@ -1258,27 +1363,36 @@ class BulkEditView(PassUserMixin):
 
             # check ownership for methods that change original document
             if (
-                has_perms
-                and method
-                in [
-                    bulk_edit.set_permissions,
-                    bulk_edit.delete,
-                    bulk_edit.rotate,
-                    bulk_edit.delete_pages,
-                ]
-            ) or (
-                method in [bulk_edit.merge, bulk_edit.split]
-                and parameters["delete_originals"]
+                (
+                    has_perms
+                    and method
+                    in [
+                        bulk_edit.set_permissions,
+                        bulk_edit.delete,
+                        bulk_edit.rotate,
+                        bulk_edit.delete_pages,
+                        bulk_edit.edit_pdf,
+                    ]
+                )
+                or (
+                    method in [bulk_edit.merge, bulk_edit.split]
+                    and parameters["delete_originals"]
+                )
+                or (method == bulk_edit.edit_pdf and parameters["update_document"])
             ):
                 has_perms = user_is_owner_of_all_documents
 
             # check global add permissions for methods that create documents
             if (
                 has_perms
-                and method in [bulk_edit.split, bulk_edit.merge]
-                and not user.has_perm(
-                    "documents.add_document",
+                and (
+                    method in [bulk_edit.split, bulk_edit.merge]
+                    or (
+                        method == bulk_edit.edit_pdf
+                        and not parameters["update_document"]
+                    )
                 )
+                and not user.has_perm("documents.add_document")
             ):
                 has_perms = False
 
@@ -1316,7 +1430,6 @@ class BulkEditView(PassUserMixin):
                     )
                 }
 
-            # TODO: parameter validation
             result = method(documents, **parameters)
 
             if settings.AUDIT_LOG_ENABLED and modified_field:
@@ -1385,6 +1498,7 @@ class PostDocumentView(GenericAPIView):
         created = serializer.validated_data.get("created")
         archive_serial_number = serializer.validated_data.get("archive_serial_number")
         custom_field_ids = serializer.validated_data.get("custom_fields")
+        from_webui = serializer.validated_data.get("from_webui")
 
         t = int(mktime(datetime.now().timetuple()))
 
@@ -1399,7 +1513,7 @@ class PostDocumentView(GenericAPIView):
         os.utime(temp_file_path, times=(t, t))
 
         input_doc = ConsumableDocument(
-            source=DocumentSource.ApiUpload,
+            source=DocumentSource.WebUI if from_webui else DocumentSource.ApiUpload,
             original_file=temp_file_path,
         )
         input_doc_overrides = DocumentMetadataOverrides(
@@ -1412,7 +1526,10 @@ class PostDocumentView(GenericAPIView):
             created=created,
             asn=archive_serial_number,
             owner_id=request.user.id,
-            custom_field_ids=custom_field_ids,
+            # TODO: set values
+            custom_fields={cf_id: None for cf_id in custom_field_ids}
+            if custom_field_ids
+            else None,
         )
 
         async_task = consume_file.delay(
@@ -1995,7 +2112,7 @@ class BulkDownloadView(GenericAPIView):
                 strategy.add_document(document)
 
         # TODO(stumpylog): Investigate using FileResponse here
-        with open(temp.name, "rb") as f:
+        with Path(temp.name).open("rb") as f:
             response = HttpResponse(f, content_type="application/zip")
             response["Content-Disposition"] = '{}; filename="{}"'.format(
                 "attachment",
@@ -2041,7 +2158,7 @@ class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         # perform the deletion so renaming/moving can happen
         response = super().destroy(request, *args, **kwargs)
 
-        if len(doc_ids):
+        if doc_ids:
             bulk_edit.bulk_update_documents.delay(doc_ids)
 
         return response
@@ -2086,6 +2203,8 @@ class UiSettingsView(GenericAPIView):
         ui_settings["trash_delay"] = settings.EMPTY_TRASH_DELAY
 
         general_config = GeneralConfig()
+
+        ui_settings["version"] = version.__full_version_str__
 
         ui_settings["app_title"] = settings.APP_TITLE
         if general_config.app_title is not None and len(general_config.app_title) > 0:
@@ -2159,24 +2278,20 @@ class RemoteVersionView(GenericAPIView):
         is_greater_than_current = False
         current_version = packaging_version.parse(version.__full_version_str__)
         try:
-            req = urllib.request.Request(
-                "https://api.github.com/repos/paperless-ngx/"
-                "paperless-ngx/releases/latest",
+            resp = httpx.get(
+                "https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest",
+                headers={"Accept": "application/json"},
             )
-            # Ensure a JSON response
-            req.add_header("Accept", "application/json")
-
-            with urllib.request.urlopen(req) as response:
-                remote = response.read().decode("utf8")
+            resp.raise_for_status()
             try:
-                remote_json = json.loads(remote)
-                remote_version = remote_json["tag_name"]
+                data = resp.json()
+                remote_version = data["tag_name"]
                 # Some early tags used ngx-x.y.z
                 remote_version = remote_version.removeprefix("ngx-")
-            except ValueError:
-                logger.debug("An error occurred parsing remote version json")
-        except urllib.error.URLError:
-            logger.debug("An error occurred checking for available updates")
+            except ValueError as e:
+                logger.debug(f"An error occurred parsing remote version json: {e}")
+        except httpx.HTTPError as e:
+            logger.debug(f"An error occurred checking for available updates: {e}")
 
         is_greater_than_current = (
             packaging_version.parse(
@@ -2220,19 +2335,41 @@ class RemoteVersionView(GenericAPIView):
         },
     ),
 )
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="task_id",
+            type=str,
+            location=OpenApiParameter.QUERY,
+            required=False,
+            description="Filter tasks by Celery UUID",
+        ),
+    ],
+)
 class TasksViewSet(ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     serializer_class = TasksViewSerializer
-    filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    filterset_class = PaperlessTaskFilterSet
+
+    TASK_AND_ARGS_BY_NAME = {
+        PaperlessTask.TaskName.INDEX_OPTIMIZE: (index_optimize, {}),
+        PaperlessTask.TaskName.TRAIN_CLASSIFIER: (
+            train_classifier,
+            {"scheduled": False},
+        ),
+        PaperlessTask.TaskName.CHECK_SANITY: (
+            sanity_check,
+            {"scheduled": False, "raise_on_error": False},
+        ),
+    }
 
     def get_queryset(self):
-        queryset = (
-            PaperlessTask.objects.filter(
-                acknowledged=False,
-            )
-            .order_by("date_created")
-            .reverse()
-        )
+        queryset = PaperlessTask.objects.all().order_by("-date_created")
         task_id = self.request.query_params.get("task_id")
         if task_id is not None:
             queryset = PaperlessTask.objects.filter(task_id=task_id)
@@ -2254,6 +2391,25 @@ class TasksViewSet(ReadOnlyModelViewSet):
             return Response({"result": result})
         except Exception:
             return HttpResponseBadRequest()
+
+    @action(methods=["post"], detail=False)
+    def run(self, request):
+        serializer = RunTaskViewSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        task_name = serializer.validated_data.get("task_name")
+
+        if not request.user.is_superuser:
+            return HttpResponseForbidden("Insufficient permissions")
+
+        try:
+            task_func, task_args = self.TASK_AND_ARGS_BY_NAME[task_name]
+            result = task_func(**task_args)
+            return Response({"result": result})
+        except Exception as e:
+            logger.warning(f"An error occurred running task: {e!s}")
+            return HttpResponseServerError(
+                "Error running task, check logs for more detail.",
+            )
 
 
 class ShareLinkViewSet(ModelViewSet, PassUserMixin):
@@ -2311,9 +2467,13 @@ def serve_file(*, doc: Document, use_archive: bool, disposition: str):
     # RFC 5987 addresses this issue
     # see https://datatracker.ietf.org/doc/html/rfc5987#section-4.2
     # Chromium cannot handle commas in the filename
-    filename_normalized = normalize("NFKD", filename.replace(",", "_")).encode(
-        "ascii",
-        "ignore",
+    filename_normalized = (
+        normalize("NFKD", filename.replace(",", "_"))
+        .encode(
+            "ascii",
+            "ignore",
+        )
+        .decode("ascii")
     )
     filename_encoded = quote(filename)
     content_disposition = (
@@ -2361,7 +2521,7 @@ class BulkEditObjectsView(PassUserMixin):
         objs = object_class.objects.select_related("owner").filter(pk__in=object_ids)
 
         if not user.is_superuser:
-            model_name = object_class._meta.verbose_name
+            model_name = object_class._meta.model_name
             perm = (
                 f"documents.change_{model_name}"
                 if operation == "set_permissions"
@@ -2422,6 +2582,13 @@ class WorkflowTriggerViewSet(ModelViewSet):
 
     queryset = WorkflowTrigger.objects.all()
 
+    def partial_update(self, request, *args, **kwargs):
+        if "id" in request.data and str(request.data["id"]) != str(kwargs["pk"]):
+            return HttpResponseBadRequest(
+                "ID in body does not match URL",
+            )
+        return super().partial_update(request, *args, **kwargs)
+
 
 class WorkflowActionViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
@@ -2439,6 +2606,13 @@ class WorkflowActionViewSet(ModelViewSet):
         "assign_change_groups",
         "assign_custom_fields",
     )
+
+    def partial_update(self, request, *args, **kwargs):
+        if "id" in request.data and str(request.data["id"]) != str(kwargs["pk"]):
+            return HttpResponseBadRequest(
+                "ID in body does not match URL",
+            )
+        return super().partial_update(request, *args, **kwargs)
 
 
 class WorkflowViewSet(ModelViewSet):
@@ -2561,6 +2735,14 @@ class CustomFieldViewSet(ModelViewSet):
                             "last_trained": serializers.DateTimeField(),
                         },
                     ),
+                    "sanity_check": inline_serializer(
+                        name="SanityCheck",
+                        fields={
+                            "status": serializers.CharField(),
+                            "error": serializers.CharField(),
+                            "last_run": serializers.DateTimeField(),
+                        },
+                    ),
                 },
             ),
         },
@@ -2621,13 +2803,20 @@ class SystemStatusView(PassUserMixin):
                 )
                 redis_error = "Error connecting to redis, check logs for more detail."
 
+        celery_error = None
+        celery_url = None
         try:
             celery_ping = celery_app.control.inspect().ping()
-            first_worker_ping = celery_ping[next(iter(celery_ping.keys()))]
+            celery_url = next(iter(celery_ping.keys()))
+            first_worker_ping = celery_ping[celery_url]
             if first_worker_ping["ok"] == "pong":
                 celery_active = "OK"
-        except Exception:
+        except Exception as e:
             celery_active = "ERROR"
+            logger.exception(
+                f"System status detected a possible problem while connecting to celery: {e}",
+            )
+            celery_error = "Error connecting to celery, check logs for more detail."
 
         index_error = None
         try:
@@ -2644,55 +2833,43 @@ class SystemStatusView(PassUserMixin):
             )
             index_last_modified = None
 
+        last_trained_task = (
+            PaperlessTask.objects.filter(
+                task_name=PaperlessTask.TaskName.TRAIN_CLASSIFIER,
+            )
+            .order_by("-date_done")
+            .first()
+        )
+        classifier_status = "OK"
         classifier_error = None
-        classifier_status = None
-        try:
-            classifier = load_classifier(raise_exception=True)
-            if classifier is None:
-                # Make sure classifier should exist
-                docs_queryset = Document.objects.exclude(
-                    tags__is_inbox_tag=True,
-                )
-                if (
-                    docs_queryset.count() > 0
-                    and (
-                        Tag.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
-                        or DocumentType.objects.filter(
-                            matching_algorithm=Tag.MATCH_AUTO,
-                        ).exists()
-                        or Correspondent.objects.filter(
-                            matching_algorithm=Tag.MATCH_AUTO,
-                        ).exists()
-                        or StoragePath.objects.filter(
-                            matching_algorithm=Tag.MATCH_AUTO,
-                        ).exists()
-                    )
-                    and not settings.MODEL_FILE.exists()
-                ):
-                    # if classifier file doesn't exist just classify as a warning
-                    classifier_error = "Classifier file does not exist (yet). Re-training may be pending."
-                    classifier_status = "WARNING"
-                    raise FileNotFoundError(classifier_error)
-            classifier_status = "OK"
-            classifier_last_trained = (
-                make_aware(
-                    datetime.fromtimestamp(classifier.get_last_checked()),
-                )
-                if settings.MODEL_FILE.exists()
-                and classifier.get_last_checked() is not None
-                else None
+        if last_trained_task is None:
+            classifier_status = "WARNING"
+            classifier_error = "No classifier training tasks found"
+        elif last_trained_task and last_trained_task.status == states.FAILURE:
+            classifier_status = "ERROR"
+            classifier_error = last_trained_task.result
+        classifier_last_trained = (
+            last_trained_task.date_done if last_trained_task else None
+        )
+
+        last_sanity_check = (
+            PaperlessTask.objects.filter(
+                task_name=PaperlessTask.TaskName.CHECK_SANITY,
             )
-        except Exception as e:
-            if classifier_status is None:
-                classifier_status = "ERROR"
-            classifier_last_trained = None
-            if classifier_error is None:
-                classifier_error = (
-                    "Unable to load classifier, check logs for more detail."
-                )
-            logger.exception(
-                f"System status detected a possible problem while loading the classifier: {e}",
-            )
+            .order_by("-date_done")
+            .first()
+        )
+        sanity_check_status = "OK"
+        sanity_check_error = None
+        if last_sanity_check is None:
+            sanity_check_status = "WARNING"
+            sanity_check_error = "No sanity check tasks found"
+        elif last_sanity_check and last_sanity_check.status == states.FAILURE:
+            sanity_check_status = "ERROR"
+            sanity_check_error = last_sanity_check.result
+        sanity_check_last_run = (
+            last_sanity_check.date_done if last_sanity_check else None
+        )
 
         return Response(
             {
@@ -2720,12 +2897,17 @@ class SystemStatusView(PassUserMixin):
                     "redis_status": redis_status,
                     "redis_error": redis_error,
                     "celery_status": celery_active,
+                    "celery_url": celery_url,
+                    "celery_error": celery_error,
                     "index_status": index_status,
                     "index_last_modified": index_last_modified,
                     "index_error": index_error,
                     "classifier_status": classifier_status,
                     "classifier_last_trained": classifier_last_trained,
                     "classifier_error": classifier_error,
+                    "sanity_check_status": sanity_check_status,
+                    "sanity_check_last_run": sanity_check_last_run,
+                    "sanity_check_error": sanity_check_error,
                 },
             },
         )
@@ -2767,3 +2949,25 @@ class TrashView(ListModelMixin, PassUserMixin):
                 doc_ids = [doc.id for doc in docs]
             empty_trash(doc_ids=doc_ids)
         return Response({"result": "OK", "doc_ids": doc_ids})
+
+
+def serve_logo(request, filename=None):
+    """
+    Serves the configured logo file with Content-Disposition: attachment.
+    Prevents inline execution of SVGs. See GHSA-6p53-hqqw-8j62
+    """
+    config = ApplicationConfiguration.objects.first()
+    app_logo = config.app_logo
+
+    if not app_logo:
+        raise Http404("No logo configured")
+
+    path = app_logo.path
+    content_type = magic.from_file(path, mime=True) or "application/octet-stream"
+
+    return FileResponse(
+        app_logo.open("rb"),
+        content_type=content_type,
+        filename=app_logo.name,
+        as_attachment=True,
+    )

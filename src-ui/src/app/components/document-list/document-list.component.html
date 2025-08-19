@@ -310,8 +310,8 @@
                       </div>
                     }
                     @if (activeDisplayFields.includes(DisplayField.TAGS)) {
-                      @for (tagID of d.tags; track t) {
-                        <pngx-tag [tagID]="tagID" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(tagID);$event.stopPropagation()"></pngx-tag>
+                      @for (tagID of d.tags; track tagID) {
+                        <pngx-tag [tagID]="tagID" class="ms-1 fs-6" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(tagID);$event.stopPropagation()"></pngx-tag>
                       }
                     }
                   </td>
@@ -348,7 +348,7 @@
                 }
                 @if (activeDisplayFields.includes(DisplayField.CREATED)) {
                   <td>
-                    {{d.created_date | customDate}}
+                    {{d.created | customDate}}
                   </td>
                 }
                 @if (activeDisplayFields.includes(DisplayField.ADDED)) {

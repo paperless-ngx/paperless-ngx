@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import {
   NgbDateParserFormatter,
   NgbDateStruct,
@@ -7,11 +7,9 @@ import { SettingsService } from '../services/settings.service'
 
 @Injectable()
 export class LocalizedDateParserFormatter extends NgbDateParserFormatter {
-  private separatorRegExp: RegExp = /[\.,\/-]+/
+  private settings = inject(SettingsService)
 
-  constructor(private settings: SettingsService) {
-    super()
-  }
+  private separatorRegExp: RegExp = /[\.,\/-]+/
 
   private getDateInputFormat() {
     return this.settings.getLocalizedDateInputFormat()

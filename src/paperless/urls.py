@@ -1,5 +1,3 @@
-import os
-
 from allauth.account import views as allauth_account_views
 from allauth.mfa.base import views as allauth_mfa_views
 from allauth.socialaccount import views as allauth_social_account_views
@@ -13,7 +11,6 @@ from django.urls import re_path
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import RedirectView
-from django.views.static import serve
 from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular.views import SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
@@ -45,6 +42,7 @@ from documents.views import UnifiedSearchViewSet
 from documents.views import WorkflowActionViewSet
 from documents.views import WorkflowTriggerViewSet
 from documents.views import WorkflowViewSet
+from documents.views import serve_logo
 from paperless.consumers import StatusConsumer
 from paperless.views import ApplicationConfigurationViewSet
 from paperless.views import DisconnectSocialAccountView
@@ -267,21 +265,22 @@ urlpatterns = [
         # TODO: with localization, this is even worse! :/
     ),
     # App logo
-    re_path(
-        r"^logo(?P<path>.*)$",
-        serve,
-        kwargs={"document_root": os.path.join(settings.MEDIA_ROOT, "logo")},
-    ),
+    re_path(r"^logo(?:/(?P<filename>.+))?/?$", serve_logo, name="app_logo"),
     # allauth
     path(
         "accounts/",
         include(
             [
                 # see allauth/account/urls.py
-                # login, logout, signup
+                # login, logout, signup, account_inactive
                 path("login/", allauth_account_views.login, name="account_login"),
                 path("logout/", allauth_account_views.logout, name="account_logout"),
                 path("signup/", allauth_account_views.signup, name="account_signup"),
+                path(
+                    "account_inactive/",
+                    allauth_account_views.account_inactive,
+                    name="account_inactive",
+                ),
                 # password reset
                 path(
                     "password/",
@@ -304,6 +303,11 @@ urlpatterns = [
                             ),
                         ],
                     ),
+                ),
+                re_path(
+                    r"^confirm-email/(?P<key>[-:\w]+)/$",
+                    allauth_account_views.ConfirmEmailView.as_view(),
+                    name="account_confirm_email",
                 ),
                 re_path(
                     r"^password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
@@ -353,7 +357,7 @@ urlpatterns = [
 
 
 websocket_urlpatterns = [
-    path(settings.BASE_URL.lstrip("/") + "ws/status/", StatusConsumer.as_asgi()),
+    path("ws/status/", StatusConsumer.as_asgi()),
 ]
 
 # Text in each page's <h1> (and above login form).

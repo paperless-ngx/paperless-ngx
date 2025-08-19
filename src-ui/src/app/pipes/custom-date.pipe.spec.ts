@@ -45,7 +45,10 @@ describe('CustomDatePipe', () => {
     if (now.getMonth() === 0) {
       notNow.setFullYear(now.getFullYear() - 1)
     }
-    expect(datePipe.transform(notNow, 'relative')).toEqual('Last month')
+    // weird options are for february...
+    expect(['Last month', '4 weeks ago', '3 weeks ago']).toContain(
+      datePipe.transform(notNow, 'relative')
+    )
     expect(datePipe.transform(now, 'relative')).toEqual('Just now')
   })
 })

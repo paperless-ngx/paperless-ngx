@@ -268,15 +268,15 @@ describe(`DocumentService`, () => {
     expect(req.request.method).toEqual('GET')
   })
 
-  it('should pass remove_inbox_tags setting to update', () => {
-    subscription = service.update(documents[0]).subscribe()
+  it('should pass remove_inbox_tags setting to patch', () => {
+    subscription = service.patch(documents[0]).subscribe()
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/`
     )
     expect(req.request.body.remove_inbox_tags).toEqual(false)
 
     settingsService.set(SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS, true)
-    subscription = service.update(documents[0]).subscribe()
+    subscription = service.patch(documents[0]).subscribe()
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/`
     )
@@ -353,6 +353,21 @@ it('should include custom fields in sort fields if user has permission', () => {
       name: 'Custom Field 2',
     },
   ])
+})
+
+it('should call appropriate api endpoint for email document', () => {
+  subscription = service
+    .emailDocument(
+      documents[0].id,
+      'hello@paperless-ngx.com',
+      'hello',
+      'world',
+      true
+    )
+    .subscribe()
+  httpTestingController.expectOne(
+    `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/email/`
+  )
 })
 
 afterEach(() => {

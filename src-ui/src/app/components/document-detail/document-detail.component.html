@@ -9,9 +9,9 @@
     }
     <div class="input-group input-group-sm me-md-5 d-none d-md-flex">
       <button class="btn btn-outline-secondary" (click)="decreaseZoom()" i18n>-</button>
-      <select class="form-select" (change)="setZoom($event.target.value)">
+      <select class="form-select" (change)="setZoom($event.target.value)" [ngModel]="currentZoom">
         @for (setting of zoomSettings; track setting) {
-          <option [value]="setting" [attr.selected]="isZoomSelected(setting) ? 'selected' : null">
+          <option [value]="setting">
             {{ getZoomSettingTitle(setting) }}
           </option>
         }
@@ -58,16 +58,8 @@
         <i-bs width="1em" height="1em" name="diagram-3"></i-bs>&nbsp;<span i18n>More like this</span>
       </button>
 
-      <button ngbDropdownItem (click)="splitDocument()" [disabled]="!userCanAdd || originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
-        <i-bs width="1em" height="1em" name="scissors"></i-bs>&nbsp;<span i18n>Split</span>
-      </button>
-
-      <button ngbDropdownItem (click)="rotateDocument()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
-        <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
-      </button>
-
-      <button ngbDropdownItem (click)="deletePages()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF || previewNumPages === 1">
-        <i-bs name="file-earmark-minus"></i-bs>&nbsp;<ng-container i18n>Delete page(s)</ng-container>
+      <button ngbDropdownItem (click)="editPdf()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
+        <i-bs name="pencil"></i-bs>&nbsp;<ng-container i18n>PDF Editor</ng-container>
       </button>
     </div>
   </div>
@@ -81,7 +73,24 @@
     (added)="addField($event)">
   </pngx-custom-fields-dropdown>
 
-  <pngx-share-links-dropdown [documentId]="documentId" [hasArchiveVersion]="!!document?.archived_file_name" [disabled]="!userCanEdit && !userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }"></pngx-share-links-dropdown>
+
+  <div class="ms-auto" ngbDropdown>
+    <button class="btn btn-sm btn-outline-primary" id="sendDropdown" ngbDropdownToggle>
+      <i-bs name="send"></i-bs>
+      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Send</ng-container></div>
+    </button>
+    <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
+      <button ngbDropdownItem (click)="openShareLinks()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }">
+        <i-bs name="link"></i-bs>&nbsp;<span i18n>Share Links</span>
+      </button>
+      @if (emailEnabled) {
+        <button ngbDropdownItem (click)="openEmailDocument()">
+          <i-bs name="envelope"></i-bs>&nbsp;<span i18n>Email</span>
+        </button>
+      }
+    </div>
+  </div>
+
 </pngx-page-header>
 
 <div class="row">
@@ -112,8 +121,8 @@
             <div>
               <pngx-input-text #inputTitle i18n-title title="Title" formControlName="title" [horizontal]="true" (keyup)="titleKeyUp($event)" [error]="error?.title"></pngx-input-text>
               <pngx-input-number i18n-title title="Archive serial number" [error]="error?.archive_serial_number" [horizontal]="true" formControlName='archive_serial_number'></pngx-input-number>
-              <pngx-input-date i18n-title title="Date created" formControlName="created_date" [suggestions]="suggestions?.dates" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
-              [error]="error?.created_date"></pngx-input-date>
+              <pngx-input-date i18n-title title="Date created" formControlName="created" [suggestions]="suggestions?.dates" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
+              [error]="error?.created"></pngx-input-date>
               <pngx-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.Correspondent)"
               (createNew)="createCorrespondent($event)" [hideAddButton]="createDisabled(DataType.Correspondent)" [suggestions]="suggestions?.correspondents" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }"></pngx-input-select>
               <pngx-input-select [items]="documentTypes" i18n-title title="Document type" formControlName="document_type" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.DocumentType)"

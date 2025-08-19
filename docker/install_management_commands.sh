@@ -18,9 +18,10 @@ for command in decrypt_documents \
 	document_fuzzy_match \
 	manage_superuser \
 	convert_mariadb_uuid \
-	prune_audit_logs;
+	prune_audit_logs \
+	createsuperuser;
 do
 	echo "installing $command..."
 	sed "s/management_command/$command/g" management_script.sh >"$PWD/rootfs/usr/local/bin/$command"
-	chmod +x "$PWD/rootfs/usr/local/bin/$command"
+	chmod u=rwx,g=rwx,o=rx "$PWD/rootfs/usr/local/bin/$command"
 done

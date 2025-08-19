@@ -69,6 +69,7 @@ import {
   FILTER_STORAGE_PATH,
   FILTER_TITLE,
   FILTER_TITLE_CONTENT,
+  NEGATIVE_NULL_FILTER_VALUE,
 } from 'src/app/data/filter-rule-type'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
@@ -96,7 +97,10 @@ import {
 import { environment } from 'src/environments/environment'
 import { ClearableBadgeComponent } from '../../common/clearable-badge/clearable-badge.component'
 import { CustomFieldsQueryDropdownComponent } from '../../common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
-import { DatesDropdownComponent } from '../../common/dates-dropdown/dates-dropdown.component'
+import {
+  DatesDropdownComponent,
+  RelativeDate,
+} from '../../common/dates-dropdown/dates-dropdown.component'
 import {
   FilterableDropdownComponent,
   Intersection,
@@ -422,7 +426,7 @@ describe('FilterEditorComponent', () => {
         value: 'created:[-1 week to now]',
       },
     ]
-    expect(component.dateCreatedRelativeDate).toEqual(0) // RELATIVE_DATE_QUERYSTRINGS['-1 week to now']
+    expect(component.dateCreatedRelativeDate).toEqual(1) // RELATIVE_DATE_QUERYSTRINGS['-1 week to now']
     expect(component.textFilter).toBeNull()
   }))
 
@@ -434,7 +438,7 @@ describe('FilterEditorComponent', () => {
         value: 'added:[-1 week to now]',
       },
     ]
-    expect(component.dateAddedRelativeDate).toEqual(0) // RELATIVE_DATE_QUERYSTRINGS['-1 week to now']
+    expect(component.dateAddedRelativeDate).toEqual(1) // RELATIVE_DATE_QUERYSTRINGS['-1 week to now']
     expect(component.textFilter).toBeNull()
   }))
 
@@ -668,9 +672,6 @@ describe('FilterEditorComponent', () => {
         value: '12',
       },
     ]
-    expect(component.correspondentSelectionModel.logicalOperator).toEqual(
-      LogicalOperator.Or
-    )
     expect(component.correspondentSelectionModel.intersection).toEqual(
       Intersection.Include
     )
@@ -678,6 +679,19 @@ describe('FilterEditorComponent', () => {
       correspondents[0],
     ])
     component.toggleCorrespondent(12) // coverage
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_CORRESPONDENT,
+        value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+      },
+    ]
+    expect(component.correspondentSelectionModel.intersection).toEqual(
+      Intersection.Exclude
+    )
+    expect(component.correspondentSelectionModel.getExcludedItems()).toEqual([
+      { id: NEGATIVE_NULL_FILTER_VALUE, name: 'Not assigned' },
+    ])
   }))
 
   it('should ingest filter rules for has any of correspondents', fakeAsync(() => {
@@ -751,9 +765,6 @@ describe('FilterEditorComponent', () => {
         value: '22',
       },
     ]
-    expect(component.documentTypeSelectionModel.logicalOperator).toEqual(
-      LogicalOperator.Or
-    )
     expect(component.documentTypeSelectionModel.intersection).toEqual(
       Intersection.Include
     )
@@ -761,6 +772,19 @@ describe('FilterEditorComponent', () => {
       document_types[0],
     ])
     component.toggleDocumentType(22) // coverage
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_DOCUMENT_TYPE,
+        value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+      },
+    ]
+    expect(component.documentTypeSelectionModel.intersection).toEqual(
+      Intersection.Exclude
+    )
+    expect(component.documentTypeSelectionModel.getExcludedItems()).toEqual([
+      { id: NEGATIVE_NULL_FILTER_VALUE, name: 'Not assigned' },
+    ])
   }))
 
   it('should ingest filter rules for has any of document types', fakeAsync(() => {
@@ -777,9 +801,6 @@ describe('FilterEditorComponent', () => {
         value: '23',
       },
     ]
-    expect(component.documentTypeSelectionModel.logicalOperator).toEqual(
-      LogicalOperator.Or
-    )
     expect(component.documentTypeSelectionModel.intersection).toEqual(
       Intersection.Include
     )
@@ -834,9 +855,6 @@ describe('FilterEditorComponent', () => {
         value: '32',
       },
     ]
-    expect(component.storagePathSelectionModel.logicalOperator).toEqual(
-      LogicalOperator.Or
-    )
     expect(component.storagePathSelectionModel.intersection).toEqual(
       Intersection.Include
     )
@@ -844,6 +862,19 @@ describe('FilterEditorComponent', () => {
       storage_paths[0],
     ])
     component.toggleStoragePath(32) // coverage
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_STORAGE_PATH,
+        value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+      },
+    ]
+    expect(component.storagePathSelectionModel.intersection).toEqual(
+      Intersection.Exclude
+    )
+    expect(component.storagePathSelectionModel.getExcludedItems()).toEqual([
+      { id: NEGATIVE_NULL_FILTER_VALUE, name: 'Not assigned' },
+    ])
   }))
 
   it('should ingest filter rules for has any of storage paths', fakeAsync(() => {
@@ -1395,6 +1426,19 @@ describe('FilterEditorComponent', () => {
         value: null,
       },
     ])
+
+    const excludeButton = correspondentsFilterableDropdown.queryAll(
+      By.css('input[value=exclude]')
+    )[0]
+    excludeButton.nativeElement.checked = true
+    excludeButton.triggerEventHandler('change')
+    fixture.detectChanges()
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_CORRESPONDENT,
+        value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+      },
+    ])
   }))
 
   it('should convert user input to correct filter rules on document type selections', fakeAsync(() => {
@@ -1452,6 +1496,19 @@ describe('FilterEditorComponent', () => {
         value: null,
       },
     ])
+
+    const excludeButton = docTypesFilterableDropdown.queryAll(
+      By.css('input[value=exclude]')
+    )[0]
+    excludeButton.nativeElement.checked = true
+    excludeButton.triggerEventHandler('change')
+    fixture.detectChanges()
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_DOCUMENT_TYPE,
+        value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+      },
+    ])
   }))
 
   it('should convert user input to correct filter rules on storage path selections', fakeAsync(() => {
@@ -1507,6 +1564,19 @@ describe('FilterEditorComponent', () => {
       {
         rule_type: FILTER_STORAGE_PATH,
         value: null,
+      },
+    ])
+
+    const excludeButton = storagePathsFilterableDropdown.queryAll(
+      By.css('input[value=exclude]')
+    )[0]
+    excludeButton.nativeElement.checked = true
+    excludeButton.triggerEventHandler('change')
+    fixture.detectChanges()
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_STORAGE_PATH,
+        value: NEGATIVE_NULL_FILTER_VALUE.toString(),
       },
     ])
   }))
@@ -1587,10 +1657,8 @@ describe('FilterEditorComponent', () => {
     const dateCreatedDropdown = fixture.debugElement.queryAll(
       By.directive(DatesDropdownComponent)
     )[0]
-    const dateCreatedBeforeRelativeButton = dateCreatedDropdown.queryAll(
-      By.css('button')
-    )[1]
-    dateCreatedBeforeRelativeButton.triggerEventHandler('click')
+    component.dateCreatedRelativeDate = RelativeDate.WITHIN_1_WEEK
+    dateCreatedDropdown.triggerEventHandler('datesSet')
     fixture.detectChanges()
     tick(400)
     expect(component.filterRules).toEqual([
@@ -1606,10 +1674,8 @@ describe('FilterEditorComponent', () => {
     const dateCreatedDropdown = fixture.debugElement.queryAll(
       By.directive(DatesDropdownComponent)
     )[0]
-    const dateCreatedBeforeRelativeButton = dateCreatedDropdown.queryAll(
-      By.css('button')
-    )[1]
-    dateCreatedBeforeRelativeButton.triggerEventHandler('click')
+    component.dateCreatedRelativeDate = RelativeDate.WITHIN_1_WEEK
+    dateCreatedDropdown.triggerEventHandler('datesSet')
     fixture.detectChanges()
     tick(400)
     expect(component.filterRules).toEqual([
@@ -1692,16 +1758,14 @@ describe('FilterEditorComponent', () => {
     const datesDropdown = fixture.debugElement.query(
       By.directive(DatesDropdownComponent)
     )
-    const dateCreatedBeforeRelativeButton = datesDropdown.queryAll(
-      By.css('button')
-    )[1]
-    dateCreatedBeforeRelativeButton.triggerEventHandler('click')
+    component.dateAddedRelativeDate = RelativeDate.WITHIN_1_WEEK
+    datesDropdown.triggerEventHandler('datesSet')
     fixture.detectChanges()
     tick(400)
     expect(component.filterRules).toEqual([
       {
         rule_type: FILTER_FULLTEXT_QUERY,
-        value: 'created:[-1 week to now]',
+        value: 'added:[-1 week to now]',
       },
     ])
   }))
@@ -1711,16 +1775,14 @@ describe('FilterEditorComponent', () => {
     const datesDropdown = fixture.debugElement.query(
       By.directive(DatesDropdownComponent)
     )
-    const dateCreatedBeforeRelativeButton = datesDropdown.queryAll(
-      By.css('button')
-    )[1]
-    dateCreatedBeforeRelativeButton.triggerEventHandler('click')
+    component.dateAddedRelativeDate = RelativeDate.WITHIN_1_WEEK
+    datesDropdown.triggerEventHandler('datesSet')
     fixture.detectChanges()
     tick(400)
     expect(component.filterRules).toEqual([
       {
         rule_type: FILTER_FULLTEXT_QUERY,
-        value: 'foo,created:[-1 week to now]',
+        value: 'foo,added:[-1 week to now]',
       },
     ])
   }))

@@ -1,15 +1,3 @@
-autolabeler:
-  - label: "bug"
-    branch:
-      - '/^fix/'
-    title:
-      - "/^fix/i"
-      - "/^Bugfix/i"
-  - label: "enhancement"
-    branch:
-      - '/^feature/'
-    title:
-      - "/^feature/i"
 categories:
   - title: 'Breaking Changes'
     labels:
@@ -17,7 +5,7 @@ categories:
   - title: 'Notable Changes'
     labels:
       - 'notable'
-  - title: 'Features'
+  - title: 'Features / Enhancements'
     labels:
       - 'enhancement'
   - title: 'Bug Fixes'

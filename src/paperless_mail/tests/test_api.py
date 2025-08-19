@@ -680,3 +680,44 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
         self.assertEqual(response.data["results"][0]["name"], rule1.name)
         self.assertEqual(response.data["results"][1]["name"], rule2.name)
         self.assertEqual(response.data["results"][2]["name"], rule4.name)
+
+    def test_mailrule_maxage_validation(self):
+        """
+        GIVEN:
+            - An existing mail account
+        WHEN:
+            - The user submits a mail rule with an excessively large maximum_age
+        THEN:
+            - The API should reject the request
+        """
+        account = MailAccount.objects.create(
+            name="Email1",
+            username="username1",
+            password="password1",
+            imap_server="server.example.com",
+            imap_port=443,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            character_set="UTF-8",
+        )
+
+        rule_data = {
+            "name": "Rule1",
+            "account": account.pk,
+            "folder": "INBOX",
+            "filter_from": "from@example.com",
+            "filter_to": "aperson@aplace.com",
+            "filter_subject": "subject",
+            "filter_body": "body",
+            "filter_attachment_filename_include": "file.pdf",
+            "maximum_age": 9000000,
+            "action": MailRule.MailAction.MARK_READ,
+            "assign_title_from": MailRule.TitleSource.FROM_SUBJECT,
+            "assign_correspondent_from": MailRule.CorrespondentSource.FROM_NOTHING,
+            "order": 0,
+            "attachment_type": MailRule.AttachmentProcessing.ATTACHMENTS_ONLY,
+        }
+
+        response = self.client.post(self.ENDPOINT, data=rule_data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("maximum_age", response.data)

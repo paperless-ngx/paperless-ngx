@@ -22,23 +22,17 @@
 # - Upload 'docker-compose.env' by clicking on 'Load variables from .env file'
 # - Modify the environment variables as needed
 # - Click 'Deploy the stack' and wait for it to be deployed
-# - Open the list of containers, select paperless_webserver_1
-# - Click 'Console' and then 'Connect' to open the command line inside the container
-# - Run 'python3 manage.py createsuperuser' to create a user
-# - Exit the console
 #
 # For more extensive installation and update instructions, refer to the
 # documentation.
-
 services:
   broker:
-    image: docker.io/library/redis:7
+    image: docker.io/library/redis:8
     restart: unless-stopped
     volumes:
       - redisdata:/data
-
   db:
-    image: docker.io/library/postgres:16
+    image: docker.io/library/postgres:17
     restart: unless-stopped
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -46,7 +40,6 @@ services:
       POSTGRES_DB: paperless
       POSTGRES_USER: paperless
       POSTGRES_PASSWORD: paperless
-
   webserver:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
@@ -65,7 +58,6 @@ services:
       PAPERLESS_DBHOST: db
     env_file:
       - stack.env
-
 volumes:
   data:
   media:

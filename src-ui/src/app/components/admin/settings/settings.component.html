@@ -118,7 +118,7 @@
               </div>
             </div>
 
-            <div class="row mb-3">
+            <div class="row">
               <div class="col-md-3 col-form-label pt-0">
                 <span i18n>Sidebar</span>
               </div>
@@ -129,7 +129,7 @@
               </div>
             </div>
 
-            <div class="row mb-3">
+            <div class="row">
               <div class="col-md-3 col-form-label pt-0">
                 <span i18n>Dark mode</span>
               </div>
@@ -165,7 +165,7 @@
                   <p i18n>
                     Update checking works by pinging the public GitHub API for the latest release to determine whether a new version is available. Actual updating of the app must still be performed manually.
                   </p>
-                  <p>
+                  <p class="mb-0">
                     <em i18n>No tracking data is collected by the app in any way.</em>
                   </p>
                 </ng-template>
@@ -173,9 +173,10 @@
             </div>
 
             <h5 class="mt-3" i18n>Saved Views</h5>
-            <div class="row mb-3">
+            <div class="row">
               <div class="col">
                 <pngx-input-check i18n-title title="Show warning when closing saved views with unsaved changes" formControlName="savedViewsWarnOnUnsavedChange"></pngx-input-check>
+                <pngx-input-check i18n-title title="Show document counts in sidebar saved views" formControlName="sidebarViewsShowCount"></pngx-input-check>
               </div>
             </div>
 
@@ -183,15 +184,15 @@
           <div class="col-xl-6 ps-xl-5">
             <h5 class="mt-3 mt-md-0" i18n>Document editing</h5>
 
-            <div class="row mb-3">
+            <div class="row">
               <div class="col">
                 <pngx-input-check i18n-title title="Use PDF viewer provided by the browser" i18n-hint hint="This is usually faster for displaying large PDF documents, but it might not work on some browsers." formControlName="useNativePdfViewer"></pngx-input-check>
               </div>
             </div>
 
-            <div class="row mb-3">
-              <div class="col-2">
-                <span i18n>Default zoom:</span>
+            <div class="row">
+              <div class="col-md-3 col-form-label pt-0">
+                <span i18n>Default zoom</span>
               </div>
               <div class="col">
                 <select class="form-select" formControlName="pdfViewerDefaultZoom">
@@ -202,7 +203,7 @@
               </div>
             </div>
 
-            <div class="row mb-3">
+            <div class="row">
               <div class="col">
                 <pngx-input-check i18n-title title="Automatically remove inbox tag(s) on save" formControlName="documentEditingRemoveInboxTags"></pngx-input-check>
               </div>
@@ -214,10 +215,22 @@
               </div>
             </div>
 
-            <h5 class="mt-3" i18n>Notes</h5>
-            <div class="row mb-3">
+            <h5 class="mt-3" i18n>Global search</h5>
+            <div class="row">
               <div class="col">
-                <pngx-input-check i18n-title title="Enable notes" formControlName="notesEnabled"></pngx-input-check>
+                <pngx-input-check i18n-title title="Do not include advanced search results" formControlName="searchDbOnly"></pngx-input-check>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-3 col-form-label pt-0">
+                <span i18n>Full search links to</span>
+              </div>
+              <div class="col mb-3">
+                <select class="form-select" formControlName="searchLink">
+                  <option [ngValue]="GlobalSearchType.TITLE_CONTENT" i18n>Title and content search</option>
+                  <option [ngValue]="GlobalSearchType.ADVANCED" i18n>Advanced search</option>
+                </select>
               </div>
             </div>
 
@@ -229,26 +242,10 @@
               </div>
             </div>
 
-            <h5 class="mt-3" i18n>Global search</h5>
+            <h5 class="mt-3" i18n>Notes</h5>
             <div class="row mb-3">
               <div class="col">
-                <pngx-input-check i18n-title title="Do not include advanced search results" formControlName="searchDbOnly"></pngx-input-check>
-              </div>
-            </div>
-
-            <div class="row mb-3">
-              <div class="col">
-                <div class="row">
-                  <div class="col-md-3 col-form-label pt-0">
-                    <span i18n>Full search links to</span>
-                  </div>
-                  <div class="col">
-                    <select class="form-select" formControlName="searchLink">
-                      <option [ngValue]="GlobalSearchType.TITLE_CONTENT" i18n>Title and content search</option>
-                      <option [ngValue]="GlobalSearchType.ADVANCED" i18n>Advanced search</option>
-                    </select>
-                  </div>
-                </div>
+                <pngx-input-check i18n-title title="Enable notes" formControlName="notesEnabled"></pngx-input-check>
               </div>
             </div>
 
@@ -267,8 +264,8 @@
         <div class="row mb-3">
           <div class="col">
             <p i18n>
-            Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI
-          </p>
+              Settings apply to this user account for objects (Tags, Mail Rules, etc. but not documents) created via the web UI.
+            </p>
           </div>
         </div>
         <div class="row mb-3">
@@ -307,7 +304,7 @@
             </div>
           </div>
         </div>
-        <div class="row mb-3">
+        <div class="row">
           <div class="col-md-3 col-form-label pt-0">
             <span i18n>Default Edit Permissions</span>
           </div>
@@ -346,7 +343,7 @@
 
         <h5 i18n>Document processing</h5>
 
-        <div class="row mb-3">
+        <div class="row">
           <div class="col">
             <pngx-input-check i18n-title title="Show notifications when new documents are detected" formControlName="notificationsConsumerNewDocument"></pngx-input-check>
             <pngx-input-check i18n-title title="Show notifications when document processing completes successfully" formControlName="notificationsConsumerSuccess"></pngx-input-check>
@@ -361,6 +358,6 @@
 
   <div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>
 
-  <button type="submit" class="btn btn-primary mb-2" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
-  <button type="button" (click)="reset()" class="btn btn-secondary ms-2 mb-2" [disabled]="(isDirty$ | async) === false" i18n>Cancel</button>
+  <button type="button" (click)="reset()" class="btn btn-outline-secondary mb-2" [disabled]="(isDirty$ | async) === false" i18n>Cancel</button>
+  <button type="submit" class="btn btn-primary ms-2 mb-2" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
 </form>

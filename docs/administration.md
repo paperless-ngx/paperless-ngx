@@ -179,9 +179,13 @@ following:
 
 ### Database Upgrades
 
-In general, paperless does not require a specific version of PostgreSQL or MariaDB and it is
+Paperless-ngx is compatible with Django-supported versions of PostgreSQL and MariaDB and it is generally
 safe to update them to newer versions. However, you should always take a backup and follow
 the instructions from your database's documentation for how to upgrade between major versions.
+
+!!! note
+
+    As of Paperless-ngx v2.18, the minimum supported version of PostgreSQL is 14.
 
 For PostgreSQL, refer to [Upgrading a PostgreSQL Cluster](https://www.postgresql.org/docs/current/upgrading.html).
 
@@ -306,7 +310,7 @@ in dedicated folders according to their nature: `archive`, `originals`,
 If `-sm` or `--split-manifest` is provided, information about document
 will be placed in individual json files, instead of a single JSON file. The main
 manifest.json will still contain application wide information (e.g. tags, correspondent,
-documenttype, etc)
+document type, etc)
 
 If `-z` or `--zip` is provided, the export will be a zip file
 in the target directory, named according to the current local date or the
@@ -333,7 +337,7 @@ must be provided to import. If this value is lost, the export cannot be imported
 The document importer takes the export produced by the [Document
 exporter](#exporter) and imports it into paperless.
 
-The importer works just like the exporter. You point it at a directory,
+The importer works just like the exporter. You point it at a directory or the generated .zip file,
 and the script does the rest of the work:
 
 ```shell
@@ -350,9 +354,6 @@ document_importer source
 When you use the provided docker compose script, put the export inside
 the `export` folder in your paperless source directory. Specify
 `../export` as the `source`.
-
-Note that .zip files (as can be generated from the exporter) are not supported. You must unzip them into
-the target directory first.
 
 !!! note
 
@@ -460,6 +461,22 @@ of the index and usually makes queries faster and also ensures that the
 autocompletion works properly. This command is regularly invoked by the
 task scheduler.
 
+### Clearing the database read cache
+
+If the database read cache is enabled, **you must run this command** after making any changes to the database outside the application context.
+This includes operations such as restoring a database backup or executing SQL statements like UPDATE, INSERT, DELETE, ALTER, CREATE, or DROP.
+
+Failing to invalidate the cache after such modifications can lead to stale data being served from the cache, and **may cause data corruption** or inconsistent behavior in the application.
+
+Use the following management command to clear the cache:
+
+```
+invalidate_cachalot
+```
+
+!!! info
+The database read cache is based on Django-Cachalot. You can refer to their [documentation](https://django-cachalot.readthedocs.io/en/latest/quickstart.html#manage-py-command).
+
 ### Managing filenames {#renamer}
 
 If you use paperless' feature to
@@ -565,19 +582,15 @@ document.
 
 ### Managing encryption {#encryption}
 
-Documents can be stored in Paperless using GnuPG encryption.
-
 !!! warning
 
-    Encryption is deprecated since [paperless-ng 0.9](changelog.md#paperless-ng-090) and doesn't really
-    provide any additional security, since you have to store the passphrase
-    in a configuration file on the same system as the encrypted documents
-    for paperless to work. Furthermore, the entire text content of the
-    documents is stored plain in the database, even if your documents are
-    encrypted. Filenames are not encrypted as well.
-
-    Also, the web server provides transparent access to your encrypted
-    documents.
+    Encryption was removed in [paperless-ng 0.9](changelog.md#paperless-ng-090)
+    because it did not really provide any additional security, the passphrase
+    was stored in a configuration file on the same system as the documents.
+    Furthermore, the entire text content of the documents is stored plain in
+    the database, even if your documents are encrypted. Filenames are not
+    encrypted as well. Finally, the web server provides transparent access to
+    your encrypted documents.
 
     Consider running paperless on an encrypted filesystem instead, which
     will then at least provide security against physical hardware theft.
@@ -632,4 +645,12 @@ entries created prior to this are not removed. This command allows you to prune 
 
 ```shell
 prune_audit_logs
+```
+
+### Create superuser {#create-superuser}
+
+If you need to create a superuser, use the following command:
+
+```shell
+createsuperuser
 ```

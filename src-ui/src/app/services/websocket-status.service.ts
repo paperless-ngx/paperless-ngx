@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { Subject } from 'rxjs'
 import { environment } from 'src/environments/environment'
+import { User } from '../data/user'
 import { WebsocketDocumentsDeletedMessage } from '../data/websocket-documents-deleted-message'
 import { WebsocketProgressMessage } from '../data/websocket-progress-message'
 import { SettingsService } from './settings.service'
@@ -92,7 +93,7 @@ export class FileStatus {
   providedIn: 'root',
 })
 export class WebsocketStatusService {
-  constructor(private settingsService: SettingsService) {}
+  private settingsService = inject(SettingsService)
 
   private statusWebSocket: WebSocket
 
@@ -173,13 +174,25 @@ export class WebsocketStatusService {
     }
   }
 
+  private canViewMessage(messageData: WebsocketProgressMessage): boolean {
+    // see paperless.consumers.StatusConsumer._can_view
+    const user: User = this.settingsService.currentUser
+    return (
+      !messageData.owner_id ||
+      user.is_superuser ||
+      (messageData.owner_id && messageData.owner_id === user.id) ||
+      (messageData.users_can_view &&
+        messageData.users_can_view.includes(user.id)) ||
+      (messageData.groups_can_view &&
+        messageData.groups_can_view.some((groupId) =>
+          user.groups?.includes(groupId)
+        ))
+    )
+  }
+
   handleProgressUpdate(messageData: WebsocketProgressMessage) {
     // fallback if backend didn't restrict message
-    if (
-      messageData.owner_id &&
-      messageData.owner_id !== this.settingsService.currentUser?.id &&
-      !this.settingsService.currentUser?.is_superuser
-    ) {
+    if (!this.canViewMessage(messageData)) {
       return
     }
 

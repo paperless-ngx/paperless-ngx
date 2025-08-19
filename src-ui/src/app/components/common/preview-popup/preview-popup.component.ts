@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Component, Input, OnDestroy, ViewChild } from '@angular/core'
+import { Component, inject, Input, OnDestroy, ViewChild } from '@angular/core'
 import { NgbPopover, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
 import { PdfViewerComponent, PdfViewerModule } from 'ng2-pdf-viewer'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -24,6 +24,10 @@ import { SettingsService } from 'src/app/services/settings.service'
   ],
 })
 export class PreviewPopupComponent implements OnDestroy {
+  private settingsService = inject(SettingsService)
+  private documentService = inject(DocumentService)
+  private http = inject(HttpClient)
+
   private _document: Document
   @Input()
   set document(document: Document) {
@@ -81,12 +85,6 @@ export class PreviewPopupComponent implements OnDestroy {
       this.document?.mime_type?.includes('pdf')
     )
   }
-
-  constructor(
-    private settingsService: SettingsService,
-    private documentService: DocumentService,
-    private http: HttpClient
-  ) {}
 
   ngOnDestroy(): void {
     this.unsubscribeNotifier.next(this)

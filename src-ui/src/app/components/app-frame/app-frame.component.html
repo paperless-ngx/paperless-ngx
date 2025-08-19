@@ -15,7 +15,7 @@
     </svg>
     <div class="ms-2 ms-md-3 d-inline-block" [class.d-md-none]="slimSidebarEnabled">
       @if (customAppTitle?.length) {
-        <div class="d-flex flex-column align-items-start">
+        <div class="d-flex flex-column align-items-start custom-title">
           <span class="title">{{customAppTitle}}</span>
           <span class="byline text-uppercase font-monospace" i18n>by Paperless-ngx</span>
         </div>
@@ -108,11 +108,19 @@
                 <li class="nav-item w-100 app-link" cdkDrag [cdkDragDisabled]="!settingsService.organizingSidebarSavedViews"
                   cdkDragPreviewContainer="parent" cdkDragPreviewClass="navItemDrag" (cdkDragStarted)="onDragStart($event)"
                   (cdkDragEnded)="onDragEnd($event)">
-                  <a class="nav-link" [class.text-truncate]="!slimSidebarEnabled" routerLink="view/{{view.id}}"
+                  <a class="nav-link" routerLink="view/{{view.id}}"
                     routerLinkActive="active" (click)="closeMenu()" [ngbPopover]="view.name"
                     [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave"
                     popoverClass="popover-slim">
-                    <i-bs class="me-1" name="funnel"></i-bs><span>&nbsp;{{view.name}}</span>
+                    <i-bs class="me-1" name="funnel"></i-bs>
+                      <span>&nbsp;<div class="d-inline-flex view-name"><span [class.text-truncate]="!slimSidebarEnabled">{{view.name}}</span></div>
+                        @if (showSidebarCounts && !slimSidebarEnabled) {
+                          <span class="badge bg-info text-dark ms-2 d-inline">{{ savedViewService.getDocumentCount(view) }}</span>
+                        }
+                      </span>
+                    @if (showSidebarCounts && slimSidebarEnabled) {
+                      <span class="badge bg-info text-dark position-absolute top-0 end-0 d-none d-md-block">{{ savedViewService.getDocumentCount(view) }}</span>
+                    }
                   </a>
                   @if (settingsService.organizingSidebarSavedViews) {
                     <div class="position-absolute end-0 top-0 px-3 py-2" [class.me-n3]="slimSidebarEnabled" cdkDragHandle>

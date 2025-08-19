@@ -9,7 +9,7 @@ if find /run/s6/container_environment/*"_FILE" -maxdepth 1 > /dev/null 2>&1; the
 	for FILENAME in /run/s6/container_environment/*; do
 		if [[ "${FILENAME##*/}" == PAPERLESS_*_FILE ]]; then
 			# This should have been named different..
-			if [[ ${FILENAME} == "PAPERLESS_OCR_SKIP_ARCHIVE_FILE" || ${FILENAME} == "PAPERLESS_MODEL_FILE" ]]; then
+			if [[ "${FILENAME##*/}" == "PAPERLESS_OCR_SKIP_ARCHIVE_FILE" || "${FILENAME##*/}" == "PAPERLESS_MODEL_FILE" ]]; then
 				continue
 			fi
 			SECRETFILE=$(cat "${FILENAME}")
@@ -17,6 +17,9 @@ if find /run/s6/container_environment/*"_FILE" -maxdepth 1 > /dev/null 2>&1; the
 			if [[ -f ${SECRETFILE} ]]; then
 				# Trim off trailing _FILE
 				FILESTRIP=${FILENAME//_FILE/}
+				if [[ $(tail -n1 "${SECRETFILE}" | wc -l) != 0 ]]; then
+					echo "${log_prefix} Your secret: ${FILENAME##*/} contains a trailing newline and may not work as expected"
+				fi
 				# Set environment variable
 				cat "${SECRETFILE}" > "${FILESTRIP}"
 				echo "${log_prefix} ${FILESTRIP##*/} set from ${FILENAME##*/}"

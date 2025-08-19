@@ -2,7 +2,6 @@ import datetime
 from datetime import timedelta
 from unittest import mock
 
-import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
@@ -623,8 +622,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0], b"auto")
 
-    @pytest.mark.skip(reason="Not implemented yet")
-    def test_search_spelling_correction(self):
+    def test_search_spelling_suggestion(self):
         with AsyncWriter(index.open_index()) as writer:
             for i in range(55):
                 doc = Document.objects.create(
@@ -635,15 +633,35 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
                 )
                 index.update_document(writer, doc)
 
-        response = self.client.get("/api/search/?query=thing")
+        response = self.client.get("/api/documents/?query=thing")
         correction = response.data["corrected_query"]
 
         self.assertEqual(correction, "things")
 
-        response = self.client.get("/api/search/?query=things")
+        response = self.client.get("/api/documents/?query=things")
         correction = response.data["corrected_query"]
 
         self.assertEqual(correction, None)
+
+    @mock.patch(
+        "whoosh.searching.Searcher.correct_query",
+        side_effect=Exception("Test error"),
+    )
+    def test_corrected_query_error(self, mock_correct_query):
+        """
+        GIVEN:
+            - A query that raises an error on correction
+        WHEN:
+            - API request for search with that query
+        THEN:
+            - The error is logged and the search proceeds
+        """
+        with self.assertLogs("paperless.index", level="INFO") as cm:
+            response = self.client.get("/api/documents/?query=2025-06-04")
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            error_str = cm.output[0]
+            expected_str = "Error while correcting query '2025-06-04': Test error"
+            self.assertIn(expected_str, error_str)
 
     def test_search_more_like(self):
         """
@@ -721,7 +739,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         d3.tags.add(t2)
         d4 = Document.objects.create(
             checksum="4",
-            created=timezone.make_aware(datetime.datetime(2020, 7, 13)),
+            created=datetime.date(2020, 7, 13),
             content="test",
             original_filename="doc4.pdf",
         )

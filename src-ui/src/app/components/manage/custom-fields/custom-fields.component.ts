@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, inject } from '@angular/core'
 import {
   NgbDropdownModule,
   NgbModal,
@@ -16,6 +16,8 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
+import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
@@ -40,18 +42,16 @@ export class CustomFieldsComponent
   extends LoadingComponentWithPermissions
   implements OnInit
 {
-  public fields: CustomField[] = []
+  private customFieldsService = inject(CustomFieldsService)
+  permissionsService = inject(PermissionsService)
+  private modalService = inject(NgbModal)
+  private toastService = inject(ToastService)
+  private documentListViewService = inject(DocumentListViewService)
+  private settingsService = inject(SettingsService)
+  private documentService = inject(DocumentService)
+  private savedViewService = inject(SavedViewService)
 
-  constructor(
-    private customFieldsService: CustomFieldsService,
-    public permissionsService: PermissionsService,
-    private modalService: NgbModal,
-    private toastService: ToastService,
-    private documentListViewService: DocumentListViewService,
-    private settingsService: SettingsService
-  ) {
-    super()
-  }
+  public fields: CustomField[] = []
 
   ngOnInit() {
     this.reload()
@@ -85,6 +85,7 @@ export class CustomFieldsComponent
         this.toastService.showInfo($localize`Saved field "${newField.name}".`)
         this.customFieldsService.clearCache()
         this.settingsService.initializeDisplayFields()
+        this.documentService.reload()
         this.reload()
       })
     modal.componentInstance.failed
@@ -111,6 +112,8 @@ export class CustomFieldsComponent
           this.toastService.showInfo($localize`Deleted field "${field.name}"`)
           this.customFieldsService.clearCache()
           this.settingsService.initializeDisplayFields()
+          this.documentService.reload()
+          this.savedViewService.reload()
           this.reload()
         },
         error: (e) => {

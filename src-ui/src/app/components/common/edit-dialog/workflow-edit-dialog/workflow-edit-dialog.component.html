@@ -123,7 +123,15 @@
       <p class="small" i18n>Set scheduled trigger offset and which date field to use.</p>
       <div class="row">
         <div class="col-4">
-          <pngx-input-number i18n-title title="Offset days" formControlName="schedule_offset_days" [showAdd]="false" [error]="error?.schedule_offset_days"></pngx-input-number>
+          <pngx-input-number
+            i18n-title
+            title="Offset days"
+            formControlName="schedule_offset_days"
+            [showAdd]="false"
+            [error]="error?.schedule_offset_days"
+            hint="Positive values will trigger after the date, negative values before."
+            i18n-hint
+          ></pngx-input-number>
         </div>
         <div class="col-4">
           <pngx-input-select i18n-title title="Relative to" formControlName="schedule_date_field" [items]="scheduleDateFieldOptions" [error]="error?.schedule_date_field"></pngx-input-select>
@@ -189,6 +197,7 @@
             <pngx-input-select i18n-title title="Assign correspondent" [items]="correspondents" [allowNull]="true" formControlName="assign_correspondent"></pngx-input-select>
             <pngx-input-select i18n-title title="Assign storage path" [items]="storagePaths" [allowNull]="true" formControlName="assign_storage_path"></pngx-input-select>
             <pngx-input-select i18n-title title="Assign custom fields" multiple="true" [items]="customFields" [allowNull]="true" formControlName="assign_custom_fields"></pngx-input-select>
+            <pngx-input-custom-fields-values formControlName="assign_custom_fields_values" [selectedFields]="formGroup.get('assign_custom_fields').value" (removeSelectedField)="removeSelectedCustomField($event, formGroup)"></pngx-input-custom-fields-values>
           </div>
           <div class="col">
             <pngx-input-select i18n-title title="Assign owner" [items]="users" bindLabel="username" formControlName="assign_owner" [allowNull]="true"></pngx-input-select>

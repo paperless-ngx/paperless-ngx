@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import hashlib
 import itertools
 import logging
 import tempfile
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Literal
 
 from celery import chain
@@ -10,7 +13,6 @@ from celery import chord
 from celery import group
 from celery import shared_task
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.db.models import Q
 from django.utils import timezone
 
@@ -29,6 +31,9 @@ from documents.plugins.helpers import DocumentsStatusManager
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
 from documents.tasks import update_document_content_maybe_archive_file
+
+if TYPE_CHECKING:
+    from django.contrib.auth.models import User
 
 logger: logging.Logger = logging.getLogger("paperless.bulk_edit")
 
@@ -202,6 +207,12 @@ def modify_custom_fields(
                     custom_field.data_type
                 ]
                 defaults[value_field] = value
+                if (
+                    custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK
+                    and doc_id in value
+                ):
+                    # Prevent self-linking
+                    continue
             CustomFieldInstance.objects.update_or_create(
                 document_id=doc_id,
                 field_id=field_id,
@@ -341,6 +352,7 @@ def merge(
     *,
     metadata_document_id: int | None = None,
     delete_originals: bool = False,
+    archive_fallback: bool = False,
     user: User | None = None,
 ) -> Literal["OK"]:
     logger.info(
@@ -356,7 +368,14 @@ def merge(
     for doc_id in doc_ids:
         doc = qs.get(id=doc_id)
         try:
-            with pikepdf.open(str(doc.source_path)) as pdf:
+            doc_path = (
+                doc.archive_path
+                if archive_fallback
+                and doc.mime_type != "application/pdf"
+                and doc.has_archive_version
+                else doc.source_path
+            )
+            with pikepdf.open(str(doc_path)) as pdf:
                 version = max(version, pdf.pdf_version)
                 merged_pdf.pages.extend(pdf.pages)
             affected_docs.append(doc.id)
@@ -372,7 +391,7 @@ def merge(
         Path(
             tempfile.mkdtemp(dir=settings.SCRATCH_DIR),
         )
-        / f"{'_'.join([str(doc_id) for doc_id in doc_ids])[:100]}_merged.pdf"
+        / f"{'_'.join([str(doc_id) for doc_id in affected_docs])[:100]}_merged.pdf"
     )
     merged_pdf.remove_unreferenced_resources()
     merged_pdf.save(filepath, min_version=version)
@@ -502,6 +521,103 @@ def delete_pages(doc_ids: list[int], pages: list[int]) -> Literal["OK"]:
             logger.info(f"Deleted pages {pages} from document {doc.id}")
     except Exception as e:
         logger.exception(f"Error deleting pages from document {doc.id}: {e}")
+
+    return "OK"
+
+
+def edit_pdf(
+    doc_ids: list[int],
+    operations: list[dict],
+    *,
+    delete_original: bool = False,
+    update_document: bool = False,
+    include_metadata: bool = True,
+    user: User | None = None,
+) -> Literal["OK"]:
+    """
+    Operations is a list of dictionaries describing the final PDF pages.
+    Each entry must contain the original page number in `page` and may
+    specify `rotate` in degrees and `doc` indicating the output
+    document index (for splitting). Pages omitted from the list are
+    discarded.
+    """
+
+    logger.info(
+        f"Editing PDF of document {doc_ids[0]} with {len(operations)} operations",
+    )
+    doc = Document.objects.get(id=doc_ids[0])
+    import pikepdf
+
+    pdf_docs: list[pikepdf.Pdf] = []
+
+    try:
+        with pikepdf.open(doc.source_path) as src:
+            # prepare output documents
+            max_idx = max(op.get("doc", 0) for op in operations)
+            pdf_docs = [pikepdf.new() for _ in range(max_idx + 1)]
+
+            if update_document and len(pdf_docs) > 1:
+                logger.error(
+                    "Update requested but multiple output documents specified",
+                )
+                raise ValueError("Multiple output documents specified")
+
+            for op in operations:
+                dst = pdf_docs[op.get("doc", 0)]
+                page = src.pages[op["page"] - 1]
+                dst.pages.append(page)
+                if op.get("rotate"):
+                    dst.pages[-1].rotate(op["rotate"], relative=True)
+
+        if update_document:
+            temp_path = doc.source_path.with_suffix(".tmp.pdf")
+            pdf = pdf_docs[0]
+            pdf.remove_unreferenced_resources()
+            # save the edited PDF to a temporary file in case of errors
+            pdf.save(temp_path)
+            # replace the original document with the edited one
+            temp_path.replace(doc.source_path)
+            doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
+            doc.page_count = len(pdf.pages)
+            doc.save()
+            update_document_content_maybe_archive_file.delay(document_id=doc.id)
+        else:
+            consume_tasks = []
+            overrides = (
+                DocumentMetadataOverrides().from_document(doc)
+                if include_metadata
+                else DocumentMetadataOverrides()
+            )
+            if user is not None:
+                overrides.owner_id = user.id
+
+            for idx, pdf in enumerate(pdf_docs, start=1):
+                filepath: Path = (
+                    Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
+                    / f"{doc.id}_edit_{idx}.pdf"
+                )
+                pdf.remove_unreferenced_resources()
+                pdf.save(filepath)
+                consume_tasks.append(
+                    consume_file.s(
+                        ConsumableDocument(
+                            source=DocumentSource.ConsumeFolder,
+                            original_file=filepath,
+                        ),
+                        overrides,
+                    ),
+                )
+
+            if delete_original:
+                chord(header=consume_tasks, body=delete.si([doc.id])).delay()
+            else:
+                group(consume_tasks).delay()
+
+    except Exception as e:
+        logger.exception(f"Error editing document {doc.id}: {e}")
+        raise ValueError(
+            f"An error occurred while editing the document: {e}",
+        ) from e
 
     return "OK"
 

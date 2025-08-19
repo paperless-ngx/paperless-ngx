@@ -11,9 +11,10 @@ printf "/usr/src/paperless/src" > /var/run/s6/container_environment/PAPERLESS_SR
 echo $(date +%s) > /var/run/s6/container_environment/PAPERLESS_START_TIME_S
 
 # Check if we're starting as a non-root user
-if [ $(id -u) == $(id -u paperless) ]; then
+if [ "$(id --user)" != "0" ]; then
 	printf "true" > /var/run/s6/container_environment/USER_IS_NON_ROOT
-	echo "${log_prefix}  paperless-ngx docker container running under a user"
+	echo "${log_prefix} paperless-ngx docker container running under a user ($(id --user):$(id --group))"
 else
-	echo "${log_prefix}  paperless-ngx docker container starting init as root"
+	printf "/usr/src/paperless" > /var/run/s6/container_environment/HOME
+	echo "${log_prefix} paperless-ngx docker container starting init as root"
 fi

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, inject } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -34,16 +34,12 @@ export class WorkflowsComponent
   extends LoadingComponentWithPermissions
   implements OnInit
 {
-  public workflows: Workflow[] = []
+  private workflowService = inject(WorkflowService)
+  permissionsService = inject(PermissionsService)
+  private modalService = inject(NgbModal)
+  private toastService = inject(ToastService)
 
-  constructor(
-    private workflowService: WorkflowService,
-    public permissionsService: PermissionsService,
-    private modalService: NgbModal,
-    private toastService: ToastService
-  ) {
-    super()
-  }
+  public workflows: Workflow[] = []
 
   ngOnInit() {
     this.reload()

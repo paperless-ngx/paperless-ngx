@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-27 08:19-0800\n"
-"PO-Revision-Date: 2025-01-27 16:20\n"
+"POT-Creation-Date: 2025-08-16 14:34+0000\n"
+"PO-Revision-Date: 2025-08-17 20:45\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -21,1138 +21,1182 @@ msgstr ""
 msgid "Documents"
 msgstr "Belgeler"
 
-#: documents/filters.py:344
+#: documents/filters.py:384
 msgid "Value must be valid JSON."
 msgstr "Değer geçerli bir JSON olmalıdır."
 
-#: documents/filters.py:363
+#: documents/filters.py:403
 msgid "Invalid custom field query expression"
-msgstr ""
+msgstr "Geçersiz özel alan sorgu ifadesi"
 
-#: documents/filters.py:373
+#: documents/filters.py:413
 msgid "Invalid expression list. Must be nonempty."
-msgstr ""
+msgstr "Geçersiz ifade listesi. Boş olmamalıdır."
 
-#: documents/filters.py:394
+#: documents/filters.py:434
 msgid "Invalid logical operator {op!r}"
-msgstr ""
+msgstr "Geçersiz mantıksal işleç {op!r}"
 
-#: documents/filters.py:408
+#: documents/filters.py:448
 msgid "Maximum number of query conditions exceeded."
-msgstr ""
+msgstr "En çok sorgu koşulu sayısı aşıldı."
 
-#: documents/filters.py:473
+#: documents/filters.py:513
 msgid "{name!r} is not a valid custom field."
-msgstr ""
+msgstr "{name!r} geçerli bir özel alan değil."
 
-#: documents/filters.py:510
+#: documents/filters.py:550
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr ""
+msgstr "{data_type}, {expr!r} sorgu ifadesini desteklemiyor."
 
-#: documents/filters.py:618
+#: documents/filters.py:658
 msgid "Maximum nesting depth exceeded."
-msgstr ""
+msgstr "En çok iç içe geçme izni aşıldı."
 
-#: documents/filters.py:785
+#: documents/filters.py:843
 msgid "Custom field not found"
-msgstr ""
+msgstr "Özel alan bulunamadı"
 
-#: documents/models.py:41 documents/models.py:801
+#: documents/models.py:36 documents/models.py:713
 msgid "owner"
 msgstr "sahibi"
 
-#: documents/models.py:58 documents/models.py:1012
+#: documents/models.py:53 documents/models.py:924
 msgid "None"
 msgstr "Hiçbiri"
 
-#: documents/models.py:59 documents/models.py:1013
+#: documents/models.py:54 documents/models.py:925
 msgid "Any word"
-msgstr "Herhangi bir kelime"
+msgstr "Herhangi bir sözcük"
 
-#: documents/models.py:60 documents/models.py:1014
+#: documents/models.py:55 documents/models.py:926
 msgid "All words"
-msgstr "Tüm Kelimeler"
+msgstr "Tüm sözcükler"
 
-#: documents/models.py:61 documents/models.py:1015
+#: documents/models.py:56 documents/models.py:927
 msgid "Exact match"
 msgstr "Tam eşleşme"
 
-#: documents/models.py:62 documents/models.py:1016
+#: documents/models.py:57 documents/models.py:928
 msgid "Regular expression"
 msgstr "Düzenli ifade"
 
-#: documents/models.py:63 documents/models.py:1017
+#: documents/models.py:58 documents/models.py:929
 msgid "Fuzzy word"
-msgstr "Bulanık kelime"
+msgstr "Bulanık sözcük"
 
-#: documents/models.py:64
+#: documents/models.py:59
 msgid "Automatic"
 msgstr "Otomatik"
 
-#: documents/models.py:67 documents/models.py:433 documents/models.py:1493
-#: paperless_mail/models.py:23 paperless_mail/models.py:136
+#: documents/models.py:62 documents/models.py:401 documents/models.py:1419
+#: paperless_mail/models.py:23 paperless_mail/models.py:143
 msgid "name"
 msgstr "ad"
 
-#: documents/models.py:69 documents/models.py:1080
+#: documents/models.py:64 documents/models.py:993
 msgid "match"
-msgstr "eşleme"
+msgstr "eşleşme"
 
-#: documents/models.py:72 documents/models.py:1083
+#: documents/models.py:67 documents/models.py:996
 msgid "matching algorithm"
 msgstr "eşleştirme algoritması"
 
-#: documents/models.py:77 documents/models.py:1088
+#: documents/models.py:72 documents/models.py:1001
 msgid "is insensitive"
 msgstr "duyarsızdır"
 
-#: documents/models.py:100 documents/models.py:151
+#: documents/models.py:95 documents/models.py:146
 msgid "correspondent"
-msgstr "kâtip"
+msgstr "muhatap"
 
-#: documents/models.py:101
+#: documents/models.py:96
 msgid "correspondents"
-msgstr "kâtipler"
+msgstr "muhataplar"
 
-#: documents/models.py:105
+#: documents/models.py:100
 msgid "color"
 msgstr "renk"
 
-#: documents/models.py:108
+#: documents/models.py:103
 msgid "is inbox tag"
-msgstr "gelen kutu etiketidir"
+msgstr "gelen kutusu etiketi"
 
-#: documents/models.py:111
+#: documents/models.py:106
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
 msgstr "Bu etiketi, gelen kutusu etiketi olarak işaretle: Yeni aktarılan tüm dokümanlar gelen kutusu etiketi ile etiketlendirileceklerdir."
 
-#: documents/models.py:117
+#: documents/models.py:112
 msgid "tag"
 msgstr "etiket"
 
-#: documents/models.py:118 documents/models.py:189
+#: documents/models.py:113 documents/models.py:184
 msgid "tags"
 msgstr "etiketler"
 
-#: documents/models.py:123 documents/models.py:171
+#: documents/models.py:118 documents/models.py:166
 msgid "document type"
 msgstr "belge türü"
 
-#: documents/models.py:124
+#: documents/models.py:119
 msgid "document types"
 msgstr "belge türleri"
 
-#: documents/models.py:129
+#: documents/models.py:124
 msgid "path"
 msgstr "dizin"
 
-#: documents/models.py:133 documents/models.py:160
+#: documents/models.py:128 documents/models.py:155
 msgid "storage path"
 msgstr "depolama dizini"
 
-#: documents/models.py:134
+#: documents/models.py:129
 msgid "storage paths"
 msgstr "depolama dizinleri"
 
-#: documents/models.py:141
+#: documents/models.py:136
 msgid "Unencrypted"
 msgstr "Şifresiz"
 
-#: documents/models.py:142
+#: documents/models.py:137
 msgid "Encrypted with GNU Privacy Guard"
 msgstr "GNU Gizlilik Koruması ile şifrelendirilmiştir"
 
-#: documents/models.py:163
+#: documents/models.py:158
 msgid "title"
 msgstr "başlık"
 
-#: documents/models.py:175 documents/models.py:715
+#: documents/models.py:170 documents/models.py:627
 msgid "content"
 msgstr "içerik"
 
-#: documents/models.py:178
+#: documents/models.py:173
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
 msgstr "Belgenin ham, yalnızca metin verileri. Bu alan öncelikle arama için kullanılır."
 
-#: documents/models.py:183
+#: documents/models.py:178
 msgid "mime type"
-msgstr "mime türü"
+msgstr "MIME türü"
 
-#: documents/models.py:193
+#: documents/models.py:188
 msgid "checksum"
 msgstr "sağlama toplamı"
 
-#: documents/models.py:197
+#: documents/models.py:192
 msgid "The checksum of the original document."
-msgstr "Orjinal belgenin sağlama toplamı."
+msgstr "Özgün belgenin sağlama toplamı."
 
-#: documents/models.py:201
+#: documents/models.py:196
 msgid "archive checksum"
 msgstr "arşiv sağlama toplamı"
 
-#: documents/models.py:206
+#: documents/models.py:201
 msgid "The checksum of the archived document."
 msgstr "Arşivlenen belgenin sağlama toplamı."
 
-#: documents/models.py:210
+#: documents/models.py:205
 msgid "page count"
 msgstr "sayfa sayısı"
 
-#: documents/models.py:217
+#: documents/models.py:212
 msgid "The number of pages of the document."
-msgstr ""
+msgstr "Belgedeki sayfaların sayısı."
 
-#: documents/models.py:221 documents/models.py:401 documents/models.py:721
-#: documents/models.py:759 documents/models.py:830 documents/models.py:888
+#: documents/models.py:217 documents/models.py:633 documents/models.py:671
+#: documents/models.py:742 documents/models.py:800
 msgid "created"
 msgstr "oluşturuldu"
 
-#: documents/models.py:224
+#: documents/models.py:223
 msgid "modified"
-msgstr "değiştirilmiş"
+msgstr "değiştirildi"
 
-#: documents/models.py:231
+#: documents/models.py:230
 msgid "storage type"
 msgstr "depolama türü"
 
-#: documents/models.py:239
+#: documents/models.py:238
 msgid "added"
 msgstr "eklendi"
 
-#: documents/models.py:246
+#: documents/models.py:245
 msgid "filename"
 msgstr "dosya adı"
 
-#: documents/models.py:252
+#: documents/models.py:251
 msgid "Current filename in storage"
 msgstr "Depolamadaki geçerli dosya adı"
 
-#: documents/models.py:256
+#: documents/models.py:255
 msgid "archive filename"
 msgstr "arşiv dosya adı"
 
-#: documents/models.py:262
+#: documents/models.py:261
 msgid "Current archive filename in storage"
 msgstr "Depolamadaki geçerli arşiv dosya adı"
 
-#: documents/models.py:266
+#: documents/models.py:265
 msgid "original filename"
 msgstr "özgün dosya adı"
 
-#: documents/models.py:272
+#: documents/models.py:271
 msgid "The original name of the file when it was uploaded"
 msgstr "Yüklendiğindeki özgün dosya adı"
 
-#: documents/models.py:279
+#: documents/models.py:278
 msgid "archive serial number"
 msgstr "arşiv seri numarası"
 
-#: documents/models.py:289
+#: documents/models.py:288
 msgid "The position of this document in your physical document archive."
 msgstr "Bu belgenin fiziksel belge arşivinizdeki konumu."
 
-#: documents/models.py:295 documents/models.py:732 documents/models.py:786
-#: documents/models.py:1536
+#: documents/models.py:294 documents/models.py:644 documents/models.py:698
+#: documents/models.py:1462
 msgid "document"
 msgstr "belge"
 
-#: documents/models.py:296
+#: documents/models.py:295
 msgid "documents"
 msgstr "belgeler"
 
-#: documents/models.py:384
-msgid "debug"
-msgstr "hata ayıklama"
-
-#: documents/models.py:385
-msgid "information"
-msgstr "bilgi"
-
-#: documents/models.py:386
-msgid "warning"
-msgstr "uyarı"
-
-#: documents/models.py:387 paperless_mail/models.py:350
-msgid "error"
-msgstr "hata"
-
-#: documents/models.py:388
-msgid "critical"
-msgstr "kritik"
-
-#: documents/models.py:391
-msgid "group"
-msgstr "grup"
-
-#: documents/models.py:393
-msgid "message"
-msgstr "ileti"
-
-#: documents/models.py:396
-msgid "level"
-msgstr "düzey"
-
-#: documents/models.py:405
-msgid "log"
-msgstr "günlük"
-
-#: documents/models.py:406
-msgid "logs"
-msgstr "günlükler"
-
-#: documents/models.py:414
+#: documents/models.py:382
 msgid "Table"
 msgstr "Tablo"
 
-#: documents/models.py:415
+#: documents/models.py:383
 msgid "Small Cards"
 msgstr "Küçük Kartlar"
 
-#: documents/models.py:416
+#: documents/models.py:384
 msgid "Large Cards"
 msgstr "Büyük kartlar"
 
-#: documents/models.py:419
+#: documents/models.py:387
 msgid "Title"
 msgstr "Başlık"
 
-#: documents/models.py:420 documents/models.py:1032
+#: documents/models.py:388 documents/models.py:945
 msgid "Created"
 msgstr "Oluşturuldu"
 
-#: documents/models.py:421 documents/models.py:1031
+#: documents/models.py:389 documents/models.py:944
 msgid "Added"
 msgstr "Eklendi"
 
-#: documents/models.py:422
+#: documents/models.py:390
 msgid "Tags"
-msgstr "Etiketler"
+msgstr "Künyeler"
 
-#: documents/models.py:423
+#: documents/models.py:391
 msgid "Correspondent"
-msgstr "Muhabirler"
+msgstr "Muhatap"
 
-#: documents/models.py:424
+#: documents/models.py:392
 msgid "Document Type"
-msgstr "Döküman tipi"
+msgstr "Döküman Türü"
 
-#: documents/models.py:425
+#: documents/models.py:393
 msgid "Storage Path"
 msgstr "Dosya yolu"
 
-#: documents/models.py:426
+#: documents/models.py:394
 msgid "Note"
 msgstr "Not"
 
-#: documents/models.py:427
+#: documents/models.py:395
 msgid "Owner"
 msgstr "Sahip"
 
-#: documents/models.py:428
+#: documents/models.py:396
 msgid "Shared"
 msgstr "Paylaşıldı"
 
-#: documents/models.py:429
+#: documents/models.py:397
 msgid "ASN"
 msgstr "ASN"
 
-#: documents/models.py:430
+#: documents/models.py:398
 msgid "Pages"
-msgstr ""
+msgstr "Sayfalar"
 
-#: documents/models.py:436
+#: documents/models.py:404
 msgid "show on dashboard"
-msgstr "kontrol panelinde göster"
+msgstr "gösterge tablosunda göster"
 
-#: documents/models.py:439
+#: documents/models.py:407
 msgid "show in sidebar"
 msgstr "kenar çubuğunda göster"
 
-#: documents/models.py:443
+#: documents/models.py:411
 msgid "sort field"
 msgstr "alan ile sırala"
 
-#: documents/models.py:448
+#: documents/models.py:416
 msgid "sort reverse"
 msgstr "tersine sırala"
 
-#: documents/models.py:451
+#: documents/models.py:419
 msgid "View page size"
-msgstr "Dosya Boyutu"
+msgstr "Dosya boyutunu görüntüle"
 
-#: documents/models.py:459
+#: documents/models.py:427
 msgid "View display mode"
-msgstr "Ekran Modunu İzle"
+msgstr "Ekran kipini görüntüle"
 
-#: documents/models.py:466
+#: documents/models.py:434
 msgid "Document display fields"
-msgstr "Döküman izleme sahaları"
+msgstr "Belge görüntüleme alanları"
 
-#: documents/models.py:473 documents/models.py:531
+#: documents/models.py:441 documents/models.py:504
 msgid "saved view"
 msgstr "kaydedilen görünüm"
 
-#: documents/models.py:474
+#: documents/models.py:442
 msgid "saved views"
 msgstr "kaydedilen görünümler"
 
-#: documents/models.py:482
+#: documents/models.py:450
 msgid "title contains"
 msgstr "başlık şunu içerir"
 
-#: documents/models.py:483
+#: documents/models.py:451
 msgid "content contains"
 msgstr "içerik şunu içerir"
 
-#: documents/models.py:484
+#: documents/models.py:452
 msgid "ASN is"
 msgstr "ASN ise"
 
-#: documents/models.py:485
+#: documents/models.py:453
 msgid "correspondent is"
-msgstr "muhatap ise"
+msgstr "muhatap"
 
-#: documents/models.py:486
+#: documents/models.py:454
 msgid "document type is"
 msgstr "belge türü ise"
 
-#: documents/models.py:487
+#: documents/models.py:455
 msgid "is in inbox"
-msgstr "gelen kutusunun içinde"
+msgstr "gelen kutusunda"
 
-#: documents/models.py:488
+#: documents/models.py:456
 msgid "has tag"
-msgstr "etiketine sahip"
+msgstr "şu künyesi var"
 
-#: documents/models.py:489
+#: documents/models.py:457
 msgid "has any tag"
-msgstr "herhangi bir etiketine sahip"
+msgstr "herhangi bir künyesi var"
 
-#: documents/models.py:490
+#: documents/models.py:458
 msgid "created before"
 msgstr "bu tarihten önce oluşturuldu"
 
-#: documents/models.py:491
+#: documents/models.py:459
 msgid "created after"
 msgstr "bu tarihten sonra oluşturuldu"
 
-#: documents/models.py:492
+#: documents/models.py:460
 msgid "created year is"
-msgstr "oluşturma yili ise"
+msgstr "oluşturma yılı"
 
-#: documents/models.py:493
+#: documents/models.py:461
 msgid "created month is"
-msgstr "oluşturma ayı ise"
+msgstr "oluşturulma ayı"
 
-#: documents/models.py:494
+#: documents/models.py:462
 msgid "created day is"
-msgstr "oluşturma günü ise"
+msgstr "oluşturma günü"
 
-#: documents/models.py:495
+#: documents/models.py:463
 msgid "added before"
 msgstr "bu tarihten önce eklendi"
 
-#: documents/models.py:496
+#: documents/models.py:464
 msgid "added after"
 msgstr "bu tarihten sonra eklendi"
 
-#: documents/models.py:497
+#: documents/models.py:465
 msgid "modified before"
 msgstr "bu tarihten önce değiştirldi"
 
-#: documents/models.py:498
+#: documents/models.py:466
 msgid "modified after"
 msgstr "bu tarihten sonra değiştirldi"
 
-#: documents/models.py:499
+#: documents/models.py:467
 msgid "does not have tag"
-msgstr "etikete sahip değil"
+msgstr "künyeye sahip değil"
 
-#: documents/models.py:500
+#: documents/models.py:468
 msgid "does not have ASN"
-msgstr "ASN'ye sahip değil"
+msgstr "ASN yok"
 
-#: documents/models.py:501
+#: documents/models.py:469
 msgid "title or content contains"
-msgstr "başlik veya içerik içerir"
+msgstr "başlık veya içerik şunu içerir"
 
-#: documents/models.py:502
+#: documents/models.py:470
 msgid "fulltext query"
 msgstr "tam metin sorgulama"
 
-#: documents/models.py:503
+#: documents/models.py:471
 msgid "more like this"
 msgstr "benzer listele"
 
-#: documents/models.py:504
+#: documents/models.py:472
 msgid "has tags in"
 msgstr "içerisinde etiketine sahip"
 
-#: documents/models.py:505
+#: documents/models.py:473
 msgid "ASN greater than"
 msgstr "ASN şundan daha büyük"
 
-#: documents/models.py:506
+#: documents/models.py:474
 msgid "ASN less than"
 msgstr "ASN şundan daha küçük"
 
-#: documents/models.py:507
+#: documents/models.py:475
 msgid "storage path is"
-msgstr "depolama yolu ise"
+msgstr "depolama yolu"
 
-#: documents/models.py:508
+#: documents/models.py:476
 msgid "has correspondent in"
-msgstr "muhabiri var"
+msgstr "şurada muhatabı var"
 
-#: documents/models.py:509
+#: documents/models.py:477
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "şurada muhatabı yok"
 
-#: documents/models.py:510
+#: documents/models.py:478
 msgid "has document type in"
 msgstr "belge türüne şurada sahip"
 
-#: documents/models.py:511
+#: documents/models.py:479
 msgid "does not have document type in"
 msgstr "belge türüne şurada sahip değil"
 
-#: documents/models.py:512
+#: documents/models.py:480
 msgid "has storage path in"
 msgstr "şurada depolama yolu mevcut"
 
-#: documents/models.py:513
+#: documents/models.py:481
 msgid "does not have storage path in"
 msgstr "şurada depolama yolu yok"
 
-#: documents/models.py:514
+#: documents/models.py:482
 msgid "owner is"
 msgstr "sahibi"
 
-#: documents/models.py:515
+#: documents/models.py:483
 msgid "has owner in"
 msgstr "şurada sahibi"
 
-#: documents/models.py:516
+#: documents/models.py:484
 msgid "does not have owner"
 msgstr "sahipsiz"
 
-#: documents/models.py:517
+#: documents/models.py:485
 msgid "does not have owner in"
-msgstr "şurada sahibi yoktur"
+msgstr "şurada sahibi yok"
 
-#: documents/models.py:518
+#: documents/models.py:486
 msgid "has custom field value"
-msgstr "özel veritabanı sahası var"
+msgstr "özel alan değeri var"
 
-#: documents/models.py:519
+#: documents/models.py:487
 msgid "is shared by me"
-msgstr "bu benimle paylaşıldı"
+msgstr "benimle paylaşıldı"
 
-#: documents/models.py:520
+#: documents/models.py:488
 msgid "has custom fields"
-msgstr "özel veritabanı sahası var"
+msgstr "özel veritabanı alanı var"
 
-#: documents/models.py:521
+#: documents/models.py:489
 msgid "has custom field in"
-msgstr "içinde özel saha var"
+msgstr "içinde özel alan var"
 
-#: documents/models.py:522
+#: documents/models.py:490
 msgid "does not have custom field in"
 msgstr "özel saha tanımlı değil"
 
-#: documents/models.py:523
+#: documents/models.py:491
 msgid "does not have custom field"
-msgstr ""
+msgstr "özel alan yok"
 
-#: documents/models.py:524
+#: documents/models.py:492
 msgid "custom fields query"
-msgstr ""
+msgstr "özel alan sorgusu"
 
-#: documents/models.py:534
+#: documents/models.py:493
+msgid "created to"
+msgstr "şuna oluşturuldu"
+
+#: documents/models.py:494
+msgid "created from"
+msgstr "şundan oluşturuldu"
+
+#: documents/models.py:495
+msgid "added to"
+msgstr "şuna eklendi"
+
+#: documents/models.py:496
+msgid "added from"
+msgstr "şundan eklendi"
+
+#: documents/models.py:497
+msgid "mime type is"
+msgstr "MIME türü şu"
+
+#: documents/models.py:507
 msgid "rule type"
 msgstr "kural türü"
 
-#: documents/models.py:536
+#: documents/models.py:509
 msgid "value"
 msgstr "değer"
 
-#: documents/models.py:539
+#: documents/models.py:512
 msgid "filter rule"
-msgstr "filtreleme kuralı"
+msgstr "süzgeç kuralı"
 
-#: documents/models.py:540
+#: documents/models.py:513
 msgid "filter rules"
-msgstr "filtreleme kuralları"
+msgstr "süzgeç kuralları"
 
-#: documents/models.py:651
+#: documents/models.py:537
+msgid "Auto Task"
+msgstr "Otomatik Görev"
+
+#: documents/models.py:538
+msgid "Scheduled Task"
+msgstr "Planlı Görev"
+
+#: documents/models.py:539
+msgid "Manual Task"
+msgstr "Elle Ayarlı Görev"
+
+#: documents/models.py:542
+msgid "Consume File"
+msgstr "Dosyayı İşle"
+
+#: documents/models.py:543
+msgid "Train Classifier"
+msgstr "Eğitim Sınıflandırıcısı"
+
+#: documents/models.py:544
+msgid "Check Sanity"
+msgstr "Geçerliliği kontrol edin"
+
+#: documents/models.py:545
+msgid "Index Optimize"
+msgstr "İndeksleri Optimize Et"
+
+#: documents/models.py:550
 msgid "Task ID"
-msgstr "Görev kimliği"
+msgstr "Görev Kimliği"
 
-#: documents/models.py:652
+#: documents/models.py:551
 msgid "Celery ID for the Task that was run"
-msgstr "Görevler için yürütülen Celery ID"
+msgstr "Çalıştırılan görev için olan Celery kimliği"
 
-#: documents/models.py:657
+#: documents/models.py:556
 msgid "Acknowledged"
 msgstr "Onaylandı"
 
-#: documents/models.py:658
+#: documents/models.py:557
 msgid "If the task is acknowledged via the frontend or API"
-msgstr ""
+msgstr "Eğer görev önyüz veya API tarafından onaylanırsa"
 
-#: documents/models.py:664
+#: documents/models.py:563
 msgid "Task Filename"
-msgstr "Görev dosya adı"
+msgstr "Görev Dosya Adı"
 
-#: documents/models.py:665
+#: documents/models.py:564
 msgid "Name of the file which the Task was run for"
-msgstr ""
+msgstr "Görevin çalıştığı dosyanın adı"
 
-#: documents/models.py:671
+#: documents/models.py:571
 msgid "Task Name"
-msgstr "Görev adı"
+msgstr "Görev Adı"
 
-#: documents/models.py:672
-msgid "Name of the Task which was run"
-msgstr ""
+#: documents/models.py:572
+msgid "Name of the task that was run"
+msgstr "Çalışan görevin adı"
 
-#: documents/models.py:679
+#: documents/models.py:579
 msgid "Task State"
 msgstr "Görev Durumu"
 
-#: documents/models.py:680
+#: documents/models.py:580
 msgid "Current state of the task being run"
-msgstr ""
+msgstr "Çalıştırılan görevin mevcut durumu"
 
-#: documents/models.py:685
+#: documents/models.py:586
 msgid "Created DateTime"
-msgstr "Oluşturulan tarih saat"
+msgstr "Oluşturulan Tarih ve Zaman"
 
-#: documents/models.py:686
+#: documents/models.py:587
 msgid "Datetime field when the task result was created in UTC"
-msgstr ""
+msgstr "Görev sonucunun UTC'de oluşturulduğu tarih ve saat alanı"
 
-#: documents/models.py:691
+#: documents/models.py:593
 msgid "Started DateTime"
-msgstr "Başlangıç saati zamanı"
+msgstr "Başlangıç Tarihi ve Zamanı"
 
-#: documents/models.py:692
+#: documents/models.py:594
 msgid "Datetime field when the task was started in UTC"
-msgstr ""
+msgstr "Görevin UTC saatine göre başlatıldığı tarih ve saat alanı"
 
-#: documents/models.py:697
+#: documents/models.py:600
 msgid "Completed DateTime"
-msgstr ""
+msgstr "Tamamlanma tarih ve saati"
 
-#: documents/models.py:698
+#: documents/models.py:601
 msgid "Datetime field when the task was completed in UTC"
-msgstr ""
+msgstr "Görev UTC saatine göre tamamlandığı tarih ve saat alanı"
 
-#: documents/models.py:703
+#: documents/models.py:607
 msgid "Result Data"
-msgstr "Sonuç veri"
+msgstr "Sonuç Verisi"
 
-#: documents/models.py:705
+#: documents/models.py:609
 msgid "The data returned by the task"
-msgstr "Gören veriyi geri çevirdi"
+msgstr "Görevin döndürdüğü veri"
 
-#: documents/models.py:717
+#: documents/models.py:617
+msgid "Task Type"
+msgstr "Görev Tipi"
+
+#: documents/models.py:618
+msgid "The type of task that was run"
+msgstr "Çalıştırılan görev tipi"
+
+#: documents/models.py:629
 msgid "Note for the document"
-msgstr "Döküman için not"
+msgstr "Belge için olan not"
 
-#: documents/models.py:741
+#: documents/models.py:653
 msgid "user"
 msgstr "kullanıcı"
 
-#: documents/models.py:746
+#: documents/models.py:658
 msgid "note"
 msgstr "not"
 
-#: documents/models.py:747
+#: documents/models.py:659
 msgid "notes"
 msgstr "notlar"
 
-#: documents/models.py:755
+#: documents/models.py:667
 msgid "Archive"
 msgstr "Arşiv"
 
-#: documents/models.py:756
+#: documents/models.py:668
 msgid "Original"
-msgstr "Orjinal"
+msgstr "Özgün"
 
-#: documents/models.py:767 paperless_mail/models.py:75
+#: documents/models.py:679 paperless_mail/models.py:75
 msgid "expiration"
 msgstr "süre sonu"
 
-#: documents/models.py:774
+#: documents/models.py:686
 msgid "slug"
-msgstr ""
+msgstr "kısaltma"
 
-#: documents/models.py:806
+#: documents/models.py:718
 msgid "share link"
 msgstr "bağlantıyı paylaş"
 
-#: documents/models.py:807
+#: documents/models.py:719
 msgid "share links"
 msgstr "bağlantıları paylaş"
 
-#: documents/models.py:819
+#: documents/models.py:731
 msgid "String"
-msgstr "Değer"
+msgstr "Dizi"
 
-#: documents/models.py:820
+#: documents/models.py:732
 msgid "URL"
 msgstr "URL"
 
-#: documents/models.py:821
+#: documents/models.py:733
 msgid "Date"
 msgstr "Tarih"
 
-#: documents/models.py:822
+#: documents/models.py:734
 msgid "Boolean"
-msgstr ""
+msgstr "Evet/Hayır"
 
-#: documents/models.py:823
+#: documents/models.py:735
 msgid "Integer"
-msgstr ""
+msgstr "Tam sayı"
 
-#: documents/models.py:824
+#: documents/models.py:736
 msgid "Float"
-msgstr ""
+msgstr "Ondalıklı sayı"
 
-#: documents/models.py:825
+#: documents/models.py:737
 msgid "Monetary"
 msgstr "Parasal"
 
-#: documents/models.py:826
+#: documents/models.py:738
 msgid "Document Link"
-msgstr ""
+msgstr "Belge Bağlantısı"
 
-#: documents/models.py:827
+#: documents/models.py:739
 msgid "Select"
 msgstr "Seç"
 
-#: documents/models.py:839
+#: documents/models.py:751
 msgid "data type"
-msgstr "veri tipi"
+msgstr "veri türü"
 
-#: documents/models.py:846
+#: documents/models.py:758
 msgid "extra data"
 msgstr "ekstra veri"
 
-#: documents/models.py:850
+#: documents/models.py:762
 msgid "Extra data for the custom field, such as select options"
 msgstr "Seçenekler gibi özel alan için ekstra veriler"
 
-#: documents/models.py:856
+#: documents/models.py:768
 msgid "custom field"
-msgstr ""
+msgstr "özel alan"
 
-#: documents/models.py:857
+#: documents/models.py:769
 msgid "custom fields"
 msgstr "özel alanlar"
 
-#: documents/models.py:954
+#: documents/models.py:866
 msgid "custom field instance"
-msgstr ""
+msgstr "özel alan değeri"
 
-#: documents/models.py:955
+#: documents/models.py:867
 msgid "custom field instances"
-msgstr ""
+msgstr "özel alan değerleri"
 
-#: documents/models.py:1020
+#: documents/models.py:932
 msgid "Consumption Started"
-msgstr ""
+msgstr "İşleme başladı"
 
-#: documents/models.py:1021
+#: documents/models.py:933
 msgid "Document Added"
-msgstr ""
+msgstr "Belge eklendi"
 
-#: documents/models.py:1022
+#: documents/models.py:934
 msgid "Document Updated"
 msgstr "Belge Güncellendi"
 
-#: documents/models.py:1023
+#: documents/models.py:935
 msgid "Scheduled"
-msgstr ""
+msgstr "Zamanlanmış"
+
+#: documents/models.py:938
+msgid "Consume Folder"
+msgstr "İşlenecek Klasör"
+
+#: documents/models.py:939
+msgid "Api Upload"
+msgstr "API yükle"
+
+#: documents/models.py:940
+msgid "Mail Fetch"
+msgstr "Posta Yükle"
+
+#: documents/models.py:941
+msgid "Web UI"
+msgstr "Web Arayüzü"
+
+#: documents/models.py:946
+msgid "Modified"
+msgstr "Değiştirilmiş"
+
+#: documents/models.py:947
+msgid "Custom Field"
+msgstr "Özel Alan"
+
+#: documents/models.py:950
+msgid "Workflow Trigger Type"
+msgstr "İş Akışı Tetikleyici Tipi"
+
+#: documents/models.py:962
+msgid "filter path"
+msgstr "filtre yolu"
+
+#: documents/models.py:967
+msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
+msgstr "Belirtilmişse, yalnızca bu ile eşleşen bir yola sahip belgeler işlenecektir. * olarak belirtilen joker karakterlere izin verilir. Büyük/küçük harf duyarlı değildir."
+
+#: documents/models.py:974
+msgid "filter filename"
+msgstr "dosya adını süz"
+
+#: documents/models.py:979 paperless_mail/models.py:200
+msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr "Yalnızca belirtilmişse bu dosya adıyla tamamen eşleşen belgeleri tüketin. *.pdf veya *fatura* gibi joker karakterlere izin verilir. BÜYÜK/küçük harf duyarsızdır."
+
+#: documents/models.py:990
+msgid "filter documents from this mail rule"
+msgstr "bu posta kuralından belgeleri filtrele"
+
+#: documents/models.py:1006
+msgid "has these tag(s)"
+msgstr "bu etiket(ler) e sahiptir"
+
+#: documents/models.py:1014
+msgid "has this document type"
+msgstr "bu doküman tipindedir"
+
+#: documents/models.py:1022
+msgid "has this correspondent"
+msgstr "bu muhatap var"
 
 #: documents/models.py:1026
-msgid "Consume Folder"
-msgstr ""
+msgid "schedule offset days"
+msgstr "kayma günlerini planla"
 
-#: documents/models.py:1027
-msgid "Api Upload"
-msgstr ""
-
-#: documents/models.py:1028
-msgid "Mail Fetch"
-msgstr ""
-
-#: documents/models.py:1033
-msgid "Modified"
-msgstr ""
+#: documents/models.py:1029
+msgid "The number of days to offset the schedule trigger by."
+msgstr "Program tetikleyicisini dengelemek için gereken gün sayısı."
 
 #: documents/models.py:1034
-msgid "Custom Field"
-msgstr ""
+msgid "schedule is recurring"
+msgstr "program tekrarlanıyor"
 
 #: documents/models.py:1037
-msgid "Workflow Trigger Type"
-msgstr ""
-
-#: documents/models.py:1049
-msgid "filter path"
-msgstr ""
-
-#: documents/models.py:1054
-msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
-
-#: documents/models.py:1061
-msgid "filter filename"
-msgstr "dosya adı ara"
-
-#: documents/models.py:1066 paperless_mail/models.py:193
-msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr "Yalnızca belirtilmişse bu dosya ismiyla tamamen eşleşen belgeleri tüket. *.pdf veya *fatura* gibi joker karakterlere izin verilir. Büyük küçük yazılımına duyarsız."
-
-#: documents/models.py:1077
-msgid "filter documents from this mail rule"
-msgstr ""
-
-#: documents/models.py:1093
-msgid "has these tag(s)"
-msgstr ""
-
-#: documents/models.py:1101
-msgid "has this document type"
-msgstr ""
-
-#: documents/models.py:1109
-msgid "has this correspondent"
-msgstr ""
-
-#: documents/models.py:1113
-msgid "schedule offset days"
-msgstr ""
-
-#: documents/models.py:1116
-msgid "The number of days to offset the schedule trigger by."
-msgstr ""
-
-#: documents/models.py:1121
-msgid "schedule is recurring"
-msgstr ""
-
-#: documents/models.py:1124
 msgid "If the schedule should be recurring."
-msgstr ""
+msgstr "Programın tekrarlı olması gerekiyorsa."
 
-#: documents/models.py:1129
+#: documents/models.py:1042
 msgid "schedule recurring delay in days"
-msgstr ""
+msgstr "gün olarak tekrar eden plan gecikmesi"
 
-#: documents/models.py:1133
+#: documents/models.py:1046
 msgid "The number of days between recurring schedule triggers."
-msgstr ""
+msgstr "Tekrarlayan zamanlama tetikleyicileri arasındaki gün sayısı."
 
-#: documents/models.py:1138
+#: documents/models.py:1051
 msgid "schedule date field"
-msgstr ""
+msgstr "planlama tarih alanı"
 
-#: documents/models.py:1143
+#: documents/models.py:1056
 msgid "The field to check for a schedule trigger."
-msgstr ""
+msgstr "Zamanlama tetikleyicisini kontrol etmek için kullanılan alan."
 
-#: documents/models.py:1152
+#: documents/models.py:1065
 msgid "schedule date custom field"
-msgstr ""
+msgstr "program tarihi özel alanı"
+
+#: documents/models.py:1069
+msgid "workflow trigger"
+msgstr "iş akışı tetikleyicisi"
+
+#: documents/models.py:1070
+msgid "workflow triggers"
+msgstr "iş akışı tetikleyicileri"
+
+#: documents/models.py:1078
+msgid "email subject"
+msgstr "e-posta konusu"
+
+#: documents/models.py:1082
+msgid "The subject of the email, can include some placeholders, see documentation."
+msgstr "E-postanın konusu, bazı yer tutucular içerebilir, belgelere bakın."
+
+#: documents/models.py:1088
+msgid "email body"
+msgstr "e-posta gövdesi"
+
+#: documents/models.py:1091
+msgid "The body (message) of the email, can include some placeholders, see documentation."
+msgstr "E-postanın konusu, bazı yer tutucular içerebilir, belgelere bakın."
+
+#: documents/models.py:1097
+msgid "emails to"
+msgstr "kime"
+
+#: documents/models.py:1100
+msgid "The destination email addresses, comma separated."
+msgstr "Hedef e-posta adresleri, virgülle ayrılmış."
+
+#: documents/models.py:1106
+msgid "include document in email"
+msgstr "belgeyi e-postaya ekle"
+
+#: documents/models.py:1117
+msgid "webhook url"
+msgstr "webhook url"
+
+#: documents/models.py:1120
+msgid "The destination URL for the notification."
+msgstr "Bildirimin hedef URL'si."
+
+#: documents/models.py:1125
+msgid "use parameters"
+msgstr "parametreleri kullan"
+
+#: documents/models.py:1130
+msgid "send as JSON"
+msgstr "JSON formatında gönder"
+
+#: documents/models.py:1134
+msgid "webhook parameters"
+msgstr "webhook parametreleri"
+
+#: documents/models.py:1137
+msgid "The parameters to send with the webhook URL if body not used."
+msgstr "Gövde kullanılmadığında webhook URL'si ile birlikte gönderilecek parametreler."
+
+#: documents/models.py:1141
+msgid "webhook body"
+msgstr "webhook gövdesi"
+
+#: documents/models.py:1144
+msgid "The body to send with the webhook URL if parameters not used."
+msgstr "Parametreler kullanılmadığında webhook URL'si ile birlikte gönderilecek gövde."
+
+#: documents/models.py:1148
+msgid "webhook headers"
+msgstr "webhook başlıkları"
+
+#: documents/models.py:1151
+msgid "The headers to send with the webhook URL."
+msgstr "Webhook URL'si ile birlikte gönderilecek başlıklar."
 
 #: documents/models.py:1156
-msgid "workflow trigger"
-msgstr ""
-
-#: documents/models.py:1157
-msgid "workflow triggers"
-msgstr ""
-
-#: documents/models.py:1165
-msgid "email subject"
-msgstr ""
-
-#: documents/models.py:1169
-msgid "The subject of the email, can include some placeholders, see documentation."
-msgstr ""
-
-#: documents/models.py:1175
-msgid "email body"
-msgstr ""
-
-#: documents/models.py:1178
-msgid "The body (message) of the email, can include some placeholders, see documentation."
-msgstr ""
-
-#: documents/models.py:1184
-msgid "emails to"
-msgstr ""
-
-#: documents/models.py:1187
-msgid "The destination email addresses, comma separated."
-msgstr ""
-
-#: documents/models.py:1193
-msgid "include document in email"
-msgstr ""
-
-#: documents/models.py:1202
-msgid "webhook url"
-msgstr ""
-
-#: documents/models.py:1204
-msgid "The destination URL for the notification."
-msgstr ""
-
-#: documents/models.py:1209
-msgid "use parameters"
-msgstr ""
-
-#: documents/models.py:1214
-msgid "send as JSON"
-msgstr ""
-
-#: documents/models.py:1218
-msgid "webhook parameters"
-msgstr ""
-
-#: documents/models.py:1221
-msgid "The parameters to send with the webhook URL if body not used."
-msgstr ""
-
-#: documents/models.py:1225
-msgid "webhook body"
-msgstr ""
-
-#: documents/models.py:1228
-msgid "The body to send with the webhook URL if parameters not used."
-msgstr ""
-
-#: documents/models.py:1232
-msgid "webhook headers"
-msgstr ""
-
-#: documents/models.py:1235
-msgid "The headers to send with the webhook URL."
-msgstr ""
-
-#: documents/models.py:1240
 msgid "include document in webhook"
-msgstr ""
+msgstr "belgeyi webhook içine dahil et"
 
-#: documents/models.py:1251
+#: documents/models.py:1167
 msgid "Assignment"
-msgstr ""
+msgstr "Atama"
 
-#: documents/models.py:1255
+#: documents/models.py:1171
 msgid "Removal"
-msgstr ""
+msgstr "Kaldırma"
 
-#: documents/models.py:1259 documents/templates/account/password_reset.html:15
+#: documents/models.py:1175 documents/templates/account/password_reset.html:15
 msgid "Email"
 msgstr "E-posta"
 
-#: documents/models.py:1263
+#: documents/models.py:1179
 msgid "Webhook"
-msgstr ""
+msgstr "Webhook"
 
-#: documents/models.py:1267
+#: documents/models.py:1183
 msgid "Workflow Action Type"
-msgstr ""
+msgstr "Webhook Aksiyon Tipi"
 
-#: documents/models.py:1273
+#: documents/models.py:1189
 msgid "assign title"
-msgstr "başlık at"
+msgstr "başlık ata"
 
-#: documents/models.py:1278
+#: documents/models.py:1194
 msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr ""
+msgstr "Belgeye bir başlık atayın, bazı yer tutucular içerebilir, belgelere bakın."
 
-#: documents/models.py:1287 paperless_mail/models.py:261
+#: documents/models.py:1203 paperless_mail/models.py:274
 msgid "assign this tag"
-msgstr "bu etiketi atan"
+msgstr "bu künyeyi ata"
 
-#: documents/models.py:1296 paperless_mail/models.py:269
+#: documents/models.py:1212 paperless_mail/models.py:282
 msgid "assign this document type"
-msgstr "bu dosya türünü atan"
+msgstr "bu dosya türünü ata"
 
-#: documents/models.py:1305 paperless_mail/models.py:283
+#: documents/models.py:1221 paperless_mail/models.py:296
 msgid "assign this correspondent"
-msgstr "bu muhabiri atan"
+msgstr "bu muhatabı ata"
 
-#: documents/models.py:1314
+#: documents/models.py:1230
 msgid "assign this storage path"
-msgstr ""
+msgstr "bu depolama yolunu atayın"
 
-#: documents/models.py:1323
+#: documents/models.py:1239
 msgid "assign this owner"
-msgstr ""
+msgstr "bu sahibi ata"
 
-#: documents/models.py:1330
+#: documents/models.py:1246
 msgid "grant view permissions to these users"
 msgstr "bu kullanıcılara görüntüleme izni ver"
 
-#: documents/models.py:1337
+#: documents/models.py:1253
 msgid "grant view permissions to these groups"
-msgstr ""
+msgstr "bu gruplara görüntüleme izni ver"
 
-#: documents/models.py:1344
+#: documents/models.py:1260
 msgid "grant change permissions to these users"
 msgstr "bu kullanıcılara değişiklik yapma izni ver"
 
-#: documents/models.py:1351
+#: documents/models.py:1267
 msgid "grant change permissions to these groups"
 msgstr "bu gruplara değişiklik yapma izni ver"
 
-#: documents/models.py:1358
+#: documents/models.py:1274
 msgid "assign these custom fields"
-msgstr ""
+msgstr "bu özel alanları atayın"
+
+#: documents/models.py:1278
+msgid "custom field values"
+msgstr "özel alan değerleri"
+
+#: documents/models.py:1282
+msgid "Optional values to assign to the custom fields."
+msgstr "Özel alanlara atanacak isteğe bağlı değerler."
+
+#: documents/models.py:1291
+msgid "remove these tag(s)"
+msgstr "bu künye(ler)i kaldır"
+
+#: documents/models.py:1296
+msgid "remove all tags"
+msgstr "tüm künyeleri kaldır"
+
+#: documents/models.py:1303
+msgid "remove these document type(s)"
+msgstr "bu belge türlerini kaldırın"
+
+#: documents/models.py:1308
+msgid "remove all document types"
+msgstr "tüm belge tiplerini kaldırın"
+
+#: documents/models.py:1315
+msgid "remove these correspondent(s)"
+msgstr "bu muhatapları kaldır"
+
+#: documents/models.py:1320
+msgid "remove all correspondents"
+msgstr "tüm muhatapları kaldır"
+
+#: documents/models.py:1327
+msgid "remove these storage path(s)"
+msgstr "bu depolama yollarını kaldırın"
+
+#: documents/models.py:1332
+msgid "remove all storage paths"
+msgstr "tüm depolama yollarını kaldırın"
+
+#: documents/models.py:1339
+msgid "remove these owner(s)"
+msgstr "bu sahip(ler)i kaldır"
+
+#: documents/models.py:1344
+msgid "remove all owners"
+msgstr "tüm sahipleri kaldır"
+
+#: documents/models.py:1351
+msgid "remove view permissions for these users"
+msgstr "bu kullanıcıların görüntüleme izinlerini kaldır"
+
+#: documents/models.py:1358
+msgid "remove view permissions for these groups"
+msgstr "bu grupların görüntüleme izinlerini kaldır"
 
 #: documents/models.py:1365
-msgid "remove these tag(s)"
-msgstr "bu etiket(ler)i kaldır"
+msgid "remove change permissions for these users"
+msgstr "bu kullanıcıların değişiklik yapma izinlerini kaldır"
 
-#: documents/models.py:1370
-msgid "remove all tags"
-msgstr "tüm etiketleri kaldır"
+#: documents/models.py:1372
+msgid "remove change permissions for these groups"
+msgstr "bu grupların değişiklik yapma izinlerini kaldır"
 
 #: documents/models.py:1377
-msgid "remove these document type(s)"
-msgstr ""
+msgid "remove all permissions"
+msgstr "tüm izinleri kaldır"
 
-#: documents/models.py:1382
-msgid "remove all document types"
-msgstr ""
+#: documents/models.py:1384
+msgid "remove these custom fields"
+msgstr "bu özel alanları kaldır"
 
 #: documents/models.py:1389
-msgid "remove these correspondent(s)"
-msgstr ""
-
-#: documents/models.py:1394
-msgid "remove all correspondents"
-msgstr ""
-
-#: documents/models.py:1401
-msgid "remove these storage path(s)"
-msgstr ""
-
-#: documents/models.py:1406
-msgid "remove all storage paths"
-msgstr ""
-
-#: documents/models.py:1413
-msgid "remove these owner(s)"
-msgstr ""
-
-#: documents/models.py:1418
-msgid "remove all owners"
-msgstr ""
-
-#: documents/models.py:1425
-msgid "remove view permissions for these users"
-msgstr ""
-
-#: documents/models.py:1432
-msgid "remove view permissions for these groups"
-msgstr ""
-
-#: documents/models.py:1439
-msgid "remove change permissions for these users"
-msgstr ""
-
-#: documents/models.py:1446
-msgid "remove change permissions for these groups"
-msgstr ""
-
-#: documents/models.py:1451
-msgid "remove all permissions"
-msgstr ""
-
-#: documents/models.py:1458
-msgid "remove these custom fields"
-msgstr ""
-
-#: documents/models.py:1463
 msgid "remove all custom fields"
-msgstr ""
+msgstr "tüm özel alanları kaldır"
 
-#: documents/models.py:1472
+#: documents/models.py:1398
 msgid "email"
-msgstr ""
+msgstr "e-posta"
 
-#: documents/models.py:1481
+#: documents/models.py:1407
 msgid "webhook"
-msgstr ""
+msgstr "webhook"
 
-#: documents/models.py:1485
+#: documents/models.py:1411
 msgid "workflow action"
-msgstr ""
+msgstr "iş akışı eylemi"
 
-#: documents/models.py:1486
+#: documents/models.py:1412
 msgid "workflow actions"
-msgstr ""
+msgstr "iş akışı eylemleri"
 
-#: documents/models.py:1495 paperless_mail/models.py:138
+#: documents/models.py:1421 paperless_mail/models.py:145
 msgid "order"
 msgstr "sıra"
 
-#: documents/models.py:1501
+#: documents/models.py:1427
 msgid "triggers"
-msgstr ""
+msgstr "tetikleyiciler"
 
-#: documents/models.py:1508
+#: documents/models.py:1434
 msgid "actions"
-msgstr ""
+msgstr "eylemler"
 
-#: documents/models.py:1511 paperless_mail/models.py:147
+#: documents/models.py:1437 paperless_mail/models.py:154
 msgid "enabled"
-msgstr ""
+msgstr "etkin"
 
-#: documents/models.py:1522
+#: documents/models.py:1448
 msgid "workflow"
-msgstr ""
+msgstr "iş akışı"
 
-#: documents/models.py:1526
+#: documents/models.py:1452
 msgid "workflow trigger type"
-msgstr ""
+msgstr "iş akışı tetikleyici tipi"
 
-#: documents/models.py:1540
+#: documents/models.py:1466
 msgid "date run"
-msgstr ""
+msgstr "çalışma tarihi"
 
-#: documents/models.py:1546
+#: documents/models.py:1472
 msgid "workflow run"
-msgstr ""
+msgstr "iş akışı çalıştırma"
 
-#: documents/models.py:1547
+#: documents/models.py:1473
 msgid "workflow runs"
-msgstr ""
+msgstr "iş akışı çalıştırma"
 
-#: documents/serialisers.py:127
+#: documents/serialisers.py:139
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr "Hatalı Düzenli İfade: %(error)s"
+msgstr "Hatalı düzenli ifade: %(error)s"
 
-#: documents/serialisers.py:474
+#: documents/serialisers.py:565
 msgid "Invalid color."
 msgstr "Geçersiz renk."
 
-#: documents/serialisers.py:1559
+#: documents/serialisers.py:1700
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Dosya türü %(type)s desteklenmiyor"
 
-#: documents/serialisers.py:1648
+#: documents/serialisers.py:1794
 msgid "Invalid variable detected."
 msgstr "Geçersiz değişken algılandı."
+
+#: documents/templates/account/account_inactive.html:5
+msgid "Paperless-ngx account inactive"
+msgstr "Paperless-ngx hesabı pasif"
+
+#: documents/templates/account/account_inactive.html:9
+msgid "Account inactive."
+msgstr "Hesap etkin değil."
+
+#: documents/templates/account/account_inactive.html:14
+msgid "This account is inactive."
+msgstr "Bu hesap aktif değildir."
+
+#: documents/templates/account/account_inactive.html:16
+msgid "Return to login"
+msgstr "Oturum açmaya geri dön"
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
@@ -1176,48 +1220,48 @@ msgstr "Lütfen oturum açın."
 #: documents/templates/account/login.html:12
 #, python-format
 msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
-msgstr ""
+msgstr "Henüz hesabınız yok mu? <a href=\"%(signup_url)s\">Kaydol</a>"
 
-#: documents/templates/account/login.html:19
-#: documents/templates/account/signup.html:15
+#: documents/templates/account/login.html:25
+#: documents/templates/account/signup.html:22
 #: documents/templates/socialaccount/signup.html:13
 msgid "Username"
 msgstr "Kullanıcı Adı"
 
-#: documents/templates/account/login.html:20
-#: documents/templates/account/signup.html:17
+#: documents/templates/account/login.html:26
+#: documents/templates/account/signup.html:24
 msgid "Password"
 msgstr "Parola"
 
-#: documents/templates/account/login.html:30
+#: documents/templates/account/login.html:36
 #: documents/templates/mfa/authenticate.html:23
 msgid "Sign in"
 msgstr "Oturum aç"
 
-#: documents/templates/account/login.html:34
+#: documents/templates/account/login.html:40
 msgid "Forgot your password?"
 msgstr "Şifrenizi mi unuttunuz?"
 
-#: documents/templates/account/login.html:45
-#: documents/templates/account/signup.html:49
+#: documents/templates/account/login.html:51
+#: documents/templates/account/signup.html:57
 msgid "or sign in via"
-msgstr ""
+msgstr "veya giriş yap"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "Paperless-ngx parola sıfırlama isteği"
 
 #: documents/templates/account/password_reset.html:9
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr ""
+msgstr "Aşağıya e-posta adresinizi girin, yeni bir tane oluşturmak için gerekli talimatları e-posta ile gönderelim."
 
 #: documents/templates/account/password_reset.html:12
 msgid "An error occurred. Please try again."
-msgstr "Bir hata oluştu. Lütfen tekrar deneyin."
+msgstr "Bir hata oluştu. Lütfen yeniden deneyin."
 
 #: documents/templates/account/password_reset.html:21
 msgid "Send me instructions!"
-msgstr "Talimatları gönder!"
+msgstr "Yönergeler gönder!"
 
 #: documents/templates/account/password_reset_done.html:5
 msgid "Paperless-ngx reset password sent"
@@ -1225,15 +1269,15 @@ msgstr "Paperless-ngx sıfırlama şifresi gönderildi"
 
 #: documents/templates/account/password_reset_done.html:9
 msgid "Check your inbox."
-msgstr "Gelen kutunuzu kontrol edin."
+msgstr "Gelen kutunuza bakın."
 
 #: documents/templates/account/password_reset_done.html:13
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr ""
+msgstr "Şifrenizi ayarlamak için gerekli talimatları size e-posta ile gönderdik. E-posta kısa süre içinde elinize ulaşacaktır!"
 
 #: documents/templates/account/password_reset_from_key.html:5
 msgid "Paperless-ngx reset password confirmation"
-msgstr ""
+msgstr "Paperless-ngx şifre sıfırlama onayı"
 
 #: documents/templates/account/password_reset_from_key.html:9
 msgid "Set a new password."
@@ -1257,7 +1301,7 @@ msgstr "Parolamı değiştir"
 
 #: documents/templates/account/password_reset_from_key_done.html:5
 msgid "Paperless-ngx reset password complete"
-msgstr ""
+msgstr "Paperless-ngx şifre sıfırlama işlemi tamamlandı"
 
 #: documents/templates/account/password_reset_from_key_done.html:9
 msgid "Password reset complete."
@@ -1266,30 +1310,34 @@ msgstr "Şifre sıfırlama tamamlandı."
 #: documents/templates/account/password_reset_from_key_done.html:14
 #, python-format
 msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
-msgstr ""
+msgstr "Yeni şifreniz ayarlandı. Artık <a href=\"%(login_url)s\">giriş </a> yapabilirsiniz"
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr ""
+msgstr "Paperless-ngx kaydolun"
 
-#: documents/templates/account/signup.html:10
+#: documents/templates/account/signup.html:11
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
 msgstr "Bir hesabınız mı var? <a href=\"%(login_url)s\">Giriş yapın</a>"
 
-#: documents/templates/account/signup.html:16
+#: documents/templates/account/signup.html:19
+msgid "Note: This is the first user account for this installation and will be granted superuser privileges."
+msgstr "Not: Bu, bu kurulum için ilk kullanıcı hesabıdır ve süper kullanıcı ayrıcalıkları verilecektir."
+
+#: documents/templates/account/signup.html:23
 #: documents/templates/socialaccount/signup.html:14
 msgid "Email (optional)"
-msgstr "E-posta(opsiyonel)"
+msgstr "E-posta (opsiyonel)"
 
-#: documents/templates/account/signup.html:18
+#: documents/templates/account/signup.html:25
 msgid "Password (again)"
-msgstr ""
+msgstr "Şifre (tekrar)"
 
-#: documents/templates/account/signup.html:36
+#: documents/templates/account/signup.html:43
 #: documents/templates/socialaccount/signup.html:27
 msgid "Sign up"
-msgstr ""
+msgstr "Kayıt ol"
 
 #: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."
@@ -1301,23 +1349,23 @@ msgstr "Hâlâ burada mısınız? Hmm, bir şeyler yanlış olabilir."
 
 #: documents/templates/index.html:62
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "İşte belgelerin bağlantısı."
 
 #: documents/templates/mfa/authenticate.html:7
 msgid "Paperless-ngx Two-Factor Authentication"
-msgstr ""
+msgstr "Paperless-ngx İki Aşamalı Doğrulama"
 
 #: documents/templates/mfa/authenticate.html:12
 msgid "Your account is protected by two-factor authentication. Please enter an authenticator code:"
-msgstr ""
+msgstr "Hesabınız iki faktörlü kimlik doğrulama ile korunmaktadır. Lütfen kimlik doğrulama kodunu girin:"
 
 #: documents/templates/mfa/authenticate.html:17
 msgid "Code"
-msgstr ""
+msgstr "Kod"
 
 #: documents/templates/mfa/authenticate.html:24
 msgid "Cancel"
-msgstr ""
+msgstr "İptal Et"
 
 #: documents/templates/paperless-ngx/base.html:58
 msgid "Share link was not found."
@@ -1330,17 +1378,17 @@ msgstr "Bağlantının kullanım süresi doldu."
 #: documents/templates/socialaccount/authentication_error.html:5
 #: documents/templates/socialaccount/login.html:5
 msgid "Paperless-ngx social account sign in"
-msgstr ""
+msgstr "Paperless-ngx sosyal hesap giriş"
 
 #: documents/templates/socialaccount/authentication_error.html:10
 #, python-format
 msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
-msgstr ""
+msgstr "Sosyal ağ hesabınızla giriş yapmaya çalışırken bir hata oluştu. <a href=\"%(login_url)s\">giriş sayfasına</a> geri dönün"
 
 #: documents/templates/socialaccount/login.html:10
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
-msgstr ""
+msgstr "%(provider)s üzerinden yeni bir üçüncü taraf hesabı bağlamak üzeresiniz."
 
 #: documents/templates/socialaccount/login.html:13
 msgid "Continue"
@@ -1348,51 +1396,55 @@ msgstr "Devam et"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
-msgstr ""
+msgstr "Paperless-ngx sosyal hesap kaydı"
 
 #: documents/templates/socialaccount/signup.html:10
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr ""
+msgstr "Giriş yapmak için %(provider_name)s hesabınızı kullanmak üzeresiniz."
 
 #: documents/templates/socialaccount/signup.html:11
 msgid "As a final step, please complete the following form:"
-msgstr ""
+msgstr "Son adım olarak, lütfen aşağıdaki formu doldurun:"
 
-#: documents/validators.py:17
+#: documents/validators.py:24
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "URI {value} ayrıştırılamıyor, şema eksik"
 
-#: documents/validators.py:22
+#: documents/validators.py:29
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "URI {value} ayrıştırılamıyor, ağ konumu veya yol eksik"
 
-#: documents/validators.py:27
+#: documents/validators.py:36
+msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
+msgstr "URI şeması ‘{parts.scheme}’ izin verilmez. İzin verilen şemalar: {‘, ’.join(allowed_schemes)}"
+
+#: documents/validators.py:45
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "URI {value} işlenemiyor"
 
-#: paperless/apps.py:10
+#: paperless/apps.py:11
 msgid "Paperless"
 msgstr "Paperless"
 
 #: paperless/models.py:26
 msgid "pdf"
-msgstr ""
+msgstr "pdf"
 
 #: paperless/models.py:27
 msgid "pdfa"
-msgstr ""
+msgstr "pdf-a"
 
 #: paperless/models.py:28
 msgid "pdfa-1"
-msgstr ""
+msgstr "pdf-a1"
 
 #: paperless/models.py:29
 msgid "pdfa-2"
-msgstr ""
+msgstr "pdf-a2"
 
 #: paperless/models.py:30
 msgid "pdfa-3"
@@ -1412,7 +1464,7 @@ msgstr "zorla"
 
 #: paperless/models.py:42
 msgid "skip_noarchive"
-msgstr ""
+msgstr "skip_noarchive"
 
 #: paperless/models.py:50
 msgid "never"
@@ -1420,7 +1472,7 @@ msgstr "asla"
 
 #: paperless/models.py:51
 msgid "with_text"
-msgstr ""
+msgstr "with_text"
 
 #: paperless/models.py:52
 msgid "always"
@@ -1428,19 +1480,19 @@ msgstr "her zaman"
 
 #: paperless/models.py:60
 msgid "clean"
-msgstr ""
+msgstr "temizle"
 
 #: paperless/models.py:61
 msgid "clean-final"
-msgstr ""
+msgstr "clean-final"
 
 #: paperless/models.py:62
 msgid "none"
-msgstr ""
+msgstr "hiçbiri"
 
 #: paperless/models.py:70
 msgid "LeaveColorUnchanged"
-msgstr ""
+msgstr "RenkleriDegistirme"
 
 #: paperless/models.py:71
 msgid "RGB"
@@ -1448,7 +1500,7 @@ msgstr "RGB"
 
 #: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
-msgstr ""
+msgstr "CihazBagimsizRenginiKullan"
 
 #: paperless/models.py:73
 msgid "Gray"
@@ -1460,15 +1512,15 @@ msgstr "CMYK"
 
 #: paperless/models.py:83
 msgid "Sets the output PDF type"
-msgstr ""
+msgstr "Çıktı PDF türünü ayarlar"
 
 #: paperless/models.py:95
 msgid "Do OCR from page 1 to this value"
-msgstr ""
+msgstr "Sayfa 1'den bu değere kadar OCR yapın"
 
 #: paperless/models.py:101
 msgid "Do OCR using these languages"
-msgstr ""
+msgstr "Bu dilleri kullanarak OCR yapın"
 
 #: paperless/models.py:108
 msgid "Sets the OCR mode"
@@ -1476,19 +1528,19 @@ msgstr ""
 
 #: paperless/models.py:116
 msgid "Controls the generation of an archive file"
-msgstr ""
+msgstr "Arşiv dosyasının oluşturulmasını kontrol eder"
 
 #: paperless/models.py:124
 msgid "Sets image DPI fallback value"
-msgstr ""
+msgstr "Görüntü DPI yedek değerini ayarlar"
 
 #: paperless/models.py:131
 msgid "Controls the unpaper cleaning"
-msgstr ""
+msgstr "Kağıt temizlemeyi kontrol eder"
 
 #: paperless/models.py:138
 msgid "Enables deskew"
-msgstr ""
+msgstr "Eğriliği düzeltir"
 
 #: paperless/models.py:141
 msgid "Enables page rotation"
@@ -1496,165 +1548,221 @@ msgstr "Sayfa döndürmeyi etkinleştir"
 
 #: paperless/models.py:146
 msgid "Sets the threshold for rotation of pages"
-msgstr ""
+msgstr "Sayfaların döndürülmesi için eşik değerini ayarlar"
 
 #: paperless/models.py:152
 msgid "Sets the maximum image size for decompression"
-msgstr ""
+msgstr "Sıkıştırmanın açılması için maksimum görüntü boyutunu ayarlar"
 
 #: paperless/models.py:158
 msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+msgstr "Ghostscript renk dönüştürme stratejisini ayarlar"
 
 #: paperless/models.py:166
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "OCRMyPDF için ek kullanıcı argümanları ekler"
 
-#: paperless/models.py:171
+#: paperless/models.py:175
 msgid "Application title"
 msgstr "Uygulama başlığı"
 
-#: paperless/models.py:178
+#: paperless/models.py:182
 msgid "Application logo"
 msgstr "Uygulama logosu"
 
-#: paperless/models.py:188
-msgid "paperless application settings"
-msgstr ""
+#: paperless/models.py:197
+msgid "Enables barcode scanning"
+msgstr "Barkod taramayı etkinleştirir"
 
-#: paperless/settings.py:698
+#: paperless/models.py:203
+msgid "Enables barcode TIFF support"
+msgstr "Barkod TIFF desteğini etkinleştirir"
+
+#: paperless/models.py:209
+msgid "Sets the barcode string"
+msgstr "Barkod yazısını ayarlar"
+
+#: paperless/models.py:217
+msgid "Retains split pages"
+msgstr "Bölünmüş sayfaları korur"
+
+#: paperless/models.py:223
+msgid "Enables ASN barcode"
+msgstr "ASN barkodunu etkinleştirir"
+
+#: paperless/models.py:229
+msgid "Sets the ASN barcode prefix"
+msgstr "ASN barkod önekini ayarlar"
+
+#: paperless/models.py:237
+msgid "Sets the barcode upscale factor"
+msgstr "Barkod ölçeklendirme faktörünü ayarlar"
+
+#: paperless/models.py:244
+msgid "Sets the barcode DPI"
+msgstr "Barkod DPI değerini ayarlar"
+
+#: paperless/models.py:251
+msgid "Sets the maximum pages for barcode"
+msgstr "Barkod için maksimum sayfa sayısını ayarlar"
+
+#: paperless/models.py:258
+msgid "Enables tag barcode"
+msgstr "Etiket barkodunu etkinleştirir"
+
+#: paperless/models.py:264
+msgid "Sets the tag barcode mapping"
+msgstr "Etiket barkod eşleşmesini ayarlar"
+
+#: paperless/models.py:269
+msgid "paperless application settings"
+msgstr "paperless uygulama ayarları"
+
+#: paperless/settings.py:774
 msgid "English (US)"
 msgstr "İngilizce (Birleşik Devletler)"
 
-#: paperless/settings.py:699
+#: paperless/settings.py:775
 msgid "Arabic"
 msgstr "Arapça"
 
-#: paperless/settings.py:700
+#: paperless/settings.py:776
 msgid "Afrikaans"
 msgstr "Afrika dili"
 
-#: paperless/settings.py:701
+#: paperless/settings.py:777
 msgid "Belarusian"
 msgstr "Belarusça"
 
-#: paperless/settings.py:702
+#: paperless/settings.py:778
 msgid "Bulgarian"
 msgstr "Bulgarca"
 
-#: paperless/settings.py:703
+#: paperless/settings.py:779
 msgid "Catalan"
 msgstr "Katalanca"
 
-#: paperless/settings.py:704
+#: paperless/settings.py:780
 msgid "Czech"
 msgstr "Çekçe"
 
-#: paperless/settings.py:705
+#: paperless/settings.py:781
 msgid "Danish"
 msgstr "Danca"
 
-#: paperless/settings.py:706
+#: paperless/settings.py:782
 msgid "German"
 msgstr "Almanca"
 
-#: paperless/settings.py:707
+#: paperless/settings.py:783
 msgid "Greek"
 msgstr "Yunanca"
 
-#: paperless/settings.py:708
+#: paperless/settings.py:784
 msgid "English (GB)"
 msgstr "İngilizce (GB)"
 
-#: paperless/settings.py:709
+#: paperless/settings.py:785
 msgid "Spanish"
 msgstr "İspanyolca"
 
-#: paperless/settings.py:710
+#: paperless/settings.py:786
+msgid "Persian"
+msgstr "Farsça"
+
+#: paperless/settings.py:787
 msgid "Finnish"
 msgstr "Fince"
 
-#: paperless/settings.py:711
+#: paperless/settings.py:788
 msgid "French"
 msgstr "Fransızca"
 
-#: paperless/settings.py:712
+#: paperless/settings.py:789
 msgid "Hungarian"
-msgstr ""
+msgstr "Macarca"
 
-#: paperless/settings.py:713
+#: paperless/settings.py:790
 msgid "Italian"
 msgstr "İtalyanca"
 
-#: paperless/settings.py:714
+#: paperless/settings.py:791
 msgid "Japanese"
-msgstr ""
+msgstr "Japonca"
 
-#: paperless/settings.py:715
+#: paperless/settings.py:792
 msgid "Korean"
-msgstr ""
+msgstr "Korece"
 
-#: paperless/settings.py:716
+#: paperless/settings.py:793
 msgid "Luxembourgish"
 msgstr "Lüksemburgca"
 
-#: paperless/settings.py:717
+#: paperless/settings.py:794
 msgid "Norwegian"
 msgstr "Norveçce"
 
-#: paperless/settings.py:718
+#: paperless/settings.py:795
 msgid "Dutch"
 msgstr "Hollandaca"
 
-#: paperless/settings.py:719
+#: paperless/settings.py:796
 msgid "Polish"
 msgstr "Polonyaca"
 
-#: paperless/settings.py:720
+#: paperless/settings.py:797
 msgid "Portuguese (Brazil)"
 msgstr "Portekizce (Brezilya)"
 
-#: paperless/settings.py:721
+#: paperless/settings.py:798
 msgid "Portuguese"
 msgstr "Portekizce"
 
-#: paperless/settings.py:722
+#: paperless/settings.py:799
 msgid "Romanian"
 msgstr "Romence"
 
-#: paperless/settings.py:723
+#: paperless/settings.py:800
 msgid "Russian"
 msgstr "Rusça"
 
-#: paperless/settings.py:724
+#: paperless/settings.py:801
 msgid "Slovak"
 msgstr "Slovakça"
 
-#: paperless/settings.py:725
+#: paperless/settings.py:802
 msgid "Slovenian"
 msgstr "Slovakça"
 
-#: paperless/settings.py:726
+#: paperless/settings.py:803
 msgid "Serbian"
 msgstr "Sırpça"
 
-#: paperless/settings.py:727
+#: paperless/settings.py:804
 msgid "Swedish"
 msgstr "İsveççe"
 
-#: paperless/settings.py:728
+#: paperless/settings.py:805
 msgid "Turkish"
 msgstr "Türkçe"
 
-#: paperless/settings.py:729
+#: paperless/settings.py:806
 msgid "Ukrainian"
 msgstr "Ukraynaca"
 
-#: paperless/settings.py:730
+#: paperless/settings.py:807
+msgid "Vietnamese"
+msgstr "Vietnamca"
+
+#: paperless/settings.py:808
 msgid "Chinese Simplified"
 msgstr "Basitleştirilmiş Çince"
 
-#: paperless/urls.py:341
+#: paperless/settings.py:809
+msgid "Chinese Traditional"
+msgstr "Geleneksel Çince"
+
+#: paperless/urls.py:368
 msgid "Paperless-ngx administration"
 msgstr "Paperless-ngx yönetimi"
 
@@ -1680,7 +1788,7 @@ msgstr "Eylemler"
 
 #: paperless_mail/admin.py:81
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr ""
+msgstr "E-posta için uygulanan eylem. Bu eylem, yalnızca e-posta gövdesi veya ekleri işlenirken gerçekleştirilir."
 
 #: paperless_mail/admin.py:89
 msgid "Metadata"
@@ -1688,7 +1796,7 @@ msgstr "Metaveri"
 
 #: paperless_mail/admin.py:92
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr "Bu kuraldan tüketilen belgelere otomatik olarak meta veriler atayın. Burada etiketler, türler veya muhabirler atamazsanız, paperless yinede tanımladığınız tüm eşleşen kuralları işlemeye devam eder."
+msgstr "Bu kuraldan tüketilen belgelere otomatik olarak meta veriler atayın. Burada künyeler, türler veya muhataplar atamazsanız paperless yine de tanımladığınız tüm eşleşen kuralları işlemeyi sürdürür."
 
 #: paperless_mail/apps.py:11
 msgid "Paperless mail"
@@ -1716,15 +1824,15 @@ msgstr "STARTTLS kullan"
 
 #: paperless_mail/models.py:19
 msgid "IMAP"
-msgstr ""
+msgstr "IMAP"
 
 #: paperless_mail/models.py:20
 msgid "Gmail OAuth"
-msgstr ""
+msgstr "Gmail OAuth"
 
 #: paperless_mail/models.py:21
 msgid "Outlook OAuth"
-msgstr ""
+msgstr "Outlook OAuth"
 
 #: paperless_mail/models.py:25
 msgid "IMAP server"
@@ -1752,7 +1860,7 @@ msgstr "şifre"
 
 #: paperless_mail/models.py:47
 msgid "Is token authentication"
-msgstr ""
+msgstr "Token kimlik doğrulaması"
 
 #: paperless_mail/models.py:50
 msgid "character set"
@@ -1764,19 +1872,19 @@ msgstr "E-posta sunucusu ile iletişim kurulduğunda kullanılan 'UTF-8' veya 'U
 
 #: paperless_mail/models.py:60
 msgid "account type"
-msgstr ""
+msgstr "hesap tipi"
 
 #: paperless_mail/models.py:66
 msgid "refresh token"
-msgstr ""
+msgstr "refresh token"
 
 #: paperless_mail/models.py:70
 msgid "The refresh token to use for token authentication e.g. with oauth2."
-msgstr ""
+msgstr "Token kimlik doğrulaması için refresh token, örneğin oauth2 ile."
 
 #: paperless_mail/models.py:79
 msgid "The expiration date of the refresh token. "
-msgstr ""
+msgstr "Refresh token son kullanma tarihi "
 
 #: paperless_mail/models.py:89
 msgid "mail rule"
@@ -1792,7 +1900,7 @@ msgstr "Sadece ekleri işle."
 
 #: paperless_mail/models.py:105
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr ""
+msgstr "Tüm e-postayı (dosyaya gömülü ekler dahil) .eml olarak işleyin"
 
 #: paperless_mail/models.py:109
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
@@ -1803,154 +1911,182 @@ msgid "Process all files, including 'inline' attachments."
 msgstr "Tüm dosyaları işle, 'satır içi' ekletiler dahil."
 
 #: paperless_mail/models.py:119
+msgid "System default"
+msgstr "Sistem varsayılanı"
+
+#: paperless_mail/models.py:120
+msgid "Text, then HTML"
+msgstr "Text, ardından HTML"
+
+#: paperless_mail/models.py:121
+msgid "HTML, then text"
+msgstr "HTML, ardından text"
+
+#: paperless_mail/models.py:122
+msgid "HTML only"
+msgstr "Sadece HTML"
+
+#: paperless_mail/models.py:123
+msgid "Text only"
+msgstr "Yalnızca Text"
+
+#: paperless_mail/models.py:126
 msgid "Delete"
 msgstr "Sil"
 
-#: paperless_mail/models.py:120
+#: paperless_mail/models.py:127
 msgid "Move to specified folder"
 msgstr "Belirtilen klasöre taşı"
 
-#: paperless_mail/models.py:121
+#: paperless_mail/models.py:128
 msgid "Mark as read, don't process read mails"
 msgstr "Okunmuş olarak işaretle, okunmuş e-postaları işleme"
 
-#: paperless_mail/models.py:122
+#: paperless_mail/models.py:129
 msgid "Flag the mail, don't process flagged mails"
 msgstr "E-Postayi etiketlendir, etiketlendirilmiş e-postaları işleme"
 
-#: paperless_mail/models.py:123
+#: paperless_mail/models.py:130
 msgid "Tag the mail with specified tag, don't process tagged mails"
 msgstr "Postayı belirtilen etiketle etiketleyin, etiketlenmiş postaları ise işleme koymayın"
 
-#: paperless_mail/models.py:126
+#: paperless_mail/models.py:133
 msgid "Use subject as title"
 msgstr "Konuyu başlık olarak kullan"
 
-#: paperless_mail/models.py:127
+#: paperless_mail/models.py:134
 msgid "Use attachment filename as title"
 msgstr "Eklenti dosyanın ismini başlık olarak kullan"
 
-#: paperless_mail/models.py:128
+#: paperless_mail/models.py:135
 msgid "Do not assign title from rule"
 msgstr "Kuraldan başlık atama"
 
-#: paperless_mail/models.py:131
+#: paperless_mail/models.py:138
 msgid "Do not assign a correspondent"
-msgstr "Muhabir atanma"
+msgstr "Muhatap atama"
 
-#: paperless_mail/models.py:132
+#: paperless_mail/models.py:139
 msgid "Use mail address"
 msgstr "E-posta adresi kullan"
 
-#: paperless_mail/models.py:133
+#: paperless_mail/models.py:140
 msgid "Use name (or mail address if not available)"
 msgstr "İsim kullan (veya yoksa e-posta adresini)"
 
-#: paperless_mail/models.py:134
+#: paperless_mail/models.py:141
 msgid "Use correspondent selected below"
-msgstr "Aşağıdaki seçili olan muhabiri kullan"
+msgstr "Aşağıdaki seçili olan muhatabı kullan"
 
-#: paperless_mail/models.py:144
+#: paperless_mail/models.py:151
 msgid "account"
 msgstr "hesap"
 
-#: paperless_mail/models.py:150 paperless_mail/models.py:305
+#: paperless_mail/models.py:157 paperless_mail/models.py:318
 msgid "folder"
 msgstr "klasör"
 
-#: paperless_mail/models.py:154
+#: paperless_mail/models.py:161
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
 msgstr "Alt klasörler, genellikle nokta ('.') veya eğik çizgi ('/') gibi bir sınırlayıcı ile ayrılmalıdır, ancak bu posta sunucusuna göre değişir."
 
-#: paperless_mail/models.py:160
+#: paperless_mail/models.py:167
 msgid "filter from"
 msgstr "den filtrele"
 
-#: paperless_mail/models.py:167
+#: paperless_mail/models.py:174
 msgid "filter to"
 msgstr "buraya kadar filtrele"
 
-#: paperless_mail/models.py:174
+#: paperless_mail/models.py:181
 msgid "filter subject"
 msgstr "konuyu filtrele"
 
-#: paperless_mail/models.py:181
+#: paperless_mail/models.py:188
 msgid "filter body"
 msgstr "içerik filtrele"
 
-#: paperless_mail/models.py:188
+#: paperless_mail/models.py:195
 msgid "filter attachment filename inclusive"
-msgstr ""
+msgstr "Filtre: Ek dosya adı dahil"
 
-#: paperless_mail/models.py:200
+#: paperless_mail/models.py:207
 msgid "filter attachment filename exclusive"
-msgstr ""
-
-#: paperless_mail/models.py:205
-msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Filtre: Ek dosya adı hariç"
 
 #: paperless_mail/models.py:212
+msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr "Yalnızca belirtilmişse bu dosya adıyla tamamen eşleşen belgeleri tüketin. *.pdf veya *fatura* gibi joker karakterlere izin verilir. BÜYÜK/küçük harf duyarsızdır."
+
+#: paperless_mail/models.py:219
 msgid "maximum age"
 msgstr "yaş sınırı"
 
-#: paperless_mail/models.py:214
+#: paperless_mail/models.py:221
 msgid "Specified in days."
 msgstr "Gün olarak belirtilmiş."
 
-#: paperless_mail/models.py:218
+#: paperless_mail/models.py:225
 msgid "attachment type"
 msgstr "eklenti türü"
 
-#: paperless_mail/models.py:222
+#: paperless_mail/models.py:229
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
 msgstr "Satır içi ekler katıştırılmış görüntüler içerir, bu nedenle bu seçeneği bir dosya adı filtresiyle birleştirmek en iyisidir."
 
-#: paperless_mail/models.py:228
+#: paperless_mail/models.py:235
 msgid "consumption scope"
-msgstr ""
+msgstr "tüketim kapsamı"
 
-#: paperless_mail/models.py:234
+#: paperless_mail/models.py:241
+msgid "pdf layout"
+msgstr "pdf düzeni"
+
+#: paperless_mail/models.py:247
 msgid "action"
 msgstr "eylem"
 
-#: paperless_mail/models.py:240
+#: paperless_mail/models.py:253
 msgid "action parameter"
-msgstr "eylem parametreleri"
+msgstr "eylem parametresi"
 
-#: paperless_mail/models.py:245
+#: paperless_mail/models.py:258
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
 msgstr "Yukarıda seçilen eylem için ek parametre, örneğin klasöre taşı eyleminin hedef klasörü gibi. Alt klasörler noktalarla ayrıştırılmalıdır."
 
-#: paperless_mail/models.py:253
+#: paperless_mail/models.py:266
 msgid "assign title from"
 msgstr "başlik atan"
 
-#: paperless_mail/models.py:273
+#: paperless_mail/models.py:286
 msgid "assign correspondent from"
-msgstr "muhabiri atan"
+msgstr "şuradan muhatap ata"
 
-#: paperless_mail/models.py:287
+#: paperless_mail/models.py:300
 msgid "Assign the rule owner to documents"
 msgstr "Kural sahibini belgelere ata"
 
-#: paperless_mail/models.py:313
+#: paperless_mail/models.py:326
 msgid "uid"
 msgstr "uid"
 
-#: paperless_mail/models.py:321
+#: paperless_mail/models.py:334
 msgid "subject"
 msgstr "konu"
 
-#: paperless_mail/models.py:329
+#: paperless_mail/models.py:342
 msgid "received"
 msgstr "alındı"
 
-#: paperless_mail/models.py:336
+#: paperless_mail/models.py:349
 msgid "processed"
 msgstr "işlendi"
 
-#: paperless_mail/models.py:342
+#: paperless_mail/models.py:355
 msgid "status"
 msgstr "durum"
+
+#: paperless_mail/models.py:363
+msgid "error"
+msgstr "hata"
 

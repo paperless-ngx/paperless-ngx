@@ -1,18 +1,18 @@
 codecov:
   require_ci_to_pass: true
-# https://docs.codecov.com/docs/flags#recommended-automatic-flag-management
-# Require each flag to have 1 upload before notification
-flag_management:
-  individual_flags:
-    - name: backend
+  # https://docs.codecov.com/docs/components
+component_management:
+  individual_components:
+    - component_id: backend
       paths:
-        - src/
-    - name: frontend
+        - src/**
+    - component_id: frontend
       paths:
-        - src-ui/
+        - src-ui/**
 # https://docs.codecov.com/docs/pull-request-comments
 # codecov will only comment if coverage changes
 comment:
+  layout: "header, diff, components, flags, files"
   require_changes: true
   # https://docs.codecov.com/docs/javascript-bundle-analysis
   require_bundle_changes: true

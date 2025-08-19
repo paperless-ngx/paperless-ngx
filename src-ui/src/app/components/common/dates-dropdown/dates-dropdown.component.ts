@@ -6,6 +6,7 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  inject,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
@@ -13,13 +14,14 @@ import {
   NgbDatepickerModule,
   NgbDropdownModule,
 } from '@ng-bootstrap/ng-bootstrap'
+import { NgSelectModule } from '@ng-select/ng-select'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, Subscription } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
-import { popperOptionsReenablePreventOverflow } from 'src/app/utils/popper-options'
+import { pngxPopperOptions } from 'src/app/utils/popper-options'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
 
 export interface DateSelection {
@@ -32,10 +34,14 @@ export interface DateSelection {
 }
 
 export enum RelativeDate {
-  WITHIN_1_WEEK = 0,
-  WITHIN_1_MONTH = 1,
-  WITHIN_3_MONTHS = 2,
-  WITHIN_1_YEAR = 3,
+  WITHIN_1_WEEK = 1,
+  WITHIN_1_MONTH = 2,
+  WITHIN_3_MONTHS = 3,
+  WITHIN_1_YEAR = 4,
+  THIS_YEAR = 5,
+  THIS_MONTH = 6,
+  TODAY = 7,
+  YESTERDAY = 8,
 }
 
 @Component({
@@ -49,15 +55,18 @@ export enum RelativeDate {
     NgxBootstrapIconsModule,
     NgbDatepickerModule,
     NgbDropdownModule,
+    NgSelectModule,
     FormsModule,
     ReactiveFormsModule,
     NgClass,
   ],
 })
 export class DatesDropdownComponent implements OnInit, OnDestroy {
-  public popperOptions = popperOptionsReenablePreventOverflow
+  public popperOptions = pngxPopperOptions
 
-  constructor(settings: SettingsService) {
+  constructor() {
+    const settings = inject(SettingsService)
+
     this.datePlaceHolder = settings.getLocalizedDateInputFormat()
   }
 
@@ -82,44 +91,64 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
       name: $localize`Within 1 year`,
       date: new Date().setFullYear(new Date().getFullYear() - 1),
     },
+    {
+      id: RelativeDate.THIS_YEAR,
+      name: $localize`This year`,
+      date: new Date('1/1/' + new Date().getFullYear()),
+    },
+    {
+      id: RelativeDate.THIS_MONTH,
+      name: $localize`This month`,
+      date: new Date().setDate(1),
+    },
+    {
+      id: RelativeDate.TODAY,
+      name: $localize`Today`,
+      date: new Date().setHours(0, 0, 0, 0),
+    },
+    {
+      id: RelativeDate.YESTERDAY,
+      name: $localize`Yesterday`,
+      date: new Date().setDate(new Date().getDate() - 1),
+    },
   ]
 
   datePlaceHolder: string
 
   // created
   @Input()
-  createdDateTo: string
+  createdDateTo: string = null
 
   @Output()
   createdDateToChange = new EventEmitter<string>()
 
   @Input()
-  createdDateFrom: string
+  createdDateFrom: string = null
 
   @Output()
   createdDateFromChange = new EventEmitter<string>()
 
   @Input()
-  createdRelativeDate: RelativeDate
+  createdRelativeDate: RelativeDate = null
 
   @Output()
   createdRelativeDateChange = new EventEmitter<number>()
 
   // added
   @Input()
-  addedDateTo: string
+  addedDateTo: string = null
 
   @Output()
   addedDateToChange = new EventEmitter<string>()
 
   @Input()
-  addedDateFrom: string
+  addedDateFrom: string = null
 
   @Output()
   addedDateFromChange = new EventEmitter<string>()
 
   @Input()
-  addedRelativeDate: RelativeDate
+  addedRelativeDate: RelativeDate = null
 
   @Output()
   addedRelativeDateChange = new EventEmitter<number>()
@@ -133,7 +162,10 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
   @Input()
   disabled: boolean = false
 
-  public readonly today: string = new Date().toISOString().split('T')[0]
+  @Input()
+  placement: string = 'bottom-start'
+
+  public readonly today: string = new Date().toLocaleDateString('en-CA')
 
   get isActive(): boolean {
     return (
@@ -172,17 +204,17 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
     this.onChange()
   }
 
-  setCreatedRelativeDate(rd: RelativeDate) {
+  onSetCreatedRelativeDate(rd: { id: number; name: string; date: number }) {
+    // createdRelativeDate is set by ngModel
     this.createdDateTo = null
     this.createdDateFrom = null
-    this.createdRelativeDate = this.createdRelativeDate == rd ? null : rd
     this.onChange()
   }
 
-  setAddedRelativeDate(rd: RelativeDate) {
+  onSetAddedRelativeDate(rd: { id: number; name: string; date: number }) {
+    // addedRelativeDate is set by ngModel
     this.addedDateTo = null
     this.addedDateFrom = null
-    this.addedRelativeDate = this.addedRelativeDate == rd ? null : rd
     this.onChange()
   }
 
@@ -224,6 +256,11 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
     this.onChange()
   }
 
+  clearCreatedRelativeDate() {
+    this.createdRelativeDate = null
+    this.onChange()
+  }
+
   clearAddedTo() {
     this.addedDateTo = null
     this.onChange()
@@ -231,6 +268,11 @@ export class DatesDropdownComponent implements OnInit, OnDestroy {
 
   clearAddedFrom() {
     this.addedDateFrom = null
+    this.onChange()
+  }
+
+  clearAddedRelativeDate() {
+    this.addedRelativeDate = null
     this.onChange()
   }
 

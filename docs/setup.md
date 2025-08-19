@@ -131,26 +131,11 @@ account. The script essentially automatically performs the steps described in [D
     by default but you can change the image to pull from Docker Hub by changing the `image`
     line to `image: paperlessngx/paperless-ngx:latest`.
 
-6.  To be able to login, you will need a "superuser". To create it,
-    execute the following command:
+6.  Run `docker compose up -d`. This will create and start the necessary containers.
 
-    ```shell-session
-    docker compose run --rm webserver createsuperuser
-    ```
-
-    or using docker exec from within the container:
-
-    ```shell-session
-    python3 manage.py createsuperuser
-    ```
-
-    This will guide you through the superuser setup.
-
-7.  Run `docker compose up -d`. This will create and start the necessary containers.
-
-8.  Congratulations! Your Paperless-ngx instance should now be accessible at `http://127.0.0.1:8000`
-    (or similar, depending on your configuration). Use the superuser credentials you have
-    created in the previous step to login.
+7.  Congratulations! Your Paperless-ngx instance should now be accessible at `http://127.0.0.1:8000`
+    (or similar, depending on your configuration). When you first access the web interface, you will be
+    prompted to create a superuser account.
 
 ### Build the Docker image yourself {#docker_build}
 
@@ -380,15 +365,20 @@ are released, dependency support is confirmed, etc.
         dependencies.  This is an alternative to the above and may require adjusting
         the example scripts to utilize the virtual environment paths
 
-9.  Go to `/opt/paperless/src`, and execute the following commands:
+    !!! tip
+
+        If you use modern Python tooling, such as `uv`, installation will not include
+        dependencies for Postgres or Mariadb.  You can select those extras with `--extra <EXTRA>`
+        or all with `--all-extras`
+
+9.  Go to `/opt/paperless/src`, and execute the following command:
 
     ```bash
     # This creates the database schema.
     sudo -Hu paperless python3 manage.py migrate
-
-    # This creates your first paperless user
-    sudo -Hu paperless python3 manage.py createsuperuser
     ```
+
+    When you first access the web interface you will be prompted to create a superuser account.
 
 10. Optional: Test that paperless is working by executing
 
@@ -426,31 +416,20 @@ are released, dependency support is confirmed, etc.
 
     !!! note
 
-        The `socket` script enables `gunicorn` to run on port 80 without
+        The `socket` script enables `granian` to run on port 80 without
         root privileges. For this you need to uncomment the
         `Require=paperless-webserver.socket` in the `webserver` script
-        and configure `gunicorn` to listen on port 80 (see
-        `paperless/gunicorn.conf.py`).
-
-    You may need to adjust the path to the `gunicorn` executable. This
-    will be installed as part of the python dependencies, and is either
-    located in the `bin` folder of your virtual environment, or in
-    `~/.local/bin/` if no virtual environment is used.
+        and configure `granian` to listen on port 80 (set `GRANIAN_PORT`).
 
     These services rely on redis and optionally the database server, but
     don't need to be started in any particular order. The example files
     depend on redis being started. If you use a database server, you
     should add additional dependencies.
 
-    !!! warning
+    !!! note
 
-        The included scripts run a `gunicorn` standalone server, which is
-        fine for running paperless. It does support SSL, however, the
-        documentation of GUnicorn states that you should use a proxy server
-        in front of gunicorn instead.
-
-        For instructions on how to use nginx for that,
-        [see the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-a-Reverse-Proxy-with-Paperless-ngx#nginx).
+        For instructions on using a reverse proxy,
+        [see the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-a-Reverse-Proxy-with-Paperless-ngx#).
 
     !!! warning
 
@@ -466,7 +445,7 @@ are released, dependency support is confirmed, etc.
 13. Configure ImageMagick to allow processing of PDF documents. Most
     distributions have this disabled by default, since PDF documents can
     contain malware. If you don't do this, paperless will fall back to
-    ghostscript for certain steps such as thumbnail generation.
+    Ghostscript for certain steps such as thumbnail generation.
 
     Edit `/etc/ImageMagick-6/policy.xml` and adjust
 
@@ -713,7 +692,10 @@ Paperless runs on Raspberry Pi. However, some things are rather slow on
 the Pi and configuring some options in paperless can help improve
 performance immensely:
 
--   Stick with SQLite to save some resources.
+-   Stick with SQLite to save some resources. See [troubleshooting](troubleshooting.md#log-reports-creating-paperlesstask-failed)
+    if you encounter issues with SQLite locking.
+-   If you do not need the filesystem-based consumer, consider disabling it
+    entirely by setting [`PAPERLESS_CONSUMER_DISABLE`](configuration.md#PAPERLESS_CONSUMER_DISABLE) to `true`.
 -   Consider setting [`PAPERLESS_OCR_PAGES`](configuration.md#PAPERLESS_OCR_PAGES) to 1, so that paperless will
     only OCR the first page of your documents. In most cases, this page
     contains enough information to be able to find it.

@@ -1,0 +1,112 @@
+name: PR Bot
+on:
+  pull_request_target:
+    types: [opened]
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  pr-bot:
+    name: Automated PR Bot
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label PR by file path or branch name
+        # see .github/labeler.yml for the labeler config
+        uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Label by size
+        uses: Gascon1/pr-size-labeler@v1.3.0
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          xs_label: 'small-change'
+          xs_diff: '9'
+          s_label: 'non-trivial'
+          s_diff: '99999'
+          fail_if_xl: 'false'
+          excluded_files: /\.lock$/ /\.txt$/ ^src-ui/pnpm-lock\.yaml$ ^src-ui/messages\.xlf$ ^src/locale/en_US/LC_MESSAGES/django\.po$
+      - name: Label by PR title
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const title = pr.title.toLowerCase();
+            const labels = [];
+
+            if (/^(fix|bugfix)/i.test(title)) {
+              labels.push('bug');
+            } else if (/^feature/i.test(title)) {
+              labels.push('enhancement');
+            } else if (!/^(dependabot)/i.test(title)) {
+              labels.push('enhancement'); // Default fallback
+            }
+
+            if (labels.length) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels,
+              });
+              core.info(`Added labels based on title: ${labels.join(', ')}`);
+            }
+      - name: Label bot-generated PRs
+        if: ${{ contains(github.actor, 'dependabot') || contains(github.actor, 'crowdin-bot') }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const user = pr.user.login.toLowerCase();
+            const labels = [];
+
+            if (user.includes('dependabot')) {
+              labels.push('dependencies');
+            }
+
+            if (user.includes('crowdin-bot')) {
+              labels.push('translation', 'skip-changelog');
+            }
+
+            if (labels.length) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels,
+              });
+            }
+      - name: Welcome comment
+        if: ${{ !contains(github.actor, 'bot') }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const user = pr.user.login;
+
+            const { data: members } = await github.rest.orgs.listMembers({
+              org: 'paperless-ngx',
+            });
+
+            const memberLogins = members.map(m => m.login.toLowerCase());
+            if (memberLogins.includes(user.toLowerCase())) {
+              core.info('Skipping comment: user is org member');
+              return;
+            }
+
+            const body =
+                "Hello @" + user + ",\n\n" +
+                "Thank you very much for submitting this PR to us!\n\n" +
+                "This is what will happen next:\n\n" +
+                "1. CI tests will run against your PR to ensure quality and consistency.\n" +
+                "2. Next, human contributors from paperless-ngx review your changes.\n" +
+                "3. Please address any issues that come up during the review as soon as you are able to.\n" +
+                "4. If accepted, your pull request will be merged into the `dev` branch and changes there will be tested further.\n" +
+                "5. Eventually, changes from you and other contributors will be merged into `main` and a new release will be made.\n\n" +
+                "You'll be hearing from us soon, and thank you again for contributing to our project.";
+
+            await github.rest.issues.createComment({
+              issue_number: pr.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body,
+            });

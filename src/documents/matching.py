@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import logging
 import re
 from fnmatch import fnmatch
+from fnmatch import translate as fnmatch_translate
+from typing import TYPE_CHECKING
 
-from documents.classifier import DocumentClassifier
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
 from documents.models import Correspondent
@@ -14,6 +17,11 @@ from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
+
+    from documents.classifier import DocumentClassifier
 
 logger = logging.getLogger("paperless.matching")
 
@@ -382,6 +390,40 @@ def existing_document_matches_workflow(
         trigger_matched = False
 
     return (trigger_matched, reason)
+
+
+def prefilter_documents_by_workflowtrigger(
+    documents: QuerySet[Document],
+    trigger: WorkflowTrigger,
+) -> QuerySet[Document]:
+    """
+    To prevent scheduled workflows checking every document, we prefilter the
+    documents by the workflow trigger filters. This is done before e.g.
+    document_matches_workflow in run_workflows
+    """
+
+    if trigger.filter_has_tags.all().count() > 0:
+        documents = documents.filter(
+            tags__in=trigger.filter_has_tags.all(),
+        ).distinct()
+
+    if trigger.filter_has_correspondent is not None:
+        documents = documents.filter(
+            correspondent=trigger.filter_has_correspondent,
+        )
+
+    if trigger.filter_has_document_type is not None:
+        documents = documents.filter(
+            document_type=trigger.filter_has_document_type,
+        )
+
+    if trigger.filter_filename is not None and len(trigger.filter_filename) > 0:
+        # the true fnmatch will actually run later so we just want a loose filter here
+        regex = fnmatch_translate(trigger.filter_filename).lstrip("^").rstrip("$")
+        regex = f"(?i){regex}"
+        documents = documents.filter(original_filename__regex=regex)
+
+    return documents
 
 
 def document_matches_workflow(

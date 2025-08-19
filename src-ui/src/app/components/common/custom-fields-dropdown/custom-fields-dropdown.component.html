@@ -1,4 +1,4 @@
-<div ngbDropdown #fieldDropdown="ngbDropdown" (openChange)="onOpenClose($event)">
+<div ngbDropdown #fieldDropdown="ngbDropdown" (openChange)="onOpenClose($event)" [popperOptions]="popperOptions" placement="bottom-end">
     <button class="btn btn-sm btn-outline-primary" id="customFieldsDropdown" [disabled]="disabled" ngbDropdownToggle>
       <i-bs name="ui-radios"></i-bs>
       <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Custom Fields</ng-container></div>

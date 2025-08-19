@@ -1,20 +1,18 @@
 #!/command/with-contenv /usr/bin/bash
 # shellcheck shell=bash
 declare -r log_prefix="[init-migrations]"
+
 declare -r data_dir="${PAPERLESS_DATA_DIR:-/usr/src/paperless/data}"
 
-(
-	# flock is in place to prevent multiple containers from doing migrations
-	# simultaneously. This also ensures that the db is ready when the command
-	# of the current container starts.
-	flock 200
-	echo "${log_prefix} Apply database migrations..."
-	cd "${PAPERLESS_SRC_DIR}"
+echo "${log_prefix} Apply database migrations..."
 
-	if [[ -n "${USER_IS_NON_ROOT}" ]]; then
-		exec python3 manage.py migrate --skip-checks --no-input
-	else
-		exec s6-setuidgid paperless python3 manage.py migrate --skip-checks --no-input
-	fi
+cd "${PAPERLESS_SRC_DIR}"
 
-) 200>"${data_dir}/migration_lock"
+# The whole migrate, with flock, needs to run as the right user
+if [[ -n "${USER_IS_NON_ROOT}" ]]; then
+	exec s6-setlock -n "${data_dir}/migration_lock" python3 manage.py migrate --skip-checks --no-input
+else
+	exec s6-setuidgid paperless \
+		s6-setlock -n "${data_dir}/migration_lock" \
+		python3 manage.py migrate --skip-checks --no-input
+fi

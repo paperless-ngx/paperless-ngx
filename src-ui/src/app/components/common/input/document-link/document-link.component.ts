@@ -1,5 +1,12 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
-import { Component, forwardRef, Input, OnDestroy, OnInit } from '@angular/core'
+import {
+  Component,
+  forwardRef,
+  inject,
+  Input,
+  OnDestroy,
+  OnInit,
+} from '@angular/core'
 import {
   FormsModule,
   NG_VALUE_ACCESSOR,
@@ -52,6 +59,8 @@ export class DocumentLinkComponent
   extends AbstractInputComponent<any[]>
   implements OnInit, OnDestroy
 {
+  private documentsService = inject(DocumentService)
+
   documentsInput$ = new Subject<string>()
   foundDocuments$: Observable<Document[]>
   loading = false
@@ -71,8 +80,8 @@ export class DocumentLinkComponent
   @Input()
   placeholder: string = $localize`Search for documents`
 
-  constructor(private documentsService: DocumentService) {
-    super()
+  get selectedDocumentIDs(): number[] {
+    return this.selectedDocuments.map((d) => d.id)
   }
 
   ngOnInit() {
@@ -90,8 +99,8 @@ export class DocumentLinkComponent
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe((documentResults) => {
           this.loading = false
-          this.selectedDocuments = documentIDs.map((id) =>
-            documentResults.results.find((d) => d.id === id)
+          this.selectedDocuments = documentIDs.map(
+            (id) => documentResults.results.find((d) => d.id === id) ?? {}
           )
           super.writeValue(documentIDs)
         })

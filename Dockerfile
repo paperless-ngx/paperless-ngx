@@ -4,50 +4,35 @@
 # Stage: compile-frontend
 # Purpose: Compiles the frontend
 # Notes:
-#  - Does NPM stuff with Typescript and such
+#  - Does PNPM stuff with Typescript and such
 FROM --platform=$BUILDPLATFORM docker.io/node:20-bookworm-slim AS compile-frontend
 
 COPY ./src-ui /src/src-ui
 
 WORKDIR /src/src-ui
 RUN set -eux \
-  && npm update npm -g \
-  && npm ci
+  && npm update -g pnpm \
+  && npm install -g corepack@latest \
+  && corepack enable \
+  && pnpm install
 
 ARG PNGX_TAG_VERSION=
 # Add the tag to the environment file if its a tagged dev build
 RUN set -eux && \
 case "${PNGX_TAG_VERSION}" in \
   dev|beta|fix*|feature*) \
-    sed -i -E "s/version: '([0-9\.]+)'/version: '\1 #${PNGX_TAG_VERSION}'/g" /src/src-ui/src/environments/environment.prod.ts \
+    sed -i -E "s/tag: '([a-z\.]+)'/tag: '${PNGX_TAG_VERSION}'/g" /src/src-ui/src/environments/environment.prod.ts \
     ;; \
 esac
 
 RUN set -eux \
   && ./node_modules/.bin/ng build --configuration production
 
-# Stage: pipenv-base
-# Purpose: Generates a requirements.txt file for building
-# Comments:
-#  - pipenv dependencies are not left in the final image
-#  - pipenv can't touch the final image somehow
-FROM --platform=$BUILDPLATFORM docker.io/python:3.12-alpine AS pipenv-base
-
-WORKDIR /usr/src/pipenv
-
-COPY Pipfile* ./
-
-RUN set -eux \
-  && echo "Installing pipenv" \
-    && python3 -m pip install --no-cache-dir --upgrade pipenv==2024.4.1 \
-  && echo "Generating requirement.txt" \
-    && pipenv requirements > requirements.txt
-
 # Stage: s6-overlay-base
 # Purpose: Installs s6-overlay and rootfs
 # Comments:
 #  - Don't leave anything extra in here either
-FROM docker.io/python:3.12-slim-bookworm AS s6-overlay-base
+FROM ghcr.io/astral-sh/uv:0.8.8-python3.12-bookworm-slim AS s6-overlay-base
 
 WORKDIR /usr/src/s6
 
@@ -62,7 +47,7 @@ ENV \
 ARG TARGETARCH
 ARG TARGETVARIANT
 # Lock this version
-ARG S6_OVERLAY_VERSION=3.2.0.2
+ARG S6_OVERLAY_VERSION=3.2.1.0
 
 ARG S6_BUILD_TIME_PKGS="curl \
                         xz-utils"
@@ -116,16 +101,19 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG TARGETARCH
 
 # Can be workflow provided, defaults set for manual building
-ARG JBIG2ENC_VERSION=0.29
+ARG JBIG2ENC_VERSION=0.30
 ARG QPDF_VERSION=11.9.0
 ARG GS_VERSION=10.03.1
 
 # Set Python environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    # Ignore warning from Whitenoise
+    # Ignore warning from Whitenoise about async iterators
     PYTHONWARNINGS="ignore:::django.http.response:517" \
-    PNGX_CONTAINERIZED=1
+    PNGX_CONTAINERIZED=1 \
+    # https://docs.astral.sh/uv/reference/settings/#link-mode
+    UV_LINK_MODE=copy \
+    UV_CACHE_DIR=/cache/uv/
 
 #
 # Begin installation and configuration
@@ -204,46 +192,29 @@ RUN set -eux \
         && rm --force --verbose *.deb \
     && rm --recursive --force --verbose /var/lib/apt/lists/*
 
-# Copy gunicorn config
-# Changes very infrequently
-WORKDIR /usr/src/paperless/
-
-COPY --chown=1000:1000 gunicorn.conf.py /usr/src/paperless/gunicorn.conf.py
-
 WORKDIR /usr/src/paperless/src/
 
 # Python dependencies
 # Change pretty frequently
-COPY --chown=1000:1000 --from=pipenv-base /usr/src/pipenv/requirements.txt ./
+COPY --chown=1000:1000 ["pyproject.toml", "uv.lock", "/usr/src/paperless/src/"]
 
 # Packages needed only for building a few quick Python
 # dependencies
 ARG BUILD_PACKAGES="\
   build-essential \
-  git \
-  # https://www.psycopg.org/docs/install.html#prerequisites
-  libpq-dev \
   # https://github.com/PyMySQL/mysqlclient#linux
   default-libmysqlclient-dev \
   pkg-config"
 
-ARG ZXING_VERSION=2.3.0
-ARG PSYCOPG_VERSION=3.2.4
-
 # hadolint ignore=DL3042
-RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
+RUN --mount=type=cache,target=${UV_CACHE_DIR},id=python-cache \
   set -eux \
   && echo "Installing build system packages" \
     && apt-get update \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
-    && python3 -m pip install --upgrade wheel \
   && echo "Installing Python requirements" \
-    && curl --fail --silent --no-progress-meter --show-error --location --remote-name-all --parallel --parallel-max 4 \
-      https://github.com/paperless-ngx/builder/releases/download/psycopg-${PSYCOPG_VERSION}/psycopg_c-${PSYCOPG_VERSION}-cp312-cp312-linux_x86_64.whl \
-      https://github.com/paperless-ngx/builder/releases/download/psycopg-${PSYCOPG_VERSION}/psycopg_c-${PSYCOPG_VERSION}-cp312-cp312-linux_aarch64.whl \
-      https://github.com/paperless-ngx/builder/releases/download/zxing-${ZXING_VERSION}/zxing_cpp-${ZXING_VERSION}-cp312-cp312-linux_aarch64.whl \
-      https://github.com/paperless-ngx/builder/releases/download/zxing-${ZXING_VERSION}/zxing_cpp-${ZXING_VERSION}-cp312-cp312-linux_x86_64.whl \
-    && python3 -m pip install --default-timeout=1000 --find-links . --requirement requirements.txt \
+    && uv export --quiet --no-dev --all-extras --format requirements-txt --output-file requirements.txt \
+    && uv pip install --system --no-python-downloads --python-preference system --requirements requirements.txt \
   && echo "Installing NLTK data" \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" snowball_data \
     && python3 -W ignore::RuntimeWarning -m nltk.downloader -d "/usr/share/nltk_data" stopwords \
@@ -268,6 +239,7 @@ COPY --from=compile-frontend --chown=1000:1000 /src/src/documents/static/fronten
 # add users, setup scripts
 # Mount the compiled frontend to expected location
 RUN set -eux \
+  && sed -i '1s|^#!/usr/bin/env python3|#!/command/with-contenv python3|' manage.py \
   && echo "Setting up user/group" \
     && addgroup --gid 1000 paperless \
     && useradd --uid 1000 --gid paperless --home-dir /usr/src/paperless paperless \
@@ -293,4 +265,4 @@ ENTRYPOINT ["/init"]
 
 EXPOSE 8000
 
-HEALTHCHECK --interval=30s --timeout=10s --retries=5 CMD [ "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000" ]
+HEALTHCHECK --interval=30s --timeout=10s --retries=5 CMD [ "curl", "-fs", "-S", "-L", "--max-time", "2", "http://localhost:8000" ]

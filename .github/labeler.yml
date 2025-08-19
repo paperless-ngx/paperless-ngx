@@ -1,0 +1,26 @@
+backend:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/**'
+          - 'pyproject.toml'
+          - 'uv.lock'
+          - 'requirements.txt'
+frontend:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src-ui/**'
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**'
+ci-cd:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/**'
+# pr types
+bug:
+  - head-branch:
+      - ['^fix']
+enhancement:
+  - head-branch:
+      - ['^feature']

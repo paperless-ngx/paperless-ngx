@@ -1,10 +1,9 @@
 import { NgClass, NgTemplateOutlet } from '@angular/common'
-import { Component, QueryList, ViewChildren } from '@angular/core'
+import { Component, QueryList, ViewChildren, inject } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import {
   NgbAlert,
   NgbAlertModule,
-  NgbCollapseModule,
   NgbProgressbarModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -21,8 +20,6 @@ import {
 } from 'src/app/services/websocket-status.service'
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
 
-const MAX_ALERTS = 5
-
 @Component({
   selector: 'pngx-upload-file-widget',
   templateUrl: './upload-file-widget.component.html',
@@ -34,27 +31,20 @@ const MAX_ALERTS = 5
     NgTemplateOutlet,
     RouterModule,
     NgbAlertModule,
-    NgbCollapseModule,
     NgbProgressbarModule,
     NgxBootstrapIconsModule,
     TourNgBootstrapModule,
   ],
 })
 export class UploadFileWidgetComponent extends ComponentWithPermissions {
-  alertsExpanded = false
+  private websocketStatusService = inject(WebsocketStatusService)
+  private uploadDocumentsService = inject(UploadDocumentsService)
+  settingsService = inject(SettingsService)
 
   @ViewChildren(NgbAlert) alerts: QueryList<NgbAlert>
 
-  constructor(
-    private websocketStatusService: WebsocketStatusService,
-    private uploadDocumentsService: UploadDocumentsService,
-    public settingsService: SettingsService
-  ) {
-    super()
-  }
-
   getStatus() {
-    return this.websocketStatusService.getConsumerStatus().slice(0, MAX_ALERTS)
+    return this.websocketStatusService.getConsumerStatus()
   }
 
   getStatusSummary() {
@@ -75,13 +65,6 @@ export class UploadFileWidgetComponent extends ComponentWithPermissions {
     return strings.join(
       $localize`:this string is used to separate processing, failed and added on the file upload widget:, `
     )
-  }
-
-  getStatusHidden() {
-    if (this.websocketStatusService.getConsumerStatus().length < MAX_ALERTS)
-      return []
-    else
-      return this.websocketStatusService.getConsumerStatus().slice(MAX_ALERTS)
   }
 
   getStatusUploading() {
@@ -147,9 +130,11 @@ export class UploadFileWidgetComponent extends ComponentWithPermissions {
   }
 
   public onFileSelected(event: Event) {
-    this.uploadDocumentsService.uploadFiles(
-      (event.target as HTMLInputElement).files
-    )
+    const files = (event.target as HTMLInputElement).files
+    for (let i = 0; i < files?.length; i++) {
+      const file = files.item(i)
+      file && this.uploadDocumentsService.uploadFile(file)
+    }
   }
 
   get slimSidebarEnabled(): boolean {

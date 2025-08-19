@@ -2,6 +2,7 @@ import json
 import tempfile
 from io import StringIO
 from pathlib import Path
+from zipfile import ZipFile
 
 from django.contrib.auth.models import User
 from django.core.management import call_command
@@ -335,3 +336,42 @@ class TestCommandImport(
 
         self.assertIn("Version mismatch:", stdout_str)
         self.assertIn("importing 2.8.1", stdout_str)
+
+    def test_import_zipped_export(self):
+        """
+        GIVEN:
+            - A zip file with correct content (manifest.json and version.json inside)
+        WHEN:
+            - An import is attempted using the zip file as the source
+        THEN:
+            - The command reads from the zip without warnings or errors
+        """
+
+        stdout = StringIO()
+        zip_path = self.dirs.scratch_dir / "export.zip"
+
+        # Create manifest.json and version.json in a temp dir
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_dir_path = Path(temp_dir)
+
+            (temp_dir_path / "manifest.json").touch()
+            (temp_dir_path / "version.json").touch()
+
+            # Create the zip file
+            with ZipFile(zip_path, "w") as zf:
+                zf.write(temp_dir_path / "manifest.json", arcname="manifest.json")
+                zf.write(temp_dir_path / "version.json", arcname="version.json")
+
+        # Try to import from the zip file
+        with self.assertRaises(json.decoder.JSONDecodeError):
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                str(zip_path),
+                stdout=stdout,
+            )
+        stdout.seek(0)
+        stdout_str = str(stdout.read())
+
+        # There should be no error or warnings. Therefore the output should be empty.
+        self.assertEqual(stdout_str, "")

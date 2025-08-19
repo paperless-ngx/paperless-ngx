@@ -15,6 +15,7 @@ from dateutil import parser
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.core import mail
 from django.core.cache import cache
 from django.db import DataError
 from django.test import override_settings
@@ -27,6 +28,7 @@ from documents.caching import CACHE_50_MINUTES
 from documents.caching import CLASSIFIER_HASH_KEY
 from documents.caching import CLASSIFIER_MODIFIED_KEY
 from documents.caching import CLASSIFIER_VERSION_KEY
+from documents.data_models import DocumentSource
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -38,6 +40,10 @@ from documents.models import SavedView
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Workflow
+from documents.models import WorkflowAction
+from documents.models import WorkflowTrigger
+from documents.signals.handlers import run_workflows
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DocumentConsumeDelayMixin
 
@@ -164,6 +170,113 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results[0]), 0)
+
+    def test_document_legacy_created_format(self):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - Document is requested with api version ≥ 9
+            - Document is requested with api version < 9
+        THEN:
+            - Document created field is returned as date
+            - Document created field is returned as datetime
+        """
+        doc = Document.objects.create(
+            title="none",
+            checksum="123",
+            mime_type="application/pdf",
+            created=date(2023, 1, 1),
+        )
+
+        response = self.client.get(
+            f"/api/documents/{doc.pk}/",
+            headers={"Accept": "application/json; version=8"},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertRegex(response.data["created"], r"^2023-01-01T00:00:00.*$")
+
+        response = self.client.get(
+            f"/api/documents/{doc.pk}/",
+            headers={"Accept": "application/json; version=9"},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["created"], "2023-01-01")
+
+        # legacy datetime format
+        response = self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            {"created": "2023-02-01T23:00:00Z"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        doc.refresh_from_db()
+        self.assertEqual(doc.created, date(2023, 2, 1))
+
+        # naive datetime
+        response = self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            {"created": "2023-06-28T23:00:00"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        doc.refresh_from_db()
+        self.assertEqual(doc.created, date(2023, 6, 28))
+
+    def test_document_update_legacy_created_format(self):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - Document is updated with created in datetime format
+        THEN:
+            - Document created field is updated as date
+        """
+        doc = Document.objects.create(
+            title="none",
+            checksum="123",
+            mime_type="application/pdf",
+            created=date(2023, 1, 1),
+        )
+
+        created_datetime = datetime.datetime(2023, 2, 1, 12, 0, 0)
+        response = self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            {"created": created_datetime},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.created, date(2023, 2, 1))
+
+    def test_document_update_with_created_date(self):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - Document is updated with created_date and not created
+        THEN:
+            - Document created field is updated
+        """
+        doc = Document.objects.create(
+            title="none",
+            checksum="123",
+            mime_type="application/pdf",
+            created=date(2023, 1, 1),
+        )
+
+        created_date = date(2023, 2, 1)
+        self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            {"created_date": created_date},
+            format="json",
+        )
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.created_date, created_date)
 
     def test_document_actions(self):
         _, filename = tempfile.mkstemp(dir=self.dirs.originals_dir)
@@ -1307,7 +1420,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         _, overrides = self.get_last_consume_delay_call_args()
 
-        self.assertEqual(overrides.created, created)
+        self.assertEqual(overrides.created, created.date())
 
     def test_upload_with_asn(self):
         self.consume_file_mock.return_value = celery.result.AsyncResult(
@@ -1360,7 +1473,93 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.assertEqual(input_doc.original_file.name, "simple.pdf")
         self.assertEqual(overrides.filename, "simple.pdf")
-        self.assertEqual(overrides.custom_field_ids, [custom_field.id])
+        self.assertEqual(overrides.custom_fields, {custom_field.id: None})
+
+    def test_upload_with_custom_fields_and_workflow(self):
+        """
+        GIVEN: A document with a source file
+        WHEN: Upload the document with custom fields and a workflow
+        THEN: Metadata is set correctly, mimicking what happens in the real consumer plugin
+        """
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
+
+        cf = CustomField.objects.create(
+            name="stringfield",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        cf2 = CustomField.objects.create(
+            name="intfield",
+            data_type=CustomField.FieldDataType.INT,
+        )
+
+        trigger1 = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            sources=f"{DocumentSource.ApiUpload},{DocumentSource.ConsumeFolder},{DocumentSource.MailFetch}",
+        )
+        action1 = WorkflowAction.objects.create(
+            assign_title="Doc title",
+        )
+        action1.assign_custom_fields.add(cf2)
+        action1.assign_custom_fields_values = {cf2.id: 123}
+        action1.save()
+
+        w1 = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w1.triggers.add(trigger1)
+        w1.actions.add(action1)
+        w1.save()
+
+        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {
+                    "document": f,
+                    "custom_fields": [cf.id],
+                },
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.consume_file_mock.assert_called_once()
+
+        input_doc, overrides = self.get_last_consume_delay_call_args()
+
+        new_overrides, msg = run_workflows(
+            trigger_type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            document=input_doc,
+            logging_group=None,
+            overrides=overrides,
+        )
+        overrides.update(new_overrides)
+        self.assertEqual(overrides.custom_fields, {cf.id: None, cf2.id: 123})
+
+    def test_upload_with_webui_source(self):
+        """
+        GIVEN: A document with a source file
+        WHEN: Upload the document with 'from_webui' flag
+        THEN: Consume is called with the source set as WebUI
+        """
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
+
+        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {"document": f, "from_webui": True},
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.consume_file_mock.assert_called_once()
+
+        input_doc, overrides = self.get_last_consume_delay_call_args()
+
+        self.assertEqual(input_doc.source, WorkflowTrigger.DocumentSourceChoices.WEB_UI)
 
     def test_upload_invalid_pdf(self):
         """
@@ -1815,6 +2014,19 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+        # empty display fields treated as none
+        response = self.client.patch(
+            f"/api/saved_views/{v1.id}/",
+            {
+                "display_fields": [],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        v1.refresh_from_db()
+        self.assertEqual(v1.display_fields, None)
+
     def test_saved_view_display_customfields(self):
         """
         GIVEN:
@@ -1885,6 +2097,42 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_saved_view_cleanup_after_custom_field_deletion(self):
+        """
+        GIVEN:
+            - Saved view with custom field in display fields and as sort field
+        WHEN:
+            - Custom field is deleted
+        THEN:
+            - Custom field is removed from display fields and sort field
+        """
+        custom_field = CustomField.objects.create(
+            name="stringfield",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+
+        view = SavedView.objects.create(
+            owner=self.user,
+            name="test",
+            sort_field=SavedView.DisplayFields.CUSTOM_FIELD % custom_field.id,
+            show_on_dashboard=True,
+            show_in_sidebar=True,
+            display_fields=[
+                SavedView.DisplayFields.TITLE,
+                SavedView.DisplayFields.CREATED,
+                SavedView.DisplayFields.CUSTOM_FIELD % custom_field.id,
+            ],
+        )
+
+        custom_field.delete()
+
+        view.refresh_from_db()
+        self.assertEqual(view.sort_field, SavedView.DisplayFields.CREATED)
+        self.assertEqual(
+            view.display_fields,
+            [str(SavedView.DisplayFields.TITLE), str(SavedView.DisplayFields.CREATED)],
+        )
 
     def test_get_logs(self):
         log_data = "test\ntest2\n"
@@ -2029,8 +2277,10 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         GIVEN:
             - A document with a single note
         WHEN:
+            - API request for document
             - API request for document notes is made
         THEN:
+            - Note is included in the document response
             - The associated note is returned
         """
         doc = Document.objects.create(
@@ -2043,6 +2293,18 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             document=doc,
             user=self.user,
         )
+
+        response = self.client.get(
+            f"/api/documents/{doc.pk}/",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        resp_data = response.json()
+        self.assertEqual(len(resp_data["notes"]), 1)
+        self.assertEqual(resp_data["notes"][0]["note"], note.note)
+        self.assertEqual(resp_data["notes"][0]["user"]["username"], self.user.username)
 
         response = self.client.get(
             f"/api/documents/{doc.pk}/notes/",
@@ -2070,6 +2332,26 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
                     "last_name": note.user.last_name,
                 },
             },
+        )
+
+    def test_docnote_serializer_v7(self):
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will have notes!",
+        )
+        Note.objects.create(
+            note="This is a note.",
+            document=doc,
+            user=self.user,
+        )
+        self.assertEqual(
+            self.client.get(
+                f"/api/documents/{doc.pk}/",
+                headers={"Accept": "application/json; version=7"},
+                format="json",
+            ).data["notes"][0]["user"],
+            self.user.id,
         )
 
     def test_create_note(self):
@@ -2612,6 +2894,153 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         doc1.refresh_from_db()
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(doc1.tags.count(), 2)
+
+    @override_settings(
+        EMAIL_ENABLED=True,
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    )
+    def test_email_document(self):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - API request is made to email document action
+        THEN:
+            - Email is sent, with document (original or archive) attached
+        """
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document 1",
+            checksum="1",
+            filename="test.pdf",
+            archive_checksum="A",
+            archive_filename="archive.pdf",
+        )
+        doc2 = Document.objects.create(
+            title="test2",
+            mime_type="application/pdf",
+            content="this is a document 2",
+            checksum="2",
+            filename="test2.pdf",
+        )
+
+        archive_file = Path(__file__).parent / "samples" / "simple.pdf"
+        source_file = Path(__file__).parent / "samples" / "simple.pdf"
+
+        shutil.copy(archive_file, doc.archive_path)
+        shutil.copy(source_file, doc2.source_path)
+
+        self.client.post(
+            f"/api/documents/{doc.pk}/email/",
+            {
+                "addresses": "hello@paperless-ngx.com",
+                "subject": "test",
+                "message": "hello",
+            },
+        )
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].attachments[0][0], "archive.pdf")
+
+        self.client.post(
+            f"/api/documents/{doc2.pk}/email/",
+            {
+                "addresses": "hello@paperless-ngx.com",
+                "subject": "test",
+                "message": "hello",
+                "use_archive_version": False,
+            },
+        )
+
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(mail.outbox[1].attachments[0][0], "test2.pdf")
+
+    @mock.patch("django.core.mail.message.EmailMessage.send", side_effect=Exception)
+    def test_email_document_errors(self, mocked_send):
+        """
+        GIVEN:
+            - Existing document
+        WHEN:
+            - API request is made to email document action with insufficient permissions
+            - API request is made to email document action with invalid document id
+            - API request is made to email document action with missing data
+            - API request is made to email document action with invalid email address
+            - API request is made to email document action and error occurs during email send
+        THEN:
+            - Error response is returned
+        """
+        user1 = User.objects.create_user(username="test1")
+        user1.user_permissions.add(*Permission.objects.all())
+        user1.save()
+
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document 1",
+            checksum="1",
+            filename="test.pdf",
+            archive_checksum="A",
+            archive_filename="archive.pdf",
+        )
+
+        doc2 = Document.objects.create(
+            title="test2",
+            mime_type="application/pdf",
+            content="this is a document 2",
+            checksum="2",
+            owner=self.user,
+        )
+
+        self.client.force_authenticate(user1)
+
+        resp = self.client.post(
+            f"/api/documents/{doc2.pk}/email/",
+            {
+                "addresses": "hello@paperless-ngx.com",
+                "subject": "test",
+                "message": "hello",
+            },
+        )
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+        resp = self.client.post(
+            "/api/documents/999/email/",
+            {
+                "addresses": "hello@paperless-ngx.com",
+                "subject": "test",
+                "message": "hello",
+            },
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        resp = self.client.post(
+            f"/api/documents/{doc.pk}/email/",
+            {
+                "addresses": "hello@paperless-ngx.com",
+            },
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+        resp = self.client.post(
+            f"/api/documents/{doc.pk}/email/",
+            {
+                "addresses": "hello@paperless-ngx.com,hello",
+                "subject": "test",
+                "message": "hello",
+            },
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+        resp = self.client.post(
+            f"/api/documents/{doc.pk}/email/",
+            {
+                "addresses": "hello@paperless-ngx.com",
+                "subject": "test",
+                "message": "hello",
+            },
+        )
+        self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @mock.patch("django_softdelete.models.SoftDeleteModel.delete")
     def test_warn_on_delete_with_old_uuid_field(self, mocked_delete):

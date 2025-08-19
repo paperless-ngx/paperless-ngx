@@ -1,4 +1,3 @@
-import os
 import re
 import shutil
 from pathlib import Path
@@ -22,7 +21,7 @@ from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
 
 
-def dummy_preprocess(content: str):
+def dummy_preprocess(content: str, **kwargs):
     """
     Simpler, faster pre-processing for testing purposes
     """
@@ -224,24 +223,47 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.generate_test_data()
         self.classifier.train()
 
-        self.assertEqual(
-            self.classifier.predict_correspondent(self.doc1.content),
-            self.c1.pk,
-        )
-        self.assertEqual(self.classifier.predict_correspondent(self.doc2.content), None)
-        self.assertListEqual(
-            self.classifier.predict_tags(self.doc1.content),
-            [self.t1.pk],
-        )
-        self.assertListEqual(
-            self.classifier.predict_tags(self.doc2.content),
-            [self.t1.pk, self.t3.pk],
-        )
-        self.assertEqual(
-            self.classifier.predict_document_type(self.doc1.content),
-            self.dt.pk,
-        )
-        self.assertEqual(self.classifier.predict_document_type(self.doc2.content), None)
+        with (
+            mock.patch.object(
+                self.classifier.data_vectorizer,
+                "transform",
+                wraps=self.classifier.data_vectorizer.transform,
+            ) as mock_transform,
+            mock.patch.object(
+                self.classifier,
+                "preprocess_content",
+                wraps=self.classifier.preprocess_content,
+            ) as mock_preprocess_content,
+        ):
+            self.assertEqual(
+                self.classifier.predict_correspondent(self.doc1.content),
+                self.c1.pk,
+            )
+            self.assertEqual(
+                self.classifier.predict_correspondent(self.doc2.content),
+                None,
+            )
+            self.assertListEqual(
+                self.classifier.predict_tags(self.doc1.content),
+                [self.t1.pk],
+            )
+            self.assertListEqual(
+                self.classifier.predict_tags(self.doc2.content),
+                [self.t1.pk, self.t3.pk],
+            )
+            self.assertEqual(
+                self.classifier.predict_document_type(self.doc1.content),
+                self.dt.pk,
+            )
+            self.assertEqual(
+                self.classifier.predict_document_type(self.doc2.content),
+                None,
+            )
+
+            # Check that the classifier vectorized content and text preprocessing has been cached
+            # It should be called once per document (doc1 and doc2)
+            self.assertEqual(mock_preprocess_content.call_count, 2)
+            self.assertEqual(mock_transform.call_count, 2)
 
     def test_no_retrain_if_no_change(self):
         """
@@ -617,7 +639,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.assertListEqual(self.classifier.predict_tags(doc2.content), [])
 
     def test_load_classifier_not_exists(self):
-        self.assertFalse(os.path.exists(settings.MODEL_FILE))
+        self.assertFalse(Path(settings.MODEL_FILE).exists())
         self.assertIsNone(load_classifier())
 
     @mock.patch("documents.classifier.DocumentClassifier.load")
@@ -632,7 +654,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         },
     )
     @override_settings(
-        MODEL_FILE=os.path.join(os.path.dirname(__file__), "data", "model.pickle"),
+        MODEL_FILE=(Path(__file__).parent / "data" / "model.pickle").as_posix(),
     )
     @pytest.mark.skip(
         reason="Disabled caching due to high memory usage - need to investigate.",
@@ -648,24 +670,24 @@ class TestClassifier(DirectoriesMixin, TestCase):
     @mock.patch("documents.classifier.DocumentClassifier.load")
     def test_load_classifier_incompatible_version(self, load):
         Path(settings.MODEL_FILE).touch()
-        self.assertTrue(os.path.exists(settings.MODEL_FILE))
+        self.assertTrue(Path(settings.MODEL_FILE).exists())
 
         load.side_effect = IncompatibleClassifierVersionError("Dummy Error")
         self.assertIsNone(load_classifier())
-        self.assertFalse(os.path.exists(settings.MODEL_FILE))
+        self.assertFalse(Path(settings.MODEL_FILE).exists())
 
     @mock.patch("documents.classifier.DocumentClassifier.load")
     def test_load_classifier_os_error(self, load):
         Path(settings.MODEL_FILE).touch()
-        self.assertTrue(os.path.exists(settings.MODEL_FILE))
+        self.assertTrue(Path(settings.MODEL_FILE).exists())
 
         load.side_effect = OSError()
         self.assertIsNone(load_classifier())
-        self.assertTrue(os.path.exists(settings.MODEL_FILE))
+        self.assertTrue(Path(settings.MODEL_FILE).exists())
 
     def test_load_old_classifier_version(self):
         shutil.copy(
-            os.path.join(os.path.dirname(__file__), "data", "v1.17.4.model.pickle"),
+            Path(__file__).parent / "data" / "v1.17.4.model.pickle",
             self.dirs.scratch_dir,
         )
         with override_settings(
@@ -695,3 +717,67 @@ class TestClassifier(DirectoriesMixin, TestCase):
         mock_load.side_effect = Exception()
         with self.assertRaises(Exception):
             load_classifier(raise_exception=True)
+
+
+def test_preprocess_content():
+    """
+    GIVEN:
+        - Advanced text processing is enabled (default)
+    WHEN:
+        - Classifier preprocesses a document's content
+    THEN:
+        - Processed content matches the expected output (stemmed words)
+    """
+    with (Path(__file__).parent / "samples" / "content.txt").open("r") as f:
+        content = f.read()
+    with (Path(__file__).parent / "samples" / "preprocessed_content_advanced.txt").open(
+        "r",
+    ) as f:
+        expected_preprocess_content = f.read().rstrip()
+    classifier = DocumentClassifier()
+    result = classifier.preprocess_content(content)
+    assert result == expected_preprocess_content
+
+
+def test_preprocess_content_nltk_disabled():
+    """
+    GIVEN:
+        - Advanced text processing is disabled
+    WHEN:
+        - Classifier preprocesses a document's content
+    THEN:
+        - Processed content matches the expected output (unstemmed words)
+    """
+    with (Path(__file__).parent / "samples" / "content.txt").open("r") as f:
+        content = f.read()
+    with (Path(__file__).parent / "samples" / "preprocessed_content.txt").open(
+        "r",
+    ) as f:
+        expected_preprocess_content = f.read().rstrip()
+    classifier = DocumentClassifier()
+    with mock.patch("documents.classifier.ADVANCED_TEXT_PROCESSING_ENABLED", new=False):
+        result = classifier.preprocess_content(content)
+    assert result == expected_preprocess_content
+
+
+def test_preprocess_content_nltk_load_fail(mocker):
+    """
+    GIVEN:
+        - NLTK stop words fail to load
+    WHEN:
+        - Classifier preprocesses a document's content
+    THEN:
+        - Processed content matches the expected output (unstemmed words)
+    """
+    _module = mocker.MagicMock(name="nltk_corpus_mock")
+    _module.stopwords.words.side_effect = AttributeError()
+    mocker.patch.dict("sys.modules", {"nltk.corpus": _module})
+    classifier = DocumentClassifier()
+    with (Path(__file__).parent / "samples" / "content.txt").open("r") as f:
+        content = f.read()
+    with (Path(__file__).parent / "samples" / "preprocessed_content.txt").open(
+        "r",
+    ) as f:
+        expected_preprocess_content = f.read().rstrip()
+    result = classifier.preprocess_content(content)
+    assert result == expected_preprocess_content

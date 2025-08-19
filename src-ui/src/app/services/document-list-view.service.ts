@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { Injectable, inject } from '@angular/core'
 import { ParamMap, Router } from '@angular/router'
 import { Observable, Subject, first, takeUntil } from 'rxjs'
 import {
@@ -91,6 +91,10 @@ export interface ListViewState {
   providedIn: 'root',
 })
 export class DocumentListViewService {
+  private documentService = inject(DocumentService)
+  private settings = inject(SettingsService)
+  private router = inject(Router)
+
   isReloading: boolean = false
   initialized: boolean = false
   error: string = null
@@ -116,11 +120,7 @@ export class DocumentListViewService {
     return this.activeListViewState.title
   }
 
-  constructor(
-    private documentService: DocumentService,
-    private settings: SettingsService,
-    private router: Router
-  ) {
+  constructor() {
     let documentListViewConfigJson = localStorage.getItem(
       DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG
     )
@@ -306,6 +306,14 @@ export class DocumentListViewService {
             // this happens when applying a filter: the current page might not be available anymore due to the reduced result set.
             activeListViewState.currentPage = 1
             this.reload()
+          } else if (
+            activeListViewState.sortField.indexOf('custom_field') === 0 &&
+            this.settings.allDisplayFields.find(
+              (f) => f.id === activeListViewState.sortField
+            ) === undefined
+          ) {
+            // e.g. field was deleted
+            this.sortField = 'created'
           } else {
             this.selectionData = null
             let errorMessage

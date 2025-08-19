@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -24,13 +24,13 @@ import { SwitchComponent } from '../input/switch/switch.component'
   ],
 })
 export class PermissionsDialogComponent {
+  activeModal = inject(NgbActiveModal)
+  private userService = inject(UserService)
+
   users: User[]
   private o: ObjectWithPermissions = undefined
 
-  constructor(
-    public activeModal: NgbActiveModal,
-    private userService: UserService
-  ) {
+  constructor() {
     this.userService.listAll().subscribe((r) => (this.users = r.results))
   }
 

@@ -1,0 +1,18 @@
+{% extends "paperless-ngx/base.html" %}
+{% load i18n %}
+
+{% block head_title %}
+    {% trans "Paperless-ngx account inactive" %}
+{% endblock head_title %}
+
+{% block form_top_content %}
+    <h4>{% translate "Account inactive." %}</h4>
+{% endblock form_top_content %}
+
+{% block form_content %}
+		{% url 'account_login' as login_url %}
+    <p>{% translate "This account is inactive." %}</p>
+    <div class="d-grid mt-3">
+        <a class="btn btn-lg btn-primary" href="{{ login_url }}">{% translate "Return to login" %}</a>
+    </div>
+{% endblock form_content %}

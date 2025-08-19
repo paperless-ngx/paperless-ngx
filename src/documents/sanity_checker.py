@@ -1,13 +1,18 @@
 import hashlib
 import logging
+import uuid
 from collections import defaultdict
 from pathlib import Path
 from typing import Final
 
+from celery import states
 from django.conf import settings
+from django.utils import timezone
 from tqdm import tqdm
 
 from documents.models import Document
+from documents.models import PaperlessTask
+from paperless.config import GeneralConfig
 
 
 class SanityCheckMessages:
@@ -57,7 +62,17 @@ class SanityCheckFailedException(Exception):
     pass
 
 
-def check_sanity(*, progress=False) -> SanityCheckMessages:
+def check_sanity(*, progress=False, scheduled=True) -> SanityCheckMessages:
+    paperless_task = PaperlessTask.objects.create(
+        task_id=uuid.uuid4(),
+        type=PaperlessTask.TaskType.SCHEDULED_TASK
+        if scheduled
+        else PaperlessTask.TaskType.MANUAL_TASK,
+        task_name=PaperlessTask.TaskName.CHECK_SANITY,
+        status=states.STARTED,
+        date_created=timezone.now(),
+        date_started=timezone.now(),
+    )
     messages = SanityCheckMessages()
 
     present_files = {
@@ -67,6 +82,13 @@ def check_sanity(*, progress=False) -> SanityCheckMessages:
     lockfile = Path(settings.MEDIA_LOCK).resolve()
     if lockfile in present_files:
         present_files.remove(lockfile)
+
+    general_config = GeneralConfig()
+    app_logo = general_config.app_logo or settings.APP_LOGO
+    if app_logo:
+        logo_file = Path(settings.MEDIA_ROOT / Path(app_logo.lstrip("/"))).resolve()
+        if logo_file in present_files:
+            present_files.remove(logo_file)
 
     for doc in tqdm(Document.global_objects.all(), disable=not progress):
         # Check sanity of the thumbnail
@@ -142,4 +164,11 @@ def check_sanity(*, progress=False) -> SanityCheckMessages:
     for extra_file in present_files:
         messages.warning(None, f"Orphaned file in media dir: {extra_file}")
 
+    paperless_task.status = states.SUCCESS if not messages.has_error else states.FAILURE
+    # result is concatenated messages
+    paperless_task.result = f"{len(messages)} issues found."
+    if messages.has_error:
+        paperless_task.result += " Check logs for details."
+    paperless_task.date_done = timezone.now()
+    paperless_task.save(update_fields=["status", "result", "date_done"])
     return messages

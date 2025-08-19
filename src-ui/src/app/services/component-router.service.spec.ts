@@ -29,7 +29,7 @@ describe('ComponentRouterService', () => {
     eventsSubject.next(
       new ActivationStart({
         url: 'test-url',
-        component: { name: 'TestComponent' },
+        data: { componentName: 'TestComponent' },
       } as any)
     )
 
@@ -41,13 +41,13 @@ describe('ComponentRouterService', () => {
     eventsSubject.next(
       new ActivationStart({
         url: 'test-url-1',
-        component: { name: 'TestComponent' },
+        data: { componentName: 'TestComponent' },
       } as any)
     )
     eventsSubject.next(
       new ActivationStart({
         url: 'test-url-2',
-        component: { name: 'TestComponent' },
+        data: { componentName: 'TestComponent' },
       } as any)
     )
 
@@ -59,13 +59,13 @@ describe('ComponentRouterService', () => {
     eventsSubject.next(
       new ActivationStart({
         url: 'test-url-1',
-        component: { name: 'TestComponent1' },
+        data: { componentName: 'TestComponent1' },
       } as any)
     )
     eventsSubject.next(
       new ActivationStart({
         url: 'test-url-2',
-        component: { name: 'TestComponent2' },
+        data: { componentName: 'TestComponent2' },
       } as any)
     )
 
@@ -76,13 +76,13 @@ describe('ComponentRouterService', () => {
     eventsSubject.next(
       new ActivationStart({
         url: 'test-url-1',
-        component: { name: 'TestComponent' },
+        data: { componentName: 'TestComponent' },
       } as any)
     )
     eventsSubject.next(
       new ActivationStart({
         url: 'test-url-2',
-        component: { name: 'TestComponent' },
+        data: { componentName: 'TestComponent' },
       } as any)
     )
 
@@ -93,7 +93,7 @@ describe('ComponentRouterService', () => {
     eventsSubject.next(
       new ActivationStart({
         url: 'test-url',
-        component: { name: 'TestComponent' },
+        data: { componentName: 'TestComponent' },
       } as any)
     )
 

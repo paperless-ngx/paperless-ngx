@@ -26,9 +26,9 @@ class TestChecks(DirectoriesMixin, TestCase):
         self.assertEqual(paths_check(None), [])
 
     @override_settings(
-        MEDIA_ROOT="uuh",
-        DATA_DIR="whatever",
-        CONSUMPTION_DIR="idontcare",
+        MEDIA_ROOT=Path("uuh"),
+        DATA_DIR=Path("whatever"),
+        CONSUMPTION_DIR=Path("idontcare"),
     )
     def test_paths_check_dont_exist(self):
         msgs = paths_check(None)
@@ -38,9 +38,9 @@ class TestChecks(DirectoriesMixin, TestCase):
             self.assertTrue(msg.msg.endswith("is set but doesn't exist."))
 
     def test_paths_check_no_access(self):
-        os.chmod(self.dirs.data_dir, 0o000)
-        os.chmod(self.dirs.media_dir, 0o000)
-        os.chmod(self.dirs.consumption_dir, 0o000)
+        Path(self.dirs.data_dir).chmod(0o000)
+        Path(self.dirs.media_dir).chmod(0o000)
+        Path(self.dirs.consumption_dir).chmod(0o000)
 
         self.addCleanup(os.chmod, self.dirs.data_dir, 0o777)
         self.addCleanup(os.chmod, self.dirs.media_dir, 0o777)

@@ -1040,6 +1040,27 @@ describe('BulkEditorComponent', () => {
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     ) // listAllFilteredIds
     expect(documentListViewService.selected.size).toEqual(0)
+
+    // Test with archiveFallback enabled
+    modal.componentInstance.deleteOriginals = false
+    modal.componentInstance.archiveFallback = true
+    modal.componentInstance.confirm()
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.flush(true)
+    expect(req.request.body).toEqual({
+      documents: [3, 4],
+      method: 'merge',
+      parameters: { metadata_document_id: 3, archive_fallback: true },
+    })
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true`
+    ) // list reload
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
+    ) // listAllFilteredIds
+    expect(documentListViewService.selected.size).toEqual(0)
   })
 
   it('should support bulk download with archive, originals or both and file formatting', () => {
@@ -1129,10 +1150,10 @@ describe('BulkEditorComponent', () => {
 
   it('should not attempt to retrieve objects if user does not have permissions', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
-    expect(component.tags).toBeUndefined()
-    expect(component.correspondents).toBeUndefined()
-    expect(component.documentTypes).toBeUndefined()
-    expect(component.storagePaths).toBeUndefined()
+    expect(component.tagSelectionModel.items.length).toEqual(0)
+    expect(component.correspondentSelectionModel.items.length).toEqual(0)
+    expect(component.documentTypeSelectionModel.items.length).toEqual(0)
+    expect(component.storagePathsSelectionModel.items.length).toEqual(0)
     httpTestingController.expectNone(`${environment.apiBaseUrl}documents/tags/`)
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/correspondents/`
@@ -1183,7 +1204,9 @@ describe('BulkEditorComponent', () => {
     expect(tagListAllSpy).toHaveBeenCalled()
 
     expect(tagSelectionModelToggleSpy).toHaveBeenCalledWith(newTag.id)
-    expect(component.tags).toEqual(tags.results)
+    expect(component.tagSelectionModel.items).toEqual(
+      [{ id: null, name: 'Not assigned' }].concat(tags.results as any)
+    )
   })
 
   it('should support create new correspondent', () => {
@@ -1230,7 +1253,9 @@ describe('BulkEditorComponent', () => {
     expect(correspondentSelectionModelToggleSpy).toHaveBeenCalledWith(
       newCorrespondent.id
     )
-    expect(component.correspondents).toEqual(correspondents.results)
+    expect(component.correspondentSelectionModel.items).toEqual(
+      [{ id: null, name: 'Not assigned' }].concat(correspondents.results as any)
+    )
   })
 
   it('should support create new document type', () => {
@@ -1274,7 +1299,9 @@ describe('BulkEditorComponent', () => {
     expect(documentTypeSelectionModelToggleSpy).toHaveBeenCalledWith(
       newDocumentType.id
     )
-    expect(component.documentTypes).toEqual(documentTypes.results)
+    expect(component.documentTypeSelectionModel.items).toEqual(
+      [{ id: null, name: 'Not assigned' }].concat(documentTypes.results as any)
+    )
   })
 
   it('should support create new storage path', () => {
@@ -1318,7 +1345,9 @@ describe('BulkEditorComponent', () => {
     expect(storagePathsSelectionModelToggleSpy).toHaveBeenCalledWith(
       newStoragePath.id
     )
-    expect(component.storagePaths).toEqual(storagePaths.results)
+    expect(component.storagePathsSelectionModel.items).toEqual(
+      [{ id: null, name: 'Not assigned' }].concat(storagePaths.results as any)
+    )
   })
 
   it('should support create new custom field', () => {
@@ -1370,7 +1399,9 @@ describe('BulkEditorComponent', () => {
     expect(customFieldsSelectionModelToggleSpy).toHaveBeenCalledWith(
       newCustomField.id
     )
-    expect(component.customFields).toEqual(customFields.results)
+    expect(component.customFieldsSelectionModel.items).toEqual(
+      [{ id: null, name: 'Not assigned' }].concat(customFields.results as any)
+    )
   })
 
   it('should open the bulk edit custom field values dialog with correct parameters', () => {
@@ -1395,17 +1426,17 @@ describe('BulkEditorComponent', () => {
     const toastServiceShowErrorSpy = jest.spyOn(toastService, 'showError')
     const listReloadSpy = jest.spyOn(documentListViewService, 'reload')
 
-    component.customFields = [
+    component.customFieldsSelectionModel.items = [
       { id: 1, name: 'Custom Field 1', data_type: CustomFieldDataType.String },
       { id: 2, name: 'Custom Field 2', data_type: CustomFieldDataType.String },
-    ]
+    ] as any
 
     component.setCustomFieldValues({
       itemsToAdd: [{ id: 1 }, { id: 2 }],
       itemsToRemove: [1],
     } as any)
 
-    expect(modal.componentInstance.customFields).toEqual(component.customFields)
+    expect(modal.componentInstance.customFields.length).toEqual(2)
     expect(modal.componentInstance.fieldsToAddIds).toEqual([1, 2])
     expect(modal.componentInstance.documents).toEqual([3, 4])
 

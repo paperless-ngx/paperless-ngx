@@ -1,12 +1,14 @@
+from __future__ import annotations
+
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import NoReturn
-from zipfile import ZipFile
-
-from documents.models import Document
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from zipfile import ZipFile
+
+    from documents.models import Document
 
 
 class BulkArchiveStrategy:

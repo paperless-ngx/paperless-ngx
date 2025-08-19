@@ -19,6 +19,7 @@ import { GroupService } from 'src/app/services/rest/group.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import * as navUtils from 'src/app/utils/navigation'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { GroupEditDialogComponent } from '../../common/edit-dialog/group-edit-dialog/group-edit-dialog.component'
 import { UserEditDialogComponent } from '../../common/edit-dialog/user-edit-dialog/user-edit-dialog.component'
@@ -107,7 +108,7 @@ describe('UsersAndGroupsComponent', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     editDialog.failed.emit()
-    expect(toastErrorSpy).toBeCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     settingsService.currentUser = users[1] // simulate logged in as different user
     editDialog.succeeded.emit(users[0])
     expect(toastInfoSpy).toHaveBeenCalledWith(
@@ -130,7 +131,7 @@ describe('UsersAndGroupsComponent', () => {
       throwError(() => new Error('error deleting user'))
     )
     deleteDialog.confirm()
-    expect(toastErrorSpy).toBeCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     deleteSpy.mockReturnValueOnce(of(true))
     deleteDialog.confirm()
     expect(listAllSpy).toHaveBeenCalled()
@@ -142,19 +143,18 @@ describe('UsersAndGroupsComponent', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
     component.editUser(users[0])
+    const navSpy = jest
+      .spyOn(navUtils, 'setLocationHref')
+      .mockImplementation(() => {})
     const editDialog = modal.componentInstance as UserEditDialogComponent
     editDialog.passwordIsSet = true
     settingsService.currentUser = users[0] // simulate logged in as same user
     editDialog.succeeded.emit(users[0])
     fixture.detectChanges()
-    Object.defineProperty(window, 'location', {
-      value: {
-        href: 'http://localhost/',
-      },
-      writable: true, // possibility to override
-    })
     tick(2600)
-    expect(window.location.href).toContain('logout')
+    expect(navSpy).toHaveBeenCalledWith(
+      `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
+    )
   }))
 
   it('should support edit / create group, show error if needed', () => {
@@ -166,7 +166,7 @@ describe('UsersAndGroupsComponent', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     editDialog.failed.emit()
-    expect(toastErrorSpy).toBeCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     editDialog.succeeded.emit(groups[0])
     expect(toastInfoSpy).toHaveBeenCalledWith(
       `Saved group "${groups[0].name}".`
@@ -188,7 +188,7 @@ describe('UsersAndGroupsComponent', () => {
       throwError(() => new Error('error deleting group'))
     )
     deleteDialog.confirm()
-    expect(toastErrorSpy).toBeCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
     deleteSpy.mockReturnValueOnce(of(true))
     deleteDialog.confirm()
     expect(listAllSpy).toHaveBeenCalled()
@@ -210,7 +210,7 @@ describe('UsersAndGroupsComponent', () => {
       )
     completeSetup(userService)
     fixture.detectChanges()
-    expect(toastErrorSpy).toBeCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
   })
 
   it('should show errors on load if load groups failure', () => {
@@ -222,6 +222,6 @@ describe('UsersAndGroupsComponent', () => {
       )
     completeSetup(groupService)
     fixture.detectChanges()
-    expect(toastErrorSpy).toBeCalled()
+    expect(toastErrorSpy).toHaveBeenCalled()
   })
 })

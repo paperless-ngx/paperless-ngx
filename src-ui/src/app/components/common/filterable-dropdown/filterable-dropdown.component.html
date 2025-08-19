@@ -30,7 +30,7 @@
       }
       <div class="list-group-item">
         <div class="input-group input-group-sm">
-          <input class="form-control" type="text" [(ngModel)]="filterText" [placeholder]="filterPlaceholder" (keyup.enter)="listFilterEnter()" #listFilterTextInput>
+          <input class="form-control" type="text" spellcheck="false" [(ngModel)]="filterText" [placeholder]="filterPlaceholder" (keyup.enter)="listFilterEnter()" #listFilterTextInput>
         </div>
       </div>
       @if (selectionModel.items) {

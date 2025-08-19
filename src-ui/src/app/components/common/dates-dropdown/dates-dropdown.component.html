@@ -1,161 +1,158 @@
-<div class="btn-group w-100" ngbDropdown role="group" [popperOptions]="popperOptions">
+<div class="btn-group w-100" ngbDropdown role="group" [popperOptions]="popperOptions" [placement]="placement">
   <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="createdDateTo || createdDateFrom ? 'btn-primary' : 'btn-outline-primary'" [disabled]="disabled">
     <i-bs width="1em" height="1em" name="calendar-event-fill"></i-bs>
     <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
     <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
   </button>
   <div class="dropdown-menu date-dropdown shadow p-2" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
-    <div class="row d-flex">
-      <div class="col border-end">
-        <div class="list-group list-group-flush">
-          <h6 class="dropdown-header border-bottom" i18n>Created</h6>
-          @for (rd of relativeDates; track rd) {
-            <button class="list-group-item small list-goup list-group-item-action d-flex p-2" role="menuitem" (click)="setCreatedRelativeDate(rd.id)">
-              <div class="selected-icon">
-                @if (createdRelativeDate === rd.id) {
-                  <i-bs width="1em" height="1em" name="check"></i-bs>
-                }
-              </div>
-              <div class="d-flex justify-content-between w-100 align-items-center ps-2">
-                <div class="pe-4">
-                  {{rd.name}}
-                </div>
-                <div class="text-muted small pe-2">
-                  <span class="small">
-                    {{ rd.date | customDate:'mediumDate' }} &ndash; <ng-container i18n>now</ng-container>
-                  </span>
-                </div>
-              </div>
-            </button>
+    <h6 class="dropdown-header border-bottom" i18n>Created</h6>
+    <div class="list-group list-group-flush">
+      <div class="list-group-item d-flex p-2 select-item" role="menuitem">
+        <div class="selected-icon">
+          @if (createdRelativeDate) {
+            <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearCreatedRelativeDate()">
+              <i-bs width="1em" height="1em" name="check" class="variant-unfocused"></i-bs>
+              <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
+            </a>
           }
-          <div class="list-group-item d-flex p-2" role="menuitem">
-
-            <div class="selected-icon">
-              @if (createdDateFrom) {
-                <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearCreatedFrom()">
-                  <i-bs width="1em" height="1em" name="check" class="variant-unfocused"></i-bs>
-                  <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
-                </a>
-              }
-            </div>
-            <div class="input-group input-group-sm small ps-1 pe-2">
-              <span class="input-group-text w-25 small text-muted" i18n>From</span>
-              <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
-                maxlength="10" [(ngModel)]="createdDateFrom" ngbDatepicker #createdDateFromPicker="ngbDatepicker" [footerTemplate]="createdFromFooterTemplate">
-              <button class="btn btn-outline-secondary" (click)="createdDateFromPicker.toggle()" type="button">
-                <i-bs width="1em" height="1em" name="calendar"></i-bs>
-              </button>
-              <ng-template #createdFromFooterTemplate>
-                <div class="btn-group-xs border-top p-2 d-flex">
-                  <button class="btn btn-primary" (click)="createdDateFrom = today; onChangeDebounce()" i18n>Today</button>
-                  <button class="btn btn-secondary ms-auto" (click)="createdDateFromPicker.close()" i18n>Close</button>
-                </div>
-              </ng-template>
-            </div>
-
-          </div>
-          <div class="list-group-item d-flex p-2" role="menuitem">
-
-            <div class="selected-icon">
-              @if (createdDateTo) {
-                <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearCreatedTo()">
-                  <i-bs width="1em" height="1em" name="check" class="variant-unfocused"></i-bs>
-                  <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
-                </a>
-              }
-            </div>
-            <div class="input-group input-group-sm small ps-1 pe-2">
-              <span class="input-group-text w-25 small text-muted" i18n>To</span>
-              <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
-                maxlength="10" [(ngModel)]="createdDateTo" ngbDatepicker #createdDateToPicker="ngbDatepicker" [footerTemplate]="createdToFooterTemplate">
-              <button class="btn btn-outline-secondary" (click)="createdDateToPicker.toggle()" type="button">
-                <i-bs width="1em" height="1em" name="calendar"></i-bs>
-              </button>
-              <ng-template #createdToFooterTemplate>
-                <div class="btn-group-xs border-top p-2 d-flex">
-                  <button class="btn btn-primary" (click)="createdDateTo = today; onChangeDebounce()" i18n>Today</button>
-                  <button class="btn btn-secondary ms-auto" (click)="createdDateToPicker.close()" i18n>Close</button>
-                </div>
-              </ng-template>
-            </div>
-
-          </div>
+        </div>
+        <div class="input-group input-group-sm small ps-1 pe-2">
+          <ng-select class="w-100" name="createdRelativeDate"
+          [items]="relativeDates" [(ngModel)]="createdRelativeDate"
+          bindValue="id"
+          bindLabel="name"
+          clearable="false"
+          placeholder="Relative dates"
+          i18n-placeholder
+          (change)="onSetCreatedRelativeDate($event)">
+          <ng-template ng-option-tmp let-item="item">
+            <div class="d-flex">{{ item.name }}<span class="ms-auto text-muted small">{{ item.date | customDate:'mediumDate' }} &ndash; <ng-container i18n>now</ng-container></span></div>
+          </ng-template>
+          </ng-select>
         </div>
       </div>
-      <div class="col">
-        <h6 class="dropdown-header border-bottom" i18n>Added</h6>
-        <div class="list-group list-group-flush">
-          @for (rd of relativeDates; track rd) {
-            <button class="list-group-item small list-goup list-group-item-action d-flex p-2" role="menuitem" (click)="setAddedRelativeDate(rd.id)">
-              <div class="selected-icon">
-                @if (addedRelativeDate === rd.id) {
-                  <i-bs width="1em" height="1em" name="check"></i-bs>
-                }
-              </div>
-              <div class="d-flex justify-content-between w-100 align-items-center ps-2">
-                <div class="pe-4">
-                  {{rd.name}}
-                </div>
-                <div class="text-muted small pe-2">
-                  <span class="small">
-                    {{ rd.date | customDate:'mediumDate' }} &ndash; <ng-container i18n>now</ng-container>
-                  </span>
-                </div>
-              </div>
-            </button>
+      <div class="list-group-item d-flex p-2" role="menuitem">
+        <div class="selected-icon">
+          @if (createdDateFrom) {
+            <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearCreatedFrom()">
+              <i-bs width="1em" height="1em" name="check" class="variant-unfocused"></i-bs>
+              <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
+            </a>
           }
-          <div class="list-group-item d-flex p-2" role="menuitem">
-
-            <div class="selected-icon">
-              @if (addedDateFrom) {
-                <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearAddedFrom()">
-                  <i-bs width="1em" height="1em" name="check" class="variant-unfocused"></i-bs>
-                  <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
-                </a>
-              }
+        </div>
+        <div class="input-group input-group-sm small ps-1 pe-2">
+          <span class="input-group-text w-25 small text-muted" i18n>From</span>
+          <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
+            maxlength="10" [(ngModel)]="createdDateFrom" ngbDatepicker #createdDateFromPicker="ngbDatepicker" [footerTemplate]="createdFromFooterTemplate">
+          <button class="btn btn-outline-secondary" (click)="createdDateFromPicker.toggle()" type="button">
+            <i-bs width="1em" height="1em" name="calendar"></i-bs>
+          </button>
+          <ng-template #createdFromFooterTemplate>
+            <div class="btn-group-xs border-top p-2 d-flex">
+              <button class="btn btn-primary" (click)="createdDateFrom = today; onChangeDebounce()" i18n>Today</button>
+              <button class="btn btn-secondary ms-auto" (click)="createdDateFromPicker.close()" i18n>Close</button>
             </div>
-            <div class="input-group input-group-sm small ps-1 pe-2">
-              <span class="input-group-text w-25 small text-muted" i18n>From</span>
-              <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
-                maxlength="10" [(ngModel)]="addedDateFrom" ngbDatepicker #addedDateFromPicker="ngbDatepicker" [footerTemplate]="addedFromFooterTemplate">
-              <button class="btn btn-outline-secondary" (click)="addedDateFromPicker.toggle()" type="button">
-                <i-bs width="1em" height="1em" name="calendar"></i-bs>
-              </button>
-              <ng-template #addedFromFooterTemplate>
-                <div class="btn-group-xs border-top p-2 d-flex">
-                  <button class="btn btn-primary" (click)="addedDateFrom = today; onChangeDebounce()" i18n>Today</button>
-                  <button class="btn btn-secondary ms-auto" (click)="addedDateFromPicker.close()" i18n>Close</button>
-                </div>
-              </ng-template>
+          </ng-template>
+        </div>
+      </div>
+      <div class="list-group-item d-flex p-2" role="menuitem">
+        <div class="selected-icon">
+          @if (createdDateTo) {
+            <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearCreatedTo()">
+              <i-bs width="1em" height="1em" name="check" class="variant-unfocused"></i-bs>
+              <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
+            </a>
+          }
+        </div>
+        <div class="input-group input-group-sm small ps-1 pe-2">
+          <span class="input-group-text w-25 small text-muted" i18n>To</span>
+          <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
+            maxlength="10" [(ngModel)]="createdDateTo" ngbDatepicker #createdDateToPicker="ngbDatepicker" [footerTemplate]="createdToFooterTemplate">
+          <button class="btn btn-outline-secondary" (click)="createdDateToPicker.toggle()" type="button">
+            <i-bs width="1em" height="1em" name="calendar"></i-bs>
+          </button>
+          <ng-template #createdToFooterTemplate>
+            <div class="btn-group-xs border-top p-2 d-flex">
+              <button class="btn btn-primary" (click)="createdDateTo = today; onChangeDebounce()" i18n>Today</button>
+              <button class="btn btn-secondary ms-auto" (click)="createdDateToPicker.close()" i18n>Close</button>
             </div>
+          </ng-template>
+        </div>
 
-          </div>
-          <div class="list-group-item d-flex p-2" role="menuitem">
-
-            <div class="selected-icon">
-              @if (addedDateTo) {
-                <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearAddedTo()">
-                  <i-bs width="1em" height="1em" name="check" class="variant-unfocused"></i-bs>
-                  <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
-                </a>
-              }
+      </div>
+    </div>
+    <h6 class="dropdown-header border-bottom" i18n>Added</h6>
+    <div class="list-group list-group-flush">
+      <div class="list-group-item d-flex p-2 select-item" role="menuitem">
+        <div class="selected-icon">
+          @if (addedRelativeDate) {
+            <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearAddedRelativeDate()">
+              <i-bs width="1em" height="1em" name="check" class="variant-unfocused"></i-bs>
+              <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
+            </a>
+          }
+        </div>
+        <div class="input-group input-group-sm small ps-1 pe-2">
+          <ng-select class="w-100" name="addedRelativeDate"
+            [items]="relativeDates" [(ngModel)]="addedRelativeDate"
+            bindValue="id"
+            bindLabel="name"
+            clearable="false"
+            placeholder="Relative dates"
+            i18n-placeholder
+            (change)="onSetAddedRelativeDate($event)">
+            <ng-template ng-option-tmp let-item="item">
+              <div class="d-flex">{{ item.name }}<span class="ms-auto text-muted small">{{ item.date | customDate:'mediumDate' }} &ndash; <ng-container i18n>now</ng-container></span></div>
+            </ng-template>
+          </ng-select>
+        </div>
+      </div>
+      <div class="list-group-item d-flex p-2" role="menuitem">
+        <div class="selected-icon">
+          @if (addedDateFrom) {
+            <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearAddedFrom()">
+              <i-bs width="1em" height="1em" name="check" class="variant-unfocused"></i-bs>
+              <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
+            </a>
+          }
+        </div>
+        <div class="input-group input-group-sm small ps-1 pe-2">
+          <span class="input-group-text w-25 small text-muted" i18n>From</span>
+          <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
+            maxlength="10" [(ngModel)]="addedDateFrom" ngbDatepicker #addedDateFromPicker="ngbDatepicker" [footerTemplate]="addedFromFooterTemplate">
+          <button class="btn btn-outline-secondary" (click)="addedDateFromPicker.toggle()" type="button">
+            <i-bs width="1em" height="1em" name="calendar"></i-bs>
+          </button>
+          <ng-template #addedFromFooterTemplate>
+            <div class="btn-group-xs border-top p-2 d-flex">
+              <button class="btn btn-primary" (click)="addedDateFrom = today; onChangeDebounce()" i18n>Today</button>
+              <button class="btn btn-secondary ms-auto" (click)="addedDateFromPicker.close()" i18n>Close</button>
             </div>
-            <div class="input-group input-group-sm small ps-1 pe-2">
-              <span class="input-group-text w-25 small text-muted" i18n>To</span>
-              <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
-                maxlength="10" [(ngModel)]="addedDateTo" ngbDatepicker #addedDateToPicker="ngbDatepicker" [footerTemplate]="addedToFooterTemplate">
-              <button class="btn btn-outline-secondary" (click)="addedDateToPicker.toggle()" type="button">
-                <i-bs width="1em" height="1em" name="calendar"></i-bs>
-              </button>
-              <ng-template #addedToFooterTemplate>
-                <div class="btn-group-xs border-top p-2 d-flex">
-                  <button class="btn btn-primary" (click)="addedDateTo = today; onChangeDebounce()" i18n>Today</button>
-                  <button class="btn btn-secondary ms-auto" (click)="addedDateToPicker.close()" i18n>Close</button>
-                </div>
-              </ng-template>
+          </ng-template>
+        </div>
+      </div>
+      <div class="list-group-item d-flex p-2" role="menuitem">
+        <div class="selected-icon">
+          @if (addedDateTo) {
+            <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearAddedTo()">
+              <i-bs width="1em" height="1em" name="check" class="variant-unfocused"></i-bs>
+              <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
+            </a>
+          }
+        </div>
+        <div class="input-group input-group-sm small ps-1 pe-2">
+          <span class="input-group-text w-25 small text-muted" i18n>To</span>
+          <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
+            maxlength="10" [(ngModel)]="addedDateTo" ngbDatepicker #addedDateToPicker="ngbDatepicker" [footerTemplate]="addedToFooterTemplate">
+          <button class="btn btn-outline-secondary" (click)="addedDateToPicker.toggle()" type="button">
+            <i-bs width="1em" height="1em" name="calendar"></i-bs>
+          </button>
+          <ng-template #addedToFooterTemplate>
+            <div class="btn-group-xs border-top p-2 d-flex">
+              <button class="btn btn-primary" (click)="addedDateTo = today; onChangeDebounce()" i18n>Today</button>
+              <button class="btn btn-secondary ms-auto" (click)="addedDateToPicker.close()" i18n>Close</button>
             </div>
-
-          </div>
+          </ng-template>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { NgTemplateOutlet } from '@angular/common'
 import {
   Component,
   EventEmitter,
+  inject,
   Input,
   Output,
   QueryList,
@@ -34,7 +35,7 @@ import {
   CustomFieldQueryElement,
   CustomFieldQueryExpression,
 } from 'src/app/utils/custom-field-query-element'
-import { popperOptionsReenablePreventOverflow } from 'src/app/utils/popper-options'
+import { pngxPopperOptions } from 'src/app/utils/popper-options'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
 import { DocumentLinkComponent } from '../input/document-link/document-link.component'
@@ -178,12 +179,14 @@ export class CustomFieldQueriesModel {
   ],
 })
 export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPermissions {
+  protected customFieldsService = inject(CustomFieldsService)
+
   public CustomFieldQueryComponentType = CustomFieldQueryElementType
   public CustomFieldQueryOperator = CustomFieldQueryOperator
   public CustomFieldDataType = CustomFieldDataType
   public CUSTOM_FIELD_QUERY_MAX_DEPTH = CUSTOM_FIELD_QUERY_MAX_DEPTH
   public CUSTOM_FIELD_QUERY_MAX_ATOMS = CUSTOM_FIELD_QUERY_MAX_ATOMS
-  public popperOptions = popperOptionsReenablePreventOverflow
+  public popperOptions = pngxPopperOptions
 
   @Input()
   title: string
@@ -243,9 +246,9 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
 
   customFields: CustomField[] = []
 
-  public readonly today: string = new Date().toISOString().split('T')[0]
+  public readonly today: string = new Date().toLocaleDateString('en-CA')
 
-  constructor(protected customFieldsService: CustomFieldsService) {
+  constructor() {
     super()
     this.selectionModel = new CustomFieldQueriesModel()
     this.getFields()

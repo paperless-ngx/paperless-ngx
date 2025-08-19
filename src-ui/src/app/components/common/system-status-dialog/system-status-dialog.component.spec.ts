@@ -1,3 +1,18 @@
+// Mock production environment for testing
+jest.mock('src/environments/environment', () => ({
+  environment: {
+    production: true,
+    apiBaseUrl: 'http://localhost:8000/api/',
+    apiVersion: '9',
+    appTitle: 'Paperless-ngx',
+    tag: 'prod',
+    version: '2.4.3',
+    webSocketHost: 'localhost:8000',
+    webSocketProtocol: 'ws:',
+    webSocketBaseUrl: '/ws/',
+  },
+}))
+
 import { Clipboard } from '@angular/cdk/clipboard'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
@@ -9,11 +24,16 @@ import {
 } from '@angular/core/testing'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { of, throwError } from 'rxjs'
+import { PaperlessTaskName } from 'src/app/data/paperless-task'
 import {
   InstallType,
   SystemStatus,
   SystemStatusItemStatus,
 } from 'src/app/data/system-status'
+import { SystemStatusService } from 'src/app/services/system-status.service'
+import { TasksService } from 'src/app/services/tasks.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { SystemStatusDialogComponent } from './system-status-dialog.component'
 
 const status: SystemStatus = {
@@ -36,12 +56,17 @@ const status: SystemStatus = {
     redis_status: SystemStatusItemStatus.ERROR,
     redis_error: 'Error 61 connecting to localhost:6379. Connection refused.',
     celery_status: SystemStatusItemStatus.ERROR,
+    celery_url: 'celery@localhost',
+    celery_error: 'Error connecting to celery@localhost',
     index_status: SystemStatusItemStatus.OK,
     index_last_modified: new Date().toISOString(),
     index_error: null,
     classifier_status: SystemStatusItemStatus.OK,
     classifier_last_trained: new Date().toISOString(),
     classifier_error: null,
+    sanity_check_status: SystemStatusItemStatus.OK,
+    sanity_check_last_run: new Date().toISOString(),
+    sanity_check_error: null,
   },
 }
 
@@ -49,6 +74,9 @@ describe('SystemStatusDialogComponent', () => {
   let component: SystemStatusDialogComponent
   let fixture: ComponentFixture<SystemStatusDialogComponent>
   let clipboard: Clipboard
+  let tasksService: TasksService
+  let systemStatusService: SystemStatusService
+  let toastService: ToastService
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -67,6 +95,9 @@ describe('SystemStatusDialogComponent', () => {
     component = fixture.componentInstance
     component.status = status
     clipboard = TestBed.inject(Clipboard)
+    tasksService = TestBed.inject(TasksService)
+    systemStatusService = TestBed.inject(SystemStatusService)
+    toastService = TestBed.inject(ToastService)
     fixture.detectChanges()
   })
 
@@ -92,5 +123,49 @@ describe('SystemStatusDialogComponent', () => {
     date.setHours(date.getHours() - 25)
     expect(component.isStale(date.toISOString())).toBeTruthy()
     expect(component.isStale(date.toISOString(), 26)).toBeFalsy()
+  })
+
+  it('should check if task is running', () => {
+    component.runTask(PaperlessTaskName.IndexOptimize)
+    expect(component.isRunning(PaperlessTaskName.IndexOptimize)).toBeTruthy()
+    expect(component.isRunning(PaperlessTaskName.SanityCheck)).toBeFalsy()
+  })
+
+  it('should support running tasks, refresh status and show toasts', () => {
+    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const getStatusSpy = jest.spyOn(systemStatusService, 'get')
+    const runSpy = jest.spyOn(tasksService, 'run')
+
+    // fail first
+    runSpy.mockReturnValue(throwError(() => new Error('error')))
+    component.runTask(PaperlessTaskName.IndexOptimize)
+    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskName.IndexOptimize)
+    expect(toastErrorSpy).toHaveBeenCalledWith(
+      `Failed to start task ${PaperlessTaskName.IndexOptimize}, see the logs for more details`,
+      expect.any(Error)
+    )
+
+    // succeed
+    runSpy.mockReturnValue(of({}))
+    getStatusSpy.mockReturnValue(of(status))
+    component.runTask(PaperlessTaskName.IndexOptimize)
+    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskName.IndexOptimize)
+
+    expect(getStatusSpy).toHaveBeenCalled()
+    expect(toastSpy).toHaveBeenCalledWith(
+      `Task ${PaperlessTaskName.IndexOptimize} started`
+    )
+  })
+
+  it('shoduld handle version mismatch', () => {
+    component.frontendVersion = '2.4.2'
+    component.ngOnInit()
+    expect(component.versionMismatch).toBeTruthy()
+    expect(component.status.pngx_version).toContain('(frontend: 2.4.2)')
+    component.frontendVersion = '2.4.3'
+    component.status.pngx_version = '2.4.3'
+    component.ngOnInit()
+    expect(component.versionMismatch).toBeFalsy()
   })
 })

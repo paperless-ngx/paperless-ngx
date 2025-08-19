@@ -7,7 +7,6 @@ import { PermissionsService } from '../services/permissions.service'
 import { AbstractNameFilterService } from '../services/rest/abstract-name-filter-service'
 import { CorrespondentService } from '../services/rest/correspondent.service'
 import { CorrespondentNamePipe } from './correspondent-name.pipe'
-import { ObjectNamePipe } from './object-name.pipe'
 
 describe('ObjectNamePipe', () => {
   /*
@@ -21,7 +20,9 @@ describe('ObjectNamePipe', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        ObjectNamePipe,
+        CorrespondentNamePipe,
+        { provide: PermissionsService },
+        { provide: CorrespondentService },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
@@ -29,7 +30,7 @@ describe('ObjectNamePipe', () => {
 
     permissionsService = TestBed.inject(PermissionsService)
     objectService = TestBed.inject(CorrespondentService)
-    pipe = new CorrespondentNamePipe(permissionsService, objectService)
+    pipe = TestBed.inject(CorrespondentNamePipe)
   })
 
   it('should return object name if user has permission', (done) => {
@@ -50,7 +51,7 @@ describe('ObjectNamePipe', () => {
     })
   })
 
-  it('should return empty string if object not found', (done) => {
+  it('should return Private string if object not found', (done) => {
     const mockObjects = {
       results: [{ id: 2, name: 'Object 2' }],
       count: 1,
@@ -60,7 +61,7 @@ describe('ObjectNamePipe', () => {
     jest.spyOn(objectService, 'listAll').mockReturnValue(of(mockObjects))
 
     pipe.transform(1).subscribe((result) => {
-      expect(result).toBe('')
+      expect(result).toBe('Private')
       done()
     })
   })
