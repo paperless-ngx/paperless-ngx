@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 
@@ -17,6 +19,10 @@ class TestTagHierarchy(APITestCase):
 
         self.parent = Tag.objects.create(name="Parent")
         self.child = Tag.objects.create(name="Child", parent=self.parent)
+
+        patcher = mock.patch("documents.bulk_edit.bulk_update_documents.delay")
+        self.async_task = patcher.start()
+        self.addCleanup(patcher.stop)
 
         self.document = Document.objects.create(
             title="doc",
