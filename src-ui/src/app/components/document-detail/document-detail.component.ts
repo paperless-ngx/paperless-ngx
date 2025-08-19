@@ -221,6 +221,7 @@ export class DocumentDetailComponent
   thumbUrl: string
   previewText: string
   previewLoaded: boolean = false
+  pdf: PDFDocumentProxy
   tiffURL: string
   tiffError: string
 
@@ -1099,6 +1100,7 @@ export class DocumentDetailComponent
     if (this.password) this.requiresPassword = false
     setTimeout(() => {
       this.previewLoaded = true
+      this.pdf = pdf
     }, 300)
   }
 
@@ -1393,6 +1395,47 @@ export class DocumentDetailComponent
             },
           })
       })
+  }
+
+  printDocument() {
+    const printUrl = this.documentsService.getDownloadUrl(
+      this.document.id,
+      false
+    )
+    this.http.get(printUrl, { responseType: 'blob' }).subscribe({
+      next: (blob) => {
+        if (this.deviceDetectorService.isMobile()) {
+          const blobUrl = URL.createObjectURL(blob)
+          window.open(blobUrl, '_blank')
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 1000)
+          return
+        }
+        const blobUrl = URL.createObjectURL(blob)
+        const iframe = document.createElement('iframe')
+        iframe.style.display = 'none'
+        iframe.src = blobUrl
+        document.body.appendChild(iframe)
+        iframe.onload = () => {
+          try {
+            iframe.contentWindow.focus()
+            iframe.contentWindow.print()
+            iframe.contentWindow.onafterprint = () => {
+              document.body.removeChild(iframe)
+              URL.revokeObjectURL(blobUrl)
+            }
+          } catch (err) {
+            this.toastService.showError($localize`Print failed.`, err)
+            document.body.removeChild(iframe)
+            URL.revokeObjectURL(blobUrl)
+          }
+        }
+      },
+      error: () => {
+        this.toastService.showError(
+          $localize`Error loading document for printing.`
+        )
+      },
+    })
   }
 
   public openShareLinks() {
