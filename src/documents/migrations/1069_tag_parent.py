@@ -7,7 +7,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "1062_alter_savedviewfilterrule_rule_type"),
+        ("documents", "1068_alter_document_created"),
     ]
 
     operations = [
