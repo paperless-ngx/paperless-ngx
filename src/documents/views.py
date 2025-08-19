@@ -341,6 +341,39 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     filterset_class = TagFilterSet
     ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
 
+    def perform_update(self, serializer):
+        old_parent = self.get_object().parent
+        tag = serializer.save()
+        new_parent = tag.parent
+        if old_parent != new_parent:
+            self._update_document_parent_tags(tag, old_parent, new_parent)
+
+    def _update_document_parent_tags(self, tag, old_parent, new_parent):
+        DocumentTagRelationship = Document.tags.through
+        doc_ids = list(Document.objects.filter(tags=tag).values_list("pk", flat=True))
+        affected = set()
+
+        if new_parent:
+            parents_to_add = [new_parent, *new_parent.get_all_ancestors()]
+            to_create = []
+            for parent in parents_to_add:
+                missing = Document.objects.filter(id__in=doc_ids).exclude(tags=parent)
+                to_create.extend(
+                    DocumentTagRelationship(document_id=doc_id, tag_id=parent.id)
+                    for doc_id in missing.values_list("pk", flat=True)
+                )
+                affected.update(missing.values_list("pk", flat=True))
+            if to_create:
+                DocumentTagRelationship.objects.bulk_create(
+                    to_create,
+                    ignore_conflicts=True,
+                )
+
+        if affected:
+            from documents.tasks import bulk_update_documents
+
+            bulk_update_documents.delay(document_ids=list(affected))
+
 
 @extend_schema_view(**generate_object_with_permissions_schema(DocumentTypeSerializer))
 class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):

@@ -90,3 +90,17 @@ class TestTagHierarchy(APITestCase):
         run_workflows(trigger.type, self.document)
         self.document.refresh_from_db()
         assert self.document.tags.count() == 0
+
+    def test_tag_view_parent_update_adds_parent_to_docs(self):
+        orphan = Tag.objects.create(name="Orphan")
+        self.document.tags.add(orphan)
+
+        self.client.patch(
+            f"/api/tags/{orphan.pk}/",
+            {"parent": self.parent.pk},
+            format="json",
+        )
+
+        self.document.refresh_from_db()
+        tags = set(self.document.tags.values_list("pk", flat=True))
+        assert tags == {self.parent.pk, orphan.pk}
