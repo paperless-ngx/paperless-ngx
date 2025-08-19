@@ -149,7 +149,11 @@
             <a [href]="getDownloadUrl()" class="btn btn-sm btn-outline-secondary" title="Download" i18n-title (click)="$event.stopPropagation()">
               <i-bs name="download"></i-bs>
             </a>
+            <a [href]="getDownloadUrl()" class="btn btn-sm btn-outline-secondary" title="Print" i18n-title>
+              <i-bs name="printer"></i-bs>
+            </a>
           } @else {
+            <button class="btn btn-sm btn-outline-secondary placeholder bg-secondary"></button>
             <button class="btn btn-sm btn-outline-secondary placeholder bg-secondary"></button>
             <button class="btn btn-sm btn-outline-secondary placeholder bg-secondary"></button>
             <button class="btn btn-sm btn-outline-secondary placeholder bg-secondary"></button>
