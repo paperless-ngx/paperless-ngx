@@ -542,6 +542,13 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 
     children = SerializerMethodField()
 
+    @extend_schema_field(
+        field=serializers.ListSerializer(
+            child=serializers.PrimaryKeyRelatedField(
+                queryset=Tag.objects.all(),
+            ),
+        ),
+    )
     def get_children(self, obj):
         return TagSerializer(obj.children.all(), many=True).data
 
