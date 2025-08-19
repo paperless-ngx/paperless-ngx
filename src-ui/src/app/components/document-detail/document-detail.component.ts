@@ -221,7 +221,6 @@ export class DocumentDetailComponent
   thumbUrl: string
   previewText: string
   previewLoaded: boolean = false
-  pdf: PDFDocumentProxy
   tiffURL: string
   tiffError: string
 
@@ -1100,7 +1099,6 @@ export class DocumentDetailComponent
     if (this.password) this.requiresPassword = false
     setTimeout(() => {
       this.previewLoaded = true
-      this.pdf = pdf
     }, 300)
   }
 
