@@ -79,6 +79,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
 
   public data: T[] = []
+  private unfilteredData: T[] = []
 
   public page = 1
 
@@ -136,6 +137,14 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     return data
   }
 
+  getDocumentCount(object: MatchingModel): number {
+    return (
+      object.document_count ??
+      this.unfilteredData.find((d) => d.id == object.id)?.document_count ??
+      0
+    )
+  }
+
   reloadData(extraParams: { [key: string]: any } = null) {
     this.loading = true
     this.clearSelection()
@@ -152,6 +161,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
       .pipe(
         takeUntil(this.unsubscribeNotifier),
         tap((c) => {
+          this.unfilteredData = c.results
           this.data = this.filterData(c.results)
           this.collectionSize = c.count
         }),

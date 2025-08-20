@@ -91,7 +91,7 @@
       <button class="btn btn-link ms-0 ps-0 text-start" (click)="userCanEdit(object) ? openEditDialog(object) : null; $event.stopPropagation()">{{ object.name }}</button>
     </td>
     <td scope="row" class="d-none d-sm-table-cell">{{ getMatching(object) }}</td>
-    <td scope="row">{{ object.document_count }}</td>
+    <td scope="row">{{ getDocumentCount(object) }}</td>
     @for (column of extraColumns; track column) {
       <td scope="row" [ngClass]="{ 'd-none d-sm-table-cell' : column.hideOnMobile }">
         @if (column.rendersHtml) {
@@ -113,8 +113,8 @@
             <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
               <button (click)="openEditDialog(object)" *pngxIfPermissions="{ action: PermissionAction.Change, type: permissionType }" ngbDropdownItem i18n>Edit</button>
               <button class="text-danger" (click)="openDeleteDialog(object)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: permissionType }" ngbDropdownItem i18n>Delete</button>
-              @if (object.document_count > 0) {
-                <button (click)="filterDocuments(object)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }" ngbDropdownItem i18n>Filter Documents ({{ object.document_count }})</button>
+              @if (getDocumentCount(object) > 0) {
+                <button (click)="filterDocuments(object)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }" ngbDropdownItem i18n>Filter Documents ({{ getDocumentCount(object) }})</button>
               }
             </div>
           </div>
@@ -127,10 +127,10 @@
             <i-bs width="1em" height="1em" name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
           </button>
         </div>
-        @if (object.document_count > 0) {
+        @if (getDocumentCount(object) > 0) {
           <div class="btn-group d-none d-sm-inline-block">
             <button class="btn btn-sm btn-outline-secondary" (click)="filterDocuments(object); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
-              <i-bs width="1em" height="1em" name="filter"></i-bs>&nbsp;<ng-container i18n>Documents</ng-container><span class="badge bg-light text-secondary ms-2">{{ object.document_count }}</span>
+              <i-bs width="1em" height="1em" name="filter"></i-bs>&nbsp;<ng-container i18n>Documents</ng-container><span class="badge bg-light text-secondary ms-2">{{ getDocumentCount(object) }}</span>
             </button>
           </div>
         }
