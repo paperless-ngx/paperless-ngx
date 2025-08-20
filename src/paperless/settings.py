@@ -1205,8 +1205,8 @@ def _ocr_to_dateparser_languages(ocr_languages: str) -> list[str]:
 
             language_part = ocr_to_dateparser.get(ocr_lang_part)
             if language_part is None:
-                logger.warning(
-                    f'Skipping unknown OCR language "{ocr_language}" — no dateparser equivalent.',
+                logger.debug(
+                    f'Unable to map OCR language "{ocr_lang_part}" to dateparser locale. ',
                 )
                 continue
 
@@ -1219,7 +1219,7 @@ def _ocr_to_dateparser_languages(ocr_languages: str) -> list[str]:
                 try:
                     loader.get_locale_map(locales=[dateparser_language])
                 except Exception:
-                    logger.warning(
+                    logger.info(
                         f"Language variant '{dateparser_language}' not supported by dateparser; falling back to base language '{language_part}'. You can manually set PAPERLESS_DATE_PARSER_LANGUAGES if needed.",
                     )
                     dateparser_language = language_part
@@ -1229,12 +1229,12 @@ def _ocr_to_dateparser_languages(ocr_languages: str) -> list[str]:
                 result.append(dateparser_language)
     except Exception as e:
         logger.warning(
-            f"Could not configure dateparser languages. Set PAPERLESS_DATE_PARSER_LANGUAGES parameter to avoid this. Detail: {e}",
+            f"Error auto-configuring dateparser languages. Set PAPERLESS_DATE_PARSER_LANGUAGES parameter to avoid this. Detail: {e}",
         )
         return []
     if not result:
-        logger.warning(
-            "Could not configure any dateparser languages from OCR_LANGUAGE — fallback to autodetection.",
+        logger.info(
+            "Unable to automatically determine dateparser languages from OCR_LANGUAGE, falling back to multi-language support.",
         )
     return result
 
