@@ -29,7 +29,6 @@ import { DocumentTypeNamePipe } from 'src/app/pipes/document-type-name.pipe'
 import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
 import { StoragePathNamePipe } from 'src/app/pipes/storage-path-name.pipe'
 import { UsernamePipe } from 'src/app/pipes/username.pipe'
-import { PrintService } from 'src/app/services/print.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { CustomFieldDisplayComponent } from '../../common/custom-field-display/custom-field-display.component'
@@ -65,7 +64,6 @@ export class DocumentCardLargeComponent
   implements AfterViewInit
 {
   private documentService = inject(DocumentService)
-  private printService = inject(PrintService)
   settingsService = inject(SettingsService)
 
   DisplayField = DisplayField
@@ -153,14 +151,6 @@ export class DocumentCardLargeComponent
 
   getDownloadUrl() {
     return this.documentService.getDownloadUrl(this.document.id)
-  }
-
-  printDocument() {
-    const printUrl = this.documentService.getDownloadUrl(
-      this.document.id,
-      false
-    )
-    this.printService.printDocument(printUrl)
   }
 
   mouseLeaveCard() {
