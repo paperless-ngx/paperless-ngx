@@ -10,10 +10,8 @@ component_management:
       paths:
         - src-ui/**
 # https://docs.codecov.com/docs/pull-request-comments
-# codecov will only comment if coverage changes
 comment:
   layout: "header, diff, components, flags, files"
-  require_changes: true
   # https://docs.codecov.com/docs/javascript-bundle-analysis
   require_bundle_changes: true
   bundle_change_threshold: "50Kb"
