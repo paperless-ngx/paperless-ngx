@@ -288,29 +288,49 @@ class OwnedObjectSerializer(
     def get_permissions(self, obj) -> dict:
         view_codename = f"view_{obj.__class__.__name__.lower()}"
         change_codename = f"change_{obj.__class__.__name__.lower()}"
-
+        view = self.context.get("view")
+        if view is None or not hasattr(view, "get_permission_mapping"):
+            return {
+                "view": {
+                    "users": get_users_with_perms(
+                        obj,
+                        only_with_perms_in=[view_codename],
+                        with_group_users=False,
+                    ).values_list("id", flat=True),
+                    "groups": get_groups_with_only_permission(
+                        obj,
+                        codename=view_codename,
+                    ).values_list("id", flat=True),
+                },
+                "change": {
+                    "users": get_users_with_perms(
+                        obj,
+                        only_with_perms_in=[change_codename],
+                        with_group_users=False,
+                    ).values_list("id", flat=True),
+                    "groups": get_groups_with_only_permission(
+                        obj,
+                        codename=change_codename,
+                    ).values_list("id", flat=True),
+                },
+            }
+        # Get from permission cache map if available
+        guardian_map = view.get_permission_mapping()
+        obj_map = guardian_map.get(
+            obj.id,
+            {
+                "view": {"users": set(), "groups": set()},
+                "change": {"users": set(), "groups": set()},
+            },
+        )
         return {
             "view": {
-                "users": get_users_with_perms(
-                    obj,
-                    only_with_perms_in=[view_codename],
-                    with_group_users=False,
-                ).values_list("id", flat=True),
-                "groups": get_groups_with_only_permission(
-                    obj,
-                    codename=view_codename,
-                ).values_list("id", flat=True),
+                "users": list(obj_map["view"]["users"]),
+                "groups": list(obj_map["view"]["groups"]),
             },
             "change": {
-                "users": get_users_with_perms(
-                    obj,
-                    only_with_perms_in=[change_codename],
-                    with_group_users=False,
-                ).values_list("id", flat=True),
-                "groups": get_groups_with_only_permission(
-                    obj,
-                    codename=change_codename,
-                ).values_list("id", flat=True),
+                "users": list(obj_map["change"]["users"]),
+                "groups": list(obj_map["change"]["groups"]),
             },
         }
 
