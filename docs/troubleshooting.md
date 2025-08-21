@@ -33,7 +33,7 @@ warns that
 `OCR for XX failed, but we're going to stick with what we've got since FORGIVING_OCR is enabled`,
 then you might need to install the [Tesseract language
 files](https://packages.ubuntu.com/search?keywords=tesseract-ocr)
-marching your document's languages.
+matching your document's languages.
 
 As an example, if you are running Paperless-ngx from any Ubuntu or
 Debian box, and your documents are written in Spanish you may need to
