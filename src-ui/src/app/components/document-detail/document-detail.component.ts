@@ -442,7 +442,11 @@ export class DocumentDetailComponent
               )
             }
 
-            if (this.documentForm.dirty) {
+            // Prevent mutating stale form values into the next document: only sync if it still matches the active document.
+            if (
+              this.documentForm.dirty &&
+              (this.document?.id === openDocument.id || !this.document)
+            ) {
               Object.assign(openDocument, this.documentForm.value)
               openDocument['owner'] =
                 this.documentForm.get('permissions_form').value['owner']
@@ -489,7 +493,11 @@ export class DocumentDetailComponent
                   this.store.getValue().title !==
                   this.documentForm.get('title').value
                 ) {
-                  this.openDocumentService.setDirty(doc, true)
+                  this.openDocumentService.setDirty(
+                    doc,
+                    true,
+                    this.getChangedFields()
+                  )
                 }
               },
             })
