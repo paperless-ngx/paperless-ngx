@@ -327,19 +327,145 @@ export class DocumentDetailComponent
     }
   }
 
+  private mapDocToForm(doc: Document): any {
+    return {
+      ...doc,
+      permissions_form: { owner: doc.owner, set_permissions: doc.permissions },
+    }
+  }
+
+  private mapFormToDoc(value: any): any {
+    const docValues = { ...value }
+    docValues['owner'] = value['permissions_form']?.owner
+    docValues['set_permissions'] = value['permissions_form']?.set_permissions
+    delete docValues['permissions_form']
+    return docValues
+  }
+
+  private prepareForm(doc: Document): void {
+    this.documentForm.reset(this.mapDocToForm(doc), { emitEvent: false })
+    if (!this.userCanEdit) {
+      this.documentForm.disable({ emitEvent: false })
+    } else {
+      this.documentForm.enable({ emitEvent: false })
+    }
+    if (doc.__changedFields) {
+      doc.__changedFields.forEach((field) => {
+        if (field === 'owner' || field === 'set_permissions') {
+          this.documentForm.get('permissions_form')?.markAsDirty()
+        } else {
+          this.documentForm.get(field)?.markAsDirty()
+        }
+      })
+    }
+  }
+
+  private setupDirtyTracking(
+    currentDocument: Document,
+    originalDocument: Document
+  ): void {
+    this.store = new BehaviorSubject({
+      title: originalDocument.title,
+      content: originalDocument.content,
+      created: originalDocument.created,
+      correspondent: originalDocument.correspondent,
+      document_type: originalDocument.document_type,
+      storage_path: originalDocument.storage_path,
+      archive_serial_number: originalDocument.archive_serial_number,
+      tags: [...originalDocument.tags],
+      permissions_form: {
+        owner: originalDocument.owner,
+        set_permissions: originalDocument.permissions,
+      },
+      custom_fields: [...originalDocument.custom_fields],
+    })
+    this.isDirty$ = dirtyCheck(this.documentForm, this.store.asObservable())
+    this.isDirty$
+      .pipe(
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier)
+      )
+      .subscribe((dirty) =>
+        this.openDocumentService.setDirty(
+          currentDocument,
+          dirty,
+          this.getChangedFields()
+        )
+      )
+  }
+
+  private loadDocument(documentId: number): void {
+    this.previewUrl = this.documentsService.getPreviewUrl(documentId)
+    this.http.get(this.previewUrl, { responseType: 'text' }).subscribe({
+      next: (res) => (this.previewText = res.toString()),
+      error: (err) =>
+        (this.previewText = $localize`An error occurred loading content: ${
+          err.message ?? err.toString()
+        }`),
+    })
+    this.thumbUrl = this.documentsService.getThumbUrl(documentId)
+    this.documentsService
+      .get(documentId)
+      .pipe(first())
+      .subscribe({
+        next: (doc) => {
+          if (!doc) {
+            this.router.navigate(['404'], { replaceUrl: true })
+            return
+          }
+          this.documentId = doc.id
+          this.suggestions = null
+          const openDocument = this.openDocumentService.getOpenDocument(
+            this.documentId
+          )
+          const useDoc = openDocument || doc
+          if (openDocument) {
+            if (
+              new Date(doc.modified) > new Date(openDocument.modified) &&
+              !this.modalService.hasOpenModals()
+            ) {
+              const modal = this.modalService.open(ConfirmDialogComponent)
+              modal.componentInstance.title = $localize`Document changes detected`
+              modal.componentInstance.messageBold = $localize`The version of this document in your browser session appears older than the existing version.`
+              modal.componentInstance.message = $localize`Saving the document here may overwrite other changes that were made. To restore the existing version, discard your changes or close the document.`
+              modal.componentInstance.cancelBtnClass = 'visually-hidden'
+              modal.componentInstance.btnCaption = $localize`Ok`
+              modal.componentInstance.confirmClicked.subscribe(() =>
+                modal.close()
+              )
+            }
+          } else {
+            this.openDocumentService.openDocument(doc).pipe(first()).subscribe()
+          }
+          this.updateComponent(useDoc)
+          this.titleSubject
+            .pipe(
+              debounceTime(1000),
+              distinctUntilChanged(),
+              takeUntil(this.docChangeNotifier),
+              takeUntil(this.unsubscribeNotifier)
+            )
+            .subscribe((titleValue) => {
+              if (titleValue !== this.titleInput.value) return
+              this.title = titleValue
+              this.documentForm.patchValue({ title: titleValue })
+            })
+          this.setupDirtyTracking(useDoc, doc)
+        },
+        error: () =>
+          this.router.navigate(['404'], {
+            replaceUrl: true,
+          }),
+      })
+  }
+
   ngOnInit(): void {
     this.setZoom(this.settings.get(SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING))
     this.documentForm.valueChanges
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(() => {
+      .subscribe((values) => {
         this.error = null
-        const docValues = Object.assign({}, this.documentForm.value)
-        docValues['owner'] =
-          this.documentForm.get('permissions_form').value['owner']
-        docValues['set_permissions'] =
-          this.documentForm.get('permissions_form').value['set_permissions']
-        delete docValues['permissions_form']
-        Object.assign(this.document, docValues)
+        Object.assign(this.document, this.mapFormToDoc(values))
       })
 
     if (
@@ -391,154 +517,17 @@ export class DocumentDetailComponent
 
     this.route.paramMap
       .pipe(
-        filter((paramMap) => {
-          // only init when changing docs & section is set
-          return (
+        filter(
+          (paramMap) =>
             +paramMap.get('id') !== this.documentId &&
             paramMap.get('section')?.length > 0
-          )
-        }),
-        takeUntil(this.unsubscribeNotifier),
-        switchMap((paramMap) => {
-          const documentId = +paramMap.get('id')
-          this.docChangeNotifier.next(documentId)
-          // Dont wait to get the preview
-          this.previewUrl = this.documentsService.getPreviewUrl(documentId)
-          this.http.get(this.previewUrl, { responseType: 'text' }).subscribe({
-            next: (res) => {
-              this.previewText = res.toString()
-            },
-            error: (err) => {
-              this.previewText = $localize`An error occurred loading content: ${
-                err.message ?? err.toString()
-              }`
-            },
-          })
-          this.thumbUrl = this.documentsService.getThumbUrl(documentId)
-          return this.documentsService.get(documentId)
-        })
+        ),
+        takeUntil(this.unsubscribeNotifier)
       )
-      .pipe(
-        switchMap((doc) => {
-          this.documentId = doc.id
-          this.suggestions = null
-          const openDocument = this.openDocumentService.getOpenDocument(
-            this.documentId
-          )
-
-          if (openDocument) {
-            if (
-              new Date(doc.modified) > new Date(openDocument.modified) &&
-              !this.modalService.hasOpenModals()
-            ) {
-              let modal = this.modalService.open(ConfirmDialogComponent)
-              modal.componentInstance.title = $localize`Document changes detected`
-              modal.componentInstance.messageBold = $localize`The version of this document in your browser session appears older than the existing version.`
-              modal.componentInstance.message = $localize`Saving the document here may overwrite other changes that were made. To restore the existing version, discard your changes or close the document.`
-              modal.componentInstance.cancelBtnClass = 'visually-hidden'
-              modal.componentInstance.btnCaption = $localize`Ok`
-              modal.componentInstance.confirmClicked.subscribe(() =>
-                modal.close()
-              )
-            }
-
-            // Prevent mutating stale form values into the next document: only sync if it still matches the active document.
-            if (
-              this.documentForm.dirty &&
-              (this.document?.id === openDocument.id || !this.document)
-            ) {
-              Object.assign(openDocument, this.documentForm.value)
-              openDocument['owner'] =
-                this.documentForm.get('permissions_form').value['owner']
-              openDocument['permissions'] =
-                this.documentForm.get('permissions_form').value[
-                  'set_permissions'
-                ]
-              delete openDocument['permissions_form']
-            }
-            if (openDocument.__changedFields) {
-              openDocument.__changedFields.forEach((field) => {
-                if (field === 'owner' || field === 'set_permissions') {
-                  this.documentForm.get('permissions_form').markAsDirty()
-                } else {
-                  this.documentForm.get(field)?.markAsDirty()
-                }
-              })
-            }
-            this.updateComponent(openDocument)
-          } else {
-            this.openDocumentService.openDocument(doc)
-            this.updateComponent(doc)
-          }
-
-          this.titleSubject
-            .pipe(
-              debounceTime(1000),
-              distinctUntilChanged(),
-              takeUntil(this.docChangeNotifier),
-              takeUntil(this.unsubscribeNotifier)
-            )
-            .subscribe({
-              next: (titleValue) => {
-                // In the rare case when the field changed just after debounced event was fired.
-                // We dont want to overwrite what's actually in the text field, so just return
-                if (titleValue !== this.titleInput.value) return
-
-                this.title = titleValue
-                this.documentForm.patchValue({ title: titleValue })
-              },
-              complete: () => {
-                // doc changed so we manually check dirty in case title was changed
-                if (
-                  this.store.getValue().title !==
-                  this.documentForm.get('title').value
-                ) {
-                  this.openDocumentService.setDirty(
-                    doc,
-                    true,
-                    this.getChangedFields()
-                  )
-                }
-              },
-            })
-
-          // Initialize dirtyCheck
-          this.store = new BehaviorSubject({
-            title: doc.title,
-            content: doc.content,
-            created: doc.created,
-            correspondent: doc.correspondent,
-            document_type: doc.document_type,
-            storage_path: doc.storage_path,
-            archive_serial_number: doc.archive_serial_number,
-            tags: [...doc.tags],
-            permissions_form: {
-              owner: doc.owner,
-              set_permissions: doc.permissions,
-            },
-            custom_fields: [...doc.custom_fields],
-          })
-
-          this.isDirty$ = dirtyCheck(
-            this.documentForm,
-            this.store.asObservable()
-          )
-
-          return this.isDirty$.pipe(
-            takeUntil(this.unsubscribeNotifier),
-            map((dirty) => ({ doc, dirty }))
-          )
-        })
-      )
-      .subscribe({
-        next: ({ doc, dirty }) => {
-          this.openDocumentService.setDirty(doc, dirty, this.getChangedFields())
-        },
-        error: (error) => {
-          this.router.navigate(['404'], {
-            replaceUrl: true,
-          })
-        },
+      .subscribe((paramMap) => {
+        const documentId = +paramMap.get('id')
+        this.docChangeNotifier.next(documentId)
+        this.loadDocument(documentId)
       })
 
     this.route.paramMap.subscribe((paramMap) => {
@@ -682,19 +671,7 @@ export class DocumentDetailComponent
         })
     }
     this.title = this.documentTitlePipe.transform(doc.title)
-    const docFormValues = Object.assign({}, doc)
-    docFormValues['permissions_form'] = {
-      owner: doc.owner,
-      set_permissions: doc.permissions,
-    }
-
-    this.documentForm.patchValue(docFormValues, { emitEvent: false })
-    if (!this.userCanEdit) this.documentForm.disable()
-    setTimeout(() => {
-      // check again after a tick in case form was dirty
-      if (!this.userCanEdit) this.documentForm.disable()
-      else this.documentForm.enable()
-    }, 10)
+    this.prepareForm(doc)
   }
 
   get customFieldFormFields(): FormArray {
