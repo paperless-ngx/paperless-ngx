@@ -690,6 +690,11 @@ export class DocumentDetailComponent
 
     this.documentForm.patchValue(docFormValues, { emitEvent: false })
     if (!this.userCanEdit) this.documentForm.disable()
+    setTimeout(() => {
+      // check again after a tick in case form was dirty
+      if (!this.userCanEdit) this.documentForm.disable()
+      else this.documentForm.enable()
+    }, 10)
   }
 
   get customFieldFormFields(): FormArray {
