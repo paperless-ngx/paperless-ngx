@@ -1764,6 +1764,48 @@ class BulkDownloadSerializer(DocumentListSerializer):
         }[compression]
 
 
+class BulkEmailSerializer(DocumentListSerializer):
+    addresses = serializers.CharField(
+        required=True,
+        label="Email addresses",
+        help_text="Comma-separated email addresses",
+    )
+
+    subject = serializers.CharField(
+        required=True,
+        label="Email subject",
+    )
+
+    message = serializers.CharField(
+        required=True,
+        label="Email message",
+    )
+
+    use_archive_version = serializers.BooleanField(
+        default=True,
+        label="Use archive version",
+        help_text="Use archive version of documents if available",
+    )
+
+    def validate_addresses(self, addresses):
+        address_list = [addr.strip() for addr in addresses.split(",")]
+        if not address_list:
+            raise serializers.ValidationError("At least one email address is required")
+
+        email_pattern = r"[^@]+@[^@]+\.[^@]+"
+        for address in address_list:
+            if not re.match(email_pattern, address):
+                raise serializers.ValidationError(f"Invalid email address: {address}")
+
+        return addresses
+
+    def validate_documents(self, documents):
+        super().validate_documents(documents)
+        if not documents:
+            raise serializers.ValidationError("At least one document is required")
+        return documents
+
+
 class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     class Meta:
         model = StoragePath
