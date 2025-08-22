@@ -11,7 +11,6 @@ on:
   pull_request:
     branches-ignore:
       - 'translations**'
-  workflow_dispatch:
 env:
   DEFAULT_UV_VERSION: "0.8.x"
   # This is the default version of Python to use in most steps which aren't specific
