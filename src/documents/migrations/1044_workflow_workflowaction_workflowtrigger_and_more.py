@@ -68,7 +68,7 @@ def migrate_consumption_templates(apps, schema_editor):
     StoragePath = apps.get_model(app_label=app_name, model_name="StoragePath")
     Tag = apps.get_model(app_label=app_name, model_name="Tag")
     CustomField = apps.get_model(app_label=app_name, model_name="CustomField")
-    MailRule = apps.get_model(app_label="paperless_mail", model_name="MailRule")
+    # MailRule = apps.get_model(app_label="paperless_mail", model_name="MailRule")  # Temporairement commenté
     User = apps.get_model(app_label="auth", model_name="User")
     Group = apps.get_model(app_label="auth", model_name="Group")
 
@@ -80,10 +80,11 @@ def migrate_consumption_templates(apps, schema_editor):
                 filter_path=template.filter_path,
                 filter_filename=template.filter_filename,
             )
-            if template.filter_mailrule is not None:
-                trigger.filter_mailrule = MailRule.objects.get(
-                    id=template.filter_mailrule.id,
-                )
+            # Temporairement commenté - paperless_mail non installé
+            # if template.filter_mailrule is not None:
+            #     trigger.filter_mailrule = MailRule.objects.get(
+            #         id=template.filter_mailrule.id,
+            #     )
             trigger.save()
 
             action = WorkflowAction.objects.create(
@@ -207,7 +208,7 @@ def undelete_consumption_template_content_type(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("paperless_mail", "0023_remove_mailrule_filter_attachment_filename_and_more"),
+        # ("paperless_mail", "0023_remove_mailrule_filter_attachment_filename_and_more"),  # Temporairement commenté
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("auth", "0012_alter_user_first_name_max_length"),
         ("documents", "1043_alter_savedviewfilterrule_rule_type"),

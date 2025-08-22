@@ -47,7 +47,7 @@ from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
-from paperless_mail.parsers import MailDocumentParser
+# from paperless_mail.parsers import MailDocumentParser
 
 
 class WorkflowTriggerPlugin(
@@ -391,18 +391,19 @@ class ConsumerPlugin(
                 ConsumerStatusShortMessage.PARSING_DOCUMENT,
             )
             self.log.debug(f"Parsing {self.filename}...")
-            if (
-                isinstance(document_parser, MailDocumentParser)
-                and self.input_doc.mailrule_id
-            ):
-                document_parser.parse(
-                    self.working_copy,
-                    mime_type,
-                    self.filename,
-                    self.input_doc.mailrule_id,
-                )
-            else:
-                document_parser.parse(self.working_copy, mime_type, self.filename)
+            # Temporairement commenté - MailDocumentParser non disponible
+            # if (
+            #     isinstance(document_parser, MailDocumentParser)
+            #     and self.input_doc.mailrule_id
+            # ):
+            #     document_parser.parse(
+            #         self.working_copy,
+            #         mime_type,
+            #         self.filename,
+            #         self.input_doc.mailrule_id,
+            #     )
+            # else:
+            document_parser.parse(self.working_copy, mime_type, self.filename)
 
             self.log.debug(f"Generating thumbnail for {self.filename}...")
             self._send_progress(

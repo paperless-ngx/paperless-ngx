@@ -14,7 +14,14 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 from paperless.models import ApplicationConfiguration
 from paperless.validators import reject_dangerous_svg
-from paperless_mail.serialisers import ObfuscatedPasswordField
+# from paperless_mail.serialisers import ObfuscatedPasswordField
+
+# Champ de mot de passe temporaire
+class ObfuscatedPasswordField(serializers.CharField):
+    def __init__(self, **kwargs):
+        kwargs.setdefault('style', {'input_type': 'password'})
+        kwargs.setdefault('write_only', True)
+        super().__init__(**kwargs)
 
 logger = logging.getLogger("paperless.settings")
 

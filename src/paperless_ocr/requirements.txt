@@ -1,0 +1,22 @@
+# Dépendances pour le module OCR hybride Paperless-ngx
+
+# OCR Engines
+pytesseract>=0.3.10
+python-doctr[torch]>=0.7.0
+
+# Image processing
+opencv-python-headless>=4.8.0
+Pillow>=10.0.0
+
+# PDF handling
+PyMuPDF>=1.23.0
+
+# Scientific computing
+numpy>=1.24.0
+
+# Installation des packages système requis (via apt)
+# tesseract-ocr
+# tesseract-ocr-fra  # Pour le français
+# tesseract-ocr-eng  # Pour l'anglais
+# libgl1-mesa-glx    # Pour OpenCV
+# libglib2.0-0       # Pour OpenCV

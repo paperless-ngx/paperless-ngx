@@ -353,6 +353,18 @@ urlpatterns = [
         login_required(ensure_csrf_cookie(IndexView.as_view())),
         name="base",
     ),
+    path(
+        "api/ocr/",
+        include("paperless_ocr.urls"),
+    ),
+    path(
+        "api/ai/",
+        include("paperless_ai.urls"),
+    ),
+    path(
+        "",
+        include("paperless_imap.urls"),
+    ),
 ]
 
 

@@ -107,3 +107,38 @@ celerybeat-schedule*
 /.devcontainer/data/
 /.devcontainer/media/
 /.devcontainer/redisdata/
+
+# AI/ML specific
+# Downloaded ML models
+*.bin
+*.h5
+*.pkl
+*.joblib
+/models/
+/checkpoints/
+
+# HuggingFace cache
+.cache/
+.transformers_cache/
+
+# PyTorch models
+*.pth
+*.pt
+
+# TensorFlow models
+*.pb
+*.tflite
+
+# AI Module specific
+/src/paperless_ai/models/downloaded/
+/src/paperless_ai/cache/
+/src/paperless_ai/logs/
+
+# ML model artifacts
+*.onnx
+*.safetensors
+
+# Training artifacts
+wandb/
+tensorboard_logs/
+training_logs/

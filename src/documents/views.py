@@ -179,11 +179,11 @@ from paperless.models import ApplicationConfiguration
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
-from paperless_mail.models import MailAccount
-from paperless_mail.models import MailRule
-from paperless_mail.oauth import PaperlessMailOAuth2Manager
-from paperless_mail.serialisers import MailAccountSerializer
-from paperless_mail.serialisers import MailRuleSerializer
+# from paperless_mail.models import MailAccount
+# from paperless_mail.models import MailRule
+# from paperless_mail.oauth import PaperlessMailOAuth2Manager
+# from paperless_mail.serialisers import MailAccountSerializer
+# from paperless_mail.serialisers import MailRuleSerializer
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -1756,8 +1756,8 @@ class SearchAutoCompleteView(GenericAPIView):
                     "storage_paths": StoragePathSerializer(many=True),
                     "users": UserSerializer(many=True),
                     "groups": GroupSerializer(many=True),
-                    "mail_rules": MailRuleSerializer(many=True),
-                    "mail_accounts": MailAccountSerializer(many=True),
+                    # "mail_rules": MailRuleSerializer(many=True),
+                    # "mail_accounts": MailAccountSerializer(many=True),
                     "workflows": WorkflowSerializer(many=True),
                     "custom_fields": CustomFieldSerializer(many=True),
                 },
@@ -1860,18 +1860,20 @@ class GlobalSearchView(PassUserMixin):
             else []
         )
         groups = groups[:OBJECT_LIMIT]
-        mail_rules = (
-            MailRule.objects.filter(name__icontains=query)
-            if request.user.has_perm("paperless_mail.view_mailrule")
-            else []
-        )
-        mail_rules = mail_rules[:OBJECT_LIMIT]
-        mail_accounts = (
-            MailAccount.objects.filter(name__icontains=query)
-            if request.user.has_perm("paperless_mail.view_mailaccount")
-            else []
-        )
-        mail_accounts = mail_accounts[:OBJECT_LIMIT]
+        # mail_rules = (
+        #     MailRule.objects.filter(name__icontains=query)
+        #     if request.user.has_perm("paperless_mail.view_mailrule")
+        #     else []
+        # )
+        # mail_rules = mail_rules[:OBJECT_LIMIT]
+        mail_rules = []  # Temporairement vide
+        # mail_accounts = (
+        #     MailAccount.objects.filter(name__icontains=query)
+        #     if request.user.has_perm("paperless_mail.view_mailaccount")
+        #     else []
+        # )
+        # mail_accounts = mail_accounts[:OBJECT_LIMIT]
+        mail_accounts = []  # Temporairement vide
         workflows = (
             Workflow.objects.filter(name__icontains=query)
             if request.user.has_perm("documents.view_workflow")
@@ -1913,16 +1915,18 @@ class GlobalSearchView(PassUserMixin):
         )
         users_serializer = UserSerializer(users, many=True, context=context)
         groups_serializer = GroupSerializer(groups, many=True, context=context)
-        mail_rules_serializer = MailRuleSerializer(
-            mail_rules,
-            many=True,
-            context=context,
-        )
-        mail_accounts_serializer = MailAccountSerializer(
-            mail_accounts,
-            many=True,
-            context=context,
-        )
+        # mail_rules_serializer = MailRuleSerializer(
+        #     mail_rules,
+        #     many=True,
+        #     context=context,
+        # )
+        mail_rules_serializer = []  # Temporairement vide
+        # mail_accounts_serializer = MailAccountSerializer(
+        #     mail_accounts,
+        #     many=True,
+        #     context=context,
+        # )
+        mail_accounts_serializer = []  # Temporairement vide
         workflows_serializer = WorkflowSerializer(workflows, many=True, context=context)
         custom_fields_serializer = CustomFieldSerializer(
             custom_fields,
