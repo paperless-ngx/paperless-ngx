@@ -142,6 +142,7 @@ from documents.serialisers import AcknowledgeTasksViewSerializer
 from documents.serialisers import BulkDownloadSerializer
 from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
+from documents.serialisers import BulkEmailSerializer
 from documents.serialisers import CorrespondentSerializer
 from documents.serialisers import CustomFieldSerializer
 from documents.serialisers import DocumentListSerializer
@@ -1074,16 +1075,16 @@ class DocumentViewSet(
             ):
                 return HttpResponseBadRequest("Invalid email address found")
 
+            attachment_path = (
+                doc.archive_path
+                if use_archive_version and doc.has_archive_version
+                else doc.source_path
+            )
             send_email(
                 subject=request.data.get("subject"),
                 body=request.data.get("message"),
                 to=addresses,
-                attachment=(
-                    doc.archive_path
-                    if use_archive_version and doc.has_archive_version
-                    else doc.source_path
-                ),
-                attachment_mime_type=doc.mime_type,
+                attachments=[(attachment_path, doc.mime_type)],
             )
             logger.debug(
                 f"Sent document {doc.id} via email to {addresses}",
@@ -2120,6 +2121,69 @@ class BulkDownloadView(GenericAPIView):
             )
 
             return response
+
+
+@extend_schema_view(
+    post=extend_schema(
+        operation_id="bulk_email",
+        description="Send multiple documents as email attachments",
+        responses={
+            200: inline_serializer(
+                name="BulkEmailResult",
+                fields={
+                    "message": serializers.CharField(),
+                },
+            ),
+        },
+    ),
+)
+class BulkEmailView(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = BulkEmailSerializer
+    parser_classes = (parsers.JSONParser,)
+
+    def post(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        document_ids = serializer.validated_data.get("documents")
+        addresses = serializer.validated_data.get("addresses").split(",")
+        addresses = [addr.strip() for addr in addresses]
+        subject = serializer.validated_data.get("subject")
+        message = serializer.validated_data.get("message")
+        use_archive_version = serializer.validated_data.get("use_archive_version")
+
+        documents = Document.objects.select_related("owner").filter(pk__in=document_ids)
+        for document in documents:
+            if not has_perms_owner_aware(request.user, "view_document", document):
+                return HttpResponseForbidden("Insufficient permissions")
+
+        attachments = []
+        for doc in documents:
+            attachment_path = (
+                doc.archive_path
+                if use_archive_version and doc.has_archive_version
+                else doc.source_path
+            )
+            attachments.append((attachment_path, doc.mime_type))
+
+        try:
+            send_email(
+                subject=subject,
+                body=message,
+                to=addresses,
+                attachments=attachments,
+            )
+
+            logger.debug(
+                f"Sent documents {documents} via email to {addresses}",
+            )
+            return Response({"message": "Email sent"})
+        except Exception as e:
+            logger.warning(f"An error occurred emailing documents: {e!s}")
+            return HttpResponseServerError(
+                "Error emailing documents, check logs for more detail.",
+            )
 
 
 @extend_schema_view(**generate_object_with_permissions_schema(StoragePathSerializer))
