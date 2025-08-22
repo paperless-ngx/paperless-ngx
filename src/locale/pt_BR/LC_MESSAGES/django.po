@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-16 14:34+0000\n"
-"PO-Revision-Date: 2025-08-16 14:36\n"
+"PO-Revision-Date: 2025-08-22 23:07\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -470,83 +470,83 @@ msgstr "não tem correspondente em"
 
 #: documents/models.py:478
 msgid "has document type in"
-msgstr "possui categoria de documento em"
+msgstr "Possui categoria de documento em"
 
 #: documents/models.py:479
 msgid "does not have document type in"
-msgstr "não possui categoria de documento em"
+msgstr "Não possui categoria de documento em"
 
 #: documents/models.py:480
 msgid "has storage path in"
-msgstr "possui caminho de armazenamento em"
+msgstr "Possui caminho de armazenamento em"
 
 #: documents/models.py:481
 msgid "does not have storage path in"
-msgstr "não possui caminho de armazenamento em"
+msgstr "Não possui caminho de armazenamento em"
 
 #: documents/models.py:482
 msgid "owner is"
-msgstr "o proprietário é"
+msgstr "O proprietário é"
 
 #: documents/models.py:483
 msgid "has owner in"
-msgstr "tem proprietário em"
+msgstr "Tem proprietário em"
 
 #: documents/models.py:484
 msgid "does not have owner"
-msgstr "não tem proprietário"
+msgstr "Não tem proprietário"
 
 #: documents/models.py:485
 msgid "does not have owner in"
-msgstr "não tem proprietário em"
+msgstr "Não tem proprietário em"
 
 #: documents/models.py:486
 msgid "has custom field value"
-msgstr "Possui valor de campo personalizado"
+msgstr "Possui valor de campo personalizado "
 
 #: documents/models.py:487
 msgid "is shared by me"
-msgstr "compartilhado por mim"
+msgstr "Compartilhado por mim"
 
 #: documents/models.py:488
 msgid "has custom fields"
-msgstr "Possui campos personalizados "
+msgstr "Possui campos personalizados  "
 
 #: documents/models.py:489
 msgid "has custom field in"
-msgstr "Possui campo personalizado dentro"
+msgstr "Possui campo personalizado dentro "
 
 #: documents/models.py:490
 msgid "does not have custom field in"
-msgstr "Não possui campo personalizado dentro"
+msgstr "Não possui campo personalizado dentro "
 
 #: documents/models.py:491
 msgid "does not have custom field"
-msgstr "Não possui campo personalizado "
+msgstr "Não possui campo personalizado  "
 
 #: documents/models.py:492
 msgid "custom fields query"
-msgstr "consulta de campos personalizados"
+msgstr "Consulta de campos personalizados"
 
 #: documents/models.py:493
 msgid "created to"
-msgstr "criado em"
+msgstr "Criado em"
 
 #: documents/models.py:494
 msgid "created from"
-msgstr "criado por"
+msgstr "Criado por"
 
 #: documents/models.py:495
 msgid "added to"
-msgstr "adicionado em"
+msgstr "Adicionado em"
 
 #: documents/models.py:496
 msgid "added from"
-msgstr "adicionado por"
+msgstr "Adicionado por"
 
 #: documents/models.py:497
 msgid "mime type is"
-msgstr "tipo MIME é"
+msgstr "Yipo MIME é"
 
 #: documents/models.py:507
 msgid "rule type"
@@ -1412,7 +1412,7 @@ msgstr "Como etapa final, por favor preencha o seguinte formulário:"
 #: documents/validators.py:24
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "Não é possível analisar o URI {value}, esquema ausente"
 
 #: documents/validators.py:29
 #, python-brace-format
@@ -1421,12 +1421,13 @@ msgstr ""
 
 #: documents/validators.py:36
 msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
-msgstr ""
+msgstr "Esquema URI '{parts.scheme}' não é permitido. Esquemas permitidos:\n"
+"{', '.join(allowed_schemes)}"
 
 #: documents/validators.py:45
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "Não é possível analisar o URI {value}"
 
 #: paperless/apps.py:11
 msgid "Paperless"
@@ -1670,7 +1671,7 @@ msgstr "Espanhol"
 
 #: paperless/settings.py:786
 msgid "Persian"
-msgstr ""
+msgstr "Persa"
 
 #: paperless/settings.py:787
 msgid "Finnish"
@@ -1754,7 +1755,7 @@ msgstr "Ucraniano"
 
 #: paperless/settings.py:807
 msgid "Vietnamese"
-msgstr ""
+msgstr "vietnamita"
 
 #: paperless/settings.py:808
 msgid "Chinese Simplified"
