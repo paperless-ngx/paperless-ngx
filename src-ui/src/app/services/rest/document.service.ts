@@ -256,18 +256,30 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     return this._searchQuery
   }
 
-  emailDocument(
-    documentId: number,
+  emailDocuments(
+    documentIds: number[],
     addresses: string,
     subject: string,
     message: string,
     useArchiveVersion: boolean
   ): Observable<any> {
-    return this.http.post(this.getResourceUrl(documentId, 'email'), {
-      addresses: addresses,
-      subject: subject,
-      message: message,
-      use_archive_version: useArchiveVersion,
-    })
+    if (documentIds.length === 1) {
+      // Use existing single document endpoint for single document
+      return this.http.post(this.getResourceUrl(documentIds[0], 'email'), {
+        addresses: addresses,
+        subject: subject,
+        message: message,
+        use_archive_version: useArchiveVersion,
+      })
+    } else {
+      // Use new bulk endpoint for multiple documents
+      return this.http.post(this.getResourceUrl(null, 'bulk_email'), {
+        documents: documentIds,
+        addresses: addresses,
+        subject: subject,
+        message: message,
+        use_archive_version: useArchiveVersion,
+      })
+    }
   }
 }

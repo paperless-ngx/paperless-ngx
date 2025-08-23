@@ -36,31 +36,61 @@ describe('EmailDocumentDialogComponent', () => {
     documentService = TestBed.inject(DocumentService)
     toastService = TestBed.inject(ToastService)
     component = fixture.componentInstance
+    component.documentIds = [1] // Initialize with default value
     fixture.detectChanges()
   })
 
   it('should set hasArchiveVersion and useArchiveVersion', () => {
     expect(component.hasArchiveVersion).toBeTruthy()
+    expect(component.useArchiveVersion).toBeTruthy()
+
     component.hasArchiveVersion = false
     expect(component.hasArchiveVersion).toBeFalsy()
     expect(component.useArchiveVersion).toBeFalsy()
   })
 
-  it('should support sending document via email, showing error if needed', () => {
+  it('should support sending single document via email, showing error if needed', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastSuccessSpy = jest.spyOn(toastService, 'showInfo')
+    component.documentIds = [1]
     component.emailAddress = 'hello@paperless-ngx.com'
     component.emailSubject = 'Hello'
     component.emailMessage = 'World'
     jest
-      .spyOn(documentService, 'emailDocument')
+      .spyOn(documentService, 'emailDocuments')
       .mockReturnValue(throwError(() => new Error('Unable to email document')))
-    component.emailDocument()
-    expect(toastErrorSpy).toHaveBeenCalled()
+    component.emailDocuments()
+    expect(toastErrorSpy).toHaveBeenCalledWith(
+      'Error emailing document',
+      expect.any(Error)
+    )
 
-    jest.spyOn(documentService, 'emailDocument').mockReturnValue(of(true))
-    component.emailDocument()
-    expect(toastSuccessSpy).toHaveBeenCalled()
+    jest.spyOn(documentService, 'emailDocuments').mockReturnValue(of(true))
+    component.emailDocuments()
+    expect(toastSuccessSpy).toHaveBeenCalledWith('Email sent')
+  })
+
+  it('should support sending multiple documents via email, showing appropriate messages', () => {
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    const toastSuccessSpy = jest.spyOn(toastService, 'showInfo')
+    component.documentIds = [1, 2, 3]
+    component.emailAddress = 'hello@paperless-ngx.com'
+    component.emailSubject = 'Hello'
+    component.emailMessage = 'World'
+    jest
+      .spyOn(documentService, 'emailDocuments')
+      .mockReturnValue(throwError(() => new Error('Unable to email documents')))
+    component.emailDocuments()
+    expect(toastErrorSpy).toHaveBeenCalledWith(
+      'Error emailing documents',
+      expect.any(Error)
+    )
+
+    jest.spyOn(documentService, 'emailDocuments').mockReturnValue(of(true))
+    component.emailDocuments()
+    expect(toastSuccessSpy).toHaveBeenCalledWith(
+      'Documents emailed successfully'
+    )
   })
 
   it('should close the dialog', () => {

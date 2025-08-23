@@ -112,6 +112,9 @@
                 <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanAdd || list.selected.size < 2">
                   <i-bs name="journals"></i-bs>&nbsp;<ng-container i18n>Merge</ng-container>
                 </button>
+                <button ngbDropdownItem (click)="emailSelected()" [disabled]="!userCanEdit">
+                  <i-bs name="envelope"></i-bs>&nbsp;<ng-container i18n>Email</ng-container>
+                </button>
               </div>
             </div>
           </div>
