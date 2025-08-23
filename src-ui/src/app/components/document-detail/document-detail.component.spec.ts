@@ -452,6 +452,18 @@ describe('DocumentDetailComponent', () => {
     expect(navigateSpy).toHaveBeenCalledWith(['404'], { replaceUrl: true })
   })
 
+  it('should navigate to 404 if error on load', () => {
+    jest
+      .spyOn(activatedRoute, 'paramMap', 'get')
+      .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
+    const navigateSpy = jest.spyOn(router, 'navigate')
+    jest
+      .spyOn(documentService, 'get')
+      .mockReturnValue(throwError(() => new Error('not found')))
+    fixture.detectChanges()
+    expect(navigateSpy).toHaveBeenCalledWith(['404'], { replaceUrl: true })
+  })
+
   it('should support save, close and show success toast', () => {
     initNormally()
     component.title = 'Foo Bar'
