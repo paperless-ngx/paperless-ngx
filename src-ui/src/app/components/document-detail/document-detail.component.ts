@@ -344,7 +344,7 @@ export class DocumentDetailComponent
 
   private prepareForm(doc: Document): void {
     this.documentForm.reset(this.mapDocToForm(doc), { emitEvent: false })
-    if (!this.userCanEdit) {
+    if (!this.userCanEditDoc(doc)) {
       this.documentForm.disable({ emitEvent: false })
     } else {
       this.documentForm.enable({ emitEvent: false })
@@ -1215,16 +1215,19 @@ export class DocumentDetailComponent
     ) {
       doc.owner = this.store.value.permissions_form.owner
     }
+    return !this.document || this.userCanEditDoc(doc)
+  }
+
+  private userCanEditDoc(doc: Document): boolean {
     return (
-      !this.document ||
-      (this.permissionsService.currentUserCan(
+      this.permissionsService.currentUserCan(
         PermissionAction.Change,
         PermissionType.Document
       ) &&
-        this.permissionsService.currentUserHasObjectPermissions(
-          PermissionAction.Change,
-          doc
-        ))
+      this.permissionsService.currentUserHasObjectPermissions(
+        PermissionAction.Change,
+        doc
+      )
     )
   }
 
