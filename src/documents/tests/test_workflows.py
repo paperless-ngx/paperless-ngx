@@ -1223,6 +1223,236 @@ class TestWorkflows(
 
         self.assertEqual(doc.custom_fields.all().count(), 1)
 
+    def test_document_updated_workflow_month_placeholder_created(self):
+        superuser = User.objects.create_superuser("superuser")
+        self.client.force_authenticate(user=superuser)
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+            created=timezone.now().replace(
+                month=6,
+                day=1,
+                hour=0,
+                minute=0,
+                second=0,
+                microsecond=0,
+            ),
+        )
+
+        trigger1 = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+            filter_has_document_type=self.dt,
+        )
+
+        action = WorkflowAction.objects.create(
+            assign_title="Doc created in {{created_month_name}}",
+        )
+
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger1)
+        w.actions.add(action)
+        w.save()
+
+        with override_settings(LANGUAGE_CODE_WORKFLOWS="de"):
+            self.client.patch(
+                f"/api/documents/{doc.id}/",
+                {"document_type": self.dt.id},
+                format="json",
+                headers={"Accept-Language": "es"},
+            )
+        doc.refresh_from_db()
+        self.assertEqual(doc.title, "Doc created in Juni")  # codespell:ignore
+
+        with override_settings(LANGUAGE_CODE_WORKFLOWS="fr"):
+            self.client.patch(
+                f"/api/documents/{doc.id}/",
+                {"document_type": self.dt.id},
+                format="json",
+            )
+        doc.refresh_from_db()
+        self.assertEqual(doc.title, "Doc created in juin")
+
+        self.client.patch(
+            f"/api/documents/{doc.id}/",
+            {"document_type": self.dt.id},
+            format="json",
+        )
+        doc.refresh_from_db()
+        self.assertEqual(doc.title, "Doc created in June")
+
+    def test_document_added_workflow_month_placeholder_created(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_filename="*sample*",
+        )
+
+        action = WorkflowAction.objects.create(
+            assign_title="Doc created in {{created_month_name_short}}",
+        )
+
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        superuser = User.objects.create_superuser("superuser")
+        self.client.force_authenticate(user=superuser)
+
+        with override_settings(LANGUAGE_CODE_WORKFLOWS="es"):
+            doc = Document.objects.create(
+                title="sample test",
+                correspondent=self.c,
+                original_filename="sample.pdf",
+                created=timezone.now().replace(
+                    month=6,
+                    day=1,
+                    hour=0,
+                    minute=0,
+                    second=0,
+                    microsecond=0,
+                ),
+            )
+        document_consumption_finished.send(
+            sender=self.__class__,
+            document=doc,
+        )
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.title, "Doc created in jun")  # codespell:ignore
+
+    def test_document_added_workflow_month_placeholder_created_translation(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_filename="*sample*",
+        )
+
+        action = WorkflowAction.objects.create(
+            assign_title="Doc created in {{ created | localize_date('MMMM', 'en_GB') }}",
+        )
+
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        superuser = User.objects.create_superuser("superuser")
+        self.client.force_authenticate(user=superuser)
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+            created=timezone.now().replace(
+                month=6,
+                day=1,
+                hour=0,
+                minute=0,
+                second=0,
+                microsecond=0,
+            ),
+        )
+        document_consumption_finished.send(
+            sender=self.__class__,
+            document=doc,
+        )
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.title, "Doc created in June")  # codespell:ignore
+
+    def test_document_added_workflow_month_placeholder_addded(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_filename="*sample*",
+        )
+
+        action = WorkflowAction.objects.create(
+            # assign_title="{% language 'de' %} {% trans %} Doc added in {{added_month_name}} {% endtrans %} {% endlanguage %}",
+            assign_title="{% trans %}{{added_month_name}}{% endtrans  %}",
+        )
+
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        superuser = User.objects.create_superuser("superuser")
+        self.client.force_authenticate(user=superuser)
+
+        with override_settings(LANGUAGE_CODE_WORKFLOWS="de"):
+            doc = Document.objects.create(
+                title="sample test",
+                correspondent=self.c,
+                original_filename="sample.pdf",
+                added=timezone.now().replace(
+                    month=2,
+                    day=1,
+                    hour=0,
+                    minute=0,
+                    second=0,
+                    microsecond=0,
+                ),
+            )
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.title, "Doc added in Februar")  # codespell:ignore
+
+    def test_document_consumption_workflow_month_placeholder_addded(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            sources=f"{DocumentSource.ApiUpload}",
+            filter_filename="simple*",
+        )
+
+        action = WorkflowAction.objects.create(
+            assign_title="Doc added in {added_month_name_short}",
+        )
+
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        superuser = User.objects.create_superuser("superuser")
+        self.client.force_authenticate(user=superuser)
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ApiUpload,
+                    original_file=test_file,
+                ),
+                None,
+            )
+            document = Document.objects.first()
+            self.assertRegex(
+                document.title,
+                r"Doc added in \w{3,}",
+            )  # Match any 3-letter month name
+
     def test_document_updated_workflow_existing_custom_field(self):
         """
         GIVEN:
