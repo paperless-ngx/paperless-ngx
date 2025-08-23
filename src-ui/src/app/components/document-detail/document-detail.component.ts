@@ -21,8 +21,9 @@ import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
 import { PDFDocumentProxy, PdfViewerModule } from 'ng2-pdf-viewer'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { DeviceDetectorService } from 'ngx-device-detector'
-import { BehaviorSubject, Observable, Subject } from 'rxjs'
+import { BehaviorSubject, Observable, of, Subject } from 'rxjs'
 import {
+  catchError,
   debounceTime,
   distinctUntilChanged,
   filter,
@@ -406,7 +407,13 @@ export class DocumentDetailComponent
     this.thumbUrl = this.documentsService.getThumbUrl(documentId)
     this.documentsService
       .get(documentId)
-      .pipe(first())
+      .pipe(
+        catchError(() => {
+          // 404 is handled in the subscribe below
+          return of(null)
+        }),
+        first()
+      )
       .subscribe({
         next: (doc) => {
           if (!doc) {
@@ -452,10 +459,6 @@ export class DocumentDetailComponent
             })
           this.setupDirtyTracking(useDoc, doc)
         },
-        error: () =>
-          this.router.navigate(['404'], {
-            replaceUrl: true,
-          }),
       })
   }
 
