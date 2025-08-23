@@ -503,7 +503,7 @@ For security reasons, webhooks can be limited to specific ports and disallowed f
 [configuration settings](configuration.md#workflow-webhooks) to change this behavior. If you are allowing non-admins to create workflows,
 you may want to adjust these settings to prevent abuse.
 
-#### Workflow placeholders
+#### Workflow placeholders {#workflow-placeholders}
 
 Some workflow text can include placeholders but the available options differ depending on the type of
 workflow trigger. This is because at the time of consumption (when the text is to be set), no automatic tags etc. have been
@@ -534,6 +534,25 @@ The following placeholders are only available for "added" or "updated" triggers
 -   `{created_day}`: created day
 -   `{created_time}`: created time in HH:MM format
 -   `{doc_url}`: URL to the document in the web UI. Requires the `PAPERLESS_URL` setting to be set.
+
+#### Jinja2 Templates {#wofkflow-templates}
+
+The title formatting can also be done via [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/templates/) to build the title.
+This allows for complex logic to be included in the format, including [logical structures](https://jinja.palletsprojects.com/en/3.1.x/templates/#list-of-control-structures)
+and [filters](https://jinja.palletsprojects.com/en/3.1.x/templates/#id11) to manipulate the [Workflow placeholders](#workflow-placeholders).
+The template is provided as a string.
+
+Using Jinja2 Templates is most usfull for [Date locatisation](advanced_usage.md#Date-Localization) in the title.
+
+##### Examples
+
+```jinja2
+{{ created | localize_date('MMMM', 'en_US') }}
+<!-- Output: "January" -->
+
+{{ added | localize_date('MMMM', 'de_DE') }}
+<!-- Output: "Juni" --> # codespell:ignore
+```
 
 ### Workflow permissions
 

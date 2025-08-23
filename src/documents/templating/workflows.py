@@ -16,7 +16,6 @@ from jinja2.sandbox import SandboxedEnvironment
 from jinja2.sandbox import SecurityError
 
 from documents.templating.utils import format_datetime
-from documents.templating.utils import get_cf_value
 from documents.templating.utils import localize_date
 
 logger = logging.getLogger("paperless.templating")
@@ -55,8 +54,6 @@ _template_environment = TitleEnvironment(
     extensions=["jinja2.ext.loopcontrols"],
     undefined=_LogStrictUndefined,
 )
-
-_template_environment.filters["get_cf_value"] = get_cf_value
 
 _template_environment.filters["datetime"] = format_datetime
 
