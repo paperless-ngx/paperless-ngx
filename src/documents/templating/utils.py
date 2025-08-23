@@ -5,6 +5,7 @@ from datetime import datetime
 from babel import Locale
 from babel import dates
 from django.utils.dateparse import parse_date
+from django.utils.dateparse import parse_datetime
 
 
 def convert_format_str_to_template_format(old_format: str) -> str:
@@ -50,7 +51,7 @@ def localize_date(value: date | datetime | str, format: str, locale: str) -> str
         TypeError: If `value` is not a date, datetime or str instance.
     """
     if isinstance(value, str):
-        value = parse_date(value)
+        value = parse_datetime(value)
 
     try:
         Locale.parse(locale)
