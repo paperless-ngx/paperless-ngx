@@ -119,6 +119,7 @@ def parse_w_workflow_placeholders(
     if re.search(r"\{\{.*\}\}", text) or re.search(r"{\%.*\%\}", text):
         # Try rendering the template
         logger.info(f"Jinja Template is : {text}")
+        logger.info(f"Added is : {local_added.isoformat()}")
         try:
             template = _template_environment.from_string(
                 text,
@@ -137,12 +138,10 @@ def parse_w_workflow_placeholders(
         except SecurityError as e:
             logger.warning(f"Template attempted restricted operation: {e}")
         except Exception as e:
-            logger.warning(f"Unknown error in ftitle  generation: {e}")
+            logger.warning(f"Unknown error in title generation: {e}")
             logger.warning(
                 f"Invalid title format '{text}', workflow not applied: {e}",
             )
         return None
-        # django_engine = engines["jinja2"]
-        # template = django_engine.from_string(text)
 
     return text.format(**formatting).strip()
