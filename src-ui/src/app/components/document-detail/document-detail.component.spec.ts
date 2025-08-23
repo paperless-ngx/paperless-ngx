@@ -1388,4 +1388,19 @@ describe('DocumentDetailComponent', () => {
     component.openEmailDocument()
     expect(modalSpy).toHaveBeenCalled()
   })
+
+  it('should set previewText', () => {
+    initNormally()
+    const previewText = 'Hello world, this is a test'
+    httpTestingController.expectOne(component.previewUrl).flush(previewText)
+    expect(component.previewText).toEqual(previewText)
+  })
+
+  it('should set previewText to error message if preview fails', () => {
+    initNormally()
+    httpTestingController
+      .expectOne(component.previewUrl)
+      .flush('fail', { status: 500, statusText: 'Server Error' })
+    expect(component.previewText).toContain('An error occurred loading content')
+  })
 })
