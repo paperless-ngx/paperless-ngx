@@ -44,8 +44,19 @@ export class SelectComponent extends AbstractInputComponent<number> {
 
   @Input()
   set items(items) {
-    this._items = items
-    if (items && this.value) this.checkForPrivateItems(this.value)
+    this._items = Array.isArray(items)
+      ? [...items].sort((a, b) => {
+          const aVal = String(a?.[this.bindLabel] ?? '');
+          const bVal = String(b?.[this.bindLabel] ?? '');
+
+          return aVal.localeCompare(bVal, 'de', {
+            sensitivity: 'variant',
+            caseFirst: 'lower',
+          });
+        })
+      : items;
+
+    if (items && this.value) this.checkForPrivateItems(this.value);
   }
 
   writeValue(newValue: any): void {
