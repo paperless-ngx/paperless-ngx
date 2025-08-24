@@ -99,4 +99,49 @@ describe('EmailDocumentDialogComponent', () => {
     component.close()
     expect(closeSpy).toHaveBeenCalled()
   })
+
+  it('should calculate current attachment size for archive version', () => {
+    component.totalOriginalSizeBytes = 2000000
+    component.totalArchiveSizeBytes = 1500000
+    component.useArchiveVersion = true
+
+    expect(component.currentAttachmentSizeBytes).toBe(1500000)
+    expect(component.currentAttachmentSizeMB).toBeCloseTo(1.43, 2)
+  })
+
+  it('should calculate current attachment size for original version', () => {
+    component.totalOriginalSizeBytes = 2000000
+    component.totalArchiveSizeBytes = 1500000
+    component.useArchiveVersion = false
+
+    expect(component.currentAttachmentSizeBytes).toBe(2000000)
+    expect(component.currentAttachmentSizeMB).toBeCloseTo(1.91, 2)
+  })
+
+  it('should show size warning when over threshold', () => {
+    component.totalOriginalSizeBytes = 12000000 // 12MB
+    component.totalArchiveSizeBytes = 8000000 // 8MB
+    component.useArchiveVersion = false
+
+    expect(component.showSizeWarning).toBe(true)
+  })
+
+  it('should not show size warning when under threshold', () => {
+    component.totalOriginalSizeBytes = 5000000 // 5MB
+    component.totalArchiveSizeBytes = 3000000 // 3MB
+    component.useArchiveVersion = true
+
+    expect(component.showSizeWarning).toBe(false)
+  })
+
+  it('should update size warning when switching between versions', () => {
+    component.totalOriginalSizeBytes = 12000000 // 12MB - over threshold
+    component.totalArchiveSizeBytes = 5000000 // 5MB - under threshold
+
+    component.useArchiveVersion = false
+    expect(component.showSizeWarning).toBe(true)
+
+    component.useArchiveVersion = true
+    expect(component.showSizeWarning).toBe(false)
+  })
 })

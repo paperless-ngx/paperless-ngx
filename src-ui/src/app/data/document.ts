@@ -142,6 +142,10 @@ export interface Document extends ObjectWithPermissions {
 
   archived_file_name?: string
 
+  original_file_size?: number
+
+  archive_file_size?: number
+
   download_url?: string
 
   thumbnail_url?: string

@@ -908,10 +908,24 @@ export class BulkEditorComponent
       (doc) => !!doc.archived_file_name
     )
 
+    const totalOriginalSizeBytes = selectedDocuments.reduce(
+      (total, doc) => total + (doc.original_file_size || 0),
+      0
+    )
+
+    const totalArchiveSizeBytes = allHaveArchiveVersion
+      ? selectedDocuments.reduce(
+          (total, doc) => total + (doc.archive_file_size || 0),
+          0
+        )
+      : 0
+
     const modal = this.modalService.open(EmailDocumentDialogComponent, {
       backdrop: 'static',
     })
     modal.componentInstance.documentIds = Array.from(this.list.selected)
     modal.componentInstance.hasArchiveVersion = allHaveArchiveVersion
+    modal.componentInstance.totalOriginalSizeBytes = totalOriginalSizeBytes
+    modal.componentInstance.totalArchiveSizeBytes = totalArchiveSizeBytes
   }
 }
