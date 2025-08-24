@@ -52,11 +52,11 @@ export class SelectComponent extends AbstractInputComponent<number> {
           return aVal.localeCompare(bVal, 'de', {
             sensitivity: 'variant',
             caseFirst: 'lower',
-          });
+          })
         })
       : items
 
-    if (items && this.value) this.checkForPrivateItems(this.value);
+    if (items && this.value) this.checkForPrivateItems(this.value)
   }
 
   writeValue(newValue: any): void {
