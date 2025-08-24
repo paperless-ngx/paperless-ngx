@@ -397,13 +397,20 @@ export class DocumentDetailComponent
 
   private loadDocument(documentId: number): void {
     this.previewUrl = this.documentsService.getPreviewUrl(documentId)
-    this.http.get(this.previewUrl, { responseType: 'text' }).subscribe({
-      next: (res) => (this.previewText = res.toString()),
-      error: (err) =>
-        (this.previewText = $localize`An error occurred loading content: ${
-          err.message ?? err.toString()
-        }`),
-    })
+    this.http
+      .get(this.previewUrl, { responseType: 'text' })
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier)
+      )
+      .subscribe({
+        next: (res) => (this.previewText = res.toString()),
+        error: (err) =>
+          (this.previewText = $localize`An error occurred loading content: ${
+            err.message ?? err.toString()
+          }`),
+      })
     this.thumbUrl = this.documentsService.getThumbUrl(documentId)
     this.documentsService
       .get(documentId)
@@ -412,7 +419,9 @@ export class DocumentDetailComponent
           // 404 is handled in the subscribe below
           return of(null)
         }),
-        first()
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier)
       )
       .subscribe({
         next: (doc) => {
@@ -442,7 +451,14 @@ export class DocumentDetailComponent
               )
             }
           } else {
-            this.openDocumentService.openDocument(doc).pipe(first()).subscribe()
+            this.openDocumentService
+              .openDocument(doc)
+              .pipe(
+                first(),
+                takeUntil(this.unsubscribeNotifier),
+                takeUntil(this.docChangeNotifier)
+              )
+              .subscribe()
           }
           this.updateComponent(useDoc)
           this.titleSubject
@@ -533,21 +549,23 @@ export class DocumentDetailComponent
         this.loadDocument(documentId)
       })
 
-    this.route.paramMap.subscribe((paramMap) => {
-      const section = paramMap.get('section')
-      if (section) {
-        const navIDKey: string = Object.keys(DocumentDetailNavIDs).find(
-          (navID) => navID.toLowerCase() == section
-        )
-        if (navIDKey) {
-          this.activeNavID = DocumentDetailNavIDs[navIDKey]
+    this.route.paramMap
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((paramMap) => {
+        const section = paramMap.get('section')
+        if (section) {
+          const navIDKey: string = Object.keys(DocumentDetailNavIDs).find(
+            (navID) => navID.toLowerCase() == section
+          )
+          if (navIDKey) {
+            this.activeNavID = DocumentDetailNavIDs[navIDKey]
+          }
+        } else if (paramMap.get('id')) {
+          this.router.navigate(['documents', +paramMap.get('id'), 'details'], {
+            replaceUrl: true,
+          })
         }
-      } else if (paramMap.get('id')) {
-        this.router.navigate(['documents', +paramMap.get('id'), 'details'], {
-          replaceUrl: true,
-        })
-      }
-    })
+      })
 
     this.hotKeyService
       .addShortcut({
@@ -777,7 +795,11 @@ export class DocumentDetailComponent
   discard() {
     this.documentsService
       .get(this.documentId)
-      .pipe(first())
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier)
+      )
       .subscribe({
         next: (doc) => {
           Object.assign(this.document, doc)
@@ -880,9 +902,10 @@ export class DocumentDetailComponent
       .patch(this.getChangedFields())
       .pipe(
         switchMap((updateResult) => {
-          return this.documentListViewService
-            .getNext(this.documentId)
-            .pipe(map((nextDocId) => ({ nextDocId, updateResult })))
+          return this.documentListViewService.getNext(this.documentId).pipe(
+            map((nextDocId) => ({ nextDocId, updateResult })),
+            takeUntil(this.unsubscribeNotifier)
+          )
         })
       )
       .pipe(
@@ -892,7 +915,10 @@ export class DocumentDetailComponent
             return this.openDocumentService
               .closeDocument(this.document)
               .pipe(
-                map((closeResult) => ({ updateResult, nextDocId, closeResult }))
+                map(
+                  (closeResult) => ({ updateResult, nextDocId, closeResult }),
+                  takeUntil(this.unsubscribeNotifier)
+                )
               )
           }
         })
@@ -1412,43 +1438,50 @@ export class DocumentDetailComponent
   }
 
   private tryRenderTiff() {
-    this.http.get(this.previewUrl, { responseType: 'arraybuffer' }).subscribe({
-      next: (res) => {
-        /* istanbul ignore next */
-        try {
-          // See UTIF.js > _imgLoaded
-          const tiffIfds: any[] = UTIF.decode(res)
-          var vsns = tiffIfds,
-            ma = 0,
-            page = vsns[0]
-          if (tiffIfds[0].subIFD) vsns = vsns.concat(tiffIfds[0].subIFD)
-          for (var i = 0; i < vsns.length; i++) {
-            var img = vsns[i]
-            if (img['t258'] == null || img['t258'].length < 3) continue
-            var ar = img['t256'] * img['t257']
-            if (ar > ma) {
-              ma = ar
-              page = img
+    this.http
+      .get(this.previewUrl, { responseType: 'arraybuffer' })
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier)
+      )
+      .subscribe({
+        next: (res) => {
+          /* istanbul ignore next */
+          try {
+            // See UTIF.js > _imgLoaded
+            const tiffIfds: any[] = UTIF.decode(res)
+            var vsns = tiffIfds,
+              ma = 0,
+              page = vsns[0]
+            if (tiffIfds[0].subIFD) vsns = vsns.concat(tiffIfds[0].subIFD)
+            for (var i = 0; i < vsns.length; i++) {
+              var img = vsns[i]
+              if (img['t258'] == null || img['t258'].length < 3) continue
+              var ar = img['t256'] * img['t257']
+              if (ar > ma) {
+                ma = ar
+                page = img
+              }
             }
+            UTIF.decodeImage(res, page, tiffIfds)
+            const rgba = UTIF.toRGBA8(page)
+            const { width: w, height: h } = page
+            var cnv = document.createElement('canvas')
+            cnv.width = w
+            cnv.height = h
+            var ctx = cnv.getContext('2d'),
+              imgd = ctx.createImageData(w, h)
+            for (var i = 0; i < rgba.length; i++) imgd.data[i] = rgba[i]
+            ctx.putImageData(imgd, 0, 0)
+            this.tiffURL = cnv.toDataURL()
+          } catch (err) {
+            this.tiffError = $localize`An error occurred loading tiff: ${err.toString()}`
           }
-          UTIF.decodeImage(res, page, tiffIfds)
-          const rgba = UTIF.toRGBA8(page)
-          const { width: w, height: h } = page
-          var cnv = document.createElement('canvas')
-          cnv.width = w
-          cnv.height = h
-          var ctx = cnv.getContext('2d'),
-            imgd = ctx.createImageData(w, h)
-          for (var i = 0; i < rgba.length; i++) imgd.data[i] = rgba[i]
-          ctx.putImageData(imgd, 0, 0)
-          this.tiffURL = cnv.toDataURL()
-        } catch (err) {
+        },
+        error: (err) => {
           this.tiffError = $localize`An error occurred loading tiff: ${err.toString()}`
-        }
-      },
-      error: (err) => {
-        this.tiffError = $localize`An error occurred loading tiff: ${err.toString()}`
-      },
-    })
+        },
+      })
   }
 }
