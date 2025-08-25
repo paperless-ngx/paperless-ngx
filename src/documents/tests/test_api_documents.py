@@ -3332,3 +3332,109 @@ class TestDocumentApiCustomFieldsSorting(DirectoriesMixin, APITestCase):
             self.client.get(
                 f"/api/documents/?ordering=custom_field_{custom_field.pk}",
             )
+
+    def test_document_serializer_includes_file_sizes(self):
+        """
+        GIVEN:
+            - Document with both original and archive files
+        WHEN:
+            - Document is requested via API
+        THEN:
+            - Both file sizes are included in response
+        """
+        # Create test files
+        _, original_file = tempfile.mkstemp(dir=self.dirs.originals_dir, suffix=".pdf")
+        _, archive_file = tempfile.mkstemp(dir=self.dirs.archive_dir, suffix=".pdf")
+
+        original_content = b"This is original content"
+        archive_content = b"This is archive content"
+
+        Path(original_file).write_bytes(original_content)
+        Path(archive_file).write_bytes(archive_content)
+
+        doc = Document.objects.create(
+            title="Test Document",
+            filename=Path(original_file).name,
+            archive_filename=Path(archive_file).name,
+            mime_type="application/pdf",
+            checksum="test123",
+        )
+
+        response = self.client.get(f"/api/documents/{doc.pk}/", format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.data
+        self.assertIn("original_file_size", data)
+        self.assertIn("archive_file_size", data)
+        self.assertEqual(data["original_file_size"], len(original_content))
+        self.assertEqual(data["archive_file_size"], len(archive_content))
+
+    def test_document_file_size_original_only(self):
+        """
+        GIVEN:
+            - Document with only original file (no archive)
+        WHEN:
+            - Document is requested via API
+        THEN:
+            - Original file size is returned, archive size is None
+        """
+        _, original_file = tempfile.mkstemp(dir=self.dirs.originals_dir, suffix=".pdf")
+        original_content = b"This is original content only"
+        Path(original_file).write_bytes(original_content)
+
+        doc = Document.objects.create(
+            title="Test Document Original Only",
+            filename=Path(original_file).name,
+            mime_type="application/pdf",
+            checksum="test456",
+        )
+
+        response = self.client.get(f"/api/documents/{doc.pk}/", format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.data
+        self.assertIn("original_file_size", data)
+        self.assertIn("archive_file_size", data)
+        self.assertEqual(data["original_file_size"], len(original_content))
+        self.assertIsNone(data["archive_file_size"])
+
+    def test_document_list_api_includes_file_sizes(self):
+        """
+        GIVEN:
+            - Multiple documents with files
+        WHEN:
+            - Document list is requested via API
+        THEN:
+            - All documents include file size information
+        """
+        # Create test files
+        _, original_file = tempfile.mkstemp(dir=self.dirs.originals_dir, suffix=".pdf")
+        _, archive_file = tempfile.mkstemp(dir=self.dirs.archive_dir, suffix=".pdf")
+
+        original_content = b"List test original content"
+        archive_content = b"List test archive content"
+
+        Path(original_file).write_bytes(original_content)
+        Path(archive_file).write_bytes(archive_content)
+
+        doc = Document.objects.create(
+            title="List Test Document",
+            filename=Path(original_file).name,
+            archive_filename=Path(archive_file).name,
+            mime_type="application/pdf",
+            checksum="listtest",
+        )
+
+        response = self.client.get("/api/documents/", format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        results = response.data["results"]
+        self.assertTrue(len(results) > 0)
+
+        # Find our test document
+        test_doc = next((d for d in results if d["id"] == doc.pk), None)
+        self.assertIsNotNone(test_doc)
+        self.assertIn("original_file_size", test_doc)
+        self.assertIn("archive_file_size", test_doc)
+        self.assertEqual(test_doc["original_file_size"], len(original_content))
+        self.assertEqual(test_doc["archive_file_size"], len(archive_content))

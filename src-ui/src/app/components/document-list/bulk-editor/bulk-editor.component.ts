@@ -45,6 +45,7 @@ import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/docume
 import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
+import { EmailDocumentDialogComponent } from '../../common/email-document-dialog/email-document-dialog.component'
 import {
   ChangedItems,
   FilterableDropdownComponent,
@@ -897,5 +898,34 @@ export class BulkEditorComponent
         error
       )
     })
+  }
+
+  emailSelected() {
+    const selectedDocuments = this.list.documents.filter((d) =>
+      this.list.selected.has(d.id)
+    )
+    const allHaveArchiveVersion = selectedDocuments.every(
+      (doc) => !!doc.archived_file_name
+    )
+
+    const totalOriginalSizeBytes = selectedDocuments.reduce(
+      (total, doc) => total + (doc.original_file_size || 0),
+      0
+    )
+
+    const totalArchiveSizeBytes = allHaveArchiveVersion
+      ? selectedDocuments.reduce(
+          (total, doc) => total + (doc.archive_file_size || 0),
+          0
+        )
+      : 0
+
+    const modal = this.modalService.open(EmailDocumentDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.documentIds = Array.from(this.list.selected)
+    modal.componentInstance.hasArchiveVersion = allHaveArchiveVersion
+    modal.componentInstance.totalOriginalSizeBytes = totalOriginalSizeBytes
+    modal.componentInstance.totalArchiveSizeBytes = totalArchiveSizeBytes
   }
 }
