@@ -1792,7 +1792,7 @@ class BulkDownloadSerializer(DocumentListSerializer):
         }[compression]
 
 
-class BulkEmailSerializer(DocumentListSerializer):
+class EmailSerializer(DocumentListSerializer):
     addresses = serializers.CharField(
         required=True,
         label="Email addresses",
