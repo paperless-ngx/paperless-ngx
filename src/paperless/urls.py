@@ -18,7 +18,6 @@ from rest_framework.routers import DefaultRouter
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
-from documents.views import BulkEmailView
 from documents.views import CorrespondentViewSet
 from documents.views import CustomFieldViewSet
 from documents.views import DocumentTypeViewSet
@@ -132,11 +131,6 @@ urlpatterns = [
                                 "^bulk_download/",
                                 BulkDownloadView.as_view(),
                                 name="bulk_download",
-                            ),
-                            re_path(
-                                "^bulk_email/",
-                                BulkEmailView.as_view(),
-                                name="bulk_email",
                             ),
                             re_path(
                                 "^selection_data/",

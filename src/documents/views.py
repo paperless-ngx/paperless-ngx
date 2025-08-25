@@ -142,12 +142,12 @@ from documents.serialisers import AcknowledgeTasksViewSerializer
 from documents.serialisers import BulkDownloadSerializer
 from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
-from documents.serialisers import BulkEmailSerializer
 from documents.serialisers import CorrespondentSerializer
 from documents.serialisers import CustomFieldSerializer
 from documents.serialisers import DocumentListSerializer
 from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
+from documents.serialisers import EmailSerializer
 from documents.serialisers import NotesSerializer
 from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import RunTaskViewSerializer
@@ -528,7 +528,7 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
             404: None,
         },
     ),
-    email=extend_schema(
+    email_document=extend_schema(
         description="Email the document to one or more recipients as an attachment.",
         request=inline_serializer(
             name="EmailRequest",
@@ -539,6 +539,21 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
                 "use_archive_version": serializers.BooleanField(default=True),
             },
         ),
+        responses={
+            200: inline_serializer(
+                name="EmailResponse",
+                fields={"message": serializers.CharField()},
+            ),
+            400: None,
+            403: None,
+            404: None,
+            500: None,
+        },
+    ),
+    email_documents=extend_schema(
+        operation_id="email_documents",
+        description="Email one or more documents as attachments to one or more recipients.",
+        request=EmailSerializer,
         responses={
             200: inline_serializer(
                 name="EmailResponse",
@@ -1045,56 +1060,68 @@ class DocumentViewSet(
 
         return Response(sorted(entries, key=lambda x: x["timestamp"], reverse=True))
 
-    @action(methods=["post"], detail=True)
-    def email(self, request, pk=None):
-        try:
-            doc = Document.objects.select_related("owner").get(pk=pk)
-            if request.user is not None and not has_perms_owner_aware(
-                request.user,
-                "view_document",
-                doc,
-            ):
+    def _send_email_with_request_data(self, request, request_data):
+        serializer = EmailSerializer(data=request_data)
+        serializer.is_valid(raise_exception=True)
+
+        validated_data = serializer.validated_data
+        document_ids = validated_data.get("documents")
+        addresses = validated_data.get("addresses").split(",")
+        addresses = [addr.strip() for addr in addresses]
+        subject = validated_data.get("subject")
+        message = validated_data.get("message")
+        use_archive_version = validated_data.get("use_archive_version", True)
+
+        if not all(re.match(r"[^@]+@[^@]+\.[^@]+", address) for address in addresses):
+            return HttpResponseBadRequest("Invalid email address found")
+
+        documents = Document.objects.select_related("owner").filter(pk__in=document_ids)
+        for document in documents:
+            if not has_perms_owner_aware(request.user, "view_document", document):
                 return HttpResponseForbidden("Insufficient permissions")
-        except Document.DoesNotExist:
-            raise Http404
 
-        try:
-            if (
-                "addresses" not in request.data
-                or "subject" not in request.data
-                or "message" not in request.data
-            ):
-                return HttpResponseBadRequest("Missing required fields")
-
-            use_archive_version = request.data.get("use_archive_version", True)
-
-            addresses = request.data.get("addresses").split(",")
-            if not all(
-                re.match(r"[^@]+@[^@]+\.[^@]+", address.strip())
-                for address in addresses
-            ):
-                return HttpResponseBadRequest("Invalid email address found")
-
+        attachments = []
+        for doc in documents:
             attachment_path = (
                 doc.archive_path
                 if use_archive_version and doc.has_archive_version
                 else doc.source_path
             )
+            attachments.append((attachment_path, doc.mime_type))
+
+        try:
             send_email(
-                subject=request.data.get("subject"),
-                body=request.data.get("message"),
+                subject=subject,
+                body=message,
                 to=addresses,
-                attachments=[(attachment_path, doc.mime_type)],
+                attachments=attachments,
             )
+
             logger.debug(
-                f"Sent document {doc.id} via email to {addresses}",
+                f"Sent documents {[doc.id for doc in documents]} via email to {addresses}",
             )
             return Response({"message": "Email sent"})
         except Exception as e:
-            logger.warning(f"An error occurred emailing document: {e!s}")
+            logger.warning(f"An error occurred emailing documents: {e!s}")
             return HttpResponseServerError(
-                "Error emailing document, check logs for more detail.",
+                "Error emailing documents, check logs for more detail.",
             )
+
+    @action(methods=["post"], detail=True, url_path="email")
+    def email_document(self, request, pk=None):
+        return self._send_email_with_request_data(
+            request,
+            {**request.data, "documents": [pk]},
+        )
+
+    @action(
+        methods=["post"],
+        detail=False,
+        url_path="email",
+        serializer_class=EmailSerializer,
+    )
+    def email_documents(self, request):
+        return self._send_email_with_request_data(request, request.data)
 
 
 @extend_schema_view(
@@ -2121,69 +2148,6 @@ class BulkDownloadView(GenericAPIView):
             )
 
             return response
-
-
-@extend_schema_view(
-    post=extend_schema(
-        operation_id="bulk_email",
-        description="Send multiple documents as email attachments",
-        responses={
-            200: inline_serializer(
-                name="BulkEmailResult",
-                fields={
-                    "message": serializers.CharField(),
-                },
-            ),
-        },
-    ),
-)
-class BulkEmailView(GenericAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = BulkEmailSerializer
-    parser_classes = (parsers.JSONParser,)
-
-    def post(self, request, format=None):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        document_ids = serializer.validated_data.get("documents")
-        addresses = serializer.validated_data.get("addresses").split(",")
-        addresses = [addr.strip() for addr in addresses]
-        subject = serializer.validated_data.get("subject")
-        message = serializer.validated_data.get("message")
-        use_archive_version = serializer.validated_data.get("use_archive_version")
-
-        documents = Document.objects.select_related("owner").filter(pk__in=document_ids)
-        for document in documents:
-            if not has_perms_owner_aware(request.user, "view_document", document):
-                return HttpResponseForbidden("Insufficient permissions")
-
-        attachments = []
-        for doc in documents:
-            attachment_path = (
-                doc.archive_path
-                if use_archive_version and doc.has_archive_version
-                else doc.source_path
-            )
-            attachments.append((attachment_path, doc.mime_type))
-
-        try:
-            send_email(
-                subject=subject,
-                body=message,
-                to=addresses,
-                attachments=attachments,
-            )
-
-            logger.debug(
-                f"Sent documents {documents} via email to {addresses}",
-            )
-            return Response({"message": "Email sent"})
-        except Exception as e:
-            logger.warning(f"An error occurred emailing documents: {e!s}")
-            return HttpResponseServerError(
-                "Error emailing documents, check logs for more detail.",
-            )
 
 
 @extend_schema_view(**generate_object_with_permissions_schema(StoragePathSerializer))

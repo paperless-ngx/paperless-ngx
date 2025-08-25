@@ -14,8 +14,8 @@ from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import SampleDirMixin
 
 
-class TestBulkEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
-    ENDPOINT = "/api/documents/bulk_email/"
+class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
+    ENDPOINT = "/api/documents/email/"
 
     def setUp(self):
         super().setUp()
@@ -49,7 +49,7 @@ class TestBulkEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
         EMAIL_ENABLED=True,
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
     )
-    def test_bulk_email_success(self):
+    def test_email_success(self):
         """
         GIVEN:
             - Multiple existing documents
@@ -90,7 +90,7 @@ class TestBulkEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
         EMAIL_ENABLED=True,
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
     )
-    def test_bulk_email_use_original_version(self):
+    def test_email_use_original_version(self):
         """
         GIVEN:
             - Documents with archive versions
@@ -117,7 +117,7 @@ class TestBulkEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].attachments[0][0], "test1.pdf")
 
-    def test_bulk_email_missing_required_fields(self):
+    def test_email_missing_required_fields(self):
         """
         GIVEN:
             - Request with missing required fields
@@ -182,7 +182,7 @@ class TestBulkEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_bulk_email_empty_document_list(self):
+    def test_email_empty_document_list(self):
         """
         GIVEN:
             - Request with empty document list
@@ -205,7 +205,7 @@ class TestBulkEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_bulk_email_invalid_document_id(self):
+    def test_email_invalid_document_id(self):
         """
         GIVEN:
             - Request with non-existent document ID
@@ -228,7 +228,7 @@ class TestBulkEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_bulk_email_invalid_email_address(self):
+    def test_email_invalid_email_address(self):
         """
         GIVEN:
             - Request with invalid email address
@@ -266,7 +266,7 @@ class TestBulkEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_bulk_email_insufficient_permissions(self):
+    def test_email_insufficient_permissions(self):
         """
         GIVEN:
             - User without permissions to view document
@@ -305,7 +305,7 @@ class TestBulkEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
         "django.core.mail.message.EmailMessage.send",
         side_effect=Exception("Email error"),
     )
-    def test_bulk_email_send_error(self, mocked_send):
+    def test_email_send_error(self, mocked_send):
         """
         GIVEN:
             - Existing documents
