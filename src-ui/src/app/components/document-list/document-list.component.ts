@@ -264,9 +264,10 @@ export class DocumentListComponent
           view,
           convertToParamMap(this.route.snapshot.queryParams)
         )
-        this.list.reload()
+        this.list.reload(() => {
+          this.savedViewService.setDocumentCount(view, this.list.collectionSize)
+        })
         this.updateDisplayCustomFields()
-        this.savedViewService.maybeRefreshDocumentCounts([view])
         this.unmodifiedFilterRules = view.filter_rules
       })
 
@@ -400,8 +401,9 @@ export class DocumentListComponent
       .subscribe((view) => {
         this.unmodifiedSavedView = view
         this.list.activateSavedView(view)
-        this.list.reload()
-        this.savedViewService.maybeRefreshDocumentCounts([view])
+        this.list.reload(() => {
+          this.savedViewService.setDocumentCount(view, this.list.collectionSize)
+        })
       })
   }
 
