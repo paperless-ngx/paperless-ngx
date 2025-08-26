@@ -266,7 +266,6 @@ export class DocumentListComponent
         )
         this.list.reload()
         this.updateDisplayCustomFields()
-        this.savedViewService.maybeRefreshDocumentCounts()
         this.unmodifiedFilterRules = view.filter_rules
       })
 
@@ -277,7 +276,6 @@ export class DocumentListComponent
       )
       .subscribe((queryParams) => {
         this.updateDisplayCustomFields()
-        this.savedViewService.maybeRefreshDocumentCounts()
         if (queryParams.has('view')) {
           // loading a saved view on /documents
           this.loadViewConfig(parseInt(queryParams.get('view')))
