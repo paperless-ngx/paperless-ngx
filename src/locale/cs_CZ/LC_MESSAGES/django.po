@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-16 14:34+0000\n"
-"PO-Revision-Date: 2025-08-16 14:36\n"
+"PO-Revision-Date: 2025-08-18 12:15\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -1411,21 +1411,22 @@ msgstr "Jako poslední krok vyplňte následující formulář:"
 #: documents/validators.py:24
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "Nelze analyzovat URI {value}, chybí schéma"
 
 #: documents/validators.py:29
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "Nelze analyzovat URI {value}, chybí síťové umístění nebo cesta"
 
 #: documents/validators.py:36
 msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
-msgstr ""
+msgstr "URI schéma '{parts.scheme}' není povoleno. Povolená schémata: {',\n"
+"'.join(allowed_schemes)}"
 
 #: documents/validators.py:45
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "Nelze zpracovat URI {value}"
 
 #: paperless/apps.py:11
 msgid "Paperless"
@@ -1753,7 +1754,7 @@ msgstr "Ukrajinština"
 
 #: paperless/settings.py:807
 msgid "Vietnamese"
-msgstr ""
+msgstr "Vietnamština"
 
 #: paperless/settings.py:808
 msgid "Chinese Simplified"

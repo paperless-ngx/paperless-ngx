@@ -90,6 +90,7 @@ class StandardPagination(PageNumberPagination):
         response_schema["properties"]["all"] = {
             "type": "array",
             "example": "[1, 2, 3]",
+            "items": {"type": "integer"},
         }
         return response_schema
 
