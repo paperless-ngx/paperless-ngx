@@ -140,9 +140,13 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
         )
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe((results: Results<Document>) => {
-          this.savedViewDocumentCounts.set(view.id, results.count)
+          this.setDocumentCount(view, results.count)
         })
     })
+  }
+
+  public setDocumentCount(view: SavedView, count: number) {
+    this.savedViewDocumentCounts.set(view.id, count)
   }
 
   public getDocumentCount(view: SavedView): number {
