@@ -266,6 +266,7 @@ export class DocumentListComponent
         )
         this.list.reload()
         this.updateDisplayCustomFields()
+        this.savedViewService.maybeRefreshDocumentCounts([view])
         this.unmodifiedFilterRules = view.filter_rules
       })
 
@@ -400,6 +401,7 @@ export class DocumentListComponent
         this.unmodifiedSavedView = view
         this.list.activateSavedView(view)
         this.list.reload()
+        this.savedViewService.maybeRefreshDocumentCounts([view])
       })
   }
 
