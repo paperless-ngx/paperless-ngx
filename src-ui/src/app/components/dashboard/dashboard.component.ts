@@ -54,6 +54,7 @@ export class DashboardComponent extends ComponentWithPermissions {
     this.savedViewService.listAll().subscribe(() => {
       this.dashboardViews = this.savedViewService.dashboardViews
     })
+    this.savedViewService.maybeRefreshDocumentCounts()
   }
 
   get subtitle() {
