@@ -159,6 +159,8 @@ export interface Document extends ObjectWithPermissions {
 
   page_count?: number
 
+  in_process?: boolean
+
   // Frontend only
   __changedFields?: string[]
 }

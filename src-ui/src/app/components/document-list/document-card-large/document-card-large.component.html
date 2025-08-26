@@ -15,8 +15,13 @@
       }
 
     </div>
-    <div class="col col-md-10">
+  <div class="col col-md-10">
       <div class="card-body">
+        @if (document?.in_process) {
+          <span class="badge bg-secondary text-light mb-2">
+            <div class="spinner-border spinner-border-sm me-1" role="status"></div><span i18n>Processing...</span>
+          </span>
+        }
         <div class="d-flex justify-content-between align-items-center">
           <h5 class="card-title w-100">
             @if (document) {

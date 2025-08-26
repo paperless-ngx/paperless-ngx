@@ -301,6 +301,11 @@
                 }
                 @if (activeDisplayFields.includes(DisplayField.TITLE) || activeDisplayFields.includes(DisplayField.TAGS)) {
                   <td width="30%">
+                    @if (d.in_process) {
+                      <span class="badge bg-secondary text-light me-1">
+                        <div class="spinner-border spinner-border-sm me-1" role="status"></div><span i18n>Processing...</span>
+                      </span>
+                    }
                     @if (activeDisplayFields.includes(DisplayField.TITLE)) {
                       <div class="d-inline-block" (mouseleave)="popupPreview.close()">
                         <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>

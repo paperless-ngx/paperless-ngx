@@ -1,4 +1,9 @@
 <pngx-page-header [(title)]="title">
+  @if (document?.in_process) {
+    <span class="badge bg-danger text-dark ms-2 d-flex align-items-center">
+      <div class="spinner-border spinner-border-sm me-1" role="status"></div><span i18n>Processing...</span>
+    </span>
+  }
   @if (archiveContentRenderType === ContentRenderType.PDF && !useNativePdfViewer) {
     @if (previewNumPages) {
       <div class="input-group input-group-sm d-none d-md-flex">
@@ -50,7 +55,7 @@
       <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
-      <button ngbDropdownItem (click)="reprocess()" [disabled]="!userCanEdit || !userIsOwner">
+      <button ngbDropdownItem (click)="reprocess()" [disabled]="!userCanEdit || !userIsOwner || document?.in_process">
         <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs>&nbsp;<span i18n>Reprocess</span>
       </button>
 
@@ -58,7 +63,7 @@
         <i-bs width="1em" height="1em" name="diagram-3"></i-bs>&nbsp;<span i18n>More like this</span>
       </button>
 
-      <button ngbDropdownItem (click)="editPdf()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
+      <button ngbDropdownItem (click)="editPdf()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF || document?.in_process">
         <i-bs name="pencil"></i-bs>&nbsp;<ng-container i18n>PDF Editor</ng-container>
       </button>
     </div>
@@ -90,7 +95,6 @@
       }
     </div>
   </div>
-
 </pngx-page-header>
 
 <div class="row">
