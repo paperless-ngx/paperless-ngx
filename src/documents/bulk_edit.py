@@ -283,6 +283,7 @@ def rotate(doc_ids: list[int], degrees: int) -> Literal["OK"]:
         f"Attempting to rotate {len(doc_ids)} documents by {degrees} degrees.",
     )
     qs = Document.objects.filter(id__in=doc_ids)
+    Document.objects.filter(pk__in=doc_ids).update(in_process=True)
     affected_docs: list[int] = []
     import pikepdf
 
@@ -309,7 +310,9 @@ def rotate(doc_ids: list[int], degrees: int) -> Literal["OK"]:
                     f"Rotated document {doc.id} by {degrees} degrees",
                 )
                 affected_docs.append(doc.id)
+                Document.objects.filter(pk__in=doc_ids).update(in_process=False)
         except Exception as e:
+            Document.objects.filter(pk__in=doc_ids).update(in_process=False)
             logger.exception(f"Error rotating document {doc.id}: {e}")
 
     if len(affected_docs) > 0:
@@ -474,6 +477,7 @@ def delete_pages(doc_ids: list[int], pages: list[int]) -> Literal["OK"]:
         f"Attempting to delete pages {pages} from {len(doc_ids)} documents",
     )
     doc = Document.objects.get(id=doc_ids[0])
+    Document.objects.filter(pk=doc.id).update(in_process=True)
     pages = sorted(pages)  # sort pages to avoid index issues
     import pikepdf
 
@@ -492,6 +496,7 @@ def delete_pages(doc_ids: list[int], pages: list[int]) -> Literal["OK"]:
             update_document_content_maybe_archive_file.delay(document_id=doc.id)
             logger.info(f"Deleted pages {pages} from document {doc.id}")
     except Exception as e:
+        Document.objects.filter(pk=doc.id).update(in_process=False)
         logger.exception(f"Error deleting pages from document {doc.id}: {e}")
 
     return "OK"
@@ -518,6 +523,7 @@ def edit_pdf(
         f"Editing PDF of document {doc_ids[0]} with {len(operations)} operations",
     )
     doc = Document.objects.get(id=doc_ids[0])
+    Document.objects.filter(pk=doc.id).update(in_process=True)
     import pikepdf
 
     pdf_docs: list[pikepdf.Pdf] = []
@@ -587,6 +593,7 @@ def edit_pdf(
 
     except Exception as e:
         logger.exception(f"Error editing document {doc.id}: {e}")
+        Document.objects.filter(pk=doc.id).update(in_process=False)
         raise ValueError(
             f"An error occurred while editing the document: {e}",
         ) from e
