@@ -106,7 +106,6 @@ describe('DashboardComponent', () => {
               }),
             dashboardViews: saved_views.filter((v) => v.show_on_dashboard),
             allViews: saved_views,
-            maybeRefreshDocumentCounts: () => {},
           },
         },
         provideHttpClient(withInterceptorsFromDi()),
