@@ -101,3 +101,24 @@ Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Relate
 
 > Document scanners are typically used to scan sensitive documents like your social insurance number, tax records, invoices, etc. **Paperless-ngx should never be run on an untrusted host** because information is stored in clear text without encryption. No guarantees are made regarding security (but we do try!) and you use the app at your own risk.
 > **The safest way to run Paperless-ngx is on a local server in your own home with backups in place**.
+
+
+<!-- GitHub Frontend Bot Testing Improvement Contribution -->
+
+This comment was added by GitHub Frontend Bot as part of a testing infrastructure improvement initiative.
+
+**Suggested Testing Improvements:**
+
+**Recommended Testing Stack:**
+- **pytest** - Modern, flexible testing framework
+- **unittest** - Built-in Python testing
+- **coverage.py** - Code coverage measurement
+- **tox** - Test automation across Python versions
+
+**Example setup:**
+```bash
+pip install pytest pytest-cov
+```
+
+---
+*Generated on 2025-08-26T19:54:16.700Z*
