@@ -250,6 +250,7 @@ def update_document_content_maybe_archive_file(document_id):
     it exists.
     """
     document = Document.objects.get(id=document_id)
+    Document.objects.filter(pk=document_id).update(in_process=True)
 
     mime_type = document.mime_type
 
@@ -349,6 +350,7 @@ def update_document_content_maybe_archive_file(document_id):
         )
     finally:
         parser.cleanup()
+        Document.objects.filter(pk=document_id).update(in_process=False)
 
 
 @shared_task
