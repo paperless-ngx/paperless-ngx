@@ -289,6 +289,13 @@ class Document(SoftDeleteModel, ModelWithOwner):
         ),
     )
 
+    in_process = models.BooleanField(
+        _("in process"),
+        default=False,
+        db_index=True,
+        help_text=_("Whether the document is currently being processed."),
+    )
+
     class Meta:
         ordering = ("-created",)
         verbose_name = _("document")
