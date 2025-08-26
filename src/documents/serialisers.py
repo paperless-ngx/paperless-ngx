@@ -935,6 +935,8 @@ class DocumentSerializer(
         required=False,
     )
 
+    in_process = serializers.BooleanField(read_only=True)
+
     def get_page_count(self, obj) -> int | None:
         return obj.page_count
 
@@ -1103,6 +1105,7 @@ class DocumentSerializer(
             "remove_inbox_tags",
             "page_count",
             "mime_type",
+            "in_process",
         )
         list_serializer_class = OwnedObjectListSerializer
 
