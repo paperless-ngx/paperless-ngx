@@ -1,5 +1,4 @@
 import logging
-import re
 
 # from babel.dates import format_date, format_time, format_datetime
 from datetime import date
@@ -113,32 +112,28 @@ def parse_w_workflow_placeholders(
     if doc_url is not None:
         formatting.update({"doc_url": doc_url})
 
-    if re.search(r"\{\{.*\}\}", text) or re.search(r"{\%.*\%\}", text):
-        # Try rendering the template
-        logger.info(f"Jinja Template is : {text}")
-        logger.info(f"Added is : {local_added.isoformat()}")
-        try:
-            template = _template_environment.from_string(
-                text,
-                template_class=TileTemplate,
-            )
+    logger.info(f"Jinja Template is : {text}")
+    try:
+        template = _template_environment.from_string(
+            text,
+            template_class=TileTemplate,
+        )
+        rendered_template = template.render(formatting)
 
-            rendered_template = template.render(formatting)
-
-            # We're good!
-            return rendered_template
-        except UndefinedError:
-            # The undefined class logs this already for us
-            pass
-        except TemplateSyntaxError as e:
-            logger.warning(f"Template syntax error in title generation: {e}")
-        except SecurityError as e:
-            logger.warning(f"Template attempted restricted operation: {e}")
-        except Exception as e:
-            logger.warning(f"Unknown error in title generation: {e}")
-            logger.warning(
-                f"Invalid title format '{text}', workflow not applied: {e}",
-            )
-        return None
-
+        # We're good!
+        return rendered_template
+    except UndefinedError as e:
+        # The undefined class logs this already for us
+        raise e
+    except TemplateSyntaxError as e:
+        logger.warning(f"Template syntax error in title generation: {e}")
+    except SecurityError as e:
+        logger.warning(f"Template attempted restricted operation: {e}")
+    except Exception as e:
+        logger.warning(f"Unknown error in title generation: {e}")
+        logger.warning(
+            f"Invalid title format '{text}', workflow not applied: {e}",
+        )
+        raise e
+    return None
     return text.format(**formatting).strip()
