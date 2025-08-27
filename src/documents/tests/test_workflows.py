@@ -1156,7 +1156,7 @@ class TestWorkflows(
         WHEN:
             - File that matches is added
         THEN:
-            - Title is not updated, error is output
+            - Title is updated but the placeholder isn't replaced
         """
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
@@ -1182,15 +1182,12 @@ class TestWorkflows(
             created=created,
         )
 
-        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
-            document_consumption_finished.send(
-                sender=self.__class__,
-                document=doc,
-            )
-            expected_str = f"Error occurred parsing title assignment '{action.assign_title}', falling back to original"
-            self.assertIn(expected_str, cm.output[0])
+        document_consumption_finished.send(
+            sender=self.__class__,
+            document=doc,
+        )
 
-        self.assertEqual(doc.title, "sample test")
+        self.assertEqual(doc.title, "Doc {created_year]")
 
     def test_document_updated_workflow(self):
         trigger = WorkflowTrigger.objects.create(
