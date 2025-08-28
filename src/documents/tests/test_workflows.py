@@ -123,7 +123,7 @@ class TestWorkflows(
             filter_path=f"*/{self.dirs.scratch_dir.parts[-1]}/*",
         )
         action = WorkflowAction.objects.create(
-            assign_title="Doc from {correspondent}",
+            assign_title="Doc from {{correspondent}}",
             assign_correspondent=self.c,
             assign_document_type=self.dt,
             assign_storage_path=self.sp,
@@ -242,7 +242,7 @@ class TestWorkflows(
         )
 
         action = WorkflowAction.objects.create(
-            assign_title="Doc from {correspondent}",
+            assign_title="Doc from {{correspondent}}",
             assign_correspondent=self.c,
             assign_document_type=self.dt,
             assign_storage_path=self.sp,
@@ -893,7 +893,7 @@ class TestWorkflows(
             filter_filename="*sample*",
         )
         action = WorkflowAction.objects.create(
-            assign_title="Doc created in {created_year}",
+            assign_title="Doc created in {{created_year}}",
             assign_correspondent=self.c2,
             assign_document_type=self.dt,
             assign_storage_path=self.sp,
@@ -1229,7 +1229,7 @@ class TestWorkflows(
         )
 
         action = WorkflowAction.objects.create(
-            assign_title="Doc added in {added_month_name_short}",
+            assign_title="Doc added in {{added_month_name_short}}",
         )
 
         w = Workflow.objects.create(
@@ -2072,7 +2072,7 @@ class TestWorkflows(
             filter_filename="*simple*",
         )
         action = WorkflowAction.objects.create(
-            assign_title="Doc from {correspondent}",
+            assign_title="Doc from {{correspondent}}",
             assign_correspondent=self.c,
             assign_document_type=self.dt,
             assign_storage_path=self.sp,
@@ -2651,7 +2651,7 @@ class TestWorkflows(
         )
         webhook_action = WorkflowActionWebhook.objects.create(
             use_params=False,
-            body="Test message: {doc_url}",
+            body="Test message: {{doc_url}}",
             url="http://paperless-ngx.com",
             include_document=False,
         )
@@ -2710,7 +2710,7 @@ class TestWorkflows(
         )
         webhook_action = WorkflowActionWebhook.objects.create(
             use_params=False,
-            body="Test message: {doc_url}",
+            body="Test message: {{doc_url}}",
             url="http://paperless-ngx.com",
             include_document=True,
         )
