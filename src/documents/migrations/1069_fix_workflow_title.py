@@ -36,6 +36,8 @@ class Migration(migrations.Migration):
             model_name="WorkflowAction",
             name="assign_title",
             field=models.TextField(
+                null=True,
+                blank=True,
                 help_text=(
                     "Assign a document title, can be a JINJA2 template, "
                     "see documentation.",

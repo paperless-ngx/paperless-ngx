@@ -1209,6 +1209,8 @@ class WorkflowAction(models.Model):
 
     assign_title = models.TextField(
         _("assign title"),
+        null=True,
+        blank=True,
         help_text=_(
             "Assign a document title, can be a JINJA2 template, see documentation.",
         ),

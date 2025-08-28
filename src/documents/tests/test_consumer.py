@@ -305,20 +305,17 @@ class TestConsumer(
         self._assert_first_last_send_progress()
 
     def testOverrideTitleInvalidPlaceholders(self):
-        with self.assertLogs("paperless.consumer", level="ERROR") as cm:
-            with self.get_consumer(
-                self.get_test_file(),
-                DocumentMetadataOverrides(title="Override {correspondent]"),
-            ) as consumer:
-                consumer.run()
+        with self.get_consumer(
+            self.get_test_file(),
+            DocumentMetadataOverrides(title="Override {correspondent]"),
+        ) as consumer:
+            consumer.run()
 
-                document = Document.objects.first()
+            document = Document.objects.first()
 
-            self.assertIsNotNone(document)
+        self.assertIsNotNone(document)
 
-            self.assertEqual(document.title, "sample")
-            expected_str = "Error occurred parsing title override 'Override {correspondent]', falling back to original"
-            self.assertIn(expected_str, cm.output[0])
+        self.assertEqual(document.title, "Override {correspondent]")
 
     def testOverrideCorrespondent(self):
         c = Correspondent.objects.create(name="test")
@@ -437,7 +434,7 @@ class TestConsumer(
             DocumentMetadataOverrides(
                 correspondent_id=c.pk,
                 document_type_id=dt.pk,
-                title="{correspondent}{document_type} {added_month}-{added_year_short}",
+                title="{{correspondent}}{{document_type}} {{added_month}}-{{added_year_short}}",
             ),
         ) as consumer:
             consumer.run()
