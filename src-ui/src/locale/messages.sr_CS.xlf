@@ -402,11 +402,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">252</context>
+          <context context-type="linenumber">253</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">254</context>
+          <context context-type="linenumber">255</context>
         </context-group>
         <target state="translated">Podešavanja</target>
       </trans-unit>
@@ -726,11 +726,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">287</context>
+          <context context-type="linenumber">288</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">290</context>
+          <context context-type="linenumber">291</context>
         </context-group>
         <target state="translated">Logovi</target>
       </trans-unit>
@@ -1094,11 +1094,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">212</context>
+          <context context-type="linenumber">213</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">214</context>
+          <context context-type="linenumber">215</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/saved-views/saved-views.component.html</context>
@@ -1726,11 +1726,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">275</context>
+          <context context-type="linenumber">276</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">277</context>
+          <context context-type="linenumber">278</context>
         </context-group>
         <target state="translated">Obrada dokumenata</target>
       </trans-unit>
@@ -2150,11 +2150,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">235</context>
+          <context context-type="linenumber">236</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">238</context>
+          <context context-type="linenumber">239</context>
         </context-group>
         <target state="translated">Otpad</target>
       </trans-unit>
@@ -2530,11 +2530,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">266</context>
+          <context context-type="linenumber">267</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">268</context>
+          <context context-type="linenumber">269</context>
         </context-group>
         <target state="translated">Korisnici i Grupe</target>
       </trans-unit>
@@ -2754,11 +2754,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">998</context>
+          <context context-type="linenumber">1011</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1360</context>
+          <context context-type="linenumber">1373</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -2898,11 +2898,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">296</context>
+          <context context-type="linenumber">297</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">299</context>
+          <context context-type="linenumber">300</context>
         </context-group>
         <target state="translated">Dokumentacija</target>
       </trans-unit>
@@ -2922,7 +2922,7 @@
         <source>Open documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">138</context>
+          <context context-type="linenumber">139</context>
         </context-group>
         <target state="translated">Otvorena dokumenta</target>
       </trans-unit>
@@ -2930,11 +2930,11 @@
         <source>Close all</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">158</context>
+          <context context-type="linenumber">159</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">160</context>
+          <context context-type="linenumber">161</context>
         </context-group>
         <target state="translated">Zatvori svе</target>
       </trans-unit>
@@ -2942,7 +2942,7 @@
         <source>Manage</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">169</context>
+          <context context-type="linenumber">170</context>
         </context-group>
         <target state="translated">Upravljanje</target>
       </trans-unit>
@@ -2950,11 +2950,11 @@
         <source>Correspondents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">175</context>
+          <context context-type="linenumber">176</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">177</context>
+          <context context-type="linenumber">178</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -2966,11 +2966,11 @@
         <source>Tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">182</context>
+          <context context-type="linenumber">183</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">185</context>
+          <context context-type="linenumber">186</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.ts</context>
@@ -3002,11 +3002,11 @@
         <source>Document Types</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">191</context>
+          <context context-type="linenumber">192</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">193</context>
+          <context context-type="linenumber">194</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -3018,11 +3018,11 @@
         <source>Storage Paths</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">198</context>
+          <context context-type="linenumber">199</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">200</context>
+          <context context-type="linenumber">201</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -3034,11 +3034,11 @@
         <source>Custom Fields</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">205</context>
+          <context context-type="linenumber">206</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">207</context>
+          <context context-type="linenumber">208</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.html</context>
@@ -3054,11 +3054,11 @@
         <source>Workflows</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">221</context>
+          <context context-type="linenumber">222</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">223</context>
+          <context context-type="linenumber">224</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
@@ -3070,11 +3070,11 @@
         <source>Mail</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">228</context>
+          <context context-type="linenumber">229</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">231</context>
+          <context context-type="linenumber">232</context>
         </context-group>
         <target state="translated">Imejl</target>
       </trans-unit>
@@ -3082,7 +3082,7 @@
         <source>Administration</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">246</context>
+          <context context-type="linenumber">247</context>
         </context-group>
         <target state="translated">Administracija</target>
       </trans-unit>
@@ -3090,11 +3090,11 @@
         <source>Configuration</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">259</context>
+          <context context-type="linenumber">260</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">261</context>
+          <context context-type="linenumber">262</context>
         </context-group>
         <target state="translated">Konfiguracija</target>
       </trans-unit>
@@ -3102,7 +3102,7 @@
         <source>GitHub</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">306</context>
+          <context context-type="linenumber">307</context>
         </context-group>
         <target state="translated">GitHub</target>
       </trans-unit>
@@ -3110,7 +3110,7 @@
         <source>is available.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">315,316</context>
+          <context context-type="linenumber">316,317</context>
         </context-group>
         <target state="translated">je dostupno.</target>
       </trans-unit>
@@ -3118,7 +3118,7 @@
         <source>Click to view.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">316</context>
+          <context context-type="linenumber">317</context>
         </context-group>
         <target state="translated">Klik za prеglеd.</target>
       </trans-unit>
@@ -3126,7 +3126,7 @@
         <source>Paperless-ngx can automatically check for updates</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">320</context>
+          <context context-type="linenumber">321</context>
         </context-group>
         <target state="translated">Paperless-ngx može automatski da proveri da li postoje ažuriranja</target>
       </trans-unit>
@@ -3134,7 +3134,7 @@
         <source> How does this work? </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">327,329</context>
+          <context context-type="linenumber">328,330</context>
         </context-group>
         <target state="translated"> Kako ovo radi? </target>
       </trans-unit>
@@ -3142,7 +3142,7 @@
         <source>Update available</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">340</context>
+          <context context-type="linenumber">341</context>
         </context-group>
         <target state="translated">Dostupno jе ažuriranjе</target>
       </trans-unit>
@@ -3426,7 +3426,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">951</context>
+          <context context-type="linenumber">964</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -5998,7 +5998,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">Select all pages</target>
+        <target state="translated">Izaberi sve stranice</target>
       </trans-unit>
       <trans-unit id="234610397929376642" datatype="html">
         <source>Deselect all pages</source>
@@ -6006,7 +6006,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Deselect all pages</target>
+        <target state="translated">Poništi izbor svih stranica</target>
       </trans-unit>
       <trans-unit id="2530246103796817298" datatype="html">
         <source>Rotate selected pages counter-clockwise</source>
@@ -6014,7 +6014,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Rotate selected pages counter-clockwise</target>
+        <target state="translated">Rotirajte izabrane stranice u smeru suprotnom od kazaljke na satu</target>
       </trans-unit>
       <trans-unit id="4787219034890830544" datatype="html">
         <source>Rotate selected pages clockwise</source>
@@ -6022,7 +6022,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Rotate selected pages clockwise</target>
+        <target state="translated">Rotirajte izabrane stranice u smeru kazaljke na satu</target>
       </trans-unit>
       <trans-unit id="3441043765105475130" datatype="html">
         <source>Delete selected pages</source>
@@ -6030,7 +6030,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Delete selected pages</target>
+        <target state="translated">Obriši izabrane stranice</target>
       </trans-unit>
       <trans-unit id="3873740163706409154" datatype="html">
         <source>Rotate page counter-clockwise</source>
@@ -6038,7 +6038,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Rotate page counter-clockwise</target>
+        <target state="translated">Rotirajte stranicu u smeru suprotnom od kazaljke na satu</target>
       </trans-unit>
       <trans-unit id="3450236521040548507" datatype="html">
         <source>Rotate page clockwise</source>
@@ -6046,7 +6046,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Rotate page clockwise</target>
+        <target state="translated">Rotirajte stranicu u smeru kazaljke na satu</target>
       </trans-unit>
       <trans-unit id="7647925464077975347" datatype="html">
         <source>Delete page</source>
@@ -6054,7 +6054,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Delete page</target>
+        <target state="translated">Obriši stranicu</target>
       </trans-unit>
       <trans-unit id="2480952115552020422" datatype="html">
         <source>Add / remove document split here</source>
@@ -6062,7 +6062,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">Add / remove document split here</target>
+        <target state="translated">Dodaj/ukloni dokument podeljen ovde</target>
       </trans-unit>
       <trans-unit id="35277754987868961" datatype="html">
         <source>Split here</source>
@@ -6070,7 +6070,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">70</context>
         </context-group>
-        <target state="needs-translation">Split here</target>
+        <target state="translated">Podeli ovde</target>
       </trans-unit>
       <trans-unit id="7273640930165035289" datatype="html">
         <source>Create new document(s)</source>
@@ -6078,7 +6078,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">82</context>
         </context-group>
-        <target state="needs-translation">Create new document(s)</target>
+        <target state="translated">Napravi novi dokument(e)</target>
       </trans-unit>
       <trans-unit id="8035757452478567832" datatype="html">
         <source>Update existing document</source>
@@ -6086,7 +6086,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="needs-translation">Update existing document</target>
+        <target state="translated">Ažuriraj postojeći dokument</target>
       </trans-unit>
       <trans-unit id="7248454234750442816" datatype="html">
         <source>Copy metadata</source>
@@ -6094,7 +6094,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation">Copy metadata</target>
+        <target state="translated">Kopiraj metapodatke</target>
       </trans-unit>
       <trans-unit id="6684403463658676119" datatype="html">
         <source>Delete original</source>
@@ -6102,7 +6102,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">98</context>
         </context-group>
-        <target state="needs-translation">Delete original</target>
+        <target state="translated">Izbriši original</target>
       </trans-unit>
       <trans-unit id="7940755769131903278" datatype="html">
         <source>Merge with existing permissions</source>
@@ -7192,7 +7192,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">7,8</context>
         </context-group>
-        <target state="needs-translation">of <x id="INTERPOLATION" equiv-text="{{previewNumPages}}"/></target>
+        <target state="translated">od <x id="INTERPOLATION" equiv-text="{{previewNumPages}}"/></target>
       </trans-unit>
       <trans-unit id="8590109102084543521" datatype="html">
         <source>-</source>
@@ -7250,9 +7250,9 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1359</context>
+          <context context-type="linenumber">1372</context>
         </context-group>
-        <target state="needs-translation">PDF Editor</target>
+        <target state="translated">PDF uređivač</target>
       </trans-unit>
       <trans-unit id="6490688569532630280" datatype="html">
         <source>Send</source>
@@ -7610,7 +7610,7 @@
         <source>Next document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">555</context>
+          <context context-type="linenumber">563</context>
         </context-group>
         <target state="translated">Sledeći dokument</target>
       </trans-unit>
@@ -7618,7 +7618,7 @@
         <source>Previous document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">565</context>
+          <context context-type="linenumber">573</context>
         </context-group>
         <target state="translated">Prethodni dokument</target>
       </trans-unit>
@@ -7626,7 +7626,7 @@
         <source>Close document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">573</context>
+          <context context-type="linenumber">581</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
@@ -7638,7 +7638,7 @@
         <source>Save document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">580</context>
+          <context context-type="linenumber">588</context>
         </context-group>
         <target state="translated">Sačuvaj dokument</target>
       </trans-unit>
@@ -7646,7 +7646,7 @@
         <source>Save and close / next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">589</context>
+          <context context-type="linenumber">597</context>
         </context-group>
         <target state="translated">Sačuvaj i zatvori / sledeće</target>
       </trans-unit>
@@ -7654,7 +7654,7 @@
         <source>Error retrieving metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">641</context>
+          <context context-type="linenumber">649</context>
         </context-group>
         <target state="translated">Greška pri preuzimanju metapodataka</target>
       </trans-unit>
@@ -7662,7 +7662,7 @@
         <source>Error retrieving suggestions.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">670</context>
+          <context context-type="linenumber">678</context>
         </context-group>
         <target state="translated">Greška pri preuzimanju predloga.</target>
       </trans-unit>
@@ -7670,11 +7670,11 @@
         <source>Document &quot;<x id="PH" equiv-text="newValues.title"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">845</context>
+          <context context-type="linenumber">858</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">869</context>
+          <context context-type="linenumber">882</context>
         </context-group>
         <target state="translated">Dokument "<x id="PH" equiv-text="newValues.title"/>" je sačuvan uspešno.</target>
       </trans-unit>
@@ -7682,7 +7682,7 @@
         <source>Error saving document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">875</context>
+          <context context-type="linenumber">888</context>
         </context-group>
         <target state="translated">Greška prilikom čuvanja dokumenta "<x id="PH" equiv-text="this.document.title"/>"</target>
       </trans-unit>
@@ -7690,7 +7690,7 @@
         <source>Error saving document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">920</context>
+          <context context-type="linenumber">933</context>
         </context-group>
         <target state="translated">Greška prilikom čuvanja dokumenta</target>
       </trans-unit>
@@ -7698,7 +7698,7 @@
         <source>Do you really want to move the document &quot;<x id="PH" equiv-text="this.document.title"/>&quot; to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">952</context>
+          <context context-type="linenumber">965</context>
         </context-group>
         <target state="translated">Da li zaista želite da premestite ovaj dokument "<x id="PH" equiv-text="this.document.title"/>" u otpad?</target>
       </trans-unit>
@@ -7706,7 +7706,7 @@
         <source>Documents can be restored prior to permanent deletion.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">953</context>
+          <context context-type="linenumber">966</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7718,7 +7718,7 @@
         <source>Move to trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">955</context>
+          <context context-type="linenumber">968</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7730,7 +7730,7 @@
         <source>Error deleting document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">974</context>
+          <context context-type="linenumber">987</context>
         </context-group>
         <target state="translated">Greška prilikom brisanja dokumenta</target>
       </trans-unit>
@@ -7738,7 +7738,7 @@
         <source>Reprocess confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">994</context>
+          <context context-type="linenumber">1007</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7750,7 +7750,7 @@
         <source>This operation will permanently recreate the archive file for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">995</context>
+          <context context-type="linenumber">1008</context>
         </context-group>
         <target state="translated">Ova akcija će trajno ponovo kreirati arhivski fajl za ovaj dokument.</target>
       </trans-unit>
@@ -7758,7 +7758,7 @@
         <source>The archive file will be re-generated with the current settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">996</context>
+          <context context-type="linenumber">1009</context>
         </context-group>
         <target state="translated">Arhivski fajl će biti ponovo generisan sa trenutnim podešavanjima.</target>
       </trans-unit>
@@ -7766,7 +7766,7 @@
         <source>Reprocess operation for &quot;<x id="PH" equiv-text="this.document.title"/>&quot; will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1006</context>
+          <context context-type="linenumber">1019</context>
         </context-group>
         <target state="translated">Operacija ponovne obrade za "<x id="PH" equiv-text="this.document.title"/>" će početi u pozadini. Zatvorite i ponovo otvorite ili ponovo učitajte dokument nakon što operacija bude završena da biste videli novi sadržaj.</target>
       </trans-unit>
@@ -7774,7 +7774,7 @@
         <source>Error executing operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1017</context>
+          <context context-type="linenumber">1030</context>
         </context-group>
         <target state="translated">Greška prilikom izvršavanja operacije</target>
       </trans-unit>
@@ -7782,7 +7782,7 @@
         <source>Error downloading document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1066</context>
+          <context context-type="linenumber">1079</context>
         </context-group>
         <target state="translated">Greška prilikom preuzimanja dokumenta</target>
       </trans-unit>
@@ -7790,7 +7790,7 @@
         <source>Page Fit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1143</context>
+          <context context-type="linenumber">1156</context>
         </context-group>
         <target state="translated">Prilagodi stranicu</target>
       </trans-unit>
@@ -7798,27 +7798,27 @@
         <source>PDF edit operation for &quot;<x id="PH" equiv-text="this.document.title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1378</context>
+          <context context-type="linenumber">1391</context>
         </context-group>
-        <target state="needs-translation">PDF edit operation for "<x id="PH" equiv-text="this.document.title"/>" will begin in the background.</target>
+        <target state="translated">Uređivanje PDF-a za „<x id="PH" equiv-text="this.document.title"/>“ će početi u pozadini.</target>
       </trans-unit>
       <trans-unit id="9043972994040261999" datatype="html">
         <source>Error executing PDF edit operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1390</context>
+          <context context-type="linenumber">1403</context>
         </context-group>
-        <target state="needs-translation">Error executing PDF edit operation</target>
+        <target state="translated">Greška pri izvršavanju operacije uređivanja PDF-a</target>
       </trans-unit>
       <trans-unit id="6085793215710522488" datatype="html">
         <source>An error occurred loading tiff: <x id="PH" equiv-text="err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1450</context>
+          <context context-type="linenumber">1463</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1454</context>
+          <context context-type="linenumber">1467</context>
         </context-group>
         <target state="translated">Došlo je do greške prilikom učitavanja TIFF-a: <x id="PH" equiv-text="err.toString()"/></target>
       </trans-unit>
