@@ -80,7 +80,7 @@ def parse_w_workflow_placeholders(
     if doc_url is not None:
         formatting.update({"doc_url": doc_url})
 
-    logger.info(f"Jinja Template is : {text}")
+    logger.debug(f"Jinja Template is : {text}")
     try:
         template = _template_environment.from_string(
             text,
@@ -104,4 +104,3 @@ def parse_w_workflow_placeholders(
         )
         raise e
     return None
-    return text.format(**formatting).strip()
