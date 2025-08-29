@@ -1212,7 +1212,7 @@ class WorkflowAction(models.Model):
         null=True,
         blank=True,
         help_text=_(
-            "Assign a document title, can be a JINJA2 template, see documentation.",
+            "Assign a document title, must  be a Jinja2  template, see documentation.",
         ),
     )
 
