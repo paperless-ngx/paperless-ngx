@@ -113,7 +113,7 @@
                     [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave"
                     popoverClass="popover-slim">
                     <i-bs class="me-1" name="funnel"></i-bs>
-                      <span>&nbsp;<div class="d-inline-flex view-name"><span class="overflow-hidden" [class.text-truncate]="!slimSidebarEnabled">{{view.name}}</span></div>
+                      <span>&nbsp;<div class="d-inline-flex view-name"><span class="overflow-hidden" [class.text-wrap]="!slimSidebarEnabled">{{view.name}}</span></div>
                         @if (showSidebarCounts && !slimSidebarEnabled) {
                           <span class="badge bg-info text-dark ms-2 d-inline">{{ savedViewService.getDocumentCount(view) }}</span>
                         }
