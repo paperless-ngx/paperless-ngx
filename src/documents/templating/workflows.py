@@ -1,6 +1,4 @@
 import logging
-
-# from babel.dates import format_date, format_time, format_datetime
 from datetime import date
 from datetime import datetime
 from pathlib import Path
@@ -11,48 +9,18 @@ from jinja2 import Template
 from jinja2 import TemplateSyntaxError
 from jinja2 import UndefinedError
 from jinja2 import make_logging_undefined
-from jinja2.sandbox import SandboxedEnvironment
 from jinja2.sandbox import SecurityError
 
-from documents.templating.utils import format_datetime
-from documents.templating.utils import localize_date
+from documents.templating.environment import _template_environment
+from documents.templating.filters import format_datetime
+from documents.templating.filters import localize_date
 
 logger = logging.getLogger("paperless.templating")
 
 _LogStrictUndefined = make_logging_undefined(logger, StrictUndefined)
 
 
-class TitleEnvironment(SandboxedEnvironment):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.undefined_tracker = None
-
-
-def is_safe_callable(self, obj):
-    # Block access to .save() and .delete() methods
-    if callable(obj) and getattr(obj, "__name__", None) in (
-        "save",
-        "delete",
-        "update",
-    ):
-        return False
-    # Call the parent method for other cases
-    return super().is_safe_callable(obj)
-
-
-class TileTemplate(Template):
-    def render(self, *args, **kwargs) -> str:
-        return super().render(*args, **kwargs)
-
-
-_template_environment = TitleEnvironment(
-    trim_blocks=True,
-    lstrip_blocks=True,
-    keep_trailing_newline=False,
-    autoescape=False,
-    extensions=["jinja2.ext.loopcontrols"],
-    undefined=_LogStrictUndefined,
-)
+_template_environment.undefined = _LogStrictUndefined
 
 _template_environment.filters["datetime"] = format_datetime
 
@@ -116,7 +84,7 @@ def parse_w_workflow_placeholders(
     try:
         template = _template_environment.from_string(
             text,
-            template_class=TileTemplate,
+            template_class=Template,
         )
         rendered_template = template.render(formatting)
 

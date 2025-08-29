@@ -12,7 +12,6 @@ from jinja2 import Template
 from jinja2 import TemplateSyntaxError
 from jinja2 import UndefinedError
 from jinja2 import make_logging_undefined
-from jinja2.sandbox import SandboxedEnvironment
 from jinja2.sandbox import SecurityError
 
 from documents.models import Correspondent
@@ -22,40 +21,14 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.templating.utils import format_datetime
-from documents.templating.utils import get_cf_value
-from documents.templating.utils import localize_date
+from documents.templating.environment import _template_environment
+from documents.templating.filters import format_datetime
+from documents.templating.filters import get_cf_value
+from documents.templating.filters import localize_date
 
 logger = logging.getLogger("paperless.templating")
 
 _LogStrictUndefined = make_logging_undefined(logger, StrictUndefined)
-
-
-class FilePathEnvironment(SandboxedEnvironment):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.undefined_tracker = None
-
-    def is_safe_callable(self, obj):
-        # Block access to .save() and .delete() methods
-        if callable(obj) and getattr(obj, "__name__", None) in (
-            "save",
-            "delete",
-            "update",
-        ):
-            return False
-        # Call the parent method for other cases
-        return super().is_safe_callable(obj)
-
-
-_template_environment = FilePathEnvironment(
-    trim_blocks=True,
-    lstrip_blocks=True,
-    keep_trailing_newline=False,
-    autoescape=False,
-    extensions=["jinja2.ext.loopcontrols"],
-    undefined=_LogStrictUndefined,
-)
 
 
 class FilePathTemplate(Template):
@@ -78,6 +51,8 @@ class FilePathTemplate(Template):
 
         return clean_filepath(original_render)
 
+
+_template_environment.undefined = _LogStrictUndefined
 
 _template_environment.filters["get_cf_value"] = get_cf_value
 

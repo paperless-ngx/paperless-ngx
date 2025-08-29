@@ -503,7 +503,7 @@ for the possible codes and their meanings.
 
 ##### Date Localization
 
-The `localize_date` filter formats a date, datetime object into a localized string using Babel internationalization.
+The `localize_date` filter formats a date or datetime object into a localized string using Babel internationalization.
 This takes into account the provided locale for translation. Since this must be used on a date or datetime object,
 you must access the field directly, i.e. `document.created`.
 An iso formatted string can also be provided, so it is possible to supply the `added` or `created` values.
