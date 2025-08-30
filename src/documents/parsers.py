@@ -19,6 +19,8 @@ from documents.loggers import LoggingMixin
 from documents.signals import document_consumer_declaration
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
+from paperless.config import OcrConfig
+from paperless.utils import ocr_to_dateparser_languages
 
 if TYPE_CHECKING:
     import datetime
@@ -272,6 +274,11 @@ def parse_date_generator(filename, text) -> Iterator[datetime.datetime]:
         """
         import dateparser
 
+        ocr_config = OcrConfig()
+        languages = settings.DATE_PARSER_LANGUAGES or ocr_to_dateparser_languages(
+            ocr_config.language,
+        )
+
         return dateparser.parse(
             ds,
             settings={
@@ -280,7 +287,7 @@ def parse_date_generator(filename, text) -> Iterator[datetime.datetime]:
                 "RETURN_AS_TIMEZONE_AWARE": True,
                 "TIMEZONE": settings.TIME_ZONE,
             },
-            locales=settings.DATE_PARSER_LANGUAGES,
+            locales=languages,
         )
 
     def __filter(date: datetime.datetime) -> datetime.datetime | None:
