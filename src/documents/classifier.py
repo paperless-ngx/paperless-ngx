@@ -135,31 +135,44 @@ class DocumentClassifier:
 
         # Catch warnings for processing
         with warnings.catch_warnings(record=True) as w:
+            state = None
             try:
                 state = joblib.load(settings.MODEL_FILE, mmap_mode="r")
+            except ValueError:
+                # Some environments may fail to mmap small files; fall back to normal load
+                state = joblib.load(settings.MODEL_FILE, mmap_mode=None)
             except Exception as err:
-                # As a fallback, try to detect old pickle-based and mark incompatible
+                # Fallback to old pickle-based format. Try to read the version and a field to
+                # distinguish truly corrupt files from incompatible versions.
                 try:
                     with Path(settings.MODEL_FILE).open("rb") as f:
-                        _ = pickle.load(f)
-                    raise IncompatibleClassifierVersionError(
-                        "Cannot load classifier, incompatible versions.",
-                    ) from err
-                except IncompatibleClassifierVersionError:
+                        _version = pickle.load(f)
+                        try:
+                            _ = pickle.load(f)
+                        except Exception as inner:
+                            raise ClassifierModelCorruptError from inner
+                        # Old, incompatible format
+                        raise IncompatibleClassifierVersionError(
+                            "Cannot load classifier, incompatible versions.",
+                        ) from err
+                except (
+                    IncompatibleClassifierVersionError,
+                    ClassifierModelCorruptError,
+                ):
                     raise
                 except Exception:
                     # Not even a readable pickle header
                     raise ClassifierModelCorruptError from err
 
-            try:
-                if (
-                    not isinstance(state, dict)
-                    or state.get("format_version") != self.FORMAT_VERSION
-                ):
-                    raise IncompatibleClassifierVersionError(
-                        "Cannot load classifier, incompatible versions.",
-                    )
+            if (
+                not isinstance(state, dict)
+                or state.get("format_version") != self.FORMAT_VERSION
+            ):
+                raise IncompatibleClassifierVersionError(
+                    "Cannot load classifier, incompatible versions.",
+                )
 
+            try:
                 self.last_doc_change_time = state.get("last_doc_change_time")
                 self.last_auto_type_hash = state.get("last_auto_type_hash")
 
@@ -171,8 +184,6 @@ class DocumentClassifier:
                 self.correspondent_classifier = state.get("correspondent_classifier")
                 self.document_type_classifier = state.get("document_type_classifier")
                 self.storage_path_classifier = state.get("storage_path_classifier")
-            except IncompatibleClassifierVersionError:
-                raise
             except Exception as err:
                 raise ClassifierModelCorruptError from err
 
