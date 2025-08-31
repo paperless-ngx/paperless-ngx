@@ -370,7 +370,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
     def test_load_corrupt_file(self, patched_pickle_load: mock.MagicMock):
         """
         GIVEN:
-            - Corrupted classifier pickle file
+            - Corrupted legacy classifier pickle file
         WHEN:
             - An attempt is made to load the classifier
         THEN:
@@ -381,9 +381,10 @@ class TestClassifier(DirectoriesMixin, TestCase):
         # First load is the schema version,allow it
         patched_pickle_load.side_effect = [DocumentClassifier.FORMAT_VERSION, OSError()]
 
-        with self.assertRaises(ClassifierModelCorruptError):
-            self.classifier.load()
-            patched_pickle_load.assert_called()
+        # Force the loader down the legacy path by making joblib.load fail
+        with mock.patch("joblib.load", side_effect=Exception("bad joblib")):
+            with self.assertRaises(ClassifierModelCorruptError):
+                self.classifier.load()
 
         patched_pickle_load.reset_mock()
         patched_pickle_load.side_effect = [
@@ -391,8 +392,8 @@ class TestClassifier(DirectoriesMixin, TestCase):
             ClassifierModelCorruptError(),
         ]
 
-        self.assertIsNone(load_classifier())
-        patched_pickle_load.assert_called()
+        with mock.patch("joblib.load", side_effect=Exception("bad joblib")):
+            self.assertIsNone(load_classifier())
 
     def test_load_new_scikit_learn_version(self):
         """
