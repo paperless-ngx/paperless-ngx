@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-16 14:34+0000\n"
-"PO-Revision-Date: 2025-08-20 12:14\n"
+"POT-Creation-Date: 2025-08-31 22:24+0000\n"
+"PO-Revision-Date: 2025-08-31 22:25\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -1619,147 +1619,147 @@ msgstr "Etiket barkod eşleşmesini ayarlar"
 msgid "paperless application settings"
 msgstr "paperless uygulama ayarları"
 
-#: paperless/settings.py:774
+#: paperless/settings.py:772
 msgid "English (US)"
 msgstr "İngilizce (Birleşik Devletler)"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:773
 msgid "Arabic"
 msgstr "Arapça"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:774
 msgid "Afrikaans"
 msgstr "Afrika dili"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:775
 msgid "Belarusian"
 msgstr "Belarusça"
 
-#: paperless/settings.py:778
+#: paperless/settings.py:776
 msgid "Bulgarian"
 msgstr "Bulgarca"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:777
 msgid "Catalan"
 msgstr "Katalanca"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:778
 msgid "Czech"
 msgstr "Çekçe"
 
-#: paperless/settings.py:781
+#: paperless/settings.py:779
 msgid "Danish"
 msgstr "Danca"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:780
 msgid "German"
 msgstr "Almanca"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:781
 msgid "Greek"
 msgstr "Yunanca"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:782
 msgid "English (GB)"
 msgstr "İngilizce (GB)"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:783
 msgid "Spanish"
 msgstr "İspanyolca"
 
-#: paperless/settings.py:786
+#: paperless/settings.py:784
 msgid "Persian"
 msgstr "Farsça"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:785
 msgid "Finnish"
 msgstr "Fince"
 
-#: paperless/settings.py:788
+#: paperless/settings.py:786
 msgid "French"
 msgstr "Fransızca"
 
-#: paperless/settings.py:789
+#: paperless/settings.py:787
 msgid "Hungarian"
 msgstr "Macarca"
 
-#: paperless/settings.py:790
+#: paperless/settings.py:788
 msgid "Italian"
 msgstr "İtalyanca"
 
-#: paperless/settings.py:791
+#: paperless/settings.py:789
 msgid "Japanese"
 msgstr "Japonca"
 
-#: paperless/settings.py:792
+#: paperless/settings.py:790
 msgid "Korean"
 msgstr "Korece"
 
-#: paperless/settings.py:793
+#: paperless/settings.py:791
 msgid "Luxembourgish"
 msgstr "Lüksemburgca"
 
-#: paperless/settings.py:794
+#: paperless/settings.py:792
 msgid "Norwegian"
 msgstr "Norveçce"
 
-#: paperless/settings.py:795
+#: paperless/settings.py:793
 msgid "Dutch"
 msgstr "Hollandaca"
 
-#: paperless/settings.py:796
+#: paperless/settings.py:794
 msgid "Polish"
 msgstr "Polonyaca"
 
-#: paperless/settings.py:797
+#: paperless/settings.py:795
 msgid "Portuguese (Brazil)"
 msgstr "Portekizce (Brezilya)"
 
-#: paperless/settings.py:798
+#: paperless/settings.py:796
 msgid "Portuguese"
 msgstr "Portekizce"
 
-#: paperless/settings.py:799
+#: paperless/settings.py:797
 msgid "Romanian"
 msgstr "Romence"
 
-#: paperless/settings.py:800
+#: paperless/settings.py:798
 msgid "Russian"
 msgstr "Rusça"
 
-#: paperless/settings.py:801
+#: paperless/settings.py:799
 msgid "Slovak"
 msgstr "Slovakça"
 
-#: paperless/settings.py:802
+#: paperless/settings.py:800
 msgid "Slovenian"
 msgstr "Slovakça"
 
-#: paperless/settings.py:803
+#: paperless/settings.py:801
 msgid "Serbian"
 msgstr "Sırpça"
 
-#: paperless/settings.py:804
+#: paperless/settings.py:802
 msgid "Swedish"
 msgstr "İsveççe"
 
-#: paperless/settings.py:805
+#: paperless/settings.py:803
 msgid "Turkish"
 msgstr "Türkçe"
 
-#: paperless/settings.py:806
+#: paperless/settings.py:804
 msgid "Ukrainian"
 msgstr "Ukraynaca"
 
-#: paperless/settings.py:807
+#: paperless/settings.py:805
 msgid "Vietnamese"
 msgstr "Vietnamca"
 
-#: paperless/settings.py:808
+#: paperless/settings.py:806
 msgid "Chinese Simplified"
 msgstr "Basitleştirilmiş Çince"
 
-#: paperless/settings.py:809
+#: paperless/settings.py:807
 msgid "Chinese Traditional"
 msgstr "Geleneksel Çince"
 
