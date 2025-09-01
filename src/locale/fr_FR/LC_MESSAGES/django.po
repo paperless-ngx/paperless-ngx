@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-16 14:34+0000\n"
-"PO-Revision-Date: 2025-08-16 14:36\n"
+"POT-Creation-Date: 2025-08-31 22:24+0000\n"
+"PO-Revision-Date: 2025-08-31 22:25\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -1618,147 +1618,147 @@ msgstr "Définit la correspondance des étiquettes de code-barres"
 msgid "paperless application settings"
 msgstr "paramètres de l'application paperless"
 
-#: paperless/settings.py:774
+#: paperless/settings.py:772
 msgid "English (US)"
 msgstr "Anglais (US)"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:773
 msgid "Arabic"
 msgstr "Arabe"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:774
 msgid "Afrikaans"
 msgstr "Afrikaans"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:775
 msgid "Belarusian"
 msgstr "Biélorusse"
 
-#: paperless/settings.py:778
+#: paperless/settings.py:776
 msgid "Bulgarian"
 msgstr "Bulgare"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:777
 msgid "Catalan"
 msgstr "Catalan"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:778
 msgid "Czech"
 msgstr "Tchèque"
 
-#: paperless/settings.py:781
+#: paperless/settings.py:779
 msgid "Danish"
 msgstr "Danois"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:780
 msgid "German"
 msgstr "Allemand"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:781
 msgid "Greek"
 msgstr "Grec"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:782
 msgid "English (GB)"
 msgstr "Anglais (GB)"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:783
 msgid "Spanish"
 msgstr "Espagnol"
 
-#: paperless/settings.py:786
+#: paperless/settings.py:784
 msgid "Persian"
 msgstr "Persan"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:785
 msgid "Finnish"
 msgstr "Finnois"
 
-#: paperless/settings.py:788
+#: paperless/settings.py:786
 msgid "French"
 msgstr "Français"
 
-#: paperless/settings.py:789
+#: paperless/settings.py:787
 msgid "Hungarian"
 msgstr "Hongrois"
 
-#: paperless/settings.py:790
+#: paperless/settings.py:788
 msgid "Italian"
 msgstr "Italien"
 
-#: paperless/settings.py:791
+#: paperless/settings.py:789
 msgid "Japanese"
 msgstr "Japonais"
 
-#: paperless/settings.py:792
+#: paperless/settings.py:790
 msgid "Korean"
 msgstr "Coréen"
 
-#: paperless/settings.py:793
+#: paperless/settings.py:791
 msgid "Luxembourgish"
 msgstr "Luxembourgeois"
 
-#: paperless/settings.py:794
+#: paperless/settings.py:792
 msgid "Norwegian"
 msgstr "Norvégien"
 
-#: paperless/settings.py:795
+#: paperless/settings.py:793
 msgid "Dutch"
 msgstr "Néerlandais"
 
-#: paperless/settings.py:796
+#: paperless/settings.py:794
 msgid "Polish"
 msgstr "Polonais"
 
-#: paperless/settings.py:797
+#: paperless/settings.py:795
 msgid "Portuguese (Brazil)"
 msgstr "Portugais (Brésil)"
 
-#: paperless/settings.py:798
+#: paperless/settings.py:796
 msgid "Portuguese"
 msgstr "Portugais"
 
-#: paperless/settings.py:799
+#: paperless/settings.py:797
 msgid "Romanian"
 msgstr "Roumain"
 
-#: paperless/settings.py:800
+#: paperless/settings.py:798
 msgid "Russian"
 msgstr "Russe"
 
-#: paperless/settings.py:801
+#: paperless/settings.py:799
 msgid "Slovak"
 msgstr "Solvaque"
 
-#: paperless/settings.py:802
+#: paperless/settings.py:800
 msgid "Slovenian"
 msgstr "Slovène"
 
-#: paperless/settings.py:803
+#: paperless/settings.py:801
 msgid "Serbian"
 msgstr "Serbe"
 
-#: paperless/settings.py:804
+#: paperless/settings.py:802
 msgid "Swedish"
 msgstr "Suédois"
 
-#: paperless/settings.py:805
+#: paperless/settings.py:803
 msgid "Turkish"
 msgstr "Turc"
 
-#: paperless/settings.py:806
+#: paperless/settings.py:804
 msgid "Ukrainian"
 msgstr "Ukrainien"
 
-#: paperless/settings.py:807
+#: paperless/settings.py:805
 msgid "Vietnamese"
 msgstr "Vietnamien"
 
-#: paperless/settings.py:808
+#: paperless/settings.py:806
 msgid "Chinese Simplified"
 msgstr "Chinois simplifié"
 
-#: paperless/settings.py:809
+#: paperless/settings.py:807
 msgid "Chinese Traditional"
 msgstr "Chinois traditionnel"
 
