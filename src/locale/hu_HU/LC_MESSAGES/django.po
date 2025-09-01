@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-16 14:34+0000\n"
-"PO-Revision-Date: 2025-08-16 14:36\n"
+"POT-Creation-Date: 2025-08-31 22:24+0000\n"
+"PO-Revision-Date: 2025-08-31 22:25\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -1410,21 +1410,21 @@ msgstr "Utolsó lépésként kérjük válaszoljon az alábbi kérdésekre:"
 #: documents/validators.py:24
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "A {value} URI értelmezése sikertelen, hiányzó séma"
 
 #: documents/validators.py:29
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "A {value} URI értelmezése sikertelen, hiányzó hálózati vagy elérési útvonal"
 
 #: documents/validators.py:36
 msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
-msgstr ""
+msgstr "A '{parts.scheme}' séma nem engedélyezett. Engedélyezett sémák: {', '.join(allowed_schemes)}"
 
 #: documents/validators.py:45
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "A {value} URI értelmezése sikertelen"
 
 #: paperless/apps.py:11
 msgid "Paperless"
@@ -1618,147 +1618,147 @@ msgstr "Beállítja a vonalkódok címkékhez rendelését"
 msgid "paperless application settings"
 msgstr "paperless alkalmazás beállítások"
 
-#: paperless/settings.py:774
+#: paperless/settings.py:772
 msgid "English (US)"
 msgstr "Angol (US)"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:773
 msgid "Arabic"
 msgstr "Arab"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:774
 msgid "Afrikaans"
 msgstr "Afrikai"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:775
 msgid "Belarusian"
 msgstr "Fehérorosz"
 
-#: paperless/settings.py:778
+#: paperless/settings.py:776
 msgid "Bulgarian"
 msgstr "Bolgár"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:777
 msgid "Catalan"
 msgstr "Katalán"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:778
 msgid "Czech"
 msgstr "Cseh"
 
-#: paperless/settings.py:781
+#: paperless/settings.py:779
 msgid "Danish"
 msgstr "Dán"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:780
 msgid "German"
 msgstr "Német"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:781
 msgid "Greek"
 msgstr "Görög"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:782
 msgid "English (GB)"
 msgstr "Angol (GB)"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:783
 msgid "Spanish"
 msgstr "Spanyol"
 
-#: paperless/settings.py:786
+#: paperless/settings.py:784
 msgid "Persian"
-msgstr ""
+msgstr "Perzsa"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:785
 msgid "Finnish"
 msgstr "Finn"
 
-#: paperless/settings.py:788
+#: paperless/settings.py:786
 msgid "French"
 msgstr "Francia"
 
-#: paperless/settings.py:789
+#: paperless/settings.py:787
 msgid "Hungarian"
 msgstr "Magyar"
 
-#: paperless/settings.py:790
+#: paperless/settings.py:788
 msgid "Italian"
 msgstr "Olasz"
 
-#: paperless/settings.py:791
+#: paperless/settings.py:789
 msgid "Japanese"
 msgstr "japán"
 
-#: paperless/settings.py:792
+#: paperless/settings.py:790
 msgid "Korean"
 msgstr "koreai"
 
-#: paperless/settings.py:793
+#: paperless/settings.py:791
 msgid "Luxembourgish"
 msgstr "Luxemburgi"
 
-#: paperless/settings.py:794
+#: paperless/settings.py:792
 msgid "Norwegian"
 msgstr "Norvég"
 
-#: paperless/settings.py:795
+#: paperless/settings.py:793
 msgid "Dutch"
 msgstr "Holland"
 
-#: paperless/settings.py:796
+#: paperless/settings.py:794
 msgid "Polish"
 msgstr "Lengyel"
 
-#: paperless/settings.py:797
+#: paperless/settings.py:795
 msgid "Portuguese (Brazil)"
 msgstr "Portugál (Brazília)"
 
-#: paperless/settings.py:798
+#: paperless/settings.py:796
 msgid "Portuguese"
 msgstr "Portugál"
 
-#: paperless/settings.py:799
+#: paperless/settings.py:797
 msgid "Romanian"
 msgstr "Román"
 
-#: paperless/settings.py:800
+#: paperless/settings.py:798
 msgid "Russian"
 msgstr "Orosz"
 
-#: paperless/settings.py:801
+#: paperless/settings.py:799
 msgid "Slovak"
 msgstr "Szlovák"
 
-#: paperless/settings.py:802
+#: paperless/settings.py:800
 msgid "Slovenian"
 msgstr "Szlovén"
 
-#: paperless/settings.py:803
+#: paperless/settings.py:801
 msgid "Serbian"
 msgstr "Szerb"
 
-#: paperless/settings.py:804
+#: paperless/settings.py:802
 msgid "Swedish"
 msgstr "Svéd"
 
-#: paperless/settings.py:805
+#: paperless/settings.py:803
 msgid "Turkish"
 msgstr "Török"
 
-#: paperless/settings.py:806
+#: paperless/settings.py:804
 msgid "Ukrainian"
 msgstr "Ukrán"
 
-#: paperless/settings.py:807
+#: paperless/settings.py:805
 msgid "Vietnamese"
-msgstr ""
+msgstr "Vietnámi"
 
-#: paperless/settings.py:808
+#: paperless/settings.py:806
 msgid "Chinese Simplified"
 msgstr "Kínai egyszerűsített"
 
-#: paperless/settings.py:809
+#: paperless/settings.py:807
 msgid "Chinese Traditional"
 msgstr "tradicionális kínai"
 

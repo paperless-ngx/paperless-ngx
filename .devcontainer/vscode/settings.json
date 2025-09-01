@@ -1,11 +1,10 @@
 {
-    "python.testing.pytestArgs": [
-        "src"
-    ],
+    "python.testing.pytestArgs": [],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
     "files.watcherExclude": {
         "**/.venv/**": true,
         "**/pytest_cache/**": true
-    }
+    },
+    "python.testing.cwd": "${workspaceFolder}/src"
 }
