@@ -1,4 +1,6 @@
+import random
 import shutil
+import string
 import tempfile
 import time
 import warnings
@@ -426,3 +428,9 @@ class DummyProgressManager:
             payload["data"].update(extra_args)
 
         self.payloads.append(payload)
+
+
+def pseudo_random_text(length=100, seed=42):
+    random.seed(seed)
+    charset = string.ascii_lowercase + " "
+    return "".join(random.choices(charset, k=length))

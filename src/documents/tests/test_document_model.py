@@ -4,13 +4,13 @@ from datetime import date
 from pathlib import Path
 from unittest import mock
 
-import pytest
 from django.test import TestCase
 from django.test import override_settings
 
 from documents.models import Correspondent
 from documents.models import Document
 from documents.tasks import empty_trash
+from documents.tests.utils import pseudo_random_text
 
 
 class TestDocument(TestCase):
@@ -108,34 +108,23 @@ class TestDocument(TestCase):
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test")
 
 
-@pytest.mark.parametrize(
-    ("content_limit", "expected_content"),
-    [
-        (10, "This is  e."),
-        (20, "This is the docu ate."),
-    ],
-)
-def test_suggestion_content(content_limit, expected_content):
-    long_content = """This is the document content. It is quite long, so we ought to crop it when computing suggestions and parsing the date."""
-    other_long_content = (
-        "Another document content, used to test property cache invalidation."
+def test_suggestion_content():
+    """
+    Check that the document for suggestion is cropped, only if it exceeds the length limit.
+    """
+    # Do not crop content under 1.2M chars
+    content_under_limit = pseudo_random_text(1200000)
+    doc = Document(
+        title="test",
+        created=date(2025, 6, 1),
+        content=content_under_limit,
     )
-    short_content = "test"
-    with override_settings(
-        SUGGESTION_CONTENT_LENGTH_LIMIT=content_limit,
-    ):
-        doc = Document(
-            title="test",
-            created=date(2025, 6, 1),
-            content=other_long_content,
-        )
-        # call the property once to cache it
-        assert doc.suggestion_content
+    assert doc.suggestion_content == content_under_limit
 
-        # Test property cache invalidation and limit
-        doc.content = long_content
-        assert doc.suggestion_content == expected_content
-
-        # Test with content shorter than the limit
-        doc.content = short_content
-        assert doc.suggestion_content == short_content
+    # If over the limit, crop to 1M char (800K from the beginning, 200K from the end)
+    content_over_limit = pseudo_random_text(1200001)
+    expected_cropped_content = (
+        content_over_limit[:800000] + " " + content_over_limit[-200000:]
+    )
+    doc.content = content_over_limit
+    assert doc.suggestion_content == expected_cropped_content
