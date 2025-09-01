@@ -504,7 +504,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">224</context>
         </context-group>
-        <target state="translated">워크플로를 통해 문서 파이프라인을 더욱 효과적으로 제어할 수 있습니다.</target>
+        <target state="translated">워크플로우를 통해 문서 파이프라인을 더욱 효과적으로 제어할 수 있습니다.</target>
       </trans-unit>
       <trans-unit id="4680387114119209483" datatype="html">
         <source>File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.</source>
@@ -2456,7 +2456,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="translated">문서 "<x id="PH" equiv-text="document.title"/>" 삭제 중 오류 발생"</target>
+        <target state="translated">문서 "<x id="PH" equiv-text="document.title"/>" 삭제 중 오류가 발생했습니다</target>
       </trans-unit>
       <trans-unit id="7266264608936522311" datatype="html">
         <source>This operation will permanently delete the selected documents.</source>
@@ -2504,7 +2504,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="translated">문서 복원 중 오류 "<x id="PH" equiv-text="document.title"/>""</target>
+        <target state="translated">문서 "<x id="PH" equiv-text="document.title"/>" 복원 중 오류가 발생했습니다</target>
       </trans-unit>
       <trans-unit id="960063472770266304" datatype="html">
         <source>Document(s) restored</source>
@@ -2754,11 +2754,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1011</context>
+          <context context-type="linenumber">1018</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1373</context>
+          <context context-type="linenumber">1383</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -2824,7 +2824,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">166</context>
         </context-group>
-        <target state="translated">오류 저장 그룹.</target>
+        <target state="translated">그룹을 저장하는데 오류가 발생했습니다.</target>
       </trans-unit>
       <trans-unit id="6538873300613683004" datatype="html">
         <source>Confirm delete user group</source>
@@ -3426,7 +3426,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">964</context>
+          <context context-type="linenumber">971</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3646,11 +3646,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">87</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">92</context>
+          <context context-type="linenumber">93</context>
         </context-group>
         <target state="translated">참</target>
       </trans-unit>
@@ -3662,11 +3662,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">87</context>
+          <context context-type="linenumber">88</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">93</context>
+          <context context-type="linenumber">94</context>
         </context-group>
         <target state="translated">거짓</target>
       </trans-unit>
@@ -3674,11 +3674,11 @@
         <source>Search docs...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">61</context>
+          <context context-type="linenumber">62</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">109</context>
+          <context context-type="linenumber">110</context>
         </context-group>
         <target state="translated">문서 검색...</target>
       </trans-unit>
@@ -3686,7 +3686,7 @@
         <source>Any</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">141</context>
+          <context context-type="linenumber">142</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
@@ -3698,7 +3698,7 @@
         <source>All</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">143</context>
+          <context context-type="linenumber">144</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
@@ -3726,7 +3726,7 @@
         <source>Not</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">146</context>
+          <context context-type="linenumber">147</context>
         </context-group>
         <target state="translated">아님</target>
       </trans-unit>
@@ -3734,7 +3734,7 @@
         <source>Add query</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">165</context>
+          <context context-type="linenumber">166</context>
         </context-group>
         <target state="translated">쿼리 추가</target>
       </trans-unit>
@@ -3742,7 +3742,7 @@
         <source>Add expression</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">168</context>
+          <context context-type="linenumber">169</context>
         </context-group>
         <target state="translated">표현식 추가</target>
       </trans-unit>
@@ -4796,7 +4796,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">88</context>
         </context-group>
-        <target state="needs-review-translation" state-qualifier="leveraged-tm">전자우편</target>
+        <target state="translated">이메일</target>
       </trans-unit>
       <trans-unit id="5342432350421167093" datatype="html">
         <source>First name</source>
@@ -5560,7 +5560,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">235</context>
         </context-group>
-        <target state="translated">새 워크플로 만들기</target>
+        <target state="translated">새 워크플로우 만들기</target>
       </trans-unit>
       <trans-unit id="5996779210524133604" datatype="html">
         <source>Edit workflow</source>
@@ -5576,7 +5576,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">Email address(es)</target>
+        <target state="translated">이메일 주소</target>
       </trans-unit>
       <trans-unit id="9127604588498960753" datatype="html">
         <source>Subject</source>
@@ -5584,7 +5584,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Subject</target>
+        <target state="translated">제목</target>
       </trans-unit>
       <trans-unit id="8066608938393600549" datatype="html">
         <source>Message</source>
@@ -5592,7 +5592,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Message</target>
+        <target state="translated">메시지</target>
       </trans-unit>
       <trans-unit id="5867799091834207531" datatype="html">
         <source>Use archive version</source>
@@ -5600,7 +5600,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Use archive version</target>
+        <target state="translated">아카이브 버전 사용</target>
       </trans-unit>
       <trans-unit id="4312183290449350804" datatype="html">
         <source>Send email</source>
@@ -5608,7 +5608,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.html</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Send email</target>
+        <target state="translated">이메일 보내기</target>
       </trans-unit>
       <trans-unit id="1342170399958833675" datatype="html">
         <source>Email Document</source>
@@ -5616,7 +5616,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Email Document</target>
+        <target state="translated">문서 이메일로 보내기</target>
       </trans-unit>
       <trans-unit id="9049148856403142491" datatype="html">
         <source>Email sent</source>
@@ -5624,7 +5624,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.ts</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="needs-translation">Email sent</target>
+        <target state="translated">이메일 보냄</target>
       </trans-unit>
       <trans-unit id="3742745894977668908" datatype="html">
         <source>Error emailing document</source>
@@ -5632,7 +5632,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.ts</context>
           <context context-type="linenumber">70</context>
         </context-group>
-        <target state="needs-translation">Error emailing document</target>
+        <target state="translated">문서를 보내는데 오류가 발생했습니다</target>
       </trans-unit>
       <trans-unit id="6381578200008167206" datatype="html">
         <source>Include</source>
@@ -5787,7 +5787,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.html</context>
-          <context context-type="linenumber">58</context>
+          <context context-type="linenumber">59</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
@@ -5911,7 +5911,7 @@
         <source>Add item</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.html</context>
-          <context context-type="linenumber">23</context>
+          <context context-type="linenumber">24</context>
         </context-group>
         <note priority="1" from="description">Used for both types, correspondents, storage paths</note>
         <target state="translated">항목 추가</target>
@@ -6054,7 +6054,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Delete page</target>
+        <target state="translated">페이지 삭제</target>
       </trans-unit>
       <trans-unit id="2480952115552020422" datatype="html">
         <source>Add / remove document split here</source>
@@ -6078,7 +6078,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">82</context>
         </context-group>
-        <target state="needs-translation">Create new document(s)</target>
+        <target state="translated">새로운 문서 생성</target>
       </trans-unit>
       <trans-unit id="8035757452478567832" datatype="html">
         <source>Update existing document</source>
@@ -6094,7 +6094,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation">Copy metadata</target>
+        <target state="translated">메타데이터 복사</target>
       </trans-unit>
       <trans-unit id="6684403463658676119" datatype="html">
         <source>Delete original</source>
@@ -7070,7 +7070,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
-        <target state="needs-translation">Upload documents</target>
+        <target state="translated">문서 업로드</target>
       </trans-unit>
       <trans-unit id="6388681050646106203" datatype="html">
         <source>or drop files anywhere</source>
@@ -7078,7 +7078,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">or drop files anywhere</target>
+        <target state="translated">또는 어디에나 파일을 드랍하기</target>
       </trans-unit>
       <trans-unit id="1749180330008942007" datatype="html">
         <source>Dismiss completed</source>
@@ -7250,9 +7250,9 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1372</context>
+          <context context-type="linenumber">1382</context>
         </context-group>
-        <target state="needs-translation">PDF Editor</target>
+        <target state="translated">PDF 편집기</target>
       </trans-unit>
       <trans-unit id="6490688569532630280" datatype="html">
         <source>Send</source>
@@ -7260,7 +7260,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="needs-translation">Send</target>
+        <target state="translated">보내기</target>
       </trans-unit>
       <trans-unit id="4452427314943113135" datatype="html">
         <source>Previous</source>
@@ -7570,7 +7570,7 @@
         <source>An error occurred loading content: <x id="PH" equiv-text="err.message ?? err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">412,414</context>
+          <context context-type="linenumber">410,412</context>
         </context-group>
         <target state="translated">콘텐츠를 로드하는 동안 오류가 발생했습니다: <x id="PH" equiv-text="err.message ?? err.toString()"/></target>
       </trans-unit>
@@ -7578,7 +7578,7 @@
         <source>Document changes detected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">435</context>
+          <context context-type="linenumber">444</context>
         </context-group>
         <target state="translated">문서 변경 감지</target>
       </trans-unit>
@@ -7586,7 +7586,7 @@
         <source>The version of this document in your browser session appears older than the existing version.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">436</context>
+          <context context-type="linenumber">445</context>
         </context-group>
         <target state="translated">브라우저 세션에서 이 문서의 버전이 기존 버전보다 이전 버전으로 표시됩니다.</target>
       </trans-unit>
@@ -7594,7 +7594,7 @@
         <source>Saving the document here may overwrite other changes that were made. To restore the existing version, discard your changes or close the document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">437</context>
+          <context context-type="linenumber">446</context>
         </context-group>
         <target state="translated">여기에 문서를 저장하면 다른 변경 내용을 덮어쓸 수 있습니다. 기존 버전을 복원하려면 변경 내용을 삭제하거나 문서를 닫으세요.</target>
       </trans-unit>
@@ -7602,7 +7602,7 @@
         <source>Ok</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">439</context>
+          <context context-type="linenumber">448</context>
         </context-group>
         <target state="translated">Ok</target>
       </trans-unit>
@@ -7610,7 +7610,7 @@
         <source>Next document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">563</context>
+          <context context-type="linenumber">574</context>
         </context-group>
         <target state="translated">다음 문서</target>
       </trans-unit>
@@ -7618,7 +7618,7 @@
         <source>Previous document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">573</context>
+          <context context-type="linenumber">584</context>
         </context-group>
         <target state="translated">이전 문서</target>
       </trans-unit>
@@ -7626,7 +7626,7 @@
         <source>Close document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">581</context>
+          <context context-type="linenumber">592</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
@@ -7638,7 +7638,7 @@
         <source>Save document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">588</context>
+          <context context-type="linenumber">599</context>
         </context-group>
         <target state="translated">문서 저장</target>
       </trans-unit>
@@ -7646,7 +7646,7 @@
         <source>Save and close / next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">597</context>
+          <context context-type="linenumber">608</context>
         </context-group>
         <target state="translated">저장 및 닫기 / 다음</target>
       </trans-unit>
@@ -7654,7 +7654,7 @@
         <source>Error retrieving metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">649</context>
+          <context context-type="linenumber">660</context>
         </context-group>
         <target state="translated">메타데이터를 가져오는데 실패하였습니다.</target>
       </trans-unit>
@@ -7662,7 +7662,7 @@
         <source>Error retrieving suggestions.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">678</context>
+          <context context-type="linenumber">689</context>
         </context-group>
         <target state="translated">추천을 가져오는데 실패하였습니다.</target>
       </trans-unit>
@@ -7670,27 +7670,27 @@
         <source>Document &quot;<x id="PH" equiv-text="newValues.title"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">858</context>
+          <context context-type="linenumber">861</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">882</context>
+          <context context-type="linenumber">885</context>
         </context-group>
-        <target state="needs-translation">Document "<x id="PH" equiv-text="newValues.title"/>" saved successfully.</target>
+        <target state="translated">문서 "<x id="PH" equiv-text="newValues.title"/>"가 성공적으로 저장되었습니다.</target>
       </trans-unit>
       <trans-unit id="6626387786259219838" datatype="html">
         <source>Error saving document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">888</context>
+          <context context-type="linenumber">891</context>
         </context-group>
-        <target state="needs-translation">Error saving document "<x id="PH" equiv-text="this.document.title"/>"</target>
+        <target state="translated">문서 "<x id="PH" equiv-text="this.document.title"/>" 저장 중 오류가 발생했습니다</target>
       </trans-unit>
       <trans-unit id="448882439049417053" datatype="html">
         <source>Error saving document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">933</context>
+          <context context-type="linenumber">940</context>
         </context-group>
         <target state="translated">문서를 저장하는데 오류가 발생하였습니다.</target>
       </trans-unit>
@@ -7698,7 +7698,7 @@
         <source>Do you really want to move the document &quot;<x id="PH" equiv-text="this.document.title"/>&quot; to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">965</context>
+          <context context-type="linenumber">972</context>
         </context-group>
         <target state="translated">"<x id="PH" equiv-text="this.document.title"/>" 문서를 휴지통으로 정말 옮기시겠습니까?</target>
       </trans-unit>
@@ -7706,7 +7706,7 @@
         <source>Documents can be restored prior to permanent deletion.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">966</context>
+          <context context-type="linenumber">973</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7718,7 +7718,7 @@
         <source>Move to trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">968</context>
+          <context context-type="linenumber">975</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7730,7 +7730,7 @@
         <source>Error deleting document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">987</context>
+          <context context-type="linenumber">994</context>
         </context-group>
         <target state="translated">문서 삭제 오류</target>
       </trans-unit>
@@ -7738,7 +7738,7 @@
         <source>Reprocess confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1007</context>
+          <context context-type="linenumber">1014</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7750,7 +7750,7 @@
         <source>This operation will permanently recreate the archive file for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1008</context>
+          <context context-type="linenumber">1015</context>
         </context-group>
         <target state="translated">이 작업을 수행하면 이 문서의 아카이브 파일이 영구적으로 다시 생성됩니다.</target>
       </trans-unit>
@@ -7758,7 +7758,7 @@
         <source>The archive file will be re-generated with the current settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1009</context>
+          <context context-type="linenumber">1016</context>
         </context-group>
         <target state="translated">아카이브 파일은 현재 설정으로 다시 생성됩니다.</target>
       </trans-unit>
@@ -7766,15 +7766,15 @@
         <source>Reprocess operation for &quot;<x id="PH" equiv-text="this.document.title"/>&quot; will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1019</context>
+          <context context-type="linenumber">1026</context>
         </context-group>
-        <target state="needs-translation">Reprocess operation for "<x id="PH" equiv-text="this.document.title"/>" will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</target>
+        <target state="translated">"<x id="PH" equiv-text="this.document.title"/>"의 재처리 작업이 백그라운드에서 시작됩니다. 작업이 완료된 후 새 콘텐츠를 보려면 이 문서를 닫았다가 다시 열거나 다시 로드하세요.</target>
       </trans-unit>
       <trans-unit id="4409560272830824468" datatype="html">
         <source>Error executing operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1030</context>
+          <context context-type="linenumber">1037</context>
         </context-group>
         <target state="translated">작업 수행중 오류가 발생하였습니다.</target>
       </trans-unit>
@@ -7782,7 +7782,7 @@
         <source>Error downloading document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1079</context>
+          <context context-type="linenumber">1086</context>
         </context-group>
         <target state="needs-translation">Error downloading document</target>
       </trans-unit>
@@ -7790,7 +7790,7 @@
         <source>Page Fit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1156</context>
+          <context context-type="linenumber">1163</context>
         </context-group>
         <target state="translated">페이지 맞춤</target>
       </trans-unit>
@@ -7798,15 +7798,15 @@
         <source>PDF edit operation for &quot;<x id="PH" equiv-text="this.document.title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1391</context>
+          <context context-type="linenumber">1401</context>
         </context-group>
-        <target state="needs-translation">PDF edit operation for "<x id="PH" equiv-text="this.document.title"/>" will begin in the background.</target>
+        <target state="translated">"<x id="PH" equiv-text="this.document.title"/>"의 PDF 편집 작업이 백그라운드에서 시작됩니다.</target>
       </trans-unit>
       <trans-unit id="9043972994040261999" datatype="html">
         <source>Error executing PDF edit operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1403</context>
+          <context context-type="linenumber">1413</context>
         </context-group>
         <target state="needs-translation">Error executing PDF edit operation</target>
       </trans-unit>
@@ -7814,11 +7814,11 @@
         <source>An error occurred loading tiff: <x id="PH" equiv-text="err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1463</context>
+          <context context-type="linenumber">1480</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1467</context>
+          <context context-type="linenumber">1484</context>
         </context-group>
         <target state="translated">tiff를 로드하는 동안 오류가 발생했습니다:<x id="PH" equiv-text="err.toString()"/></target>
       </trans-unit>
@@ -8320,7 +8320,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">91,92</context>
         </context-group>
-        <target state="needs-translation">Created: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate }}"/></target>
+        <target state="translated">생성일: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="2030261243264601523" datatype="html">
         <source>Added: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></source>
@@ -8454,7 +8454,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">311</context>
+          <context context-type="linenumber">313</context>
         </context-group>
         <target state="translated">페이지 선택</target>
       </trans-unit>
@@ -8466,7 +8466,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">304</context>
+          <context context-type="linenumber">306</context>
         </context-group>
         <target state="translated">전체 선택</target>
       </trans-unit>
@@ -8738,7 +8738,7 @@
         <source>Reset filters / selection</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">292</context>
+          <context context-type="linenumber">294</context>
         </context-group>
         <target state="translated">필터/선택 항목 재설정</target>
       </trans-unit>
@@ -8746,7 +8746,7 @@
         <source>Open first [selected] document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">320</context>
+          <context context-type="linenumber">322</context>
         </context-group>
         <target state="translated">첫번째 [선택한] 문서 열기</target>
       </trans-unit>
@@ -8754,7 +8754,7 @@
         <source>Previous page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">336</context>
+          <context context-type="linenumber">338</context>
         </context-group>
         <target state="translated">이전 페이지</target>
       </trans-unit>
@@ -8762,7 +8762,7 @@
         <source>Next page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">348</context>
+          <context context-type="linenumber">350</context>
         </context-group>
         <target state="translated">다음 페이지</target>
       </trans-unit>
@@ -8770,7 +8770,7 @@
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">381</context>
+          <context context-type="linenumber">383</context>
         </context-group>
         <target state="translated"><x id="PH" equiv-text="this.list.activeSavedViewTitle"/> 뷰가 성공적으로 저장되었습니다.</target>
       </trans-unit>
@@ -8778,7 +8778,7 @@
         <source>Failed to save view &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">387</context>
+          <context context-type="linenumber">389</context>
         </context-group>
         <target state="needs-translation">Failed to save view "<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>".</target>
       </trans-unit>
@@ -8786,7 +8786,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">431</context>
+          <context context-type="linenumber">435</context>
         </context-group>
         <target state="translated"><x id="PH" equiv-text="this.list.activeSavedViewTitle"/> 뷰가 성공적으로 생성되었습니다.</target>
       </trans-unit>
@@ -8812,7 +8812,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">188</context>
         </context-group>
-        <target state="needs-translation">File type</target>
+        <target state="translated">파일 종류</target>
       </trans-unit>
       <trans-unit id="2649431021108393503" datatype="html">
         <source>More like</source>
@@ -8884,7 +8884,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">272,276</context>
         </context-group>
-        <target state="needs-translation">Document type: <x id="PH" equiv-text="this.documentTypeSelectionModel.items.find(                 (dt) =&gt; dt.id == +rule.value               )?.name"/></target>
+        <target state="translated">문서 유형: <x id="PH" equiv-text="this.documentTypeSelectionModel.items.find(                 (dt) =&gt; dt.id == +rule.value               )?.name"/></target>
       </trans-unit>
       <trans-unit id="4362173610367509215" datatype="html">
         <source>Without document type</source>
@@ -9212,7 +9212,7 @@
           <context context-type="sourcefile">src/app/components/manage/custom-fields/custom-fields.component.ts</context>
           <context context-type="linenumber">112</context>
         </context-group>
-        <target state="needs-translation">Deleted field "<x id="PH" equiv-text="field.name"/>"</target>
+        <target state="translated">필드 "<x id="PH" equiv-text="field.name"/>" 삭제함</target>
       </trans-unit>
       <trans-unit id="4704551499967874824" datatype="html">
         <source>Error deleting field &quot;<x id="PH" equiv-text="field.name"/>&quot;.</source>
@@ -9872,7 +9872,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="translated">워크플로 추가</target>
+        <target state="translated">워크플로우 추가</target>
       </trans-unit>
       <trans-unit id="1624023882313260402" datatype="html">
         <source>No workflows defined.</source>
@@ -9880,7 +9880,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="translated">정의된 워크플로가 없습니다.</target>
+        <target state="translated">정의된 워크플로우가 없습니다.</target>
       </trans-unit>
       <trans-unit id="4200688335642457098" datatype="html">
         <source>Saved workflow &quot;<x id="PH" equiv-text="newWorkflow.name"/>&quot;.</source>
@@ -9896,7 +9896,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">98</context>
         </context-group>
-        <target state="translated">워크플로 저장 오류.</target>
+        <target state="translated">워크플로우 저장 오류.</target>
       </trans-unit>
       <trans-unit id="563460864902055482" datatype="html">
         <source>Confirm delete workflow</source>
@@ -9904,7 +9904,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">131</context>
         </context-group>
-        <target state="translated">삭제 워크플로 확인</target>
+        <target state="translated">워크플로우 삭제 확인</target>
       </trans-unit>
       <trans-unit id="6874008462443189248" datatype="html">
         <source>This operation will permanently delete this workflow.</source>
@@ -9912,7 +9912,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">132</context>
         </context-group>
-        <target state="translated">이 작업을 수행하면 이 워크플로가 영구적으로 삭제됩니다.</target>
+        <target state="translated">이 작업을 수행하면 이 워크플로우가 영구적으로 삭제됩니다.</target>
       </trans-unit>
       <trans-unit id="1284828901551483140" datatype="html">
         <source>Deleted workflow &quot;<x id="PH" equiv-text="workflow.name"/>&quot;.</source>
@@ -9920,7 +9920,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">142</context>
         </context-group>
-        <target state="needs-translation">Deleted workflow "<x id="PH" equiv-text="workflow.name"/>".</target>
+        <target state="translated">워크플로우 "<x id="PH" equiv-text="workflow.name"/>" 삭제됨.</target>
       </trans-unit>
       <trans-unit id="1427555175623563103" datatype="html">
         <source>Error deleting workflow &quot;<x id="PH" equiv-text="workflow.name"/>&quot;.</source>
@@ -9944,7 +9944,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="needs-translation">Disabled workflow "<x id="PH" equiv-text="workflow.name"/>"</target>
+        <target state="translated">워크플로우 "<x id="PH" equiv-text="workflow.name"/>" 비활성화됨</target>
       </trans-unit>
       <trans-unit id="6597823365851861961" datatype="html">
         <source>Error toggling workflow &quot;<x id="PH" equiv-text="workflow.name"/>&quot;.</source>
@@ -9952,7 +9952,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">170</context>
         </context-group>
-        <target state="translated">워크플로 "<x id="PH" equiv-text="workflow.name"/>" 토글 중 오류가 발생했습니다.</target>
+        <target state="translated">워크플로우 "<x id="PH" equiv-text="workflow.name"/>" 토글 중 오류가 발생했습니다.</target>
       </trans-unit>
       <trans-unit id="2649252321173430744" datatype="html">
         <source>Not Found</source>
