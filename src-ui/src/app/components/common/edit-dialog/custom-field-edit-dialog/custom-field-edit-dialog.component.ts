@@ -85,9 +85,9 @@ export class CustomFieldEditDialogComponent
       this.objectForm.get('data_type').disable()
     }
     if (this.object?.data_type === CustomFieldDataType.Select) {
-      this._allSelectOptions = this.object.extra_data.select_options
-        ? [...this.object.extra_data.select_options]
-        : []
+      this._allSelectOptions = [
+        ...(this.object.extra_data.select_options ?? []),
+      ]
       this.selectOptionsPage = 1
     }
   }
