@@ -2,11 +2,6 @@
 
 ## paperless-ngx 2.18.3
 
-### Features / Enhancements
-
--   Performance: Enable virtual scrolling for large custom field selects @david-loe ([#10708](https://github.com/paperless-ngx/paperless-ngx/pull/10708))
--   docker(deps): Bump astral-sh/uv from 0.8.8-python3.12-bookworm-slim to 0.8.13-python3.12-bookworm-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#10685](https://github.com/paperless-ngx/paperless-ngx/pull/10685))
-
 ### Bug Fixes
 
 -   Fix: include application config language settings for dateparser auto-detection [@shamoon](https://github.com/shamoon) ([#10722](https://github.com/paperless-ngx/paperless-ngx/pull/10722))
@@ -16,6 +11,7 @@
 -   Fix: include pagination array items for valid openapi schema [@shamoon](https://github.com/shamoon) ([#10682](https://github.com/paperless-ngx/paperless-ngx/pull/10682))
 -   Fix: prevent scroll for view name in sidebar [@shamoon](https://github.com/shamoon) ([#10676](https://github.com/paperless-ngx/paperless-ngx/pull/10676))
 -   Tweak: center document close button in app frame [@shamoon](https://github.com/shamoon) ([#10661](https://github.com/paperless-ngx/paperless-ngx/pull/10661))
+-   Performance: Enable virtual scrolling for large custom field selects @david-loe ([#10708](https://github.com/paperless-ngx/paperless-ngx/pull/10708))
 
 ### Dependencies
 
