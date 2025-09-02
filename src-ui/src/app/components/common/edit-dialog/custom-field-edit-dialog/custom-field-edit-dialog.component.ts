@@ -14,6 +14,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
+import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { takeUntil } from 'rxjs'
 import {
@@ -38,6 +39,7 @@ import { EditDialogComponent, EditDialogMode } from '../edit-dialog.component'
     FormsModule,
     ReactiveFormsModule,
     NgxBootstrapIconsModule,
+    NgbPaginationModule,
   ],
 })
 export class CustomFieldEditDialogComponent
@@ -49,9 +51,17 @@ export class CustomFieldEditDialogComponent
   @ViewChildren('selectOption')
   private selectOptionInputs: QueryList<ElementRef>
 
-  private get selectOptions(): FormArray {
+  page = 1
+  pageSize = 100
+
+  get selectOptions(): FormArray {
     return (this.objectForm.controls.extra_data as FormGroup).controls
       .select_options as FormArray
+  }
+
+  get pagedSelectOptions() {
+    const start = (this.page - 1) * this.pageSize
+    return this.selectOptions.controls.slice(start, start + this.pageSize)
   }
 
   constructor() {
@@ -120,9 +130,17 @@ export class CustomFieldEditDialogComponent
     this.selectOptions.push(
       new FormGroup({ label: new FormControl(null), id: new FormControl(null) })
     )
+    this.page = Math.ceil(this.selectOptions.length / this.pageSize)
   }
 
   public removeSelectOption(index: number) {
     this.selectOptions.removeAt(index)
+    const maxPage = Math.max(
+      1,
+      Math.ceil(this.selectOptions.length / this.pageSize)
+    )
+    if (this.page > maxPage) {
+      this.page = maxPage
+    }
   }
 }
