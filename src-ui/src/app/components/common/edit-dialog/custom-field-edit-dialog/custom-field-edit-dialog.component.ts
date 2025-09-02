@@ -29,7 +29,8 @@ import { SelectComponent } from '../../input/select/select.component'
 import { TextComponent } from '../../input/text/text.component'
 import { EditDialogComponent, EditDialogMode } from '../edit-dialog.component'
 
-export const SELECT_OPTION_PAGE_SIZE = 8
+const SELECT_OPTION_PAGE_SIZE = 8
+
 @Component({
   selector: 'pngx-custom-field-edit-dialog',
   templateUrl: './custom-field-edit-dialog.component.html',
