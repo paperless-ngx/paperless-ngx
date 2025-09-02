@@ -3,7 +3,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  NgZone,
   OnInit,
   QueryList,
   ViewChildren,
@@ -72,7 +71,7 @@ export class CustomFieldEditDialogComponent
     return this.objectForm.get('extra_data.select_options') as FormArray
   }
 
-  constructor(private zone: NgZone) {
+  constructor() {
     super()
     this.service = inject(CustomFieldsService)
     this.userService = inject(UserService)
@@ -154,17 +153,15 @@ export class CustomFieldEditDialogComponent
     const slice = this.allOptions.slice(start, start + this.pageSize)
 
     this.pauseFocus = true
-    this.zone.runOutsideAngular(() => {
-      this.selectOptions.clear()
-      for (const o of slice) {
-        this.selectOptions.push(
-          new FormGroup({
-            label: new FormControl(o.label, { updateOn: 'blur' }),
-            id: new FormControl(o.id),
-          })
-        )
-      }
-    })
+    this.selectOptions.clear()
+    for (const o of slice) {
+      this.selectOptions.push(
+        new FormGroup({
+          label: new FormControl(o.label, { updateOn: 'blur' }),
+          id: new FormControl(o.id),
+        })
+      )
+    }
     this.pauseFocus = false
   }
 
