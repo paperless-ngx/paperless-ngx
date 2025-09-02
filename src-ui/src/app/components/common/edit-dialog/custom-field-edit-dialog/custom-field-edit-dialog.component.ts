@@ -170,13 +170,10 @@ export class CustomFieldEditDialogComponent
   }
 
   public addSelectOption() {
+    this._allSelectOptions.push({ label: null, id: null })
     this.selectOptionsPage = Math.ceil(
       this.allSelectOptions.length / SELECT_OPTION_PAGE_SIZE
     )
-    this.selectOptions.push(
-      new FormGroup({ label: new FormControl(null), id: new FormControl(null) })
-    )
-    this._allSelectOptions.push({ label: null, id: null })
   }
 
   public removeSelectOption(index: number) {
