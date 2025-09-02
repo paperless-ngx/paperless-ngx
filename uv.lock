@@ -1111,7 +1111,6 @@ dependencies = [
     { name = "numpy", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "packaging", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/91/1b/6fe5dbe5be0240cfd82b52bd7c186655c578d935c0ce2e713c100e6f8cce/faiss_cpu-1.10.0.tar.gz", hash = "sha256:5bdca555f24bc036f4d67f8a5a4d6cc91b8d2126d4e78de496ca23ccd46e479d", size = 69159, upload-time = "2025-01-31T07:45:49.305Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8b/56/87eb506d8634f08fc7c63d1ca5631aeec7d6b9afbfabedf2cb7a2a804b13/faiss_cpu-1.10.0-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:6693474be296a7142ade1051ea18e7d85cedbfdee4b7eac9c52f83fed0467855", size = 7693034, upload-time = "2025-01-31T07:44:31.908Z" },
     { url = "https://files.pythonhosted.org/packages/51/46/f4d9de34ed1b06300b1a75b824d4857963216f5826de33f291af78088e39/faiss_cpu-1.10.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:70ebe60a560414dc8dd6cfe8fed105c8f002c0d11f765f5adfe8d63d42c0467f", size = 3234656, upload-time = "2025-01-31T07:44:34.418Z" },
@@ -2887,8 +2886,8 @@ requires-dist = [
     { name = "drf-spectacular", specifier = "~=0.28" },
     { name = "drf-spectacular-sidecar", specifier = "~=2025.8.1" },
     { name = "drf-writable-nested", specifier = "~=0.7.1" },
-		{ name = "faiss-cpu", specifier = ">=1.10" },
-		{ name = "filelock", specifier = "~=3.18.0" },
+    { name = "faiss-cpu", specifier = ">=1.10" },
+    { name = "filelock", specifier = "~=3.19.1" },
     { name = "flower", specifier = "~=2.0.1" },
     { name = "gotenberg-client", specifier = "~=0.11.0" },
     { name = "granian", extras = ["uvloop"], marker = "extra == 'webserver'", specifier = "~=2.5.1" },
