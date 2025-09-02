@@ -1,76 +1,137 @@
 <form [formGroup]="objectForm" (ngSubmit)="save()" autocomplete="off">
   <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
+    <h4 class="modal-title" id="modal-basic-title">{{ getTitle() }}</h4>
     @if (object?.id) {
-      <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{object.id}}</span>
+      <span class="badge bg-primary text-primary-text-contrast ms-2">
+        ID: {{ object.id }}
+      </span>
     }
-    <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
-    </button>
+    <button
+      type="button"
+      [disabled]="!closeEnabled"
+      class="btn-close"
+      aria-label="Close"
+      (click)="cancel()"
+    ></button>
   </div>
+
   <div class="modal-body">
-    <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
-    <pngx-input-select i18n-title title="Data type" [items]="getDataTypes()" formControlName="data_type"></pngx-input-select>
+    <pngx-input-text
+      i18n-title
+      title="Name"
+      formControlName="name"
+      [error]="error?.name"
+      autocomplete="off"
+    ></pngx-input-text>
+
+    <pngx-input-select
+      i18n-title
+      title="Data type"
+      [items]="getDataTypes()"
+      formControlName="data_type"
+    ></pngx-input-select>
+
     @if (typeFieldDisabled) {
-      <small class="d-block mt-n2" i18n>Data type cannot be changed after a field is created</small>
+      <small class="d-block mt-n2" i18n
+        >Data type cannot be changed after a field is created</small
+      >
     }
+
     <div [formGroup]="objectForm.controls.extra_data">
       @switch (objectForm.get('data_type').value) {
         @case (CustomFieldDataType.Select) {
-          <button type="button" class="btn btn-sm btn-primary my-2" (click)="addSelectOption()">
+          <button
+            type="button"
+            class="btn btn-sm btn-primary my-2"
+            (click)="addSelectOption()"
+          >
             <span i18n>Add option</span>&nbsp;<i-bs name="plus-circle"></i-bs>
           </button>
+
           <div formArrayName="select_options">
             @for (
-              option of pagedSelectOptions;
+              option of selectOptions.controls;
               track option;
               let i = $index
             ) {
-              <div
-                class="input-group input-group-sm my-2"
-                [formGroup]="option"
-              >
+              <div class="input-group input-group-sm my-2" [formGroup]="option">
                 <input
                   #selectOption
                   type="text"
                   class="form-control"
                   formControlName="label"
                   autocomplete="off"
+                  required
                 />
                 <input type="hidden" formControlName="id" />
                 <button
                   type="button"
                   class="btn btn-outline-danger"
-                  (click)="removeSelectOption((page - 1) * pageSize + i)"
+                  (click)="removeSelectOption(i)"
                   i18n
                 >
                   Delete
                 </button>
               </div>
             }
-            @if (selectOptions.length > pageSize) {
+
+            @if (allOptions.length > pageSize) {
               <ngb-pagination
                 class="ms-auto"
                 [pageSize]="pageSize"
-                [collectionSize]="selectOptions.length"
+                [collectionSize]="allOptions.length"
                 [(page)]="page"
+                [maxSize]="5"
                 size="sm"
+                aria-label="Pagination"
               ></ngb-pagination>
             }
           </div>
+
           @if (object?.id) {
-            <small class="d-block mt-2" i18n>Warning: existing instances of this field will retain their current value index (e.g. option #1, #2, #3) after editing the options here</small>
+            <small class="d-block mt-2" i18n>
+              Warning: existing instances of this field will retain their
+              current value index (e.g. option #1, #2, #3) after editing the
+              options here
+            </small>
           }
         }
+
         @case (CustomFieldDataType.Monetary) {
           <div class="my-3">
-            <pngx-input-text i18n-title title="Default Currency" hint="3-character currency code" i18n-hint formControlName="default_currency" placeholder="Use locale" i18n-placeholder autocomplete="off"></pngx-input-text>
+            <pngx-input-text
+              i18n-title
+              title="Default Currency"
+              hint="3-character currency code"
+              i18n-hint
+              formControlName="default_currency"
+              placeholder="Use locale"
+              i18n-placeholder
+              autocomplete="off"
+            ></pngx-input-text>
           </div>
         }
       }
     </div>
   </div>
+
   <div class="modal-footer">
-    <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
-    <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
+    <button
+      type="button"
+      class="btn btn-outline-secondary"
+      (click)="cancel()"
+      i18n
+      [disabled]="networkActive"
+    >
+      Cancel
+    </button>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      i18n
+      [disabled]="networkActive"
+    >
+      Save
+    </button>
   </div>
 </form>
