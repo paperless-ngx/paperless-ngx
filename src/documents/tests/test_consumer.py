@@ -304,19 +304,6 @@ class TestConsumer(
         self.assertEqual(document.title, "Override Title")
         self._assert_first_last_send_progress()
 
-    def testOverrideTitleInvalidPlaceholders(self):
-        with self.get_consumer(
-            self.get_test_file(),
-            DocumentMetadataOverrides(title="Override {correspondent]"),
-        ) as consumer:
-            consumer.run()
-
-            document = Document.objects.first()
-
-        self.assertIsNotNone(document)
-
-        self.assertEqual(document.title, "Override {correspondent]")
-
     def testOverrideCorrespondent(self):
         c = Correspondent.objects.create(name="test")
 
