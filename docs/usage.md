@@ -510,7 +510,7 @@ This allows for complex logic to be included in the format, including [logical s
 and [filters](https://jinja.palletsprojects.com/en/3.1.x/templates/#id11) to manipulate the title.
 The template is provided as a string.
 
-Using Jinja2 Templates is most usfull for [Date locatisation](advanced_usage.md#Date-Localization) in the title.
+Using Jinja2 Templates is most usfeull for [Date locatisation](advanced_usage.md#Date-Localization) in the title.
 
 The available options differ depending on the type of workflow trigger.
 This is because at the time of consumption (when the text is to be set), no automatic tags etc. have been
@@ -550,12 +550,6 @@ The following placeholders are only available for "added" or "updated" triggers
 
 {{ added | localize_date('MMMM', 'de_DE') }}
 <!-- Output: "Juni" --> # codespell:ignore
-
-{{ added_year }}
-<!-- Output: "2025" -->
-
-{{ original_filename }}
-<!-- Output: "invoice" -->
 ```
 
 ### Workflow permissions
