@@ -484,6 +484,7 @@ export class DocumentDetailComponent
               if (titleValue !== this.titleInput.value) return
               this.title = titleValue
               this.documentForm.patchValue({ title: titleValue })
+              this.documentForm.get('title').markAsDirty()
             })
           this.setupDirtyTracking(useDoc, doc)
         },

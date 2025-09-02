@@ -1,6 +1,6 @@
 [project]
 name = "paperless-ngx"
-version = "2.18.2"
+version = "2.18.3"
 description = "A community-supported supercharged document management system: scan, index and archive all your physical documents"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -42,9 +42,9 @@ dependencies = [
   "drf-spectacular-sidecar~=2025.8.1",
   "drf-writable-nested~=0.7.1",
   "faiss-cpu>=1.10",
-  "filelock~=3.18.0",
+  "filelock~=3.19.1",
   "flower~=2.0.1",
-  "gotenberg-client~=0.10.0",
+  "gotenberg-client~=0.11.0",
   "httpx-oauth~=0.16",
   "imap-tools~=1.11.0",
   "inotifyrecursive~=0.3",
@@ -68,7 +68,7 @@ dependencies = [
   "python-ipware~=3.0.0",
   "python-magic~=0.4.27",
   "pyzbar~=0.1.9",
-  "rapidfuzz~=3.13.0",
+  "rapidfuzz~=3.14.0",
   "redis[hiredis]~=5.2.1",
   "scikit-learn~=1.7.0",
   "sentence-transformers>=4.1",
@@ -91,7 +91,7 @@ optional-dependencies.postgres = [
   "psycopg-pool==3.2.6",
 ]
 optional-dependencies.webserver = [
-  "granian[uvloop]~=2.4.1",
+  "granian[uvloop]~=2.5.1",
 ]
 
 [dependency-groups]
