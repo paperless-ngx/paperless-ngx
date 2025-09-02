@@ -1,12 +1,14 @@
 import datetime
 from zoneinfo import ZoneInfo
 
+import pytest
 from pytest_django.fixtures import SettingsWrapper
 
 from documents.parsers import parse_date
 from documents.parsers import parse_date_generator
 
 
+@pytest.mark.django_db()
 class TestDate:
     def test_date_format_1(self):
         text = "lorem ipsum 130218 lorem ipsum"
@@ -49,7 +51,7 @@ class TestDate:
         settings: SettingsWrapper,
         settings_timezone: ZoneInfo,
     ):
-        settings.DATE_PARSER_LANGUAGES = []
+        settings.DATE_PARSER_LANGUAGES = ["de"]
         text = "lorem ipsum\nMärz 2019\nlorem ipsum"
         date = parse_date("", text)
         assert date == datetime.datetime(2019, 3, 1, 0, 0, tzinfo=settings_timezone)
