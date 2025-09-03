@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import hashlib
 import logging
 import math
 import re
+from base64 import urlsafe_b64encode
 from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
@@ -34,6 +36,8 @@ from guardian.utils import get_user_obj_perms_model
 from rest_framework import fields
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
+
+from documents.conditionals import thumbnail_last_modified
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.context import set_actor
@@ -915,6 +919,7 @@ class DocumentSerializer(
     page_count = SerializerMethodField()
 
     notes = NotesSerializer(many=True, required=False, read_only=True)
+    thumb_rev = SerializerMethodField(allow_null=False, read_only=True)
 
     custom_fields = CustomFieldInstanceSerializer(
         many=True,
@@ -946,6 +951,17 @@ class DocumentSerializer(
             return obj.get_public_filename(archive=True)
         else:
             return None
+
+    def get_thumb_rev(self, obj) -> str:
+        """
+        Return a short hash of the thumbnail, derived from its last modified time.
+
+        This is used to force cache refresh when a thumbnail is modified.
+        """
+        message = f"{obj.pk}{thumbnail_last_modified(None, obj.pk)}"
+        checksum = hashlib.md5(message.encode()).digest()
+        # 16 bits is enough to avoid collision risk when reprocessing a thumbnail
+        return urlsafe_b64encode(checksum[-2:]).decode().rstrip("=")
 
     def to_representation(self, instance):
         doc = super().to_representation(instance)
@@ -1103,6 +1119,7 @@ class DocumentSerializer(
             "remove_inbox_tags",
             "page_count",
             "mime_type",
+            "thumb_rev",
         )
         list_serializer_class = OwnedObjectListSerializer
 

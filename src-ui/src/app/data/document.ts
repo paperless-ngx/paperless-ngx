@@ -146,6 +146,8 @@ export interface Document extends ObjectWithPermissions {
 
   thumbnail_url?: string
 
+  thumb_rev?: string
+
   archive_serial_number?: number
 
   notes?: DocumentNote[]

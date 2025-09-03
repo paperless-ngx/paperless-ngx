@@ -411,7 +411,14 @@ export class DocumentDetailComponent
             err.message ?? err.toString()
           }`),
       })
-    this.thumbUrl = this.documentsService.getThumbUrl(documentId)
+    // Load the thumbnail with specified version if available from the list view
+    const docFromList = this.documentListViewService.documents.find(
+      (doc) => doc.id === documentId
+    )
+    this.thumbUrl = this.documentsService.getThumbUrl(
+      documentId,
+      docFromList?.thumb_rev
+    )
     this.documentsService
       .get(documentId)
       .pipe(
@@ -429,11 +436,22 @@ export class DocumentDetailComponent
             this.router.navigate(['404'], { replaceUrl: true })
             return
           }
+
           this.documentId = doc.id
           this.suggestions = null
           const openDocument = this.openDocumentService.getOpenDocument(
             this.documentId
           )
+          if (
+            docFromList?.thumb_rev &&
+            docFromList.thumb_rev != doc.thumb_rev
+          ) {
+            // The document's thumbnail has been refreshed in the meantime,
+            // so we need to update it in our local list.
+            // No need to fetch the actual new thumbnail now,
+            // as the preview will quickly replace it.
+            docFromList.thumb_rev = doc.thumb_rev
+          }
           const useDoc = openDocument || doc
           if (openDocument) {
             if (
