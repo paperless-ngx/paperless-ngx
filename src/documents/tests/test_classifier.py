@@ -654,7 +654,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         },
     )
     @override_settings(
-        MODEL_FILE=(Path(__file__).parent / "data" / "model.pickle").as_posix(),
+        MODEL_FILE=str(Path(__file__).parent / "data" / "model.pickle"),
     )
     @pytest.mark.skip(
         reason="Disabled caching due to high memory usage - need to investigate.",
