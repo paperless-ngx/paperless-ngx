@@ -679,7 +679,7 @@ def _parse_db_settings() -> dict:
     databases = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": str(DATA_DIR / "db.sqlite3"),
+            "NAME": DATA_DIR / "db.sqlite3",
             "OPTIONS": {},
         },
     }
@@ -807,7 +807,7 @@ LANGUAGES = [
     ("zh-tw", _("Chinese Traditional")),
 ]
 
-LOCALE_PATHS = [str(BASE_DIR / "locale")]
+LOCALE_PATHS = [BASE_DIR / "locale"]
 
 TIME_ZONE = os.getenv("PAPERLESS_TIME_ZONE", "UTC")
 
@@ -848,21 +848,21 @@ LOGGING = {
         "file_paperless": {
             "class": "concurrent_log_handler.ConcurrentRotatingFileHandler",
             "formatter": "verbose",
-            "filename": str(LOGGING_DIR / "paperless.log"),
+            "filename": LOGGING_DIR / "paperless.log",
             "maxBytes": LOGROTATE_MAX_SIZE,
             "backupCount": LOGROTATE_MAX_BACKUPS,
         },
         "file_mail": {
             "class": "concurrent_log_handler.ConcurrentRotatingFileHandler",
             "formatter": "verbose",
-            "filename": str(LOGGING_DIR / "mail.log"),
+            "filename": LOGGING_DIR / "mail.log",
             "maxBytes": LOGROTATE_MAX_SIZE,
             "backupCount": LOGROTATE_MAX_BACKUPS,
         },
         "file_celery": {
             "class": "concurrent_log_handler.ConcurrentRotatingFileHandler",
             "formatter": "verbose",
-            "filename": str(LOGGING_DIR / "celery.log"),
+            "filename": LOGGING_DIR / "celery.log",
             "maxBytes": LOGROTATE_MAX_SIZE,
             "backupCount": LOGROTATE_MAX_BACKUPS,
         },
@@ -921,7 +921,7 @@ CELERY_ACCEPT_CONTENT = ["application/json", "application/x-python-serialize"]
 CELERY_BEAT_SCHEDULE = _parse_beat_schedule()
 
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#beat-schedule-filename
-CELERY_BEAT_SCHEDULE_FILENAME = str(DATA_DIR / "celerybeat-schedule.db")
+CELERY_BEAT_SCHEDULE_FILENAME = DATA_DIR / "celerybeat-schedule.db"
 
 
 # Cachalot: Database read cache.
