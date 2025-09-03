@@ -288,26 +288,33 @@ class OwnedObjectSerializer(
     def get_permissions(self, obj) -> dict:
         view_codename = f"view_{obj.__class__.__name__.lower()}"
         change_codename = f"change_{obj.__class__.__name__.lower()}"
-
+        users_with_view = self.context.get("users_with_view", {}).get(obj.pk, [])
+        users_with_change = self.context.get("users_with_change", {}).get(obj.pk, [])
+        groups_with_view = self.context.get("groups_with_view", {}).get(obj.pk, [])
+        groups_with_change = self.context.get("groups_with_change", {}).get(obj.pk, [])
         return {
             "view": {
-                "users": get_users_with_perms(
+                "users": users_with_view
+                or get_users_with_perms(
                     obj,
                     only_with_perms_in=[view_codename],
                     with_group_users=False,
                 ).values_list("id", flat=True),
-                "groups": get_groups_with_only_permission(
+                "groups": groups_with_view
+                or get_groups_with_only_permission(
                     obj,
                     codename=view_codename,
                 ).values_list("id", flat=True),
             },
             "change": {
-                "users": get_users_with_perms(
+                "users": users_with_change
+                or get_users_with_perms(
                     obj,
                     only_with_perms_in=[change_codename],
                     with_group_users=False,
                 ).values_list("id", flat=True),
-                "groups": get_groups_with_only_permission(
+                "groups": groups_with_change
+                or get_groups_with_only_permission(
                     obj,
                     codename=change_codename,
                 ).values_list("id", flat=True),
