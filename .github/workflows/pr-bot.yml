@@ -37,7 +37,7 @@ jobs:
               labels.push('bug');
             } else if (/^feature/i.test(title)) {
               labels.push('enhancement');
-            } else if (!/^(dependabot)/i.test(title)) {
+            } else if (!/^(dependabot)/i.test(title) && /^(chore)/i.test(title)) {
               labels.push('enhancement'); // Default fallback
             }
 
