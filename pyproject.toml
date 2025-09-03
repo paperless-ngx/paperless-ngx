@@ -270,6 +270,7 @@ exclude_also = [
 ]
 
 [tool.mypy]
+mypy_path = "src"
 plugins = [
   "mypy_django_plugin.main",
   "mypy_drf_plugin.main",
