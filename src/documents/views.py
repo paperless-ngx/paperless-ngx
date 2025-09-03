@@ -339,7 +339,14 @@ class BulkPermissionMixin:
             "true",
             "1",
         ]:
-            queryset = self.filter_queryset(self.get_queryset())
+            # Detect pagination if available, to avoid querying unneeded permissions
+            page = getattr(self, "paginator", None)
+            if page and hasattr(page, "page"):
+                queryset = page.page.object_list
+            elif hasattr(self, "page"):
+                queryset = self.page
+            else:
+                queryset = self.filter_queryset(self.get_queryset())
             codenames = self.get_permission_codenames()
 
             users_perms = self.get_users_with_object_perms(
