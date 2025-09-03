@@ -296,7 +296,7 @@ class BulkPermissionMixin:
             "change": f"change_{model_name}",
         }
 
-    def get_users_with_object_perms(self, objects, perm_codename):
+    def get_users_with_object_perms(self, objects, perm_codenames):
         model = self.queryset.model
         UserObjectPermission = get_user_obj_perms_model(model)
         ctype = ContentType.objects.get_for_model(model)
@@ -304,15 +304,18 @@ class BulkPermissionMixin:
         perms_qs = UserObjectPermission.objects.filter(
             content_type=ctype,
             object_pk__in=object_pks,
-            permission__codename=perm_codename,
+            permission__codename__in=perm_codenames,
         ).select_related("user", "permission")
-        result = {pk: [] for pk in object_pks}
+        result = {
+            pk: {codename: [] for codename in perm_codenames} for pk in object_pks
+        }
         for perm in perms_qs:
             pk = int(perm.object_pk)
-            result[pk].append(perm.user_id)
+            codename = perm.permission.codename
+            result[pk][codename].append(perm.user_id)
         return result
 
-    def get_groups_with_object_perms(self, objects, perm_codename):
+    def get_groups_with_object_perms(self, objects, perm_codenames):
         model = self.queryset.model
         GroupObjectPermission = get_group_obj_perms_model(model)
         ctype = ContentType.objects.get_for_model(model)
@@ -320,12 +323,15 @@ class BulkPermissionMixin:
         perms_qs = GroupObjectPermission.objects.filter(
             content_type=ctype,
             object_pk__in=object_pks,
-            permission__codename=perm_codename,
+            permission__codename__in=perm_codenames,
         ).select_related("group", "permission")
-        result = {pk: [] for pk in object_pks}
+        result = {
+            pk: {codename: [] for codename in perm_codenames} for pk in object_pks
+        }
         for perm in perms_qs:
             pk = int(perm.object_pk)
-            result[pk].append(perm.group_id)
+            codename = perm.permission.codename
+            result[pk][codename].append(perm.group_id)
         return result
 
     def get_serializer_context(self):
@@ -336,26 +342,28 @@ class BulkPermissionMixin:
         ]:
             queryset = self.filter_queryset(self.get_queryset())
             codenames = self.get_permission_codenames()
-            users_with_view = self.get_users_with_object_perms(
+
+            users_perms = self.get_users_with_object_perms(
                 queryset,
-                codenames["view"],
+                [codenames["view"], codenames["change"]],
             )
-            users_with_change = self.get_users_with_object_perms(
+            context["users_with_view"] = {
+                pk: users_perms[pk][codenames["view"]] for pk in users_perms
+            }
+            context["users_with_change"] = {
+                pk: users_perms[pk][codenames["change"]] for pk in users_perms
+            }
+
+            groups_perms = self.get_groups_with_object_perms(
                 queryset,
-                codenames["change"],
+                [codenames["view"], codenames["change"]],
             )
-            groups_with_view = self.get_groups_with_object_perms(
-                queryset,
-                codenames["view"],
-            )
-            groups_with_change = self.get_groups_with_object_perms(
-                queryset,
-                codenames["change"],
-            )
-            context["users_with_view"] = users_with_view
-            context["users_with_change"] = users_with_change
-            context["groups_with_view"] = groups_with_view
-            context["groups_with_change"] = groups_with_change
+            context["groups_with_view"] = {
+                pk: groups_perms[pk][codenames["view"]] for pk in groups_perms
+            }
+            context["groups_with_change"] = {
+                pk: groups_perms[pk][codenames["change"]] for pk in groups_perms
+            }
         return context
 
 
