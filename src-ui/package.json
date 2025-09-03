@@ -55,7 +55,7 @@
     "@codecov/webpack-plugin": "^1.9.1",
     "@playwright/test": "^1.54.2",
     "@types/jest": "^30.0.0",
-    "@types/node": "^24.1.0",
+    "@types/node": "^24.3.0",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
     "@typescript-eslint/utils": "^8.38.0",
