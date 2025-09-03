@@ -305,14 +305,13 @@ class BulkPermissionMixin:
             content_type=ctype,
             object_pk__in=object_pks,
             permission__codename__in=perm_codenames,
-        ).select_related("user", "permission")
+        ).values_list("object_pk", "user_id", "permission__codename")
         result = {
             pk: {codename: [] for codename in perm_codenames} for pk in object_pks
         }
-        for perm in perms_qs:
-            pk = int(perm.object_pk)
-            codename = perm.permission.codename
-            result[pk][codename].append(perm.user_id)
+        for object_pk, user_id, codename in perms_qs:
+            pk = int(object_pk)
+            result[pk][codename].append(user_id)
         return result
 
     def get_groups_with_object_perms(self, objects, perm_codenames):
@@ -324,14 +323,14 @@ class BulkPermissionMixin:
             content_type=ctype,
             object_pk__in=object_pks,
             permission__codename__in=perm_codenames,
-        ).select_related("group", "permission")
+        ).values_list("object_pk", "group_id", "permission__codename")
         result = {
             pk: {codename: [] for codename in perm_codenames} for pk in object_pks
         }
-        for perm in perms_qs:
-            pk = int(perm.object_pk)
-            codename = perm.permission.codename
-            result[pk][codename].append(perm.group_id)
+
+        for object_pk, group_id, codename in perms_qs:
+            pk = int(object_pk)
+            result[pk][codename].append(group_id)
         return result
 
     def get_serializer_context(self):
