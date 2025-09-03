@@ -19,7 +19,6 @@ from celery import states
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
 from django.db import connections
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
@@ -57,8 +56,6 @@ from drf_spectacular.utils import OpenApiParameter
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import extend_schema_view
 from drf_spectacular.utils import inline_serializer
-from guardian.models import GroupObjectPermission
-from guardian.models import UserObjectPermission
 from langdetect import detect
 from packaging import version as packaging_version
 from redis import Redis
@@ -257,59 +254,7 @@ class PassUserMixin(GenericAPIView):
         return super().get_serializer(*args, **kwargs)
 
 
-class PermissionsAwareMixin(PassUserMixin):
-    """
-    Preload Django-Guardian permissions to avoid N+1 queries on models with permissions.
-    """
-
-    def list(self, request, *args, **kwargs):
-        response = super().list(request, *args, **kwargs)
-        self._preload_permissions()
-        return response
-
-    def retrieve(self, request, *args, **kwargs):
-        response = super().retrieve(request, *args, **kwargs)
-        self._preload_permissions()
-        return response
-
-    def _preload_permissions(self):
-        qs = self.get_queryset()
-        if not qs:
-            return
-
-        object_ids = list(qs.values_list("id", flat=True))
-        if not object_ids:
-            return
-
-        model = self.get_serializer_class().Meta.model
-        ctype = ContentType.objects.get_for_model(model)
-        perms_needed = list(self._permissions_cache.values())
-
-        user_perms = UserObjectPermission.objects.filter(
-            object_pk__in=object_ids,
-            content_type_id=ctype.id,
-            permission_id__in=[p.id for p in perms_needed],
-        ).select_related("user")
-
-        group_perms = GroupObjectPermission.objects.filter(
-            object_pk__in=object_ids,
-            content_type_id=ctype.id,
-            permission_id__in=[p.id for p in perms_needed],
-        ).select_related("group")
-
-        self._permission_mapping = {
-            obj_id: {"users": set(), "groups": set()} for obj_id in object_ids
-        }
-        for up in user_perms:
-            self._permission_mapping[up.object_pk]["users"].add(up.user_id)
-        for gp in group_perms:
-            self._permission_mapping[gp.object_pk]["groups"].add(gp.group_id)
-
-    def get_permission_mapping(self):
-        return getattr(self, "_permission_mapping", {})
-
-
-class PermissionsAwareDocumentCountMixin(PermissionsAwareMixin):
+class PermissionsAwareDocumentCountMixin(PassUserMixin):
     """
     Mixin to add document count to queryset, permissions-aware if needed
     """
