@@ -147,9 +147,13 @@ export abstract class EditDialogComponent<
     )
   }
 
+  protected getFormValues(): any {
+    return Object.assign({}, this.objectForm.value)
+  }
+
   save() {
     this.error = null
-    const formValues = Object.assign({}, this.objectForm.value)
+    const formValues = this.getFormValues()
     const permissionsObject: PermissionsFormObject =
       this.objectForm.get('permissions_form')?.value
     if (permissionsObject) {

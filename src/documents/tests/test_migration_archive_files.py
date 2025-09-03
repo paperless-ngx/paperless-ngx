@@ -19,15 +19,15 @@ migration_1012_obj = importlib.import_module(
 )
 
 
-def archive_name_from_filename(filename):
-    return Path(filename).stem + ".pdf"
+def archive_name_from_filename(filename: Path) -> Path:
+    return Path(filename.stem + ".pdf")
 
 
-def archive_path_old(self):
+def archive_path_old(self) -> Path:
     if self.filename:
-        fname = archive_name_from_filename(self.filename)
+        fname = archive_name_from_filename(Path(self.filename))
     else:
-        fname = f"{self.pk:07}.pdf"
+        fname = Path(f"{self.pk:07}.pdf")
 
     return Path(settings.ARCHIVE_DIR) / fname
 
