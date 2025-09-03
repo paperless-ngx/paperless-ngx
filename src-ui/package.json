@@ -1,6 +1,6 @@
 {
   "name": "paperless-ngx-ui",
-  "version": "2.18.2",
+  "version": "2.18.3",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "ng": "ng",
@@ -53,9 +53,9 @@
     "@angular/cli": "~20.1.4",
     "@angular/compiler-cli": "~20.1.4",
     "@codecov/webpack-plugin": "^1.9.1",
-    "@playwright/test": "^1.54.2",
+    "@playwright/test": "^1.55.0",
     "@types/jest": "^30.0.0",
-    "@types/node": "^24.1.0",
+    "@types/node": "^24.3.0",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
     "@typescript-eslint/utils": "^8.38.0",
@@ -68,7 +68,7 @@
     "prettier-plugin-organize-imports": "^4.2.0",
     "ts-node": "~10.9.1",
     "typescript": "^5.8.3",
-    "webpack": "^5.101.0"
+    "webpack": "^5.101.3"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
