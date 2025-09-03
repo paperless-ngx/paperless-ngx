@@ -6,11 +6,11 @@ from unittest import mock
 
 from django.test import TestCase
 from django.test import override_settings
+from faker import Faker
 
 from documents.models import Correspondent
 from documents.models import Document
 from documents.tasks import empty_trash
-from documents.tests.utils import pseudo_random_text
 
 
 class TestDocument(TestCase):
@@ -112,8 +112,10 @@ def test_suggestion_content():
     """
     Check that the document for suggestion is cropped, only if it exceeds the length limit.
     """
+    fake_text = Faker().text(max_nb_chars=1201000)
+
     # Do not crop content under 1.2M chars
-    content_under_limit = pseudo_random_text(1200000)
+    content_under_limit = fake_text[:1200000]
     doc = Document(
         title="test",
         created=date(2025, 6, 1),
@@ -122,7 +124,7 @@ def test_suggestion_content():
     assert doc.suggestion_content == content_under_limit
 
     # If over the limit, crop to 1M char (800K from the beginning, 200K from the end)
-    content_over_limit = pseudo_random_text(1200001)
+    content_over_limit = fake_text[:1200001]
     expected_cropped_content = (
         content_over_limit[:800000] + " " + content_over_limit[-200000:]
     )
