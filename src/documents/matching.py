@@ -409,17 +409,17 @@ def existing_document_matches_workflow(
                 break
             expected = values.get(str(field.pk))
             if expected is not None:
-                matches = False
+                value_match = False
                 if field.data_type == CustomField.FieldDataType.DATE:
-                    matches = str(cf_instance.value) == expected
+                    value_match = str(cf_instance.value) == expected
                 elif (
                     field.data_type == CustomField.FieldDataType.DOCUMENTLINK
                     and cf_instance.value is not None
                 ):
-                    matches = all(doc in cf_instance.value for doc in expected)
+                    value_match = all(doc in cf_instance.value for doc in expected)
                 else:
-                    matches = cf_instance.value == expected
-                if not matches:
+                    value_match = cf_instance.value == expected
+                if not value_match:
                     reason = (
                         f"Document custom field {field} value {cf_instance.value} does not match {expected}",
                     )
