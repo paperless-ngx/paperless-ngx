@@ -380,13 +380,13 @@ describe('WorkflowEditDialogComponent', () => {
       assign_custom_fields: new FormControl([1, 2, 3]),
     })
 
-    component.removeSelectedCustomField(2, formGroup)
+    component.removeSelectedCustomField(2, formGroup, 'assign_custom_fields')
     expect(formGroup.get('assign_custom_fields').value).toEqual([1, 3])
 
-    component.removeSelectedCustomField(1, formGroup)
+    component.removeSelectedCustomField(1, formGroup, 'assign_custom_fields')
     expect(formGroup.get('assign_custom_fields').value).toEqual([3])
 
-    component.removeSelectedCustomField(3, formGroup)
+    component.removeSelectedCustomField(3, formGroup, 'assign_custom_fields')
     expect(formGroup.get('assign_custom_fields').value).toEqual([])
   })
 })
