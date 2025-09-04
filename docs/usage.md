@@ -408,7 +408,7 @@ Currently, there are three events that correspond to workflow trigger 'types':
    but the document content has been extracted and metadata such as document type, tags, etc. have been set, so these can now
    be used for filtering.
 3. **Document Updated**: when a document is updated. Similar to 'added' events, triggers can include filtering by content matching,
-   tags, doc type, correspondent, storage path or custom fields.
+   tags, doc type, correspondent or storage path.
 4. **Scheduled**: a scheduled trigger that can be used to run workflows at a specific time. The date used can be either the document
    added, created, updated date or you can specify a (date) custom field. You can also specify a day offset from the date (positive
    offsets will trigger after the date, negative offsets will trigger before).
@@ -457,8 +457,6 @@ Workflows allow you to filter by:
 -   Document type (`Added`, `Updated` and `Scheduled` triggers only). Filter documents with this doc type
 -   Correspondent (`Added`, `Updated` and `Scheduled` triggers only). Filter documents with this correspondent
 -   Storage path (`Added`, `Updated` and `Scheduled` triggers only). Filter documents with this storage path
--   Custom fields (`Added`, `Updated` and `Scheduled` triggers only). Filter documents with this custom fields
-    (if no value is specified, all documents having this custom field assigned will be matched, regardless of the value)
 
 ### Workflow Actions
 

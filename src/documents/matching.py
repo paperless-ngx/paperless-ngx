@@ -9,8 +9,6 @@ from typing import TYPE_CHECKING
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
 from documents.models import Correspondent
-from documents.models import CustomField
-from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
@@ -398,34 +396,6 @@ def existing_document_matches_workflow(
         )
         trigger_matched = False
 
-    # Document custom fields vs trigger custom fields
-    if trigger.filter_has_custom_fields.exists():
-        values = trigger.filter_custom_fields_values or {}
-        for field in trigger.filter_has_custom_fields.all():
-            cf_instance = document.custom_fields.filter(field=field).first()
-            if cf_instance is None:
-                reason = (f"Document custom field {field} not present",)
-                trigger_matched = False
-                break
-            expected = values.get(str(field.pk))
-            if expected is not None:
-                value_match = False
-                if field.data_type == CustomField.FieldDataType.DATE:
-                    value_match = str(cf_instance.value) == expected
-                elif (
-                    field.data_type == CustomField.FieldDataType.DOCUMENTLINK
-                    and cf_instance.value is not None
-                ):
-                    value_match = all(doc in cf_instance.value for doc in expected)
-                else:
-                    value_match = cf_instance.value == expected
-                if not value_match:
-                    reason = (
-                        f"Document custom field {field} value {cf_instance.value} does not match {expected}",
-                    )
-                    trigger_matched = False
-                    break
-
     # Document original_filename vs trigger filename
     if (
         trigger.filter_filename is not None
@@ -474,19 +444,6 @@ def prefilter_documents_by_workflowtrigger(
         documents = documents.filter(
             storage_path=trigger.filter_has_storage_path,
         )
-
-    if trigger.filter_has_custom_fields.exists():
-        values = trigger.filter_custom_fields_values or {}
-        for field in trigger.filter_has_custom_fields.all():
-            filter_kwargs = {"custom_fields__field": field}
-            expected = values.get(str(field.pk))
-            if expected is not None:
-                value_field_name = CustomFieldInstance.get_value_field_name(
-                    field.data_type,
-                )
-                filter_kwargs[f"custom_fields__{value_field_name}"] = expected
-            documents = documents.filter(**filter_kwargs)
-        documents = documents.distinct()
 
     if trigger.filter_filename is not None and len(trigger.filter_filename) > 0:
         # the true fnmatch will actually run later so we just want a loose filter here
