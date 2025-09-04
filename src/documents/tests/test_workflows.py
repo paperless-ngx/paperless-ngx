@@ -9,6 +9,7 @@ import pytest
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.test import TestCase
 from django.test import override_settings
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
@@ -17,6 +18,7 @@ from guardian.shortcuts import get_users_with_perms
 from httpx import HTTPError
 from httpx import HTTPStatusError
 from pytest_httpx import HTTPXMock
+from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 
 from documents.signals.handlers import run_workflows
@@ -3172,7 +3174,7 @@ class TestWebhookSecurity:
 class TestDateWorkflowLocalization(
     DirectoriesMixin,
     SampleDirMixin,
-    APITestCase,
+    TestCase,
 ):
     """Test cases for workflows that use date localization in templates."""
 
@@ -3217,16 +3219,6 @@ class TestDateWorkflowLocalization(
         ),
     ]
 
-    def setUp(self):
-        superuser = User.objects.create_superuser("superuser")
-        self.client.force_authenticate(user=superuser)
-
-        self.c = Correspondent.objects.create(name="Correspondent Name")
-        self.dt = DocumentType.objects.create(name="DocType Name")
-
-        return super().setUp()
-
-    @pytest.mark.django_db(transaction=True)
     def test_document_added_workflow_month_placeholder_created_translation(self):
         """GIVEN:
             - Document added workflow with title template using localize_date filter
@@ -3268,8 +3260,14 @@ class TestDateWorkflowLocalization(
                 # Roll back this iteration's transaction so DB state is not persisted
                 transaction.set_rollback(True)
 
-    @pytest.mark.django_db(transaction=True)
     def test_document_updated_workflow_month_placeholder_created_translation(self):
+        self.dt = DocumentType.objects.create(name="DocType Name")
+        self.c = Correspondent.objects.create(name="Correspondent Name")
+
+        client = APIClient()
+        superuser = User.objects.create_superuser("superuser")
+        client.force_authenticate(user=superuser)
+
         trigger1 = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
             filter_has_document_type=self.dt,
@@ -3296,7 +3294,7 @@ class TestDateWorkflowLocalization(
                 w.actions.add(action)
                 w.save()
 
-                self.client.patch(
+                client.patch(
                     f"/api/documents/{doc.id}/",
                     {"document_type": self.dt.id},
                     format="json",
@@ -3306,8 +3304,9 @@ class TestDateWorkflowLocalization(
 
                 # Roll back this iteration's transaction so DB state is not persisted
                 transaction.set_rollback(True)
+        # Log out
+        client.force_authenticate(user=None)
 
-    @pytest.mark.django_db(transaction=True)
     def test_document_consumption_workflow_month_placeholder_addded_translation(self):
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
