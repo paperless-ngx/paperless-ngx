@@ -412,6 +412,15 @@ export class WorkflowEditDialogComponent
         filter_has_document_type: new FormControl(
           trigger.filter_has_document_type
         ),
+        filter_has_storage_path: new FormControl(
+          trigger.filter_has_storage_path
+        ),
+        filter_has_custom_fields: new FormControl(
+          trigger.filter_has_custom_fields
+        ),
+        filter_custom_fields_values: new FormControl(
+          trigger.filter_custom_fields_values
+        ),
         schedule_offset_days: new FormControl(trigger.schedule_offset_days),
         schedule_is_recurring: new FormControl(trigger.schedule_is_recurring),
         schedule_recurring_interval_days: new FormControl(
@@ -536,6 +545,9 @@ export class WorkflowEditDialogComponent
       filter_has_tags: [],
       filter_has_correspondent: null,
       filter_has_document_type: null,
+      filter_has_storage_path: null,
+      filter_has_custom_fields: [],
+      filter_custom_fields_values: {},
       matching_algorithm: MATCH_NONE,
       match: '',
       is_insensitive: true,
@@ -654,11 +666,13 @@ export class WorkflowEditDialogComponent
     super.save()
   }
 
-  public removeSelectedCustomField(fieldId: number, group: FormGroup) {
+  public removeSelectedCustomField(
+    fieldId: number,
+    group: FormGroup,
+    controlName: string
+  ) {
     group
-      .get('assign_custom_fields')
-      .setValue(
-        group.get('assign_custom_fields').value.filter((id) => id !== fieldId)
-      )
+      .get(controlName)
+      .setValue(group.get(controlName).value.filter((id) => id !== fieldId))
   }
 }
