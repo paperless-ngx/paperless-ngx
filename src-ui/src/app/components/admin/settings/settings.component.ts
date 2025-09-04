@@ -185,7 +185,8 @@ export class SettingsComponent
       this.systemStatus.tasks.classifier_status ===
         SystemStatusItemStatus.ERROR ||
       this.systemStatus.tasks.sanity_check_status ===
-        SystemStatusItemStatus.ERROR
+        SystemStatusItemStatus.ERROR ||
+      this.systemStatus.tasks.export_status === SystemStatusItemStatus.ERROR
     )
   }
 

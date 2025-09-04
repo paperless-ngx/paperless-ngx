@@ -11,6 +11,7 @@ from celery import Task
 from celery import shared_task
 from celery import states
 from django.conf import settings
+from django.core.management import call_command
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db import transaction
@@ -221,6 +222,40 @@ def sanity_check(*, scheduled=True, raise_on_error=True):
         return "Sanity check exited with infos. See log."
     else:
         return "No issues detected."
+
+
+@shared_task
+def export_documents(*, scheduled=True):
+    task = PaperlessTask.objects.create(
+        type=PaperlessTask.TaskType.SCHEDULED_TASK
+        if scheduled
+        else PaperlessTask.TaskType.MANUAL_TASK,
+        task_id=uuid.uuid4(),
+        task_name=PaperlessTask.TaskName.DOCUMENT_EXPORT,
+        status=states.STARTED,
+        date_created=timezone.now(),
+        date_started=timezone.now(),
+    )
+
+    try:
+        call_command(
+            "document_exporter",
+            settings.EXPORT_DIR,
+            "--use-filename-format",
+            "--no-archive",
+            "--no-thumbnail",
+            "--delete",
+        )
+        task.status = states.SUCCESS
+        task.result = "Export completed successfully"
+    except Exception as e:  # pragma: no cover - best effort
+        logger.warning(f"Document export failed: {e}")
+        task.status = states.FAILURE
+        task.result = str(e)
+
+    task.date_done = timezone.now()
+    task.save(update_fields=["status", "result", "date_done"])
+    return task.result
 
 
 @shared_task

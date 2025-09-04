@@ -310,3 +310,34 @@ class TestSystemStatus(APITestCase):
             "ERROR",
         )
         self.assertIsNotNone(response.data["tasks"]["sanity_check_error"])
+
+    def test_system_status_export_ok(self):
+        PaperlessTask.objects.create(
+            type=PaperlessTask.TaskType.SCHEDULED_TASK,
+            status=states.SUCCESS,
+            task_name=PaperlessTask.TaskName.DOCUMENT_EXPORT,
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["tasks"]["export_status"], "OK")
+        self.assertIsNone(response.data["tasks"]["export_error"])
+
+    def test_system_status_export_warning(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["tasks"]["export_status"], "WARNING")
+
+    def test_system_status_export_error(self):
+        PaperlessTask.objects.create(
+            type=PaperlessTask.TaskType.SCHEDULED_TASK,
+            status=states.FAILURE,
+            task_name=PaperlessTask.TaskName.DOCUMENT_EXPORT,
+            result="Export failed",
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["tasks"]["export_status"], "ERROR")
+        self.assertIsNotNone(response.data["tasks"]["export_error"])

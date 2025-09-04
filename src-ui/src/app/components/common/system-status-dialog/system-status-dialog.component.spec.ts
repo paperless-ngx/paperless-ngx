@@ -67,6 +67,9 @@ const status: SystemStatus = {
     sanity_check_status: SystemStatusItemStatus.OK,
     sanity_check_last_run: new Date().toISOString(),
     sanity_check_error: null,
+    export_status: SystemStatusItemStatus.OK,
+    export_last_run: new Date().toISOString(),
+    export_error: null,
   },
 }
 

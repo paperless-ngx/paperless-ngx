@@ -169,6 +169,7 @@ from documents.tasks import empty_trash
 from documents.tasks import index_optimize
 from documents.tasks import sanity_check
 from documents.tasks import train_classifier
+from documents.tasks import export_documents
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.utils import get_boolean
 from paperless import version
@@ -2366,6 +2367,10 @@ class TasksViewSet(ReadOnlyModelViewSet):
             sanity_check,
             {"scheduled": False, "raise_on_error": False},
         ),
+        PaperlessTask.TaskName.DOCUMENT_EXPORT: (
+            export_documents,
+            {"scheduled": False},
+        ),
     }
 
     def get_queryset(self):
@@ -2881,6 +2886,28 @@ class SystemStatusView(PassUserMixin):
             last_sanity_check.date_done if last_sanity_check else None
         )
 
+        last_export = (
+            PaperlessTask.objects.filter(
+                task_name=PaperlessTask.TaskName.DOCUMENT_EXPORT,
+                status__in=[
+                    states.SUCCESS,
+                    states.FAILURE,
+                    states.REVOKED,
+                ],
+            )
+            .order_by("-date_done")
+            .first()
+        )
+        export_status = "OK"
+        export_error = None
+        if last_export is None:
+            export_status = "WARNING"
+            export_error = "No document export tasks found"
+        elif last_export and last_export.status != states.SUCCESS:
+            export_status = "ERROR"
+            export_error = last_export.result
+        export_last_run = last_export.date_done if last_export else None
+
         return Response(
             {
                 "pngx_version": current_version,
@@ -2918,6 +2945,9 @@ class SystemStatusView(PassUserMixin):
                     "sanity_check_status": sanity_check_status,
                     "sanity_check_last_run": sanity_check_last_run,
                     "sanity_check_error": sanity_check_error,
+                    "export_status": export_status,
+                    "export_last_run": export_last_run,
+                    "export_error": export_error,
                 },
             },
         )
