@@ -32,7 +32,7 @@ except ImportError:  # pragma: no cover
 logger = logging.getLogger("paperless.management.consumer")
 
 
-def _tags_from_path(filepath) -> list[int]:
+def _tags_from_path(filepath: Path) -> list[int]:
     """
     Walk up the directory tree from filepath to CONSUMPTION_DIR
     and get or create Tag IDs for every directory.
@@ -41,7 +41,7 @@ def _tags_from_path(filepath) -> list[int]:
     """
     db.close_old_connections()
     tag_ids = set()
-    path_parts = Path(filepath).relative_to(settings.CONSUMPTION_DIR).parent.parts
+    path_parts = filepath.relative_to(settings.CONSUMPTION_DIR).parent.parts
     for part in path_parts:
         tag_ids.add(
             Tag.objects.get_or_create(name__iexact=part, defaults={"name": part})[0].pk,
@@ -50,17 +50,13 @@ def _tags_from_path(filepath) -> list[int]:
     return list(tag_ids)
 
 
-def _is_ignored(filepath: str) -> bool:
+def _is_ignored(filepath: Path) -> bool:
     """
     Checks if the given file should be ignored, based on configured
     patterns.
 
     Returns True if the file is ignored, False otherwise
     """
-    filepath = os.path.abspath(
-        os.path.normpath(filepath),
-    )
-
     # Trim out the consume directory, leaving only filename and it's
     # path relative to the consume directory
     filepath_relative = PurePath(filepath).relative_to(settings.CONSUMPTION_DIR)
@@ -85,15 +81,15 @@ def _is_ignored(filepath: str) -> bool:
     return False
 
 
-def _consume(filepath: str) -> None:
-    if os.path.isdir(filepath) or _is_ignored(filepath):
+def _consume(filepath: Path) -> None:
+    if filepath.is_dir() or _is_ignored(filepath):
         return
 
-    if not os.path.isfile(filepath):
+    if not filepath.is_file():
         logger.debug(f"Not consuming file {filepath}: File has moved.")
         return
 
-    if not is_file_ext_supported(os.path.splitext(filepath)[1]):
+    if not is_file_ext_supported(filepath.suffix):
         logger.warning(f"Not consuming file {filepath}: Unknown file extension.")
         return
 
@@ -107,7 +103,7 @@ def _consume(filepath: str) -> None:
 
     while (read_try_count < os_error_retry_count) and not file_open_ok:
         try:
-            with open(filepath, "rb"):
+            with filepath.open("rb"):
                 file_open_ok = True
         except OSError as e:
             read_try_count += 1
@@ -141,7 +137,7 @@ def _consume(filepath: str) -> None:
         logger.exception("Error while consuming document")
 
 
-def _consume_wait_unmodified(file: str) -> None:
+def _consume_wait_unmodified(file: Path) -> None:
     """
     Waits for the given file to appear unmodified based on file size
     and modification time.  Will wait a configured number of seconds
@@ -157,7 +153,7 @@ def _consume_wait_unmodified(file: str) -> None:
     current_try = 0
     while current_try < settings.CONSUMER_POLLING_RETRY_COUNT:
         try:
-            stat_data = os.stat(file)
+            stat_data = file.stat()
             new_mtime = stat_data.st_mtime
             new_size = stat_data.st_size
         except FileNotFoundError:
@@ -182,10 +178,10 @@ class Handler(FileSystemEventHandler):
         self._pool = pool
 
     def on_created(self, event):
-        self._pool.submit(_consume_wait_unmodified, event.src_path)
+        self._pool.submit(_consume_wait_unmodified, Path(event.src_path))
 
     def on_moved(self, event):
-        self._pool.submit(_consume_wait_unmodified, event.dest_path)
+        self._pool.submit(_consume_wait_unmodified, Path(event.dest_path))
 
 
 class Command(BaseCommand):
@@ -227,9 +223,9 @@ class Command(BaseCommand):
         if not directory:
             raise CommandError("CONSUMPTION_DIR does not appear to be set.")
 
-        directory = os.path.abspath(directory)
+        directory = Path(directory).resolve()
 
-        if not os.path.isdir(directory):
+        if not directory.is_dir():
             raise CommandError(f"Consumption directory {directory} does not exist")
 
         # Consumer will need this
@@ -238,11 +234,11 @@ class Command(BaseCommand):
         if recursive:
             for dirpath, _, filenames in os.walk(directory):
                 for filename in filenames:
-                    filepath = os.path.join(dirpath, filename)
+                    filepath = Path(dirpath) / filename
                     _consume(filepath)
         else:
-            for entry in os.scandir(directory):
-                _consume(entry.path)
+            for filepath in directory.iterdir():
+                _consume(filepath)
 
         if options["oneshot"]:
             return
@@ -310,7 +306,7 @@ class Command(BaseCommand):
                 try:
                     for event in inotify.read(timeout=timeout_ms):
                         path = inotify.get_path(event.wd) if recursive else directory
-                        filepath = os.path.join(path, event.name)
+                        filepath = Path(path) / event.name
                         if flags.MODIFY in flags.from_mask(event.mask):
                             notified_files.pop(filepath, None)
                         else:
@@ -327,9 +323,7 @@ class Command(BaseCommand):
 
                         # Also make sure the file exists still, some scanners might write a
                         # temporary file first
-                        file_still_exists = os.path.exists(filepath) and os.path.isfile(
-                            filepath,
-                        )
+                        file_still_exists = filepath.exists() and filepath.is_file()
 
                         if waited_long_enough and file_still_exists:
                             _consume(filepath)

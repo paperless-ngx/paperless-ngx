@@ -18,7 +18,7 @@ repos:
         exclude_types:
           - svg
           - pofile
-        exclude: "(^LICENSE$)"
+        exclude: "(^LICENSE$|^src/documents/static/bootstrap.min.css$)"
       - id: mixed-line-ending
         args:
           - "--fix=lf"
@@ -51,7 +51,7 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.12.2
     hooks:
-      - id: ruff
+      - id: ruff-check
       - id: ruff-format
   - repo: https://github.com/tox-dev/pyproject-fmt
     rev: "v2.6.0"

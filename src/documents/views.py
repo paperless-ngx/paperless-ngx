@@ -2899,7 +2899,7 @@ class SystemStatusView(PassUserMixin):
             install_type = "docker"
 
         db_conn = connections["default"]
-        db_url = db_conn.settings_dict["NAME"]
+        db_url = str(db_conn.settings_dict["NAME"])
         db_error = None
 
         try:
