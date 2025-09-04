@@ -1,7 +1,7 @@
-<div ngbDropdown #fieldDropdown="ngbDropdown" (openChange)="onOpenClose($event)" [popperOptions]="popperOptions" placement="bottom-end">
-    <button class="btn btn-sm btn-outline-primary" id="customFieldsDropdown" [disabled]="disabled" ngbDropdownToggle>
+<div ngbDropdown #fieldDropdown="ngbDropdown" (openChange)="onOpenClose($event)" [popperOptions]="popperOptions">
+    <button type="button" class="btn btn-sm btn-outline-primary" id="customFieldsDropdown" [disabled]="disabled" ngbDropdownToggle>
       <i-bs name="ui-radios"></i-bs>
-      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Custom Fields</ng-container></div>
+      <div class="d-none d-lg-inline">&nbsp;<ng-container i18n>Custom Fields</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="customFieldsDropdown" class="shadow custom-fields-dropdown">
         <div class="list-group list-group-flush" (keydown)="listKeyDown($event)">

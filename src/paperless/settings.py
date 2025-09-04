@@ -13,6 +13,7 @@ from typing import Final
 from urllib.parse import urlparse
 
 from celery.schedules import crontab
+from compression_middleware.middleware import CompressionMiddleware
 from dateparser.languages.loader import LocaleDataLoader
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
@@ -230,6 +231,17 @@ def _parse_beat_schedule() -> dict:
                 "expires": 59.0 * 60.0,
             },
         },
+        {
+            "name": "Rebuild LLM index",
+            "env_key": "PAPERLESS_LLM_INDEX_TASK_CRON",
+            # Default daily at 02:10
+            "env_default": "10 2 * * *",
+            "task": "documents.tasks.llmindex_index",
+            "options": {
+                # 1 hour before default schedule sends again
+                "expires": 23.0 * 60.0 * 60.0,
+            },
+        },
     ]
     for task in tasks:
         # Either get the environment setting or use the default
@@ -288,6 +300,7 @@ MODEL_FILE = __get_path(
     "PAPERLESS_MODEL_FILE",
     DATA_DIR / "classification_model.pickle",
 )
+LLM_INDEX_DIR = DATA_DIR / "llm_index"
 
 LOGGING_DIR = __get_path("PAPERLESS_LOGGING_DIR", DATA_DIR / "log")
 
@@ -378,6 +391,19 @@ MIDDLEWARE = [
 # Optional to enable compression
 if __get_boolean("PAPERLESS_ENABLE_COMPRESSION", "yes"):  # pragma: no cover
     MIDDLEWARE.insert(0, "compression_middleware.middleware.CompressionMiddleware")
+
+# Workaround to not compress streaming responses (e.g. chat).
+# See https://github.com/friedelwolff/django-compression-middleware/pull/7
+original_process_response = CompressionMiddleware.process_response
+
+
+def patched_process_response(self, request, response):
+    if getattr(request, "compress_exempt", False):
+        return response
+    return original_process_response(self, request, response)
+
+
+CompressionMiddleware.process_response = patched_process_response
 
 ROOT_URLCONF = "paperless.urls"
 
@@ -589,6 +615,10 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 # The next 3 settings can also be set using just PAPERLESS_URL
 CSRF_TRUSTED_ORIGINS = __get_list("PAPERLESS_CSRF_TRUSTED_ORIGINS")
 
+if DEBUG:
+    # Allow access from the angular development server during debugging
+    CSRF_TRUSTED_ORIGINS.append("http://localhost:4200")
+
 # We allow CORS from localhost:8000
 CORS_ALLOWED_ORIGINS = __get_list(
     "PAPERLESS_CORS_ALLOWED_HOSTS",
@@ -598,6 +628,8 @@ CORS_ALLOWED_ORIGINS = __get_list(
 if DEBUG:
     # Allow access from the angular development server during debugging
     CORS_ALLOWED_ORIGINS.append("http://localhost:4200")
+
+CORS_ALLOW_CREDENTIALS = True
 
 CORS_EXPOSE_HEADERS = [
     "Content-Disposition",
@@ -871,6 +903,7 @@ LOGGING = {
     "loggers": {
         "paperless": {"handlers": ["file_paperless"], "level": "DEBUG"},
         "paperless_mail": {"handlers": ["file_mail"], "level": "DEBUG"},
+        "paperless_ai": {"handlers": ["file_paperless"], "level": "DEBUG"},
         "ocrmypdf": {"handlers": ["file_paperless"], "level": "INFO"},
         "celery": {"handlers": ["file_celery"], "level": "DEBUG"},
         "kombu": {"handlers": ["file_celery"], "level": "DEBUG"},
@@ -1388,3 +1421,16 @@ WEBHOOKS_ALLOW_INTERNAL_REQUESTS = __get_boolean(
     "PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS",
     "true",
 )
+
+################################################################################
+# AI Settings                                                                  #
+################################################################################
+AI_ENABLED = __get_boolean("PAPERLESS_AI_ENABLED", "NO")
+LLM_EMBEDDING_BACKEND = os.getenv(
+    "PAPERLESS_AI_LLM_EMBEDDING_BACKEND",
+)  # "huggingface" or "openai"
+LLM_EMBEDDING_MODEL = os.getenv("PAPERLESS_AI_LLM_EMBEDDING_MODEL")
+LLM_BACKEND = os.getenv("PAPERLESS_AI_LLM_BACKEND")  # "ollama" or "openai"
+LLM_MODEL = os.getenv("PAPERLESS_AI_LLM_MODEL")
+LLM_API_KEY = os.getenv("PAPERLESS_AI_LLM_API_KEY")
+LLM_ENDPOINT = os.getenv("PAPERLESS_AI_LLM_ENDPOINT")
