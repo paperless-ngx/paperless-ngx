@@ -46,10 +46,6 @@ export interface WorkflowTrigger extends ObjectWithId {
 
   filter_has_storage_path?: number // StoragePath.id
 
-  filter_has_custom_fields?: number[] // CustomField.id[]
-
-  filter_custom_fields_values?: object
-
   schedule_offset_days?: number
 
   schedule_is_recurring?: boolean

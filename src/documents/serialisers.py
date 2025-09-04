@@ -2055,8 +2055,6 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             "filter_has_correspondent",
             "filter_has_document_type",
             "filter_has_storage_path",
-            "filter_has_custom_fields",
-            "filter_custom_fields_values",
             "schedule_offset_days",
             "schedule_is_recurring",
             "schedule_recurring_interval_days",
@@ -2078,17 +2076,6 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer):
             and len(attrs["filter_path"]) == 0
         ):
             attrs["filter_path"] = None
-
-        if (
-            attrs.get("filter_custom_fields_values")
-            and not attrs.get("filter_has_custom_fields")
-            and not (self.instance and self.instance.filter_has_custom_fields.exists())
-        ):
-            raise serializers.ValidationError(
-                {
-                    "filter_has_custom_fields": "This field is required when specifying custom field values.",
-                },
-            )
 
         trigger_type = attrs.get("type", getattr(self.instance, "type", None))
         if (
@@ -2285,7 +2272,6 @@ class WorkflowSerializer(serializers.ModelSerializer):
         if triggers is not None and triggers is not serializers.empty:
             for trigger in triggers:
                 filter_has_tags = trigger.pop("filter_has_tags", None)
-                filter_has_custom_fields = trigger.pop("filter_has_custom_fields", None)
                 # Convert sources to strings to handle django-multiselectfield v1.0 changes
                 WorkflowTriggerSerializer.normalize_workflow_trigger_sources(trigger)
                 trigger_instance, _ = WorkflowTrigger.objects.update_or_create(
@@ -2294,10 +2280,6 @@ class WorkflowSerializer(serializers.ModelSerializer):
                 )
                 if filter_has_tags is not None:
                     trigger_instance.filter_has_tags.set(filter_has_tags)
-                if filter_has_custom_fields is not None:
-                    trigger_instance.filter_has_custom_fields.set(
-                        filter_has_custom_fields,
-                    )
                 set_triggers.append(trigger_instance)
 
         if actions is not None and actions is not serializers.empty:
