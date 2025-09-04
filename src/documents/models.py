@@ -1044,6 +1044,29 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has this correspondent"),
     )
 
+    filter_has_storage_path = models.ForeignKey(
+        StoragePath,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("has this storage path"),
+    )
+
+    filter_has_custom_fields = models.ManyToManyField(
+        CustomField,
+        blank=True,
+        related_name="workflow_triggers_filter_custom_fields",
+        verbose_name=_("has these custom fields"),
+    )
+
+    filter_custom_fields_values = models.JSONField(
+        _("custom field values"),
+        null=True,
+        blank=True,
+        default=dict,
+        help_text=_("Values of the custom fields that must match."),
+    )
+
     schedule_offset_days = models.IntegerField(
         _("schedule offset days"),
         default=0,
