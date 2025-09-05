@@ -1,10 +1,12 @@
 import re
+from hashlib import md5
 from html import escape
 from pathlib import Path
 
 from bleach import clean
 from bleach import linkify
 from django.conf import settings
+from django.db.models import Q
 from django.utils.timezone import is_naive
 from django.utils.timezone import make_aware
 from gotenberg_client import GotenbergClient
@@ -21,6 +23,7 @@ from tika_client import TikaClient
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
+from documents.models import Document
 from paperless.models import OutputTypeChoices
 from paperless_mail.models import MailRule
 
@@ -142,7 +145,7 @@ class MailDocumentParser(DocumentParser):
             text = re.sub(r"(\n *)+", "\n", text)
             return text.strip()
 
-        def build_formatted_text(mail_message: MailMessage) -> str:
+        def build_formatted_text(mail_message: MailMessage, attached_docs: list[Document] | None) -> str:
             """
             Constructs a formatted string, based on the given email.  Basically tries
             to get most of the email content, included front matter, into a nice string
@@ -173,13 +176,30 @@ class MailDocumentParser(DocumentParser):
 
             fmt_text += f"\n\n{strip_text(mail.text)}"
 
+            for doc in attached_docs or []:
+                fmt_text += f"\n\nAttachment({doc.original_filename}): {doc.title} - {strip_text(doc.content)}"
+
             return fmt_text
+
+        def find_processed_attachments(mail_message: MailMessage) -> list[Document]:
+            checksums = [md5(item.payload).hexdigest() for item in mail_message.attachments if item.payload]
+            docs = Document.objects.filter(Q(checksum__in=checksums)).all()
+            docs = {doc.checksum: doc for doc in docs}
+            return [docs[cs] for cs in checksums if cs in docs] # preserve order of attachments in mail
 
         self.log.debug(f"Parsing file {document_path.name} into an email")
         mail = self.parse_file_to_message(document_path)
 
+        self.log.debug(f"Applying mail rule, if any (mailrule_id={mailrule_id})")
+        rule = None
+        attached_docs = []
+        if mailrule_id:
+            rule = MailRule.objects.get(pk=mailrule_id)
+            # todo: extend rule to toggle attachment processing
+            attached_docs = find_processed_attachments(mail)
+
         self.log.debug("Building formatted text from email")
-        self.text = build_formatted_text(mail)
+        self.text = build_formatted_text(mail, attached_docs)
 
         if is_naive(mail.date):
             self.date = make_aware(mail.date)
@@ -187,11 +207,8 @@ class MailDocumentParser(DocumentParser):
             self.date = mail.date
 
         self.log.debug("Creating a PDF from the email")
-        if mailrule_id:
-            rule = MailRule.objects.get(pk=mailrule_id)
-            self.archive_path = self.generate_pdf(mail, rule.pdf_layout)
-        else:
-            self.archive_path = self.generate_pdf(mail)
+        pdf_layout = MailRule.PdfLayout(rule.pdf_layout) if rule else None
+        self.archive_path = self.generate_pdf(mail, attached_docs=attached_docs, pdf_layout=pdf_layout)
 
     @staticmethod
     def parse_file_to_message(filepath: Path) -> MailMessage:
@@ -232,26 +249,57 @@ class MailDocumentParser(DocumentParser):
         self,
         mail_message: MailMessage,
         pdf_layout: MailRule.PdfLayout | None = None,
+        attached_docs: list[Document] | None = None,
     ) -> Path:
         archive_path = Path(self.tempdir) / "merged.pdf"
-
-        mail_pdf_file = self.generate_pdf_from_mail(mail_message)
 
         pdf_layout = (
             pdf_layout or settings.EMAIL_PARSE_DEFAULT_LAYOUT
         )  # EMAIL_PARSE_DEFAULT_LAYOUT is a MailRule.PdfLayout
 
-        # If no HTML content, create the PDF from the message
-        # Otherwise, create 2 PDFs and merge them with Gotenberg
-        if not mail_message.html:
-            archive_path.write_bytes(mail_pdf_file.read_bytes())
-        else:
+        pdfs_to_merge = [] # type: list[Path]
+
+        # Render HTML part of the email, if any and required
+        pdf_of_html_content = None
+        if mail_message.html and pdf_layout != MailRule.PdfLayout.TEXT_ONLY:
             pdf_of_html_content = self.generate_pdf_from_html(
                 mail_message.html,
                 mail_message.attachments,
             )
 
-            self.log.debug("Merging email text and HTML content into single PDF")
+        # Render TEXT part of the email including headers, if required
+        pdf_of_mail = None
+        if not pdf_of_html_content or pdf_layout != MailRule.PdfLayout.HTML_ONLY:
+            pdf_of_mail = self.generate_pdf_from_mail(mail_message)
+
+        # Apply pdf layout
+        if pdf_of_html_content:
+            match pdf_layout:
+                case MailRule.PdfLayout.HTML_TEXT:
+                    pdfs_to_merge += [pdf_of_html_content, pdf_of_mail]
+                case MailRule.PdfLayout.HTML_ONLY:
+                    pdfs_to_merge += [pdf_of_html_content]
+                case MailRule.PdfLayout.TEXT_HTML | _:
+                    pdfs_to_merge += [pdf_of_mail, pdf_of_html_content]
+
+        if not pdfs_to_merge and pdf_of_mail:
+            pdfs_to_merge = [pdf_of_mail]
+
+        assert pdfs_to_merge, "At least one PDF should be generated from the email"
+
+        # Append already processed attachments, if any and requested
+        if attached_docs:
+            for doc in attached_docs:
+                if doc.mime_type == "application/pdf":
+                    pdfs_to_merge.append(doc.source_path) # directly use source path for PDFs
+                elif path := doc.archive_path:
+                    pdfs_to_merge.append(path)
+
+        # If we have only a single PDF, just use it. Otherwise, we merge all PDFs with Gotenberg
+        if len(pdfs_to_merge) == 1:
+            archive_path.write_bytes(pdfs_to_merge[0].read_bytes())
+        else:
+            self.log.debug(f"Merging {', '.join(str(p) for p in pdfs_to_merge)} into a single PDF")
 
             with (
                 GotenbergClient(
@@ -265,15 +313,7 @@ class MailDocumentParser(DocumentParser):
                 if pdf_a_format is not None:
                     route.pdf_format(pdf_a_format)
 
-                match pdf_layout:
-                    case MailRule.PdfLayout.HTML_TEXT:
-                        route.merge([pdf_of_html_content, mail_pdf_file])
-                    case MailRule.PdfLayout.HTML_ONLY:
-                        route.merge([pdf_of_html_content])
-                    case MailRule.PdfLayout.TEXT_ONLY:
-                        route.merge([mail_pdf_file])
-                    case MailRule.PdfLayout.TEXT_HTML | _:
-                        route.merge([mail_pdf_file, pdf_of_html_content])
+                route.merge(pdfs_to_merge)
 
                 try:
                     response = route.run()

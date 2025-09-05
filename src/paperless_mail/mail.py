@@ -693,11 +693,12 @@ class MailAccountHandler(LoggingMixin):
         tag_ids: list[int] = [tag.id for tag in rule.assign_tags.all()]
         doc_type = rule.assign_document_type
 
+        # Must process attachments first, as .eml processing may use them
         if (
-            rule.consumption_scope == MailRule.ConsumptionScope.EML_ONLY
+            rule.consumption_scope == MailRule.ConsumptionScope.ATTACHMENTS_ONLY
             or rule.consumption_scope == MailRule.ConsumptionScope.EVERYTHING
         ):
-            processed_elements += self._process_eml(
+            processed_elements += self._process_attachments(
                 message,
                 rule,
                 tag_ids,
@@ -705,10 +706,10 @@ class MailAccountHandler(LoggingMixin):
             )
 
         if (
-            rule.consumption_scope == MailRule.ConsumptionScope.ATTACHMENTS_ONLY
+            rule.consumption_scope == MailRule.ConsumptionScope.EML_ONLY
             or rule.consumption_scope == MailRule.ConsumptionScope.EVERYTHING
         ):
-            processed_elements += self._process_attachments(
+            processed_elements += self._process_eml(
                 message,
                 rule,
                 tag_ids,
