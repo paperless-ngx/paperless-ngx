@@ -1,3 +1,4 @@
+import datetime
 import shutil
 import socket
 from datetime import timedelta
@@ -7,6 +8,8 @@ from unittest import mock
 import pytest
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.db import transaction
+from django.test import TestCase
 from django.test import override_settings
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
@@ -15,6 +18,7 @@ from guardian.shortcuts import get_users_with_perms
 from httpx import HTTPError
 from httpx import HTTPStatusError
 from pytest_httpx import HTTPXMock
+from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 
 from documents.signals.handlers import run_workflows
@@ -22,7 +26,6 @@ from documents.signals.handlers import send_webhook
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
-
 
 from documents import tasks
 from documents.data_models import ConsumableDocument
@@ -122,7 +125,7 @@ class TestWorkflows(
             filter_path=f"*/{self.dirs.scratch_dir.parts[-1]}/*",
         )
         action = WorkflowAction.objects.create(
-            assign_title="Doc from {correspondent}",
+            assign_title="Doc from {{correspondent}}",
             assign_correspondent=self.c,
             assign_document_type=self.dt,
             assign_storage_path=self.sp,
@@ -241,7 +244,7 @@ class TestWorkflows(
         )
 
         action = WorkflowAction.objects.create(
-            assign_title="Doc from {correspondent}",
+            assign_title="Doc from {{correspondent}}",
             assign_correspondent=self.c,
             assign_document_type=self.dt,
             assign_storage_path=self.sp,
@@ -892,7 +895,7 @@ class TestWorkflows(
             filter_filename="*sample*",
         )
         action = WorkflowAction.objects.create(
-            assign_title="Doc created in {created_year}",
+            assign_title="Doc created in {{created_year}}",
             assign_correspondent=self.c2,
             assign_document_type=self.dt,
             assign_storage_path=self.sp,
@@ -1155,7 +1158,7 @@ class TestWorkflows(
         WHEN:
             - File that matches is added
         THEN:
-            - Title is not updated, error is output
+            - Title is updated but the placeholder isn't replaced
         """
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
@@ -1181,15 +1184,12 @@ class TestWorkflows(
             created=created,
         )
 
-        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
-            document_consumption_finished.send(
-                sender=self.__class__,
-                document=doc,
-            )
-            expected_str = f"Error occurred parsing title assignment '{action.assign_title}', falling back to original"
-            self.assertIn(expected_str, cm.output[0])
+        document_consumption_finished.send(
+            sender=self.__class__,
+            document=doc,
+        )
 
-        self.assertEqual(doc.title, "sample test")
+        self.assertEqual(doc.title, "Doc {created_year]")
 
     def test_document_updated_workflow(self):
         trigger = WorkflowTrigger.objects.create(
@@ -1222,6 +1222,45 @@ class TestWorkflows(
         )
 
         self.assertEqual(doc.custom_fields.all().count(), 1)
+
+    def test_document_consumption_workflow_month_placeholder_addded(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            sources=f"{DocumentSource.ApiUpload}",
+            filter_filename="simple*",
+        )
+
+        action = WorkflowAction.objects.create(
+            assign_title="Doc added in {{added_month_name_short}}",
+        )
+
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        superuser = User.objects.create_superuser("superuser")
+        self.client.force_authenticate(user=superuser)
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ApiUpload,
+                    original_file=test_file,
+                ),
+                None,
+            )
+            document = Document.objects.first()
+            self.assertRegex(
+                document.title,
+                r"Doc added in \w{3,}",
+            )  # Match any 3-letter month name
 
     def test_document_updated_workflow_existing_custom_field(self):
         """
@@ -2035,7 +2074,7 @@ class TestWorkflows(
             filter_filename="*simple*",
         )
         action = WorkflowAction.objects.create(
-            assign_title="Doc from {correspondent}",
+            assign_title="Doc from {{correspondent}}",
             assign_correspondent=self.c,
             assign_document_type=self.dt,
             assign_storage_path=self.sp,
@@ -2614,7 +2653,7 @@ class TestWorkflows(
         )
         webhook_action = WorkflowActionWebhook.objects.create(
             use_params=False,
-            body="Test message: {doc_url}",
+            body="Test message: {{doc_url}}",
             url="http://paperless-ngx.com",
             include_document=False,
         )
@@ -2673,7 +2712,7 @@ class TestWorkflows(
         )
         webhook_action = WorkflowActionWebhook.objects.create(
             use_params=False,
-            body="Test message: {doc_url}",
+            body="Test message: {{doc_url}}",
             url="http://paperless-ngx.com",
             include_document=True,
         )
@@ -3130,3 +3169,191 @@ class TestWebhookSecurity:
         req = httpx_mock.get_request()
         assert req.headers["Host"] == "paperless-ngx.com"
         assert "evil.test" not in req.headers.get("Host", "")
+
+
+class TestDateWorkflowLocalization(
+    DirectoriesMixin,
+    SampleDirMixin,
+    TestCase,
+):
+    """Test cases for workflows that use date localization in templates."""
+
+    TEST_DATETIME = datetime.datetime(
+        2023,
+        6,
+        26,
+        14,
+        30,
+        5,
+        tzinfo=datetime.timezone.utc,
+    )
+
+    # reset_sequences = True
+    test_cases = [
+        (
+            "Created at {{ created | localize_date('MMMM', 'es_ES') }}",
+            "Created at junio",
+        ),
+        (
+            "Created at {{ created | localize_date('MMMM', 'de_DE') }}",
+            "Created at Juni",  # codespell:ignore
+        ),
+        (
+            "Created at {{ created | localize_date('dd/MM/yyyy', 'en_GB') }}",
+            "Created at 26/06/2023",
+        ),
+    ]
+
+    test_cases_added = [
+        (
+            "Added at {{ added | localize_date('MMMM', 'es_ES') }}",
+            "Added at junio",
+        ),
+        (
+            "Added at {{ added | localize_date('MMMM', 'de_DE') }}",
+            "Added at Juni",  # codespell:ignore
+        ),
+        (
+            "Added at {{ added | localize_date('dd/MM/yyyy', 'en_GB') }}",
+            "Added at 26/06/2023",
+        ),
+    ]
+
+    def test_document_added_workflow_month_placeholder_created_translation(self):
+        """GIVEN:
+            - Document added workflow with title template using localize_date filter
+        WHEN:
+            - Document is consumed
+        THEN:
+            - Document title is set with localized month name
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_filename="*sample*",
+        )
+        for title_template, expected_title in self.test_cases:
+            with transaction.atomic():
+                action = WorkflowAction.objects.create(
+                    assign_title=title_template,
+                )
+                w = Workflow.objects.create(
+                    name="Workflow 1",
+                    order=0,
+                )
+                w.triggers.add(trigger)
+                w.actions.add(action)
+                w.save()
+
+                doc = Document.objects.create(
+                    title="sample test",
+                    correspondent=None,
+                    original_filename="sample.pdf",
+                    created=self.TEST_DATETIME,
+                )
+                document_consumption_finished.send(
+                    sender=self.__class__,
+                    document=doc,
+                )
+                doc.refresh_from_db()
+                assert doc.title == expected_title
+
+                # Roll back this iteration's transaction so DB state is not persisted
+                transaction.set_rollback(True)
+
+    def test_document_updated_workflow_month_placeholder_created_translation(self):
+        self.dt = DocumentType.objects.create(name="DocType Name")
+        self.c = Correspondent.objects.create(name="Correspondent Name")
+
+        client = APIClient()
+        superuser = User.objects.create_superuser("superuser")
+        client.force_authenticate(user=superuser)
+
+        trigger1 = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+            filter_has_document_type=self.dt,
+        )
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+            created=self.TEST_DATETIME,
+        )
+
+        for title_template, expected_title in self.test_cases:
+            with transaction.atomic():
+                action = WorkflowAction.objects.create(
+                    assign_title=title_template,
+                )
+
+                w = Workflow.objects.create(
+                    name="Workflow 1",
+                    order=0,
+                )
+                w.triggers.add(trigger1)
+                w.actions.add(action)
+                w.save()
+
+                client.patch(
+                    f"/api/documents/{doc.id}/",
+                    {"document_type": self.dt.id},
+                    format="json",
+                )
+                doc.refresh_from_db()
+                assert doc.title == expected_title
+
+                # Roll back this iteration's transaction so DB state is not persisted
+                transaction.set_rollback(True)
+        # Log out
+        client.force_authenticate(user=None)
+
+    def test_document_consumption_workflow_month_placeholder_addded_translation(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            sources=f"{DocumentSource.ApiUpload}",
+            filter_filename="simple*",
+        )
+
+        for title_template, expected_title in self.test_cases_added:
+            with transaction.atomic():
+                test_file = shutil.copy(
+                    self.SAMPLE_DIR / "simple.pdf",
+                    self.dirs.scratch_dir / "simple.pdf",
+                )
+
+                action = WorkflowAction.objects.create(
+                    assign_title=title_template,
+                )
+
+                w = Workflow.objects.create(
+                    name="Workflow 1",
+                    order=0,
+                )
+                w.triggers.add(trigger)
+                w.actions.add(action)
+                w.save()
+
+                # Temporarily override "now" for the environment so templates using
+                # added/created placeholders behave as if it's a different system date.
+                with (
+                    mock.patch(
+                        "documents.tasks.ProgressManager",
+                        DummyProgressManager,
+                    ),
+                    mock.patch(
+                        "django.utils.timezone.now",
+                        return_value=self.TEST_DATETIME,
+                    ),
+                ):
+                    tasks.consume_file(
+                        ConsumableDocument(
+                            source=DocumentSource.ApiUpload,
+                            original_file=test_file,
+                        ),
+                        None,
+                    )
+                    document = Document.objects.first()
+                    assert document.title == expected_title
+
+                # Roll back this iteration's transaction so DB state is not persisted
+                transaction.set_rollback(True)
