@@ -41,7 +41,11 @@ def log_reason(
 
 
 def match_correspondents(document: Document, classifier: DocumentClassifier, user=None):
-    pred_id = classifier.predict_correspondent(document.content) if classifier else None
+    pred_id = (
+        classifier.predict_correspondent(document.suggestion_content)
+        if classifier
+        else None
+    )
 
     if user is None and document.owner is not None:
         user = document.owner
@@ -65,8 +69,11 @@ def match_correspondents(document: Document, classifier: DocumentClassifier, use
 
 
 def match_document_types(document: Document, classifier: DocumentClassifier, user=None):
-    pred_id = classifier.predict_document_type(document.content) if classifier else None
-
+    pred_id = (
+        classifier.predict_document_type(document.suggestion_content)
+        if classifier
+        else None
+    )
     if user is None and document.owner is not None:
         user = document.owner
 
@@ -89,7 +96,9 @@ def match_document_types(document: Document, classifier: DocumentClassifier, use
 
 
 def match_tags(document: Document, classifier: DocumentClassifier, user=None):
-    predicted_tag_ids = classifier.predict_tags(document.content) if classifier else []
+    predicted_tag_ids = (
+        classifier.predict_tags(document.suggestion_content) if classifier else []
+    )
 
     if user is None and document.owner is not None:
         user = document.owner
@@ -112,7 +121,11 @@ def match_tags(document: Document, classifier: DocumentClassifier, user=None):
 
 
 def match_storage_paths(document: Document, classifier: DocumentClassifier, user=None):
-    pred_id = classifier.predict_storage_path(document.content) if classifier else None
+    pred_id = (
+        classifier.predict_storage_path(document.suggestion_content)
+        if classifier
+        else None
+    )
 
     if user is None and document.owner is not None:
         user = document.owner
