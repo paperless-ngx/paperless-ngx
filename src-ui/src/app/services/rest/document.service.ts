@@ -172,8 +172,12 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     return url.toString()
   }
 
-  getThumbUrl(id: number): string {
-    return this.getResourceUrl(id, 'thumb')
+  getThumbUrl(id: number, rev: string = null): string {
+    if (rev) {
+      return `${this.getResourceUrl(id, 'thumb')}?v=${rev}`
+    } else {
+      return this.getResourceUrl(id, 'thumb')
+    }
   }
 
   getDownloadUrl(id: number, original: boolean = false): string {
