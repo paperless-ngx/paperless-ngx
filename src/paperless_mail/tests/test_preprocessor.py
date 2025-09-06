@@ -215,14 +215,14 @@ class TestMailMessageGpgDecryptor(TestMail):
         self.mailMocker.assert_queue_consumption_tasks_call_args(
             [
                 [
+                    {"override_title": "file_0", "override_filename": "file_0.pdf"},
+                    {"override_title": "file_1", "override_filename": "file_1.pdf"},
+                ],
+                [
                     {
                         "override_title": message.subject,
                         "override_filename": f"{message.subject}.eml",
                     },
-                ],
-                [
-                    {"override_title": "file_0", "override_filename": "file_0.pdf"},
-                    {"override_title": "file_1", "override_filename": "file_1.pdf"},
                 ],
             ],
         )

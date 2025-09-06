@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 import logging
 from pathlib import Path
 from unittest import mock
@@ -6,11 +7,13 @@ from unittest import mock
 import httpx
 import pytest
 from django.test.html import parse_html
+from django.db.models import Q
 from pytest_django.fixtures import SettingsWrapper
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
 
 from documents.parsers import ParseError
+from documents.models import Document
 from paperless_mail.parsers import MailDocumentParser
 
 
@@ -704,26 +707,149 @@ class TestParser:
             content=b"Pretend merged PDF content",
         )
 
-        def test_layout_option(layout_option, expected_calls, expected_pdf_names):
+        def test_layout_option(layout_option, expected_pdf_names):
+            mock_merge_route.reset_mock()
             mock_mailrule_get.return_value = mock.Mock(pdf_layout=layout_option)
             mail_parser.parse(
                 document_path=html_email_file,
                 mime_type="message/rfc822",
                 mailrule_id=1,
             )
-            args, _ = mock_merge_route.call_args
-            assert len(args[0]) == expected_calls
-            for i, pdf in enumerate(expected_pdf_names):
-                assert args[0][i].name == pdf
+            if len(expected_pdf_names) > 1:
+                args, _ = mock_merge_route.call_args
+                assert [i.name for i in args[0]] == expected_pdf_names
+                assert mail_parser.archive_path.name == "merged.pdf"
+            else:
+                mock_merge_route.assert_not_called()
+                assert mail_parser.archive_path.name == expected_pdf_names[0]
 
         # 1 = MailRule.PdfLayout.TEXT_HTML
-        test_layout_option(1, 2, ["email_as_pdf.pdf", "html.pdf"])
+        test_layout_option(1, ["email_as_pdf.pdf", "html.pdf"])
 
         # 2 = MailRule.PdfLayout.HTML_TEXT
-        test_layout_option(2, 2, ["html.pdf", "email_as_pdf.pdf"])
+        test_layout_option(2, ["html.pdf", "email_as_pdf.pdf"])
 
         # 3 = MailRule.PdfLayout.HTML_ONLY
-        test_layout_option(3, 1, ["html.pdf"])
+        test_layout_option(3, ["html.pdf"])
 
         # 4 = MailRule.PdfLayout.TEXT_ONLY
-        test_layout_option(4, 1, ["email_as_pdf.pdf"])
+        test_layout_option(4, ["email_as_pdf.pdf"])
+
+    @pytest.mark.httpx_mock(can_send_already_matched_responses=True)
+    @mock.patch("gotenberg_client._merge.routes.SyncMergePdfsRoute.merge")
+    @mock.patch("paperless_mail.models.MailRule.objects.get")
+    @mock.patch("documents.models.Document.objects.filter")
+    def test_parse_email_append_attachments(
+        self,
+        mock_document_filter: mock.Mock,
+        mock_mailrule_get: mock.Mock,
+        mock_merge_route: mock.Mock,
+        httpx_mock: HTTPXMock,
+        mail_parser: MailDocumentParser,
+        html_email_file: Path,
+        html_email_pdf_file: Path,
+        merged_pdf_first: Path,
+        merged_pdf_second: Path,
+    ):
+        """
+        GIVEN:
+            - Email message with attachments
+            - Attachments are already processed as documents
+        WHEN:
+            - Email is parsed with different attachment append
+        THEN:
+            - Gotenberg is called with the list of PDFs to merge
+        """
+        httpx_mock.add_response(
+            url="http://localhost:9998/tika/text",
+            method="PUT",
+            json={
+                "Content-Type": "text/html",
+                "X-TIKA:Parsed-By": [],
+                "X-TIKA:content": "This is some Tika HTML text",
+            },
+        )
+        httpx_mock.add_response(
+            url="http://localhost:3000/forms/chromium/convert/html",
+            method="POST",
+            content=html_email_pdf_file.read_bytes(),
+        )
+        httpx_mock.add_response(
+            url="http://localhost:3000/forms/pdfengines/merge",
+            method="POST",
+            content=b"Pretend merged PDF content",
+        )
+
+        mail_message = mail_parser.parse_file_to_message(html_email_file)
+
+        attachment_archives = {
+            "600+kbfile.txt": merged_pdf_second,
+            "IntM6gnXFm00FEV5.png": merged_pdf_first,
+        }
+
+        mail_attachment_all_checksums = [hashlib.md5(a.payload).hexdigest() for a in mail_message.attachments]
+        mail_attachment_all_names = [a.filename for a in mail_message.attachments]
+        mail_attachment_mocks = [
+            mock.Mock(
+                title=f"T[{name}]",
+                original_filename=name,
+                checksum=checksum,
+                mime_type="plain/text",
+                content="attachment content",
+                archive_path=attachment_archives[name],
+            )
+            for name, checksum in zip(mail_attachment_all_names, mail_attachment_all_checksums) if name in attachment_archives
+        ]
+
+        def test_option(attach_option, expected_pdf_names: list[str], expected_merged_content: bytes):
+            mock_document_filter.return_value = mock.Mock(all=lambda: mail_attachment_mocks if len(expected_pdf_names) > 1 else [])
+
+            for m in mail_attachment_mocks:
+                m.reset_mock()
+            mock_merge_route.reset_mock()
+
+            mock_mailrule_get.return_value = mock.Mock(
+                pdf_layout=4, # MailRule.PdfLayout.TEXT_HTML
+                append_attachments=attach_option,
+            )
+
+            mail_parser.parse(
+                document_path=html_email_file,
+                mime_type="message/rfc822",
+                mailrule_id=1,
+            )
+
+            appended_text = "".join(
+                [f"\n\nAttachment({name}): T[{name}] - attachment content" for name in mail_attachment_all_names if name in attachment_archives],
+            )
+
+            if len(expected_pdf_names) > 1 or attach_option == 2:
+                mock_document_filter.assert_called_with(Q(checksum__in=mail_attachment_all_checksums))
+            else:
+                mock_document_filter.assert_not_called()
+
+            if len(expected_pdf_names) > 1:
+                assert appended_text in mail_parser.text
+                args, _ = mock_merge_route.call_args
+                assert [i.name for i in args[0]] == expected_pdf_names
+                assert mail_parser.archive_path.name == "merged.pdf"
+            else:
+                assert appended_text not in mail_parser.text
+                mock_merge_route.assert_not_called() # no merge, only the email PDF
+                assert mail_parser.archive_path.name == expected_pdf_names[0]
+
+            assert expected_merged_content == mail_parser.archive_path.read_bytes()
+
+        html_conversion_content = html_email_pdf_file.read_bytes()
+
+        # MailRule.AttachmentAppending.DEFAULT
+        test_option(0, ["email_as_pdf.pdf"], html_conversion_content)
+
+        # MailRule.AttachmentAppending.DISABLED
+        test_option(1, ["email_as_pdf.pdf"], html_conversion_content)
+
+        # MailRule.AttachmentAppending.APPEND_EXISTING
+        test_option(2, ["email_as_pdf.pdf", merged_pdf_first.name, merged_pdf_second.name], b"Pretend merged PDF content")
+
+        # MailRule.AttachmentAppending.APPEND_EXISTING without a matching document
+        test_option(2, ["email_as_pdf.pdf"], html_conversion_content)

@@ -621,6 +621,41 @@ class TestMail(
             ],
         )
 
+    def test_handle_full_message(self):
+        message = self.mailMocker.messageBuilder.create_message(
+            subject="the message title",
+            from_="Myself",
+            attachments=2,
+            body="Test mail",
+        )
+
+        account = MailAccount.objects.create()
+        rule = MailRule(
+            assign_title_from=MailRule.TitleSource.FROM_FILENAME,
+            consumption_scope=MailRule.ConsumptionScope.EVERYTHING,
+            account=account,
+        )
+        rule.save()
+
+        result = self.mail_account_handler._handle_message(message, rule)
+        self.assertEqual(result, 3)
+        self.mailMocker.assert_queue_consumption_tasks_call_args(
+            [
+                # attachments are processed first
+                [
+                    {"override_title": "file_0", "override_filename": "file_0.pdf"},
+                    {"override_title": "file_1", "override_filename": "file_1.pdf"},
+                ],
+                # eml is processed last, to allow referencing attachments
+                [
+                    {
+                        "override_title": message.subject,
+                        "override_filename": f"{message.subject}.eml",
+                    },
+                ],
+            ],
+        )
+
     def test_filename_filter(self):
         """
         GIVEN:
