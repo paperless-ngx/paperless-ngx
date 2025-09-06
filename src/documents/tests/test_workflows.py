@@ -2,14 +2,13 @@ import datetime
 import shutil
 import socket
 from datetime import timedelta
+from pathlib import Path
 from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
-from django.db import transaction
-from django.test import TestCase
 from django.test import override_settings
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
@@ -26,6 +25,7 @@ from documents.signals.handlers import send_webhook
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
+from pytest_django.fixtures import SettingsWrapper
 
 from documents import tasks
 from documents.data_models import ConsumableDocument
@@ -3171,10 +3171,9 @@ class TestWebhookSecurity:
         assert "evil.test" not in req.headers.get("Host", "")
 
 
+@pytest.mark.django_db
 class TestDateWorkflowLocalization(
-    DirectoriesMixin,
     SampleDirMixin,
-    TestCase,
 ):
     """Test cases for workflows that use date localization in templates."""
 
@@ -3188,172 +3187,216 @@ class TestDateWorkflowLocalization(
         tzinfo=datetime.timezone.utc,
     )
 
-    # reset_sequences = True
-    test_cases = [
-        (
-            "Created at {{ created | localize_date('MMMM', 'es_ES') }}",
-            "Created at junio",
-        ),
-        (
-            "Created at {{ created | localize_date('MMMM', 'de_DE') }}",
-            "Created at Juni",  # codespell:ignore
-        ),
-        (
-            "Created at {{ created | localize_date('dd/MM/yyyy', 'en_GB') }}",
-            "Created at 26/06/2023",
-        ),
-    ]
-
-    test_cases_added = [
-        (
-            "Added at {{ added | localize_date('MMMM', 'es_ES') }}",
-            "Added at junio",
-        ),
-        (
-            "Added at {{ added | localize_date('MMMM', 'de_DE') }}",
-            "Added at Juni",  # codespell:ignore
-        ),
-        (
-            "Added at {{ added | localize_date('dd/MM/yyyy', 'en_GB') }}",
-            "Added at 26/06/2023",
-        ),
-    ]
-
-    def test_document_added_workflow_month_placeholder_created_translation(self):
-        """GIVEN:
+    @pytest.mark.parametrize(
+        "title_template,expected_title",
+        [
+            pytest.param(
+                "Created at {{ created | localize_date('MMMM', 'es_ES') }}",
+                "Created at junio",
+                id="spanish_month",
+            ),
+            pytest.param(
+                "Created at {{ created | localize_date('MMMM', 'de_DE') }}",
+                "Created at Juni",  # codespell:ignore
+                id="german_month",
+            ),
+            pytest.param(
+                "Created at {{ created | localize_date('dd/MM/yyyy', 'en_GB') }}",
+                "Created at 26/06/2023",
+                id="british_date_format",
+            ),
+        ],
+    )
+    def test_document_added_workflow_localization(
+        self,
+        title_template: str,
+        expected_title: str,
+    ):
+        """
+        GIVEN:
             - Document added workflow with title template using localize_date filter
         WHEN:
             - Document is consumed
         THEN:
-            - Document title is set with localized month name
+            - Document title is set with localized date
         """
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
             filter_filename="*sample*",
         )
-        for title_template, expected_title in self.test_cases:
-            with transaction.atomic():
-                action = WorkflowAction.objects.create(
-                    assign_title=title_template,
-                )
-                w = Workflow.objects.create(
-                    name="Workflow 1",
-                    order=0,
-                )
-                w.triggers.add(trigger)
-                w.actions.add(action)
-                w.save()
 
-                doc = Document.objects.create(
-                    title="sample test",
-                    correspondent=None,
-                    original_filename="sample.pdf",
-                    created=self.TEST_DATETIME,
-                )
-                document_consumption_finished.send(
-                    sender=self.__class__,
-                    document=doc,
-                )
-                doc.refresh_from_db()
-                assert doc.title == expected_title
+        action = WorkflowAction.objects.create(
+            assign_title=title_template,
+        )
 
-                # Roll back this iteration's transaction so DB state is not persisted
-                transaction.set_rollback(True)
+        workflow = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        workflow.save()
 
-    def test_document_updated_workflow_month_placeholder_created_translation(self):
-        self.dt = DocumentType.objects.create(name="DocType Name")
-        self.c = Correspondent.objects.create(name="Correspondent Name")
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=None,
+            original_filename="sample.pdf",
+            created=self.TEST_DATETIME,
+        )
+
+        document_consumption_finished.send(
+            sender=self.__class__,
+            document=doc,
+        )
+
+        doc.refresh_from_db()
+        assert doc.title == expected_title
+
+    @pytest.mark.parametrize(
+        "title_template,expected_title",
+        [
+            pytest.param(
+                "Created at {{ created | localize_date('MMMM', 'es_ES') }}",
+                "Created at junio",
+                id="spanish_month",
+            ),
+            pytest.param(
+                "Created at {{ created | localize_date('MMMM', 'de_DE') }}",
+                "Created at Juni",  # codespell:ignore
+                id="german_month",
+            ),
+            pytest.param(
+                "Created at {{ created | localize_date('dd/MM/yyyy', 'en_GB') }}",
+                "Created at 26/06/2023",
+                id="british_date_format",
+            ),
+        ],
+    )
+    def test_document_updated_workflow_localization(
+        self,
+        title_template: str,
+        expected_title: str,
+    ):
+        """
+        GIVEN:
+            - Document updated workflow with title template using localize_date filter
+        WHEN:
+            - Document is updated via API
+        THEN:
+            - Document title is set with localized date
+        """
+        # Setup test data
+        dt = DocumentType.objects.create(name="DocType Name")
+        c = Correspondent.objects.create(name="Correspondent Name")
 
         client = APIClient()
         superuser = User.objects.create_superuser("superuser")
         client.force_authenticate(user=superuser)
 
-        trigger1 = WorkflowTrigger.objects.create(
+        trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
-            filter_has_document_type=self.dt,
+            filter_has_document_type=dt,
         )
 
         doc = Document.objects.create(
             title="sample test",
-            correspondent=self.c,
+            correspondent=c,
             original_filename="sample.pdf",
             created=self.TEST_DATETIME,
         )
 
-        for title_template, expected_title in self.test_cases:
-            with transaction.atomic():
-                action = WorkflowAction.objects.create(
-                    assign_title=title_template,
-                )
+        action = WorkflowAction.objects.create(
+            assign_title=title_template,
+        )
 
-                w = Workflow.objects.create(
-                    name="Workflow 1",
-                    order=0,
-                )
-                w.triggers.add(trigger1)
-                w.actions.add(action)
-                w.save()
+        workflow = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        workflow.save()
 
-                client.patch(
-                    f"/api/documents/{doc.id}/",
-                    {"document_type": self.dt.id},
-                    format="json",
-                )
-                doc.refresh_from_db()
-                assert doc.title == expected_title
+        client.patch(
+            f"/api/documents/{doc.id}/",
+            {"document_type": dt.id},
+            format="json",
+        )
 
-                # Roll back this iteration's transaction so DB state is not persisted
-                transaction.set_rollback(True)
-        # Log out
-        client.force_authenticate(user=None)
+        doc.refresh_from_db()
+        assert doc.title == expected_title
 
-    def test_document_consumption_workflow_month_placeholder_addded_translation(self):
+    @pytest.mark.parametrize(
+        "title_template,expected_title",
+        [
+            pytest.param(
+                "Added at {{ added | localize_date('MMMM', 'es_ES') }}",
+                "Added at junio",
+                id="spanish_month",
+            ),
+            pytest.param(
+                "Added at {{ added | localize_date('MMMM', 'de_DE') }}",
+                "Added at Juni",  # codespell:ignore
+                id="german_month",
+            ),
+            pytest.param(
+                "Added at {{ added | localize_date('dd/MM/yyyy', 'en_GB') }}",
+                "Added at 26/06/2023",
+                id="british_date_format",
+            ),
+        ],
+    )
+    def test_document_consumption_workflow_localization(
+        self,
+        tmp_path: Path,
+        settings: SettingsWrapper,
+        title_template: str,
+        expected_title: str,
+    ):
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
             sources=f"{DocumentSource.ApiUpload}",
             filter_filename="simple*",
         )
 
-        for title_template, expected_title in self.test_cases_added:
-            with transaction.atomic():
-                test_file = shutil.copy(
-                    self.SAMPLE_DIR / "simple.pdf",
-                    self.dirs.scratch_dir / "simple.pdf",
-                )
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            tmp_path / "simple.pdf",
+        )
 
-                action = WorkflowAction.objects.create(
-                    assign_title=title_template,
-                )
+        action = WorkflowAction.objects.create(
+            assign_title=title_template,
+        )
 
-                w = Workflow.objects.create(
-                    name="Workflow 1",
-                    order=0,
-                )
-                w.triggers.add(trigger)
-                w.actions.add(action)
-                w.save()
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
 
-                # Temporarily override "now" for the environment so templates using
-                # added/created placeholders behave as if it's a different system date.
-                with (
-                    mock.patch(
-                        "documents.tasks.ProgressManager",
-                        DummyProgressManager,
-                    ),
-                    mock.patch(
-                        "django.utils.timezone.now",
-                        return_value=self.TEST_DATETIME,
-                    ),
-                ):
-                    tasks.consume_file(
-                        ConsumableDocument(
-                            source=DocumentSource.ApiUpload,
-                            original_file=test_file,
-                        ),
-                        None,
-                    )
-                    document = Document.objects.first()
-                    assert document.title == expected_title
+        settings.SCRATCH_DIR = tmp_path / "scratch"
+        (tmp_path / "scratch").mkdir(parents=True, exist_ok=True)
 
-                # Roll back this iteration's transaction so DB state is not persisted
-                transaction.set_rollback(True)
+        # Temporarily override "now" for the environment so templates using
+        # added/created placeholders behave as if it's a different system date.
+        with (
+            mock.patch(
+                "documents.tasks.ProgressManager",
+                DummyProgressManager,
+            ),
+            mock.patch(
+                "django.utils.timezone.now",
+                return_value=self.TEST_DATETIME,
+            ),
+        ):
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ApiUpload,
+                    original_file=test_file,
+                ),
+                None,
+            )
+            document = Document.objects.first()
+            assert document.title == expected_title
