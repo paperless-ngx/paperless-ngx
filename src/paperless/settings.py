@@ -1160,6 +1160,8 @@ EMAIL_PARSE_DEFAULT_LAYOUT = __get_int(
     1,  # MailRule.PdfLayout.TEXT_HTML but that can't be imported here
 )
 
+EMAIL_PARSE_APPEND_ATTACHMENTS = __get_boolean("PAPERLESS_EMAIL_PARSE_APPEND_ATTACHMENTS", "false")
+
 # Pre-2.x versions of Paperless stored your documents locally with GPG
 # encryption, but that is no longer the default.  This behaviour is still
 # available, but it must be explicitly enabled by setting

@@ -115,6 +115,11 @@ class MailRule(document_models.ModelWithOwner):
         ATTACHMENTS_ONLY = 1, _("Only process attachments.")
         EVERYTHING = 2, _("Process all files, including 'inline' attachments.")
 
+    class AttachmentAppending(models.IntegerChoices):
+        DEFAULT = 0, _("System default")
+        DISABLED = 1, _("Do not append attachments.")
+        APPEND_EXISTING = 2, _("Append processed attachments.")
+
     class PdfLayout(models.IntegerChoices):
         DEFAULT = 0, _("System default")
         TEXT_HTML = 1, _("Text, then HTML")
@@ -229,6 +234,13 @@ class MailRule(document_models.ModelWithOwner):
             "Inline attachments include embedded images, so it's best "
             "to combine this option with a filename filter.",
         ),
+    )
+
+    append_attachments = models.PositiveIntegerField(
+        _("append attachments"),
+        choices=AttachmentAppending.choices,
+        default=AttachmentAppending.DEFAULT,
+        help_text=_("Append processed attachments of the email to the email document."),
     )
 
     consumption_scope = models.PositiveIntegerField(

@@ -145,7 +145,7 @@ class MailDocumentParser(DocumentParser):
             text = re.sub(r"(\n *)+", "\n", text)
             return text.strip()
 
-        def build_formatted_text(mail_message: MailMessage, attached_docs: list[Document] | None) -> str:
+        def build_formatted_text(mail_message: MailMessage, docs_to_append: list[Document] | None) -> str:
             """
             Constructs a formatted string, based on the given email.  Basically tries
             to get most of the email content, included front matter, into a nice string
@@ -176,7 +176,7 @@ class MailDocumentParser(DocumentParser):
 
             fmt_text += f"\n\n{strip_text(mail.text)}"
 
-            for doc in attached_docs or []:
+            for doc in docs_to_append or []:
                 fmt_text += f"\n\nAttachment({doc.original_filename}): {doc.title} - {strip_text(doc.content)}"
 
             return fmt_text
@@ -192,14 +192,18 @@ class MailDocumentParser(DocumentParser):
 
         self.log.debug(f"Applying mail rule, if any (mailrule_id={mailrule_id})")
         rule = None
-        attached_docs = []
         if mailrule_id:
             rule = MailRule.objects.get(pk=mailrule_id)
-            # todo: extend rule to toggle attachment processing
-            attached_docs = find_processed_attachments(mail)
+
+        self.log.debug("Finding processed attachments, if enabled")
+        append_attachments = settings.EMAIL_PARSE_APPEND_ATTACHMENTS
+        if rule and rule.append_attachments != MailRule.AttachmentAppending.DEFAULT:
+            append_attachments = (rule.append_attachments == MailRule.AttachmentAppending.APPEND_EXISTING)
+
+        docs_to_append = find_processed_attachments(mail) if append_attachments else []
 
         self.log.debug("Building formatted text from email")
-        self.text = build_formatted_text(mail, attached_docs)
+        self.text = build_formatted_text(mail, docs_to_append)
 
         if is_naive(mail.date):
             self.date = make_aware(mail.date)
@@ -208,7 +212,7 @@ class MailDocumentParser(DocumentParser):
 
         self.log.debug("Creating a PDF from the email")
         pdf_layout = MailRule.PdfLayout(rule.pdf_layout) if rule else None
-        self.archive_path = self.generate_pdf(mail, attached_docs=attached_docs, pdf_layout=pdf_layout)
+        self.archive_path = self.generate_pdf(mail, docs_to_append=docs_to_append, pdf_layout=pdf_layout)
 
     @staticmethod
     def parse_file_to_message(filepath: Path) -> MailMessage:
@@ -249,7 +253,7 @@ class MailDocumentParser(DocumentParser):
         self,
         mail_message: MailMessage,
         pdf_layout: MailRule.PdfLayout | None = None,
-        attached_docs: list[Document] | None = None,
+        docs_to_append: list[Document] | None = None,
     ) -> Path:
         archive_path = Path(self.tempdir) / "merged.pdf"
 
@@ -269,7 +273,7 @@ class MailDocumentParser(DocumentParser):
 
         # Render TEXT part of the email including headers, if required
         pdf_of_mail = None
-        if not pdf_of_html_content or pdf_layout != MailRule.PdfLayout.HTML_ONLY:
+        if pdf_layout != MailRule.PdfLayout.HTML_ONLY or not pdf_of_html_content:
             pdf_of_mail = self.generate_pdf_from_mail(mail_message)
 
         # Apply pdf layout
@@ -288,8 +292,8 @@ class MailDocumentParser(DocumentParser):
         assert pdfs_to_merge, "At least one PDF should be generated from the email"
 
         # Append already processed attachments, if any and requested
-        if attached_docs:
-            for doc in attached_docs:
+        if docs_to_append:
+            for doc in docs_to_append:
                 if doc.mime_type == "application/pdf":
                     pdfs_to_merge.append(doc.source_path) # directly use source path for PDFs
                 elif path := doc.archive_path:
@@ -297,7 +301,7 @@ class MailDocumentParser(DocumentParser):
 
         # If we have only a single PDF, just use it. Otherwise, we merge all PDFs with Gotenberg
         if len(pdfs_to_merge) == 1:
-            archive_path.write_bytes(pdfs_to_merge[0].read_bytes())
+            archive_path = pdfs_to_merge[0]
         else:
             self.log.debug(f"Merging {', '.join(str(p) for p in pdfs_to_merge)} into a single PDF")
 

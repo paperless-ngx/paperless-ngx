@@ -264,6 +264,16 @@ rules can specify this setting, thus this fallback is used for the default selec
     - `3` = HTML only
     - `4` = Text only
 
+#### [`EMAIL_PARSE_APPEND_ATTACHMENTS=<bool>`](#EMAIL_PARSE_APPEND_ATTACHMENTS) {#EMAIL_PARSE_APPEND_ATTACHMENTS}
+
+: The default value of whether to append all processed attachments to the PDF and text content generated from emails that are consumed as documents.
+When enabled, email preview and text index will include selected attachments in the order they appear inside the email.
+This only has an effect when both attachments and the email are processed as individual documents.
+
+If you remove documents created from attachments after the email was processed, reprocessing the email will yield different results, as this feature relies on attachments being present as documents while creating the document for the `.eml` file.
+
+    Defaults to `false`.
+
 ## Paths and folders
 
 #### [`PAPERLESS_CONSUMPTION_DIR=<path>`](#PAPERLESS_CONSUMPTION_DIR) {#PAPERLESS_CONSUMPTION_DIR}
