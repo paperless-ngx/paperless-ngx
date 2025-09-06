@@ -54,6 +54,7 @@ from documents.sanity_checker import SanityCheckFailedException
 from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
+from documents.split_pages import SplitPagesPlugin
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -148,6 +149,7 @@ def consume_file(
     plugins: list[type[ConsumeTaskPlugin]] = [
         ConsumerPreflightPlugin,
         CollatePlugin,
+        SplitPagesPlugin,
         BarcodePlugin,
         WorkflowTriggerPlugin,
         ConsumerPlugin,
