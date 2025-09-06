@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-31 22:24+0000\n"
-"PO-Revision-Date: 2025-08-31 22:25\n"
+"PO-Revision-Date: 2025-09-05 00:33\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -27,11 +27,11 @@ msgstr "La valeur doit être un JSON valide."
 
 #: documents/filters.py:403
 msgid "Invalid custom field query expression"
-msgstr "Requête sur un champ personnalisé invalide"
+msgstr "Expression de requête personnalisée invalide"
 
 #: documents/filters.py:413
 msgid "Invalid expression list. Must be nonempty."
-msgstr "Liste d'expressions invalide. Doit être non vide."
+msgstr "Liste d’expressions invalide. Doit être non vide."
 
 #: documents/filters.py:434
 msgid "Invalid logical operator {op!r}"
@@ -470,7 +470,7 @@ msgstr "n'a pas de correspondant dans"
 
 #: documents/models.py:478
 msgid "has document type in"
-msgstr "A un type de document en"
+msgstr "a un type de document en"
 
 #: documents/models.py:479
 msgid "does not have document type in"
@@ -502,7 +502,7 @@ msgstr "N'aie pas de propriétaire dans"
 
 #: documents/models.py:486
 msgid "has custom field value"
-msgstr "A valeur d'un champ personnalisé"
+msgstr "a une valeur de champ personnalisé"
 
 #: documents/models.py:487
 msgid "is shared by me"
@@ -518,11 +518,11 @@ msgstr "A un champ personnalisé dans"
 
 #: documents/models.py:490
 msgid "does not have custom field in"
-msgstr "N'aie pas de champ personnalisé dans"
+msgstr "n'a pas de champ personnalisé dans"
 
 #: documents/models.py:491
 msgid "does not have custom field"
-msgstr "N'aie pas de champ personnalisé"
+msgstr "n'a pas de champ personnalisé"
 
 #: documents/models.py:492
 msgid "custom fields query"
@@ -530,7 +530,7 @@ msgstr "champs personnalisés de requête"
 
 #: documents/models.py:493
 msgid "created to"
-msgstr "créé de"
+msgstr "créé vers"
 
 #: documents/models.py:494
 msgid "created from"
@@ -546,7 +546,7 @@ msgstr "ajouté depuis"
 
 #: documents/models.py:497
 msgid "mime type is"
-msgstr "type mime est"
+msgstr "le type mime est"
 
 #: documents/models.py:507
 msgid "rule type"
@@ -602,7 +602,7 @@ msgstr "Identifiant Celery pour la tâche qui a été exécutée"
 
 #: documents/models.py:556
 msgid "Acknowledged"
-msgstr "Confirmer"
+msgstr "Confirmé"
 
 #: documents/models.py:557
 msgid "If the task is acknowledged via the frontend or API"
@@ -622,7 +622,7 @@ msgstr "Nom de la tâche"
 
 #: documents/models.py:572
 msgid "Name of the task that was run"
-msgstr "Nom de la tâche qui a été exécuté"
+msgstr "Nom de la tâche qui a été exécutée"
 
 #: documents/models.py:579
 msgid "Task State"
@@ -670,7 +670,7 @@ msgstr "Type de tâche"
 
 #: documents/models.py:618
 msgid "The type of task that was run"
-msgstr "Type de tâche qui a été exécuté"
+msgstr "Le type de tâche qui a été exécutée"
 
 #: documents/models.py:629
 msgid "Note for the document"
