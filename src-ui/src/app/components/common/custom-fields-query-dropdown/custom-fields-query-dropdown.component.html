@@ -51,7 +51,6 @@
     <ng-select #fieldSelects
       class="paperless-input-select rounded-end"
       [items]="getSelectOptionsForField(atom.field)"
-      [virtualScroll]="getSelectOptionsForField(atom.field)?.length > 100"
       bindLabel="label"
       bindValue="id"
       [(ngModel)]="atom.value"
