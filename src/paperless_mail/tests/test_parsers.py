@@ -6,14 +6,13 @@ from unittest import mock
 
 import httpx
 import pytest
-from django.test.html import parse_html
 from django.db.models import Q
+from django.test.html import parse_html
 from pytest_django.fixtures import SettingsWrapper
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
 
 from documents.parsers import ParseError
-from documents.models import Document
 from paperless_mail.parsers import MailDocumentParser
 
 
@@ -787,7 +786,9 @@ class TestParser:
             "IntM6gnXFm00FEV5.png": merged_pdf_first,
         }
 
-        mail_attachment_all_checksums = [hashlib.md5(a.payload).hexdigest() for a in mail_message.attachments]
+        mail_attachment_all_checksums = [
+            hashlib.md5(a.payload).hexdigest() for a in mail_message.attachments
+        ]
         mail_attachment_all_names = [a.filename for a in mail_message.attachments]
         mail_attachment_mocks = [
             mock.Mock(
@@ -798,18 +799,30 @@ class TestParser:
                 content="attachment content",
                 archive_path=attachment_archives[name],
             )
-            for name, checksum in zip(mail_attachment_all_names, mail_attachment_all_checksums) if name in attachment_archives
+            for name, checksum in zip(
+                mail_attachment_all_names,
+                mail_attachment_all_checksums,
+            )
+            if name in attachment_archives
         ]
 
-        def test_option(attach_option, expected_pdf_names: list[str], expected_merged_content: bytes):
-            mock_document_filter.return_value = mock.Mock(all=lambda: mail_attachment_mocks if len(expected_pdf_names) > 1 else [])
+        def test_option(
+            attach_option,
+            expected_pdf_names: list[str],
+            expected_merged_content: bytes,
+        ):
+            mock_document_filter.return_value = mock.Mock(
+                all=lambda: mail_attachment_mocks
+                if len(expected_pdf_names) > 1
+                else [],
+            )
 
             for m in mail_attachment_mocks:
                 m.reset_mock()
             mock_merge_route.reset_mock()
 
             mock_mailrule_get.return_value = mock.Mock(
-                pdf_layout=4, # MailRule.PdfLayout.TEXT_HTML
+                pdf_layout=4,  # MailRule.PdfLayout.TEXT_HTML
                 append_attachments=attach_option,
             )
 
@@ -820,11 +833,17 @@ class TestParser:
             )
 
             appended_text = "".join(
-                [f"\n\nAttachment({name}): T[{name}] - attachment content" for name in mail_attachment_all_names if name in attachment_archives],
+                [
+                    f"\n\nAttachment({name}): T[{name}] - attachment content"
+                    for name in mail_attachment_all_names
+                    if name in attachment_archives
+                ],
             )
 
             if len(expected_pdf_names) > 1 or attach_option == 2:
-                mock_document_filter.assert_called_with(Q(checksum__in=mail_attachment_all_checksums))
+                mock_document_filter.assert_called_with(
+                    Q(checksum__in=mail_attachment_all_checksums),
+                )
             else:
                 mock_document_filter.assert_not_called()
 
@@ -835,7 +854,7 @@ class TestParser:
                 assert mail_parser.archive_path.name == "merged.pdf"
             else:
                 assert appended_text not in mail_parser.text
-                mock_merge_route.assert_not_called() # no merge, only the email PDF
+                mock_merge_route.assert_not_called()  # no merge, only the email PDF
                 assert mail_parser.archive_path.name == expected_pdf_names[0]
 
             assert expected_merged_content == mail_parser.archive_path.read_bytes()
@@ -849,7 +868,11 @@ class TestParser:
         test_option(1, ["email_as_pdf.pdf"], html_conversion_content)
 
         # MailRule.AttachmentAppending.APPEND_EXISTING
-        test_option(2, ["email_as_pdf.pdf", merged_pdf_first.name, merged_pdf_second.name], b"Pretend merged PDF content")
+        test_option(
+            2,
+            ["email_as_pdf.pdf", merged_pdf_first.name, merged_pdf_second.name],
+            b"Pretend merged PDF content",
+        )
 
         # MailRule.AttachmentAppending.APPEND_EXISTING without a matching document
         test_option(2, ["email_as_pdf.pdf"], html_conversion_content)

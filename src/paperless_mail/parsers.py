@@ -20,10 +20,10 @@ from imap_tools import MailAttachment
 from imap_tools import MailMessage
 from tika_client import TikaClient
 
+from documents.models import Document
 from documents.parsers import DocumentParser
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
-from documents.models import Document
 from paperless.models import OutputTypeChoices
 from paperless_mail.models import MailRule
 
@@ -145,7 +145,10 @@ class MailDocumentParser(DocumentParser):
             text = re.sub(r"(\n *)+", "\n", text)
             return text.strip()
 
-        def build_formatted_text(mail_message: MailMessage, docs_to_append: list[Document] | None) -> str:
+        def build_formatted_text(
+            mail_message: MailMessage,
+            docs_to_append: list[Document] | None,
+        ) -> str:
             """
             Constructs a formatted string, based on the given email.  Basically tries
             to get most of the email content, included front matter, into a nice string
@@ -182,10 +185,16 @@ class MailDocumentParser(DocumentParser):
             return fmt_text
 
         def find_processed_attachments(mail_message: MailMessage) -> list[Document]:
-            checksums = [md5(item.payload).hexdigest() for item in mail_message.attachments if item.payload]
+            checksums = [
+                md5(item.payload).hexdigest()
+                for item in mail_message.attachments
+                if item.payload
+            ]
             docs = Document.objects.filter(Q(checksum__in=checksums)).all()
             docs = {doc.checksum: doc for doc in docs}
-            return [docs[cs] for cs in checksums if cs in docs] # preserve order of attachments in mail
+            return [
+                docs[cs] for cs in checksums if cs in docs
+            ]  # preserve order of attachments in mail
 
         self.log.debug(f"Parsing file {document_path.name} into an email")
         mail = self.parse_file_to_message(document_path)
@@ -198,7 +207,9 @@ class MailDocumentParser(DocumentParser):
         self.log.debug("Finding processed attachments, if enabled")
         append_attachments = settings.EMAIL_PARSE_APPEND_ATTACHMENTS
         if rule and rule.append_attachments != MailRule.AttachmentAppending.DEFAULT:
-            append_attachments = (rule.append_attachments == MailRule.AttachmentAppending.APPEND_EXISTING)
+            append_attachments = (
+                rule.append_attachments == MailRule.AttachmentAppending.APPEND_EXISTING
+            )
 
         docs_to_append = find_processed_attachments(mail) if append_attachments else []
 
@@ -212,7 +223,11 @@ class MailDocumentParser(DocumentParser):
 
         self.log.debug("Creating a PDF from the email")
         pdf_layout = MailRule.PdfLayout(rule.pdf_layout) if rule else None
-        self.archive_path = self.generate_pdf(mail, docs_to_append=docs_to_append, pdf_layout=pdf_layout)
+        self.archive_path = self.generate_pdf(
+            mail,
+            docs_to_append=docs_to_append,
+            pdf_layout=pdf_layout,
+        )
 
     @staticmethod
     def parse_file_to_message(filepath: Path) -> MailMessage:
@@ -261,7 +276,7 @@ class MailDocumentParser(DocumentParser):
             pdf_layout or settings.EMAIL_PARSE_DEFAULT_LAYOUT
         )  # EMAIL_PARSE_DEFAULT_LAYOUT is a MailRule.PdfLayout
 
-        pdfs_to_merge = [] # type: list[Path]
+        pdfs_to_merge = []  # type: list[Path]
 
         # Render HTML part of the email, if any and required
         pdf_of_html_content = None
@@ -295,7 +310,7 @@ class MailDocumentParser(DocumentParser):
         if docs_to_append:
             for doc in docs_to_append:
                 if doc.mime_type == "application/pdf":
-                    pdfs_to_merge.append(doc.source_path) # directly use source path for PDFs
+                    pdfs_to_merge.append(doc.source_path)
                 elif path := doc.archive_path:
                     pdfs_to_merge.append(path)
 
@@ -303,7 +318,9 @@ class MailDocumentParser(DocumentParser):
         if len(pdfs_to_merge) == 1:
             archive_path = pdfs_to_merge[0]
         else:
-            self.log.debug(f"Merging {', '.join(str(p) for p in pdfs_to_merge)} into a single PDF")
+            self.log.debug(
+                f"Merging {', '.join(str(p) for p in pdfs_to_merge)} into a single PDF",
+            )
 
             with (
                 GotenbergClient(
