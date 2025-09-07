@@ -5,7 +5,7 @@
       <trans-unit id="ngb.alert.close" datatype="html">
         <source>Close</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/alert/alert.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/alert/alert.ts</context>
           <context context-type="linenumber">50</context>
         </context-group>
         <target state="translated">Tutup</target>
@@ -13,16 +13,16 @@
       <trans-unit id="ngb.carousel.slide-number" datatype="html">
         <source> Slide <x id="INTERPOLATION" equiv-text="ueryList&lt;NgbSli"/> of <x id="INTERPOLATION_1" equiv-text="EventSource = N"/> </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/carousel/carousel.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/carousel/carousel.ts</context>
           <context context-type="linenumber">131,135</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="needs-translation"> Slide <x id="INTERPOLATION" equiv-text="ueryList&lt;NgbSli"/> of <x id="INTERPOLATION_1" equiv-text="EventSource = N"/> </target>
+        <target state="translated"> Slide <x id="INTERPOLATION" equiv-text="ueryList&lt;NgbSli"/>dari <x id="INTERPOLATION_1" equiv-text="EventSource = N"/> </target>
       </trans-unit>
       <trans-unit id="ngb.carousel.previous" datatype="html">
         <source>Previous</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/carousel/carousel.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/carousel/carousel.ts</context>
           <context context-type="linenumber">157,159</context>
         </context-group>
         <target state="translated">Sebelumnya</target>
@@ -30,7 +30,7 @@
       <trans-unit id="ngb.carousel.next" datatype="html">
         <source>Next</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/carousel/carousel.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/carousel/carousel.ts</context>
           <context context-type="linenumber">198</context>
         </context-group>
         <target state="translated">Selanjutnya</target>
@@ -38,11 +38,11 @@
       <trans-unit id="ngb.datepicker.previous-month" datatype="html">
         <source>Previous month</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">83,85</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">112</context>
         </context-group>
         <target state="translated">Bulan sebelumnya</target>
@@ -50,11 +50,11 @@
       <trans-unit id="ngb.datepicker.next-month" datatype="html">
         <source>Next month</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">112</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">112</context>
         </context-group>
         <target state="translated">Bulan depan</target>
@@ -62,7 +62,7 @@
       <trans-unit id="ngb.timepicker.HH" datatype="html">
         <source>HH</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">HH</target>
@@ -70,7 +70,7 @@
       <trans-unit id="ngb.toast.close-aria" datatype="html">
         <source>Close</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Tutup</target>
@@ -78,11 +78,11 @@
       <trans-unit id="ngb.datepicker.select-month" datatype="html">
         <source>Select month</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Pilih bulan</target>
@@ -90,7 +90,7 @@
       <trans-unit id="ngb.pagination.first" datatype="html">
         <source>««</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">««</target>
@@ -98,7 +98,7 @@
       <trans-unit id="ngb.timepicker.hours" datatype="html">
         <source>Hours</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Jam</target>
@@ -106,7 +106,7 @@
       <trans-unit id="ngb.pagination.previous" datatype="html">
         <source>«</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">«</target>
@@ -114,7 +114,7 @@
       <trans-unit id="ngb.timepicker.MM" datatype="html">
         <source>MM</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">MM</target>
@@ -122,7 +122,7 @@
       <trans-unit id="ngb.pagination.next" datatype="html">
         <source>»</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">»</target>
@@ -130,11 +130,11 @@
       <trans-unit id="ngb.datepicker.select-year" datatype="html">
         <source>Select year</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Pilih tahun</target>
@@ -142,7 +142,7 @@
       <trans-unit id="ngb.timepicker.minutes" datatype="html">
         <source>Minutes</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Menit</target>
@@ -150,7 +150,7 @@
       <trans-unit id="ngb.pagination.last" datatype="html">
         <source>»»</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">»»</target>
@@ -158,7 +158,7 @@
       <trans-unit id="ngb.pagination.first-aria" datatype="html">
         <source>First</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Pertama</target>
@@ -166,7 +166,7 @@
       <trans-unit id="ngb.timepicker.increment-hours" datatype="html">
         <source>Increment hours</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Penambahan jam</target>
@@ -174,7 +174,7 @@
       <trans-unit id="ngb.pagination.previous-aria" datatype="html">
         <source>Previous</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Sebelumnya</target>
@@ -182,7 +182,7 @@
       <trans-unit id="ngb.timepicker.decrement-hours" datatype="html">
         <source>Decrement hours</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Pengurangan jam</target>
@@ -190,7 +190,7 @@
       <trans-unit id="ngb.pagination.next-aria" datatype="html">
         <source>Next</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Selanjutnya</target>
@@ -198,7 +198,7 @@
       <trans-unit id="ngb.timepicker.increment-minutes" datatype="html">
         <source>Increment minutes</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Penambahan menit</target>
@@ -206,7 +206,7 @@
       <trans-unit id="ngb.pagination.last-aria" datatype="html">
         <source>Last</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Terahkir</target>
@@ -214,7 +214,7 @@
       <trans-unit id="ngb.timepicker.decrement-minutes" datatype="html">
         <source>Decrement minutes</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Pengurangan menit</target>
@@ -222,7 +222,7 @@
       <trans-unit id="ngb.timepicker.SS" datatype="html">
         <source>SS</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">SS</target>
@@ -230,7 +230,7 @@
       <trans-unit id="ngb.timepicker.seconds" datatype="html">
         <source>Seconds</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Detik</target>
@@ -238,7 +238,7 @@
       <trans-unit id="ngb.timepicker.increment-seconds" datatype="html">
         <source>Increment seconds</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Penambahan detik</target>
@@ -246,7 +246,7 @@
       <trans-unit id="ngb.timepicker.decrement-seconds" datatype="html">
         <source>Decrement seconds</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
         <target state="translated">Pengurangan detik</target>
@@ -256,7 +256,7 @@
           <x id="INTERPOLATION"/>
         </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/ngb-config.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/ngb-config.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
@@ -265,10 +265,10 @@
           <x id="INTERPOLATION" equiv-text="barConfig);  pu"/>
         </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.1.4_@angular+core@20.1.4_@angular+_4264661dcfc97b5bf5cf26958990f623/node_modules/src/progressbar/progressbar.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@19.0.1_@angular+common@20.2.4_@angular+core@20.2.4_@angular+_db9461b4835bfc9061e01150e14e6256/node_modules/src/progressbar/progressbar.ts</context>
           <context context-type="linenumber">41,42</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="barConfig);  pu"/></target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="barConfig);  pu"/></target>
       </trans-unit>
       <trans-unit id="3527354815023530656" datatype="html">
         <source>Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</source>
@@ -444,7 +444,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">178</context>
         </context-group>
-        <target state="needs-translation">The dashboard can be used to show saved views, such as an 'Inbox'. Views are found under Manage &gt; Saved Views once you have created some.</target>
+        <target state="translated">Dasbor dapat digunakan untuk menampilkan tampilan yang disimpan, seperti ‘Inbox’. Tampilan dapat ditemukan di menu Kelola &gt; Tampilan Tersimpan setelah membuatnya.</target>
       </trans-unit>
       <trans-unit id="9075755296812854717" datatype="html">
         <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
@@ -524,7 +524,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">240</context>
         </context-group>
-        <target state="needs-translation">Check out the settings for various tweaks to the web app.</target>
+        <target state="translated">Lihat pengaturan untuk berbagai penyesuaian aplikasi web.</target>
       </trans-unit>
       <trans-unit id="7172877665285340082" datatype="html">
         <source>Thank you! 🙏</source>
@@ -614,7 +614,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
-          <context context-type="linenumber">45</context>
+          <context context-type="linenumber">55</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component.html</context>
@@ -864,7 +864,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Options to customize appearance, notifications and more. Settings apply to the &lt;strong&gt;current user only&lt;/strong&gt;.</target>
+        <target state="translated">Opsi untuk menyesuaikan tampilan, notifikasi, dan lainnya. Pengaturan hanya berlaku untuk &lt;strong&gt;pengguna saat ini&lt;/strong&gt;.</target>
       </trans-unit>
       <trans-unit id="1685061484835793745" datatype="html">
         <source>Start tour</source>
@@ -1076,7 +1076,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">165,167</context>
         </context-group>
-        <target state="needs-translation"> Update checking works by pinging the public GitHub API for the latest release to determine whether a new version is available. Actual updating of the app must still be performed manually. </target>
+        <target state="translated"> Pemeriksaan pembaruan dilakukan dengan mengakses API GitHub publik untuk mengetahui rilis terbaru. Pembaruan aplikasi tetap harus dilakukan secara manual. </target>
       </trans-unit>
       <trans-unit id="8416061320800650487" datatype="html">
         <source>No tracking data is collected by the app in any way.</source>
@@ -1084,7 +1084,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">169</context>
         </context-group>
-        <target state="needs-translation">No tracking data is collected by the app in any way.</target>
+        <target state="translated">Aplikasi ini tidak mengumpulkan data pelacakan dengan cara apa pun.</target>
       </trans-unit>
       <trans-unit id="5775451530782446954" datatype="html">
         <source>Saved Views</source>
@@ -1104,7 +1104,7 @@
           <context context-type="sourcefile">src/app/components/manage/saved-views/saved-views.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="needs-translation">Saved Views</target>
+        <target state="translated">Tampilan Tersimpan</target>
       </trans-unit>
       <trans-unit id="1595668988802980095" datatype="html">
         <source>Show warning when closing saved views with unsaved changes</source>
@@ -1120,7 +1120,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">179</context>
         </context-group>
-        <target state="needs-translation">Show document counts in sidebar saved views</target>
+        <target state="translated">Tampilkan jumlah dokumen pada tampilan tersimpan di sidebar</target>
       </trans-unit>
       <trans-unit id="908152367861642592" datatype="html">
         <source>Document editing</source>
@@ -1152,7 +1152,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">195</context>
         </context-group>
-        <target state="needs-translation">Default zoom</target>
+        <target state="translated">Zoom standar</target>
       </trans-unit>
       <trans-unit id="2222784219255971268" datatype="html">
         <source>Fit width</source>
@@ -1160,7 +1160,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">199</context>
         </context-group>
-        <target state="needs-translation">Fit width</target>
+        <target state="translated">Sesuaikan lebar</target>
       </trans-unit>
       <trans-unit id="8409221133589393872" datatype="html">
         <source>Fit page</source>
@@ -1168,7 +1168,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">200</context>
         </context-group>
-        <target state="needs-translation">Fit page</target>
+        <target state="translated">Sesuaikan halaman</target>
       </trans-unit>
       <trans-unit id="7019985100624067992" datatype="html">
         <source>Only applies to the Paperless-ngx PDF viewer.</source>
@@ -1176,7 +1176,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">202</context>
         </context-group>
-        <target state="needs-translation">Only applies to the Paperless-ngx PDF viewer.</target>
+        <target state="translated">Hanya berlaku untuk penampil PDF Paperless-ngx.</target>
       </trans-unit>
       <trans-unit id="2959590948110714366" datatype="html">
         <source>Automatically remove inbox tag(s) on save</source>
@@ -1192,7 +1192,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">214</context>
         </context-group>
-        <target state="needs-translation">Show document thumbnail during loading</target>
+        <target state="translated">Tampilkan gambar mini dokumen saat proses pemuatan</target>
       </trans-unit>
       <trans-unit id="6760166989231109310" datatype="html">
         <source>Global search</source>
@@ -1376,7 +1376,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">266,268</context>
         </context-group>
-        <target state="needs-translation"> Settings apply to this user account for objects (Tags, Mail Rules, etc. but not documents) created via the web UI. </target>
+        <target state="translated"> Pengaturan berlaku untuk akun pengguna ini pada objek (Tag, Aturan Email, dsb. namun bukan dokumen) yang dibuat lewat antarmuka web. </target>
       </trans-unit>
       <trans-unit id="4292903881380648974" datatype="html">
         <source>Default Owner</source>
@@ -1582,7 +1582,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
-          <context context-type="linenumber">44</context>
+          <context context-type="linenumber">54</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component.html</context>
@@ -1662,7 +1662,7 @@
         <source>Error retrieving users</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">225</context>
+          <context context-type="linenumber">226</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
@@ -1674,7 +1674,7 @@
         <source>Error retrieving groups</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">244</context>
+          <context context-type="linenumber">245</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
@@ -1686,7 +1686,7 @@
         <source>Settings were saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">547</context>
+          <context context-type="linenumber">548</context>
         </context-group>
         <target state="translated">Pengaturan berhasil disimpan.</target>
       </trans-unit>
@@ -1694,7 +1694,7 @@
         <source>Settings were saved successfully. Reload is required to apply some changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">551</context>
+          <context context-type="linenumber">552</context>
         </context-group>
         <target state="translated">Pengaturan berhasil disimpan. Muat ulang diperlukan untuk menerapkan beberapa perubahan.</target>
       </trans-unit>
@@ -1702,7 +1702,7 @@
         <source>Reload now</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">552</context>
+          <context context-type="linenumber">553</context>
         </context-group>
         <target state="translated">Muat ulang sekarang</target>
       </trans-unit>
@@ -1710,7 +1710,7 @@
         <source>An error occurred while saving settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.ts</context>
-          <context context-type="linenumber">562</context>
+          <context context-type="linenumber">563</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
@@ -1768,7 +1768,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Filter by</target>
+        <target state="translated">Saring berdasarkan</target>
       </trans-unit>
       <trans-unit id="8953033926734869941" datatype="html">
         <source>Name</source>
@@ -2076,7 +2076,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Result</target>
+        <target state="translated">Hasil</target>
       </trans-unit>
       <trans-unit id="5404910960991552159" datatype="html">
         <source>Dismiss selected</source>
@@ -2448,7 +2448,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">Document "<x id="PH" equiv-text="document.title"/>" deleted</target>
+        <target state="translated">Dokumen "<x id="PH" equiv-text="document.title"/>" dihapus</target>
       </trans-unit>
       <trans-unit id="6899041168041745793" datatype="html">
         <source>Error deleting document &quot;<x id="PH" equiv-text="document.title"/>&quot;</source>
@@ -2456,7 +2456,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="needs-translation">Error deleting document "<x id="PH" equiv-text="document.title"/>"</target>
+        <target state="translated">Gagal menghapus dokumen "<x id="PH" equiv-text="document.title"/>"</target>
       </trans-unit>
       <trans-unit id="7266264608936522311" datatype="html">
         <source>This operation will permanently delete the selected documents.</source>
@@ -2496,7 +2496,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">144</context>
         </context-group>
-        <target state="needs-translation">Document "<x id="PH" equiv-text="document.title"/>" restored</target>
+        <target state="translated">Dokumen "<x id="PH" equiv-text="document.title"/>" dipulihkan</target>
       </trans-unit>
       <trans-unit id="8771034816522852043" datatype="html">
         <source>Error restoring document &quot;<x id="PH" equiv-text="document.title"/>&quot;</source>
@@ -2504,7 +2504,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="needs-translation">Error restoring document "<x id="PH" equiv-text="document.title"/>"</target>
+        <target state="translated">Gagal memulihkan dokumen "<x id="PH" equiv-text="document.title"/>"</target>
       </trans-unit>
       <trans-unit id="960063472770266304" datatype="html">
         <source>Document(s) restored</source>
@@ -2754,11 +2754,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1018</context>
+          <context context-type="linenumber">1019</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1383</context>
+          <context context-type="linenumber">1384</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -2800,7 +2800,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">131</context>
         </context-group>
-        <target state="needs-translation">Deleted user "<x id="PH" equiv-text="user.username"/>"</target>
+        <target state="translated">Gagal menghapus pengguna "<x id="PH" equiv-text="user.username"/>"</target>
       </trans-unit>
       <trans-unit id="286457042048584728" datatype="html">
         <source>Error deleting user &quot;<x id="PH" equiv-text="user.username"/>&quot;.</source>
@@ -2808,7 +2808,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">138</context>
         </context-group>
-        <target state="needs-translation">Error deleting user "<x id="PH" equiv-text="user.username"/>".</target>
+        <target state="translated">Gagal menghapus pengguna "<x id="PH" equiv-text="user.username"/>".</target>
       </trans-unit>
       <trans-unit id="5766640174051730159" datatype="html">
         <source>Saved group &quot;<x id="PH" equiv-text="newGroup.name"/>&quot;.</source>
@@ -2848,7 +2848,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">184</context>
         </context-group>
-        <target state="needs-translation">Deleted group "<x id="PH" equiv-text="group.name"/>"</target>
+        <target state="translated">Grup "<x id="PH" equiv-text="group.name"/>" dihapus</target>
       </trans-unit>
       <trans-unit id="1697803415975901060" datatype="html">
         <source>Error deleting group &quot;<x id="PH" equiv-text="group.name"/>&quot;.</source>
@@ -2856,7 +2856,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">191</context>
         </context-group>
-        <target state="needs-translation">Error deleting group "<x id="PH" equiv-text="group.name"/>".</target>
+        <target state="translated">Gagal menghapus grup "<x id="PH" equiv-text="group.name"/>".</target>
       </trans-unit>
       <trans-unit id="7931334600001636863" datatype="html">
         <source>by Paperless-ngx</source>
@@ -3380,7 +3380,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/toasts-dropdown/toasts-dropdown.component.html</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Clear All</target>
+        <target state="translated">Hapus Semua</target>
       </trans-unit>
       <trans-unit id="1656872994210958357" datatype="html">
         <source>No notifications</source>
@@ -3388,7 +3388,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/toasts-dropdown/toasts-dropdown.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">No notifications</target>
+        <target state="translated">Tidak ada notifikasi</target>
       </trans-unit>
       <trans-unit id="8700121026680200191" datatype="html">
         <source>Clear</source>
@@ -3426,7 +3426,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">971</context>
+          <context context-type="linenumber">972</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -3484,7 +3484,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Try to include archive version in merge for non-PDF files</target>
+        <target state="translated">Coba sertakan versi arsip saat menggabungkan file non-PDF</target>
       </trans-unit>
       <trans-unit id="5612366187076076264" datatype="html">
         <source>Delete original documents after successful merge</source>
@@ -3536,7 +3536,7 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation">Search fields</target>
+        <target state="translated">Kolom Pencarian</target>
       </trans-unit>
       <trans-unit id="3672488183382190185" datatype="html">
         <source>Create new field</source>
@@ -3600,7 +3600,7 @@
           <context context-type="sourcefile">src/app/components/common/input/date/date.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Today</target>
+        <target state="translated">Hari Ini</target>
       </trans-unit>
       <trans-unit id="7819314041543176992" datatype="html">
         <source>Close</source>
@@ -3646,13 +3646,13 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">87</context>
+          <context context-type="linenumber">86</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">93</context>
+          <context context-type="linenumber">92</context>
         </context-group>
-        <target state="needs-translation">True</target>
+        <target state="translated">Benar</target>
       </trans-unit>
       <trans-unit id="3800326155195149498" datatype="html">
         <source>False</source>
@@ -3662,23 +3662,23 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">88</context>
+          <context context-type="linenumber">87</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">94</context>
+          <context context-type="linenumber">93</context>
         </context-group>
-        <target state="needs-translation">False</target>
+        <target state="translated">Salah</target>
       </trans-unit>
       <trans-unit id="7551700625201096185" datatype="html">
         <source>Search docs...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">62</context>
+          <context context-type="linenumber">61</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">110</context>
+          <context context-type="linenumber">109</context>
         </context-group>
         <target state="translated">Cari dokumen...</target>
       </trans-unit>
@@ -3686,7 +3686,7 @@
         <source>Any</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">142</context>
+          <context context-type="linenumber">141</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
@@ -3698,7 +3698,7 @@
         <source>All</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">144</context>
+          <context context-type="linenumber">143</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
@@ -3726,15 +3726,15 @@
         <source>Not</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">147</context>
+          <context context-type="linenumber">146</context>
         </context-group>
-        <target state="needs-translation">Not</target>
+        <target state="translated">Tidak</target>
       </trans-unit>
       <trans-unit id="6548676277933116532" datatype="html">
         <source>Add query</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">166</context>
+          <context context-type="linenumber">165</context>
         </context-group>
         <target state="translated">Tambah permintaan</target>
       </trans-unit>
@@ -3742,9 +3742,9 @@
         <source>Add expression</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">169</context>
+          <context context-type="linenumber">168</context>
         </context-group>
-        <target state="needs-translation">Add expression</target>
+        <target state="translated">Tambah ekspresi</target>
       </trans-unit>
       <trans-unit id="6312759212949884929" datatype="html">
         <source>Relative dates</source>
@@ -3756,7 +3756,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.html</context>
           <context context-type="linenumber">101</context>
         </context-group>
-        <target state="needs-translation">Relative dates</target>
+        <target state="translated">Tanggal relatif</target>
       </trans-unit>
       <trans-unit id="6052766076365105714" datatype="html">
         <source>now</source>
@@ -3780,7 +3780,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.html</context>
           <context context-type="linenumber">120</context>
         </context-group>
-        <target state="needs-translation">From</target>
+        <target state="translated">Dari</target>
       </trans-unit>
       <trans-unit id="1640609344969975994" datatype="html">
         <source>To</source>
@@ -3792,7 +3792,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.html</context>
           <context context-type="linenumber">144</context>
         </context-group>
-        <target state="needs-translation">To</target>
+        <target state="translated">Hingga</target>
       </trans-unit>
       <trans-unit id="231679111972850796" datatype="html">
         <source>Added</source>
@@ -3816,7 +3816,7 @@
           <context context-type="sourcefile">src/app/data/document.ts</context>
           <context context-type="linenumber">93</context>
         </context-group>
-        <target state="needs-translation">Added</target>
+        <target state="translated">Ditambahkan</target>
       </trans-unit>
       <trans-unit id="9129856334122659953" datatype="html">
         <source>Within 1 week</source>
@@ -3824,7 +3824,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.ts</context>
           <context context-type="linenumber">76</context>
         </context-group>
-        <target state="needs-translation">Within 1 week</target>
+        <target state="translated">Dalam 1 minggu</target>
       </trans-unit>
       <trans-unit id="123064370501514576" datatype="html">
         <source>Within 1 month</source>
@@ -3832,7 +3832,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.ts</context>
           <context context-type="linenumber">81</context>
         </context-group>
-        <target state="needs-translation">Within 1 month</target>
+        <target state="translated">Dalam 1 bulan</target>
       </trans-unit>
       <trans-unit id="1027161426440526546" datatype="html">
         <source>Within 3 months</source>
@@ -3840,7 +3840,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.ts</context>
           <context context-type="linenumber">86</context>
         </context-group>
-        <target state="needs-translation">Within 3 months</target>
+        <target state="translated">Dalam 3 bulan</target>
       </trans-unit>
       <trans-unit id="226779700214642230" datatype="html">
         <source>Within 1 year</source>
@@ -3848,7 +3848,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.ts</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="needs-translation">Within 1 year</target>
+        <target state="translated">Dalam 1 tahun</target>
       </trans-unit>
       <trans-unit id="8462417627724236320" datatype="html">
         <source>This year</source>
@@ -3856,7 +3856,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.ts</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="needs-translation">This year</target>
+        <target state="translated">Tahun ini</target>
       </trans-unit>
       <trans-unit id="842657237693374355" datatype="html">
         <source>This month</source>
@@ -3864,7 +3864,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.ts</context>
           <context context-type="linenumber">101</context>
         </context-group>
-        <target state="needs-translation">This month</target>
+        <target state="translated">Bulan ini</target>
       </trans-unit>
       <trans-unit id="4498682414491138092" datatype="html">
         <source>Yesterday</source>
@@ -3876,7 +3876,7 @@
           <context context-type="sourcefile">src/app/pipes/custom-date.pipe.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Yesterday</target>
+        <target state="translated">Kemarin</target>
       </trans-unit>
       <trans-unit id="8743659855412792665" datatype="html">
         <source>Matching algorithm</source>
@@ -3940,7 +3940,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">171</context>
         </context-group>
-        <target state="needs-translation">Case insensitive</target>
+        <target state="translated">Tidak membedakan huruf besar kecil</target>
       </trans-unit>
       <trans-unit id="6457471243969293847" datatype="html">
         <source>Create new correspondent</source>
@@ -3980,29 +3980,29 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Add option</target>
+        <target state="translated">Tambah opsi</target>
       </trans-unit>
       <trans-unit id="5077457124599302010" datatype="html">
         <source>Warning: existing instances of this field will retain their current value index (e.g. option #1, #2, #3) after editing the options here</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Warning: existing instances of this field will retain their current value index (e.g. option #1, #2, #3) after editing the options here</target>
+        <target state="translated">Peringatan: data yang sudah ada untuk kolom ini akan tetap menggunakan indeks nilai sebelumnya (misal: opsi #1, #2, #3) setelah opsi di sini diubah</target>
       </trans-unit>
       <trans-unit id="2739003406164860877" datatype="html">
         <source>Default Currency</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">47</context>
         </context-group>
-        <target state="needs-translation">Default Currency</target>
+        <target state="translated">Mata uang default</target>
       </trans-unit>
       <trans-unit id="7615210738790237590" datatype="html">
         <source>3-character currency code</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">47</context>
         </context-group>
         <target state="translated">3-Karakter Kode Mata Uang</target>
       </trans-unit>
@@ -4010,15 +4010,15 @@
         <source>Use locale</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">47</context>
         </context-group>
-        <target state="needs-translation">Use locale</target>
+        <target state="translated">Gunakan locale</target>
       </trans-unit>
       <trans-unit id="528950215505228201" datatype="html">
         <source>Create new custom field</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.ts</context>
-          <context context-type="linenumber">93</context>
+          <context context-type="linenumber">118</context>
         </context-group>
         <target state="translated">Buat kolom variasi baru</target>
       </trans-unit>
@@ -4026,7 +4026,7 @@
         <source>Edit custom field</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.ts</context>
-          <context context-type="linenumber">97</context>
+          <context context-type="linenumber">122</context>
         </context-group>
         <target state="translated">Ubah kolom variasi</target>
       </trans-unit>
@@ -4224,7 +4224,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Order</target>
+        <target state="translated">Urutan</target>
       </trans-unit>
       <trans-unit id="4816216590591222133" datatype="html">
         <source>Enabled</source>
@@ -4340,7 +4340,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">PDF layout</target>
+        <target state="translated">Tata letak PDF</target>
       </trans-unit>
       <trans-unit id="2873939123535615966" datatype="html">
         <source>Include only files matching</source>
@@ -4384,7 +4384,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">Only performed if the mail is processed.</target>
+        <target state="translated">Hanya dijalankan jika email telah diproses.</target>
       </trans-unit>
       <trans-unit id="1261794314435932203" datatype="html">
         <source>Action parameter</source>
@@ -4465,6 +4465,10 @@
           <context context-type="linenumber">254</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
+          <context context-type="linenumber">264</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/toast/toast.component.html</context>
           <context context-type="linenumber">30</context>
         </context-group>
@@ -4512,7 +4516,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="needs-translation">System default</target>
+        <target state="translated">Pengaturan standar sistem</target>
       </trans-unit>
       <trans-unit id="4812910224365219000" datatype="html">
         <source>Text, then HTML</source>
@@ -4520,7 +4524,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">68</context>
         </context-group>
-        <target state="needs-translation">Text, then HTML</target>
+        <target state="translated">Teks, lalu HTML</target>
       </trans-unit>
       <trans-unit id="3181744476823286470" datatype="html">
         <source>HTML, then text</source>
@@ -4528,7 +4532,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">72</context>
         </context-group>
-        <target state="needs-translation">HTML, then text</target>
+        <target state="translated">HTML, lalu teks</target>
       </trans-unit>
       <trans-unit id="9048933760263399623" datatype="html">
         <source>HTML only</source>
@@ -4536,7 +4540,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">76</context>
         </context-group>
-        <target state="needs-translation">HTML only</target>
+        <target state="translated">Hanya HTML</target>
       </trans-unit>
       <trans-unit id="3835211125655594627" datatype="html">
         <source>Text only</source>
@@ -4544,7 +4548,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="needs-translation">Text only</target>
+        <target state="translated">Hanya teks</target>
       </trans-unit>
       <trans-unit id="2784260611081866636" datatype="html">
         <source>Move to specified folder</source>
@@ -4844,7 +4848,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Access logs, Django backend</target>
+        <target state="translated">Log akses, backend Django</target>
       </trans-unit>
       <trans-unit id="1808271538028523977" datatype="html">
         <source>Superuser</source>
@@ -4876,7 +4880,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">137</context>
         </context-group>
-        <target state="needs-translation">Two-factor Authentication</target>
+        <target state="translated">Autentikasi dua faktor</target>
       </trans-unit>
       <trans-unit id="8418597938335066730" datatype="html">
         <source>Disable Two-factor Authentication</source>
@@ -4896,7 +4900,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">170</context>
         </context-group>
-        <target state="needs-translation">Disable Two-factor Authentication</target>
+        <target state="translated">Nonaktifkan autentikasi dua faktor</target>
       </trans-unit>
       <trans-unit id="1436831433675346331" datatype="html">
         <source>Create new user account</source>
@@ -4920,7 +4924,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.ts</context>
           <context context-type="linenumber">130</context>
         </context-group>
-        <target state="needs-translation">Totp deactivated</target>
+        <target state="translated">Totp dinonaktifkan</target>
       </trans-unit>
       <trans-unit id="6439190193788239059" datatype="html">
         <source>Totp deactivation failed</source>
@@ -4932,7 +4936,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.ts</context>
           <context context-type="linenumber">138</context>
         </context-group>
-        <target state="needs-translation">Totp deactivation failed</target>
+        <target state="translated">Gagal menonaktifkan Totp</target>
       </trans-unit>
       <trans-unit id="8419515490539218007" datatype="html">
         <source>Sort order</source>
@@ -5004,7 +5008,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">123</context>
         </context-group>
-        <target state="needs-translation">Set scheduled trigger offset and which date field to use.</target>
+        <target state="translated">Atur jeda pemicu terjadwal dan kolom tanggal yang digunakan.</target>
       </trans-unit>
       <trans-unit id="4779176004576564638" datatype="html">
         <source>Offset days</source>
@@ -5012,7 +5016,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">128</context>
         </context-group>
-        <target state="needs-translation">Offset days</target>
+        <target state="translated">Hari jeda</target>
       </trans-unit>
       <trans-unit id="7715068346263636924" datatype="html">
         <source>Positive values will trigger after the date, negative values before.</source>
@@ -5020,7 +5024,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">132</context>
         </context-group>
-        <target state="needs-translation">Positive values will trigger after the date, negative values before.</target>
+        <target state="translated">Nilai positif akan memicu setelah tanggalnya, nilai negatif sebelum tanggalnya.</target>
       </trans-unit>
       <trans-unit id="3726450101884717309" datatype="html">
         <source>Relative to</source>
@@ -5028,7 +5032,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">137</context>
         </context-group>
-        <target state="needs-translation">Relative to</target>
+        <target state="translated">Relatif terhadap</target>
       </trans-unit>
       <trans-unit id="3878884308536053934" datatype="html">
         <source>Custom field</source>
@@ -5036,7 +5040,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">141</context>
         </context-group>
-        <target state="needs-translation">Custom field</target>
+        <target state="translated">Bidang khusus</target>
       </trans-unit>
       <trans-unit id="1088170562604583291" datatype="html">
         <source>Custom field to use for date.</source>
@@ -5044,7 +5048,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">141</context>
         </context-group>
-        <target state="needs-translation">Custom field to use for date.</target>
+        <target state="translated">Bidang khusus yang digunakan untuk tanggal.</target>
       </trans-unit>
       <trans-unit id="1011433830042635014" datatype="html">
         <source>Recurring</source>
@@ -5052,7 +5056,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">147</context>
         </context-group>
-        <target state="needs-translation">Recurring</target>
+        <target state="translated">Berulang</target>
       </trans-unit>
       <trans-unit id="1421663004162437543" datatype="html">
         <source>Trigger is recurring.</source>
@@ -5060,7 +5064,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">147</context>
         </context-group>
-        <target state="needs-translation">Trigger is recurring.</target>
+        <target state="translated">Pemicu berulang.</target>
       </trans-unit>
       <trans-unit id="5937989815294159481" datatype="html">
         <source>Recurring interval days</source>
@@ -5068,7 +5072,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">151</context>
         </context-group>
-        <target state="needs-translation">Recurring interval days</target>
+        <target state="translated">Hari interval berulang</target>
       </trans-unit>
       <trans-unit id="722765958672682251" datatype="html">
         <source>Repeat the trigger every n days.</source>
@@ -5076,7 +5080,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">151</context>
         </context-group>
-        <target state="needs-translation">Repeat the trigger every n days.</target>
+        <target state="translated">Ulangi pemicu setiap n hari.</target>
       </trans-unit>
       <trans-unit id="8727727835543352574" datatype="html">
         <source>Trigger for documents that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> filters specified below.</source>
@@ -5204,7 +5208,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">194</context>
         </context-group>
-        <target state="needs-translation">Can include some placeholders, see &lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'&gt;documentation&lt;/a&gt;.</target>
+        <target state="translated">Bisa memasukkan beberapa placeholder, lihat &lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'&gt;dokumentasi&lt;/a&gt;.</target>
       </trans-unit>
       <trans-unit id="6528897010417701530" datatype="html">
         <source>Assign tags</source>
@@ -5364,7 +5368,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">338</context>
         </context-group>
-        <target state="needs-translation">Email subject</target>
+        <target state="translated">Subjek email</target>
       </trans-unit>
       <trans-unit id="8239445959209739142" datatype="html">
         <source>Email body</source>
@@ -5372,7 +5376,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">339</context>
         </context-group>
-        <target state="needs-translation">Email body</target>
+        <target state="translated">Isi email</target>
       </trans-unit>
       <trans-unit id="1222152280703048012" datatype="html">
         <source>Email recipients</source>
@@ -5380,7 +5384,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">340</context>
         </context-group>
-        <target state="needs-translation">Email recipients</target>
+        <target state="translated">Penerima email</target>
       </trans-unit>
       <trans-unit id="7916910101279824329" datatype="html">
         <source>Attach document</source>
@@ -5388,7 +5392,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">341</context>
         </context-group>
-        <target state="needs-translation">Attach document</target>
+        <target state="translated">Lampirkan dokumen</target>
       </trans-unit>
       <trans-unit id="5028001922785731600" datatype="html">
         <source>Webhook url</source>
@@ -5396,7 +5400,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">349</context>
         </context-group>
-        <target state="needs-translation">Webhook url</target>
+        <target state="translated">Url webhook</target>
       </trans-unit>
       <trans-unit id="7491983459027245019" datatype="html">
         <source>Use parameters for webhook body</source>
@@ -5404,7 +5408,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">351</context>
         </context-group>
-        <target state="needs-translation">Use parameters for webhook body</target>
+        <target state="translated">Gunakan parameter untuk isi webhook</target>
       </trans-unit>
       <trans-unit id="4078214298308732810" datatype="html">
         <source>Send webhook payload as JSON</source>
@@ -5412,7 +5416,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">352</context>
         </context-group>
-        <target state="needs-translation">Send webhook payload as JSON</target>
+        <target state="translated">Kirim payload webhook sebagai JSON</target>
       </trans-unit>
       <trans-unit id="6806149889743731985" datatype="html">
         <source>Webhook params</source>
@@ -5420,7 +5424,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">355</context>
         </context-group>
-        <target state="needs-translation">Webhook params</target>
+        <target state="translated">Parameter webhook</target>
       </trans-unit>
       <trans-unit id="7089924379374330" datatype="html">
         <source>Webhook body</source>
@@ -5428,7 +5432,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">357</context>
         </context-group>
-        <target state="needs-translation">Webhook body</target>
+        <target state="translated">Isi webhook</target>
       </trans-unit>
       <trans-unit id="3829826512656746316" datatype="html">
         <source>Webhook headers</source>
@@ -5436,7 +5440,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">359</context>
         </context-group>
-        <target state="needs-translation">Webhook headers</target>
+        <target state="translated">Header webhook</target>
       </trans-unit>
       <trans-unit id="2114525789021600887" datatype="html">
         <source>Include document</source>
@@ -5444,7 +5448,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">360</context>
         </context-group>
-        <target state="needs-translation">Include document</target>
+        <target state="translated">Sertakan dokumen</target>
       </trans-unit>
       <trans-unit id="4626030417479279989" datatype="html">
         <source>Consume Folder</source>
@@ -5476,7 +5480,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="needs-translation">Web UI</target>
+        <target state="translated">Antarmuka Web</target>
       </trans-unit>
       <trans-unit id="3553216189604488439" datatype="html">
         <source>Modified</source>
@@ -5488,7 +5492,7 @@
           <context context-type="sourcefile">src/app/data/document.ts</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation">Modified</target>
+        <target state="translated">Diubah</target>
       </trans-unit>
       <trans-unit id="8686921715946540725" datatype="html">
         <source>Custom Field</source>
@@ -5496,7 +5500,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="needs-translation">Custom Field</target>
+        <target state="translated">Bidang Khusus</target>
       </trans-unit>
       <trans-unit id="8696908693776094667" datatype="html">
         <source>Consumption Started</source>
@@ -5528,7 +5532,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="needs-translation">Scheduled</target>
+        <target state="translated">Terjadwal</target>
       </trans-unit>
       <trans-unit id="5502398334173581061" datatype="html">
         <source>Assignment</source>
@@ -5552,7 +5556,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">134</context>
         </context-group>
-        <target state="needs-translation">Webhook</target>
+        <target state="translated">Webhook</target>
       </trans-unit>
       <trans-unit id="3138206142174978019" datatype="html">
         <source>Create new workflow</source>
@@ -5576,7 +5580,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">Email address(es)</target>
+        <target state="translated">Alamat email</target>
       </trans-unit>
       <trans-unit id="9127604588498960753" datatype="html">
         <source>Subject</source>
@@ -5584,7 +5588,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Subject</target>
+        <target state="translated">Subjek</target>
       </trans-unit>
       <trans-unit id="8066608938393600549" datatype="html">
         <source>Message</source>
@@ -5592,7 +5596,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Message</target>
+        <target state="translated">Pesan</target>
       </trans-unit>
       <trans-unit id="5867799091834207531" datatype="html">
         <source>Use archive version</source>
@@ -5600,7 +5604,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Use archive version</target>
+        <target state="translated">Gunakan versi arsip</target>
       </trans-unit>
       <trans-unit id="4312183290449350804" datatype="html">
         <source>Send email</source>
@@ -5608,7 +5612,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.html</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Send email</target>
+        <target state="translated">Kirim email</target>
       </trans-unit>
       <trans-unit id="1342170399958833675" datatype="html">
         <source>Email Document</source>
@@ -5616,7 +5620,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Email Document</target>
+        <target state="translated">Kirim Dokumen via Email</target>
       </trans-unit>
       <trans-unit id="9049148856403142491" datatype="html">
         <source>Email sent</source>
@@ -5624,7 +5628,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.ts</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="needs-translation">Email sent</target>
+        <target state="translated">Email berhasil dikirim</target>
       </trans-unit>
       <trans-unit id="3742745894977668908" datatype="html">
         <source>Error emailing document</source>
@@ -5632,7 +5636,7 @@
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.ts</context>
           <context context-type="linenumber">70</context>
         </context-group>
-        <target state="needs-translation">Error emailing document</target>
+        <target state="translated">Gagal mengirim dokumen lewat email</target>
       </trans-unit>
       <trans-unit id="6381578200008167206" datatype="html">
         <source>Include</source>
@@ -5787,7 +5791,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.html</context>
-          <context context-type="linenumber">59</context>
+          <context context-type="linenumber">58</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
@@ -5837,7 +5841,7 @@
           <context context-type="sourcefile">src/app/components/common/input/document-link/document-link.component.html</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="needs-translation">Not found</target>
+        <target state="translated">Tidak ditemukan</target>
       </trans-unit>
       <trans-unit id="5676637575587497817" datatype="html">
         <source>Search for documents</source>
@@ -5853,7 +5857,7 @@
           <context context-type="sourcefile">src/app/components/common/input/drag-drop-select/drag-drop-select.component.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Selected items</target>
+        <target state="translated">Item yang dipilih</target>
       </trans-unit>
       <trans-unit id="528456107179161277" datatype="html">
         <source>No items selected</source>
@@ -5861,7 +5865,7 @@
           <context context-type="sourcefile">src/app/components/common/input/drag-drop-select/drag-drop-select.component.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">No items selected</target>
+        <target state="translated">Tidak ada item yang dipilih</target>
       </trans-unit>
       <trans-unit id="3249513483374643425" datatype="html">
         <source>Add</source>
@@ -5911,7 +5915,7 @@
         <source>Add item</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.html</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">23</context>
         </context-group>
         <note priority="1" from="description">Used for both types, correspondents, storage paths</note>
         <target state="translated">Tambah barang</target>
@@ -5970,7 +5974,7 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Remove tag</target>
+        <target state="translated">Hapus tag</target>
       </trans-unit>
       <trans-unit id="2561408369057364131" datatype="html">
         <source>Filter documents with these Tags</source>
@@ -5998,7 +6002,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">Select all pages</target>
+        <target state="translated">Pilih semua halaman</target>
       </trans-unit>
       <trans-unit id="234610397929376642" datatype="html">
         <source>Deselect all pages</source>
@@ -6006,7 +6010,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Deselect all pages</target>
+        <target state="translated">Hapus pilihan semua halaman</target>
       </trans-unit>
       <trans-unit id="2530246103796817298" datatype="html">
         <source>Rotate selected pages counter-clockwise</source>
@@ -6014,7 +6018,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Rotate selected pages counter-clockwise</target>
+        <target state="translated">Putar halaman terpilih berlawanan arah jarum jam</target>
       </trans-unit>
       <trans-unit id="4787219034890830544" datatype="html">
         <source>Rotate selected pages clockwise</source>
@@ -6022,7 +6026,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Rotate selected pages clockwise</target>
+        <target state="translated">Putar halaman terpilih searah jarum jam</target>
       </trans-unit>
       <trans-unit id="3441043765105475130" datatype="html">
         <source>Delete selected pages</source>
@@ -6030,7 +6034,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Delete selected pages</target>
+        <target state="translated">Hapus halaman yang dipilih</target>
       </trans-unit>
       <trans-unit id="3873740163706409154" datatype="html">
         <source>Rotate page counter-clockwise</source>
@@ -6038,7 +6042,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Rotate page counter-clockwise</target>
+        <target state="translated">Putar halaman berlawanan arah jarum jam</target>
       </trans-unit>
       <trans-unit id="3450236521040548507" datatype="html">
         <source>Rotate page clockwise</source>
@@ -6046,7 +6050,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Rotate page clockwise</target>
+        <target state="translated">Putar halaman searah jarum jam</target>
       </trans-unit>
       <trans-unit id="7647925464077975347" datatype="html">
         <source>Delete page</source>
@@ -6054,7 +6058,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Delete page</target>
+        <target state="translated">Hapus halaman</target>
       </trans-unit>
       <trans-unit id="2480952115552020422" datatype="html">
         <source>Add / remove document split here</source>
@@ -6062,7 +6066,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">Add / remove document split here</target>
+        <target state="translated">Tambah/hapus pembagian dokumen di sini</target>
       </trans-unit>
       <trans-unit id="35277754987868961" datatype="html">
         <source>Split here</source>
@@ -6070,7 +6074,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">70</context>
         </context-group>
-        <target state="needs-translation">Split here</target>
+        <target state="translated">Bagi di sini</target>
       </trans-unit>
       <trans-unit id="7273640930165035289" datatype="html">
         <source>Create new document(s)</source>
@@ -6078,7 +6082,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">82</context>
         </context-group>
-        <target state="needs-translation">Create new document(s)</target>
+        <target state="translated">Buat dokumen baru</target>
       </trans-unit>
       <trans-unit id="8035757452478567832" datatype="html">
         <source>Update existing document</source>
@@ -6086,7 +6090,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="needs-translation">Update existing document</target>
+        <target state="translated">Perbarui dokumen yang ada</target>
       </trans-unit>
       <trans-unit id="7248454234750442816" datatype="html">
         <source>Copy metadata</source>
@@ -6094,7 +6098,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation">Copy metadata</target>
+        <target state="translated">Salin metadata</target>
       </trans-unit>
       <trans-unit id="6684403463658676119" datatype="html">
         <source>Delete original</source>
@@ -6102,7 +6106,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">98</context>
         </context-group>
-        <target state="needs-translation">Delete original</target>
+        <target state="translated">Hapus file asli</target>
       </trans-unit>
       <trans-unit id="7940755769131903278" datatype="html">
         <source>Merge with existing permissions</source>
@@ -6110,7 +6114,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Merge with existing permissions</target>
+        <target state="translated">Gabungkan dengan izin yang ada</target>
       </trans-unit>
       <trans-unit id="7062872617520618723" datatype="html">
         <source>Set permissions</source>
@@ -6118,7 +6122,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Set permissions</target>
+        <target state="translated">Atur izin</target>
       </trans-unit>
       <trans-unit id="1678966148862835666" datatype="html">
         <source>Edit permissions for </source>
@@ -6126,7 +6130,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="needs-translation">Edit permissions for </target>
+        <target state="translated">Edit izin untuk </target>
       </trans-unit>
       <trans-unit id="347498040201588614" datatype="html">
         <source>Existing owner, user and group permissions will be merged with these settings.</source>
@@ -6134,7 +6138,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="needs-translation">Existing owner, user and group permissions will be merged with these settings.</target>
+        <target state="translated">Izin pemilik, pengguna, dan grup yang ada akan digabungkan dengan pengaturan ini.</target>
       </trans-unit>
       <trans-unit id="3434726483516379481" datatype="html">
         <source>Any and all existing owner, user and group permissions will be replaced.</source>
@@ -6142,7 +6146,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">88</context>
         </context-group>
-        <target state="needs-translation">Any and all existing owner, user and group permissions will be replaced.</target>
+        <target state="translated">Semua izin pemilik, pengguna, dan grup yang ada akan diganti.</target>
       </trans-unit>
       <trans-unit id="5947558132119506443" datatype="html">
         <source>My documents</source>
@@ -6190,7 +6194,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Global permissions define what areas of the app and API endpoints users can access.</target>
+        <target state="translated">Izin global menentukan area aplikasi dan endpoint API apa saja yang dapat diakses pengguna.</target>
       </trans-unit>
       <trans-unit id="8650499415827640724" datatype="html">
         <source>Type</source>
@@ -6218,7 +6222,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.ts</context>
           <context context-type="linenumber">78</context>
         </context-group>
-        <target state="needs-translation">Inherited from group</target>
+        <target state="translated">Mengikuti dari grup</target>
       </trans-unit>
       <trans-unit id="6418218602775540217" datatype="html">
         <source>Error loading preview</source>
@@ -6234,7 +6238,7 @@
           <context context-type="sourcefile">src/app/components/common/preview-popup/preview-popup.component.ts</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="needs-translation">Open preview</target>
+        <target state="translated">Buka pratinjau</target>
       </trans-unit>
       <trans-unit id="2984628903434675339" datatype="html">
         <source>Edit Profile</source>
@@ -6266,7 +6270,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">API Auth Token</target>
+        <target state="translated">Token Auth API</target>
       </trans-unit>
       <trans-unit id="4323470180912194028" datatype="html">
         <source>Copy</source>
@@ -6288,7 +6292,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
-          <context context-type="linenumber">272</context>
+          <context context-type="linenumber">284</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
@@ -6314,7 +6318,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">47</context>
         </context-group>
-        <target state="needs-translation">Regenerate auth token</target>
+        <target state="translated">Buat ulang token otentikasi</target>
       </trans-unit>
       <trans-unit id="5392341774767336507" datatype="html">
         <source>Copied!</source>
@@ -6394,7 +6398,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">114</context>
         </context-group>
-        <target state="needs-translation">Scan the QR code with your authenticator app and then enter the code below</target>
+        <target state="translated">Pindai kode QR dengan aplikasi autentikator lalu masukkan kodenya di bawah ini</target>
       </trans-unit>
       <trans-unit id="5867169599865838267" datatype="html">
         <source>Authenticator secret</source>
@@ -6402,7 +6406,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">117</context>
         </context-group>
-        <target state="needs-translation">Authenticator secret</target>
+        <target state="translated">Kode rahasia autentikator</target>
       </trans-unit>
       <trans-unit id="5331198279926709145" datatype="html">
         <source>You can store this secret and use it to reinstall your authenticator app at a later time.</source>
@@ -6410,7 +6414,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">118</context>
         </context-group>
-        <target state="needs-translation">You can store this secret and use it to reinstall your authenticator app at a later time.</target>
+        <target state="translated">Kamu bisa simpan kode rahasia ini untuk menginstal ulang aplikasi autentikator nanti.</target>
       </trans-unit>
       <trans-unit id="8186013988289067040" datatype="html">
         <source>Code</source>
@@ -6418,7 +6422,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">121</context>
         </context-group>
-        <target state="needs-translation">Code</target>
+        <target state="translated">Kode</target>
       </trans-unit>
       <trans-unit id="3176701652604668614" datatype="html">
         <source>Recovery codes will not be shown again, make sure to save them.</source>
@@ -6426,7 +6430,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">140</context>
         </context-group>
-        <target state="needs-translation">Recovery codes will not be shown again, make sure to save them.</target>
+        <target state="translated">Kode pemulihan tidak akan ditampilkan lagi, pastikan untuk menyimpannya.</target>
       </trans-unit>
       <trans-unit id="2722512118372958038" datatype="html">
         <source>Copy codes</source>
@@ -6434,7 +6438,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">158</context>
         </context-group>
-        <target state="needs-translation">Copy codes</target>
+        <target state="translated">Salin kode</target>
       </trans-unit>
       <trans-unit id="6141884091799403188" datatype="html">
         <source>Emails must match</source>
@@ -6490,7 +6494,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">267</context>
         </context-group>
-        <target state="needs-translation">Error fetching TOTP settings</target>
+        <target state="translated">Gagal mengambil pengaturan TOTP</target>
       </trans-unit>
       <trans-unit id="1030314492414713260" datatype="html">
         <source>TOTP activated successfully</source>
@@ -6498,7 +6502,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">288</context>
         </context-group>
-        <target state="needs-translation">TOTP activated successfully</target>
+        <target state="translated">TOTP berhasil diaktifkan</target>
       </trans-unit>
       <trans-unit id="3755006064892435830" datatype="html">
         <source>Error activating TOTP</source>
@@ -6510,7 +6514,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">296</context>
         </context-group>
-        <target state="needs-translation">Error activating TOTP</target>
+        <target state="translated">Gagal mengaktifkan TOTP</target>
       </trans-unit>
       <trans-unit id="5919827473541889422" datatype="html">
         <source>TOTP deactivated successfully</source>
@@ -6518,7 +6522,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">312</context>
         </context-group>
-        <target state="needs-translation">TOTP deactivated successfully</target>
+        <target state="translated">TOTP berhasil dinonaktifkan</target>
       </trans-unit>
       <trans-unit id="6214722303383624015" datatype="html">
         <source>Error deactivating TOTP</source>
@@ -6530,7 +6534,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">319</context>
         </context-group>
-        <target state="needs-translation">Error deactivating TOTP</target>
+        <target state="translated">Gagal menonaktifkan TOTP</target>
       </trans-unit>
       <trans-unit id="6617773613987957957" datatype="html">
         <source> No existing links </source>
@@ -6674,7 +6678,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Server OS</target>
+        <target state="translated">Sistem Operasi Server</target>
       </trans-unit>
       <trans-unit id="2903495470702110128" datatype="html">
         <source>Media Storage</source>
@@ -6698,7 +6702,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">total</target>
+        <target state="translated">total</target>
       </trans-unit>
       <trans-unit id="4198035112366277884" datatype="html">
         <source>Database</source>
@@ -6706,7 +6710,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="needs-translation">Database</target>
+        <target state="translated">Basis data</target>
       </trans-unit>
       <trans-unit id="5611592591303869712" datatype="html">
         <source>Status</source>
@@ -6742,7 +6746,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="needs-translation">Up to date</target>
+        <target state="translated">Sudah terbaru</target>
       </trans-unit>
       <trans-unit id="7881311375431899727" datatype="html">
         <source>Latest Migration</source>
@@ -6750,7 +6754,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">85</context>
         </context-group>
-        <target state="needs-translation">Latest Migration</target>
+        <target state="translated">Migrasi Terbaru</target>
       </trans-unit>
       <trans-unit id="4632965004151576238" datatype="html">
         <source>Pending Migrations</source>
@@ -6758,7 +6762,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="needs-translation">Pending Migrations</target>
+        <target state="translated">Migrasi Tertunda</target>
       </trans-unit>
       <trans-unit id="2790343143501919450" datatype="html">
         <source>Tasks Queue</source>
@@ -6766,7 +6770,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">105</context>
         </context-group>
-        <target state="needs-translation">Tasks Queue</target>
+        <target state="translated">Antrean Tugas</target>
       </trans-unit>
       <trans-unit id="6911698235105017958" datatype="html">
         <source>Redis Status</source>
@@ -6774,7 +6778,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">109</context>
         </context-group>
-        <target state="needs-translation">Redis Status</target>
+        <target state="translated">Status Redis</target>
       </trans-unit>
       <trans-unit id="5349496739889768589" datatype="html">
         <source>Celery Status</source>
@@ -6782,7 +6786,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">127</context>
         </context-group>
-        <target state="needs-translation">Celery Status</target>
+        <target state="translated">Status Celery</target>
       </trans-unit>
       <trans-unit id="2041675390931385838" datatype="html">
         <source>Health</source>
@@ -6790,7 +6794,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">153</context>
         </context-group>
-        <target state="needs-translation">Health</target>
+        <target state="translated">Kesehatan</target>
       </trans-unit>
       <trans-unit id="31377277941774469" datatype="html">
         <source>Search Index</source>
@@ -6798,7 +6802,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">157</context>
         </context-group>
-        <target state="needs-translation">Search Index</target>
+        <target state="translated">Indeks Pencarian</target>
       </trans-unit>
       <trans-unit id="9127131074422113272" datatype="html">
         <source>Run Task</source>
@@ -6814,7 +6818,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">245</context>
         </context-group>
-        <target state="needs-translation">Run Task</target>
+        <target state="translated">Jalankan Tugas</target>
       </trans-unit>
       <trans-unit id="4089509911694721896" datatype="html">
         <source>Last Updated</source>
@@ -6822,7 +6826,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">184</context>
         </context-group>
-        <target state="needs-translation">Last Updated</target>
+        <target state="translated">Terakhir Diperbarui</target>
       </trans-unit>
       <trans-unit id="46628344485199198" datatype="html">
         <source>Classifier</source>
@@ -6830,7 +6834,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">189</context>
         </context-group>
-        <target state="needs-translation">Classifier</target>
+        <target state="translated">Klasifikasi</target>
       </trans-unit>
       <trans-unit id="6096684179126491743" datatype="html">
         <source>Last Trained</source>
@@ -6838,7 +6842,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">218</context>
         </context-group>
-        <target state="needs-translation">Last Trained</target>
+        <target state="translated">Terakhir Dilatih</target>
       </trans-unit>
       <trans-unit id="6427836860962380759" datatype="html">
         <source>Sanity Checker</source>
@@ -6846,7 +6850,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">223</context>
         </context-group>
-        <target state="needs-translation">Sanity Checker</target>
+        <target state="translated">Pemeriksa Validitas</target>
       </trans-unit>
       <trans-unit id="6578747070254776938" datatype="html">
         <source>Last Run</source>
@@ -6854,7 +6858,23 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">252</context>
         </context-group>
-        <target state="needs-translation">Last Run</target>
+        <target state="translated">Terakhir Dijalankan</target>
+      </trans-unit>
+      <trans-unit id="5921685253729220446" datatype="html">
+        <source>WebSocket Connection</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
+          <context context-type="linenumber">257</context>
+        </context-group>
+        <target state="translated">Koneksi WebSocket</target>
+      </trans-unit>
+      <trans-unit id="8998179362936748717" datatype="html">
+        <source>OK</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
+          <context context-type="linenumber">261</context>
+        </context-group>
+        <target state="translated">OK</target>
       </trans-unit>
       <trans-unit id="6732151329960766506" datatype="html">
         <source>Copy Raw Error</source>
@@ -6862,7 +6882,7 @@
           <context context-type="sourcefile">src/app/components/common/toast/toast.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Copy Raw Error</target>
+        <target state="translated">Salin Kesalahan Mentah</target>
       </trans-unit>
       <trans-unit id="4524189418954028091" datatype="html">
         <source>Hint: saved views can be created from the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/documents&quot;&gt;"/>documents list<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></source>
@@ -6870,7 +6890,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Hint: saved views can be created from the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/documents&quot;&gt;"/>documents list<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></target>
+        <target state="translated">Tips: tampilan tersimpan dapat dibuat dari <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/documents&quot;&gt;"/>daftar dokumen<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></target>
       </trans-unit>
       <trans-unit id="6581372518205328477" datatype="html">
         <source>Hello <x id="PH" equiv-text="this.settingsService.displayName"/>, welcome to <x id="PH_1" equiv-text="environment.appTitle"/></source>
@@ -6966,7 +6986,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="needs-translation">Filter by owner</target>
+        <target state="translated">Saring berdasarkan pemilik</target>
       </trans-unit>
       <trans-unit id="2807800733729323332" datatype="html">
         <source>Yes</source>
@@ -6978,7 +6998,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">366</context>
         </context-group>
-        <target state="needs-translation">Yes</target>
+        <target state="translated">Ya</target>
       </trans-unit>
       <trans-unit id="3542042671420335679" datatype="html">
         <source>No</source>
@@ -6990,7 +7010,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">366</context>
         </context-group>
-        <target state="needs-translation">No</target>
+        <target state="translated">Tidak</target>
       </trans-unit>
       <trans-unit id="872092479747931526" datatype="html">
         <source>No documents</source>
@@ -7054,7 +7074,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Current ASN</target>
+        <target state="translated">ASN Saat Ini</target>
       </trans-unit>
       <trans-unit id="8693603235657020323" datatype="html">
         <source>Other</source>
@@ -7070,7 +7090,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
-        <target state="needs-translation">Upload documents</target>
+        <target state="translated">Unggah dokumen</target>
       </trans-unit>
       <trans-unit id="6388681050646106203" datatype="html">
         <source>or drop files anywhere</source>
@@ -7078,7 +7098,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">or drop files anywhere</target>
+        <target state="translated">atau seret berkas ke mana saja</target>
       </trans-unit>
       <trans-unit id="1749180330008942007" datatype="html">
         <source>Dismiss completed</source>
@@ -7192,7 +7212,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">7,8</context>
         </context-group>
-        <target state="needs-translation">of <x id="INTERPOLATION" equiv-text="{{previewNumPages}}"/></target>
+        <target state="translated">dari <x id="INTERPOLATION" equiv-text="{{previewNumPages}}"/></target>
       </trans-unit>
       <trans-unit id="8590109102084543521" datatype="html">
         <source>-</source>
@@ -7228,7 +7248,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="needs-translation">Reprocess</target>
+        <target state="translated">Proses Ulang</target>
       </trans-unit>
       <trans-unit id="1418444397960583910" datatype="html">
         <source>More like this</source>
@@ -7250,9 +7270,9 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1382</context>
+          <context context-type="linenumber">1383</context>
         </context-group>
-        <target state="needs-translation">PDF Editor</target>
+        <target state="translated">Editor PDF</target>
       </trans-unit>
       <trans-unit id="6490688569532630280" datatype="html">
         <source>Send</source>
@@ -7260,7 +7280,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="needs-translation">Send</target>
+        <target state="translated">Kirim</target>
       </trans-unit>
       <trans-unit id="4452427314943113135" datatype="html">
         <source>Previous</source>
@@ -7492,7 +7512,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">272</context>
         </context-group>
-        <target state="needs-translation">Archive MD5 checksum</target>
+        <target state="translated">Ceksum MD5 Arsip</target>
       </trans-unit>
       <trans-unit id="6033581412811562084" datatype="html">
         <source>Archive file size</source>
@@ -7508,7 +7528,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">287</context>
         </context-group>
-        <target state="needs-translation">Original document metadata</target>
+        <target state="translated">Metadata dokumen asli</target>
       </trans-unit>
       <trans-unit id="2846565152091361585" datatype="html">
         <source>Archived document metadata</source>
@@ -7516,7 +7536,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">290</context>
         </context-group>
-        <target state="needs-translation">Archived document metadata</target>
+        <target state="translated">Metadata dokumen arsip</target>
       </trans-unit>
       <trans-unit id="7206723502037428235" datatype="html">
         <source>Notes <x id="START_BLOCK_IF" equiv-text="@if (document?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="ngth}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></source>
@@ -7524,7 +7544,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">309,312</context>
         </context-group>
-        <target state="needs-translation">Notes <x id="START_BLOCK_IF" equiv-text="@if (document?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="ngth}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></target>
+        <target state="translated">Catatan <x id="START_BLOCK_IF" equiv-text="@if (document?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="ngth}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></target>
       </trans-unit>
       <trans-unit id="186236568870281953" datatype="html">
         <source>History</source>
@@ -7532,7 +7552,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">320</context>
         </context-group>
-        <target state="needs-translation">History</target>
+        <target state="translated">Riwayat</target>
       </trans-unit>
       <trans-unit id="5129524307369213584" datatype="html">
         <source>Save &amp; next</source>
@@ -7556,7 +7576,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">370</context>
         </context-group>
-        <target state="needs-translation">Document loading...</target>
+        <target state="translated">Memuat dokumen...</target>
       </trans-unit>
       <trans-unit id="8191371354890763172" datatype="html">
         <source>Enter Password</source>
@@ -7580,7 +7600,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">444</context>
         </context-group>
-        <target state="needs-translation">Document changes detected</target>
+        <target state="translated">Perubahan pada dokumen terdeteksi</target>
       </trans-unit>
       <trans-unit id="2887155916749964" datatype="html">
         <source>The version of this document in your browser session appears older than the existing version.</source>
@@ -7588,7 +7608,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">445</context>
         </context-group>
-        <target state="needs-translation">The version of this document in your browser session appears older than the existing version.</target>
+        <target state="translated">Versi dokumen di sesi browser ini tampaknya lebih lama dari versi yang ada.</target>
       </trans-unit>
       <trans-unit id="237142428785956348" datatype="html">
         <source>Saving the document here may overwrite other changes that were made. To restore the existing version, discard your changes or close the document.</source>
@@ -7596,7 +7616,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">446</context>
         </context-group>
-        <target state="needs-translation">Saving the document here may overwrite other changes that were made. To restore the existing version, discard your changes or close the document.</target>
+        <target state="translated">Menyimpan dokumen di sini bisa menimpa perubahan lain yang sudah dilakukan. Untuk mengembalikan versi yang ada, batalkan perubahan atau tutup dokumen.</target>
       </trans-unit>
       <trans-unit id="8720977247725652816" datatype="html">
         <source>Ok</source>
@@ -7604,7 +7624,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">448</context>
         </context-group>
-        <target state="needs-translation">Ok</target>
+        <target state="translated">Ok</target>
       </trans-unit>
       <trans-unit id="6142395741265832184" datatype="html">
         <source>Next document</source>
@@ -7612,7 +7632,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">574</context>
         </context-group>
-        <target state="needs-translation">Next document</target>
+        <target state="translated">Dokumen berikutnya</target>
       </trans-unit>
       <trans-unit id="651985345816518480" datatype="html">
         <source>Previous document</source>
@@ -7620,7 +7640,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">584</context>
         </context-group>
-        <target state="needs-translation">Previous document</target>
+        <target state="translated">Dokumen sebelumnya</target>
       </trans-unit>
       <trans-unit id="2885986061416655600" datatype="html">
         <source>Close document</source>
@@ -7632,7 +7652,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">130</context>
         </context-group>
-        <target state="needs-translation">Close document</target>
+        <target state="translated">Tutup dokumen</target>
       </trans-unit>
       <trans-unit id="8229691481345614469" datatype="html">
         <source>Save document</source>
@@ -7640,7 +7660,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">599</context>
         </context-group>
-        <target state="needs-translation">Save document</target>
+        <target state="translated">Simpan dokumen</target>
       </trans-unit>
       <trans-unit id="1784543155727940353" datatype="html">
         <source>Save and close / next</source>
@@ -7648,7 +7668,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">608</context>
         </context-group>
-        <target state="needs-translation">Save and close / next</target>
+        <target state="translated">Simpan dan tutup / lanjut</target>
       </trans-unit>
       <trans-unit id="5758784066858623886" datatype="html">
         <source>Error retrieving metadata</source>
@@ -7664,7 +7684,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">689</context>
         </context-group>
-        <target state="needs-translation">Error retrieving suggestions.</target>
+        <target state="translated">Gagal mengambil saran.</target>
       </trans-unit>
       <trans-unit id="2194092841814123758" datatype="html">
         <source>Document &quot;<x id="PH" equiv-text="newValues.title"/>&quot; saved successfully.</source>
@@ -7676,7 +7696,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">885</context>
         </context-group>
-        <target state="needs-translation">Document "<x id="PH" equiv-text="newValues.title"/>" saved successfully.</target>
+        <target state="translated">Dokumen "<x id="PH" equiv-text="newValues.title"/>" berhasil disimpan.</target>
       </trans-unit>
       <trans-unit id="6626387786259219838" datatype="html">
         <source>Error saving document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;</source>
@@ -7684,13 +7704,13 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">891</context>
         </context-group>
-        <target state="needs-translation">Error saving document "<x id="PH" equiv-text="this.document.title"/>"</target>
+        <target state="translated">Gagal menyimpan dokumen "<x id="PH" equiv-text="this.document.title"/>"</target>
       </trans-unit>
       <trans-unit id="448882439049417053" datatype="html">
         <source>Error saving document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">940</context>
+          <context context-type="linenumber">941</context>
         </context-group>
         <target state="translated">Kesalahan saat menyimpan dokumen</target>
       </trans-unit>
@@ -7698,39 +7718,39 @@
         <source>Do you really want to move the document &quot;<x id="PH" equiv-text="this.document.title"/>&quot; to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">972</context>
+          <context context-type="linenumber">973</context>
         </context-group>
-        <target state="needs-translation">Do you really want to move the document "<x id="PH" equiv-text="this.document.title"/>" to the trash?</target>
+        <target state="translated">Yakin ingin memindahkan dokumen "<x id="PH" equiv-text="this.document.title"/>" ke tempat sampah?</target>
       </trans-unit>
       <trans-unit id="282586936710748252" datatype="html">
         <source>Documents can be restored prior to permanent deletion.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">973</context>
+          <context context-type="linenumber">974</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">749</context>
         </context-group>
-        <target state="needs-translation">Documents can be restored prior to permanent deletion.</target>
+        <target state="translated">Dokumen masih bisa dipulihkan sebelum dihapus permanen.</target>
       </trans-unit>
       <trans-unit id="2048798344356757326" datatype="html">
         <source>Move to trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">975</context>
+          <context context-type="linenumber">976</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">751</context>
         </context-group>
-        <target state="needs-translation">Move to trash</target>
+        <target state="translated">Pindahkan ke tempat sampah</target>
       </trans-unit>
       <trans-unit id="7295637485862454066" datatype="html">
         <source>Error deleting document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">994</context>
+          <context context-type="linenumber">995</context>
         </context-group>
         <target state="translated">Kesalahan saat menghapus dokumen</target>
       </trans-unit>
@@ -7738,89 +7758,89 @@
         <source>Reprocess confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1014</context>
+          <context context-type="linenumber">1015</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">789</context>
         </context-group>
-        <target state="needs-translation">Reprocess confirm</target>
+        <target state="translated">Konfirmasi proses ulang</target>
       </trans-unit>
       <trans-unit id="2951161989614003846" datatype="html">
         <source>This operation will permanently recreate the archive file for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1015</context>
+          <context context-type="linenumber">1016</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently recreate the archive file for this document.</target>
+        <target state="translated">Tindakan ini akan membuat ulang file arsip dokumen secara permanen.</target>
       </trans-unit>
       <trans-unit id="302054111564709516" datatype="html">
         <source>The archive file will be re-generated with the current settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1016</context>
+          <context context-type="linenumber">1017</context>
         </context-group>
-        <target state="needs-translation">The archive file will be re-generated with the current settings.</target>
+        <target state="translated">File arsip akan dibuat ulang dengan pengaturan saat ini.</target>
       </trans-unit>
       <trans-unit id="8251197608401006898" datatype="html">
         <source>Reprocess operation for &quot;<x id="PH" equiv-text="this.document.title"/>&quot; will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1026</context>
+          <context context-type="linenumber">1027</context>
         </context-group>
-        <target state="needs-translation">Reprocess operation for "<x id="PH" equiv-text="this.document.title"/>" will begin in the background. Close and re-open or reload this document after the operation has completed to see new content.</target>
+        <target state="translated">Proses ulang untuk "<x id="PH" equiv-text="this.document.title"/>" akan dimulai di latar belakang. Tutup dan buka kembali atau muat ulang dokumen ini setelah proses selesai untuk melihat konten baru.</target>
       </trans-unit>
       <trans-unit id="4409560272830824468" datatype="html">
         <source>Error executing operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1037</context>
+          <context context-type="linenumber">1038</context>
         </context-group>
-        <target state="needs-translation">Error executing operation</target>
+        <target state="translated">Gagal menjalankan operasi</target>
       </trans-unit>
       <trans-unit id="6030453331794586802" datatype="html">
         <source>Error downloading document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1086</context>
+          <context context-type="linenumber">1087</context>
         </context-group>
-        <target state="needs-translation">Error downloading document</target>
+        <target state="translated">Gagal mengunduh dokumen</target>
       </trans-unit>
       <trans-unit id="4458954481601077369" datatype="html">
         <source>Page Fit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1163</context>
+          <context context-type="linenumber">1164</context>
         </context-group>
-        <target state="needs-translation">Page Fit</target>
+        <target state="translated">Sesuaikan halaman</target>
       </trans-unit>
       <trans-unit id="4663705961777238777" datatype="html">
         <source>PDF edit operation for &quot;<x id="PH" equiv-text="this.document.title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1401</context>
+          <context context-type="linenumber">1402</context>
         </context-group>
-        <target state="needs-translation">PDF edit operation for "<x id="PH" equiv-text="this.document.title"/>" will begin in the background.</target>
+        <target state="translated">Proses edit PDF untuk "<x id="PH" equiv-text="this.document.title"/>" akan dimulai di latar belakang.</target>
       </trans-unit>
       <trans-unit id="9043972994040261999" datatype="html">
         <source>Error executing PDF edit operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1413</context>
+          <context context-type="linenumber">1414</context>
         </context-group>
-        <target state="needs-translation">Error executing PDF edit operation</target>
+        <target state="translated">Gagal menjalankan proses edit PDF</target>
       </trans-unit>
       <trans-unit id="6085793215710522488" datatype="html">
         <source>An error occurred loading tiff: <x id="PH" equiv-text="err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1480</context>
+          <context context-type="linenumber">1481</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1484</context>
+          <context context-type="linenumber">1485</context>
         </context-group>
-        <target state="needs-translation">An error occurred loading tiff: <x id="PH" equiv-text="err.toString()"/></target>
+        <target state="translated">Terjadi kesalahan saat memuat tiff: <x id="PH" equiv-text="err.toString()"/></target>
       </trans-unit>
       <trans-unit id="4958946940233632319" datatype="html">
         <source>No entries found.</source>
@@ -7828,7 +7848,7 @@
           <context context-type="sourcefile">src/app/components/document-history/document-history.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation">No entries found.</target>
+        <target state="translated">Tidak ada data ditemukan.</target>
       </trans-unit>
       <trans-unit id="6857598786757174736" datatype="html">
         <source>Select:</source>
@@ -7908,7 +7928,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">186</context>
         </context-group>
-        <target state="needs-translation">Custom fields</target>
+        <target state="translated">Bidang khusus</target>
       </trans-unit>
       <trans-unit id="6475890479659129881" datatype="html">
         <source>Filter custom fields</source>
@@ -7916,7 +7936,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">78</context>
         </context-group>
-        <target state="needs-translation">Filter custom fields</target>
+        <target state="translated">Saring bidang khusus</target>
       </trans-unit>
       <trans-unit id="5139192806922838657" datatype="html">
         <source>Set values</source>
@@ -7924,7 +7944,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">86</context>
         </context-group>
-        <target state="needs-translation">Set values</target>
+        <target state="translated">Atur nilai</target>
       </trans-unit>
       <trans-unit id="1050269006235116171" datatype="html">
         <source>Rotate</source>
@@ -7940,7 +7960,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">113</context>
         </context-group>
-        <target state="needs-translation">Merge</target>
+        <target state="translated">Gabungkan</target>
       </trans-unit>
       <trans-unit id="1015374532025907183" datatype="html">
         <source>Include:</source>
@@ -7956,7 +7976,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">139</context>
         </context-group>
-        <target state="needs-translation">Archived files</target>
+        <target state="translated">Berkas terarsip</target>
       </trans-unit>
       <trans-unit id="2520291319362448498" datatype="html">
         <source>Original files</source>
@@ -7964,7 +7984,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">143</context>
         </context-group>
-        <target state="needs-translation">Original files</target>
+        <target state="translated">Berkas asli</target>
       </trans-unit>
       <trans-unit id="8009862506882713059" datatype="html">
         <source>Use formatted filename</source>
@@ -7972,7 +7992,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">148</context>
         </context-group>
-        <target state="needs-translation">Use formatted filename</target>
+        <target state="translated">Gunakan nama berkas terformat</target>
       </trans-unit>
       <trans-unit id="1215215387232313677" datatype="html">
         <source>Error executing bulk operation</source>
@@ -7980,7 +8000,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">285</context>
         </context-group>
-        <target state="needs-translation">Error executing bulk operation</target>
+        <target state="translated">Gagal menjalankan operasi massal</target>
       </trans-unit>
       <trans-unit id="7894972847287473517" datatype="html">
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot;</source>
@@ -7992,7 +8012,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">379</context>
         </context-group>
-        <target state="needs-translation">"<x id="PH" equiv-text="items[0].name"/>"</target>
+        <target state="translated">"<x id="PH" equiv-text="items[0].name"/>"</target>
       </trans-unit>
       <trans-unit id="8639884465898458690" datatype="html">
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot; and &quot;<x id="PH_1" equiv-text="items[1].name"/>&quot;</source>
@@ -8001,7 +8021,7 @@
           <context context-type="linenumber">375</context>
         </context-group>
         <note priority="1" from="description">This is for messages like 'modify "tag1" and "tag2"'</note>
-        <target state="needs-translation">"<x id="PH" equiv-text="items[0].name"/>" and "<x id="PH_1" equiv-text="items[1].name"/>"</target>
+        <target state="translated">"<x id="PH" equiv-text="items[0].name"/>" dan "<x id="PH_1" equiv-text="items[1].name"/>"</target>
       </trans-unit>
       <trans-unit id="1822679894391095557" datatype="html">
         <source><x id="PH" equiv-text="list"/> and &quot;<x id="PH_1" equiv-text="items[items.length - 1].name"/>&quot;</source>
@@ -8010,7 +8030,7 @@
           <context context-type="linenumber">383,385</context>
         </context-group>
         <note priority="1" from="description">this is for messages like 'modify "tag1", "tag2" and "tag3"'</note>
-        <target state="needs-translation"><x id="PH" equiv-text="list"/> and "<x id="PH_1" equiv-text="items[items.length - 1].name"/>"</target>
+        <target state="translated"><x id="PH" equiv-text="list"/> dan "<x id="PH_1" equiv-text="items[items.length - 1].name"/>"</target>
       </trans-unit>
       <trans-unit id="4137232459980262849" datatype="html">
         <source>Confirm tags assignment</source>
@@ -8018,7 +8038,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">400</context>
         </context-group>
-        <target state="needs-translation">Confirm tags assignment</target>
+        <target state="translated">Konfirmasi penetapan tag</target>
       </trans-unit>
       <trans-unit id="6619516195038467207" datatype="html">
         <source>This operation will add the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -8026,7 +8046,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">406</context>
         </context-group>
-        <target state="needs-translation">This operation will add the tag "<x id="PH" equiv-text="tag.name"/>" to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Tindakan ini akan menambahkan tag "<x id="PH" equiv-text="tag.name"/>" ke <x id="PH_1" equiv-text="this.list.selected.size"/> dokumen terpilih.</target>
       </trans-unit>
       <trans-unit id="1894412783609570695" datatype="html">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -8034,7 +8054,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">411,413</context>
         </context-group>
-        <target state="needs-translation">This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Tindakan ini akan menambahkan tag <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> ke <x id="PH_1" equiv-text="this.list.selected.size"/> dokumen terpilih.</target>
       </trans-unit>
       <trans-unit id="7181166515756808573" datatype="html">
         <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -8042,7 +8062,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">419</context>
         </context-group>
-        <target state="needs-translation">This operation will remove the tag "<x id="PH" equiv-text="tag.name"/>" from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Tindakan ini akan menghapus tag "<x id="PH" equiv-text="tag.name"/>" dari <x id="PH_1" equiv-text="this.list.selected.size"/> dokumen terpilih.</target>
       </trans-unit>
       <trans-unit id="3819792277998068944" datatype="html">
         <source>This operation will remove the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -8050,7 +8070,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">424,426</context>
         </context-group>
-        <target state="needs-translation">This operation will remove the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Tindakan ini akan menghapus tag <x id='PH' equiv-text='this._localizeList(changedTags.itemsToRemove)'/> dari <x id='PH_1' equiv-text='this.list.selected.size'/> dokumen terpilih.</target>
       </trans-unit>
       <trans-unit id="2739066218579571288" datatype="html">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -8058,7 +8078,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">428,432</context>
         </context-group>
-        <target state="needs-translation">This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Tindakan ini akan menambahkan tag <x id='PH' equiv-text='this._localizeList(changedTags.itemsToAdd)'/> dan menghapus tag <x id='PH_1' equiv-text='this._localizeList(changedTags.itemsToRemove)'/> pada <x id='PH_2' equiv-text='this.list.selected.size'/> dokumen terpilih.</target>
       </trans-unit>
       <trans-unit id="2996713129519325161" datatype="html">
         <source>Confirm correspondent assignment</source>
@@ -8066,7 +8086,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">469</context>
         </context-group>
-        <target state="needs-translation">Confirm correspondent assignment</target>
+        <target state="translated">Konfirmasi penetapan pengirim</target>
       </trans-unit>
       <trans-unit id="6900893559485781849" datatype="html">
         <source>This operation will assign the correspondent &quot;<x id="PH" equiv-text="correspondent.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -8074,7 +8094,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">471</context>
         </context-group>
-        <target state="needs-translation">This operation will assign the correspondent "<x id="PH" equiv-text="correspondent.name"/>" to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Tindakan ini akan menetapkan pengirim "<x id='PH' equiv-text='correspondent.name'/>" ke <x id='PH_1' equiv-text='this.list.selected.size'/> dokumen terpilih.</target>
       </trans-unit>
       <trans-unit id="1257522660364398440" datatype="html">
         <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -8082,7 +8102,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">473</context>
         </context-group>
-        <target state="needs-translation">This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Tindakan ini akan menghapus pengirim dari <x id='PH' equiv-text='this.list.selected.size'/> dokumen terpilih.</target>
       </trans-unit>
       <trans-unit id="5393409374423140648" datatype="html">
         <source>Confirm document type assignment</source>
@@ -8090,7 +8110,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">507</context>
         </context-group>
-        <target state="needs-translation">Confirm document type assignment</target>
+        <target state="translated">Konfirmasi penetapan tipe dokumen</target>
       </trans-unit>
       <trans-unit id="332180123895325027" datatype="html">
         <source>This operation will assign the document type &quot;<x id="PH" equiv-text="documentType.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -8098,7 +8118,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">509</context>
         </context-group>
-        <target state="needs-translation">This operation will assign the document type "<x id="PH" equiv-text="documentType.name"/>" to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Tindakan ini akan menetapkan tipe dokumen "<x id='PH' equiv-text='documentType.name'/>" ke <x id='PH_1' equiv-text='this.list.selected.size'/> dokumen terpilih.</target>
       </trans-unit>
       <trans-unit id="2236642492594872779" datatype="html">
         <source>This operation will remove the document type from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -8106,7 +8126,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">511</context>
         </context-group>
-        <target state="needs-translation">This operation will remove the document type from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Tindakan ini akan menghapus tipe dokumen dari <x id='PH' equiv-text='this.list.selected.size'/> dokumen terpilih.</target>
       </trans-unit>
       <trans-unit id="6386555513013840736" datatype="html">
         <source>Confirm storage path assignment</source>
@@ -8114,7 +8134,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">545</context>
         </context-group>
-        <target state="needs-translation">Confirm storage path assignment</target>
+        <target state="translated">Konfirmasi penetapan jalur penyimpanan</target>
       </trans-unit>
       <trans-unit id="8750527458618415924" datatype="html">
         <source>This operation will assign the storage path &quot;<x id="PH" equiv-text="storagePath.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -8122,7 +8142,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">547</context>
         </context-group>
-        <target state="needs-translation">This operation will assign the storage path "<x id="PH" equiv-text="storagePath.name"/>" to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Tindakan ini akan menetapkan jalur penyimpanan "<x id='PH' equiv-text='storagePath.name'/>" ke <x id='PH_1' equiv-text='this.list.selected.size'/> dokumen terpilih.</target>
       </trans-unit>
       <trans-unit id="60728365335056946" datatype="html">
         <source>This operation will remove the storage path from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -8130,7 +8150,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">549</context>
         </context-group>
-        <target state="needs-translation">This operation will remove the storage path from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Tindakan ini akan menghapus jalur penyimpanan dari <x id='PH' equiv-text='this.list.selected.size'/> dokumen terpilih.</target>
       </trans-unit>
       <trans-unit id="4187352575310415704" datatype="html">
         <source>Confirm custom field assignment</source>
@@ -8138,7 +8158,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">578</context>
         </context-group>
-        <target state="needs-translation">Confirm custom field assignment</target>
+        <target state="translated">Konfirmasi penetapan bidang khusus</target>
       </trans-unit>
       <trans-unit id="7966494636326273856" datatype="html">
         <source>This operation will assign the custom field &quot;<x id="PH" equiv-text="customField.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -8146,7 +8166,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">584</context>
         </context-group>
-        <target state="needs-translation">This operation will assign the custom field "<x id="PH" equiv-text="customField.name"/>" to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Tindakan ini akan menetapkan bidang khusus "<x id='PH' equiv-text='customField.name'/>" ke <x id='PH_1' equiv-text='this.list.selected.size'/> dokumen terpilih.</target>
       </trans-unit>
       <trans-unit id="5789455969634598553" datatype="html">
         <source>This operation will assign the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -8154,7 +8174,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">589,591</context>
         </context-group>
-        <target state="needs-translation">This operation will assign the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Tindakan ini akan menetapkan bidang khusus <x id='PH' equiv-text='this._localizeList(changedCustomFields.itemsToAdd)'/> ke <x id='PH_1' equiv-text='this.list.selected.size'/> dokumen terpilih.</target>
       </trans-unit>
       <trans-unit id="5648572354333199245" datatype="html">
         <source>This operation will remove the custom field &quot;<x id="PH" equiv-text="customField.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -8162,7 +8182,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">597</context>
         </context-group>
-        <target state="needs-translation">This operation will remove the custom field "<x id="PH" equiv-text="customField.name"/>" from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Tindakan ini akan menghapus bidang khusus "<x id='PH' equiv-text='customField.name'/>" dari <x id='PH_1' equiv-text='this.list.selected.size'/> dokumen terpilih.</target>
       </trans-unit>
       <trans-unit id="6666899594015948817" datatype="html">
         <source>This operation will remove the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -8170,7 +8190,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">602,604</context>
         </context-group>
-        <target state="needs-translation">This operation will remove the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Tindakan ini akan menghapus bidang khusus <x id='PH' equiv-text='this._localizeList(changedCustomFields.itemsToRemove)'/> dari <x id='PH_1' equiv-text='this.list.selected.size'/> dokumen terpilih.</target>
       </trans-unit>
       <trans-unit id="8050047262594964176" datatype="html">
         <source>This operation will assign the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> and remove the custom fields <x id="PH_1" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -8178,7 +8198,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">606,610</context>
         </context-group>
-        <target state="needs-translation">This operation will assign the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> and remove the custom fields <x id="PH_1" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Tindakan ini akan menetapkan bidang khusus <x id='PH' equiv-text='this._localizeList(changedCustomFields.itemsToAdd)'/> dan menghapus bidang khusus <x id='PH_1' equiv-text='this._localizeList(changedCustomFields.itemsToRemove)'/> pada <x id='PH_2' equiv-text='this.list.selected.size'/> dokumen terpilih.</target>
       </trans-unit>
       <trans-unit id="8615059324209654051" datatype="html">
         <source>Move <x id="PH" equiv-text="this.list.selected.size"/> selected document(s) to the trash?</source>
@@ -8186,7 +8206,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">748</context>
         </context-group>
-        <target state="needs-translation">Move <x id="PH" equiv-text="this.list.selected.size"/> selected document(s) to the trash?</target>
+        <target state="translated">Pindahkan <x id='PH' equiv-text='this.list.selected.size'/> dokumen terpilih ke tempat sampah?</target>
       </trans-unit>
       <trans-unit id="8585195717323764335" datatype="html">
         <source>This operation will permanently recreate the archive files for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -8194,7 +8214,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">790</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently recreate the archive files for <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Tindakan ini akan membuat ulang berkas arsip secara permanen untuk <x id='PH' equiv-text='this.list.selected.size'/> dokumen terpilih.</target>
       </trans-unit>
       <trans-unit id="7366623494074776040" datatype="html">
         <source>The archive files will be re-generated with the current settings.</source>
@@ -8202,7 +8222,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">791</context>
         </context-group>
-        <target state="needs-translation">The archive files will be re-generated with the current settings.</target>
+        <target state="translated">Berkas arsip akan dibuat ulang menggunakan pengaturan saat ini.</target>
       </trans-unit>
       <trans-unit id="6555329262222566158" datatype="html">
         <source>Rotate confirm</source>
@@ -8210,7 +8230,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">823</context>
         </context-group>
-        <target state="needs-translation">Rotate confirm</target>
+        <target state="translated">Konfirmasi rotasi</target>
       </trans-unit>
       <trans-unit id="6390006284731990222" datatype="html">
         <source>This operation will permanently rotate the original version of <x id="PH" equiv-text="this.list.selected.size"/> document(s).</source>
@@ -8218,7 +8238,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">824</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently rotate the original version of <x id="PH" equiv-text="this.list.selected.size"/> document(s).</target>
+        <target state="translated">Tindakan ini akan memutar versi asli dari <x id='PH' equiv-text='this.list.selected.size'/> dokumen secara permanen.</target>
       </trans-unit>
       <trans-unit id="7910756456450124185" datatype="html">
         <source>Merge confirm</source>
@@ -8226,7 +8246,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">843</context>
         </context-group>
-        <target state="needs-translation">Merge confirm</target>
+        <target state="translated">Konfirmasi penggabungan</target>
       </trans-unit>
       <trans-unit id="7643543647233874431" datatype="html">
         <source>This operation will merge <x id="PH" equiv-text="this.list.selected.size"/> selected documents into a new document.</source>
@@ -8234,7 +8254,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">844</context>
         </context-group>
-        <target state="needs-translation">This operation will merge <x id="PH" equiv-text="this.list.selected.size"/> selected documents into a new document.</target>
+        <target state="translated">Tindakan ini akan menggabungkan <x id='PH' equiv-text='this.list.selected.size'/> dokumen terpilih menjadi dokumen baru.</target>
       </trans-unit>
       <trans-unit id="7869008840945899895" datatype="html">
         <source>Merged document will be queued for consumption.</source>
@@ -8242,7 +8262,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">863</context>
         </context-group>
-        <target state="needs-translation">Merged document will be queued for consumption.</target>
+        <target state="translated">Dokumen hasil gabungan akan masuk antrean untuk diproses.</target>
       </trans-unit>
       <trans-unit id="476913782630693351" datatype="html">
         <source>Custom fields updated.</source>
@@ -8250,7 +8270,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">887</context>
         </context-group>
-        <target state="needs-translation">Custom fields updated.</target>
+        <target state="translated">Bidang khusus diperbarui.</target>
       </trans-unit>
       <trans-unit id="3873496751167944011" datatype="html">
         <source>Error updating custom fields.</source>
@@ -8258,7 +8278,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">896</context>
         </context-group>
-        <target state="needs-translation">Error updating custom fields.</target>
+        <target state="translated">Gagal memperbarui bidang khusus.</target>
       </trans-unit>
       <trans-unit id="6307402210351946694" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {Set custom fields for 1 document} other {Set custom fields for <x id="INTERPOLATION"/> documents}}</source>
@@ -8266,7 +8286,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component.html</context>
           <context context-type="linenumber">3,7</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {Set custom fields for 1 document} other {Set custom fields for <x id="INTERPOLATION"/> documents}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {Atur bidang khusus untuk 1 dokumen} other{ Atur bidang khusus untuk <x id="INTERPOLATION"/> dokumen}}</target>
       </trans-unit>
       <trans-unit id="8100177157764133131" datatype="html">
         <source>Select custom fields</source>
@@ -8274,7 +8294,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Select custom fields</target>
+        <target state="translated">Pilih bidang khusus</target>
       </trans-unit>
       <trans-unit id="8244572554104037643" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {This operation will also remove 1 custom field from the selected documents.} other {This operation will also
@@ -8283,8 +8303,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component.html</context>
           <context context-type="linenumber">69,74</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {This operation will also remove 1 custom field from the selected documents.} other {This operation will also
-          remove <x id="INTERPOLATION"/> custom fields from the selected documents.}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {Tindakan ini juga akan menghapus 1 bidang khusus dari dokumen terpilih.} other {Tindakan ini juga akan menghapus <x id='INTERPOLATION'/> bidang khusus dari dokumen terpilih.}}</target>
       </trans-unit>
       <trans-unit id="2784168796433474565" datatype="html">
         <source>Filter by tag</source>
@@ -8304,7 +8323,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="needs-translation">View notes</target>
+        <target state="translated">Lihat catatan</target>
       </trans-unit>
       <trans-unit id="3727324658595204357" datatype="html">
         <source>Created: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate }}"/></source>
@@ -8320,7 +8339,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">91,92</context>
         </context-group>
-        <target state="needs-translation">Created: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate }}"/></target>
+        <target state="translated">Dibuat: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="2030261243264601523" datatype="html">
         <source>Added: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></source>
@@ -8336,7 +8355,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">92,93</context>
         </context-group>
-        <target state="needs-translation">Added: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></target>
+        <target state="translated">Ditambahkan:<x id="INTERPOLATION" equiv-text="{{ document.added | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="4235671847487610290" datatype="html">
         <source>Modified: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></source>
@@ -8352,7 +8371,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">93,94</context>
         </context-group>
-        <target state="needs-translation">Modified: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></target>
+        <target state="translated">Diubah: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="197162226430950645" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {1 page} other {<x id="INTERPOLATION"/> pages}}</source>
@@ -8364,7 +8383,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">106</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {1 page} other {<x id="INTERPOLATION"/> pages}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {1 halaman} other {<x id="INTERPOLATION"/> halaman}}</target>
       </trans-unit>
       <trans-unit id="5739581984228459958" datatype="html">
         <source>Shared</source>
@@ -8384,7 +8403,7 @@
           <context context-type="sourcefile">src/app/pipes/username.pipe.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Shared</target>
+        <target state="translated">Dibagikan</target>
       </trans-unit>
       <trans-unit id="2332107018974972998" datatype="html">
         <source>Score:</source>
