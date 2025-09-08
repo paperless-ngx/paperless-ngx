@@ -964,6 +964,7 @@ export class DocumentDetailComponent
       .patch(this.getChangedFields())
       .pipe(
         switchMap((updateResult) => {
+          this.savedViewService.maybeRefreshDocumentCounts()
           return this.documentListViewService.getNext(this.documentId).pipe(
             map((nextDocId) => ({ nextDocId, updateResult })),
             takeUntil(this.unsubscribeNotifier)

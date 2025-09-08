@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-31 22:24+0000\n"
-"PO-Revision-Date: 2025-08-31 22:25\n"
+"PO-Revision-Date: 2025-09-03 12:13\n"
 "Last-Translator: \n"
 "Language-Team: Serbian (Latin)\n"
 "Language: sr_CS\n"
@@ -23,7 +23,7 @@ msgstr "Dokumenta"
 
 #: documents/filters.py:384
 msgid "Value must be valid JSON."
-msgstr "Value must be valid JSON."
+msgstr "Vrednost mora da bude važeći JSON."
 
 #: documents/filters.py:403
 msgid "Invalid custom field query expression"
@@ -51,7 +51,7 @@ msgstr "{data_type} ne podržava izraz u upitu {expr!r}."
 
 #: documents/filters.py:658
 msgid "Maximum nesting depth exceeded."
-msgstr "Premašena je maksimalni nesting depth."
+msgstr "Premašena je maksimalna dubina grananja."
 
 #: documents/filters.py:843
 msgid "Custom field not found"
@@ -124,7 +124,7 @@ msgstr "je oznaka prijemnog sandučeta"
 
 #: documents/models.py:106
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr "Označava ovu oznaku kao oznaku prijemnog sandučeta (inbox): Svi novoobrađeni dokumenti će biti označeni oznakama prijemnog sandučeta (inbox)."
+msgstr "Obeležava ovu oznaku kao oznaku prijemnog sandučeta: Svi novoobrađeni dokumenti biće automatski označeni oznakom prijemnog sandučeta."
 
 #: documents/models.py:112
 msgid "tag"

@@ -48,4 +48,5 @@ export interface SystemStatus {
     llmindex_last_modified: string // ISO date string
     llmindex_error: string
   }
+  websocket_connected?: SystemStatusItemStatus // added client-side
 }

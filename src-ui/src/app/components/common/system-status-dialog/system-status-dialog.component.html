@@ -254,6 +254,18 @@
                   <h6><ng-container i18n>Error</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.sanity_check_error}}</span>
                 }
               </ng-template>
+              <dt i18n>WebSocket Connection</dt>
+              <dd>
+                <span class="btn btn-sm pe-none align-items-center btn-dark text-uppercase small">
+                  @if (status.websocket_connected === 'OK') {
+                    <ng-container i18n>OK</ng-container>
+                    <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
+                  } @else {
+                    <ng-container i18n>Error</ng-container>
+                    <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
+                  }
+                </span>
+              </dd>
               @if (aiEnabled) {
                 <dt i18n>AI Index</dt>
                 <dd class="d-flex align-items-center">

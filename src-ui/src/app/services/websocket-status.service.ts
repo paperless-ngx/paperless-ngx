@@ -103,6 +103,7 @@ export class WebsocketStatusService {
   private documentConsumptionFinishedSubject = new Subject<FileStatus>()
   private documentConsumptionFailedSubject = new Subject<FileStatus>()
   private documentDeletedSubject = new Subject<boolean>()
+  private connectionStatusSubject = new Subject<boolean>()
 
   private get(taskId: string, filename?: string) {
     let status =
@@ -153,6 +154,15 @@ export class WebsocketStatusService {
     this.statusWebSocket = new WebSocket(
       `${environment.webSocketProtocol}//${environment.webSocketHost}${environment.webSocketBaseUrl}status/`
     )
+    this.statusWebSocket.onopen = () => {
+      this.connectionStatusSubject.next(true)
+    }
+    this.statusWebSocket.onclose = () => {
+      this.connectionStatusSubject.next(false)
+    }
+    this.statusWebSocket.onerror = () => {
+      this.connectionStatusSubject.next(false)
+    }
     this.statusWebSocket.onmessage = (ev: MessageEvent) => {
       const {
         type,
@@ -285,5 +295,13 @@ export class WebsocketStatusService {
 
   onDocumentDeleted() {
     return this.documentDeletedSubject
+  }
+
+  onConnectionStatus() {
+    return this.connectionStatusSubject.asObservable()
+  }
+
+  isConnected(): boolean {
+    return this.statusWebSocket?.readyState === WebSocket.OPEN
   }
 }

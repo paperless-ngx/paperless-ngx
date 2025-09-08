@@ -1,5 +1,5 @@
 import { Clipboard, ClipboardModule } from '@angular/cdk/clipboard'
-import { Component, OnInit, inject } from '@angular/core'
+import { Component, OnDestroy, OnInit, inject } from '@angular/core'
 import {
   NgbActiveModal,
   NgbModalModule,
@@ -7,6 +7,7 @@ import {
   NgbProgressbarModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { Subject, takeUntil } from 'rxjs'
 import { PaperlessTaskName } from 'src/app/data/paperless-task'
 import {
   SystemStatus,
@@ -20,6 +21,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { SystemStatusService } from 'src/app/services/system-status.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { environment } from 'src/environments/environment'
 
 @Component({
@@ -36,13 +38,14 @@ import { environment } from 'src/environments/environment'
     NgxBootstrapIconsModule,
   ],
 })
-export class SystemStatusDialogComponent implements OnInit {
+export class SystemStatusDialogComponent implements OnInit, OnDestroy {
   activeModal = inject(NgbActiveModal)
   private clipboard = inject(Clipboard)
   private systemStatusService = inject(SystemStatusService)
   private tasksService = inject(TasksService)
   private toastService = inject(ToastService)
   private permissionsService = inject(PermissionsService)
+  private websocketStatusService = inject(WebsocketStatusService)
   private settingsService = inject(SettingsService)
 
   public SystemStatusItemStatus = SystemStatusItemStatus
@@ -54,6 +57,7 @@ export class SystemStatusDialogComponent implements OnInit {
   public copied: boolean = false
 
   private runningTasks: Set<PaperlessTaskName> = new Set()
+  private unsubscribeNotifier: Subject<any> = new Subject()
 
   get currentUserIsSuperUser(): boolean {
     return this.permissionsService.isSuperUser()
@@ -72,6 +76,17 @@ export class SystemStatusDialogComponent implements OnInit {
     if (this.versionMismatch) {
       this.status.pngx_version = `${this.status.pngx_version} (frontend: ${this.frontendVersion})`
     }
+    this.status.websocket_connected = this.websocketStatusService.isConnected()
+      ? SystemStatusItemStatus.OK
+      : SystemStatusItemStatus.ERROR
+    this.websocketStatusService
+      .onConnectionStatus()
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((connected) => {
+        this.status.websocket_connected = connected
+          ? SystemStatusItemStatus.OK
+          : SystemStatusItemStatus.ERROR
+      })
   }
 
   public close() {
@@ -104,7 +119,7 @@ export class SystemStatusDialogComponent implements OnInit {
         this.runningTasks.delete(taskName)
         this.systemStatusService.get().subscribe({
           next: (status) => {
-            this.status = status
+            Object.assign(this.status, status)
           },
         })
       },
@@ -116,5 +131,10 @@ export class SystemStatusDialogComponent implements OnInit {
         )
       },
     })
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribeNotifier.next(this)
+    this.unsubscribeNotifier.complete()
   }
 }
