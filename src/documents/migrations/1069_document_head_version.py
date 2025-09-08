@@ -7,7 +7,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "1063_alter_workflowactionwebhook_url_and_more"),
+        ("documents", "1068_alter_document_created"),
     ]
 
     operations = [
