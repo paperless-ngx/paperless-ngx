@@ -44,4 +44,5 @@ export interface SystemStatus {
     sanity_check_last_run: string // ISO date string
     sanity_check_error: string
   }
+  websocket_connected?: SystemStatusItemStatus // added client-side
 }

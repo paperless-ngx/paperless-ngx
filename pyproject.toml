@@ -1,6 +1,6 @@
 [project]
 name = "paperless-ngx"
-version = "2.18.3"
+version = "2.18.4"
 description = "A community-supported supercharged document management system: scan, index and archive all your physical documents"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -125,6 +125,7 @@ typing = [
   "django-filter-stubs",
   "django-stubs[compatible-mypy]",
   "djangorestframework-stubs[compatible-mypy]",
+  "lxml-stubs",
   "mypy",
   "types-bleach",
   "types-colorama",
@@ -132,6 +133,7 @@ typing = [
   "types-markdown",
   "types-pygments",
   "types-python-dateutil",
+  "types-pytz",
   "types-redis",
   "types-setuptools",
   "types-tqdm",
@@ -272,10 +274,10 @@ exclude_also = [
 ]
 
 [tool.mypy]
+mypy_path = "src"
 plugins = [
   "mypy_django_plugin.main",
   "mypy_drf_plugin.main",
-  "numpy.typing.mypy_plugin",
 ]
 check_untyped_defs = true
 disallow_any_generics = true
