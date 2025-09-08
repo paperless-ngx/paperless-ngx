@@ -14,6 +14,51 @@ from documents.classifier import DocumentClassifier
 from documents.models import Document
 
 
+def _resolve_effective_doc(pk: int, request) -> Document | None:
+    """
+    Resolve which Document row should be considered for caching keys:
+    - If a version is requested, use that version
+    - If pk is a head doc, use its newest child version if present, else the head.
+    - Else, pk is a version, use that version.
+    Returns None if resolution fails (treat as no-cache).
+    """
+    try:
+        request_doc = Document.objects.only("id", "head_version_id").get(pk=pk)
+    except Document.DoesNotExist:
+        return None
+
+    head_doc = (
+        request_doc
+        if request_doc.head_version_id is None
+        else Document.objects.only("id").get(id=request_doc.head_version_id)
+    )
+
+    version_param = (
+        request.query_params.get("version")
+        if hasattr(request, "query_params")
+        else None
+    )
+    if version_param:
+        try:
+            version_id = int(version_param)
+            candidate = Document.objects.only("id", "head_version_id").get(
+                id=version_id,
+            )
+            if candidate.id != head_doc.id and candidate.head_version_id != head_doc.id:
+                return None
+            return candidate
+        except Exception:
+            return None
+
+    # Default behavior: if pk is a head doc, prefer its newest child version
+    if request_doc.head_version_id is None:
+        latest = head_doc.versions.only("id").order_by("id").last()
+        return latest or head_doc
+
+    # pk is already a version
+    return request_doc
+
+
 def suggestions_etag(request, pk: int) -> str | None:
     """
     Returns an optional string for the ETag, allowing browser caching of
@@ -71,11 +116,10 @@ def metadata_etag(request, pk: int) -> str | None:
     Metadata is extracted from the original file, so use its checksum as the
     ETag
     """
-    try:
-        doc = Document.objects.only("checksum").get(pk=pk)
-        return doc.checksum
-    except Document.DoesNotExist:  # pragma: no cover
+    doc = _resolve_effective_doc(pk, request)
+    if doc is None:
         return None
+    return doc.checksum
     return None
 
 
@@ -85,11 +129,10 @@ def metadata_last_modified(request, pk: int) -> datetime | None:
     not the modification of the original file, but of the database object, but might as well
     error on the side of more cautious
     """
-    try:
-        doc = Document.objects.only("modified").get(pk=pk)
-        return doc.modified
-    except Document.DoesNotExist:  # pragma: no cover
+    doc = _resolve_effective_doc(pk, request)
+    if doc is None:
         return None
+    return doc.modified
     return None
 
 
@@ -97,15 +140,15 @@ def preview_etag(request, pk: int) -> str | None:
     """
     ETag for the document preview, using the original or archive checksum, depending on the request
     """
-    try:
-        doc = Document.objects.only("checksum", "archive_checksum").get(pk=pk)
-        use_original = (
-            "original" in request.query_params
-            and request.query_params["original"] == "true"
-        )
-        return doc.checksum if use_original else doc.archive_checksum
-    except Document.DoesNotExist:  # pragma: no cover
+    doc = _resolve_effective_doc(pk, request)
+    if doc is None:
         return None
+    use_original = (
+        hasattr(request, "query_params")
+        and "original" in request.query_params
+        and request.query_params["original"] == "true"
+    )
+    return doc.checksum if use_original else doc.archive_checksum
     return None
 
 
@@ -114,11 +157,10 @@ def preview_last_modified(request, pk: int) -> datetime | None:
     Uses the documents modified time to set the Last-Modified header.  Not strictly
     speaking correct, but close enough and quick
     """
-    try:
-        doc = Document.objects.only("modified").get(pk=pk)
-        return doc.modified
-    except Document.DoesNotExist:  # pragma: no cover
+    doc = _resolve_effective_doc(pk, request)
+    if doc is None:
         return None
+    return doc.modified
     return None
 
 
@@ -128,10 +170,13 @@ def thumbnail_last_modified(request, pk: int) -> datetime | None:
     Cache should be (slightly?) faster than filesystem
     """
     try:
-        doc = Document.objects.only("storage_type").get(pk=pk)
+        doc = _resolve_effective_doc(pk, request)
+        if doc is None:
+            return None
         if not doc.thumbnail_path.exists():
             return None
-        doc_key = get_thumbnail_modified_key(pk)
+        # Use the effective document id for cache key
+        doc_key = get_thumbnail_modified_key(doc.id)
 
         cache_hit = cache.get(doc_key)
         if cache_hit is not None:
