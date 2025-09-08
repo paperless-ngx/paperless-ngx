@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import logging
 import tempfile
 from pathlib import Path
@@ -333,10 +332,8 @@ def rotate(doc_ids: list[int], degrees: int) -> Literal["OK"]:
         f"Attempting to rotate {len(doc_ids)} documents by {degrees} degrees.",
     )
     qs = Document.objects.filter(id__in=doc_ids)
-    affected_docs: list[int] = []
     import pikepdf
 
-    rotate_tasks = []
     for doc in qs:
         if doc.mime_type != "application/pdf":
             logger.warning(
@@ -344,27 +341,33 @@ def rotate(doc_ids: list[int], degrees: int) -> Literal["OK"]:
             )
             continue
         try:
-            with pikepdf.open(doc.source_path, allow_overwriting_input=True) as pdf:
+            # Write rotated output to a temp file and create a new version via consume pipeline
+            filepath: Path = (
+                Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
+                / f"{doc.id}_rotated.pdf"
+            )
+            with pikepdf.open(doc.source_path) as pdf:
                 for page in pdf.pages:
                     page.rotate(degrees, relative=True)
-                pdf.save()
-                doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
-                doc.save()
-                rotate_tasks.append(
-                    update_document_content_maybe_archive_file.s(
-                        document_id=doc.id,
-                    ),
-                )
-                logger.info(
-                    f"Rotated document {doc.id} by {degrees} degrees",
-                )
-                affected_docs.append(doc.id)
+                pdf.remove_unreferenced_resources()
+                pdf.save(filepath)
+
+            # Preserve metadata/permissions via overrides; mark as new version
+            overrides = DocumentMetadataOverrides().from_document(doc)
+
+            consume_file.delay(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=filepath,
+                    head_version_id=doc.id,
+                ),
+                overrides,
+            )
+            logger.info(
+                f"Queued new rotated version for document {doc.id} by {degrees} degrees",
+            )
         except Exception as e:
             logger.exception(f"Error rotating document {doc.id}: {e}")
-
-    if len(affected_docs) > 0:
-        bulk_update_task = bulk_update_documents.si(document_ids=affected_docs)
-        chord(header=rotate_tasks, body=bulk_update_task).delay()
 
     return "OK"
 
@@ -528,19 +531,31 @@ def delete_pages(doc_ids: list[int], pages: list[int]) -> Literal["OK"]:
     import pikepdf
 
     try:
-        with pikepdf.open(doc.source_path, allow_overwriting_input=True) as pdf:
+        # Produce edited PDF to a temp file and create a new version
+        filepath: Path = (
+            Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
+            / f"{doc.id}_pages_deleted.pdf"
+        )
+        with pikepdf.open(doc.source_path) as pdf:
             offset = 1  # pages are 1-indexed
             for page_num in pages:
                 pdf.pages.remove(pdf.pages[page_num - offset])
                 offset += 1  # remove() changes the index of the pages
             pdf.remove_unreferenced_resources()
-            pdf.save()
-            doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
-            if doc.page_count is not None:
-                doc.page_count = doc.page_count - len(pages)
-            doc.save()
-            update_document_content_maybe_archive_file.delay(document_id=doc.id)
-            logger.info(f"Deleted pages {pages} from document {doc.id}")
+            pdf.save(filepath)
+
+        overrides = DocumentMetadataOverrides().from_document(doc)
+        consume_file.delay(
+            ConsumableDocument(
+                source=DocumentSource.ConsumeFolder,
+                original_file=filepath,
+                head_version_id=doc.id,
+            ),
+            overrides,
+        )
+        logger.info(
+            f"Queued new version for document {doc.id} after deleting pages {pages}",
+        )
     except Exception as e:
         logger.exception(f"Error deleting pages from document {doc.id}: {e}")
 
@@ -592,17 +607,29 @@ def edit_pdf(
                     dst.pages[-1].rotate(op["rotate"], relative=True)
 
         if update_document:
-            temp_path = doc.source_path.with_suffix(".tmp.pdf")
+            # Create a new version from the edited PDF rather than replacing in-place
             pdf = pdf_docs[0]
             pdf.remove_unreferenced_resources()
-            # save the edited PDF to a temporary file in case of errors
-            pdf.save(temp_path)
-            # replace the original document with the edited one
-            temp_path.replace(doc.source_path)
-            doc.checksum = hashlib.md5(doc.source_path.read_bytes()).hexdigest()
-            doc.page_count = len(pdf.pages)
-            doc.save()
-            update_document_content_maybe_archive_file.delay(document_id=doc.id)
+            filepath: Path = (
+                Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
+                / f"{doc.id}_edited.pdf"
+            )
+            pdf.save(filepath)
+            overrides = (
+                DocumentMetadataOverrides().from_document(doc)
+                if include_metadata
+                else DocumentMetadataOverrides()
+            )
+            if user is not None:
+                overrides.owner_id = user.id
+            consume_file.delay(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=filepath,
+                    head_version_id=doc.id,
+                ),
+                overrides,
+            )
         else:
             consume_tasks = []
             overrides = (
