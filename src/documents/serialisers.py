@@ -1016,6 +1016,10 @@ class DocumentSerializer(
             request.version if request else settings.REST_FRAMEWORK["DEFAULT_VERSION"],
         )
 
+        if doc.get("versions") is not None:
+            doc["versions"] = sorted(doc["versions"], reverse=True)
+            doc["versions"].append(doc["id"])
+
         if api_version < 9:
             # provide created as a datetime for backwards compatibility
             from django.utils import timezone

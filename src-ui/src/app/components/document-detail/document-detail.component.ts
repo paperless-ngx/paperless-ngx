@@ -644,8 +644,10 @@ export class DocumentDetailComponent
 
   updateComponent(doc: Document) {
     this.document = doc
-    // Default selected version is the head document
-    this.selectedVersionId = doc.id
+    // Default selected version is the newest version
+    this.selectedVersionId = doc.versions?.length
+      ? Math.max(...doc.versions)
+      : doc.id
     this.requiresPassword = false
     this.updateFormForCustomFields()
     if (this.archiveContentRenderType === ContentRenderType.TIFF) {
@@ -714,6 +716,8 @@ export class DocumentDetailComponent
   selectVersion(versionId: number) {
     this.selectedVersionId = versionId
     this.previewUrl = this.documentsService.getPreviewUrl(
+      this.documentId,
+      false,
       this.selectedVersionId
     )
     this.thumbUrl = this.documentsService.getThumbUrl(this.selectedVersionId)

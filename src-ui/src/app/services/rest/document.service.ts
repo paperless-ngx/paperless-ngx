@@ -163,11 +163,18 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     })
   }
 
-  getPreviewUrl(id: number, original: boolean = false): string {
+  getPreviewUrl(
+    id: number,
+    original: boolean = false,
+    versionID: number = null
+  ): string {
     let url = new URL(this.getResourceUrl(id, 'preview'))
     if (this._searchQuery) url.hash = `#search="${this.searchQuery}"`
     if (original) {
       url.searchParams.append('original', 'true')
+    }
+    if (versionID) {
+      url.searchParams.append('version', versionID.toString())
     }
     return url.toString()
   }
