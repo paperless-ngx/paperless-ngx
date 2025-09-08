@@ -44,6 +44,27 @@
     }
   </div>
 
+  @if (document?.versions?.length > 0) {
+    <div class="btn-group ms-2" ngbDropdown role="group">
+      <button class="btn btn-sm btn-outline-secondary dropdown-toggle" ngbDropdownToggle>
+        <i-bs name="layers"></i-bs>
+        <span class="d-none d-lg-inline ps-1" i18n>Version</span>
+      </button>
+      <div class="dropdown-menu shadow" ngbDropdownMenu>
+        <button ngbDropdownItem (click)="selectVersion(document.id)">
+          <span i18n>Current</span>
+          @if (selectedVersionId === document.id) { <span>&nbsp;✓</span> }
+        </button>
+        @for (vid of document.versions; track vid) {
+          <button ngbDropdownItem (click)="selectVersion(vid)">
+            <span i18n>Version</span> {{vid}}
+            @if (selectedVersionId === vid) { <span>&nbsp;✓</span> }
+          </button>
+        }
+      </div>
+    </div>
+  }
+
   <div class="ms-auto" ngbDropdown>
     <button class="btn btn-sm btn-outline-primary" id="actionsDropdown" ngbDropdownToggle>
       <i-bs name="three-dots"></i-bs>
@@ -65,6 +86,12 @@
       <button ngbDropdownItem (click)="editPdf()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
         <i-bs name="pencil"></i-bs>&nbsp;<ng-container i18n>PDF Editor</ng-container>
       </button>
+
+      <div class="dropdown-divider"></div>
+      <button ngbDropdownItem (click)="triggerUploadVersion()" [disabled]="!userIsOwner || !userCanEdit">
+        <i-bs name="file-earmark-plus"></i-bs>&nbsp;<ng-container i18n>Upload new version</ng-container>
+      </button>
+      <input #versionFileInput type="file" class="visually-hidden" (change)="onVersionFileSelected($event)" />
     </div>
   </div>
 

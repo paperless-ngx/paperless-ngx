@@ -159,6 +159,10 @@ export interface Document extends ObjectWithPermissions {
 
   page_count?: number
 
+  // Versioning
+  head_version?: number
+  versions?: number[]
+
   // Frontend only
   __changedFields?: string[]
 }

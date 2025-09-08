@@ -222,6 +222,8 @@ export class DocumentDetailComponent
   titleSubject: Subject<string> = new Subject()
   previewUrl: string
   thumbUrl: string
+  // Versioning: which document ID to use for file preview/download
+  selectedVersionId: number
   previewText: string
   previewLoaded: boolean = false
   tiffURL: string
@@ -270,6 +272,7 @@ export class DocumentDetailComponent
   public readonly DataType = DataType
 
   @ViewChild('nav') nav: NgbNav
+  @ViewChild('versionFileInput') versionFileInput
   @ViewChild('pdfPreview') set pdfPreview(element) {
     // this gets called when component added or removed from DOM
     if (
@@ -402,7 +405,10 @@ export class DocumentDetailComponent
   }
 
   private loadDocument(documentId: number): void {
-    this.previewUrl = this.documentsService.getPreviewUrl(documentId)
+    this.selectedVersionId = documentId
+    this.previewUrl = this.documentsService.getPreviewUrl(
+      this.selectedVersionId
+    )
     this.http
       .get(this.previewUrl, { responseType: 'text' })
       .pipe(
@@ -417,7 +423,7 @@ export class DocumentDetailComponent
             err.message ?? err.toString()
           }`),
       })
-    this.thumbUrl = this.documentsService.getThumbUrl(documentId)
+    this.thumbUrl = this.documentsService.getThumbUrl(this.selectedVersionId)
     this.documentsService
       .get(documentId)
       .pipe(
@@ -638,6 +644,8 @@ export class DocumentDetailComponent
 
   updateComponent(doc: Document) {
     this.document = doc
+    // Default selected version is the head document
+    this.selectedVersionId = doc.id
     this.requiresPassword = false
     this.updateFormForCustomFields()
     if (this.archiveContentRenderType === ContentRenderType.TIFF) {
@@ -700,6 +708,30 @@ export class DocumentDetailComponent
     }
     this.title = this.documentTitlePipe.transform(doc.title)
     this.prepareForm(doc)
+  }
+
+  // Update file preview and download target to a specific version (by document id)
+  selectVersion(versionId: number) {
+    this.selectedVersionId = versionId
+    this.previewUrl = this.documentsService.getPreviewUrl(
+      this.selectedVersionId
+    )
+    this.thumbUrl = this.documentsService.getThumbUrl(this.selectedVersionId)
+    // For text previews, refresh content
+    this.http
+      .get(this.previewUrl, { responseType: 'text' })
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier)
+      )
+      .subscribe({
+        next: (res) => (this.previewText = res.toString()),
+        error: (err) =>
+          (this.previewText = $localize`An error occurred loading content: ${
+            err.message ?? err.toString()
+          }`),
+      })
   }
 
   get customFieldFormFields(): FormArray {
@@ -1049,10 +1081,41 @@ export class DocumentDetailComponent
     })
   }
 
+  // Upload a new file version for this document
+  triggerUploadVersion() {
+    this.versionFileInput?.nativeElement?.click()
+  }
+
+  onVersionFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement
+    if (!input?.files || input.files.length === 0) return
+    const file = input.files[0]
+    // Reset input to allow re-selection of the same file later
+    input.value = ''
+    this.documentsService
+      .uploadVersion(this.documentId, file)
+      .pipe(first())
+      .subscribe({
+        next: () => {
+          this.toastService.showInfo(
+            $localize`Uploading new version. Processing will happen in the background.`
+          )
+          // Refresh metadata to reflect that versions changed (when ready)
+          this.openDocumentService.refreshDocument(this.documentId)
+        },
+        error: (error) => {
+          this.toastService.showError(
+            $localize`Error uploading new version`,
+            error
+          )
+        },
+      })
+  }
+
   download(original: boolean = false) {
     this.downloading = true
     const downloadUrl = this.documentsService.getDownloadUrl(
-      this.documentId,
+      this.selectedVersionId || this.documentId,
       original
     )
     this.http
