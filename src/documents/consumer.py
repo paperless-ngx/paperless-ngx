@@ -488,6 +488,22 @@ class ConsumerPlugin(
                     original_document.head_version = Document.objects.get(
                         pk=self.input_doc.head_version_id,
                     )
+                    file_for_checksum = (
+                        self.unmodified_original
+                        if self.unmodified_original is not None
+                        else self.working_copy
+                    )
+                    original_document.checksum = hashlib.md5(
+                        file_for_checksum.read_bytes(),
+                    ).hexdigest()
+                    original_document.content = text
+                    original_document.page_count = page_count
+                    original_document.mime_type = mime_type
+                    original_document.original_filename = self.filename
+                    # Clear unique file path fields so they can be generated uniquely later
+                    original_document.filename = None
+                    original_document.archive_filename = None
+                    original_document.archive_checksum = None
                     original_document.modified = timezone.now()
                     original_document.save()
                     document = original_document
