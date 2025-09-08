@@ -660,18 +660,55 @@ class DocumentViewSet(
             and request.query_params["original"] == "true"
         )
 
+    def _resolve_file_doc(self, head_doc: Document, request):
+        version_param = request.query_params.get("version")
+        if version_param:
+            try:
+                version_id = int(version_param)
+            except (TypeError, ValueError):
+                raise NotFound("Invalid version parameter")
+            try:
+                candidate = Document.global_objects.select_related("owner").get(
+                    id=version_id,
+                )
+            except Document.DoesNotExist:
+                raise Http404
+            if candidate.id != head_doc.id and candidate.head_version_id != head_doc.id:
+                raise Http404
+            return candidate
+        latest = head_doc.versions.order_by("id").last()
+        return latest or head_doc
+
     def file_response(self, pk, request, disposition):
-        doc = Document.global_objects.select_related("owner").get(id=pk)
+        request_doc = Document.global_objects.select_related("owner").get(id=pk)
+        head_doc = (
+            request_doc
+            if request_doc.head_version_id is None
+            else Document.global_objects.select_related("owner").get(
+                id=request_doc.head_version_id,
+            )
+        )
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "view_document",
-            doc,
+            head_doc,
         ):
             return HttpResponseForbidden("Insufficient permissions")
+        # If a version is explicitly requested, use it. Otherwise:
+        # - if pk is a head document: serve newest version
+        # - if pk is a version: serve that version
+        if "version" in request.query_params:
+            file_doc = self._resolve_file_doc(head_doc, request)
+        else:
+            file_doc = (
+                self._resolve_file_doc(head_doc, request)
+                if request_doc.head_version_id is None
+                else request_doc
+            )
         return serve_file(
-            doc=doc,
+            doc=file_doc,
             use_archive=not self.original_requested(request)
-            and doc.has_archive_version,
+            and file_doc.has_archive_version,
             disposition=disposition,
         )
 
@@ -706,15 +743,32 @@ class DocumentViewSet(
     )
     def metadata(self, request, pk=None):
         try:
-            doc = Document.objects.select_related("owner").get(pk=pk)
+            request_doc = Document.objects.select_related("owner").get(pk=pk)
+            head_doc = (
+                request_doc
+                if request_doc.head_version_id is None
+                else Document.objects.select_related("owner").get(
+                    id=request_doc.head_version_id,
+                )
+            )
             if request.user is not None and not has_perms_owner_aware(
                 request.user,
                 "view_document",
-                doc,
+                head_doc,
             ):
                 return HttpResponseForbidden("Insufficient permissions")
         except Document.DoesNotExist:
             raise Http404
+
+        # Choose the effective document (newest version by default, or explicit via ?version=)
+        if "version" in request.query_params:
+            doc = self._resolve_file_doc(head_doc, request)
+        else:
+            doc = (
+                self._resolve_file_doc(head_doc, request)
+                if request_doc.head_version_id is None
+                else request_doc
+            )
 
         document_cached_metadata = get_metadata_cache(doc.pk)
 
@@ -827,17 +881,32 @@ class DocumentViewSet(
     @method_decorator(last_modified(thumbnail_last_modified))
     def thumb(self, request, pk=None):
         try:
-            doc = Document.objects.select_related("owner").get(id=pk)
+            request_doc = Document.objects.select_related("owner").get(id=pk)
+            head_doc = (
+                request_doc
+                if request_doc.head_version_id is None
+                else Document.objects.select_related("owner").get(
+                    id=request_doc.head_version_id,
+                )
+            )
             if request.user is not None and not has_perms_owner_aware(
                 request.user,
                 "view_document",
-                doc,
+                head_doc,
             ):
                 return HttpResponseForbidden("Insufficient permissions")
-            if doc.storage_type == Document.STORAGE_TYPE_GPG:
-                handle = GnuPG.decrypted(doc.thumbnail_file)
+            if "version" in request.query_params:
+                file_doc = self._resolve_file_doc(head_doc, request)
             else:
-                handle = doc.thumbnail_file
+                file_doc = (
+                    self._resolve_file_doc(head_doc, request)
+                    if request_doc.head_version_id is None
+                    else request_doc
+                )
+            if file_doc.storage_type == Document.STORAGE_TYPE_GPG:
+                handle = GnuPG.decrypted(file_doc.thumbnail_file)
+            else:
+                handle = file_doc.thumbnail_file
 
             return HttpResponse(handle, content_type="image/webp")
         except (FileNotFoundError, Document.DoesNotExist):
