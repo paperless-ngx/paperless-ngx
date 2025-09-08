@@ -1553,6 +1553,15 @@ wheels = [
 ]
 
 [[package]]
+name = "lxml-stubs"
+version = "0.5.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/99/da/1a3a3e5d159b249fc2970d73437496b908de8e4716a089c69591b4ffa6fd/lxml-stubs-0.5.1.tar.gz", hash = "sha256:e0ec2aa1ce92d91278b719091ce4515c12adc1d564359dfaf81efa7d4feab79d", size = 14778, upload-time = "2024-01-10T09:37:46.521Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1f/c9/e0f8e4e6e8a69e5959b06499582dca6349db6769cc7fdfb8a02a7c75a9ae/lxml_stubs-0.5.1-py3-none-any.whl", hash = "sha256:1f689e5dbc4b9247cb09ae820c7d34daeb1fdbd1db06123814b856dae7787272", size = 13584, upload-time = "2024-01-10T09:37:44.931Z" },
+]
+
+[[package]]
 name = "markdown"
 version = "3.7"
 source = { registry = "https://pypi.org/simple" }
@@ -2007,7 +2016,7 @@ wheels = [
 
 [[package]]
 name = "paperless-ngx"
-version = "2.18.3"
+version = "2.18.4"
 source = { virtual = "." }
 dependencies = [
     { name = "babel", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -2130,6 +2139,7 @@ typing = [
     { name = "django-filter-stubs", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "django-stubs", extra = ["compatible-mypy"], marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "djangorestframework-stubs", extra = ["compatible-mypy"], marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "lxml-stubs", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "mypy", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-bleach", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-colorama", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -2137,6 +2147,7 @@ typing = [
     { name = "types-markdown", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-pygments", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-python-dateutil", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "types-pytz", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-redis", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-setuptools", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-tqdm", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -2257,6 +2268,7 @@ typing = [
     { name = "django-filter-stubs" },
     { name = "django-stubs", extras = ["compatible-mypy"] },
     { name = "djangorestframework-stubs", extras = ["compatible-mypy"] },
+    { name = "lxml-stubs" },
     { name = "mypy" },
     { name = "types-bleach" },
     { name = "types-colorama" },
@@ -2264,6 +2276,7 @@ typing = [
     { name = "types-markdown" },
     { name = "types-pygments" },
     { name = "types-python-dateutil" },
+    { name = "types-pytz" },
     { name = "types-redis" },
     { name = "types-setuptools" },
     { name = "types-tqdm" },
@@ -3778,6 +3791,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/a9/60/47d92293d9bc521cd2301e423a358abfac0ad409b3a1606d8fbae1321961/types_python_dateutil-2.9.0.20241206.tar.gz", hash = "sha256:18f493414c26ffba692a72369fea7a154c502646301ebfe3d56a04b3767284cb", size = 13802, upload-time = "2024-12-06T02:56:41.019Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/0f/b3/ca41df24db5eb99b00d97f89d7674a90cb6b3134c52fb8121b6d8d30f15c/types_python_dateutil-2.9.0.20241206-py3-none-any.whl", hash = "sha256:e248a4bc70a486d3e3ec84d0dc30eec3a5f979d6e7ee4123ae043eedbb987f53", size = 14384, upload-time = "2024-12-06T02:56:39.412Z" },
+]
+
+[[package]]
+name = "types-pytz"
+version = "2025.2.0.20250809"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/07/e2/c774f754de26848f53f05defff5bb21dd9375a059d1ba5b5ea943cf8206e/types_pytz-2025.2.0.20250809.tar.gz", hash = "sha256:222e32e6a29bb28871f8834e8785e3801f2dc4441c715cd2082b271eecbe21e5", size = 10876, upload-time = "2025-08-09T03:14:17.453Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/db/d0/91c24fe54e565f2344d7a6821e6c6bb099841ef09007ea6321a0bac0f808/types_pytz-2025.2.0.20250809-py3-none-any.whl", hash = "sha256:4f55ed1b43e925cf851a756fe1707e0f5deeb1976e15bf844bcaa025e8fbd0db", size = 10095, upload-time = "2025-08-09T03:14:16.674Z" },
 ]
 
 [[package]]
