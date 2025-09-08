@@ -871,8 +871,36 @@ class DocumentViewSet(
     )
     def preview(self, request, pk=None):
         try:
-            response = self.file_response(pk, request, "inline")
-            return response
+            request_doc = Document.objects.select_related("owner").get(id=pk)
+            head_doc = (
+                request_doc
+                if request_doc.head_version_id is None
+                else Document.objects.select_related("owner").get(
+                    id=request_doc.head_version_id,
+                )
+            )
+            if request.user is not None and not has_perms_owner_aware(
+                request.user,
+                "view_document",
+                head_doc,
+            ):
+                return HttpResponseForbidden("Insufficient permissions")
+
+            if "version" in request.query_params:
+                file_doc = self._resolve_file_doc(head_doc, request)
+            else:
+                file_doc = (
+                    self._resolve_file_doc(head_doc, request)
+                    if request_doc.head_version_id is None
+                    else request_doc
+                )
+
+            return serve_file(
+                doc=file_doc,
+                use_archive=not self.original_requested(request)
+                and file_doc.has_archive_version,
+                disposition="inline",
+            )
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404
 
