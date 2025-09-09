@@ -26,6 +26,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.models import Correspondent
+from documents.models import MatchingModel
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from paperless_mail import tasks
@@ -446,6 +447,8 @@ class TestMail(
         c = handler._get_correspondent(message, rule)
         self.assertIsNotNone(c)
         self.assertEqual(c.name, "someone@somewhere.com")
+        self.assertEqual(c.matching_algorithm, MatchingModel.MATCH_ANY)
+        self.assertEqual(c.match, "someone@somewhere.com")
         c = handler._get_correspondent(message2, rule)
         self.assertIsNotNone(c)
         self.assertEqual(c.name, "me@localhost.com")
