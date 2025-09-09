@@ -468,7 +468,12 @@ class MailAccountHandler(LoggingMixin):
 
     def _correspondent_from_name(self, name: str) -> Correspondent | None:
         try:
-            return Correspondent.objects.get_or_create(name=name)[0]
+            return Correspondent.objects.get_or_create(
+                name=name,
+                defaults={
+                    "match": name,
+                },
+            )[0]
         except DatabaseError as e:
             self.log.error(f"Error while retrieving correspondent {name}: {e}")
             return None
