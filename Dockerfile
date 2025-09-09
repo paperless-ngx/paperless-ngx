@@ -32,7 +32,7 @@ RUN set -eux \
 # Purpose: Installs s6-overlay and rootfs
 # Comments:
 #  - Don't leave anything extra in here either
-FROM ghcr.io/astral-sh/uv:0.8.13-python3.12-bookworm-slim AS s6-overlay-base
+FROM ghcr.io/astral-sh/uv:0.8.15-python3.12-bookworm-slim AS s6-overlay-base
 
 WORKDIR /usr/src/s6
 
