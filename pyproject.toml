@@ -94,7 +94,7 @@ dev = [
 ]
 
 docs = [
-  "mkdocs-glightbox~=0.4.0",
+  "mkdocs-glightbox~=0.5.1",
   "mkdocs-material~=9.6.4",
 ]
 
