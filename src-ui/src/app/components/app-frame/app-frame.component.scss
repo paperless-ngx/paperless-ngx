@@ -191,7 +191,7 @@ main {
   list-style-type: none;
 
   &:hover .close {
-    display: block;
+    display: flex;
   }
 
   .close {

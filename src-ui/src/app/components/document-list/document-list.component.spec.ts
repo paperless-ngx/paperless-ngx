@@ -199,6 +199,14 @@ describe('DocumentListComponent', () => {
     }
     const queryParams = { id: view.id.toString() }
     const getSavedViewSpy = jest.spyOn(savedViewService, 'getCached')
+    const setCountSpy = jest.spyOn(savedViewService, 'setDocumentCount')
+    jest.spyOn(documentService, 'listFiltered').mockReturnValue(
+      of({
+        results: docs,
+        count: 3,
+        all: docs.map((d) => d.id),
+      })
+    )
     getSavedViewSpy.mockReturnValue(of(view))
     const activateSavedViewSpy = jest.spyOn(
       documentListService,
@@ -215,6 +223,7 @@ describe('DocumentListComponent', () => {
       view,
       convertToParamMap(queryParams)
     )
+    expect(setCountSpy).toHaveBeenCalledWith(view, 3)
   })
 
   it('should 404 on load saved view from URL if no view', () => {
@@ -246,6 +255,34 @@ describe('DocumentListComponent', () => {
       .mockReturnValue(of(convertToParamMap({ view: view.id.toString() })))
     fixture.detectChanges()
     expect(getSavedViewSpy).toHaveBeenCalledWith(view.id)
+  })
+
+  it('should update saved view document count on load saved view from query params', () => {
+    jest.spyOn(savedViewService, 'getCached').mockReturnValue(
+      of({
+        id: 10,
+        sort_field: 'added',
+        sort_reverse: true,
+        filter_rules: [],
+      })
+    )
+    jest.spyOn(documentService, 'listFiltered').mockReturnValue(
+      of({
+        results: docs,
+        count: 3,
+        all: docs.map((d) => d.id),
+      })
+    )
+    const setCountSpy = jest.spyOn(savedViewService, 'setDocumentCount')
+    jest.spyOn(documentService, 'listFiltered').mockReturnValue(
+      of({
+        results: docs,
+        count: 3,
+        all: docs.map((d) => d.id),
+      })
+    )
+    component.loadViewConfig(10)
+    expect(setCountSpy).toHaveBeenCalledWith(expect.any(Object), 3)
   })
 
   it('should support 3 different display modes', () => {

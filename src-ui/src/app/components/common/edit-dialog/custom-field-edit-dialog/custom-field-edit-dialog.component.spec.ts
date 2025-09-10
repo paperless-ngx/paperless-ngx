@@ -125,4 +125,42 @@ describe('CustomFieldEditDialogComponent', () => {
     fixture.detectChanges()
     expect(document.activeElement).toBe(selectOptionInputs.last.nativeElement)
   })
+
+  it('should send all select options including those changed in form on save', () => {
+    component.dialogMode = EditDialogMode.EDIT
+    component.object = {
+      id: 1,
+      name: 'Field 1',
+      data_type: CustomFieldDataType.Select,
+      extra_data: {
+        select_options: Array.from({ length: 50 }, (_, i) => ({
+          label: `Option ${i + 1}`,
+          id: `${i + 1}-xyz`,
+        })),
+      },
+    }
+    fixture.detectChanges()
+    component.ngOnInit()
+    component.selectOptionsPage = 2
+    fixture.detectChanges()
+    component.objectForm
+      .get('extra_data')
+      .get('select_options')
+      .get('0')
+      .get('label')
+      .setValue('Updated Option 9')
+    const formValues = (component as any).getFormValues()
+    // first item unchanged
+    expect(formValues.extra_data.select_options[0]).toEqual({
+      label: 'Option 1',
+      id: '1-xyz',
+    })
+    // page 2 first item updated
+    expect(
+      formValues.extra_data.select_options[component.SELECT_OPTION_PAGE_SIZE]
+    ).toEqual({
+      label: 'Updated Option 9',
+      id: '9-xyz',
+    })
+  })
 })

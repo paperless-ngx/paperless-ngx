@@ -2797,7 +2797,7 @@ class SystemStatusView(PassUserMixin):
             install_type = "docker"
 
         db_conn = connections["default"]
-        db_url = db_conn.settings_dict["NAME"]
+        db_url = str(db_conn.settings_dict["NAME"])
         db_error = None
 
         try:
@@ -2869,6 +2869,11 @@ class SystemStatusView(PassUserMixin):
         last_trained_task = (
             PaperlessTask.objects.filter(
                 task_name=PaperlessTask.TaskName.TRAIN_CLASSIFIER,
+                status__in=[
+                    states.SUCCESS,
+                    states.FAILURE,
+                    states.REVOKED,
+                ],  # ignore running tasks
             )
             .order_by("-date_done")
             .first()
@@ -2878,7 +2883,7 @@ class SystemStatusView(PassUserMixin):
         if last_trained_task is None:
             classifier_status = "WARNING"
             classifier_error = "No classifier training tasks found"
-        elif last_trained_task and last_trained_task.status == states.FAILURE:
+        elif last_trained_task and last_trained_task.status != states.SUCCESS:
             classifier_status = "ERROR"
             classifier_error = last_trained_task.result
         classifier_last_trained = (
@@ -2888,6 +2893,11 @@ class SystemStatusView(PassUserMixin):
         last_sanity_check = (
             PaperlessTask.objects.filter(
                 task_name=PaperlessTask.TaskName.CHECK_SANITY,
+                status__in=[
+                    states.SUCCESS,
+                    states.FAILURE,
+                    states.REVOKED,
+                ],  # ignore running tasks
             )
             .order_by("-date_done")
             .first()
@@ -2897,7 +2907,7 @@ class SystemStatusView(PassUserMixin):
         if last_sanity_check is None:
             sanity_check_status = "WARNING"
             sanity_check_error = "No sanity check tasks found"
-        elif last_sanity_check and last_sanity_check.status == states.FAILURE:
+        elif last_sanity_check and last_sanity_check.status != states.SUCCESS:
             sanity_check_status = "ERROR"
             sanity_check_error = last_sanity_check.result
         sanity_check_last_run = (
