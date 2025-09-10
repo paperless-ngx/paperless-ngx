@@ -28,7 +28,7 @@
           <ng-template ng-option-tmp let-item="item" let-index="index" let-search="searchTerm">
             <div class="tag-wrap">
               @if (item.id && tags) {
-                <pngx-tag class="me-2" [tag]="getTag(item.id)"></pngx-tag>
+                <pngx-tag class="me-2" [tag]="getTag(item.id)" showParents="true"></pngx-tag>
               }
             </div>
           </ng-template>
