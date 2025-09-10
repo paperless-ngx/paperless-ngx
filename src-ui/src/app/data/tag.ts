@@ -10,4 +10,8 @@ export interface Tag extends MatchingModel {
   parent?: number // Tag ID
 
   children?: Tag[] // read-only
+
+  // UI-only: computed depth and order for hierarchical dropdowns
+  depth?: number
+  orderIndex?: number
 }
