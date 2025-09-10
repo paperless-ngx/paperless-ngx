@@ -196,6 +196,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
   addTag(id) {
     this.value = [...this.value, id]
+    this.onAdd(this.getTag(id))
     this.onChange(this.value)
   }
 
