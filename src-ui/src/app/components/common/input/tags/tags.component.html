@@ -26,9 +26,20 @@
             </button>
           </ng-template>
           <ng-template ng-option-tmp let-item="item" let-index="index" let-search="searchTerm">
-            <div class="tag-wrap">
+            <div class="tag-option-row d-flex align-items-center">
               @if (item.id && tags) {
-                <pngx-tag class="me-2" [tag]="getTag(item.id)" showParents="true"></pngx-tag>
+                @if (getTag(item.id)?.parent) {
+                  <i-bs name="list-nested" class="me-1"></i-bs>
+                  <span class="hierarchy-reveal d-flex align-items-center">
+                    <span class="parents d-flex align-items-center">
+                      @for (p of getParentChain(item.id); track p.id) {
+                        <span class="badge me-1" [style.background]="p.color" [style.color]="p.text_color">{{p.name}}</span>
+                        <i-bs name="chevron-right" width=".8em" height=".8em" class="me-1"></i-bs>
+                      }
+                    </span>
+                  </span>
+                }
+                <pngx-tag class="current-tag d-flex" [tag]="getTag(item.id)"></pngx-tag>
               }
             </div>
           </ng-template>

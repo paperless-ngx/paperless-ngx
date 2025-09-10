@@ -20,3 +20,40 @@
       }
   }
 }
+
+// Dropdown hierarchy reveal for ng-select options
+::ng-deep .ng-dropdown-panel .ng-option {
+  .tag-option-row {
+    font-size: 1rem;
+  }
+
+  .hierarchy-reveal {
+    overflow: hidden;
+    max-width: 0;
+    transition: max-width 200ms ease;
+  }
+
+  // .hierarchy-indicator {
+  //   display: inline-block;
+  //   width: .35rem;
+  //   height: 1rem;
+  //   border-radius: .25rem;
+  //   background: var(--pngx-border-color, rgba(0,0,0,.2));
+  // }
+
+  .parents .badge {
+    white-space: nowrap;
+  }
+}
+
+// Expand reveal area when hovering or when option is keyboard-marked
+::ng-deep .ng-dropdown-panel .ng-option:hover .hierarchy-reveal,
+::ng-deep .ng-dropdown-panel .ng-option.ng-option-marked .hierarchy-reveal {
+  max-width: 1000px; // effectively "auto" for transition
+}
+
+// Fade indicator when expanded
+::ng-deep .ng-dropdown-panel .ng-option:hover .hierarchy-indicator,
+::ng-deep .ng-dropdown-panel .ng-option.ng-option-marked .hierarchy-indicator {
+  background: transparent;
+}
