@@ -195,6 +195,7 @@ def update_document(writer: AsyncWriter, doc: Document) -> None:
         original_filename=doc.original_filename,
         is_shared=len(viewer_ids) > 0,
     )
+    logger.debug(f"Index updated for document {doc.pk}.")
 
 
 def remove_document(writer: AsyncWriter, doc: Document) -> None:

@@ -299,6 +299,10 @@ export class DocumentDetailComponent
     return this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
   }
 
+  get isMobile(): boolean {
+    return this.deviceDetectorService.isMobile()
+  }
+
   get aiEnabled(): boolean {
     return this.settings.get(SETTINGS_KEYS.AI_ENABLED)
   }
@@ -1477,6 +1481,44 @@ export class DocumentDetailComponent
               )
             },
           })
+      })
+  }
+
+  printDocument() {
+    const printUrl = this.documentsService.getDownloadUrl(
+      this.document.id,
+      false
+    )
+    this.http
+      .get(printUrl, { responseType: 'blob' })
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (blob) => {
+          const blobUrl = URL.createObjectURL(blob)
+          const iframe = document.createElement('iframe')
+          iframe.style.display = 'none'
+          iframe.src = blobUrl
+          document.body.appendChild(iframe)
+          iframe.onload = () => {
+            try {
+              iframe.contentWindow.focus()
+              iframe.contentWindow.print()
+              iframe.contentWindow.onafterprint = () => {
+                document.body.removeChild(iframe)
+                URL.revokeObjectURL(blobUrl)
+              }
+            } catch (err) {
+              this.toastService.showError($localize`Print failed.`, err)
+              document.body.removeChild(iframe)
+              URL.revokeObjectURL(blobUrl)
+            }
+          }
+        },
+        error: () => {
+          this.toastService.showError(
+            $localize`Error loading document for printing.`
+          )
+        },
       })
   }
 
