@@ -1,4 +1,5 @@
-from django.test import TestCase
+from unittest import TestCase
+
 from django.test import override_settings
 
 from paperless_remote import check_remote_parser_configured
@@ -18,7 +19,7 @@ class TestChecks(TestCase):
         self.assertEqual(len(msgs), 1)
         self.assertTrue(
             msgs[0].msg.startswith(
-                "Azure AI remote parser requires endpoint to be configured.",
+                "Azure AI remote parser requires endpoint and API key to be configured.",
             ),
         )
 
