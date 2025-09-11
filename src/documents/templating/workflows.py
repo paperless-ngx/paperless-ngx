@@ -1,6 +1,32 @@
+import logging
 from datetime import date
 from datetime import datetime
 from pathlib import Path
+
+from django.utils.text import slugify as django_slugify
+from jinja2 import StrictUndefined
+from jinja2 import Template
+from jinja2 import TemplateSyntaxError
+from jinja2 import UndefinedError
+from jinja2 import make_logging_undefined
+from jinja2.sandbox import SecurityError
+
+from documents.templating.environment import _template_environment
+from documents.templating.filters import format_datetime
+from documents.templating.filters import localize_date
+
+logger = logging.getLogger("paperless.templating")
+
+_LogStrictUndefined = make_logging_undefined(logger, StrictUndefined)
+
+
+_template_environment.undefined = _LogStrictUndefined
+
+_template_environment.filters["datetime"] = format_datetime
+
+_template_environment.filters["slugify"] = django_slugify
+
+_template_environment.filters["localize_date"] = localize_date
 
 
 def parse_w_workflow_placeholders(
@@ -20,6 +46,7 @@ def parse_w_workflow_placeholders(
     e.g. for pre-consumption triggers created will not have been parsed yet, but it will
     for added / updated triggers
     """
+
     formatting = {
         "correspondent": correspondent_name,
         "document_type": doc_type_name,
@@ -52,4 +79,28 @@ def parse_w_workflow_placeholders(
         formatting.update({"doc_title": doc_title})
     if doc_url is not None:
         formatting.update({"doc_url": doc_url})
-    return text.format(**formatting).strip()
+
+    logger.debug(f"Jinja Template is : {text}")
+    try:
+        template = _template_environment.from_string(
+            text,
+            template_class=Template,
+        )
+        rendered_template = template.render(formatting)
+
+        # We're good!
+        return rendered_template
+    except UndefinedError as e:
+        # The undefined class logs this already for us
+        raise e
+    except TemplateSyntaxError as e:
+        logger.warning(f"Template syntax error in title generation: {e}")
+    except SecurityError as e:
+        logger.warning(f"Template attempted restricted operation: {e}")
+    except Exception as e:
+        logger.warning(f"Unknown error in title generation: {e}")
+        logger.warning(
+            f"Invalid title format '{text}', workflow not applied: {e}",
+        )
+        raise e
+    return None

@@ -306,6 +306,28 @@ class Document(SoftDeleteModel, ModelWithOwner):
         return res
 
     @property
+    def suggestion_content(self):
+        """
+        Returns the document text used to generate suggestions.
+
+        If the document content length exceeds a specified limit,
+        the text is cropped to include the start and end segments.
+        Otherwise, the full content is returned.
+
+        This improves processing speed for large documents while keeping
+        enough context for accurate suggestions.
+        """
+        if not self.content or len(self.content) <= 1200000:
+            return self.content
+        else:
+            # Use 80% from the start and 20% from the end
+            # to preserve both opening and closing context.
+            head_len = 800000
+            tail_len = 200000
+
+            return " ".join((self.content[:head_len], self.content[-tail_len:]))
+
+    @property
     def source_path(self) -> Path:
         if self.filename:
             fname = str(self.filename)
@@ -1022,6 +1044,14 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has this correspondent"),
     )
 
+    filter_has_storage_path = models.ForeignKey(
+        StoragePath,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("has this storage path"),
+    )
+
     schedule_offset_days = models.IntegerField(
         _("schedule offset days"),
         default=0,
@@ -1185,14 +1215,12 @@ class WorkflowAction(models.Model):
         default=WorkflowActionType.ASSIGNMENT,
     )
 
-    assign_title = models.CharField(
+    assign_title = models.TextField(
         _("assign title"),
-        max_length=256,
         null=True,
         blank=True,
         help_text=_(
-            "Assign a document title, can include some placeholders, "
-            "see documentation.",
+            "Assign a document title, must  be a Jinja2 template, see documentation.",
         ),
     )
 

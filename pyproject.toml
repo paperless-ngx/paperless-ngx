@@ -30,16 +30,16 @@ dependencies = [
   "django-cachalot~=2.8.0",
   "django-celery-results~=2.6.0",
   "django-compression-middleware~=0.5.0",
-  "django-cors-headers~=4.7.0",
+  "django-cors-headers~=4.8.0",
   "django-extensions~=4.1",
   "django-filter~=25.1",
-  "django-guardian~=3.0.3",
+  "django-guardian~=3.1.2",
   "django-multiselectfield~=1.0.1",
   "django-soft-delete~=1.0.18",
   "djangorestframework~=3.16",
   "djangorestframework-guardian~=0.4.0",
   "drf-spectacular~=0.28",
-  "drf-spectacular-sidecar~=2025.8.1",
+  "drf-spectacular-sidecar~=2025.9.1",
   "drf-writable-nested~=0.7.1",
   "filelock~=3.19.1",
   "flower~=2.0.1",
@@ -94,7 +94,7 @@ dev = [
 ]
 
 docs = [
-  "mkdocs-glightbox~=0.4.0",
+  "mkdocs-glightbox~=0.5.1",
   "mkdocs-material~=9.6.4",
 ]
 
@@ -103,7 +103,7 @@ testing = [
   "factory-boy~=3.3.1",
   "imagehash",
   "pytest~=8.4.1",
-  "pytest-cov~=6.2.1",
+  "pytest-cov~=7.0.0",
   "pytest-django~=4.11.1",
   "pytest-env",
   "pytest-httpx",
