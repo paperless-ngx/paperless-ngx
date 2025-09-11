@@ -54,6 +54,10 @@
         <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs>&nbsp;<span i18n>Reprocess</span>
       </button>
 
+      <button ngbDropdownItem (click)="printDocument()" [hidden]="useNativePdfViewer || isMobile">
+        <i-bs width="1em" height="1em" name="printer"></i-bs>&nbsp;<span i18n>Print</span>
+      </button>
+
       <button ngbDropdownItem (click)="moreLike()">
         <i-bs width="1em" height="1em" name="diagram-3"></i-bs>&nbsp;<span i18n>More like this</span>
       </button>
