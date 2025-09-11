@@ -14,7 +14,7 @@ from paperless_remote.signals import get_parser
 class TestParser(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     SAMPLE_FILES = Path(__file__).resolve().parent / "samples"
 
-    def assertContainsStrings(self, content, strings):
+    def assertContainsStrings(self, content: str, strings: list[str]):
         # Asserts that all strings appear in content, in the given order.
         indices = []
         for s in strings:
