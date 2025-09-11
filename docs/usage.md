@@ -472,7 +472,7 @@ The following workflow action types are available:
 -   Tags, correspondent, document type and storage path
 -   Document owner
 -   View and / or edit permissions to users or groups
--   Custom fields.
+-   Custom fields. Note that no value for the field will be set
 
 ##### Removal {#workflow-action-removal}
 
