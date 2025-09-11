@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-09 20:04+0000\n"
+"POT-Creation-Date: 2025-09-11 13:57+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -89,7 +89,7 @@ msgstr ""
 msgid "Automatic"
 msgstr ""
 
-#: documents/models.py:62 documents/models.py:423 documents/models.py:1441
+#: documents/models.py:62 documents/models.py:423 documents/models.py:1439
 #: paperless_mail/models.py:23 paperless_mail/models.py:143
 msgid "name"
 msgstr ""
@@ -256,7 +256,7 @@ msgid "The position of this document in your physical document archive."
 msgstr ""
 
 #: documents/models.py:294 documents/models.py:666 documents/models.py:720
-#: documents/models.py:1484
+#: documents/models.py:1482
 msgid "document"
 msgstr ""
 
@@ -1003,176 +1003,175 @@ msgstr ""
 msgid "assign title"
 msgstr ""
 
-#: documents/models.py:1216
-msgid ""
-"Assign a document title, can include some placeholders, see documentation."
+#: documents/models.py:1215
+msgid "Assign a document title, must  be a Jinja2 template, see documentation."
 msgstr ""
 
-#: documents/models.py:1225 paperless_mail/models.py:274
+#: documents/models.py:1223 paperless_mail/models.py:274
 msgid "assign this tag"
 msgstr ""
 
-#: documents/models.py:1234 paperless_mail/models.py:282
+#: documents/models.py:1232 paperless_mail/models.py:282
 msgid "assign this document type"
 msgstr ""
 
-#: documents/models.py:1243 paperless_mail/models.py:296
+#: documents/models.py:1241 paperless_mail/models.py:296
 msgid "assign this correspondent"
 msgstr ""
 
-#: documents/models.py:1252
+#: documents/models.py:1250
 msgid "assign this storage path"
 msgstr ""
 
-#: documents/models.py:1261
+#: documents/models.py:1259
 msgid "assign this owner"
 msgstr ""
 
-#: documents/models.py:1268
+#: documents/models.py:1266
 msgid "grant view permissions to these users"
 msgstr ""
 
-#: documents/models.py:1275
+#: documents/models.py:1273
 msgid "grant view permissions to these groups"
 msgstr ""
 
-#: documents/models.py:1282
+#: documents/models.py:1280
 msgid "grant change permissions to these users"
 msgstr ""
 
-#: documents/models.py:1289
+#: documents/models.py:1287
 msgid "grant change permissions to these groups"
 msgstr ""
 
-#: documents/models.py:1296
+#: documents/models.py:1294
 msgid "assign these custom fields"
 msgstr ""
 
-#: documents/models.py:1300
+#: documents/models.py:1298
 msgid "custom field values"
 msgstr ""
 
-#: documents/models.py:1304
+#: documents/models.py:1302
 msgid "Optional values to assign to the custom fields."
 msgstr ""
 
-#: documents/models.py:1313
+#: documents/models.py:1311
 msgid "remove these tag(s)"
 msgstr ""
 
-#: documents/models.py:1318
+#: documents/models.py:1316
 msgid "remove all tags"
 msgstr ""
 
-#: documents/models.py:1325
+#: documents/models.py:1323
 msgid "remove these document type(s)"
 msgstr ""
 
-#: documents/models.py:1330
+#: documents/models.py:1328
 msgid "remove all document types"
 msgstr ""
 
-#: documents/models.py:1337
+#: documents/models.py:1335
 msgid "remove these correspondent(s)"
 msgstr ""
 
-#: documents/models.py:1342
+#: documents/models.py:1340
 msgid "remove all correspondents"
 msgstr ""
 
-#: documents/models.py:1349
+#: documents/models.py:1347
 msgid "remove these storage path(s)"
 msgstr ""
 
-#: documents/models.py:1354
+#: documents/models.py:1352
 msgid "remove all storage paths"
 msgstr ""
 
-#: documents/models.py:1361
+#: documents/models.py:1359
 msgid "remove these owner(s)"
 msgstr ""
 
-#: documents/models.py:1366
+#: documents/models.py:1364
 msgid "remove all owners"
 msgstr ""
 
-#: documents/models.py:1373
+#: documents/models.py:1371
 msgid "remove view permissions for these users"
 msgstr ""
 
-#: documents/models.py:1380
+#: documents/models.py:1378
 msgid "remove view permissions for these groups"
 msgstr ""
 
-#: documents/models.py:1387
+#: documents/models.py:1385
 msgid "remove change permissions for these users"
 msgstr ""
 
-#: documents/models.py:1394
+#: documents/models.py:1392
 msgid "remove change permissions for these groups"
 msgstr ""
 
-#: documents/models.py:1399
+#: documents/models.py:1397
 msgid "remove all permissions"
 msgstr ""
 
-#: documents/models.py:1406
+#: documents/models.py:1404
 msgid "remove these custom fields"
 msgstr ""
 
-#: documents/models.py:1411
+#: documents/models.py:1409
 msgid "remove all custom fields"
 msgstr ""
 
-#: documents/models.py:1420
+#: documents/models.py:1418
 msgid "email"
 msgstr ""
 
-#: documents/models.py:1429
+#: documents/models.py:1427
 msgid "webhook"
 msgstr ""
 
-#: documents/models.py:1433
+#: documents/models.py:1431
 msgid "workflow action"
 msgstr ""
 
-#: documents/models.py:1434
+#: documents/models.py:1432
 msgid "workflow actions"
 msgstr ""
 
-#: documents/models.py:1443 paperless_mail/models.py:145
+#: documents/models.py:1441 paperless_mail/models.py:145
 msgid "order"
 msgstr ""
 
-#: documents/models.py:1449
+#: documents/models.py:1447
 msgid "triggers"
 msgstr ""
 
-#: documents/models.py:1456
+#: documents/models.py:1454
 msgid "actions"
 msgstr ""
 
-#: documents/models.py:1459 paperless_mail/models.py:154
+#: documents/models.py:1457 paperless_mail/models.py:154
 msgid "enabled"
 msgstr ""
 
-#: documents/models.py:1470
+#: documents/models.py:1468
 msgid "workflow"
 msgstr ""
 
-#: documents/models.py:1474
+#: documents/models.py:1472
 msgid "workflow trigger type"
 msgstr ""
 
-#: documents/models.py:1488
+#: documents/models.py:1486
 msgid "date run"
 msgstr ""
 
-#: documents/models.py:1494
+#: documents/models.py:1492
 msgid "workflow run"
 msgstr ""
 
-#: documents/models.py:1495
+#: documents/models.py:1493
 msgid "workflow runs"
 msgstr ""
 
