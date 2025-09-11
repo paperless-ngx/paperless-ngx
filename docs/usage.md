@@ -507,7 +507,7 @@ you may want to adjust these settings to prevent abuse.
 
 Titles can be assigned by workflows, using [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/templates/).
 This allows for complex logic to be included in the format, including [logical structures](https://jinja.palletsprojects.com/en/3.1.x/templates/#list-of-control-structures)
-and [filters](https://jinja.palletsprojects.com/en/3.1.x/templates/#id11) to manipulate the title.
+and [filters](https://jinja.palletsprojects.com/en/3.1.x/templates/#id11).
 The template is provided as a string.
 
 Using Jinja2 Templates is also useful for [Date localization](advanced_usage.md#Date-Localization) in the title.
