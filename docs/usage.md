@@ -512,7 +512,7 @@ The template is provided as a string.
 
 Using Jinja2 Templates is also useful for [Date localization](advanced_usage.md#Date-Localization) in the title.
 
-The available options differ depending on the type of workflow trigger.
+The available inputs differ depending on the type of workflow trigger.
 This is because at the time of consumption (when the text is to be set), no automatic tags etc. have been
 applied. You can use the following placeholders in the template with any trigger type:
 
