@@ -503,7 +503,7 @@ For security reasons, webhooks can be limited to specific ports and disallowed f
 [configuration settings](configuration.md#workflow-webhooks) to change this behavior. If you are allowing non-admins to create workflows,
 you may want to adjust these settings to prevent abuse.
 
-#### Workflow placeholders {#workflow-placeholders}
+#### Workflow placeholders
 
 Titles can be assigned by workflows using [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/templates/).
 This allows for complex logic to be used to generate the title, including [logical structures](https://jinja.palletsprojects.com/en/3.1.x/templates/#list-of-control-structures)
