@@ -1150,6 +1150,38 @@ class TestWorkflows(
             expected_str = f"Document correspondent {doc.correspondent} does not match {trigger.filter_has_correspondent}"
             self.assertIn(expected_str, cm.output[1])
 
+    def test_document_added_no_match_storage_path(self):
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_has_storage_path=self.sp,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc assign owner",
+            assign_owner=self.user2,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            original_filename="sample.pdf",
+        )
+
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+            expected_str = f"Document did not match {w}"
+            self.assertIn(expected_str, cm.output[0])
+            expected_str = f"Document storage path {doc.storage_path} does not match {trigger.filter_has_storage_path}"
+            self.assertIn(expected_str, cm.output[1])
+
     def test_document_added_invalid_title_placeholders(self):
         """
         GIVEN:
@@ -1816,6 +1848,7 @@ class TestWorkflows(
             filter_filename="*sample*",
             filter_has_document_type=self.dt,
             filter_has_correspondent=self.c,
+            filter_has_storage_path=self.sp,
         )
         trigger.filter_has_tags.set([self.t1])
         trigger.save()
@@ -1836,6 +1869,7 @@ class TestWorkflows(
                 title=f"sample test {i}",
                 checksum=f"checksum{i}",
                 correspondent=self.c,
+                storage_path=self.sp,
                 original_filename=f"sample_{i}.pdf",
                 document_type=self.dt if i % 2 == 0 else None,
             )

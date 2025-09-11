@@ -408,7 +408,7 @@ Currently, there are three events that correspond to workflow trigger 'types':
    but the document content has been extracted and metadata such as document type, tags, etc. have been set, so these can now
    be used for filtering.
 3. **Document Updated**: when a document is updated. Similar to 'added' events, triggers can include filtering by content matching,
-   tags, doc type, or correspondent.
+   tags, doc type, correspondent or storage path.
 4. **Scheduled**: a scheduled trigger that can be used to run workflows at a specific time. The date used can be either the document
    added, created, updated date or you can specify a (date) custom field. You can also specify a day offset from the date (positive
    offsets will trigger after the date, negative offsets will trigger before).
@@ -452,10 +452,11 @@ Workflows allow you to filter by:
 -   File path, including wildcards. Note that enabling `PAPERLESS_CONSUMER_RECURSIVE` would allow, for
     example, automatically assigning documents to different owners based on the upload directory.
 -   Mail rule. Choosing this option will force 'mail fetch' to be the workflow source.
--   Content matching (`Added` and `Updated` triggers only). Filter document content using the matching settings.
--   Tags (`Added` and `Updated` triggers only). Filter for documents with any of the specified tags
--   Document type (`Added` and `Updated` triggers only). Filter documents with this doc type
--   Correspondent (`Added` and `Updated` triggers only). Filter documents with this correspondent
+-   Content matching (`Added`, `Updated` and `Scheduled` triggers only). Filter document content using the matching settings.
+-   Tags (`Added`, `Updated` and `Scheduled` triggers only). Filter for documents with any of the specified tags
+-   Document type (`Added`, `Updated` and `Scheduled` triggers only). Filter documents with this doc type
+-   Correspondent (`Added`, `Updated` and `Scheduled` triggers only). Filter documents with this correspondent
+-   Storage path (`Added`, `Updated` and `Scheduled` triggers only). Filter documents with this storage path
 
 ### Workflow Actions
 
