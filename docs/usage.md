@@ -506,7 +506,7 @@ you may want to adjust these settings to prevent abuse.
 #### Workflow placeholders {#workflow-placeholders}
 
 Titles can be assigned by workflows, using [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/templates/).
-This allows for complex logic to be included in the format, including [logical structures](https://jinja.palletsprojects.com/en/3.1.x/templates/#list-of-control-structures)
+This allows for complex logic to be used to generate the title, including [logical structures](https://jinja.palletsprojects.com/en/3.1.x/templates/#list-of-control-structures)
 and [filters](https://jinja.palletsprojects.com/en/3.1.x/templates/#id11).
 The template is provided as a string.
 
