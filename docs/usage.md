@@ -505,35 +505,52 @@ you may want to adjust these settings to prevent abuse.
 
 #### Workflow placeholders
 
-Some workflow text can include placeholders but the available options differ depending on the type of
-workflow trigger. This is because at the time of consumption (when the text is to be set), no automatic tags etc. have been
-applied. You can use the following placeholders with any trigger type:
+Titles can be assigned by workflows using [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/templates/).
+This allows for complex logic to be used to generate the title, including [logical structures](https://jinja.palletsprojects.com/en/3.1.x/templates/#list-of-control-structures)
+and [filters](https://jinja.palletsprojects.com/en/3.1.x/templates/#id11).
+The template is provided as a string.
 
--   `{correspondent}`: assigned correspondent name
--   `{document_type}`: assigned document type name
--   `{owner_username}`: assigned owner username
--   `{added}`: added datetime
--   `{added_year}`: added year
--   `{added_year_short}`: added year
--   `{added_month}`: added month
--   `{added_month_name}`: added month name
--   `{added_month_name_short}`: added month short name
--   `{added_day}`: added day
--   `{added_time}`: added time in HH:MM format
--   `{original_filename}`: original file name without extension
--   `{filename}`: current file name without extension
+Using Jinja2 Templates is also useful for [Date localization](advanced_usage.md#Date-Localization) in the title.
+
+The available inputs differ depending on the type of workflow trigger.
+This is because at the time of consumption (when the text is to be set), no automatic tags etc. have been
+applied. You can use the following placeholders in the template with any trigger type:
+
+-   `{{correspondent}}`: assigned correspondent name
+-   `{{document_type}}`: assigned document type name
+-   `{{owner_username}}`: assigned owner username
+-   `{{added}}`: added datetime
+-   `{{added_year}}`: added year
+-   `{{added_year_short}}`: added year
+-   `{{added_month}}`: added month
+-   `{{added_month_name}}`: added month name
+-   `{{added_month_name_short}}`: added month short name
+-   `{{added_day}}`: added day
+-   `{{added_time}}`: added time in HH:MM format
+-   `{{original_filename}}`: original file name without extension
+-   `{{filename}}`: current file name without extension
 
 The following placeholders are only available for "added" or "updated" triggers
 
--   `{created}`: created datetime
--   `{created_year}`: created year
--   `{created_year_short}`: created year
--   `{created_month}`: created month
--   `{created_month_name}`: created month name
--   `{created_month_name_short}`: created month short name
--   `{created_day}`: created day
--   `{created_time}`: created time in HH:MM format
--   `{doc_url}`: URL to the document in the web UI. Requires the `PAPERLESS_URL` setting to be set.
+-   `{{created}}`: created datetime
+-   `{{created_year}}`: created year
+-   `{{created_year_short}}`: created year
+-   `{{created_month}}`: created month
+-   `{{created_month_name}}`: created month name
+-   `{created_month_name_short}}`: created month short name
+-   `{{created_day}}`: created day
+-   `{{created_time}}`: created time in HH:MM format
+-   `{{doc_url}}`: URL to the document in the web UI. Requires the `PAPERLESS_URL` setting to be set.
+
+##### Examples
+
+```jinja2
+{{ created | localize_date('MMMM', 'en_US') }}
+<!-- Output: "January" -->
+
+{{ added | localize_date('MMMM', 'de_DE') }}
+<!-- Output: "Juni" --> # codespell:ignore
+```
 
 ### Workflow permissions
 
