@@ -100,6 +100,7 @@ class RemoteDocumentParser(RasterisedDocumentParser):
             ):
                 f.write(chunk)
 
+        client.close()
         return result.content
 
     def parse(self, document_path: Path, mime_type, file_name=None):
