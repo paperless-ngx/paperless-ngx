@@ -517,7 +517,7 @@ An iso formatted string can also be provided, so it is possible to supply the `a
 
 ###### Parameters
 
--   `value` (date | datetime | str): Date, datetime object or iso string to format (datetime should be timezone-aware)
+-   `value` (date | datetime | str): Date, datetime object or ISO string to format (datetime should be timezone-aware)
 -   `format` (str): Format type - either a Babel preset ('short', 'medium', 'long', 'full') or custom pattern
 -   `locale` (str): Locale code for localization (e.g., 'en_US', 'fr_FR', 'de_DE')
 
