@@ -92,7 +92,7 @@ class RemoteDocumentParser(RasterisedDocumentParser):
         result = poller.result()
 
         # Download the PDF with embedded text
-        self.archive_path = Path(self.tempdir) / "archive.pdf"
+        self.archive_path = self.tempdir / "archive.pdf"
         with self.archive_path.open("wb") as f:
             for chunk in client.get_analyze_result_pdf(
                 model_id="prebuilt-read",
