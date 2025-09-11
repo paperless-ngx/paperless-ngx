@@ -1207,14 +1207,12 @@ class WorkflowAction(models.Model):
         default=WorkflowActionType.ASSIGNMENT,
     )
 
-    assign_title = models.CharField(
+    assign_title = models.TextField(
         _("assign title"),
-        max_length=256,
         null=True,
         blank=True,
         help_text=_(
-            "Assign a document title, can include some placeholders, "
-            "see documentation.",
+            "Assign a document title, must  be a Jinja2 template, see documentation.",
         ),
     )
 
