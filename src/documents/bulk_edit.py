@@ -181,6 +181,7 @@ def modify_custom_fields(
                 defaults[value_field] = value
                 if (
                     custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK
+                    and value
                     and doc_id in value
                 ):
                     # Prevent self-linking
