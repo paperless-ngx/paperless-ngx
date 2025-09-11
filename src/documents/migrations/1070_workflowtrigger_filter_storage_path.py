@@ -7,7 +7,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "1069_migrate_workflow_title_jinja"),
+        ("documents", "1068_alter_document_created"),
     ]
 
     operations = [
