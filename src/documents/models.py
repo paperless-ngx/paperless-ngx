@@ -1044,6 +1044,14 @@ class WorkflowTrigger(models.Model):
         verbose_name=_("has this correspondent"),
     )
 
+    filter_has_storage_path = models.ForeignKey(
+        StoragePath,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_("has this storage path"),
+    )
+
     schedule_offset_days = models.IntegerField(
         _("schedule offset days"),
         default=0,

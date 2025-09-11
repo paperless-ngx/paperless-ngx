@@ -186,6 +186,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                             "filter_has_tags": [self.t1.id],
                             "filter_has_document_type": self.dt.id,
                             "filter_has_correspondent": self.c.id,
+                            "filter_has_storage_path": self.sp.id,
                         },
                     ],
                     "actions": [
