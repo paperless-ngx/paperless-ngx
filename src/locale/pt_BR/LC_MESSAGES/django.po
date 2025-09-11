@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-16 14:34+0000\n"
-"PO-Revision-Date: 2025-08-16 14:36\n"
+"POT-Creation-Date: 2025-08-31 22:24+0000\n"
+"PO-Revision-Date: 2025-08-31 22:25\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -470,83 +470,83 @@ msgstr "não tem correspondente em"
 
 #: documents/models.py:478
 msgid "has document type in"
-msgstr "possui categoria de documento em"
+msgstr "Possui categoria de documento em"
 
 #: documents/models.py:479
 msgid "does not have document type in"
-msgstr "não possui categoria de documento em"
+msgstr "Não possui categoria de documento em"
 
 #: documents/models.py:480
 msgid "has storage path in"
-msgstr "possui caminho de armazenamento em"
+msgstr "Possui caminho de armazenamento em"
 
 #: documents/models.py:481
 msgid "does not have storage path in"
-msgstr "não possui caminho de armazenamento em"
+msgstr "Não possui caminho de armazenamento em"
 
 #: documents/models.py:482
 msgid "owner is"
-msgstr "o proprietário é"
+msgstr "O proprietário é"
 
 #: documents/models.py:483
 msgid "has owner in"
-msgstr "tem proprietário em"
+msgstr "Tem proprietário em"
 
 #: documents/models.py:484
 msgid "does not have owner"
-msgstr "não tem proprietário"
+msgstr "Não tem proprietário"
 
 #: documents/models.py:485
 msgid "does not have owner in"
-msgstr "não tem proprietário em"
+msgstr "Não tem proprietário em"
 
 #: documents/models.py:486
 msgid "has custom field value"
-msgstr "Possui valor de campo personalizado"
+msgstr "Possui valor de campo personalizado "
 
 #: documents/models.py:487
 msgid "is shared by me"
-msgstr "compartilhado por mim"
+msgstr "Compartilhado por mim"
 
 #: documents/models.py:488
 msgid "has custom fields"
-msgstr "Possui campos personalizados "
+msgstr "Possui campos personalizados  "
 
 #: documents/models.py:489
 msgid "has custom field in"
-msgstr "Possui campo personalizado dentro"
+msgstr "Possui campo personalizado dentro "
 
 #: documents/models.py:490
 msgid "does not have custom field in"
-msgstr "Não possui campo personalizado dentro"
+msgstr "Não possui campo personalizado dentro "
 
 #: documents/models.py:491
 msgid "does not have custom field"
-msgstr "Não possui campo personalizado "
+msgstr "Não possui campo personalizado  "
 
 #: documents/models.py:492
 msgid "custom fields query"
-msgstr "consulta de campos personalizados"
+msgstr "Consulta de campos personalizados"
 
 #: documents/models.py:493
 msgid "created to"
-msgstr "criado em"
+msgstr "Criado em"
 
 #: documents/models.py:494
 msgid "created from"
-msgstr "criado por"
+msgstr "Criado por"
 
 #: documents/models.py:495
 msgid "added to"
-msgstr "adicionado em"
+msgstr "Adicionado em"
 
 #: documents/models.py:496
 msgid "added from"
-msgstr "adicionado por"
+msgstr "Adicionado por"
 
 #: documents/models.py:497
 msgid "mime type is"
-msgstr "tipo MIME é"
+msgstr "Yipo MIME é"
 
 #: documents/models.py:507
 msgid "rule type"
@@ -1412,7 +1412,7 @@ msgstr "Como etapa final, por favor preencha o seguinte formulário:"
 #: documents/validators.py:24
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "Não é possível analisar o URI {value}, esquema ausente"
 
 #: documents/validators.py:29
 #, python-brace-format
@@ -1421,12 +1421,13 @@ msgstr ""
 
 #: documents/validators.py:36
 msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
-msgstr ""
+msgstr "Esquema URI '{parts.scheme}' não é permitido. Esquemas permitidos:\n"
+"{', '.join(allowed_schemes)}"
 
 #: documents/validators.py:45
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr ""
+msgstr "Não é possível analisar o URI {value}"
 
 #: paperless/apps.py:11
 msgid "Paperless"
@@ -1620,147 +1621,147 @@ msgstr "Define o mapeamento de códigos de barras da tag"
 msgid "paperless application settings"
 msgstr "configurações do aplicativo paperless"
 
-#: paperless/settings.py:774
+#: paperless/settings.py:772
 msgid "English (US)"
 msgstr "Inglês (EUA)"
 
-#: paperless/settings.py:775
+#: paperless/settings.py:773
 msgid "Arabic"
 msgstr "Árabe"
 
-#: paperless/settings.py:776
+#: paperless/settings.py:774
 msgid "Afrikaans"
 msgstr "Africanês"
 
-#: paperless/settings.py:777
+#: paperless/settings.py:775
 msgid "Belarusian"
 msgstr "Bielorrusso"
 
-#: paperless/settings.py:778
+#: paperless/settings.py:776
 msgid "Bulgarian"
 msgstr "Búlgaro"
 
-#: paperless/settings.py:779
+#: paperless/settings.py:777
 msgid "Catalan"
 msgstr "Catalão"
 
-#: paperless/settings.py:780
+#: paperless/settings.py:778
 msgid "Czech"
 msgstr "Tcheco"
 
-#: paperless/settings.py:781
+#: paperless/settings.py:779
 msgid "Danish"
 msgstr "Dinamarquês"
 
-#: paperless/settings.py:782
+#: paperless/settings.py:780
 msgid "German"
 msgstr "Alemão"
 
-#: paperless/settings.py:783
+#: paperless/settings.py:781
 msgid "Greek"
 msgstr "Grego"
 
-#: paperless/settings.py:784
+#: paperless/settings.py:782
 msgid "English (GB)"
 msgstr "Inglês (GB)"
 
-#: paperless/settings.py:785
+#: paperless/settings.py:783
 msgid "Spanish"
 msgstr "Espanhol"
 
-#: paperless/settings.py:786
+#: paperless/settings.py:784
 msgid "Persian"
-msgstr ""
+msgstr "Persa"
 
-#: paperless/settings.py:787
+#: paperless/settings.py:785
 msgid "Finnish"
 msgstr "Finlandês"
 
-#: paperless/settings.py:788
+#: paperless/settings.py:786
 msgid "French"
 msgstr "Francês"
 
-#: paperless/settings.py:789
+#: paperless/settings.py:787
 msgid "Hungarian"
 msgstr "Húngaro"
 
-#: paperless/settings.py:790
+#: paperless/settings.py:788
 msgid "Italian"
 msgstr "Italiano"
 
-#: paperless/settings.py:791
+#: paperless/settings.py:789
 msgid "Japanese"
 msgstr "Japonês"
 
-#: paperless/settings.py:792
+#: paperless/settings.py:790
 msgid "Korean"
 msgstr "Coreano"
 
-#: paperless/settings.py:793
+#: paperless/settings.py:791
 msgid "Luxembourgish"
 msgstr "Luxemburguês"
 
-#: paperless/settings.py:794
+#: paperless/settings.py:792
 msgid "Norwegian"
 msgstr "Norueguês"
 
-#: paperless/settings.py:795
+#: paperless/settings.py:793
 msgid "Dutch"
 msgstr "Holandês"
 
-#: paperless/settings.py:796
+#: paperless/settings.py:794
 msgid "Polish"
 msgstr "Polonês"
 
-#: paperless/settings.py:797
+#: paperless/settings.py:795
 msgid "Portuguese (Brazil)"
 msgstr "Português (Brasil)"
 
-#: paperless/settings.py:798
+#: paperless/settings.py:796
 msgid "Portuguese"
 msgstr "Português"
 
-#: paperless/settings.py:799
+#: paperless/settings.py:797
 msgid "Romanian"
 msgstr "Romeno"
 
-#: paperless/settings.py:800
+#: paperless/settings.py:798
 msgid "Russian"
 msgstr "Russo"
 
-#: paperless/settings.py:801
+#: paperless/settings.py:799
 msgid "Slovak"
 msgstr "Eslovaco"
 
-#: paperless/settings.py:802
+#: paperless/settings.py:800
 msgid "Slovenian"
 msgstr "Esloveno"
 
-#: paperless/settings.py:803
+#: paperless/settings.py:801
 msgid "Serbian"
 msgstr "Sérvio"
 
-#: paperless/settings.py:804
+#: paperless/settings.py:802
 msgid "Swedish"
 msgstr "Sueco"
 
-#: paperless/settings.py:805
+#: paperless/settings.py:803
 msgid "Turkish"
 msgstr "Turco"
 
-#: paperless/settings.py:806
+#: paperless/settings.py:804
 msgid "Ukrainian"
 msgstr "Ucraniano"
 
-#: paperless/settings.py:807
+#: paperless/settings.py:805
 msgid "Vietnamese"
-msgstr ""
+msgstr "vietnamita"
 
-#: paperless/settings.py:808
+#: paperless/settings.py:806
 msgid "Chinese Simplified"
 msgstr "Chinês Simplificado"
 
-#: paperless/settings.py:809
+#: paperless/settings.py:807
 msgid "Chinese Traditional"
 msgstr "Chinês Tradicional"
 

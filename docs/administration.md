@@ -471,7 +471,7 @@ Failing to invalidate the cache after such modifications can lead to stale data 
 Use the following management command to clear the cache:
 
 ```
-invalidate_cachalot
+python3 manage.py invalidate_cachalot
 ```
 
 !!! info
