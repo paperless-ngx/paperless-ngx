@@ -19,7 +19,7 @@ class TestTagHierarchy(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         self.parent = Tag.objects.create(name="Parent")
-        self.child = Tag.objects.create(name="Child", parent=self.parent)
+        self.child = Tag.objects.create(name="Child", tn_parent=self.parent)
 
         patcher = mock.patch("documents.bulk_edit.bulk_update_documents.delay")
         self.async_task = patcher.start()
@@ -134,8 +134,8 @@ class TestTagHierarchy(APITestCase):
 
     def test_cannot_set_parent_to_descendant(self):
         a = Tag.objects.create(name="A")
-        b = Tag.objects.create(name="B", parent=a)
-        c = Tag.objects.create(name="C", parent=b)
+        b = Tag.objects.create(name="B", tn_parent=a)
+        c = Tag.objects.create(name="C", tn_parent=b)
 
         # Attempt to set A's parent to C (descendant) should fail
         resp = self.client.patch(
@@ -148,9 +148,9 @@ class TestTagHierarchy(APITestCase):
 
     def test_max_depth_on_create(self):
         a = Tag.objects.create(name="A1")
-        b = Tag.objects.create(name="B1", parent=a)
-        c = Tag.objects.create(name="C1", parent=b)
-        d = Tag.objects.create(name="D1", parent=c)
+        b = Tag.objects.create(name="B1", tn_parent=a)
+        c = Tag.objects.create(name="C1", tn_parent=b)
+        d = Tag.objects.create(name="D1", tn_parent=c)
 
         # Creating E under D yields depth 5: allowed
         resp_ok = self.client.post(
@@ -176,12 +176,12 @@ class TestTagHierarchy(APITestCase):
 
     def test_max_depth_on_move_subtree(self):
         a = Tag.objects.create(name="A2")
-        b = Tag.objects.create(name="B2", parent=a)
-        c = Tag.objects.create(name="C2", parent=b)
-        d = Tag.objects.create(name="D2", parent=c)
+        b = Tag.objects.create(name="B2", tn_parent=a)
+        c = Tag.objects.create(name="C2", tn_parent=b)
+        d = Tag.objects.create(name="D2", tn_parent=c)
 
         x = Tag.objects.create(name="X2")
-        y = Tag.objects.create(name="Y2", parent=x)
+        y = Tag.objects.create(name="Y2", tn_parent=x)
         assert y.parent_id == x.id
 
         # Moving X under D would make deepest node Y exceed depth 5 -> reject

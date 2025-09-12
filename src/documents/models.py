@@ -14,6 +14,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from multiselectfield import MultiSelectField
+from treenode.models import TreeNodeModel
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
@@ -97,7 +98,7 @@ class Correspondent(MatchingModel):
         verbose_name_plural = _("correspondents")
 
 
-class Tag(MatchingModel):
+class Tag(MatchingModel, TreeNodeModel):
     color = models.CharField(_("color"), max_length=7, default="#a6cee3")
     # Maximum allowed nesting depth for tags (root = 1, max depth = 5)
     MAX_NESTING_DEPTH: Final[int] = 5
@@ -111,35 +112,12 @@ class Tag(MatchingModel):
         ),
     )
 
-    parent = models.ForeignKey(
-        "self",
-        blank=True,
-        null=True,
-        on_delete=models.CASCADE,
-        related_name="children",
-        verbose_name=_("parent"),
-    )
-
     class Meta(MatchingModel.Meta):
         verbose_name = _("tag")
         verbose_name_plural = _("tags")
 
-    def get_all_descendants(self):
-        descendants = []
-        for child in self.children.all():
-            descendants.append(child)
-            descendants.extend(child.get_all_descendants())
-        return descendants
-
-    def get_all_ancestors(self):
-        ancestors = []
-        if self.parent:
-            ancestors.append(self.parent)
-            ancestors.extend(self.parent.get_all_ancestors())
-        return ancestors
-
-    def subtree_height(self, node) -> int:
-        children = list(node.children.all())
+    def subtree_height(self, node: TreeNodeModel) -> int:
+        children = list(node.children)
         if not children:
             return 0
         return 1 + max(self.subtree_height(child) for child in children)
@@ -153,16 +131,14 @@ class Tag(MatchingModel):
         if (
             self.parent
             and self.pk is not None
-            and any(
-                ancestor.pk == self.pk for ancestor in self.parent.get_all_ancestors()
-            )
+            and any(ancestor.pk == self.pk for ancestor in self.parent.get_ancestors())
         ):
             raise ValidationError(_("Cannot set parent to a descendant."))
 
         # Enforce maximum nesting depth
         new_parent_depth = 0
         if self.parent:
-            new_parent_depth = len(self.parent.get_all_ancestors()) + 1
+            new_parent_depth = len(self.parent.get_ancestors()) + 1
         if self.pk is None:
             # Unsaved tag cannot have children; treat as leaf
             height = 0

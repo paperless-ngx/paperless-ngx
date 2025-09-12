@@ -354,7 +354,7 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         affected = set()
 
         if new_parent:
-            parents_to_add = [new_parent, *new_parent.get_all_ancestors()]
+            parents_to_add = [new_parent, *new_parent.get_ancestors()]
             to_create = []
             for parent in parents_to_add:
                 missing = Document.objects.filter(id__in=doc_ids).exclude(tags=parent)

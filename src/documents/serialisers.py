@@ -541,17 +541,8 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 
     text_color = serializers.SerializerMethodField()
 
-    children = SerializerMethodField()
-
-    @extend_schema_field(
-        field=serializers.ListSerializer(
-            child=serializers.PrimaryKeyRelatedField(
-                queryset=Tag.objects.all(),
-            ),
-        ),
-    )
     def get_children(self, obj):
-        return TagSerializer(obj.children.all(), many=True).data
+        return obj.get_children_pks()
 
     class Meta:
         model = Tag
@@ -588,16 +579,16 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             # Temporarily set parent on the instance if updating and use model clean()
             original_parent = self.instance.parent
             try:
-                self.instance.parent = parent
+                self.instance.tn_parent = parent
                 self.instance.clean()
             except ValidationError as e:
                 logger.debug("Tag parent validation failed: %s", e)
                 raise serializers.ValidationError({"parent": _("Invalid parent tag.")})
             finally:
-                self.instance.parent = original_parent
+                self.instance.tn_parent = original_parent
         else:
             # For new instances, create a transient Tag and validate
-            temp = Tag(parent=parent)
+            temp = Tag(tn_parent=parent)
             try:
                 temp.clean()
             except ValidationError as e:
@@ -1073,7 +1064,7 @@ class DocumentSerializer(
             # add all parent tags
             all_ancestor_tags = set(validated_data["tags"])
             for tag in validated_data["tags"]:
-                all_ancestor_tags.update(tag.get_all_ancestors())
+                all_ancestor_tags.update(tag.get_ancestors())
             validated_data["tags"] = list(all_ancestor_tags)
             # remove any children for parents that are being removed
             tag_parents_being_removed = [
