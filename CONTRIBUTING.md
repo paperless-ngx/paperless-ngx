@@ -2,10 +2,7 @@
 
 If you feel like contributing to the project, please do! Bug fixes and improvements are always welcome.
 
-!!! warning
-
-    Pull requests that implement a new feature or enhancement *should almost always target an existing feature request* with evidence of community interest and discussion. This is in order to balance the work of implementing and maintaining new features / enhancements. Pull requests that are opened without meeting
-    this requirement may not be merged.
+⚠️ Please note: Pull requests that implement a new feature or enhancement _should almost always target an existing feature request_ with evidence of community interest and discussion. This is in order to balance the work of implementing and maintaining new features / enhancements. Pull requests that are opened without meeting this requirement may not be merged.
 
 If you want to implement something big:
 
