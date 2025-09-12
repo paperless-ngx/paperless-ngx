@@ -3411,7 +3411,9 @@ class TestDateWorkflowLocalization(
         w.save()
 
         settings.SCRATCH_DIR = tmp_path / "scratch"
+        settings.THUMBNAIL_DIR = tmp_path / "thumbnails"
         (tmp_path / "scratch").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "thumbnails").mkdir(parents=True, exist_ok=True)
 
         # Temporarily override "now" for the environment so templates using
         # added/created placeholders behave as if it's a different system date.
