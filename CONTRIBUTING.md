@@ -2,9 +2,14 @@
 
 If you feel like contributing to the project, please do! Bug fixes and improvements are always welcome.
 
+!!! warning
+
+    Pull requests that implement a new feature or enhancement *should almost always target an existing feature request* with evidence of community interest and discussion. This is in order to balance the work of implementing and maintaining new features / enhancements. Pull requests that are opened without meeting
+    this requirement may not be merged.
+
 If you want to implement something big:
 
-- Please start a discussion about that in the issues! Maybe something similar is already in development and we can make it happen together.
+- As above, please start with a discussion! Maybe something similar is already in development and we can make it happen together.
 - When making additions to the project, consider if the majority of users will benefit from your change. If not, you're probably better of forking the project.
 - Also consider if your change will get in the way of other users. A good change is a change that enhances the experience of some users who want that change and does not affect users who do not care about the change.
 - Please see the [paperless-ngx merge process](#merging-prs) below.
