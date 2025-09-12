@@ -99,6 +99,8 @@ class Correspondent(MatchingModel):
 
 class Tag(MatchingModel):
     color = models.CharField(_("color"), max_length=7, default="#a6cee3")
+    # Maximum allowed nesting depth for tags (root = 1, max depth = 5)
+    MAX_NESTING_DEPTH: Final[int] = 5
 
     is_inbox_tag = models.BooleanField(
         _("is inbox tag"),
@@ -136,9 +138,43 @@ class Tag(MatchingModel):
             ancestors.extend(self.parent.get_all_ancestors())
         return ancestors
 
+    def subtree_height(self, node) -> int:
+        children = list(node.children.all())
+        if not children:
+            return 0
+        return 1 + max(self.subtree_height(child) for child in children)
+
     def clean(self):
+        # Prevent self-parenting
         if self.parent == self:
-            raise ValidationError("Cannot set itself as parent.")
+            raise ValidationError(_("Cannot set itself as parent."))
+
+        # Prevent assigning a descendant as parent
+        if (
+            self.parent
+            and self.pk is not None
+            and any(
+                ancestor.pk == self.pk for ancestor in self.parent.get_all_ancestors()
+            )
+        ):
+            raise ValidationError(_("Cannot set parent to a descendant."))
+
+        # Enforce maximum nesting depth
+        new_parent_depth = 0
+        if self.parent:
+            new_parent_depth = len(self.parent.get_all_ancestors()) + 1
+        if self.pk is None:
+            # Unsaved tag cannot have children; treat as leaf
+            height = 0
+        else:
+            try:
+                height = self.subtree_height(self)
+            except RecursionError:
+                raise ValidationError(_("Invalid tag hierarchy."))
+        deepest_new_depth = (new_parent_depth + 1) + height
+        if deepest_new_depth > self.MAX_NESTING_DEPTH:
+            raise ValidationError(_("Maximum nesting depth exceeded."))
+
         return super().clean()
 
 

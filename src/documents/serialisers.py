@@ -13,6 +13,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.core.validators import DecimalValidator
 from django.core.validators import MaxLengthValidator
 from django.core.validators import RegexValidator
@@ -578,6 +579,30 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         if not re.match(regex, color):
             raise serializers.ValidationError(_("Invalid color."))
         return color
+
+    def validate(self, attrs):
+        # Validate when changing parent
+        parent = attrs.get("parent", self.instance.parent if self.instance else None)
+
+        if self.instance:
+            # Temporarily set parent on the instance if updating and use model clean()
+            original_parent = self.instance.parent
+            try:
+                self.instance.parent = parent
+                self.instance.clean()
+            except ValidationError as e:
+                raise serializers.ValidationError({"parent": list(e)})
+            finally:
+                self.instance.parent = original_parent
+        else:
+            # For new instances, create a transient Tag and validate
+            temp = Tag(parent=parent)
+            try:
+                temp.clean()
+            except ValidationError as e:
+                raise serializers.ValidationError({"parent": list(e)})
+
+        return super().validate(attrs)
 
 
 class CorrespondentField(serializers.PrimaryKeyRelatedField):

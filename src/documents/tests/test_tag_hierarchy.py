@@ -110,3 +110,84 @@ class TestTagHierarchy(APITestCase):
         self.document.refresh_from_db()
         tags = set(self.document.tags.values_list("pk", flat=True))
         assert tags == {self.parent.pk, orphan.pk}
+
+    def test_cannot_set_parent_to_self(self):
+        tag = Tag.objects.create(name="Selfie")
+        resp = self.client.patch(
+            f"/api/tags/{tag.pk}/",
+            {"parent": tag.pk},
+            format="json",
+        )
+        assert resp.status_code == 400
+        assert "parent" in resp.data
+
+    def test_cannot_set_parent_to_descendant(self):
+        a = Tag.objects.create(name="A")
+        b = Tag.objects.create(name="B", parent=a)
+        c = Tag.objects.create(name="C", parent=b)
+
+        # Attempt to set A's parent to C (descendant) should fail
+        resp = self.client.patch(
+            f"/api/tags/{a.pk}/",
+            {"parent": c.pk},
+            format="json",
+        )
+        assert resp.status_code == 400
+        assert "parent" in resp.data
+
+    def test_max_depth_on_create(self):
+        a = Tag.objects.create(name="A1")
+        b = Tag.objects.create(name="B1", parent=a)
+        c = Tag.objects.create(name="C1", parent=b)
+        d = Tag.objects.create(name="D1", parent=c)
+
+        # Creating E under D yields depth 5: allowed
+        resp_ok = self.client.post(
+            "/api/tags/",
+            {"name": "E1", "parent": d.pk},
+            format="json",
+        )
+        assert resp_ok.status_code in (200, 201)
+        e_id = (
+            resp_ok.data["id"] if resp_ok.status_code == 201 else resp_ok.data.get("id")
+        )
+        assert e_id is not None
+
+        # Creating F under E would yield depth 6: rejected
+        resp_fail = self.client.post(
+            "/api/tags/",
+            {"name": "F1", "parent": e_id},
+            format="json",
+        )
+        assert resp_fail.status_code == 400
+        assert "parent" in resp_fail.data
+        assert any("Maximum" in str(msg) for msg in resp_fail.data["parent"])
+
+    def test_max_depth_on_move_subtree(self):
+        a = Tag.objects.create(name="A2")
+        b = Tag.objects.create(name="B2", parent=a)
+        c = Tag.objects.create(name="C2", parent=b)
+        d = Tag.objects.create(name="D2", parent=c)
+
+        x = Tag.objects.create(name="X2")
+        y = Tag.objects.create(name="Y2", parent=x)
+        assert y.parent_id == x.id
+
+        # Moving X under D would make deepest node Y exceed depth 5 -> reject
+        resp_fail = self.client.patch(
+            f"/api/tags/{x.pk}/",
+            {"parent": d.pk},
+            format="json",
+        )
+        assert resp_fail.status_code == 400
+        assert "parent" in resp_fail.data
+
+        # Moving X under C (depth 3) should be allowed (deepest becomes 5)
+        resp_ok = self.client.patch(
+            f"/api/tags/{x.pk}/",
+            {"parent": c.pk},
+            format="json",
+        )
+        assert resp_ok.status_code in (200, 202)
+        x.refresh_from_db()
+        assert x.parent_id == c.id
