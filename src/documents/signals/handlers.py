@@ -71,7 +71,7 @@ def add_inbox_tags(sender, document: Document, logging_group=None, **kwargs):
     else:
         tags = Tag.objects.all()
     inbox_tags = tags.filter(is_inbox_tag=True)
-    document.tags.add(*inbox_tags)
+    document.add_nested_tags(inbox_tags)
 
 
 def _suggestion_printer(
