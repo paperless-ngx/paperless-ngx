@@ -549,10 +549,16 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         source="tn_parent",
     )
 
-    def get_children(self, obj):
-        return obj.get_children_pks()
-
+    # children as nested Tag objects
     children = serializers.SerializerMethodField()
+
+    def get_children(self, obj):
+        serializer = self.__class__(
+            obj.get_children(),
+            many=True,
+            context=self.context,
+        )
+        return serializer.data
 
     class Meta:
         model = Tag
