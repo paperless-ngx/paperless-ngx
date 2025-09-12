@@ -1,6 +1,7 @@
 from unittest import mock
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from rest_framework.test import APITestCase
 
 from documents import bulk_edit
@@ -191,3 +192,14 @@ class TestTagHierarchy(APITestCase):
         assert resp_ok.status_code in (200, 202)
         x.refresh_from_db()
         assert x.parent_id == c.id
+
+    def test_invalid_hierarchy_recursion_error(self):
+        t = Tag.objects.create(name="TagA")
+
+        with mock.patch(
+            "documents.models.Tag.subtree_height",
+            side_effect=RecursionError,
+        ):
+            with self.assertRaises(ValidationError) as cm:
+                t.clean()
+            assert "Invalid tag hierarchy" in str(cm.exception)
