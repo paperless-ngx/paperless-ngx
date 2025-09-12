@@ -20,6 +20,7 @@ from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.models import Tag
+from documents.models import User
 from documents.parsers import is_file_ext_supported
 from documents.tasks import consume_file
 
@@ -30,6 +31,40 @@ except ImportError:  # pragma: no cover
     INotify = flags = None
 
 logger = logging.getLogger("paperless.management.consumer")
+
+
+def _owner_from_path(filepath: Path) -> int:
+    """
+    Determine the base directory of filepath relative to CONSUMPTION_DIR
+    and look up that directory name as a User to assign ownership of this
+    document.
+    """
+    db.close_old_connections()
+    path_parts = filepath.relative_to(settings.CONSUMPTION_DIR).parent.parts
+
+    if len(path_parts) < 1:
+        logger.debug(
+            f"Unable to assign ownership of {filepath}: not in subdirectory of consume path.",
+        )
+        return None
+
+    owner_name = path_parts[0]
+    owner_path = Path(settings.CONSUMPTION_DIR) / owner_name
+
+    if not owner_path.is_dir():
+        logger.debug(
+            f"Unable to assign ownership of {filepath}: {owner_name} was not a directory.",
+        )
+        return None
+
+    owner = User.objects.filter(username__iexact=owner_name).first()
+    if not owner:
+        logger.debug(
+            f"Unable to assign ownership of {filepath}: user '{owner_name}' does not exist.",
+        )
+        return None
+
+    return owner.id
 
 
 def _tags_from_path(filepath: Path) -> list[int]:
@@ -114,6 +149,13 @@ def _consume(filepath: Path) -> None:
         logger.warning(f"Not consuming file {filepath}: OS reports {os_error_str}")
         return
 
+    owner_id = None
+    try:
+        if settings.CONSUMER_SUBDIR_BY_OWNER:
+            owner_id = _owner_from_path(filepath)
+    except Exception:
+        logger.exception("Error assigning ownership from path")
+
     tag_ids = None
     try:
         if settings.CONSUMER_SUBDIRS_AS_TAGS:
@@ -128,7 +170,10 @@ def _consume(filepath: Path) -> None:
                 source=DocumentSource.ConsumeFolder,
                 original_file=filepath,
             ),
-            DocumentMetadataOverrides(tag_ids=tag_ids),
+            DocumentMetadataOverrides(
+                owner_id=owner_id,
+                tag_ids=tag_ids,
+            ),
         )
     except Exception:
         # Catch all so that the consumer won't crash.

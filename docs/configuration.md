@@ -1153,6 +1153,19 @@ consumption directory as well.
 
     Defaults to false.
 
+#### [`PAPERLESS_CONSUMER_SUBDIR_AS_OWNER=<bool>`](#PAPERLESS_CONSUMER_SUBDIR_AS_OWNER) {#PAPERLESS_CONSUMER_SUBDIR_AS_OWNER}
+
+: Set the ownership of consumed files using the name of the first subdirectory
+below of the consumption directory. E.g. `<CONSUMPTION_DIR>/username/file.pdf`
+will assign ownership of `file.pdf` to `username` if the user exists.
+
+    This is useful for assigning ownership of documents uploaded to a network
+    share with subdirectories per user. These folders won't be deleted.
+
+    PAPERLESS_CONSUMER_RECURSIVE must be enabled for this to work.
+
+    Defaults to false.
+
 #### [`PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS=<bool>`](#PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS) {#PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS}
 
 : Set the names of subdirectories as tags for consumed files. E.g.

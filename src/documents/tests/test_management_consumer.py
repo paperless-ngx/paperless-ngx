@@ -15,6 +15,7 @@ from documents.consumer import ConsumerError
 from documents.data_models import ConsumableDocument
 from documents.management.commands import document_consumer
 from documents.models import Tag
+from documents.models import User
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DocumentConsumeDelayMixin
 
@@ -372,6 +373,45 @@ class TestConsumerRecursive(TestConsumer):
 class TestConsumerRecursivePolling(TestConsumer):
     # just do all the tests with polling and recursive
     pass
+
+
+class TestConsumerOwnership(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
+    @override_settings(CONSUMER_RECURSIVE=True, CONSUMER_SUBDIR_BY_OWNER=True)
+    def test_consume_file_with_path_ownership(self):
+        # Subdirectory of consumption directory.
+        subdirectory_path = ("username", "Sub directory")
+
+        # Create a User prior to consuming a file using it in path
+        owner_id = User.objects.create(username="username").pk
+
+        self.t_start()
+
+        path = Path(self.dirs.consumption_dir) / "/".join(subdirectory_path)
+        path.mkdir(parents=True, exist_ok=True)
+        f = path / "my_file.pdf"
+        # Wait at least inotify read_delay for recursive watchers
+        # to be created for the new directories
+        sleep(1)
+        shutil.copy(self.sample_file, f)
+
+        self.wait_for_task_mock_call()
+
+        self.consume_file_mock.assert_called_once()
+
+        input_doc, overrides = self.get_last_consume_delay_call_args()
+
+        self.assertEqual(input_doc.original_file, f)
+
+        # Ensure we've assigned ownership of the consumed file
+        self.assertEqual(overrides.owner_id, owner_id)
+
+    @override_settings(
+        CONSUMER_POLLING=1,
+        CONSUMER_POLLING_DELAY=3,
+        CONSUMER_POLLING_RETRY_COUNT=20,
+    )
+    def test_consume_file_with_path_ownership_polling(self):
+        self.test_consume_file_with_path_ownership()
 
 
 class TestConsumerTags(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
