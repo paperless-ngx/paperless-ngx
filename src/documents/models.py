@@ -116,37 +116,20 @@ class Tag(MatchingModel, TreeNodeModel):
         verbose_name = _("tag")
         verbose_name_plural = _("tags")
 
-    def subtree_height(self, node: TreeNodeModel) -> int:
-        children = list(node.get_children())
-        if not children:
-            return 0
-        return 1 + max(self.subtree_height(child) for child in children)
-
     def clean(self):
-        # Prevent self-parenting
-        if self.parent == self:
-            raise ValidationError(_("Cannot set itself as parent."))
-
-        # Prevent assigning a descendant as parent
-        if (
-            self.parent
-            and self.pk is not None
-            and any(ancestor.pk == self.pk for ancestor in self.parent.get_ancestors())
-        ):
-            raise ValidationError(_("Cannot set parent to a descendant."))
+        # Prevent self-parenting and assigning a descendant as parent
+        parent = self.get_parent()
+        if parent == self:
+            raise ValidationError({"parent": _("Cannot set itself as parent.")})
+        if parent and self.pk is not None and self.is_ancestor_of(parent):
+            raise ValidationError({"parent": _("Cannot set parent to a descendant.")})
 
         # Enforce maximum nesting depth
         new_parent_depth = 0
-        if self.parent:
-            new_parent_depth = len(self.parent.get_ancestors()) + 1
-        if self.pk is None:
-            # Unsaved tag cannot have children; treat as leaf
-            height = 0
-        else:
-            try:
-                height = self.subtree_height(self)
-            except RecursionError:
-                raise ValidationError(_("Invalid tag hierarchy."))
+        if parent:
+            new_parent_depth = parent.get_ancestors_count() + 1
+
+        height = 0 if self.pk is None else self.get_depth()
         deepest_new_depth = (new_parent_depth + 1) + height
         if deepest_new_depth > self.MAX_NESTING_DEPTH:
             raise ValidationError(_("Maximum nesting depth exceeded."))
@@ -442,8 +425,9 @@ class Document(SoftDeleteModel, ModelWithOwner):
     def add_nested_tags(self, tags):
         for tag in tags:
             self.tags.add(tag)
-            if tag.parent:
-                self.add_nested_tags([tag.parent])
+            parent = tag.get_parent()
+            if parent:
+                self.add_nested_tags([parent])
 
 
 class SavedView(ModelWithOwner):

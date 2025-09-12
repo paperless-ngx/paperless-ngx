@@ -583,19 +583,28 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 
     def validate(self, attrs):
         # Validate when changing parent
-        parent = attrs.get("parent", self.instance.parent if self.instance else None)
+        parent = attrs.get(
+            "tn_parent",
+            self.instance.get_parent() if self.instance else None,
+        )
 
         if self.instance:
             # Temporarily set parent on the instance if updating and use model clean()
-            original_parent = self.instance.parent
+            original_parent = self.instance.get_parent()
             try:
-                self.instance.set_parent(parent)
+                # Temporarily set tn_parent in-memory to validate clean()
+                self.instance.tn_parent = parent
                 self.instance.clean()
             except ValueError as e:
                 logger.debug("Tag parent validation failed: %s", e)
                 raise serializers.ValidationError({"parent": _("Invalid parent tag.")})
+            except ValidationError as e:
+                logger.debug("Tag parent validation failed: %s", e)
+                if getattr(e, "message_dict", None):
+                    raise serializers.ValidationError(e.message_dict)
+                raise serializers.ValidationError({"non_field_errors": e.messages})
             finally:
-                self.instance.set_parent(original_parent)
+                self.instance.tn_parent = original_parent
         else:
             # For new instances, create a transient Tag and validate
             temp = Tag(tn_parent=parent)

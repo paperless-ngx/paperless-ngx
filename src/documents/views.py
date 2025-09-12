@@ -342,9 +342,9 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
 
     def perform_update(self, serializer):
-        old_parent = self.get_object().parent
+        old_parent = self.get_object().get_parent()
         tag = serializer.save()
-        new_parent = tag.parent
+        new_parent = tag.get_parent()
         if old_parent != new_parent:
             self._update_document_parent_tags(tag, old_parent, new_parent)
 
