@@ -281,6 +281,34 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
     migrate_to = "1012_fix_archive_files"
     auto_migrate = False
 
+    def tearDown(self):
+        """
+        These tests intentionally assert that 1012 raises during performMigration.
+        When the base TestMigrations tearDown later migrates back to HEAD, the
+        1012 data step would raise again. Patch that RunPython op to a no-op so
+        we still apply the schema changes but skip the data movement during teardown.
+        """
+        try:
+            import importlib
+
+            from django.db import migrations as dj_migrations
+
+            mig_mod = importlib.import_module(
+                "documents.migrations.1012_fix_archive_files",
+            )
+
+            def _noop(apps, schema_editor):
+                return None
+
+            for op in getattr(mig_mod.Migration, "operations", []):
+                if isinstance(op, dj_migrations.RunPython):
+                    op.code = _noop
+                    op.reverse_code = dj_migrations.RunPython.noop
+        except Exception:
+            pass
+
+        super().tearDown()
+
     def test_archive_missing(self):
         Document = self.apps.get_model("documents", "Document")
 
