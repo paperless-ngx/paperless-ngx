@@ -76,6 +76,7 @@ import { DocumentTypeService } from 'src/app/services/rest/document-type.service
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -88,6 +89,7 @@ import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspo
 import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
 import { EditDialogMode } from '../common/edit-dialog/edit-dialog.component'
 import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { TagEditDialogComponent } from '../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { EmailDocumentDialogComponent } from '../common/email-document-dialog/email-document-dialog.component'
 import { CheckComponent } from '../common/input/check/check.component'
 import { DateComponent } from '../common/input/date/date.component'
@@ -105,6 +107,7 @@ import {
   PdfEditorEditMode,
 } from '../common/pdf-editor/pdf-editor.component'
 import { ShareLinksDialogComponent } from '../common/share-links-dialog/share-links-dialog.component'
+import { SuggestionsDropdownComponent } from '../common/suggestions-dropdown/suggestions-dropdown.component'
 import { DocumentHistoryComponent } from '../document-history/document-history.component'
 import { DocumentNotesComponent } from '../document-notes/document-notes.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
@@ -161,6 +164,7 @@ export enum ZoomSetting {
     NumberComponent,
     MonetaryComponent,
     UrlComponent,
+    SuggestionsDropdownComponent,
     CustomDatePipe,
     FileSizePipe,
     IfPermissionsDirective,
@@ -181,6 +185,7 @@ export class DocumentDetailComponent
 {
   private documentsService = inject(DocumentService)
   private route = inject(ActivatedRoute)
+  private tagService = inject(TagService)
   private correspondentService = inject(CorrespondentService)
   private documentTypeService = inject(DocumentTypeService)
   private router = inject(Router)
@@ -203,6 +208,8 @@ export class DocumentDetailComponent
   @ViewChild('inputTitle')
   titleInput: TextComponent
 
+  @ViewChild('tagsInput') tagsInput: TagsComponent
+
   expandOriginalMetadata = false
   expandArchivedMetadata = false
 
@@ -214,6 +221,7 @@ export class DocumentDetailComponent
   document: Document
   metadata: DocumentMetadata
   suggestions: DocumentSuggestions
+  suggestionsLoading: boolean = false
   users: User[]
 
   title: string
@@ -293,6 +301,10 @@ export class DocumentDetailComponent
 
   get isMobile(): boolean {
     return this.deviceDetectorService.isMobile()
+  }
+
+  get aiEnabled(): boolean {
+    return this.settings.get(SETTINGS_KEYS.AI_ENABLED)
   }
 
   get archiveContentRenderType(): ContentRenderType {
@@ -676,25 +688,12 @@ export class DocumentDetailComponent
         PermissionType.Document
       )
     ) {
-      this.documentsService
-        .getSuggestions(doc.id)
-        .pipe(
-          first(),
-          takeUntil(this.unsubscribeNotifier),
-          takeUntil(this.docChangeNotifier)
-        )
-        .subscribe({
-          next: (result) => {
-            this.suggestions = result
-          },
-          error: (error) => {
-            this.suggestions = null
-            this.toastService.showError(
-              $localize`Error retrieving suggestions.`,
-              error
-            )
-          },
-        })
+      this.tagService.getCachedMany(doc.tags).subscribe((tags) => {
+        // only show suggestions if document has inbox tags
+        if (tags.some((tag) => tag.is_inbox_tag)) {
+          this.getSuggestions()
+        }
+      })
     }
     this.title = this.documentTitlePipe.transform(doc.title)
     this.prepareForm(doc)
@@ -702,6 +701,56 @@ export class DocumentDetailComponent
 
   get customFieldFormFields(): FormArray {
     return this.documentForm.get('custom_fields') as FormArray
+  }
+
+  getSuggestions() {
+    this.suggestionsLoading = true
+    this.documentsService
+      .getSuggestions(this.documentId)
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier)
+      )
+      .subscribe({
+        next: (result) => {
+          this.suggestions = result
+          this.suggestionsLoading = false
+        },
+        error: (error) => {
+          this.suggestions = null
+          this.suggestionsLoading = false
+          this.toastService.showError(
+            $localize`Error retrieving suggestions.`,
+            error
+          )
+        },
+      })
+  }
+
+  createTag(newName: string) {
+    var modal = this.modalService.open(TagEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    if (newName) modal.componentInstance.object = { name: newName }
+    modal.componentInstance.succeeded
+      .pipe(
+        switchMap((newTag) => {
+          return this.tagService
+            .listAll()
+            .pipe(map((tags) => ({ newTag, tags })))
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newTag, tags }) => {
+        this.tagsInput.tags = tags.results
+        this.tagsInput.addTag(newTag.id)
+        if (this.suggestions) {
+          this.suggestions.suggested_tags =
+            this.suggestions.suggested_tags.filter((tag) => tag !== newName)
+        }
+      })
   }
 
   createDocumentType(newName: string) {
@@ -723,6 +772,12 @@ export class DocumentDetailComponent
         this.documentTypes = documentTypes.results
         this.documentForm.get('document_type').setValue(newDocumentType.id)
         this.documentForm.get('document_type').markAsDirty()
+        if (this.suggestions) {
+          this.suggestions.suggested_document_types =
+            this.suggestions.suggested_document_types.filter(
+              (dt) => dt !== newName
+            )
+        }
       })
   }
 
@@ -747,6 +802,12 @@ export class DocumentDetailComponent
         this.correspondents = correspondents.results
         this.documentForm.get('correspondent').setValue(newCorrespondent.id)
         this.documentForm.get('correspondent').markAsDirty()
+        if (this.suggestions) {
+          this.suggestions.suggested_correspondents =
+            this.suggestions.suggested_correspondents.filter(
+              (c) => c !== newName
+            )
+        }
       })
   }
 

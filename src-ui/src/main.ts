@@ -9,6 +9,7 @@ import { DatePipe, registerLocaleData } from '@angular/common'
 import {
   HTTP_INTERCEPTORS,
   provideHttpClient,
+  withFetch,
   withInterceptorsFromDi,
 } from '@angular/common/http'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -48,6 +49,7 @@ import {
   caretDown,
   caretUp,
   chatLeftText,
+  chatSquareDots,
   check,
   check2All,
   checkAll,
@@ -119,6 +121,7 @@ import {
   sliders2Vertical,
   sortAlphaDown,
   sortAlphaUpAlt,
+  stars,
   tag,
   tagFill,
   tags,
@@ -258,6 +261,7 @@ const icons = {
   caretDown,
   caretUp,
   chatLeftText,
+  chatSquareDots,
   check,
   check2All,
   checkAll,
@@ -329,6 +333,7 @@ const icons = {
   sliders2Vertical,
   sortAlphaDown,
   sortAlphaUpAlt,
+  stars,
   tagFill,
   tag,
   tags,
@@ -393,6 +398,6 @@ bootstrapApplication(AppComponent, {
     CorrespondentNamePipe,
     DocumentTypeNamePipe,
     StoragePathNamePipe,
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(withInterceptorsFromDi(), withFetch()),
   ],
 }).catch((err) => console.error(err))
