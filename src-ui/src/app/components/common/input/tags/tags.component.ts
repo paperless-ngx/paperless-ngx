@@ -212,10 +212,8 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     )
   }
 
-  /**
-   * Returns ancestors from root → immediate parent for a tag id
-   */
   getParentChain(id: number): Tag[] {
+    // Returns ancestors from root → immediate parent for a tag id
     const chain: Tag[] = []
     let current = this.getTag(id)
     const guard = new Set<number>()
