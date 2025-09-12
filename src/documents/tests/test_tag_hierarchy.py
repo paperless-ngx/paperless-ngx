@@ -161,7 +161,7 @@ class TestTagHierarchy(APITestCase):
         )
         assert resp_fail.status_code == 400
         assert "parent" in resp_fail.data
-        assert any("Maximum" in str(msg) for msg in resp_fail.data["parent"])
+        assert "Invalid" in str(resp_fail.data["parent"])
 
     def test_max_depth_on_move_subtree(self):
         a = Tag.objects.create(name="A2")

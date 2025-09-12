@@ -591,7 +591,8 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
                 self.instance.parent = parent
                 self.instance.clean()
             except ValidationError as e:
-                raise serializers.ValidationError({"parent": list(e)})
+                logger.debug("Tag parent validation failed: %s", e)
+                raise serializers.ValidationError({"parent": _("Invalid parent tag.")})
             finally:
                 self.instance.parent = original_parent
         else:
@@ -600,7 +601,8 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             try:
                 temp.clean()
             except ValidationError as e:
-                raise serializers.ValidationError({"parent": list(e)})
+                logger.debug("Tag parent validation failed: %s", e)
+                raise serializers.ValidationError({"parent": _("Invalid parent tag.")})
 
         return super().validate(attrs)
 
