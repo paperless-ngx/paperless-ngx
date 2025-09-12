@@ -23,8 +23,11 @@
 
 // Dropdown hierarchy reveal for ng-select options
 ::ng-deep .ng-dropdown-panel .ng-option {
+  overflow-x: scroll;
+
   .tag-option-row {
     font-size: 1rem;
+    width: max-content;
   }
 
   .hierarchy-reveal {
