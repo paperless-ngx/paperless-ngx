@@ -13,7 +13,7 @@ export function flattenTags(all: Tag[]): Tag[] {
   }
   const roots = Array.from(map.values()).filter((t) => !t.parent)
   const sortByName = (a: Tag, b: Tag) =>
-    (a.name || '').localeCompare(b.name || '', undefined, {
+    a.name.localeCompare(b.name, undefined, {
       sensitivity: 'base',
       numeric: true,
     })
