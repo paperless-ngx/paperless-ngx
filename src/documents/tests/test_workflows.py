@@ -3410,8 +3410,6 @@ class TestDateWorkflowLocalization(
         w.actions.add(action)
         w.save()
 
-        settings.SCRATCH_DIR = tmp_path / "scratch"
-        settings.THUMBNAIL_DIR = tmp_path / "thumbnails"
         (tmp_path / "scratch").mkdir(parents=True, exist_ok=True)
         (tmp_path / "thumbnails").mkdir(parents=True, exist_ok=True)
 
@@ -3425,6 +3423,10 @@ class TestDateWorkflowLocalization(
             mock.patch(
                 "django.utils.timezone.now",
                 return_value=self.TEST_DATETIME,
+            ),
+            override_settings(
+                SCRATCH_DIR=tmp_path / "scratch",
+                THUMBNAIL_DIR=tmp_path / "thumbnails",
             ),
         ):
             tasks.consume_file(
