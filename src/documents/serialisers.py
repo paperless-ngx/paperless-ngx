@@ -5,6 +5,7 @@ import math
 import re
 from datetime import datetime
 from decimal import Decimal
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import magic
@@ -911,6 +912,8 @@ class DocumentSerializer(
 
     original_file_name = SerializerMethodField()
     archived_file_name = SerializerMethodField()
+    original_file_size = SerializerMethodField()
+    archive_file_size = SerializerMethodField()
     created_date = serializers.DateField(required=False)
     page_count = SerializerMethodField()
 
@@ -946,6 +949,29 @@ class DocumentSerializer(
             return obj.get_public_filename(archive=True)
         else:
             return None
+
+    def get_original_file_size(self, obj) -> int | None:
+        """Get size of original document file in bytes"""
+        try:
+            return self.get_filesize(obj.source_path)
+        except (OSError, AttributeError):
+            return None
+
+    def get_archive_file_size(self, obj) -> int | None:
+        """Get size of archive document file in bytes"""
+        if not obj.has_archive_version:
+            return None
+        try:
+            return self.get_filesize(obj.archive_path)
+        except (OSError, AttributeError):
+            return None
+
+    def get_filesize(self, filename) -> int:
+        """Reuse file size logic from views.py"""
+        if Path(filename).is_file():
+            return Path(filename).stat().st_size
+        else:
+            return 0
 
     def to_representation(self, instance):
         doc = super().to_representation(instance)
@@ -1093,6 +1119,8 @@ class DocumentSerializer(
             "archive_serial_number",
             "original_file_name",
             "archived_file_name",
+            "original_file_size",
+            "archive_file_size",
             "owner",
             "permissions",
             "user_can_change",
@@ -1762,6 +1790,48 @@ class BulkDownloadSerializer(DocumentListSerializer):
             "bzip2": zipfile.ZIP_BZIP2,
             "lzma": zipfile.ZIP_LZMA,
         }[compression]
+
+
+class EmailSerializer(DocumentListSerializer):
+    addresses = serializers.CharField(
+        required=True,
+        label="Email addresses",
+        help_text="Comma-separated email addresses",
+    )
+
+    subject = serializers.CharField(
+        required=True,
+        label="Email subject",
+    )
+
+    message = serializers.CharField(
+        required=True,
+        label="Email message",
+    )
+
+    use_archive_version = serializers.BooleanField(
+        default=True,
+        label="Use archive version",
+        help_text="Use archive version of documents if available",
+    )
+
+    def validate_addresses(self, addresses):
+        address_list = [addr.strip() for addr in addresses.split(",")]
+        if not address_list:
+            raise serializers.ValidationError("At least one email address is required")
+
+        email_pattern = r"[^@]+@[^@]+\.[^@]+"
+        for address in address_list:
+            if not re.match(email_pattern, address):
+                raise serializers.ValidationError(f"Invalid email address: {address}")
+
+        return addresses
+
+    def validate_documents(self, documents):
+        super().validate_documents(documents)
+        if not documents:
+            raise serializers.ValidationError("At least one document is required")
+        return documents
 
 
 class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):

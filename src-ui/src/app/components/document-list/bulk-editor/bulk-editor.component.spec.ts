@@ -1454,4 +1454,91 @@ describe('BulkEditorComponent', () => {
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     ) // listAllFilteredIds
   })
+
+  it('should calculate attachment sizes correctly for email with all archive versions', () => {
+    component.list.documents = [
+      {
+        id: 1,
+        original_file_size: 1000000,
+        archive_file_size: 500000,
+        archived_file_name: 'test.pdf',
+      },
+      {
+        id: 2,
+        original_file_size: 2000000,
+        archive_file_size: 1500000,
+        archived_file_name: 'test2.pdf',
+      },
+    ] as any[]
+    component.list.selected = new Set([1, 2])
+
+    const modalRefSpy = jasmine.createSpyObj('NgbModalRef', ['close'])
+    modalRefSpy.componentInstance = {}
+    const openSpy = spyOn(ngbModal, 'open').and.returnValue(modalRefSpy)
+
+    component.emailSelected()
+
+    expect(openSpy).toHaveBeenCalled()
+    expect(modalRefSpy.componentInstance.totalOriginalSizeBytes).toBe(3000000)
+    expect(modalRefSpy.componentInstance.totalArchiveSizeBytes).toBe(2000000)
+    expect(modalRefSpy.componentInstance.hasArchiveVersion).toBe(true)
+  })
+
+  it('should handle documents without archive versions for email', () => {
+    component.list.documents = [
+      {
+        id: 1,
+        original_file_size: 1000000,
+        archive_file_size: null,
+        archived_file_name: null,
+      },
+      {
+        id: 2,
+        original_file_size: 2000000,
+        archive_file_size: null,
+        archived_file_name: null,
+      },
+    ] as any[]
+    component.list.selected = new Set([1, 2])
+
+    const modalRefSpy = jasmine.createSpyObj('NgbModalRef', ['close'])
+    modalRefSpy.componentInstance = {}
+    const openSpy = spyOn(ngbModal, 'open').and.returnValue(modalRefSpy)
+
+    component.emailSelected()
+
+    expect(openSpy).toHaveBeenCalled()
+    expect(modalRefSpy.componentInstance.totalOriginalSizeBytes).toBe(3000000)
+    expect(modalRefSpy.componentInstance.totalArchiveSizeBytes).toBe(0)
+    expect(modalRefSpy.componentInstance.hasArchiveVersion).toBe(false)
+  })
+
+  it('should set hasArchiveVersion to false when some documents lack archive versions', () => {
+    component.list.documents = [
+      {
+        id: 1,
+        original_file_size: 1000000,
+        archive_file_size: 500000,
+        archived_file_name: 'test.pdf',
+      },
+      {
+        id: 2,
+        original_file_size: 2000000,
+        archive_file_size: null,
+        archived_file_name: null,
+      },
+    ] as any[]
+    component.list.selected = new Set([1, 2])
+
+    const modalRefSpy = jasmine.createSpyObj('NgbModalRef', ['close'])
+    modalRefSpy.componentInstance = {}
+    const openSpy = spyOn(ngbModal, 'open').and.returnValue(modalRefSpy)
+
+    component.emailSelected()
+
+    expect(openSpy).toHaveBeenCalled()
+    expect(modalRefSpy.componentInstance.totalOriginalSizeBytes).toBe(3000000)
+    expect(modalRefSpy.componentInstance.totalArchiveSizeBytes).toBe(0)
+    expect(modalRefSpy.componentInstance.hasArchiveVersion).toBe(false)
+  })
 })
