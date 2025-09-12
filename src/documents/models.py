@@ -112,7 +112,7 @@ class Tag(MatchingModel, TreeNodeModel):
         ),
     )
 
-    class Meta(MatchingModel.Meta):
+    class Meta(MatchingModel.Meta, TreeNodeModel.Meta):
         verbose_name = _("tag")
         verbose_name_plural = _("tags")
 
