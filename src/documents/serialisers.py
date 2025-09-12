@@ -541,9 +541,6 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 
     text_color = serializers.SerializerMethodField()
 
-    def get_children(self, obj):
-        return obj.get_children_pks()
-
     # map to treenode's tn_parent
     parent = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
@@ -551,6 +548,11 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         required=False,
         source="tn_parent",
     )
+
+    def get_children(self, obj):
+        return obj.get_children_pks()
+
+    children = serializers.SerializerMethodField()
 
     class Meta:
         model = Tag
