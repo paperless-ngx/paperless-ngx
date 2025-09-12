@@ -144,7 +144,7 @@ class TestTagHierarchy(APITestCase):
             format="json",
         )
         assert resp.status_code == 400
-        assert "parent" in resp.data
+        assert "Cannot set parent to a descendant" in str(resp.data["non_field_errors"])
 
     def test_max_depth_on_create(self):
         a = Tag.objects.create(name="A1")
@@ -182,7 +182,7 @@ class TestTagHierarchy(APITestCase):
 
         x = Tag.objects.create(name="X2")
         y = Tag.objects.create(name="Y2", tn_parent=x)
-        assert y.parent_id == x.id
+        assert y.parent_pk == x.pk
 
         # Moving X under D would make deepest node Y exceed depth 5 -> reject
         resp_fail = self.client.patch(
@@ -191,7 +191,9 @@ class TestTagHierarchy(APITestCase):
             format="json",
         )
         assert resp_fail.status_code == 400
-        assert "parent" in resp_fail.data
+        assert "Maximum nesting depth exceeded" in str(
+            resp_fail.data["non_field_errors"],
+        )
 
         # Moving X under C (depth 3) should be allowed (deepest becomes 5)
         resp_ok = self.client.patch(

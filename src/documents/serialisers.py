@@ -544,6 +544,14 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     def get_children(self, obj):
         return obj.get_children_pks()
 
+    # map to treenode's tn_parent
+    parent = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(),
+        allow_null=True,
+        required=False,
+        source="tn_parent",
+    )
+
     class Meta:
         model = Tag
         fields = (
@@ -579,13 +587,13 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             # Temporarily set parent on the instance if updating and use model clean()
             original_parent = self.instance.parent
             try:
-                self.instance.tn_parent = parent
+                self.instance.set_parent(parent)
                 self.instance.clean()
-            except ValidationError as e:
+            except ValueError as e:
                 logger.debug("Tag parent validation failed: %s", e)
                 raise serializers.ValidationError({"parent": _("Invalid parent tag.")})
             finally:
-                self.instance.tn_parent = original_parent
+                self.instance.set_parent(original_parent)
         else:
             # For new instances, create a transient Tag and validate
             temp = Tag(tn_parent=parent)
@@ -1070,7 +1078,7 @@ class DocumentSerializer(
             tag_parents_being_removed = [
                 tag
                 for tag in instance.tags.all()
-                if tag not in validated_data["tags"] and tag.children.count() > 0
+                if tag not in validated_data["tags"] and tag.get_children_count() > 0
             ]
             validated_data["tags"] = [
                 tag

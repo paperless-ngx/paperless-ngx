@@ -117,7 +117,7 @@ class Tag(MatchingModel, TreeNodeModel):
         verbose_name_plural = _("tags")
 
     def subtree_height(self, node: TreeNodeModel) -> int:
-        children = list(node.children)
+        children = list(node.get_children())
         if not children:
             return 0
         return 1 + max(self.subtree_height(child) for child in children)
