@@ -3410,8 +3410,8 @@ class TestDateWorkflowLocalization(
         w.actions.add(action)
         w.save()
 
-        settings.SCRATCH_DIR = tmp_path / "scratch"
         (tmp_path / "scratch").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "thumbnails").mkdir(parents=True, exist_ok=True)
 
         # Temporarily override "now" for the environment so templates using
         # added/created placeholders behave as if it's a different system date.
@@ -3423,6 +3423,10 @@ class TestDateWorkflowLocalization(
             mock.patch(
                 "django.utils.timezone.now",
                 return_value=self.TEST_DATETIME,
+            ),
+            override_settings(
+                SCRATCH_DIR=tmp_path / "scratch",
+                THUMBNAIL_DIR=tmp_path / "thumbnails",
             ),
         ):
             tasks.consume_file(
