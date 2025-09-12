@@ -19,7 +19,7 @@ export enum ToggleableItemState {
 })
 export class ToggleableDropdownButtonComponent {
   @Input()
-  item: MatchingModel | Tag
+  item: MatchingModel
 
   @Input()
   state: ToggleableItemState
