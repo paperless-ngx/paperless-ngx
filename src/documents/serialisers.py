@@ -606,9 +606,7 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
                 raise serializers.ValidationError({"parent": _("Invalid parent tag.")})
             except ValidationError as e:
                 logger.debug("Tag parent validation failed: %s", e)
-                if getattr(e, "message_dict", None):
-                    raise serializers.ValidationError(e.message_dict)
-                raise serializers.ValidationError({"non_field_errors": e.messages})
+                raise e
             finally:
                 self.instance.tn_parent = original_parent
         else:
