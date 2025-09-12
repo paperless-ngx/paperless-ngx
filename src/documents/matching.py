@@ -386,6 +386,16 @@ def existing_document_matches_workflow(
         )
         trigger_matched = False
 
+    # Document storage_path vs trigger has_storage_path
+    if (
+        trigger.filter_has_storage_path is not None
+        and document.storage_path != trigger.filter_has_storage_path
+    ):
+        reason = (
+            f"Document storage path {document.storage_path} does not match {trigger.filter_has_storage_path}",
+        )
+        trigger_matched = False
+
     # Document original_filename vs trigger filename
     if (
         trigger.filter_filename is not None
@@ -428,6 +438,11 @@ def prefilter_documents_by_workflowtrigger(
     if trigger.filter_has_document_type is not None:
         documents = documents.filter(
             document_type=trigger.filter_has_document_type,
+        )
+
+    if trigger.filter_has_storage_path is not None:
+        documents = documents.filter(
+            storage_path=trigger.filter_has_storage_path,
         )
 
     if trigger.filter_filename is not None and len(trigger.filter_filename) > 0:

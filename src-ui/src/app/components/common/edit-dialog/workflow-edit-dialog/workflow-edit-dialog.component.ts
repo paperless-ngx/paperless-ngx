@@ -412,6 +412,9 @@ export class WorkflowEditDialogComponent
         filter_has_document_type: new FormControl(
           trigger.filter_has_document_type
         ),
+        filter_has_storage_path: new FormControl(
+          trigger.filter_has_storage_path
+        ),
         schedule_offset_days: new FormControl(trigger.schedule_offset_days),
         schedule_is_recurring: new FormControl(trigger.schedule_is_recurring),
         schedule_recurring_interval_days: new FormControl(
@@ -536,6 +539,7 @@ export class WorkflowEditDialogComponent
       filter_has_tags: [],
       filter_has_correspondent: null,
       filter_has_document_type: null,
+      filter_has_storage_path: null,
       matching_algorithm: MATCH_NONE,
       match: '',
       is_insensitive: true,

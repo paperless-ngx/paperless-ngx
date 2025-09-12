@@ -44,6 +44,8 @@ export interface WorkflowTrigger extends ObjectWithId {
 
   filter_has_document_type?: number // DocumentType.id
 
+  filter_has_storage_path?: number // StoragePath.id
+
   schedule_offset_days?: number
 
   schedule_is_recurring?: boolean
