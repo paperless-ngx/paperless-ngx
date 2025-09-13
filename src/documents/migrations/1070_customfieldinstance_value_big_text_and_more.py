@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name="customfieldinstance",
-            name="value_big_text",
+            name="value_long_text",
             field=models.TextField(null=True),
         ),
         migrations.AlterField(

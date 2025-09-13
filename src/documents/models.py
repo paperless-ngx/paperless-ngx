@@ -808,7 +808,7 @@ class CustomFieldInstance(SoftDeleteModel):
     """
 
     TYPE_TO_DATA_STORE_NAME_MAP = {
-        CustomField.FieldDataType.LONG_STRING: "value_big_text",
+        CustomField.FieldDataType.LONG_STRING: "value_long_text",
         CustomField.FieldDataType.STRING: "value_text",
         CustomField.FieldDataType.URL: "value_url",
         CustomField.FieldDataType.DATE: "value_date",
@@ -846,7 +846,7 @@ class CustomFieldInstance(SoftDeleteModel):
     )
 
     # Actual data storage
-    value_big_text = models.TextField(null=True)
+    value_long_text = models.TextField(null=True)
 
     value_text = models.CharField(max_length=128, null=True)
 

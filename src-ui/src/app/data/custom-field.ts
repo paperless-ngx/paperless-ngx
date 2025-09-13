@@ -40,7 +40,7 @@ export const DATA_TYPE_LABELS = [
   },
   {
     id: CustomFieldDataType.LongString,
-    name: $localize`Big Text`,
+    name: $localize`Long Text`,
   },
   {
     id: CustomFieldDataType.Url,

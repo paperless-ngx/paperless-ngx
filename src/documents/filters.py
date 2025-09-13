@@ -221,7 +221,7 @@ class CustomFieldsFilter(Filter):
                             option_ids.extend([option.get("id")])
             return (
                 qs.filter(custom_fields__field__name__icontains=value)
-                | qs.filter(custom_fields__value_big_text__icontains=value)
+                | qs.filter(custom_fields__value_long_text__icontains=value)
                 | qs.filter(custom_fields__value_text__icontains=value)
                 | qs.filter(custom_fields__value_bool__icontains=value)
                 | qs.filter(custom_fields__value_int__icontains=value)
