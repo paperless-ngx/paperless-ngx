@@ -221,6 +221,7 @@ class CustomFieldsFilter(Filter):
                             option_ids.extend([option.get("id")])
             return (
                 qs.filter(custom_fields__field__name__icontains=value)
+                | qs.filter(custom_fields__value_big_text__icontains=value)
                 | qs.filter(custom_fields__value_text__icontains=value)
                 | qs.filter(custom_fields__value_bool__icontains=value)
                 | qs.filter(custom_fields__value_int__icontains=value)
@@ -305,6 +306,7 @@ class CustomFieldQueryParser:
     }
 
     SUPPORTED_EXPR_CATEGORIES = {
+        CustomField.FieldDataType.BIG_STRING: ("basic", "string"),
         CustomField.FieldDataType.STRING: ("basic", "string"),
         CustomField.FieldDataType.URL: ("basic", "string"),
         CustomField.FieldDataType.DATE: ("basic", "arithmetic"),
@@ -845,7 +847,10 @@ class DocumentsOrderingFilter(OrderingFilter):
 
             annotation = None
             match field.data_type:
-                case CustomField.FieldDataType.STRING:
+                case (
+                    CustomField.FieldDataType.BIG_STRING
+                    | CustomField.FieldDataType.STRING
+                ):
                     annotation = Subquery(
                         CustomFieldInstance.objects.filter(
                             document_id=OuterRef("id"),

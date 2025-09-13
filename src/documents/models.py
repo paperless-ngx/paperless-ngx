@@ -750,6 +750,7 @@ class CustomField(models.Model):
     """
 
     class FieldDataType(models.TextChoices):
+        BIG_STRING = ("bigstring", _("Big String"))
         STRING = ("string", _("String"))
         URL = ("url", _("URL"))
         DATE = ("date", _("Date"))
@@ -807,6 +808,7 @@ class CustomFieldInstance(SoftDeleteModel):
     """
 
     TYPE_TO_DATA_STORE_NAME_MAP = {
+        CustomField.FieldDataType.BIG_STRING: "value_big_text",
         CustomField.FieldDataType.STRING: "value_text",
         CustomField.FieldDataType.URL: "value_url",
         CustomField.FieldDataType.DATE: "value_date",
@@ -844,6 +846,8 @@ class CustomFieldInstance(SoftDeleteModel):
     )
 
     # Actual data storage
+    value_big_text = models.TextField(null=True)
+
     value_text = models.CharField(max_length=128, null=True)
 
     value_bool = models.BooleanField(null=True)

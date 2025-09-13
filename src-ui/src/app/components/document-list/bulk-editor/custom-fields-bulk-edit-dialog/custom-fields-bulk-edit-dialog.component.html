@@ -16,6 +16,10 @@
       @for (field of fieldsToAdd; track field.id) {
         <div class="d-flex gap-2">
           @switch (field.data_type) {
+            @case (CustomFieldDataType.BigString) {
+              <pngx-input-text formControlName="{{field.id}}" class="w-100" [title]="field.name" [horizontal]="true">
+              </pngx-input-text>
+            }
             @case (CustomFieldDataType.String) {
               <pngx-input-text formControlName="{{field.id}}" class="w-100" [title]="field.name" [horizontal]="true">
               </pngx-input-text>
