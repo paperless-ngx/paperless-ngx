@@ -1088,22 +1088,27 @@ class DocumentSerializer(
                             doc_id,
                         )
         if "tags" in validated_data:
-            # add all parent tags
-            all_ancestor_tags = set(validated_data["tags"])
-            for tag in validated_data["tags"]:
-                all_ancestor_tags.update(tag.get_ancestors())
-            validated_data["tags"] = list(all_ancestor_tags)
-            # remove any children for parents that are being removed
-            tag_parents_being_removed = [
-                tag
-                for tag in instance.tags.all()
-                if tag not in validated_data["tags"] and tag.get_children_count() > 0
-            ]
-            validated_data["tags"] = [
-                tag
-                for tag in validated_data["tags"]
-                if tag not in tag_parents_being_removed
-            ]
+            # Respect tag hierarchy on updates:
+            # - Adding a child adds its ancestors
+            # - Removing a parent removes all its descendants
+            prev_tags = set(instance.tags.all())
+            requested_tags = set(validated_data["tags"])
+
+            # Tags being removed in this update and all descendants
+            removed_tags = prev_tags - requested_tags
+            blocked_tags = set(removed_tags)
+            for t in removed_tags:
+                blocked_tags.update(t.get_descendants())
+
+            # Add all parent tags
+            final_tags = set(requested_tags)
+            for t in requested_tags:
+                final_tags.update(t.get_ancestors())
+
+            # Drop removed parents and their descendants
+            final_tags.difference_update(blocked_tags)
+
+            validated_data["tags"] = list(final_tags)
         if validated_data.get("remove_inbox_tags"):
             tag_ids_being_added = (
                 [

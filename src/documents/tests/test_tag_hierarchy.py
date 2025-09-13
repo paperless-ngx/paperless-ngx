@@ -51,6 +51,16 @@ class TestTagHierarchy(APITestCase):
         tags = set(self.document.tags.values_list("pk", flat=True))
         assert tags == {self.parent.pk, self.child.pk}
 
+    def test_document_api_remove_parent_removes_children(self):
+        self.document.add_nested_tags([self.parent, self.child])
+        self.client.patch(
+            f"/api/documents/{self.document.pk}/",
+            {"tags": [self.child.pk]},
+            format="json",
+        )
+        self.document.refresh_from_db()
+        assert self.document.tags.count() == 0
+
     def test_document_api_remove_parent_removes_child(self):
         self.document.add_nested_tags([self.child])
         self.client.patch(
