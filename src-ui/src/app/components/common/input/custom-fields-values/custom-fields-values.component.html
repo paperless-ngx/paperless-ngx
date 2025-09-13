@@ -6,10 +6,9 @@
       align-items-center">
       @switch (getCustomField(fieldId)?.data_type) {
         @case (CustomFieldDataType.BigString) {
-          <pngx-input-text [(ngModel)]="value[fieldId]" (ngModelChange)="onChange(value)"
+          <pngx-input-textarea [(ngModel)]="value[fieldId]" (ngModelChange)="onChange(value)"
           [title]="getCustomField(fieldId)?.name"
-          class="flex-grow-1"
-          [horizontal]="true"></pngx-input-text>
+          class="flex-grow-1"></pngx-input-textarea>
         }
         @case (CustomFieldDataType.String) {
           <pngx-input-text [(ngModel)]="value[fieldId]" (ngModelChange)="onChange(value)"

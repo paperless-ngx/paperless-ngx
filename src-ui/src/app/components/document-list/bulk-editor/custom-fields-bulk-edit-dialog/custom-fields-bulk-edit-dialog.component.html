@@ -17,8 +17,8 @@
         <div class="d-flex gap-2">
           @switch (field.data_type) {
             @case (CustomFieldDataType.BigString) {
-              <pngx-input-text formControlName="{{field.id}}" class="w-100" [title]="field.name" [horizontal]="true">
-              </pngx-input-text>
+              <pngx-input-textarea formControlName="{{field.id}}" class="w-100" [title]="field.name" [horizontal]="true">
+              </pngx-input-textarea>
             }
             @case (CustomFieldDataType.String) {
               <pngx-input-text formControlName="{{field.id}}" class="w-100" [title]="field.name" [horizontal]="true">

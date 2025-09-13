@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
             name="data_type",
             field=models.CharField(
                 choices=[
-                    ("bigstring", "Big String"),
+                    ("longstring", "Long String"),
                     ("string", "String"),
                     ("url", "URL"),
                     ("date", "Date"),

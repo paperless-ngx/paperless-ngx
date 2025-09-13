@@ -306,7 +306,7 @@ class CustomFieldQueryParser:
     }
 
     SUPPORTED_EXPR_CATEGORIES = {
-        CustomField.FieldDataType.BIG_STRING: ("basic", "string"),
+        CustomField.FieldDataType.LONG_STRING: ("basic", "string"),
         CustomField.FieldDataType.STRING: ("basic", "string"),
         CustomField.FieldDataType.URL: ("basic", "string"),
         CustomField.FieldDataType.DATE: ("basic", "arithmetic"),
@@ -848,7 +848,7 @@ class DocumentsOrderingFilter(OrderingFilter):
             annotation = None
             match field.data_type:
                 case (
-                    CustomField.FieldDataType.BIG_STRING
+                    CustomField.FieldDataType.LONG_STRING
                     | CustomField.FieldDataType.STRING
                 ):
                     annotation = Subquery(

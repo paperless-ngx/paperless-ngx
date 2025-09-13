@@ -811,9 +811,6 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError(
                         "Some documents in value don't exist or were specified twice.",
                     )
-            elif field.data_type == CustomField.FieldDataType.BIG_STRING:
-                # no validation, put anything here!
-                pass
 
         return data
 

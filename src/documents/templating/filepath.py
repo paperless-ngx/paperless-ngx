@@ -200,7 +200,7 @@ def get_custom_fields_context(
         # String types need to be sanitized
         elif field_instance.field.data_type in {
             CustomField.FieldDataType.MONETARY,
-            CustomField.FieldDataType.BIG_STRING,
+            CustomField.FieldDataType.LONG_STRING,
             CustomField.FieldDataType.STRING,
             CustomField.FieldDataType.URL,
         }:
