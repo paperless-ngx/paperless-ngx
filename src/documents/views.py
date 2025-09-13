@@ -169,6 +169,7 @@ from documents.tasks import empty_trash
 from documents.tasks import index_optimize
 from documents.tasks import sanity_check
 from documents.tasks import train_classifier
+from documents.tasks import update_document_parent_tags
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.utils import get_boolean
 from paperless import version
@@ -346,33 +347,7 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         tag = serializer.save()
         new_parent = tag.get_parent()
         if old_parent != new_parent:
-            self._update_document_parent_tags(tag, old_parent, new_parent)
-
-    def _update_document_parent_tags(self, tag, old_parent, new_parent):
-        DocumentTagRelationship = Document.tags.through
-        doc_ids = list(Document.objects.filter(tags=tag).values_list("pk", flat=True))
-        affected = set()
-
-        if new_parent:
-            parents_to_add = [new_parent, *new_parent.get_ancestors()]
-            to_create = []
-            for parent in parents_to_add:
-                missing = Document.objects.filter(id__in=doc_ids).exclude(tags=parent)
-                to_create.extend(
-                    DocumentTagRelationship(document_id=doc_id, tag_id=parent.id)
-                    for doc_id in missing.values_list("pk", flat=True)
-                )
-                affected.update(missing.values_list("pk", flat=True))
-            if to_create:
-                DocumentTagRelationship.objects.bulk_create(
-                    to_create,
-                    ignore_conflicts=True,
-                )
-
-        if affected:
-            from documents.tasks import bulk_update_documents
-
-            bulk_update_documents.delay(document_ids=list(affected))
+            update_document_parent_tags(tag, new_parent)
 
 
 @extend_schema_view(**generate_object_with_permissions_schema(DocumentTypeSerializer))

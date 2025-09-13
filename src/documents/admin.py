@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
+from treenode.admin import TreeNodeModelAdmin
 
 from documents.models import Correspondent
 from documents.models import CustomField
@@ -14,6 +15,7 @@ from documents.models import SavedViewFilterRule
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.tasks import update_document_parent_tags
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.admin import LogEntryAdmin
@@ -26,11 +28,24 @@ class CorrespondentAdmin(GuardedModelAdmin):
     list_editable = ("match", "matching_algorithm")
 
 
-class TagAdmin(GuardedModelAdmin):
+class TagAdmin(GuardedModelAdmin, TreeNodeModelAdmin):
     list_display = ("name", "color", "match", "matching_algorithm")
     list_filter = ("matching_algorithm",)
     list_editable = ("color", "match", "matching_algorithm")
     search_fields = ("color", "name")
+
+    def save_model(self, request, obj, form, change):
+        old_parent = None
+        if change and obj.pk:
+            tag = Tag.objects.get(pk=obj.pk)
+            old_parent = tag.get_parent() if tag else None
+
+        super().save_model(request, obj, form, change)
+
+        # sync parent tags on documents if changed
+        new_parent = obj.get_parent()
+        if old_parent != new_parent:
+            update_document_parent_tags(obj, new_parent)
 
 
 class DocumentTypeAdmin(GuardedModelAdmin):
