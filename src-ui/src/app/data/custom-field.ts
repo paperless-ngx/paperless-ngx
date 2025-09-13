@@ -10,7 +10,7 @@ export enum CustomFieldDataType {
   Monetary = 'monetary',
   DocumentLink = 'documentlink',
   Select = 'select',
-  BigString = 'longstring',
+  LongString = 'longstring',
 }
 
 export const DATA_TYPE_LABELS = [
@@ -39,7 +39,7 @@ export const DATA_TYPE_LABELS = [
     name: $localize`Text`,
   },
   {
-    id: CustomFieldDataType.BigString,
+    id: CustomFieldDataType.LongString,
     name: $localize`Big Text`,
   },
   {

@@ -137,7 +137,7 @@
               @for (fieldInstance of document?.custom_fields; track fieldInstance.field; let i = $index) {
                 <div [formGroup]="customFieldFormFields.controls[i]">
                   @switch (getCustomFieldFromInstance(fieldInstance)?.data_type) {
-                    @case (CustomFieldDataType.BigString) {
+                    @case (CustomFieldDataType.LongString) {
                       <pngx-input-textarea formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
                       [removable]="userCanEdit"

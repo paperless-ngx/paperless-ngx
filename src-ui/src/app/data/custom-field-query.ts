@@ -70,7 +70,7 @@ export const CUSTOM_FIELD_QUERY_OPERATORS_BY_GROUP = {
 
 // filters.py > SUPPORTED_EXPR_CATEGORIES
 export const CUSTOM_FIELD_QUERY_OPERATOR_GROUPS_BY_TYPE = {
-  [CustomFieldDataType.BigString]: [
+  [CustomFieldDataType.LongString]: [
     CustomFieldQueryOperatorGroups.Basic,
     CustomFieldQueryOperatorGroups.Exact,
     CustomFieldQueryOperatorGroups.String,
