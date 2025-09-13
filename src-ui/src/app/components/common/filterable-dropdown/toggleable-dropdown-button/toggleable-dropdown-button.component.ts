@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { MatchingModel } from 'src/app/data/matching-model'
+import { Tag } from 'src/app/data/tag'
 import { TagComponent } from '../../tag/tag.component'
 
 export enum ToggleableItemState {
@@ -43,6 +44,10 @@ export class ToggleableDropdownButtonComponent {
 
   get isTag(): boolean {
     return 'is_inbox_tag' in this.item
+  }
+
+  getDepth(): number {
+    return (this.item as Tag).depth ?? 0
   }
 
   get currentCount(): number {

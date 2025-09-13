@@ -852,6 +852,15 @@ wheels = [
 ]
 
 [[package]]
+name = "django-treenode"
+version = "0.23.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/75/f3/274b84607fd64c0844e98659985f964190a46c2460f2523a446c4a946216/django_treenode-0.23.2.tar.gz", hash = "sha256:3c5a6ff5e0c83e34da88749f602b3013dd1ab0527f51952c616e3c21bf265d52", size = 26700, upload-time = "2025-09-04T21:16:53.497Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/00/61/e17d3dee5c6bb24b8faf0c101e17f9a8cafeba6384166176e066c80e8cbb/django_treenode-0.23.2-py3-none-any.whl", hash = "sha256:9363cb50f753654a9acfad6ec4df2a664a5f89dfdf8b55ffd964f27461bef85e", size = 21879, upload-time = "2025-09-04T21:16:51.811Z" },
+]
+
+[[package]]
 name = "djangorestframework"
 version = "3.16.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2042,6 +2051,7 @@ dependencies = [
     { name = "django-guardian", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "django-multiselectfield", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "django-soft-delete", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "django-treenode", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "djangorestframework", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "djangorestframework-guardian", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "drf-spectacular", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -2178,6 +2188,7 @@ requires-dist = [
     { name = "django-guardian", specifier = "~=3.1.2" },
     { name = "django-multiselectfield", specifier = "~=1.0.1" },
     { name = "django-soft-delete", specifier = "~=1.0.18" },
+    { name = "django-treenode", specifier = ">=0.23.2" },
     { name = "djangorestframework", specifier = "~=3.16" },
     { name = "djangorestframework-guardian", specifier = "~=0.4.0" },
     { name = "drf-spectacular", specifier = "~=0.28" },

@@ -1,4 +1,5 @@
 import types
+from unittest.mock import patch
 
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
@@ -7,7 +8,9 @@ from django.utils import timezone
 
 from documents import index
 from documents.admin import DocumentAdmin
+from documents.admin import TagAdmin
 from documents.models import Document
+from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
 from paperless.admin import PaperlessUserAdmin
 
@@ -68,6 +71,24 @@ class TestDocumentAdmin(DirectoriesMixin, TestCase):
             created=timezone.make_aware(timezone.datetime(2020, 4, 12)),
         )
         self.assertEqual(self.doc_admin.created_(doc), "2020-04-12")
+
+
+class TestTagAdmin(DirectoriesMixin, TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.tag_admin = TagAdmin(model=Tag, admin_site=AdminSite())
+
+    @patch("documents.tasks.bulk_update_documents")
+    def test_parent_tags_get_added(self, mock_bulk_update):
+        document = Document.objects.create(title="test")
+        parent = Tag.objects.create(name="parent")
+        child = Tag.objects.create(name="child")
+        document.tags.add(child)
+
+        child.tn_parent = parent
+        self.tag_admin.save_model(None, child, None, change=True)
+        document.refresh_from_db()
+        self.assertIn(parent, document.tags.all())
 
 
 class TestPaperlessAdmin(DirectoriesMixin, TestCase):
