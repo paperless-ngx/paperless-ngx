@@ -517,14 +517,11 @@ def check_scheduled_workflows():
                         )
 
 
-def update_document_parent_tags(tag: Tag, new_parent: Tag | None) -> None:
+def update_document_parent_tags(tag: Tag, new_parent: Tag) -> None:
     """
     When a tag's parent changes, ensure all documents containing the tag also have
     the parent tag (and its ancestors) applied.
     """
-    if new_parent is None:
-        return
-
     DocumentTagRelationship = Document.tags.through
 
     doc_ids: list[int] = list(

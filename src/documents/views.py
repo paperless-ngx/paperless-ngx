@@ -346,7 +346,7 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         old_parent = self.get_object().get_parent()
         tag = serializer.save()
         new_parent = tag.get_parent()
-        if old_parent != new_parent:
+        if new_parent and old_parent != new_parent:
             update_document_parent_tags(tag, new_parent)
 
 

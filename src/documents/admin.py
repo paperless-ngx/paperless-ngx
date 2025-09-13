@@ -44,7 +44,7 @@ class TagAdmin(GuardedModelAdmin, TreeNodeModelAdmin):
 
         # sync parent tags on documents if changed
         new_parent = obj.get_parent()
-        if old_parent != new_parent:
+        if new_parent and old_parent != new_parent:
             update_document_parent_tags(obj, new_parent)
 
 
