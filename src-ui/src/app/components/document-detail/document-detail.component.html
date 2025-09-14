@@ -216,6 +216,14 @@
                       (removed)="removeField(fieldInstance)"
                       [error]="getCustomFieldError(i)"></pngx-input-select>
                     }
+                    @case (CustomFieldDataType.LongText) {
+                      <pngx-input-textarea formControlName="value"
+                      [title]="getCustomFieldFromInstance(fieldInstance)?.name"
+                      [removable]="userCanEdit"
+                      (removed)="removeField(fieldInstance)"
+                      [horizontal]="true"
+                      [error]="getCustomFieldError(i)"></pngx-input-textarea>
+                    }
                   }
                 </div>
               }
