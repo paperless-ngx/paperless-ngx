@@ -25,6 +25,7 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 blank=True,
                 max_length=128,
+                null=True,
                 verbose_name="Sets the LLM API key",
             ),
         ),
@@ -35,6 +36,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 choices=[("openai", "OpenAI"), ("ollama", "Ollama")],
                 max_length=32,
+                null=True,
                 verbose_name="Sets the LLM backend",
             ),
         ),
@@ -45,6 +47,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 choices=[("openai", "OpenAI"), ("huggingface", "Huggingface")],
                 max_length=32,
+                null=True,
                 verbose_name="Sets the LLM embedding backend",
             ),
         ),
@@ -54,6 +57,7 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 blank=True,
                 max_length=32,
+                null=True,
                 verbose_name="Sets the LLM embedding model",
             ),
         ),
@@ -63,6 +67,7 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 blank=True,
                 max_length=32,
+                null=True,
                 verbose_name="Sets the LLM model",
             ),
         ),
@@ -72,6 +77,7 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 blank=True,
                 max_length=128,
+                null=True,
                 verbose_name="Sets the LLM endpoint, optional",
             ),
         ),

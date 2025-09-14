@@ -291,6 +291,7 @@ class ApplicationConfiguration(AbstractSingletonModel):
 
     llm_embedding_backend = models.CharField(
         verbose_name=_("Sets the LLM embedding backend"),
+        null=True,
         blank=True,
         max_length=32,
         choices=LLMEmbeddingBackend.choices,
@@ -298,12 +299,14 @@ class ApplicationConfiguration(AbstractSingletonModel):
 
     llm_embedding_model = models.CharField(
         verbose_name=_("Sets the LLM embedding model"),
+        null=True,
         blank=True,
         max_length=32,
     )
 
     llm_backend = models.CharField(
         verbose_name=_("Sets the LLM backend"),
+        null=True,
         blank=True,
         max_length=32,
         choices=LLMBackend.choices,
@@ -311,18 +314,21 @@ class ApplicationConfiguration(AbstractSingletonModel):
 
     llm_model = models.CharField(
         verbose_name=_("Sets the LLM model"),
+        null=True,
         blank=True,
         max_length=32,
     )
 
     llm_api_key = models.CharField(
         verbose_name=_("Sets the LLM API key"),
+        null=True,
         blank=True,
         max_length=128,
     )
 
     llm_endpoint = models.CharField(
         verbose_name=_("Sets the LLM endpoint, optional"),
+        null=True,
         blank=True,
         max_length=128,
     )
