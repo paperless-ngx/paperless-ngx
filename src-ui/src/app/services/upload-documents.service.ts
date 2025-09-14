@@ -33,9 +33,7 @@ export class UploadDocumentsService {
     let formData = new FormData()
     formData.append('document', file, file.name)
     formData.append('from_webui', 'true')
-    if (splitPdfOnUpload) {
-      formData.append('split_pdf', 'true')
-    }
+    formData.append('split_pdf', splitPdfOnUpload ? 'true' : 'false')
     let status = this.websocketStatusService.newFileUpload(file.name)
 
     status.message = $localize`Connecting...`
