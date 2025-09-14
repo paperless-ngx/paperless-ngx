@@ -23,10 +23,12 @@ class SplitPagesPlugin(ConsumeTaskPlugin):
 
     @property
     def able_to_run(self) -> bool:
-        return (
-            settings.CONSUMER_SPLIT_PDF_ON_UPLOAD
-            and self.input_doc.mime_type == "application/pdf"
+        enabled = (
+            self.metadata.split_pdf_on_upload
+            if self.metadata.split_pdf_on_upload is not None
+            else settings.CONSUMER_SPLIT_PDF_ON_UPLOAD
         )
+        return enabled and self.input_doc.mime_type == "application/pdf"
 
     def setup(self) -> None:
         self.temp_dir = tempfile.TemporaryDirectory(

@@ -1682,6 +1682,12 @@ class PostDocumentSerializer(serializers.Serializer):
         required=False,
     )
 
+    split_pdf = serializers.BooleanField(
+        label="Split PDF on upload",
+        write_only=True,
+        required=False,
+    )
+
     def validate_document(self, document):
         document_data = document.file.read()
         mime_type = magic.from_buffer(document_data, mime=True)

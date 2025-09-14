@@ -1,6 +1,18 @@
 <pngx-widget-frame *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Document }" [cardless]="true">
   <div content tourAnchor="tour.upload-widget">
     <form class="justify-content-center d-flex flex-column align-items-center">
+      <div class="form-check form-switch align-self-end mb-2">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            [(ngModel)]="splitOnUpload"
+            id="splitOnUpload"
+            name="splitOnUpload"
+          />
+        <label class="form-check-label" for="splitOnUpload" i18n>
+          Split PDFs on upload
+        </label>
+      </div>
       <button type="button" class="btn btn-outline-dark bg-light shadow-sm w-100 h-100 pt-3 pb-3" (click)="fileUpload.click()">
         <i-bs class="text-primary" name="plus-circle"></i-bs>&nbsp;
         <span class="text-primary" i18n>Upload documents</span>

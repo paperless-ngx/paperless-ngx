@@ -1499,6 +1499,7 @@ class PostDocumentView(GenericAPIView):
         archive_serial_number = serializer.validated_data.get("archive_serial_number")
         custom_field_ids = serializer.validated_data.get("custom_fields")
         from_webui = serializer.validated_data.get("from_webui")
+        split_pdf = serializer.validated_data.get("split_pdf")
 
         t = int(mktime(datetime.now().timetuple()))
 
@@ -1526,6 +1527,7 @@ class PostDocumentView(GenericAPIView):
             created=created,
             asn=archive_serial_number,
             owner_id=request.user.id,
+            split_pdf_on_upload=split_pdf,
             # TODO: set values
             custom_fields={cf_id: None for cf_id in custom_field_ids}
             if custom_field_ids

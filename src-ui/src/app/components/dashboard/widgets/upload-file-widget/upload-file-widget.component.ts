@@ -1,5 +1,5 @@
 import { NgClass, NgTemplateOutlet } from '@angular/common'
-import { Component, QueryList, ViewChildren, inject } from '@angular/core'
+import { Component, QueryList, ViewChildren, inject, OnInit } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import {
   NgbAlert,
@@ -13,12 +13,14 @@ import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SettingsService } from 'src/app/services/settings.service'
 import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
+import { ConfigService } from 'src/app/services/config.service'
 import {
   FileStatus,
   FileStatusPhase,
   WebsocketStatusService,
 } from 'src/app/services/websocket-status.service'
 import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
+import { FormsModule } from '@angular/forms'
 
 @Component({
   selector: 'pngx-upload-file-widget',
@@ -34,14 +36,27 @@ import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
     NgbProgressbarModule,
     NgxBootstrapIconsModule,
     TourNgBootstrapModule,
+    FormsModule,
   ],
 })
-export class UploadFileWidgetComponent extends ComponentWithPermissions {
+export class UploadFileWidgetComponent
+  extends ComponentWithPermissions
+  implements OnInit
+{
   private websocketStatusService = inject(WebsocketStatusService)
   private uploadDocumentsService = inject(UploadDocumentsService)
+  private configService = inject(ConfigService)
   settingsService = inject(SettingsService)
 
+  splitOnUpload = false
+
   @ViewChildren(NgbAlert) alerts: QueryList<NgbAlert>
+
+  ngOnInit() {
+    this.configService
+      .getConfig()
+      .subscribe((c) => (this.splitOnUpload = !!c.split_pdf_on_upload))
+  }
 
   getStatus() {
     return this.websocketStatusService.getConsumerStatus()
@@ -132,10 +147,11 @@ export class UploadFileWidgetComponent extends ComponentWithPermissions {
   public onFileSelected(event: Event) {
     const files = (event.target as HTMLInputElement).files
     for (let i = 0; i < files?.length; i++) {
-      const file = files.item(i)
-      file && this.uploadDocumentsService.uploadFile(file)
+        const file = files.item(i)
+        file &&
+          this.uploadDocumentsService.uploadFile(file, this.splitOnUpload)
+      }
     }
-  }
 
   get slimSidebarEnabled(): boolean {
     return this.settingsService.get(SETTINGS_KEYS.SLIM_SIDEBAR)

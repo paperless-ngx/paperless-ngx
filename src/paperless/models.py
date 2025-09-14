@@ -188,6 +188,12 @@ class ApplicationConfiguration(AbstractSingletonModel):
         upload_to="logo/",
     )
 
+    # PAPERLESS_CONSUMER_SPLIT_PDF_ON_UPLOAD
+    split_pdf_on_upload = models.BooleanField(
+        verbose_name=_("Split PDFs on upload"),
+        null=True,
+    )
+
     """
     Settings for the barcode scanner
     """

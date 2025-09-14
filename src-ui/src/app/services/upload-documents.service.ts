@@ -16,10 +16,13 @@ export class UploadDocumentsService {
 
   private uploadSubscriptions: Array<Subscription> = []
 
-  public uploadFile(file: File) {
+  public uploadFile(file: File, splitPdfOnUpload = false) {
     let formData = new FormData()
     formData.append('document', file, file.name)
     formData.append('from_webui', 'true')
+    if (splitPdfOnUpload) {
+      formData.append('split_pdf', 'true')
+    }
     let status = this.websocketStatusService.newFileUpload(file.name)
 
     status.message = $localize`Connecting...`

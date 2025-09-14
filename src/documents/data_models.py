@@ -30,6 +30,7 @@ class DocumentMetadataOverrides:
     change_users: list[int] | None = None
     change_groups: list[int] | None = None
     custom_fields: dict | None = None
+    split_pdf_on_upload: bool | None = None
 
     def update(self, other: "DocumentMetadataOverrides") -> "DocumentMetadataOverrides":
         """
@@ -49,6 +50,8 @@ class DocumentMetadataOverrides:
             self.storage_path_id = other.storage_path_id
         if other.owner_id is not None:
             self.owner_id = other.owner_id
+        if other.split_pdf_on_upload is not None:
+            self.split_pdf_on_upload = other.split_pdf_on_upload
 
         # merge
         if self.tag_ids is None:

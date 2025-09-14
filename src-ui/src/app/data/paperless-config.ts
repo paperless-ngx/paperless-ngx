@@ -182,6 +182,13 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     category: ConfigCategory.General,
   },
   {
+    key: 'split_pdf_on_upload',
+    title: $localize`Split PDFs on upload`,
+    type: ConfigOptionType.Boolean,
+    config_key: 'PAPERLESS_CONSUMER_SPLIT_PDF_ON_UPLOAD',
+    category: ConfigCategory.General,
+  },
+  {
     key: 'barcodes_enabled',
     title: $localize`Enable Barcodes`,
     type: ConfigOptionType.Boolean,
@@ -276,6 +283,7 @@ export interface PaperlessConfig extends ObjectWithId {
   user_args: object
   app_logo: string
   app_title: string
+  split_pdf_on_upload: boolean
   barcodes_enabled: boolean
   barcode_enable_tiff_support: boolean
   barcode_string: string

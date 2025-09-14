@@ -13,12 +13,14 @@ import { routes } from 'src/app/app-routing.module'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
+import { ConfigService } from 'src/app/services/config.service'
 import {
   FileStatus,
   FileStatusPhase,
   WebsocketStatusService,
 } from 'src/app/services/websocket-status.service'
 import { UploadFileWidgetComponent } from './upload-file-widget.component'
+import { of } from 'rxjs'
 
 const FAILED_STATUSES = [new FileStatus()]
 const WORKING_STATUSES = [new FileStatus(), new FileStatus()]
@@ -61,6 +63,10 @@ describe('UploadFileWidgetComponent', () => {
         },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
+        {
+          provide: ConfigService,
+          useValue: { getConfig: () => of({ split_pdf_on_upload: false }) },
+        },
       ],
     }).compileComponents()
 
@@ -73,7 +79,7 @@ describe('UploadFileWidgetComponent', () => {
   })
 
   it('should support browse files', () => {
-    const fileInput = fixture.debugElement.query(By.css('input'))
+    const fileInput = fixture.debugElement.query(By.css('input[type="file"]'))
     const clickSpy = jest.spyOn(fileInput.nativeElement, 'click')
     fixture.debugElement
       .query(By.css('button'))
@@ -87,7 +93,7 @@ describe('UploadFileWidgetComponent', () => {
       [new Blob(['testing'], { type: 'application/pdf' })],
       'file.pdf'
     )
-    const fileInput = fixture.debugElement.query(By.css('input'))
+    const fileInput = fixture.debugElement.query(By.css('input[type="file"]'))
     jest.spyOn(fileInput.nativeElement, 'files', 'get').mockReturnValue({
       item: () => file,
       length: 1,
