@@ -6,7 +6,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "1069_workflowtrigger_filter_has_storage_path_and_more"),
+        ("documents", "1070_customfieldinstance_value_long_text_and_more"),
     ]
 
     operations = [
