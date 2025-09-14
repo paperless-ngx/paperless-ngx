@@ -10,7 +10,7 @@ export enum CustomFieldDataType {
   Monetary = 'monetary',
   DocumentLink = 'documentlink',
   Select = 'select',
-  LongString = 'longstring',
+  LongText = 'longtext',
 }
 
 export const DATA_TYPE_LABELS = [
@@ -39,10 +39,6 @@ export const DATA_TYPE_LABELS = [
     name: $localize`Text`,
   },
   {
-    id: CustomFieldDataType.LongString,
-    name: $localize`Long Text`,
-  },
-  {
     id: CustomFieldDataType.Url,
     name: $localize`Url`,
   },
@@ -53,6 +49,10 @@ export const DATA_TYPE_LABELS = [
   {
     id: CustomFieldDataType.Select,
     name: $localize`Select`,
+  },
+  {
+    id: CustomFieldDataType.LongText,
+    name: $localize`Long Text`,
   },
 ]
 

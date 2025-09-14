@@ -70,11 +70,6 @@ export const CUSTOM_FIELD_QUERY_OPERATORS_BY_GROUP = {
 
 // filters.py > SUPPORTED_EXPR_CATEGORIES
 export const CUSTOM_FIELD_QUERY_OPERATOR_GROUPS_BY_TYPE = {
-  [CustomFieldDataType.LongString]: [
-    CustomFieldQueryOperatorGroups.Basic,
-    CustomFieldQueryOperatorGroups.Exact,
-    CustomFieldQueryOperatorGroups.String,
-  ],
   [CustomFieldDataType.String]: [
     CustomFieldQueryOperatorGroups.Basic,
     CustomFieldQueryOperatorGroups.Exact,
@@ -118,6 +113,11 @@ export const CUSTOM_FIELD_QUERY_OPERATOR_GROUPS_BY_TYPE = {
     CustomFieldQueryOperatorGroups.Basic,
     CustomFieldQueryOperatorGroups.Exact,
     CustomFieldQueryOperatorGroups.Subset,
+  ],
+  [CustomFieldDataType.LongText]: [
+    CustomFieldQueryOperatorGroups.Basic,
+    CustomFieldQueryOperatorGroups.Exact,
+    CustomFieldQueryOperatorGroups.String,
   ],
 }
 

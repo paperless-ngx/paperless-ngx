@@ -20,7 +20,6 @@ class Migration(migrations.Migration):
             name="data_type",
             field=models.CharField(
                 choices=[
-                    ("longstring", "Long String"),
                     ("string", "String"),
                     ("url", "URL"),
                     ("date", "Date"),
@@ -30,6 +29,7 @@ class Migration(migrations.Migration):
                     ("monetary", "Monetary"),
                     ("documentlink", "Document Link"),
                     ("select", "Select"),
+                    ("longtext", "Long Text"),
                 ],
                 editable=False,
                 max_length=50,

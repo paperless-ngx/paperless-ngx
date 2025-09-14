@@ -200,9 +200,9 @@ def get_custom_fields_context(
         # String types need to be sanitized
         elif field_instance.field.data_type in {
             CustomField.FieldDataType.MONETARY,
-            CustomField.FieldDataType.LONG_STRING,
             CustomField.FieldDataType.STRING,
             CustomField.FieldDataType.URL,
+            CustomField.FieldDataType.LONG_TEXT,
         }:
             value = pathvalidate.sanitize_filename(
                 field_instance.value,

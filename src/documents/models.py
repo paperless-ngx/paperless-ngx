@@ -750,7 +750,6 @@ class CustomField(models.Model):
     """
 
     class FieldDataType(models.TextChoices):
-        LONG_STRING = ("longstring", _("Long String"))
         STRING = ("string", _("String"))
         URL = ("url", _("URL"))
         DATE = ("date", _("Date"))
@@ -760,6 +759,7 @@ class CustomField(models.Model):
         MONETARY = ("monetary", _("Monetary"))
         DOCUMENTLINK = ("documentlink", _("Document Link"))
         SELECT = ("select", _("Select"))
+        LONG_TEXT = ("longtext", _("Long Text"))
 
     created = models.DateTimeField(
         _("created"),
@@ -808,7 +808,6 @@ class CustomFieldInstance(SoftDeleteModel):
     """
 
     TYPE_TO_DATA_STORE_NAME_MAP = {
-        CustomField.FieldDataType.LONG_STRING: "value_long_text",
         CustomField.FieldDataType.STRING: "value_text",
         CustomField.FieldDataType.URL: "value_url",
         CustomField.FieldDataType.DATE: "value_date",
@@ -818,6 +817,7 @@ class CustomFieldInstance(SoftDeleteModel):
         CustomField.FieldDataType.MONETARY: "value_monetary",
         CustomField.FieldDataType.DOCUMENTLINK: "value_document_ids",
         CustomField.FieldDataType.SELECT: "value_select",
+        CustomField.FieldDataType.LONG_TEXT: "value_long_text",
     }
 
     created = models.DateTimeField(
@@ -846,8 +846,6 @@ class CustomFieldInstance(SoftDeleteModel):
     )
 
     # Actual data storage
-    value_long_text = models.TextField(null=True)
-
     value_text = models.CharField(max_length=128, null=True)
 
     value_bool = models.BooleanField(null=True)
@@ -886,6 +884,8 @@ class CustomFieldInstance(SoftDeleteModel):
     value_document_ids = models.JSONField(null=True)
 
     value_select = models.CharField(null=True, max_length=16)
+
+    value_long_text = models.TextField(null=True)
 
     class Meta:
         ordering = ("created",)

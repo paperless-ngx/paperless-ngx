@@ -221,7 +221,6 @@ class CustomFieldsFilter(Filter):
                             option_ids.extend([option.get("id")])
             return (
                 qs.filter(custom_fields__field__name__icontains=value)
-                | qs.filter(custom_fields__value_long_text__icontains=value)
                 | qs.filter(custom_fields__value_text__icontains=value)
                 | qs.filter(custom_fields__value_bool__icontains=value)
                 | qs.filter(custom_fields__value_int__icontains=value)
@@ -231,6 +230,7 @@ class CustomFieldsFilter(Filter):
                 | qs.filter(custom_fields__value_monetary__icontains=value)
                 | qs.filter(custom_fields__value_document_ids__icontains=value)
                 | qs.filter(custom_fields__value_select__in=option_ids)
+                | qs.filter(custom_fields__value_long_text__icontains=value)
             )
         else:
             return qs
@@ -306,7 +306,6 @@ class CustomFieldQueryParser:
     }
 
     SUPPORTED_EXPR_CATEGORIES = {
-        CustomField.FieldDataType.LONG_STRING: ("basic", "string"),
         CustomField.FieldDataType.STRING: ("basic", "string"),
         CustomField.FieldDataType.URL: ("basic", "string"),
         CustomField.FieldDataType.DATE: ("basic", "arithmetic"),
@@ -316,6 +315,7 @@ class CustomFieldQueryParser:
         CustomField.FieldDataType.MONETARY: ("basic", "string", "arithmetic"),
         CustomField.FieldDataType.DOCUMENTLINK: ("basic", "containment"),
         CustomField.FieldDataType.SELECT: ("basic",),
+        CustomField.FieldDataType.LONG_TEXT: ("basic", "string"),
     }
 
     DATE_COMPONENTS = [
@@ -848,8 +848,8 @@ class DocumentsOrderingFilter(OrderingFilter):
             annotation = None
             match field.data_type:
                 case (
-                    CustomField.FieldDataType.LONG_STRING
-                    | CustomField.FieldDataType.STRING
+                    CustomField.FieldDataType.STRING
+                    | CustomField.FieldDataType.LONG_TEXT
                 ):
                     annotation = Subquery(
                         CustomFieldInstance.objects.filter(
