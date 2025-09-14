@@ -14,6 +14,8 @@ import {
   FileStatusPhase,
   WebsocketStatusService,
 } from './websocket-status.service'
+import { ConfigService } from './config.service'
+import { of } from 'rxjs'
 
 describe('UploadDocumentsService', () => {
   let httpTestingController: HttpTestingController
@@ -26,6 +28,10 @@ describe('UploadDocumentsService', () => {
       providers: [
         UploadDocumentsService,
         WebsocketStatusService,
+        {
+          provide: ConfigService,
+          useValue: { getConfig: () => of({ split_pdf_on_upload: false }) },
+        },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],

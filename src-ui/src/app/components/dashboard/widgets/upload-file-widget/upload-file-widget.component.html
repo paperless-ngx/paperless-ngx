@@ -6,6 +6,7 @@
             class="form-check-input"
             type="checkbox"
             [(ngModel)]="splitOnUpload"
+            (ngModelChange)="onSplitOnUploadChange()"
             id="splitOnUpload"
             name="splitOnUpload"
           />

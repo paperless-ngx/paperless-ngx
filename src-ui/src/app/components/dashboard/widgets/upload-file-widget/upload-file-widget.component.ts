@@ -53,9 +53,14 @@ export class UploadFileWidgetComponent
   @ViewChildren(NgbAlert) alerts: QueryList<NgbAlert>
 
   ngOnInit() {
-    this.configService
-      .getConfig()
-      .subscribe((c) => (this.splitOnUpload = !!c.split_pdf_on_upload))
+    this.configService.getConfig().subscribe((c) => {
+      this.splitOnUpload = !!c.split_pdf_on_upload
+      this.uploadDocumentsService.setSplitPdfOnUpload(this.splitOnUpload)
+    })
+  }
+
+  onSplitOnUploadChange() {
+    this.uploadDocumentsService.setSplitPdfOnUpload(this.splitOnUpload)
   }
 
   getStatus() {
@@ -147,11 +152,10 @@ export class UploadFileWidgetComponent
   public onFileSelected(event: Event) {
     const files = (event.target as HTMLInputElement).files
     for (let i = 0; i < files?.length; i++) {
-        const file = files.item(i)
-        file &&
-          this.uploadDocumentsService.uploadFile(file, this.splitOnUpload)
-      }
+      const file = files.item(i)
+      file && this.uploadDocumentsService.uploadFile(file)
     }
+  }
 
   get slimSidebarEnabled(): boolean {
     return this.settingsService.get(SETTINGS_KEYS.SLIM_SIDEBAR)

@@ -1,6 +1,7 @@
 import { HttpEventType } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core'
 import { Subscription } from 'rxjs'
+import { ConfigService } from './config.service'
 import { DocumentService } from './rest/document.service'
 import {
   FileStatusPhase,
@@ -13,10 +14,22 @@ import {
 export class UploadDocumentsService {
   private documentService = inject(DocumentService)
   private websocketStatusService = inject(WebsocketStatusService)
+  private configService = inject(ConfigService)
 
   private uploadSubscriptions: Array<Subscription> = []
+  private splitPdfOnUpload = false
 
-  public uploadFile(file: File, splitPdfOnUpload = false) {
+  constructor() {
+    this.configService
+      .getConfig()
+      .subscribe((c) => (this.splitPdfOnUpload = !!c.split_pdf_on_upload))
+  }
+
+  public setSplitPdfOnUpload(split: boolean) {
+    this.splitPdfOnUpload = split
+  }
+
+  public uploadFile(file: File, splitPdfOnUpload = this.splitPdfOnUpload) {
     let formData = new FormData()
     formData.append('document', file, file.name)
     formData.append('from_webui', 'true')
