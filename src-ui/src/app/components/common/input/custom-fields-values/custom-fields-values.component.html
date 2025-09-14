@@ -68,6 +68,11 @@
           [allowNull]="true"
           [horizontal]="true"></pngx-input-select>
         }
+        @case (CustomFieldDataType.LongText) {
+          <pngx-input-textarea [(ngModel)]="value[fieldId]" (ngModelChange)="onChange(value)"
+          [title]="getCustomField(fieldId)?.name"
+          class="flex-grow-1"></pngx-input-textarea>
+        }
       }
       <button type="button" class="btn btn-link text-danger" (click)="removeSelectedField.next(fieldId)">
         <i-bs name="trash"></i-bs>
