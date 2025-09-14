@@ -8,7 +8,7 @@ export function flattenTags(all: Tag[]): Tag[] {
   for (const t of map.values()) {
     if (t.parent) {
       const p = map.get(t.parent)
-      p && p.children.push(t)
+      p?.children.push(t)
     }
   }
   const roots = Array.from(map.values()).filter((t) => !t.parent)
@@ -29,6 +29,7 @@ export function flattenTags(all: Tag[]): Tag[] {
       }
     }
   }
-  roots.sort(sortByName).forEach((r) => walk(r, 0))
+  roots.sort(sortByName)
+  roots.forEach((r) => walk(r, 0))
   return ordered
 }

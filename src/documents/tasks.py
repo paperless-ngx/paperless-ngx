@@ -522,7 +522,7 @@ def update_document_parent_tags(tag: Tag, new_parent: Tag) -> None:
     When a tag's parent changes, ensure all documents containing the tag also have
     the parent tag (and its ancestors) applied.
     """
-    DocumentTagRelationship = Document.tags.through
+    doc_tag_relationship = Document.tags.through
 
     doc_ids: list[int] = list(
         Document.objects.filter(tags=tag).values_list("pk", flat=True),
@@ -540,13 +540,13 @@ def update_document_parent_tags(tag: Tag, new_parent: Tag) -> None:
         missing_qs = Document.objects.filter(id__in=doc_ids).exclude(tags=parent)
         missing_ids = list(missing_qs.values_list("pk", flat=True))
         to_create.extend(
-            DocumentTagRelationship(document_id=doc_id, tag_id=parent.id)
+            doc_tag_relationship(document_id=doc_id, tag_id=parent.id)
             for doc_id in missing_ids
         )
         affected.update(missing_ids)
 
     if to_create:
-        DocumentTagRelationship.objects.bulk_create(
+        doc_tag_relationship.objects.bulk_create(
             to_create,
             ignore_conflicts=True,
         )

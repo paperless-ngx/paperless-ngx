@@ -34,17 +34,17 @@ describe('flattenTags', () => {
     expect(flat.map((t) => t.orderIndex)).toEqual([0, 1, 2, 3, 4, 5, 6])
 
     // Children are rebuilt
-    const aRoot = flat.find((t) => t.name === 'A-root')!
+    const aRoot = flat.find((t) => t.name === 'A-root')
     expect(new Set(aRoot.children?.map((c) => c.name))).toEqual(
       new Set(['child 2', 'Child 10'])
     )
 
-    const bRoot = flat.find((t) => t.name === 'B-root')!
+    const bRoot = flat.find((t) => t.name === 'B-root')
     expect(new Set(bRoot.children?.map((c) => c.name))).toEqual(
       new Set(['Alpha', 'beta'])
     )
 
-    const child2 = flat.find((t) => t.name === 'child 2')!
+    const child2 = flat.find((t) => t.name === 'child 2')
     expect(new Set(child2.children?.map((c) => c.name))).toEqual(
       new Set(['Sub 1'])
     )

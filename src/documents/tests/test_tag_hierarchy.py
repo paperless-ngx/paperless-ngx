@@ -31,16 +31,6 @@ class TestTagHierarchy(APITestCase):
             mime_type="application/pdf",
         )
 
-    def test_api_add_child_adds_parent(self):
-        self.client.patch(
-            f"/api/documents/{self.document.pk}/",
-            {"tags": [self.child.pk]},
-            format="json",
-        )
-        self.document.refresh_from_db()
-        tags = set(self.document.tags.values_list("pk", flat=True))
-        assert tags == {self.parent.pk, self.child.pk}
-
     def test_document_api_add_child_adds_parent(self):
         self.client.patch(
             f"/api/documents/{self.document.pk}/",
