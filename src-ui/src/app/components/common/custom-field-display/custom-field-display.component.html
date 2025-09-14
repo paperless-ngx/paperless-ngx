@@ -35,6 +35,9 @@
             @case (CustomFieldDataType.Select) {
                 <span [ngbTooltip]="nameTooltip">{{getSelectValue(field, value)}}</span>
             }
+            @case (CustomFieldDataType.LongText) {
+                <p class="mb-0" [ngbTooltip]="nameTooltip">{{value | slice:0:20}}{{value.length > 20 ? '...' : ''}}</p>
+            }
             @default {
               <span [ngbTooltip]="nameTooltip">{{value}}</span>
             }

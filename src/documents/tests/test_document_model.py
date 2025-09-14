@@ -18,14 +18,17 @@ class TestDocument(TestCase):
         self.originals_dir = tempfile.mkdtemp()
         self.thumb_dir = tempfile.mkdtemp()
 
-        override_settings(
+        self.overrides = override_settings(
             ORIGINALS_DIR=self.originals_dir,
             THUMBNAIL_DIR=self.thumb_dir,
-        ).enable()
+        )
+
+        self.overrides.enable()
 
     def tearDown(self) -> None:
         shutil.rmtree(self.originals_dir)
         shutil.rmtree(self.thumb_dir)
+        self.overrides.disable()
 
     def test_file_deletion(self):
         document = Document.objects.create(
