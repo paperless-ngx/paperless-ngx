@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-31 22:24+0000\n"
-"PO-Revision-Date: 2025-09-03 12:13\n"
+"POT-Creation-Date: 2025-09-14 03:21+0000\n"
+"PO-Revision-Date: 2025-09-14 03:22\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -21,67 +21,67 @@ msgstr ""
 msgid "Documents"
 msgstr "文档"
 
-#: documents/filters.py:384
+#: documents/filters.py:386
 msgid "Value must be valid JSON."
 msgstr "值必须是有效的 JSON 格式。"
 
-#: documents/filters.py:403
+#: documents/filters.py:405
 msgid "Invalid custom field query expression"
 msgstr "无效的自定义字段查询表达式"
 
-#: documents/filters.py:413
+#: documents/filters.py:415
 msgid "Invalid expression list. Must be nonempty."
 msgstr "无效的表达式列表。必须不为空。"
 
-#: documents/filters.py:434
+#: documents/filters.py:436
 msgid "Invalid logical operator {op!r}"
 msgstr "无效的逻辑运算符 {op!r}"
 
-#: documents/filters.py:448
+#: documents/filters.py:450
 msgid "Maximum number of query conditions exceeded."
 msgstr "超出查询条件的最大数量。"
 
-#: documents/filters.py:513
+#: documents/filters.py:515
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} 不是一个有效的自定义字段。"
 
-#: documents/filters.py:550
+#: documents/filters.py:552
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} 不支持查询表达式 {expr!r}。"
 
-#: documents/filters.py:658
+#: documents/filters.py:660
 msgid "Maximum nesting depth exceeded."
 msgstr "超出最大嵌套深度。"
 
-#: documents/filters.py:843
+#: documents/filters.py:845
 msgid "Custom field not found"
 msgstr "Custom field not found"
 
-#: documents/models.py:36 documents/models.py:713
+#: documents/models.py:36 documents/models.py:735
 msgid "owner"
 msgstr "所有者"
 
-#: documents/models.py:53 documents/models.py:924
+#: documents/models.py:53 documents/models.py:950
 msgid "None"
 msgstr "无"
 
-#: documents/models.py:54 documents/models.py:925
+#: documents/models.py:54 documents/models.py:951
 msgid "Any word"
 msgstr "任意单词"
 
-#: documents/models.py:55 documents/models.py:926
+#: documents/models.py:55 documents/models.py:952
 msgid "All words"
 msgstr "所有单词"
 
-#: documents/models.py:56 documents/models.py:927
+#: documents/models.py:56 documents/models.py:953
 msgid "Exact match"
 msgstr "精确匹配"
 
-#: documents/models.py:57 documents/models.py:928
+#: documents/models.py:57 documents/models.py:954
 msgid "Regular expression"
 msgstr "正则表达式"
 
-#: documents/models.py:58 documents/models.py:929
+#: documents/models.py:58 documents/models.py:955
 msgid "Fuzzy word"
 msgstr "模糊单词"
 
@@ -89,20 +89,20 @@ msgstr "模糊单词"
 msgid "Automatic"
 msgstr "自动"
 
-#: documents/models.py:62 documents/models.py:401 documents/models.py:1419
+#: documents/models.py:62 documents/models.py:423 documents/models.py:1451
 #: paperless_mail/models.py:23 paperless_mail/models.py:143
 msgid "name"
 msgstr "名称"
 
-#: documents/models.py:64 documents/models.py:993
+#: documents/models.py:64 documents/models.py:1019
 msgid "match"
 msgstr "匹配"
 
-#: documents/models.py:67 documents/models.py:996
+#: documents/models.py:67 documents/models.py:1022
 msgid "matching algorithm"
 msgstr "匹配算法"
 
-#: documents/models.py:72 documents/models.py:1001
+#: documents/models.py:72 documents/models.py:1027
 msgid "is insensitive"
 msgstr "忽略大小写"
 
@@ -166,7 +166,7 @@ msgstr "使用 GNU 隐私防护（GPG）加密"
 msgid "title"
 msgstr "标题"
 
-#: documents/models.py:170 documents/models.py:627
+#: documents/models.py:170 documents/models.py:649
 msgid "content"
 msgstr "内容"
 
@@ -202,8 +202,8 @@ msgstr "页数"
 msgid "The number of pages of the document."
 msgstr "文档页数。"
 
-#: documents/models.py:217 documents/models.py:633 documents/models.py:671
-#: documents/models.py:742 documents/models.py:800
+#: documents/models.py:217 documents/models.py:655 documents/models.py:693
+#: documents/models.py:765 documents/models.py:824
 msgid "created"
 msgstr "已创建"
 
@@ -251,8 +251,8 @@ msgstr "归档序列号"
 msgid "The position of this document in your physical document archive."
 msgstr "此文档在您的物理文档归档中的位置。"
 
-#: documents/models.py:294 documents/models.py:644 documents/models.py:698
-#: documents/models.py:1462
+#: documents/models.py:294 documents/models.py:666 documents/models.py:720
+#: documents/models.py:1494
 msgid "document"
 msgstr "文档"
 
@@ -260,907 +260,915 @@ msgstr "文档"
 msgid "documents"
 msgstr "文档"
 
-#: documents/models.py:382
+#: documents/models.py:404
 msgid "Table"
 msgstr "表格"
 
-#: documents/models.py:383
+#: documents/models.py:405
 msgid "Small Cards"
 msgstr "小卡片"
 
-#: documents/models.py:384
+#: documents/models.py:406
 msgid "Large Cards"
 msgstr "大卡片"
 
-#: documents/models.py:387
+#: documents/models.py:409
 msgid "Title"
 msgstr "标题"
 
-#: documents/models.py:388 documents/models.py:945
+#: documents/models.py:410 documents/models.py:971
 msgid "Created"
 msgstr "创建时间"
 
-#: documents/models.py:389 documents/models.py:944
+#: documents/models.py:411 documents/models.py:970
 msgid "Added"
 msgstr "添加时间"
 
-#: documents/models.py:390
+#: documents/models.py:412
 msgid "Tags"
 msgstr "标签"
 
-#: documents/models.py:391
+#: documents/models.py:413
 msgid "Correspondent"
 msgstr "联系人"
 
-#: documents/models.py:392
+#: documents/models.py:414
 msgid "Document Type"
 msgstr "文档类型"
 
-#: documents/models.py:393
+#: documents/models.py:415
 msgid "Storage Path"
 msgstr "保存路径"
 
-#: documents/models.py:394
+#: documents/models.py:416
 msgid "Note"
 msgstr "备注"
 
-#: documents/models.py:395
+#: documents/models.py:417
 msgid "Owner"
 msgstr "所有者"
 
-#: documents/models.py:396
+#: documents/models.py:418
 msgid "Shared"
 msgstr "已共享"
 
-#: documents/models.py:397
+#: documents/models.py:419
 msgid "ASN"
 msgstr "ASN"
 
-#: documents/models.py:398
+#: documents/models.py:420
 msgid "Pages"
 msgstr "页"
 
-#: documents/models.py:404
+#: documents/models.py:426
 msgid "show on dashboard"
 msgstr "在仪表盘显示"
 
-#: documents/models.py:407
+#: documents/models.py:429
 msgid "show in sidebar"
 msgstr "在侧边栏显示"
 
-#: documents/models.py:411
+#: documents/models.py:433
 msgid "sort field"
 msgstr "排序字段"
 
-#: documents/models.py:416
+#: documents/models.py:438
 msgid "sort reverse"
 msgstr "反向排序"
 
-#: documents/models.py:419
+#: documents/models.py:441
 msgid "View page size"
 msgstr "查看页面大小"
 
-#: documents/models.py:427
+#: documents/models.py:449
 msgid "View display mode"
 msgstr "查看显示模式"
 
-#: documents/models.py:434
+#: documents/models.py:456
 msgid "Document display fields"
 msgstr "文档显示字段"
 
-#: documents/models.py:441 documents/models.py:504
+#: documents/models.py:463 documents/models.py:526
 msgid "saved view"
 msgstr "保存的视图"
 
-#: documents/models.py:442
+#: documents/models.py:464
 msgid "saved views"
 msgstr "保存的视图"
 
-#: documents/models.py:450
+#: documents/models.py:472
 msgid "title contains"
 msgstr "标题包含"
 
-#: documents/models.py:451
+#: documents/models.py:473
 msgid "content contains"
 msgstr "内容包含"
 
-#: documents/models.py:452
+#: documents/models.py:474
 msgid "ASN is"
 msgstr "ASN 为"
 
-#: documents/models.py:453
+#: documents/models.py:475
 msgid "correspondent is"
 msgstr "联系人是"
 
-#: documents/models.py:454
+#: documents/models.py:476
 msgid "document type is"
 msgstr "文档类型是"
 
-#: documents/models.py:455
+#: documents/models.py:477
 msgid "is in inbox"
 msgstr "在收件箱中"
 
-#: documents/models.py:456
+#: documents/models.py:478
 msgid "has tag"
 msgstr "有标签"
 
-#: documents/models.py:457
+#: documents/models.py:479
 msgid "has any tag"
 msgstr "有任意标签"
 
-#: documents/models.py:458
+#: documents/models.py:480
 msgid "created before"
 msgstr "在此时间之前创建"
 
-#: documents/models.py:459
+#: documents/models.py:481
 msgid "created after"
 msgstr "在此时间之后创建"
 
-#: documents/models.py:460
+#: documents/models.py:482
 msgid "created year is"
 msgstr "创建年份是"
 
-#: documents/models.py:461
+#: documents/models.py:483
 msgid "created month is"
 msgstr "创建月份是"
 
-#: documents/models.py:462
+#: documents/models.py:484
 msgid "created day is"
 msgstr "创建日期是"
 
-#: documents/models.py:463
+#: documents/models.py:485
 msgid "added before"
 msgstr "添加早于"
 
-#: documents/models.py:464
+#: documents/models.py:486
 msgid "added after"
 msgstr "添加晚于"
 
-#: documents/models.py:465
+#: documents/models.py:487
 msgid "modified before"
 msgstr "修改早于"
 
-#: documents/models.py:466
+#: documents/models.py:488
 msgid "modified after"
 msgstr "修改晚于"
 
-#: documents/models.py:467
+#: documents/models.py:489
 msgid "does not have tag"
 msgstr "没有标签"
 
-#: documents/models.py:468
+#: documents/models.py:490
 msgid "does not have ASN"
 msgstr "没有 ASN"
 
-#: documents/models.py:469
+#: documents/models.py:491
 msgid "title or content contains"
 msgstr "标题或内容包含"
 
-#: documents/models.py:470
+#: documents/models.py:492
 msgid "fulltext query"
 msgstr "全文检索"
 
-#: documents/models.py:471
+#: documents/models.py:493
 msgid "more like this"
 msgstr "如同这个"
 
-#: documents/models.py:472
+#: documents/models.py:494
 msgid "has tags in"
 msgstr "有标签包含于"
 
-#: documents/models.py:473
+#: documents/models.py:495
 msgid "ASN greater than"
 msgstr "ASN 大于"
 
-#: documents/models.py:474
+#: documents/models.py:496
 msgid "ASN less than"
 msgstr "ASN 小于"
 
-#: documents/models.py:475
+#: documents/models.py:497
 msgid "storage path is"
 msgstr "保存路径"
 
-#: documents/models.py:476
+#: documents/models.py:498
 msgid "has correspondent in"
 msgstr "联系人"
 
-#: documents/models.py:477
+#: documents/models.py:499
 msgid "does not have correspondent in"
 msgstr "没有联系人"
 
-#: documents/models.py:478
+#: documents/models.py:500
 msgid "has document type in"
 msgstr "文档类型"
 
-#: documents/models.py:479
+#: documents/models.py:501
 msgid "does not have document type in"
 msgstr "没有文档类型"
 
-#: documents/models.py:480
+#: documents/models.py:502
 msgid "has storage path in"
 msgstr "存储路径"
 
-#: documents/models.py:481
+#: documents/models.py:503
 msgid "does not have storage path in"
 msgstr "没有存储路径"
 
-#: documents/models.py:482
+#: documents/models.py:504
 msgid "owner is"
 msgstr "所有者是"
 
-#: documents/models.py:483
+#: documents/models.py:505
 msgid "has owner in"
 msgstr "已经设置所有者"
 
-#: documents/models.py:484
+#: documents/models.py:506
 msgid "does not have owner"
 msgstr "没有所有者"
 
-#: documents/models.py:485
+#: documents/models.py:507
 msgid "does not have owner in"
 msgstr "没有所有者"
 
-#: documents/models.py:486
+#: documents/models.py:508
 msgid "has custom field value"
 msgstr "添加自定义字段值"
 
-#: documents/models.py:487
+#: documents/models.py:509
 msgid "is shared by me"
 msgstr "由我共享"
 
-#: documents/models.py:488
+#: documents/models.py:510
 msgid "has custom fields"
 msgstr "具有自定义字段"
 
-#: documents/models.py:489
+#: documents/models.py:511
 msgid "has custom field in"
 msgstr "具有自定义字段在其中"
 
-#: documents/models.py:490
+#: documents/models.py:512
 msgid "does not have custom field in"
 msgstr "没有自定义字段在其中"
 
-#: documents/models.py:491
+#: documents/models.py:513
 msgid "does not have custom field"
 msgstr "没有自定义字段"
 
-#: documents/models.py:492
+#: documents/models.py:514
 msgid "custom fields query"
 msgstr "自定义字段查询"
 
-#: documents/models.py:493
+#: documents/models.py:515
 msgid "created to"
 msgstr "创建到"
 
-#: documents/models.py:494
+#: documents/models.py:516
 msgid "created from"
 msgstr "创建于"
 
-#: documents/models.py:495
+#: documents/models.py:517
 msgid "added to"
 msgstr "添加到"
 
-#: documents/models.py:496
+#: documents/models.py:518
 msgid "added from"
 msgstr "添加于"
 
-#: documents/models.py:497
+#: documents/models.py:519
 msgid "mime type is"
 msgstr "MIME 类型是"
 
-#: documents/models.py:507
+#: documents/models.py:529
 msgid "rule type"
 msgstr "规则类型"
 
-#: documents/models.py:509
+#: documents/models.py:531
 msgid "value"
 msgstr "值"
 
-#: documents/models.py:512
+#: documents/models.py:534
 msgid "filter rule"
 msgstr "过滤规则"
 
-#: documents/models.py:513
+#: documents/models.py:535
 msgid "filter rules"
 msgstr "过滤规则"
 
-#: documents/models.py:537
+#: documents/models.py:559
 msgid "Auto Task"
 msgstr "自动任务"
 
-#: documents/models.py:538
+#: documents/models.py:560
 msgid "Scheduled Task"
 msgstr "计划任务"
 
-#: documents/models.py:539
+#: documents/models.py:561
 msgid "Manual Task"
 msgstr "手动任务"
 
-#: documents/models.py:542
+#: documents/models.py:564
 msgid "Consume File"
 msgstr "处理文件"
 
-#: documents/models.py:543
+#: documents/models.py:565
 msgid "Train Classifier"
 msgstr "训练分类器"
 
-#: documents/models.py:544
+#: documents/models.py:566
 msgid "Check Sanity"
 msgstr "检查健全性"
 
-#: documents/models.py:545
+#: documents/models.py:567
 msgid "Index Optimize"
 msgstr "索引优化"
 
-#: documents/models.py:550
+#: documents/models.py:572
 msgid "Task ID"
 msgstr "任务ID"
 
-#: documents/models.py:551
+#: documents/models.py:573
 msgid "Celery ID for the Task that was run"
 msgstr "正在运行的任务的 Celery ID"
 
-#: documents/models.py:556
+#: documents/models.py:578
 msgid "Acknowledged"
 msgstr "已确认"
 
-#: documents/models.py:557
+#: documents/models.py:579
 msgid "If the task is acknowledged via the frontend or API"
 msgstr "如果任务通过前端或 API 确认"
 
-#: documents/models.py:563
+#: documents/models.py:585
 msgid "Task Filename"
 msgstr "任务文件名"
 
-#: documents/models.py:564
+#: documents/models.py:586
 msgid "Name of the file which the Task was run for"
 msgstr "正在运行的任务文件名称"
 
-#: documents/models.py:571
+#: documents/models.py:593
 msgid "Task Name"
 msgstr "任务名称"
 
-#: documents/models.py:572
+#: documents/models.py:594
 msgid "Name of the task that was run"
 msgstr "运行的任务名称"
 
-#: documents/models.py:579
+#: documents/models.py:601
 msgid "Task State"
 msgstr "任务状态"
 
-#: documents/models.py:580
+#: documents/models.py:602
 msgid "Current state of the task being run"
 msgstr "当前任务运行状态"
 
-#: documents/models.py:586
+#: documents/models.py:608
 msgid "Created DateTime"
 msgstr "创建日期"
 
-#: documents/models.py:587
+#: documents/models.py:609
 msgid "Datetime field when the task result was created in UTC"
 msgstr "任务结果创建时间（UTC）"
 
-#: documents/models.py:593
+#: documents/models.py:615
 msgid "Started DateTime"
 msgstr "开始时间"
 
-#: documents/models.py:594
+#: documents/models.py:616
 msgid "Datetime field when the task was started in UTC"
 msgstr "任务开始时间（UTC）"
 
-#: documents/models.py:600
+#: documents/models.py:622
 msgid "Completed DateTime"
 msgstr "完成时间"
 
-#: documents/models.py:601
+#: documents/models.py:623
 msgid "Datetime field when the task was completed in UTC"
 msgstr "任务完成时间（UTC）"
 
-#: documents/models.py:607
+#: documents/models.py:629
 msgid "Result Data"
 msgstr "结果数据"
 
-#: documents/models.py:609
+#: documents/models.py:631
 msgid "The data returned by the task"
 msgstr "任务返回的数据"
 
-#: documents/models.py:617
+#: documents/models.py:639
 msgid "Task Type"
 msgstr "任务类型"
 
-#: documents/models.py:618
+#: documents/models.py:640
 msgid "The type of task that was run"
 msgstr "运行的任务类型"
 
-#: documents/models.py:629
+#: documents/models.py:651
 msgid "Note for the document"
 msgstr "文档备注"
 
-#: documents/models.py:653
+#: documents/models.py:675
 msgid "user"
 msgstr "用户"
 
-#: documents/models.py:658
+#: documents/models.py:680
 msgid "note"
 msgstr "备注"
 
-#: documents/models.py:659
+#: documents/models.py:681
 msgid "notes"
 msgstr "备注"
 
-#: documents/models.py:667
+#: documents/models.py:689
 msgid "Archive"
 msgstr "归档"
 
-#: documents/models.py:668
+#: documents/models.py:690
 msgid "Original"
 msgstr "原版"
 
-#: documents/models.py:679 paperless_mail/models.py:75
+#: documents/models.py:701 paperless_mail/models.py:75
 msgid "expiration"
 msgstr "过期时间"
 
-#: documents/models.py:686
+#: documents/models.py:708
 msgid "slug"
 msgstr "缩写"
 
-#: documents/models.py:718
+#: documents/models.py:740
 msgid "share link"
 msgstr "分享链接"
 
-#: documents/models.py:719
+#: documents/models.py:741
 msgid "share links"
 msgstr "分享链接"
 
-#: documents/models.py:731
+#: documents/models.py:753
 msgid "String"
 msgstr "字符串"
 
-#: documents/models.py:732
+#: documents/models.py:754
 msgid "URL"
 msgstr "URL链接"
 
-#: documents/models.py:733
+#: documents/models.py:755
 msgid "Date"
 msgstr "日期"
 
-#: documents/models.py:734
+#: documents/models.py:756
 msgid "Boolean"
 msgstr "布尔型"
 
-#: documents/models.py:735
+#: documents/models.py:757
 msgid "Integer"
 msgstr "整数"
 
-#: documents/models.py:736
+#: documents/models.py:758
 msgid "Float"
 msgstr "浮点数"
 
-#: documents/models.py:737
+#: documents/models.py:759
 msgid "Monetary"
 msgstr "货币"
 
-#: documents/models.py:738
+#: documents/models.py:760
 msgid "Document Link"
 msgstr "文档链接"
 
-#: documents/models.py:739
+#: documents/models.py:761
 msgid "Select"
 msgstr "选择"
 
-#: documents/models.py:751
+#: documents/models.py:762
+msgid "Long Text"
+msgstr ""
+
+#: documents/models.py:774
 msgid "data type"
 msgstr "数据类型"
 
-#: documents/models.py:758
+#: documents/models.py:781
 msgid "extra data"
 msgstr "额外数据"
 
-#: documents/models.py:762
+#: documents/models.py:785
 msgid "Extra data for the custom field, such as select options"
 msgstr "自定义字段的额外数据，例如选择选项"
 
-#: documents/models.py:768
+#: documents/models.py:791
 msgid "custom field"
 msgstr "自定义字段"
 
-#: documents/models.py:769
+#: documents/models.py:792
 msgid "custom fields"
 msgstr "自定义字段"
 
-#: documents/models.py:866
+#: documents/models.py:892
 msgid "custom field instance"
 msgstr "自定义字段实例"
 
-#: documents/models.py:867
+#: documents/models.py:893
 msgid "custom field instances"
 msgstr "自定义字段实例"
 
-#: documents/models.py:932
+#: documents/models.py:958
 msgid "Consumption Started"
 msgstr "消费已开始"
 
-#: documents/models.py:933
+#: documents/models.py:959
 msgid "Document Added"
 msgstr "文档已添加"
 
-#: documents/models.py:934
+#: documents/models.py:960
 msgid "Document Updated"
 msgstr "文档已更新"
 
-#: documents/models.py:935
+#: documents/models.py:961
 msgid "Scheduled"
 msgstr "已预约"
 
-#: documents/models.py:938
+#: documents/models.py:964
 msgid "Consume Folder"
 msgstr "消费文件夹"
 
-#: documents/models.py:939
+#: documents/models.py:965
 msgid "Api Upload"
 msgstr "Api上传"
 
-#: documents/models.py:940
+#: documents/models.py:966
 msgid "Mail Fetch"
 msgstr "邮件获取"
 
-#: documents/models.py:941
+#: documents/models.py:967
 msgid "Web UI"
 msgstr "网页界面 (Web UI)"
 
-#: documents/models.py:946
+#: documents/models.py:972
 msgid "Modified"
 msgstr "修改时间"
 
-#: documents/models.py:947
+#: documents/models.py:973
 msgid "Custom Field"
 msgstr "自定义字段"
 
-#: documents/models.py:950
+#: documents/models.py:976
 msgid "Workflow Trigger Type"
 msgstr "工作流触发器类型"
 
-#: documents/models.py:962
+#: documents/models.py:988
 msgid "filter path"
 msgstr "过滤路径"
 
-#: documents/models.py:967
+#: documents/models.py:993
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr "只消耗匹配了指定路径的文档。路径指定中允许使用*作为通配符，大小写不敏感。"
 
-#: documents/models.py:974
+#: documents/models.py:1000
 msgid "filter filename"
 msgstr "过滤文件名"
 
-#: documents/models.py:979 paperless_mail/models.py:200
+#: documents/models.py:1005 paperless_mail/models.py:200
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "如果指定了文件名，只处理完全匹配此文件名的文档。允许使用通配符，如 *.pdf 或 *发票*。不区分大小写。"
 
-#: documents/models.py:990
+#: documents/models.py:1016
 msgid "filter documents from this mail rule"
 msgstr "从邮件规则中过滤文档"
 
-#: documents/models.py:1006
+#: documents/models.py:1032
 msgid "has these tag(s)"
 msgstr "含有这些标签"
 
-#: documents/models.py:1014
+#: documents/models.py:1040
 msgid "has this document type"
 msgstr "具有此文档类型"
 
-#: documents/models.py:1022
+#: documents/models.py:1048
 msgid "has this correspondent"
 msgstr "已有此联系人"
 
-#: documents/models.py:1026
+#: documents/models.py:1056
+msgid "has this storage path"
+msgstr ""
+
+#: documents/models.py:1060
 msgid "schedule offset days"
 msgstr "预约偏移天数"
 
-#: documents/models.py:1029
+#: documents/models.py:1063
 msgid "The number of days to offset the schedule trigger by."
 msgstr "预约触发器的偏移天数。"
 
-#: documents/models.py:1034
+#: documents/models.py:1068
 msgid "schedule is recurring"
 msgstr "预约已设定循环"
 
-#: documents/models.py:1037
+#: documents/models.py:1071
 msgid "If the schedule should be recurring."
 msgstr "预约是否应该循环。"
 
-#: documents/models.py:1042
+#: documents/models.py:1076
 msgid "schedule recurring delay in days"
 msgstr "预约循环延迟天数"
 
-#: documents/models.py:1046
+#: documents/models.py:1080
 msgid "The number of days between recurring schedule triggers."
 msgstr "预约触发器循环间隔天数。"
 
-#: documents/models.py:1051
+#: documents/models.py:1085
 msgid "schedule date field"
 msgstr "预约日期字段"
 
-#: documents/models.py:1056
+#: documents/models.py:1090
 msgid "The field to check for a schedule trigger."
 msgstr "预约触发器对应的字段"
 
-#: documents/models.py:1065
+#: documents/models.py:1099
 msgid "schedule date custom field"
 msgstr "预约自定义日期字段"
 
-#: documents/models.py:1069
+#: documents/models.py:1103
 msgid "workflow trigger"
 msgstr "工作流触发器"
 
-#: documents/models.py:1070
+#: documents/models.py:1104
 msgid "workflow triggers"
 msgstr "工作流触发器"
 
-#: documents/models.py:1078
+#: documents/models.py:1112
 msgid "email subject"
 msgstr "邮件主题"
 
-#: documents/models.py:1082
+#: documents/models.py:1116
 msgid "The subject of the email, can include some placeholders, see documentation."
 msgstr "邮件主题，可以包含一些占位符，参见文档。"
 
-#: documents/models.py:1088
+#: documents/models.py:1122
 msgid "email body"
 msgstr "邮件正文"
 
-#: documents/models.py:1091
+#: documents/models.py:1125
 msgid "The body (message) of the email, can include some placeholders, see documentation."
 msgstr "邮件正文（内容），可以包含一些占位符，参见文档。"
 
-#: documents/models.py:1097
+#: documents/models.py:1131
 msgid "emails to"
 msgstr "发送邮件至"
 
-#: documents/models.py:1100
+#: documents/models.py:1134
 msgid "The destination email addresses, comma separated."
 msgstr "目标邮箱地址，以逗号分隔。"
 
-#: documents/models.py:1106
+#: documents/models.py:1140
 msgid "include document in email"
 msgstr "在邮件中添加文档"
 
-#: documents/models.py:1117
+#: documents/models.py:1151
 msgid "webhook url"
 msgstr "webhook链接"
 
-#: documents/models.py:1120
+#: documents/models.py:1154
 msgid "The destination URL for the notification."
 msgstr "通知的目标地址"
 
-#: documents/models.py:1125
+#: documents/models.py:1159
 msgid "use parameters"
 msgstr "使用参数"
 
-#: documents/models.py:1130
+#: documents/models.py:1164
 msgid "send as JSON"
 msgstr "以 JSON 格式发送"
 
-#: documents/models.py:1134
+#: documents/models.py:1168
 msgid "webhook parameters"
 msgstr "webhook 参数"
 
-#: documents/models.py:1137
+#: documents/models.py:1171
 msgid "The parameters to send with the webhook URL if body not used."
 msgstr "要添加的webhook参数（不使用负载时）"
 
-#: documents/models.py:1141
+#: documents/models.py:1175
 msgid "webhook body"
 msgstr "webhook负载"
 
-#: documents/models.py:1144
+#: documents/models.py:1178
 msgid "The body to send with the webhook URL if parameters not used."
 msgstr "要添加的webhook负载（不使用参数时）"
 
-#: documents/models.py:1148
+#: documents/models.py:1182
 msgid "webhook headers"
 msgstr "webhook标头"
 
-#: documents/models.py:1151
+#: documents/models.py:1185
 msgid "The headers to send with the webhook URL."
 msgstr "要添加的webhook标头"
 
-#: documents/models.py:1156
+#: documents/models.py:1190
 msgid "include document in webhook"
 msgstr "在webhook中添加文档"
 
-#: documents/models.py:1167
+#: documents/models.py:1201
 msgid "Assignment"
 msgstr "分配任务"
 
-#: documents/models.py:1171
+#: documents/models.py:1205
 msgid "Removal"
 msgstr "移除"
 
-#: documents/models.py:1175 documents/templates/account/password_reset.html:15
+#: documents/models.py:1209 documents/templates/account/password_reset.html:15
 msgid "Email"
 msgstr "电子邮件"
 
-#: documents/models.py:1179
+#: documents/models.py:1213
 msgid "Webhook"
 msgstr "Webhook"
 
-#: documents/models.py:1183
+#: documents/models.py:1217
 msgid "Workflow Action Type"
 msgstr "工作流动作类型"
 
-#: documents/models.py:1189
+#: documents/models.py:1223
 msgid "assign title"
 msgstr "指定标题"
 
-#: documents/models.py:1194
-msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr "指定一个文档标题，可以包含一些占位符，参见文档。"
+#: documents/models.py:1227
+msgid "Assign a document title, must  be a Jinja2 template, see documentation."
+msgstr ""
 
-#: documents/models.py:1203 paperless_mail/models.py:274
+#: documents/models.py:1235 paperless_mail/models.py:274
 msgid "assign this tag"
 msgstr "分配此标签"
 
-#: documents/models.py:1212 paperless_mail/models.py:282
+#: documents/models.py:1244 paperless_mail/models.py:282
 msgid "assign this document type"
 msgstr "分配此文档类型"
 
-#: documents/models.py:1221 paperless_mail/models.py:296
+#: documents/models.py:1253 paperless_mail/models.py:296
 msgid "assign this correspondent"
 msgstr "分配此联系人"
 
-#: documents/models.py:1230
+#: documents/models.py:1262
 msgid "assign this storage path"
 msgstr "指定存储路径"
 
-#: documents/models.py:1239
+#: documents/models.py:1271
 msgid "assign this owner"
 msgstr "指定所有者"
 
-#: documents/models.py:1246
+#: documents/models.py:1278
 msgid "grant view permissions to these users"
 msgstr "为这些用户授予观看权限"
 
-#: documents/models.py:1253
+#: documents/models.py:1285
 msgid "grant view permissions to these groups"
 msgstr "为这些用户组授予观看权限"
 
-#: documents/models.py:1260
+#: documents/models.py:1292
 msgid "grant change permissions to these users"
 msgstr "为这些用户授予修改权限"
 
-#: documents/models.py:1267
+#: documents/models.py:1299
 msgid "grant change permissions to these groups"
 msgstr "为这些用户组授予修改权限"
 
-#: documents/models.py:1274
+#: documents/models.py:1306
 msgid "assign these custom fields"
 msgstr "分配这些自定义字段"
 
-#: documents/models.py:1278
+#: documents/models.py:1310
 msgid "custom field values"
 msgstr "自定义字段值"
 
-#: documents/models.py:1282
+#: documents/models.py:1314
 msgid "Optional values to assign to the custom fields."
 msgstr "给自定义字段分配可选值。"
 
-#: documents/models.py:1291
+#: documents/models.py:1323
 msgid "remove these tag(s)"
 msgstr "移除这些标签"
 
-#: documents/models.py:1296
+#: documents/models.py:1328
 msgid "remove all tags"
 msgstr "删除所有的标签"
 
-#: documents/models.py:1303
+#: documents/models.py:1335
 msgid "remove these document type(s)"
 msgstr "移除这些文档类型 "
 
-#: documents/models.py:1308
+#: documents/models.py:1340
 msgid "remove all document types"
 msgstr "移除所有文档类型"
 
-#: documents/models.py:1315
+#: documents/models.py:1347
 msgid "remove these correspondent(s)"
 msgstr "移除这些通讯员"
 
-#: documents/models.py:1320
+#: documents/models.py:1352
 msgid "remove all correspondents"
 msgstr "移除所有通讯员"
 
-#: documents/models.py:1327
+#: documents/models.py:1359
 msgid "remove these storage path(s)"
 msgstr "移除这些存储路径"
 
-#: documents/models.py:1332
+#: documents/models.py:1364
 msgid "remove all storage paths"
 msgstr "移除全部存储路径"
 
-#: documents/models.py:1339
+#: documents/models.py:1371
 msgid "remove these owner(s)"
 msgstr "移除这些所有者 "
 
-#: documents/models.py:1344
+#: documents/models.py:1376
 msgid "remove all owners"
 msgstr "移除所有所有者"
 
-#: documents/models.py:1351
+#: documents/models.py:1383
 msgid "remove view permissions for these users"
 msgstr "移除这些用户的查看权限"
 
-#: documents/models.py:1358
+#: documents/models.py:1390
 msgid "remove view permissions for these groups"
 msgstr "移除这些组的查看权限"
 
-#: documents/models.py:1365
+#: documents/models.py:1397
 msgid "remove change permissions for these users"
 msgstr "为这些用户授予修改权限"
 
-#: documents/models.py:1372
+#: documents/models.py:1404
 msgid "remove change permissions for these groups"
 msgstr "移除这些组的更改权限"
 
-#: documents/models.py:1377
+#: documents/models.py:1409
 msgid "remove all permissions"
 msgstr "移除所有权限"
 
-#: documents/models.py:1384
+#: documents/models.py:1416
 msgid "remove these custom fields"
 msgstr "移除这些自定义字段"
 
-#: documents/models.py:1389
+#: documents/models.py:1421
 msgid "remove all custom fields"
 msgstr "移除所有自定义字段"
 
-#: documents/models.py:1398
+#: documents/models.py:1430
 msgid "email"
 msgstr "电子邮件"
 
-#: documents/models.py:1407
+#: documents/models.py:1439
 msgid "webhook"
 msgstr "webhook"
 
-#: documents/models.py:1411
+#: documents/models.py:1443
 msgid "workflow action"
 msgstr "工作流动作"
 
-#: documents/models.py:1412
+#: documents/models.py:1444
 msgid "workflow actions"
 msgstr "工作流动作"
 
-#: documents/models.py:1421 paperless_mail/models.py:145
+#: documents/models.py:1453 paperless_mail/models.py:145
 msgid "order"
 msgstr "排序"
 
-#: documents/models.py:1427
+#: documents/models.py:1459
 msgid "triggers"
 msgstr "触发器"
 
-#: documents/models.py:1434
+#: documents/models.py:1466
 msgid "actions"
 msgstr "动作"
 
-#: documents/models.py:1437 paperless_mail/models.py:154
+#: documents/models.py:1469 paperless_mail/models.py:154
 msgid "enabled"
 msgstr "已启用"
 
-#: documents/models.py:1448
+#: documents/models.py:1480
 msgid "workflow"
 msgstr "工作流"
 
-#: documents/models.py:1452
+#: documents/models.py:1484
 msgid "workflow trigger type"
 msgstr "工作流触发类型"
 
-#: documents/models.py:1466
+#: documents/models.py:1498
 msgid "date run"
 msgstr "运行日期"
 
-#: documents/models.py:1472
+#: documents/models.py:1504
 msgid "workflow run"
 msgstr "工作流运行"
 
-#: documents/models.py:1473
+#: documents/models.py:1505
 msgid "workflow runs"
 msgstr "工作流运行"
 
