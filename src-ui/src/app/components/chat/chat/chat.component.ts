@@ -110,7 +110,7 @@ export class ChatComponent implements OnInit {
       return
     }
 
-    const nextChar = this.typewriterBuffer.shift()!
+    const nextChar = this.typewriterBuffer.shift()
     message.content += nextChar
     this.scrollToBottom()
 
