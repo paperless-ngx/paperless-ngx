@@ -100,6 +100,7 @@ import { PermissionsFormComponent } from '../common/input/permissions/permission
 import { SelectComponent } from '../common/input/select/select.component'
 import { TagsComponent } from '../common/input/tags/tags.component'
 import { TextComponent } from '../common/input/text/text.component'
+import { TextAreaComponent } from '../common/input/textarea/textarea.component'
 import { UrlComponent } from '../common/input/url/url.component'
 import { PageHeaderComponent } from '../common/page-header/page-header.component'
 import {
@@ -177,6 +178,7 @@ export enum ZoomSetting {
     NgbDropdownModule,
     NgxBootstrapIconsModule,
     PdfViewerModule,
+    TextAreaComponent,
   ],
 })
 export class DocumentDetailComponent

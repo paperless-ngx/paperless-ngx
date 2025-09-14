@@ -30,7 +30,7 @@
       <div class="page-item rounded p-2" cdkDrag (click)="toggleSelection(i)" [class.selected]="p.selected">
         <div class="btn-toolbar hover-actions z-10">
           <div class="btn-group me-2">
-            <button class="btn btn-sm btn-dark" (click)="rotate(i); $event.stopPropagation()" title="Rotate page counter-clockwise" i18n-title>
+            <button class="btn btn-sm btn-dark" (click)="rotate(i, true); $event.stopPropagation()" title="Rotate page counter-clockwise" i18n-title>
               <i-bs name="arrow-counterclockwise"></i-bs>
             </button>
             <button class="btn btn-sm btn-dark" (click)="rotate(i); $event.stopPropagation()" title="Rotate page clockwise" i18n-title>
