@@ -1758,6 +1758,8 @@ class PostDocumentSerializer(serializers.Serializer):
                         "value": value,
                     },
                 )
+            # Normalize keys to integers for later
+            return {int(k): v for k, v in custom_fields_w_values.items()}
 
     def validate_created(self, created):
         # support datetime format for created for backwards compatibility
