@@ -1547,6 +1547,16 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             id=str(uuid.uuid4()),
         )
 
+        # invalid custom field ids
+        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {"document": f, "custom_fields_w_values": {"3456": "a string"}},
+            )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.consume_file_mock.assert_not_called()
+        self.consume_file_mock.reset_mock()
+
         cf_string = CustomField.objects.create(
             name="stringfield",
             data_type=CustomField.FieldDataType.STRING,
