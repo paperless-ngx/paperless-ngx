@@ -1740,7 +1740,6 @@ class PostDocumentSerializer(serializers.Serializer):
                         _("Custom field id must be an integer: %(id)s")
                         % {"id": field_id},
                     )
-
                 try:
                     field = CustomField.objects.get(id=field_id_int)
                 except CustomField.DoesNotExist:
@@ -1748,7 +1747,6 @@ class PostDocumentSerializer(serializers.Serializer):
                         _("Custom field with id %(id)s does not exist")
                         % {"id": field_id_int},
                     )
-
                 custom_field_serializer.validate(
                     {
                         "field": field,
@@ -1756,10 +1754,8 @@ class PostDocumentSerializer(serializers.Serializer):
                     },
                 )
                 normalized[field_id_int] = value
-
             return normalized
-
-        if isinstance(custom_fields, list):
+        elif isinstance(custom_fields, list):
             try:
                 ids = [int(i) for i in custom_fields]
             except (TypeError, ValueError):
@@ -1773,7 +1769,6 @@ class PostDocumentSerializer(serializers.Serializer):
                     _("Some custom fields don't exist or were specified twice."),
                 )
             return ids
-
         raise serializers.ValidationError(
             _(
                 "Custom fields must be a list of integers or an object mapping ids to values.",
