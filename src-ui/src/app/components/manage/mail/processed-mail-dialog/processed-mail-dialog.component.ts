@@ -32,9 +32,9 @@ import { ToastService } from 'src/app/services/toast.service'
   styleUrl: './processed-mail-dialog.component.scss',
 })
 export class ProcessedMailDialogComponent implements OnInit {
-  private activeModal = inject(NgbActiveModal)
-  private processedMailService = inject(ProcessedMailService)
-  private toastService = inject(ToastService)
+  private readonly activeModal = inject(NgbActiveModal)
+  private readonly processedMailService = inject(ProcessedMailService)
+  private readonly toastService = inject(ToastService)
 
   public processedMails: ProcessedMail[] = []
 
