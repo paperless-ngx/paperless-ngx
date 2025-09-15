@@ -1682,6 +1682,12 @@ class PostDocumentSerializer(serializers.Serializer):
         required=False,
     )
 
+    custom_fields_w_values = serializers.JSONField(
+        label="Custom fields with values",
+        write_only=True,
+        required=False,
+    )
+
     def validate_document(self, document):
         document_data = document.file.read()
         mime_type = magic.from_buffer(document_data, mime=True)
@@ -1731,6 +1737,27 @@ class PostDocumentSerializer(serializers.Serializer):
             return [custom_field.id for custom_field in custom_fields]
         else:
             return None
+
+    def validate_custom_fields_w_values(self, custom_fields_w_values):
+        if custom_fields_w_values:
+            custom_field_serializer = CustomFieldInstanceSerializer()
+            for field_id, value in custom_fields_w_values.items():
+                try:
+                    field = CustomField.objects.get(id=field_id)
+                except CustomField.DoesNotExist:
+                    raise serializers.ValidationError(
+                        _("Custom field with id %(id)s does not exist")
+                        % {
+                            "id": field_id,
+                        },
+                    )
+                # validate the value using the CustomFieldInstanceSerializer
+                custom_field_serializer.validate(
+                    {
+                        "field": field,
+                        "value": value,
+                    },
+                )
 
     def validate_created(self, created):
         # support datetime format for created for backwards compatibility

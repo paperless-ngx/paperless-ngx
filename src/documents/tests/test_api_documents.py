@@ -1537,6 +1537,50 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         overrides.update(new_overrides)
         self.assertEqual(overrides.custom_fields, {cf.id: None, cf2.id: 123})
 
+    def test_upload_with_custom_field_values(self):
+        """
+        GIVEN: A document with a source file
+        WHEN: Upload the document with custom fields and values
+        THEN: Metadata is set correctly
+        """
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
+
+        cf_string = CustomField.objects.create(
+            name="stringfield",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        cf_int = CustomField.objects.create(
+            name="intfield",
+            data_type=CustomField.FieldDataType.INT,
+        )
+
+        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {
+                    "document": f,
+                    "custom_fields_w_values": {
+                        str(cf_string.id): "a string",
+                        str(cf_int.id): 123,
+                    },
+                },
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.consume_file_mock.assert_called_once()
+
+        input_doc, overrides = self.get_last_consume_delay_call_args()
+
+        self.assertEqual(input_doc.original_file.name, "simple.pdf")
+        self.assertEqual(overrides.filename, "simple.pdf")
+        self.assertEqual(
+            overrides.custom_fields,
+            {cf_string.id: "a string", cf_int.id: 123},
+        )
+
     def test_upload_with_webui_source(self):
         """
         GIVEN: A document with a source file

@@ -1498,6 +1498,9 @@ class PostDocumentView(GenericAPIView):
         created = serializer.validated_data.get("created")
         archive_serial_number = serializer.validated_data.get("archive_serial_number")
         custom_field_ids = serializer.validated_data.get("custom_fields")
+        custom_fields_w_values = serializer.validated_data.get(
+            "custom_fields_w_values",
+        )
         from_webui = serializer.validated_data.get("from_webui")
 
         t = int(mktime(datetime.now().timetuple()))
@@ -1516,6 +1519,13 @@ class PostDocumentView(GenericAPIView):
             source=DocumentSource.WebUI if from_webui else DocumentSource.ApiUpload,
             original_file=temp_file_path,
         )
+        custom_fields = None
+        if custom_fields_w_values:
+            custom_fields = {
+                cf_id: value for cf_id, value in custom_fields_w_values.items()
+            }
+        elif custom_field_ids:
+            custom_fields = {cf_id: None for cf_id in custom_field_ids}
         input_doc_overrides = DocumentMetadataOverrides(
             filename=doc_name,
             title=title,
@@ -1526,10 +1536,7 @@ class PostDocumentView(GenericAPIView):
             created=created,
             asn=archive_serial_number,
             owner_id=request.user.id,
-            # TODO: set values
-            custom_fields={cf_id: None for cf_id in custom_field_ids}
-            if custom_field_ids
-            else None,
+            custom_fields=custom_fields,
         )
 
         async_task = consume_file.delay(
