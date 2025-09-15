@@ -288,14 +288,14 @@ class OwnedObjectSerializer(
     def get_permissions(self, obj) -> dict:
         view_codename = f"view_{obj.__class__.__name__.lower()}"
         change_codename = f"change_{obj.__class__.__name__.lower()}"
-        users_with_view = self.context.get("users_with_view", {}).get(
+        users_view_perms = self.context.get("users_view_perms", {}).get(
             obj.pk,
         ) or get_users_with_perms(
             obj,
             only_with_perms_in=[view_codename],
             with_group_users=False,
         ).values_list("id", flat=True)
-        users_with_change = self.context.get("users_with_change", {}).get(
+        users_change_perms = self.context.get("users_change_perms", {}).get(
             obj.pk,
             [],
         ) or get_users_with_perms(
@@ -304,7 +304,7 @@ class OwnedObjectSerializer(
             with_group_users=False,
         ).values_list("id", flat=True)
 
-        groups_with_view = self.context.get("groups_with_view", {}).get(
+        groups_view_perms = self.context.get("groups_view_perms", {}).get(
             obj.pk,
             [],
         ) or get_groups_with_only_permission(
@@ -312,7 +312,7 @@ class OwnedObjectSerializer(
             codename=view_codename,
         ).values_list("id", flat=True)
 
-        groups_with_change = self.context.get("groups_with_change", {}).get(
+        groups_change_perms = self.context.get("groups_change_perms", {}).get(
             obj.pk,
             [],
         ) or get_groups_with_only_permission(
@@ -322,12 +322,12 @@ class OwnedObjectSerializer(
 
         return {
             "view": {
-                "users": users_with_view,
-                "groups": groups_with_view,
+                "users": users_view_perms,
+                "groups": groups_view_perms,
             },
             "change": {
-                "users": users_with_change,
-                "groups": groups_with_change,
+                "users": users_change_perms,
+                "groups": groups_change_perms,
             },
         }
 

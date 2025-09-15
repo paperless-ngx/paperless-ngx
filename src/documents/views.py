@@ -335,10 +335,13 @@ class BulkPermissionMixin:
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        if self.request.query_params.get("full_perms", "false").lower() in [
-            "true",
-            "1",
-        ]:
+        try:
+            full_perms = get_boolean(
+                str(self.request.query_params.get("full_perms", "false")),
+            )
+        except ValueError:
+            full_perms = False
+        if full_perms:
             # Detect pagination if available, to avoid querying unneeded permissions
             page = getattr(self, "paginator", None)
             if page and hasattr(page, "page"):
@@ -353,10 +356,10 @@ class BulkPermissionMixin:
                 queryset,
                 [codenames["view"], codenames["change"]],
             )
-            context["users_with_view"] = {
+            context["users_view_perms"] = {
                 pk: users_perms[pk][codenames["view"]] for pk in users_perms
             }
-            context["users_with_change"] = {
+            context["users_change_perms"] = {
                 pk: users_perms[pk][codenames["change"]] for pk in users_perms
             }
 
@@ -364,10 +367,10 @@ class BulkPermissionMixin:
                 queryset,
                 [codenames["view"], codenames["change"]],
             )
-            context["groups_with_view"] = {
+            context["groups_view_perms"] = {
                 pk: groups_perms[pk][codenames["view"]] for pk in groups_perms
             }
-            context["groups_with_change"] = {
+            context["groups_change_perms"] = {
                 pk: groups_perms[pk][codenames["change"]] for pk in groups_perms
             }
         return context
