@@ -168,6 +168,13 @@
                   <i-bs width="1em" height="1em" name="files"></i-bs>&nbsp;<ng-container i18n>Copy</ng-container>
                 </button>
               </div>
+              <div class="btn-group">
+                <div *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.ProcessedMail }">
+                  <button class="btn btn-sm btn-outline-secondary" type="button" (click)="viewProcessedMails(rule)">
+                    <i-bs width="1em" height="1em" name="clock-history"></i-bs>&nbsp;<ng-container i18n>Processed Mails</ng-container>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

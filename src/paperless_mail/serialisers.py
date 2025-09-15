@@ -6,6 +6,7 @@ from documents.serialisers import OwnedObjectSerializer
 from documents.serialisers import TagsField
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+from paperless_mail.models import ProcessedMail
 
 
 class ObfuscatedPasswordField(serializers.CharField):
@@ -130,3 +131,20 @@ class MailRuleSerializer(OwnedObjectSerializer):
         if value > 36500:  # ~100 years
             raise serializers.ValidationError("Maximum mail age is unreasonably large.")
         return value
+
+
+class ProcessedMailSerializer(OwnedObjectSerializer):
+    class Meta:
+        model = ProcessedMail
+        fields = [
+            "id",
+            "owner",
+            "rule",
+            "folder",
+            "uid",
+            "subject",
+            "received",
+            "processed",
+            "status",
+            "error",
+        ]

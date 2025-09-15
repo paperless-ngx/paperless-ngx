@@ -1,0 +1,91 @@
+import { SlicePipe } from '@angular/common'
+import { Component, inject, Input } from '@angular/core'
+import {
+  NgbActiveModal,
+  NgbPagination,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { ConfirmButtonComponent } from 'src/app/components/common/confirm-button/confirm-button.component'
+import { MailRule } from 'src/app/data/mail-rule'
+import { ProcessedMail } from 'src/app/data/processed-mail'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
+import { ProcessedMailService } from 'src/app/services/rest/processed-mail.service'
+import { ToastService } from 'src/app/services/toast.service'
+
+@Component({
+  selector: 'pngx-processed-mails-dialog',
+  imports: [
+    ConfirmButtonComponent,
+    CustomDatePipe,
+    NgbPagination,
+    NgbTooltipModule,
+    NgxBootstrapIconsModule,
+    SlicePipe,
+  ],
+  templateUrl: './processed-mails-dialog.component.html',
+  styleUrl: './processed-mails-dialog.component.scss',
+})
+export class ProcessedMailsDialogComponent {
+  private activeModal = inject(NgbActiveModal)
+  private processedMailService = inject(ProcessedMailService)
+  private toastService = inject(ToastService)
+
+  public processedMails: ProcessedMail[] = []
+
+  public loading: boolean = true
+  public toggleAllEnabled: boolean = false
+  public readonly selectedMailIds: Set<number> = new Set<number>()
+
+  public page: number = 1
+
+  @Input() rule: MailRule
+
+  ngOnInit(): void {
+    this.loadProcessedMails()
+  }
+
+  public close() {
+    this.activeModal.close()
+  }
+
+  private loadProcessedMails(): void {
+    this.loading = true
+    this.clearSelection()
+    this.processedMailService
+      .list(this.page, 50, 'processed_at', true, { rule: this.rule.id })
+      .subscribe((result) => {
+        this.processedMails = result.results
+        this.loading = false
+      })
+  }
+
+  public deleteSelected(): void {
+    this.processedMailService
+      .bulk_delete(Array.from(this.selectedMailIds))
+      .subscribe(() => {
+        this.toastService.showInfo($localize`Processed mail(s) deleted`)
+        this.loadProcessedMails()
+      })
+  }
+
+  public toggleAll(event: PointerEvent) {
+    if ((event.target as HTMLInputElement).checked) {
+      this.selectedMailIds.clear()
+      this.processedMails.forEach((mail) => this.selectedMailIds.add(mail.id))
+    } else {
+      this.clearSelection()
+    }
+  }
+
+  public clearSelection() {
+    this.toggleAllEnabled = false
+    this.selectedMailIds.clear()
+  }
+
+  public toggleSelected(mail: ProcessedMail) {
+    this.selectedMailIds.has(mail.id)
+      ? this.selectedMailIds.delete(mail.id)
+      : this.selectedMailIds.add(mail.id)
+  }
+}
