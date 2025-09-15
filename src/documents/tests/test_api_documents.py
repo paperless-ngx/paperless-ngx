@@ -1554,7 +1554,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
                 "/api/documents/post_document/",
                 {
                     "document": f,
-                    "custom_fields_w_values": json.dumps({"3456": "a string"}),
+                    "custom_fields": json.dumps({"3456": "a string"}),
                 },
             )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -1575,7 +1575,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
                 "/api/documents/post_document/",
                 {
                     "document": f,
-                    "custom_fields_w_values": json.dumps(
+                    "custom_fields": json.dumps(
                         {
                             str(cf_string.id): "a string",
                             str(cf_int.id): 123,

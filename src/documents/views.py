@@ -1497,10 +1497,7 @@ class PostDocumentView(GenericAPIView):
         title = serializer.validated_data.get("title")
         created = serializer.validated_data.get("created")
         archive_serial_number = serializer.validated_data.get("archive_serial_number")
-        custom_field_ids = serializer.validated_data.get("custom_fields")
-        custom_fields_w_values = serializer.validated_data.get(
-            "custom_fields_w_values",
-        )
+        cf = serializer.validated_data.get("custom_fields")
         from_webui = serializer.validated_data.get("from_webui")
 
         t = int(mktime(datetime.now().timetuple()))
@@ -1520,12 +1517,10 @@ class PostDocumentView(GenericAPIView):
             original_file=temp_file_path,
         )
         custom_fields = None
-        if custom_fields_w_values:
-            custom_fields = {
-                cf_id: value for cf_id, value in custom_fields_w_values.items()
-            }
-        elif custom_field_ids:
-            custom_fields = {cf_id: None for cf_id in custom_field_ids}
+        if isinstance(cf, dict) and cf:
+            custom_fields = {cf_id: value for cf_id, value in cf.items()}
+        elif isinstance(cf, list) and cf:
+            custom_fields = {cf_id: None for cf_id in cf}
         input_doc_overrides = DocumentMetadataOverrides(
             filename=doc_name,
             title=title,

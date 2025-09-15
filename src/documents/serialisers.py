@@ -1668,9 +1668,8 @@ class PostDocumentSerializer(serializers.Serializer):
         max_value=Document.ARCHIVE_SERIAL_NUMBER_MAX,
     )
 
-    custom_fields = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=CustomField.objects.all(),
+    # Accept either a list of custom field ids or a dict mapping id -> value
+    custom_fields = serializers.JSONField(
         label="Custom fields",
         write_only=True,
         required=False,
@@ -1678,12 +1677,6 @@ class PostDocumentSerializer(serializers.Serializer):
 
     from_webui = serializers.BooleanField(
         label="Documents are from Paperless-ngx WebUI",
-        write_only=True,
-        required=False,
-    )
-
-    custom_fields_w_values = serializers.JSONField(
-        label="Custom fields with values",
         write_only=True,
         required=False,
     )
@@ -1733,33 +1726,61 @@ class PostDocumentSerializer(serializers.Serializer):
             return None
 
     def validate_custom_fields(self, custom_fields):
-        if custom_fields:
-            return [custom_field.id for custom_field in custom_fields]
-        else:
+        if not custom_fields:
             return None
 
-    def validate_custom_fields_w_values(self, custom_fields_w_values):
-        if custom_fields_w_values:
+        if isinstance(custom_fields, dict):
             custom_field_serializer = CustomFieldInstanceSerializer()
-            for field_id, value in custom_fields_w_values.items():
+            normalized = {}
+            for field_id, value in custom_fields.items():
                 try:
-                    field = CustomField.objects.get(id=field_id)
+                    field_id_int = int(field_id)
+                except (TypeError, ValueError):
+                    raise serializers.ValidationError(
+                        _("Custom field id must be an integer: %(id)s")
+                        % {"id": field_id},
+                    )
+
+                try:
+                    field = CustomField.objects.get(id=field_id_int)
                 except CustomField.DoesNotExist:
                     raise serializers.ValidationError(
                         _("Custom field with id %(id)s does not exist")
-                        % {
-                            "id": field_id,
-                        },
+                        % {"id": field_id_int},
                     )
-                # validate the value using the CustomFieldInstanceSerializer
+
                 custom_field_serializer.validate(
                     {
                         "field": field,
                         "value": value,
                     },
                 )
-            # Normalize keys to integers for later
-            return {int(k): v for k, v in custom_fields_w_values.items()}
+                normalized[field_id_int] = value
+
+            return normalized
+
+        if isinstance(custom_fields, list):
+            try:
+                ids = [int(i) for i in custom_fields]
+            except (TypeError, ValueError):
+                raise serializers.ValidationError(
+                    _(
+                        "Custom fields must be a list of integers or an object mapping ids to values.",
+                    ),
+                )
+            if CustomField.objects.filter(id__in=ids).count() != len(set(ids)):
+                raise serializers.ValidationError(
+                    _("Some custom fields don't exist or were specified twice."),
+                )
+            return ids
+
+        raise serializers.ValidationError(
+            _(
+                "Custom fields must be a list of integers or an object mapping ids to values.",
+            ),
+        )
+
+    # custom_fields_w_values handled via validate_custom_fields
 
     def validate_created(self, created):
         # support datetime format for created for backwards compatibility
