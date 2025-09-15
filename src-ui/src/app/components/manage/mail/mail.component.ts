@@ -27,7 +27,7 @@ import { MailRuleEditDialogComponent } from '../../common/edit-dialog/mail-rule-
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
-import { ProcessedMailsDialogComponent } from './processed-mails-dialog/processed-mails-dialog.component'
+import { ProcessedMailDialogComponent } from './processed-mail-dialog/processed-mail-dialog.component'
 
 @Component({
   selector: 'pngx-mail',
@@ -349,7 +349,7 @@ export class MailComponent
   }
 
   viewProcessedMails(rule: MailRule) {
-    const modal = this.modalService.open(ProcessedMailsDialogComponent, {
+    const modal = this.modalService.open(ProcessedMailDialogComponent, {
       backdrop: 'static',
       size: 'xl',
     })

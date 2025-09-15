@@ -16,7 +16,7 @@ import { ProcessedMailService } from 'src/app/services/rest/processed-mail.servi
 import { ToastService } from 'src/app/services/toast.service'
 
 @Component({
-  selector: 'pngx-processed-mails-dialog',
+  selector: 'pngx-processed-mail-dialog',
   imports: [
     ConfirmButtonComponent,
     CustomDatePipe,
@@ -28,10 +28,10 @@ import { ToastService } from 'src/app/services/toast.service'
     ReactiveFormsModule,
     SlicePipe,
   ],
-  templateUrl: './processed-mails-dialog.component.html',
-  styleUrl: './processed-mails-dialog.component.scss',
+  templateUrl: './processed-mail-dialog.component.html',
+  styleUrl: './processed-mail-dialog.component.scss',
 })
-export class ProcessedMailsDialogComponent implements OnInit {
+export class ProcessedMailDialogComponent implements OnInit {
   private activeModal = inject(NgbActiveModal)
   private processedMailService = inject(ProcessedMailService)
   private toastService = inject(ToastService)

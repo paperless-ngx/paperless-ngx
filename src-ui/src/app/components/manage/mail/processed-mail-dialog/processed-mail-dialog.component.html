@@ -1,5 +1,5 @@
 <div class="modal-header">
-  <h6 class="modal-title" id="modal-basic-title" i18n>Processed Mails for <em>{{ rule.name }}</em></h6>
+  <h6 class="modal-title" id="modal-basic-title" i18n>Processed Mail for <em>{{ rule.name }}</em></h6>
   <button class="btn btn-sm btn-link text-muted me-auto p-0 p-md-2" title="What's this?" i18n-title type="button" [ngbPopover]="infoPopover" [autoClose]="true">
     <i-bs name="question-circle"></i-bs>
   </button>
@@ -17,7 +17,7 @@
       </div>
     </div>
   } @else if (processedMails.length === 0) {
-    <span i18n>No processed mails found.</span>
+    <span i18n>No processed email messages found.</span>
   } @else {
     <div class="table-responsive">
       <table class="table table-hover table-sm align-middle">
