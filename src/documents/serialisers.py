@@ -1729,6 +1729,16 @@ class PostDocumentSerializer(serializers.Serializer):
         if not custom_fields:
             return None
 
+        # Normalize single values to a list
+        if isinstance(custom_fields, int):
+            custom_fields = [custom_fields]
+        elif isinstance(custom_fields, str):
+            # try to coerce a string to an integer list
+            try:
+                custom_fields = [int(custom_fields)]
+            except (TypeError, ValueError):
+                pass
+
         if isinstance(custom_fields, dict):
             custom_field_serializer = CustomFieldInstanceSerializer()
             normalized = {}
