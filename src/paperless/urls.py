@@ -25,6 +25,7 @@ from documents.views import GlobalSearchView
 from documents.views import IndexView
 from documents.views import LogViewSet
 from documents.views import PostDocumentView
+from documents.views import ProcessedMailViewSet
 from documents.views import RemoteVersionView
 from documents.views import SavedViewViewSet
 from documents.views import SearchAutoCompleteView
@@ -77,6 +78,7 @@ api_router.register(r"workflow_actions", WorkflowActionViewSet)
 api_router.register(r"workflows", WorkflowViewSet)
 api_router.register(r"custom_fields", CustomFieldViewSet)
 api_router.register(r"config", ApplicationConfigurationViewSet)
+api_router.register(r"processed_mail", ProcessedMailViewSet)
 
 
 urlpatterns = [
