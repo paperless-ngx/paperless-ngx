@@ -1,5 +1,5 @@
 import { SlicePipe } from '@angular/common'
-import { Component, inject, Input } from '@angular/core'
+import { Component, inject, Input, OnInit } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
   NgbActiveModal,
@@ -29,7 +29,7 @@ import { ToastService } from 'src/app/services/toast.service'
   templateUrl: './processed-mails-dialog.component.html',
   styleUrl: './processed-mails-dialog.component.scss',
 })
-export class ProcessedMailsDialogComponent {
+export class ProcessedMailsDialogComponent implements OnInit {
   private activeModal = inject(NgbActiveModal)
   private processedMailService = inject(ProcessedMailService)
   private toastService = inject(ToastService)
