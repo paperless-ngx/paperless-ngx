@@ -20,6 +20,30 @@ describe('ProcessedMailDialogComponent', () => {
   let toastService: ToastService
 
   const rule: any = { id: 10, name: 'Mail Rule' } // minimal rule object for tests
+  const mails = [
+    {
+      id: 1,
+      rule: rule.id,
+      folder: 'INBOX',
+      uid: 111,
+      subject: 'A',
+      received: new Date().toISOString(),
+      processed: new Date().toISOString(),
+      status: 'SUCCESS',
+      error: null,
+    },
+    {
+      id: 2,
+      rule: rule.id,
+      folder: 'INBOX',
+      uid: 222,
+      subject: 'B',
+      received: new Date().toISOString(),
+      processed: new Date().toISOString(),
+      status: 'FAILED',
+      error: 'Oops',
+    },
+  ]
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -58,30 +82,6 @@ describe('ProcessedMailDialogComponent', () => {
   it('should load processed mails on init', () => {
     fixture.detectChanges()
     const req = expectListRequest(rule.id)
-    const mails = [
-      {
-        id: 1,
-        rule: rule.id,
-        folder: 'INBOX',
-        uid: 111,
-        subject: 'Subject 1',
-        received: new Date().toISOString(),
-        processed: new Date().toISOString(),
-        status: 'SUCCESS',
-        error: null,
-      },
-      {
-        id: 2,
-        rule: rule.id,
-        folder: 'INBOX',
-        uid: 222,
-        subject: 'Subject 2',
-        received: new Date().toISOString(),
-        processed: new Date().toISOString(),
-        status: 'FAILED',
-        error: 'Something went wrong',
-      },
-    ]
     req.flush({ count: 2, results: mails })
     expect(component.loading).toBeFalsy()
     expect(component.processedMails).toEqual(mails)
@@ -116,30 +116,6 @@ describe('ProcessedMailDialogComponent', () => {
     fixture.detectChanges()
     // initial load with two mails
     const req = expectListRequest(rule.id)
-    const mails = [
-      {
-        id: 1,
-        rule: rule.id,
-        folder: 'INBOX',
-        uid: 111,
-        subject: 'A',
-        received: new Date().toISOString(),
-        processed: new Date().toISOString(),
-        status: 'SUCCESS',
-        error: null,
-      },
-      {
-        id: 2,
-        rule: rule.id,
-        folder: 'INBOX',
-        uid: 222,
-        subject: 'B',
-        received: new Date().toISOString(),
-        processed: new Date().toISOString(),
-        status: 'FAILED',
-        error: 'Oops',
-      },
-    ]
     req.flush({ count: 2, results: mails })
     fixture.detectChanges()
 
