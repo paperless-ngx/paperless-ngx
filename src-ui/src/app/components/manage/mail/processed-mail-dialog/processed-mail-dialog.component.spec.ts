@@ -11,11 +11,11 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
-import { ProcessedMailsDialogComponent } from './processed-mails-dialog.component'
+import { ProcessedMailDialogComponent } from './processed-mail-dialog.component'
 
-describe('ProcessedMailsDialogComponent', () => {
-  let component: ProcessedMailsDialogComponent
-  let fixture: ComponentFixture<ProcessedMailsDialogComponent>
+describe('ProcessedMailDialogComponent', () => {
+  let component: ProcessedMailDialogComponent
+  let fixture: ComponentFixture<ProcessedMailDialogComponent>
   let httpTestingController: HttpTestingController
   let toastService: ToastService
 
@@ -24,7 +24,7 @@ describe('ProcessedMailsDialogComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        ProcessedMailsDialogComponent,
+        ProcessedMailDialogComponent,
         FormsModule,
         NgxBootstrapIconsModule.pick(allIcons),
       ],
@@ -38,7 +38,7 @@ describe('ProcessedMailsDialogComponent', () => {
 
     httpTestingController = TestBed.inject(HttpTestingController)
     toastService = TestBed.inject(ToastService)
-    fixture = TestBed.createComponent(ProcessedMailsDialogComponent)
+    fixture = TestBed.createComponent(ProcessedMailDialogComponent)
     component = fixture.componentInstance
     component.rule = rule
   })
