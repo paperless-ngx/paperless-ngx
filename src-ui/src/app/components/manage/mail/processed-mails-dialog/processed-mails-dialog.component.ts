@@ -1,5 +1,6 @@
 import { SlicePipe } from '@angular/common'
 import { Component, inject, Input } from '@angular/core'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
   NgbActiveModal,
   NgbPagination,
@@ -21,6 +22,8 @@ import { ToastService } from 'src/app/services/toast.service'
     NgbPagination,
     NgbTooltipModule,
     NgxBootstrapIconsModule,
+    FormsModule,
+    ReactiveFormsModule,
     SlicePipe,
   ],
   templateUrl: './processed-mails-dialog.component.html',
