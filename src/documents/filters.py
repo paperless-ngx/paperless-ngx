@@ -41,7 +41,6 @@ from documents.models import PaperlessTask
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
-from paperless_mail.models import ProcessedMail
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -799,15 +798,6 @@ class PaperlessTaskFilterSet(FilterSet):
         fields = {
             "type": ["exact"],
             "task_name": ["exact"],
-            "status": ["exact"],
-        }
-
-
-class ProcessedMailFilterSet(FilterSet):
-    class Meta:
-        model = ProcessedMail
-        fields = {
-            "rule": ["exact"],
             "status": ["exact"],
         }
 
