@@ -414,7 +414,7 @@ describe('MailComponent', () => {
     completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
-    component.viewProcessedMails(mailRules[0] as MailRule)
+    component.viewProcessedMail(mailRules[0] as MailRule)
     const dialog = modal.componentInstance as any
     expect(dialog.rule).toEqual(mailRules[0])
   })
