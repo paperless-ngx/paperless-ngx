@@ -1982,7 +1982,7 @@ wheels = [
 
 [[package]]
 name = "ocrmypdf"
-version = "16.10.4"
+version = "16.11.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "deprecation", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -1995,9 +1995,9 @@ dependencies = [
     { name = "pluggy", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "rich", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cd/40/cb85e6260e5a20d08195d03541b31db4296f8f4d3442ee595686f47a75b0/ocrmypdf-16.10.4.tar.gz", hash = "sha256:de749ef5f554b63d57e68d032e7cba5500cbd5030835bf24f658f7b7a04f3dc1", size = 7003649, upload-time = "2025-07-07T20:55:01.735Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/44/af/947d6abb0cb41f99971a7a4bd33684d3cee20c9e32c8f9dc90e8c5dcf21c/ocrmypdf-16.11.0.tar.gz", hash = "sha256:d89077e503238dac35c6e565925edc8d98b71e5289853c02cacbc1d0901f1be7", size = 7015068, upload-time = "2025-09-12T08:36:53.507Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8e/6a/53bb2b0e57f8ca8d4a021194202cc772d1ce049269e9b0cb88d1fa87a0ef/ocrmypdf-16.10.4-py3-none-any.whl", hash = "sha256:061f3165d09ffafac975cea00803802b8a75551ada9965292ea86ea382673688", size = 162559, upload-time = "2025-07-07T20:55:00.061Z" },
+    { url = "https://files.pythonhosted.org/packages/d9/b2/eda3bb0939bf81d889812dd82cf37fa6f8769af8e31008bd586ba12fae09/ocrmypdf-16.11.0-py3-none-any.whl", hash = "sha256:13628294a309c85b21947b5c7bc7fcd202464517c14b71a050adc9dde85c48f7", size = 162883, upload-time = "2025-09-12T08:36:51.611Z" },
 ]
 
 [[package]]
@@ -2194,7 +2194,7 @@ requires-dist = [
     { name = "langdetect", specifier = "~=1.0.9" },
     { name = "mysqlclient", marker = "extra == 'mariadb'", specifier = "~=2.2.7" },
     { name = "nltk", specifier = "~=3.9.1" },
-    { name = "ocrmypdf", specifier = "~=16.10.0" },
+    { name = "ocrmypdf", specifier = "~=16.11.0" },
     { name = "pathvalidate", specifier = "~=3.3.1" },
     { name = "pdf2image", specifier = "~=1.17.0" },
     { name = "psycopg", extras = ["c", "pool"], marker = "extra == 'postgres'", specifier = "==3.2.9" },
