@@ -151,6 +151,10 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: backend-python-${{ matrix.python-version }}
           files: coverage.xml
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - name: Stop containers
         if: always()
         run: |
@@ -233,6 +237,10 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/coverage/
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   tests-frontend-e2e:
     name: "Frontend E2E Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     runs-on: ubuntu-24.04
