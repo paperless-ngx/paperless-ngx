@@ -1518,9 +1518,9 @@ class PostDocumentView(GenericAPIView):
         )
         custom_fields = None
         if isinstance(cf, dict) and cf:
-            custom_fields = {cf_id: value for cf_id, value in cf.items()}
+            custom_fields = cf
         elif isinstance(cf, list) and cf:
-            custom_fields = {cf_id: None for cf_id in cf}
+            custom_fields = dict.fromkeys(cf, None)
         input_doc_overrides = DocumentMetadataOverrides(
             filename=doc_name,
             title=title,
