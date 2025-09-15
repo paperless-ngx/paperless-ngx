@@ -38,6 +38,11 @@
         </thead>
         <tbody>
           @for (mail of processedMails; track mail.id) {
+            <ng-template #statusTooltip>
+              <div class="small text-light font-monospace">
+                  {{mail.status}}
+              </div>
+            </ng-template>
             <tr>
               <td>
                 <div class="form-check m-0 ms-2 me-n2">
@@ -51,13 +56,13 @@
               <td>
                 @switch (mail.status) {
                   @case ('SUCCESS') {
-                    <i-bs name="check-circle" title="SUCCESS" class="text-success" [ngbTooltip]="mail.status"></i-bs>
+                    <i-bs name="check-circle" title="SUCCESS" class="text-success" [ngbTooltip]="statusTooltip"></i-bs>
                   }
                   @case ('FAILED') {
-                    <i-bs name="exclamation-triangle" title="FAILED" class="text-danger" [ngbTooltip]="mail.status"></i-bs>
+                    <i-bs name="exclamation-triangle" title="FAILED" class="text-danger" [ngbTooltip]="statusTooltip"></i-bs>
                   }
                   @default {
-                    <i-bs name="question-circle" title="{{ mail.status }}" class="text-muted" [ngbTooltip]="mail.status"></i-bs>
+                    <i-bs name="slash-circle" title="{{ mail.status }}" class="text-muted" [ngbTooltip]="statusTooltip"></i-bs>
                   }
                 }
               </td>
