@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
   NgbActiveModal,
   NgbPagination,
+  NgbPopoverModule,
   NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -20,6 +21,7 @@ import { ToastService } from 'src/app/services/toast.service'
     ConfirmButtonComponent,
     CustomDatePipe,
     NgbPagination,
+    NgbPopoverModule,
     NgbTooltipModule,
     NgxBootstrapIconsModule,
     FormsModule,

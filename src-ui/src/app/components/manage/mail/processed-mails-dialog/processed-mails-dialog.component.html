@@ -1,5 +1,12 @@
 <div class="modal-header">
   <h6 class="modal-title" id="modal-basic-title" i18n>Processed Mails for <em>{{ rule.name }}</em></h6>
+  <button class="btn btn-sm btn-link text-muted me-auto p-0 p-md-2" title="What's this?" i18n-title type="button" [ngbPopover]="infoPopover" [autoClose]="true">
+    <i-bs name="question-circle"></i-bs>
+  </button>
+  <ng-template #infoPopover>
+    <a href="https://docs.paperless-ngx.com/usage#processed-mail" target="_blank" referrerpolicy="noopener noreferrer" i18n>Read more</a>
+    <i-bs class="ms-1" width=".8em" height=".8em" name="box-arrow-up-right"></i-bs>
+  </ng-template>
   <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
 </div>
 <div class="modal-body">
