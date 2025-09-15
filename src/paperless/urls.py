@@ -25,7 +25,6 @@ from documents.views import GlobalSearchView
 from documents.views import IndexView
 from documents.views import LogViewSet
 from documents.views import PostDocumentView
-from documents.views import ProcessedMailViewSet
 from documents.views import RemoteVersionView
 from documents.views import SavedViewViewSet
 from documents.views import SearchAutoCompleteView
@@ -58,6 +57,7 @@ from paperless.views import UserViewSet
 from paperless_mail.views import MailAccountViewSet
 from paperless_mail.views import MailRuleViewSet
 from paperless_mail.views import OauthCallbackView
+from paperless_mail.views import ProcessedMailViewSet
 
 api_router = DefaultRouter()
 api_router.register(r"correspondents", CorrespondentViewSet)

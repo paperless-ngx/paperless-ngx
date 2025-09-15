@@ -107,7 +107,6 @@ from documents.filters import DocumentTypeFilterSet
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
 from documents.filters import ObjectOwnedPermissionsFilter
 from documents.filters import PaperlessTaskFilterSet
-from documents.filters import ProcessedMailFilterSet
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
@@ -183,11 +182,9 @@ from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
-from paperless_mail.models import ProcessedMail
 from paperless_mail.oauth import PaperlessMailOAuth2Manager
 from paperless_mail.serialisers import MailAccountSerializer
 from paperless_mail.serialisers import MailRuleSerializer
-from paperless_mail.serialisers import ProcessedMailSerializer
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -2994,31 +2991,3 @@ def serve_logo(request, filename=None):
         filename=app_logo.name,
         as_attachment=True,
     )
-
-
-class ProcessedMailViewSet(ReadOnlyModelViewSet, DestroyModelMixin, PassUserMixin):
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
-    serializer_class = ProcessedMailSerializer
-    pagination_class = StandardPagination
-    filter_backends = (
-        DjangoFilterBackend,
-        OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
-    )
-    filterset_class = ProcessedMailFilterSet
-
-    queryset = ProcessedMail.objects.all().order_by("-processed")
-
-    @action(methods=["post"], detail=False)
-    def bulk_delete(self, request):
-        mail_ids = request.data.get("mail_ids", [])
-        if not isinstance(mail_ids, list) or not all(
-            isinstance(i, int) for i in mail_ids
-        ):
-            return HttpResponseBadRequest("mail_ids must be a list of integers")
-        mails = ProcessedMail.objects.filter(id__in=mail_ids)
-        for mail in mails:
-            if not has_perms_owner_aware(request.user, "delete_processedmail", mail):
-                return HttpResponseForbidden("Insufficient permissions")
-            mail.delete()
-        return Response({"result": "OK", "deleted_mail_ids": mail_ids})
