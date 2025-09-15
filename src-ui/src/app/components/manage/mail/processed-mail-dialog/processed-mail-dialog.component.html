@@ -67,10 +67,13 @@
                 }
               </td>
               <td>
+                <ng-template #errorPopover>
+                  <pre class="small text-light">
+                    {{ mail.error }}
+                  </pre>
+                </ng-template>
                 @if (mail.error) {
-                  <span class="text-danger">{{ mail.error | slice:0:20 }}</span>
-                } @else {
-                  <span class="text-muted" i18n>None</span>
+                  <span class="text-danger" triggers="mouseenter:mouseleave" [ngbPopover]="errorPopover">{{ mail.error | slice:0:20 }}</span>
                 }
               </td>
             </tr>
