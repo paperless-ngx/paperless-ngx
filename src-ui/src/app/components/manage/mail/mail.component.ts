@@ -348,7 +348,7 @@ export class MailComponent
     )
   }
 
-  viewProcessedMails(rule: MailRule) {
+  viewProcessedMail(rule: MailRule) {
     const modal = this.modalService.open(ProcessedMailDialogComponent, {
       backdrop: 'static',
       size: 'xl',
