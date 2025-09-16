@@ -138,7 +138,6 @@ jobs:
             --dev \
             --frozen \
             pytest
-          ls -ahl .
       - name: Upload backend test results to Codecov
         if: always()
         uses: codecov/test-results-action@v1
@@ -163,6 +162,7 @@ jobs:
             junit.xml
           retention-days: 1
           include-hidden-files: true
+          if-no-files-found: fail
       - name: Stop containers
         if: always()
         run: |
@@ -255,6 +255,7 @@ jobs:
             src-ui/coverage/coverage-final.json
             src-ui/junit.xml
           retention-days: 1
+          if-no-files-found: fail
   tests-frontend-e2e:
     name: "Frontend E2E Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     runs-on: ubuntu-24.04
@@ -373,10 +374,9 @@ jobs:
       # Merge frontend coverage from all shards
       - name: Merge frontend coverage
         run: |
-          # Merge all coverage-final.json files
-          npx nyc merge coverage/frontend-coverage-*/ merged-frontend.json
-          # Generate LCOV from merged data
-          npx nyc report --reporter=lcov --temp-dir ./ --report-dir ./
+          mkdir -p .nyc_output
+          npx nyc merge coverage .nyc_output/out.json
+          npx nyc report --reporter=lcovonly --report-dir coverage
       - name: SonarQube Analysis
         uses: SonarSource/sonarqube-scan-action@v5
         env:
