@@ -263,7 +263,7 @@ configured via [`PAPERLESS_EMAIL_TASK_CRON`](configuration.md#PAPERLESS_EMAIL_TA
 
 #### Processed Mail
 
-Paperless keeps track of mails it has processed in order to avoid processing the same mail multiple times. This uses the message `UID` provided by the mail server, which should be unique for each message. You can view and manage processed mails from the web UI under Settings > Mail > Processed Mails. If you need to re-process a message, you can delete the corresponding processed mail entry, which will allow Paperless to process the mail again the next time the mail fetch task runs.
+Paperless keeps track of emails it has processed in order to avoid processing the same mail multiple times. This uses the message `UID` provided by the mail server, which should be unique for each message. You can view and manage processed mails from the web UI under Mail > Processed Mails. If you need to re-process a message, you can delete the corresponding processed mail entry, which will allow Paperless-ngx to process the email again the next time the mail fetch task runs.
 
 #### OAuth Email Setup
 
