@@ -138,6 +138,7 @@ jobs:
             --dev \
             --frozen \
             pytest
+          ls -ahl .
       - name: Upload backend test results to Codecov
         if: always()
         uses: codecov/test-results-action@v1
@@ -159,6 +160,7 @@ jobs:
           path: |
             .coverage
             coverage.xml
+            junit.xml
           retention-days: 1
       - name: Stop containers
         if: always()
@@ -247,7 +249,10 @@ jobs:
         if: always()
         with:
           name: frontend-coverage-${{ matrix.shard-index }}
-          path: src-ui/coverage/coverage-final.json
+          path: |
+            src-ui/coverage/lcov.info
+            src-ui/coverage/coverage-final.json
+            src-ui/junit.xml
           retention-days: 1
   tests-frontend-e2e:
     name: "Frontend E2E Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
@@ -342,12 +347,12 @@ jobs:
         with:
           fetch-depth: 0
       - name: Download all backend coverage
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5.0.0
         with:
           pattern: backend-coverage-*
           path: ./coverage/
       - name: Download all frontend coverage
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5.0.0
         with:
           pattern: frontend-coverage-*
           path: ./coverage/
