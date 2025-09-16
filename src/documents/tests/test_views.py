@@ -7,8 +7,10 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.db import connection
 from django.test import TestCase
 from django.test import override_settings
+from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from rest_framework import status
@@ -227,3 +229,44 @@ class TestViews(DirectoriesMixin, TestCase):
                 }
             else:
                 assert False, f"Unexpected tag found: {tag['name']}"
+
+    def test_list_no_n_plus_1_queries(self):
+        """
+        GIVEN:
+            - Tags with different permissions
+        WHEN:
+            - Request to get tag list with full permissions is made
+        THEN:
+            - Permissions are not queries in database tag by tag,
+             i.e. there are no N+1 queries
+        """
+        view_permissions = Permission.objects.filter(
+            codename__contains="view_tag",
+        )
+        self.user.user_permissions.add(*view_permissions)
+        self.user.save()
+        self.client.force_login(self.user)
+
+        # Start by a small list, and count the number of SQL queries
+        for i in range(2):
+            Tag.objects.create(name=f"tag_{i}")
+
+        with CaptureQueriesContext(connection) as ctx_small:
+            response_small = self.client.get("/api/tags/?full_perms=true")
+            assert response_small.status_code == 200
+        num_queries_small = len(ctx_small.captured_queries)
+
+        # Complete the list, and count the number of SQL queries again
+        for i in range(2, 50):
+            Tag.objects.create(name=f"tag_{i}")
+
+        with CaptureQueriesContext(connection) as ctx_large:
+            response_large = self.client.get("/api/tags/?full_perms=true")
+            assert response_large.status_code == 200
+        num_queries_large = len(ctx_large.captured_queries)
+
+        # A few additional queries are allowed, but not a linear explosion
+        assert num_queries_large <= num_queries_small + 5, (
+            f"Possible N+1 queries detected: {num_queries_small} queries for 2 tags, "
+            f"but {num_queries_large} queries for 50 tags"
+        )
