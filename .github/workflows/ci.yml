@@ -162,6 +162,7 @@ jobs:
             coverage.xml
             junit.xml
           retention-days: 1
+          include-hidden-files: true
       - name: Stop containers
         if: always()
         run: |
