@@ -6,6 +6,7 @@ import re
 from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
+from typing import Literal
 
 import magic
 from celery import states
@@ -252,6 +253,35 @@ class OwnedObjectSerializer(
             except KeyError:
                 pass
 
+    def _get_perms(self, obj, codename: str, target: Literal["users", "groups"]):
+        """
+        Get the given permissions from context or from django-guardian.
+        Parameters:
+        - codename: e.g. 'view_tag' or 'change_tag'
+        - target: 'users' or 'groups'
+        """
+        key = f"{target}_{codename}_perms"
+        cached = self.context.get(key, {}).get(obj.pk)
+        if cached is not None:
+            return list(cached)
+
+        # Permission not found in the context, get it from guardian
+        if target == "users":
+            return list(
+                get_users_with_perms(
+                    obj,
+                    only_with_perms_in=[f"{codename}_{obj.__class__.__name__.lower()}"],
+                    with_group_users=False,
+                ).values_list("id", flat=True),
+            )
+        else:  # groups
+            return list(
+                get_groups_with_only_permission(
+                    obj,
+                    codename=f"{codename}_{obj.__class__.__name__.lower()}",
+                ).values_list("id", flat=True),
+            )
+
     @extend_schema_field(
         field={
             "type": "object",
@@ -286,48 +316,14 @@ class OwnedObjectSerializer(
         },
     )
     def get_permissions(self, obj) -> dict:
-        view_codename = f"view_{obj.__class__.__name__.lower()}"
-        change_codename = f"change_{obj.__class__.__name__.lower()}"
-        users_view_perms = self.context.get("users_view_perms", {}).get(
-            obj.pk,
-        ) or get_users_with_perms(
-            obj,
-            only_with_perms_in=[view_codename],
-            with_group_users=False,
-        ).values_list("id", flat=True)
-        users_change_perms = self.context.get("users_change_perms", {}).get(
-            obj.pk,
-            [],
-        ) or get_users_with_perms(
-            obj,
-            only_with_perms_in=[change_codename],
-            with_group_users=False,
-        ).values_list("id", flat=True)
-
-        groups_view_perms = self.context.get("groups_view_perms", {}).get(
-            obj.pk,
-            [],
-        ) or get_groups_with_only_permission(
-            obj,
-            codename=view_codename,
-        ).values_list("id", flat=True)
-
-        groups_change_perms = self.context.get("groups_change_perms", {}).get(
-            obj.pk,
-            [],
-        ) or get_groups_with_only_permission(
-            obj,
-            codename=change_codename,
-        ).values_list("id", flat=True)
-
         return {
             "view": {
-                "users": users_view_perms,
-                "groups": groups_view_perms,
+                "users": self._get_perms(obj, "view", "users"),
+                "groups": self._get_perms(obj, "view", "groups"),
             },
             "change": {
-                "users": users_change_perms,
-                "groups": groups_change_perms,
+                "users": self._get_perms(obj, "change", "users"),
+                "groups": self._get_perms(obj, "change", "groups"),
             },
         }
 

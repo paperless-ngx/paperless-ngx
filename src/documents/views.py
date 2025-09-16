@@ -5,9 +5,11 @@ import platform
 import re
 import tempfile
 import zipfile
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 from time import mktime
+from typing import Literal
 from unicodedata import normalize
 from urllib.parse import quote
 from urllib.parse import urlparse
@@ -257,7 +259,101 @@ class PassUserMixin(GenericAPIView):
         return super().get_serializer(*args, **kwargs)
 
 
-class PermissionsAwareDocumentCountMixin(PassUserMixin):
+class BulkPermissionMixin:
+    """
+    Prefetch Django-Guardian permissions for a list before serialization, to avoid N+1 queries.
+    """
+
+    def get_permission_codenames(self):
+        model_name = self.queryset.model.__name__.lower()
+        return {
+            "view": f"view_{model_name}",
+            "change": f"change_{model_name}",
+        }
+
+    def _get_object_perms(
+        self,
+        objects: list,
+        perm_codenames: list[str],
+        actor: Literal["users", "groups"],
+    ) -> dict[int, dict[str, list[int]]]:
+        """
+        Collect object-level permissions for either users or groups.
+        """
+        model = self.queryset.model
+        obj_perm_model = (
+            get_user_obj_perms_model(model)
+            if actor == "users"
+            else get_group_obj_perms_model(model)
+        )
+        id_field = "user_id" if actor == "users" else "group_id"
+        ctype = ContentType.objects.get_for_model(model)
+        object_pks = [obj.pk for obj in objects]
+
+        perms_qs = obj_perm_model.objects.filter(
+            content_type=ctype,
+            object_pk__in=object_pks,
+            permission__codename__in=perm_codenames,
+        ).values_list("object_pk", id_field, "permission__codename")
+
+        perms: dict[int, dict[str, list[int]]] = defaultdict(lambda: defaultdict(list))
+        for object_pk, actor_id, codename in perms_qs:
+            perms[int(object_pk)][codename].append(actor_id)
+
+        # Ensure that all objects have all codenames, even if empty
+        for pk in object_pks:
+            for codename in perm_codenames:
+                perms[pk][codename]
+
+        return perms
+
+    def get_serializer_context(self):
+        """
+        Get all permissions of the current list of objects at once and pass them to the serializer.
+        This avoid fetching permissions object by object in database.
+        """
+        context = super().get_serializer_context()
+        try:
+            full_perms = get_boolean(
+                str(self.request.query_params.get("full_perms", "false")),
+            )
+        except ValueError:
+            full_perms = False
+
+        if not full_perms:
+            return context
+
+        # Check which objects are being paginated
+        page = getattr(self, "paginator", None)
+        if page and hasattr(page, "page"):
+            queryset = page.page.object_list
+        elif hasattr(self, "page"):
+            queryset = self.page
+        else:
+            queryset = self.filter_queryset(self.get_queryset())
+
+        codenames = self.get_permission_codenames()
+        perm_names = [codenames["view"], codenames["change"]]
+        user_perms = self._get_object_perms(queryset, perm_names, actor="users")
+        group_perms = self._get_object_perms(queryset, perm_names, actor="groups")
+
+        context["users_view_perms"] = {
+            pk: user_perms[pk][codenames["view"]] for pk in user_perms
+        }
+        context["users_change_perms"] = {
+            pk: user_perms[pk][codenames["change"]] for pk in user_perms
+        }
+        context["groups_view_perms"] = {
+            pk: group_perms[pk][codenames["view"]] for pk in group_perms
+        }
+        context["groups_change_perms"] = {
+            pk: group_perms[pk][codenames["change"]] for pk in group_perms
+        }
+
+        return context
+
+
+class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
     """
     Mixin to add document count to queryset, permissions-aware if needed
     """
@@ -284,104 +380,8 @@ class PermissionsAwareDocumentCountMixin(PassUserMixin):
         )
 
 
-class BulkPermissionMixin:
-    """
-    Prefetch Django-Guardian permissions for a list before serialization, to avoid N+1 queries.
-    """
-
-    def get_permission_codenames(self):
-        model_name = self.queryset.model.__name__.lower()
-        return {
-            "view": f"view_{model_name}",
-            "change": f"change_{model_name}",
-        }
-
-    def get_users_with_object_perms(self, objects, perm_codenames):
-        model = self.queryset.model
-        UserObjectPermission = get_user_obj_perms_model(model)
-        ctype = ContentType.objects.get_for_model(model)
-        object_pks = [obj.pk for obj in objects]
-        perms_qs = UserObjectPermission.objects.filter(
-            content_type=ctype,
-            object_pk__in=object_pks,
-            permission__codename__in=perm_codenames,
-        ).values_list("object_pk", "user_id", "permission__codename")
-        result = {
-            pk: {codename: [] for codename in perm_codenames} for pk in object_pks
-        }
-        for object_pk, user_id, codename in perms_qs:
-            pk = int(object_pk)
-            result[pk][codename].append(user_id)
-        return result
-
-    def get_groups_with_object_perms(self, objects, perm_codenames):
-        model = self.queryset.model
-        GroupObjectPermission = get_group_obj_perms_model(model)
-        ctype = ContentType.objects.get_for_model(model)
-        object_pks = [obj.pk for obj in objects]
-        perms_qs = GroupObjectPermission.objects.filter(
-            content_type=ctype,
-            object_pk__in=object_pks,
-            permission__codename__in=perm_codenames,
-        ).values_list("object_pk", "group_id", "permission__codename")
-        result = {
-            pk: {codename: [] for codename in perm_codenames} for pk in object_pks
-        }
-
-        for object_pk, group_id, codename in perms_qs:
-            pk = int(object_pk)
-            result[pk][codename].append(group_id)
-        return result
-
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        try:
-            full_perms = get_boolean(
-                str(self.request.query_params.get("full_perms", "false")),
-            )
-        except ValueError:
-            full_perms = False
-        if full_perms:
-            # Detect pagination if available, to avoid querying unneeded permissions
-            page = getattr(self, "paginator", None)
-            if page and hasattr(page, "page"):
-                queryset = page.page.object_list
-            elif hasattr(self, "page"):
-                queryset = self.page
-            else:
-                queryset = self.filter_queryset(self.get_queryset())
-            codenames = self.get_permission_codenames()
-
-            users_perms = self.get_users_with_object_perms(
-                queryset,
-                [codenames["view"], codenames["change"]],
-            )
-            context["users_view_perms"] = {
-                pk: users_perms[pk][codenames["view"]] for pk in users_perms
-            }
-            context["users_change_perms"] = {
-                pk: users_perms[pk][codenames["change"]] for pk in users_perms
-            }
-
-            groups_perms = self.get_groups_with_object_perms(
-                queryset,
-                [codenames["view"], codenames["change"]],
-            )
-            context["groups_view_perms"] = {
-                pk: groups_perms[pk][codenames["view"]] for pk in groups_perms
-            }
-            context["groups_change_perms"] = {
-                pk: groups_perms[pk][codenames["change"]] for pk in groups_perms
-            }
-        return context
-
-
 @extend_schema_view(**generate_object_with_permissions_schema(CorrespondentSerializer))
-class CorrespondentViewSet(
-    BulkPermissionMixin,
-    ModelViewSet,
-    PermissionsAwareDocumentCountMixin,
-):
+class CorrespondentViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = Correspondent
 
     queryset = Correspondent.objects.select_related("owner").order_by(Lower("name"))
@@ -418,7 +418,7 @@ class CorrespondentViewSet(
 
 
 @extend_schema_view(**generate_object_with_permissions_schema(TagSerializer))
-class TagViewSet(BulkPermissionMixin, ModelViewSet, PermissionsAwareDocumentCountMixin):
+class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = Tag
 
     queryset = Tag.objects.select_related("owner").order_by(
@@ -450,11 +450,7 @@ class TagViewSet(BulkPermissionMixin, ModelViewSet, PermissionsAwareDocumentCoun
 
 
 @extend_schema_view(**generate_object_with_permissions_schema(DocumentTypeSerializer))
-class DocumentTypeViewSet(
-    BulkPermissionMixin,
-    ModelViewSet,
-    PermissionsAwareDocumentCountMixin,
-):
+class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = DocumentType
 
     queryset = DocumentType.objects.select_related("owner").order_by(Lower("name"))
@@ -2236,11 +2232,7 @@ class BulkDownloadView(GenericAPIView):
 
 
 @extend_schema_view(**generate_object_with_permissions_schema(StoragePathSerializer))
-class StoragePathViewSet(
-    BulkPermissionMixin,
-    ModelViewSet,
-    PermissionsAwareDocumentCountMixin,
-):
+class StoragePathViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     model = StoragePath
 
     queryset = StoragePath.objects.select_related("owner").order_by(
