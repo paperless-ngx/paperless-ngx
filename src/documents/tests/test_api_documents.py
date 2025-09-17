@@ -1529,7 +1529,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         input_doc, overrides = self.get_last_consume_delay_call_args()
 
-        new_overrides, msg = run_workflows(
+        new_overrides, _ = run_workflows(
             trigger_type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
             document=input_doc,
             logging_group=None,
@@ -1638,7 +1638,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.consume_file_mock.assert_called_once()
 
-        input_doc, overrides = self.get_last_consume_delay_call_args()
+        input_doc, _ = self.get_last_consume_delay_call_args()
 
         self.assertEqual(input_doc.source, WorkflowTrigger.DocumentSourceChoices.WEB_UI)
 
