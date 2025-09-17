@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-import itertools
 import logging
 import tempfile
 from pathlib import Path
@@ -154,15 +153,15 @@ def modify_tags(
     expanded_add_tags: set[int] = set()
     add_tag_objects = Tag.objects.filter(pk__in=add_tags)
     for t in add_tag_objects:
-        expanded_add_tags.add(t.id)
-        expanded_add_tags.update(t.get_ancestors_pks())
+        expanded_add_tags.add(int(t.id))
+        expanded_add_tags.update(int(pk) for pk in t.get_ancestors_pks())
 
     # remove with all descendants
     expanded_remove_tags: set[int] = set()
     remove_tag_objects = Tag.objects.filter(pk__in=remove_tags)
     for t in remove_tag_objects:
-        expanded_remove_tags.add(t.id)
-        expanded_remove_tags.update(t.get_descendants_pks())
+        expanded_remove_tags.add(int(t.id))
+        expanded_remove_tags.update(int(pk) for pk in t.get_descendants_pks())
 
     try:
         with transaction.atomic():
@@ -172,15 +171,27 @@ def modify_tags(
                     tag_id__in=expanded_remove_tags,
                 ).delete()
 
-            to_create = [
-                DocumentTagRelationship(document_id=doc, tag_id=tag)
-                for (doc, tag) in itertools.product(affected_docs, expanded_add_tags)
-            ]
-            if to_create:
-                DocumentTagRelationship.objects.bulk_create(
-                    to_create,
-                    ignore_conflicts=True,
+            to_create: list[DocumentTagRelationship] = []
+            if expanded_add_tags:
+                existing_pairs = set(
+                    DocumentTagRelationship.objects.filter(
+                        document_id__in=affected_docs,
+                        tag_id__in=expanded_add_tags,
+                    ).values_list("document_id", "tag_id"),
                 )
+
+                to_create = [
+                    DocumentTagRelationship(document_id=doc, tag_id=tag)
+                    for doc in affected_docs
+                    for tag in expanded_add_tags
+                    if (doc, tag) not in existing_pairs
+                ]
+
+                if to_create:
+                    DocumentTagRelationship.objects.bulk_create(
+                        to_create,
+                        ignore_conflicts=True,
+                    )
 
             if affected_docs:
                 bulk_update_documents.delay(document_ids=affected_docs)
