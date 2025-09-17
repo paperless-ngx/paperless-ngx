@@ -3,6 +3,7 @@ from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -13,6 +14,7 @@ from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+from paperless_mail.models import ProcessedMail
 from paperless_mail.tests.test_mail import BogusMailBox
 
 
@@ -721,3 +723,285 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("maximum_age", response.data)
+
+
+class TestAPIProcessedMails(DirectoriesMixin, APITestCase):
+    ENDPOINT = "/api/processed_mail/"
+
+    def setUp(self):
+        super().setUp()
+
+        self.user = User.objects.create_user(username="temp_admin")
+        self.user.user_permissions.add(*Permission.objects.all())
+        self.user.save()
+        self.client.force_authenticate(user=self.user)
+
+    def test_get_processed_mails_owner_aware(self):
+        """
+        GIVEN:
+            - Configured processed mails with different users
+        WHEN:
+            - API call is made to get processed mails
+        THEN:
+            - Only unowned, owned by user or granted processed mails are provided
+        """
+        user2 = User.objects.create_user(username="temp_admin2")
+
+        account = MailAccount.objects.create(
+            name="Email1",
+            username="username1",
+            password="password1",
+            imap_server="server.example.com",
+            imap_port=443,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            character_set="UTF-8",
+        )
+
+        rule = MailRule.objects.create(
+            name="Rule1",
+            account=account,
+            folder="INBOX",
+            filter_from="from@example.com",
+            order=0,
+        )
+
+        pm1 = ProcessedMail.objects.create(
+            rule=rule,
+            folder="INBOX",
+            uid="1",
+            subject="Subj1",
+            received=timezone.now(),
+            processed=timezone.now(),
+            status="SUCCESS",
+            error=None,
+        )
+
+        pm2 = ProcessedMail.objects.create(
+            rule=rule,
+            folder="INBOX",
+            uid="2",
+            subject="Subj2",
+            received=timezone.now(),
+            processed=timezone.now(),
+            status="FAILED",
+            error="err",
+            owner=self.user,
+        )
+
+        ProcessedMail.objects.create(
+            rule=rule,
+            folder="INBOX",
+            uid="3",
+            subject="Subj3",
+            received=timezone.now(),
+            processed=timezone.now(),
+            status="SUCCESS",
+            error=None,
+            owner=user2,
+        )
+
+        pm4 = ProcessedMail.objects.create(
+            rule=rule,
+            folder="INBOX",
+            uid="4",
+            subject="Subj4",
+            received=timezone.now(),
+            processed=timezone.now(),
+            status="SUCCESS",
+            error=None,
+        )
+        pm4.owner = user2
+        pm4.save()
+        assign_perm("view_processedmail", self.user, pm4)
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 3)
+        returned_ids = {r["id"] for r in response.data["results"]}
+        self.assertSetEqual(returned_ids, {pm1.id, pm2.id, pm4.id})
+
+    def test_get_processed_mails_filter_by_rule(self):
+        """
+        GIVEN:
+            - Processed mails belonging to two different rules
+        WHEN:
+            - API call is made with rule filter
+        THEN:
+            - Only processed mails for that rule are returned
+        """
+        account = MailAccount.objects.create(
+            name="Email1",
+            username="username1",
+            password="password1",
+            imap_server="server.example.com",
+            imap_port=443,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            character_set="UTF-8",
+        )
+
+        rule1 = MailRule.objects.create(
+            name="Rule1",
+            account=account,
+            folder="INBOX",
+            filter_from="from1@example.com",
+            order=0,
+        )
+        rule2 = MailRule.objects.create(
+            name="Rule2",
+            account=account,
+            folder="INBOX",
+            filter_from="from2@example.com",
+            order=1,
+        )
+
+        pm1 = ProcessedMail.objects.create(
+            rule=rule1,
+            folder="INBOX",
+            uid="r1-1",
+            subject="R1-A",
+            received=timezone.now(),
+            processed=timezone.now(),
+            status="SUCCESS",
+            error=None,
+            owner=self.user,
+        )
+        pm2 = ProcessedMail.objects.create(
+            rule=rule1,
+            folder="INBOX",
+            uid="r1-2",
+            subject="R1-B",
+            received=timezone.now(),
+            processed=timezone.now(),
+            status="FAILED",
+            error="e",
+        )
+        ProcessedMail.objects.create(
+            rule=rule2,
+            folder="INBOX",
+            uid="r2-1",
+            subject="R2-A",
+            received=timezone.now(),
+            processed=timezone.now(),
+            status="SUCCESS",
+            error=None,
+        )
+
+        response = self.client.get(f"{self.ENDPOINT}?rule={rule1.pk}")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        returned_ids = {r["id"] for r in response.data["results"]}
+        self.assertSetEqual(returned_ids, {pm1.id, pm2.id})
+
+    def test_bulk_delete_processed_mails(self):
+        """
+        GIVEN:
+            - Processed mails belonging to two different rules and different users
+        WHEN:
+            - API call is made to bulk delete some of the processed mails
+        THEN:
+            - Only the specified processed mails are deleted, respecting ownership and permissions
+        """
+        user2 = User.objects.create_user(username="temp_admin2")
+
+        account = MailAccount.objects.create(
+            name="Email1",
+            username="username1",
+            password="password1",
+            imap_server="server.example.com",
+            imap_port=443,
+            imap_security=MailAccount.ImapSecurity.SSL,
+            character_set="UTF-8",
+        )
+
+        rule = MailRule.objects.create(
+            name="Rule1",
+            account=account,
+            folder="INBOX",
+            filter_from="from@example.com",
+            order=0,
+        )
+
+        # unowned and owned by self, and one with explicit object perm
+        pm_unowned = ProcessedMail.objects.create(
+            rule=rule,
+            folder="INBOX",
+            uid="u1",
+            subject="Unowned",
+            received=timezone.now(),
+            processed=timezone.now(),
+            status="SUCCESS",
+            error=None,
+        )
+        pm_owned = ProcessedMail.objects.create(
+            rule=rule,
+            folder="INBOX",
+            uid="u2",
+            subject="Owned",
+            received=timezone.now(),
+            processed=timezone.now(),
+            status="FAILED",
+            error="e",
+            owner=self.user,
+        )
+        pm_granted = ProcessedMail.objects.create(
+            rule=rule,
+            folder="INBOX",
+            uid="u3",
+            subject="Granted",
+            received=timezone.now(),
+            processed=timezone.now(),
+            status="SUCCESS",
+            error=None,
+            owner=user2,
+        )
+        assign_perm("delete_processedmail", self.user, pm_granted)
+        pm_forbidden = ProcessedMail.objects.create(
+            rule=rule,
+            folder="INBOX",
+            uid="u4",
+            subject="Forbidden",
+            received=timezone.now(),
+            processed=timezone.now(),
+            status="SUCCESS",
+            error=None,
+            owner=user2,
+        )
+
+        # Success for allowed items
+        response = self.client.post(
+            f"{self.ENDPOINT}bulk_delete/",
+            data={
+                "mail_ids": [pm_unowned.id, pm_owned.id, pm_granted.id],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["result"], "OK")
+        self.assertSetEqual(
+            set(response.data["deleted_mail_ids"]),
+            {pm_unowned.id, pm_owned.id, pm_granted.id},
+        )
+        self.assertFalse(ProcessedMail.objects.filter(id=pm_unowned.id).exists())
+        self.assertFalse(ProcessedMail.objects.filter(id=pm_owned.id).exists())
+        self.assertFalse(ProcessedMail.objects.filter(id=pm_granted.id).exists())
+        self.assertTrue(ProcessedMail.objects.filter(id=pm_forbidden.id).exists())
+
+        # 403 and not deleted
+        response = self.client.post(
+            f"{self.ENDPOINT}bulk_delete/",
+            data={
+                "mail_ids": [pm_forbidden.id],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(ProcessedMail.objects.filter(id=pm_forbidden.id).exists())
+
+        # missing mail_ids
+        response = self.client.post(
+            f"{self.ENDPOINT}bulk_delete/",
+            data={"mail_ids": "not-a-list"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
