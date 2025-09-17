@@ -335,6 +335,7 @@ INSTALLED_APPS = [
     "allauth.mfa",
     "drf_spectacular",
     "drf_spectacular_sidecar",
+    "treenode",
     *env_apps,
 ]
 

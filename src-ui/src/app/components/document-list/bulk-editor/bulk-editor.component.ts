@@ -37,6 +37,7 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { flattenTags } from 'src/app/utils/flatten-tags'
 import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
 import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
@@ -164,7 +165,10 @@ export class BulkEditorComponent
       this.tagService
         .listAll()
         .pipe(first())
-        .subscribe((result) => (this.tagSelectionModel.items = result.results))
+        .subscribe(
+          (result) =>
+            (this.tagSelectionModel.items = flattenTags(result.results))
+        )
     }
     if (
       this.permissionService.currentUserCan(
@@ -648,7 +652,7 @@ export class BulkEditorComponent
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(({ newTag, tags }) => {
-        this.tagSelectionModel.items = tags.results
+        this.tagSelectionModel.items = flattenTags(tags.results)
         this.tagSelectionModel.toggle(newTag.id)
       })
   }

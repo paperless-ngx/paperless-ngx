@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-31 22:24+0000\n"
-"PO-Revision-Date: 2025-08-31 22:25\n"
+"POT-Creation-Date: 2025-09-14 03:21+0000\n"
+"PO-Revision-Date: 2025-09-14 03:22\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -21,67 +21,67 @@ msgstr ""
 msgid "Documents"
 msgstr "ドキュメント"
 
-#: documents/filters.py:384
+#: documents/filters.py:386
 msgid "Value must be valid JSON."
 msgstr "値は有効なJSONである必要があります。"
 
-#: documents/filters.py:403
+#: documents/filters.py:405
 msgid "Invalid custom field query expression"
 msgstr "無効なカスタムフィールドクエリ式"
 
-#: documents/filters.py:413
+#: documents/filters.py:415
 msgid "Invalid expression list. Must be nonempty."
 msgstr "無効な式リストです。空であってはなりません。"
 
-#: documents/filters.py:434
+#: documents/filters.py:436
 msgid "Invalid logical operator {op!r}"
 msgstr "無効な論理演算子 {op!r}"
 
-#: documents/filters.py:448
+#: documents/filters.py:450
 msgid "Maximum number of query conditions exceeded."
 msgstr "クエリ条件の最大数を超えました。"
 
-#: documents/filters.py:513
+#: documents/filters.py:515
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} は有効なカスタムフィールドではありません。"
 
-#: documents/filters.py:550
+#: documents/filters.py:552
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} はクエリ expr {expr!r} をサポートしていません。"
 
-#: documents/filters.py:658
+#: documents/filters.py:660
 msgid "Maximum nesting depth exceeded."
 msgstr "最大ネストの深さを超えました。"
 
-#: documents/filters.py:843
+#: documents/filters.py:845
 msgid "Custom field not found"
 msgstr "カスタムフィールドが見つかりません"
 
-#: documents/models.py:36 documents/models.py:713
+#: documents/models.py:36 documents/models.py:735
 msgid "owner"
 msgstr "所有者"
 
-#: documents/models.py:53 documents/models.py:924
+#: documents/models.py:53 documents/models.py:950
 msgid "None"
 msgstr "なし"
 
-#: documents/models.py:54 documents/models.py:925
+#: documents/models.py:54 documents/models.py:951
 msgid "Any word"
 msgstr "いずれかの単語"
 
-#: documents/models.py:55 documents/models.py:926
+#: documents/models.py:55 documents/models.py:952
 msgid "All words"
 msgstr "すべての単語"
 
-#: documents/models.py:56 documents/models.py:927
+#: documents/models.py:56 documents/models.py:953
 msgid "Exact match"
 msgstr "完全一致"
 
-#: documents/models.py:57 documents/models.py:928
+#: documents/models.py:57 documents/models.py:954
 msgid "Regular expression"
 msgstr "正規表現"
 
-#: documents/models.py:58 documents/models.py:929
+#: documents/models.py:58 documents/models.py:955
 msgid "Fuzzy word"
 msgstr "あいまいな単語"
 
@@ -89,20 +89,20 @@ msgstr "あいまいな単語"
 msgid "Automatic"
 msgstr "自動"
 
-#: documents/models.py:62 documents/models.py:401 documents/models.py:1419
+#: documents/models.py:62 documents/models.py:423 documents/models.py:1451
 #: paperless_mail/models.py:23 paperless_mail/models.py:143
 msgid "name"
 msgstr "名称"
 
-#: documents/models.py:64 documents/models.py:993
+#: documents/models.py:64 documents/models.py:1019
 msgid "match"
 msgstr "マッチ"
 
-#: documents/models.py:67 documents/models.py:996
+#: documents/models.py:67 documents/models.py:1022
 msgid "matching algorithm"
 msgstr "マッチングアルゴリズム"
 
-#: documents/models.py:72 documents/models.py:1001
+#: documents/models.py:72 documents/models.py:1027
 msgid "is insensitive"
 msgstr "大文字・小文字の区別なし"
 
@@ -166,7 +166,7 @@ msgstr "GNU Privacy Guard で暗号化"
 msgid "title"
 msgstr "タイトル"
 
-#: documents/models.py:170 documents/models.py:627
+#: documents/models.py:170 documents/models.py:649
 msgid "content"
 msgstr "コンテンツ"
 
@@ -202,8 +202,8 @@ msgstr "ページ数"
 msgid "The number of pages of the document."
 msgstr "ドキュメントのページ数。"
 
-#: documents/models.py:217 documents/models.py:633 documents/models.py:671
-#: documents/models.py:742 documents/models.py:800
+#: documents/models.py:217 documents/models.py:655 documents/models.py:693
+#: documents/models.py:765 documents/models.py:824
 msgid "created"
 msgstr "作成日"
 
@@ -251,8 +251,8 @@ msgstr "アーカイブ番号"
 msgid "The position of this document in your physical document archive."
 msgstr "物理的なドキュメントアーカイブ内での、このドキュメントの位置"
 
-#: documents/models.py:294 documents/models.py:644 documents/models.py:698
-#: documents/models.py:1462
+#: documents/models.py:294 documents/models.py:666 documents/models.py:720
+#: documents/models.py:1494
 msgid "document"
 msgstr "ドキュメント"
 
@@ -260,907 +260,915 @@ msgstr "ドキュメント"
 msgid "documents"
 msgstr "ドキュメント"
 
-#: documents/models.py:382
+#: documents/models.py:404
 msgid "Table"
 msgstr "テーブル"
 
-#: documents/models.py:383
+#: documents/models.py:405
 msgid "Small Cards"
 msgstr "小カード"
 
-#: documents/models.py:384
+#: documents/models.py:406
 msgid "Large Cards"
 msgstr "大カード"
 
-#: documents/models.py:387
+#: documents/models.py:409
 msgid "Title"
 msgstr "タイトル"
 
-#: documents/models.py:388 documents/models.py:945
+#: documents/models.py:410 documents/models.py:971
 msgid "Created"
 msgstr "作成済み"
 
-#: documents/models.py:389 documents/models.py:944
+#: documents/models.py:411 documents/models.py:970
 msgid "Added"
 msgstr "追加済"
 
-#: documents/models.py:390
+#: documents/models.py:412
 msgid "Tags"
 msgstr "タグ"
 
-#: documents/models.py:391
+#: documents/models.py:413
 msgid "Correspondent"
 msgstr "担当"
 
-#: documents/models.py:392
+#: documents/models.py:414
 msgid "Document Type"
 msgstr "ドキュメントタイプ"
 
-#: documents/models.py:393
+#: documents/models.py:415
 msgid "Storage Path"
 msgstr "ストレージパス"
 
-#: documents/models.py:394
+#: documents/models.py:416
 msgid "Note"
 msgstr "メモ"
 
-#: documents/models.py:395
+#: documents/models.py:417
 msgid "Owner"
 msgstr "所有者"
 
-#: documents/models.py:396
+#: documents/models.py:418
 msgid "Shared"
 msgstr "共有済み"
 
-#: documents/models.py:397
+#: documents/models.py:419
 msgid "ASN"
 msgstr "ASN"
 
-#: documents/models.py:398
+#: documents/models.py:420
 msgid "Pages"
 msgstr "ページ"
 
-#: documents/models.py:404
+#: documents/models.py:426
 msgid "show on dashboard"
 msgstr "ダッシュボードに表示"
 
-#: documents/models.py:407
+#: documents/models.py:429
 msgid "show in sidebar"
 msgstr "サイドバーに表示"
 
-#: documents/models.py:411
+#: documents/models.py:433
 msgid "sort field"
 msgstr "項目を並べ替え"
 
-#: documents/models.py:416
+#: documents/models.py:438
 msgid "sort reverse"
 msgstr "項目を逆順で並べ替え"
 
-#: documents/models.py:419
+#: documents/models.py:441
 msgid "View page size"
 msgstr "ページサイズの表示"
 
-#: documents/models.py:427
+#: documents/models.py:449
 msgid "View display mode"
 msgstr "表示モード"
 
-#: documents/models.py:434
+#: documents/models.py:456
 msgid "Document display fields"
 msgstr "ドキュメントの表示フィールド"
 
-#: documents/models.py:441 documents/models.py:504
+#: documents/models.py:463 documents/models.py:526
 msgid "saved view"
 msgstr "保存済みビュー"
 
-#: documents/models.py:442
+#: documents/models.py:464
 msgid "saved views"
 msgstr "保存済みビュー"
 
-#: documents/models.py:450
+#: documents/models.py:472
 msgid "title contains"
 msgstr "タイトルが次のものを含む"
 
-#: documents/models.py:451
+#: documents/models.py:473
 msgid "content contains"
 msgstr "コンテンツが次のものを含む"
 
-#: documents/models.py:452
+#: documents/models.py:474
 msgid "ASN is"
 msgstr "ASN が"
 
-#: documents/models.py:453
+#: documents/models.py:475
 msgid "correspondent is"
 msgstr "担当が"
 
-#: documents/models.py:454
+#: documents/models.py:476
 msgid "document type is"
 msgstr "ドキュメントタイプが"
 
-#: documents/models.py:455
+#: documents/models.py:477
 msgid "is in inbox"
 msgstr "次のものが受信トレイにある"
 
-#: documents/models.py:456
+#: documents/models.py:478
 msgid "has tag"
 msgstr "次のタグがある"
 
-#: documents/models.py:457
+#: documents/models.py:479
 msgid "has any tag"
 msgstr "次のいずれかのタグがある"
 
-#: documents/models.py:458
+#: documents/models.py:480
 msgid "created before"
 msgstr "次の日付以前に作成"
 
-#: documents/models.py:459
+#: documents/models.py:481
 msgid "created after"
 msgstr "次の日付以降に作成"
 
-#: documents/models.py:460
+#: documents/models.py:482
 msgid "created year is"
 msgstr "作成年が"
 
-#: documents/models.py:461
+#: documents/models.py:483
 msgid "created month is"
 msgstr "作成月が"
 
-#: documents/models.py:462
+#: documents/models.py:484
 msgid "created day is"
 msgstr "作成日が"
 
-#: documents/models.py:463
+#: documents/models.py:485
 msgid "added before"
 msgstr "次の日付以前に追加"
 
-#: documents/models.py:464
+#: documents/models.py:486
 msgid "added after"
 msgstr "次の日付以降に追加"
 
-#: documents/models.py:465
+#: documents/models.py:487
 msgid "modified before"
 msgstr "次の日付以前に変更"
 
-#: documents/models.py:466
+#: documents/models.py:488
 msgid "modified after"
 msgstr "次の日付以降に変更"
 
-#: documents/models.py:467
+#: documents/models.py:489
 msgid "does not have tag"
 msgstr "次のタグがない"
 
-#: documents/models.py:468
+#: documents/models.py:490
 msgid "does not have ASN"
 msgstr "次の ASN でない"
 
-#: documents/models.py:469
+#: documents/models.py:491
 msgid "title or content contains"
 msgstr "タイトルまたはコンテンツに次のものを含む"
 
-#: documents/models.py:470
+#: documents/models.py:492
 msgid "fulltext query"
 msgstr "全文検索"
 
-#: documents/models.py:471
+#: documents/models.py:493
 msgid "more like this"
 msgstr "これと類似のもの"
 
-#: documents/models.py:472
+#: documents/models.py:494
 msgid "has tags in"
 msgstr "次のタグがある"
 
-#: documents/models.py:473
+#: documents/models.py:495
 msgid "ASN greater than"
 msgstr "ASN が次の値より大きい"
 
-#: documents/models.py:474
+#: documents/models.py:496
 msgid "ASN less than"
 msgstr "ASN が次の値より小さい"
 
-#: documents/models.py:475
+#: documents/models.py:497
 msgid "storage path is"
 msgstr "フォルダーが"
 
-#: documents/models.py:476
+#: documents/models.py:498
 msgid "has correspondent in"
 msgstr "次のものが担当"
 
-#: documents/models.py:477
+#: documents/models.py:499
 msgid "does not have correspondent in"
 msgstr "次のものが担当でない"
 
-#: documents/models.py:478
+#: documents/models.py:500
 msgid "has document type in"
 msgstr "次のドキュメントタイプがある"
 
-#: documents/models.py:479
+#: documents/models.py:501
 msgid "does not have document type in"
 msgstr "次のドキュメントタイプがない"
 
-#: documents/models.py:480
+#: documents/models.py:502
 msgid "has storage path in"
 msgstr "次のフォルダーがある"
 
-#: documents/models.py:481
+#: documents/models.py:503
 msgid "does not have storage path in"
 msgstr "次のフォルダーがない"
 
-#: documents/models.py:482
+#: documents/models.py:504
 msgid "owner is"
 msgstr "所有者が"
 
-#: documents/models.py:483
+#: documents/models.py:505
 msgid "has owner in"
 msgstr "所有者がいる"
 
-#: documents/models.py:484
+#: documents/models.py:506
 msgid "does not have owner"
 msgstr "次のものが所有者"
 
-#: documents/models.py:485
+#: documents/models.py:507
 msgid "does not have owner in"
 msgstr "次のものが所有者でない"
 
-#: documents/models.py:486
+#: documents/models.py:508
 msgid "has custom field value"
 msgstr "次のカスタム項目がある"
 
-#: documents/models.py:487
+#: documents/models.py:509
 msgid "is shared by me"
 msgstr "自分が共有した"
 
-#: documents/models.py:488
+#: documents/models.py:510
 msgid "has custom fields"
 msgstr "カスタムフィールド"
 
-#: documents/models.py:489
+#: documents/models.py:511
 msgid "has custom field in"
 msgstr "カスタムフィールドがあります"
 
-#: documents/models.py:490
+#: documents/models.py:512
 msgid "does not have custom field in"
 msgstr "カスタムフィールドがありません"
 
-#: documents/models.py:491
+#: documents/models.py:513
 msgid "does not have custom field"
 msgstr "カスタムフィールドがありません"
 
-#: documents/models.py:492
+#: documents/models.py:514
 msgid "custom fields query"
 msgstr "カスタムフィールドのクエリ"
 
-#: documents/models.py:493
+#: documents/models.py:515
 msgid "created to"
 msgstr "作成"
 
-#: documents/models.py:494
+#: documents/models.py:516
 msgid "created from"
 msgstr "作成元"
 
-#: documents/models.py:495
+#: documents/models.py:517
 msgid "added to"
 msgstr "追加"
 
-#: documents/models.py:496
+#: documents/models.py:518
 msgid "added from"
 msgstr "追加元"
 
-#: documents/models.py:497
+#: documents/models.py:519
 msgid "mime type is"
 msgstr "MIMEタイプ"
 
-#: documents/models.py:507
+#: documents/models.py:529
 msgid "rule type"
 msgstr "ルールタイプ"
 
-#: documents/models.py:509
+#: documents/models.py:531
 msgid "value"
 msgstr "値"
 
-#: documents/models.py:512
+#: documents/models.py:534
 msgid "filter rule"
 msgstr "フィルタルール"
 
-#: documents/models.py:513
+#: documents/models.py:535
 msgid "filter rules"
 msgstr "フィルタールール"
 
-#: documents/models.py:537
+#: documents/models.py:559
 msgid "Auto Task"
 msgstr "自動タスク"
 
-#: documents/models.py:538
+#: documents/models.py:560
 msgid "Scheduled Task"
 msgstr "スケジュールされたタスク"
 
-#: documents/models.py:539
+#: documents/models.py:561
 msgid "Manual Task"
 msgstr "手動タスク"
 
-#: documents/models.py:542
+#: documents/models.py:564
 msgid "Consume File"
 msgstr "ファイルの利用"
 
-#: documents/models.py:543
+#: documents/models.py:565
 msgid "Train Classifier"
 msgstr "分類子の訓練"
 
-#: documents/models.py:544
+#: documents/models.py:566
 msgid "Check Sanity"
 msgstr "健全性のチェック"
 
-#: documents/models.py:545
+#: documents/models.py:567
 msgid "Index Optimize"
 msgstr "インデックスの最適化"
 
-#: documents/models.py:550
+#: documents/models.py:572
 msgid "Task ID"
 msgstr "タスク ID"
 
-#: documents/models.py:551
+#: documents/models.py:573
 msgid "Celery ID for the Task that was run"
 msgstr "実行されたタスクの Celery ID"
 
-#: documents/models.py:556
+#: documents/models.py:578
 msgid "Acknowledged"
 msgstr "承認"
 
-#: documents/models.py:557
+#: documents/models.py:579
 msgid "If the task is acknowledged via the frontend or API"
 msgstr "フロントエンドまたは API 経由でタスクが承認されている場合"
 
-#: documents/models.py:563
+#: documents/models.py:585
 msgid "Task Filename"
 msgstr "タスクのファイル名"
 
-#: documents/models.py:564
+#: documents/models.py:586
 msgid "Name of the file which the Task was run for"
 msgstr "タスクを実行したファイル名"
 
-#: documents/models.py:571
+#: documents/models.py:593
 msgid "Task Name"
 msgstr "タスク名"
 
-#: documents/models.py:572
+#: documents/models.py:594
 msgid "Name of the task that was run"
 msgstr "実行されたタスク名"
 
-#: documents/models.py:579
+#: documents/models.py:601
 msgid "Task State"
 msgstr "タスクの状態"
 
-#: documents/models.py:580
+#: documents/models.py:602
 msgid "Current state of the task being run"
 msgstr "実行中のタスクの状態"
 
-#: documents/models.py:586
+#: documents/models.py:608
 msgid "Created DateTime"
 msgstr "作成日時"
 
-#: documents/models.py:587
+#: documents/models.py:609
 msgid "Datetime field when the task result was created in UTC"
 msgstr "タスクの結果が作成された UTC 日時"
 
-#: documents/models.py:593
+#: documents/models.py:615
 msgid "Started DateTime"
 msgstr "開始日時"
 
-#: documents/models.py:594
+#: documents/models.py:616
 msgid "Datetime field when the task was started in UTC"
 msgstr "タスクが開始された UTC 日時"
 
-#: documents/models.py:600
+#: documents/models.py:622
 msgid "Completed DateTime"
 msgstr "完了日時"
 
-#: documents/models.py:601
+#: documents/models.py:623
 msgid "Datetime field when the task was completed in UTC"
 msgstr "タスクが完了した UTC 日時"
 
-#: documents/models.py:607
+#: documents/models.py:629
 msgid "Result Data"
 msgstr "結果データ"
 
-#: documents/models.py:609
+#: documents/models.py:631
 msgid "The data returned by the task"
 msgstr "タスクが出力したデータ"
 
-#: documents/models.py:617
+#: documents/models.py:639
 msgid "Task Type"
 msgstr "タスクタイプ"
 
-#: documents/models.py:618
+#: documents/models.py:640
 msgid "The type of task that was run"
 msgstr "実行されたタスクの種類"
 
-#: documents/models.py:629
+#: documents/models.py:651
 msgid "Note for the document"
 msgstr "ドキュメントのメモ"
 
-#: documents/models.py:653
+#: documents/models.py:675
 msgid "user"
 msgstr "ユーザー"
 
-#: documents/models.py:658
+#: documents/models.py:680
 msgid "note"
 msgstr "メモ"
 
-#: documents/models.py:659
+#: documents/models.py:681
 msgid "notes"
 msgstr "メモ"
 
-#: documents/models.py:667
+#: documents/models.py:689
 msgid "Archive"
 msgstr "アーカイブ"
 
-#: documents/models.py:668
+#: documents/models.py:690
 msgid "Original"
 msgstr "原本"
 
-#: documents/models.py:679 paperless_mail/models.py:75
+#: documents/models.py:701 paperless_mail/models.py:75
 msgid "expiration"
 msgstr "有効期限"
 
-#: documents/models.py:686
+#: documents/models.py:708
 msgid "slug"
 msgstr "スラグ"
 
-#: documents/models.py:718
+#: documents/models.py:740
 msgid "share link"
 msgstr "共有リンク"
 
-#: documents/models.py:719
+#: documents/models.py:741
 msgid "share links"
 msgstr "共有リンク"
 
-#: documents/models.py:731
+#: documents/models.py:753
 msgid "String"
 msgstr "文字列"
 
-#: documents/models.py:732
+#: documents/models.py:754
 msgid "URL"
 msgstr "URL"
 
-#: documents/models.py:733
+#: documents/models.py:755
 msgid "Date"
 msgstr "日付"
 
-#: documents/models.py:734
+#: documents/models.py:756
 msgid "Boolean"
 msgstr "ブール値"
 
-#: documents/models.py:735
+#: documents/models.py:757
 msgid "Integer"
 msgstr "整数"
 
-#: documents/models.py:736
+#: documents/models.py:758
 msgid "Float"
 msgstr "浮動小数点数"
 
-#: documents/models.py:737
+#: documents/models.py:759
 msgid "Monetary"
 msgstr "通貨 (ドル)"
 
-#: documents/models.py:738
+#: documents/models.py:760
 msgid "Document Link"
 msgstr "ドキュメントリンク"
 
-#: documents/models.py:739
+#: documents/models.py:761
 msgid "Select"
 msgstr "選択"
 
-#: documents/models.py:751
+#: documents/models.py:762
+msgid "Long Text"
+msgstr ""
+
+#: documents/models.py:774
 msgid "data type"
 msgstr "データの種類"
 
-#: documents/models.py:758
+#: documents/models.py:781
 msgid "extra data"
 msgstr "追加データ"
 
-#: documents/models.py:762
+#: documents/models.py:785
 msgid "Extra data for the custom field, such as select options"
 msgstr "カスタムフィールドの追加データ（選択オプションなど）"
 
-#: documents/models.py:768
+#: documents/models.py:791
 msgid "custom field"
 msgstr "カスタム項目"
 
-#: documents/models.py:769
+#: documents/models.py:792
 msgid "custom fields"
 msgstr "カスタム項目"
 
-#: documents/models.py:866
+#: documents/models.py:892
 msgid "custom field instance"
 msgstr "カスタム項目インスタンス"
 
-#: documents/models.py:867
+#: documents/models.py:893
 msgid "custom field instances"
 msgstr "カスタム項目インスタンス"
 
-#: documents/models.py:932
+#: documents/models.py:958
 msgid "Consumption Started"
 msgstr "利用開始時"
 
-#: documents/models.py:933
+#: documents/models.py:959
 msgid "Document Added"
 msgstr "ドキュメントの追加時"
 
-#: documents/models.py:934
+#: documents/models.py:960
 msgid "Document Updated"
 msgstr "ドキュメントの更新時"
 
-#: documents/models.py:935
+#: documents/models.py:961
 msgid "Scheduled"
 msgstr "スケジュール済"
 
-#: documents/models.py:938
+#: documents/models.py:964
 msgid "Consume Folder"
 msgstr "フォルダーの利用"
 
-#: documents/models.py:939
+#: documents/models.py:965
 msgid "Api Upload"
 msgstr "API アップロード"
 
-#: documents/models.py:940
+#: documents/models.py:966
 msgid "Mail Fetch"
 msgstr "メールの取得"
 
-#: documents/models.py:941
+#: documents/models.py:967
 msgid "Web UI"
 msgstr "ウェブUI"
 
-#: documents/models.py:946
+#: documents/models.py:972
 msgid "Modified"
 msgstr "更新日"
 
-#: documents/models.py:947
+#: documents/models.py:973
 msgid "Custom Field"
 msgstr "カスタムフィールド"
 
-#: documents/models.py:950
+#: documents/models.py:976
 msgid "Workflow Trigger Type"
 msgstr "ワークフローのトリガータイプ"
 
-#: documents/models.py:962
+#: documents/models.py:988
 msgid "filter path"
 msgstr "パスをフィルター"
 
-#: documents/models.py:967
+#: documents/models.py:993
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr "指定されたパスを持つドキュメントのみを使用します。ワイルドカード (*) が使用できます。大文字・小文字を区別しません。"
 
-#: documents/models.py:974
+#: documents/models.py:1000
 msgid "filter filename"
 msgstr "ファイル名をフィルター"
 
-#: documents/models.py:979 paperless_mail/models.py:200
+#: documents/models.py:1005 paperless_mail/models.py:200
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "指定されたファイル名に完全にマッチするドキュメントのみを使用します。 *.pdf や *請求書* などのワイルドカードが使用できます。大文字・小文字を区別しません。"
 
-#: documents/models.py:990
+#: documents/models.py:1016
 msgid "filter documents from this mail rule"
 msgstr "このメールルールからのドキュメントをフィルター"
 
-#: documents/models.py:1006
+#: documents/models.py:1032
 msgid "has these tag(s)"
 msgstr "タグ"
 
-#: documents/models.py:1014
+#: documents/models.py:1040
 msgid "has this document type"
 msgstr "ドキュメントタイプ"
 
-#: documents/models.py:1022
+#: documents/models.py:1048
 msgid "has this correspondent"
 msgstr "担当"
 
-#: documents/models.py:1026
+#: documents/models.py:1056
+msgid "has this storage path"
+msgstr ""
+
+#: documents/models.py:1060
 msgid "schedule offset days"
 msgstr "スケジュールオフセット日"
 
-#: documents/models.py:1029
+#: documents/models.py:1063
 msgid "The number of days to offset the schedule trigger by."
 msgstr "スケジュールトリガーをオフセットする日数。"
 
-#: documents/models.py:1034
+#: documents/models.py:1068
 msgid "schedule is recurring"
 msgstr "スケジュールは繰り返します"
 
-#: documents/models.py:1037
+#: documents/models.py:1071
 msgid "If the schedule should be recurring."
 msgstr "スケジュールを繰り返しますか。"
 
-#: documents/models.py:1042
+#: documents/models.py:1076
 msgid "schedule recurring delay in days"
 msgstr "定期的な遅延を日数でスケジュールする"
 
-#: documents/models.py:1046
+#: documents/models.py:1080
 msgid "The number of days between recurring schedule triggers."
 msgstr "定期的なスケジュールがトリガーされる間隔の日数。"
 
-#: documents/models.py:1051
+#: documents/models.py:1085
 msgid "schedule date field"
 msgstr "スケジュール日フィールド"
 
-#: documents/models.py:1056
+#: documents/models.py:1090
 msgid "The field to check for a schedule trigger."
 msgstr "スケジュールトリガーをチェックするフィールド。"
 
-#: documents/models.py:1065
+#: documents/models.py:1099
 msgid "schedule date custom field"
 msgstr "スケジュール日カスタムフィールド"
 
-#: documents/models.py:1069
+#: documents/models.py:1103
 msgid "workflow trigger"
 msgstr "ワークフローのトリガー"
 
-#: documents/models.py:1070
+#: documents/models.py:1104
 msgid "workflow triggers"
 msgstr "ワークフローのトリガー"
 
-#: documents/models.py:1078
+#: documents/models.py:1112
 msgid "email subject"
 msgstr "メールの件名"
 
-#: documents/models.py:1082
+#: documents/models.py:1116
 msgid "The subject of the email, can include some placeholders, see documentation."
 msgstr "メールの件名にはプレースホルダーを含めることができます。ドキュメントを参照してください。"
 
-#: documents/models.py:1088
+#: documents/models.py:1122
 msgid "email body"
 msgstr "メール本文"
 
-#: documents/models.py:1091
+#: documents/models.py:1125
 msgid "The body (message) of the email, can include some placeholders, see documentation."
 msgstr "メールの本文（メッセージ）にはプレースホルダを含めることができます。ドキュメントを参照してください。"
 
-#: documents/models.py:1097
+#: documents/models.py:1131
 msgid "emails to"
 msgstr "メール先"
 
-#: documents/models.py:1100
+#: documents/models.py:1134
 msgid "The destination email addresses, comma separated."
 msgstr "宛先のメールアドレス（カンマ区切り）。"
 
-#: documents/models.py:1106
+#: documents/models.py:1140
 msgid "include document in email"
 msgstr "メールにドキュメントを含める"
 
-#: documents/models.py:1117
+#: documents/models.py:1151
 msgid "webhook url"
 msgstr "webhook URL"
 
-#: documents/models.py:1120
+#: documents/models.py:1154
 msgid "The destination URL for the notification."
 msgstr "通知の宛先URL。"
 
-#: documents/models.py:1125
+#: documents/models.py:1159
 msgid "use parameters"
 msgstr "パラメータを使用する"
 
-#: documents/models.py:1130
+#: documents/models.py:1164
 msgid "send as JSON"
 msgstr "JSON形式で送信"
 
-#: documents/models.py:1134
+#: documents/models.py:1168
 msgid "webhook parameters"
 msgstr "webhookパラメータ"
 
-#: documents/models.py:1137
+#: documents/models.py:1171
 msgid "The parameters to send with the webhook URL if body not used."
 msgstr "本文が使用されていない場合にWebhook URLとともに送信されるパラメータ。"
 
-#: documents/models.py:1141
+#: documents/models.py:1175
 msgid "webhook body"
 msgstr "webhook本文"
 
-#: documents/models.py:1144
+#: documents/models.py:1178
 msgid "The body to send with the webhook URL if parameters not used."
 msgstr "パラメータが使用されていない場合にWebhook URLとともに送信される本文。"
 
-#: documents/models.py:1148
+#: documents/models.py:1182
 msgid "webhook headers"
 msgstr "webhookヘッダー"
 
-#: documents/models.py:1151
+#: documents/models.py:1185
 msgid "The headers to send with the webhook URL."
 msgstr "Webhook URLとともに送信するヘッダー。"
 
-#: documents/models.py:1156
+#: documents/models.py:1190
 msgid "include document in webhook"
 msgstr "webhookにドキュメントを含める"
 
-#: documents/models.py:1167
+#: documents/models.py:1201
 msgid "Assignment"
 msgstr "割り当て"
 
-#: documents/models.py:1171
+#: documents/models.py:1205
 msgid "Removal"
 msgstr "削除"
 
-#: documents/models.py:1175 documents/templates/account/password_reset.html:15
+#: documents/models.py:1209 documents/templates/account/password_reset.html:15
 msgid "Email"
 msgstr "メールアドレス"
 
-#: documents/models.py:1179
+#: documents/models.py:1213
 msgid "Webhook"
 msgstr "Webhook"
 
-#: documents/models.py:1183
+#: documents/models.py:1217
 msgid "Workflow Action Type"
 msgstr "ワークフローのアクションタイプ"
 
-#: documents/models.py:1189
+#: documents/models.py:1223
 msgid "assign title"
 msgstr "タイトルの割り当て"
 
-#: documents/models.py:1194
-msgid "Assign a document title, can include some placeholders, see documentation."
-msgstr "ドキュメントタイトルを割り当てます。ドキュメントタイトルにはプレースホルダーを含めることができます。マニュアルを参照してください。"
+#: documents/models.py:1227
+msgid "Assign a document title, must  be a Jinja2 template, see documentation."
+msgstr ""
 
-#: documents/models.py:1203 paperless_mail/models.py:274
+#: documents/models.py:1235 paperless_mail/models.py:274
 msgid "assign this tag"
 msgstr "タグの割り当て"
 
-#: documents/models.py:1212 paperless_mail/models.py:282
+#: documents/models.py:1244 paperless_mail/models.py:282
 msgid "assign this document type"
 msgstr "ドキュメントタイプの割り当て"
 
-#: documents/models.py:1221 paperless_mail/models.py:296
+#: documents/models.py:1253 paperless_mail/models.py:296
 msgid "assign this correspondent"
 msgstr "担当の割り当て"
 
-#: documents/models.py:1230
+#: documents/models.py:1262
 msgid "assign this storage path"
 msgstr "フォルダーの割り当て"
 
-#: documents/models.py:1239
+#: documents/models.py:1271
 msgid "assign this owner"
 msgstr "所有者の割り当て"
 
-#: documents/models.py:1246
+#: documents/models.py:1278
 msgid "grant view permissions to these users"
 msgstr "ユーザーへの表示権限の付与"
 
-#: documents/models.py:1253
+#: documents/models.py:1285
 msgid "grant view permissions to these groups"
 msgstr "グループへの表示権限の付与"
 
-#: documents/models.py:1260
+#: documents/models.py:1292
 msgid "grant change permissions to these users"
 msgstr "ユーザーへの変更権限の付与"
 
-#: documents/models.py:1267
+#: documents/models.py:1299
 msgid "grant change permissions to these groups"
 msgstr "グループへの変更権限の付与"
 
-#: documents/models.py:1274
+#: documents/models.py:1306
 msgid "assign these custom fields"
 msgstr "カスタム項目の割り当て"
 
-#: documents/models.py:1278
+#: documents/models.py:1310
 msgid "custom field values"
 msgstr "カスタムフィールド値"
 
-#: documents/models.py:1282
+#: documents/models.py:1314
 msgid "Optional values to assign to the custom fields."
 msgstr "カスタムフィールドに割り当てる任意の値。"
 
-#: documents/models.py:1291
+#: documents/models.py:1323
 msgid "remove these tag(s)"
 msgstr "タグの削除"
 
-#: documents/models.py:1296
+#: documents/models.py:1328
 msgid "remove all tags"
 msgstr "すべてのタグの削除"
 
-#: documents/models.py:1303
+#: documents/models.py:1335
 msgid "remove these document type(s)"
 msgstr "ドキュメントタイプの削除"
 
-#: documents/models.py:1308
+#: documents/models.py:1340
 msgid "remove all document types"
 msgstr "すべてのドキュメントタイプの削除"
 
-#: documents/models.py:1315
+#: documents/models.py:1347
 msgid "remove these correspondent(s)"
 msgstr "担当の削除"
 
-#: documents/models.py:1320
+#: documents/models.py:1352
 msgid "remove all correspondents"
 msgstr "すべての担当の削除"
 
-#: documents/models.py:1327
+#: documents/models.py:1359
 msgid "remove these storage path(s)"
 msgstr "フォルダーの削除"
 
-#: documents/models.py:1332
+#: documents/models.py:1364
 msgid "remove all storage paths"
 msgstr "すべてのフォルダーの削除"
 
-#: documents/models.py:1339
+#: documents/models.py:1371
 msgid "remove these owner(s)"
 msgstr "所有者の削除"
 
-#: documents/models.py:1344
+#: documents/models.py:1376
 msgid "remove all owners"
 msgstr "すべての所有者の削除"
 
-#: documents/models.py:1351
+#: documents/models.py:1383
 msgid "remove view permissions for these users"
 msgstr "ユーザの表示権限の削除"
 
-#: documents/models.py:1358
+#: documents/models.py:1390
 msgid "remove view permissions for these groups"
 msgstr "グループの表示権限の削除"
 
-#: documents/models.py:1365
+#: documents/models.py:1397
 msgid "remove change permissions for these users"
 msgstr "ユーザの編集権限の削除"
 
-#: documents/models.py:1372
+#: documents/models.py:1404
 msgid "remove change permissions for these groups"
 msgstr "グループの編集権限の削除"
 
-#: documents/models.py:1377
+#: documents/models.py:1409
 msgid "remove all permissions"
 msgstr "すべての権限の削除"
 
-#: documents/models.py:1384
+#: documents/models.py:1416
 msgid "remove these custom fields"
 msgstr "カスタム項目の削除"
 
-#: documents/models.py:1389
+#: documents/models.py:1421
 msgid "remove all custom fields"
 msgstr "すべてのカスタム項目の削除"
 
-#: documents/models.py:1398
+#: documents/models.py:1430
 msgid "email"
 msgstr "メール"
 
-#: documents/models.py:1407
+#: documents/models.py:1439
 msgid "webhook"
 msgstr "webhook"
 
-#: documents/models.py:1411
+#: documents/models.py:1443
 msgid "workflow action"
 msgstr "ワークフローのアクション"
 
-#: documents/models.py:1412
+#: documents/models.py:1444
 msgid "workflow actions"
 msgstr "ワークフローのアクション"
 
-#: documents/models.py:1421 paperless_mail/models.py:145
+#: documents/models.py:1453 paperless_mail/models.py:145
 msgid "order"
 msgstr "順序"
 
-#: documents/models.py:1427
+#: documents/models.py:1459
 msgid "triggers"
 msgstr "トリガー"
 
-#: documents/models.py:1434
+#: documents/models.py:1466
 msgid "actions"
 msgstr "アクション"
 
-#: documents/models.py:1437 paperless_mail/models.py:154
+#: documents/models.py:1469 paperless_mail/models.py:154
 msgid "enabled"
 msgstr "有効"
 
-#: documents/models.py:1448
+#: documents/models.py:1480
 msgid "workflow"
 msgstr "ワークフロー"
 
-#: documents/models.py:1452
+#: documents/models.py:1484
 msgid "workflow trigger type"
 msgstr "ワークフロートリガータイプ"
 
-#: documents/models.py:1466
+#: documents/models.py:1498
 msgid "date run"
 msgstr "日付実行"
 
-#: documents/models.py:1472
+#: documents/models.py:1504
 msgid "workflow run"
 msgstr "ワークフローの実行"
 
-#: documents/models.py:1473
+#: documents/models.py:1505
 msgid "workflow runs"
 msgstr "ワークフローの実行"
 
