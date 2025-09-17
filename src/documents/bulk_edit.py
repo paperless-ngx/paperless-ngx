@@ -171,7 +171,7 @@ def modify_tags(
                     tag_id__in=expanded_remove_tags,
                 ).delete()
 
-            to_create: list[DocumentTagRelationship] = []
+            to_create = []
             if expanded_add_tags:
                 existing_pairs = set(
                     DocumentTagRelationship.objects.filter(
