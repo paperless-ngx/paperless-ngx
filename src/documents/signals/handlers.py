@@ -770,7 +770,7 @@ def run_workflows(
             tag_ids_to_add: set[int] = set()
             for tag in action.assign_tags.all():
                 tag_ids_to_add.add(tag.pk)
-                tag_ids_to_add.update(t.pk for t in tag.get_ancestors())
+                tag_ids_to_add.update(int(pk) for pk in tag.get_ancestors_pks())
 
             if not use_overrides:
                 doc_tag_ids[:] = list(set(doc_tag_ids) | tag_ids_to_add)
@@ -923,7 +923,7 @@ def run_workflows(
             tag_ids_to_remove: set[int] = set()
             for tag in action.remove_tags.all():
                 tag_ids_to_remove.add(tag.pk)
-                tag_ids_to_remove.update(t.pk for t in tag.get_descendants())
+                tag_ids_to_remove.update(int(pk) for pk in tag.get_descendants_pks())
 
             if not use_overrides:
                 doc_tag_ids[:] = [t for t in doc_tag_ids if t not in tag_ids_to_remove]
