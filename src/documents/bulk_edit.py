@@ -124,8 +124,7 @@ def add_tag(doc_ids: list[int], tag: int) -> Literal["OK"]:
 
 def remove_tag(doc_ids: list[int], tag: int) -> Literal["OK"]:
     tag_obj = Tag.objects.get(pk=tag)
-    tags_to_remove = [tag_obj, *tag_obj.get_descendants()]
-    tag_ids = [t.id for t in tags_to_remove]
+    tag_ids = [tag_obj.id, *tag_obj.get_descendants_pks()]
 
     DocumentTagRelationship = Document.tags.through
     qs = DocumentTagRelationship.objects.filter(
@@ -152,15 +151,17 @@ def modify_tags(
 
     # add with all ancestors
     expanded_add_tags: set[int] = set()
-    for tag_id in add_tags:
-        t = Tag.objects.get(pk=tag_id)
-        expanded_add_tags.update([t.id for t in [t, *t.get_ancestors()]])
+    add_tag_objects = Tag.objects.filter(pk__in=add_tags)
+    for t in add_tag_objects:
+        expanded_add_tags.add(t.id)
+        expanded_add_tags.update(t.get_ancestors_pks())
 
     # remove with all descendants
     expanded_remove_tags: set[int] = set()
-    for tag_id in remove_tags:
-        t = Tag.objects.get(pk=tag_id)
-        expanded_remove_tags.update([t.id for t in [t, *t.get_descendants()]])
+    remove_tag_objects = Tag.objects.filter(pk__in=remove_tags)
+    for t in remove_tag_objects:
+        expanded_remove_tags.add(t.id)
+        expanded_remove_tags.update(t.get_descendants_pks())
 
     if expanded_remove_tags:
         DocumentTagRelationship.objects.filter(
