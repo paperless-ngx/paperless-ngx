@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 21:44+0000\n"
+"POT-Creation-Date: 2025-09-17 22:44+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1204,12 +1204,31 @@ msgstr ""
 msgid "Invalid parent tag."
 msgstr ""
 
-#: documents/serialisers.py:1781
+#: documents/serialisers.py:1780
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:1875
+#: documents/serialisers.py:1824
+#, python-format
+msgid "Custom field id must be an integer: %(id)s"
+msgstr ""
+
+#: documents/serialisers.py:1831
+#, python-format
+msgid "Custom field with id %(id)s does not exist"
+msgstr ""
+
+#: documents/serialisers.py:1848 documents/serialisers.py:1858
+msgid ""
+"Custom fields must be a list of integers or an object mapping ids to values."
+msgstr ""
+
+#: documents/serialisers.py:1853
+msgid "Some custom fields don't exist or were specified twice."
+msgstr ""
+
+#: documents/serialisers.py:1923
 msgid "Invalid variable detected."
 msgstr ""
 
