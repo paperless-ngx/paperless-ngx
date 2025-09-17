@@ -169,6 +169,7 @@ from documents.tasks import empty_trash
 from documents.tasks import index_optimize
 from documents.tasks import sanity_check
 from documents.tasks import train_classifier
+from documents.tasks import update_document_parent_tags
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.utils import get_boolean
 from paperless import version
@@ -340,6 +341,13 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     )
     filterset_class = TagFilterSet
     ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
+
+    def perform_update(self, serializer):
+        old_parent = self.get_object().get_parent()
+        tag = serializer.save()
+        new_parent = tag.get_parent()
+        if new_parent and old_parent != new_parent:
+            update_document_parent_tags(tag, new_parent)
 
 
 @extend_schema_view(**generate_object_with_permissions_schema(DocumentTypeSerializer))
@@ -1497,7 +1505,7 @@ class PostDocumentView(GenericAPIView):
         title = serializer.validated_data.get("title")
         created = serializer.validated_data.get("created")
         archive_serial_number = serializer.validated_data.get("archive_serial_number")
-        custom_field_ids = serializer.validated_data.get("custom_fields")
+        cf = serializer.validated_data.get("custom_fields")
         from_webui = serializer.validated_data.get("from_webui")
 
         t = int(mktime(datetime.now().timetuple()))
@@ -1516,6 +1524,11 @@ class PostDocumentView(GenericAPIView):
             source=DocumentSource.WebUI if from_webui else DocumentSource.ApiUpload,
             original_file=temp_file_path,
         )
+        custom_fields = None
+        if isinstance(cf, dict) and cf:
+            custom_fields = cf
+        elif isinstance(cf, list) and cf:
+            custom_fields = dict.fromkeys(cf, None)
         input_doc_overrides = DocumentMetadataOverrides(
             filename=doc_name,
             title=title,
@@ -1526,10 +1539,7 @@ class PostDocumentView(GenericAPIView):
             created=created,
             asn=archive_serial_number,
             owner_id=request.user.id,
-            # TODO: set values
-            custom_fields={cf_id: None for cf_id in custom_field_ids}
-            if custom_field_ids
-            else None,
+            custom_fields=custom_fields,
         )
 
         async_task = consume_file.delay(

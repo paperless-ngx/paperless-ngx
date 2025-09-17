@@ -15,12 +15,17 @@
       <i-bs width="1em" height="1em" name="x"></i-bs>
     }
   </div>
-  <div class="me-1">
-    @if (isTag) {
-      <pngx-tag [tag]="item" [clickable]="false"></pngx-tag>
-    } @else {
-      <small>{{item.name}}</small>
+  <div class="me-1 name-cell" [style.--depth]="isTag ? getDepth() + 1 : 1">
+    @if (isTag && getDepth() > 0) {
+      <div class="indicator"></div>
     }
+    <div>
+      @if (isTag) {
+        <pngx-tag [tag]="item" [clickable]="false"></pngx-tag>
+      } @else {
+        <small>{{item.name}}</small>
+      }
+    </div>
   </div>
   @if (!hideCount) {
     <div class="badge bg-light text-dark rounded-pill ms-auto me-1">{{currentCount}}</div>

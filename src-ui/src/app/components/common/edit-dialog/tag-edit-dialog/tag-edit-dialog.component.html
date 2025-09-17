@@ -12,6 +12,8 @@
 
     <pngx-input-color i18n-title title="Color" formControlName="color" [error]="error?.color"></pngx-input-color>
 
+    <pngx-input-select i18n-title title="Parent" formControlName="parent" [items]="tags" [allowNull]="true" [error]="error?.parent"></pngx-input-select>
+
     <pngx-input-check i18n-title title="Inbox tag" formControlName="is_inbox_tag" i18n-hint hint="Inbox tags are automatically assigned to all consumed documents."></pngx-input-check>
     <pngx-input-select i18n-title title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></pngx-input-select>
     @if (patternRequired) {

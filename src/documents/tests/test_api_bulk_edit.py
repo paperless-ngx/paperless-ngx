@@ -839,7 +839,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         m.assert_called()
-        args, kwargs = m.call_args
+        _, kwargs = m.call_args
         self.assertEqual(kwargs["merge"], False)
 
         response = self.client.post(
@@ -857,7 +857,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         m.assert_called()
-        args, kwargs = m.call_args
+        _, kwargs = m.call_args
         self.assertEqual(kwargs["merge"], True)
 
     @mock.patch("documents.serialisers.bulk_edit.set_storage_path")

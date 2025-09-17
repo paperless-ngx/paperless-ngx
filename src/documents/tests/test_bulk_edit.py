@@ -74,7 +74,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         )
         self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 3)
         self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
+        _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id, self.doc2.id])
 
     def test_unset_correspondent(self):
@@ -82,7 +82,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         bulk_edit.set_correspondent([self.doc1.id, self.doc2.id, self.doc3.id], None)
         self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 0)
         self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
+        _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc2.id, self.doc3.id])
 
     def test_set_document_type(self):
@@ -93,7 +93,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         )
         self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 3)
         self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
+        _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id, self.doc2.id])
 
     def test_unset_document_type(self):
@@ -101,7 +101,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         bulk_edit.set_document_type([self.doc1.id, self.doc2.id, self.doc3.id], None)
         self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 0)
         self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
+        _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc2.id, self.doc3.id])
 
     def test_set_document_storage_path(self):
@@ -123,7 +123,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         self.assertEqual(Document.objects.filter(storage_path=None).count(), 4)
 
         self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
+        _, kwargs = self.async_task.call_args
 
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id])
 
@@ -154,7 +154,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         self.assertEqual(Document.objects.filter(storage_path=None).count(), 5)
 
         self.async_task.assert_called()
-        args, kwargs = self.async_task.call_args
+        _, kwargs = self.async_task.call_args
 
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id])
 
@@ -166,7 +166,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         )
         self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 4)
         self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
+        _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id, self.doc3.id])
 
     def test_remove_tag(self):
@@ -174,7 +174,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         bulk_edit.remove_tag([self.doc1.id, self.doc3.id, self.doc4.id], self.t1.id)
         self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 1)
         self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
+        _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc4.id])
 
     def test_modify_tags(self):
@@ -191,7 +191,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         self.assertCountEqual(list(self.doc3.tags.all()), [self.t2, tag_unrelated])
 
         self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
+        _, kwargs = self.async_task.call_args
         # TODO: doc3 should not be affected, but the query for that is rather complicated
         self.assertCountEqual(kwargs["document_ids"], [self.doc2.id, self.doc3.id])
 
@@ -248,7 +248,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         )
 
         self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
+        _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id, self.doc2.id])
 
     def test_modify_custom_fields_with_values(self):
@@ -325,7 +325,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         )
 
         self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
+        _, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc1.id, self.doc2.id])
 
         # removal of document link cf, should also remove symmetric link

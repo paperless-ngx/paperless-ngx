@@ -327,6 +327,19 @@ class TestMigrations(TransactionTestCase):
     def setUpBeforeMigration(self, apps):
         pass
 
+    def tearDown(self):
+        """
+        Ensure the database schema is restored to the latest migration after
+        each migration test, so subsequent tests run against HEAD.
+        """
+        try:
+            executor = MigrationExecutor(connection)
+            executor.loader.build_graph()
+            targets = executor.loader.graph.leaf_nodes()
+            executor.migrate(targets)
+        finally:
+            super().tearDown()
+
 
 class SampleDirMixin:
     SAMPLE_DIR = Path(__file__).parent / "samples"

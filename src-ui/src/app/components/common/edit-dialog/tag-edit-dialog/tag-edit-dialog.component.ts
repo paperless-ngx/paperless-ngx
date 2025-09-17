@@ -35,11 +35,16 @@ import { TextComponent } from '../../input/text/text.component'
   ],
 })
 export class TagEditDialogComponent extends EditDialogComponent<Tag> {
+  tags: Tag[]
+
   constructor() {
     super()
     this.service = inject(TagService)
     this.userService = inject(UserService)
     this.settingsService = inject(SettingsService)
+    this.service.listAll().subscribe((result) => {
+      this.tags = result.results
+    })
   }
 
   getCreateTitle() {
@@ -55,6 +60,7 @@ export class TagEditDialogComponent extends EditDialogComponent<Tag> {
       name: new FormControl(''),
       color: new FormControl(randomColor()),
       is_inbox_tag: new FormControl(false),
+      parent: new FormControl(null),
       matching_algorithm: new FormControl(DEFAULT_MATCHING_ALGORITHM),
       match: new FormControl(''),
       is_insensitive: new FormControl(true),

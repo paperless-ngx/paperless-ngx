@@ -1,4 +1,8 @@
 @if (tag) {
+  @if (showParents && tag.parent) {
+    <pngx-tag [tagID]="tag.parent" [clickable]="clickable" [linkTitle]="linkTitle"></pngx-tag>
+      &nbsp;&gt;&nbsp;
+  }
   @if (!clickable) {
     <span class="badge" [style.background]="tag.color" [style.color]="tag.text_color">{{tag.name}}</span>
   }
