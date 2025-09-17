@@ -531,19 +531,29 @@ def update_document_parent_tags(tag: Tag, new_parent: Tag) -> None:
     if not doc_ids:
         return
 
-    parents_to_add = [new_parent, *new_parent.get_ancestors()]
+    parent_ids = [new_parent.id, *new_parent.get_ancestors_pks()]
+
+    parent_ids = list(dict.fromkeys(parent_ids))
+
+    existing_pairs = set(
+        doc_tag_relationship.objects.filter(
+            document_id__in=doc_ids,
+            tag_id__in=parent_ids,
+        ).values_list("document_id", "tag_id"),
+    )
 
     to_create: list = []
     affected: set[int] = set()
 
-    for parent in parents_to_add:
-        missing_qs = Document.objects.filter(id__in=doc_ids).exclude(tags=parent)
-        missing_ids = list(missing_qs.values_list("pk", flat=True))
-        to_create.extend(
-            doc_tag_relationship(document_id=doc_id, tag_id=parent.id)
-            for doc_id in missing_ids
-        )
-        affected.update(missing_ids)
+    for doc_id in doc_ids:
+        for parent_id in parent_ids:
+            if (doc_id, parent_id) in existing_pairs:
+                continue
+
+            to_create.append(
+                doc_tag_relationship(document_id=doc_id, tag_id=parent_id),
+            )
+            affected.add(doc_id)
 
     if to_create:
         doc_tag_relationship.objects.bulk_create(
