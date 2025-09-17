@@ -13,6 +13,7 @@ from celery import chord
 from celery import group
 from celery import shared_task
 from django.conf import settings
+from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
@@ -163,21 +164,29 @@ def modify_tags(
         expanded_remove_tags.add(t.id)
         expanded_remove_tags.update(t.get_descendants_pks())
 
-    if expanded_remove_tags:
-        DocumentTagRelationship.objects.filter(
-            document_id__in=affected_docs,
-            tag_id__in=expanded_remove_tags,
-        ).delete()
+    try:
+        with transaction.atomic():
+            if expanded_remove_tags:
+                DocumentTagRelationship.objects.filter(
+                    document_id__in=affected_docs,
+                    tag_id__in=expanded_remove_tags,
+                ).delete()
 
-    to_create = [
-        DocumentTagRelationship(document_id=doc, tag_id=tag)
-        for (doc, tag) in itertools.product(affected_docs, expanded_add_tags)
-    ]
-    if to_create:
-        DocumentTagRelationship.objects.bulk_create(to_create, ignore_conflicts=True)
+            to_create = [
+                DocumentTagRelationship(document_id=doc, tag_id=tag)
+                for (doc, tag) in itertools.product(affected_docs, expanded_add_tags)
+            ]
+            if to_create:
+                DocumentTagRelationship.objects.bulk_create(
+                    to_create,
+                    ignore_conflicts=True,
+                )
 
-    if affected_docs:
-        bulk_update_documents.delay(document_ids=affected_docs)
+            if affected_docs:
+                bulk_update_documents.delay(document_ids=affected_docs)
+    except Exception as e:
+        logger.error(f"Error modifying tags: {e}")
+        return "ERROR"
 
     return "OK"
 
