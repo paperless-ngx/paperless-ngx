@@ -202,6 +202,7 @@ def get_custom_fields_context(
             CustomField.FieldDataType.MONETARY,
             CustomField.FieldDataType.STRING,
             CustomField.FieldDataType.URL,
+            CustomField.FieldDataType.LONG_TEXT,
         }:
             value = pathvalidate.sanitize_filename(
                 field_instance.value,
