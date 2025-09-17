@@ -13,6 +13,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.core.validators import DecimalValidator
 from django.core.validators import MaxLengthValidator
 from django.core.validators import RegexValidator
@@ -540,6 +541,32 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 
     text_color = serializers.SerializerMethodField()
 
+    # map to treenode's tn_parent
+    parent = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(),
+        allow_null=True,
+        required=False,
+        source="tn_parent",
+    )
+
+    @extend_schema_field(
+        field=serializers.ListSerializer(
+            child=serializers.PrimaryKeyRelatedField(
+                queryset=Tag.objects.all(),
+            ),
+        ),
+    )
+    def get_children(self, obj):
+        serializer = TagSerializer(
+            obj.get_children(),
+            many=True,
+            context=self.context,
+        )
+        return serializer.data
+
+    # children as nested Tag objects
+    children = serializers.SerializerMethodField()
+
     class Meta:
         model = Tag
         fields = (
@@ -557,6 +584,8 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "permissions",
             "user_can_change",
             "set_permissions",
+            "parent",
+            "children",
         )
 
     def validate_color(self, color):
@@ -564,6 +593,36 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         if not re.match(regex, color):
             raise serializers.ValidationError(_("Invalid color."))
         return color
+
+    def validate(self, attrs):
+        # Validate when changing parent
+        parent = attrs.get(
+            "tn_parent",
+            self.instance.get_parent() if self.instance else None,
+        )
+
+        if self.instance:
+            # Temporarily set parent on the instance if updating and use model clean()
+            original_parent = self.instance.get_parent()
+            try:
+                # Temporarily set tn_parent in-memory to validate clean()
+                self.instance.tn_parent = parent
+                self.instance.clean()
+            except ValidationError as e:
+                logger.debug("Tag parent validation failed: %s", e)
+                raise e
+            finally:
+                self.instance.tn_parent = original_parent
+        else:
+            # For new instances, create a transient Tag and validate
+            temp = Tag(tn_parent=parent)
+            try:
+                temp.clean()
+            except ValidationError as e:
+                logger.debug("Tag parent validation failed: %s", e)
+                raise serializers.ValidationError({"parent": _("Invalid parent tag.")})
+
+        return super().validate(attrs)
 
 
 class CorrespondentField(serializers.PrimaryKeyRelatedField):
@@ -1028,6 +1087,28 @@ class DocumentSerializer(
                             custom_field_instance.field,
                             doc_id,
                         )
+        if "tags" in validated_data:
+            # Respect tag hierarchy on updates:
+            # - Adding a child adds its ancestors
+            # - Removing a parent removes all its descendants
+            prev_tags = set(instance.tags.all())
+            requested_tags = set(validated_data["tags"])
+
+            # Tags being removed in this update and all descendants
+            removed_tags = prev_tags - requested_tags
+            blocked_tags = set(removed_tags)
+            for t in removed_tags:
+                blocked_tags.update(t.get_descendants())
+
+            # Add all parent tags
+            final_tags = set(requested_tags)
+            for t in requested_tags:
+                final_tags.update(t.get_ancestors())
+
+            # Drop removed parents and their descendants
+            final_tags.difference_update(blocked_tags)
+
+            validated_data["tags"] = list(final_tags)
         if validated_data.get("remove_inbox_tags"):
             tag_ids_being_added = (
                 [
