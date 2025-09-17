@@ -1,4 +1,5 @@
 import datetime
+import json
 import shutil
 import tempfile
 import uuid
@@ -1536,6 +1537,86 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
         overrides.update(new_overrides)
         self.assertEqual(overrides.custom_fields, {cf.id: None, cf2.id: 123})
+
+    def test_upload_with_custom_field_values(self):
+        """
+        GIVEN: A document with a source file
+        WHEN: Upload the document with custom fields and values
+        THEN: Metadata is set correctly
+        """
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
+
+        cf_string = CustomField.objects.create(
+            name="stringfield",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        cf_int = CustomField.objects.create(
+            name="intfield",
+            data_type=CustomField.FieldDataType.INT,
+        )
+
+        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {
+                    "document": f,
+                    "custom_fields": json.dumps(
+                        {
+                            str(cf_string.id): "a string",
+                            str(cf_int.id): 123,
+                        },
+                    ),
+                },
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.consume_file_mock.assert_called_once()
+
+        input_doc, overrides = self.get_last_consume_delay_call_args()
+
+        self.assertEqual(input_doc.original_file.name, "simple.pdf")
+        self.assertEqual(overrides.filename, "simple.pdf")
+        self.assertEqual(
+            overrides.custom_fields,
+            {cf_string.id: "a string", cf_int.id: 123},
+        )
+
+    def test_upload_with_custom_fields_errors(self):
+        """
+        GIVEN: A document with a source file
+        WHEN: Upload the document with invalid custom fields payloads
+        THEN: The upload is rejected
+        """
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
+
+        error_payloads = [
+            # Non-integer key in mapping
+            {"custom_fields": json.dumps({"abc": "a string"})},
+            # List with non-integer entry
+            {"custom_fields": json.dumps(["abc"])},
+            # Nonexistent id in mapping
+            {"custom_fields": json.dumps({99999999: "a string"})},
+            # Nonexistent id in list
+            {"custom_fields": json.dumps([99999999])},
+            # Invalid type (JSON string, not list/dict/int)
+            {"custom_fields": json.dumps("not-a-supported-structure")},
+        ]
+
+        for payload in error_payloads:
+            with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+                data = {"document": f, **payload}
+                response = self.client.post(
+                    "/api/documents/post_document/",
+                    data,
+                )
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.consume_file_mock.assert_not_called()
 
     def test_upload_with_webui_source(self):
         """
