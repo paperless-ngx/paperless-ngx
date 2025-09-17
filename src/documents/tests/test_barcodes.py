@@ -614,14 +614,16 @@ class TestBarcodeNewConsume(
             self.assertIsNotFile(temp_copy)
 
             # Check the split files exist
+            # Check the original_path is set
             # Check the source is unchanged
             # Check the overrides are unchanged
             for (
                 new_input_doc,
                 new_doc_overrides,
             ) in self.get_all_consume_delay_call_args():
-                self.assertEqual(new_input_doc.source, DocumentSource.ConsumeFolder)
                 self.assertIsFile(new_input_doc.original_file)
+                self.assertEqual(new_input_doc.original_path, temp_copy)
+                self.assertEqual(new_input_doc.source, DocumentSource.ConsumeFolder)
                 self.assertEqual(overrides, new_doc_overrides)
 
 
