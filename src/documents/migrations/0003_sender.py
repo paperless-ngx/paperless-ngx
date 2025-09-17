@@ -17,7 +17,7 @@ def move_sender_strings_to_sender_model(apps, schema_editor):
         if document.sender:
             (
                 DOCUMENT_SENDER_MAP[document.pk],
-                created,
+                _,
             ) = sender_model.objects.get_or_create(
                 name=document.sender,
                 defaults={"slug": slugify(document.sender)},

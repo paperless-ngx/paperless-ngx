@@ -132,7 +132,7 @@ class RasterisedDocumentParser(DocumentParser):
     def get_dpi(self, image) -> int | None:
         try:
             with Image.open(image) as im:
-                x, y = im.info["dpi"]
+                x, _ = im.info["dpi"]
                 return round(x)
         except Exception as e:
             self.log.warning(f"Error while getting DPI from image {image}: {e}")
@@ -141,7 +141,7 @@ class RasterisedDocumentParser(DocumentParser):
     def calculate_a4_dpi(self, image) -> int | None:
         try:
             with Image.open(image) as im:
-                width, height = im.size
+                width, _ = im.size
                 # divide image width by A4 width (210mm) in inches.
                 dpi = int(width / (21 / 2.54))
                 self.log.debug(f"Estimated DPI {dpi} based on image width {width}")

@@ -123,14 +123,14 @@ class TestRetagger(DirectoriesMixin, TestCase):
 
     def test_add_type(self):
         call_command("document_retagger", "--document_type")
-        d_first, d_second, d_unrelated, d_auto = self.get_updated_docs()
+        d_first, d_second, _, _ = self.get_updated_docs()
 
         self.assertEqual(d_first.document_type, self.doctype_first)
         self.assertEqual(d_second.document_type, self.doctype_second)
 
     def test_add_correspondent(self):
         call_command("document_retagger", "--correspondent")
-        d_first, d_second, d_unrelated, d_auto = self.get_updated_docs()
+        d_first, d_second, _, _ = self.get_updated_docs()
 
         self.assertEqual(d_first.correspondent, self.correspondent_first)
         self.assertEqual(d_second.correspondent, self.correspondent_second)
@@ -160,7 +160,7 @@ class TestRetagger(DirectoriesMixin, TestCase):
 
     def test_add_tags_suggest(self):
         call_command("document_retagger", "--tags", "--suggest")
-        d_first, d_second, d_unrelated, d_auto = self.get_updated_docs()
+        d_first, d_second, _, d_auto = self.get_updated_docs()
 
         self.assertEqual(d_first.tags.count(), 0)
         self.assertEqual(d_second.tags.count(), 0)
@@ -168,14 +168,14 @@ class TestRetagger(DirectoriesMixin, TestCase):
 
     def test_add_type_suggest(self):
         call_command("document_retagger", "--document_type", "--suggest")
-        d_first, d_second, d_unrelated, d_auto = self.get_updated_docs()
+        d_first, d_second, _, _ = self.get_updated_docs()
 
         self.assertIsNone(d_first.document_type)
         self.assertIsNone(d_second.document_type)
 
     def test_add_correspondent_suggest(self):
         call_command("document_retagger", "--correspondent", "--suggest")
-        d_first, d_second, d_unrelated, d_auto = self.get_updated_docs()
+        d_first, d_second, _, _ = self.get_updated_docs()
 
         self.assertIsNone(d_first.correspondent)
         self.assertIsNone(d_second.correspondent)
@@ -187,7 +187,7 @@ class TestRetagger(DirectoriesMixin, TestCase):
             "--suggest",
             "--base-url=http://localhost",
         )
-        d_first, d_second, d_unrelated, d_auto = self.get_updated_docs()
+        d_first, d_second, _, d_auto = self.get_updated_docs()
 
         self.assertEqual(d_first.tags.count(), 0)
         self.assertEqual(d_second.tags.count(), 0)
@@ -200,7 +200,7 @@ class TestRetagger(DirectoriesMixin, TestCase):
             "--suggest",
             "--base-url=http://localhost",
         )
-        d_first, d_second, d_unrelated, d_auto = self.get_updated_docs()
+        d_first, d_second, _, _ = self.get_updated_docs()
 
         self.assertIsNone(d_first.document_type)
         self.assertIsNone(d_second.document_type)
@@ -212,7 +212,7 @@ class TestRetagger(DirectoriesMixin, TestCase):
             "--suggest",
             "--base-url=http://localhost",
         )
-        d_first, d_second, d_unrelated, d_auto = self.get_updated_docs()
+        d_first, d_second, _, _ = self.get_updated_docs()
 
         self.assertIsNone(d_first.correspondent)
         self.assertIsNone(d_second.correspondent)

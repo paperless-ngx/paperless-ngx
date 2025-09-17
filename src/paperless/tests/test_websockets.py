@@ -21,7 +21,7 @@ TEST_CHANNEL_LAYERS = {
 class TestWebSockets(TestCase):
     async def test_no_auth(self):
         communicator = WebsocketCommunicator(application, "/ws/status/")
-        connected, subprotocol = await communicator.connect()
+        connected, _ = await communicator.connect()
         self.assertFalse(connected)
         await communicator.disconnect()
 
@@ -31,7 +31,7 @@ class TestWebSockets(TestCase):
         _authenticated.return_value = True
 
         communicator = WebsocketCommunicator(application, "/ws/status/")
-        connected, subprotocol = await communicator.connect()
+        connected, _ = await communicator.connect()
         self.assertTrue(connected)
 
         message = {"type": "status_update", "data": {"task_id": "test"}}
@@ -63,7 +63,7 @@ class TestWebSockets(TestCase):
         _authenticated.return_value = True
 
         communicator = WebsocketCommunicator(application, "/ws/status/")
-        connected, subprotocol = await communicator.connect()
+        connected, _ = await communicator.connect()
         self.assertTrue(connected)
 
         await communicator.disconnect()
@@ -73,7 +73,7 @@ class TestWebSockets(TestCase):
         _authenticated.return_value = True
 
         communicator = WebsocketCommunicator(application, "/ws/status/")
-        connected, subprotocol = await communicator.connect()
+        connected, _ = await communicator.connect()
         self.assertTrue(connected)
 
         message = {"type": "status_update", "data": {"task_id": "test"}}
@@ -98,7 +98,7 @@ class TestWebSockets(TestCase):
         communicator.scope["user"].is_superuser = False
         communicator.scope["user"].id = 1
 
-        connected, subprotocol = await communicator.connect()
+        connected, _ = await communicator.connect()
         self.assertTrue(connected)
 
         # Test as owner
@@ -141,7 +141,7 @@ class TestWebSockets(TestCase):
         _authenticated.return_value = True
 
         communicator = WebsocketCommunicator(application, "/ws/status/")
-        connected, subprotocol = await communicator.connect()
+        connected, _ = await communicator.connect()
         self.assertTrue(connected)
 
         message = {"type": "documents_deleted", "data": {"documents": [1, 2, 3]}}

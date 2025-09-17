@@ -107,3 +107,6 @@ celerybeat-schedule*
 /.devcontainer/data/
 /.devcontainer/media/
 /.devcontainer/redisdata/
+
+# ignore pnpm package store folder created when setting up the devcontainer
+.pnpm-store/
