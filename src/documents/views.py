@@ -169,6 +169,7 @@ from documents.tasks import empty_trash
 from documents.tasks import index_optimize
 from documents.tasks import sanity_check
 from documents.tasks import train_classifier
+from documents.tasks import update_document_parent_tags
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.utils import get_boolean
 from paperless import version
@@ -340,6 +341,13 @@ class TagViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
     )
     filterset_class = TagFilterSet
     ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
+
+    def perform_update(self, serializer):
+        old_parent = self.get_object().get_parent()
+        tag = serializer.save()
+        new_parent = tag.get_parent()
+        if new_parent and old_parent != new_parent:
+            update_document_parent_tags(tag, new_parent)
 
 
 @extend_schema_view(**generate_object_with_permissions_schema(DocumentTypeSerializer))

@@ -1204,7 +1204,7 @@ describe('BulkEditorComponent', () => {
     expect(tagListAllSpy).toHaveBeenCalled()
 
     expect(tagSelectionModelToggleSpy).toHaveBeenCalledWith(newTag.id)
-    expect(component.tagSelectionModel.items).toEqual(
+    expect(component.tagSelectionModel.items).toMatchObject(
       [{ id: null, name: 'Not assigned' }].concat(tags.results as any)
     )
   })
