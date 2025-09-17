@@ -423,11 +423,13 @@ class Document(SoftDeleteModel, ModelWithOwner):
         return self.created
 
     def add_nested_tags(self, tags):
+        tag_ids = set()
         for tag in tags:
-            self.tags.add(tag)
-            parent = tag.get_parent()
-            if parent:
-                self.add_nested_tags([parent])
+            tag_ids.add(tag.id)
+            tag_ids.update(tag.get_ancestors_pks())
+
+        tags_to_add = self.tags.model.objects.filter(id__in=tag_ids)
+        self.tags.add(*tags_to_add)
 
 
 class SavedView(ModelWithOwner):
