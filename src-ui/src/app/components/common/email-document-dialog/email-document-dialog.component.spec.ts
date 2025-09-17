@@ -36,7 +36,7 @@ describe('EmailDocumentDialogComponent', () => {
     documentService = TestBed.inject(DocumentService)
     toastService = TestBed.inject(ToastService)
     component = fixture.componentInstance
-    component.documentIds = [1] // Initialize with default value
+    component.documentIds = [1]
     fixture.detectChanges()
   })
 
