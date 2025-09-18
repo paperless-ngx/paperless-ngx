@@ -254,6 +254,7 @@ PAPERLESS_DISABLE_DBHANDLER = "true"
 PAPERLESS_CACHE_BACKEND = "django.core.cache.backends.locmem.LocMemCache"
 
 [tool.coverage.run]
+relative_files = true
 source = [
   "src/",
 ]

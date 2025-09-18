@@ -378,14 +378,15 @@ jobs:
           npx nyc merge coverage .nyc_output/out.json
           npx nyc report --reporter=lcovonly --report-dir coverage
       - name: Upload coverage artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: merged-coverage
           path: |
             merged-backend-coverage.xml
-            .nyc_output/
+            .nyc_output/*
           retention-days: 7
           if-no-files-found: error
+          include-hidden-files: true
       - name: SonarQube Analysis
         uses: SonarSource/sonarqube-scan-action@v5
         env:
