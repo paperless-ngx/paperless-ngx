@@ -139,6 +139,7 @@ describe('DocumentDetailComponent', () => {
   let deviceDetectorService: DeviceDetectorService
   let httpTestingController: HttpTestingController
   let componentRouterService: ComponentRouterService
+  let tagService: TagService
 
   let currentUserCan = true
   let currentUserHasObjectPermissions = true
@@ -288,6 +289,7 @@ describe('DocumentDetailComponent', () => {
     fixture = TestBed.createComponent(DocumentDetailComponent)
     httpTestingController = TestBed.inject(HttpTestingController)
     componentRouterService = TestBed.inject(ComponentRouterService)
+    tagService = TestBed.inject(TagService)
     component = fixture.componentInstance
   })
 
@@ -400,17 +402,60 @@ describe('DocumentDetailComponent', () => {
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
-    component.createTag('NewTag12')
-    expect(modalSpy).toHaveBeenCalled()
-    openModal.componentInstance.succeeded.next({
-      id: 12,
-      name: 'NewTag12',
-      is_inbox_tag: true,
-      color: '#ff0000',
-      text_color: '#000000',
-    })
-    expect(component.documentForm.get('tags').value).toContain(12)
-    expect(component.suggestions.suggested_tags).not.toContain('NewTag12')
+    // temporarily add NewTag12 to listAll results
+    const listAllSpy = jest
+      .spyOn(tagService, 'listAll')
+      .mockImplementation(() =>
+        of({
+          count: 4,
+          all: [41, 42, 43, 12],
+          results: [
+            {
+              id: 41,
+              name: 'Tag41',
+              is_inbox_tag: true,
+              color: '#ff0000',
+              text_color: '#000000',
+            },
+            {
+              id: 42,
+              name: 'Tag42',
+              is_inbox_tag: true,
+              color: '#ff0000',
+              text_color: '#000000',
+            },
+            {
+              id: 43,
+              name: 'Tag43',
+              is_inbox_tag: true,
+              color: '#ff0000',
+              text_color: '#000000',
+            },
+            {
+              id: 12,
+              name: 'NewTag12',
+              is_inbox_tag: true,
+              color: '#ff0000',
+              text_color: '#000000',
+            },
+          ],
+        })
+      )
+    try {
+      component.createTag('NewTag12')
+      expect(modalSpy).toHaveBeenCalled()
+      openModal.componentInstance.succeeded.next({
+        id: 12,
+        name: 'NewTag12',
+        is_inbox_tag: true,
+        color: '#ff0000',
+        text_color: '#000000',
+      })
+      expect(component.tagsInput.value.includes(12)).toBeTruthy()
+      expect(component.suggestions.suggested_tags).not.toContain('NewTag12')
+    } finally {
+      listAllSpy.mockRestore()
+    }
   })
 
   it('should support creating document type, remove from suggestions', () => {

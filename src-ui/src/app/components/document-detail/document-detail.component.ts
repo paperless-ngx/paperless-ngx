@@ -736,6 +736,8 @@ export class DocumentDetailComponent
     })
     modal.componentInstance.dialogMode = EditDialogMode.CREATE
     if (newName) modal.componentInstance.object = { name: newName }
+    console.log('createTag called with', newName)
+
     modal.componentInstance.succeeded
       .pipe(
         switchMap((newTag) => {
@@ -748,6 +750,8 @@ export class DocumentDetailComponent
       .subscribe(({ newTag, tags }) => {
         this.tagsInput.tags = tags.results
         this.tagsInput.addTag(newTag.id)
+        console.log(this.suggestions)
+
         if (this.suggestions) {
           this.suggestions.suggested_tags =
             this.suggestions.suggested_tags.filter((tag) => tag !== newName)
