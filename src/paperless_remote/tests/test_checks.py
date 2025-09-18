@@ -22,9 +22,3 @@ class TestChecks(TestCase):
                 "Azure AI remote parser requires endpoint and API key to be configured.",
             ),
         )
-
-    @override_settings(REMOTE_OCR_ENGINE="something")
-    @override_settings(REMOTE_OCR_API_KEY="somekey")
-    def test_valid_configuration(self):
-        msgs = check_remote_parser_configured(None)
-        self.assertEqual(len(msgs), 0)

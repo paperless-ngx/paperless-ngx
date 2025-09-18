@@ -109,6 +109,5 @@ class RemoteDocumentParser(RasterisedDocumentParser):
                 "No valid remote parser engine is configured, content will be empty.",
             )
             self.text = ""
-            return
         elif self.settings.engine == "azureai":
             self.text = self.azure_ai_vision_parse(document_path)
