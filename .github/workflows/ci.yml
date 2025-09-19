@@ -396,6 +396,7 @@ jobs:
           path: |
             merged-backend-coverage.xml
             .nyc_output/*
+            coverage/lcov.info
           retention-days: 7
           if-no-files-found: error
           include-hidden-files: true
