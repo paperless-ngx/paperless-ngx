@@ -358,8 +358,6 @@ jobs:
         with:
           pattern: frontend-coverage-*
           path: ./coverage/
-      - name: Display structure of downloaded coverage
-        run: ls -R ./coverage/
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
