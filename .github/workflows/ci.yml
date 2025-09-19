@@ -374,8 +374,20 @@ jobs:
       # Merge frontend coverage from all shards
       - name: Merge frontend coverage
         run: |
+          # Find all coverage-final.json files from the shards, exit with error if none found
+          shopt -s nullglob
+          files=(coverage/frontend-coverage-*/coverage/coverage-final.json)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No frontend coverage JSON found under coverage/" >&2
+            exit 1
+          fi
+          # Create .nyc_output directory and copy each shard's coverage JSON into it with a unique name
           mkdir -p .nyc_output
-          npx nyc merge coverage .nyc_output/out.json
+          for coverage_json in "${files[@]}"; do
+            shard=$(basename "$(dirname "$(dirname "$coverage_json")")")
+            cp "$coverage_json" ".nyc_output/${shard}.json"
+          done
+          npx nyc merge .nyc_output .nyc_output/out.json
           npx nyc report --reporter=lcovonly --report-dir coverage
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v4.6.2
