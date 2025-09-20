@@ -3,7 +3,7 @@
   @if (document?.versions?.length > 0) {
     <div class="btn-group" ngbDropdown role="group">
       <div class="btn-group" ngbDropdown role="group">
-        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" ngbDropdownToggle>
+        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" ngbDropdownToggle [disabled]="!hasVersions">
           <i-bs name="layers"></i-bs>
           <span class="d-none d-lg-inline ps-1" i18n>Version</span>
         </button>
@@ -17,7 +17,7 @@
         </div>
       </div>
       <input #versionFileInput type="file" class="visually-hidden" (change)="onVersionFileSelected($event)" />
-      <button class="btn btn-sm btn-outline-secondary" title="Upload new version" i18n-title (click)="triggerUploadVersion()" [disabled]="!userIsOwner || !userCanEdit">
+      <button class="btn btn-sm btn-outline-secondary" title="Upload new version" i18n-title (click)="versionFileInput.click()" [disabled]="!userIsOwner || !userCanEdit">
         <i-bs name="file-earmark-plus"></i-bs><span class="visually-hidden" i18n>Upload new version</span>
       </button>
     </div>

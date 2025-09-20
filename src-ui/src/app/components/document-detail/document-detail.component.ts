@@ -712,6 +712,10 @@ export class DocumentDetailComponent
     this.prepareForm(doc)
   }
 
+  get hasVersions(): boolean {
+    return this.document?.versions?.length > 1
+  }
+
   // Update file preview and download target to a specific version (by document id)
   selectVersion(versionId: number) {
     this.selectedVersionId = versionId
@@ -1083,11 +1087,6 @@ export class DocumentDetailComponent
           },
         })
     })
-  }
-
-  // Upload a new file version for this document
-  triggerUploadVersion() {
-    this.versionFileInput?.nativeElement?.click()
   }
 
   onVersionFileSelected(event: Event) {
