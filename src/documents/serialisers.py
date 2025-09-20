@@ -974,6 +974,8 @@ class DocumentSerializer(
     page_count = SerializerMethodField()
 
     notes = NotesSerializer(many=True, required=False, read_only=True)
+    head_version = serializers.PrimaryKeyRelatedField(read_only=True)
+    versions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     custom_fields = CustomFieldInstanceSerializer(
         many=True,
