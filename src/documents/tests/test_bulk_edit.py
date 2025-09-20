@@ -787,10 +787,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
         mock_consume_file.assert_not_called()
 
-    @mock.patch("documents.tasks.bulk_update_documents.si")
-    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.s")
-    @mock.patch("celery.chord.delay")
-    def test_rotate(self, mock_chord, mock_update_document, mock_update_documents):
+    @mock.patch("documents.tasks.consume_file.delay")
+    def test_rotate(self, mock_consume_delay):
         """
         GIVEN:
             - Existing documents
@@ -801,19 +799,22 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         """
         doc_ids = [self.doc1.id, self.doc2.id]
         result = bulk_edit.rotate(doc_ids, 90)
-        self.assertEqual(mock_update_document.call_count, 2)
-        mock_update_documents.assert_called_once()
-        mock_chord.assert_called_once()
+        self.assertEqual(mock_consume_delay.call_count, 2)
+        for call, expected_id in zip(
+            mock_consume_delay.call_args_list,
+            doc_ids,
+        ):
+            consumable, overrides = call.args
+            self.assertEqual(consumable.head_version_id, expected_id)
+            self.assertIsNotNone(overrides)
         self.assertEqual(result, "OK")
 
-    @mock.patch("documents.tasks.bulk_update_documents.si")
-    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.s")
+    @mock.patch("documents.tasks.consume_file.delay")
     @mock.patch("pikepdf.Pdf.save")
     def test_rotate_with_error(
         self,
         mock_pdf_save,
-        mock_update_archive_file,
-        mock_update_documents,
+        mock_consume_delay,
     ):
         """
         GIVEN:
@@ -832,16 +833,12 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             error_str = cm.output[0]
             expected_str = "Error rotating document"
             self.assertIn(expected_str, error_str)
-            mock_update_archive_file.assert_not_called()
+            mock_consume_delay.assert_not_called()
 
-    @mock.patch("documents.tasks.bulk_update_documents.si")
-    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.s")
-    @mock.patch("celery.chord.delay")
+    @mock.patch("documents.tasks.consume_file.delay")
     def test_rotate_non_pdf(
         self,
-        mock_chord,
-        mock_update_document,
-        mock_update_documents,
+        mock_consume_delay,
     ):
         """
         GIVEN:
@@ -856,14 +853,16 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             output_str = cm.output[1]
             expected_str = "Document 4 is not a PDF, skipping rotation"
             self.assertIn(expected_str, output_str)
-            self.assertEqual(mock_update_document.call_count, 1)
-            mock_update_documents.assert_called_once()
-            mock_chord.assert_called_once()
+            self.assertEqual(mock_consume_delay.call_count, 1)
+            consumable, overrides = mock_consume_delay.call_args[0]
+            self.assertEqual(consumable.head_version_id, self.doc2.id)
+            self.assertIsNotNone(overrides)
             self.assertEqual(result, "OK")
 
-    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.delay")
+    @mock.patch("documents.tasks.consume_file.delay")
     @mock.patch("pikepdf.Pdf.save")
-    def test_delete_pages(self, mock_pdf_save, mock_update_archive_file):
+    @mock.patch("documents.data_models.magic.from_file", return_value="application/pdf")
+    def test_delete_pages(self, mock_magic, mock_pdf_save, mock_consume_delay):
         """
         GIVEN:
             - Existing documents
@@ -871,24 +870,22 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             - Delete pages action is called with 1 document and 2 pages
         THEN:
             - Save should be called once
-            - Archive file should be updated once
-            - The document's page_count should be reduced by the number of deleted pages
+            - A new version should be enqueued via consume_file
         """
         doc_ids = [self.doc2.id]
-        initial_page_count = self.doc2.page_count
         pages = [1, 3]
         result = bulk_edit.delete_pages(doc_ids, pages)
         mock_pdf_save.assert_called_once()
-        mock_update_archive_file.assert_called_once()
+        mock_consume_delay.assert_called_once()
+        consumable, overrides = mock_consume_delay.call_args[0]
+        self.assertEqual(consumable.head_version_id, self.doc2.id)
+        self.assertTrue(str(consumable.original_file).endswith("_pages_deleted.pdf"))
+        self.assertIsNotNone(overrides)
         self.assertEqual(result, "OK")
 
-        expected_page_count = initial_page_count - len(pages)
-        self.doc2.refresh_from_db()
-        self.assertEqual(self.doc2.page_count, expected_page_count)
-
-    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.delay")
+    @mock.patch("documents.tasks.consume_file.delay")
     @mock.patch("pikepdf.Pdf.save")
-    def test_delete_pages_with_error(self, mock_pdf_save, mock_update_archive_file):
+    def test_delete_pages_with_error(self, mock_pdf_save, mock_consume_delay):
         """
         GIVEN:
             - Existing documents
@@ -897,7 +894,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             - PikePDF raises an error
         THEN:
             - Save should be called once
-            - Archive file should not be updated
+            - No new version should be enqueued
         """
         mock_pdf_save.side_effect = Exception("Error saving PDF")
         doc_ids = [self.doc2.id]
@@ -908,7 +905,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             error_str = cm.output[0]
             expected_str = "Error deleting pages from document"
             self.assertIn(expected_str, error_str)
-            mock_update_archive_file.assert_not_called()
+            mock_consume_delay.assert_not_called()
 
     @mock.patch("documents.bulk_edit.group")
     @mock.patch("documents.tasks.consume_file.s")
@@ -968,21 +965,18 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertEqual(result, "OK")
         mock_chord.assert_called_once()
 
-    @mock.patch("documents.tasks.update_document_content_maybe_archive_file.delay")
-    def test_edit_pdf_with_update_document(self, mock_update_document):
+    @mock.patch("documents.tasks.consume_file.delay")
+    def test_edit_pdf_with_update_document(self, mock_consume_delay):
         """
         GIVEN:
             - A single existing PDF document
         WHEN:
             - edit_pdf is called with update_document=True and a single output
         THEN:
-            - The original document is updated in-place
-            - The update_document_content_maybe_archive_file task is triggered
+            - A version update is enqueued targeting the existing document
         """
         doc_ids = [self.doc2.id]
         operations = [{"page": 1}, {"page": 2}]
-        original_checksum = self.doc2.checksum
-        original_page_count = self.doc2.page_count
 
         result = bulk_edit.edit_pdf(
             doc_ids,
@@ -992,10 +986,11 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(result, "OK")
-        self.doc2.refresh_from_db()
-        self.assertNotEqual(self.doc2.checksum, original_checksum)
-        self.assertNotEqual(self.doc2.page_count, original_page_count)
-        mock_update_document.assert_called_once_with(document_id=self.doc2.id)
+        mock_consume_delay.assert_called_once()
+        consumable, overrides = mock_consume_delay.call_args[0]
+        self.assertEqual(consumable.head_version_id, self.doc2.id)
+        self.assertTrue(str(consumable.original_file).endswith("_edited.pdf"))
+        self.assertIsNotNone(overrides)
 
     @mock.patch("documents.bulk_edit.group")
     @mock.patch("documents.tasks.consume_file.s")
