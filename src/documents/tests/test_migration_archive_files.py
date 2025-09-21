@@ -114,7 +114,7 @@ class TestMigrateArchiveFiles(DirectoriesMixin, FileSystemAssertsMixin, TestMigr
     migrate_from = "1006_auto_20201208_2209_squashed_1011_auto_20210101_2340"
     migrate_to = "1012_fix_archive_files"
 
-    def setUpBeforeMigration(self, apps):
+    def setUpBeforeMigration(self, apps) -> None:
         Document = apps.get_model("documents", "Document")
 
         self.unrelated = make_test_document(
@@ -180,7 +180,7 @@ class TestMigrateArchiveFiles(DirectoriesMixin, FileSystemAssertsMixin, TestMigr
             archive_path_old(self.clash4),
         )
 
-    def testArchiveFilesMigrated(self):
+    def testArchiveFilesMigrated(self) -> None:
         Document = self.apps.get_model("documents", "Document")
 
         for doc in Document.objects.all():
@@ -205,7 +205,7 @@ class TestMigrateArchiveFiles(DirectoriesMixin, FileSystemAssertsMixin, TestMigr
             6,
         )
 
-    def test_filenames(self):
+    def test_filenames(self) -> None:
         Document = self.apps.get_model("documents", "Document")
         self.assertEqual(
             Document.objects.get(id=self.unrelated.id).archive_filename,
@@ -239,7 +239,7 @@ class TestMigrateArchiveFiles(DirectoriesMixin, FileSystemAssertsMixin, TestMigr
 
 @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
 class TestMigrateArchiveFilesWithFilenameFormat(TestMigrateArchiveFiles):
-    def test_filenames(self):
+    def test_filenames(self) -> None:
         Document = self.apps.get_model("documents", "Document")
         self.assertEqual(
             Document.objects.get(id=self.unrelated.id).archive_filename,
@@ -271,7 +271,7 @@ class TestMigrateArchiveFilesWithFilenameFormat(TestMigrateArchiveFiles):
         )
 
 
-def fake_parse_wrapper(parser, path, mime_type, file_name):
+def fake_parse_wrapper(parser, path, mime_type, file_name) -> None:
     parser.archive_path = None
     parser.text = "the text"
 
@@ -283,7 +283,7 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
     auto_migrate = False
 
     @pytest.mark.skip(reason="Fails with migration tearDown util. Needs investigation.")
-    def test_archive_missing(self):
+    def test_archive_missing(self) -> None:
         Document = self.apps.get_model("documents", "Document")
 
         doc = make_test_document(
@@ -303,7 +303,7 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
         )
 
     @pytest.mark.skip(reason="Fails with migration tearDown util. Needs investigation.")
-    def test_parser_missing(self):
+    def test_parser_missing(self) -> None:
         Document = self.apps.get_model("documents", "Document")
 
         make_test_document(
@@ -330,7 +330,7 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
         )
 
     @mock.patch(f"{__name__}.migration_1012_obj.parse_wrapper")
-    def test_parser_error(self, m):
+    def test_parser_error(self, m) -> None:
         m.side_effect = ParseError()
         Document = self.apps.get_model("documents", "Document")
 
@@ -395,7 +395,7 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
         self.assertIsNone(doc2.archive_filename)
 
     @mock.patch(f"{__name__}.migration_1012_obj.parse_wrapper")
-    def test_parser_no_archive(self, m):
+    def test_parser_no_archive(self, m) -> None:
         m.side_effect = fake_parse_wrapper
 
         Document = self.apps.get_model("documents", "Document")
@@ -453,7 +453,7 @@ class TestMigrateArchiveFilesBackwards(
     migrate_from = "1012_fix_archive_files"
     migrate_to = "1006_auto_20201208_2209_squashed_1011_auto_20210101_2340"
 
-    def setUpBeforeMigration(self, apps):
+    def setUpBeforeMigration(self, apps) -> None:
         Document = apps.get_model("documents", "Document")
 
         make_test_document(
@@ -482,7 +482,7 @@ class TestMigrateArchiveFilesBackwards(
             "clash_02.pdf",
         )
 
-    def testArchiveFilesReverted(self):
+    def testArchiveFilesReverted(self) -> None:
         Document = self.apps.get_model("documents", "Document")
 
         for doc in Document.objects.all():
@@ -517,7 +517,7 @@ class TestMigrateArchiveFilesBackwardsErrors(DirectoriesMixin, TestMigrations):
     migrate_to = "1006_auto_20201208_2209_squashed_1011_auto_20210101_2340"
     auto_migrate = False
 
-    def test_filename_clash(self):
+    def test_filename_clash(self) -> None:
         Document = self.apps.get_model("documents", "Document")
 
         self.clashA = make_test_document(
@@ -545,7 +545,7 @@ class TestMigrateArchiveFilesBackwardsErrors(DirectoriesMixin, TestMigrations):
             self.performMigration,
         )
 
-    def test_filename_exists(self):
+    def test_filename_exists(self) -> None:
         Document = self.apps.get_model("documents", "Document")
 
         self.clashA = make_test_document(

@@ -20,7 +20,7 @@ from documents.tests.utils import DocumentConsumeDelayMixin
 
 
 class ConsumerThread(Thread):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.cmd = document_consumer.Command()
         self.cmd.stop_flag.clear()
@@ -28,7 +28,7 @@ class ConsumerThread(Thread):
     def run(self) -> None:
         self.cmd.handle(directory=settings.CONSUMPTION_DIR, oneshot=False, testing=True)
 
-    def stop(self):
+    def stop(self) -> None:
         # Consumer checks this every second.
         self.cmd.stop_flag.set()
 
@@ -52,7 +52,7 @@ class ConsumerThreadMixin(DocumentConsumeDelayMixin):
         super().setUp()
         self.t = None
 
-    def t_start(self):
+    def t_start(self) -> None:
         self.t = ConsumerThread()
         self.t.start()
         # give the consumer some time to do initial work
@@ -68,13 +68,13 @@ class ConsumerThreadMixin(DocumentConsumeDelayMixin):
 
         super().tearDown()
 
-    def wait_for_task_mock_call(self, expected_call_count=1):
+    def wait_for_task_mock_call(self, expected_call_count=1) -> None:
         n = 0
         while n < 50:
             if self.consume_file_mock.call_count >= expected_call_count:
                 # give task_mock some time to finish and raise errors
                 sleep(1)
-                return
+                return None
             n += 1
             sleep(0.1)
 
@@ -84,7 +84,7 @@ class ConsumerThreadMixin(DocumentConsumeDelayMixin):
         self,
         input_doc: ConsumableDocument,
         overrides=None,
-    ):
+    ) -> None:
         eq = filecmp.cmp(input_doc.original_file, self.sample_file, shallow=False)
         if not eq:
             print("Consumed an INVALID file.")  # noqa: T201
@@ -92,7 +92,7 @@ class ConsumerThreadMixin(DocumentConsumeDelayMixin):
         else:
             print("Consumed a perfectly valid file.")  # noqa: T201
 
-    def slow_write_file(self, target, *, incomplete=False):
+    def slow_write_file(self, target, *, incomplete=False) -> None:
         with Path(self.sample_file).open("rb") as f:
             pdf_bytes = f.read()
 
@@ -112,7 +112,7 @@ class ConsumerThreadMixin(DocumentConsumeDelayMixin):
     CONSUMER_INOTIFY_DELAY=0.01,
 )
 class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
-    def test_consume_file(self):
+    def test_consume_file(self) -> None:
         self.t_start()
 
         f = Path(self.dirs.consumption_dir) / "my_file.pdf"
@@ -126,7 +126,7 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
 
         self.assertEqual(input_doc.original_file, f)
 
-    def test_consume_file_invalid_ext(self):
+    def test_consume_file_invalid_ext(self) -> None:
         self.t_start()
 
         f = Path(self.dirs.consumption_dir) / "my_file.wow"
@@ -136,7 +136,7 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
 
         self.consume_file_mock.assert_not_called()
 
-    def test_consume_existing_file(self):
+    def test_consume_existing_file(self) -> None:
         f = Path(self.dirs.consumption_dir) / "my_file.pdf"
         shutil.copy(self.sample_file, f)
 
@@ -148,7 +148,7 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
         self.assertEqual(input_doc.original_file, f)
 
     @mock.patch("documents.management.commands.document_consumer.logger.error")
-    def test_slow_write_pdf(self, error_logger):
+    def test_slow_write_pdf(self, error_logger) -> None:
         self.consume_file_mock.side_effect = self.bogus_task
 
         self.t_start()
@@ -168,7 +168,7 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
         self.assertEqual(input_doc.original_file, fname)
 
     @mock.patch("documents.management.commands.document_consumer.logger.error")
-    def test_slow_write_and_move(self, error_logger):
+    def test_slow_write_and_move(self, error_logger) -> None:
         self.consume_file_mock.side_effect = self.bogus_task
 
         self.t_start()
@@ -190,7 +190,7 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
         error_logger.assert_not_called()
 
     @mock.patch("documents.management.commands.document_consumer.logger.error")
-    def test_slow_write_incomplete(self, error_logger):
+    def test_slow_write_incomplete(self, error_logger) -> None:
         self.consume_file_mock.side_effect = self.bogus_task
 
         self.t_start()
@@ -230,14 +230,14 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
         self.consume_file_mock.assert_not_called()
 
     @override_settings(CONSUMPTION_DIR="does_not_exist")
-    def test_consumption_directory_invalid(self):
+    def test_consumption_directory_invalid(self) -> None:
         self.assertRaises(CommandError, call_command, "document_consumer", "--oneshot")
 
     @override_settings(CONSUMPTION_DIR="")
-    def test_consumption_directory_unset(self):
+    def test_consumption_directory_unset(self) -> None:
         self.assertRaises(CommandError, call_command, "document_consumer", "--oneshot")
 
-    def test_mac_write(self):
+    def test_mac_write(self) -> None:
         self.consume_file_mock.side_effect = self.bogus_task
 
         self.t_start()
@@ -275,7 +275,7 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
 
         self.assertCountEqual(consumed_files, ["my_file.pdf", "my_second_file.pdf"])
 
-    def test_is_ignored(self):
+    def test_is_ignored(self) -> None:
         test_paths = [
             {
                 "path": str(Path(self.dirs.consumption_dir) / "foo.pdf"),
@@ -351,7 +351,7 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
             )
 
     @mock.patch("documents.management.commands.document_consumer.Path.open")
-    def test_consume_file_busy(self, open_mock):
+    def test_consume_file_busy(self, open_mock) -> None:
         # Calling this mock always raises this
         open_mock.side_effect = OSError
 
@@ -396,7 +396,7 @@ class TestConsumerRecursivePolling(TestConsumer):
 
 class TestConsumerTags(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
     @override_settings(CONSUMER_RECURSIVE=True, CONSUMER_SUBDIRS_AS_TAGS=True)
-    def test_consume_file_with_path_tags(self):
+    def test_consume_file_with_path_tags(self) -> None:
         tag_names = ("existingTag", "Space Tag")
         # Create a Tag prior to consuming a file using it in path
         tag_ids = [
@@ -434,5 +434,5 @@ class TestConsumerTags(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCas
         CONSUMER_POLLING_DELAY=3,
         CONSUMER_POLLING_RETRY_COUNT=20,
     )
-    def test_consume_file_with_path_tags_polling(self):
+    def test_consume_file_with_path_tags_polling(self) -> None:
         self.test_consume_file_with_path_tags()

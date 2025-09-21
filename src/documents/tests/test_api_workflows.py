@@ -78,7 +78,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.workflow.actions.add(self.action)
         self.workflow.save()
 
-    def test_api_get_workflow(self):
+    def test_api_get_workflow(self) -> None:
         """
         GIVEN:
             - API request to get all workflows
@@ -99,7 +99,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             self.action.assign_correspondent.pk,
         )
 
-    def test_api_create_workflow(self):
+    def test_api_create_workflow(self) -> None:
         """
         GIVEN:
             - API request to create a workflow, trigger and action separately
@@ -160,7 +160,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Workflow.objects.count(), 2)
 
-    def test_api_create_workflow_nested(self):
+    def test_api_create_workflow_nested(self) -> None:
         """
         GIVEN:
             - API request to create a workflow with nested trigger and action
@@ -265,7 +265,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             json.dumps(["AND", [[self.cf1.id, "exact", "value"]]]),
         )
 
-    def test_api_create_invalid_workflow_trigger(self):
+    def test_api_create_invalid_workflow_trigger(self) -> None:
         """
         GIVEN:
             - API request to create a workflow trigger
@@ -301,7 +301,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
 
         self.assertEqual(WorkflowTrigger.objects.count(), 1)
 
-    def test_api_create_invalid_assign_title(self):
+    def test_api_create_invalid_assign_title(self) -> None:
         """
         GIVEN:
             - API request to create a workflow
@@ -340,7 +340,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
 
         self.assertEqual(Workflow.objects.count(), 1)
 
-    def test_api_create_workflow_trigger_action_empty_fields(self):
+    def test_api_create_workflow_trigger_action_empty_fields(self) -> None:
         """
         GIVEN:
             - API request to create a workflow trigger and action
@@ -397,7 +397,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(trigger2.filter_path, "*/test/*")
         self.assertIsNone(trigger2.filter_filename)
 
-    def test_api_update_workflow_nested_triggers_actions(self):
+    def test_api_update_workflow_nested_triggers_actions(self) -> None:
         """
         GIVEN:
             - Existing workflow with trigger and action
@@ -468,7 +468,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(workflow.actions.first().assign_title, "Action New Title")
 
-    def test_api_update_workflow_no_trigger_actions(self):
+    def test_api_update_workflow_no_trigger_actions(self) -> None:
         """
         GIVEN:
             - Existing workflow
@@ -512,7 +512,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(workflow.triggers.count(), 1)
         self.assertEqual(workflow.actions.count(), 0)
 
-    def test_api_auto_remove_orphaned_triggers_actions(self):
+    def test_api_auto_remove_orphaned_triggers_actions(self) -> None:
         """
         GIVEN:
             - Existing trigger and action
@@ -552,7 +552,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(WorkflowAction.objects.all().count(), 1)
         self.assertNotEqual(workflow.actions.first().id, self.action.id)
 
-    def test_email_action_validation(self):
+    def test_email_action_validation(self) -> None:
         """
         GIVEN:
             - API request to create a workflow with an email action
@@ -645,7 +645,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_webhook_action_validation(self):
+    def test_webhook_action_validation(self) -> None:
         """
         GIVEN:
             - API request to create a workflow with a notification action
@@ -707,7 +707,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_webhook_action_url_validation(self):
+    def test_webhook_action_url_validation(self) -> None:
         """
         GIVEN:
             - API request to create a workflow with a notification action
@@ -749,7 +749,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             )
             self.assertEqual(response.status_code, expected_resp_code)
 
-    def test_patch_trigger_cannot_change_id(self):
+    def test_patch_trigger_cannot_change_id(self) -> None:
         """
         GIVEN:
             - An existing workflow trigger

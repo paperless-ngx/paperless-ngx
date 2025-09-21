@@ -13,7 +13,7 @@ from documents.tests.utils import FileSystemAssertsMixin
 
 
 class TestMakeThumbnails(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
-    def make_models(self):
+    def make_models(self) -> None:
         self.d1 = Document.objects.create(
             checksum="A",
             title="A",
@@ -54,12 +54,12 @@ class TestMakeThumbnails(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         super().setUp()
         self.make_models()
 
-    def test_process_document(self):
+    def test_process_document(self) -> None:
         self.assertIsNotFile(self.d1.thumbnail_path)
         _process_document(self.d1.id)
         self.assertIsFile(self.d1.thumbnail_path)
 
-    def test_process_document_password_protected(self):
+    def test_process_document_password_protected(self) -> None:
         self.assertIsFile(get_default_thumbnail())
         self.assertIsNotFile(self.d3.thumbnail_path)
         _process_document(self.d3.id)
@@ -68,7 +68,7 @@ class TestMakeThumbnails(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsFile(self.d3.thumbnail_path)
 
     @mock.patch("documents.management.commands.document_thumbnails.shutil.move")
-    def test_process_document_invalid_mime_type(self, m: mock.Mock):
+    def test_process_document_invalid_mime_type(self, m: mock.Mock) -> None:
         self.d1.mime_type = "asdasdasd"
         self.d1.save()
 
@@ -80,14 +80,14 @@ class TestMakeThumbnails(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         # Not called during processing of document
         m.assert_not_called()
 
-    def test_command(self):
+    def test_command(self) -> None:
         self.assertIsNotFile(self.d1.thumbnail_path)
         self.assertIsNotFile(self.d2.thumbnail_path)
         call_command("document_thumbnails", "--processes", "1")
         self.assertIsFile(self.d1.thumbnail_path)
         self.assertIsFile(self.d2.thumbnail_path)
 
-    def test_command_documentid(self):
+    def test_command_documentid(self) -> None:
         self.assertIsNotFile(self.d1.thumbnail_path)
         self.assertIsNotFile(self.d2.thumbnail_path)
         call_command("document_thumbnails", "--processes", "1", "-d", f"{self.d1.id}")

@@ -25,7 +25,7 @@ class TestMigrateWebPThumbnails(TestMigrations):
     migrate_to = "1021_webp_thumbnail_conversion"
     auto_migrate = False
 
-    def pretend_convert_output(self, *args, **kwargs):
+    def pretend_convert_output(self, *args, **kwargs) -> None:
         """
         Pretends to do the conversion, by copying the input file
         to the output file
@@ -35,7 +35,7 @@ class TestMigrateWebPThumbnails(TestMigrations):
             Path(kwargs["output_file"]),
         )
 
-    def pretend_map(self, func: Callable, iterable: Iterable):
+    def pretend_map(self, func: Callable, iterable: Iterable) -> None:
         """
         Pretends to be the map of a multiprocessing.Pool, but secretly does
         everything in series
@@ -49,7 +49,7 @@ class TestMigrateWebPThumbnails(TestMigrations):
         ext: str,
         count: int,
         start_count: int = 0,
-    ):
+    ) -> None:
         """
         Helper to create a certain count of files of given extension in a given directory
         """
@@ -63,7 +63,7 @@ class TestMigrateWebPThumbnails(TestMigrations):
         thumb_dir: Path,
         count: int,
         start_count: int = 0,
-    ):
+    ) -> None:
         """
         Creates a dummy WebP thumbnail file in the given directory, based on
         the database Document
@@ -75,7 +75,7 @@ class TestMigrateWebPThumbnails(TestMigrations):
         thumb_dir: Path,
         count: int,
         start_count: int = 0,
-    ):
+    ) -> None:
         """
         Creates a dummy PNG thumbnail file in the given directory, based on
         the database Document
@@ -87,7 +87,7 @@ class TestMigrateWebPThumbnails(TestMigrations):
         ext: str,
         dir: str | Path,
         expected_count: int,
-    ):
+    ) -> None:
         """
         Helper to assert a certain count of given extension files in given directory
         """
@@ -96,13 +96,13 @@ class TestMigrateWebPThumbnails(TestMigrations):
         matching_files = list(dir.glob(f"*.{ext}"))
         self.assertEqual(len(matching_files), expected_count)
 
-    def assert_png_file_count(self, dir: Path, expected_count: int):
+    def assert_png_file_count(self, dir: Path, expected_count: int) -> None:
         """
         Helper to assert a certain count of PNG extension files in given directory
         """
         self.assert_file_count_by_extension("png", dir, expected_count)
 
-    def assert_webp_file_count(self, dir: Path, expected_count: int):
+    def assert_webp_file_count(self, dir: Path, expected_count: int) -> None:
         """
         Helper to assert a certain count of WebP extension files in given directory
         """
@@ -122,7 +122,7 @@ class TestMigrateWebPThumbnails(TestMigrations):
         self,
         run_convert_mock: mock.MagicMock,
         map_mock: mock.MagicMock,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Document exists with default WebP thumbnail path
@@ -147,7 +147,7 @@ class TestMigrateWebPThumbnails(TestMigrations):
         self,
         run_convert_mock: mock.MagicMock,
         map_mock: mock.MagicMock,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Document exists with PNG thumbnail
@@ -175,7 +175,7 @@ class TestMigrateWebPThumbnails(TestMigrations):
         self,
         run_convert_mock: mock.MagicMock,
         map_mock: mock.MagicMock,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Document exists with PNG thumbnail
@@ -203,7 +203,7 @@ class TestMigrateWebPThumbnails(TestMigrations):
         self,
         run_convert_mock: mock.MagicMock,
         map_mock: mock.MagicMock,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Document exists with PNG thumbnail

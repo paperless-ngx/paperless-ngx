@@ -27,12 +27,12 @@ class TestViews(DirectoriesMixin, TestCase):
         self.user = User.objects.create_user("testuser")
         super().setUp()
 
-    def test_login_redirect(self):
+    def test_login_redirect(self) -> None:
         response = self.client.get("/")
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(response.url, "/accounts/login/?next=/")
 
-    def test_index(self):
+    def test_index(self) -> None:
         self.client.force_login(self.user)
         for language_given, language_actual in [
             ("", "en-US"),
@@ -76,7 +76,7 @@ class TestViews(DirectoriesMixin, TestCase):
             )
 
     @override_settings(BASE_URL="/paperless/")
-    def test_index_app_logo_with_base_url(self):
+    def test_index_app_logo_with_base_url(self) -> None:
         """
         GIVEN:
             - Existing config with app_logo specified
@@ -95,7 +95,7 @@ class TestViews(DirectoriesMixin, TestCase):
             f"/paperless{config.app_logo}",
         )
 
-    def test_share_link_views(self):
+    def test_share_link_views(self) -> None:
         """
         GIVEN:
             - Share link created
@@ -161,7 +161,7 @@ class TestViews(DirectoriesMixin, TestCase):
         self.assertEqual(response.request["PATH_INFO"], "/accounts/login/")
         self.assertContains(response, b"Share link has expired")
 
-    def test_list_with_full_permissions(self):
+    def test_list_with_full_permissions(self) -> None:
         """
         GIVEN:
             - Tags with different permissions
@@ -230,7 +230,7 @@ class TestViews(DirectoriesMixin, TestCase):
             else:
                 assert False, f"Unexpected tag found: {tag['name']}"
 
-    def test_list_no_n_plus_1_queries(self):
+    def test_list_no_n_plus_1_queries(self) -> None:
         """
         GIVEN:
             - Tags with different permissions
