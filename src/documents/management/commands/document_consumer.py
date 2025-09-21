@@ -82,15 +82,19 @@ def _is_ignored(filepath: Path) -> bool:
 
 
 def _consume(filepath: Path) -> None:
-    if filepath.is_dir() or _is_ignored(filepath):
-        return
+    try:
+        if filepath.is_dir() or _is_ignored(filepath):
+            return
 
-    if not filepath.is_file():
-        logger.debug(f"Not consuming file {filepath}: File has moved.")
-        return
+        if not filepath.is_file():
+            logger.debug(f"Not consuming file {filepath}: File has moved.")
+            return
 
-    if not is_file_ext_supported(filepath.suffix):
-        logger.warning(f"Not consuming file {filepath}: Unknown file extension.")
+        if not is_file_ext_supported(filepath.suffix):
+            logger.warning(f"Not consuming file {filepath}: Unknown file extension.")
+            return
+    except (PermissionError, OSError):
+        logger.warning(f"Unable to check file {filepath}")
         return
 
     # Total wait time: up to 500ms
@@ -323,7 +327,12 @@ class Command(BaseCommand):
 
                         # Also make sure the file exists still, some scanners might write a
                         # temporary file first
-                        file_still_exists = filepath.exists() and filepath.is_file()
+                        try:
+                            file_still_exists = filepath.exists() and filepath.is_file()
+                        except (PermissionError, OSError):  # pragma: no cover
+                            # If we can't check, let it fail in the _consume function
+                            file_still_exists = True
+                            continue
 
                         if waited_long_enough and file_still_exists:
                             _consume(filepath)
