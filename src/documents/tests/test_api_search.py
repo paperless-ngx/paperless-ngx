@@ -31,13 +31,13 @@ from paperless_mail.models import MailRule
 
 
 class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
         self.client.force_authenticate(user=self.user)
 
-    def test_search(self):
+    def test_search(self) -> None:
         d1 = Document.objects.create(
             title="invoice",
             content="the thing i bought at a shop and paid with bank account",
@@ -89,7 +89,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(len(results), 0)
         self.assertCountEqual(response.data["all"], [])
 
-    def test_search_custom_field_ordering(self):
+    def test_search_custom_field_ordering(self) -> None:
         custom_field = CustomField.objects.create(
             name="Sortable field",
             data_type=CustomField.FieldDataType.INT,
@@ -148,7 +148,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             [d1.id, d3.id, d2.id],
         )
 
-    def test_search_multi_page(self):
+    def test_search_multi_page(self) -> None:
         with AsyncWriter(index.open_index()) as writer:
             for i in range(55):
                 doc = Document.objects.create(
@@ -183,7 +183,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             self.assertNotIn(result["id"], seen_ids)
             seen_ids.append(result["id"])
 
-    def test_search_invalid_page(self):
+    def test_search_invalid_page(self) -> None:
         with AsyncWriter(index.open_index()) as writer:
             for i in range(15):
                 doc = Document.objects.create(
@@ -202,7 +202,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
     @override_settings(
         TIME_ZONE="UTC",
     )
-    def test_search_added_in_last_week(self):
+    def test_search_added_in_last_week(self) -> None:
         """
         GIVEN:
             - Three documents added right now
@@ -254,7 +254,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
     @override_settings(
         TIME_ZONE="America/Chicago",
     )
-    def test_search_added_in_last_week_with_timezone_behind(self):
+    def test_search_added_in_last_week_with_timezone_behind(self) -> None:
         """
         GIVEN:
             - Two documents added right now
@@ -306,7 +306,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
     @override_settings(
         TIME_ZONE="Europe/Sofia",
     )
-    def test_search_added_in_last_week_with_timezone_ahead(self):
+    def test_search_added_in_last_week_with_timezone_ahead(self) -> None:
         """
         GIVEN:
             - Two documents added right now
@@ -355,7 +355,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             # Assert subset in results
             self.assertDictEqual(result, {**result, **subset})
 
-    def test_search_added_in_last_month(self):
+    def test_search_added_in_last_month(self) -> None:
         """
         GIVEN:
             - One document added right now
@@ -410,7 +410,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
     @override_settings(
         TIME_ZONE="America/Denver",
     )
-    def test_search_added_in_last_month_timezone_behind(self):
+    def test_search_added_in_last_month_timezone_behind(self) -> None:
         """
         GIVEN:
             - One document added right now
@@ -466,7 +466,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
     @override_settings(
         TIME_ZONE="Europe/Sofia",
     )
-    def test_search_added_specific_date_with_timezone_ahead(self):
+    def test_search_added_specific_date_with_timezone_ahead(self) -> None:
         """
         GIVEN:
             - Two documents added right now
@@ -519,7 +519,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             # Assert subset in results
             self.assertDictEqual(result, {**result, **subset})
 
-    def test_search_added_invalid_date(self):
+    def test_search_added_invalid_date(self) -> None:
         """
         GIVEN:
             - One document added right now
@@ -545,7 +545,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(len(results), 0)
 
     @mock.patch("documents.index.autocomplete")
-    def test_search_autocomplete_limits(self, m):
+    def test_search_autocomplete_limits(self, m) -> None:
         """
         GIVEN:
             - No pre-conditions
@@ -576,7 +576,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 10)
 
-    def test_search_autocomplete_respect_permissions(self):
+    def test_search_autocomplete_respect_permissions(self) -> None:
         """
         GIVEN:
             - Multiple users and documents with & without permissions
@@ -636,7 +636,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, [b"apples", b"applebaum", b"appletini"])
 
-    def test_search_autocomplete_field_name_match(self):
+    def test_search_autocomplete_field_name_match(self) -> None:
         """
         GIVEN:
             - One document exists in index (must be one document to experience the crash)
@@ -659,7 +659,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, [])
 
-    def test_search_autocomplete_search_term(self):
+    def test_search_autocomplete_search_term(self) -> None:
         """
         GIVEN:
             - Search results for autocomplete include the exact search term
@@ -681,7 +681,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0], b"auto")
 
-    def test_search_spelling_suggestion(self):
+    def test_search_spelling_suggestion(self) -> None:
         with AsyncWriter(index.open_index()) as writer:
             for i in range(55):
                 doc = Document.objects.create(
@@ -706,7 +706,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         "whoosh.searching.Searcher.correct_query",
         side_effect=Exception("Test error"),
     )
-    def test_corrected_query_error(self, mock_correct_query):
+    def test_corrected_query_error(self, mock_correct_query) -> None:
         """
         GIVEN:
             - A query that raises an error on correction
@@ -722,7 +722,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             expected_str = "Error while correcting query '2025-06-04': Test error"
             self.assertIn(expected_str, error_str)
 
-    def test_search_more_like(self):
+    def test_search_more_like(self) -> None:
         """
         GIVEN:
             - Documents exist which have similar content
@@ -772,7 +772,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(results[0]["id"], d3.id)
         self.assertEqual(results[1]["id"], d1.id)
 
-    def test_search_filtering(self):
+    def test_search_filtering(self) -> None:
         t = Tag.objects.create(name="tag")
         t2 = Tag.objects.create(name="tag2")
         c = Correspondent.objects.create(name="correspondent")
@@ -1031,7 +1031,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             ),
         )
 
-    def test_search_filtering_respect_owner(self):
+    def test_search_filtering_respect_owner(self) -> None:
         """
         GIVEN:
             - Documents with owners set & without
@@ -1087,7 +1087,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         r = self.client.get(f"/api/documents/?query=test&owner__id__none={u1.id}")
         self.assertEqual(r.data["count"], 3)
 
-    def test_search_filtering_with_object_perms(self):
+    def test_search_filtering_with_object_perms(self) -> None:
         """
         GIVEN:
             - Documents with granted view permissions to others
@@ -1148,7 +1148,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         r = self.client.get(f"/api/documents/?query=test&shared_by__id={u1.id}")
         self.assertEqual(r.data["count"], 1)
 
-    def test_search_sorting(self):
+    def test_search_sorting(self) -> None:
         u1 = User.objects.create_user("user1")
         u2 = User.objects.create_user("user2")
         c1 = Correspondent.objects.create(name="corres Ax")
@@ -1238,7 +1238,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         )
 
     @mock.patch("documents.bulk_edit.bulk_update_documents")
-    def test_global_search(self, m):
+    def test_global_search(self, m) -> None:
         """
         GIVEN:
             - Multiple documents and objects
@@ -1357,7 +1357,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(results["custom_fields"][0]["id"], custom_field1.id)
         self.assertEqual(results["workflows"][0]["id"], workflow1.id)
 
-    def test_global_search_bad_request(self):
+    def test_global_search_bad_request(self) -> None:
         """
         WHEN:
             - Global search query is made without or with query < 3 characters

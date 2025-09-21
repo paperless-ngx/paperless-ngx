@@ -9,14 +9,14 @@ from paperless import version
 class TestApiRemoteVersion:
     ENDPOINT = "/api/remote_version/"
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         cache.clear()
 
     def test_remote_version_enabled_no_update_prefix(
         self,
         rest_api_client: APIClient,
         httpx_mock: HTTPXMock,
-    ):
+    ) -> None:
         httpx_mock.add_response(
             url="https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest",
             json={"tag_name": "ngx-1.6.0"},
@@ -35,7 +35,7 @@ class TestApiRemoteVersion:
         self,
         rest_api_client: APIClient,
         httpx_mock: HTTPXMock,
-    ):
+    ) -> None:
         httpx_mock.add_response(
             url="https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest",
             json={"tag_name": version.__full_version_str__},
@@ -54,7 +54,7 @@ class TestApiRemoteVersion:
         self,
         rest_api_client: APIClient,
         httpx_mock: HTTPXMock,
-    ):
+    ) -> None:
         new_version = (
             version.__version__[0],
             version.__version__[1],
@@ -80,7 +80,7 @@ class TestApiRemoteVersion:
         self,
         rest_api_client: APIClient,
         httpx_mock: HTTPXMock,
-    ):
+    ) -> None:
         httpx_mock.add_response(
             content=b'{ "blah":',
             headers={"Content-Type": "application/json"},
@@ -99,7 +99,7 @@ class TestApiRemoteVersion:
         self,
         rest_api_client: APIClient,
         httpx_mock: HTTPXMock,
-    ):
+    ) -> None:
         httpx_mock.add_response(status_code=503)
 
         response = rest_api_client.get(self.ENDPOINT)

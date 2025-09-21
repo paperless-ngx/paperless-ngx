@@ -38,7 +38,7 @@ def extract_text(pdf_path: Path) -> str:
 
 
 class MailAttachmentMock:
-    def __init__(self, payload, content_id):
+    def __init__(self, payload, content_id) -> None:
         self.payload = payload
         self.content_id = content_id
         self.content_type = "image/png"
@@ -53,7 +53,7 @@ class TestUrlCanary:
     Verify certain URLs are still available so testing is valid still
     """
 
-    def test_online_image_exception_on_not_available(self):
+    def test_online_image_exception_on_not_available(self) -> None:
         """
         GIVEN:
             - Fresh start
@@ -75,7 +75,7 @@ class TestUrlCanary:
 
         assert exec_info.value.response.status_code == httpx.codes.NOT_FOUND
 
-    def test_is_online_image_still_available(self):
+    def test_is_online_image_still_available(self) -> None:
         """
         GIVEN:
             - Fresh start
@@ -112,7 +112,7 @@ class TestParserLive:
         simple_txt_email_file: Path,
         simple_txt_email_pdf_file: Path,
         simple_txt_email_thumbnail_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Fresh start
@@ -137,7 +137,7 @@ class TestParserLive:
             f"Created Thumbnail {thumb} differs from expected file {simple_txt_email_thumbnail_file}"
         )
 
-    def test_tika_parse_successful(self, mail_parser: MailDocumentParser):
+    def test_tika_parse_successful(self, mail_parser: MailDocumentParser) -> None:
         """
         GIVEN:
             - Fresh start
@@ -160,7 +160,7 @@ class TestParserLive:
         html_email_file: Path,
         merged_pdf_first: Path,
         merged_pdf_second: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Intermediary pdfs to be merged
@@ -200,7 +200,7 @@ class TestParserLive:
         html_email_file: Path,
         html_email_pdf_file: Path,
         html_email_thumbnail_file: Path,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Fresh start

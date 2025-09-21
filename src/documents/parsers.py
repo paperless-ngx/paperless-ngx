@@ -340,7 +340,7 @@ class DocumentParser(LoggingMixin):
 
     logging_name = "paperless.parsing"
 
-    def __init__(self, logging_group, progress_callback=None):
+    def __init__(self, logging_group, progress_callback=None) -> None:
         super().__init__()
         self.renew_logging_group()
         self.logging_group = logging_group
@@ -355,7 +355,7 @@ class DocumentParser(LoggingMixin):
         self.date: datetime.datetime | None = None
         self.progress_callback = progress_callback
 
-    def progress(self, current_progress, max_progress):
+    def progress(self, current_progress, max_progress) -> None:
         if self.progress_callback:
             self.progress_callback(current_progress, max_progress)
 
@@ -401,6 +401,6 @@ class DocumentParser(LoggingMixin):
     def get_date(self) -> datetime.datetime | None:
         return self.date
 
-    def cleanup(self):
+    def cleanup(self) -> None:
         self.log.debug(f"Deleting directory {self.tempdir}")
         shutil.rmtree(self.tempdir)

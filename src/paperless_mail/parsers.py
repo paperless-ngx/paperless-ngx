@@ -128,7 +128,7 @@ class MailDocumentParser(DocumentParser):
         mime_type: str,
         file_name=None,
         mailrule_id: int | None = None,
-    ):
+    ) -> None:
         """
         Parses the given .eml into formatted text, based on the decoded email.
 
@@ -471,7 +471,7 @@ class MailDocumentParser(DocumentParser):
         html_pdf.write_bytes(response.content)
         return html_pdf
 
-    def get_settings(self):
+    def get_settings(self) -> None:
         """
         This parser does not implement additional settings yet
         """

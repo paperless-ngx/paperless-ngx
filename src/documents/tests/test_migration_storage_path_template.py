@@ -6,7 +6,7 @@ class TestMigrateStoragePathToTemplate(TestMigrations):
     migrate_from = "1054_customfieldinstance_value_monetary_amount_and_more"
     migrate_to = "1055_alter_storagepath_path"
 
-    def setUpBeforeMigration(self, apps):
+    def setUpBeforeMigration(self, apps) -> None:
         self.old_format = StoragePath.objects.create(
             name="sp1",
             path="Something/{title}",
@@ -20,7 +20,7 @@ class TestMigrateStoragePathToTemplate(TestMigrations):
             path="Some/Fixed/Path",
         )
 
-    def test_migrate_old_to_new_storage_path(self):
+    def test_migrate_old_to_new_storage_path(self) -> None:
         self.old_format.refresh_from_db()
         self.new_format.refresh_from_db()
         self.no_formatting.refresh_from_db()
