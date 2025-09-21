@@ -209,6 +209,24 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
         # assert that we have an error logged with this invalid file.
         error_logger.assert_called_once()
 
+    @mock.patch("documents.management.commands.document_consumer.logger.warning")
+    def test_permission_error_on_prechecks(self, warning_logger):
+        filepath = Path(self.dirs.consumption_dir) / "selinux.txt"
+        filepath.touch()
+
+        original_stat = Path.stat
+
+        def raising_stat(self, *args, **kwargs):
+            if self == filepath:
+                raise PermissionError("Permission denied")
+            return original_stat(self, *args, **kwargs)
+
+        with mock.patch("pathlib.Path.stat", new=raising_stat):
+            document_consumer._consume(filepath)
+
+        warning_logger.assert_called_once_with(f"Unable to check file {filepath}")
+        self.consume_file_mock.assert_not_called()
+
     @override_settings(CONSUMPTION_DIR="does_not_exist")
     def test_consumption_directory_invalid(self):
         self.assertRaises(CommandError, call_command, "document_consumer", "--oneshot")
