@@ -82,19 +82,15 @@ def _is_ignored(filepath: Path) -> bool:
 
 
 def _consume(filepath: Path) -> None:
-    try:
-        if filepath.is_dir() or _is_ignored(filepath):
-            return
+    if filepath.is_dir() or _is_ignored(filepath):
+        return
 
-        if not filepath.is_file():
-            logger.debug(f"Not consuming file {filepath}: File has moved.")
-            return
+    if not filepath.is_file():
+        logger.debug(f"Not consuming file {filepath}: File has moved.")
+        return
 
-        if not is_file_ext_supported(filepath.suffix):
-            logger.warning(f"Not consuming file {filepath}: Unknown file extension.")
-            return
-    except (PermissionError, OSError):
-        logger.warning(f"Unable to check file {filepath}")
+    if not is_file_ext_supported(filepath.suffix):
+        logger.warning(f"Not consuming file {filepath}: Unknown file extension.")
         return
 
     # Total wait time: up to 500ms
