@@ -82,6 +82,13 @@ def _is_ignored(filepath: Path) -> bool:
 
 
 def _consume(filepath: Path) -> None:
+    # Check permissions early
+    try:
+        filepath.stat()
+    except (PermissionError, OSError):
+        logger.warning(f"Not consuming file {filepath}: Permission denied.")
+        return
+
     if filepath.is_dir() or _is_ignored(filepath):
         return
 
@@ -323,7 +330,12 @@ class Command(BaseCommand):
 
                         # Also make sure the file exists still, some scanners might write a
                         # temporary file first
-                        file_still_exists = filepath.exists() and filepath.is_file()
+                        try:
+                            file_still_exists = filepath.exists() and filepath.is_file()
+                        except (PermissionError, OSError):  # pragma: no cover
+                            # If we can't check, let it fail in the _consume function
+                            file_still_exists = True
+                            continue
 
                         if waited_long_enough and file_still_exists:
                             _consume(filepath)
