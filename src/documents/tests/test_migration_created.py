@@ -13,7 +13,7 @@ class TestMigrateDocumentCreated(DirectoriesMixin, TestMigrations):
     migrate_from = "1066_alter_workflowtrigger_schedule_offset_days"
     migrate_to = "1067_alter_document_created"
 
-    def setUpBeforeMigration(self, apps):
+    def setUpBeforeMigration(self, apps) -> None:
         # create 600 documents
         for i in range(600):
             Document = apps.get_model("documents", "Document")
@@ -26,7 +26,7 @@ class TestMigrateDocumentCreated(DirectoriesMixin, TestMigrations):
                 checksum=i,
             )
 
-    def testDocumentCreatedMigrated(self):
+    def testDocumentCreatedMigrated(self) -> None:
         Document = self.apps.get_model("documents", "Document")
 
         doc = Document.objects.get(id=1)

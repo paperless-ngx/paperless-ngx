@@ -25,7 +25,7 @@ class Command(BaseCommand):
         parser.formatter_class = RawTextHelpFormatter
         return parser
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         username = os.getenv("PAPERLESS_ADMIN_USER", "admin")
         mail = os.getenv("PAPERLESS_ADMIN_MAIL", "root@localhost")
         password = os.getenv("PAPERLESS_ADMIN_PASSWORD")

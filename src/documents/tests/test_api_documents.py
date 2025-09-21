@@ -50,14 +50,14 @@ from documents.tests.utils import DocumentConsumeDelayMixin
 
 
 class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
         self.client.force_authenticate(user=self.user)
         cache.clear()
 
-    def testDocuments(self):
+    def testDocuments(self) -> None:
         response = self.client.get("/api/documents/").data
 
         self.assertEqual(response["count"], 0)
@@ -110,7 +110,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.assertEqual(len(Document.objects.all()), 0)
 
-    def test_document_fields(self):
+    def test_document_fields(self) -> None:
         c = Correspondent.objects.create(name="c", pk=41)
         dt = DocumentType.objects.create(name="dt", pk=63)
         Tag.objects.create(name="t", pk=85)
@@ -172,7 +172,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results[0]), 0)
 
-    def test_document_legacy_created_format(self):
+    def test_document_legacy_created_format(self) -> None:
         """
         GIVEN:
             - Existing document
@@ -225,7 +225,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         doc.refresh_from_db()
         self.assertEqual(doc.created, date(2023, 6, 28))
 
-    def test_document_update_legacy_created_format(self):
+    def test_document_update_legacy_created_format(self) -> None:
         """
         GIVEN:
             - Existing document
@@ -253,7 +253,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         doc.refresh_from_db()
         self.assertEqual(doc.created, date(2023, 2, 1))
 
-    def test_document_update_with_created_date(self):
+    def test_document_update_with_created_date(self) -> None:
         """
         GIVEN:
             - Existing document
@@ -279,7 +279,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         doc.refresh_from_db()
         self.assertEqual(doc.created_date, created_date)
 
-    def test_document_actions(self):
+    def test_document_actions(self) -> None:
         _, filename = tempfile.mkstemp(dir=self.dirs.originals_dir)
 
         content = b"This is a test"
@@ -314,7 +314,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.content, content_thumbnail)
 
-    def test_document_actions_with_perms(self):
+    def test_document_actions_with_perms(self) -> None:
         """
         GIVEN:
             - Document with owner and without granted permissions
@@ -371,7 +371,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     @override_settings(FILENAME_FORMAT="")
-    def test_download_with_archive(self):
+    def test_download_with_archive(self) -> None:
         content = b"This is a test"
         content_archive = b"This is the same test but archived"
 
@@ -412,7 +412,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.content, content)
 
-    def test_document_actions_not_existing_file(self):
+    def test_document_actions_not_existing_file(self) -> None:
         doc = Document.objects.create(
             title="none",
             filename=Path("asd").name,
@@ -428,7 +428,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_document_history_action(self):
+    def test_document_history_action(self) -> None:
         """
         GIVEN:
             - Document
@@ -459,7 +459,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             {"title": ["First title", "New title"]},
         )
 
-    def test_document_history_action_w_custom_fields(self):
+    def test_document_history_action_w_custom_fields(self) -> None:
         """
         GIVEN:
             - Document with custom fields
@@ -522,7 +522,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.data[1]["action"], "create")
 
     @override_settings(AUDIT_LOG_ENABLED=False)
-    def test_document_history_action_disabled(self):
+    def test_document_history_action_disabled(self) -> None:
         """
         GIVEN:
             - Audit log is disabled
@@ -547,7 +547,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.get(f"/api/documents/{doc.pk}/history/")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_document_history_insufficient_perms(self):
+    def test_document_history_insufficient_perms(self) -> None:
         """
         GIVEN:
             - Audit log is enabled
@@ -585,7 +585,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.get(f"/api/documents/{doc2.pk}/history/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_document_filters(self):
+    def test_document_filters(self) -> None:
         doc1 = Document.objects.create(
             title="none1",
             checksum="A",
@@ -760,7 +760,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results), 3)
 
-    def test_custom_field_select_filter(self):
+    def test_custom_field_select_filter(self) -> None:
         """
         GIVEN:
             - Documents with select custom field values
@@ -795,7 +795,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.data["count"], 0)
 
-    def test_document_checksum_filter(self):
+    def test_document_checksum_filter(self) -> None:
         Document.objects.create(
             title="none1",
             checksum="A",
@@ -823,7 +823,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results), 0)
 
-    def test_document_original_filename_filter(self):
+    def test_document_original_filename_filter(self) -> None:
         doc1 = Document.objects.create(
             title="none1",
             checksum="A",
@@ -863,7 +863,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             [doc1.id, doc2.id, doc3.id],
         )
 
-    def test_documents_title_content_filter(self):
+    def test_documents_title_content_filter(self) -> None:
         doc1 = Document.objects.create(
             title="title A",
             content="content A",
@@ -912,7 +912,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results), 0)
 
-    def test_document_permissions_filters(self):
+    def test_document_permissions_filters(self) -> None:
         """
         GIVEN:
             - Documents with owners, with and without granted permissions
@@ -1016,7 +1016,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             [u1_doc1.id],
         )
 
-    def test_pagination_all(self):
+    def test_pagination_all(self) -> None:
         """
         GIVEN:
             - A set of 50 documents
@@ -1041,7 +1041,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(len(response.data["all"]), 50)
         self.assertCountEqual(response.data["all"], [d.id for d in docs])
 
-    def test_statistics(self):
+    def test_statistics(self) -> None:
         doc1 = Document.objects.create(
             title="none1",
             checksum="A",
@@ -1091,7 +1091,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.data["document_type_count"], 1)
         self.assertEqual(response.data["storage_path_count"], 2)
 
-    def test_statistics_no_inbox_tag(self):
+    def test_statistics_no_inbox_tag(self) -> None:
         Document.objects.create(title="none1", checksum="A")
 
         response = self.client.get("/api/statistics/")
@@ -1099,7 +1099,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.data["documents_inbox"], None)
         self.assertEqual(response.data["inbox_tags"], None)
 
-    def test_statistics_multiple_users(self):
+    def test_statistics_multiple_users(self) -> None:
         """
         GIVEN:
             - Inbox tags with different owners and documents that are accessible to different users
@@ -1138,7 +1138,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["documents_inbox"], 0)
 
-    def test_upload(self):
+    def test_upload(self) -> None:
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1162,7 +1162,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.document_type_id)
         self.assertIsNone(overrides.tag_ids)
 
-    def test_create_wrong_endpoint(self):
+    def test_create_wrong_endpoint(self) -> None:
         response = self.client.post(
             "/api/documents/",
             {},
@@ -1170,7 +1170,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def test_upload_empty_metadata(self):
+    def test_upload_empty_metadata(self) -> None:
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1201,7 +1201,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.storage_path_id)
         self.assertIsNone(overrides.tag_ids)
 
-    def test_upload_invalid_form(self):
+    def test_upload_invalid_form(self) -> None:
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1214,7 +1214,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.consume_file_mock.assert_not_called()
 
-    def test_upload_invalid_file(self):
+    def test_upload_invalid_file(self) -> None:
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1227,7 +1227,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.consume_file_mock.assert_not_called()
 
-    def test_upload_with_title(self):
+    def test_upload_with_title(self) -> None:
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1248,7 +1248,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.document_type_id)
         self.assertIsNone(overrides.tag_ids)
 
-    def test_upload_with_correspondent(self):
+    def test_upload_with_correspondent(self) -> None:
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1270,7 +1270,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.document_type_id)
         self.assertIsNone(overrides.tag_ids)
 
-    def test_upload_with_invalid_correspondent(self):
+    def test_upload_with_invalid_correspondent(self) -> None:
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1284,7 +1284,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.consume_file_mock.assert_not_called()
 
-    def test_upload_with_document_type(self):
+    def test_upload_with_document_type(self) -> None:
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1306,7 +1306,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.title)
         self.assertIsNone(overrides.tag_ids)
 
-    def test_upload_with_invalid_document_type(self):
+    def test_upload_with_invalid_document_type(self) -> None:
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1320,7 +1320,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.consume_file_mock.assert_not_called()
 
-    def test_upload_with_storage_path(self):
+    def test_upload_with_storage_path(self) -> None:
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1342,7 +1342,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.title)
         self.assertIsNone(overrides.tag_ids)
 
-    def test_upload_with_invalid_storage_path(self):
+    def test_upload_with_invalid_storage_path(self) -> None:
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1356,7 +1356,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.consume_file_mock.assert_not_called()
 
-    def test_upload_with_tags(self):
+    def test_upload_with_tags(self) -> None:
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1379,7 +1379,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.correspondent_id)
         self.assertIsNone(overrides.title)
 
-    def test_upload_with_invalid_tags(self):
+    def test_upload_with_invalid_tags(self) -> None:
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1395,7 +1395,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.consume_file_mock.assert_not_called()
 
-    def test_upload_with_created(self):
+    def test_upload_with_created(self) -> None:
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1423,7 +1423,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.assertEqual(overrides.created, created.date())
 
-    def test_upload_with_asn(self):
+    def test_upload_with_asn(self) -> None:
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1447,7 +1447,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(overrides.tag_ids)
         self.assertEqual(500, overrides.asn)
 
-    def test_upload_with_custom_fields(self):
+    def test_upload_with_custom_fields(self) -> None:
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),
         )
@@ -1476,7 +1476,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(overrides.filename, "simple.pdf")
         self.assertEqual(overrides.custom_fields, {custom_field.id: None})
 
-    def test_upload_with_custom_fields_and_workflow(self):
+    def test_upload_with_custom_fields_and_workflow(self) -> None:
         """
         GIVEN: A document with a source file
         WHEN: Upload the document with custom fields and a workflow
@@ -1538,7 +1538,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         overrides.update(new_overrides)
         self.assertEqual(overrides.custom_fields, {cf.id: None, cf2.id: 123})
 
-    def test_upload_with_custom_field_values(self):
+    def test_upload_with_custom_field_values(self) -> None:
         """
         GIVEN: A document with a source file
         WHEN: Upload the document with custom fields and values
@@ -1584,7 +1584,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             {cf_string.id: "a string", cf_int.id: 123},
         )
 
-    def test_upload_with_custom_fields_errors(self):
+    def test_upload_with_custom_fields_errors(self) -> None:
         """
         GIVEN: A document with a source file
         WHEN: Upload the document with invalid custom fields payloads
@@ -1618,7 +1618,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.consume_file_mock.assert_not_called()
 
-    def test_upload_with_webui_source(self):
+    def test_upload_with_webui_source(self) -> None:
         """
         GIVEN: A document with a source file
         WHEN: Upload the document with 'from_webui' flag
@@ -1642,7 +1642,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.assertEqual(input_doc.source, WorkflowTrigger.DocumentSourceChoices.WEB_UI)
 
-    def test_upload_invalid_pdf(self):
+    def test_upload_invalid_pdf(self) -> None:
         """
         GIVEN: Invalid PDF named "*.pdf" that mime_type is in settings.CONSUMER_PDF_RECOVERABLE_MIME_TYPES
         WHEN: Upload the file
@@ -1660,7 +1660,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_get_metadata(self):
+    def test_get_metadata(self) -> None:
         doc = Document.objects.create(
             title="test",
             filename="file.pdf",
@@ -1698,11 +1698,11 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         response = self.client.get(f"/api/documents/{doc.pk}/metadata/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_get_metadata_invalid_doc(self):
+    def test_get_metadata_invalid_doc(self) -> None:
         response = self.client.get("/api/documents/34576/metadata/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_get_metadata_no_archive(self):
+    def test_get_metadata_no_archive(self) -> None:
         doc = Document.objects.create(
             title="test",
             filename="file.pdf",
@@ -1722,7 +1722,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(meta["archive_metadata"])
         self.assertIsNone(meta["archive_media_filename"])
 
-    def test_get_metadata_missing_files(self):
+    def test_get_metadata_missing_files(self) -> None:
         doc = Document.objects.create(
             title="test",
             filename="file.pdf",
@@ -1743,7 +1743,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertIsNone(meta["archive_metadata"])
         self.assertIsNone(meta["archive_size"])
 
-    def test_get_empty_suggestions(self):
+    def test_get_empty_suggestions(self) -> None:
         doc = Document.objects.create(title="test", mime_type="application/pdf")
 
         response = self.client.get(f"/api/documents/{doc.pk}/suggestions/")
@@ -1760,7 +1760,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             },
         )
 
-    def test_get_suggestions_invalid_doc(self):
+    def test_get_suggestions_invalid_doc(self) -> None:
         response = self.client.get("/api/documents/34676/suggestions/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -1913,7 +1913,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.client.get(f"/api/documents/{doc.pk}/suggestions/")
         self.assertFalse(parse_date_generator.called)
 
-    def test_saved_views(self):
+    def test_saved_views(self) -> None:
         u1 = User.objects.create_superuser("user1")
         u2 = User.objects.create_superuser("user2")
 
@@ -1970,7 +1970,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             status.HTTP_404_NOT_FOUND,
         )
 
-    def test_saved_view_create_update_patch(self):
+    def test_saved_view_create_update_patch(self) -> None:
         User.objects.create_user("user1")
 
         view = {
@@ -2017,7 +2017,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         v1 = SavedView.objects.get(id=v1.id)
         self.assertEqual(v1.filter_rules.count(), 0)
 
-    def test_saved_view_display_options(self):
+    def test_saved_view_display_options(self) -> None:
         """
         GIVEN:
             - Saved view
@@ -2108,7 +2108,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         v1.refresh_from_db()
         self.assertEqual(v1.display_fields, None)
 
-    def test_saved_view_display_customfields(self):
+    def test_saved_view_display_customfields(self) -> None:
         """
         GIVEN:
             - Saved view
@@ -2179,7 +2179,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_saved_view_cleanup_after_custom_field_deletion(self):
+    def test_saved_view_cleanup_after_custom_field_deletion(self) -> None:
         """
         GIVEN:
             - Saved view with custom field in display fields and as sort field
@@ -2215,7 +2215,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             [str(SavedView.DisplayFields.TITLE), str(SavedView.DisplayFields.CREATED)],
         )
 
-    def test_get_logs(self):
+    def test_get_logs(self) -> None:
         log_data = "test\ntest2\n"
         with (Path(settings.LOGGING_DIR) / "mail.log").open("w") as f:
             f.write(log_data)
@@ -2225,7 +2225,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertCountEqual(response.data, ["mail", "paperless"])
 
-    def test_get_logs_only_when_exist(self):
+    def test_get_logs_only_when_exist(self) -> None:
         log_data = "test\ntest2\n"
         with (Path(settings.LOGGING_DIR) / "paperless.log").open("w") as f:
             f.write(log_data)
@@ -2233,16 +2233,16 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertCountEqual(response.data, ["paperless"])
 
-    def test_get_invalid_log(self):
+    def test_get_invalid_log(self) -> None:
         response = self.client.get("/api/logs/bogus_log/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     @override_settings(LOGGING_DIR="bogus_dir")
-    def test_get_nonexistent_log(self):
+    def test_get_nonexistent_log(self) -> None:
         response = self.client.get("/api/logs/paperless/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_get_log(self):
+    def test_get_log(self) -> None:
         log_data = "test\ntest2\n"
         with (Path(settings.LOGGING_DIR) / "paperless.log").open("w") as f:
             f.write(log_data)
@@ -2250,7 +2250,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertListEqual(response.data, ["test", "test2"])
 
-    def test_invalid_regex_other_algorithm(self):
+    def test_invalid_regex_other_algorithm(self) -> None:
         for endpoint in ["correspondents", "tags", "document_types"]:
             response = self.client.post(
                 f"/api/{endpoint}/",
@@ -2263,7 +2263,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             )
             self.assertEqual(response.status_code, status.HTTP_201_CREATED, endpoint)
 
-    def test_invalid_regex(self):
+    def test_invalid_regex(self) -> None:
         for endpoint in ["correspondents", "tags", "document_types"]:
             response = self.client.post(
                 f"/api/{endpoint}/",
@@ -2280,7 +2280,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
                 endpoint,
             )
 
-    def test_valid_regex(self):
+    def test_valid_regex(self) -> None:
         for endpoint in ["correspondents", "tags", "document_types"]:
             response = self.client.post(
                 f"/api/{endpoint}/",
@@ -2293,7 +2293,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             )
             self.assertEqual(response.status_code, status.HTTP_201_CREATED, endpoint)
 
-    def test_regex_no_algorithm(self):
+    def test_regex_no_algorithm(self) -> None:
         for endpoint in ["correspondents", "tags", "document_types"]:
             response = self.client.post(
                 f"/api/{endpoint}/",
@@ -2302,7 +2302,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             )
             self.assertEqual(response.status_code, status.HTTP_201_CREATED, endpoint)
 
-    def test_tag_color_default(self):
+    def test_tag_color_default(self) -> None:
         response = self.client.post("/api/tags/", {"name": "tag"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Tag.objects.get(id=response.data["id"]).color, "#a6cee3")
@@ -2315,7 +2315,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             1,
         )
 
-    def test_tag_color(self):
+    def test_tag_color(self) -> None:
         response = self.client.post(
             "/api/tags/",
             data={"name": "tag", "colour": 3},
@@ -2333,7 +2333,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             3,
         )
 
-    def test_tag_color_invalid(self):
+    def test_tag_color_invalid(self) -> None:
         response = self.client.post(
             "/api/tags/",
             data={"name": "tag", "colour": 34},
@@ -2342,7 +2342,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_tag_color_custom(self):
+    def test_tag_color_custom(self) -> None:
         tag = Tag.objects.create(name="test", color="#abcdef")
         self.assertEqual(
             self.client.get(
@@ -2353,7 +2353,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             1,
         )
 
-    def test_get_existing_notes(self):
+    def test_get_existing_notes(self) -> None:
         """
         GIVEN:
             - A document with a single note
@@ -2415,7 +2415,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             },
         )
 
-    def test_docnote_serializer_v7(self):
+    def test_docnote_serializer_v7(self) -> None:
         doc = Document.objects.create(
             title="test",
             mime_type="application/pdf",
@@ -2435,7 +2435,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             self.user.id,
         )
 
-    def test_create_note(self):
+    def test_create_note(self) -> None:
         """
         GIVEN:
             - Existing document
@@ -2479,7 +2479,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         # modified was updated to today
         self.assertEqual(doc.modified.day, timezone.now().day)
 
-    def test_notes_permissions_aware(self):
+    def test_notes_permissions_aware(self) -> None:
         """
         GIVEN:
             - Existing document owned by user2 but with granted view perms for user1
@@ -2535,7 +2535,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(response.content, b"Insufficient permissions to delete notes")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_delete_note(self):
+    def test_delete_note(self) -> None:
         """
         GIVEN:
             - Existing document, existing note
@@ -2571,7 +2571,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         # modified was updated to today
         self.assertEqual(doc.modified.day, timezone.now().day)
 
-    def test_get_notes_no_doc(self):
+    def test_get_notes_no_doc(self) -> None:
         """
         GIVEN:
             - A request to get notes from a non-existent document
@@ -2586,7 +2586,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_tag_unique_name_and_owner(self):
+    def test_tag_unique_name_and_owner(self) -> None:
         """
         GIVEN:
             - Multiple users
@@ -2646,7 +2646,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_tag_unique_name_and_owner_enforced_on_update(self):
+    def test_tag_unique_name_and_owner_enforced_on_update(self) -> None:
         """
         GIVEN:
             - Multiple users
@@ -2680,7 +2680,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_create_share_links(self):
+    def test_create_share_links(self) -> None:
         """
         GIVEN:
             - Existing document
@@ -2752,7 +2752,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_share_links_permissions_aware(self):
+    def test_share_links_permissions_aware(self) -> None:
         """
         GIVEN:
             - Existing document owned by user2 but with granted view perms for user1
@@ -2793,7 +2793,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-    def test_next_asn(self):
+    def test_next_asn(self) -> None:
         """
         GIVEN:
             - Existing documents with ASNs, highest owned by user2
@@ -2837,7 +2837,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.content, b"1000")
 
-    def test_next_asn_no_documents_with_asn(self):
+    def test_next_asn_no_documents_with_asn(self) -> None:
         """
         GIVEN:
             - Existing document, but with no ASN assugned
@@ -2866,7 +2866,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.content, b"1")
 
-    def test_asn_not_unique_with_trashed_doc(self):
+    def test_asn_not_unique_with_trashed_doc(self) -> None:
         """
         GIVEN:
             - Existing document with ASN that is trashed
@@ -2910,7 +2910,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             },
         )
 
-    def test_remove_inbox_tags(self):
+    def test_remove_inbox_tags(self) -> None:
         """
         GIVEN:
             - Existing document with or without inbox tags
@@ -2980,7 +2980,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         EMAIL_ENABLED=True,
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
     )
-    def test_email_document(self):
+    def test_email_document(self) -> None:
         """
         GIVEN:
             - Existing document
@@ -3040,7 +3040,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(mail.outbox[1].attachments[0][0], expected_filename2)
 
     @mock.patch("django.core.mail.message.EmailMessage.send", side_effect=Exception)
-    def test_email_document_errors(self, mocked_send):
+    def test_email_document_errors(self, mocked_send) -> None:
         """
         GIVEN:
             - Existing document
@@ -3126,7 +3126,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @mock.patch("django_softdelete.models.SoftDeleteModel.delete")
-    def test_warn_on_delete_with_old_uuid_field(self, mocked_delete):
+    def test_warn_on_delete_with_old_uuid_field(self, mocked_delete) -> None:
         """
         GIVEN:
             - Existing document in a (mocked) MariaDB database with an old UUID field
@@ -3156,7 +3156,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
 
 class TestDocumentApiV2(DirectoriesMixin, APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
@@ -3164,7 +3164,7 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
         self.client.force_authenticate(user=self.user)
         self.client.defaults["HTTP_ACCEPT"] = "application/json; version=2"
 
-    def test_tag_validate_color(self):
+    def test_tag_validate_color(self) -> None:
         self.assertEqual(
             self.client.post(
                 "/api/tags/",
@@ -3207,7 +3207,7 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
             status.HTTP_400_BAD_REQUEST,
         )
 
-    def test_tag_text_color(self):
+    def test_tag_text_color(self) -> None:
         t = Tag.objects.create(name="tag1", color="#000000")
         self.assertEqual(
             self.client.get(f"/api/tags/{t.id}/", format="json").data["text_color"],
@@ -3237,7 +3237,7 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
 
 
 class TestDocumentApiCustomFieldsSorting(DirectoriesMixin, APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
@@ -3261,7 +3261,7 @@ class TestDocumentApiCustomFieldsSorting(DirectoriesMixin, APITestCase):
 
         cache.clear()
 
-    def test_document_custom_fields_sorting(self):
+    def test_document_custom_fields_sorting(self) -> None:
         """
         GIVEN:
             - Documents with custom fields
@@ -3381,7 +3381,7 @@ class TestDocumentApiCustomFieldsSorting(DirectoriesMixin, APITestCase):
                     [self.doc1.id, self.doc3.id, self.doc2.id],
                 )
 
-    def test_document_custom_fields_sorting_invalid(self):
+    def test_document_custom_fields_sorting_invalid(self) -> None:
         """
         GIVEN:
             - Documents with custom fields
@@ -3396,7 +3396,7 @@ class TestDocumentApiCustomFieldsSorting(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_document_custom_fields_sorting_invalid_data_type(self):
+    def test_document_custom_fields_sorting_invalid_data_type(self) -> None:
         """
         GIVEN:
             - Documents with custom fields

@@ -122,7 +122,7 @@ class DocumentClassifier:
             )
         self._stop_words = None
 
-    def _update_data_vectorizer_hash(self):
+    def _update_data_vectorizer_hash(self) -> None:
         self.data_vectorizer_hash = sha256(
             pickle.dumps(self.data_vectorizer),
         ).hexdigest()

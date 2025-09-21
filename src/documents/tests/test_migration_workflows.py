@@ -12,7 +12,7 @@ class TestMigrateWorkflow(TestMigrations):
         ),
     )
 
-    def setUpBeforeMigration(self, apps):
+    def setUpBeforeMigration(self, apps) -> None:
         User = apps.get_model("auth", "User")
         Group = apps.get_model("auth", "Group")
         self.Permission = apps.get_model("auth", "Permission")
@@ -72,7 +72,9 @@ class TestMigrateWorkflow(TestMigrations):
         ct.assign_custom_fields.add(cf1)
         ct.save()
 
-    def test_users_with_add_documents_get_add_and_workflow_templates_get_migrated(self):
+    def test_users_with_add_documents_get_add_and_workflow_templates_get_migrated(
+        self,
+    ) -> None:
         permission = self.Permission.objects.get(codename="add_workflow")
         self.assertTrue(permission in self.user.user_permissions.all())
         self.assertTrue(permission in self.group.permissions.all())
@@ -85,7 +87,7 @@ class TestReverseMigrateWorkflow(TestMigrations):
     migrate_from = "1044_workflow_workflowaction_workflowtrigger_and_more"
     migrate_to = "1043_alter_savedviewfilterrule_rule_type"
 
-    def setUpBeforeMigration(self, apps):
+    def setUpBeforeMigration(self, apps) -> None:
         User = apps.get_model("auth", "User")
         Group = apps.get_model("auth", "Group")
         self.Permission = apps.get_model("auth", "Permission")
@@ -122,7 +124,7 @@ class TestReverseMigrateWorkflow(TestMigrations):
 
     def test_remove_workflow_permissions_and_migrate_workflows_to_consumption_templates(
         self,
-    ):
+    ) -> None:
         permission = self.Permission.objects.filter(
             codename="add_workflow",
         ).first()

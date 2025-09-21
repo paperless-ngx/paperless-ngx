@@ -17,7 +17,7 @@ def source_path(self):
     return Path(settings.ORIGINALS_DIR / fname).resolve()
 
 
-def add_number_of_pages_to_page_count(apps, schema_editor):
+def add_number_of_pages_to_page_count(apps, schema_editor) -> None:
     Document = apps.get_model("documents", "Document")
 
     if not Document.objects.all().exists():
