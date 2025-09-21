@@ -68,7 +68,7 @@ def setup_directories():
     return dirs
 
 
-def remove_dirs(dirs):
+def remove_dirs(dirs) -> None:
     shutil.rmtree(dirs.media_dir, ignore_errors=True)
     shutil.rmtree(dirs.data_dir, ignore_errors=True)
     shutil.rmtree(dirs.scratch_dir, ignore_errors=True)
@@ -169,23 +169,23 @@ class FileSystemAssertsMixin:
     Utilities for checks various state information of the file system
     """
 
-    def assertIsFile(self, path: PathLike | str):
+    def assertIsFile(self, path: PathLike | str) -> None:
         self.assertTrue(Path(path).resolve().is_file(), f"File does not exist: {path}")
 
-    def assertIsNotFile(self, path: PathLike | str):
+    def assertIsNotFile(self, path: PathLike | str) -> None:
         self.assertFalse(Path(path).resolve().is_file(), f"File does exist: {path}")
 
-    def assertIsDir(self, path: PathLike | str):
+    def assertIsDir(self, path: PathLike | str) -> None:
         self.assertTrue(Path(path).resolve().is_dir(), f"Dir does not exist: {path}")
 
-    def assertIsNotDir(self, path: PathLike | str):
+    def assertIsNotDir(self, path: PathLike | str) -> None:
         self.assertFalse(Path(path).resolve().is_dir(), f"Dir does exist: {path}")
 
     def assertFilesEqual(
         self,
         path1: PathLike | str,
         path2: PathLike | str,
-    ):
+    ) -> None:
         path1 = Path(path1)
         path2 = Path(path2)
         import hashlib
@@ -195,7 +195,7 @@ class FileSystemAssertsMixin:
 
         self.assertEqual(hash1, hash2, "File SHA256 mismatch")
 
-    def assertFileCountInDir(self, path: PathLike | str, count: int):
+    def assertFileCountInDir(self, path: PathLike | str, count: int) -> None:
         path = Path(path).resolve()
         self.assertTrue(path.is_dir(), f"Path {path} is not a directory")
         files = [x for x in path.iterdir() if x.is_file()]
@@ -293,7 +293,7 @@ class TestMigrations(TransactionTestCase):
     migrate_to = None
     auto_migrate = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         assert self.migrate_from and self.migrate_to, (
@@ -316,7 +316,7 @@ class TestMigrations(TransactionTestCase):
         if self.auto_migrate:
             self.performMigration()
 
-    def performMigration(self):
+    def performMigration(self) -> None:
         # Run the migration to test
         executor = MigrationExecutor(connection)
         executor.loader.build_graph()  # reload.
@@ -324,10 +324,10 @@ class TestMigrations(TransactionTestCase):
 
         self.apps = executor.loader.project_state(self.migrate_to).apps
 
-    def setUpBeforeMigration(self, apps):
+    def setUpBeforeMigration(self, apps) -> None:
         pass
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """
         Ensure the database schema is restored to the latest migration after
         each migration test, so subsequent tests run against HEAD.
@@ -404,7 +404,7 @@ class DummyProgressManager:
         self.open()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         self.close()
 
     def open(self) -> None:

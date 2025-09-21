@@ -7,7 +7,7 @@ class DocumentsConfig(AppConfig):
 
     verbose_name = _("Documents")
 
-    def ready(self):
+    def ready(self) -> None:
         from documents.signals import document_consumption_finished
         from documents.signals import document_updated
         from documents.signals.handlers import add_inbox_tags
