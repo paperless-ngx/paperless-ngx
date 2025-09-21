@@ -71,4 +71,20 @@ describe('TagListComponent', () => {
       'Do you really want to delete the tag "Tag1"?'
     )
   })
+
+  it('should filter out child tags if name filter is empty, otherwise show all', () => {
+    const tags = [
+      { id: 1, name: 'Tag1', parent: null },
+      { id: 2, name: 'Tag2', parent: 1 },
+      { id: 3, name: 'Tag3', parent: null },
+    ]
+    component['_nameFilter'] = null // Simulate empty name filter
+    const filtered = component.filterData(tags as any)
+    expect(filtered.length).toBe(2)
+    expect(filtered.find((t) => t.id === 2)).toBeUndefined()
+
+    component['_nameFilter'] = 'Tag2' // Simulate non-empty name filter
+    const filteredWithName = component.filterData(tags as any)
+    expect(filteredWithName.length).toBe(3)
+  })
 })

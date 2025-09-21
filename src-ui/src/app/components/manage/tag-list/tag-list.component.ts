@@ -62,6 +62,8 @@ export class TagListComponent extends ManagementListComponent<Tag> {
   }
 
   filterData(data: Tag[]) {
-    return data.filter((tag) => !tag.parent)
+    return this.nameFilter?.length
+      ? [...data]
+      : data.filter((tag) => !tag.parent)
   }
 }
