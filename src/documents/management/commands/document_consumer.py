@@ -82,6 +82,13 @@ def _is_ignored(filepath: Path) -> bool:
 
 
 def _consume(filepath: Path) -> None:
+    # Check permissions early
+    try:
+        filepath.stat()
+    except (PermissionError, OSError):
+        logger.warning(f"Not consuming file {filepath}: Permission denied.")
+        return
+
     if filepath.is_dir() or _is_ignored(filepath):
         return
 

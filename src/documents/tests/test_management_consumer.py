@@ -224,7 +224,9 @@ class TestConsumer(DirectoriesMixin, ConsumerThreadMixin, TransactionTestCase):
         with mock.patch("pathlib.Path.stat", new=raising_stat):
             document_consumer._consume(filepath)
 
-        warning_logger.assert_called_once_with(f"Unable to check file {filepath}")
+        warning_logger.assert_called_once()
+        (args, _) = warning_logger.call_args
+        self.assertIn("Permission denied", args[0])
         self.consume_file_mock.assert_not_called()
 
     @override_settings(CONSUMPTION_DIR="does_not_exist")
