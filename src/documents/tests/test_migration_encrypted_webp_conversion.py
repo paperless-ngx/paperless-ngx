@@ -28,7 +28,7 @@ class TestMigrateToEncrytpedWebPThumbnails(TestMigrations):
     migrate_to = "1037_webp_encrypted_thumbnail_conversion"
     auto_migrate = False
 
-    def pretend_convert_output(self, *args, **kwargs):
+    def pretend_convert_output(self, *args, **kwargs) -> None:
         """
         Pretends to do the conversion, by copying the input file
         to the output file
@@ -38,7 +38,7 @@ class TestMigrateToEncrytpedWebPThumbnails(TestMigrations):
             Path(kwargs["output_file"]),
         )
 
-    def pretend_map(self, func: Callable, iterable: Iterable):
+    def pretend_map(self, func: Callable, iterable: Iterable) -> None:
         """
         Pretends to be the map of a multiprocessing.Pool, but secretly does
         everything in series
@@ -52,7 +52,7 @@ class TestMigrateToEncrytpedWebPThumbnails(TestMigrations):
         ext: str,
         count: int,
         start_count: int = 0,
-    ):
+    ) -> None:
         """
         Helper to create a certain count of files of given extension in a given directory
         """
@@ -66,7 +66,7 @@ class TestMigrateToEncrytpedWebPThumbnails(TestMigrations):
         thumb_dir: Path,
         count: int,
         start_count: int = 0,
-    ):
+    ) -> None:
         """
         Creates a dummy WebP thumbnail file in the given directory, based on
         the database Document
@@ -78,7 +78,7 @@ class TestMigrateToEncrytpedWebPThumbnails(TestMigrations):
         thumb_dir: Path,
         count: int,
         start_count: int = 0,
-    ):
+    ) -> None:
         """
         Creates a dummy encrypted WebP thumbnail file in the given directory, based on
         the database Document
@@ -90,7 +90,7 @@ class TestMigrateToEncrytpedWebPThumbnails(TestMigrations):
         thumb_dir: Path,
         count: int,
         start_count: int = 0,
-    ):
+    ) -> None:
         """
         Creates a dummy PNG thumbnail file in the given directory, based on
         the database Document
@@ -103,7 +103,7 @@ class TestMigrateToEncrytpedWebPThumbnails(TestMigrations):
         thumb_dir: Path,
         count: int,
         start_count: int = 0,
-    ):
+    ) -> None:
         """
         Creates a dummy encrypted PNG thumbnail file in the given directory, based on
         the database Document
@@ -116,7 +116,7 @@ class TestMigrateToEncrytpedWebPThumbnails(TestMigrations):
         ext: str,
         dir: str | Path,
         expected_count: int,
-    ):
+    ) -> None:
         """
         Helper to assert a certain count of given extension files in given directory
         """
@@ -125,25 +125,25 @@ class TestMigrateToEncrytpedWebPThumbnails(TestMigrations):
         matching_files = list(dir.glob(f"*.{ext}"))
         self.assertEqual(len(matching_files), expected_count)
 
-    def assert_encrypted_png_file_count(self, dir: Path, expected_count: int):
+    def assert_encrypted_png_file_count(self, dir: Path, expected_count: int) -> None:
         """
         Helper to assert a certain count of excrypted PNG extension files in given directory
         """
         self.assert_file_count_by_extension("png.gpg", dir, expected_count)
 
-    def assert_encrypted_webp_file_count(self, dir: Path, expected_count: int):
+    def assert_encrypted_webp_file_count(self, dir: Path, expected_count: int) -> None:
         """
         Helper to assert a certain count of encrypted WebP extension files in given directory
         """
         self.assert_file_count_by_extension("webp.gpg", dir, expected_count)
 
-    def assert_webp_file_count(self, dir: Path, expected_count: int):
+    def assert_webp_file_count(self, dir: Path, expected_count: int) -> None:
         """
         Helper to assert a certain count of WebP extension files in given directory
         """
         self.assert_file_count_by_extension("webp", dir, expected_count)
 
-    def assert_png_file_count(self, dir: Path, expected_count: int):
+    def assert_png_file_count(self, dir: Path, expected_count: int) -> None:
         """
         Helper to assert a certain count of PNG extension files in given directory
         """
@@ -163,7 +163,7 @@ class TestMigrateToEncrytpedWebPThumbnails(TestMigrations):
         self,
         run_convert_mock: mock.MagicMock,
         map_mock: mock.MagicMock,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Encrypted document exists with existing encrypted WebP thumbnail path
@@ -188,7 +188,7 @@ class TestMigrateToEncrytpedWebPThumbnails(TestMigrations):
         self,
         run_convert_mock: mock.MagicMock,
         map_mock: mock.MagicMock,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Encrypted documents exist with PNG thumbnail
@@ -216,7 +216,7 @@ class TestMigrateToEncrytpedWebPThumbnails(TestMigrations):
         self,
         run_convert_mock: mock.MagicMock,
         map_mock: mock.MagicMock,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Encrypted document exists with PNG thumbnail
@@ -244,7 +244,7 @@ class TestMigrateToEncrytpedWebPThumbnails(TestMigrations):
         self,
         run_convert_mock: mock.MagicMock,
         map_mock: mock.MagicMock,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Documents exist with PNG, encrypted PNG and WebP thumbnails

@@ -27,7 +27,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
             safe_fallback=False,
         )
 
-    def test_db_settings_ocr_pages(self):
+    def test_db_settings_ocr_pages(self) -> None:
         """
         GIVEN:
             - Django settings defines different value for OCR_PAGES than
@@ -45,7 +45,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
             params = self.get_params()
         self.assertEqual(params["pages"], "1-5")
 
-    def test_db_settings_ocr_language(self):
+    def test_db_settings_ocr_language(self) -> None:
         """
         GIVEN:
             - Django settings defines different value for OCR_LANGUAGE than
@@ -63,7 +63,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
             params = self.get_params()
         self.assertEqual(params["language"], "fra+ita")
 
-    def test_db_settings_ocr_output_type(self):
+    def test_db_settings_ocr_output_type(self) -> None:
         """
         GIVEN:
             - Django settings defines different value for OCR_OUTPUT_TYPE than
@@ -81,7 +81,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
             params = self.get_params()
         self.assertEqual(params["output_type"], "pdfa")
 
-    def test_db_settings_ocr_mode(self):
+    def test_db_settings_ocr_mode(self) -> None:
         """
         GIVEN:
             - Django settings defines different value for OCR_MODE than
@@ -101,7 +101,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         self.assertNotIn("redo_ocr", params)
         self.assertNotIn("force_ocr", params)
 
-    def test_db_settings_ocr_clean(self):
+    def test_db_settings_ocr_clean(self) -> None:
         """
         GIVEN:
             - Django settings defines different value for OCR_CLEAN than
@@ -129,7 +129,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         self.assertTrue(params["clean_final"])
         self.assertNotIn("clean", params)
 
-    def test_db_settings_ocr_deskew(self):
+    def test_db_settings_ocr_deskew(self) -> None:
         """
         GIVEN:
             - Django settings defines different value for OCR_DESKEW than
@@ -147,7 +147,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
             params = self.get_params()
         self.assertTrue(params["deskew"])
 
-    def test_db_settings_ocr_rotate(self):
+    def test_db_settings_ocr_rotate(self) -> None:
         """
         GIVEN:
             - Django settings defines different value for OCR_ROTATE_PAGES
@@ -167,7 +167,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         self.assertTrue(params["rotate_pages"])
         self.assertAlmostEqual(params["rotate_pages_threshold"], 15.0)
 
-    def test_db_settings_ocr_max_pixels(self):
+    def test_db_settings_ocr_max_pixels(self) -> None:
         """
         GIVEN:
             - Django settings defines different value for OCR_MAX_IMAGE_PIXELS than
@@ -185,7 +185,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
             params = self.get_params()
         self.assertAlmostEqual(params["max_image_mpixels"], 1.0)
 
-    def test_db_settings_ocr_color_convert(self):
+    def test_db_settings_ocr_color_convert(self) -> None:
         """
         GIVEN:
             - Django settings defines different value for OCR_COLOR_CONVERSION_STRATEGY than
@@ -206,7 +206,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
             "UseDeviceIndependentColor",
         )
 
-    def test_ocr_user_args(self):
+    def test_ocr_user_args(self) -> None:
         """
         GIVEN:
             - Django settings defines different value for OCR_USER_ARGS than

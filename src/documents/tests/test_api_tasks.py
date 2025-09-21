@@ -15,13 +15,13 @@ from documents.views import TasksViewSet
 class TestTasks(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/tasks/"
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
         self.client.force_authenticate(user=self.user)
 
-    def test_get_tasks(self):
+    def test_get_tasks(self) -> None:
         """
         GIVEN:
             - Attempted celery tasks
@@ -56,7 +56,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_task2["status"], celery.states.PENDING)
         self.assertEqual(returned_task2["task_file_name"], task2.task_file_name)
 
-    def test_get_single_task_status(self):
+    def test_get_single_task_status(self) -> None:
         """
         GIVEN
             - Query parameter for a valid task ID
@@ -85,7 +85,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
 
         self.assertEqual(returned_task1["task_id"], task1.task_id)
 
-    def test_get_single_task_status_not_valid(self):
+    def test_get_single_task_status_not_valid(self) -> None:
         """
         GIVEN
             - Query parameter for a non-existent task ID
@@ -109,7 +109,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 0)
 
-    def test_acknowledge_tasks(self):
+    def test_acknowledge_tasks(self) -> None:
         """
         GIVEN:
             - Attempted celery tasks
@@ -135,7 +135,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         response = self.client.get(self.ENDPOINT + "?acknowledged=false")
         self.assertEqual(len(response.data), 0)
 
-    def test_acknowledge_tasks_requires_change_permission(self):
+    def test_acknowledge_tasks_requires_change_permission(self) -> None:
         """
         GIVEN:
             - A regular user initially without change permissions
@@ -173,7 +173,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_tasks_owner_aware(self):
+    def test_tasks_owner_aware(self) -> None:
         """
         GIVEN:
             - Existing PaperlessTasks with owner and with no owner
@@ -219,7 +219,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         self.assertEqual(acknowledge_response.status_code, status.HTTP_200_OK)
         self.assertEqual(acknowledge_response.data, {"result": 2})
 
-    def test_task_result_no_error(self):
+    def test_task_result_no_error(self) -> None:
         """
         GIVEN:
             - A celery task completed without error
@@ -245,7 +245,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_data["result"], "Success. New document id 1 created")
         self.assertEqual(returned_data["related_document"], "1")
 
-    def test_task_result_with_error(self):
+    def test_task_result_with_error(self) -> None:
         """
         GIVEN:
             - A celery task completed with an exception
@@ -273,7 +273,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
             "test.pdf: Not consuming test.pdf: It is a duplicate.",
         )
 
-    def test_task_name_webui(self):
+    def test_task_name_webui(self) -> None:
         """
         GIVEN:
             - Attempted celery task
@@ -299,7 +299,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
 
         self.assertEqual(returned_data["task_file_name"], "test.pdf")
 
-    def test_task_name_consume_folder(self):
+    def test_task_name_consume_folder(self) -> None:
         """
         GIVEN:
             - Attempted celery task
@@ -325,7 +325,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
 
         self.assertEqual(returned_data["task_file_name"], "anothertest.pdf")
 
-    def test_task_result_failed_duplicate_includes_related_doc(self):
+    def test_task_result_failed_duplicate_includes_related_doc(self) -> None:
         """
         GIVEN:
             - A celery task failed with a duplicate error
@@ -350,7 +350,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
 
         self.assertEqual(returned_data["related_document"], "1234")
 
-    def test_run_train_classifier_task(self):
+    def test_run_train_classifier_task(self) -> None:
         """
         GIVEN:
             - A superuser
@@ -387,7 +387,7 @@ class TestTasks(DirectoriesMixin, APITestCase):
         mock_train_classifier.assert_called_once_with(scheduled=False)
 
     @mock.patch("documents.tasks.sanity_check")
-    def test_run_task_requires_superuser(self, mock_check_sanity):
+    def test_run_task_requires_superuser(self, mock_check_sanity) -> None:
         """
         GIVEN:
             - A regular user

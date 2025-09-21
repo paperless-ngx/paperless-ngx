@@ -187,7 +187,7 @@ class TestExportImport(
 
         return manifest
 
-    def test_exporter(self, *, use_filename_format=False):
+    def test_exporter(self, *, use_filename_format=False) -> None:
         shutil.rmtree(Path(self.dirs.media_dir) / "documents")
         shutil.copytree(
             Path(__file__).parent / "samples" / "documents",
@@ -290,7 +290,7 @@ class TestExportImport(
             # everything is alright after the test
             self.assertEqual(len(messages), 0)
 
-    def test_exporter_with_filename_format(self):
+    def test_exporter_with_filename_format(self) -> None:
         shutil.rmtree(Path(self.dirs.media_dir) / "documents")
         shutil.copytree(
             Path(__file__).parent / "samples" / "documents",
@@ -302,7 +302,7 @@ class TestExportImport(
         ):
             self.test_exporter(use_filename_format=True)
 
-    def test_update_export_changed_time(self):
+    def test_update_export_changed_time(self) -> None:
         shutil.rmtree(Path(self.dirs.media_dir) / "documents")
         shutil.copytree(
             Path(__file__).parent / "samples" / "documents",
@@ -341,7 +341,7 @@ class TestExportImport(
         st_mtime_4 = (self.target / "manifest.json").stat().st_mtime
         self.assertEqual(st_mtime_3, st_mtime_4)
 
-    def test_update_export_changed_checksum(self):
+    def test_update_export_changed_checksum(self) -> None:
         shutil.rmtree(Path(self.dirs.media_dir) / "documents")
         shutil.copytree(
             Path(__file__).parent / "samples" / "documents",
@@ -371,7 +371,7 @@ class TestExportImport(
 
         self.assertIsFile(self.target / "manifest.json")
 
-    def test_update_export_deleted_document(self):
+    def test_update_export_deleted_document(self) -> None:
         shutil.rmtree(Path(self.dirs.media_dir) / "documents")
         shutil.copytree(
             Path(__file__).parent / "samples" / "documents",
@@ -406,7 +406,7 @@ class TestExportImport(
         self.assertTrue(len(manifest), 6)
 
     @override_settings(FILENAME_FORMAT="{title}/{correspondent}")
-    def test_update_export_changed_location(self):
+    def test_update_export_changed_location(self) -> None:
         shutil.rmtree(Path(self.dirs.media_dir) / "documents")
         shutil.copytree(
             Path(__file__).parent / "samples" / "documents",
@@ -430,7 +430,7 @@ class TestExportImport(
             self.target / "wow2" / "none_01.pdf",
         )
 
-    def test_export_missing_files(self):
+    def test_export_missing_files(self) -> None:
         target = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, target)
         Document.objects.create(
@@ -442,7 +442,7 @@ class TestExportImport(
         self.assertRaises(FileNotFoundError, call_command, "document_exporter", target)
 
     @override_settings(PASSPHRASE="test")
-    def test_export_zipped(self):
+    def test_export_zipped(self) -> None:
         """
         GIVEN:
             - Request to export documents to zipfile
@@ -474,7 +474,7 @@ class TestExportImport(
             self.assertIn("metadata.json", zip.namelist())
 
     @override_settings(PASSPHRASE="test")
-    def test_export_zipped_format(self):
+    def test_export_zipped_format(self) -> None:
         """
         GIVEN:
             - Request to export documents to zipfile
@@ -511,7 +511,7 @@ class TestExportImport(
             self.assertIn("metadata.json", zip.namelist())
 
     @override_settings(PASSPHRASE="test")
-    def test_export_zipped_with_delete(self):
+    def test_export_zipped_with_delete(self) -> None:
         """
         GIVEN:
             - Request to export documents to zipfile
@@ -557,7 +557,7 @@ class TestExportImport(
             self.assertIn("manifest.json", zip.namelist())
             self.assertIn("metadata.json", zip.namelist())
 
-    def test_export_target_not_exists(self):
+    def test_export_target_not_exists(self) -> None:
         """
         GIVEN:
             - Request to export documents to directory that doesn't exist
@@ -573,7 +573,7 @@ class TestExportImport(
 
         self.assertEqual("That path doesn't exist", str(e.exception))
 
-    def test_export_target_exists_but_is_file(self):
+    def test_export_target_exists_but_is_file(self) -> None:
         """
         GIVEN:
             - Request to export documents to file instead of directory
@@ -591,7 +591,7 @@ class TestExportImport(
 
             self.assertEqual("That path isn't a directory", str(e.exception))
 
-    def test_export_target_not_writable(self):
+    def test_export_target_not_writable(self) -> None:
         """
         GIVEN:
             - Request to export documents to directory that's not writeable
@@ -613,7 +613,7 @@ class TestExportImport(
                 str(e.exception),
             )
 
-    def test_no_archive(self):
+    def test_no_archive(self) -> None:
         """
         GIVEN:
             - Request to export documents to directory
@@ -654,7 +654,7 @@ class TestExportImport(
             call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
 
-    def test_no_thumbnail(self):
+    def test_no_thumbnail(self) -> None:
         """
         GIVEN:
             - Request to export documents to directory
@@ -697,7 +697,7 @@ class TestExportImport(
             call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
 
-    def test_split_manifest(self):
+    def test_split_manifest(self) -> None:
         """
         GIVEN:
             - Request to export documents to directory
@@ -729,7 +729,7 @@ class TestExportImport(
             self.assertEqual(Document.objects.count(), 4)
             self.assertEqual(CustomFieldInstance.objects.count(), 1)
 
-    def test_folder_prefix(self):
+    def test_folder_prefix(self) -> None:
         """
         GIVEN:
             - Request to export documents to directory
@@ -753,7 +753,7 @@ class TestExportImport(
             call_command("document_importer", "--no-progress-bar", self.target)
             self.assertEqual(Document.objects.count(), 4)
 
-    def test_import_db_transaction_failed(self):
+    def test_import_db_transaction_failed(self) -> None:
         """
         GIVEN:
             - Import from manifest started
@@ -797,7 +797,7 @@ class TestExportImport(
             self.assertEqual(ContentType.objects.count(), num_content_type_objects)
             self.assertEqual(Permission.objects.count(), num_permission_objects + 1)
 
-    def test_exporter_with_auditlog_disabled(self):
+    def test_exporter_with_auditlog_disabled(self) -> None:
         shutil.rmtree(Path(self.dirs.media_dir) / "documents")
         shutil.copytree(
             Path(__file__).parent / "samples" / "documents",
@@ -811,7 +811,7 @@ class TestExportImport(
             for obj in manifest:
                 self.assertNotEqual(obj["model"], "auditlog.logentry")
 
-    def test_export_data_only(self):
+    def test_export_data_only(self) -> None:
         """
         GIVEN:
             - Request to export documents with data only
@@ -861,7 +861,7 @@ class TestCryptExportImport(
         shutil.rmtree(self.target, ignore_errors=True)
         return super().tearDown()
 
-    def test_export_passphrase(self):
+    def test_export_passphrase(self) -> None:
         """
         GIVEN:
             - A mail account exists
@@ -936,7 +936,7 @@ class TestCryptExportImport(
         social_token = SocialToken.objects.first()
         self.assertIsNotNone(social_token)
 
-    def test_import_crypt_no_passphrase(self):
+    def test_import_crypt_no_passphrase(self) -> None:
         """
         GIVEN:
             - A mail account exists
@@ -967,7 +967,7 @@ class TestCryptExportImport(
                 "No passphrase was given, but this export contains encrypted fields",
             )
 
-    def test_export_warn_plaintext(self):
+    def test_export_warn_plaintext(self) -> None:
         """
         GIVEN:
             - A mail account exists

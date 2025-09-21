@@ -10,29 +10,29 @@ from documents.parsers import parse_date_generator
 
 @pytest.mark.django_db()
 class TestDate:
-    def test_date_format_1(self):
+    def test_date_format_1(self) -> None:
         text = "lorem ipsum 130218 lorem ipsum"
         assert parse_date("", text) is None
 
-    def test_date_format_2(self):
+    def test_date_format_2(self) -> None:
         text = "lorem ipsum 2018 lorem ipsum"
         assert parse_date("", text) is None
 
-    def test_date_format_3(self):
+    def test_date_format_3(self) -> None:
         text = "lorem ipsum 20180213 lorem ipsum"
         assert parse_date("", text) is None
 
-    def test_date_format_4(self, settings_timezone: ZoneInfo):
+    def test_date_format_4(self, settings_timezone: ZoneInfo) -> None:
         text = "lorem ipsum 13.02.2018 lorem ipsum"
         date = parse_date("", text)
         assert date == datetime.datetime(2018, 2, 13, 0, 0, tzinfo=settings_timezone)
 
-    def test_date_format_5(self, settings_timezone: ZoneInfo):
+    def test_date_format_5(self, settings_timezone: ZoneInfo) -> None:
         text = "lorem ipsum 130218, 2018, 20180213 and lorem 13.02.2018 lorem ipsum"
         date = parse_date("", text)
         assert date == datetime.datetime(2018, 2, 13, 0, 0, tzinfo=settings_timezone)
 
-    def test_date_format_6(self):
+    def test_date_format_6(self) -> None:
         text = (
             "lorem ipsum\n"
             "Wohnort\n"
@@ -50,7 +50,7 @@ class TestDate:
         self,
         settings: SettingsWrapper,
         settings_timezone: ZoneInfo,
-    ):
+    ) -> None:
         settings.DATE_PARSER_LANGUAGES = ["de"]
         text = "lorem ipsum\nMärz 2019\nlorem ipsum"
         date = parse_date("", text)
@@ -60,7 +60,7 @@ class TestDate:
         self,
         settings: SettingsWrapper,
         settings_timezone: ZoneInfo,
-    ):
+    ) -> None:
         settings.DATE_PARSER_LANGUAGES = ["de"]
         text = (
             "lorem ipsum\n"
@@ -87,7 +87,7 @@ class TestDate:
         self,
         settings: SettingsWrapper,
         settings_timezone: ZoneInfo,
-    ):
+    ) -> None:
         settings.DATE_PARSER_LANGUAGES = ["de"]
         text = "lorem ipsum\n27. Nullmonth 2020\nMärz 2020\nlorem ipsum"
         assert parse_date("", text) == datetime.datetime(
@@ -99,7 +99,7 @@ class TestDate:
             tzinfo=settings_timezone,
         )
 
-    def test_date_format_10(self, settings_timezone: ZoneInfo):
+    def test_date_format_10(self, settings_timezone: ZoneInfo) -> None:
         text = "Customer Number Currency 22-MAR-2022 Credit Card 1934829304"
         assert parse_date("", text) == datetime.datetime(
             2022,
@@ -110,7 +110,7 @@ class TestDate:
             tzinfo=settings_timezone,
         )
 
-    def test_date_format_11(self, settings_timezone: ZoneInfo):
+    def test_date_format_11(self, settings_timezone: ZoneInfo) -> None:
         text = "Customer Number Currency 22 MAR 2022 Credit Card 1934829304"
         assert parse_date("", text) == datetime.datetime(
             2022,
@@ -121,7 +121,7 @@ class TestDate:
             tzinfo=settings_timezone,
         )
 
-    def test_date_format_12(self, settings_timezone: ZoneInfo):
+    def test_date_format_12(self, settings_timezone: ZoneInfo) -> None:
         text = "Customer Number Currency 22/MAR/2022 Credit Card 1934829304"
         assert parse_date("", text) == datetime.datetime(
             2022,
@@ -132,7 +132,7 @@ class TestDate:
             tzinfo=settings_timezone,
         )
 
-    def test_date_format_13(self, settings_timezone: ZoneInfo):
+    def test_date_format_13(self, settings_timezone: ZoneInfo) -> None:
         text = "Customer Number Currency 22.MAR.2022 Credit Card 1934829304"
         assert parse_date("", text) == datetime.datetime(
             2022,
@@ -143,7 +143,7 @@ class TestDate:
             tzinfo=settings_timezone,
         )
 
-    def test_date_format_14(self, settings_timezone: ZoneInfo):
+    def test_date_format_14(self, settings_timezone: ZoneInfo) -> None:
         text = "Customer Number Currency 22.MAR 2022 Credit Card 1934829304"
         assert parse_date("", text) == datetime.datetime(
             2022,
@@ -154,23 +154,23 @@ class TestDate:
             tzinfo=settings_timezone,
         )
 
-    def test_date_format_15(self):
+    def test_date_format_15(self) -> None:
         text = "Customer Number Currency 22.MAR.22 Credit Card 1934829304"
         assert parse_date("", text) is None
 
-    def test_date_format_16(self):
+    def test_date_format_16(self) -> None:
         text = "Customer Number Currency 22.MAR,22 Credit Card 1934829304"
         assert parse_date("", text) is None
 
-    def test_date_format_17(self):
+    def test_date_format_17(self) -> None:
         text = "Customer Number Currency 22,MAR,2022 Credit Card 1934829304"
         assert parse_date("", text) is None
 
-    def test_date_format_18(self):
+    def test_date_format_18(self) -> None:
         text = "Customer Number Currency 22 MAR,2022 Credit Card 1934829304"
         assert parse_date("", text) is None
 
-    def test_date_format_19(self, settings_timezone: ZoneInfo):
+    def test_date_format_19(self, settings_timezone: ZoneInfo) -> None:
         text = "Customer Number Currency 21st MAR 2022 Credit Card 1934829304"
         assert parse_date("", text) == datetime.datetime(
             2022,
@@ -181,7 +181,7 @@ class TestDate:
             tzinfo=settings_timezone,
         )
 
-    def test_date_format_20(self, settings_timezone: ZoneInfo):
+    def test_date_format_20(self, settings_timezone: ZoneInfo) -> None:
         text = "Customer Number Currency 22nd March 2022 Credit Card 1934829304"
         assert parse_date("", text) == datetime.datetime(
             2022,
@@ -192,7 +192,7 @@ class TestDate:
             tzinfo=settings_timezone,
         )
 
-    def test_date_format_21(self, settings_timezone: ZoneInfo):
+    def test_date_format_21(self, settings_timezone: ZoneInfo) -> None:
         text = "Customer Number Currency 2nd MAR 2022 Credit Card 1934829304"
         assert parse_date("", text) == datetime.datetime(
             2022,
@@ -203,7 +203,7 @@ class TestDate:
             tzinfo=settings_timezone,
         )
 
-    def test_date_format_22(self, settings_timezone: ZoneInfo):
+    def test_date_format_22(self, settings_timezone: ZoneInfo) -> None:
         text = "Customer Number Currency 23rd MAR 2022 Credit Card 1934829304"
         assert parse_date("", text) == datetime.datetime(
             2022,
@@ -214,7 +214,7 @@ class TestDate:
             tzinfo=settings_timezone,
         )
 
-    def test_date_format_23(self, settings_timezone: ZoneInfo):
+    def test_date_format_23(self, settings_timezone: ZoneInfo) -> None:
         text = "Customer Number Currency 24th MAR 2022 Credit Card 1934829304"
         assert parse_date("", text) == datetime.datetime(
             2022,
@@ -225,7 +225,7 @@ class TestDate:
             tzinfo=settings_timezone,
         )
 
-    def test_date_format_24(self, settings_timezone: ZoneInfo):
+    def test_date_format_24(self, settings_timezone: ZoneInfo) -> None:
         text = "Customer Number Currency 21-MAR-2022 Credit Card 1934829304"
         assert parse_date("", text) == datetime.datetime(
             2022,
@@ -236,7 +236,7 @@ class TestDate:
             tzinfo=settings_timezone,
         )
 
-    def test_date_format_25(self, settings_timezone: ZoneInfo):
+    def test_date_format_25(self, settings_timezone: ZoneInfo) -> None:
         text = "Customer Number Currency 25TH MAR 2022 Credit Card 1934829304"
         assert parse_date("", text) == datetime.datetime(
             2022,
@@ -247,7 +247,7 @@ class TestDate:
             tzinfo=settings_timezone,
         )
 
-    def test_date_format_26(self, settings_timezone: ZoneInfo):
+    def test_date_format_26(self, settings_timezone: ZoneInfo) -> None:
         text = "CHASE 0 September 25, 2019 JPMorgan Chase Bank, NA. P0 Box 182051"
         assert parse_date("", text) == datetime.datetime(
             2019,
@@ -258,20 +258,20 @@ class TestDate:
             tzinfo=settings_timezone,
         )
 
-    def test_crazy_date_past(self):
+    def test_crazy_date_past(self) -> None:
         assert parse_date("", "01-07-0590 00:00:00") is None
 
-    def test_crazy_date_future(self):
+    def test_crazy_date_future(self) -> None:
         assert parse_date("", "01-07-2350 00:00:00") is None
 
-    def test_crazy_date_with_spaces(self):
+    def test_crazy_date_with_spaces(self) -> None:
         assert parse_date("", "20 408000l 2475") is None
 
     def test_utf_month_names(
         self,
         settings: SettingsWrapper,
         settings_timezone: ZoneInfo,
-    ):
+    ) -> None:
         settings.DATE_PARSER_LANGUAGES = ["fr", "de", "hr", "cs", "pl", "tr"]
         assert parse_date("", "13 décembre 2023") == datetime.datetime(
             2023,
@@ -378,7 +378,7 @@ class TestDate:
             tzinfo=settings_timezone,
         )
 
-    def test_multiple_dates(self, settings_timezone: ZoneInfo):
+    def test_multiple_dates(self, settings_timezone: ZoneInfo) -> None:
         text = """This text has multiple dates.
                   For example 02.02.2018, 22 July 2022 and December 2021.
                   But not 24-12-9999 because it's in the future..."""
@@ -408,7 +408,7 @@ class TestDate:
         self,
         settings: SettingsWrapper,
         settings_timezone: ZoneInfo,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Date parsing from the filename is enabled
@@ -429,7 +429,7 @@ class TestDate:
         self,
         settings: SettingsWrapper,
         settings_timezone: ZoneInfo,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Date parsing from the filename is enabled
@@ -445,7 +445,7 @@ class TestDate:
             "No date in here",
         ) == datetime.datetime(2021, 1, 10, 0, 0, tzinfo=settings_timezone)
 
-    def test_filename_date_parse_invalid(self, settings: SettingsWrapper):
+    def test_filename_date_parse_invalid(self, settings: SettingsWrapper) -> None:
         """
         GIVEN:
             - Date parsing from the filename is enabled
@@ -462,7 +462,7 @@ class TestDate:
         self,
         settings: SettingsWrapper,
         settings_timezone: ZoneInfo,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Date parsing from the filename is enabled
@@ -486,7 +486,7 @@ class TestDate:
         self,
         settings: SettingsWrapper,
         settings_timezone: ZoneInfo,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Ignore dates have been set
@@ -511,7 +511,7 @@ class TestDate:
         self,
         settings: SettingsWrapper,
         settings_timezone: ZoneInfo,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Ignore dates have been set

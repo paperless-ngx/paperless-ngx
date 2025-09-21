@@ -8,11 +8,11 @@ from paperless_tesseract import check_default_language_available
 
 
 class TestChecks(TestCase):
-    def test_default_language(self):
+    def test_default_language(self) -> None:
         check_default_language_available(None)
 
     @override_settings(OCR_LANGUAGE="")
-    def test_no_language(self):
+    def test_no_language(self) -> None:
         msgs = check_default_language_available(None)
         self.assertEqual(len(msgs), 1)
         self.assertTrue(
@@ -23,7 +23,7 @@ class TestChecks(TestCase):
 
     @override_settings(OCR_LANGUAGE="ita")
     @mock.patch("paperless_tesseract.checks.get_tesseract_langs")
-    def test_invalid_language(self, m):
+    def test_invalid_language(self, m) -> None:
         m.return_value = ["deu", "eng"]
         msgs = check_default_language_available(None)
         self.assertEqual(len(msgs), 1)
@@ -31,7 +31,7 @@ class TestChecks(TestCase):
 
     @override_settings(OCR_LANGUAGE="chi_sim")
     @mock.patch("paperless_tesseract.checks.get_tesseract_langs")
-    def test_multi_part_language(self, m):
+    def test_multi_part_language(self, m) -> None:
         """
         GIVEN:
             - An OCR language which is multi part (ie chi-sim)
@@ -49,7 +49,7 @@ class TestChecks(TestCase):
 
     @override_settings(OCR_LANGUAGE="chi-sim")
     @mock.patch("paperless_tesseract.checks.get_tesseract_langs")
-    def test_multi_part_language_bad_format(self, m):
+    def test_multi_part_language_bad_format(self, m) -> None:
         """
         GIVEN:
             - An OCR language which is multi part (ie chi-sim)

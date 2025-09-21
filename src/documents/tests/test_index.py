@@ -14,7 +14,7 @@ from documents.tests.utils import DirectoriesMixin
 
 
 class TestAutoComplete(DirectoriesMixin, TestCase):
-    def test_auto_complete(self):
+    def test_auto_complete(self) -> None:
         doc1 = Document.objects.create(
             title="doc1",
             checksum="A",
@@ -40,7 +40,7 @@ class TestAutoComplete(DirectoriesMixin, TestCase):
         self.assertListEqual(index.autocomplete(ix, "tes", limit=1), [b"test2"])
         self.assertListEqual(index.autocomplete(ix, "tes", limit=0), [])
 
-    def test_archive_serial_number_ranging(self):
+    def test_archive_serial_number_ranging(self) -> None:
         """
         GIVEN:
             - Document with an archive serial number above schema allowed size
@@ -73,7 +73,7 @@ class TestAutoComplete(DirectoriesMixin, TestCase):
                 expected_str = "ERROR:paperless.index:Not indexing Archive Serial Number 4294967296 of document 1"
                 self.assertIn(expected_str, error_str)
 
-    def test_archive_serial_number_is_none(self):
+    def test_archive_serial_number_is_none(self) -> None:
         """
         GIVEN:
             - Document with no archive serial number
@@ -98,7 +98,7 @@ class TestAutoComplete(DirectoriesMixin, TestCase):
             self.assertIsNone(kwargs["asn"])
 
     @override_settings(TIME_ZONE="Pacific/Auckland")
-    def test_added_today_respects_local_timezone_boundary(self):
+    def test_added_today_respects_local_timezone_boundary(self) -> None:
         tz = get_current_timezone()
         fixed_now = datetime(2025, 7, 20, 15, 0, 0, tzinfo=tz)
 

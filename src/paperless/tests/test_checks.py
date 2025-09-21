@@ -15,14 +15,14 @@ from paperless.checks import settings_values_check
 
 
 class TestChecks(DirectoriesMixin, TestCase):
-    def test_binaries(self):
+    def test_binaries(self) -> None:
         self.assertEqual(binaries_check(None), [])
 
     @override_settings(CONVERT_BINARY="uuuhh")
-    def test_binaries_fail(self):
+    def test_binaries_fail(self) -> None:
         self.assertEqual(len(binaries_check(None)), 1)
 
-    def test_paths_check(self):
+    def test_paths_check(self) -> None:
         self.assertEqual(paths_check(None), [])
 
     @override_settings(
@@ -30,14 +30,14 @@ class TestChecks(DirectoriesMixin, TestCase):
         DATA_DIR=Path("whatever"),
         CONSUMPTION_DIR=Path("idontcare"),
     )
-    def test_paths_check_dont_exist(self):
+    def test_paths_check_dont_exist(self) -> None:
         msgs = paths_check(None)
         self.assertEqual(len(msgs), 3, str(msgs))
 
         for msg in msgs:
             self.assertTrue(msg.msg.endswith("is set but doesn't exist."))
 
-    def test_paths_check_no_access(self):
+    def test_paths_check_no_access(self) -> None:
         Path(self.dirs.data_dir).chmod(0o000)
         Path(self.dirs.media_dir).chmod(0o000)
         Path(self.dirs.consumption_dir).chmod(0o000)
@@ -53,16 +53,16 @@ class TestChecks(DirectoriesMixin, TestCase):
             self.assertTrue(msg.msg.endswith("is not writeable"))
 
     @override_settings(DEBUG=False)
-    def test_debug_disabled(self):
+    def test_debug_disabled(self) -> None:
         self.assertEqual(debug_mode_check(None), [])
 
     @override_settings(DEBUG=True)
-    def test_debug_enabled(self):
+    def test_debug_enabled(self) -> None:
         self.assertEqual(len(debug_mode_check(None)), 1)
 
 
 class TestSettingsChecksAgainstDefaults(DirectoriesMixin, TestCase):
-    def test_all_valid(self):
+    def test_all_valid(self) -> None:
         """
         GIVEN:
             - Default settings
@@ -77,7 +77,7 @@ class TestSettingsChecksAgainstDefaults(DirectoriesMixin, TestCase):
 
 class TestOcrSettingsChecks(DirectoriesMixin, TestCase):
     @override_settings(OCR_OUTPUT_TYPE="notapdf")
-    def test_invalid_output_type(self):
+    def test_invalid_output_type(self) -> None:
         """
         GIVEN:
             - Default settings
@@ -95,7 +95,7 @@ class TestOcrSettingsChecks(DirectoriesMixin, TestCase):
         self.assertIn('OCR output type "notapdf"', msg.msg)
 
     @override_settings(OCR_MODE="makeitso")
-    def test_invalid_ocr_type(self):
+    def test_invalid_ocr_type(self) -> None:
         """
         GIVEN:
             - Default settings
@@ -113,7 +113,7 @@ class TestOcrSettingsChecks(DirectoriesMixin, TestCase):
         self.assertIn('OCR output mode "makeitso"', msg.msg)
 
     @override_settings(OCR_MODE="skip_noarchive")
-    def test_deprecated_ocr_type(self):
+    def test_deprecated_ocr_type(self) -> None:
         """
         GIVEN:
             - Default settings
@@ -131,7 +131,7 @@ class TestOcrSettingsChecks(DirectoriesMixin, TestCase):
         self.assertIn("deprecated", msg.msg)
 
     @override_settings(OCR_SKIP_ARCHIVE_FILE="invalid")
-    def test_invalid_ocr_skip_archive_file(self):
+    def test_invalid_ocr_skip_archive_file(self) -> None:
         """
         GIVEN:
             - Default settings
@@ -149,7 +149,7 @@ class TestOcrSettingsChecks(DirectoriesMixin, TestCase):
         self.assertIn('OCR_SKIP_ARCHIVE_FILE setting "invalid"', msg.msg)
 
     @override_settings(OCR_CLEAN="cleanme")
-    def test_invalid_ocr_clean(self):
+    def test_invalid_ocr_clean(self) -> None:
         """
         GIVEN:
             - Default settings
@@ -169,7 +169,7 @@ class TestOcrSettingsChecks(DirectoriesMixin, TestCase):
 
 class TestTimezoneSettingsChecks(DirectoriesMixin, TestCase):
     @override_settings(TIME_ZONE="TheMoon\\MyCrater")
-    def test_invalid_timezone(self):
+    def test_invalid_timezone(self) -> None:
         """
         GIVEN:
             - Default settings
@@ -189,7 +189,7 @@ class TestTimezoneSettingsChecks(DirectoriesMixin, TestCase):
 
 class TestBarcodeSettingsChecks(DirectoriesMixin, TestCase):
     @override_settings(CONSUMER_BARCODE_SCANNER="Invalid")
-    def test_barcode_scanner_invalid(self):
+    def test_barcode_scanner_invalid(self) -> None:
         msgs = settings_values_check(None)
         self.assertEqual(len(msgs), 1)
 
@@ -198,7 +198,7 @@ class TestBarcodeSettingsChecks(DirectoriesMixin, TestCase):
         self.assertIn('Invalid Barcode Scanner "Invalid"', msg.msg)
 
     @override_settings(CONSUMER_BARCODE_SCANNER="")
-    def test_barcode_scanner_empty(self):
+    def test_barcode_scanner_empty(self) -> None:
         msgs = settings_values_check(None)
         self.assertEqual(len(msgs), 1)
 
@@ -207,14 +207,14 @@ class TestBarcodeSettingsChecks(DirectoriesMixin, TestCase):
         self.assertIn('Invalid Barcode Scanner ""', msg.msg)
 
     @override_settings(CONSUMER_BARCODE_SCANNER="PYZBAR")
-    def test_barcode_scanner_valid(self):
+    def test_barcode_scanner_valid(self) -> None:
         msgs = settings_values_check(None)
         self.assertEqual(len(msgs), 0)
 
 
 class TestEmailCertSettingsChecks(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     @override_settings(EMAIL_CERTIFICATE_FILE=Path("/tmp/not_actually_here.pem"))
-    def test_not_valid_file(self):
+    def test_not_valid_file(self) -> None:
         """
         GIVEN:
             - Default settings
@@ -236,7 +236,7 @@ class TestEmailCertSettingsChecks(DirectoriesMixin, FileSystemAssertsMixin, Test
 
 
 class TestAuditLogChecks(TestCase):
-    def test_was_enabled_once(self):
+    def test_was_enabled_once(self) -> None:
         """
         GIVEN:
             - Audit log is not enabled

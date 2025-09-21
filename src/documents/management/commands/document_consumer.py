@@ -184,10 +184,10 @@ class Handler(FileSystemEventHandler):
         super().__init__()
         self._pool = pool
 
-    def on_created(self, event):
+    def on_created(self, event) -> None:
         self._pool.submit(_consume_wait_unmodified, Path(event.src_path))
 
-    def on_moved(self, event):
+    def on_moved(self, event) -> None:
         self._pool.submit(_consume_wait_unmodified, Path(event.dest_path))
 
 
@@ -204,7 +204,7 @@ class Command(BaseCommand):
     testing_timeout_s: Final[float] = 0.5
     testing_timeout_ms: Final[float] = testing_timeout_s * 1000.0
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument(
             "directory",
             default=settings.CONSUMPTION_DIR,
@@ -223,7 +223,7 @@ class Command(BaseCommand):
             default=False,
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         directory = options["directory"]
         recursive = settings.CONSUMER_RECURSIVE
 
@@ -259,7 +259,7 @@ class Command(BaseCommand):
 
         logger.debug("Consumer exiting.")
 
-    def handle_polling(self, directory, recursive, *, is_testing: bool):
+    def handle_polling(self, directory, recursive, *, is_testing: bool) -> None:
         logger.info(f"Polling directory for changes: {directory}")
 
         timeout = None
@@ -286,7 +286,7 @@ class Command(BaseCommand):
                 observer.stop()
             observer.join()
 
-    def handle_inotify(self, directory, recursive, *, is_testing: bool):
+    def handle_inotify(self, directory, recursive, *, is_testing: bool) -> None:
         logger.info(f"Using inotify to watch directory for changes: {directory}")
 
         timeout_ms = None
