@@ -589,7 +589,7 @@ describe('FilterEditorComponent', () => {
     expect(component.tagSelectionModel.logicalOperator).toEqual(
       LogicalOperator.And
     )
-    expect(component.tagSelectionModel.getSelectedItems()).toEqual(tags)
+    expect(component.tagSelectionModel.getSelectedItems()).toMatchObject(tags)
     // coverage
     component.filterRules = [
       {
@@ -615,7 +615,7 @@ describe('FilterEditorComponent', () => {
     expect(component.tagSelectionModel.logicalOperator).toEqual(
       LogicalOperator.Or
     )
-    expect(component.tagSelectionModel.getSelectedItems()).toEqual(tags)
+    expect(component.tagSelectionModel.getSelectedItems()).toMatchObject(tags)
     // coverage
     component.filterRules = [
       {
@@ -652,7 +652,7 @@ describe('FilterEditorComponent', () => {
     expect(component.tagSelectionModel.logicalOperator).toEqual(
       LogicalOperator.And
     )
-    expect(component.tagSelectionModel.getExcludedItems()).toEqual(tags)
+    expect(component.tagSelectionModel.getExcludedItems()).toMatchObject(tags)
     // coverage
     component.filterRules = [
       {

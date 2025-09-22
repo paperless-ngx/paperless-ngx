@@ -2,9 +2,11 @@
 
 If you feel like contributing to the project, please do! Bug fixes and improvements are always welcome.
 
+⚠️ Please note: Pull requests that implement a new feature or enhancement _should almost always target an existing feature request_ with evidence of community interest and discussion. This is in order to balance the work of implementing and maintaining new features / enhancements. Pull requests that are opened without meeting this requirement may not be merged.
+
 If you want to implement something big:
 
-- Please start a discussion about that in the issues! Maybe something similar is already in development and we can make it happen together.
+- As above, please start with a discussion! Maybe something similar is already in development and we can make it happen together.
 - When making additions to the project, consider if the majority of users will benefit from your change. If not, you're probably better of forking the project.
 - Also consider if your change will get in the way of other users. A good change is a change that enhances the experience of some users who want that change and does not affect users who do not care about the change.
 - Please see the [paperless-ngx merge process](#merging-prs) below.
@@ -133,7 +135,7 @@ community members. That said, in an effort to keep the repository organized and 
 - Issues, pull requests and discussions that are closed will be locked after 30 days of inactivity.
 - Discussions with a marked answer will be automatically closed.
 - Discussions in the 'General' or 'Support' categories will be closed after 180 days of inactivity.
-- Feature requests that do not meet the following thresholds will be closed: 180 days of inactivity, < 5 "up-votes" after 180 days, < 20 "up-votes" after 1 year or < 80 "up-votes" at 2 years.
+- Feature requests that do not meet the following thresholds will be closed: 180 days of inactivity with less than 80 "up-votes", < 5 "up-votes" after 180 days, < 20 "up-votes" after 1 year or < 40 "up-votes" at 2 years.
 
 In all cases, threads can be re-opened by project maintainers and, of course, users can always create a new discussion for related concerns.
 Finally, remember that all information remains searchable and 'closed' feature requests can still serve as inspiration for new features.
