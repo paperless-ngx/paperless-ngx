@@ -151,6 +151,18 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: backend-python-${{ matrix.python-version }}
           files: coverage.xml
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage-${{ matrix.python-version }}
+          path: |
+            .coverage
+            coverage.xml
+            junit.xml
+          retention-days: 1
+          include-hidden-files: true
+          if-no-files-found: error
       - name: Stop containers
         if: always()
         run: |
@@ -233,6 +245,17 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/coverage/
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-coverage-${{ matrix.shard-index }}
+          path: |
+            src-ui/coverage/lcov.info
+            src-ui/coverage/coverage-final.json
+            src-ui/junit.xml
+          retention-days: 1
+          if-no-files-found: error
   tests-frontend-e2e:
     name: "Frontend E2E Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     runs-on: ubuntu-24.04
@@ -313,6 +336,74 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: cd src-ui && pnpm run build --configuration=production
+  sonarqube-analysis:
+    name: "SonarQube Analysis"
+    runs-on: ubuntu-24.04
+    needs:
+      - tests-backend
+      - tests-frontend
+    if: github.repository_owner == 'paperless-ngx'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Download all backend coverage
+        uses: actions/download-artifact@v5.0.0
+        with:
+          pattern: backend-coverage-*
+          path: ./coverage/
+      - name: Download all frontend coverage
+        uses: actions/download-artifact@v5.0.0
+        with:
+          pattern: frontend-coverage-*
+          path: ./coverage/
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Install coverage tools
+        run: |
+          pip install coverage
+          npm install -g nyc
+      # Merge backend coverage from all Python versions
+      - name: Merge backend coverage
+        run: |
+          coverage combine coverage/backend-coverage-*/.coverage
+          coverage xml -o merged-backend-coverage.xml
+      # Merge frontend coverage from all shards
+      - name: Merge frontend coverage
+        run: |
+          # Find all coverage-final.json files from the shards, exit with error if none found
+          shopt -s nullglob
+          files=(coverage/frontend-coverage-*/coverage/coverage-final.json)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No frontend coverage JSON found under coverage/" >&2
+            exit 1
+          fi
+          # Create .nyc_output directory and copy each shard's coverage JSON into it with a unique name
+          mkdir -p .nyc_output
+          for coverage_json in "${files[@]}"; do
+            shard=$(basename "$(dirname "$(dirname "$coverage_json")")")
+            cp "$coverage_json" ".nyc_output/${shard}.json"
+          done
+          npx nyc merge .nyc_output .nyc_output/out.json
+          npx nyc report --reporter=lcovonly --report-dir coverage
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: merged-coverage
+          path: |
+            merged-backend-coverage.xml
+            .nyc_output/*
+            coverage/lcov.info
+          retention-days: 7
+          if-no-files-found: error
+          include-hidden-files: true
+      - name: SonarQube Analysis
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   build-docker-image:
     name: Build Docker image for ${{ github.ref_name }}
     runs-on: ubuntu-24.04
