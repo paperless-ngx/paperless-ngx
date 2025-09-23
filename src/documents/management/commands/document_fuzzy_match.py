@@ -92,6 +92,9 @@ class Command(MultiProcessMixin, ProgressBarMixin, BaseCommand):
                 # doc to doc is obviously not useful
                 if first_doc.pk == second_doc.pk:
                     continue
+                # Skip empty documents (e.g. password-protected)
+                if first_doc.content.strip() == "" or second_doc.content.strip() == "":
+                    continue
                 # Skip matching which have already been matched together
                 # doc 1 to doc 2 is the same as doc 2 to doc 1
                 doc_1_to_doc_2 = (first_doc.pk, second_doc.pk)
