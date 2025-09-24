@@ -206,3 +206,29 @@ class TestFuzzyMatchCommand(TestCase):
         self.assertEqual(Document.objects.count(), 2)
         self.assertIsNotNone(Document.objects.get(pk=1))
         self.assertIsNotNone(Document.objects.get(pk=2))
+
+    def test_empty_content(self):
+        """
+        GIVEN:
+            - 2 documents exist, content is empty (pw-protected)
+        WHEN:
+            - Command is called
+        THEN:
+            - No matches are found
+        """
+        Document.objects.create(
+            checksum="BEEFCAFE",
+            title="A",
+            content="",
+            mime_type="application/pdf",
+            filename="test.pdf",
+        )
+        Document.objects.create(
+            checksum="DEADBEAF",
+            title="A",
+            content="",
+            mime_type="application/pdf",
+            filename="other_test.pdf",
+        )
+        stdout, _ = self.call_command()
+        self.assertIn("No matches found", stdout)

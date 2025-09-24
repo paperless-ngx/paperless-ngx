@@ -50,4 +50,7 @@ export class TagComponent {
 
   @Input()
   clickable: boolean = false
+
+  @Input()
+  showParents: boolean = false
 }

@@ -241,6 +241,7 @@ jobs:
                 ) {
                   nodes {
                     id,
+                    createdAt,
                     number,
                     updatedAt,
                     upvoteCount,

@@ -515,3 +515,51 @@ def check_scheduled_workflows():
                             workflow_to_run=workflow,
                             document=document,
                         )
+
+
+def update_document_parent_tags(tag: Tag, new_parent: Tag) -> None:
+    """
+    When a tag's parent changes, ensure all documents containing the tag also have
+    the parent tag (and its ancestors) applied.
+    """
+    doc_tag_relationship = Document.tags.through
+
+    doc_ids: list[int] = list(
+        Document.objects.filter(tags=tag).values_list("pk", flat=True),
+    )
+
+    if not doc_ids:
+        return
+
+    parent_ids = [new_parent.id, *new_parent.get_ancestors_pks()]
+
+    parent_ids = list(dict.fromkeys(parent_ids))
+
+    existing_pairs = set(
+        doc_tag_relationship.objects.filter(
+            document_id__in=doc_ids,
+            tag_id__in=parent_ids,
+        ).values_list("document_id", "tag_id"),
+    )
+
+    to_create: list = []
+    affected: set[int] = set()
+
+    for doc_id in doc_ids:
+        for parent_id in parent_ids:
+            if (doc_id, parent_id) in existing_pairs:
+                continue
+
+            to_create.append(
+                doc_tag_relationship(document_id=doc_id, tag_id=parent_id),
+            )
+            affected.add(doc_id)
+
+    if to_create:
+        doc_tag_relationship.objects.bulk_create(
+            to_create,
+            ignore_conflicts=True,
+        )
+
+    if affected:
+        bulk_update_documents.delay(document_ids=list(affected))

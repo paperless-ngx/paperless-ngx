@@ -18,6 +18,7 @@ import { TextComponent } from 'src/app/components/common/input/text/text.compone
 import { UrlComponent } from 'src/app/components/common/input/url/url.component'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import { TextAreaComponent } from '../../../common/input/textarea/textarea.component'
 
 @Component({
   selector: 'pngx-custom-fields-bulk-edit-dialog',
@@ -35,6 +36,7 @@ import { DocumentService } from 'src/app/services/rest/document.service'
     FormsModule,
     ReactiveFormsModule,
     NgxBootstrapIconsModule,
+    TextAreaComponent,
   ],
 })
 export class CustomFieldsBulkEditDialogComponent {

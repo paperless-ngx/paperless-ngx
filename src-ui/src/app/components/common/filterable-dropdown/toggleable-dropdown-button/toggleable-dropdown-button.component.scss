@@ -2,3 +2,19 @@
   min-width: 1em;
   min-height: 1em;
 }
+
+.name-cell {
+  padding-left: calc(calc(var(--depth) - 2) * 1rem);
+  display: flex;
+  align-items: center;
+
+  .indicator {
+    display: inline-block;
+    width: .8rem;
+    height: .8rem;
+    border-left: 1px solid var(--bs-secondary);
+    border-bottom: 1px solid var(--bs-secondary);
+    margin-right: .25rem;
+    margin-left: .5rem;
+  }
+}
