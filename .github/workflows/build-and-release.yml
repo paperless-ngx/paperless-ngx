@@ -1,0 +1,430 @@
+name: build-and-release
+on:
+  workflow_run:
+    workflows:
+      - ci
+    types:
+      - completed
+permissions:
+  contents: write
+  packages: write
+  pull-requests: write
+env:
+  DEFAULT_UV_VERSION: "0.8.x"
+  DEFAULT_PYTHON_VERSION: "3.11"
+  NLTK_DATA: "/usr/share/nltk_data"
+jobs:
+  prepare:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
+    name: Prepare build context
+    runs-on: ubuntu-24.04
+    outputs:
+      should-build: ${{ steps.determine.outputs.should-build }}
+      ref: ${{ steps.determine.outputs.ref }}
+      ref-name: ${{ steps.determine.outputs.ref-name }}
+      sha: ${{ steps.determine.outputs.sha }}
+      is-tag: ${{ steps.determine.outputs.is-tag }}
+      is-release-target: ${{ steps.determine.outputs.is-release-target }}
+      is-beta-rc: ${{ steps.determine.outputs.is-beta-rc }}
+    steps:
+      - name: Determine ref information
+        id: determine
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const run = context.payload.workflow_run;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const sha = run.head_sha;
+            const branch = run.head_branch;
+
+            let ref = undefined;
+            let refName = undefined;
+
+            if (branch) {
+              ref = `refs/heads/${branch}`;
+              refName = branch;
+            } else {
+              const iterator = github.paginate.iterator(
+                github.rest.repos.listTags,
+                {
+                  owner,
+                  repo,
+                  per_page: 100,
+                },
+              );
+
+              for await (const { data } of iterator) {
+                const match = data.find((tag) => tag.commit?.sha === sha);
+                if (match) {
+                  ref = `refs/tags/${match.name}`;
+                  refName = match.name;
+                  break;
+                }
+              }
+            }
+
+            const outputs = {
+              shouldBuild: false,
+              ref: ref ?? '',
+              refName: refName ?? '',
+              sha,
+              isTag: ref?.startsWith('refs/tags/') ?? false,
+              isReleaseTarget: false,
+              isBetaRc: false,
+            };
+
+            if (!ref || !refName) {
+              core.info('No matching ref found for workflow run; skipping post-CI workflow.');
+            } else {
+              const allowed =
+                ref.startsWith('refs/heads/feature-') ||
+                ref.startsWith('refs/heads/fix-') ||
+                ref.startsWith('refs/heads/l10n_') ||
+                ref === 'refs/heads/dev' ||
+                ref === 'refs/heads/beta' ||
+                ref.includes('beta.rc') ||
+                ref.startsWith('refs/tags/v');
+
+              const isBetaRc = refName.includes('beta.rc');
+              const isReleaseTarget = outputs.isTag && (refName.startsWith('v') || isBetaRc);
+
+              outputs.shouldBuild = allowed;
+              outputs.isReleaseTarget = isReleaseTarget;
+              outputs.isBetaRc = isBetaRc;
+            }
+
+            core.setOutput('should-build', outputs.shouldBuild ? 'true' : 'false');
+            core.setOutput('ref', outputs.ref);
+            core.setOutput('ref-name', outputs.refName);
+            core.setOutput('sha', outputs.sha);
+            core.setOutput('is-tag', outputs.isTag ? 'true' : 'false');
+            core.setOutput('is-release-target', outputs.isReleaseTarget ? 'true' : 'false');
+            core.setOutput('is-beta-rc', outputs.isBetaRc ? 'true' : 'false');
+  build-docker-image:
+    needs: prepare
+    if: needs.prepare.outputs.should-build == 'true'
+    name: Build Docker image for ${{ needs.prepare.outputs.ref-name }}
+    runs-on: ubuntu-24.04
+    concurrency:
+      group: ${{ github.workflow }}-build-docker-image-${{ needs.prepare.outputs.ref-name || needs.prepare.outputs.sha }}
+      cancel-in-progress: true
+    env:
+      REF: ${{ needs.prepare.outputs.ref }}
+      REF_NAME: ${{ needs.prepare.outputs.ref-name }}
+      SHA: ${{ needs.prepare.outputs.sha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ env.SHA }}
+      - name: Check pushing to Docker Hub
+        id: push-other-places
+        env:
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+          REF_NAME: ${{ env.REF_NAME }}
+          REF: ${{ env.REF }}
+        run: |
+          if [[ "$REPOSITORY_OWNER" == "paperless-ngx" ]] && \
+             ([[ "$REF_NAME" == "dev" ]] || [[ "$REF_NAME" == "beta" ]] || [[ "$REF" == refs/tags/v* ]]); then
+            echo "Enabling DockerHub image push"
+            echo "enable=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Not pushing to DockerHub"
+            echo "enable=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Set ghcr repository name
+        id: set-ghcr-repository
+        run: |
+          ghcr_name=$(echo "${{ github.repository }}" | awk '{ print tolower($0) }')
+          echo "Name is ${ghcr_name}"
+          echo "ghcr-repository=${ghcr_name}" >> "$GITHUB_OUTPUT"
+      - name: Gather Docker metadata
+        id: docker-meta
+        uses: docker/metadata-action@v5
+        env:
+          GITHUB_REF: ${{ env.REF }}
+          GITHUB_REF_NAME: ${{ env.REF_NAME }}
+          GITHUB_SHA: ${{ env.SHA }}
+        with:
+          images: |
+            ghcr.io/${{ steps.set-ghcr-repository.outputs.ghcr-repository }}
+            name=paperlessngx/paperless-ngx,enable=${{ steps.push-other-places.outputs.enable }}
+            name=quay.io/paperlessngx/paperless-ngx,enable=${{ steps.push-other-places.outputs.enable }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to Docker Hub
+        if: steps.push-other-places.outputs.enable == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to Quay.io
+        if: steps.push-other-places.outputs.enable == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_ROBOT_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.docker-meta.outputs.tags }}
+          labels: ${{ steps.docker-meta.outputs.labels }}
+          build-args: |
+            PNGX_TAG_VERSION=${{ steps.docker-meta.outputs.version }}
+          cache-from: |
+            type=registry,ref=ghcr.io/${{ steps.set-ghcr-repository.outputs.ghcr-repository }}/builder/cache/app:${{ env.REF_NAME }}
+            type=registry,ref=ghcr.io/${{ steps.set-ghcr-repository.outputs.ghcr-repository }}/builder/cache/app:dev
+          cache-to: |
+            type=registry,mode=max,ref=ghcr.io/${{ steps.set-ghcr-repository.outputs.ghcr-repository }}/builder/cache/app:${{ env.REF_NAME }}
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
+      - name: Export frontend artifact from docker
+        run: |
+          docker create --name frontend-extract ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
+          docker cp frontend-extract:/usr/src/paperless/src/documents/static/frontend src/documents/static/frontend/
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-compiled
+          path: src/documents/static/frontend/
+          retention-days: 7
+  build-release:
+    needs:
+      - prepare
+      - build-docker-image
+    if: needs.prepare.outputs.should-build == 'true'
+    name: Build release bundle
+    runs-on: ubuntu-24.04
+    env:
+      REF_NAME: ${{ needs.prepare.outputs.ref-name }}
+      SHA: ${{ needs.prepare.outputs.sha }}
+      CI_RUN_ID: ${{ github.event.workflow_run.id }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ env.SHA }}
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
+          enable-cache: true
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Install Python dependencies
+        run: |
+          uv sync --python ${{ steps.setup-python.outputs.python-version }} --dev --frozen
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq --no-install-recommends gettext liblept5
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: frontend-compiled
+          path: src/documents/static/frontend/
+      - name: Download documentation artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: documentation
+          path: docs/_build/html/
+          run-id: ${{ env.CI_RUN_ID }}
+      - name: Generate requirements file
+        run: |
+          uv export --quiet --no-dev --all-extras --format requirements-txt --output-file requirements.txt
+      - name: Compile messages
+        run: |
+          cd src/
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            manage.py compilemessages
+      - name: Collect static files
+        run: |
+          cd src/
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            manage.py collectstatic --no-input
+      - name: Move files
+        run: |
+          echo "Making dist folders"
+          for directory in dist \
+                          dist/paperless-ngx \
+                          dist/paperless-ngx/scripts;
+          do
+            mkdir --verbose --parents ${directory}
+          done
+
+          echo "Copying basic files"
+          for file_name in .dockerignore \
+                          .env \
+                          Dockerfile \
+                          pyproject.toml \
+                          uv.lock \
+                          requirements.txt \
+                          LICENSE \
+                          README.md \
+                          paperless.conf.example
+          do
+            cp --verbose ${file_name} dist/paperless-ngx/
+          done
+          mv --verbose dist/paperless-ngx/paperless.conf.example dist/paperless-ngx/paperless.conf
+
+          echo "Copying Docker related files"
+          cp --recursive docker/ dist/paperless-ngx/docker
+
+          echo "Copying startup scripts"
+          cp --verbose scripts/*.service scripts/*.sh scripts/*.socket dist/paperless-ngx/scripts/
+
+          echo "Copying source files"
+          cp --recursive src/ dist/paperless-ngx/src
+          echo "Copying documentation"
+          cp --recursive docs/_build/html/ dist/paperless-ngx/docs
+
+          mv --verbose static dist/paperless-ngx
+      - name: Make release package
+        run: |
+          echo "Creating release archive"
+          cd dist
+          sudo chown -R 1000:1000 paperless-ngx/
+          tar -cJf paperless-ngx.tar.xz paperless-ngx/
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: dist/paperless-ngx.tar.xz
+          retention-days: 7
+  publish-release:
+    needs:
+      - prepare
+      - build-release
+    if: needs.prepare.outputs.is-release-target == 'true'
+    name: Publish release
+    runs-on: ubuntu-24.04
+    outputs:
+      prerelease: ${{ steps.get_version.outputs.prerelease }}
+      changelog: ${{ steps.create-release.outputs.body }}
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - name: Download release artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: release
+          path: ./
+      - name: Get version
+        id: get_version
+        run: |
+          echo "version=${{ needs.prepare.outputs.ref-name }}" >> "$GITHUB_OUTPUT"
+          if [[ ${{ needs.prepare.outputs.is-beta-rc }} == 'true' ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Create Release and Changelog
+        id: create-release
+        uses: release-drafter/release-drafter@v6
+        with:
+          name: Paperless-ngx ${{ steps.get_version.outputs.version }}
+          tag: ${{ steps.get_version.outputs.version }}
+          version: ${{ steps.get_version.outputs.version }}
+          prerelease: ${{ steps.get_version.outputs.prerelease }}
+          publish: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload release archive
+        id: upload-release-asset
+        uses: shogo82148/actions-upload-release-asset@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: ./paperless-ngx.tar.xz
+          asset_name: paperless-ngx-${{ steps.get_version.outputs.version }}.tar.xz
+          asset_content_type: application/x-xz
+  append-changelog:
+    needs:
+      - publish-release
+    if: needs.publish-release.outputs.prerelease == 'false'
+    name: Append changelog to docs
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: main
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
+          enable-cache: true
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Append Changelog to docs
+        id: append-Changelog
+        working-directory: docs
+        run: |
+          git branch ${{ needs.publish-release.outputs.version }}-changelog
+          git checkout ${{ needs.publish-release.outputs.version }}-changelog
+          echo -e "# Changelog\n\n${{ needs.publish-release.outputs.changelog }}\n" > changelog-new.md
+          echo "Manually linking usernames"
+          sed -i -r 's|@([a-zA-Z0-9_]+) \(\[#|[@\1](https://github.com/\1) ([#|g' changelog-new.md
+          echo "Removing unneeded comment tags"
+          sed -i -r 's|@<!---->|@|g' changelog-new.md
+          CURRENT_CHANGELOG=`tail --lines +2 changelog.md`
+          echo -e "$CURRENT_CHANGELOG" >> changelog-new.md
+          mv changelog-new.md changelog.md
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --dev \
+            pre-commit run --files changelog.md || true
+          git config --global user.name "github-actions"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Changelog ${{ needs.publish-release.outputs.version }} - GHA"
+          git push origin ${{ needs.publish-release.outputs.version }}-changelog
+      - name: Create Pull Request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { repo, owner } = context.repo;
+            const result = await github.rest.pulls.create({
+              title: 'Documentation: Add ${{ needs.publish-release.outputs.version }} changelog',
+              owner,
+              repo,
+              head: '${{ needs.publish-release.outputs.version }}-changelog',
+              base: 'main',
+              body: 'This PR is auto-generated by CI.'
+            });
+            github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number: result.data.number,
+              labels: ['documentation', 'skip-changelog']
+            });
