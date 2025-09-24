@@ -377,8 +377,8 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: cd src-ui && pnpm run build --configuration=production
-  sonarqube-analysis:
-    name: "SonarQube Analysis"
+  prepare-sonar-coverage:
+    name: "Prepare Sonar Coverage Artifacts"
     runs-on: ubuntu-24.04
     needs:
       - tests-backend
@@ -441,10 +441,6 @@ jobs:
           retention-days: 7
           if-no-files-found: error
           include-hidden-files: true
-      - name: SonarQube Analysis
-        uses: SonarSource/sonarqube-scan-action@v5
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   build-docker-image:
     name: Build Docker image for ${{ github.ref_name }}
     runs-on: ubuntu-24.04
