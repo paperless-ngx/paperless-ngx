@@ -322,6 +322,220 @@ jobs:
         run: cd src-ui && pnpm exec playwright install
       - name: Run Playwright e2e tests
         run: cd src-ui && pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
+  codecov-comment:
+    name: "Codecov PR Comment"
+    runs-on: ubuntu-24.04
+    needs:
+      - tests-backend
+      - tests-frontend
+      - tests-frontend-e2e
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Gather pull request context
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            if (!pr) {
+              core.info('No associated pull request. Skipping.');
+              core.setOutput('shouldRun', 'false');
+              return;
+            }
+
+            core.setOutput('shouldRun', 'true');
+            core.setOutput('prNumber', pr.number.toString());
+            core.setOutput('headSha', pr.head.sha);
+      - name: Fetch Codecov coverage
+        id: coverage
+        if: steps.pr.outputs.shouldRun == 'true'
+        uses: actions/github-script@v7
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          COMMIT_SHA: ${{ steps.pr.outputs.headSha }}
+        with:
+          script: |
+            const token = process.env.CODECOV_TOKEN;
+            if (!token) {
+              core.warning('CODECOV_TOKEN secret is not available; skipping comment.');
+              core.setOutput('shouldComment', 'false');
+              return;
+            }
+
+            const commitSha = process.env.COMMIT_SHA;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const url = `https://codecov.io/api/v2/github/${owner}/repos/${repo}/commits/${commitSha}/report`;
+            const maxAttempts = 10;
+            const waitMs = 15000;
+            const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+            let data;
+            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+              core.info(`Fetching Codecov report (attempt ${attempt}/${maxAttempts})`);
+              const response = await fetch(url, {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+                  Accept: 'application/json',
+                },
+              });
+
+              if (response.status === 404) {
+                core.info('Report not ready yet (404). Waiting before retrying.');
+                await sleep(waitMs);
+                continue;
+              }
+
+              if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`Codecov API returned ${response.status}: ${text}`);
+              }
+
+              data = await response.json();
+              if (data && Object.keys(data).length > 0) {
+                break;
+              }
+
+              core.info('Report payload empty. Waiting before retrying.');
+              await sleep(waitMs);
+            }
+
+            if (!data) {
+              core.warning('Unable to retrieve Codecov report after multiple attempts.');
+              core.setOutput('shouldComment', 'false');
+              return;
+            }
+
+            const totals = data.report?.totals ?? data.commit?.totals ?? data.totals;
+            if (!totals) {
+              core.warning('Codecov response does not contain coverage totals.');
+              core.setOutput('shouldComment', 'false');
+              return;
+            }
+
+            const compareTotals = data.report?.compare?.totals ?? data.compare?.totals;
+            const flagsRaw = data.report?.totals_by_flag ?? data.report?.components ?? [];
+
+            const toNumber = (value) => {
+              if (value === null || value === undefined || value === '') {
+                return undefined;
+              }
+              const num = Number(value);
+              return Number.isFinite(num) ? num : undefined;
+            };
+
+            const coverage = toNumber(totals.coverage);
+            const baseCoverage = toNumber(compareTotals?.base_coverage ?? compareTotals?.base);
+            const delta = toNumber(
+              compareTotals?.coverage_change ??
+              compareTotals?.coverage_diff ??
+              totals.delta ??
+              totals.diff ??
+              totals.change,
+            );
+
+            const formatPercent = (value) => {
+              if (value === undefined) return '—';
+              return `${value.toFixed(2)}%`;
+            };
+
+            const formatDelta = (value) => {
+              if (value === undefined) return '—';
+              const sign = value >= 0 ? '+' : '';
+              return `${sign}${value.toFixed(2)}%`;
+            };
+
+            const shortSha = commitSha.slice(0, 7);
+            const lines = [
+              '<!-- codecov-coverage-comment -->',
+              '**Codecov Coverage**',
+              '',
+              `- Head \`${shortSha}\`: ${formatPercent(coverage)}`,
+            ];
+
+            if (baseCoverage !== undefined) {
+              lines.push(`- Base: ${formatPercent(baseCoverage)}`);
+            }
+
+            if (delta !== undefined) {
+              lines.push(`- Change: ${formatDelta(delta)}`);
+            }
+
+            const flagEntries = Array.isArray(flagsRaw)
+              ? flagsRaw
+              : Object.entries(flagsRaw).map(([name, totals]) => ({ name, totals }));
+
+            const flagRows = [];
+            for (const entry of flagEntries) {
+              const label = entry.flag ?? entry.name ?? entry.component ?? entry.id;
+              const entryTotals = entry.totals ?? entry;
+              const entryCoverage = toNumber(entryTotals?.coverage);
+              const entryDelta = toNumber(
+                entryTotals?.coverage_change ??
+                entryTotals?.coverage_diff ??
+                entryTotals?.delta ??
+                entryTotals?.diff,
+              );
+              if (!label || entryCoverage === undefined) {
+                continue;
+              }
+              flagRows.push(`| ${label} | ${formatPercent(entryCoverage)} | ${formatDelta(entryDelta)} |`);
+            }
+
+            if (flagRows.length) {
+              lines.push('');
+              lines.push('| Flag | Coverage | Change |');
+              lines.push('| --- | --- | --- |');
+              lines.push(...flagRows);
+            }
+
+            const commentBody = lines.join('\n');
+            const shouldComment = coverage !== undefined;
+            core.setOutput('shouldComment', shouldComment ? 'true' : 'false');
+            if (shouldComment) {
+              core.setOutput('commentBody', commentBody);
+            }
+      - name: Upsert coverage comment
+        if: steps.pr.outputs.shouldRun == 'true' && steps.coverage.outputs.shouldComment == 'true'
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.prNumber }}
+          COMMENT_BODY: ${{ steps.coverage.outputs.commentBody }}
+        with:
+          script: |
+            const prNumber = Number(process.env.PR_NUMBER);
+            const body = process.env.COMMENT_BODY;
+            const marker = '<!-- codecov-coverage-comment -->';
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              per_page: 100,
+            });
+
+            const existing = comments.find((comment) => comment.body?.includes(marker));
+            if (existing) {
+              core.info(`Updating existing coverage comment (id: ${existing.id}).`);
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              core.info('Creating new coverage comment.');
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
   frontend-bundle-analysis:
     name: "Frontend Bundle Analysis"
     runs-on: ubuntu-24.04
