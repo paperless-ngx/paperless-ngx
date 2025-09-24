@@ -17,52 +17,11 @@ env:
   DEFAULT_PYTHON_VERSION: "3.11"
   NLTK_DATA: "/usr/share/nltk_data"
 jobs:
-  detect-duplicate:
-    name: Detect Duplicate Run
-    runs-on: ubuntu-24.04
-    outputs:
-      should_run: ${{ steps.check.outputs.should_run }}
-    steps:
-      - name: Check if workflow should run
-        id: check
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            if (context.eventName !== 'push') {
-              core.info('Not a push event; running workflow.');
-              core.setOutput('should_run', 'true');
-              return;
-            }
-
-            const ref = context.ref || '';
-            if (!ref.startsWith('refs/heads/')) {
-              core.info('Push is not to a branch; running workflow.');
-              core.setOutput('should_run', 'true');
-              return;
-            }
-
-            const branch = ref.substring('refs/heads/'.length);
-            const { owner, repo } = context.repo;
-            const prs = await github.paginate(github.rest.pulls.list, {
-              owner,
-              repo,
-              state: 'open',
-              head: `${owner}:${branch}`,
-              per_page: 100,
-            });
-
-            if (prs.length === 0) {
-              core.info(`No open PR found for ${branch}; running workflow.`);
-              core.setOutput('should_run', 'true');
-            } else {
-              core.info(`Found ${prs.length} open PR(s) for ${branch}; skipping duplicate push run.`);
-              core.setOutput('should_run', 'false');
-            }
   pre-commit:
-    needs:
-      - detect-duplicate
-    if: needs.detect-duplicate.outputs.should_run == 'true'
+    # We want to run on external PRs, but not on our own internal PRs as they'll be run
+    # by the push to the branch. Without this if check, checks are duplicated since
+    # internal PRs match both the push and pull_request events.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     name: Linting Checks
     runs-on: ubuntu-24.04
     steps:
