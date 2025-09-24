@@ -314,11 +314,19 @@ def consumable_document_matches_workflow(
         trigger_matched = False
 
     # Document path vs trigger path
+
+    # Use the original_path if set, else us the original_file
+    match_against = (
+        document.original_path
+        if document.original_path is not None
+        else document.original_file
+    )
+
     if (
         trigger.filter_path is not None
         and len(trigger.filter_path) > 0
         and not fnmatch(
-            document.original_file,
+            match_against,
             trigger.filter_path,
         )
     ):
