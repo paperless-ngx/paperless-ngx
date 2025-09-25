@@ -354,18 +354,10 @@ jobs:
         if: steps.pr.outputs.shouldRun == 'true'
         uses: actions/github-script@v7
         env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           COMMIT_SHA: ${{ steps.pr.outputs.headSha }}
           PR_NUMBER: ${{ steps.pr.outputs.prNumber }}
         with:
           script: |
-            const token = process.env.CODECOV_TOKEN;
-            if (!token) {
-              core.warning('CODECOV_TOKEN secret is not available; skipping comment.');
-              core.setOutput('shouldComment', 'false');
-              return;
-            }
-
             const commitSha = process.env.COMMIT_SHA;
             const prNumber = process.env.PR_NUMBER;
             const owner = context.repo.owner;
@@ -384,7 +376,6 @@ jobs:
               try {
                 response = await fetch(commitUrl, {
                   headers: {
-                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
                   },
@@ -434,7 +425,6 @@ jobs:
               try {
                 prResponse = await fetch(prUrl, {
                   headers: {
-                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
                   },
