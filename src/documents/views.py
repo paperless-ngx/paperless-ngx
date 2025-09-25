@@ -541,7 +541,7 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         ),
         responses={
             200: inline_serializer(
-                name="EmailResponse",
+                name="EmailDocumentResponse",
                 fields={"message": serializers.CharField()},
             ),
             400: None,
@@ -556,7 +556,7 @@ class DocumentTypeViewSet(ModelViewSet, PermissionsAwareDocumentCountMixin):
         request=EmailSerializer,
         responses={
             200: inline_serializer(
-                name="EmailResponse",
+                name="EmailDocumentsResponse",
                 fields={"message": serializers.CharField()},
             ),
             400: None,
