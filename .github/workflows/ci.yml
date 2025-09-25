@@ -514,8 +514,6 @@ jobs:
               }
             }
 
-            const flagsRaw = reportData.totals_by_flag ?? reportData.components ?? [];
-
             const coverage = toNumber(totals.coverage);
             const baseCoverage = toNumber(compareTotals?.base_coverage ?? compareTotals?.base);
             let delta = toNumber(
@@ -542,47 +540,192 @@ jobs:
             };
 
             const shortSha = commitSha.slice(0, 7);
-            const lines = [
-              '<!-- codecov-coverage-comment -->',
-              '**Codecov Coverage**',
-              '',
-              `- Head \`${shortSha}\`: ${formatPercent(coverage)}`,
-            ];
+            const reportBaseUrl = `https://app.codecov.io/gh/${owner}/${repo}`;
+            const commitReportUrl = `${reportBaseUrl}/commit/${commitSha}?src=pr&el=comment`;
+            const prReportUrl = prNumber
+              ? `${reportBaseUrl}/pull/${prNumber}?src=pr&el=comment`
+              : commitReportUrl;
+
+            const findBaseCommitSha = () =>
+              data?.report?.compare?.base_commitid ??
+              data?.report?.compare?.base?.commitid ??
+              data?.report?.base_commitid ??
+              data?.compare?.base_commitid ??
+              data?.compare?.base?.commitid ??
+              data?.base_commitid ??
+              data?.base?.commitid;
+
+            const baseCommitSha = findBaseCommitSha();
+            const baseCommitUrl = baseCommitSha
+              ? `${reportBaseUrl}/commit/${baseCommitSha}?src=pr&el=comment`
+              : undefined;
+            const baseShortSha = baseCommitSha ? baseCommitSha.slice(0, 7) : undefined;
+
+            const lines = ['<!-- codecov-coverage-comment -->'];
+            lines.push(`## [Codecov](${prReportUrl}) Report`);
+            lines.push('');
+
+            if (coverage !== undefined) {
+              lines.push(`:white_check_mark: Project coverage for \`${shortSha}\` is ${formatPercent(coverage)}.`);
+            } else {
+              lines.push(':warning: Coverage for the head commit is unavailable.');
+            }
 
             if (baseCoverage !== undefined) {
-              lines.push(`- Base: ${formatPercent(baseCoverage)}`);
+              const changeEmoji = delta === undefined ? ':grey_question:' : delta >= 0 ? ':white_check_mark:' : ':small_red_triangle_down:';
+              const baseCoverageText = `Base${baseShortSha ? ` \`${baseShortSha}\`` : ''} ${formatPercent(baseCoverage)}`;
+              const baseLink = baseCommitUrl ? `[${baseCoverageText}](${baseCommitUrl})` : baseCoverageText;
+              const changeText =
+                delta !== undefined
+                  ? `${baseLink} (${formatDelta(delta)})`
+                  : `${baseLink} (change unknown)`;
+              lines.push(`${changeEmoji} ${changeText}.`);
             }
 
-            if (delta !== undefined) {
-              lines.push(`- Change: ${formatDelta(delta)}`);
-            }
+            lines.push(`:clipboard: [View full report on Codecov](${commitReportUrl}).`);
 
-            const flagEntries = Array.isArray(flagsRaw)
-              ? flagsRaw
-              : Object.entries(flagsRaw).map(([name, totals]) => ({ name, totals }));
+            const normalizeTotals = (value) => {
+              if (!value) return undefined;
+              if (value.totals && typeof value.totals === 'object') return value.totals;
+              return value;
+            };
 
-            const flagRows = [];
-            for (const entry of flagEntries) {
-              const label = entry.flag ?? entry.name ?? entry.component ?? entry.id;
-              const entryTotals = entry.totals ?? entry;
-              const entryCoverage = toNumber(entryTotals?.coverage);
-              const entryDelta = toNumber(
-                entryTotals?.coverage_change ??
-                entryTotals?.coverage_diff ??
-                entryTotals?.delta ??
-                entryTotals?.diff,
-              );
-              if (!label || entryCoverage === undefined) {
-                continue;
+            const headTotals = normalizeTotals(totals) ?? {};
+            const baseTotals =
+              normalizeTotals(data.base_totals) ??
+              normalizeTotals(reportData.base_totals) ??
+              normalizeTotals(reportData.compare?.base_totals) ??
+              normalizeTotals(reportData.compare?.base);
+
+            const formatInteger = (value) => {
+              if (value === undefined) return '—';
+              return value.toLocaleString('en-US');
+            };
+
+            const formatIntegerDelta = (value) => {
+              if (value === undefined) return '—';
+              const sign = value >= 0 ? '+' : '';
+              return `${sign}${value.toLocaleString('en-US')}`;
+            };
+
+            const getInteger = (value) => {
+              const num = toNumber(value);
+              return Number.isFinite(num) ? Math.round(num) : undefined;
+            };
+
+            const metrics = [];
+            metrics.push({
+              label: 'Coverage',
+              base: baseCoverage,
+              head: coverage,
+              diff: delta,
+              format: formatPercent,
+              formatDiff: formatDelta,
+            });
+
+            const pushIntegerMetric = (label, headValueRaw, baseValueRaw) => {
+              const headValue = getInteger(headValueRaw);
+              const baseValue = getInteger(baseValueRaw);
+              if (headValue === undefined && baseValue === undefined) {
+                return;
               }
-              flagRows.push(`| ${label} | ${formatPercent(entryCoverage)} | ${formatDelta(entryDelta)} |`);
+              const diff = headValue !== undefined && baseValue !== undefined ? headValue - baseValue : undefined;
+              metrics.push({
+                label,
+                base: baseValue,
+                head: headValue,
+                diff,
+                format: formatInteger,
+                formatDiff: formatIntegerDelta,
+              });
+            };
+
+            pushIntegerMetric('Files', headTotals.files, baseTotals?.files);
+            pushIntegerMetric('Lines', headTotals.lines, baseTotals?.lines);
+            pushIntegerMetric('Branches', headTotals.branches, baseTotals?.branches);
+            pushIntegerMetric('Hits', headTotals.hits, baseTotals?.hits);
+            pushIntegerMetric('Misses', headTotals.misses, baseTotals?.misses);
+
+            const hasMetricData = metrics.some((metric) => metric.base !== undefined || metric.head !== undefined);
+            if (hasMetricData) {
+              lines.push('');
+              lines.push('<details><summary>Coverage summary</summary>');
+              lines.push('');
+              lines.push('| Metric | Base | Head | Δ |');
+              lines.push('| --- | --- | --- | --- |');
+              for (const metric of metrics) {
+                const baseValue = metric.base !== undefined ? metric.format(metric.base) : '—';
+                const headValue = metric.head !== undefined ? metric.format(metric.head) : '—';
+                const diffValue = metric.diff !== undefined ? metric.formatDiff(metric.diff) : '—';
+                lines.push(`| ${metric.label} | ${baseValue} | ${headValue} | ${diffValue} |`);
+              }
+              lines.push('');
+              lines.push('</details>');
             }
 
-            if (flagRows.length) {
-              lines.push('');
-              lines.push('| Flag | Coverage | Change |');
-              lines.push('| --- | --- | --- |');
-              lines.push(...flagRows);
+            const normalizeEntries = (raw) => {
+              if (!raw) return [];
+              if (Array.isArray(raw)) return raw;
+              if (typeof raw === 'object') {
+                return Object.entries(raw).map(([name, totals]) => ({ name, ...(typeof totals === 'object' ? totals : { coverage: totals }) }));
+              }
+              return [];
+            };
+
+            const buildTableRows = (entries) => {
+              const rows = [];
+              for (const entry of entries) {
+                const label = entry.flag ?? entry.name ?? entry.component ?? entry.id;
+                const entryTotals = entry.totals ?? entry;
+                const entryCoverage = toNumber(entryTotals?.coverage);
+                if (!label || entryCoverage === undefined) {
+                  continue;
+                }
+                const entryDelta = toNumber(
+                  entryTotals?.coverage_change ??
+                  entryTotals?.coverage_diff ??
+                  entryTotals?.delta ??
+                  entryTotals?.diff ??
+                  entryTotals?.change,
+                );
+                const coverageText = entryCoverage !== undefined ? `\`${formatPercent(entryCoverage)}\`` : '—';
+                const deltaText = entryDelta !== undefined ? `\`${formatDelta(entryDelta)}\`` : '—';
+                rows.push(`| ${label} | ${coverageText} | ${deltaText} |`);
+              }
+              return rows;
+            };
+
+            const componentEntries = normalizeEntries(reportData.components ?? data.components);
+            const flagEntries = normalizeEntries(reportData.totals_by_flag ?? data.totals_by_flag);
+
+            if (componentEntries.length) {
+              const componentsLink = prNumber
+                ? `${reportBaseUrl}/pull/${prNumber}/components?src=pr&el=components`
+                : `${commitReportUrl}`;
+              const componentRows = buildTableRows(componentEntries);
+              if (componentRows.length) {
+                lines.push('');
+                lines.push(`[Components report](${componentsLink})`);
+                lines.push('');
+                lines.push('| Component | Coverage | Δ |');
+                lines.push('| --- | --- | --- |');
+                lines.push(...componentRows);
+              }
+            }
+
+            if (flagEntries.length) {
+              const flagsLink = prNumber
+                ? `${reportBaseUrl}/pull/${prNumber}/flags?src=pr&el=flags`
+                : `${commitReportUrl}`;
+              const flagRows = buildTableRows(flagEntries);
+              if (flagRows.length) {
+                lines.push('');
+                lines.push(`[Flags report](${flagsLink})`);
+                lines.push('');
+                lines.push('| Flag | Coverage | Δ |');
+                lines.push('| --- | --- | --- |');
+                lines.push(...flagRows);
+              }
             }
 
             const commentBody = lines.join('\n');
