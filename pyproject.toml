@@ -36,6 +36,7 @@ dependencies = [
   "django-guardian~=3.1.2",
   "django-multiselectfield~=1.0.1",
   "django-soft-delete~=1.0.18",
+  "django-treenode>=0.23.2",
   "djangorestframework~=3.16",
   "djangorestframework-guardian~=0.4.0",
   "drf-spectacular~=0.28",
@@ -50,7 +51,7 @@ dependencies = [
   "jinja2~=3.1.5",
   "langdetect~=1.0.9",
   "nltk~=3.9.1",
-  "ocrmypdf~=16.10.0",
+  "ocrmypdf~=16.11.0",
   "pathvalidate~=3.3.1",
   "pdf2image~=1.17.0",
   "psycopg-pool",
@@ -116,7 +117,7 @@ testing = [
 lint = [
   "pre-commit~=4.3.0",
   "pre-commit-uv~=4.1.3",
-  "ruff~=0.12.2",
+  "ruff~=0.13.0",
 ]
 
 typing = [

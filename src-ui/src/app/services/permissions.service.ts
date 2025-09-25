@@ -28,6 +28,7 @@ export enum PermissionType {
   ShareLink = '%s_sharelink',
   CustomField = '%s_customfield',
   Workflow = '%s_workflow',
+  ProcessedMail = '%s_processedmail',
 }
 
 @Injectable({
