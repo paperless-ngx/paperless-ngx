@@ -356,6 +356,7 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           COMMIT_SHA: ${{ steps.pr.outputs.headSha }}
+          PR_NUMBER: ${{ steps.pr.outputs.prNumber }}
         with:
           script: |
             const token = process.env.CODECOV_TOKEN;
@@ -366,23 +367,33 @@ jobs:
             }
 
             const commitSha = process.env.COMMIT_SHA;
+            const prNumber = process.env.PR_NUMBER;
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-            const url = `https://codecov.io/api/v2/github/${owner}/repos/${repo}/commits/${commitSha}/report`;
-            const maxAttempts = 10;
+            const service = 'gh';
+            const baseUrl = `https://api.codecov.io/api/v2/${service}/${owner}/repos/${repo}`;
+            const commitUrl = `${baseUrl}/commits/${commitSha}`;
+            const maxAttempts = 20;
             const waitMs = 15000;
             const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
             let data;
             for (let attempt = 1; attempt <= maxAttempts; attempt++) {
               core.info(`Fetching Codecov report (attempt ${attempt}/${maxAttempts})`);
-              const response = await fetch(url, {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  'Content-Type': 'application/json',
-                  Accept: 'application/json',
-                },
-              });
+              let response;
+              try {
+                response = await fetch(commitUrl, {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                  },
+                });
+              } catch (error) {
+                core.warning(`Codecov fetch failed: ${error}. Waiting before retrying.`);
+                await sleep(waitMs);
+                continue;
+              }
 
               if (response.status === 404) {
                 core.info('Report not ready yet (404). Waiting before retrying.');
@@ -390,12 +401,24 @@ jobs:
                 continue;
               }
 
-              if (!response.ok) {
-                const text = await response.text();
-                throw new Error(`Codecov API returned ${response.status}: ${text}`);
+              if ([429, 500, 502, 503, 504].includes(response.status)) {
+                const text = await response.text().catch(() => '');
+                core.info(`Codecov API transient error ${response.status}: ${text}. Waiting before retrying.`);
+                await sleep(waitMs);
+                continue;
               }
 
-              data = await response.json();
+              if (!response.ok) {
+                const text = await response.text().catch(() => '');
+                core.warning(`Codecov API returned ${response.status}: ${text}. Skipping comment.`);
+                core.setOutput('shouldComment', 'false');
+                return;
+              }
+
+              data = await response.json().catch((error) => {
+                core.warning(`Failed to parse Codecov response: ${error}.`);
+                return undefined;
+              });
               if (data && Object.keys(data).length > 0) {
                 break;
               }
@@ -404,21 +427,104 @@ jobs:
               await sleep(waitMs);
             }
 
+            if (!data && prNumber) {
+              core.info('Attempting to retrieve coverage from PR endpoint.');
+              const prUrl = `${baseUrl}/pulls/${prNumber}`;
+              let prResponse;
+              try {
+                prResponse = await fetch(prUrl, {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                  },
+                });
+              } catch (error) {
+                core.warning(`Codecov PR fetch failed: ${error}.`);
+              }
+
+              if (prResponse) {
+                if ([429, 500, 502, 503, 504].includes(prResponse.status)) {
+                  const text = await prResponse.text().catch(() => '');
+                  core.info(`Codecov PR endpoint transient error ${prResponse.status}: ${text}.`);
+                } else if (!prResponse.ok) {
+                  const text = await prResponse.text().catch(() => '');
+                  core.warning(`Codecov PR endpoint returned ${prResponse.status}: ${text}.`);
+                } else {
+                  const prData = await prResponse.json().catch((error) => {
+                    core.warning(`Failed to parse Codecov PR response: ${error}.`);
+                    return undefined;
+                  });
+
+                  if (prData?.latest_report) {
+                    data = { report: prData.latest_report };
+                  } else if (prData?.head_totals) {
+                    const headTotals = prData.head_totals;
+                    const baseTotals = prData.base_totals;
+                    let compareTotals;
+                    if (baseTotals && headTotals) {
+                      const headCoverage = Number(headTotals.coverage);
+                      const baseCoverage = Number(baseTotals.coverage);
+                      if (Number.isFinite(headCoverage) && Number.isFinite(baseCoverage)) {
+                        compareTotals = {
+                          base_coverage: baseCoverage,
+                          coverage_change: headCoverage - baseCoverage,
+                        };
+                      }
+                    }
+
+                    data = {
+                      report: {
+                        totals: headTotals,
+                        compare: compareTotals ? { totals: compareTotals } : undefined,
+                        totals_by_flag: [],
+                      },
+                      head_totals: headTotals,
+                      base_totals: baseTotals,
+                    };
+                  } else {
+                    data = prData;
+                  }
+                }
+              }
+            }
+
             if (!data) {
               core.warning('Unable to retrieve Codecov report after multiple attempts.');
               core.setOutput('shouldComment', 'false');
               return;
             }
 
-            const totals = data.report?.totals ?? data.commit?.totals ?? data.totals;
+            const toNumber = (value) => {
+              if (value === null || value === undefined || value === '') {
+                return undefined;
+              }
+              const num = Number(value);
+              return Number.isFinite(num) ? num : undefined;
+            };
+
+            const reportData = data.report || data;
+            const totals = reportData.totals ?? data.head_totals ?? data.totals;
             if (!totals) {
               core.warning('Codecov response does not contain coverage totals.');
               core.setOutput('shouldComment', 'false');
               return;
             }
 
-            const compareTotals = data.report?.compare?.totals ?? data.compare?.totals;
-            const flagsRaw = data.report?.totals_by_flag ?? data.report?.components ?? [];
+            let compareTotals = reportData.compare?.totals ?? data.compare?.totals;
+            if (!compareTotals && data.base_totals) {
+              const baseCoverageValue = toNumber(data.base_totals.coverage);
+              if (baseCoverageValue !== undefined) {
+                const headCoverageValue = toNumber((data.head_totals ?? {}).coverage);
+                compareTotals = {
+                  base_coverage: baseCoverageValue,
+                  coverage_change:
+                    headCoverageValue !== undefined ? headCoverageValue - baseCoverageValue : undefined,
+                };
+              }
+            }
+
+            const flagsRaw = reportData.totals_by_flag ?? reportData.components ?? [];
 
             const toNumber = (value) => {
               if (value === null || value === undefined || value === '') {
