@@ -192,6 +192,14 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: backend-python-${{ matrix.python-version }}
           files: coverage.xml
+      - name: Upload backend coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: coverage.xml
+          format: cobertura
+          flag-name: backend-python-${{ matrix.python-version }}
+          parallel: true
       - name: Stop containers
         if: always()
         run: |
@@ -274,6 +282,26 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/coverage/
+      - name: Upload frontend coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: src-ui/coverage/lcov.info
+          format: lcov
+          flag-name: frontend-node-${{ matrix.node-version }}-shard-${{ matrix.shard-index }}
+          parallel: true
+  coveralls-finish:
+    name: Finalize Coveralls
+    runs-on: ubuntu-24.04
+    needs:
+      - tests-backend
+      - tests-frontend
+    steps:
+      - name: Mark Coveralls jobs complete
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true
   tests-frontend-e2e:
     name: "Frontend E2E Tests (Node ${{ matrix.node-version }} - ${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     runs-on: ubuntu-24.04
