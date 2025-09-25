@@ -526,23 +526,19 @@ jobs:
 
             const flagsRaw = reportData.totals_by_flag ?? reportData.components ?? [];
 
-            const toNumber = (value) => {
-              if (value === null || value === undefined || value === '') {
-                return undefined;
-              }
-              const num = Number(value);
-              return Number.isFinite(num) ? num : undefined;
-            };
-
             const coverage = toNumber(totals.coverage);
             const baseCoverage = toNumber(compareTotals?.base_coverage ?? compareTotals?.base);
-            const delta = toNumber(
+            let delta = toNumber(
               compareTotals?.coverage_change ??
               compareTotals?.coverage_diff ??
               totals.delta ??
               totals.diff ??
               totals.change,
             );
+
+            if (delta === undefined && coverage !== undefined && baseCoverage !== undefined) {
+              delta = coverage - baseCoverage;
+            }
 
             const formatPercent = (value) => {
               if (value === undefined) return '—';
