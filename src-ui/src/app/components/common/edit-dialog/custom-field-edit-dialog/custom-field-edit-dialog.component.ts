@@ -177,10 +177,16 @@ export class CustomFieldEditDialogComponent
   }
 
   public removeSelectOption(index: number) {
-    this.selectOptions.removeAt(index)
-    this._allSelectOptions.splice(
-      index + (this.selectOptionsPage - 1) * SELECT_OPTION_PAGE_SIZE,
-      1
+    const globalIndex =
+      index + (this.selectOptionsPage - 1) * SELECT_OPTION_PAGE_SIZE
+    this._allSelectOptions.splice(globalIndex, 1)
+
+    const totalPages = Math.max(
+      1,
+      Math.ceil(this._allSelectOptions.length / SELECT_OPTION_PAGE_SIZE)
     )
+    const targetPage = Math.min(this.selectOptionsPage, totalPages)
+
+    this.selectOptionsPage = targetPage
   }
 }
