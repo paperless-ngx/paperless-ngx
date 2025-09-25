@@ -88,9 +88,7 @@ describe('EmailDocumentDialogComponent', () => {
 
     jest.spyOn(documentService, 'emailDocuments').mockReturnValue(of(true))
     component.emailDocuments()
-    expect(toastSuccessSpy).toHaveBeenCalledWith(
-      'Documents emailed successfully'
-    )
+    expect(toastSuccessSpy).toHaveBeenCalledWith('Email sent')
   })
 
   it('should close the dialog', () => {

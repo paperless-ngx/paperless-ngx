@@ -365,9 +365,7 @@ it('should call appropriate api endpoint for email document', () => {
       true
     )
     .subscribe()
-  httpTestingController.expectOne(
-    `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/email/`
-  )
+  httpTestingController.expectOne(`${environment.apiBaseUrl}${endpoint}/email/`)
 })
 
 afterEach(() => {
