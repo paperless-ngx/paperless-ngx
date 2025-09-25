@@ -1072,12 +1072,13 @@ class DocumentViewSet(
         message = validated_data.get("message")
         use_archive_version = validated_data.get("use_archive_version", True)
 
-        if not all(re.match(r"[^@]+@[^@]+\.[^@]+", address) for address in addresses):
-            return HttpResponseBadRequest("Invalid email address found")
-
         documents = Document.objects.select_related("owner").filter(pk__in=document_ids)
         for document in documents:
-            if not has_perms_owner_aware(request.user, "view_document", document):
+            if request.user is not None and not has_perms_owner_aware(
+                request.user,
+                "view_document",
+                document,
+            ):
                 return HttpResponseForbidden("Insufficient permissions")
 
         attachments = []
@@ -1109,10 +1110,15 @@ class DocumentViewSet(
 
     @action(methods=["post"], detail=True, url_path="email")
     def email_document(self, request, pk=None):
-        return self._send_email_with_request_data(
-            request,
-            {**request.data, "documents": [pk]},
-        )
+        request_data = {
+            "addresses": request.data.get("addresses"),
+            "subject": request.data.get("subject"),
+            "message": request.data.get("message"),
+            "use_archive_version": request.data.get("use_archive_version", True),
+            "documents": [pk],
+        }
+
+        return self._send_email_with_request_data(request, request_data)
 
     @action(
         methods=["post"],

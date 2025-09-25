@@ -1797,12 +1797,13 @@ class EmailSerializer(DocumentListSerializer):
             if not re.match(email_pattern, address):
                 raise serializers.ValidationError(f"Invalid email address: {address}")
 
-        return addresses
+        return ",".join(address_list)
 
     def validate_documents(self, documents):
         super().validate_documents(documents)
         if not documents:
             raise serializers.ValidationError("At least one document is required")
+
         return documents
 
 
