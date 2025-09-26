@@ -33,6 +33,7 @@ export class MergeConfirmDialogComponent
   public documentIDs: number[] = []
   public archiveFallback: boolean = false
   public deleteOriginals: boolean = false
+  public interleaved: boolean = false
   private _documents: Document[] = []
   get documents(): Document[] {
     return this._documents

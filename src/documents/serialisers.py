@@ -1604,6 +1604,11 @@ class BulkEditSerializer(
                 raise serializers.ValidationError("archive_fallback must be a boolean")
         else:
             parameters["archive_fallback"] = False
+        if "interleaved" in parameters:
+            if not isinstance(parameters["interleaved"], bool):
+                raise serializers.ValidationError("interleaved must be a boolean")
+        else:
+            parameters["interleaved"] = False
 
     def _validate_parameters_edit_pdf(self, parameters, document_id):
         if "operations" not in parameters:

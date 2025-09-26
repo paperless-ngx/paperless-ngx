@@ -301,6 +301,7 @@ The following methods are supported:
         -   `"metadata_document_id": DOC_ID` apply metadata (tags, correspondent, etc.) from this document to the merged document.
         -   `"delete_originals": true` to delete the original documents. This requires the calling user being the owner of
             all documents that are merged.
+        -   `"interleaved": true` to interleave pages (requires exactly 2 documents).
 -   `split`
     -   Requires `parameters`:
         -   `"pages": [..]` The list should be a list of pages and/or a ranges, separated by commas e.g. `"[1,2-3,4,5-7]"`

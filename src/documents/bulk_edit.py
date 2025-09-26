@@ -369,12 +369,45 @@ def rotate(doc_ids: list[int], degrees: int) -> Literal["OK"]:
     return "OK"
 
 
+def _interleave_pdf_pages(pdf, doc_page_counts):
+    import pikepdf
+
+    if len(doc_page_counts) != 2:
+        logger.warning("Interleaving only works with exactly 2 documents")
+        return pdf
+
+    doc1_pages = doc_page_counts[0]
+    doc2_pages = doc_page_counts[1]
+
+    operations = []
+    max_iterations = max(doc1_pages, doc2_pages)
+
+    for i in range(max_iterations):
+        # Add page from doc1 (forward: page 1, 2, 3...)
+        if i < doc1_pages:
+            doc1_page = i + 1
+            operations.append({"page": doc1_page})
+
+        # Add page from doc2 (backward: last, second-last, third-last...)
+        if i < doc2_pages:
+            doc2_page = doc1_pages + doc2_pages - i
+            operations.append({"page": doc2_page})
+
+    interleaved_pdf = pikepdf.new()
+    for op in operations:
+        if op["page"] <= len(pdf.pages):
+            interleaved_pdf.pages.append(pdf.pages[op["page"] - 1])
+
+    return interleaved_pdf
+
+
 def merge(
     doc_ids: list[int],
     *,
     metadata_document_id: int | None = None,
     delete_originals: bool = False,
     archive_fallback: bool = False,
+    interleaved: bool = False,
     user: User | None = None,
 ) -> Literal["OK"]:
     logger.info(
@@ -386,6 +419,8 @@ def merge(
 
     merged_pdf = pikepdf.new()
     version: str = merged_pdf.pdf_version
+    doc_page_counts = []  # Track page counts for interleaving
+
     # use doc_ids to preserve order
     for doc_id in doc_ids:
         doc = qs.get(id=doc_id)
@@ -399,6 +434,7 @@ def merge(
             )
             with pikepdf.open(str(doc_path)) as pdf:
                 version = max(version, pdf.pdf_version)
+                doc_page_counts.append(len(pdf.pages))
                 merged_pdf.pages.extend(pdf.pages)
             affected_docs.append(doc.id)
         except Exception as e:
@@ -408,6 +444,15 @@ def merge(
     if len(affected_docs) == 0:
         logger.warning("No documents were merged")
         return "OK"
+
+    if interleaved and len(affected_docs) == 2:
+        interleaved_pdf = _interleave_pdf_pages(merged_pdf, doc_page_counts)
+        merged_pdf.close()
+        merged_pdf = interleaved_pdf
+    elif interleaved and len(affected_docs) != 2:
+        logger.warning(
+            "Interleaving requires exactly 2 documents, proceeding with regular merge",
+        )
 
     filepath = (
         Path(
