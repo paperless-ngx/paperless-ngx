@@ -807,14 +807,14 @@ wheels = [
 
 [[package]]
 name = "django-soft-delete"
-version = "1.0.19"
+version = "1.0.21"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ce/77/44a6615a7da3ca0ddc624039d399d17d6c3503e1c2dad08b443f8d4a3570/django_soft_delete-1.0.19.tar.gz", hash = "sha256:c67ee8920e1456eca84cc59b3304ef27fa9d476b516be726ce7e1fc558502908", size = 11993, upload-time = "2025-06-19T20:32:20.373Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/da/bf/13996c18bffee3bbcf294830c1737bfb5564164b8319c51e6714b6bdf783/django_soft_delete-1.0.21.tar.gz", hash = "sha256:542bd4650d2769105a4363ea7bb7fbdb3c28429dbaa66417160f8f4b5dc689d5", size = 21153, upload-time = "2025-09-17T08:46:30.476Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/96/9e/f8b5a02cdcba606eb40fbe30fe0c9c7493a2c18f83ec3b4620e4e86a34d3/django_soft_delete-1.0.19-py3-none-any.whl", hash = "sha256:46aa5fab513db566d3d7a832529ed27245b5900eaaa705535bc7674055801a46", size = 10889, upload-time = "2025-06-19T20:32:19.083Z" },
+    { url = "https://files.pythonhosted.org/packages/fa/e6/8f4fed14499c63e35ca33cf9f424ad2e14e963ec5545594d7c7dc2f710f4/django_soft_delete-1.0.21-py3-none-any.whl", hash = "sha256:dd91e671d9d431ff96f4db727ce03e7fbb4008ae4541b1d162d5d06cc9becd2a", size = 18681, upload-time = "2025-09-17T08:46:29.272Z" },
 ]
 
 [[package]]
