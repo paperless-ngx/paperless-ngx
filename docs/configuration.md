@@ -1,18 +1,18 @@
 # Configuration
 
-Paperless provides a wide range of customizations. Depending on how you
-run paperless, these settings have to be defined in different places.
+Paperless-ngx provides a wide range of customizations. Depending on how you
+run Paperless-ngx, these settings have to be defined in different places.
 
 Certain configuration options may be set via the UI. This currently includes
 common [OCR](#ocr) related settings and some frontend settings. If set, these will take
 preference over the settings via environment variables. If not set, the environment setting
 or applicable default will be utilized instead.
 
--   If you run paperless on docker, `paperless.conf` is not used.
-    Rather, configure paperless by copying necessary options to
+-   If you run Paperless-ngx on docker, `paperless.conf` is not used.
+    Rather, configure Paperless-ngx by copying necessary options to
     `docker-compose.env`.
 
--   If you are running paperless on anything else, paperless will search
+-   If you are running Paperless-ngx on anything else, Paperless-ngx will search
     for the configuration file in these locations and use the first one
     it finds:
     -   The environment variable `PAPERLESS_CONFIGURATION_PATH`
@@ -44,19 +44,19 @@ matcher.
 
 #### [`PAPERLESS_REDIS_PREFIX=<prefix>`](#PAPERLESS_REDIS_PREFIX) {#PAPERLESS_REDIS_PREFIX}
 
-: Prefix to be used in Redis for keys and channels. Useful for sharing one Redis server among multiple Paperless instances.
+: Prefix to be used in Redis for keys and channels. Useful for sharing one Redis server among multiple Paperless-ngx instances.
 
     Defaults to no prefix.
 
 ### Database
 
-By default, Paperless uses **SQLite** with a database stored at `data/db.sqlite3`.
+By default, Paperless-ngx uses **SQLite** with a database stored at `data/db.sqlite3`.
 To switch to **PostgreSQL** or **MariaDB**, set [`PAPERLESS_DBHOST`](#PAPERLESS_DBHOST) and optionally configure other
 database-related environment variables.
 
 #### [`PAPERLESS_DBHOST=<hostname>`](#PAPERLESS_DBHOST) {#PAPERLESS_DBHOST}
 
-: If unset, Paperless uses **SQLite** by default.
+: If unset, Paperless-ngx uses **SQLite** by default.
 
     Set `PAPERLESS_DBHOST` to switch to PostgreSQL or MariaDB instead.
 
@@ -172,8 +172,8 @@ Available options are `postgresql` and `mariadb`.
 
         A small pool is typically sufficient — for example, a size of 4.
         Make sure your PostgreSQL server's max_connections setting is large enough to handle:
-        ```(Paperless workers + Celery workers) × pool size + safety margin```
-        For example, with 4 Paperless workers and 2 Celery workers, and a pool size of 4:
+        ```(Paperless-ngx workers + Celery workers) × pool size + safety margin```
+        For example, with 4 Paperless-ngx workers and 2 Celery workers, and a pool size of 4:
         (4 + 2) × 4 + 10 = 34 connections required.
 
 #### [`PAPERLESS_DB_READ_CACHE_ENABLED=<bool>`](#PAPERLESS_DB_READ_CACHE_ENABLED) {#PAPERLESS_DB_READ_CACHE_ENABLED}
@@ -215,7 +215,7 @@ For more details, refer to the [Redis eviction policy documentation](https://red
 
 ### Tika {#tika}
 
-Paperless can make use of [Tika](https://tika.apache.org/) and
+Paperless-ngx can make use of [Tika](https://tika.apache.org/) and
 [Gotenberg](https://gotenberg.dev/) for parsing and converting
 "Office" documents (such as ".doc", ".xlsx" and ".odt").
 Tika and Gotenberg are also needed to allow parsing of E-Mails (.eml).
@@ -231,17 +231,17 @@ configure their endpoints, and enable the feature.
 
 #### [`PAPERLESS_TIKA_ENDPOINT=<url>`](#PAPERLESS_TIKA_ENDPOINT) {#PAPERLESS_TIKA_ENDPOINT}
 
-: Set the endpoint URL where Paperless can reach your Tika server.
+: Set the endpoint URL where Paperless-ngx can reach your Tika server.
 
     Defaults to "<http://localhost:9998>".
 
 #### [`PAPERLESS_TIKA_GOTENBERG_ENDPOINT=<url>`](#PAPERLESS_TIKA_GOTENBERG_ENDPOINT) {#PAPERLESS_TIKA_GOTENBERG_ENDPOINT}
 
-: Set the endpoint URL where Paperless can reach your Gotenberg server.
+: Set the endpoint URL where Paperless-ngx can reach your Gotenberg server.
 
     Defaults to "<http://localhost:3000>".
 
-If you run paperless on docker, you can add those services to the
+If you run Paperless-ngx on docker, you can add those services to the
 Docker Compose file (see the provided
 [`docker-compose.sqlite-tika.yml`](https://github.com/paperless-ngx/paperless-ngx/blob/main/docker/compose/docker-compose.sqlite-tika.yml)
 file for reference).
@@ -269,8 +269,8 @@ rules can specify this setting, thus this fallback is used for the default selec
 #### [`PAPERLESS_CONSUMPTION_DIR=<path>`](#PAPERLESS_CONSUMPTION_DIR) {#PAPERLESS_CONSUMPTION_DIR}
 
 : This is where your documents should go to be consumed. Make sure that
-it exists and that the user running the paperless service can
-read/write its contents before you start Paperless.
+it exists and that the user running the Paperless-ngx service can
+read/write its contents before you start Paperless-ngx.
 
     Don't change this when using docker, as it only changes the path
     within the container. Change the local consumption directory in the
@@ -280,7 +280,7 @@ read/write its contents before you start Paperless.
 
 #### [`PAPERLESS_DATA_DIR=<path>`](#PAPERLESS_DATA_DIR) {#PAPERLESS_DATA_DIR}
 
-: This is where paperless stores all its data (search index, SQLite
+: This is where Paperless-ngx stores all its data (search index, SQLite
 database, classification model, etc).
 
     Defaults to "../data/", relative to the "src" directory.
@@ -290,7 +290,7 @@ database, classification model, etc).
 : When documents are deleted (e.g. after emptying the trash) the original files will be moved here
 instead of being removed from the filesystem. Only the original version is kept.
 
-    This must be writeable by the user running paperless. When running
+    This must be writeable by the user running Paperless-ngx. When running
     inside docker, ensure that this path is within a permanent volume
     (such as "../media/trash") so it won't get lost on upgrades.
 
@@ -305,7 +305,7 @@ instead of being removed from the filesystem. Only the original version is kept.
 : This is where your documents and thumbnails are stored.
 
     You can set this and PAPERLESS_DATA_DIR to the same folder to have
-    paperless store all its data within the same volume.
+    Paperless-ngx store all its data within the same volume.
 
     Defaults to "../media/", relative to the "src" directory.
 
@@ -322,14 +322,14 @@ files created using "collectstatic" manager command are stored.
 
 #### [`PAPERLESS_FILENAME_FORMAT=<format>`](#PAPERLESS_FILENAME_FORMAT) {#PAPERLESS_FILENAME_FORMAT}
 
-: Changes the filenames paperless uses to store documents in the media
+: Changes the filenames Paperless-ngx uses to store documents in the media
 directory. See [File name handling](advanced_usage.md#file-name-handling) for details.
 
     Default is none, which disables this feature.
 
 #### [`PAPERLESS_FILENAME_FORMAT_REMOVE_NONE=<bool>`](#PAPERLESS_FILENAME_FORMAT_REMOVE_NONE) {#PAPERLESS_FILENAME_FORMAT_REMOVE_NONE}
 
-: Tells paperless to replace placeholders in
+: Tells Paperless-ngx to replace placeholders in
 `PAPERLESS_FILENAME_FORMAT` that would resolve to
 'none' to be omitted from the resulting filename. This also holds
 true for directory names. See [File name handling](advanced_usage.md#empty-placeholders) for
@@ -339,13 +339,13 @@ details.
 
 #### [`PAPERLESS_LOGGING_DIR=<path>`](#PAPERLESS_LOGGING_DIR) {#PAPERLESS_LOGGING_DIR}
 
-: This is where paperless will store log files.
+: This is where Paperless-ngx will store log files.
 
     Defaults to `PAPERLESS_DATA_DIR/log/`.
 
 #### [`PAPERLESS_NLTK_DIR=<path>`](#PAPERLESS_NLTK_DIR) {#PAPERLESS_NLTK_DIR}
 
-: This is where paperless will search for the data required for NLTK
+: This is where Paperless-ngx will search for the data required for NLTK
 processing, if you are using it. If you are using the Docker image,
 this should not be changed, as the data is included in the image
 already.
@@ -358,7 +358,7 @@ Defaults to `/usr/share/nltk_data`
 
 #### [`PAPERLESS_MODEL_FILE=<path>`](#PAPERLESS_MODEL_FILE) {#PAPERLESS_MODEL_FILE}
 
-: This is where paperless will store the classification model.
+: This is where Paperless-ngx will store the classification model.
 
     Defaults to `PAPERLESS_DATA_DIR/classification_model.pickle`.
 
@@ -380,7 +380,7 @@ Defaults to `/usr/share/nltk_data`
 
 #### [`PAPERLESS_SECRET_KEY=<key>`](#PAPERLESS_SECRET_KEY) {#PAPERLESS_SECRET_KEY}
 
-: Paperless uses this to make session tokens. If you expose paperless
+: Paperless-ngx uses this to make session tokens. If you expose Paperless-ngx
 on the internet, you need to change this, since the default secret
 is well known.
 
@@ -401,7 +401,7 @@ not include a trailing slash. E.g. <https://paperless.domain.com>
     !!! note
 
         This value cannot contain a path (e.g. domain.com/path), even if
-        you are installing paperless-ngx at a subpath.
+        you are installing Paperless-ngx at a subpath.
 
 #### [`PAPERLESS_CSRF_TRUSTED_ORIGINS=<comma-separated-list>`](#PAPERLESS_CSRF_TRUSTED_ORIGINS) {#PAPERLESS_CSRF_TRUSTED_ORIGINS}
 
@@ -416,7 +416,7 @@ See the [Django project documentation on the settings](https://docs.djangoprojec
 
 #### [`PAPERLESS_ALLOWED_HOSTS=<comma-separated-list>`](#PAPERLESS_ALLOWED_HOSTS) {#PAPERLESS_ALLOWED_HOSTS}
 
-: If you're planning on putting Paperless on the open internet, then
+: If you're planning on putting Paperless-ngx on the open internet, then
 you really should set this value to the domain name you're using.
 Failing to do so leaves you open to HTTP host header attacks.
 You can read more about this in [the Django project's documentation](https://docs.djangoproject.com/en/4.1/topics/security/#host-header-validation)
@@ -450,14 +450,14 @@ IP address(es).
 
 #### [`PAPERLESS_FORCE_SCRIPT_NAME=<path>`](#PAPERLESS_FORCE_SCRIPT_NAME) {#PAPERLESS_FORCE_SCRIPT_NAME}
 
-: To host paperless under a subpath url like example.com/paperless you
+: To host Paperless-ngx under a subpath url like example.com/paperless you
 set this value to /paperless. No trailing slash!
 
-    Defaults to none, which hosts paperless at "/".
+    Defaults to none, which hosts Paperless-ngx at "/".
 
 #### [`PAPERLESS_STATIC_URL=<path>`](#PAPERLESS_STATIC_URL) {#PAPERLESS_STATIC_URL}
 
-: Override the STATIC_URL here. Unless you're hosting Paperless off a
+: Override the STATIC_URL here. Unless you're hosting Paperless-ngx off a
 specific path like /paperless/, you probably don't need to change this.
 If you do change it, be sure to include the trailing slash.
 
@@ -465,25 +465,25 @@ If you do change it, be sure to include the trailing slash.
 
     !!! note
 
-        When hosting paperless behind a reverse proxy like Traefik or Nginx
+        When hosting Paperless-ngx behind a reverse proxy like Traefik or Nginx
         at a subpath e.g. example.com/paperlessngx you will also need to set
         `PAPERLESS_FORCE_SCRIPT_NAME` (see above).
 
 #### [`PAPERLESS_AUTO_LOGIN_USERNAME=<username>`](#PAPERLESS_AUTO_LOGIN_USERNAME) {#PAPERLESS_AUTO_LOGIN_USERNAME}
 
-: Specify a username here so that paperless will automatically perform
+: Specify a username here so that Paperless-ngx will automatically perform
 login with the selected user.
 
     !!! danger
 
-        Do not use this when exposing paperless on the internet. There are
+        Do not use this when exposing Paperless-ngx on the internet. There are
         no checks in place that would prevent you from doing this.
 
     Defaults to none, which disables this feature.
 
 #### [`PAPERLESS_ADMIN_USER=<username>`](#PAPERLESS_ADMIN_USER) {#PAPERLESS_ADMIN_USER}
 
-: If this environment variable is specified, Paperless automatically
+: If this environment variable is specified, Paperless-ngx automatically
 creates a superuser with the provided username at start. This is
 useful in cases where you can not run the
 `createsuperuser` command separately, such as Kubernetes
@@ -511,9 +511,9 @@ be the password of the automatically created superuser.
 
 #### [`PAPERLESS_COOKIE_PREFIX=<str>`](#PAPERLESS_COOKIE_PREFIX) {#PAPERLESS_COOKIE_PREFIX}
 
-: Specify a prefix that is added to the cookies used by paperless to
+: Specify a prefix that is added to the cookies used by Paperless-ngx to
 identify the currently logged in user. This is useful for when
-you're running two instances of paperless on the same host.
+you're running two instances of Paperless-ngx on the same host.
 
     After changing this, you will have to login again.
 
@@ -529,10 +529,10 @@ applications.
         This will allow authentication by simply adding a
         `Remote-User: <username>` header to a request. Use with care! You
         especially *must* ensure that any such header is not passed from
-        external requests to your reverse-proxy to paperless (that would
+        external requests to your reverse-proxy to Paperless-ngx (that would
         effectively bypass all authentication).
 
-        If you're exposing paperless to the internet directly (i.e.
+        If you're exposing Paperless-ngx to the internet directly (i.e.
         without a reverse proxy), do not use this.
 
         Also see the warning [in the official documentation](https://docs.djangoproject.com/en/4.1/howto/auth-remote-user/#configuration).
@@ -547,7 +547,7 @@ applications.
 
         See the warning above about securing your installation when using remote user header authentication. This setting is separate from
         `PAPERLESS_ENABLE_HTTP_REMOTE_USER` to avoid introducing a security vulnerability to existing reverse proxy setups. As above,
-        ensure that your reverse proxy does not simply pass the `Remote-User` header from the internet to paperless.
+        ensure that your reverse proxy does not simply pass the `Remote-User` header from the internet to Paperless-ngx.
 
     Defaults to "false" which disables this feature.
 
@@ -721,14 +721,14 @@ If both the [PAPERLESS_ACCOUNT_DEFAULT_GROUPS](#PAPERLESS_ACCOUNT_DEFAULT_GROUPS
 
 ## OCR settings {#ocr}
 
-Paperless uses [OCRmyPDF](https://ocrmypdf.readthedocs.io/en/latest/)
-for performing OCR on documents and images. Paperless uses sensible
+Paperless-ngx uses [OCRmyPDF](https://ocrmypdf.readthedocs.io/en/latest/)
+for performing OCR on documents and images. Paperless-ngx uses sensible
 defaults for most settings, but all of them can be configured to your
 needs.
 
 #### [`PAPERLESS_OCR_LANGUAGE=<lang>`](#PAPERLESS_OCR_LANGUAGE) {#PAPERLESS_OCR_LANGUAGE}
 
-: Customize the language that paperless will attempt to use when
+: Customize the language that Paperless-ngx will attempt to use when
 parsing documents.
 
     It should be a 3-letter code, see the list of [languages Tesseract supports](https://tesseract-ocr.github.io/tessdoc/Data-Files-in-different-versions.html).
@@ -753,10 +753,10 @@ parsing documents.
 : Tell paperless when and how to perform ocr on your documents. Three
 modes are available:
 
-    -   `skip`: Paperless skips all pages and will perform ocr only on
+    -   `skip`: Paperless-ngx skips all pages and will perform ocr only on
         pages where no text is present. This is the safest option.
 
-    -   `redo`: Paperless will OCR all pages of your documents and
+    -   `redo`: Paperless-ngx will OCR all pages of your documents and
         attempt to replace any existing text layers with new text. This
         will be useful for documents from scanners that already
         performed OCR with insufficient results. It will also perform
@@ -766,7 +766,7 @@ modes are available:
         cannot be removed, such as forms. In this case, the text from
         the document is used instead.
 
-    -   `force`: Paperless rasterizes your documents, converting any
+    -   `force`: Paperless-ngx rasterizes your documents, converting any
         text into images and puts the OCRed text on top. This works for
         all documents, however, the resulting document may be
         significantly larger and text won't appear as sharp when zoomed
@@ -780,7 +780,7 @@ modes are available:
 
 #### [`PAPERLESS_OCR_SKIP_ARCHIVE_FILE=<mode>`](#PAPERLESS_OCR_SKIP_ARCHIVE_FILE) {#PAPERLESS_OCR_SKIP_ARCHIVE_FILE}
 
-: Specify when you would like paperless to skip creating an archived
+: Specify when you would like Paperless-ngx to skip creating an archived
 version of your documents. This is useful if you don't want to have two
 almost-identical versions of your documents in the media folder.
 
@@ -793,7 +793,7 @@ almost-identical versions of your documents in the media folder.
 
 #### [`PAPERLESS_OCR_CLEAN=<mode>`](#PAPERLESS_OCR_CLEAN) {#PAPERLESS_OCR_CLEAN}
 
-: Tells paperless to use `unpaper` to clean any input document before
+: Tells Paperless-ngx to use `unpaper` to clean any input document before
 sending it to tesseract. This uses more resources, but generally
 results in better OCR results. The following modes are available:
 
@@ -812,7 +812,7 @@ results in better OCR results. The following modes are available:
 
 #### [`PAPERLESS_OCR_DESKEW=<bool>`](#PAPERLESS_OCR_DESKEW) {#PAPERLESS_OCR_DESKEW}
 
-: Tells paperless to correct skewing (slight rotation of input images
+: Tells Paperless-ngx to correct skewing (slight rotation of input images
 mainly due to improper scanning)
 
     Defaults to `true`, which enables this feature.
@@ -824,10 +824,10 @@ mainly due to improper scanning)
 
 #### [`PAPERLESS_OCR_ROTATE_PAGES=<bool>`](#PAPERLESS_OCR_ROTATE_PAGES) {#PAPERLESS_OCR_ROTATE_PAGES}
 
-: Tells paperless to correct page rotation (90°, 180° and 270°
+: Tells Paperless-ngx to correct page rotation (90°, 180° and 270°
 rotation).
 
-    If you notice that paperless is not rotating incorrectly rotated
+    If you notice that Paperless-ngx is not rotating incorrectly rotated
     pages (or vice versa), try adjusting the threshold up or down (see
     below).
 
@@ -845,7 +845,7 @@ pages being rotated as well.
 
 #### [`PAPERLESS_OCR_OUTPUT_TYPE=<type>`](#PAPERLESS_OCR_OUTPUT_TYPE) {#PAPERLESS_OCR_OUTPUT_TYPE}
 
-: Specify the the type of PDF documents that paperless should produce.
+: Specify the the type of PDF documents that Paperless-ngx should produce.
 
     -   `pdf`: Modify the PDF document as little as possible.
     -   `pdfa`: Convert PDF documents into PDF/A-2b documents, which is
@@ -854,12 +854,12 @@ pages being rotated as well.
     -   `pdfa-1`, `pdfa-2`, `pdfa-3` to specify the exact version of
         PDF/A you wish to use.
 
-    If not specified, `pdfa` is used. Remember that paperless also keeps
+    If not specified, `pdfa` is used. Remember that Paperless-ngx also keeps
     the original input file as well as the archived version.
 
 #### [`PAPERLESS_OCR_PAGES=<num>`](#PAPERLESS_OCR_PAGES) {#PAPERLESS_OCR_PAGES}
 
-: Tells paperless to use only the specified amount of pages for OCR.
+: Tells Paperless-ngx to use only the specified amount of pages for OCR.
 Documents with less than the specified amount of pages get OCR'ed
 completely.
 
@@ -876,11 +876,11 @@ completely.
 
 #### [`PAPERLESS_OCR_IMAGE_DPI=<num>`](#PAPERLESS_OCR_IMAGE_DPI) {#PAPERLESS_OCR_IMAGE_DPI}
 
-: Paperless will OCR any images you put into the system and convert
+: Paperless-ngx will OCR any images you put into the system and convert
 them into PDF documents. This is useful if your scanner produces
-images. In order to do so, paperless needs to know the DPI of the
+images. In order to do so, Paperless-ngx needs to know the DPI of the
 image. Most images from scanners will have this information embedded
-and paperless will detect and use that information. In case this
+and Paperless-ngx will detect and use that information. In case this
 fails, it uses this value as a fallback.
 
     Set this to the DPI your scanner produces images at.
@@ -890,7 +890,7 @@ fails, it uses this value as a fallback.
 
 #### [`PAPERLESS_OCR_MAX_IMAGE_PIXELS=<num>`](#PAPERLESS_OCR_MAX_IMAGE_PIXELS) {#PAPERLESS_OCR_MAX_IMAGE_PIXELS}
 
-: Paperless will raise a warning when OCRing images which are over
+: Paperless-ngx will raise a warning when OCRing images which are over
 this limit and will not OCR images which are more than twice this
 limit. Note this does not prevent the document from being consumed,
 but could result in missing text content.
@@ -902,7 +902,7 @@ but could result in missing text content.
 
     !!! note
 
-        Increasing this limit could cause Paperless to consume additional
+        Increasing this limit could cause Paperless-ngx to consume additional
         resources when consuming a file. Be sure you have sufficient system
         resources.
 
@@ -930,7 +930,7 @@ will only be utilized if the output is a version of PDF/A.
 #### [`PAPERLESS_OCR_USER_ARGS=<json>`](#PAPERLESS_OCR_USER_ARGS) {#PAPERLESS_OCR_USER_ARGS}
 
 : OCRmyPDF offers many more options. Use this parameter to specify any
-additional arguments you wish to pass to OCRmyPDF. Since Paperless
+additional arguments you wish to pass to OCRmyPDF. Since Paperless-ngx
 uses the API of OCRmyPDF, you have to specify these in a format that
 can be passed to the API. See [the API reference of
 OCRmyPDF](https://ocrmypdf.readthedocs.io/en/latest/api.html#reference)
@@ -939,9 +939,9 @@ they use underscores instead of dashes.
 
     !!! warning
 
-        Paperless has been tested to work with the OCR options provided
+        Paperless-ngx has been tested to work with the OCR options provided
         above. There are many options that are incompatible with each other,
-        so specifying invalid options may prevent paperless from consuming
+        so specifying invalid options may prevent Paperless-ngx from consuming
         any documents.  Use with caution!
 
     Specify arguments as a JSON dictionary. Keep note of lower case
@@ -955,7 +955,7 @@ they use underscores instead of dashes.
 
 #### [`PAPERLESS_TASK_WORKERS=<num>`](#PAPERLESS_TASK_WORKERS) {#PAPERLESS_TASK_WORKERS}
 
-: Paperless does multiple things in the background: Maintain the
+: Paperless-ngx does multiple things in the background: Maintain the
 search index, maintain the automatic matching algorithm, check
 emails, consume documents, etc. This variable specifies how many
 things it will do in parallel.
@@ -964,9 +964,9 @@ things it will do in parallel.
 
 #### [`PAPERLESS_THREADS_PER_WORKER=<num>`](#PAPERLESS_THREADS_PER_WORKER) {#PAPERLESS_THREADS_PER_WORKER}
 
-: Furthermore, paperless uses multiple threads when consuming
+: Furthermore, Paperless-ngx uses multiple threads when consuming
 documents to speed up OCR. This variable specifies how many pages
-paperless will process in parallel on a single document.
+Paperless-ngx will process in parallel on a single document.
 
     !!! warning
 
@@ -974,9 +974,9 @@ paperless will process in parallel on a single document.
 
         `PAPERLESS_TASK_WORKERS * PAPERLESS_THREADS_PER_WORKER`
 
-        does not exceed your CPU core count or else paperless will be
-        extremely slow. If you want paperless to process many documents in
-        parallel, choose a high worker count. If you want paperless to
+        does not exceed your CPU core count or else Paperless-ngx will be
+        extremely slow. If you want Paperless-ngx to process many documents in
+        parallel, choose a high worker count. If you want Paperless-ngx to
         process very large documents faster, use a higher thread per worker
         count.
 
@@ -993,7 +993,7 @@ paperless will process in parallel on a single document.
     | > 12           | > 3     | > 4     |
     | > 16           | > 4     | > 4     |
 
-    If you only specify PAPERLESS_TASK_WORKERS, paperless will adjust
+    If you only specify PAPERLESS_TASK_WORKERS, Paperless-ngx will adjust
     PAPERLESS_THREADS_PER_WORKER automatically.
 
 #### [`PAPERLESS_WORKER_TIMEOUT=<num>`](#PAPERLESS_WORKER_TIMEOUT) {#PAPERLESS_WORKER_TIMEOUT}
@@ -1013,7 +1013,7 @@ for details on how to set it.
 #### [`PAPERLESS_ENABLE_NLTK=<bool>`](#PAPERLESS_ENABLE_NLTK) {#PAPERLESS_ENABLE_NLTK}
 
 : Enables or disables the advanced natural language processing
-used during automatic classification. If disabled, paperless will
+used during automatic classification. If disabled, Paperless-ngx will
 still perform some basic text pre-processing before matching.
 
 : See also `PAPERLESS_NLTK_DIR`.
@@ -1022,7 +1022,7 @@ still perform some basic text pre-processing before matching.
 
 #### [`PAPERLESS_DATE_PARSER_LANGUAGES=<lang>`](#PAPERLESS_DATE_PARSER_LANGUAGES) {#PAPERLESS_DATE_PARSER_LANGUAGES}
 
-Specifies which language Paperless should use when parsing dates from documents.
+Specifies which language Paperless-ngx should use when parsing dates from documents.
 
     This should be a language code supported by the dateparser library,
     for example: "en", or a combination such as "en+de".
@@ -1031,7 +1031,7 @@ Specifies which language Paperless should use when parsing dates from documents.
     For valid values, refer to the list of supported languages and locales in the [dateparser documentation](https://dateparser.readthedocs.io/en/latest/supported_locales.html).
 
     Set this to match the languages in which most of your documents are written.
-    If not set, Paperless will attempt to infer the language(s) from the OCR configuration (`PAPERLESS_OCR_LANGUAGE`).
+    If not set, Paperless-ngx will attempt to infer the language(s) from the OCR configuration (`PAPERLESS_OCR_LANGUAGE`).
 
 !!! note
 This format differs from the `PAPERLESS_OCR_LANGUAGE` setting, which uses ISO 639-2 codes (3 letters, e.g., "eng+deu" for Tesseract OCR).
@@ -1147,7 +1147,7 @@ the original document. This default behavior can be changed here.
 
 #### [`PAPERLESS_CONSUMER_RECURSIVE=<bool>`](#PAPERLESS_CONSUMER_RECURSIVE) {#PAPERLESS_CONSUMER_RECURSIVE}
 
-: Enable recursive watching of the consumption directory. Paperless
+: Enable recursive watching of the consumption directory. Paperless-ngx
 will then pickup files from files in subdirectories within your
 consumption directory as well.
 
@@ -1157,7 +1157,7 @@ consumption directory as well.
 
 : Set the names of subdirectories as tags for consumed files. E.g.
 `<CONSUMPTION_DIR>/foo/bar/file.pdf` will add the tags "foo" and
-"bar" to the consumed file. Paperless will create any tags that
+"bar" to the consumed file. Paperless-ngx will create any tags that
 don't exist yet.
 
     This is useful for sorting documents with certain tags such as `car`
@@ -1169,7 +1169,7 @@ don't exist yet.
 
 #### [`PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>`](#PAPERLESS_CONSUMER_IGNORE_PATTERNS) {#PAPERLESS_CONSUMER_IGNORE_PATTERNS}
 
-: By default, paperless ignores certain files and folders in the
+: By default, Paperless-ngx ignores certain files and folders in the
 consumption directory, such as system files created by the Mac OS
 or hidden folders some tools use to store data.
 
@@ -1195,7 +1195,7 @@ or hidden folders some tools use to store data.
 
 #### [`PAPERLESS_PRE_CONSUME_SCRIPT=<filename>`](#PAPERLESS_PRE_CONSUME_SCRIPT) {#PAPERLESS_PRE_CONSUME_SCRIPT}
 
-: After some initial validation, Paperless can trigger an arbitrary
+: After some initial validation, Paperless-ngx can trigger an arbitrary
 script if you like before beginning consumption. This script will be provided
 data for it to work with via the environment.
 
@@ -1205,7 +1205,7 @@ data for it to work with via the environment.
 
 #### [`PAPERLESS_POST_CONSUME_SCRIPT=<filename>`](#PAPERLESS_POST_CONSUME_SCRIPT) {#PAPERLESS_POST_CONSUME_SCRIPT}
 
-: After a document is consumed, Paperless can trigger an arbitrary
+: After a document is consumed, Paperless-ngx can trigger an arbitrary
 script if you like. This script will be provided
 data for it to work with via the environment.
 
@@ -1215,7 +1215,7 @@ data for it to work with via the environment.
 
 #### [`PAPERLESS_FILENAME_DATE_ORDER=<format>`](#PAPERLESS_FILENAME_DATE_ORDER) {#PAPERLESS_FILENAME_DATE_ORDER}
 
-: Paperless will check the document text for document date
+: Paperless-ngx will check the document text for document date
 information. Use this setting to enable checking the document
 filename for date information. The date order can be set to any
 option as specified in
@@ -1229,10 +1229,10 @@ document text will be checked as normal.
 
 #### [`PAPERLESS_NUMBER_OF_SUGGESTED_DATES=<num>`](#PAPERLESS_NUMBER_OF_SUGGESTED_DATES) {#PAPERLESS_NUMBER_OF_SUGGESTED_DATES}
 
-: Paperless searches an entire document for dates. The first date
+: Paperless-ngx searches an entire document for dates. The first date
 found will be used as the initial value for the created date. When
 this variable is greater than 0 (or left to its default value),
-paperless will also suggest other dates found in the document, up to
+Paperless-ngx will also suggest other dates found in the document, up to
 a maximum of this setting. Note that duplicates will be removed,
 which can result in fewer dates displayed in the frontend than this
 setting value.
@@ -1244,7 +1244,7 @@ setting value.
 
 #### [`PAPERLESS_THUMBNAIL_FONT_NAME=<filename>`](#PAPERLESS_THUMBNAIL_FONT_NAME) {#PAPERLESS_THUMBNAIL_FONT_NAME}
 
-: Paperless creates thumbnails for plain text files by rendering the
+: Paperless-ngx creates thumbnails for plain text files by rendering the
 content of the file on an image and uses a predefined font for that.
 This font can be changed here.
 
@@ -1256,7 +1256,7 @@ This font can be changed here.
 
 #### [`PAPERLESS_IGNORE_DATES=<string>`](#PAPERLESS_IGNORE_DATES) {#PAPERLESS_IGNORE_DATES}
 
-: Paperless parses a document's creation date from filename and file
+: Paperless-ngx parses a document's creation date from filename and file
 content. You may specify a comma separated list of dates that should
 be ignored during this process. This is useful for special dates
 (like date of birth) that appear in documents regularly but are very
@@ -1268,8 +1268,8 @@ unlikely to be the document's creation date.
 
 #### [`PAPERLESS_DATE_ORDER=<format>`](#PAPERLESS_DATE_ORDER) {#PAPERLESS_DATE_ORDER}
 
-: Paperless will try to determine the document creation date from its
-contents. Specify the date format Paperless should expect to see
+: Paperless-ngx will try to determine the document creation date from its
+contents. Specify the date format Paperless-ngx should expect to see
 within your documents.
 
     This option defaults to DMY which translates to day first, month
@@ -1310,10 +1310,10 @@ ports.
 
 #### [`PAPERLESS_CONSUMER_POLLING=<num>`](#PAPERLESS_CONSUMER_POLLING) {#PAPERLESS_CONSUMER_POLLING}
 
-: If paperless won't find documents added to your consume folder, it
+: If Paperless-ngx won't find documents added to your consume folder, it
 might not be able to automatically detect filesystem changes. In
 that case, specify a polling interval in seconds here, which will
-then cause paperless to periodically check your consumption
+then cause Paperless-ngx to periodically check your consumption
 directory for changes. This will also disable listening for file
 system changes with `inotify`.
 
@@ -1323,7 +1323,7 @@ system changes with `inotify`.
 #### [`PAPERLESS_CONSUMER_POLLING_RETRY_COUNT=<num>`](#PAPERLESS_CONSUMER_POLLING_RETRY_COUNT) {#PAPERLESS_CONSUMER_POLLING_RETRY_COUNT}
 
 : If consumer polling is enabled, sets the maximum number of times
-paperless will check for a file to remain unmodified. If a file's
+Paperless-ngx will check for a file to remain unmodified. If a file's
 modification time and size are identical for two consecutive checks, it
 will be consumed.
 
@@ -1332,7 +1332,7 @@ will be consumed.
 #### [`PAPERLESS_CONSUMER_POLLING_DELAY=<num>`](#PAPERLESS_CONSUMER_POLLING_DELAY) {#PAPERLESS_CONSUMER_POLLING_DELAY}
 
 : If consumer polling is enabled, sets the delay in seconds between
-each check (above) paperless will do while waiting for a file to
+each check (above) Paperless-ngx will do while waiting for a file to
 remain unmodified.
 
     Defaults to 5.
@@ -1355,7 +1355,7 @@ consumers working on the same file. Configure this to prevent that.
 
 #### [`PAPERLESS_OAUTH_CALLBACK_BASE_URL=<str>`](#PAPERLESS_OAUTH_CALLBACK_BASE_URL) {#PAPERLESS_OAUTH_CALLBACK_BASE_URL}
 
-: The base URL for the OAuth callback. This is used to construct the full URL for the OAuth callback. This should be the URL that the Paperless instance is accessible at. If not set, defaults to the `PAPERLESS_URL` setting. At least one of these settings must be set to enable OAuth Email setup.
+: The base URL for the OAuth callback. This is used to construct the full URL for the OAuth callback. This should be the URL that the Paperless-ngx instance is accessible at. If not set, defaults to the `PAPERLESS_URL` setting. At least one of these settings must be set to enable OAuth Email setup.
 
     Defaults to none (thus will use [PAPERLESS_URL](#PAPERLESS_URL)).
 
@@ -1428,7 +1428,7 @@ PAPERLESS_CONSUMER_ENABLE_BARCODES has been enabled.
 #### [`PAPERLESS_CONSUMER_BARCODE_STRING=<string>`](#PAPERLESS_CONSUMER_BARCODE_STRING) {#PAPERLESS_CONSUMER_BARCODE_STRING}
 
 : Defines the string to be detected as a separator barcode. If
-paperless is used with the PATCH-T separator pages, users shouldn't
+Paperless-ngx is used with the PATCH-T separator pages, users shouldn't
 change this.
 
     Defaults to "PATCHT"
@@ -1576,7 +1576,7 @@ document.
 arrive.
 
     This only has an effect if `PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED`
-    has been enabled. Note that Paperless will not automatically create the
+    has been enabled. Note that Paperless-ngx will not automatically create the
     directory.
 
     Defaults to "double-sided".
@@ -1606,7 +1606,7 @@ processing. This only has an effect if
 
 ## Binaries
 
-There are a few external software packages that Paperless expects to
+There are a few external software packages that Paperless-ngx expects to
 find on your system when it starts up. Unless you've done something
 creative with their installation, you probably won't need to edit any
 of these. However, if you've installed these programs somewhere where
@@ -1676,14 +1676,14 @@ one pod).
 
 #### [`USERMAP_UID=<uid>`](#USERMAP_UID) {#USERMAP_UID}
 
-: The ID of the paperless user in the container. Set this to your
+: The ID of the Paperless-ngx user in the container. Set this to your
 actual user ID on the host system, which you can get by executing
 
     ``` shell-session
     id -u
     ```
 
-    Paperless will change ownership on its folders to this user, so you
+    Paperless-ngx will change ownership on its folders to this user, so you
     need to get this right in order to be able to write to the
     consumption directory.
 
@@ -1691,14 +1691,14 @@ actual user ID on the host system, which you can get by executing
 
 #### [`USERMAP_GID=<gid>`](#USERMAP_GID) {#USERMAP_GID}
 
-: The ID of the paperless Group in the container. Set this to your
+: The ID of the Paperless-ngx Group in the container. Set this to your
 actual group ID on the host system, which you can get by executing
 
     ``` shell-session
     id -g
     ```
 
-    Paperless will change ownership on its folders to this group, so you
+    Paperless-ngx will change ownership on its folders to this group, so you
     need to get this right in order to be able to write to the
     consumption directory.
 
@@ -1706,7 +1706,7 @@ actual group ID on the host system, which you can get by executing
 
 #### [`PAPERLESS_OCR_LANGUAGES=<list>`](#PAPERLESS_OCR_LANGUAGES) {#PAPERLESS_OCR_LANGUAGES}
 
-: Additional OCR languages to install. By default, paperless comes
+: Additional OCR languages to install. By default, Paperless-ngx comes
 with English, German, Italian, Spanish and French. If your language
 is not in this list, install additional languages with this
 configuration option. You will need to [find the right LangCodes](https://tesseract-ocr.github.io/tessdoc/Data-Files-in-different-versions.html)
@@ -1721,7 +1721,7 @@ specified as "chi-tra".
     Make sure it's a space-separated list when using several values.
 
     To actually use these languages, also set the default OCR language
-    of paperless:
+    of Paperless-ngx:
 
     ``` bash
     PAPERLESS_OCR_LANGUAGE=tur
@@ -1761,7 +1761,7 @@ started by the container.
 
 !!! note
 
-    The logo file will be viewable by anyone with access to the Paperless instance login page,
+    The logo file will be viewable by anyone with access to the Paperless-ngx instance login page,
     so consider your choice of logo carefully and removing exif data from images before uploading.
 
 #### [`PAPERLESS_ENABLE_UPDATE_CHECK=<bool>`](#PAPERLESS_ENABLE_UPDATE_CHECK) {#PAPERLESS_ENABLE_UPDATE_CHECK}
