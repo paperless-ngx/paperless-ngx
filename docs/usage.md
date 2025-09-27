@@ -705,32 +705,12 @@ By default, Paperless-ngx returns only documents which contain all words
 typed in the search bar. However, Paperless-ngx also offers advanced search
 syntax if you want to drill down the results further.
 
-Matching documents with logical expressions:
-
-```
-shopname AND (product1 OR product2)
-```
-
-Matching specific tags, correspondents or types:
-
-```
-type:invoice tag:unpaid
-correspondent:university certificate
-```
-
-Matching dates:
-
-```
-created:[2005 to 2009]
-added:yesterday
-modified:today
-```
-
-Matching inexact words:
-
-```
-produ*name
-```
+| Use Case                                        | Example                                                             | Explanation                                                                                                                                              |
+| ----------------------------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Matching documents with logical expressions     | `shopname AND (product1 OR product2)`                               | Find documents that contain "shopname" and either "product1" or "product2".                                                                              |
+| Matching specific tags, correspondents or types | `type:invoice tag:unpaid`<br/>`correspondent:university`            | Find documents of type "invoice" that have the "unpaid" tag.<br/>Find documents from the correspondent "university" that contain the word "certificate". |
+| Matching dates                                  | `created:[2005 to 2009]`<br/>`added:yesterday`<br/>`modified:today` | Find documents created between 2005 and 2009.<br/>Find documents added yesterday.<br/>Find documents modified today.                                     |
+| Matching inexact words                          | `produ*name`                                                        | Find documents that contain words starting with "produ" and ending with "name", such as "productname" or "produ123name".                                 |
 
 !!! note
 
