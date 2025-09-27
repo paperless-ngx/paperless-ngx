@@ -7,11 +7,11 @@ for finding and managing your documents.
 
 ## Terms and definitions
 
-Paperless essentially consists of two different parts for managing your
+Paperless-ngx essentially consists of two different parts for managing your
 documents:
 
 -   The _consumer_ watches a specified folder and adds all documents in
-    that folder to paperless.
+    that folder to Paperless-ngx.
 -   The _web server_ (web UI) provides a UI that you use to manage and
     search documents.
 
@@ -25,7 +25,7 @@ Each document has data fields that you can assign to them:
     as more powerful folders: Multiple documents can be grouped together
     with a single tag, however, a single document can also have multiple
     tags. This is not possible with folders. The reason folders are not
-    implemented in paperless is simply that tags are much more versatile
+    implemented in Paperless-ngx is simply that tags are much more versatile
     than folders.
 -   A _document type_ is used to demarcate the type of a document such
     as letter, bank statement, invoice, contract, etc. It is used to
@@ -34,7 +34,7 @@ Each document has data fields that you can assign to them:
     are stored. See [Storage Paths](advanced_usage.md#storage-paths) for
     more information.
 -   The _date added_ of a document is the date the document was scanned
-    into paperless. You cannot and should not change this date.
+    into Paperless-ngx. You cannot and should not change this date.
 -   The _date created_ of a document is the date the document was
     initially issued. This can be the date you bought a product, the
     date you signed a contract, or the date a letter was sent to you.
@@ -94,29 +94,29 @@ workflows and more from the management sections.
 
 ## Adding documents to Paperless-ngx
 
-Once you've got Paperless setup, you need to start feeding documents
-into it. When adding documents to paperless, it will perform the
+Once you've got Paperless-ngx setup, you need to start feeding documents
+into it. When adding documents to Paperless-ngx, it will perform the
 following operations on your documents:
 
 1.  OCR the document, if it has no text. Digital documents usually have
     text, and this step will be skipped for those documents.
-2.  Paperless will create an archivable PDF/A document from your
+2.  Paperless-ngx will create an archivable PDF/A document from your
     document. If this document is coming from your scanner, it will have
     embedded selectable text.
-3.  Paperless performs automatic matching of tags, correspondents and
+3.  Paperless-ngx performs automatic matching of tags, correspondents and
     types on the document before storing it in the database.
 
 !!! tip
 
     This process can be configured to fit your needs. If you don't want
-    paperless to create archived versions for digital documents, you can
+    Paperless-ngx to create archived versions for digital documents, you can
     configure that by configuring
     `PAPERLESS_OCR_SKIP_ARCHIVE_FILE=with_text`. Please read the
     [relevant section in the documentation](configuration.md#ocr).
 
 !!! note
 
-    No matter which options you choose, Paperless will always store the
+    No matter which options you choose, Paperless-ngx will always store the
     original document that it found in the consumption directory or in the
     mail and will never overwrite that document (except when using certain
     document actions, which make that clear). Archived versions are
@@ -135,7 +135,7 @@ think of this folder as a temporary location, as files will be re-created
 inside Paperless-ngx and removed from the consumption folder.
 
 Getting stuff into this directory is up to you. If you're running
-Paperless on your local computer, you might just want to drag and drop
+Paperless-ngx on your local computer, you might just want to drag and drop
 files there, but if you're running this on a server and want your
 scanner to automatically push files to this directory, you'll need to
 setup some sort of service to accept the files from the scanner.
@@ -154,7 +154,7 @@ Typically, you're looking at an FTP server like
 
 ### Web UI Upload
 
-The dashboard has a button to upload documents to paperless or you
+The dashboard has a button to upload documents to Paperless-ngx or you
 can simply drag a file anywhere into the app to initiate the consumption
 process.
 
@@ -165,7 +165,7 @@ software (e.g. for mobile devices) that is compatible with Paperless-ngx.
 
 ### Incoming Email {#incoming-mail}
 
-You can tell paperless-ngx to consume documents from your email
+You can tell Paperless-ngx to consume documents from your email
 accounts. This is a very flexible and powerful feature, if you regularly
 received documents via mail that you need to archive. The mail consumer
 can be configured via the frontend settings (/settings/mail) in the following
@@ -180,12 +180,12 @@ These rules perform the following:
 2.  Fetch all matching mails (as defined by folder, maximum age and the
     filters)
 3.  Check if there are any consumable attachments.
-4.  If so, instruct paperless to consume the attachments and optionally
+4.  If so, instruct Paperless-ngx to consume the attachments and optionally
     use the metadata provided in the rule for the new document.
 5.  If documents were consumed from a mail, the rule action is performed
     on that mail.
 
-Paperless will check all emails only once and completely ignore messages
+Paperless-ngx will check all emails only once and completely ignore messages
 that do not match your filters. It will also only perform the rule action
 on e-mails that it has consumed documents from. The filename attachment
 patterns can include wildcards and multiple patterns separated by a comma.
@@ -193,17 +193,17 @@ patterns can include wildcards and multiple patterns separated by a comma.
 The actions all ensure that the same mail is not consumed twice by
 different means. These are as follows:
 
--   **Delete:** Immediately deletes mail that paperless has consumed
+-   **Delete:** Immediately deletes mail that Paperless-ngx has consumed
     documents from. Use with caution.
--   **Mark as read:** Mark consumed mail as read. Paperless will not
+-   **Mark as read:** Mark consumed mail as read. Paperless-ngx will not
     consume documents from already read mails. If you read a mail before
-    paperless sees it, it will be ignored.
+    Paperless-ngx sees it, it will be ignored.
 -   **Flag:** Sets the 'important' flag on mails with consumed
-    documents. Paperless will not consume flagged mails.
+    documents. Paperless-ngx will not consume flagged mails.
 -   **Move to folder:** Moves consumed mails out of the way so that
-    paperless won't consume them again.
+    Paperless-ngx won't consume them again.
 -   **Add custom Tag:** Adds a custom tag to mails with consumed
-    documents (the IMAP standard calls these "keywords"). Paperless
+    documents (the IMAP standard calls these "keywords"). Paperless-ngx
     will not consume mails already tagged. Not all mail servers support
     this feature!
 
@@ -214,19 +214,19 @@ different means. These are as follows:
     The mail consumer will perform these actions on all mails it has
     consumed documents from. Keep in mind that the actual consumption
     process may fail for some reason, leaving you with missing documents in
-    paperless.
+    Paperless-ngx.
 
 !!! note
 
     With the correct set of rules, you can completely automate your email
     documents. Create rules for every correspondent you receive digital
-    documents from and paperless will read them automatically. The default
+    documents from and Paperless-ngx will read them automatically. The default
     action "mark as read" is pretty tame and will not cause any damage or
     data loss whatsoever.
 
-    You can also setup a special folder in your mail account for paperless
+    You can also setup a special folder in your mail account for Paperless-ngx
     and use your favorite mail client to move to be consumed mails into that
-    folder automatically or manually and tell paperless to move them to yet
+    folder automatically or manually and tell Paperless-ngx to move them to yet
     another folder after consumption. It's up to you.
 
 !!! note
@@ -235,20 +235,20 @@ different means. These are as follows:
     characters to define how the sub-folders are separated. Common values
     include ".", "/" or "\|", but this varies by the mail server.
     Check the documentation for your mail server. In the event of an error
-    fetching mail from a certain folder, check the Paperless logs. When a
-    folder is not located, Paperless will attempt to list all folders found
-    in the account to the Paperless logs.
+    fetching mail from a certain folder, check the Paperless-ngx logs. When a
+    folder is not located, Paperless-ngx will attempt to list all folders found
+    in the account to the Paperless-ngx logs.
 
 !!! note
 
-    Paperless will process the rules in the order defined in the admin page.
+    Paperless-ngx will process the rules in the order defined in the admin page.
 
     You can define catch-all rules and have them executed last to consume
     any documents not matched by previous rules. Such a rule may assign an
     "Unknown mail document" tag to consumed documents so you can inspect
     them further.
 
-Paperless is set up to check your mails every 10 minutes. This can be
+Paperless-ngx is set up to check your mails every 10 minutes. This can be
 configured via [`PAPERLESS_EMAIL_TASK_CRON`](configuration.md#PAPERLESS_EMAIL_TASK_CRON)
 
 #### OAuth Email Setup
@@ -277,11 +277,11 @@ or using [email](#workflow-action-email) or [webhook](#workflow-action-webhook) 
 -   Share links do not require a user to login and thus link directly to a file.
 -   Links are unique and are of the form `{paperless-url}/share/{randomly-generated-slug}`.
 -   Links can optionally have an expiration time set.
--   After a link expires or is deleted users will be redirected to the regular paperless-ngx login.
+-   After a link expires or is deleted users will be redirected to the regular Paperless-ngx login.
 
 !!! tip
 
-    If your paperless-ngx instance is behind a reverse-proxy you may want to create an exception to bypass any authentication layers that are part of your setup in order to make links truly publicly-accessible. Of course, do so with caution.
+    If your Paperless-ngx instance is behind a reverse-proxy you may want to create an exception to bypass any authentication layers that are part of your setup in order to make links truly publicly-accessible. Of course, do so with caution.
 
 ### Email Sharing {#email-sharing}
 
@@ -295,7 +295,7 @@ Permissions in Paperless-ngx are based around ['global' permissions](#global-per
 ['object-level' permissions](#object-permissions). Global permissions determine which parts of the
 application a user can access (e.g. Documents, Tags, Settings) and object-level determine which
 objects are visible or editable. All objects have an 'owner' and 'view' and 'edit' permissions which
-can be granted to other users or groups. The paperless-ngx permissions system uses the built-in user
+can be granted to other users or groups. The Paperless-ngx permissions system uses the built-in user
 model of the backend framework, Django.
 
 !!! tip
@@ -332,7 +332,7 @@ Superusers can access all parts of the front and backend application as well as 
 
 #### Admin Status
 
-Admin status (Django 'staff status') grants access to viewing the paperless logs and the system status dialog
+Admin status (Django 'staff status') grants access to viewing the paperless-ngx logs and the system status dialog
 as well as accessing the Django backend.
 
 #### Detailed Explanation of Global Permissions {#global-permissions}
@@ -610,7 +610,7 @@ Note that the empty trash directory only stores the original file, the archive f
 
 ## Best practices {#basic-searching}
 
-Paperless offers a couple tools that help you organize your document
+Paperless-ngx offers a couple tools that help you organize your document
 collection. However, it is up to you to use them in a way that helps you
 organize documents and find specific documents when you need them. This
 section offers a couple ideas for managing your collection.
@@ -618,7 +618,7 @@ section offers a couple ideas for managing your collection.
 Document types allow you to classify documents according to what they
 are. You can define types such as "Receipt", "Invoice", or
 "Contract". If you used to collect all your receipts in a single
-binder, you can recreate that system in paperless by defining a document
+binder, you can recreate that system in Paperless-ngx by defining a document
 type, assigning documents to that type and then filtering by that type
 to only see all receipts.
 
@@ -626,12 +626,12 @@ Not all documents need document types. Sometimes its hard to determine
 what the type of a document is or it is hard to justify creating a
 document type that you only need once or twice. This is okay. As long as
 the types you define help you organize your collection in the way you
-want, paperless is doing its job.
+want, Paperless-ngx is doing its job.
 
 Tags can be used in many different ways. Think of tags are more
 versatile folders or binders. If you have a binder for documents related
 to university / your car or health care, you can create these binders in
-paperless by creating tags and assigning them to relevant documents.
+Paperless-ngx by creating tags and assigning them to relevant documents.
 Just as with documents, you can filter the document list by tags and
 only see documents of a certain topic.
 
@@ -646,7 +646,7 @@ entirely possible.
     This can be used in many different ways. One example: Imagine you're
     working on a particular task, such as signing up for university. Usually
     you'll need to collect a bunch of different documents that are already
-    sorted into various folders. With the tag system of paperless, you can
+    sorted into various folders. With the tag system of Paperless-ngx, you can
     create a new group of documents that are relevant to this task without
     destroying the already existing organization. When you're done with the
     task, you could delete the tag again, which would be equal to sorting
@@ -673,7 +673,7 @@ collection.
     such as reply, or perform some task online.
 -   A tag `bank account x` for all bank statement related to that
     account.
--   A tag `mail` for anything that you added to paperless via its mail
+-   A tag `mail` for anything that you added to Paperless-ngx via its mail
     processing capabilities.
 -   A tag `missing_metadata` when you still need to add some metadata to
     a document, but can't or don't want to do this right now.
@@ -690,19 +690,19 @@ the document index) will also be included. This can be disabled under settings.
 
 ### Document searches
 
-Paperless offers an extensive searching mechanism that is designed to
+Paperless-ngx offers an extensive searching mechanism that is designed to
 allow you to quickly find a document you're looking for (for example,
 that thing that just broke and you bought a couple months ago, that
 contract you signed 8 years ago).
 
-When you search paperless for a document, it tries to match this query
-against your documents. Paperless will look for matching documents by
-inspecting their content, title, correspondent, type and tags. Paperless
+When you search Paperless-ngx for a document, it tries to match this query
+against your documents. Paperless-ngx will look for matching documents by
+inspecting their content, title, correspondent, type and tags. Paperless-ngx
 returns a scored list of results, so that documents matching your query
 better will appear further up in the search results.
 
-By default, paperless returns only documents which contain all words
-typed in the search bar. However, paperless also offers advanced search
+By default, Paperless-ngx returns only documents which contain all words
+typed in the search bar. However, Paperless-ngx also offers advanced search
 syntax if you want to drill down the results further.
 
 Matching documents with logical expressions:
@@ -735,11 +735,11 @@ produ*name
 !!! note
 
     Inexact terms are hard for search indexes. These queries might take a
-    while to execute. That's why paperless offers auto complete and query
+    while to execute. That's why Paperless-ngx offers auto complete and query
     correction.
 
 All of these constructs can be combined as you see fit. If you want to
-learn more about the query language used by paperless, paperless uses
+learn more about the query language used by Paperless-ngx, Paperless-ngx uses
 Whoosh's default query language. Head over to [Whoosh query
 language](https://whoosh.readthedocs.io/en/latest/querylang.html). For
 details on what date parsing utilities are available, see [Date
@@ -753,7 +753,7 @@ based on which area of Paperless-ngx you are using.
 
 ## The recommended workflow {#usage-recommended-workflow}
 
-Once you have familiarized yourself with paperless and are ready to use
+Once you have familiarized yourself with Paperless-ngx and are ready to use
 it for all your documents, the recommended workflow for managing your
 documents is as follows. This workflow also takes into account that some
 documents have to be kept in physical form, but still ensures that you
@@ -763,7 +763,7 @@ The following diagram shows how easy it is to manage your documents.
 
 ![image](assets/recommended_workflow.png){width=400}
 
-### Preparations in paperless
+### Preparations in Paperless-ngx
 
 -   Create an inbox tag that gets assigned to all new documents.
 -   Create a TODO tag.
@@ -790,7 +790,7 @@ documents in your inbox:
     Instead of writing a number on the document by hand, you may also prepare
     a spool of labels with barcodes with an ascending serial number, that are
     formatted like `ASN00001`.
-    This also enables Paperless to automatically parse and process the ASN
+    This also enables Paperless-ngx to automatically parse and process the ASN
     (if enabled in the config), so that you don't need to manually assign it.
 
 Over time, you will notice that your physical binder will fill up. If it
@@ -802,14 +802,14 @@ The idea behind this process is that you will never have to use the
 physical binders to find a document. If you need a specific physical
 document, you may find this document by:
 
-1.  Searching in paperless for the document.
+1.  Searching in Paperless-ngx for the document.
 2.  Identify the ASN of the document, since it appears on the scan.
 3.  Grab the relevant document binder and get the document. This is easy
     since they are sorted by ASN.
 
-### Processing of documents in paperless
+### Processing of documents in Paperless-ngx
 
-Once you have scanned in a document, proceed in paperless as follows.
+Once you have scanned in a document, proceed in Paperless-ngx as follows.
 
 1.  If the document has an ASN, assign the ASN to the document.
 2.  Assign a correspondent to the document (i.e., your employer, bank,
@@ -820,7 +820,7 @@ Once you have scanned in a document, proceed in paperless as follows.
     document when you need it.
 4.  Assign a proper title to the document (the name of an item you
     bought, the subject of the letter, etc)
-5.  Check that the date of the document is correct. Paperless tries to
+5.  Check that the date of the document is correct. Paperless-ngx tries to
     read the date from the content of the document, but this fails
     sometimes if the OCR is bad or multiple dates appear on the
     document.
@@ -829,8 +829,8 @@ Once you have scanned in a document, proceed in paperless as follows.
 !!! tip
 
     You can setup manual matching rules for your correspondents and tags and
-    paperless will assign them automatically. After consuming a couple
-    documents, you can even ask paperless to *learn* when to assign tags and
+    Paperless-ngx will assign them automatically. After consuming a couple
+    documents, you can even ask Paperless-ngx to *learn* when to assign tags and
     correspondents by itself. For details on this feature, see
     [advanced matching](advanced_usage.md#matching).
 
@@ -838,13 +838,13 @@ Once you have scanned in a document, proceed in paperless as follows.
 
 Some documents require attention and require you to act on the document.
 You may take two different approaches to handle these documents based on
-how regularly you intend to scan documents and use paperless.
+how regularly you intend to scan documents and use Paperless-ngx.
 
--   If you scan and process your documents in paperless regularly,
+-   If you scan and process your documents in Paperless-ngx regularly,
     assign a TODO tag to all scanned documents that you need to process.
     Create a saved view on the dashboard that shows all documents with
     this tag.
--   If you do not scan documents regularly and use paperless solely for
+-   If you do not scan documents regularly and use Paperless-ngx solely for
     archiving, create a physical todo box next to your physical inbox
     and put documents you need to process in the TODO box. When you
     performed the task associated with the document, move it to the
@@ -856,7 +856,7 @@ Paperless-ngx consists of the following components:
 
 -   **The webserver:** This serves the administration pages, the API,
     and the new frontend. This is the main tool you'll be using to interact
-    with paperless. You may start the webserver directly with
+    with Paperless-ngx. You may start the webserver directly with
 
     ```shell-session
     cd /path/to/paperless/src/
@@ -879,7 +879,7 @@ Paperless-ngx consists of the following components:
     python3 manage.py document_consumer
     ```
 
--   **The task processor:** Paperless relies on [Celery - Distributed
+-   **The task processor:** Paperless-ngx relies on [Celery - Distributed
     Task Queue](https://docs.celeryq.dev/en/stable/index.html) for doing
     most of the heavy lifting. This is a task queue that accepts tasks
     from multiple sources and processes these in parallel. It also comes
@@ -895,10 +895,10 @@ Paperless-ngx consists of the following components:
         accounts for new emails and notifies the task processor to
         consume the attachment of an email.
     -   Maintaining the search index and the automatic matching
-        algorithm. These are things that paperless needs to do from time
+        algorithm. These are things that Paperless-ngx needs to do from time
         to time in order to operate properly.
 
-    This allows paperless to process multiple documents from your
+    This allows Paperless-ngx to process multiple documents from your
     consumption folder in parallel! On a modern multi core system, this
     makes the consumption process with full OCR blazingly fast.
 
@@ -913,5 +913,5 @@ Paperless-ngx consists of the following components:
     different process (maybe even on different machines!), and
     therefore, this is necessary.
 
--   Optional: A database server. Paperless supports PostgreSQL, MariaDB
+-   Optional: A database server. Paperless-ngx supports PostgreSQL, MariaDB
     and SQLite for storing its data.
