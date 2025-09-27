@@ -1,164 +1,147 @@
 <div class="d-flex flex-wrap gap-4">
-  <div class="d-flex align-items-center" role="group" aria-label="Select">
-    <button class="btn btn-sm btn-outline-secondary" (click)="list.selectNone()">
-      <i-bs name="slash-circle"></i-bs>&nbsp;<ng-container i18n>Cancel</ng-container>
+  <div class="d-flex flex-wrap align-items-center gap-2" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
+    <label class="me-2" i18n>Edit:</label>
+    @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.Tag)) {
+      <pngx-filterable-dropdown title="Tags" icon="tag-fill" i18n-title
+        filterPlaceholder="Filter tags" i18n-filterPlaceholder
+        [disabled]="!userCanEditAll || disabled"
+        [editing]="true"
+        [applyOnClose]="applyOnClose"
+        [createRef]="createTag.bind(this)"
+        (opened)="openTagsDropdown()"
+        [(selectionModel)]="tagSelectionModel"
+        [documentCounts]="tagDocumentCounts"
+        (apply)="setTags($event)"
+        shortcutKey="t">
+      </pngx-filterable-dropdown>
+    }
+    @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
+      <pngx-filterable-dropdown title="Correspondent" icon="person-fill" i18n-title
+        filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
+        [disabled]="!userCanEditAll || disabled"
+        [editing]="true"
+        [applyOnClose]="applyOnClose"
+        [createRef]="createCorrespondent.bind(this)"
+        (opened)="openCorrespondentDropdown()"
+        [(selectionModel)]="correspondentSelectionModel"
+        [documentCounts]="correspondentDocumentCounts"
+        (apply)="setCorrespondents($event)"
+        shortcutKey="y">
+      </pngx-filterable-dropdown>
+    }
+    @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
+      <pngx-filterable-dropdown title="Document type" icon="file-earmark-fill" i18n-title
+        filterPlaceholder="Filter document types" i18n-filterPlaceholder
+        [disabled]="!userCanEditAll || disabled"
+        [editing]="true"
+        [applyOnClose]="applyOnClose"
+        [createRef]="createDocumentType.bind(this)"
+        (opened)="openDocumentTypeDropdown()"
+        [(selectionModel)]="documentTypeSelectionModel"
+        [documentCounts]="documentTypeDocumentCounts"
+        (apply)="setDocumentTypes($event)"
+        shortcutKey="u">
+      </pngx-filterable-dropdown>
+    }
+    @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
+      <pngx-filterable-dropdown title="Storage path" icon="folder-fill" i18n-title
+        filterPlaceholder="Filter storage paths" i18n-filterPlaceholder
+        [disabled]="!userCanEditAll || disabled"
+        [editing]="true"
+        [applyOnClose]="applyOnClose"
+        [createRef]="createStoragePath.bind(this)"
+        (opened)="openStoragePathDropdown()"
+        [(selectionModel)]="storagePathsSelectionModel"
+        [documentCounts]="storagePathDocumentCounts"
+        (apply)="setStoragePaths($event)"
+        shortcutKey="i">
+      </pngx-filterable-dropdown>
+    }
+    @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.CustomField)) {
+      <pngx-filterable-dropdown title="Custom fields" icon="ui-radios" i18n-title
+        filterPlaceholder="Filter custom fields" i18n-filterPlaceholder
+        [disabled]="!userCanEditAll"
+        [editing]="true"
+        [applyOnClose]="applyOnClose"
+        [createRef]="createCustomField.bind(this)"
+        (opened)="openCustomFieldsDropdown()"
+        [(selectionModel)]="customFieldsSelectionModel"
+        [documentCounts]="customFieldDocumentCounts"
+        extraButtonTitle="Set values"
+        i18n-extraButtonTitle
+        (extraButton)="setCustomFieldValues($event)"
+        (apply)="setCustomFields($event)">
+      </pngx-filterable-dropdown>
+    }
+    <div class="btn-group">
+      <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="setPermissions()" [disabled]="!userOwnsAll || !userCanEditAll">
+        <i-bs name="person-fill-lock"></i-bs><div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Permissions</ng-container></div>
       </button>
     </div>
-    <div class="d-flex align-items-center gap-2" role="group" aria-label="Select">
-      <label class="me-2" i18n>Select:</label>
-      <div class="btn-group">
-        <button class="btn btn-sm btn-outline-primary" (click)="list.selectPage()">
-          <i-bs name="file-earmark-check"></i-bs>&nbsp;<ng-container i18n>Page</ng-container>
+  </div>
+  <div class="d-flex align-items-center gap-2 ms-auto">
+    <div class="btn-toolbar">
+      <div ngbDropdown>
+        <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" [disabled]="!userCanEdit && !userCanAdd" ngbDropdownToggle>
+          <i-bs name="three-dots"></i-bs>
+          <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
+        </button>
+        <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
+          <button ngbDropdownItem (click)="reprocessSelected()" [disabled]="!userCanEditAll && !userCanEditAll">
+            <i-bs name="body-text"></i-bs>&nbsp;<ng-container i18n>Reprocess</ng-container>
           </button>
-          <button class="btn btn-sm btn-outline-primary" (click)="list.selectAll()">
-            <i-bs name="check-all"></i-bs>&nbsp;<ng-container i18n>All</ng-container>
-            </button>
-          </div>
+          <button ngbDropdownItem (click)="rotateSelected()" [disabled]="!userOwnsAll && !userCanEditAll">
+            <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
+          </button>
+          <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanAdd || list.selected.size < 2">
+            <i-bs name="journals"></i-bs>&nbsp;<ng-container i18n>Merge</ng-container>
+          </button>
+          <button ngbDropdownItem (click)="emailSelected()" [disabled]="!userCanEdit">
+            <i-bs name="envelope"></i-bs>&nbsp;<ng-container i18n>Email</ng-container>
+          </button>
         </div>
-        <div class="d-flex align-items-center gap-2" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-          <label class="me-2" i18n>Edit:</label>
-          @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.Tag)) {
-            <pngx-filterable-dropdown title="Tags" icon="tag-fill" i18n-title
-              filterPlaceholder="Filter tags" i18n-filterPlaceholder
-              [disabled]="!userCanEditAll || disabled"
-              [editing]="true"
-              [applyOnClose]="applyOnClose"
-              [createRef]="createTag.bind(this)"
-              (opened)="openTagsDropdown()"
-              [(selectionModel)]="tagSelectionModel"
-              [documentCounts]="tagDocumentCounts"
-              (apply)="setTags($event)"
-              shortcutKey="t">
-            </pngx-filterable-dropdown>
-          }
-          @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.Correspondent)) {
-            <pngx-filterable-dropdown title="Correspondent" icon="person-fill" i18n-title
-              filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
-              [disabled]="!userCanEditAll || disabled"
-              [editing]="true"
-              [applyOnClose]="applyOnClose"
-              [createRef]="createCorrespondent.bind(this)"
-              (opened)="openCorrespondentDropdown()"
-              [(selectionModel)]="correspondentSelectionModel"
-              [documentCounts]="correspondentDocumentCounts"
-              (apply)="setCorrespondents($event)"
-              shortcutKey="y">
-            </pngx-filterable-dropdown>
-          }
-          @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.DocumentType)) {
-            <pngx-filterable-dropdown title="Document type" icon="file-earmark-fill" i18n-title
-              filterPlaceholder="Filter document types" i18n-filterPlaceholder
-              [disabled]="!userCanEditAll || disabled"
-              [editing]="true"
-              [applyOnClose]="applyOnClose"
-              [createRef]="createDocumentType.bind(this)"
-              (opened)="openDocumentTypeDropdown()"
-              [(selectionModel)]="documentTypeSelectionModel"
-              [documentCounts]="documentTypeDocumentCounts"
-              (apply)="setDocumentTypes($event)"
-              shortcutKey="u">
-            </pngx-filterable-dropdown>
-          }
-          @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.StoragePath)) {
-            <pngx-filterable-dropdown title="Storage path" icon="folder-fill" i18n-title
-              filterPlaceholder="Filter storage paths" i18n-filterPlaceholder
-              [disabled]="!userCanEditAll || disabled"
-              [editing]="true"
-              [applyOnClose]="applyOnClose"
-              [createRef]="createStoragePath.bind(this)"
-              (opened)="openStoragePathDropdown()"
-              [(selectionModel)]="storagePathsSelectionModel"
-              [documentCounts]="storagePathDocumentCounts"
-              (apply)="setStoragePaths($event)"
-              shortcutKey="i">
-            </pngx-filterable-dropdown>
-          }
-          @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.CustomField)) {
-            <pngx-filterable-dropdown title="Custom fields" icon="ui-radios" i18n-title
-              filterPlaceholder="Filter custom fields" i18n-filterPlaceholder
-              [disabled]="!userCanEditAll"
-              [editing]="true"
-              [applyOnClose]="applyOnClose"
-              [createRef]="createCustomField.bind(this)"
-              (opened)="openCustomFieldsDropdown()"
-              [(selectionModel)]="customFieldsSelectionModel"
-              [documentCounts]="customFieldDocumentCounts"
-              extraButtonTitle="Set values"
-              i18n-extraButtonTitle
-              (extraButton)="setCustomFieldValues($event)"
-              (apply)="setCustomFields($event)">
-            </pngx-filterable-dropdown>
-          }
+      </div>
+    </div>
+    <div class="btn-group btn-group-sm">
+      <button class="btn btn-sm btn-outline-primary" [disabled]="awaitingDownload" (click)="downloadSelected()">
+        @if (!awaitingDownload) {
+          <i-bs name="arrow-down"></i-bs>
+        }
+        @if (awaitingDownload) {
+          <div class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">Preparing download...</span>
+          </div>
+        }
+        <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Download</ng-container></div>
+      </button>
+      <div ngbDropdown class="me-2 d-flex btn-group" role="group">
+        <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle-split rounded-end" ngbDropdownToggle></button>
+        <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
+          <form [formGroup]="downloadForm" class="px-3 py-1">
+            <p class="mb-1" i18n>Include:</p>
+            <div class="form-group ps-3 mb-2">
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="downloadFileType_archive" formControlName="downloadFileTypeArchive" />
+                <label class="form-check-label" for="downloadFileType_archive" i18n>Archived files</label>
+              </div>
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="downloadFileType_originals" formControlName="downloadFileTypeOriginals" />
+                <label class="form-check-label" for="downloadFileType_originals" i18n>Original files</label>
+              </div>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="downloadUseFormatting" formControlName="downloadUseFormatting" />
+              <label class="form-check-label" for="downloadUseFormatting" i18n>Use formatted filename</label>
+            </div>
+          </form>
         </div>
-        <div class="d-flex align-items-center gap-2 ms-auto">
-          <div class="btn-toolbar">
+      </div>
+    </div>
 
-            <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="setPermissions()" [disabled]="!userOwnsAll || !userCanEditAll">
-              <i-bs name="person-fill-lock"></i-bs><div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Permissions</ng-container></div>
-            </button>
-
-            <div ngbDropdown>
-              <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" [disabled]="!userCanEdit && !userCanAdd" ngbDropdownToggle>
-                <i-bs name="three-dots"></i-bs>
-                <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Actions</ng-container></div>
-              </button>
-              <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
-                <button ngbDropdownItem (click)="reprocessSelected()" [disabled]="!userCanEditAll && !userCanEditAll">
-                  <i-bs name="body-text"></i-bs>&nbsp;<ng-container i18n>Reprocess</ng-container>
-                </button>
-                <button ngbDropdownItem (click)="rotateSelected()" [disabled]="!userOwnsAll && !userCanEditAll">
-                  <i-bs name="arrow-clockwise"></i-bs>&nbsp;<ng-container i18n>Rotate</ng-container>
-                </button>
-                <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanAdd || list.selected.size < 2">
-                  <i-bs name="journals"></i-bs>&nbsp;<ng-container i18n>Merge</ng-container>
-                </button>
-                <button ngbDropdownItem (click)="emailSelected()" [disabled]="!userCanEdit">
-                  <i-bs name="envelope"></i-bs>&nbsp;<ng-container i18n>Email</ng-container>
-                </button>
-              </div>
-            </div>
-          </div>
-
-            <div class="btn-group btn-group-sm">
-              <button class="btn btn-sm btn-outline-primary" [disabled]="awaitingDownload" (click)="downloadSelected()">
-                @if (!awaitingDownload) {
-                  <i-bs name="arrow-down"></i-bs>
-                }
-                @if (awaitingDownload) {
-                  <div class="spinner-border spinner-border-sm" role="status">
-                    <span class="visually-hidden">Preparing download...</span>
-                  </div>
-                }
-                <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Download</ng-container></div>
-              </button>
-              <div ngbDropdown class="me-2 d-flex btn-group" role="group">
-                <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle-split rounded-end" ngbDropdownToggle></button>
-                <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
-                  <form [formGroup]="downloadForm" class="px-3 py-1">
-                    <p class="mb-1" i18n>Include:</p>
-                    <div class="form-group ps-3 mb-2">
-                      <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="downloadFileType_archive" formControlName="downloadFileTypeArchive" />
-                        <label class="form-check-label" for="downloadFileType_archive" i18n>Archived files</label>
-                      </div>
-                      <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="downloadFileType_originals" formControlName="downloadFileTypeOriginals" />
-                        <label class="form-check-label" for="downloadFileType_originals" i18n>Original files</label>
-                      </div>
-                    </div>
-                    <div class="form-check">
-                      <input type="checkbox" class="form-check-input" id="downloadUseFormatting" formControlName="downloadUseFormatting" />
-                      <label class="form-check-label" for="downloadUseFormatting" i18n>Use formatted filename</label>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-
-            <div class="btn-group btn-group-sm">
-              <button type="button" class="btn btn-sm btn-outline-danger" (click)="applyDelete()" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }" [disabled]="!userOwnsAll">
-                <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
-                </button>
-              </div>
-            </div>
-          </div>
+    <div class="btn-group btn-group-sm">
+      <button type="button" class="btn btn-sm btn-outline-danger" (click)="applyDelete()" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }" [disabled]="!userOwnsAll">
+        <i-bs name="trash"></i-bs>&nbsp;<ng-container i18n>Delete</ng-container>
+      </button>
+    </div>
+  </div>
+</div>
