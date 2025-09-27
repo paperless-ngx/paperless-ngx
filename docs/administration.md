@@ -2,17 +2,17 @@
 
 ## Making backups {#backup}
 
-Multiple options exist for making backups of your paperless instance,
-depending on how you installed paperless.
+Multiple options exist for making backups of your Paperless-ngx instance,
+depending on how you installed Paperless-ngx.
 
-Before making a backup, it's probably best to make sure that paperless is not actively
+Before making a backup, it's probably best to make sure that Paperless-ngx is not actively
 consuming documents at that time.
 
-Options available to any installation of paperless:
+Options available to any installation of Paperless-ngx:
 
 -   Use the [document exporter](#exporter). The document exporter exports all your documents,
     thumbnails, metadata, and database contents to a specific folder. You may import your
-    documents and settings into a fresh instance of paperless again or store your
+    documents and settings into a fresh instance of Paperless-ngx again or store your
     documents in another DMS with this export.
 
     The document exporter is also able to update an already existing
@@ -23,8 +23,8 @@ Options available to any installation of paperless:
 
 !!! caution
 
-    You cannot import the export generated with one version of paperless in
-    a different version of paperless. The export contains an exact image of
+    You cannot import the export generated with one version of Paperless-ngx in
+    a different version of Paperless-ngx. The export contains an exact image of
     the database, and migrations may change the database layout.
 
 Options available to docker installations:
@@ -33,7 +33,7 @@ Options available to docker installations:
     `/var/lib/docker/volumes` on the host and you need to be root in
     order to access them.
 
-    Paperless uses 4 volumes:
+    Paperless-ngx uses 4 volumes:
 
     -   `paperless_media`: This is where your documents are stored.
     -   `paperless_data`: This is where auxiliary data is stored. This
@@ -45,8 +45,8 @@ Options available to docker installations:
 
 Options available to bare-metal and non-docker installations:
 
--   Backup the entire paperless folder. This ensures that if your
-    paperless instance crashes at some point or your disk fails, you can
+-   Backup the entire Paperless-ngx folder. This ensures that if your
+    Paperless-ngx instance crashes at some point or your disk fails, you can
     simply copy the folder back into place and it works.
 
     When using PostgreSQL or MariaDB, you'll also have to backup the
@@ -60,18 +60,18 @@ restoring can simply be done with the [document importer](#importer).
 Of course, other backup strategies require restoring any volumes, folders and database
 copies you created in the steps above.
 
-## Updating Paperless {#updating}
+## Updating Paperless-ngx {#updating}
 
 ### Docker Route {#docker-updating}
 
-If a new release of paperless-ngx is available, upgrading depends on how
-you installed paperless-ngx in the first place. The releases are
+If a new release of Paperless-ngx is available, upgrading depends on how
+you installed Paperless-ngx in the first place. The releases are
 available at the [release
 page](https://github.com/paperless-ngx/paperless-ngx/releases).
 
 First of all, make sure no active processes (like consumption) are running, then [make a backup](#backup).
 
-After that, ensure that paperless is stopped:
+After that, ensure that Paperless-ngx is stopped:
 
 ```shell-session
 $ cd /path/to/paperless
@@ -98,7 +98,7 @@ $ docker compose down
 
 Running `docker compose up` will also apply any new database migrations.
 If you see everything working, press CTRL+C once to gracefully stop
-paperless. Then you can start paperless-ngx with `-d` to have it run in
+Paperless-ngx. Then you can start Paperless-ngx with `-d` to have it run in
 the background.
 
 !!! note
@@ -146,7 +146,7 @@ the background.
 After grabbing the new release and unpacking the contents, do the
 following:
 
-1.  Update dependencies. New paperless version may require additional
+1.  Update dependencies. New Paperless-ngx versions may require additional
     dependencies. The dependencies required are listed in the section
     about
     [bare metal installations](setup.md#bare_metal).
@@ -174,7 +174,7 @@ following:
 
     1.  Including `sudo -Hu <paperless_user>` may be required
 
-    This might not actually do anything. Not every new paperless version
+    This might not actually do anything. Not every new Paperless-ngx version
     comes with new database migrations.
 
 ### Database Upgrades
@@ -200,11 +200,11 @@ You may also use the exporter and importer with the `--data-only` flag, after cr
 
 ## Management utilities {#management-commands}
 
-Paperless comes with some management commands that perform various
-maintenance tasks on your paperless instance. You can invoke these
+Paperless-ngx comes with some management commands that perform various
+maintenance tasks on your Paperless-ngx instance. You can invoke these
 commands in the following way:
 
-With Docker Compose, while paperless is running:
+With Docker Compose, while Paperless-ngx is running:
 
 ```shell-session
 $ cd /path/to/paperless
@@ -232,7 +232,7 @@ with the argument `--help`.
 ### Document exporter {#exporter}
 
 The document exporter exports all your data (including your settings
-and database contents) from paperless into a folder for backup or
+and database contents) from Paperless-ngx into a folder for backup or
 migration to another DMS.
 
 If you use the document exporter within a cronjob to backup your data
@@ -267,25 +267,25 @@ When you use the provided docker compose script, specify `../export` as
 the target. This path inside the container is automatically mounted on
 your host on the folder `export`.
 
-If the target directory already exists and contains files, paperless
+If the target directory already exists and contains files, Paperless-ngx
 will assume that the contents of the export directory are a previous
-export and will attempt to update the previous export. Paperless will
-only export changed and added files. Paperless determines whether a file
+export and will attempt to update the previous export. Paperless-ngx will
+only export changed and added files. Paperless-ngx determines whether a file
 has changed by inspecting the file attributes "date/time modified" and
 "size". If that does not work out for you, specify `-c` or
-`--compare-checksums` and paperless will attempt to compare file
+`--compare-checksums` and Paperless-ngx will attempt to compare file
 checksums instead. This is slower. The manifest and metadata json files
 are always updated, unless `cj` or `--compare-json` is specified.
 
-Paperless will not remove any existing files in the export directory. If
-you want paperless to also remove files that do not belong to the
+Paperless-ngx will not remove any existing files in the export directory. If
+you want Paperless-ngx to also remove files that do not belong to the
 current export such as files from deleted documents, specify `-d` or `--delete`.
-Be careful when pointing paperless to a directory that already contains
+Be careful when pointing Paperless-ngx to a directory that already contains
 other files.
 
 The filenames generated by this command follow the format
 `[date created] [correspondent] [title].[extension]`. If you want
-paperless to use [`PAPERLESS_FILENAME_FORMAT`](configuration.md#PAPERLESS_FILENAME_FORMAT) for exported filenames
+Paperless-ngx to use [`PAPERLESS_FILENAME_FORMAT`](configuration.md#PAPERLESS_FILENAME_FORMAT) for exported filenames
 instead, specify `-f` or `--use-filename-format`.
 
 If `-na` or `--no-archive` is provided, no archive files will be exported,
@@ -335,7 +335,7 @@ must be provided to import. If this value is lost, the export cannot be imported
 ### Document importer {#importer}
 
 The document importer takes the export produced by the [Document
-exporter](#exporter) and imports it into paperless.
+exporter](#exporter) and imports it into Paperless-ngx.
 
 The importer works just like the exporter. You point it at a directory or the generated .zip file,
 and the script does the rest of the work:
@@ -352,12 +352,12 @@ document_importer source
 | `--passphrase`      | No       | N/A     | If your export was encrypted with a passphrase, must be provided          |
 
 When you use the provided docker compose script, put the export inside
-the `export` folder in your paperless source directory. Specify
+the `export` folder in your Paperless-ngx source directory. Specify
 `../export` as the `source`.
 
 !!! note
 
-    Importing from a previous version of Paperless may work, but for best
+    Importing from a previous version of Paperless-ngx may work, but for best
     results it is suggested to match the versions.
 
 !!! warning
@@ -445,7 +445,7 @@ document_thumbnails
 
 The document search index is responsible for delivering search results
 for the website. The document index is automatically updated whenever
-documents get added to, changed, or removed from paperless. However, if
+documents get added to, changed, or removed from Paperless-ngx. However, if
 the search yields non-existing documents or won't find anything, you
 may need to recreate the index manually.
 
@@ -479,7 +479,7 @@ The database read cache is based on Django-Cachalot. You can refer to their [doc
 
 ### Managing filenames {#renamer}
 
-If you use paperless' feature to
+If you use Paperless-ngx's feature to
 [assign custom filenames to your documents](advanced_usage.md#file-name-handling), you can use this command to move all your files after
 changing the naming scheme.
 
@@ -500,7 +500,7 @@ Learn how to use
 
 ### Sanity checker {#sanity-checker}
 
-Paperless has a built-in sanity checker that inspects your document
+Paperless-ngx has a built-in sanity checker that inspects your document
 collection for issues.
 
 The issues detected by the sanity checker are as follows:
@@ -517,7 +517,7 @@ The issues detected by the sanity checker are as follows:
 -   Inaccessible thumbnails due to improper permissions.
 -   Documents without any content (warning).
 -   Orphaned files in the media directory (warning). These are files
-    that are not referenced by any document in paperless.
+    that are not referenced by any document in Paperless-ngx.
 
 ```
 document_sanity_checker
@@ -528,7 +528,7 @@ archive, this may take some time.
 
 ### Fetching e-mail
 
-Paperless automatically fetches your e-mail every 10 minutes by default.
+Paperless-ngx automatically fetches your e-mail every 10 minutes by default.
 If you want to invoke the email consumer manually, call the following
 management command:
 
@@ -549,11 +549,11 @@ rules.
 
 ### Creating archived documents {#archiver}
 
-Paperless stores archived PDF/A documents alongside your original
+Paperless-ngx stores archived PDF/A documents alongside your original
 documents. These archived documents will also contain selectable text
 for image-only originals. These documents are derived from the
 originals, which are always stored unmodified. If coming from an earlier
-version of paperless, your documents won't have archived versions.
+version of Paperless-ngx, your documents won't have archived versions.
 
 This command creates PDF/A documents for your documents.
 
@@ -592,7 +592,7 @@ document.
     encrypted as well. Finally, the web server provides transparent access to
     your encrypted documents.
 
-    Consider running paperless on an encrypted filesystem instead, which
+    Consider running Paperless-ngx on an encrypted filesystem instead, which
     will then at least provide security against physical hardware theft.
 
 #### Enabling encryption
@@ -612,7 +612,7 @@ decrypt_documents [--passphrase SECR3TP4SSPHRA$E]
 
 ### Detecting duplicates {#fuzzy_duplicate}
 
-Paperless already catches and prevents upload of exactly matching documents,
+Paperless-ngx already catches and prevents upload of exactly matching documents,
 however a new scan of an existing document may not produce an exact bit for bit
 duplicate. But the content should be exact or close, allowing detection.
 
