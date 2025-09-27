@@ -18,10 +18,7 @@ export class EmailDocumentDialogComponent extends LoadingComponentWithPermission
   private toastService = inject(ToastService)
 
   @Input()
-  title = $localize`Email Document`
-
-  @Input()
-  documentId: number
+  documentIds: number[]
 
   private _hasArchiveVersion: boolean = true
 
@@ -46,11 +43,11 @@ export class EmailDocumentDialogComponent extends LoadingComponentWithPermission
     this.loading = false
   }
 
-  public emailDocument() {
+  public emailDocuments() {
     this.loading = true
     this.documentService
-      .emailDocument(
-        this.documentId,
+      .emailDocuments(
+        this.documentIds,
         this.emailAddress,
         this.emailSubject,
         this.emailMessage,
@@ -67,7 +64,11 @@ export class EmailDocumentDialogComponent extends LoadingComponentWithPermission
         },
         error: (e) => {
           this.loading = false
-          this.toastService.showError($localize`Error emailing document`, e)
+          const errorMessage =
+            this.documentIds.length > 1
+              ? $localize`Error emailing documents`
+              : $localize`Error emailing document`
+          this.toastService.showError(errorMessage, e)
         },
       })
   }
