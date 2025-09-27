@@ -1,6 +1,6 @@
 ## Installation
 
-You can go multiple routes to setup and run Paperless:
+You can go multiple routes to setup and run Paperless-ngx:
 
 -   [Use the script to setup a Docker install](#docker_script)
 -   [Use the Docker compose templates](#docker)
@@ -20,7 +20,7 @@ above mentioned components yourself.
 
 ### Use the Installation Script {#docker_script}
 
-Paperless provides an interactive installation script to setup a Docker Compose
+Paperless-ngx provides an interactive installation script to setup a Docker Compose
 installation. The script asks for a couple configuration options, and will then create the
 necessary configuration files, pull the docker image, start Paperless-ngx and create your superuser
 account. The script essentially automatically performs the steps described in [Docker setup](#docker).
@@ -84,7 +84,7 @@ account. The script essentially automatically performs the steps described in [D
 
         It is currently not possible to run the container rootless if additional languages are specified via `PAPERLESS_OCR_LANGUAGES`.
 
-    If you want to run Paperless as a rootless container, you will need
+    If you want to run Paperless-ngx as a rootless container, you will need
     to do the following in your `docker-compose.yml`:
 
     -   set the `user` running the container to map to the `paperless`
@@ -93,7 +93,7 @@ account. The script essentially automatically performs the steps described in [D
         the next step. See `USERMAP_UID` and `USERMAP_GID`
         [here](configuration.md#docker).
 
-    Your entry for Paperless should contain something like:
+    Your entry for Paperless-ngx should contain something like:
 
     > ```
     > webserver:
@@ -122,7 +122,7 @@ account. The script essentially automatically performs the steps described in [D
 
         Some file systems such as NFS network shares don't support file
         system notifications with `inotify`. When storing the consumption
-        directory on such a file system, paperless will not pick up new
+        directory on such a file system, Paperless-ngx will not pick up new
         files with the default configuration. You will need to use
         [`PAPERLESS_CONSUMER_POLLING`](configuration.md#PAPERLESS_CONSUMER_POLLING), which will disable inotify. See
         [here](configuration.md#polling).
@@ -139,7 +139,7 @@ account. The script essentially automatically performs the steps described in [D
 
 ### Build the Docker image yourself {#docker_build}
 
-1.  Clone the entire repository of paperless:
+1.  Clone the entire repository of Paperless-ngx:
 
     ```shell-session
     git clone https://github.com/paperless-ngx/paperless-ngx
@@ -153,7 +153,7 @@ account. The script essentially automatically performs the steps described in [D
     root as well.
 
 3.  In the `docker-compose.yml` file, find the line that instructs
-    Docker Compose to pull the paperless image from Docker Hub:
+    Docker Compose to pull the Paperless-ngx image from Docker Hub:
 
     ```yaml
     webserver:
@@ -180,17 +180,17 @@ account. The script essentially automatically performs the steps described in [D
 
 ### Bare Metal Route {#bare_metal}
 
-Paperless runs on linux only. The following procedure has been tested on
+Paperless-ngx runs on linux only. The following procedure has been tested on
 a minimal installation of Debian/Buster, which is the current stable
 release at the time of writing. Windows is not and will never be
 supported.
 
-Paperless requires Python 3. At this time, 3.10 - 3.12 are tested versions.
+Paperless-ngx requires Python 3. At this time, 3.10 - 3.12 are tested versions.
 Newer versions may work, but some dependencies may not fully support newer versions.
 Support for older Python versions may be dropped as they reach end of life or as newer versions
 are released, dependency support is confirmed, etc.
 
-1.  Install dependencies. Paperless requires the following packages.
+1.  Install dependencies. Paperless-ngx requires the following packages.
 
     -   `python3`
     -   `python3-pip`
@@ -255,7 +255,7 @@ are released, dependency support is confirmed, etc.
 2.  Install `redis` >= 6.0 and configure it to start automatically.
 
 3.  Optional. Install `postgresql` and configure a database, user and
-    password for paperless. If you do not wish to use PostgreSQL,
+    password for Paperless-ngx. If you do not wish to use PostgreSQL,
     MariaDB and SQLite are available as well.
 
     !!! note
@@ -265,7 +265,7 @@ are released, dependency support is confirmed, etc.
         enabled. This is usually the case, but not always.
 
 4.  Create a system user with a new home folder under which you wish
-    to run paperless.
+    to run Paperless-ngx.
 
     ```shell-session
     adduser paperless --system --home /opt/paperless --group
@@ -291,10 +291,10 @@ are released, dependency support is confirmed, etc.
     compile the frontend yourself, see [here](development.md#front-end-development)
     and use the `build` step, not `serve`.
 
-6.  Configure paperless. See [configuration](configuration.md) for details.
+6.  Configure Paperless-ngx. See [configuration](configuration.md) for details.
     Edit the included `paperless.conf` and adjust the settings to your
     needs. Required settings for getting
-    paperless running are:
+    Paperless-ngx running are:
 
     -   [`PAPERLESS_REDIS`](configuration.md#PAPERLESS_REDIS) should point to your redis server, such as
         <redis://localhost:6379>.
@@ -317,7 +317,7 @@ are released, dependency support is confirmed, etc.
         [configuration](configuration.md) for more
         information.
 
-    Many more adjustments can be made to paperless, especially the OCR
+    Many more adjustments can be made to Paperless-ngx, especially the OCR
     part. The following options are recommended for everyone:
 
     -   Set [`PAPERLESS_OCR_LANGUAGE`](configuration.md#PAPERLESS_OCR_LANGUAGE) to the language most of your
@@ -335,7 +335,7 @@ are released, dependency support is confirmed, etc.
     -   `/opt/paperless/consume`
 
     Adjust as necessary if you configured different folders.
-    Ensure that the paperless user has write permissions for every one
+    Ensure that the Paperless-ngx user has write permissions for every one
     of these folders with
 
     ```shell-session
@@ -357,7 +357,7 @@ are released, dependency support is confirmed, etc.
     ```
 
     This will install all python dependencies in the home directory of
-    the new paperless user.
+    the new Paperless-ngx user.
 
     !!! tip
 
@@ -380,7 +380,7 @@ are released, dependency support is confirmed, etc.
 
     When you first access the web interface you will be prompted to create a superuser account.
 
-10. Optional: Test that paperless is working by executing
+10. Optional: Test that Paperless-ngx is working by executing
 
     ```bash
     # Manually starts the webserver
@@ -388,7 +388,7 @@ are released, dependency support is confirmed, etc.
     ```
 
     and pointing your browser to http://localhost:8000 if
-    accessing from the same devices on which paperless is installed.
+    accessing from the same devices on which Paperless-ngx is installed.
     If accessing from another machine, set up systemd services. You may need
     to set `PAPERLESS_DEBUG=true` in order for the development server to work
     normally in your browser.
@@ -401,14 +401,14 @@ are released, dependency support is confirmed, etc.
 
     !!! tip
 
-        This will not start the consumer. Paperless does this in a separate
+        This will not start the consumer. Paperless-ngx does this in a separate
         process.
 
-11. Setup systemd services to run paperless automatically. You may use
+11. Setup systemd services to run Paperless-ngx automatically. You may use
     the service definition files included in the `scripts` folder as a
     starting point.
 
-    Paperless needs the `webserver` script to run the webserver, the
+    Paperless-ngx needs the `webserver` script to run the webserver, the
     `consumer` script to watch the input folder, `taskqueue` for the
     background workers used to handle things like document consumption
     and the `scheduler` script to run tasks such as email checking at
@@ -444,7 +444,7 @@ are released, dependency support is confirmed, etc.
 
 13. Configure ImageMagick to allow processing of PDF documents. Most
     distributions have this disabled by default, since PDF documents can
-    contain malware. If you don't do this, paperless will fall back to
+    contain malware. If you don't do this, Paperless-ngx will fall back to
     Ghostscript for certain steps such as thumbnail generation.
 
     Edit `/etc/ImageMagick-6/policy.xml` and adjust
@@ -508,11 +508,11 @@ and then pull the latest version.
 
 ## Migrating from Paperless
 
-At its core, paperless-ngx is still paperless and fully compatible.
+At its core, Paperless-ngx is still Paperless and fully compatible.
 However, some things have changed under the hood, so you need to adapt
-your setup depending on how you installed paperless.
+your setup depending on how you installed Paperless.
 
-This setup describes how to update an existing paperless Docker
+This setup describes how to update an existing Paperless Docker
 installation. The important things to keep in mind are as follows:
 
 -   Read the [changelog](changelog.md) and
@@ -521,19 +521,19 @@ installation. The important things to keep in mind are as follows:
     migrate your database to PostgreSQL. See [documentation](#sqlite_to_psql)
     for details on
     how to move your data from SQLite to PostgreSQL. Both work fine with
-    paperless. However, if you already have a database server running
-    for other services, you might as well use it for paperless as well.
--   The task scheduler of paperless, which is used to execute periodic
+    Paperless. However, if you already have a database server running
+    for other services, you might as well use it for Paperless as well.
+-   The task scheduler of Paperless, which is used to execute periodic
     tasks such as email checking and maintenance, requires a
     [redis](https://redis.io/) message broker instance. The
     Docker Compose route takes care of that.
 -   The layout of the folder structure for your documents and data
     remains the same, so you can just plug your old docker volumes into
-    paperless-ngx and expect it to find everything where it should be.
+    Paperless-ngx and expect it to find everything where it should be.
 
-Migration to paperless-ngx is then performed in a few simple steps:
+Migration to Paperless-ngx is then performed in a few simple steps:
 
-1.  Stop paperless.
+1.  Stop Paperless.
 
     ```bash
     cd /path/to/current/paperless
@@ -541,23 +541,23 @@ Migration to paperless-ngx is then performed in a few simple steps:
     ```
 
 2.  Do a backup for two purposes: If something goes wrong, you still
-    have your data. Second, if you don't like paperless-ngx, you can
-    switch back to paperless.
+    have your data. Second, if you don't like Paperless-ngx, you can
+    switch back to Paperless.
 
-3.  Download the latest release of paperless-ngx. You can either go with
+3.  Download the latest release of Paperless-ngx. You can either go with
     the Docker Compose files from
     [here](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose)
     or clone the repository to build the image yourself (see
     [above](#docker_build)). You can
-    either replace your current paperless folder or put paperless-ngx in
+    either replace your current Paperless folder or put Paperless-ngx in
     a different location.
 
     !!! warning
 
         Paperless-ngx includes a `.env` file. This will set the project name
         for docker compose to `paperless`, which will also define the name
-        of the volumes by paperless-ngx. However, if you experience that
-        paperless-ngx is not using your old paperless volumes, verify the
+        of the volumes by Paperless-ngx. However, if you experience that
+        Paperless-ngx is not using your old Paperless volumes, verify the
         names of your volumes with
 
         ``` shell-session
@@ -586,18 +586,18 @@ Migration to paperless-ngx is then performed in a few simple steps:
     ```
 
     This will migrate your database and create the search index. After
-    that, paperless will take care of maintaining the index by itself.
+    that, Paperless-ngx will take care of maintaining the index by itself.
 
-8.  Start paperless-ngx.
+8.  Start Paperless-ngx.
 
     ```bash
     docker compose up -d
     ```
 
-    This will run paperless in the background and automatically start it
+    This will run Paperless-ngx in the background and automatically start it
     on system boot.
 
-9.  Paperless installed a permanent redirect to `admin/` in your
+9.  Paperless-ngx installed a permanent redirect to `admin/` in your
     browser. This redirect is still in place and prevents access to the
     new UI. Clear your browsing cache in order to fix this.
 
@@ -611,7 +611,7 @@ create a backup before starting. This assumes the image was running
 using Docker Compose, but the instructions are translatable to Docker
 commands as well.
 
-1.  Stop and remove the paperless container
+1.  Stop and remove the Paperless-ngx container
 2.  If using an external database, stop the container
 3.  Update Redis configuration
 
@@ -688,8 +688,8 @@ differently) and probably your cache as well.
 
 # Considerations for less powerful devices {#less-powerful-devices}
 
-Paperless runs on Raspberry Pi. However, some things are rather slow on
-the Pi and configuring some options in paperless can help improve
+Paperless-ngx runs on Raspberry Pi. However, some things are rather slow on
+the Pi and configuring some options in Paperless-ngx can help improve
 performance immensely:
 
 -   Stick with SQLite to save some resources. See [troubleshooting](troubleshooting.md#log-reports-creating-paperlesstask-failed)
@@ -701,13 +701,13 @@ performance immensely:
     contains enough information to be able to find it.
 -   [`PAPERLESS_TASK_WORKERS`](configuration.md#PAPERLESS_TASK_WORKERS) and [`PAPERLESS_THREADS_PER_WORKER`](configuration.md#PAPERLESS_THREADS_PER_WORKER) are
     configured to use all cores. The Raspberry Pi models 3 and up have 4
-    cores, meaning that paperless will use 2 workers and 2 threads per
+    cores, meaning that Paperless-ngx will use 2 workers and 2 threads per
     worker. This may result in sluggish response times during
     consumption, so you might want to lower these settings (example: 2
     workers and 1 thread to always have some computing power left for
     other tasks).
 -   Keep [`PAPERLESS_OCR_MODE`](configuration.md#PAPERLESS_OCR_MODE) at its default value `skip` and consider
-    OCR'ing your documents before feeding them into paperless. Some
+    OCR'ing your documents before feeding them into Paperless-ngx. Some
     scanners are able to do this!
 -   Set [`PAPERLESS_OCR_SKIP_ARCHIVE_FILE`](configuration.md#PAPERLESS_OCR_SKIP_ARCHIVE_FILE) to `with_text` to skip archive
     file generation for already ocr'ed documents, or `always` to skip it
